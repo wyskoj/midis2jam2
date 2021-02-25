@@ -1,0 +1,24 @@
+0, 0, Header, 1, 2, 192
+1, 0, Start_track
+1, 0, Time_signature, 4, 2, 24, 8
+1, 0, Tempo, 500000
+1, 0, Title_t, "Tempo Track"
+1, 7680, End_track
+2, 0, Start_track
+2, 0, Title_t, "New Instrument"
+2, 0, Note_on_c, 0, 74, 100
+2, 95, Note_off_c, 0, 74, 0
+2, 96, Note_on_c, 0, 76, 100
+2, 191, Note_off_c, 0, 76, 0
+2, 192, Note_on_c, 0, 77, 100
+2, 287, Note_off_c, 0, 77, 0
+2, 288, Note_on_c, 0, 79, 100
+2, 383, Note_off_c, 0, 79, 0
+2, 384, Note_on_c, 0, 76, 100
+2, 575, Note_off_c, 0, 76, 0
+2, 576, Note_on_c, 0, 72, 100
+2, 671, Note_off_c, 0, 72, 0
+2, 672, Note_on_c, 0, 74, 100
+2, 1535, Note_off_c, 0, 74, 0
+2, 7680, End_track
+0, 0, End_of_file
