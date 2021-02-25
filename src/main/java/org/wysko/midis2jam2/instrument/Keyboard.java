@@ -9,7 +9,7 @@ import com.jme3.texture.Texture;
 public class Keyboard {
 	
 	static final int KEYBOARD_KEY_COUNT = 88;
-	static final int A_0 = 21;
+	public static final int A_0 = 21;
 	
 	public Node pianoNode = new Node();
 	public KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];

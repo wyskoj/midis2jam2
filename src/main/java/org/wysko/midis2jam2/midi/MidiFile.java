@@ -5,6 +5,6 @@ public class MidiFile {
 	public short division;
 	
 	public double eventInSeconds(MidiEvent event) {
-		return (event.time) * (500000.0 / division) / 1000000f;
+		return (event.time) * ((60000000f/190) / division) / 1000000f;
 	}
 }

@@ -7,4 +7,14 @@ public class MidiNoteOnEvent extends MidiNoteEvent {
 		super(time,channel,note);
 		this.velocity = velocity;
 	}
+	
+	@Override
+	public String toString() {
+		return "MidiNoteOnEvent{" +
+				"time=" + time +
+				", channel=" + channel +
+				", note=" + note +
+				", velocity=" + velocity +
+				'}';
+	}
 }
