@@ -5,5 +5,5 @@ newmtl Material01
 Ka 0.199219 0.199219 0.199219
 Kd 0.796875 0.796875 0.796875
 Ks 0.000000 0.000000 0.000000
-map_Kd RubberFoot.tga
+map_Kd RubberFoot.png
 

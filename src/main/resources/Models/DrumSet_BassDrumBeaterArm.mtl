@@ -1,0 +1,21 @@
+# created by Biturn
+# materials for file object_68.obj
+
+newmtl ShinySilver
+Ka 0.761719 0.761719 0.761719
+Kd 0.937500 0.937500 0.937500
+Ks 0.000000 0.000000 0.000000
+map_Kd ShinySilver.png
+
+newmtl Black
+Ka 0.199219 0.199219 0.199219
+Kd 0.273438 0.273438 0.273438
+Ks 0.000000 0.000000 0.000000
+map_Kd MetalTexture.png
+
+newmtl White
+Ka 0.835938 0.835938 0.835938
+Kd 0.996094 0.996094 0.996094
+Ks 0.000000 0.000000 0.000000
+map_Kd MetalTexture.png
+
