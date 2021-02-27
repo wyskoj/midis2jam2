@@ -41,7 +41,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = new File("licc.mid");
+		File rawFile = new File("speedylicc.mid");
 		
 		if (args.length > 0) {
 			rawFile = new File(args[0]);
@@ -73,11 +73,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			public void run() {
 				System.out.println("playing");
 				midijam.sequencer.setTempoInBPM((float) midijam.file.firstTempoInBpm());
-				midijam.sequencer.start();
+//				midijam.sequencer.start();
 				midijam.seqHasRunOnce = true;
 				midijam.timeSinceStart = 0;
 			}
-		}, 3000);
+		}, 0);
 		System.out.println("end!");
 	}
 	
@@ -258,9 +258,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Override
 	public void simpleInitApp() {
 		flyCam.setMoveSpeed(100f);
-		flyCam.setEnabled(true);
+		flyCam.setEnabled(false);
 		setupKeys();
 		setCamera(Camera.CAMERA_1A);
+//
+//		cam.setLocation(new Vector3f(0,0,3500));
+//		cam.setRotation(new Quaternion().fromAngles(0,rad(180),0));
+//		cam.setLocation(new Vector3f(0,3800,0));
+//		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
+//		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
 		Spatial stage = loadModel("Stage.obj", "stageuv.png");
 		rootNode.attachChild(stage);
