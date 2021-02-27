@@ -1,0 +1,28 @@
+= midis2jam2
+
+*midis2jam2* is a remaster, sequel, v2.0, etc., to MIDIJam, a MIDI file visualizer made by Scott Haag, last updated in 2006.
+
+midis2jam2 aims to faithfully recreate MIDIJam while fixing bugs and completing the GM-1 implementation.
+
+Future versions may add extended features, such as custom graphics, real-time MIDI visualization, and others.
+
+== Running
+Download and build from source.
+----
+git clone https://github.com/wyskoj/midis2jam2
+gradlew shadowjar
+----
+Copy the `.jar` from `build/libs` and `Midicsv.exe` to a new folder. Then run the program.
+
+----
+java -jar midis2jam2.jar your_midi_file.mid
+----
+
+== Contributing
+
+Fork and make a pull request to directly make changes. Open an issue to request features and report bugs.
+
+== License
+
+midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
+Assets Copyright &copy; 2006 Scott Haag.
