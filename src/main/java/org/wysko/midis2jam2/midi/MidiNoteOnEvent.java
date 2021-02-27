@@ -4,7 +4,7 @@ public class MidiNoteOnEvent extends MidiNoteEvent {
 	final int velocity;
 	
 	public MidiNoteOnEvent(long time, int channel, int note, int velocity) {
-		super(time,channel,note);
+		super(time, channel, note);
 		this.velocity = velocity;
 	}
 	

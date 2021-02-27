@@ -26,8 +26,8 @@ public class Percussion implements Instrument {
 		// Snare drum
 		snareDrumNode.move(-10.9f, 18, 6.1f);
 		snareDrumNode.rotate(rad(10), 0, rad(-10));
-		snareDrumStick.rotate(rad(50),rad(90),0);
-		snareDrumStick.move(10,2,0);
+		snareDrumStick.rotate(rad(50), rad(90), 0);
+		snareDrumStick.move(10, 2, 0);
 		
 		// Attach nodes to group node
 		percussionNode.attachChild(snareDrumNode);

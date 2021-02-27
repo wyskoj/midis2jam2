@@ -1,10 +1,8 @@
 package org.wysko.midis2jam2.instrument;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiEvent;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -158,9 +156,8 @@ public class Keyboard implements Instrument {
 		
 		public KeyboardKey(Midis2jam2 context, int midiNote, int startPos) {
 			this.midiNote = midiNote;
-	
 			
-
+			
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
 				// Front key
 				Spatial keyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile);

@@ -10,13 +10,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
-import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.scene.Spatial;
-import com.jme3.shadow.DirectionalLightShadowFilter;
-import com.jme3.shadow.DirectionalLightShadowRenderer;
-import com.jme3.shadow.EdgeFilteringMode;
-import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
@@ -278,7 +272,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		DirectionalLight sun = new DirectionalLight();
 		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(rad(180),0,0));
+		sun.setDirection(new Vector3f(rad(180), 0, 0));
 		rootNode.addLight(sun);
 		
 		/* Drop shadows */
@@ -299,11 +293,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		for (Instrument instrument : instruments)
 			if (instrument != null)
 				instrument.tick(-1, 0);
-			
+		
 	}
 	
-	
-
 	
 	/**
 	 * Loads a model given a model and texture paths.

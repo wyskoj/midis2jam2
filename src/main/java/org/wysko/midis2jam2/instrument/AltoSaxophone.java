@@ -1,8 +1,6 @@
 package org.wysko.midis2jam2.instrument;
 
-import com.jme3.material.Material;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -31,7 +29,6 @@ public class AltoSaxophone extends Horn implements Instrument {
 //		altoSaxRoot.move(0,30,-50);
 //		horn.move(0,-22,0);
 	}
-	
 	
 	
 	@Override

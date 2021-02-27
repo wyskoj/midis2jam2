@@ -3,15 +3,13 @@ package org.wysko.midis2jam2.midi;
 import java.util.Comparator;
 
 public class MidiChannelSpecificEvent extends MidiEvent {
+	public static final Comparator<MidiChannelSpecificEvent> COMPARE_BY_TIME = new CompareByTime();
 	public final int channel;
 	
 	public MidiChannelSpecificEvent(long time, int channel) {
 		super(time);
 		this.channel = channel;
 	}
-	
-	public static final Comparator<MidiChannelSpecificEvent> COMPARE_BY_TIME = new CompareByTime();
-	
 	
 	private static class CompareByTime implements Comparator<MidiChannelSpecificEvent> {
 		@Override

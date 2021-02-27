@@ -2,7 +2,7 @@ package org.wysko.midis2jam2.midi;
 
 import java.util.Comparator;
 
-public abstract class MidiEvent{
+public abstract class MidiEvent {
 	public long time;
 	
 	public MidiEvent(long time) {
@@ -13,7 +13,7 @@ public abstract class MidiEvent{
 		
 		@Override
 		public int compare(MidiEvent e1, MidiEvent e2) {
-			return (int) (e1.time-e2.time);
+			return (int) (e1.time - e2.time);
 		}
 	}
 }
