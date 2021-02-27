@@ -41,7 +41,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = new File("speedylicc.mid");
+		File rawFile = new File("testmidi/bawsolo.mid");
 		
 		if (args.length > 0) {
 			rawFile = new File(args[0]);
@@ -73,11 +73,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			public void run() {
 				System.out.println("playing");
 				midijam.sequencer.setTempoInBPM((float) midijam.file.firstTempoInBpm());
-//				midijam.sequencer.start();
+				midijam.sequencer.start();
 				midijam.seqHasRunOnce = true;
 				midijam.timeSinceStart = 0;
 			}
-		}, 0);
+		}, 500);
 		System.out.println("end!");
 	}
 	

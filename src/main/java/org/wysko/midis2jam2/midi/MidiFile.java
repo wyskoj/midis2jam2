@@ -27,7 +27,7 @@ public class MidiFile {
 	 */
 	public static MidiFile readMidiFile(File midiFile) throws IOException, InterruptedException {
 		// Run midicsv
-		String[] midiCsvArgs = new String[] {"midicsv.exe", midiFile.getName(), "midi.csv"};
+		String[] midiCsvArgs = new String[] {"midicsv.exe", midiFile.getAbsolutePath(), "midi.csv"};
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
 		proc.waitFor();
 		// Parse CSV file
