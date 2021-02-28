@@ -8,113 +8,33 @@ import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class AltoSaxophone extends Horn implements Instrument {
-	public class AltoSaxophoneClone implements Instrument {
-		
-		Node polyphonicAlto = new Node();
-		Node animAlto = new Node();
-		Node modelAlto = new Node();
-		private final List<NotePeriod> notePeriods;
-		private boolean currentlyPlaying = false;
-		
-		
-		public boolean isPlayingAtTime(long midiTick) {
-			for (NotePeriod notePeriod : notePeriods) {
-				if (midiTick >= notePeriod.startTick() && midiTick < notePeriod.endTick()) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		private final Spatial bell;
-		private final Spatial body;
-		
-		NotePeriod currentNotePeriod;
-		
-		public AltoSaxophoneClone(List<NotePeriod> notePeriods) {
-			this.notePeriods = notePeriods;
-			this.body = AltoSaxophone.this.context.loadModel("AltoSaxBody.obj", "HornSkin.png");
-			this.bell = AltoSaxophone.this.context.loadModel("AltoSaxHorn.obj", "HornSkin.png");
-			
-			modelAlto.attachChild(body);
-			modelAlto.attachChild(bell);
-			bell.move(0, -22, 0); // Move bell down to body
-			
-			animAlto.attachChild(modelAlto);
-			polyphonicAlto.attachChild(animAlto);
-		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			// Prevent overlapping
-			int clonesBeforeMe = 0;
-			int indexThis = AltoSaxophone.this.clones.indexOf(this);
-			
-			if (currentlyPlaying || indexThis == 0) {
-				// Show
-				body.setCullHint(Spatial.CullHint.Dynamic);
-				bell.setCullHint(Spatial.CullHint.Dynamic);
-			} else {
-				// Hide
-				bell.setCullHint(Spatial.CullHint.Always);
-				body.setCullHint(Spatial.CullHint.Always);
-			}
-			
-			
-			
-			
-			while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
-				currentNotePeriod = notePeriods.remove(0);
-			}
-			
-			if (currentNotePeriod != null) {
-				if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
-					bell.setLocalScale(1, (float) ((0.5f * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1), 1);
-					animAlto.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * 0.1f, 0, 0));
-					currentlyPlaying = true;
-				} else {
-					currentlyPlaying = false;
-					bell.setLocalScale(1, 1, 1);
-				}
-			}
-			
-			polyphonicAlto.setLocalTranslation(20 * indexThis, 0, 0);
-			
-		}
-	}
-	private final List<MidiNoteEvent> noteEvents = new ArrayList<>();
-	private final Midis2jam2 context;
+/**
+ * The alto saxophone.
+ */
+public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxophoneClone> implements Instrument {
+	
 	Node highLevelAlto = new Node();
 	Node groupOfPolyphony = new Node();
-	MidiFile file;
-	private List<NotePeriod> notePeriods;
-	private List<AltoSaxophoneClone> clones;
 	
-	/*
-		NODE STRUCTURE
-		
-		highLevelAlto -  For multiple channels ("instruments") of altos (Moves up if there are +1 altos)
-		separateAlto - For setting the idle position and rotation
-		polyphonicAlto - For polyphony (Rotates around a pivot to display multiple altos)
-		animAlto - For visual rotation when playing (Tilts the alto while playing)
-		modelAlto - For connecting the pieces of the alto together
-		
+	/**
+	 * Constructs an alto saxophone.
+	 *
+	 * @param context context to midis2jam2
+	 * @param events  all events that pertain to this instance of an alto saxophone
+	 * @param file    context to the MIDI file
 	 */
-	
 	public AltoSaxophone(Midis2jam2 context, List<MidiChannelSpecificEvent> events, MidiFile file) {
-		this.context = context;
-		this.file = file;
-		for (MidiChannelSpecificEvent event : events) {
-			if (event instanceof MidiNoteOnEvent || event instanceof MidiNoteOffEvent) {
-				noteEvents.add((MidiNoteEvent) event);
-			}
-		}
+		super(context, file);
 		
-		calculateNotePeriods();
+		List<MidiNoteEvent> noteEvents = events.stream()
+				.filter(event -> event instanceof MidiNoteOnEvent || event instanceof MidiNoteOffEvent)
+				.map(event -> (MidiNoteEvent) event).collect(Collectors.toList());
+		
+		calculateNotePeriods(noteEvents);
 		calculateClones();
 		
 		for (AltoSaxophoneClone clone : clones) {
@@ -136,10 +56,11 @@ public class AltoSaxophone extends Horn implements Instrument {
 	 * for monophonic instruments that need a polyphonic visualization.
 	 * <br>
 	 * TODO Make this less spaghetti
+	 * TODO Can this pulled up somehow?
 	 */
 	private void calculateClones() {
 		clones = new ArrayList<>();
-		clones.add(new AltoSaxophoneClone(new ArrayList<>()));
+		clones.add(new AltoSaxophoneClone());
 		for (int i = 0; i < notePeriods.size(); i++) {
 			for (int j = 0; j < notePeriods.size(); j++) {
 				if (j == i) continue;
@@ -160,7 +81,7 @@ public class AltoSaxophone extends Horn implements Instrument {
 						}
 					}
 					if (!added) {
-						AltoSaxophoneClone e = new AltoSaxophoneClone(new ArrayList<>());
+						AltoSaxophoneClone e = new AltoSaxophoneClone();
 						e.notePeriods.add(comp1);
 						clones.add(e);
 					}
@@ -168,26 +89,6 @@ public class AltoSaxophone extends Horn implements Instrument {
 					clones.get(0).notePeriods.add(comp1);
 				}
 				break;
-			}
-		}
-	}
-	
-	
-	private void calculateNotePeriods() {
-		notePeriods = new ArrayList<>();
-		for (int i = 0, noteEventsSize = noteEvents.size(); i < noteEventsSize; i++) {
-			MidiNoteEvent noteEvent = noteEvents.get(i);
-			if (noteEvent instanceof MidiNoteOnEvent) {
-				for (int j = i + 1; j < noteEventsSize; j++) {
-					MidiNoteEvent check = noteEvents.get(j);
-					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
-						// We found a block
-						notePeriods.add(new NotePeriod(check.note, file.eventInSeconds(noteEvent),
-								file.eventInSeconds(check), noteEvent.time, check.time, ((MidiNoteOnEvent) noteEvent)
-								, ((MidiNoteOffEvent) check)));
-						break;
-					}
-				}
 			}
 		}
 	}
@@ -208,35 +109,67 @@ public class AltoSaxophone extends Horn implements Instrument {
 		highLevelAlto.setLocalTranslation(0, altosBeforeMe * 40, 0);
 		
 		for (AltoSaxophoneClone clone : clones) {
-			clone.tick(time,delta);
+			clone.tick(time, delta);
 		}
 	}
 	
-	private static class NotePeriod {
-		final int midiNote;
-		final double startTime;
-		final double endTime;
-		final MidiNoteOnEvent noteOn;
-		final MidiNoteOffEvent noteOff;
+	/**
+	 * Implements {@link MonophonicClone}, as alto saxophone clones.
+	 */
+	public class AltoSaxophoneClone extends MonophonicClone {
 		
-		public long startTick() {
-			return noteOn.time;
-		}
-		public long endTick() {
-			return noteOff.time;
-		}
+		private final Spatial bell;
+		private final Spatial body;
+		Node polyphonicAlto = new Node();
 		
-		public NotePeriod(int midiNote, double startTime, double endTime, long startTick, long endTick,
-		                  MidiNoteOnEvent noteOn, MidiNoteOffEvent noteOff) {
-			this.midiNote = midiNote;
-			this.startTime = startTime;
-			this.endTime = endTime;
-			this.noteOn = noteOn;
-			this.noteOff = noteOff;
+		public AltoSaxophoneClone() {
+			this.body = AltoSaxophone.this.context.loadModel("AltoSaxBody.obj", "HornSkin.png");
+			this.bell = AltoSaxophone.this.context.loadModel("AltoSaxHorn.obj", "HornSkin.png");
+			
+			modelNode.attachChild(body);
+			modelNode.attachChild(bell);
+			bell.move(0, -22, 0); // Move bell down to body
+			
+			animNode.attachChild(modelNode);
+			polyphonicAlto.attachChild(animNode);
 		}
 		
-		double duration() {
-			return endTime - startTime;
+		@Override
+		public void tick(double time, float delta) {
+			int indexThis = AltoSaxophone.this.clones.indexOf(this);
+			
+			/* Hide or show depending on degree of polyphony and current playing status */
+			if (currentlyPlaying || indexThis == 0) {
+				// Show
+				body.setCullHint(Spatial.CullHint.Dynamic);
+				bell.setCullHint(Spatial.CullHint.Dynamic);
+			} else {
+				// Hide
+				bell.setCullHint(Spatial.CullHint.Always);
+				body.setCullHint(Spatial.CullHint.Always);
+			}
+			
+			/* Collect note periods to execute */
+			while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
+				currentNotePeriod = notePeriods.remove(0);
+			}
+			
+			/* Perform animation */
+			if (currentNotePeriod != null) {
+				if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
+					bell.setLocalScale(1, (float) ((0.5f * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1), 1);
+					animNode.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * 0.1f, 0, 0));
+					currentlyPlaying = true;
+				} else {
+					currentlyPlaying = false;
+					bell.setLocalScale(1, 1, 1);
+				}
+			}
+			
+			/* Move depending on degree of polyphony */
+			polyphonicAlto.setLocalTranslation(20 * indexThis, 0, 0);
+			
 		}
 	}
+	
 }

@@ -59,8 +59,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		// Create a sequencer for the sequence
 		Sequence sequence = MidiSystem.getSequence(rawFile);
 		
-		midijam.sequencer = MidiSystem.getSequencer(false);
-		
 		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
 		MidiDevice device = null;
 		for (MidiDevice.Info eachInfo : info) {
@@ -69,15 +67,18 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				break;
 			}
 		}
+		
+		midijam.sequencer = MidiSystem.getSequencer(false);
+		
 		if (device == null) {
-			System.err.println("You don't have Microsoft GS Wavetable Synth. So you don't get to use this program " +
-					"right now.");
-			System.exit(1);
+			midijam.sequencer = MidiSystem.getSequencer(true);
+		} else {
+			device.open();
+			midijam.sequencer = MidiSystem.getSequencer(false);
+			midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
 		}
-		System.out.println(info);
-		device.open();
+		
 		midijam.sequencer.open();
-		midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
 		
 		midijam.sequencer.setSequence(sequence);
 		
