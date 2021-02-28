@@ -135,6 +135,7 @@ public class MidiFile {
 	}
 	
 	public double eventInSeconds(MidiEvent event) {
-		return eventAbsoluteTime.getOrDefault(event, -1.0);
+		// If we get null, shit has really hit the fan
+		return eventAbsoluteTime.get(event);
 	}
 }

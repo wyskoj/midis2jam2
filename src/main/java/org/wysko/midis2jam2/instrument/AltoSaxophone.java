@@ -17,12 +17,13 @@ public class AltoSaxophone extends Horn implements Instrument {
 		Node polyphonicAlto = new Node();
 		Node animAlto = new Node();
 		Node modelAlto = new Node();
-		private final List<Extension> extensions;
+		private final List<NotePeriod> notePeriods;
+		private boolean currentlyPlaying = false;
 		
 		
 		public boolean isPlayingAtTime(long midiTick) {
-			for (Extension extension : extensions) {
-				if (midiTick >= extension.startTick && midiTick < extension.endTick) {
+			for (NotePeriod notePeriod : notePeriods) {
+				if (midiTick >= notePeriod.startTick() && midiTick < notePeriod.endTick()) {
 					return true;
 				}
 			}
@@ -32,10 +33,10 @@ public class AltoSaxophone extends Horn implements Instrument {
 		private final Spatial bell;
 		private final Spatial body;
 		
-		Extension currentExtension;
+		NotePeriod currentNotePeriod;
 		
-		public AltoSaxophoneClone(List<Extension> extensions) {
-			this.extensions = extensions;
+		public AltoSaxophoneClone(List<NotePeriod> notePeriods) {
+			this.notePeriods = notePeriods;
 			this.body = AltoSaxophone.this.context.loadModel("AltoSaxBody.obj", "HornSkin.png");
 			this.bell = AltoSaxophone.this.context.loadModel("AltoSaxHorn.obj", "HornSkin.png");
 			
@@ -47,35 +48,50 @@ public class AltoSaxophone extends Horn implements Instrument {
 			polyphonicAlto.attachChild(animAlto);
 		}
 		
-		
 		@Override
 		public void tick(double time, float delta) {
 			// Prevent overlapping
 			int clonesBeforeMe = 0;
-			int mySpot = AltoSaxophone.this.clones.indexOf(this);
+			int indexThis = AltoSaxophone.this.clones.indexOf(this);
 			
-			polyphonicAlto.setLocalTranslation(20*mySpot,0,0);
-			
-			while (!extensions.isEmpty() && extensions.get(0).startTime <= time) {
-				currentExtension = extensions.remove(0);
+			if (currentlyPlaying || indexThis == 0) {
+				// Show
+				body.setCullHint(Spatial.CullHint.Dynamic);
+				bell.setCullHint(Spatial.CullHint.Dynamic);
+			} else {
+				// Hide
+				bell.setCullHint(Spatial.CullHint.Always);
+				body.setCullHint(Spatial.CullHint.Always);
 			}
 			
-			if (currentExtension != null) {
-				if (time >= currentExtension.startTime && time <= currentExtension.endTime) {
-					bell.setLocalScale(1, (float) ((0.5f * (currentExtension.endTime - time) / currentExtension.duration()) + 1), 1);
-					animAlto.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentExtension.endTime - time) / currentExtension.duration())) * 0.1f, 0, 0));
+			
+			
+			
+			while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
+				currentNotePeriod = notePeriods.remove(0);
+			}
+			
+			if (currentNotePeriod != null) {
+				if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
+					bell.setLocalScale(1, (float) ((0.5f * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1), 1);
+					animAlto.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * 0.1f, 0, 0));
+					currentlyPlaying = true;
 				} else {
+					currentlyPlaying = false;
 					bell.setLocalScale(1, 1, 1);
 				}
 			}
+			
+			polyphonicAlto.setLocalTranslation(20 * indexThis, 0, 0);
+			
 		}
 	}
 	private final List<MidiNoteEvent> noteEvents = new ArrayList<>();
 	private final Midis2jam2 context;
 	Node highLevelAlto = new Node();
-	Node groupOfPolyphonies = new Node();
+	Node groupOfPolyphony = new Node();
 	MidiFile file;
-	private List<Extension> extensions;
+	private List<NotePeriod> notePeriods;
 	private List<AltoSaxophoneClone> clones;
 	
 	/*
@@ -98,54 +114,67 @@ public class AltoSaxophone extends Horn implements Instrument {
 			}
 		}
 		
-		calculateExtensions();
+		calculateNotePeriods();
 		calculateClones();
 		
 		for (AltoSaxophoneClone clone : clones) {
-			groupOfPolyphonies.attachChild(clone.polyphonicAlto);
+			groupOfPolyphony.attachChild(clone.polyphonicAlto);
 		}
 		
-		highLevelAlto.attachChild(groupOfPolyphonies);
+		highLevelAlto.attachChild(groupOfPolyphony);
 		
-		groupOfPolyphonies.move(-14, 41.5f, -45);
-		groupOfPolyphonies.rotate(rad(13), rad(75), 0);
+		groupOfPolyphony.move(-14, 41.5f, -45);
+		groupOfPolyphony.rotate(rad(13), rad(75), 0);
 		
 		context.getRootNode().attachChild(highLevelAlto);
 	}
 	
+	/**
+	 * This method is a mess. Your brain may rapidly combust if you try to understand it.
+	 * <br>
+	 * Essentially, it figures out when notes overlap and assigns them to "clones" of the instrument. This is used
+	 * for monophonic instruments that need a polyphonic visualization.
+	 * <br>
+	 * TODO Make this less spaghetti
+	 */
 	private void calculateClones() {
 		clones = new ArrayList<>();
 		clones.add(new AltoSaxophoneClone(new ArrayList<>()));
-		for (int i = 0; i < extensions.size(); i++) {
-			for (int j = 0; j < extensions.size(); j++) {
+		for (int i = 0; i < notePeriods.size(); i++) {
+			for (int j = 0; j < notePeriods.size(); j++) {
 				if (j == i) continue;
-				Extension comp1 = extensions.get(i);
-				Extension comp2 = extensions.get(j);
-				if (comp1.startTick > comp2.endTick || comp1.endTick < comp2.startTick) continue;
-				if (comp1.startTick >= comp2.startTick && comp1.startTick <= comp2.endTick) { // Overlapping note
+				NotePeriod comp1 = notePeriods.get(i);
+				NotePeriod comp2 = notePeriods.get(j);
+				if (comp1.startTick() > comp2.endTick()) continue;
+				if (comp1.endTick() < comp2.startTick()) {
+					clones.get(0).notePeriods.add(comp1);
+					break;
+				}
+				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
 					boolean added = false;
 					for (AltoSaxophoneClone clone : clones) {
-						if (!clone.isPlayingAtTime(comp1.startTick)) {
-							clone.extensions.add(comp1);
+						if (!clone.isPlayingAtTime(comp1.startTick())) {
+							clone.notePeriods.add(comp1);
 							added = true;
 							break;
 						}
 					}
 					if (!added) {
 						AltoSaxophoneClone e = new AltoSaxophoneClone(new ArrayList<>());
-						e.extensions.add(comp1);
+						e.notePeriods.add(comp1);
 						clones.add(e);
 					}
 				} else {
-					clones.get(0).extensions.add(comp1);
+					clones.get(0).notePeriods.add(comp1);
 				}
 				break;
 			}
 		}
 	}
 	
-	private void calculateExtensions() {
-		extensions = new ArrayList<>();
+	
+	private void calculateNotePeriods() {
+		notePeriods = new ArrayList<>();
 		for (int i = 0, noteEventsSize = noteEvents.size(); i < noteEventsSize; i++) {
 			MidiNoteEvent noteEvent = noteEvents.get(i);
 			if (noteEvent instanceof MidiNoteOnEvent) {
@@ -153,8 +182,9 @@ public class AltoSaxophone extends Horn implements Instrument {
 					MidiNoteEvent check = noteEvents.get(j);
 					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
 						// We found a block
-						extensions.add(new Extension(check.note, file.eventInSeconds(noteEvent),
-								file.eventInSeconds(check), noteEvent.time, check.time));
+						notePeriods.add(new NotePeriod(check.note, file.eventInSeconds(noteEvent),
+								file.eventInSeconds(check), noteEvent.time, check.time, ((MidiNoteOnEvent) noteEvent)
+								, ((MidiNoteOffEvent) check)));
 						break;
 					}
 				}
@@ -182,19 +212,27 @@ public class AltoSaxophone extends Horn implements Instrument {
 		}
 	}
 	
-	private static class Extension {
+	private static class NotePeriod {
 		final int midiNote;
 		final double startTime;
 		final double endTime;
-		final long startTick;
-		final long endTick;
+		final MidiNoteOnEvent noteOn;
+		final MidiNoteOffEvent noteOff;
 		
-		public Extension(int midiNote, double startTime, double endTime, long startTick, long endTick) {
+		public long startTick() {
+			return noteOn.time;
+		}
+		public long endTick() {
+			return noteOff.time;
+		}
+		
+		public NotePeriod(int midiNote, double startTime, double endTime, long startTick, long endTick,
+		                  MidiNoteOnEvent noteOn, MidiNoteOffEvent noteOff) {
 			this.midiNote = midiNote;
 			this.startTime = startTime;
 			this.endTime = endTime;
-			this.startTick = startTick;
-			this.endTick = endTick;
+			this.noteOn = noteOn;
+			this.noteOff = noteOff;
 		}
 		
 		double duration() {

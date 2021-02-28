@@ -19,15 +19,11 @@ import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.Keyboard;
 import org.wysko.midis2jam2.instrument.Percussion;
 import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.midi.MidiEvent;
 
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
+import javax.sound.midi.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
@@ -41,7 +37,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = new File("testmidi/bawsolo.mid");
+		File rawFile = new File("testmidi/miss_you.mid");
 		
 		if (args.length > 0) {
 			rawFile = new File(args[0]);
@@ -62,10 +58,28 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		// Create a sequencer for the sequence
 		Sequence sequence = MidiSystem.getSequence(rawFile);
-		midijam.sequencer = MidiSystem.getSequencer();
+		
+		midijam.sequencer = MidiSystem.getSequencer(false);
+		
+		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
+		MidiDevice device = null;
+		for (MidiDevice.Info eachInfo : info) {
+			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
+				device = MidiSystem.getMidiDevice(eachInfo);
+				break;
+			}
+		}
+		if (device == null) {
+			System.err.println("You don't have Microsoft GS Wavetable Synth. So you don't get to use this program " +
+					"right now.");
+			System.exit(1);
+		}
+		System.out.println(info);
+		device.open();
 		midijam.sequencer.open();
+		midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
+		
 		midijam.sequencer.setSequence(sequence);
-		midijam.sequencer.open();
 		
 		// Start the song one second from now
 		new Timer().schedule(new TimerTask() {
@@ -77,7 +91,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				midijam.seqHasRunOnce = true;
 				midijam.timeSinceStart = 0;
 			}
-		}, 500);
+		}, (long) 2E3);
 		System.out.println("end!");
 	}
 	
@@ -258,7 +272,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Override
 	public void simpleInitApp() {
 		flyCam.setMoveSpeed(100f);
-		flyCam.setEnabled(false);
+		flyCam.setEnabled(true);
+		flyCam.setDragToRotate(true);
 		setupKeys();
 		setCamera(Camera.CAMERA_1A);
 //
@@ -329,6 +344,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		inputManager.addMapping(Camera.CAMERA_5.name(), new KeyTrigger(KeyInput.KEY_5));
 		inputManager.addListener(this, Camera.CAMERA_5.name());
+		
+		
+		inputManager.addMapping("freecam", new KeyTrigger(KeyInput.KEY_GRAVE));
+		inputManager.addListener(this, "freecam");
 		
 		inputManager.addMapping("exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
 		inputManager.addListener(this, "exit");
