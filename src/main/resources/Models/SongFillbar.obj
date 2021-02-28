@@ -1,0 +1,41 @@
+# created by: Biturn ver 0.88
+# http://mirex.mypage.sk
+# ------------------------------------
+# 4 vertices, 2 polygons, 6 points, 1 materials
+
+
+mtllib object_211.mtl
+
+#-- object 'Converted object 0' --
+# 4 vertices, 2 polygons, 6 points
+
+g Converted object 0
+
+# vertexs: 4
+v -0.002274 -113.697800 -290.000000
+v -0.002274 -118.302200 -290.000000
+v 244.176270 -113.697800 -290.000000
+v 244.176270 -118.302200 -290.000000
+
+# normals: 6
+vn 0.000000 0.000000 1.000000
+vn 0.000000 0.000000 1.000000
+vn 0.000000 0.000000 1.000000
+vn 0.000000 0.000000 1.000000
+vn 0.000000 0.000000 1.000000
+vn 0.000000 0.000000 1.000000
+
+# texture coords: 6
+vt -0.000320 0.992557
+vt -0.000320 0.007888
+vt 0.999680 0.992557
+vt -0.000320 0.007888
+vt 0.999680 0.007888
+vt 0.999680 0.992557
+
+# polygons: 2
+usemtl Sheet Music
+f 1/1/1 2/2/2 3/3/3
+f 2/4/4 4/5/5 3/6/6
+
+# object end 'Converted object 0'

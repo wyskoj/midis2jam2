@@ -1,0 +1,41 @@
+# created by: Biturn ver 0.88
+# http://mirex.mypage.sk
+# ------------------------------------
+# 4 vertices, 2 polygons, 6 points, 1 materials
+
+
+mtllib object_124.mtl
+
+#-- object 'Converted object 0' --
+# 4 vertices, 2 polygons, 6 points
+
+g Converted object 0
+
+# vertexs: 4
+v -24.761806 0.000000 3.501220
+v 24.200977 0.000000 3.501220
+v 24.200977 0.000000 -6.876189
+v -24.761806 0.000000 -6.876189
+
+# normals: 6
+vn 0.000000 1.000000 0.000000
+vn 0.000000 1.000000 0.000000
+vn 0.000000 1.000000 0.000000
+vn 0.000000 1.000000 0.000000
+vn 0.000000 1.000000 0.000000
+vn 0.000000 1.000000 0.000000
+
+# texture coords: 6
+vt 0.000000 0.929804
+vt 0.000000 0.077900
+vt 1.000000 0.929804
+vt 0.000000 0.077900
+vt 1.000000 0.077900
+vt 1.000000 0.929804
+
+# polygons: 2
+usemtl WhiteKey1
+f 4/1/1 1/2/2 3/3/3
+f 1/4/4 2/5/5 3/6/6
+
+# object end 'Converted object 0'
