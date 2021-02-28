@@ -1,5 +1,8 @@
 package org.wysko.midis2jam2.instrument;
 
+import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
+import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
+
 /**
  * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments
  * for each channel, and also creates new instruments when the program of a channel changes (i.e., the MIDI

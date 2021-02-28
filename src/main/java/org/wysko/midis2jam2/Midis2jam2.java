@@ -14,7 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
-import org.wysko.midis2jam2.instrument.AltoSaxophone;
+import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSaxophone;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.Keyboard;
 import org.wysko.midis2jam2.instrument.Percussion;

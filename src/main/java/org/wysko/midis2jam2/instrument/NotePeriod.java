@@ -3,12 +3,12 @@ package org.wysko.midis2jam2.instrument;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-class NotePeriod {
-	final int midiNote;
-	final double startTime;
-	final double endTime;
-	final MidiNoteOnEvent noteOn;
-	final MidiNoteOffEvent noteOff;
+public class NotePeriod {
+	public final int midiNote;
+	public final double startTime;
+	public final double endTime;
+	public final MidiNoteOnEvent noteOn;
+	public final MidiNoteOffEvent noteOff;
 	
 	public long startTick() {
 		return noteOn.time;
@@ -27,7 +27,7 @@ class NotePeriod {
 		this.noteOff = noteOff;
 	}
 	
-	double duration() {
+	public double duration() {
 		return endTime - startTime;
 	}
 }

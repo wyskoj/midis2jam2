@@ -1,6 +1,8 @@
-package org.wysko.midis2jam2.instrument;
+package org.wysko.midis2jam2.instrument.monophonic;
 
 import com.jme3.scene.Node;
+import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ public abstract class MonophonicClone implements Instrument {
 	 *
 	 * @see NotePeriod
 	 */
-	protected final List<NotePeriod> notePeriods;
+	public final List<NotePeriod> notePeriods;
 	/**
 	 * Is this clone currently playing a note?
 	 */
@@ -26,9 +28,9 @@ public abstract class MonophonicClone implements Instrument {
 	/**
 	 * The curent note period that is being handled.
 	 */
-	NotePeriod currentNotePeriod;
-	Node animNode = new Node();
-	Node modelNode = new Node();
+	public NotePeriod currentNotePeriod;
+	public Node animNode = new Node();
+	public Node modelNode = new Node();
 	
 	public MonophonicClone() {
 		this.notePeriods = new ArrayList<>();

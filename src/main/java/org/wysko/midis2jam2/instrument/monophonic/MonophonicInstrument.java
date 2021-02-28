@@ -1,6 +1,8 @@
-package org.wysko.midis2jam2.instrument;
+package org.wysko.midis2jam2.instrument.monophonic;
 
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
@@ -27,11 +29,11 @@ public abstract class MonophonicInstrument<C> implements Instrument {
 	 *
 	 * @see #calculateNotePeriods(List)
 	 */
-	protected List<NotePeriod> notePeriods;
+	public List<NotePeriod> notePeriods;
 	/**
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
 	 */
-	protected List<C> clones;
+	public List<C> clones;
 	/**
 	 * Reference to the midi file.
 	 */
