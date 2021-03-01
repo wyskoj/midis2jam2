@@ -1,13 +1,11 @@
 package org.wysko.midis2jam2.midi;
 
-public class MidiControlEvent extends MidiEvent {
+public class MidiControlEvent extends MidiChannelSpecificEvent {
 	final int controlNum;
 	final int value;
-	final int channel;
 	
 	public MidiControlEvent(long time, int channel, int controlNum, int value) {
-		super(time);
-		this.channel = channel;
+		super(time, channel);
 		this.controlNum = controlNum;
 		this.value = value;
 	}

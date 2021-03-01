@@ -4,32 +4,27 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.*;
 
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
  * The alto saxophone.
  */
-public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxophoneClone> implements Instrument {
+public class AltoSaxophone extends Saxophone {
 	
-	private final static int KEY_COUNT = 20;
 	private final static float STRETCH_FACTOR = 0.65f;
 	/**
 	 * Defines which keys need to be pressed given the corresponding MIDI note.
 	 */
 	private final static HashMap<Integer, Integer[]> KEY_MAPPING = new HashMap<Integer, Integer[]>() {{
+		
 		/*
 		0 - Palm F
 		1 - Palm E
@@ -96,18 +91,14 @@ public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxoph
 	 * @param events  all events that pertain to this instance of an alto saxophone
 	 * @param file    context to the MIDI file
 	 */
-	public AltoSaxophone(Midis2jam2 context, List<MidiChannelSpecificEvent> events, MidiFile file) {
-		super(context, file);
+	public AltoSaxophone(Midis2jam2 context, List<MidiChannelSpecificEvent> events, MidiFile file) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		super(context, file, events);
 		
-		List<MidiNoteEvent> noteEvents = events.stream()
-				.filter(event -> event instanceof MidiNoteOnEvent || event instanceof MidiNoteOffEvent)
-				.map(event -> (MidiNoteEvent) event).collect(Collectors.toList());
+		calculateClones(this, AltoSaxophoneClone.class);
 		
-		calculateNotePeriods(noteEvents);
-		calculateClones();
-		
-		for (AltoSaxophoneClone clone : clones) {
-			groupOfPolyphony.attachChild(clone.polyphonicAlto);
+		for (MonophonicClone clone : clones) {
+			AltoSaxophoneClone altoClone = ((AltoSaxophoneClone) clone);
+			groupOfPolyphony.attachChild(altoClone.polyphonicAlto);
 		}
 		
 		highLevelAlto.attachChild(groupOfPolyphony);
@@ -116,50 +107,6 @@ public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxoph
 		groupOfPolyphony.rotate(rad(13), rad(75), 0);
 		
 		context.getRootNode().attachChild(highLevelAlto);
-	}
-	
-	/**
-	 * This method is a mess. Your brain may rapidly combust if you try to understand it.
-	 * <br>
-	 * Essentially, it figures out when notes overlap and assigns them to "clones" of the instrument. This is used
-	 * for monophonic instruments that need a polyphonic visualization.
-	 * <br>
-	 * TODO Make this less spaghetti
-	 * TODO Can this pulled up somehow?
-	 */
-	private void calculateClones() {
-		clones = new ArrayList<>();
-		clones.add(new AltoSaxophoneClone());
-		for (int i = 0; i < notePeriods.size(); i++) {
-			for (int j = 0; j < notePeriods.size(); j++) {
-				if (j == i) continue;
-				NotePeriod comp1 = notePeriods.get(i);
-				NotePeriod comp2 = notePeriods.get(j);
-				if (comp1.startTick() > comp2.endTick()) continue;
-				if (comp1.endTick() < comp2.startTick()) {
-					clones.get(0).notePeriods.add(comp1);
-					break;
-				}
-				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
-					boolean added = false;
-					for (AltoSaxophoneClone clone : clones) {
-						if (!clone.isPlayingAtTime(comp1.startTick())) {
-							clone.notePeriods.add(comp1);
-							added = true;
-							break;
-						}
-					}
-					if (!added) {
-						AltoSaxophoneClone e = new AltoSaxophoneClone();
-						e.notePeriods.add(comp1);
-						clones.add(e);
-					}
-				} else {
-					clones.get(0).notePeriods.add(comp1);
-				}
-				break;
-			}
-		}
 	}
 	
 	@Override
@@ -177,8 +124,9 @@ public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxoph
 		
 		highLevelAlto.setLocalTranslation(0, altosBeforeMe * 40, 0);
 		
-		for (AltoSaxophoneClone clone : clones) {
-			clone.tick(time, delta);
+		for (MonophonicClone clone : clones) {
+			AltoSaxophoneClone altoSaxophoneClone = ((AltoSaxophoneClone) clone);
+			altoSaxophoneClone.tick(time, delta);
 		}
 	}
 	
@@ -207,6 +155,8 @@ public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxoph
 								".png");
 				
 				modelNode.attachChild(KEYS_UP[i]);
+				modelNode.attachChild(KEYS_DOWN[i]);
+				KEYS_DOWN[i].setCullHint(Spatial.CullHint.Always);
 			}
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
@@ -251,6 +201,9 @@ public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxoph
 				
 				/* Show hide correct keys */
 				Integer[] keysToGoDown = KEY_MAPPING.get(currentNotePeriod.midiNote);
+				if (keysToGoDown == null) { // A note outside of the range of the instrument
+					keysToGoDown = new Integer[0];
+				}
 				for (int i = 0; i < KEY_COUNT; i++) {
 					int finalI = i;
 					if (Arrays.stream(keysToGoDown).anyMatch(a -> a == finalI)) {
@@ -271,6 +224,7 @@ public class AltoSaxophone extends MonophonicInstrument<AltoSaxophone.AltoSaxoph
 			polyphonicAlto.setLocalTranslation(20 * indexThis, 0, 0);
 			
 		}
+		
 	}
 	
 }

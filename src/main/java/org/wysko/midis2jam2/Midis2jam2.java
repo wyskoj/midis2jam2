@@ -1,7 +1,6 @@
 package org.wysko.midis2jam2;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -15,20 +14,24 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSaxophone;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.Keyboard;
 import org.wysko.midis2jam2.instrument.Percussion;
+import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSaxophone;
 import org.wysko.midis2jam2.midi.*;
-import org.wysko.midis2jam2.midi.MidiEvent;
 
-import javax.sound.midi.*;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.Sequence;
+import javax.sound.midi.Sequencer;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
+	private static boolean ROLLBACK_TO_INTERNAL = false;
 	public List<Instrument> instruments = new ArrayList<>();
 	Sequencer sequencer;
 	MidiFile file;
@@ -38,10 +41,35 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = new File("testmidi/miss_you.mid");
+		File rawFile = null;
 		
-		if (args.length > 0) {
+		if (args.length == 1) {
 			rawFile = new File(args[0]);
+		} else {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].equals("-j")) {
+					ROLLBACK_TO_INTERNAL = true;
+					break;
+				}
+				if (args[i].equals("-m")) {
+					if (i + 1 < args.length) {
+						rawFile = new File(args[i + 1]);
+					}
+				}
+			}
+		}
+		
+		if (rawFile == null) {
+			System.err.println("args = " + Arrays.toString(args));
+			System.err.println("Unable to open MIDI input file.");
+			System.exit(1);
+		}
+		
+		if (!rawFile.exists()) {
+			System.err.println("args = " + Arrays.toString(args));
+			System.err.println(rawFile.getAbsolutePath());
+			System.err.println("The file " + rawFile.getName() + " does not exist.");
+			System.exit(2);
 		}
 		
 		midijam.file = MidiFile.readMidiFile(rawFile);
@@ -71,7 +99,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		midijam.sequencer = MidiSystem.getSequencer(false);
 		
-		if (device == null) {
+		if (device == null || ROLLBACK_TO_INTERNAL) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
 		} else {
 			device.open();
@@ -133,7 +161,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * Reads the MIDI file and calculates program events, appropriately creating instances of each instrument and
 	 * assigning the correct events to respective instruments.
 	 */
-	private void calculateInstruments() {
+	private void calculateInstruments() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		//noinspection unchecked
 		ArrayList<MidiChannelSpecificEvent>[] channels = (ArrayList<MidiChannelSpecificEvent>[]) new ArrayList[16];
 		// Create 16 ArrayLists for each channel
@@ -223,7 +251,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * @return a new instrument of the correct type containing the specified events
 	 */
 	@Nullable
-	private Instrument fromEvents(MidiProgramEvent programEvent, List<MidiChannelSpecificEvent> events) {
+	private Instrument fromEvents(MidiProgramEvent programEvent, List<MidiChannelSpecificEvent> events) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		switch (programEvent.programNum) {
 			case 0: // Acoustic Grand Piano
 			case 1: // Bright Acoustic Piano
@@ -310,7 +338,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		viewPort.addProcessor(fpp);
 //
 		
-		calculateInstruments();
+		try {
+			calculateInstruments();
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			e.printStackTrace();
+		}
 		
 		// "wake up" instruments by ticking at a negative time value
 		for (Instrument instrument : instruments)
