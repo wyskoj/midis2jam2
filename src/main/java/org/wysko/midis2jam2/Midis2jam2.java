@@ -17,7 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.Keyboard;
 import org.wysko.midis2jam2.instrument.Percussion;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSaxophone;
+import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
+import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
@@ -26,12 +27,14 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
-	private static boolean ROLLBACK_TO_INTERNAL = false;
 	public List<Instrument> instruments = new ArrayList<>();
 	Sequencer sequencer;
 	MidiFile file;
@@ -41,35 +44,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = null;
+		File rawFile = new File("testmidi/miss_you.mid");
 		
-		if (args.length == 1) {
+		if (args.length > 0) {
 			rawFile = new File(args[0]);
-		} else {
-			for (int i = 0; i < args.length; i++) {
-				if (args[i].equals("-j")) {
-					ROLLBACK_TO_INTERNAL = true;
-					break;
-				}
-				if (args[i].equals("-m")) {
-					if (i + 1 < args.length) {
-						rawFile = new File(args[i + 1]);
-					}
-				}
-			}
-		}
-		
-		if (rawFile == null) {
-			System.err.println("args = " + Arrays.toString(args));
-			System.err.println("Unable to open MIDI input file.");
-			System.exit(1);
-		}
-		
-		if (!rawFile.exists()) {
-			System.err.println("args = " + Arrays.toString(args));
-			System.err.println(rawFile.getAbsolutePath());
-			System.err.println("The file " + rawFile.getName() + " does not exist.");
-			System.exit(2);
 		}
 		
 		midijam.file = MidiFile.readMidiFile(rawFile);
@@ -99,7 +77,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		midijam.sequencer = MidiSystem.getSequencer(false);
 		
-		if (device == null || ROLLBACK_TO_INTERNAL) {
+		if (device == null) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
 		} else {
 			device.open();
@@ -161,7 +139,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * Reads the MIDI file and calculates program events, appropriately creating instances of each instrument and
 	 * assigning the correct events to respective instruments.
 	 */
-	private void calculateInstruments() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	private void calculateInstruments() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 		//noinspection unchecked
 		ArrayList<MidiChannelSpecificEvent>[] channels = (ArrayList<MidiChannelSpecificEvent>[]) new ArrayList[16];
 		// Create 16 ArrayLists for each channel
@@ -251,7 +229,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * @return a new instrument of the correct type containing the specified events
 	 */
 	@Nullable
-	private Instrument fromEvents(MidiProgramEvent programEvent, List<MidiChannelSpecificEvent> events) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	private Instrument fromEvents(MidiProgramEvent programEvent,
+	                              List<MidiChannelSpecificEvent> events) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 		switch (programEvent.programNum) {
 			case 0: // Acoustic Grand Piano
 			case 1: // Bright Acoustic Piano
@@ -272,7 +251,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 55: // Orchestra Hit
 				return new Keyboard(this, events, file, Keyboard.Skin.WOOD);
 			case 65: // Alto Sax
-				return new AltoSaxophone(this, events, file);
+				return new AltoSax(this, events, file);
+			case 67:
+				return new BaritoneSax(this,events,file);
 			case 80: // Lead 1 (Square)
 			case 81: // Lead 2 (Sawtooth)
 			case 83: // Lead 4 (Chiff)
@@ -313,10 +294,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
 //		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
-		Spatial stage = loadModel("Stage.obj", "stageuv.png");
+		Spatial stage = loadModel("Stage.obj", "stageuv.bmp");
 		rootNode.attachChild(stage);
 		
-		Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.png");
+		Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp");
 		rootNode.attachChild(pianoStand);
 		pianoStand.move(-50, 32f, -6);
 		pianoStand.rotate(0, rad(45), 0);
@@ -340,7 +321,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		try {
 			calculateInstruments();
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+		} catch (InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
 		
@@ -360,8 +341,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * @return the model
 	 */
 	public Spatial loadModel(String m, String t) {
-		Spatial model = assetManager.loadModel("Models/" + m);
-		Texture texture = assetManager.loadTexture("Textures/" + t);
+		Spatial model = assetManager.loadModel("Assets/" + m);
+		Texture texture = assetManager.loadTexture("Assets/" + t);
 		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", texture);
 		model.setMaterial(material);

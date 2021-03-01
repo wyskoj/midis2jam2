@@ -60,13 +60,12 @@ public class MidiFile {
 					int noteOnChannel = Integer.parseInt(record.get(3).trim());
 					int noteOnNote = Integer.parseInt(record.get(4).trim());
 					int velocity = Integer.parseInt(record.get(5).trim());
-					MidiNoteEvent event;
-					if (velocity == 0) { // This is actually a note off
-						event = new MidiNoteOffEvent(time, noteOnChannel, noteOnNote);
-					} else {
-						event = new MidiNoteOnEvent(time, noteOnChannel, noteOnNote, velocity);
-					}
-					file.tracks[track].events.add(event);
+					MidiNoteEvent noteOn;
+					if (velocity > 0)
+						noteOn = new MidiNoteOnEvent(time, noteOnChannel, noteOnNote, velocity);
+					else
+						noteOn = new MidiNoteOffEvent(time, noteOnChannel, noteOnNote);
+					file.tracks[track].events.add(noteOn);
 					break;
 				case "Note_off_c":
 					int channel = Integer.parseInt(record.get(3).trim());

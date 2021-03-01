@@ -6,7 +6,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Percussion implements Instrument {
+public class Percussion extends Instrument {
 	public Node percussionNode = new Node("PercussionNode");
 	public Node snareDrumNode = new Node("SnareDrumNode");
 	
@@ -14,8 +14,8 @@ public class Percussion implements Instrument {
 		// INSTRUMENTS
 		
 		// Snare drum
-		Spatial snareDrum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.png");
-		Spatial snareDrumStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.png");
+		Spatial snareDrum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
+		Spatial snareDrumStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		
 		// Attach models to nodes
 		snareDrumNode.attachChild(snareDrum);

@@ -1,16 +1,18 @@
 package org.wysko.midis2jam2.instrument.monophonic;
 
+import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSaxophone;
-import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.midi.MidiFile;
+import org.wysko.midis2jam2.midi.MidiNoteEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A monophonic instrument is any instrument that can only play one note at a time (e.g., saxophones, clarinets,
@@ -19,12 +21,11 @@ import java.util.stream.Collectors;
  *
  * @see MonophonicClone
  */
-public abstract class MonophonicInstrument implements Instrument {
+public abstract class MonophonicInstrument extends Instrument {
 	/**
 	 * Since this is effectively static, we need reference to midis2jam2.
 	 */
-	protected final Midis2jam2 context;
-	protected final List<MidiNoteEvent> noteEvents;
+	public final Midis2jam2 context;
 	/**
 	 * Populated by {@link #calculateNotePeriods(List)}.
 	 *
@@ -39,24 +40,18 @@ public abstract class MonophonicInstrument implements Instrument {
 	 * Reference to the midi file.
 	 */
 	MidiFile file;
-	List<MidiChannelSpecificEvent> events;
+	protected Node highestLevel = new Node();
 	
 	/**
 	 * Constructs a monophonic instrument.
 	 *
 	 * @param context context to midis2jam2
 	 * @param file    context to the midi file
-	 * @param events  the MIDI events related to this instrument
 	 */
 	public MonophonicInstrument(
-			Midis2jam2 context, MidiFile file, List<MidiChannelSpecificEvent> events) {
-		noteEvents = events.stream()
-				.filter(event -> event instanceof MidiNoteOnEvent || event instanceof MidiNoteOffEvent)
-				.map(event -> (MidiNoteEvent) event).collect(Collectors.toList());
+			Midis2jam2 context, MidiFile file) {
 		this.context = context;
 		this.file = file;
-		this.events = events;
-		
 	}
 	
 	/**
@@ -76,7 +71,8 @@ public abstract class MonophonicInstrument implements Instrument {
 					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
 						// We found a block
 						notePeriods.add(new NotePeriod(check.note, file.eventInSeconds(noteEvent),
-								file.eventInSeconds(check), noteEvent.time, check.time, ((MidiNoteOnEvent) noteEvent), ((MidiNoteOffEvent) check)));
+								file.eventInSeconds(check), noteEvent.time, check.time, ((MidiNoteOnEvent) noteEvent)
+								, ((MidiNoteOffEvent) check)));
 						break;
 					}
 				}
@@ -84,17 +80,8 @@ public abstract class MonophonicInstrument implements Instrument {
 		}
 	}
 	
-	/**
-	 * This method is a mess. Your brain may rapidly combust if you try to understand it.
-	 * <br>
-	 * Essentially, it figures out when notes overlap and assigns them to "clones" of the instrument. This is used
-	 * for monophonic instruments that need a polyphonic visualization.
-	 * <br>
-	 * TODO Make this less spaghetti
-	 * TODO Can this pulled up somehow?
-	 */
-	protected void calculateClones(MonophonicInstrument instrument, Class<? extends MonophonicClone> cloneClass) throws InstantiationException,
-			IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	protected void calculateClones(MonophonicInstrument instrument,
+	                               Class<? extends MonophonicClone> cloneClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 		clones = new ArrayList<>();
 		Constructor<?> constructor = cloneClass.getDeclaredConstructor(instrument.getClass());
 		clones.add((MonophonicClone) constructor.newInstance(instrument));
@@ -127,6 +114,25 @@ public abstract class MonophonicInstrument implements Instrument {
 				}
 				break;
 			}
+		}
+	}
+	
+	
+	protected void updateClones(double time, float delta) {
+		int clonesBeforeMe = 0;
+		int mySpot = context.instruments.indexOf(this);
+		for (int i = 0; i < context.instruments.size(); i++) {
+			if (this.getClass().isInstance(context.instruments.get(i)) &&
+					context.instruments.get(i) != this &&
+					i < mySpot) {
+				clonesBeforeMe++;
+			}
+		}
+		
+		highestLevel.setLocalTranslation(0, clonesBeforeMe * 40, 0);
+		
+		for (MonophonicClone clone : clones) {
+			clone.tick(time, delta);
 		}
 	}
 }

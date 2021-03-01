@@ -14,14 +14,13 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Keyboard implements Instrument {
+public class Keyboard extends Instrument {
 	
 	public static final int A_0 = 21;
 	static final int KEYBOARD_KEY_COUNT = 88;
 	private final List<? extends MidiEvent> events;
 	private final MidiFile file;
 	private final Skin skin;
-	private final Midis2jam2 context;
 	public Node movementNode = new Node();
 	public Node node = new Node();
 	public KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
@@ -134,10 +133,10 @@ public class Keyboard implements Instrument {
 	}
 	
 	public enum Skin {
-		HARPSICHORD("HarpsichordSkin.png"),
-		PIANO("PianoSkin.png"),
-		SYNTH("SynthSkin.png"),
-		WOOD("PianoSkin_Wood.png");
+		HARPSICHORD("HarpsichordSkin.bmp"),
+		PIANO("PianoSkin.bmp"),
+		SYNTH("SynthSkin.bmp"),
+		WOOD("PianoSkin_Wood.bmp");
 		String textureFile;
 		
 		Skin(String textureFile) {

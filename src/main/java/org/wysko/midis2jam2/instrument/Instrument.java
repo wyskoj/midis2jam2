@@ -1,5 +1,6 @@
 package org.wysko.midis2jam2.instrument;
 
+import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 
@@ -16,12 +17,13 @@ import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
  * @see MonophonicInstrument
  * @see MonophonicClone
  */
-public interface Instrument {
+public abstract class Instrument {
 	/**
 	 * Updates the animation and other necessary frame-dependant calculations.
 	 *
 	 * @param time  the current time since the beginning of the MIDI file, expressed in seconds
 	 * @param delta the amount of time since the last call this method, expressed in seconds
 	 */
-	void tick(double time, float delta);
+	public abstract void tick(double time, float delta);
+	protected Midis2jam2 context;
 }
