@@ -34,7 +34,7 @@ public abstract class StretchyClone extends FingeredKeyedClone {
 		if (currentNotePeriod != null) {
 			if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
 				bell.setLocalScale(1,
-						(float) ((stretchFactor* (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1),
+						(float) ((stretchFactor * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1),
 						1);
 				animNode.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * rotationFactor, 0, 0));
 				currentlyPlaying = true;
@@ -45,7 +45,5 @@ public abstract class StretchyClone extends FingeredKeyedClone {
 			/* Show hide correct keys */
 			pushOrReleaseKeys(keyMap);
 		}
-		/* Move depending on degree of polyphony */
-		cloneNode.setLocalTranslation(20 * indexThis, 0, 0);
 	}
 }
