@@ -80,7 +80,7 @@ public class TenorSax extends Saxophone {
 		put(44, new Integer[] {3, 5, 6, 14, 15, 17, 19, 10}); // Bb
 	}};
 	private final static float ROTATION_FACTOR = 0.1f;
-	Node groupOfPolyphony = new Node();
+	final Node groupOfPolyphony = new Node();
 	
 	/**
 	 * Constructs a tenor sax.

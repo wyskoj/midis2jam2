@@ -20,12 +20,12 @@ public abstract class Drum extends Instrument {
 	Spatial drum;
 	Spatial stick;
 	List<MidiNoteOnEvent> hits;
-	Node highLevelNode = new Node();
+	final Node highLevelNode = new Node();
 	/**
 	 * Attach {@link #drum} and {@link #stick} to this and move this for recoil.
 	 */
-	Node recoilNode = new Node();
-	Node stickNode = new Node();
+	final Node recoilNode = new Node();
+	final Node stickNode = new Node();
 	
 	/**
 	 * midis2jam2 displays velocity ramping in recoiled instruments. Different functions may be used, but a sqrt
@@ -71,7 +71,7 @@ public abstract class Drum extends Instrument {
 			// Not yet ready to strike
 			if (floats[0] < MAX_ANGLE) {
 				// We have come down, need to recoil
-				float xAngle = floats[0] + 0.03f;
+				float xAngle = floats[0] + 3f * delta;
 				xAngle = Math.min(rad((float) MAX_ANGLE), xAngle);
 				stick.setLocalRotation(new Quaternion().fromAngles(
 						xAngle, 0, 0

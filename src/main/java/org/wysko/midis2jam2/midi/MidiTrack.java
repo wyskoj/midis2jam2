@@ -4,5 +4,5 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MidiTrack {
-	public List<MidiEvent> events = new ArrayList<>();
+	public final List<MidiEvent> events = new ArrayList<>();
 }

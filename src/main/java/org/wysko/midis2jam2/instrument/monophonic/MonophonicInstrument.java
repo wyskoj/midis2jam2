@@ -39,8 +39,8 @@ public abstract class MonophonicInstrument extends Instrument {
 	/**
 	 * Reference to the midi file.
 	 */
-	MidiFile file;
-	protected Node highestLevel = new Node();
+	final MidiFile file;
+	protected final Node highestLevel = new Node();
 	
 	/**
 	 * Constructs a monophonic instrument.

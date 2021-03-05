@@ -22,9 +22,9 @@ public class Keyboard extends Instrument {
 	private final List<? extends MidiEvent> events;
 	private final MidiFile file;
 	private final Skin skin;
-	public Node movementNode = new Node();
-	public Node node = new Node();
-	public KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
+	public final Node movementNode = new Node();
+	public final Node node = new Node();
+	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
 	
 	public Keyboard(Midis2jam2 context, List<? extends MidiEvent> events, MidiFile file, Skin skin) {
 		this.context = context;
@@ -138,7 +138,7 @@ public class Keyboard extends Instrument {
 		PIANO("PianoSkin.bmp"),
 		SYNTH("SynthSkin.bmp"),
 		WOOD("PianoSkin_Wood.bmp");
-		String textureFile;
+		final String textureFile;
 		
 		Skin(String textureFile) {
 			this.textureFile = textureFile;
@@ -150,8 +150,8 @@ public class Keyboard extends Instrument {
 	}
 	
 	public class KeyboardKey {
-		public int midiNote;
-		public Node node = new Node();
+		public final int midiNote;
+		public final Node node = new Node();
 		public boolean beingPressed = false;
 		
 		public KeyboardKey(Midis2jam2 context, int midiNote, int startPos) {

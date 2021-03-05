@@ -24,13 +24,13 @@ public abstract class MonophonicClone {
 	 * The current note period that is being handled.
 	 */
 	public NotePeriod currentNotePeriod;
-	public Node animNode = new Node();
-	public Node modelNode = new Node();
+	public final Node animNode = new Node();
+	public final Node modelNode = new Node();
 	/**
 	 * Is this clone currently playing a note?
 	 */
 	protected boolean currentlyPlaying = false;
-	public Node cloneNode = new Node();
+	public final Node cloneNode = new Node();
 	
 	public MonophonicClone() {
 		this.notePeriods = new ArrayList<>();
