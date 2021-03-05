@@ -41,10 +41,10 @@ public class MidiFile {
 		
 		// Clean up your goddamn windows-1252 characters that fucks up CSV parsing
 		Scanner scanner = new Scanner(new File("midi.csv"));
-		FileWriter stream = new FileWriter(new File("cleanmidi.csv"));
+		FileWriter stream = new FileWriter("cleanmidi.csv");
 		Pattern titlePattern = Pattern.compile("\\d+, \\d+, Title_t,");
 		Pattern copyrightPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
-		Pattern markerPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
+		Pattern markerPattern = Pattern.compile("\\d+, \\d+, Marker_t,");
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (!titlePattern.matcher(line).find() &&
