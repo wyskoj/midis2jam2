@@ -14,6 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.percussive.Percussion;
@@ -39,8 +40,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public List<Instrument> instruments = new ArrayList<>();
 	Sequencer sequencer;
 	public MidiFile file;
-	double timeSinceStart = 0.0;
+	double timeSinceStart;
 	boolean seqHasRunOnce = false;
+	
+	
+	static final long LATENCY_FIX = -100;
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -95,9 +99,26 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			public void run() {
 				System.out.println("playing");
 				midijam.sequencer.setTempoInBPM((float) midijam.file.firstTempoInBpm());
-				midijam.sequencer.start();
-				midijam.seqHasRunOnce = true;
-				midijam.timeSinceStart = 0;
+				if (LATENCY_FIX > 0) {
+					new Timer().schedule(new TimerTask() {
+						@Override
+						public void run() {
+							midijam.sequencer.start();
+						}
+					}, LATENCY_FIX);
+					midijam.seqHasRunOnce = true;
+					midijam.timeSinceStart = 0;
+				} else {
+					new Timer().schedule(new TimerTask() {
+						@Override
+						public void run() {
+							
+							midijam.seqHasRunOnce = true;
+							midijam.timeSinceStart = 0;
+						}
+					}, -LATENCY_FIX);
+					midijam.sequencer.start();
+				}
 			}
 		}, 1000);
 		System.out.println("end!");

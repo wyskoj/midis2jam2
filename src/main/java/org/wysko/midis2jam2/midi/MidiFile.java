@@ -5,12 +5,12 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class MidiFile {
 	public MidiTrack[] tracks;
@@ -38,8 +38,26 @@ public class MidiFile {
 		
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
 		proc.waitFor();
+		
+		// Clean up your goddamn windows-1252 characters that fucks up CSV parsing
+		Scanner scanner = new Scanner(new File("midi.csv"));
+		FileWriter stream = new FileWriter(new File("cleanmidi.csv"));
+		Pattern titlePattern = Pattern.compile("\\d+, \\d+, Title_t,");
+		Pattern copyrightPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
+		Pattern markerPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (!titlePattern.matcher(line).find() &&
+					!copyrightPattern.matcher(line).find() &&
+					!markerPattern.matcher(line).find()) {
+						stream.write(line);
+						stream.write("\n");
+					}
+		}
+		stream.close();
+		
 		// Parse CSV file
-		CSVParser parse = CSVParser.parse(new File("midi.csv"), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
+		CSVParser parse = CSVParser.parse(new File("cleanmidi.csv"), StandardCharsets.UTF_8, CSVFormat.DEFAULT);
 		List<CSVRecord> records = parse.getRecords();
 		
 		// Build midi from data
@@ -152,5 +170,19 @@ public class MidiFile {
 	
 	public double eventInSeconds(MidiEvent event) {
 		return midiTickInSeconds(event.time);
+	}
+	
+	public MidiTempoEvent tempoBefore(MidiNoteOnEvent event) {
+		MidiTempoEvent lastTempo = tempos.get(0);
+		if (tempos.size() > 1) {
+			for (MidiTempoEvent tempo : tempos) {
+				if (tempo.time < event.time) {
+					lastTempo = tempo;
+				} else {
+					return lastTempo;
+				}
+			}
+		}
+		return lastTempo;
 	}
 }
