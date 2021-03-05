@@ -14,11 +14,13 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.Keyboard;
-import org.wysko.midis2jam2.instrument.Percussion;
+import org.wysko.midis2jam2.instrument.keyed.Keyboard;
+import org.wysko.midis2jam2.instrument.percussive.Percussion;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
+import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
@@ -37,9 +39,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	public List<Instrument> instruments = new ArrayList<>();
 	Sequencer sequencer;
-	MidiFile file;
-	double timeSinceStart = 0.0;
+	public MidiFile file;
+	double timeSinceStart;
 	boolean seqHasRunOnce = false;
+	
+	
+	static final long LATENCY_FIX = -100;
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -76,7 +81,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		midijam.sequencer = MidiSystem.getSequencer(false);
-		
 		if (device == null) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
 		} else {
@@ -95,11 +99,28 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			public void run() {
 				System.out.println("playing");
 				midijam.sequencer.setTempoInBPM((float) midijam.file.firstTempoInBpm());
-				midijam.sequencer.start();
-				midijam.seqHasRunOnce = true;
-				midijam.timeSinceStart = 0;
+				if (LATENCY_FIX > 0) {
+					new Timer().schedule(new TimerTask() {
+						@Override
+						public void run() {
+							midijam.sequencer.start();
+						}
+					}, LATENCY_FIX);
+					midijam.seqHasRunOnce = true;
+					midijam.timeSinceStart = 0;
+				} else {
+					new Timer().schedule(new TimerTask() {
+						@Override
+						public void run() {
+							
+							midijam.seqHasRunOnce = true;
+							midijam.timeSinceStart = 0;
+						}
+					}, -LATENCY_FIX);
+					midijam.sequencer.start();
+				}
 			}
-		}, (long) 2E3);
+		}, 1000);
 		System.out.println("end!");
 	}
 	
@@ -166,12 +187,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		List<Instrument> instruments = new ArrayList<>();
 		for (int j = 0, channelsLength = channels.length; j < channelsLength; j++) {
+			ArrayList<MidiChannelSpecificEvent> channel = channels[j];
 			if (j == 9) { // Percussion channel
-				Percussion percussion = new Percussion(this);
-				// TODO
+				Percussion percussion = new Percussion(this, channel);
+				instruments.add(percussion);
 				continue;
 			}
-			ArrayList<MidiChannelSpecificEvent> channel = channels[j];
 			/* Skip channels with no note-on events */
 			boolean hasANoteOn = channel.stream().anyMatch(e -> e instanceof MidiNoteOnEvent);
 			if (!hasANoteOn) continue;
@@ -181,6 +202,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 					programEvents.add(((MidiProgramEvent) channelEvent));
 				}
 			}
+			
 			if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
 				programEvents.add(new MidiProgramEvent(0, j, 0));
 			}
@@ -252,6 +274,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Keyboard(this, events, file, Keyboard.Skin.WOOD);
 			case 65: // Alto Sax
 				return new AltoSax(this, events, file);
+			case 66:
+				return new TenorSax(this,events,file);
 			case 67:
 				return new BaritoneSax(this,events,file);
 			case 80: // Lead 1 (Square)
