@@ -14,7 +14,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.percussive.Percussion;
@@ -149,11 +148,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (instrument != null) // Null if not implemented yet
 				instrument.tick(timeSinceStart, tpf);
 		}
-
-//		float[] angles = new float[3];
-//		cam.getRotation().toAngles(angles);
-//		System.out.println("angles = " + Arrays.toString(angles));
-//		timeText.setText(String.valueOf(timeSinceStart));
 	}
 	
 	/**
@@ -330,18 +324,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		sun.setColor(ColorRGBA.White);
 		sun.setDirection(new Vector3f(rad(180), 0, 0));
 		rootNode.addLight(sun);
-		
-		/* Drop shadows */
-//		final int SHADOWMAP_SIZE=1024;
-//		DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
-//		dlsr.setLight(sun);
-//		viewPort.addProcessor(dlsr);
-//
-//		FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-//		SSAOFilter ssaoFilter = new SSAOFilter(12.94f, 43.92f, 0.33f, 0.61f);
-//		fpp.addFilter(ssaoFilter);
-//		viewPort.addProcessor(fpp);
-//
 		
 		try {
 			calculateInstruments();

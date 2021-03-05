@@ -1,6 +1,5 @@
 package org.wysko.midis2jam2.instrument.monophonic.reed.sax;
 
-import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
@@ -151,12 +150,9 @@ public class AltoSax extends Saxophone {
 			animation(time, indexThis, AltoSax.STRETCH_FACTOR, AltoSax.ROTATION_FACTOR, AltoSax.KEY_MAPPING);
 			
 			/* Move depending on degree of polyphony */
-			int degrees = 10;
-//			cloneNode.setLocalTranslation((float) (20 * Math.sin(rad(degrees)*indexThis)), 0,
-//					(float) (20 * Math.cos(rad(degrees)*indexThis)));
 			cloneNode.setLocalTranslation((float) 20*indexThis,0,0);
-			// TODO
-//			cloneNode.setLocalRotation(new Quaternion().fromAngles(0,rad(degrees)*indexThis,0));
+			// TODO Make saxophones rotate about an origin, and fill any gaps. Write here and then pull up to
+			//  Saxophone or monophonic instrument?
 		}
 		
 	}

@@ -5,7 +5,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +15,6 @@ public class MidiFile {
 	public MidiTrack[] tracks;
 	public short division;
 	
-	public HashMap<MidiEvent, Double> eventAbsoluteTime = new HashMap<>();
 	List<MidiTempoEvent> tempos = new ArrayList<>();
 	
 	/**

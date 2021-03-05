@@ -1,8 +1,6 @@
 package org.wysko.midis2jam2.instrument.monophonic.reed.sax;
 
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.instrument.monophonic.FingeredKeyedClone;
 import org.wysko.midis2jam2.instrument.monophonic.StretchyClone;
 
 public abstract class SaxophoneClone extends StretchyClone {
