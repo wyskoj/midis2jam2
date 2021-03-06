@@ -29,19 +29,6 @@ public abstract class StickDrum extends Drum {
 		super(context, hits);
 	}
 	
-	/**
-	 * midis2jam2 displays velocity ramping in recoiled instruments. Different functions may be used, but a sqrt
-	 * regression looks pretty good. May adjust this in the future.
-	 * <a href="https://www.desmos.com/calculator/17rgvqhl84">See a graph.</a>
-	 *
-	 * @param x the velocity of the note
-	 * @return a percentage to multiply by the target recoil
-	 */
-	@Range(from = 0, to = 1)
-	double velocityRecoilDampening(@Range(from = 0, to = 127) int x) {
-		return FastMath.sqrt(x) / 11.26942767f;
-	}
-	
 	void drumRecoil(double time, float delta) {
 		MidiNoteOnEvent recoil = null;
 		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {

@@ -59,7 +59,7 @@ public class BassDrum extends Drum {
 			// We need to strike
 			bassDrumBeaterArm.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
 			bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
-			drumNode.setLocalTranslation(0,0,-3);
+			drumNode.setLocalTranslation(0,0, (float) (-3 * velocityRecoilDampening(nextHit.velocity)));
 		} else {
 			
 			// Drum recoil
