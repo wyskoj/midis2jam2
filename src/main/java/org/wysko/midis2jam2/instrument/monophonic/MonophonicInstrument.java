@@ -26,6 +26,7 @@ public abstract class MonophonicInstrument extends Instrument {
 	 * Since this is effectively static, we need reference to midis2jam2.
 	 */
 	public final Midis2jam2 context;
+	protected final Node groupOfPolyphony = new Node();
 	/**
 	 * Populated by {@link #calculateNotePeriods(List)}.
 	 *

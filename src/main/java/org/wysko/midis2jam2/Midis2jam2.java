@@ -16,10 +16,11 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
-import org.wysko.midis2jam2.instrument.percussive.Percussion;
+import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
+import org.wysko.midis2jam2.instrument.percussive.Percussion;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
@@ -36,15 +37,13 @@ import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
+	static final long LATENCY_FIX = -100;
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	public List<Instrument> instruments = new ArrayList<>();
-	Sequencer sequencer;
 	public MidiFile file;
+	Sequencer sequencer;
 	double timeSinceStart;
 	boolean seqHasRunOnce = false;
-	
-	
-	static final long LATENCY_FIX = -100;
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -279,10 +278,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Keyboard(this, events, file, Keyboard.Skin.WOOD);
 			case 65: // Alto Sax
 				return new AltoSax(this, events, file);
-			case 66:
-				return new TenorSax(this,events,file);
-			case 67:
-				return new BaritoneSax(this,events,file);
+			case 66: // Tenor Sax
+				return new TenorSax(this, events, file);
+			case 67: // Baritone Sax
+				return new BaritoneSax(this, events, file);
+			case 73: // Flute
+				return new Flute(this, events, file);
 			case 80: // Lead 1 (Square)
 			case 81: // Lead 2 (Sawtooth)
 			case 83: // Lead 4 (Chiff)
