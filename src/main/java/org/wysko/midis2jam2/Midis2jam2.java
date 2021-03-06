@@ -36,6 +36,7 @@ import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
+	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	public List<Instrument> instruments = new ArrayList<>();
 	Sequencer sequencer;
 	public MidiFile file;
@@ -80,7 +81,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		midijam.sequencer = MidiSystem.getSequencer(false);
-		if (device == null) {
+		if (device == null || USE_DEFAULT_SYNTHESIZER) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
 		} else {
 			device.open();
@@ -131,6 +132,16 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 */
 	public static float rad(float deg) {
 		return deg / 180 * FastMath.PI;
+	}
+	
+	/**
+	 * Converts an angle expressed in degrees to radians.
+	 *
+	 * @param deg the angle expressed in degrees
+	 * @return the angle expressed in radians
+	 */
+	public static float rad(double deg) {
+		return (float) (deg / 180 * FastMath.PI);
 	}
 	
 	@Override

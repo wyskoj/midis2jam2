@@ -12,18 +12,22 @@ import java.util.stream.Collectors;
 public class Percussion extends Instrument {
 	
 	public final SnareDrum snareDrum;
+	public final BassDrum bassDrum;
 	public final Node percussionNode = new Node();
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		/* Percussion only cares about note on. */
 		List<MidiNoteOnEvent> noteOnEvents = events.stream()
-						.filter(e -> e instanceof MidiNoteOnEvent)
-						.map(e -> ((MidiNoteOnEvent) e))
-						.collect(Collectors.toList());
+				.filter(e -> e instanceof MidiNoteOnEvent)
+				.map(e -> ((MidiNoteOnEvent) e))
+				.collect(Collectors.toList());
 		
 		
 		snareDrum = new SnareDrum(context,
 				noteOnEvents.stream().filter(e -> e.note == 40 || e.note == 38).collect(Collectors.toList()));
+		
+		bassDrum = new BassDrum(context,
+				noteOnEvents.stream().filter(e -> e.note == 35 || e.note == 36).collect(Collectors.toList()));
 		
 		// Attach nodes to group node
 		percussionNode.attachChild(snareDrum.highLevelNode);
@@ -35,6 +39,7 @@ public class Percussion extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		snareDrum.tick(time,delta);
+		snareDrum.tick(time, delta);
+		bassDrum.tick(time, delta);
 	}
 }
