@@ -5,6 +5,9 @@ import com.jme3.scene.Spatial;
 
 import java.util.HashMap;
 
+/**
+ * Instruments that stretch when they play.
+ */
 public abstract class StretchyClone extends FingeredKeyedClone {
 	protected Spatial bell;
 	protected Spatial body;

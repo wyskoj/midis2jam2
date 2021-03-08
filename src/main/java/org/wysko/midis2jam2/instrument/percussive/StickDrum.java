@@ -45,14 +45,16 @@ public abstract class StickDrum extends Drum {
 	}
 	
 	void handleStick(double time, float delta) {
-		MidiNoteOnEvent nextHit;
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time)
-			hits.remove(0);
+		MidiNoteOnEvent nextHit = null;
 		
-		nextHit = hits.get(0);
-		double number = 6E7 / context.file.tempoBefore(nextHit).number;
-		number /= 500;
-		double proposedRotation = -1000 * number * (time - context.file.eventInSeconds(nextHit));
+		if (!hits.isEmpty())
+			nextHit = hits.get(0);
+		
+		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time)
+			nextHit = hits.remove(0);
+		
+		double proposedRotation = nextHit == null ? MAX_ANGLE : -1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / 500) * (time - context.file.eventInSeconds(nextHit));
+		
 		float[] floats = stick.getLocalRotation().toAngles(new float[3]);
 		
 		if (proposedRotation > MAX_ANGLE) {

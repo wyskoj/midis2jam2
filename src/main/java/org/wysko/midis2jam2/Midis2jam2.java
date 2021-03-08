@@ -96,7 +96,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				System.out.println("playing");
 				midijam.sequencer.setTempoInBPM((float) midijam.file.firstTempoInBpm());
 				if (LATENCY_FIX > 0) {
 					new Timer().schedule(new TimerTask() {
@@ -119,8 +118,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 					midijam.sequencer.start();
 				}
 			}
-		}, 1000);
-		System.out.println("end!");
+		}, 500);
 	}
 	
 	/**

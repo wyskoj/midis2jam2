@@ -9,6 +9,7 @@ import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
+import org.wysko.midis2jam2.particle.SteamPuffer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -45,16 +46,18 @@ public class Flute extends MonophonicInstrument {
 		
 		// Flute positioning
 		groupOfPolyphony.setLocalTranslation(0, 70, 0);
-		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-80),rad(-60),rad(0)));
+		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-80), rad(-60), rad(0)));
 		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-	
+		clones.forEach(clone -> clone.tick(time, delta));
 	}
 	
 	public class FluteClone extends HandedClone {
+		SteamPuffer puffer;
+		
 		public FluteClone() {
 			// 0-12 left hand
 			horn = Flute.this.context.loadModel("Flute.obj", "HornSkinGrey.bmp");
@@ -64,7 +67,6 @@ public class Flute extends MonophonicInstrument {
 				leftHandNode.attachChild(leftHands[i]);
 				if (i != 0) leftHands[i].setCullHint(Spatial.CullHint.Always);
 			}
-			cloneNode.attachChild(leftHandNode);
 			// 0-12 left hand
 			rightHands = new Spatial[12];
 			for (int i = 0; i < 12; i++) {
@@ -72,13 +74,28 @@ public class Flute extends MonophonicInstrument {
 				rightHandNode.attachChild(rightHands[i]);
 				if (i != 0) rightHands[i].setCullHint(Spatial.CullHint.Always);
 			}
+			
+			puffer = new SteamPuffer(Flute.this.context, SteamPuffer.SteamPuffType.WHISTLE);
+			cloneNode.attachChild(puffer.steamPuffNode);
+			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0,0, rad(-90)}));
+			puffer.steamPuffNode.setLocalTranslation(0,-12.3f,0);
+			cloneNode.attachChild(leftHandNode);
 			cloneNode.attachChild(rightHandNode);
 			cloneNode.attachChild(horn);
 		}
 		
 		@Override
 		public void tick(double time, float delta) {
-		
+			/* Collect note periods to execute */
+			while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
+				currentNotePeriod = notePeriods.remove(0);
+			}
+			if (currentNotePeriod != null) {
+				currentlyPlaying = time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime;
+				puffer.tick(time, delta, currentlyPlaying);
+				
+				/* Set the hands */
+			}
 		}
 	}
 }
