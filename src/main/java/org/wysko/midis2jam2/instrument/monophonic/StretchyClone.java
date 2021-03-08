@@ -16,15 +16,7 @@ public abstract class StretchyClone extends FingeredKeyedClone {
 			Integer[]> keyMap) {
 		
 		/* Hide or show depending on degree of polyphony and current playing status */
-		if (indexThis != 0) {
-			if (currentlyPlaying) {
-				cloneNode.setCullHint(Spatial.CullHint.Dynamic);
-			} else {
-				cloneNode.setCullHint(Spatial.CullHint.Always);
-			}
-		} else {
-			body.setCullHint(Spatial.CullHint.Dynamic);
-		}
+		hideOrShowOnPolyphony(indexThis);
 		
 		
 		
@@ -49,4 +41,5 @@ public abstract class StretchyClone extends FingeredKeyedClone {
 			pushOrReleaseKeys(keyMap);
 		}
 	}
+	
 }

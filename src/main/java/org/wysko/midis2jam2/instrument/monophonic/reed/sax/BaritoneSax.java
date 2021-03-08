@@ -124,7 +124,7 @@ public class BaritoneSax extends Saxophone {
 	
 	@Override
 	public void tick(double time, float delta) {
-		updateClones(time, delta);
+		updateClones(time, delta, MULTI_SAX_OFFSET);
 	}
 	
 	

@@ -12,4 +12,21 @@ public abstract class HandedClone extends MonophonicClone {
 	protected Node rightHandNode = new Node();
 	protected Spatial[] leftHands;
 	protected Spatial[] rightHands;
+	public static class Hands {
+		public final int left;
+		public final int right;
+		
+		public Hands(int left, int right) {
+			this.left = left;
+			this.right = right;
+		}
+		
+		@Override
+		public String toString() {
+			return "Hands{" +
+					"left=" + left +
+					", right=" + right +
+					'}';
+		}
+	}
 }

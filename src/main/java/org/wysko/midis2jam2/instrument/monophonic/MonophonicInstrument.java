@@ -1,5 +1,6 @@
 package org.wysko.midis2jam2.instrument.monophonic;
 
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
@@ -27,6 +28,11 @@ public abstract class MonophonicInstrument extends Instrument {
 	 */
 	public final Midis2jam2 context;
 	protected final Node groupOfPolyphony = new Node();
+	protected final Node highestLevel = new Node();
+	/**
+	 * Reference to the midi file.
+	 */
+	final MidiFile file;
 	/**
 	 * Populated by {@link #calculateNotePeriods(List)}.
 	 *
@@ -37,11 +43,6 @@ public abstract class MonophonicInstrument extends Instrument {
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
 	 */
 	public List<MonophonicClone> clones;
-	/**
-	 * Reference to the midi file.
-	 */
-	final MidiFile file;
-	protected final Node highestLevel = new Node();
 	
 	/**
 	 * Constructs a monophonic instrument.
@@ -77,6 +78,15 @@ public abstract class MonophonicInstrument extends Instrument {
 						break;
 					}
 				}
+			}
+		}
+		for (int i = notePeriods.size() - 2; i >= 0; i--) {
+			final NotePeriod a = notePeriods.get(i + 1);
+			final NotePeriod b = notePeriods.get(i);
+			if (a.startTick() == b.startTick() &&
+					a.endTick() == b.endTick() &&
+					a.midiNote == b.midiNote) {
+				notePeriods.remove(i + 1);
 			}
 		}
 	}
@@ -119,18 +129,18 @@ public abstract class MonophonicInstrument extends Instrument {
 	}
 	
 	
-	protected void updateClones(double time, float delta) {
-		int clonesBeforeMe = 0;
+	protected void updateClones(double time, float delta, Vector3f multiChannelOffset) {
+		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {
 			if (this.getClass().isInstance(context.instruments.get(i)) &&
 					context.instruments.get(i) != this &&
 					i < mySpot) {
-				clonesBeforeMe++;
+				othersOfMyType++;
 			}
 		}
 		
-		highestLevel.setLocalTranslation(0, clonesBeforeMe * 40, 0);
+		highestLevel.setLocalTranslation(multiChannelOffset.mult(othersOfMyType));
 		
 		for (MonophonicClone clone : clones) {
 			clone.tick(time, delta);

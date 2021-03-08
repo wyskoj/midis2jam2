@@ -37,7 +37,7 @@ import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
-	static final long LATENCY_FIX = -100;
+	static final long LATENCY_FIX = -200;
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	public List<Instrument> instruments = new ArrayList<>();
 	public MidiFile file;
@@ -118,7 +118,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 					midijam.sequencer.start();
 				}
 			}
-		}, 500);
+		}, 1500);
 	}
 	
 	/**

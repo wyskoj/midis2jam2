@@ -1,6 +1,7 @@
 package org.wysko.midis2jam2.instrument.monophonic;
 
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 
 import java.util.ArrayList;
@@ -46,4 +47,16 @@ public abstract class MonophonicClone {
 	}
 	
 	public abstract void tick(double time, float delta);
+	
+	protected void hideOrShowOnPolyphony(int indexThis) {
+		if (indexThis != 0) {
+			if (currentlyPlaying) {
+				cloneNode.setCullHint(Spatial.CullHint.Dynamic);
+			} else {
+				cloneNode.setCullHint(Spatial.CullHint.Always);
+			}
+		} else {
+			cloneNode.setCullHint(Spatial.CullHint.Dynamic);
+		}
+	}
 }
