@@ -44,7 +44,8 @@ public class Flute extends MonophonicInstrument {
 		highestLevel.attachChild(groupOfPolyphony);
 		
 		// Flute positioning
-		groupOfPolyphony.setLocalTranslation(0, 50, 0);
+		groupOfPolyphony.setLocalTranslation(0, 70, 0);
+		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-80),rad(-60),rad(0)));
 		context.getRootNode().attachChild(highestLevel);
 	}
 	
@@ -73,7 +74,6 @@ public class Flute extends MonophonicInstrument {
 			}
 			cloneNode.attachChild(rightHandNode);
 			cloneNode.attachChild(horn);
-			rightHandNode.setLocalTranslation(0, -1, 0);
 		}
 		
 		@Override
