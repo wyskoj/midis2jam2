@@ -6,9 +6,6 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiFile;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -52,43 +49,9 @@ public abstract class MonophonicInstrument extends Instrument {
 	 */
 	public MonophonicInstrument(
 			Midis2jam2 context, MidiFile file) {
+		super(context);
 		this.context = context;
 		this.file = file;
-	}
-	
-	/**
-	 * A MIDI file is a sequence of {@link MidiNoteOnEvent}s and {@link MidiNoteOffEvent}s. This method searches the
-	 * files and connects corresponding events together. This is effectively calculating the "blocks" you would see
-	 * in a piano roll editor. The method saves the results to {@link #notePeriods}.
-	 *
-	 * @param noteEvents the note events to calculate NotePeriods from
-	 */
-	protected void calculateNotePeriods(List<MidiNoteEvent> noteEvents) {
-		notePeriods = new ArrayList<>();
-		for (int i = 0, noteEventsSize = noteEvents.size(); i < noteEventsSize; i++) {
-			MidiNoteEvent noteEvent = noteEvents.get(i);
-			if (noteEvent instanceof MidiNoteOnEvent) {
-				for (int j = i + 1; j < noteEventsSize; j++) {
-					MidiNoteEvent check = noteEvents.get(j);
-					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
-						// We found a block
-						notePeriods.add(new NotePeriod(check.note, file.eventInSeconds(noteEvent),
-								file.eventInSeconds(check), noteEvent.time, check.time, ((MidiNoteOnEvent) noteEvent)
-								, ((MidiNoteOffEvent) check)));
-						break;
-					}
-				}
-			}
-		}
-		for (int i = notePeriods.size() - 2; i >= 0; i--) {
-			final NotePeriod a = notePeriods.get(i + 1);
-			final NotePeriod b = notePeriods.get(i);
-			if (a.startTick() == b.startTick() &&
-					a.endTick() == b.endTick() &&
-					a.midiNote == b.midiNote) {
-				notePeriods.remove(i + 1);
-			}
-		}
 	}
 	
 	protected void calculateClones(MonophonicInstrument instrument,

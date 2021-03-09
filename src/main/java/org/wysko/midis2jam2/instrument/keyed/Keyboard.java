@@ -6,7 +6,6 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.midi.MidiEvent;
-import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -20,16 +19,14 @@ public class Keyboard extends Instrument {
 	public static final int A_0 = 21;
 	static final int KEYBOARD_KEY_COUNT = 88;
 	private final List<? extends MidiEvent> events;
-	private final MidiFile file;
 	private final Skin skin;
 	public final Node movementNode = new Node();
 	public final Node node = new Node();
 	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
 	
-	public Keyboard(Midis2jam2 context, List<? extends MidiEvent> events, MidiFile file, Skin skin) {
-		this.context = context;
+	public Keyboard(Midis2jam2 context, List<? extends MidiEvent> events, Skin skin) {
+		super(context);
 		this.events = events;
-		this.file = file;
 		this.skin = skin;
 		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile);
 		
@@ -88,8 +85,8 @@ public class Keyboard extends Instrument {
 			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
 				events.remove(0);
 			}
-			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && file.eventInSeconds(events.get(0)) <= x) ||
-					(events.get(0) instanceof MidiNoteOffEvent && file.eventInSeconds(events.get(0)) - x <= 0.05))) {
+			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.file.eventInSeconds(events.get(0)) <= x) ||
+					(events.get(0) instanceof MidiNoteOffEvent && context.file.eventInSeconds(events.get(0)) - x <= 0.05))) {
 				eventsToPerform.add(events.remove(0));
 			}
 		}

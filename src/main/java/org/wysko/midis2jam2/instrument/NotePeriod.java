@@ -3,8 +3,6 @@ package org.wysko.midis2jam2.instrument;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.util.Objects;
-
 public class NotePeriod {
 	public final int midiNote;
 	public final double startTime;

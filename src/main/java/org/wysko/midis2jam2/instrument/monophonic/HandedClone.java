@@ -8,8 +8,8 @@ import com.jme3.scene.Spatial;
  */
 public abstract class HandedClone extends MonophonicClone {
 	protected Spatial horn;
-	protected Node leftHandNode = new Node();
-	protected Node rightHandNode = new Node();
+	protected final Node leftHandNode = new Node();
+	protected final Node rightHandNode = new Node();
 	protected Spatial[] leftHands;
 	protected Spatial[] rightHands;
 	public static class Hands {

@@ -14,6 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
+import org.wysko.midis2jam2.instrument.Guitar;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
@@ -263,9 +264,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 4: // Electric Piano 1
 			case 5: // Electric Piano 2
 			case 7: // Clavi
-				return (new Keyboard(this, events, file, Keyboard.Skin.PIANO));
+				return (new Keyboard(this, events, Keyboard.Skin.PIANO));
 			case 6: // Harpsichord
-				return new Keyboard(this, events, file, Keyboard.Skin.HARPSICHORD);
+				return new Keyboard(this, events, Keyboard.Skin.HARPSICHORD);
 			case 15: // Dulcimer
 			case 16: // Drawbar Organ
 			case 17: // Percussive Organ
@@ -273,7 +274,17 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 19: // Church Organ
 			case 20: // Reed Organ
 			case 55: // Orchestra Hit
-				return new Keyboard(this, events, file, Keyboard.Skin.WOOD);
+				return new Keyboard(this, events, Keyboard.Skin.WOOD);
+			case 24: // Acoustic Guitar (Nylon)
+			case 25: // Acoustic Guitar (Steel)
+				return new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
+			case 26: // Electric Guitar (jazz)
+			case 27: // Electric Guitar (clean)
+			case 28: // Electric Guitar (muted)
+			case 29: // Overdriven Guitar
+			case 30: // Distortion Guitar
+			case 31: // Guitar Harmonics
+				return new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
 			case 65: // Alto Sax
 				return new AltoSax(this, events, file);
 			case 66: // Tenor Sax
@@ -301,7 +312,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 101: // FX 6 (Goblins)
 			case 102: // FX 7 (Echoes)
 			case 103: // FX 8 (Sci-fi)
-				return new Keyboard(this, events, file, Keyboard.Skin.SYNTH);
+				return new Keyboard(this, events, Keyboard.Skin.SYNTH);
 			default:
 				return null;
 		}
@@ -311,6 +322,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Override
 	public void simpleInitApp() {
 		flyCam.setMoveSpeed(100f);
+		flyCam.setZoomSpeed(10);
 		flyCam.setEnabled(true);
 		flyCam.setDragToRotate(true);
 		setupKeys();
@@ -370,12 +382,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 */
 	private void setupKeys() {
 		inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
+		
 		inputManager.addMapping(Camera.CAMERA_1A.name(), new KeyTrigger(KeyInput.KEY_1));
 		inputManager.addListener(this, Camera.CAMERA_1A.name());
 		
 		inputManager.addMapping(Camera.CAMERA_5.name(), new KeyTrigger(KeyInput.KEY_5));
 		inputManager.addListener(this, Camera.CAMERA_5.name());
 		
+		inputManager.addMapping("slow", new KeyTrigger(KeyInput.KEY_LCONTROL));
+		inputManager.addListener(this, "slow");
 		
 		inputManager.addMapping("freecam", new KeyTrigger(KeyInput.KEY_GRAVE));
 		inputManager.addListener(this, "freecam");
@@ -397,12 +412,14 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
+		this.flyCam.setMoveSpeed(name.equals("slow") && isPressed ? 10 : 100);
 		if (isPressed) {
 			try {
 				Camera camera = Camera.valueOf(name);
 				setCamera(camera);
 			} catch (IllegalArgumentException ignored) {
 				if (name.equals("exit")) System.exit(0);
+				
 			}
 		}
 	}

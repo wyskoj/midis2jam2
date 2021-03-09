@@ -76,7 +76,7 @@ public class Flute extends MonophonicInstrument {
 				events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> (MidiNoteEvent) e)
 						.collect(Collectors.toList());
 		
-		calculateNotePeriods(notes);
+		this.notePeriods = calculateNotePeriods(notes);
 		calculateClones(this, FluteClone.class);
 		
 		
@@ -99,7 +99,7 @@ public class Flute extends MonophonicInstrument {
 	}
 	
 	public class FluteClone extends HandedClone {
-		SteamPuffer puffer;
+		final SteamPuffer puffer;
 		
 		public FluteClone() {
 			// 0-12 left hand
@@ -143,7 +143,6 @@ public class Flute extends MonophonicInstrument {
 				
 				/* Set the hands */
 				final int midiNote = currentNotePeriod.midiNote;
-				System.out.println("midiNote = " + midiNote);
 				final Hands hands = KEY_MAPPING.get(midiNote);
 				if (hands != null) {
 					

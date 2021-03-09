@@ -3,7 +3,6 @@ package org.wysko.midis2jam2.instrument.monophonic.reed.sax;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
-import org.wysko.midis2jam2.instrument.percussive.SnareDrum;
 import org.wysko.midis2jam2.midi.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -105,7 +104,7 @@ public class BaritoneSax extends Saxophone {
 						.map(e -> ((MidiNoteEvent) e))
 						.collect(Collectors.toList());
 		
-		calculateNotePeriods(justTheNotes);
+		this.notePeriods = calculateNotePeriods(justTheNotes);
 		calculateClones(this, BaritoneSaxClone.class);
 		
 		for (MonophonicClone clone : clones) {
@@ -149,7 +148,8 @@ public class BaritoneSax extends Saxophone {
 		@Override
 		public void tick(double time, float delta) {
 			int indexThis = BaritoneSax.this.clones.indexOf(this);
-			animation(time, indexThis, BaritoneSax.STRETCH_FACTOR, BaritoneSax.ROTATION_FACTOR, BaritoneSax.KEY_MAPPING);
+			animation(time, indexThis, BaritoneSax.STRETCH_FACTOR, BaritoneSax.ROTATION_FACTOR,
+					BaritoneSax.KEY_MAPPING);
 		}
 		
 	}

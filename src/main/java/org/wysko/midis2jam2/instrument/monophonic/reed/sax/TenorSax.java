@@ -104,7 +104,7 @@ public class TenorSax extends Saxophone {
 						.map(e -> ((MidiNoteEvent) e))
 						.collect(Collectors.toList());
 		
-		calculateNotePeriods(justTheNotes);
+		this.notePeriods = calculateNotePeriods(justTheNotes);
 		calculateClones(this, TenorSaxClone.class);
 		
 		for (MonophonicClone clone : clones) {

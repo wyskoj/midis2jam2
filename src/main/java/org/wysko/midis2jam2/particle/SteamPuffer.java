@@ -15,11 +15,10 @@ import java.util.Random;
  */
 public class SteamPuffer implements ParticleGenerator {
 	
+	public final Node steamPuffNode = new Node();
+	final List<Cloud> clouds = new ArrayList<>();
 	private final Midis2jam2 context;
 	private final SteamPuffType type;
-	public Node steamPuffNode = new Node();
-	float velocity = 0.1f;
-	List<Cloud> clouds = new ArrayList<>();
 	
 	public SteamPuffer(Midis2jam2 context, SteamPuffType type) {
 		this.context = context;
@@ -34,9 +33,15 @@ public class SteamPuffer implements ParticleGenerator {
 	public void tick(double time, float delta, boolean active) {
 		if (active) {
 			// Spawn clouds
-			int numberOfCloudsToSpawn = (int) (delta / (1f / 60f));
-			numberOfCloudsToSpawn = Math.max(1, numberOfCloudsToSpawn);
-			for (int i = 0; i < numberOfCloudsToSpawn; i++) {
+			double numberOfCloudsToSpawn = (delta / (1f / 60f));
+			if (numberOfCloudsToSpawn < 1) {
+				if (new Random().nextDouble() < numberOfCloudsToSpawn) {
+					numberOfCloudsToSpawn = 1;
+				} else {
+					numberOfCloudsToSpawn = 0;
+				}
+			}
+			for (int i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
 				Cloud cloud = new Cloud();
 				clouds.add(cloud);
 				steamPuffNode.attachChild(cloud.cloud);
@@ -49,6 +54,7 @@ public class SteamPuffer implements ParticleGenerator {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public enum SteamPuffType {
 		NORMAL("SteamPuff.bmp"),
 		HARMONICA("SteamPuff_Harmonica.bmp"),
@@ -62,11 +68,9 @@ public class SteamPuffer implements ParticleGenerator {
 	}
 	
 	class Cloud implements Particle {
-		private final double END_OF_LIFE = 0.7;
-		float velocity = 0.7f;
-		Node cloud = new Node();
-		float randY;
-		float randZ;
+		final Node cloud = new Node();
+		final float randY;
+		final float randZ;
 		double life = 0;
 		
 		public Cloud() {
@@ -84,9 +88,10 @@ public class SteamPuffer implements ParticleGenerator {
 		
 		@Override
 		public void tick(double time, float delta) {
-			cloud.setLocalTranslation(locEase(life) * 5, locEase(life) * randY, locEase(life) * randZ);
-			cloud.setLocalScale((float) (0.75 * life + 0.75));
+			cloud.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
+			cloud.setLocalScale((float) (0.75 * life + 1.2));
 			life += delta * 1.5;
+			double END_OF_LIFE = 0.7;
 			if (life > END_OF_LIFE) despawn();
 		}
 		
@@ -99,8 +104,5 @@ public class SteamPuffer implements ParticleGenerator {
 			return (float) (1 - Math.pow(1 - x, 4));
 		}
 		
-		private float scaleEase(double x) {
-			return (float) (x);
-		}
 	}
 }

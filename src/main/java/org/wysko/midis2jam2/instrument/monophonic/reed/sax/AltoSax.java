@@ -102,7 +102,7 @@ public class AltoSax extends Saxophone {
 						.map(e -> ((MidiNoteEvent) e))
 						.collect(Collectors.toList());
 		
-		calculateNotePeriods(justTheNotes);
+		this.notePeriods = calculateNotePeriods(justTheNotes);
 		calculateClones(this, AltoSaxClone.class);
 		
 		for (MonophonicClone clone : clones) {

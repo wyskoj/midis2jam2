@@ -16,6 +16,7 @@ public class Percussion extends Instrument {
 	public final Node percussionNode = new Node();
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
+		super(context);
 		/* Percussion only cares about note on. */
 		List<MidiNoteOnEvent> noteOnEvents = events.stream()
 				.filter(e -> e instanceof MidiNoteOnEvent)
