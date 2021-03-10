@@ -1,5 +1,7 @@
 package org.wysko.midis2jam2.instrument.monophonic.reed.sax;
 
+import com.jme3.material.Material;
+import com.jme3.math.Vector3f;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.*;
@@ -133,6 +135,11 @@ public class AltoSax extends Saxophone {
 			
 			this.body = AltoSax.this.context.loadModel("AltoSaxBody.obj", "HornSkin.bmp");
 			this.bell = AltoSax.this.context.loadModel("AltoSaxHorn.obj", "HornSkin.bmp");
+			
+//			final Material reflectiveMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/reflect" +
+//					".j3md");
+//			reflectiveMaterial.setTexture("CubeMap", context.getAssetManager().loadTexture("Assets/HornSkin.bmp"));
+//			body.setMaterial(reflectiveMaterial);
 			
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);

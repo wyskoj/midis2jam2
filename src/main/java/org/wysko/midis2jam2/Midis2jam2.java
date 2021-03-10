@@ -343,8 +343,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		pianoStand.rotate(0, rad(45), 0);
 		
 		DirectionalLight sun = new DirectionalLight();
-		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(rad(180), 0, 0));
+		sun.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
 		rootNode.addLight(sun);
 		
 		try {
