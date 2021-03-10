@@ -46,7 +46,6 @@ public class BassDrum extends Drum {
 		beaterNode.setLocalTranslation(0,0,1.5f);
 		
 		highLevelNode.setLocalTranslation(0,0,-80);
-		context.getRootNode().attachChild(highLevelNode);
 	}
 	
 	@Override

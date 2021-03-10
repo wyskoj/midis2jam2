@@ -13,6 +13,13 @@ public class Percussion extends Instrument {
 	
 	public final SnareDrum snareDrum;
 	public final BassDrum bassDrum;
+	public final Tom tom1;
+	public final Tom tom2;
+	public final Tom tom3;
+	public final Tom tom4;
+	public final Tom tom5;
+	public final Tom tom6;
+	public final Node drumsetNode = new Node();
 	public final Node percussionNode = new Node();
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -30,9 +37,35 @@ public class Percussion extends Instrument {
 		bassDrum = new BassDrum(context,
 				noteOnEvents.stream().filter(e -> e.note == 35 || e.note == 36).collect(Collectors.toList()));
 		
-		// Attach nodes to group node
-		percussionNode.attachChild(snareDrum.highLevelNode);
+		tom1 = new Tom(context,
+				noteOnEvents.stream().filter(e -> e.note == 41).collect(Collectors.toList()), Tom.TomPitch.LOW_FLOOR);
 		
+		tom2 = new Tom(context,
+				noteOnEvents.stream().filter(e -> e.note == 43).collect(Collectors.toList()), Tom.TomPitch.HIGH_FLOOR);
+		
+		tom3 = new Tom(context,
+				noteOnEvents.stream().filter(e -> e.note == 45).collect(Collectors.toList()), Tom.TomPitch.LOW);
+		
+		tom4 = new Tom(context,
+				noteOnEvents.stream().filter(e -> e.note == 47).collect(Collectors.toList()), Tom.TomPitch.LOW_MID);
+		
+		tom5 = new Tom(context,
+				noteOnEvents.stream().filter(e -> e.note == 48).collect(Collectors.toList()), Tom.TomPitch.HIGH_MID);
+		
+		tom6 = new Tom(context,
+				noteOnEvents.stream().filter(e -> e.note == 50).collect(Collectors.toList()), Tom.TomPitch.HIGH);
+		
+		// Attach nodes to group node
+		drumsetNode.attachChild(snareDrum.highLevelNode);
+		drumsetNode.attachChild(bassDrum.highLevelNode);
+		drumsetNode.attachChild(tom1.highLevelNode);
+		drumsetNode.attachChild(tom2.highLevelNode);
+		drumsetNode.attachChild(tom3.highLevelNode);
+		drumsetNode.attachChild(tom4.highLevelNode);
+		drumsetNode.attachChild(tom5.highLevelNode);
+		drumsetNode.attachChild(tom6.highLevelNode);
+		
+		percussionNode.attachChild(drumsetNode);
 		context.getRootNode().attachChild(percussionNode);
 		
 		System.out.println(events);
@@ -42,5 +75,11 @@ public class Percussion extends Instrument {
 	public void tick(double time, float delta) {
 		snareDrum.tick(time, delta);
 		bassDrum.tick(time, delta);
+		tom1.tick(time, delta);
+		tom2.tick(time, delta);
+		tom3.tick(time, delta);
+		tom4.tick(time, delta);
+		tom5.tick(time, delta);
+		tom6.tick(time, delta);
 	}
 }
