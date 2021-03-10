@@ -251,11 +251,13 @@ public class Guitar extends Instrument {
 		
 		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
 			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
-				if (currentNotePeriods.get(i).endTime <= time) {
+				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01) { // floating points are the death of me
 					currentNotePeriods.remove(i);
 				}
 			}
 		}
+		final double inc = delta / (1 / 60f);
+		this.frame += inc;
 	}
 	
 	/**
@@ -282,7 +284,8 @@ public class Guitar extends Instrument {
 		}
 		
 		float fretDistance = fretToDistance(fret);
-		final Vector3f localScale = new Vector3f(RESTING_STRINGS[string].setY(fretDistance));
+		final Vector3f localScale = new Vector3f(RESTING_STRINGS[string]);
+		localScale.setY(fretDistance);
 		upperStrings[string].setLocalScale(localScale);
 		for (int i = 0; i < 5; i++) {
 			frame = frame % 5;
@@ -291,11 +294,8 @@ public class Guitar extends Instrument {
 			} else {
 				animStrings[string][i].setCullHint(Spatial.CullHint.Always);
 			}
-			animStrings[string][i].setLocalScale(new Vector3f(RESTING_STRINGS[string].setY(1 - fretDistance)));
+			animStrings[string][i].setLocalScale(new Vector3f(RESTING_STRINGS[string]).setY(1 - fretDistance));
 		}
-		
-		final double inc = delta / (1 / 60f);
-		this.frame += inc;
 		
 		// Show the fret finger on the right spot (if not an open string)
 		if (fret != 0) {
