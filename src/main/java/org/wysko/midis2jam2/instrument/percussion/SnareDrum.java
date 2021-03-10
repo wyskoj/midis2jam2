@@ -12,8 +12,6 @@ public class SnareDrum extends StickDrum {
 	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
-		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		stickNode.attachChild(stick);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);
 		highLevelNode.attachChild(recoilNode);
@@ -21,7 +19,6 @@ public class SnareDrum extends StickDrum {
 		highLevelNode.rotate(rad(10), 0, rad(-10));
 		stickNode.rotate(0, rad(80), 0);
 		stickNode.move(10, 0, 3);
-		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
 	}
 	
 	@Override

@@ -14,8 +14,6 @@ public class Tom extends StickDrum {
 		super(context, hits);
 		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp");
 		drum.setLocalScale(pitch.scale);
-		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		stickNode.attachChild(stick);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);
 		highLevelNode.attachChild(recoilNode);

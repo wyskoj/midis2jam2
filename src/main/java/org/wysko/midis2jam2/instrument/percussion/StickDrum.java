@@ -17,8 +17,6 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public abstract class StickDrum extends SingleStickedInstrument {
 	
 	static final float RECOIL_DISTANCE = -2f;
-	final static double MAX_ANGLE = 50;
-	final Node highLevelNode = new Node();
 	/**
 	 * Attach {@link #drum} and {@link #stick} to this and move this for recoil.
 	 */

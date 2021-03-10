@@ -136,8 +136,7 @@ public class AltoSax extends Saxophone {
 			this.body = AltoSax.this.context.loadModel("AltoSaxBody.obj", "HornSkin.bmp");
 			this.bell = AltoSax.this.context.loadModel("AltoSaxHorn.obj", "HornSkin.bmp");
 			
-//			final Material reflectiveMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/reflect" +
-//					".j3md");
+//			Material reflectiveMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/reflect.j3md");
 //			reflectiveMaterial.setTexture("CubeMap", context.getAssetManager().loadTexture("Assets/HornSkin.bmp"));
 //			body.setMaterial(reflectiveMaterial);
 			

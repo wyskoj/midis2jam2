@@ -19,8 +19,11 @@ public class Percussion extends Instrument {
 	public final Tom tom4;
 	public final Tom tom5;
 	public final Tom tom6;
+	public final Cymbal crash1;
+	public final Cymbal splash;
 	public final Node drumSetNode = new Node();
 	public final Node percussionNode = new Node();
+	private final Cymbal crash2;
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
@@ -55,6 +58,16 @@ public class Percussion extends Instrument {
 		tom6 = new Tom(context,
 				noteOnEvents.stream().filter(e -> e.note == 50).collect(Collectors.toList()), Tom.TomPitch.HIGH);
 		
+		crash1 = new Cymbal(context,
+				noteOnEvents.stream().filter(e -> e.note == 49).collect(Collectors.toList()), Cymbal.CymbalType.CRASH_1);
+		
+		crash2 = new Cymbal(context,
+				noteOnEvents.stream().filter(e -> e.note == 57).collect(Collectors.toList()),
+				Cymbal.CymbalType.CRASH_2);
+		
+		splash = new Cymbal(context,
+				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.SPLASH);
+		
 		// Attach nodes to group node
 		drumSetNode.attachChild(snareDrum.highLevelNode);
 		drumSetNode.attachChild(bassDrum.highLevelNode);
@@ -64,6 +77,9 @@ public class Percussion extends Instrument {
 		drumSetNode.attachChild(tom4.highLevelNode);
 		drumSetNode.attachChild(tom5.highLevelNode);
 		drumSetNode.attachChild(tom6.highLevelNode);
+		drumSetNode.attachChild(crash1.highLevelNode);
+		drumSetNode.attachChild(crash2.highLevelNode);
+		drumSetNode.attachChild(splash.highLevelNode);
 		
 		percussionNode.attachChild(drumSetNode);
 		context.getRootNode().attachChild(percussionNode);
@@ -81,5 +97,8 @@ public class Percussion extends Instrument {
 		tom4.tick(time, delta);
 		tom5.tick(time, delta);
 		tom6.tick(time, delta);
+		crash1.tick(time, delta);
+		crash2.tick(time, delta);
+		splash.tick(time, delta);
 	}
 }
