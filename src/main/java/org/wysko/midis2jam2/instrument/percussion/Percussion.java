@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussive;
+package org.wysko.midis2jam2.instrument.percussion;
 
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
@@ -19,7 +19,7 @@ public class Percussion extends Instrument {
 	public final Tom tom4;
 	public final Tom tom5;
 	public final Tom tom6;
-	public final Node drumsetNode = new Node();
+	public final Node drumSetNode = new Node();
 	public final Node percussionNode = new Node();
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -56,16 +56,16 @@ public class Percussion extends Instrument {
 				noteOnEvents.stream().filter(e -> e.note == 50).collect(Collectors.toList()), Tom.TomPitch.HIGH);
 		
 		// Attach nodes to group node
-		drumsetNode.attachChild(snareDrum.highLevelNode);
-		drumsetNode.attachChild(bassDrum.highLevelNode);
-		drumsetNode.attachChild(tom1.highLevelNode);
-		drumsetNode.attachChild(tom2.highLevelNode);
-		drumsetNode.attachChild(tom3.highLevelNode);
-		drumsetNode.attachChild(tom4.highLevelNode);
-		drumsetNode.attachChild(tom5.highLevelNode);
-		drumsetNode.attachChild(tom6.highLevelNode);
+		drumSetNode.attachChild(snareDrum.highLevelNode);
+		drumSetNode.attachChild(bassDrum.highLevelNode);
+		drumSetNode.attachChild(tom1.highLevelNode);
+		drumSetNode.attachChild(tom2.highLevelNode);
+		drumSetNode.attachChild(tom3.highLevelNode);
+		drumSetNode.attachChild(tom4.highLevelNode);
+		drumSetNode.attachChild(tom5.highLevelNode);
+		drumSetNode.attachChild(tom6.highLevelNode);
 		
-		percussionNode.attachChild(drumsetNode);
+		percussionNode.attachChild(drumSetNode);
 		context.getRootNode().attachChild(percussionNode);
 		
 		System.out.println(events);

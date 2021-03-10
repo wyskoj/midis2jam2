@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussive;
+package org.wysko.midis2jam2.instrument.percussion;
 
 import com.jme3.math.FastMath;
 import org.jetbrains.annotations.Range;
@@ -8,11 +8,14 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
 
-public abstract class Drum extends Instrument {
+/**
+ * Anything on the percussion channel. This excludes melodic agogos, woodblocks, etc.
+ */
+public abstract class PercussionInstrument extends Instrument {
 	static final float DRUM_RECOIL_COMEBACK = 22;
-	protected final List<MidiNoteOnEvent> hits;
+	List<MidiNoteOnEvent> hits;
 	
-	protected Drum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
+	protected PercussionInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context);
 		this.hits = hits;
 	}

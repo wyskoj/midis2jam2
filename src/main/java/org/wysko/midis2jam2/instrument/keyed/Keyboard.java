@@ -166,6 +166,7 @@ public class Keyboard extends Instrument {
 				node.attachChild(keyBack);
 				
 				Keyboard.this.movementNode.attachChild(node);
+				// TODO use the down key model
 				node.move(startPos - 26, 0, 0); // 26 = count(white keys) / 2
 			} else { // Black key
 				Spatial blackKey = context.loadModel("PianoBlackKey.obj", skin.textureFile);

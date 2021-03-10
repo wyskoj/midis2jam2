@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussive;
+package org.wysko.midis2jam2.instrument.percussion;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;

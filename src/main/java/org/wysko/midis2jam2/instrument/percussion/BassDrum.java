@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussive;
+package org.wysko.midis2jam2.instrument.percussion;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -10,9 +10,9 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
-import static org.wysko.midis2jam2.instrument.percussive.StickDrum.MAX_ANGLE;
+import static org.wysko.midis2jam2.instrument.percussion.StickDrum.MAX_ANGLE;
 
-public class BassDrum extends Drum {
+public class BassDrum extends PercussionInstrument {
 	
 	private final static int PEDAL_MAX_ANGLE = 20;
 	
@@ -65,7 +65,7 @@ public class BassDrum extends Drum {
 			Vector3f localTranslation = drumNode.getLocalTranslation();
 			if (localTranslation.z < -0.0001) {
 				drumNode.setLocalTranslation(0, 0, Math.min(0,
-						localTranslation.z + (Drum.DRUM_RECOIL_COMEBACK * delta)));
+						localTranslation.z + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)));
 			} else {
 				drumNode.setLocalTranslation(0, 0, 0);
 			}

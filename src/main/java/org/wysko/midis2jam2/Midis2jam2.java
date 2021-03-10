@@ -6,7 +6,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -21,7 +20,7 @@ import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
-import org.wysko.midis2jam2.instrument.percussive.Percussion;
+import org.wysko.midis2jam2.instrument.percussion.Percussion;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
