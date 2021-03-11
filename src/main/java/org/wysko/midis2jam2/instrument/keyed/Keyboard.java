@@ -18,11 +18,11 @@ public class Keyboard extends Instrument {
 	
 	public static final int A_0 = 21;
 	static final int KEYBOARD_KEY_COUNT = 88;
-	private final List<? extends MidiEvent> events;
-	private final Skin skin;
 	public final Node movementNode = new Node();
 	public final Node node = new Node();
 	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
+	private final List<? extends MidiEvent> events;
+	private final Skin skin;
 	
 	public Keyboard(Midis2jam2 context, List<? extends MidiEvent> events, Skin skin) {
 		super(context);
@@ -106,6 +106,8 @@ public class Keyboard extends Instrument {
 		KeyboardKey key = keys[midiNote - Keyboard.A_0];
 		key.node.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));
 		key.beingPressed = true;
+		key.downNode.setCullHint(Spatial.CullHint.Dynamic);
+		key.upNode.setCullHint(Spatial.CullHint.Always);
 	}
 	
 	public void transitionAnimation(float delta) {
@@ -117,9 +119,11 @@ public class Keyboard extends Instrument {
 					key.node.setLocalRotation(new Quaternion(new float[]
 							{Math.max(angles[0] - (0.02f * delta * 50), 0), 0, 0}
 					));
-//					key.node.rotate(-0.02f * delta * 50, 0, 0);
 				} else {
 					key.node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
+					
+					key.downNode.setCullHint(Spatial.CullHint.Always);
+					key.upNode.setCullHint(Spatial.CullHint.Dynamic);
 				}
 			}
 		}
@@ -149,6 +153,8 @@ public class Keyboard extends Instrument {
 	public class KeyboardKey {
 		public final int midiNote;
 		public final Node node = new Node();
+		public final Node upNode = new Node();
+		public final Node downNode = new Node();
 		public boolean beingPressed = false;
 		
 		public KeyboardKey(Midis2jam2 context, int midiNote, int startPos) {
@@ -156,26 +162,49 @@ public class Keyboard extends Instrument {
 			
 			
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
+				
+				/* UP KEY */
 				// Front key
-				Spatial keyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
+				Spatial upKeyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile,
+						Midis2jam2.MatType.UNSHADED);
+				// Back Key
+				Spatial upKeyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile,
+						Midis2jam2.MatType.UNSHADED);
 				
+				upNode.attachChild(upKeyFront);
+				upNode.attachChild(upKeyBack);
+				/* DOWN KEY */
+				// Front key
+				Spatial downKeyFront = context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile,
+						Midis2jam2.MatType.UNSHADED);
 				// Back key
-				Spatial keyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
+				Spatial downKeyBack = context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile,
+						Midis2jam2.MatType.UNSHADED);
+				downNode.attachChild(downKeyFront);
+				downNode.attachChild(downKeyBack);
 				
-				node.attachChild(keyFront);
-				node.attachChild(keyBack);
+				node.attachChild(upNode);
+				node.attachChild(downNode);
 				
 				Keyboard.this.movementNode.attachChild(node);
-				// TODO use the down key model
 				node.move(startPos - 26, 0, 0); // 26 = count(white keys) / 2
 			} else { // Black key
+				
+				/* Up key */
 				Spatial blackKey = context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
-				node.attachChild(blackKey);
+				upNode.attachChild(blackKey);
+				/* Up key */
+				Spatial blackKeyDown = context.loadModel("PianoKeyBlackDown.obj", skin.textureFile,
+						Midis2jam2.MatType.UNSHADED);
+				downNode.attachChild(blackKeyDown);
+				
+				node.attachChild(upNode);
+				node.attachChild(downNode);
 				
 				Keyboard.this.movementNode.attachChild(node);
-				node.move(midiNote * (7 / 12f) - 38.2f, 0, 0);
+				node.move(midiNote * (7 / 12f) - 38.2f, 0, 0); // funky math
 			}
-			
+			downNode.setCullHint(Spatial.CullHint.Always);
 		}
 	}
 }
