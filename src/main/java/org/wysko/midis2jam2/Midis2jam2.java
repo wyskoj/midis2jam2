@@ -61,7 +61,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 		settings.setFullscreen(false);
-		settings.setResolution(1280, 720);
+		settings.setResolution(1024, 768);
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
 		settings.setSamples(4);
@@ -352,7 +352,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
 //		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
-		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED);
+		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED);
 		rootNode.attachChild(stage);
 		
 		Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED);

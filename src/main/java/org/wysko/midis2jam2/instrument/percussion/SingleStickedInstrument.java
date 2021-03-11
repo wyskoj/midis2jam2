@@ -18,6 +18,7 @@ public abstract class SingleStickedInstrument extends PercussionInstrument {
 	final static double MAX_ANGLE = 50;
 	final Node stickNode = new Node();
 	final Spatial stick;
+	private final static double STRIKE_SPEED = 3;
 	
 	protected SingleStickedInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
@@ -38,7 +39,8 @@ public abstract class SingleStickedInstrument extends PercussionInstrument {
 		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time)
 			nextHit = hits.remove(0);
 		
-		double proposedRotation = nextHit == null ? SingleStickedInstrument.MAX_ANGLE : -1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / 500) * (time - context.file.eventInSeconds(nextHit));
+		double proposedRotation = nextHit == null ? SingleStickedInstrument.MAX_ANGLE :
+				-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f/ STRIKE_SPEED)) * (time - context.file.eventInSeconds(nextHit));
 		
 		float[] floats = stick.getLocalRotation().toAngles(new float[3]);
 		
