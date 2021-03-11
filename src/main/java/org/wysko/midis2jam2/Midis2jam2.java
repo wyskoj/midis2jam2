@@ -16,6 +16,7 @@ import org.wysko.midis2jam2.instrument.Guitar;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
+import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
@@ -89,6 +90,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
 		}
 		
+		midijam.sequencer.setMasterSyncMode(Sequencer.SyncMode.MIDI_SYNC);
 		midijam.sequencer.open();
 		
 		midijam.sequencer.setSequence(sequence);
@@ -118,8 +120,23 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 					}, -LATENCY_FIX);
 					midijam.sequencer.start();
 				}
+				
+				new Timer().scheduleAtFixedRate(new TimerTask() {
+					@Override
+					public void run() {
+						// Find the first tempo we haven't hit and need to execute
+						long currentMidiTick = midijam.sequencer.getTickPosition();
+						for (MidiTempoEvent tempo : midijam.file.tempos) {
+							if (tempo.time == currentMidiTick) {
+								midijam.sequencer.setTempoInBPM(60_000_000f / tempo.number);
+							}
+						}
+					}
+				},0,1);
 			}
 		}, 2000);
+		
+		
 	}
 	
 	/**
@@ -288,6 +305,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new TenorSax(this, events, file);
 			case 67: // Baritone Sax
 				return new BaritoneSax(this, events, file);
+			case 72: // Piccolo
+				return new Piccolo(this,events,file);
 			case 73: // Flute
 				return new Flute(this, events, file);
 			case 80: // Lead 1 (Square)

@@ -18,7 +18,7 @@ public class MidiFile {
 	public MidiTrack[] tracks;
 	public short division;
 	
-	List<MidiTempoEvent> tempos = new ArrayList<>();
+	public List<MidiTempoEvent> tempos = new ArrayList<>();
 	
 	/**
 	 * Reads a MIDI file and parses using MIDICSV.
