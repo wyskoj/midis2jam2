@@ -4,7 +4,7 @@
 # 104 vertices, 204 polygons, 612 points, 1 materials
 
 
-
+mtllib AccordianRightHand.mtl
 
 #-- object 'Converted object 0' --
 # 104 vertices, 204 polygons, 612 points
@@ -1346,7 +1346,7 @@ vt 0.175375 0.784943
 vt 0.175384 0.088925
 
 # polygons: 204
-usemtl black
+
 f 1/1/1 28/2/2 29/3/3
 f 30/4/4 31/5/5 32/6/6
 f 27/7/7 33/8/8 28/9/9

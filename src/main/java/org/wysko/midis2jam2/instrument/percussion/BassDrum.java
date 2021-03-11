@@ -27,10 +27,10 @@ public class BassDrum extends PercussionInstrument {
 	
 	public BassDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		bassDrum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp");
-		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.obj", "MetalTexture.bmp");
-		bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.obj", "MetalTexture.bmp");
-		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp");
+		bassDrum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED);
+		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.obj", "MetalTexture.bmp", Midis2jam2.MatType.UNSHADED);
+		bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.obj", "MetalTexture.bmp", Midis2jam2.MatType.UNSHADED);
+		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp", Midis2jam2.MatType.UNSHADED);
 		
 		drumNode.attachChild(bassDrum);
 		beaterNode.attachChild(bassDrumBeaterArm);
@@ -40,12 +40,12 @@ public class BassDrum extends PercussionInstrument {
 		highLevelNode.attachChild(beaterNode);
 		
 		bassDrumBeaterArm.setLocalTranslation(0, 5.5f, 1.35f);
-		bassDrumBeaterArm.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE),0,0));
-		bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(rad(PEDAL_MAX_ANGLE),0,0));
-		bassDrumPedal.setLocalTranslation(0,0.5f,7.5f);
-		beaterNode.setLocalTranslation(0,0,1.5f);
+		bassDrumBeaterArm.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
+		bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(rad(PEDAL_MAX_ANGLE), 0, 0));
+		bassDrumPedal.setLocalTranslation(0, 0.5f, 7.5f);
+		beaterNode.setLocalTranslation(0, 0, 1.5f);
 		
-		highLevelNode.setLocalTranslation(0,0,-80);
+		highLevelNode.setLocalTranslation(0, 0, -80);
 	}
 	
 	@Override
@@ -58,7 +58,7 @@ public class BassDrum extends PercussionInstrument {
 			// We need to strike
 			bassDrumBeaterArm.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
 			bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
-			drumNode.setLocalTranslation(0,0, (float) (-3 * velocityRecoilDampening(nextHit.velocity)));
+			drumNode.setLocalTranslation(0, 0, (float) (-3 * velocityRecoilDampening(nextHit.velocity)));
 		} else {
 			
 			// Drum recoil
@@ -80,7 +80,7 @@ public class BassDrum extends PercussionInstrument {
 			
 			// Pedal comeback
 			float[] pedalAngles = bassDrumPedal.getLocalRotation().toAngles(new float[3]);
-			float pedalAngle = (float) (pedalAngles[0] + 8f * delta * (PEDAL_MAX_ANGLE/ MAX_ANGLE));
+			float pedalAngle = (float) (pedalAngles[0] + 8f * delta * (PEDAL_MAX_ANGLE / MAX_ANGLE));
 			pedalAngle = Math.min(rad((float) PEDAL_MAX_ANGLE), pedalAngle);
 			bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(
 					pedalAngle, 0, 0

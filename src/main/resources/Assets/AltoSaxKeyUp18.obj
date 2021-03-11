@@ -4,7 +4,7 @@
 # 26 vertices, 48 polygons, 144 points, 2 materials
 
 
-
+mtllib AltoSaxKeyUp18.mtl
 
 #-- object 'Converted object 0(m1)' --
 # 26 vertices, 48 polygons, 144 points
@@ -332,7 +332,7 @@ vt 0.092020 0.380089
 vt 0.046524 0.380091
 
 # polygons: 48
-usemtl Material01_1
+
 f 1/1/1 3/2/2 26/3/3
 f 2/4/4 25/5/5 4/6/6
 f 1/7/7 2/8/8 3/9/9

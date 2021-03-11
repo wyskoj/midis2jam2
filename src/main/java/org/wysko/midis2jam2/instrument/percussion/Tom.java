@@ -12,7 +12,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Tom extends StickDrum {
 	public Tom(Midis2jam2 context, List<MidiNoteOnEvent> hits, TomPitch pitch) {
 		super(context, hits);
-		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp");
+		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED);
 		drum.setLocalScale(pitch.scale);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);
@@ -22,10 +22,10 @@ public class Tom extends StickDrum {
 		
 		
 		if (pitch == TomPitch.HIGH_FLOOR || pitch == TomPitch.LOW_FLOOR) {
-			stickNode.setLocalRotation(new Quaternion().fromAngles(0,rad(80),0));
-			stickNode.setLocalTranslation(10,0,0);
+			stickNode.setLocalRotation(new Quaternion().fromAngles(0, rad(80), 0));
+			stickNode.setLocalTranslation(10, 0, 0);
 		} else {
-			stickNode.setLocalTranslation(0,0,10);
+			stickNode.setLocalTranslation(0, 0, 10);
 		}
 		
 		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
@@ -48,24 +48,24 @@ public class Tom extends StickDrum {
 				new Quaternion().fromAngles(rad(-5), rad(180), rad(-15))),
 		
 		LOW(new Vector3f(1.2f, 1.2f, 1.2f),
-				new Vector3f(10f, 27+2, -82),
-				new Quaternion().fromAngles(rad(60),rad(-30),0)),
+				new Vector3f(10f, 27 + 2, -82),
+				new Quaternion().fromAngles(rad(60), rad(-30), 0)),
 		
 		LOW_MID(new Vector3f(1f, 1f, 1f),
-				new Vector3f(0, 30+2, -85),
-				new Quaternion().fromAngles(rad(60),0,0)),
+				new Vector3f(0, 30 + 2, -85),
+				new Quaternion().fromAngles(rad(60), 0, 0)),
 		
 		HIGH_MID(new Vector3f(0.8f, 0.8f, 0.8f),
-				new Vector3f(-9, 29+2, -82),
-				new Quaternion().fromAngles(rad(60),rad(20),0)),
+				new Vector3f(-9, 29 + 2, -82),
+				new Quaternion().fromAngles(rad(60), rad(20), 0)),
 		
 		HIGH(new Vector3f(0.6f, 0.6f, 0.6f),
-				new Vector3f(-15, 27+2, -78),
-				new Quaternion().fromAngles(rad(50),rad(40),0));
+				new Vector3f(-15, 27 + 2, -78),
+				new Quaternion().fromAngles(rad(50), rad(40), 0));
 		
-		Vector3f scale;
-		Vector3f location;
-		Quaternion rotation;
+		final Vector3f scale;
+		final Vector3f location;
+		final Quaternion rotation;
 		
 		TomPitch(Vector3f scale, Vector3f location, Quaternion rotation) {
 			this.scale = scale;

@@ -4,7 +4,7 @@
 # 445 vertices, 652 polygons, 1956 points, 1 materials
 
 
-
+mtllib Piccolo.mtl
 
 #-- object 'Converted object 0' --
 # 445 vertices, 652 polygons, 1956 points
@@ -4375,7 +4375,7 @@ vt 1.000000 0.666667
 vt 1.000000 0.333333
 
 # polygons: 652
-usemtl Material01
+
 f 5/1/1 61/2/2 10/3/3
 f 1/4/4 2/5/5 7/6/6
 f 1/7/7 7/8/8 6/9/9

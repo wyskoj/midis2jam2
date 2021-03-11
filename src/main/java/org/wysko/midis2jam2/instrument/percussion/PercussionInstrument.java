@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class PercussionInstrument extends Instrument {
 	static final float DRUM_RECOIL_COMEBACK = 22;
 	final Node highLevelNode = new Node();
-	List<MidiNoteOnEvent> hits;
+	final List<MidiNoteOnEvent> hits;
 	
 	protected PercussionInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context);

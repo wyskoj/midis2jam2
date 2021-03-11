@@ -4,7 +4,7 @@
 # 146 vertices, 264 polygons, 792 points, 1 materials
 
 
-
+mtllib TubularBellMallet.mtl
 
 #-- object 'Converted object 0' --
 # 146 vertices, 264 polygons, 792 points
@@ -1748,7 +1748,7 @@ vt 0.530898 0.903659
 vt 0.547089 0.728430
 
 # polygons: 264
-usemtl Material01
+
 f 1/1/1 8/2/2 86/3/3
 f 7/4/4 85/5/5 14/6/6
 f 1/7/7 2/8/8 9/9/9

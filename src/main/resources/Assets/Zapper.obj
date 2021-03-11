@@ -4,7 +4,7 @@
 # 197 vertices, 330 polygons, 990 points, 1 materials
 
 
-
+mtllib Zapper.mtl
 
 #-- object 'Converted object 0' --
 # 197 vertices, 330 polygons, 990 points
@@ -2195,7 +2195,7 @@ vt 0.987500 0.734437
 vt 0.856693 0.734437
 
 # polygons: 330
-usemtl Material01
+
 f 2/1/1 3/2/2 4/3/3
 f 1/4/4 52/5/5 51/6/6
 f 2/7/7 4/8/8 5/9/9

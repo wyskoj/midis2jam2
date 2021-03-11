@@ -4,7 +4,7 @@
 # 88 vertices, 168 polygons, 504 points, 1 materials
 
 
-
+mtllib XylophoneMalletWhite.mtl
 
 #-- object 'Converted object 0' --
 # 88 vertices, 168 polygons, 504 points
@@ -1114,7 +1114,7 @@ vt 0.649341 0.880413
 vt 0.649341 0.003387
 
 # polygons: 168
-usemtl WhiteKey1
+
 f 2/1/1 3/2/2 4/3/3
 f 1/4/4 52/5/5 51/6/6
 f 2/7/7 4/8/8 5/9/9

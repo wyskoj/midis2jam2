@@ -4,7 +4,7 @@
 # 50 vertices, 96 polygons, 288 points, 1 materials
 
 
-
+mtllib TaikoStick.mtl
 
 #-- object 'Converted object 0' --
 # 50 vertices, 96 polygons, 288 points
@@ -644,7 +644,7 @@ vt 0.254867 0.993325
 vt 0.254867 0.771786
 
 # polygons: 96
-usemtl WhiteKey1
+
 f 1/1/1 5/2/2 50/3/3
 f 4/4/4 49/5/5 8/6/6
 f 1/7/7 2/8/8 5/9/9

@@ -4,7 +4,7 @@
 # 12 vertices, 12 polygons, 36 points, 1 materials
 
 
-
+mtllib StageString.mtl
 
 #-- object 'Converted object 0' --
 # 12 vertices, 12 polygons, 36 points
@@ -102,7 +102,7 @@ vt 0.196579 0.997168
 vt 0.196579 0.967678
 
 # polygons: 12
-usemtl WhiteKey1
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 6/9/9

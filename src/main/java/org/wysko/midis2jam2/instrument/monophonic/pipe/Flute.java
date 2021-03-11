@@ -95,7 +95,7 @@ public class Flute extends MonophonicInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		updateClones(time, delta, new Vector3f(0,10,0));
+		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	
 	public class FluteClone extends HandedClone {
@@ -103,10 +103,10 @@ public class Flute extends MonophonicInstrument {
 		
 		public FluteClone() {
 			// 0-12 left hand
-			horn = Flute.this.context.loadModel("Flute.obj", "ShinySilver.bmp");
+			horn = Flute.this.context.loadModel("Flute.obj", "ShinySilver.bmp", Midis2jam2.MatType.UNSHADED);
 			leftHands = new Spatial[13];
 			for (int i = 0; i < 13; i++) {
-				leftHands[i] = Flute.this.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp");
+				leftHands[i] = Flute.this.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp", Midis2jam2.MatType.UNSHADED);
 				leftHandNode.attachChild(leftHands[i]);
 				if (i != 0) {
 					leftHands[i].setCullHint(Spatial.CullHint.Always);
@@ -115,7 +115,7 @@ public class Flute extends MonophonicInstrument {
 			// 0-11 right hand
 			rightHands = new Spatial[12];
 			for (int i = 0; i < 12; i++) {
-				rightHands[i] = Flute.this.context.loadModel(String.format("Flute_RightHand%02d.obj", i), "hands.bmp");
+				rightHands[i] = Flute.this.context.loadModel(String.format("Flute_RightHand%02d.obj", i), "hands.bmp", Midis2jam2.MatType.UNSHADED);
 				rightHandNode.attachChild(rightHands[i]);
 				if (i != 0) {
 					rightHands[i].setCullHint(Spatial.CullHint.Always);

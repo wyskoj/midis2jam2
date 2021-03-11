@@ -4,7 +4,7 @@
 # 367 vertices, 684 polygons, 2052 points, 2 materials
 
 
-
+mtllib TrumpetBody.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 318 vertices, 600 polygons, 1800 points
@@ -3936,7 +3936,7 @@ vt 0.560476 0.574376
 vt 0.560476 0.362560
 
 # polygons: 600
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 2/7/7 5/8/8 6/9/9
@@ -5105,7 +5105,7 @@ vt 0.972861 0.889807
 vt 0.973118 0.918185
 
 # polygons: 84
-usemtl Material01_1
+
 f 319/1801/1 320/1802/2 321/1803/3
 f 319/1804/4 321/1805/5 322/1806/6
 f 320/1807/7 323/1808/8 321/1809/9

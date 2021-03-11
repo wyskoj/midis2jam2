@@ -4,7 +4,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -39,7 +38,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	static final long LATENCY_FIX = -200;
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
-	public List<Instrument> instruments = new ArrayList<>();
+	public final List<Instrument> instruments = new ArrayList<>();
 	public MidiFile file;
 	Sequencer sequencer;
 	double timeSinceStart;
@@ -61,11 +60,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 		settings.setFullscreen(false);
-		settings.setResolution(1024, 768);
+		settings.setResolution(1280, 720);
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
+		settings.setSamples(4);
 		midijam.start();
 		midijam.setPauseOnLostFocus(false);
+		
 		
 		// Create a sequencer for the sequence
 		Sequence sequence = MidiSystem.getSequence(rawFile);
@@ -118,7 +119,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 					midijam.sequencer.start();
 				}
 			}
-		}, 1500);
+		}, 2000);
 	}
 	
 	/**
@@ -187,7 +188,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		for (ArrayList<MidiChannelSpecificEvent> channelEvent : channels) {
 			channelEvent.sort(MidiChannelSpecificEvent.COMPARE_BY_TIME);
 		}
-		List<Instrument> instruments = new ArrayList<>();
 		for (int j = 0, channelsLength = channels.length; j < channelsLength; j++) {
 			ArrayList<MidiChannelSpecificEvent> channel = channels[j];
 			if (j == 9) { // Percussion channel
@@ -240,8 +240,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				instruments.add(fromEvents(lastProgramEvent, lastInstrumentEvents));
 			}
 		}
-		System.out.println("instruments = " + instruments);
-		this.instruments = instruments;
 	}
 	
 	/**
@@ -326,6 +324,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		flyCam.setDragToRotate(true);
 		setupKeys();
 		setCamera(Camera.CAMERA_1A);
+		setDisplayStatView(false);
+		setDisplayFps(false);
 //
 //		cam.setLocation(new Vector3f(0,0,3500));
 //		cam.setRotation(new Quaternion().fromAngles(0,rad(180),0));
@@ -333,17 +333,17 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
 //		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
-		Spatial stage = loadModel("Stage.obj", "stageuv.bmp");
+		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED);
 		rootNode.attachChild(stage);
 		
-		Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp");
+		Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED);
 		rootNode.attachChild(pianoStand);
 		pianoStand.move(-50, 32f, -6);
 		pianoStand.rotate(0, rad(45), 0);
-		
-		DirectionalLight sun = new DirectionalLight();
-		sun.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
-		rootNode.addLight(sun);
+
+//		DirectionalLight l = new DirectionalLight();
+//		l.setDirection(new Vector3f(0, -1, -1));
+//		rootNode.addLight(l);
 		
 		try {
 			calculateInstruments();
@@ -356,23 +356,61 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (instrument != null)
 				instrument.tick(-1, 0);
 		
+		
+		// Sky
+//		rootNode.attachChild(SkyFactory.createSky(assetManager, assetManager.loadTexture("BrightSky.dds"),
+//				SkyFactory.EnvMapType.CubeMap));
+		
+		
 	}
 	
 	
 	/**
 	 * Loads a model given a model and texture paths.
 	 *
-	 * @param m the path to the model
-	 * @param t the path to the texture
+	 * @param m    the path to the model
+	 * @param t    the path to the texture
+	 * @param type the type of material
 	 * @return the model
 	 */
-	public Spatial loadModel(String m, String t) {
+	public Spatial loadModel(String m, String t, MatType type) {
 		Spatial model = assetManager.loadModel("Assets/" + m);
 		Texture texture = assetManager.loadTexture("Assets/" + t);
-		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		material.setTexture("ColorMap", texture);
+		Material material;
+		switch (type) {
+			case UNSHADED:
+				material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+				material.setTexture("ColorMap", texture);
+				break;
+			case SHADED:
+				material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+				material.setTexture("DiffuseMap", texture);
+				break;
+			case REFLECTIVE:
+				material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+				material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
+				material.setBoolean("EnvMapAsSphereMap", true);
+				material.setTexture("EnvMap", texture);
+				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + type);
+		}
 		model.setMaterial(material);
 		return model;
+	}
+	
+	public Material reflectiveMaterial(String reflectiveTextureFile) {
+		Material material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
+		material.setBoolean("EnvMapAsSphereMap", true);
+		material.setTexture("EnvMap", assetManager.loadTexture(reflectiveTextureFile));
+		return material;
+	}
+	
+	public enum MatType {
+		UNSHADED,
+		SHADED,
+		REFLECTIVE
 	}
 	
 	/**

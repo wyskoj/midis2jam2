@@ -4,7 +4,7 @@
 # 68 vertices, 132 polygons, 396 points, 1 materials
 
 
-
+mtllib Ocarina.mtl
 
 #-- object 'Converted object 0' --
 # 68 vertices, 132 polygons, 396 points
@@ -878,7 +878,7 @@ vt 0.647493 0.738447
 vt 0.493259 0.763823
 
 # polygons: 132
-usemtl Ocarina
+
 f 2/1/1 3/2/2 4/3/3
 f 1/4/4 52/5/5 51/6/6
 f 2/7/7 4/8/8 5/9/9

@@ -4,7 +4,7 @@
 # 433 vertices, 828 polygons, 2484 points, 2 materials
 
 
-
+mtllib JingleBells.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 61 vertices, 108 polygons, 324 points
@@ -727,7 +727,7 @@ vt 0.749346 0.705429
 vt 0.749345 0.936142
 
 # polygons: 108
-usemtl DrumShell
+
 f 1/1/1 2/2/2 3/3/3
 f 1/4/4 4/5/5 2/6/6
 f 1/7/7 5/8/8 4/9/9
@@ -5543,7 +5543,7 @@ vt 0.500000 0.933013
 vt 0.500000 0.750000
 
 # polygons: 720
-usemtl Material01
+
 f 62/325/1 63/326/2 64/327/3
 f 65/328/4 66/329/5 67/330/6
 f 62/331/7 64/332/8 68/333/9

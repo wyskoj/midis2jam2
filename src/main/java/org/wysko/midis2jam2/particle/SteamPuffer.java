@@ -50,7 +50,7 @@ public class SteamPuffer implements ParticleGenerator {
 		
 		for (Cloud cloud : clouds) {
 			if (cloud != null)
-				cloud.tick(time, delta);
+				cloud.tick(delta);
 		}
 	}
 	
@@ -77,7 +77,7 @@ public class SteamPuffer implements ParticleGenerator {
 			Random random = new Random();
 			randY = (random.nextFloat() - 0.5f) * 1.5f;
 			randZ = (random.nextFloat() - 0.5f) * 1.5f;
-			Spatial cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename);
+			Spatial cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED);
 			cube.setLocalRotation(new Quaternion().fromAngles(new float[] {
 					random.nextFloat() * FastMath.TWO_PI,
 					random.nextFloat() * FastMath.TWO_PI,
@@ -87,7 +87,7 @@ public class SteamPuffer implements ParticleGenerator {
 		}
 		
 		@Override
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			cloud.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
 			cloud.setLocalScale((float) (0.75 * life + 1.2));
 			life += delta * 1.5;

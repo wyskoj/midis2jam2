@@ -4,7 +4,7 @@
 # 38 vertices, 68 polygons, 204 points, 2 materials
 
 
-
+mtllib StageStringBow.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 30 vertices, 56 polygons, 168 points
@@ -384,7 +384,7 @@ vt 0.000000 1.000000
 vt 0.000000 1.000000
 
 # polygons: 56
-usemtl Cymbal
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9
@@ -536,7 +536,7 @@ vt 1.000000 0.000000
 vt 1.000000 1.000000
 
 # polygons: 12
-usemtl string
+
 f 31/169/1 32/170/2 33/171/3
 f 32/172/4 34/173/5 33/174/6
 f 33/175/7 34/176/8 35/177/9

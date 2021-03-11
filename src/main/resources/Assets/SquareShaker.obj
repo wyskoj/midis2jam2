@@ -4,7 +4,7 @@
 # 88 vertices, 172 polygons, 516 points, 1 materials
 
 
-
+mtllib SquareShaker.mtl
 
 #-- object 'Converted object 0' --
 # 88 vertices, 172 polygons, 516 points
@@ -1138,7 +1138,7 @@ vt 0.116284 0.116283
 vt 0.883726 0.116290
 
 # polygons: 172
-usemtl Skin
+
 f 45/1/1 46/2/2 47/3/3
 f 48/4/4 49/5/5 50/6/6
 f 45/7/7 47/8/8 51/9/9

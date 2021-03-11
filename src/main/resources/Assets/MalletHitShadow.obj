@@ -4,7 +4,7 @@
 # 13 vertices, 12 polygons, 36 points, 1 materials
 
 
-
+mtllib MalletHitShadow.mtl
 
 #-- object 'Converted object 0' --
 # 13 vertices, 12 polygons, 36 points
@@ -103,7 +103,7 @@ vt 0.877509 0.180820
 vt 0.970959 0.180820
 
 # polygons: 12
-usemtl WhiteKey1
+
 f 1/1/1 13/2/2 2/3/3
 f 2/4/4 13/5/5 3/6/6
 f 3/7/7 13/8/8 4/9/9

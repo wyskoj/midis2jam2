@@ -1,6 +1,5 @@
 package org.wysko.midis2jam2.instrument.percussion;
 
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -8,8 +7,6 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
-
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
  * A drum that is hit with a stick.

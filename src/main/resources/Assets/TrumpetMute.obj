@@ -4,7 +4,7 @@
 # 42 vertices, 60 polygons, 180 points, 1 materials
 
 
-
+mtllib TrumpetMute.mtl
 
 #-- object 'Converted object 0' --
 # 42 vertices, 60 polygons, 180 points
@@ -420,7 +420,7 @@ vt 0.834020 0.724672
 vt 0.224728 0.252831
 
 # polygons: 60
-usemtl Material01
+
 f 1/1/1 2/2/2 5/3/3
 f 2/4/4 6/5/5 5/6/6
 f 2/7/7 3/8/8 7/9/9

@@ -4,7 +4,7 @@
 # 24 vertices, 24 polygons, 72 points, 1 materials
 
 
-
+mtllib PopBottleMiddle.mtl
 
 #-- object 'Converted object 0' --
 # 24 vertices, 24 polygons, 72 points
@@ -186,7 +186,7 @@ vt 1.000000 0.166667
 vt 1.000000 0.083333
 
 # polygons: 24
-usemtl Cymbal
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 6/9/9

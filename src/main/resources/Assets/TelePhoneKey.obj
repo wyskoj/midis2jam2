@@ -4,7 +4,7 @@
 # 8 vertices, 10 polygons, 30 points, 1 materials
 
 
-
+mtllib TelePhoneKey.mtl
 
 #-- object 'Converted object 0' --
 # 8 vertices, 10 polygons, 30 points
@@ -86,7 +86,7 @@ vt 0.976207 0.091402
 vt 0.976207 0.932556
 
 # polygons: 10
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9

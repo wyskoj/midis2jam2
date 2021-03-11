@@ -4,7 +4,7 @@
 # 299 vertices, 332 polygons, 996 points, 1 materials
 
 
-
+mtllib Harp.mtl
 
 #-- object 'Converted object 0' --
 # 299 vertices, 332 polygons, 996 points
@@ -2309,7 +2309,7 @@ vt 0.031035 0.773466
 vt 0.003755 0.775452
 
 # polygons: 332
-usemtl WhiteKey1
+
 f 1/1/1 3/2/2 16/3/3
 f 2/4/4 15/5/5 4/6/6
 f 1/7/7 2/8/8 3/9/9

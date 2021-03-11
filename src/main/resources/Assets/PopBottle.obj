@@ -4,7 +4,7 @@
 # 170 vertices, 288 polygons, 864 points, 2 materials
 
 
-
+mtllib PopBottle.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 145 vertices, 252 polygons, 756 points
@@ -1675,7 +1675,7 @@ vt 1.000000 0.916667
 vt 1.000000 0.833333
 
 # polygons: 252
-usemtl Cymbal
+
 f 1/1/1 2/2/2 3/3/3
 f 1/4/4 4/5/5 5/6/6
 f 1/7/7 5/8/8 2/9/9
@@ -2184,7 +2184,7 @@ vt 1.000000 1.000000
 vt 1.000000 0.916667
 
 # polygons: 36
-usemtl Material01
+
 f 146/757/1 147/758/2 148/759/3
 f 149/760/4 146/761/5 150/762/6
 f 146/763/7 148/764/8 150/765/9

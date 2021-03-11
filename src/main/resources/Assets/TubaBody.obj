@@ -4,7 +4,7 @@
 # 597 vertices, 1116 polygons, 3348 points, 2 materials
 
 
-
+mtllib TubaBody.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 548 vertices, 1032 polygons, 3096 points
@@ -6758,7 +6758,7 @@ vt 0.000000 1.000000
 vt 0.000000 1.000000
 
 # polygons: 1032
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 4/4/4 5/5/5 6/6/6
 f 1/7/7 4/8/8 2/9/9
@@ -8359,7 +8359,7 @@ vt 0.000000 1.000000
 vt 0.000000 1.000000
 
 # polygons: 84
-usemtl Material01_1
+
 f 549/3097/1 550/3098/2 551/3099/3
 f 550/3100/4 552/3101/5 551/3102/6
 f 552/3103/7 553/3104/8 551/3105/9

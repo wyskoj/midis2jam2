@@ -1,7 +1,8 @@
 package org.wysko.midis2jam2.instrument.monophonic.reed.sax;
 
 import com.jme3.material.Material;
-import com.jme3.math.Vector3f;
+import com.jme3.math.ColorRGBA;
+import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.*;
@@ -133,14 +134,20 @@ public class AltoSax extends Saxophone {
 		public AltoSaxClone() {
 			super(AltoSax.this);
 			
-			this.body = AltoSax.this.context.loadModel("AltoSaxBody.obj", "HornSkin.bmp");
-			this.bell = AltoSax.this.context.loadModel("AltoSaxHorn.obj", "HornSkin.bmp");
+			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp");
+			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+			black.setColor("Color", ColorRGBA.Black);
 			
-//			Material reflectiveMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/reflect.j3md");
-//			reflectiveMaterial.setTexture("CubeMap", context.getAssetManager().loadTexture("Assets/HornSkin.bmp"));
-//			body.setMaterial(reflectiveMaterial);
+			this.body = context.getAssetManager().loadModel("Assets/AltoSaxBody.fbx");
+			this.bell = context.getAssetManager().loadModel("Assets/AltoSaxHorn.obj");
 			
-			modelNode.attachChild(body);
+			Node bodyNode = ((Node) body);
+			
+			bodyNode.getChild(0).setMaterial(shinyHornSkin);
+			bodyNode.getChild(1).setMaterial(black);
+			bell.setMaterial(shinyHornSkin);
+			
+			modelNode.attachChild(this.body);
 			modelNode.attachChild(bell);
 			bell.move(0, -22, 0); // Move bell down to body
 			

@@ -4,7 +4,7 @@
 # 102 vertices, 108 polygons, 324 points, 1 materials
 
 
-
+mtllib AccordianFold.mtl
 
 #-- object 'Converted object 0' --
 # 102 vertices, 108 polygons, 324 points
@@ -768,7 +768,7 @@ vt 1.000000 0.947147
 vt 0.543281 0.897647
 
 # polygons: 108
-usemtl black
+
 f 19/1/1 21/2/2 20/3/3
 f 21/4/4 22/5/5 20/6/6
 f 20/7/7 22/8/8 24/9/9

@@ -28,7 +28,7 @@ public class Keyboard extends Instrument {
 		super(context);
 		this.events = events;
 		this.skin = skin;
-		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile);
+		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
 		
 		int whiteCount = 0;
 		for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
@@ -157,10 +157,10 @@ public class Keyboard extends Instrument {
 			
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
 				// Front key
-				Spatial keyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile);
+				Spatial keyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
 				
 				// Back key
-				Spatial keyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile);
+				Spatial keyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
 				
 				node.attachChild(keyFront);
 				node.attachChild(keyBack);
@@ -169,7 +169,7 @@ public class Keyboard extends Instrument {
 				// TODO use the down key model
 				node.move(startPos - 26, 0, 0); // 26 = count(white keys) / 2
 			} else { // Black key
-				Spatial blackKey = context.loadModel("PianoBlackKey.obj", skin.textureFile);
+				Spatial blackKey = context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
 				node.attachChild(blackKey);
 				
 				Keyboard.this.movementNode.attachChild(node);

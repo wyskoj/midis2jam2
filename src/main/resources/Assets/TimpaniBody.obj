@@ -4,7 +4,7 @@
 # 132 vertices, 216 polygons, 648 points, 2 materials
 
 
-
+mtllib TimpaniBody.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 84 vertices, 144 polygons, 432 points
@@ -966,7 +966,7 @@ vt 0.256532 0.910302
 vt 0.256532 0.597728
 
 # polygons: 144
-usemtl DrumShell
+
 f 1/1/1 2/2/2 3/3/3
 f 1/4/4 3/5/5 4/6/6
 f 2/7/7 5/8/8 3/9/9
@@ -1606,7 +1606,7 @@ vt 0.256532 0.988025
 vt 0.256532 0.978268
 
 # polygons: 72
-usemtl Material01
+
 f 85/433/1 86/434/2 87/435/3
 f 85/436/4 87/437/5 88/438/6
 f 86/439/7 89/440/8 87/441/9

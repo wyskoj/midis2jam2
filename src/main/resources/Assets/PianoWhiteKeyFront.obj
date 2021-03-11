@@ -62,7 +62,7 @@ vn 0.000000 1.000000 0.000000
 # 5 normals
 
 g Box01
-usemtl WhiteKey1
+
 s 6
 f 1/1/1 2/2/1 3/3/1
 f 2/2/1 4/4/1 3/3/1
@@ -78,7 +78,7 @@ f 8/14/4 6/16/4 4/15/4
 # 8 triangles in group
 
 g Duplicate01
-usemtl WhiteKey1
+
 s 6
 f 9/17/1 10/18/1 11/19/1
 f 10/18/1 12/20/1 11/19/1

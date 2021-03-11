@@ -4,7 +4,7 @@
 # 16 vertices, 18 polygons, 54 points, 1 materials
 
 
-
+mtllib PianoKeyWhiteFront.mtl
 
 #-- object 'Converted object 0' --
 # 16 vertices, 18 polygons, 54 points
@@ -142,7 +142,7 @@ vt 0.246396 0.134451
 vt 0.246396 0.123422
 
 # polygons: 18
-usemtl WhiteKey1
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9

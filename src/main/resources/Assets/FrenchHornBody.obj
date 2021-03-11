@@ -4,7 +4,7 @@
 # 540 vertices, 984 polygons, 2952 points, 2 materials
 
 
-
+mtllib FrenchHornBody.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 432 vertices, 840 polygons, 2520 points
@@ -5490,7 +5490,7 @@ vt 0.000000 1.000000
 vt 0.000000 1.000000
 
 # polygons: 840
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 2/7/7 5/8/8 6/9/9
@@ -7318,7 +7318,7 @@ vt 0.000000 1.000000
 vt 0.000000 1.000000
 
 # polygons: 144
-usemtl Material01_1
+
 f 433/2521/1 434/2522/2 435/2523/3
 f 433/2524/4 435/2525/5 436/2526/6
 f 437/2527/7 438/2528/8 434/2529/9

@@ -24,7 +24,7 @@ import java.util.List;
  * @see MonophonicClone
  */
 public abstract class Instrument {
-	protected Midis2jam2 context;
+	protected final Midis2jam2 context;
 	
 	protected Instrument(Midis2jam2 context) {
 		this.context = context;
@@ -55,7 +55,7 @@ public abstract class Instrument {
 					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
 						// We found a block
 						notePeriods.add(new NotePeriod(check.note, context.file.eventInSeconds(noteEvent),
-								context.file.eventInSeconds(check), noteEvent.time, check.time, ((MidiNoteOnEvent) noteEvent)
+								context.file.eventInSeconds(check), ((MidiNoteOnEvent) noteEvent)
 								, ((MidiNoteOffEvent) check)));
 						break;
 					}

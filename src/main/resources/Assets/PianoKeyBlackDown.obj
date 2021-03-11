@@ -4,7 +4,7 @@
 # 16 vertices, 20 polygons, 60 points, 1 materials
 
 
-
+mtllib PianoKeyBlackDown.mtl
 
 #-- object 'Converted object 0' --
 # 16 vertices, 20 polygons, 60 points
@@ -154,7 +154,7 @@ vt 0.833478 0.075422
 vt 0.833478 0.252069
 
 # polygons: 20
-usemtl WhiteKey1
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9

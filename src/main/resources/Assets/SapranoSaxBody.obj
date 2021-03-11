@@ -4,7 +4,7 @@
 # 260 vertices, 384 polygons, 1152 points, 3 materials
 
 
-
+mtllib SapranoSaxBody.mtl
 
 #-- object 'Converted object 0(m1)' --
 # 188 vertices, 288 polygons, 864 points
@@ -1934,7 +1934,7 @@ vt 0.253200 0.935179
 vt 0.179765 0.958341
 
 # polygons: 288
-usemtl Material01_1
+
 f 1/1/1 2/2/2 3/3/3
 f 1/4/4 3/5/5 4/6/6
 f 4/7/7 3/8/8 5/9/9
@@ -2886,7 +2886,7 @@ vt 0.170775 0.959581
 vt 0.025206 0.998423
 
 # polygons: 96
-usemtl black
+
 f 189/865/1 190/866/2 191/867/3
 f 189/868/4 191/869/5 192/870/6
 f 193/871/7 194/872/8 190/873/9

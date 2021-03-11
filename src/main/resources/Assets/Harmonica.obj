@@ -4,7 +4,7 @@
 # 122 vertices, 240 polygons, 720 points, 1 materials
 
 
-
+mtllib Harmonica.mtl
 
 #-- object 'Converted object 0' --
 # 122 vertices, 240 polygons, 720 points
@@ -1580,7 +1580,7 @@ vt 0.889933 0.638112
 vt 0.854935 0.647369
 
 # polygons: 240
-usemtl Cymbal
+
 f 1/1/1 16/2/2 122/3/3
 f 15/4/4 121/5/5 30/6/6
 f 1/7/7 2/8/8 17/9/9

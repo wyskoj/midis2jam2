@@ -4,7 +4,7 @@
 # 98 vertices, 192 polygons, 576 points, 1 materials
 
 
-
+mtllib Triangle.mtl
 
 #-- object 'Converted object 0' --
 # 98 vertices, 192 polygons, 576 points
@@ -1268,7 +1268,7 @@ vt 1.000000 1.000000
 vt 1.000000 0.857143
 
 # polygons: 192
-usemtl DrumShell
+
 f 1/1/1 9/2/2 98/3/3
 f 8/4/4 97/5/5 16/6/6
 f 1/7/7 2/8/8 9/9/9

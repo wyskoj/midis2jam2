@@ -4,7 +4,7 @@
 # 86 vertices, 144 polygons, 432 points, 2 materials
 
 
-
+mtllib TubaKey4.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 62 vertices, 120 polygons, 360 points
@@ -800,7 +800,7 @@ vt 0.636706 0.681602
 vt 0.643553 0.670455
 
 # polygons: 120
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 4/4/4 5/5/5 6/6/6
 f 1/7/7 7/8/8 8/9/9
@@ -1104,7 +1104,7 @@ vt 0.632426 0.672211
 vt 0.632426 0.622866
 
 # polygons: 24
-usemtl Material01_1
+
 f 63/361/1 64/362/2 65/363/3
 f 64/364/4 66/365/5 65/366/6
 f 65/367/7 66/368/8 67/369/9

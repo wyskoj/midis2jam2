@@ -4,7 +4,7 @@
 # 138 vertices, 252 polygons, 756 points, 1 materials
 
 
-
+mtllib MusicBoxSpindle.mtl
 
 #-- object 'Converted object 0' --
 # 138 vertices, 252 polygons, 756 points
@@ -1668,7 +1668,7 @@ vt 1.000000 0.000000
 vt 1.000000 1.000000
 
 # polygons: 252
-usemtl Material01
+
 f 1/1/1 3/2/2 26/3/3
 f 2/4/4 25/5/5 4/6/6
 f 1/7/7 2/8/8 3/9/9

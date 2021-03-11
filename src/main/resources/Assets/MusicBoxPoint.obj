@@ -4,7 +4,7 @@
 # 49 vertices, 84 polygons, 252 points, 1 materials
 
 
-
+mtllib MusicBoxPoint.mtl
 
 #-- object 'Converted object 0' --
 # 49 vertices, 84 polygons, 252 points
@@ -571,7 +571,7 @@ vt 1.000000 0.833333
 vt 1.000000 0.666667
 
 # polygons: 84
-usemtl Material01
+
 f 1/1/1 39/2/2 38/3/3
 f 1/4/4 40/5/5 39/6/6
 f 1/7/7 41/8/8 40/9/9

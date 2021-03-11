@@ -4,7 +4,7 @@
 # 128 vertices, 228 polygons, 684 points, 1 materials
 
 
-
+mtllib StageChoir.mtl
 
 #-- object 'Converted object 0' --
 # 128 vertices, 228 polygons, 684 points
@@ -1514,7 +1514,7 @@ vt 0.815277 0.640496
 vt 0.885666 0.640496
 
 # polygons: 228
-usemtl Cymbal
+
 f 7/1/1 8/2/2 9/3/3
 f 10/4/4 11/5/5 12/6/6
 f 7/7/7 10/8/8 8/9/9

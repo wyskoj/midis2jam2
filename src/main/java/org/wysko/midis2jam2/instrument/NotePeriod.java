@@ -10,7 +10,7 @@ public class NotePeriod {
 	public final MidiNoteOnEvent noteOn;
 	public final MidiNoteOffEvent noteOff;
 	
-	public NotePeriod(int midiNote, double startTime, double endTime, long startTick, long endTick,
+	public NotePeriod(int midiNote, double startTime, double endTime,
 	                  MidiNoteOnEvent noteOn, MidiNoteOffEvent noteOff) {
 		this.midiNote = midiNote;
 		this.startTime = startTime;

@@ -4,7 +4,7 @@
 # 205 vertices, 396 polygons, 1188 points, 2 materials
 
 
-
+mtllib SaxBottom.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 205 vertices, 396 polygons, 1188 points
@@ -2599,7 +2599,7 @@ vt 0.937458 0.317904
 vt 0.937458 0.298080
 
 # polygons: 396
-usemtl Material01
+
 f 1/1/1 18/2/2 205/3/3
 f 1/4/4 2/5/5 19/6/6
 f 1/7/7 19/8/8 18/9/9

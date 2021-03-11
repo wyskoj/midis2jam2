@@ -4,7 +4,7 @@
 # 4 vertices, 2 polygons, 6 points, 1 materials
 
 
-
+mtllib SongFillbar.mtl
 
 #-- object 'Converted object 0' --
 # 4 vertices, 2 polygons, 6 points
@@ -34,7 +34,7 @@ vt 0.999680 0.007888
 vt 0.999680 0.992557
 
 # polygons: 2
-usemtl Sheet Music
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 

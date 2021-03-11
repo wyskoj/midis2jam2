@@ -4,7 +4,7 @@
 # 244 vertices, 367 polygons, 1101 points, 2 materials
 
 
-
+mtllib MutedTriangle.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 98 vertices, 192 polygons, 576 points
@@ -1268,7 +1268,7 @@ vt 1.000000 1.000000
 vt 1.000000 0.857143
 
 # polygons: 192
-usemtl DrumShell
+
 f 1/1/1 2/2/2 3/3/3
 f 4/4/4 5/5/5 6/6/6
 f 1/7/7 7/8/8 2/9/9
@@ -2672,7 +2672,7 @@ vt 0.531860 0.960669
 vt 0.517215 0.939636
 
 # polygons: 175
-usemtl Skin
+
 f 99/577/1 100/578/2 101/579/3
 f 99/580/4 101/581/5 102/582/6
 f 102/583/7 101/584/8 103/585/9

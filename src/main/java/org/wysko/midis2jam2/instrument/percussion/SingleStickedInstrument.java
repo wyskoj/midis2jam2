@@ -17,12 +17,13 @@ public abstract class SingleStickedInstrument extends PercussionInstrument {
 	
 	final static double MAX_ANGLE = 50;
 	final Node stickNode = new Node();
-	Spatial stick;
+	final Spatial stick;
 	
 	protected SingleStickedInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
+		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp", Midis2jam2.MatType.UNSHADED);
 		stickNode.attachChild(stick);
+		stick.setLocalTranslation(0,0,0); // Offset set the stick so the pivot is at the base of the stick
 		highLevelNode.attachChild(stickNode);
 		
 		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));

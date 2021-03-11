@@ -4,7 +4,7 @@
 # 8 vertices, 12 polygons, 36 points, 1 materials
 
 
-
+mtllib XylophoneWhiteBarDown.mtl
 
 #-- object 'Converted object 0' --
 # 8 vertices, 12 polygons, 36 points
@@ -98,7 +98,7 @@ vt 0.361701 0.968099
 vt 0.361702 0.035510
 
 # polygons: 12
-usemtl WhiteKey1
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9

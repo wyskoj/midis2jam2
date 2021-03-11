@@ -19,15 +19,16 @@ public class Cymbal extends SingleStickedInstrument {
 	
 	private final int WOBBLE_SPEED = 7;
 	private final double DAMPENING = 1;
-	Node cymbalNode = new Node();
+	final Node cymbalNode = new Node();
 	double animTime = -1;
-	private double AMPLITUDE = 1.5;
+	private final double AMPLITUDE = 1.5;
 	
 	protected Cymbal(Midis2jam2 context,
 	                 List<MidiNoteOnEvent> hits, CymbalType type) {
 		super(context, hits);
 		
-		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp");
+		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
+				Midis2jam2.MatType.REFLECTIVE);
 		cymbalNode.attachChild(cymbal);
 		cymbalNode.setLocalScale(type.size);
 		highLevelNode.setLocalTranslation(type.location);
@@ -69,18 +70,17 @@ public class Cymbal extends SingleStickedInstrument {
 	}
 	
 	public enum CymbalType {
-		CRASH_1(new Vector3f(-18, 45, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f, "DrumSet_Cymbal.obj"),
-		CRASH_2(new Vector3f(13, 45, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f, "DrumSet_Cymbal" +
-				".obj"),
-		SPLASH(new Vector3f(-2, 45, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f, "DrumSet_Cymbal.obj"),
-		RIDE_1(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f, "DrumSet_Cymbal.obj"),
-		RIDE_2(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f, "DrumSet_Cymbal.obj"),
-		CHINA(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f, "DrumSet_ChinaCymbal.obj");
+		CRASH_1(new Vector3f(-18, 45, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f),
+		CRASH_2(new Vector3f(13, 45, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f),
+		SPLASH(new Vector3f(-2, 45, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f),
+		RIDE_1(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f),
+		RIDE_2(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f),
+		CHINA(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f);
 		final float size;
 		final Vector3f location;
 		final Quaternion rotation;
 		
-		CymbalType(Vector3f location, Quaternion rotation, float size, String modelFile) {
+		CymbalType(Vector3f location, Quaternion rotation, float size) {
 			this.location = location;
 			this.rotation = rotation;
 			this.size = size;

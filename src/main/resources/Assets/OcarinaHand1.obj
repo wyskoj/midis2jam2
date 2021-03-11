@@ -4,7 +4,7 @@
 # 148 vertices, 344 polygons, 1032 points, 1 materials
 
 
-
+mtllib OcarinaHand1.mtl
 
 #-- object 'Converted object 0' --
 # 148 vertices, 344 polygons, 1032 points
@@ -2230,7 +2230,7 @@ vt 0.497003 0.918722
 vt 0.487677 0.944163
 
 # polygons: 344
-usemtl Skin
+
 f 1/1/1 2/2/2 3/3/3
 f 4/4/4 1/5/5 3/6/6
 f 5/7/7 1/8/8 4/9/9

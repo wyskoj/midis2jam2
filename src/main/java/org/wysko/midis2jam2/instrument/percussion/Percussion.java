@@ -24,6 +24,7 @@ public class Percussion extends Instrument {
 	public final Node drumSetNode = new Node();
 	public final Node percussionNode = new Node();
 	private final Cymbal crash2;
+//	private final Spatial shadow;
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
@@ -80,11 +81,18 @@ public class Percussion extends Instrument {
 		drumSetNode.attachChild(crash1.highLevelNode);
 		drumSetNode.attachChild(crash2.highLevelNode);
 		drumSetNode.attachChild(splash.highLevelNode);
+//		shadow = context.loadModel("DrumShadow.obj","DrumShadow.bmp");
+////		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+////		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+////		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
+////		shadow.setMaterial(material);
+////		shadow.move(0,0.001f,-80);
 		
 		percussionNode.attachChild(drumSetNode);
+//		percussionNode.attachChild(shadow);
 		context.getRootNode().attachChild(percussionNode);
 		
-		System.out.println(events);
+		
 	}
 	
 	@Override

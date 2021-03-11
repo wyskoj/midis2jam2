@@ -4,7 +4,7 @@
 # 27 vertices, 44 polygons, 132 points, 1 materials
 
 
-
+mtllib MetronomeBox.mtl
 
 #-- object 'Converted object 0' --
 # 27 vertices, 44 polygons, 132 points
@@ -309,7 +309,7 @@ vt 0.500000 0.621966
 vt 0.500000 1.000000
 
 # polygons: 44
-usemtl DrumShell
+
 f 1/1/1 5/2/2 18/3/3
 f 4/4/4 17/5/5 8/6/6
 f 1/7/7 2/8/8 5/9/9

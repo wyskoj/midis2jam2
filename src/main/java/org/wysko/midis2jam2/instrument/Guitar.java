@@ -68,15 +68,16 @@ public class Guitar extends Instrument {
 	}};
 	private final List<MidiChannelSpecificEvent> events;
 	private final List<NotePeriod> notePeriods;
-	Node guitarNode = new Node();
+	private final Node allGuitarsNode;
+	final Node aGuitarNode = new Node();
 	/**
 	 * Eddy ate dynamite. He fucking died.
 	 */
-	Spatial[] upperStrings = new Spatial[6];
-	Spatial[][] animStrings = new Spatial[6][5];
-	Spatial[] noteFingers = new Spatial[6];
+	final Spatial[] upperStrings = new Spatial[6];
+	final Spatial[][] animStrings = new Spatial[6][5];
+	final Spatial[] noteFingers = new Spatial[6];
 	double frame = 0;
-	List<NotePeriod> currentNotePeriods = new ArrayList<>();
+	final List<NotePeriod> currentNotePeriods = new ArrayList<>();
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context);
@@ -88,18 +89,18 @@ public class Guitar extends Instrument {
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		
-		final Spatial guitarBody = context.loadModel(type.modelFileName, type.textureFileName);
-		guitarNode.attachChild(guitarBody);
+		final Spatial guitarBody = context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED);
+		aGuitarNode.attachChild(guitarBody);
 		
 		for (int i = 0; i < 6; i++) {
 			Spatial string;
 			if (i < 3) {
-				string = context.loadModel("GuitarStringLow.obj", type.textureFileName);
+				string = context.loadModel("GuitarStringLow.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED);
 			} else {
-				string = context.loadModel("GuitarStringHigh.obj", type.textureFileName);
+				string = context.loadModel("GuitarStringHigh.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED);
 			}
 			upperStrings[i] = string;
-			guitarNode.attachChild(upperStrings[i]);
+			aGuitarNode.attachChild(upperStrings[i]);
 		}
 		
 		// Position each string
@@ -132,10 +133,10 @@ public class Guitar extends Instrument {
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < 5; j++) {
 				if (i < 3)
-					animStrings[i][j] = context.loadModel("GuitarLowStringBottom" + j + ".obj", type.textureFileName);
+					animStrings[i][j] = context.loadModel("GuitarLowStringBottom" + j + ".obj", type.textureFileName, Midis2jam2.MatType.UNSHADED);
 				else
-					animStrings[i][j] = context.loadModel("GuitarHighStringBottom" + j + ".obj", type.textureFileName);
-				guitarNode.attachChild(animStrings[i][j]);
+					animStrings[i][j] = context.loadModel("GuitarHighStringBottom" + j + ".obj", type.textureFileName, Midis2jam2.MatType.UNSHADED);
+				aGuitarNode.attachChild(animStrings[i][j]);
 			}
 		}
 		
@@ -184,15 +185,19 @@ public class Guitar extends Instrument {
 		
 		// Initialize note fingers
 		for (int i = 0; i < 6; i++) {
-			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", type.textureFileName);
-			guitarNode.attachChild(noteFingers[i]);
+			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED);
+			aGuitarNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 		}
 		
 		// Position guitar
-		guitarNode.setLocalTranslation(45,40, 10);
-		guitarNode.setLocalRotation(new Quaternion().fromAngles(rad(0),rad(0),rad(0)));
-		context.getRootNode().attachChild(guitarNode);
+		allGuitarsNode = new Node();
+		allGuitarsNode.setLocalTranslation(45, 40, 10);
+		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(0), rad(0)));
+		allGuitarsNode.attachChild(aGuitarNode);
+		context.getRootNode().attachChild(allGuitarsNode);
+		
+		
 	}
 	
 	private float stringHeight() {
@@ -223,6 +228,8 @@ public class Guitar extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		final int i1 = context.instruments.stream().filter(e -> e instanceof Guitar).collect(Collectors.toList()).indexOf(this);
+		aGuitarNode.setLocalTranslation(i1 * 10, 0, i1 * 10);
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}
@@ -246,7 +253,7 @@ public class Guitar extends Instrument {
 			}
 		}
 		for (int i = 0; i < 6; i++) {
-			animateString(i, frets[i], delta);
+			animateString(i, frets[i]);
 		}
 		
 		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
@@ -258,6 +265,8 @@ public class Guitar extends Instrument {
 		}
 		final double inc = delta / (1 / 60f);
 		this.frame += inc;
+		
+		
 	}
 	
 	/**
@@ -272,7 +281,7 @@ public class Guitar extends Instrument {
 	}
 	
 	
-	private void animateString(int string, int fret, float delta) {
+	private void animateString(int string, int fret) {
 		if (fret == -1) {
 			// Just hide everything
 			upperStrings[string].setLocalScale(RESTING_STRINGS[string]);
@@ -314,8 +323,8 @@ public class Guitar extends Instrument {
 	public enum GuitarType {
 		ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"), // TODO Obviously.
 		ELECTRIC("Guitar.obj", "GuitarSkin.bmp");
-		String modelFileName;
-		String textureFileName;
+		final String modelFileName;
+		final String textureFileName;
 		
 		GuitarType(String modelFileName, String textureFileName) {
 			this.modelFileName = modelFileName;
@@ -332,11 +341,13 @@ public class Guitar extends Instrument {
 		 * The string of the guitar.
 		 */
 		@Range(from = 0, to = 5)
+		final
 		int string;
 		/**
 		 * The fret of the guitar. A fret of 0 is an open string.
 		 */
 		@Range(from = 0, to = 22)
+		final
 		int fret;
 		
 		public GuitarPosition(int string, int fret) {

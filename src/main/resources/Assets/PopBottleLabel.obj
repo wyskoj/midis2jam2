@@ -4,7 +4,7 @@
 # 10 vertices, 8 polygons, 24 points, 1 materials
 
 
-
+mtllib PopBottleLabel.mtl
 
 #-- object 'Converted object 0' --
 # 10 vertices, 8 polygons, 24 points
@@ -76,7 +76,7 @@ vt 0.500000 0.990757
 vt 0.500000 0.010656
 
 # polygons: 8
-usemtl Cymbal
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 6/9/9

@@ -4,7 +4,7 @@
 # 84 vertices, 140 polygons, 420 points, 2 materials
 
 
-
+mtllib DrumSet_BassDrumBeaterHolder.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 76 vertices, 128 polygons, 384 points
@@ -862,7 +862,7 @@ vt 1.000000 0.000000
 vt 1.000000 1.000000
 
 # polygons: 128
-usemtl Black
+
 f 1/1/1 2/2/2 3/3/3
 f 4/4/4 5/5/5 6/6/6
 f 1/7/7 4/8/8 2/9/9
@@ -1086,7 +1086,7 @@ vt 1.000000 0.000000
 vt 1.000000 1.000000
 
 # polygons: 12
-usemtl White
+
 f 77/385/1 78/386/2 79/387/3
 f 78/388/4 80/389/5 79/390/6
 f 79/391/7 80/392/8 81/393/9

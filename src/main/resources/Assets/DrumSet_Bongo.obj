@@ -4,7 +4,7 @@
 # 98 vertices, 128 polygons, 384 points, 1 materials
 
 
-
+mtllib DrumSet_Bongo.mtl
 
 #-- object 'Converted object 0' --
 # 98 vertices, 128 polygons, 384 points
@@ -884,7 +884,7 @@ vt 0.997286 0.498212
 vt 0.997286 0.253430
 
 # polygons: 128
-usemtl DrumShell
+
 f 1/1/1 2/2/2 3/3/3
 f 82/4/4 83/5/5 84/6/6
 f 2/7/7 6/8/8 3/9/9

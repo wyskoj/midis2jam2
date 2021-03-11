@@ -4,7 +4,7 @@
 # 353 vertices, 608 polygons, 1824 points, 1 materials
 
 
-
+mtllib DrumSet_Cymbal.mtl
 
 #-- object 'Converted object 0' --
 # 353 vertices, 608 polygons, 1824 points
@@ -4019,7 +4019,7 @@ vt 1.000000 0.916667
 vt 1.000000 0.833333
 
 # polygons: 608
-usemtl Cymbal
+
 f 1/1/1 33/2/2 2/3/3
 f 33/4/4 34/5/5 2/6/6
 f 2/7/7 34/8/8 35/9/9

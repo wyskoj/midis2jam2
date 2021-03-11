@@ -4,7 +4,7 @@
 # 96 vertices, 96 polygons, 288 points, 2 materials
 
 
-
+mtllib PanPipe.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 72 vertices, 72 polygons, 216 points
@@ -522,7 +522,7 @@ vt 1.000000 1.000000
 vt 1.000000 0.750000
 
 # polygons: 72
-usemtl Cymbal
+
 f 1/1/1 2/2/2 3/3/3
 f 1/4/4 3/5/5 4/6/6
 f 4/7/7 3/8/8 5/9/9
@@ -778,7 +778,7 @@ vt 1.000000 0.750000
 vt 1.000000 0.500000
 
 # polygons: 24
-usemtl Material01
+
 f 73/217/1 74/218/2 75/219/3
 f 73/220/4 75/221/5 76/222/6
 f 76/223/7 75/224/8 77/225/9

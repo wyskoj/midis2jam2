@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class MidiFile {
@@ -48,9 +51,9 @@ public class MidiFile {
 			if (!titlePattern.matcher(line).find() &&
 					!copyrightPattern.matcher(line).find() &&
 					!markerPattern.matcher(line).find()) {
-						stream.write(line);
-						stream.write("\n");
-					}
+				stream.write(line);
+				stream.write("\n");
+			}
 		}
 		stream.close();
 		

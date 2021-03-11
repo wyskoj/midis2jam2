@@ -4,7 +4,7 @@
 # 992 vertices, 1332 polygons, 3996 points, 1 materials
 
 
-
+mtllib Violin.mtl
 
 #-- object 'Converted object 0' --
 # 992 vertices, 1332 polygons, 3996 points
@@ -9002,7 +9002,7 @@ vt 0.883938 0.485467
 vt 0.884317 0.535632
 
 # polygons: 1332
-usemtl Material01
+
 f 1/1/1 2/2/2 6/3/3
 f 1/4/4 6/5/5 5/6/6
 f 3/7/7 4/8/8 8/9/9

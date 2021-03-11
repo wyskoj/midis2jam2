@@ -4,7 +4,7 @@
 # 60 vertices, 96 polygons, 288 points, 1 materials
 
 
-
+mtllib TubularBellDark.mtl
 
 #-- object 'Converted object 0' --
 # 60 vertices, 96 polygons, 288 points
@@ -654,7 +654,7 @@ vt 1.000000 1.000000
 vt 1.000000 0.750000
 
 # polygons: 96
-usemtl Material01
+
 f 1/1/1 2/2/2 7/3/3
 f 1/4/4 7/5/5 6/6/6
 f 2/7/7 3/8/8 7/9/9

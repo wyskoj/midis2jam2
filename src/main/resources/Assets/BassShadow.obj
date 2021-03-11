@@ -4,7 +4,7 @@
 # 4 vertices, 2 polygons, 6 points, 1 materials
 
 
-
+mtllib BassShadow.mtl
 
 #-- object 'Converted object 0' --
 # 4 vertices, 2 polygons, 6 points
@@ -34,7 +34,7 @@ vt 1.000000 0.077900
 vt 1.000000 0.929804
 
 # polygons: 2
-usemtl WhiteKey1
+
 f 4/1/1 1/2/2 3/3/3
 f 1/4/4 2/5/5 3/6/6
 

@@ -4,7 +4,7 @@
 # 110 vertices, 216 polygons, 648 points, 1 materials
 
 
-
+mtllib DrumSet_Stick.mtl
 
 #-- object 'Converted object 0' --
 # 110 vertices, 216 polygons, 648 points
@@ -1424,7 +1424,7 @@ vt 0.749345 0.951262
 vt 0.749345 0.970158
 
 # polygons: 216
-usemtl DrumShell
+
 f 74/1/1 75/2/2 76/3/3
 f 13/4/4 14/5/5 15/6/6
 f 74/7/7 76/8/8 77/9/9

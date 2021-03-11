@@ -4,7 +4,7 @@
 # 380 vertices, 600 polygons, 1800 points, 2 materials
 
 
-
+mtllib TenorSaxBody.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 308 vertices, 504 polygons, 1512 points
@@ -3350,7 +3350,7 @@ vt 0.253200 0.935179
 vt 0.179765 0.958341
 
 # polygons: 504
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 1/4/4 3/5/5 4/6/6
 f 4/7/7 3/8/8 5/9/9
@@ -4518,7 +4518,7 @@ vt 0.170775 0.959581
 vt 0.025206 0.998423
 
 # polygons: 96
-usemtl black
+
 f 309/1513/1 310/1514/2 311/1515/3
 f 309/1516/4 311/1517/5 312/1518/6
 f 313/1519/7 314/1520/8 310/1521/9

@@ -4,7 +4,7 @@
 # 120 vertices, 216 polygons, 648 points, 1 materials
 
 
-
+mtllib maraca.mtl
 
 #-- object 'Converted object 0' --
 # 120 vertices, 216 polygons, 648 points
@@ -1434,7 +1434,7 @@ vt 0.992175 0.999456
 vt 0.992175 0.888622
 
 # polygons: 216
-usemtl Skin
+
 f 1/1/1 2/2/2 11/3/3
 f 2/4/4 12/5/5 11/6/6
 f 2/7/7 3/8/8 13/9/9

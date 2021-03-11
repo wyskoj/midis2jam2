@@ -4,7 +4,7 @@
 # 28 vertices, 46 polygons, 138 points, 1 materials
 
 
-
+mtllib PizzicatoStringHolder.mtl
 
 #-- object 'Converted object 0' --
 # 28 vertices, 46 polygons, 138 points
@@ -322,7 +322,7 @@ vt 0.149791 0.529467
 vt 0.333345 0.529412
 
 # polygons: 46
-usemtl Cymbal
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9

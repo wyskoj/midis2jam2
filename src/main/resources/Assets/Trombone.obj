@@ -4,7 +4,7 @@
 # 578 vertices, 816 polygons, 2448 points, 2 materials
 
 
-
+mtllib Trombone.mtl
 
 #-- object 'Converted object 0(m0)' --
 # 434 vertices, 624 polygons, 1872 points
@@ -4196,7 +4196,7 @@ vt 0.500001 0.500000
 vt 0.534963 1.000000
 
 # polygons: 624
-usemtl Material01
+
 f 1/1/1 2/2/2 3/3/3
 f 2/4/4 4/5/5 3/6/6
 f 3/7/7 4/8/8 5/9/9
@@ -6132,7 +6132,7 @@ vt 1.000000 0.050000
 vt 1.000000 0.000000
 
 # polygons: 192
-usemtl Material01_1
+
 f 435/1873/1 436/1874/2 437/1875/3
 f 436/1876/4 438/1877/5 437/1878/6
 f 437/1879/7 438/1880/8 439/1881/9

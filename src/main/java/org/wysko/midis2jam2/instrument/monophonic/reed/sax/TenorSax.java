@@ -1,5 +1,7 @@
 package org.wysko.midis2jam2.instrument.monophonic.reed.sax;
 
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
@@ -134,8 +136,18 @@ public class TenorSax extends Saxophone {
 		public TenorSaxClone() {
 			super(TenorSax.this);
 			
-			this.body = TenorSax.this.context.loadModel("TenorSaxBody.obj", "HornSkinGrey.bmp");
-			this.bell = TenorSax.this.context.loadModel("TenorSaxHorn.obj", "HornSkinGrey.bmp");
+			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
+			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+			black.setColor("Color", ColorRGBA.Black);
+			
+			this.body = context.getAssetManager().loadModel("Assets/TenorSaxBody.fbx");
+			this.bell = context.getAssetManager().loadModel("Assets/TenorSaxHorn.obj");
+			
+			Node bodyNode = ((Node) body);
+			
+			bodyNode.getChild(0).setMaterial(shinyHornSkin);
+			bodyNode.getChild(1).setMaterial(black);
+			bell.setMaterial(shinyHornSkin);
 			
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
