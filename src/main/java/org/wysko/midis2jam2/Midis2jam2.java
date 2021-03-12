@@ -473,7 +473,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				Camera camera = Camera.valueOf(name);
 				setCamera(camera);
 			} catch (IllegalArgumentException ignored) {
-				if (name.equals("exit")) System.exit(0);
+				if (name.equals("exit")) {
+					sequencer.stop();
+					System.exit(0);
+				}
 				
 			}
 		}
