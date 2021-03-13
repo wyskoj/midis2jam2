@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.instrument.monophonic.pipe.Ocarina;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
+import org.wysko.midis2jam2.instrument.monophonic.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
 import org.wysko.midis2jam2.instrument.percussion.Percussion;
 import org.wysko.midis2jam2.instrument.piano.Accordion;
@@ -287,6 +288,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 30: // Distortion Guitar
 			case 31: // Guitar Harmonics
 				return new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
+			case 64: // Soprano Sax
+				return new SopranoSax(this, events, file);
 			case 65: // Alto Sax
 				return new AltoSax(this, events, file);
 			case 66: // Tenor Sax
