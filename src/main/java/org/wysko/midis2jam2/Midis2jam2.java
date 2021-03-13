@@ -1,6 +1,8 @@
 package org.wysko.midis2jam2;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -15,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Guitar;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.Mallets;
+import org.wysko.midis2jam2.instrument.keyed.Accordion;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
@@ -279,6 +282,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * @param events       the list of events to apply to this instrument
 	 * @return a new instrument of the correct type containing the specified events
 	 */
+	@SuppressWarnings("SpellCheckingInspection")
 	@Nullable
 	private Instrument fromEvents(MidiProgramEvent programEvent,
 	                              List<MidiChannelSpecificEvent> events) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
@@ -310,6 +314,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 20: // Reed Organ
 			case 55: // Orchestra Hit
 				return new Keyboard(this, events, Keyboard.Skin.WOOD);
+			case 21: // Accordion
+			case 23: // Tango Accordion
+				return new Accordion(this, events);
 			case 24: // Acoustic Guitar (Nylon)
 			case 25: // Acoustic Guitar (Steel)
 				return new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
@@ -416,6 +423,14 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 	}
 	
+	public BitmapText debugText(String text, float size) {
+		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Console.fnt");
+		BitmapText bText = new BitmapText(bitmapFont, false);
+		bText.setSize(size);
+		bText.setText(text);
+		return bText;
+	}
+	
 	
 	/**
 	 * Loads a model given a model and texture paths.
@@ -474,8 +489,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		inputManager.addMapping("slow", new KeyTrigger(KeyInput.KEY_LCONTROL));
 		inputManager.addListener(this, "slow");
 		
-		inputManager.addMapping("freecam", new KeyTrigger(KeyInput.KEY_GRAVE));
-		inputManager.addListener(this, "freecam");
+		inputManager.addMapping("freeCam", new KeyTrigger(KeyInput.KEY_GRAVE));
+		inputManager.addListener(this, "freeCam");
 		
 		inputManager.addMapping("exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
 		inputManager.addListener(this, "exit");

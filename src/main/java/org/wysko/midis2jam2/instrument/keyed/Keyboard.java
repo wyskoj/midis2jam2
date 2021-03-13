@@ -4,18 +4,17 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Keyboard extends Instrument {
+public class Keyboard extends KeyedInstrument {
 	
 	public static final int A_0 = 21;
 	public static final int C_8 = 108;
@@ -26,8 +25,8 @@ public class Keyboard extends Instrument {
 	private final List<? extends MidiEvent> events;
 	private final Skin skin;
 	
-	public Keyboard(Midis2jam2 context, List<? extends MidiEvent> events, Skin skin) {
-		super(context);
+	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, Skin skin) {
+		super(context, events);
 		this.events = events;
 		this.skin = skin;
 		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
@@ -111,20 +110,7 @@ public class Keyboard extends Instrument {
 	
 	public void transitionAnimation(float delta) {
 		for (KeyboardKey key : keys) {
-			if (!key.beingPressed) {
-				float[] angles = new float[3];
-				key.node.getLocalRotation().toAngles(angles);
-				if (angles[0] > 0.0001) { // fuck floats
-					key.node.setLocalRotation(new Quaternion(new float[]
-							{Math.max(angles[0] - (0.02f * delta * 50), 0), 0, 0}
-					));
-				} else {
-					key.node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
-					
-					key.downNode.setCullHint(Spatial.CullHint.Always);
-					key.upNode.setCullHint(Spatial.CullHint.Dynamic);
-				}
-			}
+			handleAKey(delta, key.beingPressed, key.node, key.downNode, key.upNode, key);
 		}
 	}
 	
@@ -150,7 +136,7 @@ public class Keyboard extends Instrument {
 		WHITE, BLACK
 	}
 	
-	public class KeyboardKey {
+	public class KeyboardKey extends Key {
 		public final int midiNote;
 		public final Node node = new Node();
 		public final Node upNode = new Node();
