@@ -4,7 +4,6 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import org.lwjgl.Sys;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -71,8 +70,8 @@ public class Mallets extends Instrument {
 				}
 			}
 		});
-		
-		
+
+
 //		Spatial marker = context.loadModel("Piccolo.obj", "SphereMapExplained.bmp",
 //				Midis2jam2.MatType.REFLECTIVE);
 //		positioning.attachChild(marker);
@@ -111,15 +110,15 @@ public class Mallets extends Instrument {
 					-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / STRIKE_SPEED)) * (time - context.file.eventInSeconds(nextHit));
 			
 			float[] floats = bar.malletNode.getLocalRotation().toAngles(new float[3]);
-			
+
 //			bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(rad(proposedRotation),0,0));
 			if (proposedRotation > MAX_ANGLE) {
 				// Not yet ready to strike
 				if (floats[0] <= MAX_ANGLE) {
 					// We have come down, need to recoil
 					float xAngle = floats[0] + 5f * delta;
-					xAngle = Math.min(rad(MAX_ANGLE),xAngle);
-
+					xAngle = Math.min(rad(MAX_ANGLE), xAngle);
+					
 					bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(
 							xAngle, 0, 0
 					));
@@ -129,7 +128,7 @@ public class Mallets extends Instrument {
 			} else {
 				// Striking
 				bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(rad((float) (
-						Math.min(MAX_ANGLE, proposedRotation)
+						Math.max(0, Math.min(MAX_ANGLE, proposedRotation))
 				)), 0, 0));
 				bars[i].shadow.setLocalScale((float) ((1 - (proposedRotation / MAX_ANGLE)) / 2f));
 			}
@@ -191,7 +190,7 @@ public class Mallets extends Instrument {
 				noteNode.move(1.333f * (startPos - 26), 0, 0); // 26 = count(white keys) / 2
 				
 				malletNode.setLocalTranslation(0, 1.35f, (-midiNote / 11.5f) + 19);
-				shadow.setLocalTranslation(0, 1f, (-midiNote / 11.5f) + 11);
+				shadow.setLocalTranslation(0, 0.75f, (-midiNote / 11.5f) + 11);
 			} else {
 				upBar = Mallets.this.context.loadModel("XylophoneBlackBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
 				downBar = Mallets.this.context.loadModel("XylophoneBlackBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
@@ -228,9 +227,16 @@ public class Mallets extends Instrument {
 					// The bar needs to go all the way down
 					downBar.setLocalTranslation(0, -0.5f, 0);
 				} else {
-					if (barRecoil.y < -0.0001)
+					if (barRecoil.y < -0.0001) {
 						downBar.move(0, 5f * delta, 0);
-					else {
+						Vector3f localTranslation = downBar.getLocalTranslation();
+						downBar.setLocalTranslation(new Vector3f(
+								localTranslation.x,
+								Math.min(0,localTranslation.y),
+								localTranslation.z
+						));
+					}
+					else{
 						
 						upBar.setCullHint(Spatial.CullHint.Dynamic);
 						downBar.setCullHint(Spatial.CullHint.Always);

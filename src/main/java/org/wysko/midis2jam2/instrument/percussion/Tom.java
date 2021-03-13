@@ -11,7 +11,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Tom extends StickDrum {
 	public Tom(Midis2jam2 context, List<MidiNoteOnEvent> hits, TomPitch pitch) {
-		super(context, hits);
+		super(context, hits, Pivot.AT_END);
 		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED);
 		drum.setLocalScale(pitch.scale);
 		recoilNode.attachChild(drum);

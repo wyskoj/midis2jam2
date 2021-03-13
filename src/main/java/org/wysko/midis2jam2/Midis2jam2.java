@@ -41,13 +41,14 @@ import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
-	static final long LATENCY_FIX = -200;
+	static final long LATENCY_FIX = 250;
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	public final List<Instrument> instruments = new ArrayList<>();
 	public MidiFile file;
 	Sequencer sequencer;
-	double timeSinceStart;
+	double timeSinceStart = -2;
 	boolean seqHasRunOnce = false;
+	private BitmapText bitmapText1;
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -95,54 +96,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			midijam.sequencer = MidiSystem.getSequencer(false);
 			midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
 		}
-		
 		midijam.sequencer.setMasterSyncMode(Sequencer.SyncMode.MIDI_SYNC);
 		midijam.sequencer.open();
-		
 		midijam.sequencer.setSequence(sequence);
 		
-		// Start the song one second from now
-		new Timer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				midijam.sequencer.setTempoInBPM((float) midijam.file.firstTempoInBpm());
-				if (LATENCY_FIX > 0) {
-					new Timer().schedule(new TimerTask() {
-						@Override
-						public void run() {
-							midijam.sequencer.start();
-						}
-					}, LATENCY_FIX);
-					midijam.seqHasRunOnce = true;
-					midijam.timeSinceStart = 0;
-				} else {
-					new Timer().schedule(new TimerTask() {
-						@Override
-						public void run() {
-							
-							midijam.seqHasRunOnce = true;
-							midijam.timeSinceStart = 0;
-						}
-					}, -LATENCY_FIX);
-					midijam.sequencer.start();
-				}
-				
-				new Timer().scheduleAtFixedRate(new TimerTask() {
-					@Override
-					public void run() {
-						// Find the first tempo we haven't hit and need to execute
-						long currentMidiTick = midijam.sequencer.getTickPosition();
-						for (MidiTempoEvent tempo : midijam.file.tempos) {
-							if (tempo.time == currentMidiTick) {
-								midijam.sequencer.setTempoInBPM(60_000_000f / tempo.number);
-							}
-						}
-					}
-				}, 0, 1);
-			}
-		}, 2000);
-		
-		
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> midijam.sequencer.stop()));
 	}
 	
 	/**
@@ -168,12 +126,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Override
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdate(tpf);
-		
+		bitmapText1.setText(String.valueOf(timeSinceStart));
 		if (sequencer == null) return;
-		if (!sequencer.isRunning() && !seqHasRunOnce)
-			return;
-		
 		timeSinceStart += tpf;
+		
 		
 		// Update animation
 		for (Instrument instrument : instruments) {
@@ -236,8 +192,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			while (programEvents.size() > 1 && d < programEvents.size() - 1) {
 				while (d < programEvents.size() - 1 && (
 						programEvents.get(d + 1).time == programEvents.get(d).time
-						|| programEvents.get(d + 1).programNum == programEvents.get(d).programNum
-						)) {
+								|| programEvents.get(d + 1).programNum == programEvents.get(d).programNum
+				)) {
 					programEvents.remove(d);
 				}
 				d++;
@@ -383,8 +339,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED);
 		rootNode.attachChild(stage);
 		
-		
-		
+		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+		bitmapText1 = new BitmapText(bitmapFont, false);
+		bitmapText1.setSize(bitmapFont.getCharSet().getRenderedSize());
+		bitmapText1.setText("Hello World");
+		bitmapText1.setLocalTranslation(300, bitmapText1.getLineHeight(), 0);
+		guiNode.attachChild(bitmapText1);
+
 
 //		DirectionalLight l = new DirectionalLight();
 //		l.setDirection(new Vector3f(0, -1, -1));
@@ -409,24 +370,59 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			malletStand.rotate(0, rad(33.7), 0);
 			malletStand.scale(2 / 3f);
 		}
+
+//		seqHasRunOnce = true;
+//		new Timer().schedule(new TimerTask() {
+//			@Override
+//			public void run() {
+//				sequencer.setTempoInBPM((float) file.firstTempoInBpm());
+//				bitmapText1.move(0,10,0);
+//
+//
+//
+//				new Timer().scheduleAtFixedRate(new TimerTask() {
+//					@Override
+//					public void run() {
+//						// Find the first tempo we haven't hit and need to execute
+//						long currentMidiTick = sequencer.getTickPosition();
+//						for (MidiTempoEvent tempo : file.tempos) {
+//							if (tempo.time == currentMidiTick) {
+//								sequencer.setTempoInBPM(60_000_000f / tempo.number);
+//							}
+//						}
+//					}
+//				}, 0, 1);
+//			}
+//		}, 5000);
 		
-		// "wake up" instruments by ticking at a negative time value
-		for (Instrument instrument : instruments)
-			if (instrument != null)
-				instrument.tick(-1, 0);
-		
-		
-		// Sky
-//		rootNode.attachChild(SkyFactory.createSky(assetManager, assetManager.loadTexture("BrightSky.dds"),
-//				SkyFactory.EnvMapType.CubeMap));
-		
-		
+		new Timer().scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				if (timeSinceStart + (LATENCY_FIX / 1000.0) >= 0 && !seqHasRunOnce) {
+					sequencer.setTempoInBPM((float) file.firstTempoInBpm());
+					sequencer.start();
+					seqHasRunOnce = true;
+					new Timer().scheduleAtFixedRate(new TimerTask() {
+						@Override
+						public void run() {
+							// Find the first tempo we haven't hit and need to execute
+							long currentMidiTick = sequencer.getTickPosition();
+							for (MidiTempoEvent tempo : file.tempos) {
+								if (tempo.time == currentMidiTick) {
+									sequencer.setTempoInBPM(60_000_000f / tempo.number);
+								}
+							}
+						}
+					}, 0, 1);
+				}
+			}
+		}, 0, 1);
 	}
 	
 	public BitmapText debugText(String text, float size) {
 		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Console.fnt");
 		BitmapText bText = new BitmapText(bitmapFont, false);
-		bText.setSize(size);
+		bText.setSize(guiFont.getCharSet().getRenderedSize());
 		bText.setText(text);
 		return bText;
 	}

@@ -20,7 +20,7 @@ public abstract class StickDrum extends SingleStickedInstrument {
 	final Node recoilNode = new Node();
 	Spatial drum;
 	
-	protected StickDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
+	protected StickDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits, Pivot pivot) {
 		super(context, hits);
 	}
 	
