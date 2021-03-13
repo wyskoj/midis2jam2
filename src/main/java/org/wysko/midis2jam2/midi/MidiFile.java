@@ -4,14 +4,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class MidiFile {
@@ -103,7 +98,6 @@ public class MidiFile {
 			}
 		}
 		file.calculateTempoMap();
-//		file.calculateTimeOfEachEvent();
 		return file;
 	}
 	

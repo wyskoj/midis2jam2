@@ -1,5 +1,7 @@
 package org.wysko.midis2jam2.instrument;
 
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -38,6 +40,14 @@ public class Guitar extends Instrument {
 	};
 	private static final float[] STRING_TOP_X = new float[] {-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f};
 	private static final float[] STRING_BOTTOM_X = new float[] {-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f};
+	final Node aGuitarNode = new Node();
+	/**
+	 * Eddy ate dynamite. He fucking died.
+	 */
+	final Spatial[] upperStrings = new Spatial[6];
+	final Spatial[][] animStrings = new Spatial[6][5];
+	final Spatial[] noteFingers = new Spatial[6];
+	final List<NotePeriod> currentNotePeriods = new ArrayList<>();
 	/**
 	 * <a href="https://docs.google.com/spreadsheets/d/1OavkZ2xtrEhjwIk3dRaqXCiewQUOKUgWfKh6sFq7uoM/edit?usp=sharing">link</a>
 	 */
@@ -69,15 +79,8 @@ public class Guitar extends Instrument {
 	private final List<MidiChannelSpecificEvent> events;
 	private final List<NotePeriod> notePeriods;
 	private final Node allGuitarsNode;
-	final Node aGuitarNode = new Node();
-	/**
-	 * Eddy ate dynamite. He fucking died.
-	 */
-	final Spatial[] upperStrings = new Spatial[6];
-	final Spatial[][] animStrings = new Spatial[6][5];
-	final Spatial[] noteFingers = new Spatial[6];
+	private final BitmapText timeText;
 	double frame = 0;
-	final List<NotePeriod> currentNotePeriods = new ArrayList<>();
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context);
@@ -197,7 +200,12 @@ public class Guitar extends Instrument {
 		allGuitarsNode.attachChild(aGuitarNode);
 		context.getRootNode().attachChild(allGuitarsNode);
 		
-		
+		BitmapFont bitmapFont = context.getAssetManager().loadFont("Interface/Fonts/Console.fnt");
+		timeText = new BitmapText(bitmapFont, false);
+		timeText.setSize(2f);
+		timeText.setText("Hello World");
+		timeText.setLocalTranslation(2, 10, 0);
+		aGuitarNode.attachChild(timeText);
 	}
 	
 	private float stringHeight() {
@@ -228,6 +236,7 @@ public class Guitar extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		
 		final int i1 = context.instruments.stream().filter(e -> e instanceof Guitar).collect(Collectors.toList()).indexOf(this);
 		aGuitarNode.setLocalTranslation(i1 * 10, 0, i1 * 10);
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
@@ -255,10 +264,17 @@ public class Guitar extends Instrument {
 		for (int i = 0; i < 6; i++) {
 			animateString(i, frets[i]);
 		}
-		
+		timeText.setText(String.format("[%2s,%2s,%2s,%2s,%2s,%2s]",
+				frets[0] == -1? "" : frets[0],
+				frets[1] == -1? "" : frets[1],
+				frets[2] == -1? "" : frets[2],
+				frets[3] == -1? "" : frets[3],
+				frets[4] == -1? "" : frets[4],
+				frets[5] == -1? "" : frets[5]));
 		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
 			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
-				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01) { // floating points are the death of me
+				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) { // floating points are the death
+					// of me
 					currentNotePeriods.remove(i);
 				}
 			}

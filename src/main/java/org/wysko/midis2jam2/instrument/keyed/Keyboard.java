@@ -9,6 +9,7 @@ import org.wysko.midis2jam2.midi.MidiEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,8 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Keyboard extends Instrument {
 	
 	public static final int A_0 = 21;
-	static final int KEYBOARD_KEY_COUNT = 88;
+	public static final int C_8 = 108;
+	public static final int KEYBOARD_KEY_COUNT = 88;
 	public final Node movementNode = new Node();
 	public final Node node = new Node();
 	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
@@ -33,10 +35,10 @@ public class Keyboard extends Instrument {
 		int whiteCount = 0;
 		for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
 			if (midiValueToColor(i + A_0) == KeyColor.WHITE) { // White key
-				keys[i] = new KeyboardKey(context, i + A_0, whiteCount);
+				keys[i] = new KeyboardKey(i + A_0, whiteCount);
 				whiteCount++;
 			} else { // Black key
-				keys[i] = new KeyboardKey(context, i + A_0, i);
+				keys[i] = new KeyboardKey(i + A_0, i);
 			}
 		}
 		
@@ -54,17 +56,13 @@ public class Keyboard extends Instrument {
 	 * @param x the MIDI note value
 	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
 	 */
-	static KeyColor midiValueToColor(int x) {
+	public static KeyColor midiValueToColor(int x) {
 		x = x % 12;
 		return x == 1
 				|| x == 3
 				|| x == 6
 				|| x == 8
 				|| x == 10 ? KeyColor.BLACK : KeyColor.WHITE;
-	}
-	
-	KeyboardKey getKeyByMIDINote(int midiNote) {
-		return keys[midiNote - A_0];
 	}
 	
 	public void tick(double x, float delta) {
@@ -103,6 +101,7 @@ public class Keyboard extends Instrument {
 	}
 	
 	public void pushKeyDown(int midiNote) {
+		if (midiNote < A_0 || midiNote > C_8) return;
 		KeyboardKey key = keys[midiNote - Keyboard.A_0];
 		key.node.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));
 		key.beingPressed = true;
@@ -130,6 +129,7 @@ public class Keyboard extends Instrument {
 	}
 	
 	public void releaseKey(int midiNote) {
+		if (midiNote < A_0 || midiNote > C_8) return;
 		KeyboardKey key = keys[midiNote - Keyboard.A_0];
 		key.beingPressed = false;
 	}
@@ -146,7 +146,7 @@ public class Keyboard extends Instrument {
 		}
 	}
 	
-	enum KeyColor {
+	public enum KeyColor {
 		WHITE, BLACK
 	}
 	
@@ -157,7 +157,7 @@ public class Keyboard extends Instrument {
 		public final Node downNode = new Node();
 		public boolean beingPressed = false;
 		
-		public KeyboardKey(Midis2jam2 context, int midiNote, int startPos) {
+		public KeyboardKey(int midiNote, int startPos) {
 			this.midiNote = midiNote;
 			
 			
@@ -165,20 +165,20 @@ public class Keyboard extends Instrument {
 				
 				/* UP KEY */
 				// Front key
-				Spatial upKeyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile,
+				Spatial upKeyFront = Keyboard.this.context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile,
 						Midis2jam2.MatType.UNSHADED);
 				// Back Key
-				Spatial upKeyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile,
+				Spatial upKeyBack = Keyboard.this.context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile,
 						Midis2jam2.MatType.UNSHADED);
 				
 				upNode.attachChild(upKeyFront);
 				upNode.attachChild(upKeyBack);
 				/* DOWN KEY */
 				// Front key
-				Spatial downKeyFront = context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile,
+				Spatial downKeyFront = Keyboard.this.context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile,
 						Midis2jam2.MatType.UNSHADED);
 				// Back key
-				Spatial downKeyBack = context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile,
+				Spatial downKeyBack = Keyboard.this.context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile,
 						Midis2jam2.MatType.UNSHADED);
 				downNode.attachChild(downKeyFront);
 				downNode.attachChild(downKeyBack);
@@ -191,10 +191,10 @@ public class Keyboard extends Instrument {
 			} else { // Black key
 				
 				/* Up key */
-				Spatial blackKey = context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
+				Spatial blackKey = Keyboard.this.context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
 				upNode.attachChild(blackKey);
 				/* Up key */
-				Spatial blackKeyDown = context.loadModel("PianoKeyBlackDown.obj", skin.textureFile,
+				Spatial blackKeyDown = Keyboard.this.context.loadModel("PianoKeyBlackDown.obj", skin.textureFile,
 						Midis2jam2.MatType.UNSHADED);
 				downNode.attachChild(blackKeyDown);
 				

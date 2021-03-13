@@ -14,6 +14,7 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Guitar;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.Mallets;
 import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
@@ -62,6 +63,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		settings.setTitle("midis2jam2");
 		settings.setFullscreen(false);
 		settings.setResolution(1024, 768);
+		settings.setResizable(true);
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
 		settings.setSamples(4);
@@ -75,7 +77,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
 		MidiDevice device = null;
 		for (MidiDevice.Info eachInfo : info) {
-			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
+			System.out.println("eachInfo = " + eachInfo);
+			if (eachInfo.getName().equals("VirtualMIDISynth #1")) {
 				device = MidiSystem.getMidiDevice(eachInfo);
 				break;
 			}
@@ -132,7 +135,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 							}
 						}
 					}
-				},0,1);
+				}, 0, 1);
 			}
 		}, 2000);
 		
@@ -225,13 +228,16 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
 				programEvents.add(new MidiProgramEvent(0, j, 0));
 			}
-			int dupC = 0;
 			// Remove duplicate events (either at duplicate time or same program number)
-			while (programEvents.size() > 1 &&
-					(programEvents.get(dupC + 1).time == programEvents.get(dupC).time ||
-							programEvents.get(dupC + 1).programNum == programEvents.get(dupC).programNum)
-			) {
-				programEvents.remove(dupC);
+			int d = 0;
+			while (programEvents.size() > 1 && d < programEvents.size() - 1) {
+				while (d < programEvents.size() - 1 && (
+						programEvents.get(d + 1).time == programEvents.get(d).time
+						|| programEvents.get(d + 1).programNum == programEvents.get(d).programNum
+						)) {
+					programEvents.remove(d);
+				}
+				d++;
 			}
 			if (programEvents.size() == 1) {
 				instruments.add(fromEvents(programEvents.get(0), channel));
@@ -270,6 +276,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Nullable
 	private Instrument fromEvents(MidiProgramEvent programEvent,
 	                              List<MidiChannelSpecificEvent> events) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+		System.out.println(("the program num is " + programEvent.programNum));
 		switch (programEvent.programNum) {
 			case 0: // Acoustic Grand Piano
 			case 1: // Bright Acoustic Piano
@@ -281,6 +288,14 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return (new Keyboard(this, events, Keyboard.Skin.PIANO));
 			case 6: // Harpsichord
 				return new Keyboard(this, events, Keyboard.Skin.HARPSICHORD);
+			case 9: // Glockenspiel
+				return new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
+			case 11: // Vibraphone
+				return new Mallets(this, events, Mallets.MalletType.VIBES);
+			case 12: // Marimba
+				return new Mallets(this, events, Mallets.MalletType.MARIMBA);
+			case 13: // Xylophone
+				return new Mallets(this, events, Mallets.MalletType.XYLOPHONE);
 			case 15: // Dulcimer
 			case 16: // Drawbar Organ
 			case 17: // Percussive Organ
@@ -306,7 +321,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 67: // Baritone Sax
 				return new BaritoneSax(this, events, file);
 			case 72: // Piccolo
-				return new Piccolo(this,events,file);
+				return new Piccolo(this, events, file);
 			case 73: // Flute
 				return new Flute(this, events, file);
 			case 80: // Lead 1 (Square)
@@ -355,10 +370,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED);
 		rootNode.attachChild(stage);
 		
-		Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED);
-		rootNode.attachChild(pianoStand);
-		pianoStand.move(-50, 32f, -6);
-		pianoStand.rotate(0, rad(45), 0);
+		
+		
 
 //		DirectionalLight l = new DirectionalLight();
 //		l.setDirection(new Vector3f(0, -1, -1));
@@ -368,6 +381,20 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			calculateInstruments();
 		} catch (InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
 			e.printStackTrace();
+		}
+		
+		if (instruments.stream().anyMatch(i -> i instanceof Keyboard)) {
+			Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED);
+			rootNode.attachChild(pianoStand);
+			pianoStand.move(-50, 32f, -6);
+			pianoStand.rotate(0, rad(45), 0);
+		}
+		if (instruments.stream().anyMatch(i -> i instanceof Mallets)) {
+			Spatial malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED);
+			rootNode.attachChild(malletStand);
+			malletStand.setLocalTranslation(new Vector3f(-22, 22.2f, 23));
+			malletStand.rotate(0, rad(33.7), 0);
+			malletStand.scale(2 / 3f);
 		}
 		
 		// "wake up" instruments by ticking at a negative time value
@@ -426,12 +453,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		return material;
 	}
 	
-	public enum MatType {
-		UNSHADED,
-		SHADED,
-		REFLECTIVE
-	}
-	
 	/**
 	 * Registers key handling.
 	 */
@@ -464,7 +485,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		cam.setRotation(camera.rotation);
 	}
 	
-	
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
 		this.flyCam.setMoveSpeed(name.equals("slow") && isPressed ? 10 : 100);
@@ -480,6 +500,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				
 			}
 		}
+	}
+	
+	
+	public enum MatType {
+		UNSHADED,
+		SHADED,
+		REFLECTIVE
 	}
 	
 	/**
