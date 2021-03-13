@@ -246,7 +246,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 					List<MidiChannelSpecificEvent> events = new ArrayList<>();
 					for (MidiChannelSpecificEvent eventInChannel : channel) {
 						if (eventInChannel.time < programEvents.get(i + 1).time) {
-							events.add(eventInChannel);
+							if (i > 0) {
+								if (eventInChannel.time >= programEvents.get(i).time) {
+									events.add(eventInChannel);
+								}
+							} else {
+								events.add(eventInChannel);
+							}
 						} else {
 							break;
 						}
