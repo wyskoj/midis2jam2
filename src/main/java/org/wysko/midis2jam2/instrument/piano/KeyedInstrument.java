@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.keyed;
+package org.wysko.midis2jam2.instrument.piano;
 
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;

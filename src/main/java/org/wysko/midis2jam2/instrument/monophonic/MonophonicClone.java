@@ -23,7 +23,7 @@ public abstract class MonophonicClone {
 	public final List<NotePeriod> notePeriods;
 	public final Node animNode = new Node();
 	public final Node modelNode = new Node();
-	public final Node cloneNode = new Node();
+	public Node cloneNode = new Node();
 	/**
 	 * The current note period that is being handled.
 	 */

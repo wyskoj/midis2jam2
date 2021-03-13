@@ -7,6 +7,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -19,10 +20,13 @@ public class SteamPuffer implements ParticleGenerator {
 	final List<Cloud> clouds = new ArrayList<>();
 	private final Midis2jam2 context;
 	private final SteamPuffType type;
+	private final double scale;
+	List<Cloud> cloudPool = new ArrayList<>();
 	
-	public SteamPuffer(Midis2jam2 context, SteamPuffType type) {
+	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale) {
 		this.context = context;
 		this.type = type;
+		this.scale = scale;
 	}
 	
 	private void despawnCloud(Cloud cloud) {
@@ -42,15 +46,31 @@ public class SteamPuffer implements ParticleGenerator {
 				}
 			}
 			for (int i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
-				Cloud cloud = new Cloud();
+				Cloud cloud;
+				if (!cloudPool.isEmpty())
+					cloud = cloudPool.remove(0);
+				else {
+					cloud = new Cloud();
+				}
 				clouds.add(cloud);
+				cloud.currentlyUsing = true;
+				cloud.randomInit();
 				steamPuffNode.attachChild(cloud.cloud);
 			}
 		}
 		
-		for (Cloud cloud : clouds) {
-			if (cloud != null)
-				cloud.tick(delta);
+		Iterator<Cloud> iterator = clouds.iterator();
+		while (iterator.hasNext()) {
+			Cloud cloud = iterator.next();
+			if (cloud != null) {
+				boolean tick = cloud.tick(delta);
+				if (!tick) {
+					cloud.currentlyUsing = false;
+					cloudPool.add(cloud);
+					SteamPuffer.this.despawnCloud(cloud);
+					iterator.remove();
+				}
+			}
 		}
 	}
 	
@@ -68,36 +88,41 @@ public class SteamPuffer implements ParticleGenerator {
 	}
 	
 	class Cloud implements Particle {
-		final Node cloud = new Node();
-		final float randY;
-		final float randZ;
+		Node cloud = new Node();
+		float randY;
+		float randZ;
 		double life = 0;
+		boolean currentlyUsing = false;
+		private final Spatial cube;
 		
 		public Cloud() {
+			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED);
+			randomInit();
+			cloud.attachChild(cube);
+		}
+		
+		private void randomInit() {
 			Random random = new Random();
 			randY = (random.nextFloat() - 0.5f) * 1.5f;
 			randZ = (random.nextFloat() - 0.5f) * 1.5f;
-			Spatial cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED);
 			cube.setLocalRotation(new Quaternion().fromAngles(new float[] {
 					random.nextFloat() * FastMath.TWO_PI,
 					random.nextFloat() * FastMath.TWO_PI,
 					random.nextFloat() * FastMath.TWO_PI,
 			}));
-			cloud.attachChild(cube);
+			life = 0;
+			cloud.setLocalTranslation(0,0,0);
 		}
 		
 		@Override
-		public void tick(float delta) {
+		public boolean tick(float delta) {
+			if (!currentlyUsing) return false;
 			cloud.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
-			cloud.setLocalScale((float) (0.75 * life + 1.2));
+			cloud.setLocalScale((float) ((0.75 * life + 1.2) * scale));
 			life += delta * 1.5;
 			double END_OF_LIFE = 0.7;
-			if (life > END_OF_LIFE) despawn();
-		}
-		
-		@Override
-		public void despawn() {
-			SteamPuffer.this.despawnCloud(this);
+			if (life > END_OF_LIFE) return false;
+			return true;
 		}
 		
 		private float locEase(double x) {

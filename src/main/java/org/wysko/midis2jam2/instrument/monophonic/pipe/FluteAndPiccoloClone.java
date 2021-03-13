@@ -3,15 +3,14 @@ package org.wysko.midis2jam2.instrument.monophonic.pipe;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.particle.SteamPuffer;
 
 public class FluteAndPiccoloClone extends HandedClone {
 	
 	SteamPuffer puffer;
-	FluteAndPiccolo parent;
+	HandedInstrument parent;
 	
-	public FluteAndPiccoloClone(FluteAndPiccolo parent) {
+	public FluteAndPiccoloClone(HandedInstrument parent) {
 		this.parent = parent;
 	}
 	

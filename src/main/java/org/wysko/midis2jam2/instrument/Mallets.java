@@ -5,7 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.keyed.Keyboard;
+import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
-import static org.wysko.midis2jam2.instrument.keyed.Keyboard.*;
+import static org.wysko.midis2jam2.instrument.piano.Keyboard.*;
 
 public class Mallets extends Instrument {
 	public final static double MAX_ANGLE = 50.0;

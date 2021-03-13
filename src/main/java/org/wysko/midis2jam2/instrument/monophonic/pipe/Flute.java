@@ -2,7 +2,6 @@ package org.wysko.midis2jam2.instrument.monophonic.pipe;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
@@ -18,11 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Flute extends FluteAndPiccolo {
-	
-
-	
-	
+public class Flute extends HandedInstrument {
 	
 	/**
 	 * Constructs a flute.
@@ -109,7 +104,7 @@ public class Flute extends FluteAndPiccolo {
 			horn = Flute.this.context.loadModel("Flute.obj", "ShinySilver.bmp", Midis2jam2.MatType.REFLECTIVE);
 			loadHands();
 			
-			puffer = new SteamPuffer(Flute.this.context, SteamPuffer.SteamPuffType.WHISTLE);
+			puffer = new SteamPuffer(Flute.this.context, SteamPuffer.SteamPuffType.WHISTLE, 1.0);
 			cloneNode.attachChild(puffer.steamPuffNode);
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);

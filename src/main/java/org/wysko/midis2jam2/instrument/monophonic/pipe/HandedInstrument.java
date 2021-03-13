@@ -7,9 +7,9 @@ import org.wysko.midis2jam2.midi.MidiFile;
 
 import java.util.HashMap;
 
-public abstract class FluteAndPiccolo extends MonophonicInstrument {
+public abstract class HandedInstrument extends MonophonicInstrument {
 	public HashMap<Integer, HandedClone.Hands> KEY_MAPPING;
-	public FluteAndPiccolo(Midis2jam2 context, MidiFile file) {
+	public HandedInstrument(Midis2jam2 context, MidiFile file) {
 		super(context, file);
 	}
 }

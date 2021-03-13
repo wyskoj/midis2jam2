@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.keyed;
+package org.wysko.midis2jam2.instrument.piano;
 
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
@@ -10,11 +10,10 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
-import static org.wysko.midis2jam2.instrument.keyed.Keyboard.midiValueToColor;
+import static org.wysko.midis2jam2.instrument.piano.Keyboard.midiValueToColor;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class Accordion extends KeyedInstrument {

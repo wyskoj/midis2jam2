@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Piccolo extends FluteAndPiccolo {
+public class Piccolo extends HandedInstrument {
 	
 	
 	/**
@@ -106,7 +106,7 @@ public class Piccolo extends FluteAndPiccolo {
 					Midis2jam2.MatType.REFLECTIVE);
 			loadHands();
 			
-			puffer = new SteamPuffer(Piccolo.this.context, SteamPuffer.SteamPuffType.NORMAL);
+			puffer = new SteamPuffer(Piccolo.this.context, SteamPuffer.SteamPuffType.NORMAL, 1.0);
 			cloneNode.attachChild(puffer.steamPuffNode);
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -8.6f, 0);

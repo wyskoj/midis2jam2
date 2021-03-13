@@ -15,16 +15,18 @@ import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Guitar;
+import org.wysko.midis2jam2.instrument.Harmonica;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.Mallets;
-import org.wysko.midis2jam2.instrument.keyed.Accordion;
-import org.wysko.midis2jam2.instrument.keyed.Keyboard;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
+import org.wysko.midis2jam2.instrument.monophonic.pipe.Ocarina;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
 import org.wysko.midis2jam2.instrument.percussion.Percussion;
+import org.wysko.midis2jam2.instrument.piano.Accordion;
+import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
@@ -126,7 +128,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Override
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdate(tpf);
-		bitmapText1.setText(String.valueOf(timeSinceStart));
+//		bitmapText1.setText(String.valueOf(timeSinceStart));
 		if (sequencer == null) return;
 		timeSinceStart += tpf;
 		
@@ -273,6 +275,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 21: // Accordion
 			case 23: // Tango Accordion
 				return new Accordion(this, events);
+			case 22: // Harmonica
+				return new Harmonica(this, events);
 			case 24: // Acoustic Guitar (Nylon)
 			case 25: // Acoustic Guitar (Steel)
 				return new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
@@ -293,6 +297,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Piccolo(this, events, file);
 			case 73: // Flute
 				return new Flute(this, events, file);
+			case 79: // Ocarina
+				return new Ocarina(this, events, file);
 			case 80: // Lead 1 (Square)
 			case 81: // Lead 2 (Sawtooth)
 			case 83: // Lead 4 (Chiff)
@@ -342,7 +348,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
 		bitmapText1 = new BitmapText(bitmapFont, false);
 		bitmapText1.setSize(bitmapFont.getCharSet().getRenderedSize());
-		bitmapText1.setText("Hello World");
+		bitmapText1.setText("");
 		bitmapText1.setLocalTranslation(300, bitmapText1.getLineHeight(), 0);
 		guiNode.attachChild(bitmapText1);
 
