@@ -32,6 +32,7 @@ import org.wysko.midis2jam2.instrument.organ.Accordion;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.strings.Harp;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
@@ -303,6 +304,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 38: // Synth Bass 1
 			case 39: // Synth Bass 2
 				return new BassGuitar(this,events);
+			case 46: // Orchestral Harp
+				return new Harp(this, events);
 			case 64: // Soprano Sax
 				return new SopranoSax(this, events, file);
 			case 65: // Alto Sax

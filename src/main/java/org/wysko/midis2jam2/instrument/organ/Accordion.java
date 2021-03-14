@@ -150,10 +150,16 @@ public class Accordion extends KeyedInstrument {
 		
 		if (expanding) {
 			angle += delta * squeezingSpeed;
-			if (angle > 4) expanding = false;
+			if (angle > 4) {
+				angle = 4;
+				expanding = false;
+			}
 		} else {
 			angle -= delta * squeezingSpeed;
-			if (angle < 1) expanding = true;
+			if (angle < 1) {
+				angle = 1;
+				expanding = true;
+			}
 		}
 	}
 	

@@ -95,7 +95,7 @@ public class TelephoneRing extends Instrument {
 			}
 		}
 		
-		highestNode.setLocalTranslation(othersOfMyType * 13,0,0);
+		highestNode.setLocalTranslation(othersOfMyType * 13, 0, 0);
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
@@ -137,10 +137,10 @@ public class TelephoneRing extends Instrument {
 				rad(new Random().nextGaussian() * 3) * force, 0));
 		if (isPlaying) {
 			force += 10 * delta;
-			force = Math.min(1,force);
+			force = Math.min(1, force);
 		} else {
 			force -= 10 * delta;
-			force = Math.max(0,force);
+			force = Math.max(0, force);
 		}
 	}
 }
