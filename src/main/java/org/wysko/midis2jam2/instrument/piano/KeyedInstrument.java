@@ -45,8 +45,8 @@ public abstract class KeyedInstrument extends Instrument {
 		transitionAnimation(delta);
 	}
 	
-	static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode,
-	                       Key key) {
+	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode,
+	                                 Key key) {
 		if (!beingPressed) {
 			float[] angles = new float[3];
 			node.getLocalRotation().toAngles(angles);

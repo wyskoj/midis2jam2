@@ -15,6 +15,9 @@ import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.*;
+import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
+import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
+import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Ocarina;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
@@ -22,10 +25,12 @@ import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
-import org.wysko.midis2jam2.instrument.percussion.TubularBells;
+import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
+import org.wysko.midis2jam2.instrument.organ.Harmonica;
 import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
-import org.wysko.midis2jam2.instrument.piano.Accordion;
+import org.wysko.midis2jam2.instrument.organ.Accordion;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
+import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
@@ -332,6 +337,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 102: // FX 7 (Echoes)
 			case 103: // FX 8 (Sci-fi)
 				return new Keyboard(this, events, Keyboard.Skin.SYNTH);
+			case 124: // Telephone Ring
+				return new TelephoneRing(this, events);
 			default:
 				return null;
 		}
