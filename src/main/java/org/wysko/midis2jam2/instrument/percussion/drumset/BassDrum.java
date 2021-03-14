@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussion;
+package org.wysko.midis2jam2.instrument.percussion.drumset;
 
 import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
@@ -12,7 +12,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
-import static org.wysko.midis2jam2.instrument.percussion.StickDrum.MAX_ANGLE;
+import static org.wysko.midis2jam2.instrument.percussion.drumset.StickDrum.MAX_ANGLE;
 
 public class BassDrum extends PercussionInstrument {
 	

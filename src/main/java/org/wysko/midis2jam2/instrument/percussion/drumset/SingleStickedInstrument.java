@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussion;
+package org.wysko.midis2jam2.instrument.percussion.drumset;
 
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;

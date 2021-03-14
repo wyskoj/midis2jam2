@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussion;
+package org.wysko.midis2jam2.instrument.percussion.drumset;
 
 import com.jme3.math.FastMath;
 import com.jme3.scene.Node;
@@ -31,7 +31,7 @@ public abstract class PercussionInstrument extends Instrument {
 	 * @return a percentage to multiply by the target recoil
 	 */
 	@Range(from = 0, to = 1)
-	double velocityRecoilDampening(@Range(from = 0, to = 127) int x) {
+	public static double velocityRecoilDampening(@Range(from = 0, to = 127) int x) {
 		return FastMath.sqrt(x) / 11.26942767f;
 	}
 }

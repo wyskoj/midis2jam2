@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.percussion;
+package org.wysko.midis2jam2.instrument.percussion.drumset;
 
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;

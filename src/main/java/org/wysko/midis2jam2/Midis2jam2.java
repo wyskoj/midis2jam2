@@ -22,7 +22,8 @@ import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
-import org.wysko.midis2jam2.instrument.percussion.Percussion;
+import org.wysko.midis2jam2.instrument.percussion.TubularBells;
+import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
 import org.wysko.midis2jam2.instrument.piano.Accordion;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.*;
@@ -262,6 +263,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Mallets(this, events, Mallets.MalletType.MARIMBA);
 			case 13: // Xylophone
 				return new Mallets(this, events, Mallets.MalletType.XYLOPHONE);
+			case 14: // Tubular Bells
+			case 112: // Tinkle Bell
+				return new TubularBells(this, events);
 			case 15: // Dulcimer
 			case 16: // Drawbar Organ
 			case 17: // Percussive Organ
