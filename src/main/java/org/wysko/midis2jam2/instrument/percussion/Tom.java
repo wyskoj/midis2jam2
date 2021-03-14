@@ -12,7 +12,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Tom extends StickDrum {
 	public Tom(Midis2jam2 context, List<MidiNoteOnEvent> hits, TomPitch pitch) {
 		super(context, hits, Pivot.AT_END);
-		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED);
+		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		drum.setLocalScale(pitch.scale);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);
@@ -34,7 +34,7 @@ public class Tom extends StickDrum {
 	@Override
 	public void tick(double time, float delta) {
 		drumRecoil(time, delta);
-		handleStick(time, delta);
+		handleStick(time, delta, hits);
 	}
 	
 	public enum TomPitch {

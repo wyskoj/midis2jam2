@@ -17,18 +17,18 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class Cymbal extends SingleStickedInstrument {
 	
+	final Node cymbalNode = new Node();
 	private final int WOBBLE_SPEED = 7;
 	private final double DAMPENING = 1;
-	final Node cymbalNode = new Node();
-	double animTime = -1;
 	private final double AMPLITUDE = 1.5;
+	double animTime = -1;
 	
 	protected Cymbal(Midis2jam2 context,
 	                 List<MidiNoteOnEvent> hits, CymbalType type) {
 		super(context, hits);
 		
 		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
-				Midis2jam2.MatType.REFLECTIVE);
+				Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		cymbalNode.attachChild(cymbal);
 		cymbalNode.setLocalScale(type.size);
 		highLevelNode.setLocalTranslation(type.location);
@@ -66,7 +66,7 @@ public class Cymbal extends SingleStickedInstrument {
 		cymbalNode.setLocalRotation(new Quaternion().fromAngles(rotationAmount(), 0, 0));
 		if (animTime != -1) animTime += delta;
 		
-		handleStick(time, delta);
+		handleStick(time, delta, hits);
 	}
 	
 	public enum CymbalType {

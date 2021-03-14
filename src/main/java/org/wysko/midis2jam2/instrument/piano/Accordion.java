@@ -34,7 +34,7 @@ public class Accordion extends KeyedInstrument {
 		IntStream.range(0, 14).forEach(i -> rotationNodes[i] = new Node());
 		
 		// Set node 0
-		Spatial leftHand = context.loadModel("AccordianLeftHand.fbx", "AccordianCase.bmp", Midis2jam2.MatType.UNSHADED);
+		Spatial leftHand = context.loadModel("AccordianLeftHand.fbx", "AccordianCase.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		
 		// Set materials
 		Node lHNode = (Node) leftHand;
@@ -46,7 +46,7 @@ public class Accordion extends KeyedInstrument {
 		rubberFoot.setTexture("ColorMap",context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
 		lHNode.getChild(0).setMaterial(rubberFoot);
 		
-		Spatial fold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED);
+		Spatial fold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		Node node0 = new Node();
 		node0.attachChild(leftHand);
 		node0.attachChild(fold);
@@ -56,14 +56,14 @@ public class Accordion extends KeyedInstrument {
 		// Set nodes 1 - 12
 		for (int i = 1; i <= 12; i++) {
 			rotationNodes[i] = new Node();
-			Spatial aFold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED);
+			Spatial aFold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			rotationNodes[i].attachChild(aFold);
 		}
 		
 		// Set node 13
 		Spatial rightHand = context.loadModel("AccordianRightHand.obj", "AccordianCaseFront.bmp",
-				Midis2jam2.MatType.UNSHADED);
-		Spatial aFold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED);
+				Midis2jam2.MatType.UNSHADED, 0.9f);
+		Spatial aFold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		Node node13 = new Node();
 		node13.attachChild(rightHand);
 		node13.attachChild(aFold);
@@ -113,10 +113,10 @@ public class Accordion extends KeyedInstrument {
 	private Node whiteKey() {
 		Node node = new Node();
 		Spatial upKeyFront = Accordion.this.context.loadModel("AccordianKeyWhiteFront.obj", "AccordianKey.bmp",
-				Midis2jam2.MatType.UNSHADED);
+				Midis2jam2.MatType.UNSHADED, 0.9f);
 		// Back Key
 		Spatial upKeyBack = Accordion.this.context.loadModel("AccordianKeyWhiteBack.obj", "AccordianKey.bmp",
-				Midis2jam2.MatType.UNSHADED);
+				Midis2jam2.MatType.UNSHADED, 0.9f);
 		node.attachChild(upKeyBack);
 		node.attachChild(upKeyFront);
 		return node;
@@ -188,20 +188,20 @@ public class Accordion extends KeyedInstrument {
 				/* UP KEY */
 				// Front key
 				Spatial upKeyFront = Accordion.this.context.loadModel("AccordianKeyWhiteFront.obj", "AccordianKey.bmp",
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				// Back Key
 				Spatial upKeyBack = Accordion.this.context.loadModel("AccordianKeyWhiteBack.obj", "AccordianKey.bmp",
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				
 				upNode.attachChild(upKeyFront);
 				upNode.attachChild(upKeyBack);
 				/* DOWN KEY */
 				// Front key
 				Spatial downKeyFront = Accordion.this.context.loadModel("AccordianKeyWhiteFront.obj", "AccordianKeyDown.bmp",
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				// Back key
 				Spatial downKeyBack = Accordion.this.context.loadModel("AccordianKeyWhiteBack.obj", "AccordianKeyDown.bmp",
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				downNode.attachChild(downKeyFront);
 				downNode.attachChild(downKeyBack);
 				
@@ -213,12 +213,12 @@ public class Accordion extends KeyedInstrument {
 				
 				/* Up key */
 				Spatial blackKey = Accordion.this.context.loadModel("AccordianKeyBlack.obj", "AccordianKeyBlack.bmp",
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				upNode.attachChild(blackKey);
 				/* Up key */
 				Spatial blackKeyDown = Accordion.this.context.loadModel("AccordianKeyBlack.obj",
 						"AccordianKeyBlackDown.bmp",
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				downNode.attachChild(blackKeyDown);
 				
 				node.attachChild(upNode);

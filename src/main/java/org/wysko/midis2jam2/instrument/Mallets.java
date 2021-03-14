@@ -42,7 +42,7 @@ public class Mallets extends Instrument {
 	               MalletType type) {
 		super(context);
 		this.type = type;
-		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED);
+		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		malletCase.setLocalScale(2 / 3f);
 		contents.attachChild(malletCase);
 		
@@ -169,18 +169,18 @@ public class Mallets extends Instrument {
 		Spatial shadow;
 		
 		public MalletBar(int midiNote, int startPos) {
-			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
+			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 			malletNode.attachChild(mallet);
 			malletNode.setLocalScale(0.667f);
 			malletNode.setLocalRotation(new Quaternion().fromAngles(rad(50), 0, 0));
 			mallet.setLocalTranslation(0, 0, -2);
 			malletNode.move(0, 0, 2);
 			
-			shadow = Mallets.this.context.loadModel("MalletHitShadow.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED);
+			shadow = Mallets.this.context.loadModel("MalletHitShadow.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			
 			if (midiValueToColor(midiNote) == Keyboard.KeyColor.WHITE) {
-				upBar = Mallets.this.context.loadModel("XylophoneWhiteBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
-				downBar = Mallets.this.context.loadModel("XylophoneWhiteBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
+				upBar = Mallets.this.context.loadModel("XylophoneWhiteBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+				downBar = Mallets.this.context.loadModel("XylophoneWhiteBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 				
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
@@ -192,8 +192,8 @@ public class Mallets extends Instrument {
 				malletNode.setLocalTranslation(0, 1.35f, (-midiNote / 11.5f) + 19);
 				shadow.setLocalTranslation(0, 0.75f, (-midiNote / 11.5f) + 11);
 			} else {
-				upBar = Mallets.this.context.loadModel("XylophoneBlackBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
-				downBar = Mallets.this.context.loadModel("XylophoneBlackBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED);
+				upBar = Mallets.this.context.loadModel("XylophoneBlackBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+				downBar = Mallets.this.context.loadModel("XylophoneBlackBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 				
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);

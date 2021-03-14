@@ -96,7 +96,7 @@ public class SteamPuffer implements ParticleGenerator {
 		private final Spatial cube;
 		
 		public Cloud() {
-			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED);
+			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED, 0.9f);
 			randomInit();
 			cloud.attachChild(cube);
 		}

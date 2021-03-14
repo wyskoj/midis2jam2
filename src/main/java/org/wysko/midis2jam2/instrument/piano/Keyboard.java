@@ -29,7 +29,7 @@ public class Keyboard extends KeyedInstrument {
 		super(context, events);
 		this.events = events;
 		this.skin = skin;
-		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
+		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 		
 		int whiteCount = 0;
 		for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
@@ -152,20 +152,20 @@ public class Keyboard extends KeyedInstrument {
 				/* UP KEY */
 				// Front key
 				Spatial upKeyFront = Keyboard.this.context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				// Back Key
 				Spatial upKeyBack = Keyboard.this.context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				
 				upNode.attachChild(upKeyFront);
 				upNode.attachChild(upKeyBack);
 				/* DOWN KEY */
 				// Front key
 				Spatial downKeyFront = Keyboard.this.context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				// Back key
 				Spatial downKeyBack = Keyboard.this.context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				downNode.attachChild(downKeyFront);
 				downNode.attachChild(downKeyBack);
 				
@@ -177,11 +177,11 @@ public class Keyboard extends KeyedInstrument {
 			} else { // Black key
 				
 				/* Up key */
-				Spatial blackKey = Keyboard.this.context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED);
+				Spatial blackKey = Keyboard.this.context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 				upNode.attachChild(blackKey);
 				/* Up key */
 				Spatial blackKeyDown = Keyboard.this.context.loadModel("PianoKeyBlackDown.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED);
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				downNode.attachChild(blackKeyDown);
 				
 				node.attachChild(upNode);

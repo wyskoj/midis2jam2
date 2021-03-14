@@ -23,58 +23,54 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Guitar extends Instrument {
+public class BassGuitar extends Instrument {
 	
 	
-	private static final float TOP_Y = 16.6f;
-	private static final float BOTTOM_Y = -18.1f;
+	private static final float TOP_Y = 19.5f;
+	private static final float BOTTOM_Y = -26.57f;
 	private static final Vector3f FINGER_VERTICAL_OFFSET = new Vector3f(0, TOP_Y, 0);
 	private static final Vector3f[] RESTING_STRINGS = new Vector3f[] {
-			new Vector3f(0.8f, 1, 0.8f),
-			new Vector3f(0.75f, 1, 0.75f),
-			new Vector3f(0.7f, 1, 0.7f),
-			new Vector3f(0.77f, 1, 0.77f),
-			new Vector3f(0.75f, 1, 0.75f),
-			new Vector3f(0.7f, 1, 0.7f),
+			new Vector3f(1, 1, 1),
+			new Vector3f(1, 1, 1),
+			new Vector3f(1, 1, 1),
+			new Vector3f(1, 1, 1)
 		
 	};
-	private static final float[] STRING_TOP_X = new float[] {-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f};
-	private static final float[] STRING_BOTTOM_X = new float[] {-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f};
+	private static final float[] STRING_TOP_X = new float[] {-0.85f, -0.31f, 0.20f, 0.70f};
+	private static final float[] STRING_BOTTOM_X = new float[] {-1.86f, -0.85f, 0.34f, 1.37f};
 	final Node aGuitarNode = new Node();
 	/**
-	 * Eddy ate dynamite. He fucking died.
+	 * Eat and drink grapes. Just don't choke.
 	 */
-	final Spatial[] upperStrings = new Spatial[6];
-	final Spatial[][] animStrings = new Spatial[6][5];
-	final Spatial[] noteFingers = new Spatial[6];
+	final Spatial[] upperStrings = new Spatial[4];
+	final Spatial[][] animStrings = new Spatial[4][5];
+	final Spatial[] noteFingers = new Spatial[4];
 	final List<NotePeriod> currentNotePeriods = new ArrayList<>();
-	/**
-	 * <a href="https://docs.google.com/spreadsheets/d/1OavkZ2xtrEhjwIk3dRaqXCiewQUOKUgWfKh6sFq7uoM/edit?usp=sharing">link</a>
-	 */
+	
 	private final HashMap<Integer, Float> FRET_HEIGHTS = new HashMap<Integer, Float>() {{
-		put(0, 0f);
-		put(1, 0.03744493392f);
-		put(2, 0.09691629956f);
-		put(3, 0.1431718062f);
-		put(4, 0.1916299559f);
-		put(5, 0.2400881057f);
-		put(6, 0.2841409692f);
-		put(7, 0.3193832599f);
-		put(8, 0.359030837f);
-		put(9, 0.3920704846f);
-		put(10, 0.4295154185f);
-		put(11, 0.4603524229f);
-		put(12, 0.4911894273f);
-		put(13, 0.5176211454f);
-		put(14, 0.5440528634f);
-		put(15, 0.5726872247f);
-		put(16, 0.5947136564f);
-		put(17, 0.6189427313f);
-		put(18, 0.6387665198f);
-		put(19, 0.6585903084f);
-		put(20, 0.6806167401f);
-		put(21, 0.6982378855f);
-		put(22, 0.7158590308f);
+		put(0, 0.0f);
+		put(1, 0.05f);
+		put(2, 0.1f);
+		put(3, 0.15f);
+		put(4, 0.20f);
+		put(5, 0.24f);
+		put(6, 0.285f);
+		put(7, 0.325f);
+		put(8, 0.364f);
+		put(9, 0.4f);
+		put(10, 0.43f);
+		put(11, 0.464f);
+		put(12, 0.494f);
+		put(13, 0.523f);
+		put(14, 0.55f);
+		put(15, 0.575f);
+		put(16, 0.6f);
+		put(17, 0.62f);
+		put(18, 0.643f);
+		put(19, 0.663f);
+		put(20, 0.68f);
+		put(21, 0.698f);
+		put(22, 0.716f);
 	}};
 	private final List<MidiChannelSpecificEvent> events;
 	private final List<NotePeriod> notePeriods;
@@ -82,26 +78,23 @@ public class Guitar extends Instrument {
 	private final BitmapText timeText;
 	double frame = 0;
 	
-	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
+	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
 		this.events = events;
 		
 		
 		final List<MidiNoteEvent> justTheNotes =
-				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> (MidiNoteEvent) e).collect(Collectors.toList());
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		
-		final Spatial guitarBody = context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+		final Spatial guitarBody = context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		aGuitarNode.attachChild(guitarBody);
 		
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 4; i++) {
 			Spatial string;
-			if (i < 3) {
-				string = context.loadModel("GuitarStringLow.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
-			} else {
-				string = context.loadModel("GuitarStringHigh.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
-			}
+			
+			string = context.loadModel("BassString.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			upperStrings[i] = string;
 			aGuitarNode.attachChild(upperStrings[i]);
 		}
@@ -109,36 +102,26 @@ public class Guitar extends Instrument {
 		// Position each string
 		final float forward = 0.125f;
 		upperStrings[0].setLocalTranslation(STRING_TOP_X[0], TOP_Y, forward);
-		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
+		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1.24)));
 		upperStrings[0].setLocalScale(RESTING_STRINGS[0]);
 		
 		upperStrings[1].setLocalTranslation(STRING_TOP_X[1], TOP_Y, forward);
-		upperStrings[1].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.62)));
+		upperStrings[1].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.673)));
 		upperStrings[1].setLocalScale(RESTING_STRINGS[1]);
 		
 		upperStrings[2].setLocalTranslation(STRING_TOP_X[2], TOP_Y, forward);
-		upperStrings[2].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.22)));
+		upperStrings[2].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.17)));
 		upperStrings[2].setLocalScale(RESTING_STRINGS[2]);
 		
 		upperStrings[3].setLocalTranslation(STRING_TOP_X[3], TOP_Y, forward);
-		upperStrings[3].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.08)));
+		upperStrings[3].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.824)));
 		upperStrings[3].setLocalScale(RESTING_STRINGS[3]);
 		
-		upperStrings[4].setLocalTranslation(STRING_TOP_X[4], TOP_Y, forward);
-		upperStrings[4].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.45)));
-		upperStrings[4].setLocalScale(RESTING_STRINGS[4]);
-		
-		upperStrings[5].setLocalTranslation(STRING_TOP_X[5], TOP_Y, forward);
-		upperStrings[5].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.9)));
-		upperStrings[5].setLocalScale(RESTING_STRINGS[5]);
-		
 		// Lower strings
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 5; j++) {
-				if (i < 3)
-					animStrings[i][j] = context.loadModel("GuitarLowStringBottom" + j + ".obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
-				else
-					animStrings[i][j] = context.loadModel("GuitarHighStringBottom" + j + ".obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+				animStrings[i][j] = context.loadModel("BassStringBottom" + j + ".obj", "BassSkin.bmp",
+						Midis2jam2.MatType.UNSHADED, 0.9f);
 				aGuitarNode.attachChild(animStrings[i][j]);
 			}
 		}
@@ -146,40 +129,28 @@ public class Guitar extends Instrument {
 		// Position lower strings
 		for (int i = 0; i < 5; i++) {
 			animStrings[0][i].setLocalTranslation(STRING_BOTTOM_X[0], BOTTOM_Y, forward);
-			animStrings[0][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
+			animStrings[0][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1.24)));
 			animStrings[0][i].setLocalScale(RESTING_STRINGS[0]);
 		}
 		for (int i = 0; i < 5; i++) {
 			animStrings[1][i].setLocalTranslation(STRING_BOTTOM_X[1], BOTTOM_Y, forward);
-			animStrings[1][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.62)));
+			animStrings[1][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.673)));
 			animStrings[1][i].setLocalScale(RESTING_STRINGS[0]);
 		}
 		for (int i = 0; i < 5; i++) {
 			animStrings[2][i].setLocalTranslation(STRING_BOTTOM_X[2], BOTTOM_Y, forward);
-			animStrings[2][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.22)));
+			animStrings[2][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.17)));
 			animStrings[2][i].setLocalScale(RESTING_STRINGS[0]);
 		}
 		
 		for (int i = 0; i < 5; i++) {
 			animStrings[3][i].setLocalTranslation(STRING_BOTTOM_X[3], BOTTOM_Y, forward);
-			animStrings[3][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.08)));
+			animStrings[3][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.824)));
 			animStrings[3][i].setLocalScale(RESTING_STRINGS[0]);
 		}
 		
-		for (int i = 0; i < 5; i++) {
-			animStrings[4][i].setLocalTranslation(STRING_BOTTOM_X[4], BOTTOM_Y, forward);
-			animStrings[4][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.45)));
-			animStrings[4][i].setLocalScale(RESTING_STRINGS[0]);
-		}
-		
-		for (int i = 0; i < 5; i++) {
-			animStrings[5][i].setLocalTranslation(STRING_BOTTOM_X[5], BOTTOM_Y, forward);
-			animStrings[5][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.9)));
-			animStrings[5][i].setLocalScale(RESTING_STRINGS[0]);
-		}
-		
 		// Hide all wobbly strings
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 5; j++) {
 				animStrings[i][j].setCullHint(Spatial.CullHint.Always);
 			}
@@ -187,8 +158,8 @@ public class Guitar extends Instrument {
 		
 		
 		// Initialize note fingers
-		for (int i = 0; i < 6; i++) {
-			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+		for (int i = 0; i < 4; i++) {
+			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			aGuitarNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 		}
@@ -215,12 +186,12 @@ public class Guitar extends Instrument {
 	@Nullable
 	private GuitarPosition guitarPositions(int midiNote, boolean[] allowedStrings) {
 		List<GuitarPosition> list = new ArrayList<>();
-		if (midiNote >= 40 && midiNote <= 79) {
+		if (midiNote >= 28 && midiNote <= 65) {
 			// String starting notes
-			final int[] starts = new int[] {40, 45, 50, 55, 59, 64};
-			for (int i = 0; i < 6; i++) {
+			final int[] starts = new int[] {28, 33, 38, 43};
+			for (int i = 0; i < 4; i++) {
 				int fret = midiNote - starts[i];
-				if ((fret < 0 || fret > 22) || !allowedStrings[i]) {
+				if (fret < 0 || fret > 22 || !allowedStrings[i]) {
 					// The note will not fit on this string, or we are not allowed to
 					continue;
 				}
@@ -228,8 +199,8 @@ public class Guitar extends Instrument {
 			}
 			
 		}
-		list.sort((Comparator.comparingInt(o -> o.string)));
-		list.sort((Comparator.comparingInt(o -> o.fret)));
+		list.sort(Comparator.comparingInt(o -> o.string));
+		list.sort(Comparator.comparingInt(o -> o.fret));
 		if (list.isEmpty()) return null;
 		return list.get(0);
 	}
@@ -243,9 +214,9 @@ public class Guitar extends Instrument {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}
 		
-		int[] frets = new int[] {-1, -1, -1, -1, -1, -1};
+		int[] frets = new int[] {-1, -1, -1, -1};
 		if (!currentNotePeriods.isEmpty()) {
-			currentNotePeriods.sort((Comparator.comparingInt(o -> o.midiNote)));
+			currentNotePeriods.sort(Comparator.comparingInt(o -> o.midiNote));
 			for (NotePeriod currentNotePeriod : currentNotePeriods) {
 				final GuitarPosition guitarPosition = guitarPositions(currentNotePeriod.midiNote,
 						new boolean[] {
@@ -253,24 +224,20 @@ public class Guitar extends Instrument {
 								frets[1] == -1,
 								frets[2] == -1,
 								frets[3] == -1,
-								frets[4] == -1,
-								frets[5] == -1,
 						});
 				if (guitarPosition != null) {
 					frets[guitarPosition.string] = guitarPosition.fret;
 				}
 			}
 		}
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 4; i++) {
 			animateString(i, frets[i]);
 		}
-		timeText.setText(String.format("[%2s,%2s,%2s,%2s,%2s,%2s]",
-				frets[0] == -1? "" : frets[0],
-				frets[1] == -1? "" : frets[1],
-				frets[2] == -1? "" : frets[2],
-				frets[3] == -1? "" : frets[3],
-				frets[4] == -1? "" : frets[4],
-				frets[5] == -1? "" : frets[5]));
+		timeText.setText(String.format("[%2s,%2s,%2s,%2s]",
+				frets[0] == -1 ? "" : frets[0],
+				frets[1] == -1 ? "" : frets[1],
+				frets[2] == -1 ? "" : frets[2],
+				frets[3] == -1 ? "" : frets[3]));
 		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
 			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
 				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) { // floating points are the death
@@ -279,7 +246,7 @@ public class Guitar extends Instrument {
 				}
 			}
 		}
-		final double inc = delta / (1 / 60f);
+		final double inc = delta / 0.016666668f;
 		this.frame += inc;
 		
 		
@@ -326,25 +293,13 @@ public class Guitar extends Instrument {
 		if (fret != 0) {
 			noteFingers[string].setCullHint(Spatial.CullHint.Dynamic);
 			final Vector3f fingerPosition = new Vector3f(
-					((STRING_BOTTOM_X[string] - STRING_TOP_X[string]) * fretDistance) + STRING_TOP_X[string],
-					FINGER_VERTICAL_OFFSET.y - (stringHeight() * fretDistance),
+					(STRING_BOTTOM_X[string] - STRING_TOP_X[string]) * fretDistance + STRING_TOP_X[string],
+					FINGER_VERTICAL_OFFSET.y - stringHeight() * fretDistance,
 					0
 			);
 			noteFingers[string].setLocalTranslation(fingerPosition);
 		} else {
 			noteFingers[string].setCullHint(Spatial.CullHint.Always);
-		}
-	}
-	
-	public enum GuitarType {
-		ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"), // TODO Obviously.
-		ELECTRIC("Guitar.obj", "GuitarSkin.bmp");
-		final String modelFileName;
-		final String textureFileName;
-		
-		GuitarType(String modelFileName, String textureFileName) {
-			this.modelFileName = modelFileName;
-			this.textureFileName = textureFileName;
 		}
 	}
 	
@@ -356,7 +311,7 @@ public class Guitar extends Instrument {
 		/**
 		 * The string of the guitar.
 		 */
-		@Range(from = 0, to = 5)
+		@Range(from = 0, to = 4)
 		final
 		int string;
 		/**
@@ -385,8 +340,7 @@ public class Guitar extends Instrument {
 		
 		@Override
 		public String toString() {
-			return "GuitarPosition{" +
-					"string=" + string +
+			return "GuitarPosition{string=" + string +
 					", fret=" + fret +
 					'}';
 		}

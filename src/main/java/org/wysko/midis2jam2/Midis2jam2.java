@@ -14,10 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
-import org.wysko.midis2jam2.instrument.Guitar;
-import org.wysko.midis2jam2.instrument.Harmonica;
-import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.Mallets;
+import org.wysko.midis2jam2.instrument.*;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Ocarina;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
@@ -287,7 +284,16 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 29: // Overdriven Guitar
 			case 30: // Distortion Guitar
 			case 31: // Guitar Harmonics
+			case 120: // Guitar Fret Noise
 				return new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
+			case 33: // Electric Bass (finger)
+			case 34: // Electric Bass (pick)
+			case 35: // Fretless Bass
+			case 36: // Slap Bass 1
+			case 37: // Slap Bass 2
+			case 38: // Synth Bass 1
+			case 39: // Synth Bass 2
+				return new BassGuitar(this,events);
 			case 64: // Soprano Sax
 				return new SopranoSax(this, events, file);
 			case 65: // Alto Sax
@@ -345,7 +351,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
 //		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
-		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED);
+		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED, 0.9f);
 		rootNode.attachChild(stage);
 		
 		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
@@ -367,13 +373,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		if (instruments.stream().anyMatch(i -> i instanceof Keyboard)) {
-			Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED);
+			Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(pianoStand);
 			pianoStand.move(-50, 32f, -6);
 			pianoStand.rotate(0, rad(45), 0);
 		}
 		if (instruments.stream().anyMatch(i -> i instanceof Mallets)) {
-			Spatial malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED);
+			Spatial malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(malletStand);
 			malletStand.setLocalTranslation(new Vector3f(-22, 22.2f, 23));
 			malletStand.rotate(0, rad(33.7), 0);
@@ -443,9 +449,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * @param m    the path to the model
 	 * @param t    the path to the texture
 	 * @param type the type of material
+	 * @param brightness
 	 * @return the model
 	 */
-	public Spatial loadModel(String m, String t, MatType type) {
+	public Spatial loadModel(String m, String t, MatType type, float brightness) {
 		Spatial model = assetManager.loadModel("Assets/" + m);
 		Texture texture = assetManager.loadTexture("Assets/" + t);
 		Material material;
@@ -460,7 +467,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				break;
 			case REFLECTIVE:
 				material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-				material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
+				material.setVector3("FresnelParams", new Vector3f(0.1f, brightness, 0.1f));
 				material.setBoolean("EnvMapAsSphereMap", true);
 				material.setTexture("EnvMap", texture);
 				break;

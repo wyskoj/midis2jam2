@@ -28,7 +28,7 @@ public class Harmonica extends Instrument {
 	public Harmonica(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context);
 		this.events = eventList;
-		harmonica = context.loadModel("Harmonica.obj", "Harmonica.bmp", Midis2jam2.MatType.UNSHADED);
+		harmonica = context.loadModel("Harmonica.obj", "Harmonica.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		harmonicaNode.attachChild(harmonica);
 		
 		for (int i = 0; i < 12; i++) {

@@ -13,11 +13,11 @@ public abstract class SaxophoneClone extends StretchyClone {
 		for (int i = 0; i < Saxophone.KEY_COUNT; i++) {
 			KEYS_UP[i] = parent.context.loadModel(String.format("AltoSaxKeyUp%d.obj", i),
 					"HornSkinGrey" +
-							".bmp", Midis2jam2.MatType.REFLECTIVE);
+							".bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			
 			KEYS_DOWN[i] = parent.context.loadModel(String.format("AltoSaxKeyDown%d.obj", i),
 					"HornSkinGrey" +
-							".bmp", Midis2jam2.MatType.REFLECTIVE);
+							".bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			
 			modelNode.attachChild(KEYS_UP[i]);
 			modelNode.attachChild(KEYS_DOWN[i]);

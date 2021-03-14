@@ -16,13 +16,13 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public abstract class SingleStickedInstrument extends PercussionInstrument {
 	
 	final static double MAX_ANGLE = 50;
-	private final static double STRIKE_SPEED = 3;
+	protected final static double STRIKE_SPEED = 4;
 	protected final Spatial stick;
 	final Node stickNode = new Node();
 	
 	protected SingleStickedInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp", Midis2jam2.MatType.UNSHADED);
+		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		stickNode.attachChild(stick);
 		stick.setLocalTranslation(0, 0, 0); // Offset set the stick so the pivot is at the base of the stick
 		highLevelNode.attachChild(stickNode);
@@ -30,9 +30,8 @@ public abstract class SingleStickedInstrument extends PercussionInstrument {
 		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
 	}
 	
-	void handleStick(double time, float delta) {
+	void handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
 		MidiNoteOnEvent nextHit = null;
-		
 		if (!hits.isEmpty())
 			nextHit = hits.get(0);
 		
@@ -70,7 +69,5 @@ public abstract class SingleStickedInstrument extends PercussionInstrument {
 			// Striking or recoiling
 			stick.setCullHint(Spatial.CullHint.Dynamic);
 		}
-		
-		
 	}
 }

@@ -103,7 +103,7 @@ public class Piccolo extends HandedInstrument {
 			super(Piccolo.this);
 			// 0-12 left hand
 			horn = Piccolo.this.context.loadModel("Piccolo.obj", "CymbalSkinSphereMap.bmp",
-					Midis2jam2.MatType.REFLECTIVE);
+					Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			loadHands();
 			
 			puffer = new SteamPuffer(Piccolo.this.context, SteamPuffer.SteamPuffType.NORMAL, 1.0);

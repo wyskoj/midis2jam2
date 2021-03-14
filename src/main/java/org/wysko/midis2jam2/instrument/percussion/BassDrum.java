@@ -29,9 +29,9 @@ public class BassDrum extends PercussionInstrument {
 	
 	public BassDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		bassDrum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED);
+		bassDrum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", "MetalTexture.bmp",
-				Midis2jam2.MatType.UNSHADED);
+				Midis2jam2.MatType.UNSHADED, 0.9f);
 		
 		// Apply materials
 		final Node arm = (Node) bassDrumBeaterArm;
@@ -47,13 +47,13 @@ public class BassDrum extends PercussionInstrument {
 		arm.getChild(1).setMaterial(darkMetalMaterial);
 		
 		bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", "MetalTexture.bmp",
-				Midis2jam2.MatType.UNSHADED);
+				Midis2jam2.MatType.UNSHADED, 0.9f);
 		final Node holder = (Node) bassDrumBeaterHolder;
 		
 		holder.getChild(0).setMaterial(darkMetalMaterial);
 		
 		
-		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp", Midis2jam2.MatType.UNSHADED);
+		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		
 		drumNode.attachChild(bassDrum);
 		beaterNode.attachChild(this.bassDrumBeaterArm);

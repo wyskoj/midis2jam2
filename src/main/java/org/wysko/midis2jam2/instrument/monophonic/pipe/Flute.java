@@ -101,7 +101,7 @@ public class Flute extends HandedInstrument {
 		public FluteClone() {
 			super(Flute.this);
 			// 0-12 left hand
-			horn = Flute.this.context.loadModel("Flute.obj", "ShinySilver.bmp", Midis2jam2.MatType.REFLECTIVE);
+			horn = Flute.this.context.loadModel("Flute.obj", "ShinySilver.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			loadHands();
 			
 			puffer = new SteamPuffer(Flute.this.context, SteamPuffer.SteamPuffType.WHISTLE, 1.0);

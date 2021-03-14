@@ -23,6 +23,7 @@ public class Percussion extends Instrument {
 	public final Cymbal splash;
 	public final Node drumSetNode = new Node();
 	public final Node percussionNode = new Node();
+	public final HiHat hiHat;
 	private final Cymbal crash2;
 //	private final Spatial shadow;
 	
@@ -69,6 +70,9 @@ public class Percussion extends Instrument {
 		splash = new Cymbal(context,
 				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.SPLASH);
 		
+		hiHat = new HiHat(context,
+				noteOnEvents.stream().filter(e -> e.note == 42 || e.note == 44 || e.note == 46).collect(Collectors.toList()));
+		
 		// Attach nodes to group node
 		drumSetNode.attachChild(snareDrum.highLevelNode);
 		drumSetNode.attachChild(bassDrum.highLevelNode);
@@ -81,6 +85,7 @@ public class Percussion extends Instrument {
 		drumSetNode.attachChild(crash1.highLevelNode);
 		drumSetNode.attachChild(crash2.highLevelNode);
 		drumSetNode.attachChild(splash.highLevelNode);
+		drumSetNode.attachChild(hiHat.highLevelNode);
 //		shadow = context.loadModel("DrumShadow.obj","DrumShadow.bmp");
 ////		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 ////		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
@@ -108,5 +113,6 @@ public class Percussion extends Instrument {
 		crash1.tick(time, delta);
 		crash2.tick(time, delta);
 		splash.tick(time, delta);
+		hiHat.tick(time,delta);
 	}
 }

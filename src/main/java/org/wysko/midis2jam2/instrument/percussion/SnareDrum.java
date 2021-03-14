@@ -10,7 +10,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class SnareDrum extends StickDrum {
 	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits, Pivot.NEAR_END);
-		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp", Midis2jam2.MatType.UNSHADED);
+		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);
 		highLevelNode.attachChild(recoilNode);
@@ -23,6 +23,6 @@ public class SnareDrum extends StickDrum {
 	@Override
 	public void tick(double time, float delta) {
 		drumRecoil(time, delta);
-		handleStick(time, delta);
+		handleStick(time, delta, hits);
 	}
 }

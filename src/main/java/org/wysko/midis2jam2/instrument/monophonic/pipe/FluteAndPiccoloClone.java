@@ -56,7 +56,7 @@ public class FluteAndPiccoloClone extends HandedClone {
 	protected void loadHands() {
 		leftHands = new Spatial[13];
 		for (int i = 0; i < 13; i++) {
-			leftHands[i] = parent.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp", Midis2jam2.MatType.UNSHADED);
+			leftHands[i] = parent.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			leftHandNode.attachChild(leftHands[i]);
 			if (i != 0) {
 				leftHands[i].setCullHint(Spatial.CullHint.Always);
@@ -65,7 +65,7 @@ public class FluteAndPiccoloClone extends HandedClone {
 		// 0-11 right hand
 		rightHands = new Spatial[12];
 		for (int i = 0; i < 12; i++) {
-			rightHands[i] = parent.context.loadModel(String.format("Flute_RightHand%02d.obj", i), "hands.bmp", Midis2jam2.MatType.UNSHADED);
+			rightHands[i] = parent.context.loadModel(String.format("Flute_RightHand%02d.obj", i), "hands.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			rightHandNode.attachChild(rightHands[i]);
 			if (i != 0) {
 				rightHands[i].setCullHint(Spatial.CullHint.Always);
