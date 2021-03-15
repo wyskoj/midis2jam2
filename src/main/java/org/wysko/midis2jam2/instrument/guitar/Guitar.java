@@ -16,11 +16,9 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.strings.StringFamilyInstrument;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -230,8 +228,9 @@ public class Guitar extends Instrument {
 			}
 			
 		}
-		list.sort((Comparator.comparingInt(o -> o.string)));
 		list.sort((Comparator.comparingInt(o -> o.fret)));
+//		Collections.reverse(list);
+//		list.sort((Comparator.comparingInt(o -> o.string)));
 		if (list.isEmpty()) return null;
 		return list.get(0);
 	}
@@ -273,14 +272,7 @@ public class Guitar extends Instrument {
 				frets[3] == -1? "" : frets[3],
 				frets[4] == -1? "" : frets[4],
 				frets[5] == -1? "" : frets[5]));
-		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
-			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
-				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) { // floating points are the death
-					// of me
-					currentNotePeriods.remove(i);
-				}
-			}
-		}
+		StringFamilyInstrument.removeElapsedNotePeriods(time, notePeriods, currentNotePeriods);
 		final double inc = delta / (1 / 60f);
 		this.frame += inc;
 		

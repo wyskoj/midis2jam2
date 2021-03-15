@@ -14,8 +14,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
-import org.wysko.midis2jam2.instrument.*;
+import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
+import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
@@ -25,14 +26,13 @@ import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
-import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
+import org.wysko.midis2jam2.instrument.organ.Accordion;
 import org.wysko.midis2jam2.instrument.organ.Harmonica;
 import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
-import org.wysko.midis2jam2.instrument.organ.Accordion;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.midi.*;
-import org.wysko.midis2jam2.strings.Harp;
+import org.wysko.midis2jam2.strings.*;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
@@ -48,7 +48,7 @@ import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
-	static final long LATENCY_FIX = 250;
+	static long LATENCY_FIX = 250;
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	public final List<Instrument> instruments = new ArrayList<>();
 	public MidiFile file;
@@ -60,7 +60,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = new File("testmidi/miss_you.mid");
+		File rawFile = new File("testmidi/curvesnointro.mid");
 		
 		if (args.length > 0) {
 			rawFile = new File(args[0]);
@@ -87,18 +87,27 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
 		MidiDevice device = null;
+		MidiDevice backup = null;
 		for (MidiDevice.Info eachInfo : info) {
 			System.out.println("eachInfo = " + eachInfo);
 			if (eachInfo.getName().equals("VirtualMIDISynth #1")) {
 				device = MidiSystem.getMidiDevice(eachInfo);
 				break;
 			}
+			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
+				backup = MidiSystem.getMidiDevice(eachInfo);
+				break;
+			}
 		}
 		
 		midijam.sequencer = MidiSystem.getSequencer(false);
-		if (device == null || USE_DEFAULT_SYNTHESIZER) {
+		if ((device == null && backup == null) || USE_DEFAULT_SYNTHESIZER) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
 		} else {
+			if (device == null) {
+				LATENCY_FIX = 0;
+				device = backup;
+			}
 			device.open();
 			midijam.sequencer = MidiSystem.getSequencer(false);
 			midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
@@ -296,6 +305,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 31: // Guitar Harmonics
 			case 120: // Guitar Fret Noise
 				return new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
+			case 32: // Acoustic Bass
+				return new AcousticBass(this, events, AcousticBass.PlayingStyle.PIZZ);
 			case 33: // Electric Bass (finger)
 			case 34: // Electric Bass (pick)
 			case 35: // Fretless Bass
@@ -303,7 +314,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 37: // Slap Bass 2
 			case 38: // Synth Bass 1
 			case 39: // Synth Bass 2
-				return new BassGuitar(this,events);
+				return new BassGuitar(this, events);
+			case 40: // Violin
+				return new Violin(this, events);
+			case 41: // Viola
+				return new Viola(this, events);
+			case 42: // Cello
+				return new Cello(this, events);
+			case 43: // Contrabass
+				return new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
 			case 46: // Orchestral Harp
 				return new Harp(this, events);
 			case 64: // Soprano Sax
@@ -460,9 +479,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	/**
 	 * Loads a model given a model and texture paths.
 	 *
-	 * @param m    the path to the model
-	 * @param t    the path to the texture
-	 * @param type the type of material
+	 * @param m          the path to the model
+	 * @param t          the path to the texture
+	 * @param type       the type of material
 	 * @param brightness
 	 * @return the model
 	 */

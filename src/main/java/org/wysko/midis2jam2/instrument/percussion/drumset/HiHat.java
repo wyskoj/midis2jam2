@@ -45,7 +45,9 @@ public class HiHat extends SingleStickedInstrument {
 		highLevelNode.attachChild(wholeHat);
 		highLevelNode.setLocalTranslation(-6, 22, -72);
 		highLevelNode.setLocalRotation(new Quaternion().fromAngles(0, rad(90), 0));
-		stickNode.setLocalTranslation(0, 1, 0);
+		highLevelNode.detachChild(stickNode);
+		wholeHat.attachChild(stickNode);
+		stickNode.setLocalTranslation(0, 1, 13);
 	}
 	
 	@Override

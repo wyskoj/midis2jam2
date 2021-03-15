@@ -12,11 +12,11 @@ import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.strings.StringFamilyInstrument;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,7 +41,7 @@ public class BassGuitar extends Instrument {
 	};
 	private static final float[] STRING_TOP_X = new float[] {-0.85f, -0.31f, 0.20f, 0.70f};
 	private static final float[] STRING_BOTTOM_X = new float[] {-1.86f, -0.85f, 0.34f, 1.37f};
-	final Node aGuitarNode = new Node();
+	final Node bassGuitarNode = new Node();
 	/**
 	 * Eat and drink grapes. Just don't choke.
 	 */
@@ -92,14 +92,14 @@ public class BassGuitar extends Instrument {
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		
 		final Spatial guitarBody = context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
-		aGuitarNode.attachChild(guitarBody);
+		bassGuitarNode.attachChild(guitarBody);
 		
 		for (int i = 0; i < 4; i++) {
 			Spatial string;
 			
 			string = context.loadModel("BassString.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			upperStrings[i] = string;
-			aGuitarNode.attachChild(upperStrings[i]);
+			bassGuitarNode.attachChild(upperStrings[i]);
 		}
 		
 		// Position each string
@@ -125,7 +125,7 @@ public class BassGuitar extends Instrument {
 			for (int j = 0; j < 5; j++) {
 				animStrings[i][j] = context.loadModel("BassStringBottom" + j + ".obj", "BassSkin.bmp",
 						Midis2jam2.MatType.UNSHADED, 0.9f);
-				aGuitarNode.attachChild(animStrings[i][j]);
+				bassGuitarNode.attachChild(animStrings[i][j]);
 			}
 		}
 		
@@ -163,15 +163,15 @@ public class BassGuitar extends Instrument {
 		// Initialize note fingers
 		for (int i = 0; i < 4; i++) {
 			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
-			aGuitarNode.attachChild(noteFingers[i]);
+			bassGuitarNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 		}
 		
 		// Position guitar
 		allGuitarsNode = new Node();
-		allGuitarsNode.setLocalTranslation(45, 40, 10);
+		allGuitarsNode.setLocalTranslation(20, 40, 10);
 		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(0), rad(0)));
-		allGuitarsNode.attachChild(aGuitarNode);
+		allGuitarsNode.attachChild(bassGuitarNode);
 		context.getRootNode().attachChild(allGuitarsNode);
 		
 		BitmapFont bitmapFont = context.getAssetManager().loadFont("Interface/Fonts/Console.fnt");
@@ -179,7 +179,7 @@ public class BassGuitar extends Instrument {
 		timeText.setSize(2f);
 		timeText.setText("Hello World");
 		timeText.setLocalTranslation(2, 10, 0);
-		aGuitarNode.attachChild(timeText);
+		bassGuitarNode.attachChild(timeText);
 	}
 	
 	private float stringHeight() {
@@ -211,8 +211,9 @@ public class BassGuitar extends Instrument {
 	@Override
 	public void tick(double time, float delta) {
 		
-		final int i1 = context.instruments.stream().filter(e -> e instanceof Guitar).collect(Collectors.toList()).indexOf(this);
-		aGuitarNode.setLocalTranslation(i1 * 10, 0, i1 * 10);
+		final int i1 =
+				context.instruments.stream().filter(e -> e instanceof BassGuitar).collect(Collectors.toList()).indexOf(this);
+		bassGuitarNode.setLocalTranslation(i1 * 10, 0, i1 * 10);
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}
@@ -241,14 +242,7 @@ public class BassGuitar extends Instrument {
 				frets[1] == -1 ? "" : frets[1],
 				frets[2] == -1 ? "" : frets[2],
 				frets[3] == -1 ? "" : frets[3]));
-		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
-			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
-				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) { // floating points are the death
-					// of me
-					currentNotePeriods.remove(i);
-				}
-			}
-		}
+		StringFamilyInstrument.removeElapsedNotePeriods(time, notePeriods, currentNotePeriods);
 		final double inc = delta / 0.016666668f;
 		this.frame += inc;
 		

@@ -111,8 +111,6 @@ public class Mallets extends Instrument {
 					-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / STRIKE_SPEED)) * (time - context.file.eventInSeconds(nextHit));
 			
 			float[] floats = bar.malletNode.getLocalRotation().toAngles(new float[3]);
-
-//			bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(rad(proposedRotation),0,0));
 			if (proposedRotation > MAX_ANGLE) {
 				// Not yet ready to strike
 				if (floats[0] <= MAX_ANGLE) {

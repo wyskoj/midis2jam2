@@ -171,14 +171,30 @@ public class Accordion extends KeyedInstrument {
 	@Override
 	public void transitionAnimation(float delta) {
 		for (AccordionKey key : keys) {
-			KeyedInstrument.handleAKey(delta, key.beingPressed, key.node, key.downNode, key.upNode, key);
+			handleAKey(delta, key.beingPressed, key.node, key.downNode, key.upNode);
+		}
+	}
+	
+	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode) {
+		if (!beingPressed) {
+			float[] angles = new float[3];
+			node.getLocalRotation().toAngles(angles);
+			if (angles[1] < -0.0001) { // fuck floats
+				node.setLocalRotation(new Quaternion(new float[]
+						{0, Math.min(angles[1] + (0.02f * delta * 50), 0), 0}
+				));
+			} else {
+				node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
+				downNode.setCullHint(Spatial.CullHint.Always);
+				upNode.setCullHint(Spatial.CullHint.Dynamic);
+			}
 		}
 	}
 	
 	@Override
 	protected void pushKeyDown(int note) {
 		int key = note % 24;
-		keys[key].node.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));
+		keys[key].node.setLocalRotation(new Quaternion().fromAngles(0, -0.1f, 0));
 		keys[key].beingPressed = true;
 		keys[key].downNode.setCullHint(Spatial.CullHint.Dynamic);
 		keys[key].upNode.setCullHint(Spatial.CullHint.Always);
