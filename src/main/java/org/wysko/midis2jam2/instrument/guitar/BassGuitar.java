@@ -79,6 +79,7 @@ public class BassGuitar extends Instrument {
 	private final List<NotePeriod> notePeriods;
 	private final Node allGuitarsNode;
 	private final BitmapText timeText;
+	private final static Vector3f BASE_POSITION = new Vector3f(51.5863f, 54.5902f, -16.5817f);
 	double frame = 0;
 	
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -169,8 +170,8 @@ public class BassGuitar extends Instrument {
 		
 		// Position guitar
 		allGuitarsNode = new Node();
-		allGuitarsNode.setLocalTranslation(20, 40, 10);
-		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(0), rad(0)));
+		allGuitarsNode.setLocalTranslation(BASE_POSITION);
+		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
 		allGuitarsNode.attachChild(bassGuitarNode);
 		context.getRootNode().attachChild(allGuitarsNode);
 		
@@ -213,7 +214,8 @@ public class BassGuitar extends Instrument {
 		
 		final int i1 =
 				context.instruments.stream().filter(e -> e instanceof BassGuitar).collect(Collectors.toList()).indexOf(this);
-		bassGuitarNode.setLocalTranslation(i1 * 10, 0, i1 * 10);
+		Vector3f add = new Vector3f(BASE_POSITION).add(new Vector3f(i1 * 7, i1 * -2.43f, 0));
+		allGuitarsNode.setLocalTranslation(add);
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}

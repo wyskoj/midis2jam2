@@ -81,6 +81,7 @@ public class Guitar extends Instrument {
 	private final Node allGuitarsNode;
 	private final BitmapText timeText;
 	double frame = 0;
+	private static final Vector3f BASE_POSITION = new Vector3f(43.431f, 35.292f, 7.063f);
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context);
@@ -195,8 +196,8 @@ public class Guitar extends Instrument {
 		
 		// Position guitar
 		allGuitarsNode = new Node();
-		allGuitarsNode.setLocalTranslation(45, 40, 10);
-		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(0), rad(0)));
+		allGuitarsNode.setLocalTranslation(BASE_POSITION);
+		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3)));
 		allGuitarsNode.attachChild(aGuitarNode);
 		context.getRootNode().attachChild(allGuitarsNode);
 		
@@ -239,7 +240,8 @@ public class Guitar extends Instrument {
 	public void tick(double time, float delta) {
 		
 		final int i1 = context.instruments.stream().filter(e -> e instanceof Guitar).collect(Collectors.toList()).indexOf(this);
-		aGuitarNode.setLocalTranslation(i1 * 10, 0, i1 * 10);
+		Vector3f add = new Vector3f(BASE_POSITION).add(new Vector3f(i1 * 5, i1 * -4, 0));
+		allGuitarsNode.setLocalTranslation(add);
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}
