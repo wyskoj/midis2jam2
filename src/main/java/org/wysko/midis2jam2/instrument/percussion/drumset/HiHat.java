@@ -59,7 +59,7 @@ public class HiHat extends SingleStickedInstrument {
 		}
 		
 		if (recoil != null) {
-			wholeHat.setLocalTranslation(0, -0.5f, -14);
+			wholeHat.setLocalTranslation(0, (float) (-0.7 * velocityRecoilDampening(recoil.velocity)), -14);
 			if (recoil.note == 46) {
 				status = HiHatStatus.OPEN;
 				topCymbal.setLocalTranslation(0, 2, 0);
