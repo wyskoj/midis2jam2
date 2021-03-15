@@ -150,7 +150,7 @@ public class StageStrings extends Instrument {
 			// Load bow
 			bow = context.loadModel("StageStringBow.fbx", "FakeWood.bmp", Midis2jam2.MatType.UNSHADED, 0);
 			Node bowAsNode = (Node) this.bow;
-			bowAsNode.getChild(0).setMaterial(((Geometry) restingString).getMaterial());
+			bowAsNode.getChild(1).setMaterial(((Geometry) restingString).getMaterial());
 			bowNode.attachChild(this.bow);
 			bowNode.setLocalTranslation(0, 48, 0);
 			bowNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-60)));
