@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.strings;
+package org.wysko.midis2jam2.instrument.strings;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -252,7 +252,6 @@ public class StringFamilyInstrument extends Instrument {
 			noteFingers[string].setCullHint(Spatial.CullHint.Dynamic);
 			// this is ugly
 			float z = (((TOP_Z[string] - BOTTOM_Z[string]) * fretDistance + TOP_Z[string]) * -1.3f) - 2;
-			System.out.println("z = " + z);
 			final Vector3f fingerPosition = new Vector3f(
 					(STRING_BOTTOM_X[string] - STRING_TOP_X[string]) * fretDistance + STRING_TOP_X[string],
 					FINGER_VERTICAL_OFFSET.y - stringHeight() * fretDistance,
