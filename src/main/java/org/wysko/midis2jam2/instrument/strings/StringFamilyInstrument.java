@@ -60,8 +60,7 @@ public class StringFamilyInstrument extends Instrument {
 		super(context);
 		this.events = events;
 		
-		final List<MidiNoteEvent> justTheNotes =
-				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> (MidiNoteEvent) e).collect(Collectors.toList());
+		final List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		

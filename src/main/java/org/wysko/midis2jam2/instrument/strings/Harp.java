@@ -1,7 +1,6 @@
-package org.wysko.midis2jam2.strings;
+package org.wysko.midis2jam2.instrument.strings;
 
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;

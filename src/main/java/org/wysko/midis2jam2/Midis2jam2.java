@@ -7,9 +7,11 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
@@ -31,8 +33,8 @@ import org.wysko.midis2jam2.instrument.organ.Harmonica;
 import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
+import org.wysko.midis2jam2.instrument.strings.*;
 import org.wysko.midis2jam2.midi.*;
-import org.wysko.midis2jam2.strings.*;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
@@ -48,8 +50,8 @@ import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
-	static long LATENCY_FIX = 250;
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
+	static long LATENCY_FIX = 250;
 	public final List<Instrument> instruments = new ArrayList<>();
 	public MidiFile file;
 	Sequencer sequencer;
@@ -316,6 +318,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 39: // Synth Bass 2
 				return new BassGuitar(this, events);
 			case 40: // Violin
+			case 110: // Fiddle
 				return new Violin(this, events);
 			case 41: // Viola
 				return new Viola(this, events);
@@ -325,6 +328,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
 			case 46: // Orchestral Harp
 				return new Harp(this, events);
+			case 48: // String Ensemble 1
+			case 49: // String Ensemble 2
+			case 50: // Synth Strings 1
+			case 51: // Synth Strings 2
+			case 92: // Pad 5 (Bowed)
+				return new StageStrings(this, events);
 			case 64: // Soprano Sax
 				return new SopranoSax(this, events, file);
 			case 65: // Alto Sax
@@ -384,7 +393,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
 //		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
-		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED, 0.9f);
+		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED, 0.9f);
 		rootNode.attachChild(stage);
 		
 		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
@@ -410,6 +419,16 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			rootNode.attachChild(pianoStand);
 			pianoStand.move(-50, 32f, -6);
 			pianoStand.rotate(0, rad(45), 0);
+			
+			Spatial shadow = assetManager.loadModel("Assets/PianoShadow.obj");
+			final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			material.setTexture("ColorMap",assetManager.loadTexture("Assets/KeyboardShadow.png"));
+			material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+			shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
+			shadow.setMaterial(material);
+			shadow.move(-47,0.01f,-3);
+			shadow.rotate(0, rad(45), 0);
+			rootNode.attachChild(shadow);
 		}
 		if (instruments.stream().anyMatch(i -> i instanceof Mallets)) {
 			Spatial malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);

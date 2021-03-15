@@ -100,10 +100,7 @@ public class AltoSax extends Saxophone {
 		
 		super(context, file);
 		
-		List<MidiNoteEvent> justTheNotes =
-				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent)
-						.map(e -> ((MidiNoteEvent) e))
-						.collect(Collectors.toList());
+		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		calculateClones(this, AltoSaxClone.class);

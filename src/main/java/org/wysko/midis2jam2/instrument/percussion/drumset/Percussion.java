@@ -1,6 +1,10 @@
 package org.wysko.midis2jam2.instrument.percussion.drumset;
 
+import com.jme3.material.Material;
+import com.jme3.material.RenderState;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -25,7 +29,7 @@ public class Percussion extends Instrument {
 	public final Node percussionNode = new Node();
 	public final HiHat hiHat;
 	private final Cymbal crash2;
-//	private final Spatial shadow;
+	private final Spatial shadow;
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
@@ -86,15 +90,17 @@ public class Percussion extends Instrument {
 		drumSetNode.attachChild(crash2.highLevelNode);
 		drumSetNode.attachChild(splash.highLevelNode);
 		drumSetNode.attachChild(hiHat.highLevelNode);
-//		shadow = context.loadModel("DrumShadow.obj","DrumShadow.bmp");
-////		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-////		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-////		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
-////		shadow.setMaterial(material);
-////		shadow.move(0,0.001f,-80);
+		
+		shadow = context.getAssetManager().loadModel("Assets/DrumShadow.obj");
+		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		material.setTexture("ColorMap",context.getAssetManager().loadTexture("Assets/DrumShadow.png"));
+		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
+		shadow.setMaterial(material);
+		shadow.move(0,0.01f,-80);
 		
 		percussionNode.attachChild(drumSetNode);
-//		percussionNode.attachChild(shadow);
+		percussionNode.attachChild(shadow);
 		context.getRootNode().attachChild(percussionNode);
 		
 		

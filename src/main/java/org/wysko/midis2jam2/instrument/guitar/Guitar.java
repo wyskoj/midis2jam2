@@ -7,6 +7,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
@@ -16,7 +17,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.strings.StringFamilyInstrument;
+import org.wysko.midis2jam2.instrument.strings.StringFamilyInstrument;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -88,8 +89,7 @@ public class Guitar extends Instrument {
 		this.events = events;
 		
 		
-		final List<MidiNoteEvent> justTheNotes =
-				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		final List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		

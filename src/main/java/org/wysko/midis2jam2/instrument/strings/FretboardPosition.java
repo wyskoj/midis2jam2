@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.strings;
+package org.wysko.midis2jam2.instrument.strings;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Range;

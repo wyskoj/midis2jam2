@@ -1,14 +1,17 @@
 package org.wysko.midis2jam2.instrument;
 
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments
@@ -28,6 +31,13 @@ public abstract class Instrument {
 	
 	protected Instrument(Midis2jam2 context) {
 		this.context = context;
+	}
+	
+	@NotNull
+	protected List<MidiNoteEvent> scrapeMidiNoteEvents(List<MidiChannelSpecificEvent> events) {
+		final List<MidiNoteEvent> justTheNotes =
+				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		return justTheNotes;
 	}
 	
 	/**

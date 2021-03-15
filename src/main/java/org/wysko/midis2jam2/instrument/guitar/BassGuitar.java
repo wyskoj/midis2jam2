@@ -16,7 +16,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.strings.StringFamilyInstrument;
+import org.wysko.midis2jam2.instrument.strings.StringFamilyInstrument;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,6 +41,7 @@ public class BassGuitar extends Instrument {
 	};
 	private static final float[] STRING_TOP_X = new float[] {-0.85f, -0.31f, 0.20f, 0.70f};
 	private static final float[] STRING_BOTTOM_X = new float[] {-1.86f, -0.85f, 0.34f, 1.37f};
+	private final static Vector3f BASE_POSITION = new Vector3f(51.5863f, 54.5902f, -16.5817f);
 	final Node bassGuitarNode = new Node();
 	/**
 	 * Eat and drink grapes. Just don't choke.
@@ -49,7 +50,6 @@ public class BassGuitar extends Instrument {
 	final Spatial[][] animStrings = new Spatial[4][5];
 	final Spatial[] noteFingers = new Spatial[4];
 	final List<NotePeriod> currentNotePeriods = new ArrayList<>();
-	
 	private final HashMap<Integer, Float> FRET_HEIGHTS = new HashMap<Integer, Float>() {{
 		put(0, 0.0f);
 		put(1, 0.05f);
@@ -79,7 +79,6 @@ public class BassGuitar extends Instrument {
 	private final List<NotePeriod> notePeriods;
 	private final Node allGuitarsNode;
 	private final BitmapText timeText;
-	private final static Vector3f BASE_POSITION = new Vector3f(51.5863f, 54.5902f, -16.5817f);
 	double frame = 0;
 	
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -87,8 +86,7 @@ public class BassGuitar extends Instrument {
 		this.events = events;
 		
 		
-		final List<MidiNoteEvent> justTheNotes =
-				events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> (MidiNoteEvent) e).collect(Collectors.toList());
+		final List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		
