@@ -169,9 +169,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		// For each track
 		for (MidiTrack track : file.tracks) {
 			if (track == null) continue; // Skip non-existent tracks
-			/* Skip tracks with no note-on events */
-			boolean aNoteOn = track.events.stream().anyMatch(event -> event instanceof MidiNoteOnEvent);
-			if (!aNoteOn) continue;
+//			/* Skip tracks with no note-on events */
+//			boolean aNoteOn = track.events.stream().anyMatch(event -> event instanceof MidiNoteOnEvent);
+//			if (!aNoteOn) continue;
 			
 			// Add important events
 			for (MidiEvent event : track.events) {
