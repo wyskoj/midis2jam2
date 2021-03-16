@@ -10,6 +10,6 @@ import java.util.HashMap;
 public abstract class HandedInstrument extends MonophonicInstrument {
 	public HashMap<Integer, HandedClone.Hands> KEY_MAPPING;
 	public HandedInstrument(Midis2jam2 context, MidiFile file) {
-		super(context, file);
+		super(context);
 	}
 }

@@ -77,26 +77,7 @@ public class Keyboard extends KeyedInstrument {
 		}
 		movementNode.setLocalTranslation(0, keyboardsBeforeMe * 3.030f, -keyboardsBeforeMe * (5.865f));
 		
-		List<MidiEvent> eventsToPerform = new ArrayList<>();
-		if (!events.isEmpty()) {
-			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
-				events.remove(0);
-			}
-			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.file.eventInSeconds(events.get(0)) <= x) ||
-					(events.get(0) instanceof MidiNoteOffEvent && context.file.eventInSeconds(events.get(0)) - x <= 0.05))) {
-				eventsToPerform.add(events.remove(0));
-			}
-		}
-		
-		for (MidiEvent event : eventsToPerform) {
-			if (event instanceof MidiNoteOnEvent) {
-				pushKeyDown(((MidiNoteOnEvent) event).note);
-			} else if (event instanceof MidiNoteOffEvent) {
-				releaseKey(((MidiNoteOffEvent) event).note);
-			}
-		}
-		
-		transitionAnimation(delta);
+		handleKeys(x,delta);
 	}
 	
 	public void pushKeyDown(int midiNote) {

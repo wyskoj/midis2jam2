@@ -16,7 +16,7 @@ public abstract class Saxophone extends MonophonicInstrument {
 	 * @param file    context to the midi file
 	 */
 	public Saxophone(Midis2jam2 context, MidiFile file) {
-		super(context, file);
+		super(context);
 		
 	}
 }

@@ -18,6 +18,7 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.StageHorns;
+import org.wysko.midis2jam2.instrument.brass.Trumpet;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
@@ -336,6 +337,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 51: // Synth Strings 2
 			case 92: // Pad 5 (Bowed)
 				return new StageStrings(this, events);
+			case 56: // Trumpet
+				return new Trumpet(this,events);
 			case 61: // Brass Section
 			case 62: // Synth Brass 1
 			case 63: // Synth Brass 2

@@ -40,7 +40,7 @@ public class Flute extends HandedInstrument {
 		
 		for (MonophonicClone clone : clones) {
 			FluteClone fluteClone = ((FluteClone) clone);
-			groupOfPolyphony.attachChild(fluteClone.cloneNode);
+			groupOfPolyphony.attachChild(fluteClone.hornNode);
 		}
 		
 		highestLevel.attachChild(groupOfPolyphony);
@@ -105,10 +105,10 @@ public class Flute extends HandedInstrument {
 			loadHands();
 			
 			puffer = new SteamPuffer(Flute.this.context, SteamPuffer.SteamPuffType.WHISTLE, 1.0);
-			cloneNode.attachChild(puffer.steamPuffNode);
+			hornNode.attachChild(puffer.steamPuffNode);
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);
-			cloneNode.attachChild(horn);
+			hornNode.attachChild(horn);
 		}
 		
 	}

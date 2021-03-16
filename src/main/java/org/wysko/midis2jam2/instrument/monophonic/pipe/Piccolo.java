@@ -41,7 +41,7 @@ public class Piccolo extends HandedInstrument {
 		
 		for (MonophonicClone clone : clones) {
 			PiccoloClone PiccoloClone = ((PiccoloClone) clone);
-			groupOfPolyphony.attachChild(PiccoloClone.cloneNode);
+			groupOfPolyphony.attachChild(PiccoloClone.hornNode);
 		}
 		
 		highestLevel.attachChild(groupOfPolyphony);
@@ -107,10 +107,10 @@ public class Piccolo extends HandedInstrument {
 			loadHands();
 			
 			puffer = new SteamPuffer(Piccolo.this.context, SteamPuffer.SteamPuffType.NORMAL, 1.0);
-			cloneNode.attachChild(puffer.steamPuffNode);
+			hornNode.attachChild(puffer.steamPuffNode);
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -8.6f, 0);
-			cloneNode.attachChild(horn);
+			hornNode.attachChild(horn);
 		}
 		
 	}

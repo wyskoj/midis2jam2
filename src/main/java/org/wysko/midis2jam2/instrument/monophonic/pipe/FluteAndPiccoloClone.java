@@ -50,7 +50,7 @@ public class FluteAndPiccoloClone extends HandedClone {
 		/* Move if polyphonic */
 		final int myIndex = parent.clones.indexOf(this);
 		hideOrShowOnPolyphony(myIndex);
-		cloneNode.setLocalTranslation(myIndex * 5, 0, -myIndex * 5);
+		hornNode.setLocalTranslation(myIndex * 5, 0, -myIndex * 5);
 	}
 	
 	protected void loadHands() {
@@ -72,7 +72,7 @@ public class FluteAndPiccoloClone extends HandedClone {
 			}
 		}
 		
-		cloneNode.attachChild(leftHandNode);
-		cloneNode.attachChild(rightHandNode);
+		hornNode.attachChild(leftHandNode);
+		hornNode.attachChild(rightHandNode);
 	}
 }

@@ -10,7 +10,6 @@ import org.wysko.midis2jam2.midi.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
@@ -107,7 +106,7 @@ public class AltoSax extends Saxophone {
 		
 		for (MonophonicClone clone : clones) {
 			AltoSaxClone altoClone = ((AltoSaxClone) clone);
-			groupOfPolyphony.attachChild(altoClone.cloneNode);
+			groupOfPolyphony.attachChild(altoClone.hornNode);
 		}
 		
 		highestLevel.attachChild(groupOfPolyphony);
@@ -149,7 +148,7 @@ public class AltoSax extends Saxophone {
 			bell.move(0, -22, 0); // Move bell down to body
 			
 			animNode.attachChild(modelNode);
-			cloneNode.attachChild(animNode);
+			hornNode.attachChild(animNode);
 		}
 		
 		@Override
@@ -158,7 +157,7 @@ public class AltoSax extends Saxophone {
 			animation(time, indexThis, AltoSax.STRETCH_FACTOR, AltoSax.ROTATION_FACTOR, AltoSax.KEY_MAPPING);
 			
 			/* Move depending on degree of polyphony */
-			cloneNode.setLocalTranslation((float) 20 * indexThis, 0, 0);
+			hornNode.setLocalTranslation((float) 20 * indexThis, 0, 0);
 			// TODO Make saxophones rotate about an origin, and fill any gaps. Write here and then pull up to
 			//  Saxophone or monophonic instrument?
 		}

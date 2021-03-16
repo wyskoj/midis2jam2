@@ -39,7 +39,7 @@ public class Ocarina extends HandedInstrument {
 		
 		for (MonophonicClone clone : clones) {
 			OcarinaClone ocarinaClone = ((OcarinaClone) clone);
-			groupOfPolyphony.attachChild(ocarinaClone.cloneNode);
+			groupOfPolyphony.attachChild(ocarinaClone.hornNode);
 		}
 		
 		highestLevel.attachChild(groupOfPolyphony);
@@ -56,10 +56,10 @@ public class Ocarina extends HandedInstrument {
 	public class OcarinaClone extends HandedClone {
 		public OcarinaClone() {
 			super();
-			cloneNode = new Node();
+			hornNode = new Node();
 			horn = context.loadModel("Ocarina.obj", "Ocarina.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			animNode.attachChild(horn);
-			cloneNode.attachChild(animNode);
+			hornNode.attachChild(animNode);
 			loadHands();
 			for (int i = 0; i < rightHands.length; i++) {
 				if (i == 0) rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
@@ -100,7 +100,7 @@ public class Ocarina extends HandedInstrument {
 			}
 			final int myIndex = Ocarina.this.clones.indexOf(this);
 			hideOrShowOnPolyphony(myIndex);
-			cloneNode.setLocalTranslation(myIndex * 10, 0, 0);
+			hornNode.setLocalTranslation(myIndex * 10, 0, 0);
 		}
 	}
 }

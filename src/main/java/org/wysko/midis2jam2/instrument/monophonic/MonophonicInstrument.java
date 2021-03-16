@@ -27,10 +27,6 @@ public abstract class MonophonicInstrument extends Instrument {
 	protected final Node groupOfPolyphony = new Node();
 	protected final Node highestLevel = new Node();
 	/**
-	 * Reference to the midi file.
-	 */
-	final MidiFile file;
-	/**
 	 * Populated by {@link #calculateNotePeriods(List)}.
 	 *
 	 * @see #calculateNotePeriods(List)
@@ -43,15 +39,13 @@ public abstract class MonophonicInstrument extends Instrument {
 	
 	/**
 	 * Constructs a monophonic instrument.
+	 *  @param context context to midis2jam2
 	 *
-	 * @param context context to midis2jam2
-	 * @param file    context to the midi file
 	 */
 	public MonophonicInstrument(
-			Midis2jam2 context, MidiFile file) {
+			Midis2jam2 context) {
 		super(context);
 		this.context = context;
-		this.file = file;
 	}
 	
 	protected void calculateClones(MonophonicInstrument instrument,

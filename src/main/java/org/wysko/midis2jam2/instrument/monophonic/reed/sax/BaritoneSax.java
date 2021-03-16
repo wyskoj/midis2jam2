@@ -10,7 +10,6 @@ import org.wysko.midis2jam2.midi.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
@@ -108,7 +107,7 @@ public class BaritoneSax extends Saxophone {
 		
 		for (MonophonicClone clone : clones) {
 			BaritoneSaxClone baritoneSaxClone = ((BaritoneSaxClone) clone);
-			groupOfPolyphony.attachChild(baritoneSaxClone.cloneNode);
+			groupOfPolyphony.attachChild(baritoneSaxClone.hornNode);
 		}
 		
 		highestLevel.attachChild(groupOfPolyphony);
@@ -154,7 +153,7 @@ public class BaritoneSax extends Saxophone {
 			bell.move(0, -10, 0); // Move bell down to body
 			
 			animNode.attachChild(modelNode);
-			cloneNode.attachChild(animNode);
+			hornNode.attachChild(animNode);
 		}
 		
 		@Override

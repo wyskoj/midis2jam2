@@ -23,7 +23,7 @@ public abstract class MonophonicClone {
 	public final List<NotePeriod> notePeriods;
 	public final Node animNode = new Node();
 	public final Node modelNode = new Node();
-	public Node cloneNode = new Node();
+	public Node hornNode = new Node();
 	/**
 	 * The current note period that is being handled.
 	 */
@@ -51,12 +51,12 @@ public abstract class MonophonicClone {
 	protected void hideOrShowOnPolyphony(int indexThis) {
 		if (indexThis != 0) {
 			if (currentlyPlaying) {
-				cloneNode.setCullHint(Spatial.CullHint.Dynamic);
+				hornNode.setCullHint(Spatial.CullHint.Dynamic);
 			} else {
-				cloneNode.setCullHint(Spatial.CullHint.Always);
+				hornNode.setCullHint(Spatial.CullHint.Always);
 			}
 		} else {
-			cloneNode.setCullHint(Spatial.CullHint.Dynamic);
+			hornNode.setCullHint(Spatial.CullHint.Dynamic);
 		}
 	}
 }
