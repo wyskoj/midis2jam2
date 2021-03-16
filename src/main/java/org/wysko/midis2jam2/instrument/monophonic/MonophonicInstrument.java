@@ -63,6 +63,11 @@ public abstract class MonophonicInstrument extends Instrument {
 					clones.get(0).notePeriods.add(comp1);
 					break;
 				}
+				/* If notes overlap by less than 5 midi ticks, just ignore those ticks */
+				final long l = comp2.endTick() - comp1.startTick();
+				if (l < 5 && l > 0) {
+					comp2.noteOff.time -= l;
+				}
 				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
 					boolean added = false;
 					for (MonophonicClone clone : clones) {
