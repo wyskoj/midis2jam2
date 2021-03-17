@@ -5,7 +5,6 @@ import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.midi.MidiFile;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -39,8 +38,8 @@ public abstract class MonophonicInstrument extends Instrument {
 	
 	/**
 	 * Constructs a monophonic instrument.
-	 *  @param context context to midis2jam2
 	 *
+	 * @param context context to midis2jam2
 	 */
 	public MonophonicInstrument(
 			Midis2jam2 context) {
@@ -63,9 +62,10 @@ public abstract class MonophonicInstrument extends Instrument {
 					clones.get(0).notePeriods.add(comp1);
 					break;
 				}
-				/* If notes overlap by less than 5 midi ticks, just ignore those ticks */
-				final long l = comp2.endTick() - comp1.startTick();
-				if (l < 5 && l > 0) {
+				/* If notes overlap by less than ~1000 adjusted ticks, just ignore those ticks */
+				double l = comp2.endTick() - comp1.startTick();
+				double adj = l / context.file.division;
+				if (adj < 10 && adj > 0) {
 					comp2.noteOff.time -= l;
 				}
 				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
@@ -97,7 +97,7 @@ public abstract class MonophonicInstrument extends Instrument {
 		for (int i = 0; i < context.instruments.size(); i++) {
 			if (this.getClass().isInstance(context.instruments.get(i)) &&
 					context.instruments.get(i) != this &&
-					i < mySpot) {
+					i < mySpot && context.instruments.get(i).visible) {
 				othersOfMyType++;
 			}
 		}

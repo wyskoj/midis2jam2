@@ -12,17 +12,15 @@ import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class StringFamilyInstrument extends Instrument {
+public abstract class StringFamilyInstrument extends Instrument {
 	protected static final float TOP_Y = 8.84f;
 	protected static final float BOTTOM_Y = -6.17f;
 	protected static final float[] TOP_Z = new float[] {-0.6f, -0.6f, -0.6f, -0.6f};
@@ -51,6 +49,7 @@ public class StringFamilyInstrument extends Instrument {
 	final Spatial[] noteFingers = new Spatial[4];
 	final List<NotePeriod> currentNotePeriods = new ArrayList<>();
 	protected List<NotePeriod> notePeriods;
+	protected List<NotePeriod> finalNotePeriods;
 	boolean bowGoesLeft = false;
 	double frame = 0;
 	
@@ -63,7 +62,7 @@ public class StringFamilyInstrument extends Instrument {
 		final List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
-		
+		finalNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
 		final Spatial guitarBody = context.loadModel(modelFile, textureFile,
 				Midis2jam2.MatType.UNSHADED,
 				0.9f);
@@ -93,6 +92,18 @@ public class StringFamilyInstrument extends Instrument {
 		loadNoteFingers();
 		
 		highestLevel = new Node();
+	}
+	
+	public static void removeElapsedNotePeriods(double time, List<NotePeriod> notePeriods,
+	                                            List<NotePeriod> currentNotePeriods) {
+		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
+			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
+				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) { // floating points are the death
+					// of me
+					currentNotePeriods.remove(i);
+				}
+			}
+		}
 	}
 	
 	protected float stringHeight() {
@@ -170,10 +181,7 @@ public class StringFamilyInstrument extends Instrument {
 		}
 	}
 	
-	@Override
-	public void tick(double time, float delta) {
-	
-	}
+	public abstract void tick(double time, float delta);
 	
 	protected void getCurrentNotePeriods(double time) {
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
@@ -288,18 +296,6 @@ public class StringFamilyInstrument extends Instrument {
 	
 	protected void removeElapsedNotePeriods(double time) {
 		removeElapsedNotePeriods(time, notePeriods, currentNotePeriods);
-	}
-	
-	public static void removeElapsedNotePeriods(double time, List<NotePeriod> notePeriods,
-	                                            List<NotePeriod> currentNotePeriods) {
-		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
-			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
-				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) { // floating points are the death
-					// of me
-					currentNotePeriods.remove(i);
-				}
-			}
-		}
 	}
 	
 	protected void calculateFrameChanges(float delta) {

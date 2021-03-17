@@ -53,7 +53,6 @@ public class Trumpet extends MonophonicInstrument {
 		put(81, new Boolean[] {false, true, false,});//
 		put(82, new Boolean[] {false, false, false,});//
 	}};
-	Node multiChannel = new Node();
 	Node cloneNode = new Node();
 	
 	public Trumpet(Midis2jam2 context,
@@ -71,16 +70,15 @@ public class Trumpet extends MonophonicInstrument {
 			cloneNode.setLocalTranslation(-31.5f, 60, 10);
 			cloneNode.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
 		}
-		multiChannel.attachChild(cloneNode);
+		highestLevel.attachChild(cloneNode);
 		
-		context.getRootNode().attachChild(multiChannel);
+		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		for (MonophonicClone clone : clones) {
-			clone.tick(time, delta);
-		}
+		setIdleVisibiltyByPeriods(notePeriods, time, highestLevel);
+		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	
 	public class TrumpetClone extends StretchyClone {
@@ -148,9 +146,9 @@ public class Trumpet extends MonophonicInstrument {
 					if (booleans != null) {
 						for (int i = 0; i < 3; i++) {
 							if (booleans[i]) {
-								keys[i].setLocalTranslation(0,-0.5f,0);
+								keys[i].setLocalTranslation(0, -0.5f, 0);
 							} else {
-								keys[i].setLocalTranslation(0,0,0);
+								keys[i].setLocalTranslation(0, 0, 0);
 							}
 						}
 					}

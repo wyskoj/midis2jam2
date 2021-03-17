@@ -10,6 +10,7 @@ import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class Harp extends Instrument {
 		super(context);
 		List<MidiNoteEvent> notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
 		this.notes = notes;
-		this.notePeriods = calculateNotePeriods(notes);
+		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(notes));
 		harpNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f));
 		harpNode.setLocalTranslation(5, 3.6f, 17);
 		harpNode.setLocalRotation(new Quaternion().fromAngles(0,rad(-35),0));
@@ -37,13 +38,12 @@ public class Harp extends Instrument {
 			harpNode.attachChild(strings[i].stringNode);
 		}
 		
-
-		
 		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibiltyByPeriods(notePeriods,time,highestLevel);
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {

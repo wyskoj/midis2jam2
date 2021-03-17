@@ -3,6 +3,7 @@ package org.wysko.midis2jam2.instrument.monophonic.pipe;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -11,6 +12,7 @@ import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.particle.SteamPuffer;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +21,8 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Piccolo extends HandedInstrument {
 	
+	
+	private List<NotePeriod> finalNotePeriods;
 	
 	/**
 	 * Constructs a Piccolo.
@@ -37,6 +41,7 @@ public class Piccolo extends HandedInstrument {
 		
 		this.notePeriods = calculateNotePeriods(notes);
 		calculateClones(this, PiccoloClone.class);
+		finalNotePeriods = new ArrayList<>(notePeriods);
 		
 		
 		for (MonophonicClone clone : clones) {
@@ -94,6 +99,7 @@ public class Piccolo extends HandedInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	

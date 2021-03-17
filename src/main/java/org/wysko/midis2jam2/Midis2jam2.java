@@ -44,10 +44,7 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
@@ -60,6 +57,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	double timeSinceStart = -2;
 	boolean seqHasRunOnce = false;
 	private BitmapText bitmapText1;
+	private Spatial pianoStand;
+	private Spatial malletStand;
+	private Spatial pianoShadow;
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -156,6 +156,18 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (instrument != null) // Null if not implemented yet
 				instrument.tick(timeSinceStart, tpf);
 		}
+		
+		// Hide/show stands
+		if (pianoStand != null)
+		pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
+				Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		if (pianoShadow != null)
+		pianoShadow.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
+				Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		if (malletStand != null)
+		malletStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Mallets) ?
+				Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		
 	}
 	
 	/**
@@ -424,23 +436,23 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		if (instruments.stream().anyMatch(i -> i instanceof Keyboard)) {
-			Spatial pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
+			pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(pianoStand);
 			pianoStand.move(-50, 32f, -6);
 			pianoStand.rotate(0, rad(45), 0);
 			
-			Spatial shadow = assetManager.loadModel("Assets/PianoShadow.obj");
+			pianoShadow = assetManager.loadModel("Assets/PianoShadow.obj");
 			final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 			material.setTexture("ColorMap",assetManager.loadTexture("Assets/KeyboardShadow.png"));
 			material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-			shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
-			shadow.setMaterial(material);
-			shadow.move(-47,0.01f,-3);
-			shadow.rotate(0, rad(45), 0);
-			rootNode.attachChild(shadow);
+			pianoShadow.setQueueBucket(RenderQueue.Bucket.Transparent);
+			pianoShadow.setMaterial(material);
+			pianoShadow.move(-47,0.01f,-3);
+			pianoShadow.rotate(0, rad(45), 0);
+			rootNode.attachChild(pianoShadow);
 		}
 		if (instruments.stream().anyMatch(i -> i instanceof Mallets)) {
-			Spatial malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
+			malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(malletStand);
 			malletStand.setLocalTranslation(new Vector3f(-22, 22.2f, 23));
 			malletStand.rotate(0, rad(33.7), 0);

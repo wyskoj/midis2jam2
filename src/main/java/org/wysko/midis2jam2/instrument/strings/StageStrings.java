@@ -5,17 +5,21 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.StageInstrument;
 import org.wysko.midis2jam2.instrument.brass.OneStageInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class StageStrings extends StageInstrument {
+	private final List<NotePeriod> finalNotePeriods;
 	
 	// Strings are 9 / 12 degrees apart
 	// Left one is 22 up
@@ -36,10 +40,13 @@ public class StageStrings extends StageInstrument {
 		}
 		
 		context.getRootNode().attachChild(highestLevel);
+		
+		finalNotePeriods = calculateNotePeriods(scrapeMidiNoteEvents(eventList));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibiltyByPeriods(finalNotePeriods,time,highestLevel);
 		final int i1 =
 				context.instruments.stream().filter(e -> e instanceof StageStrings).collect(Collectors.toList()).indexOf(this);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (10.6 * i1)), 0));

@@ -4,12 +4,10 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -24,6 +22,7 @@ public class Keyboard extends KeyedInstrument {
 	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
 	private final List<? extends MidiEvent> events;
 	private final Skin skin;
+	private final List<NotePeriod> notePeriods;
 	
 	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, Skin skin) {
 		super(context, events);
@@ -47,6 +46,8 @@ public class Keyboard extends KeyedInstrument {
 		
 		node.move(-50, 32f, -6);
 		node.rotate(0, rad(45), 0);
+		
+		notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(events));
 	}
 	
 	/**
@@ -76,7 +77,7 @@ public class Keyboard extends KeyedInstrument {
 			}
 		}
 		movementNode.setLocalTranslation(0, keyboardsBeforeMe * 3.030f, -keyboardsBeforeMe * (5.865f));
-		
+		setIdleVisibiltyByPeriods(notePeriods,x, movementNode);
 		handleKeys(x,delta);
 	}
 	

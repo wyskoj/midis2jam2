@@ -7,7 +7,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
@@ -15,8 +14,6 @@ import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import org.wysko.midis2jam2.instrument.strings.StringFamilyInstrument;
 
 import java.util.*;
@@ -79,8 +76,9 @@ public class Guitar extends Instrument {
 	}};
 	private final List<MidiChannelSpecificEvent> events;
 	private final List<NotePeriod> notePeriods;
-	private final Node allGuitarsNode;
+	private final Node highestLevel;
 	private final BitmapText timeText;
+	private final List<NotePeriod> finalNotePeriods;
 	double frame = 0;
 	private static final Vector3f BASE_POSITION = new Vector3f(43.431f, 35.292f, 7.063f);
 	
@@ -195,11 +193,11 @@ public class Guitar extends Instrument {
 		}
 		
 		// Position guitar
-		allGuitarsNode = new Node();
-		allGuitarsNode.setLocalTranslation(BASE_POSITION);
-		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3)));
-		allGuitarsNode.attachChild(aGuitarNode);
-		context.getRootNode().attachChild(allGuitarsNode);
+		highestLevel = new Node();
+		highestLevel.setLocalTranslation(BASE_POSITION);
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3)));
+		highestLevel.attachChild(aGuitarNode);
+		context.getRootNode().attachChild(highestLevel);
 		
 		BitmapFont bitmapFont = context.getAssetManager().loadFont("Interface/Fonts/Console.fnt");
 		timeText = new BitmapText(bitmapFont, false);
@@ -207,6 +205,8 @@ public class Guitar extends Instrument {
 		timeText.setText("Hello World");
 		timeText.setLocalTranslation(2, 10, 0);
 		aGuitarNode.attachChild(timeText);
+		
+		finalNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
 	}
 	
 	private float stringHeight() {
@@ -238,10 +238,11 @@ public class Guitar extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		
-		final int i1 = context.instruments.stream().filter(e -> e instanceof Guitar).collect(Collectors.toList()).indexOf(this);
+		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
+		final int i1 =
+				context.instruments.stream().filter(e -> e instanceof Guitar && e.visible).collect(Collectors.toList()).indexOf(this);
 		Vector3f add = new Vector3f(BASE_POSITION).add(new Vector3f(i1 * 5, i1 * -4, 0));
-		allGuitarsNode.setLocalTranslation(add);
+		highestLevel.setLocalTranslation(add);
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}

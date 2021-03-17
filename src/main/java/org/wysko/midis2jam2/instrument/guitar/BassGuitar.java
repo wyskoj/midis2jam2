@@ -14,14 +14,9 @@ import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import org.wysko.midis2jam2.instrument.strings.StringFamilyInstrument;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -77,8 +72,9 @@ public class BassGuitar extends Instrument {
 	}};
 	private final List<MidiChannelSpecificEvent> events;
 	private final List<NotePeriod> notePeriods;
-	private final Node allGuitarsNode;
+	private final Node highestLevel;
 	private final BitmapText timeText;
+	private final List<NotePeriod> finalNotePeriods;
 	double frame = 0;
 	
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -167,11 +163,11 @@ public class BassGuitar extends Instrument {
 		}
 		
 		// Position guitar
-		allGuitarsNode = new Node();
-		allGuitarsNode.setLocalTranslation(BASE_POSITION);
-		allGuitarsNode.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
-		allGuitarsNode.attachChild(bassGuitarNode);
-		context.getRootNode().attachChild(allGuitarsNode);
+		highestLevel = new Node();
+		highestLevel.setLocalTranslation(BASE_POSITION);
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
+		highestLevel.attachChild(bassGuitarNode);
+		context.getRootNode().attachChild(highestLevel);
 		
 		BitmapFont bitmapFont = context.getAssetManager().loadFont("Interface/Fonts/Console.fnt");
 		timeText = new BitmapText(bitmapFont, false);
@@ -179,6 +175,8 @@ public class BassGuitar extends Instrument {
 		timeText.setText("Hello World");
 		timeText.setLocalTranslation(2, 10, 0);
 		bassGuitarNode.attachChild(timeText);
+		
+		finalNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
 	}
 	
 	private float stringHeight() {
@@ -209,11 +207,13 @@ public class BassGuitar extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
 		
 		final int i1 =
-				context.instruments.stream().filter(e -> e instanceof BassGuitar).collect(Collectors.toList()).indexOf(this);
+				context.instruments.stream().filter(e -> e instanceof BassGuitar && e.visible).collect(Collectors.toList()).indexOf(this);
 		Vector3f add = new Vector3f(BASE_POSITION).add(new Vector3f(i1 * 7, i1 * -2.43f, 0));
-		allGuitarsNode.setLocalTranslation(add);
+		highestLevel.setLocalTranslation(add);
+		
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}

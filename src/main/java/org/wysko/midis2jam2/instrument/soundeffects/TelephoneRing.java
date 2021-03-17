@@ -10,6 +10,7 @@ import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class TelephoneRing extends Instrument {
 	private final List<NotePeriod> notePeriods;
 	private final Node highestNode = new Node();
+	private final List<NotePeriod> finalNotePeriods;
 	Node telephoneNode = new Node();
 	Spatial[] upKeys = new Spatial[12];
 	Spatial[] downKeys = new Spatial[12];
@@ -80,11 +82,13 @@ public class TelephoneRing extends Instrument {
 		telephoneNode.setLocalTranslation(0, 1, -50);
 		highestNode.attachChild(telephoneNode);
 		context.getRootNode().attachChild(highestNode);
+		
+		finalNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		
+		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestNode);
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {

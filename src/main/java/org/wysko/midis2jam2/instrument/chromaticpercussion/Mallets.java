@@ -33,11 +33,12 @@ public class Mallets extends Instrument {
 	
 	Spatial malletCase;
 	Node contents = new Node();
-	Node positioning = new Node();
+	Node highestLevel = new Node();
 	MalletType type;
 	
 	MalletBar[] bars = new MalletBar[KEYBOARD_KEY_COUNT];
 	List<MidiNoteOnEvent>[] barStrikes;
+	List<MidiNoteOnEvent> strikesForVisibiltyCheck;
 	
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
 	               MalletType type) {
@@ -71,7 +72,7 @@ public class Mallets extends Instrument {
 				}
 			}
 		});
-
+		strikesForVisibiltyCheck = eventList.stream().filter(e -> e instanceof MidiNoteOnEvent).map(e -> ((MidiNoteOnEvent) e)).collect(Collectors.toList());
 
 //		Spatial marker = context.loadModel("Piccolo.obj", "SphereMapExplained.bmp",
 //				Midis2jam2.MatType.REFLECTIVE);
@@ -79,17 +80,19 @@ public class Mallets extends Instrument {
 //		marker.setLocalTranslation(0, 10, 0);
 //		marker.setLocalScale(2, 5, 2);
 		
-		positioning.attachChild(contents);
-		context.getRootNode().attachChild(positioning);
-		positioning.setLocalTranslation(20, 0, 0);
+		highestLevel.attachChild(contents);
+		context.getRootNode().attachChild(highestLevel);
+		highestLevel.setLocalTranslation(20, 0, 0);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		int i1 = context.instruments.stream().filter(e -> e instanceof Mallets).collect(Collectors.toList()).indexOf(this);
+		setIdleVisibilityByStrikes(strikesForVisibiltyCheck, time, highestLevel);
+		int i1 =
+				context.instruments.stream().filter(e -> e instanceof Mallets && e.visible).collect(Collectors.toList()).indexOf(this);
 		i1 -= 2;
 		contents.setLocalTranslation(-50, 26.5f + (2 * i1), 0);
-		positioning.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
 		
 		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
 			MalletBar bar = bars[i];
@@ -231,11 +234,10 @@ public class Mallets extends Instrument {
 						Vector3f localTranslation = downBar.getLocalTranslation();
 						downBar.setLocalTranslation(new Vector3f(
 								localTranslation.x,
-								Math.min(0,localTranslation.y),
+								Math.min(0, localTranslation.y),
 								localTranslation.z
 						));
-					}
-					else{
+					} else {
 						
 						upBar.setCullHint(Spatial.CullHint.Dynamic);
 						downBar.setCullHint(Spatial.CullHint.Always);

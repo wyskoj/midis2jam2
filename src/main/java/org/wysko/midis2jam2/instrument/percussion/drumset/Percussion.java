@@ -31,10 +31,12 @@ public class Percussion extends Instrument {
 	private final Cymbal crash2;
 	private final Spatial shadow;
 	
+	List<MidiNoteOnEvent> noteOnEvents;
+	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
 		/* Percussion only cares about note on. */
-		List<MidiNoteOnEvent> noteOnEvents = events.stream()
+		noteOnEvents = events.stream()
 				.filter(e -> e instanceof MidiNoteOnEvent)
 				.map(e -> ((MidiNoteOnEvent) e))
 				.collect(Collectors.toList());
@@ -93,11 +95,11 @@ public class Percussion extends Instrument {
 		
 		shadow = context.getAssetManager().loadModel("Assets/DrumShadow.obj");
 		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		material.setTexture("ColorMap",context.getAssetManager().loadTexture("Assets/DrumShadow.png"));
+		material.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/DrumShadow.png"));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
 		shadow.setMaterial(material);
-		shadow.move(0,0.01f,-80);
+		shadow.move(0, 0.01f, -80);
 		
 		percussionNode.attachChild(drumSetNode);
 		percussionNode.attachChild(shadow);
@@ -108,6 +110,7 @@ public class Percussion extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibilityByStrikes(noteOnEvents, time, percussionNode);
 		snareDrum.tick(time, delta);
 		bassDrum.tick(time, delta);
 		tom1.tick(time, delta);
@@ -119,6 +122,6 @@ public class Percussion extends Instrument {
 		crash1.tick(time, delta);
 		crash2.tick(time, delta);
 		splash.tick(time, delta);
-		hiHat.tick(time,delta);
+		hiHat.tick(time, delta);
 	}
 }

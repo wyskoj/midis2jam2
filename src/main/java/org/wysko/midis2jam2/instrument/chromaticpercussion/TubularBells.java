@@ -22,11 +22,11 @@ public class TubularBells extends Instrument {
 	Bell[] bells = new Bell[12];
 	Node tubularBellNode = new Node();
 	List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
+	private final List<MidiNoteOnEvent> filteredHits;
 	
 	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> hits) {
 		super(context);
-		List<MidiNoteOnEvent> filteredHits =
-				hits.stream().filter(h -> h instanceof MidiNoteOnEvent).map(h -> ((MidiNoteOnEvent) h)).collect(Collectors.toList());
+		filteredHits = hits.stream().filter(h -> h instanceof MidiNoteOnEvent).map(h -> ((MidiNoteOnEvent) h)).collect(Collectors.toList());
 		
 		for (int i = 0; i < 12; i++) {
 			bells[i] = new Bell(i);
@@ -52,8 +52,9 @@ public class TubularBells extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		int i1 = context.instruments.stream().filter(e -> e instanceof TubularBells).collect(Collectors.toList()).indexOf(this);
-		
+		setIdleVisibilityByStrikes(filteredHits, time, tubularBellNode);
+		int i1 =
+				context.instruments.stream().filter(e -> e instanceof TubularBells && e.visible).collect(Collectors.toList()).indexOf(this);
 		
 		for (int i = 0, barsLength = 12; i < barsLength; i++) { // For each bar on the instrument
 			MidiNoteOnEvent nextHit = null;

@@ -26,8 +26,9 @@ public class Viola extends StringFamilyInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		
-		final int i1 = context.instruments.stream().filter(e -> e instanceof Viola).collect(Collectors.toList()).indexOf(this);
+		setIdleVisibiltyByPeriods(finalNotePeriods,time,highestLevel);
+		final int i1 =
+				context.instruments.stream().filter(e -> e instanceof Viola && e.visible).collect(Collectors.toList()).indexOf(this);
 		instrumentNode.setLocalTranslation(i1 * 20, 0, 0);
 		
 		getCurrentNotePeriods(time);

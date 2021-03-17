@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -12,12 +13,15 @@ import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Ocarina extends HandedInstrument {
+	
+	private List<NotePeriod> finalNotePeriods;
 	
 	/**
 	 * Constructs an ocarina.
@@ -36,6 +40,8 @@ public class Ocarina extends HandedInstrument {
 		this.notePeriods = calculateNotePeriods(notes);
 		calculateClones(this, Ocarina.OcarinaClone.class);
 		
+		finalNotePeriods = new ArrayList<>(notePeriods);
+		
 		
 		for (MonophonicClone clone : clones) {
 			OcarinaClone ocarinaClone = ((OcarinaClone) clone);
@@ -50,6 +56,7 @@ public class Ocarina extends HandedInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	

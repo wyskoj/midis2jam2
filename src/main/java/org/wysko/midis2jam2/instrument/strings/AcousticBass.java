@@ -27,7 +27,9 @@ public class AcousticBass extends StringFamilyInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		final int i1 = context.instruments.stream().filter(e -> e instanceof AcousticBass).collect(Collectors.toList()).indexOf(this);
+		setIdleVisibiltyByPeriods(finalNotePeriods,time,highestLevel);
+		final int i1 =
+				context.instruments.stream().filter(e -> e instanceof AcousticBass && e.visible).collect(Collectors.toList()).indexOf(this);
 		instrumentNode.setLocalTranslation(-i1 * 25, 0, 0);
 		getCurrentNotePeriods(time);
 		int[] frets = new int[] {-1, -1, -1, -1};

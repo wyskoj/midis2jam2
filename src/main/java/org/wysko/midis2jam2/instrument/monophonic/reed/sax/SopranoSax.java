@@ -4,12 +4,14 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -83,6 +85,7 @@ public class SopranoSax extends Saxophone {
 		put(56, new Integer[] {3, 5, 6, 14, 15, 17, 19, 10}); // Bb
 	}};
 	private final static float ROTATION_FACTOR = 0.1f;
+	private List<NotePeriod> finalNotePeriods;
 	
 	/**
 	 * Constructs an Soprano saxophone.
@@ -105,7 +108,7 @@ public class SopranoSax extends Saxophone {
 		
 		this.notePeriods = calculateNotePeriods(justTheNotes);
 		calculateClones(this, SopranoSaxClone.class);
-		
+		finalNotePeriods = new ArrayList<>(notePeriods);
 		for (MonophonicClone clone : clones) {
 			SopranoSaxClone SopranoClone = ((SopranoSaxClone) clone);
 			groupOfPolyphony.attachChild(SopranoClone.hornNode);
@@ -122,6 +125,8 @@ public class SopranoSax extends Saxophone {
 	
 	@Override
 	public void tick(double time, float delta) {
+		
+		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, MULTI_SAX_OFFSET);
 	}
 	

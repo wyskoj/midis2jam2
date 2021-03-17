@@ -5,7 +5,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.StageInstrument;
-import org.wysko.midis2jam2.instrument.strings.StageStrings;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
@@ -40,8 +39,9 @@ public class StageHorns extends StageInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		setIdleVisibiltyByPeriods(notePeriods, time, highestLevel);
 		final int i1 =
-				context.instruments.stream().filter(e -> e instanceof StageHorns).collect(Collectors.toList()).indexOf(this);
+				context.instruments.stream().filter(e -> e instanceof StageHorns && e.visible).collect(Collectors.toList()).indexOf(this);
 		for (OneStageInstrument horn : eachNote) {
 			horn.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(new Vector3f(0, 0, -5 * i1)));
 		}

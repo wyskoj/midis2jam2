@@ -27,7 +27,15 @@ public class NotePeriod {
 		return noteOff.time;
 	}
 	
+	/**
+	 * Expressed in seconds
+	 * @return
+	 */
 	public double duration() {
 		return endTime - startTime;
+	}
+	
+	public boolean isPlayingAt(double time) {
+		return time <= endTime && time >= startTime;
 	}
 }

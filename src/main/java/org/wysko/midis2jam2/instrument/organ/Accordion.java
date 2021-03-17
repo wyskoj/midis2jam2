@@ -6,12 +6,14 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.piano.Key;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.piano.KeyedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -21,6 +23,7 @@ import static org.wysko.midis2jam2.instrument.piano.Keyboard.midiValueToColor;
 @SuppressWarnings("SpellCheckingInspection")
 public class Accordion extends KeyedInstrument {
 	private final AccordionKey[] keys = new AccordionKey[24]; // Two octaves (the end keys are phantom)
+	private final List<NotePeriod> notePeriods;
 	Node[] rotationNodes = new Node[14];
 	Node accordionNode = new Node();
 	float angle = 4;
@@ -42,11 +45,11 @@ public class Accordion extends KeyedInstrument {
 		// Set materials
 		Node lHNode = (Node) leftHand;
 		Material leatherStrap = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		leatherStrap.setTexture("ColorMap",context.getAssetManager().loadTexture("Assets/LeatherStrap.bmp"));
+		leatherStrap.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/LeatherStrap.bmp"));
 		lHNode.getChild(1).setMaterial(leatherStrap);
 		
 		Material rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		rubberFoot.setTexture("ColorMap",context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
+		rubberFoot.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
 		lHNode.getChild(0).setMaterial(rubberFoot);
 		
 		Spatial fold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -102,15 +105,32 @@ public class Accordion extends KeyedInstrument {
 		
 		context.getRootNode().attachChild(accordionNode);
 		accordionNode.setLocalTranslation(-70, 10, -60);
-		accordionNode.setLocalRotation(new Quaternion().fromAngles(rad(0),rad(45),rad(-5)));
+		accordionNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(45), rad(-5)));
 		
 		debug = context.debugText(String.valueOf(debug), 2f);
 		accordionNode.attachChild(debug);
 		debug.setCullHint(Spatial.CullHint.Always);
 		
 		int indexThis = (int) context.instruments.stream().filter(i -> i instanceof Accordion).count();
-		accordionNode.move(0,indexThis * 30, 0);
-		System.out.println("indexThis = " + indexThis);
+		accordionNode.move(0, indexThis * 30, 0);
+		
+		notePeriods = Collections.unmodifiableList(calculateNotePeriods(scrapeMidiNoteEvents(eventList)));
+	}
+	
+	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode) {
+		if (!beingPressed) {
+			float[] angles = new float[3];
+			node.getLocalRotation().toAngles(angles);
+			if (angles[1] < -0.0001) { // fuck floats
+				node.setLocalRotation(new Quaternion(new float[]
+						{0, Math.min(angles[1] + (0.02f * delta * 50), 0), 0}
+				));
+			} else {
+				node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
+				downNode.setCullHint(Spatial.CullHint.Always);
+				upNode.setCullHint(Spatial.CullHint.Dynamic);
+			}
+		}
 	}
 	
 	private Node whiteKey() {
@@ -129,11 +149,14 @@ public class Accordion extends KeyedInstrument {
 	public void tick(double time, float delta) {
 		calculateAngle(delta);
 		handleKeys(time, delta);
-		
+		setIdleVisibiltyByPeriods(notePeriods, time, accordionNode);
 		
 		for (int i = 0; i < rotationNodes.length; i++) {
 			rotationNodes[i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(angle * (i - 7.5))));
 		}
+		
+		int indexThis = (int) context.instruments.stream().filter(i -> i instanceof Accordion && i.visible).count();
+		accordionNode.setLocalTranslation(0, indexThis * 30, 0);
 	}
 	
 	private void calculateAngle(float delta) {
@@ -172,22 +195,6 @@ public class Accordion extends KeyedInstrument {
 	public void transitionAnimation(float delta) {
 		for (AccordionKey key : keys) {
 			handleAKey(delta, key.beingPressed, key.node, key.downNode, key.upNode);
-		}
-	}
-	
-	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode) {
-		if (!beingPressed) {
-			float[] angles = new float[3];
-			node.getLocalRotation().toAngles(angles);
-			if (angles[1] < -0.0001) { // fuck floats
-				node.setLocalRotation(new Quaternion(new float[]
-						{0, Math.min(angles[1] + (0.02f * delta * 50), 0), 0}
-				));
-			} else {
-				node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
-				downNode.setCullHint(Spatial.CullHint.Always);
-				upNode.setCullHint(Spatial.CullHint.Dynamic);
-			}
 		}
 	}
 	

@@ -5,6 +5,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
@@ -19,6 +20,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Harmonica extends Instrument {
 	private final Node highestLevel = new Node();
+	private final List<NotePeriod> notePeriods;
 	SteamPuffer[] puffers = new SteamPuffer[12];
 	Node[] pufferNodes = new Node[12];
 	Node harmonicaNode = new Node();
@@ -50,12 +52,14 @@ public class Harmonica extends Instrument {
 		
 		highestLevel.setLocalTranslation(74, 32, -38);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-90), 0));
+		
+		notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(events));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
 		/* Collect note periods to execute */
-		
+		setIdleVisibiltyByPeriods(notePeriods,time,highestLevel);
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		if (!events.isEmpty()) {
 			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
@@ -83,7 +87,8 @@ public class Harmonica extends Instrument {
 			puffers[i].tick(time, delta, activities[i]);
 		}
 		
-		int mySpot = context.instruments.stream().filter(i -> i instanceof Harmonica).collect(Collectors.toList()).indexOf(this);
+		int mySpot =
+				context.instruments.stream().filter(i -> i instanceof Harmonica && i.visible).collect(Collectors.toList()).indexOf(this);
 		harmonicaNode.setLocalTranslation(0,mySpot * 10,0);
 	}
 }
