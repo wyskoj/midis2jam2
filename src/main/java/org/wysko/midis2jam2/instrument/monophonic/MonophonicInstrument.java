@@ -62,12 +62,12 @@ public abstract class MonophonicInstrument extends Instrument {
 					clones.get(0).notePeriods.add(comp1);
 					break;
 				}
-				/* If notes overlap by less than ~1000 adjusted ticks, just ignore those ticks */
-				double l = comp2.endTick() - comp1.startTick();
-				double adj = l / context.file.division;
-				if (adj < 10 && adj > 0) {
-					comp2.noteOff.time -= l;
-				}
+//				/* If notes overlap by less than ~1000 adjusted ticks, just ignore those ticks */
+//				double l = comp2.endTick() - comp1.startTick();
+//				double adj = l / context.file.division;
+//				if (adj < 10 && adj > 0) {
+//					comp2.noteOff.time -= l;
+//				}
 				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
 					boolean added = false;
 					for (MonophonicClone clone : clones) {
