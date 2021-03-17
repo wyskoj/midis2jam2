@@ -7,7 +7,6 @@ import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.particle.SteamPuffer;
 
@@ -26,15 +25,12 @@ public class Piccolo extends HandedInstrument {
 	
 	/**
 	 * Constructs a Piccolo.
-	 *
-	 * @param context context to midis2jam2
+	 *  @param context context to midis2jam2
 	 * @param events  the events to play
-	 * @param file    context to the midi file
 	 */
-	public Piccolo(Midis2jam2 context, List<MidiChannelSpecificEvent> events,
-	               MidiFile file) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public Piccolo(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		
-		super(context, file);
+		super(context);
 		List<MidiNoteEvent> notes =
 				events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> (MidiNoteEvent) e)
 						.collect(Collectors.toList());
@@ -99,7 +95,7 @@ public class Piccolo extends HandedInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	

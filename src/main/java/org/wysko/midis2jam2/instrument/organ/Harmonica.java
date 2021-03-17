@@ -59,7 +59,7 @@ public class Harmonica extends Instrument {
 	@Override
 	public void tick(double time, float delta) {
 		/* Collect note periods to execute */
-		setIdleVisibiltyByPeriods(notePeriods,time,highestLevel);
+		setIdleVisibilityByPeriods(notePeriods,time,highestLevel);
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		if (!events.isEmpty()) {
 			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {

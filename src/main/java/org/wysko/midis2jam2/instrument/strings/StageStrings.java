@@ -7,12 +7,10 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.StageInstrument;
-import org.wysko.midis2jam2.instrument.brass.OneStageInstrument;
+import org.wysko.midis2jam2.instrument.brass.StageInstrumentNote;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,10 +27,10 @@ public class StageStrings extends StageInstrument {
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		eachNote = new OneStageString[12];
+		eachNote = new StageStringNote[12];
 		for (int i = 0; i < 12; i++) {
 			stringNodes[i] = new Node();
-			eachNote[i] = new OneStageString();
+			eachNote[i] = new StageStringNote();
 			stringNodes[i].attachChild(eachNote[i].highestLevel);
 			eachNote[i].highestLevel.setLocalTranslation(0, 2 * i, -151.76f);
 			stringNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad((9 / 10f) * i), 0));
@@ -46,7 +44,7 @@ public class StageStrings extends StageInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods,time,highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods,time,highestLevel);
 		final int i1 =
 				context.instruments.stream().filter(e -> e instanceof StageStrings).collect(Collectors.toList()).indexOf(this);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (10.6 * i1)), 0));
@@ -57,7 +55,7 @@ public class StageStrings extends StageInstrument {
 		Arrays.stream(eachNote).forEach(string -> string.tick(time, delta));
 	}
 	
-	public class OneStageString extends OneStageInstrument {
+	public class StageStringNote extends StageInstrumentNote {
 		
 		final Node movementNode = new Node();
 		final Node bowNode = new Node();
@@ -66,7 +64,7 @@ public class StageStrings extends StageInstrument {
 		final Spatial bow;
 		double frame = 0;
 		
-		public OneStageString() {
+		public StageStringNote() {
 			// Load holder
 			movementNode.attachChild(context.loadModel("StageStringHolder.obj", "FakeWood.bmp",
 					Midis2jam2.MatType.UNSHADED, 0));

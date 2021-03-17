@@ -88,7 +88,7 @@ public class TelephoneRing extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestNode);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestNode);
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {

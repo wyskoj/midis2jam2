@@ -77,7 +77,7 @@ public class Trumpet extends MonophonicInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(notePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(notePeriods, time, highestLevel);
 		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	

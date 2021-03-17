@@ -2,8 +2,7 @@ package org.wysko.midis2jam2.instrument;
 
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.brass.OneStageInstrument;
-import org.wysko.midis2jam2.instrument.brass.StageHorns;
+import org.wysko.midis2jam2.instrument.brass.StageInstrumentNote;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 public abstract class StageInstrument extends Instrument {
 	protected final List<NotePeriod> notePeriods;
-	protected OneStageInstrument[] eachNote;
+	protected StageInstrumentNote[] eachNote;
 	protected Node highestLevel = new Node();
 	
 	protected StageInstrument(Midis2jam2 context,

@@ -9,7 +9,6 @@ import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,13 +24,11 @@ public class Ocarina extends HandedInstrument {
 	
 	/**
 	 * Constructs an ocarina.
+	 *  @param context context to midis2jam2
 	 *
-	 * @param context context to midis2jam2
-	 * @param file    context to the midi file
 	 */
-	public Ocarina(Midis2jam2 context, List<MidiChannelSpecificEvent> events,
-	               MidiFile file) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-		super(context, file);
+	public Ocarina(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+		super(context);
 		
 		List<MidiNoteEvent> notes =
 				events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> (MidiNoteEvent) e)
@@ -56,7 +53,7 @@ public class Ocarina extends HandedInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	

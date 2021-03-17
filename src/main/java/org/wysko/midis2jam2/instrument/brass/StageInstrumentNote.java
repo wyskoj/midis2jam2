@@ -2,7 +2,7 @@ package org.wysko.midis2jam2.instrument.brass;
 
 import com.jme3.scene.Node;
 
-public abstract class OneStageInstrument {
+public abstract class StageInstrumentNote {
 	public final Node highestLevel = new Node();
 	protected final Node animNode = new Node();
 	protected double progress = 0;

@@ -43,7 +43,7 @@ public class Harp extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(notePeriods,time,highestLevel);
+		setIdleVisibilityByPeriods(notePeriods,time,highestLevel);
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {

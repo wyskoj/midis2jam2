@@ -26,7 +26,7 @@ public class Cello extends StringFamilyInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods,time,highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods,time,highestLevel);
 		final int i1 =
 				context.instruments.stream().filter(e -> e instanceof Cello && e.visible).collect(Collectors.toList()).indexOf(this);
 		instrumentNode.setLocalTranslation(-i1 * 20, 0, 0);

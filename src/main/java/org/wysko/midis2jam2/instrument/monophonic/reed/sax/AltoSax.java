@@ -8,7 +8,6 @@ import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.*;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,17 +90,15 @@ public class AltoSax extends Saxophone {
 	 *
 	 * @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of an alto saxophone
-	 * @param file    context to the MIDI file
 	 */
 	public AltoSax(Midis2jam2 context,
-	               List<MidiChannelSpecificEvent> events,
-	               MidiFile file)
+	               List<MidiChannelSpecificEvent> events)
 			throws InstantiationException,
 			IllegalAccessException,
 			InvocationTargetException,
 			NoSuchMethodException {
 		
-		super(context, file);
+		super(context);
 		
 		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
@@ -124,7 +121,7 @@ public class AltoSax extends Saxophone {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, MULTI_SAX_OFFSET);
 	}
 	

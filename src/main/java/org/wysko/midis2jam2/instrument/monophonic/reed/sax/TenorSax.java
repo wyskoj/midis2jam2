@@ -88,20 +88,17 @@ public class TenorSax extends Saxophone {
 	
 	/**
 	 * Constructs a tenor sax.
-	 *
-	 * @param context context to midis2jam2
+	 *  @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of a tenor sax
-	 * @param file    context to the MIDI file
 	 */
 	public TenorSax(Midis2jam2 context,
-	                List<MidiChannelSpecificEvent> events,
-	                MidiFile file)
+	                List<MidiChannelSpecificEvent> events)
 			throws InstantiationException,
 			IllegalAccessException,
 			InvocationTargetException,
 			NoSuchMethodException {
 		
-		super(context, file);
+		super(context);
 		
 		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
@@ -124,7 +121,7 @@ public class TenorSax extends Saxophone {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, MULTI_SAX_OFFSET);
 	}
 	

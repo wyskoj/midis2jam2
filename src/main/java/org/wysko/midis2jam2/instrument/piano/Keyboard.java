@@ -72,12 +72,12 @@ public class Keyboard extends KeyedInstrument {
 		for (int i = 0; i < context.instruments.size(); i++) {
 			if (context.instruments.get(i) instanceof Keyboard &&
 					context.instruments.get(i) != this &&
-					i < mySpot) {
+					i < mySpot && context.instruments.get(i).visible) {
 				keyboardsBeforeMe++;
 			}
 		}
 		movementNode.setLocalTranslation(0, keyboardsBeforeMe * 3.030f, -keyboardsBeforeMe * (5.865f));
-		setIdleVisibiltyByPeriods(notePeriods,x, movementNode);
+		setIdleVisibilityByPeriods(notePeriods,x, movementNode);
 		handleKeys(x,delta);
 	}
 	

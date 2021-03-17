@@ -4,6 +4,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 public abstract class Instrument {
 	protected final Midis2jam2 context;
 	public boolean visible = false;
-	
+	public Node highestLevel = new Node();
 	protected Instrument(Midis2jam2 context) {
 		this.context = context;
 	}
@@ -85,7 +86,7 @@ public abstract class Instrument {
 		return notePeriods;
 	}
 	
-	protected boolean setIdleVisibiltyByPeriods(List<NotePeriod> notePeriods, double time, Node node) {
+	protected void setIdleVisibilityByPeriods(List<? extends NotePeriod> notePeriods, double time, Node node) {
 		boolean show = false;
 		for (NotePeriod notePeriod : notePeriods) {
 			// Within 1 second of a note on,
@@ -102,10 +103,9 @@ public abstract class Instrument {
 			}
 		}
 		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
-		return show;
 	}
 	
-	protected boolean setIdleVisibilityByStrikes(List<MidiNoteOnEvent> strikes, double time, Node node) {
+	protected void setIdleVisibilityByStrikes(List<MidiNoteOnEvent> strikes, double time, Node node) {
 		boolean show = false;
 		for (MidiNoteOnEvent strike : strikes) {
 			double x = time - context.file.eventInSeconds(strike);
@@ -118,6 +118,11 @@ public abstract class Instrument {
 			}
 		}
 		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
-		return show;
+	}
+	
+	protected int getIndexOfThis() {
+		return context.instruments.stream()
+				.filter(e -> this.getClass().isInstance(e) && e.visible)
+				.collect(Collectors.toList()).indexOf(this);
 	}
 }

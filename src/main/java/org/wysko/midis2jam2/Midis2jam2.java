@@ -356,19 +356,19 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 63: // Synth Brass 2
 				return new StageHorns(this,events);
 			case 64: // Soprano Sax
-				return new SopranoSax(this, events, file);
+				return new SopranoSax(this, events);
 			case 65: // Alto Sax
-				return new AltoSax(this, events, file);
+				return new AltoSax(this, events);
 			case 66: // Tenor Sax
-				return new TenorSax(this, events, file);
+				return new TenorSax(this, events);
 			case 67: // Baritone Sax
-				return new BaritoneSax(this, events, file);
+				return new BaritoneSax(this, events);
 			case 72: // Piccolo
-				return new Piccolo(this, events, file);
+				return new Piccolo(this, events);
 			case 73: // Flute
-				return new Flute(this, events, file);
+				return new Flute(this, events);
 			case 79: // Ocarina
-				return new Ocarina(this, events, file);
+				return new Ocarina(this, events);
 			case 80: // Lead 1 (Square)
 			case 81: // Lead 2 (Sawtooth)
 			case 83: // Lead 4 (Chiff)

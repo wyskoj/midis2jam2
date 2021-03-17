@@ -7,7 +7,6 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -90,20 +89,17 @@ public class BaritoneSax extends Saxophone {
 	
 	/**
 	 * Constructs a baritone sax.
-	 *
-	 * @param context context to midis2jam2
+	 *  @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of a baritone sax
-	 * @param file    context to the MIDI file
 	 */
 	public BaritoneSax(Midis2jam2 context,
-	                   List<MidiChannelSpecificEvent> events,
-	                   MidiFile file)
+	                   List<MidiChannelSpecificEvent> events)
 			throws InstantiationException,
 			IllegalAccessException,
 			InvocationTargetException,
 			NoSuchMethodException {
 		
-		super(context, file);
+		super(context);
 		
 		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
 		
@@ -126,7 +122,7 @@ public class BaritoneSax extends Saxophone {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(finalNotePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
 		updateClones(time, delta, MULTI_SAX_OFFSET);
 	}
 	

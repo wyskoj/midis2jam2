@@ -24,10 +24,10 @@ public class StageHorns extends StageInstrument {
 	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		eachNote = new OneStageHorn[12];
+		eachNote = new StageHornNote[12];
 		for (int i = 0; i < 12; i++) {
 			hornNodes[i] = new Node();
-			eachNote[i] = new OneStageHorn();
+			eachNote[i] = new StageHornNote();
 			hornNodes[i].attachChild(eachNote[i].highestLevel);
 			eachNote[i].highestLevel.setLocalTranslation(BASE_POSITION);
 			hornNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(i * 1.5), 0));
@@ -39,10 +39,10 @@ public class StageHorns extends StageInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibiltyByPeriods(notePeriods, time, highestLevel);
+		setIdleVisibilityByPeriods(notePeriods, time, highestLevel);
 		final int i1 =
 				context.instruments.stream().filter(e -> e instanceof StageHorns && e.visible).collect(Collectors.toList()).indexOf(this);
-		for (OneStageInstrument horn : eachNote) {
+		for (StageInstrumentNote horn : eachNote) {
 			horn.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(new Vector3f(0, 0, -5 * i1)));
 		}
 		
@@ -50,15 +50,15 @@ public class StageHorns extends StageInstrument {
 		playStageInstruments(time);
 		
 		// Tick each string
-		for (OneStageInstrument string : eachNote) {
+		for (StageInstrumentNote string : eachNote) {
 			string.tick(time, delta);
 		}
 	}
 	
-	public class OneStageHorn extends OneStageInstrument {
+	public class StageHornNote extends StageInstrumentNote {
 		
 		
-		public OneStageHorn() {
+		public StageHornNote() {
 			// Load horn
 			animNode.attachChild(context.loadModel("StageHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE,
 					0.9f));

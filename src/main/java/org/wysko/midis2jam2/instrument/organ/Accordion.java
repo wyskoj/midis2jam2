@@ -149,7 +149,7 @@ public class Accordion extends KeyedInstrument {
 	public void tick(double time, float delta) {
 		calculateAngle(delta);
 		handleKeys(time, delta);
-		setIdleVisibiltyByPeriods(notePeriods, time, accordionNode);
+		setIdleVisibilityByPeriods(notePeriods, time, accordionNode);
 		
 		for (int i = 0; i < rotationNodes.length; i++) {
 			rotationNodes[i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(angle * (i - 7.5))));
