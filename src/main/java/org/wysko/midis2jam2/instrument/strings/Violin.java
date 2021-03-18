@@ -10,10 +10,27 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Violin.
+ */
 public class Violin extends StringFamilyInstrument {
 	
+	/**
+	 * Instantiates a new Violin.
+	 *
+	 * @param context the context
+	 * @param events  the events
+	 */
 	public Violin(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
-		super(context, events, "Violin.obj", "ViolinSkin.bmp", true, 0, new Vector3f(1, 1, 1) );
+		super(context,
+				events,
+				true,
+				0,
+				new Vector3f(1, 1, 1),
+				new int[] {55, 62, 69, 76},
+				55,
+				112,
+				context.loadModel("Violin.obj", "ViolinSkin.bmp"));
 		
 		highestLevel.setLocalTranslation(10, 57, -15);
 		highestLevel.attachChild(instrumentNode);
@@ -26,19 +43,13 @@ public class Violin extends StringFamilyInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods,time,highestLevel);
-		final int i1 =
-				context.instruments.stream().filter(e -> e instanceof Violin && e.visible).collect(Collectors.toList()).indexOf(this);
+		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
+		
+		final int i1 = getIndexOfThis();
 		instrumentNode.setLocalTranslation(i1 * 20, 0, 0);
 		
-		getCurrentNotePeriods(time);
-		
-		int[] frets = new int[] {-1, -1, -1, -1};
-		doFretCalculations(frets, 55,112 ,new int[] {55, 62, 69, 76} );
-		animateStrings(frets);
+		handleStrings(time, delta);
 		animateBow(delta);
-		removeElapsedNotePeriods(time);
-		calculateFrameChanges(delta);
 	}
 	
 }

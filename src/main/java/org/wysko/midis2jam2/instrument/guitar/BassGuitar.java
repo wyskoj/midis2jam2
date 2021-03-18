@@ -33,31 +33,32 @@ public class BassGuitar extends FrettedInstrument {
 					
 				},
 						new float[] {-0.85f, -0.31f, 0.20f, 0.70f},
-						new float[] {-1.86f, -0.85f, 0.34f, 1.37f}, new HashMap<Integer, Float>() {{
-					put(0, 0.0f);
-					put(1, 0.05f);
-					put(2, 0.1f);
-					put(3, 0.15f);
-					put(4, 0.20f);
-					put(5, 0.24f);
-					put(6, 0.285f);
-					put(7, 0.325f);
-					put(8, 0.364f);
-					put(9, 0.4f);
-					put(10, 0.43f);
-					put(11, 0.464f);
-					put(12, 0.494f);
-					put(13, 0.523f);
-					put(14, 0.55f);
-					put(15, 0.575f);
-					put(16, 0.6f);
-					put(17, 0.62f);
-					put(18, 0.643f);
-					put(19, 0.663f);
-					put(20, 0.68f);
-					put(21, 0.698f);
-					put(22, 0.716f);
-				}}),
+						new float[] {-1.86f, -0.85f, 0.34f, 1.37f},
+						new FretHeightByTable(new HashMap<Integer, Float>() {{
+							put(0, 0.0f);
+							put(1, 0.05f);
+							put(2, 0.1f);
+							put(3, 0.15f);
+							put(4, 0.20f);
+							put(5, 0.24f);
+							put(6, 0.285f);
+							put(7, 0.325f);
+							put(8, 0.364f);
+							put(9, 0.4f);
+							put(10, 0.43f);
+							put(11, 0.464f);
+							put(12, 0.494f);
+							put(13, 0.523f);
+							put(14, 0.55f);
+							put(15, 0.575f);
+							put(16, 0.6f);
+							put(17, 0.62f);
+							put(18, 0.643f);
+							put(19, 0.663f);
+							put(20, 0.68f);
+							put(21, 0.698f);
+							put(22, 0.716f);
+						}})),
 				4,
 				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f)
 		);
@@ -145,6 +146,5 @@ public class BassGuitar extends FrettedInstrument {
 		highestLevel.setLocalTranslation(add);
 		
 		handleStrings(time, delta);
-		
 	}
 }

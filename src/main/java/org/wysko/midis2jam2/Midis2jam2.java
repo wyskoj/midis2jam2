@@ -18,7 +18,7 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.StageHorns;
-import org.wysko.midis2jam2.instrument.brass.Trumpet;
+import org.wysko.midis2jam2.instrument.monophonic.brass.Trumpet;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
@@ -37,11 +37,9 @@ import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.strings.*;
 import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.midi.MidiEvent;
 
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
+import javax.sound.midi.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -107,6 +105,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		midijam.sequencer = MidiSystem.getSequencer(false);
 		if ((device == null && backup == null) || USE_DEFAULT_SYNTHESIZER) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
+			LATENCY_FIX = 0;
 		} else {
 			if (device == null) {
 				LATENCY_FIX = 0;
@@ -116,7 +115,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			midijam.sequencer = MidiSystem.getSequencer(false);
 			midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
 		}
-		midijam.sequencer.setMasterSyncMode(Sequencer.SyncMode.MIDI_SYNC);
+		
 		midijam.sequencer.open();
 		midijam.sequencer.setSequence(sequence);
 		
@@ -148,7 +147,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		super.simpleUpdate(tpf);
 //		bitmapText1.setText(String.valueOf(timeSinceStart));
 		if (sequencer == null) return;
-		timeSinceStart += tpf;
+		if (sequencer.isOpen())
+			timeSinceStart += tpf;
 		
 		
 		// Update animation
@@ -283,9 +283,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 4: // Electric Piano 1
 			case 5: // Electric Piano 2
 			case 7: // Clavi
-				return (new Keyboard(this, events, Keyboard.Skin.PIANO));
+				return (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
 			case 6: // Harpsichord
-				return new Keyboard(this, events, Keyboard.Skin.HARPSICHORD);
+				return new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
 			case 9: // Glockenspiel
 				return new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
 			case 11: // Vibraphone
@@ -305,7 +305,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 19: // Church Organ
 			case 20: // Reed Organ
 			case 55: // Orchestra Hit
-				return new Keyboard(this, events, Keyboard.Skin.WOOD);
+				return new Keyboard(this, events, Keyboard.KeyboardSkin.WOOD);
 			case 21: // Accordion
 			case 23: // Tango Accordion
 				return new Accordion(this, events);
@@ -323,7 +323,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 120: // Guitar Fret Noise
 				return new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
 			case 32: // Acoustic Bass
-				return new AcousticBass(this, events, AcousticBass.PlayingStyle.PIZZ);
+				return new AcousticBass(this, events, AcousticBass.PlayingStyle.PIZZICATO);
 			case 33: // Electric Bass (finger)
 			case 34: // Electric Bass (pick)
 			case 35: // Fretless Bass
@@ -388,7 +388,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 101: // FX 6 (Goblins)
 			case 102: // FX 7 (Echoes)
 			case 103: // FX 8 (Sci-fi)
-				return new Keyboard(this, events, Keyboard.Skin.SYNTH);
+				return new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
 			case 124: // Telephone Ring
 				return new TelephoneRing(this, events);
 			default:
@@ -486,7 +486,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				if (timeSinceStart + (LATENCY_FIX / 1000.0) >= 0 && !seqHasRunOnce) {
+				if (timeSinceStart + (LATENCY_FIX / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
 					sequencer.setTempoInBPM((float) file.firstTempoInBpm());
 					sequencer.start();
 					seqHasRunOnce = true;
@@ -517,12 +517,23 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	
 	/**
+	 * Loads a model given a model and texture paths. Applies unshaded material.
+	 *
+	 * @param m          the path to the model
+	 * @param t          the path to the texture
+	 * @return the model
+	 */
+	public Spatial loadModel(String m, String t) {
+		return loadModel(m, t, MatType.UNSHADED, 0);
+	}
+	
+	/**
 	 * Loads a model given a model and texture paths.
 	 *
 	 * @param m          the path to the model
 	 * @param t          the path to the texture
 	 * @param type       the type of material
-	 * @param brightness
+	 * @param brightness the brightness of the reflection
 	 * @return the model
 	 */
 	public Spatial loadModel(String m, String t, MatType type, float brightness) {

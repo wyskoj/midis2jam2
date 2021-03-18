@@ -12,6 +12,9 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The full, 88-key keyboard.
+ */
 public class Keyboard extends KeyedInstrument {
 	
 	public static final int A_0 = 21;
@@ -21,10 +24,10 @@ public class Keyboard extends KeyedInstrument {
 	public final Node node = new Node();
 	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
 	private final List<? extends MidiEvent> events;
-	private final Skin skin;
+	private final KeyboardSkin skin;
 	private final List<NotePeriod> notePeriods;
 	
-	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, Skin skin) {
+	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, KeyboardSkin skin) {
 		super(context, events);
 		this.events = events;
 		this.skin = skin;
@@ -102,14 +105,14 @@ public class Keyboard extends KeyedInstrument {
 		key.beingPressed = false;
 	}
 	
-	public enum Skin {
+	public enum KeyboardSkin {
 		HARPSICHORD("HarpsichordSkin.bmp"),
 		PIANO("PianoSkin.bmp"),
 		SYNTH("SynthSkin.bmp"),
 		WOOD("PianoSkin_Wood.bmp");
 		final String textureFile;
 		
-		Skin(String textureFile) {
+		KeyboardSkin(String textureFile) {
 			this.textureFile = textureFile;
 		}
 	}

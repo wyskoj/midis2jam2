@@ -4,7 +4,14 @@ import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-class NotePeriodWithFretboardPosition extends NotePeriod {
+/**
+ * Note periods that also need to keep track of where they have been assigned to on the fretboard.
+ */
+public class NotePeriodWithFretboardPosition extends NotePeriod {
+	
+	/**
+	 * The fretboard position this note period was assigned to.
+	 */
 	public FrettingEngine.FretboardPosition position;
 	
 	private NotePeriodWithFretboardPosition(int midiNote, double startTime, double endTime,

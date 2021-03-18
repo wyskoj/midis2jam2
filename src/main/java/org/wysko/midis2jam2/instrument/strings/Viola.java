@@ -13,7 +13,15 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Viola extends StringFamilyInstrument {
 	
 	public Viola(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
-		super(context, events, "Violin.obj", "ViolaSkin.bmp", true, 0, new Vector3f(1, 1, 1) );
+		super(context,
+				events,
+				true,
+				0,
+				new Vector3f(1, 1, 1),
+				new int[] {48, 55, 62, 69},
+				48,
+				105,
+				context.loadModel("Violin.obj","ViolaSkin.bmp"));
 		
 		highestLevel.setLocalTranslation(-2, 27, -15);
 		highestLevel.attachChild(instrumentNode);
@@ -27,18 +35,9 @@ public class Viola extends StringFamilyInstrument {
 	@Override
 	public void tick(double time, float delta) {
 		setIdleVisibilityByPeriods(finalNotePeriods,time,highestLevel);
-		final int i1 =
-				context.instruments.stream().filter(e -> e instanceof Viola && e.visible).collect(Collectors.toList()).indexOf(this);
+		final int i1 = getIndexOfThis();
 		instrumentNode.setLocalTranslation(i1 * 20, 0, 0);
-		
-		getCurrentNotePeriods(time);
-		
-		int[] frets = new int[] {-1, -1, -1, -1};
-		doFretCalculations(frets, 48, 105, new int[] {48, 55, 62, 69});
-		animateStrings(frets);
+		handleStrings(time, delta);
 		animateBow(delta);
-		removeElapsedNotePeriods(time);
-		calculateFrameChanges(delta);
 	}
-	
 }

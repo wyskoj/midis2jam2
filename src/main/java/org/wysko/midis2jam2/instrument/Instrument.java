@@ -4,7 +4,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -23,23 +22,45 @@ import java.util.stream.Collectors;
  * <p>
  * Classes that implement Instrument are responsible for handling {@link #tick}, which updates the
  * current animation and note handling for every call.
- * <p>
- * Monophonic clones are also considered to be instruments, as well as their parent.
  *
  * @see MonophonicInstrument
  * @see MonophonicClone
  */
 public abstract class Instrument {
+	/**
+	 * Since these classes are effectively static, we need reference to the main class.
+	 */
 	protected final Midis2jam2 context;
+	/**
+	 * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
+	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill
+	 * its spot).
+	 */
 	public boolean visible = false;
+	/**
+	 * This node should contain all animation and geometry. It shall be only used for general positioning.
+	 */
 	public Node highestLevel = new Node();
+	
+	/**
+	 * Instantiates a new Instrument.
+	 *
+	 * @param context the context to the main class
+	 */
 	protected Instrument(Midis2jam2 context) {
 		this.context = context;
 	}
 	
+	/**
+	 * Filters a list of MIDI channel specific events and returns only the {@link MidiNoteEvent}s.
+	 *
+	 * @param events the event list
+	 * @return only the MidiNoteEvents
+	 * @see MidiNoteEvent
+	 */
 	@NotNull
-	protected List<MidiNoteEvent> scrapeMidiNoteEvents(List<MidiChannelSpecificEvent> events) {
-		return events.stream().filter(e -> e instanceof MidiNoteOnEvent || e instanceof MidiNoteOffEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+	protected static List<MidiNoteEvent> scrapeMidiNoteEvents(List<MidiChannelSpecificEvent> events) {
+		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
 	}
 	
 	/**
@@ -86,6 +107,20 @@ public abstract class Instrument {
 		return notePeriods;
 	}
 	
+	/**
+	 * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
+	 * <p>
+	 * The instrument should be visible if:
+	 * <ul>
+	 *     <li>There is at least 1 second between now and the start of any note period,</li>
+	 *     <li>There is at least 4 seconds between now and the end of any note period, or</li>
+	 *     <li>Any note period is currently playing</li>
+	 * </ul>
+	 *
+	 * @param notePeriods the note periods to check from
+	 * @param time        the current time
+	 * @param node        the node to hide
+	 */
 	protected void setIdleVisibilityByPeriods(List<? extends NotePeriod> notePeriods, double time, Node node) {
 		boolean show = false;
 		for (NotePeriod notePeriod : notePeriods) {
@@ -105,6 +140,19 @@ public abstract class Instrument {
 		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	
+	/**
+	 * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
+	 * <p>
+	 * The instrument should be visible if:
+	 * <ul>
+	 *     <li>There is at least 1 second between now and any strike, when the strike comes later, or,</li>
+	 *     <li>There is at least 4 seconds between now and any strike, when the strike has elapsed</li>
+	 * </ul>
+	 *
+	 * @param strikes the note on events to check from
+	 * @param time    the current time
+	 * @param node    the node to hide
+	 */
 	protected void setIdleVisibilityByStrikes(List<MidiNoteOnEvent> strikes, double time, Node node) {
 		boolean show = false;
 		for (MidiNoteOnEvent strike : strikes) {
@@ -120,6 +168,11 @@ public abstract class Instrument {
 		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	
+	/**
+	 * Returns the index of this instrument in the list of other instruments of this type that are visible.
+	 *
+	 * @return the index of this instrument in the list of other instruments of this type that are visible
+	 */
 	protected int getIndexOfThis() {
 		return context.instruments.stream()
 				.filter(e -> this.getClass().isInstance(e) && e.visible)

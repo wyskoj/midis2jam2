@@ -37,7 +37,7 @@ public class Guitar extends FrettedInstrument {
 						},
 						new float[] {-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f},
 						new float[] {-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f},
-						new HashMap<Integer, Float>() {{
+						new FretHeightByTable(new HashMap<Integer, Float>() {{
 							put(0, 0f);
 							put(1, 0.03744493392f);
 							put(2, 0.09691629956f);
@@ -61,7 +61,7 @@ public class Guitar extends FrettedInstrument {
 							put(20, 0.6806167401f);
 							put(21, 0.6982378855f);
 							put(22, 0.7158590308f);
-						}}),
+						}})),
 				6,
 				context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f)
 		);

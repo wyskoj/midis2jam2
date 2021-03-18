@@ -1,4 +1,4 @@
-package org.wysko.midis2jam2.instrument.brass;
+package org.wysko.midis2jam2.instrument.monophonic.brass;
 
 import com.jme3.material.Material;
 import com.jme3.math.Quaternion;

@@ -14,6 +14,8 @@ import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.wysko.midis2jam2.instrument.guitar.FrettedInstrument.FrettedInstrumentPositioning.*;
+
 /**
  * Any instrument that has strings that can be pushed down to change the pitch (e.g., guitar, bass guitar, violin,
  * banjo, etc.)
@@ -116,8 +118,8 @@ public abstract class FrettedInstrument extends Instrument {
 	 * @return the vertical ratio
 	 */
 	@Contract(pure = true)
-	private float fretToDistance(@Range(from = 0, to = 22) int fret) {
-		return positioning.fretHeights.get(fret);
+	protected float fretToDistance(@Range(from = 0, to = 22) int fret) {
+		return positioning.fretHeights.scale(fret);
 	}
 	
 	/**
@@ -154,11 +156,23 @@ public abstract class FrettedInstrument extends Instrument {
 		// Show the fret finger on the right spot (if not an open string)
 		if (fret != 0) {
 			noteFingers[string].setCullHint(Spatial.CullHint.Dynamic);
-			final Vector3f fingerPosition = new Vector3f(
-					((positioning.bottomX[string] - positioning.topX[string]) * fretDistance) + positioning.topX[string],
-					positioning.fingerVerticalOffset.y - (stringHeight() * fretDistance),
-					0
-			);
+			final Vector3f fingerPosition;
+			if (positioning instanceof FrettedInstrumentPositioningWithZ) {
+				FrettedInstrumentPositioningWithZ positioningWithZ = (FrettedInstrumentPositioningWithZ) positioning;
+				float z =
+						(((positioningWithZ.topZ[string] - positioningWithZ.bottomZ[string]) * fretDistance + positioningWithZ.topZ[string]) * -1.3f) - 2;
+				fingerPosition = new Vector3f(
+						(positioningWithZ.bottomX[string] - positioningWithZ.topX[string]) * fretDistance + positioningWithZ.topX[string],
+						positioningWithZ.fingerVerticalOffset.y - stringHeight() * fretDistance,
+						z
+				);
+			} else {
+				fingerPosition = new Vector3f(
+						((positioning.bottomX[string] - positioning.topX[string]) * fretDistance) + positioning.topX[string],
+						positioning.fingerVerticalOffset.y - (stringHeight() * fretDistance),
+						0
+				);
+			}
 			noteFingers[string].setLocalTranslation(fingerPosition);
 		} else {
 			noteFingers[string].setCullHint(Spatial.CullHint.Always);
@@ -170,8 +184,10 @@ public abstract class FrettedInstrument extends Instrument {
 	 *
 	 * @param time  the current time
 	 * @param delta the time since the last frame
+	 * @return true if a new note was played, false otherwise
 	 */
-	protected void handleStrings(double time, float delta) {
+	protected boolean handleStrings(double time, float delta) {
+		boolean noteStarted = false;
 		/* Stop playing note periods that have elapsed */
 		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
 			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
@@ -194,6 +210,7 @@ public abstract class FrettedInstrument extends Instrument {
 		notesToBeginPlaying.sort(Comparator.comparingInt(o -> o.midiNote));
 		
 		for (NotePeriodWithFretboardPosition notePeriod : notesToBeginPlaying) {
+			noteStarted = true;
 			final FrettingEngine.FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod.midiNote);
 			if (guitarPosition != null) {
 				frettingEngine.applyFretboardPosition(guitarPosition);
@@ -208,6 +225,8 @@ public abstract class FrettedInstrument extends Instrument {
 		
 		final double inc = delta / (1 / 60f);
 		this.frame += inc;
+		
+		return noteStarted;
 	}
 	
 	/**
@@ -222,8 +241,8 @@ public abstract class FrettedInstrument extends Instrument {
 	 * by a factor 1 - x. This way, they meet at the correct spot on the fretboard. At that position, the note finger
 	 * is placed to hide the seam between the upper and lower strings.
 	 * <p>
-	 * To know how much to scale the upper and lower strings by to achieve the correct location on the fretboard, I'm
-	 * just using a lookup table I've manually created.
+	 *
+	 * @see FretHeightCalculator
 	 */
 	public static class FrettedInstrumentPositioning {
 		/**
@@ -251,10 +270,9 @@ public abstract class FrettedInstrument extends Instrument {
 		 */
 		public final float[] bottomX;
 		/**
-		 * The lookup table for scaling. The key is the fret number and the value is the amount to scale the upper
-		 * string.
+		 * The interface for scaling strings.
 		 */
-		public final HashMap<Integer, Float> fretHeights;
+		public final FretHeightCalculator fretHeights;
 		
 		
 		/**
@@ -269,7 +287,7 @@ public abstract class FrettedInstrument extends Instrument {
 		 */
 		public FrettedInstrumentPositioning(float topY, float bottomY,
 		                                    Vector3f[] restingStrings, float[] topX, float[] bottomX,
-		                                    HashMap<Integer, Float> fretHeights) {
+		                                    FretHeightCalculator fretHeights) {
 			this.topY = topY;
 			this.bottomY = bottomY;
 			this.fingerVerticalOffset = new Vector3f(0, topY, 0);
@@ -277,6 +295,37 @@ public abstract class FrettedInstrument extends Instrument {
 			this.topX = topX;
 			this.bottomX = bottomX;
 			this.fretHeights = fretHeights;
+		}
+		
+		public static class FrettedInstrumentPositioningWithZ extends FrettedInstrumentPositioning {
+			/**
+			 * The z-coordinates of the top strings.
+			 */
+			private final float[] topZ;
+			/**
+			 * The z-coordinates of the bottom strings.
+			 */
+			private final float[] bottomZ;
+			
+			/**
+			 * Instantiates a fretted instrument positioning.
+			 *
+			 * @see #topY
+			 * @see #bottomY
+			 * @see #restingStrings
+			 * @see #topX
+			 * @see #bottomX
+			 * @see #fretHeights
+			 * @see #topZ
+			 * @see #bottomZ
+			 */
+			public FrettedInstrumentPositioningWithZ(float topY, float bottomY, Vector3f[] restingStrings, float[] topX,
+			                                         float[] bottomX,
+			                                         FretHeightCalculator fretHeights, float[] top_z, float[] bottom_z) {
+				super(topY, bottomY, restingStrings, topX, bottomX, fretHeights);
+				topZ = top_z;
+				bottomZ = bottom_z;
+			}
 		}
 	}
 }
