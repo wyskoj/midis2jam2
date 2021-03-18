@@ -93,10 +93,7 @@ public class SopranoSax extends Saxophone {
 	 */
 	public SopranoSax(Midis2jam2 context,
 	                  List<MidiChannelSpecificEvent> events)
-			throws InstantiationException,
-			IllegalAccessException,
-			InvocationTargetException,
-			NoSuchMethodException {
+			throws ReflectiveOperationException {
 		
 		super(context);
 		

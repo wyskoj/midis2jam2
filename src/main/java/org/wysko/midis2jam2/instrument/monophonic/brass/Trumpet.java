@@ -21,56 +21,53 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Trumpet extends MonophonicInstrument {
 	
 	final HashMap<Integer, Boolean[]> KEY_MAPPING = new HashMap<Integer, Boolean[]>() {{
-		put(52, new Boolean[] {true, true, true}); // F#
+		put(52, new Boolean[] {true, true, true});
 		put(53, new Boolean[] {true, false, true});
 		put(54, new Boolean[] {false, true, true});
-		put(55, new Boolean[] {true, true, false}); // A
+		put(55, new Boolean[] {true, true, false});
 		put(56, new Boolean[] {true, false, false});
 		put(57, new Boolean[] {false, true, false});
-		put(58, new Boolean[] {false, false, false}); // C
+		put(58, new Boolean[] {false, false, false});
 		put(59, new Boolean[] {true, true, true});
 		put(60, new Boolean[] {true, false, true});
 		put(61, new Boolean[] {false, true, true});
 		put(62, new Boolean[] {true, true, false});
-		put(63, new Boolean[] {true, false, false});// F
+		put(63, new Boolean[] {true, false, false});
 		put(64, new Boolean[] {false, true, false});
 		put(65, new Boolean[] {false, false, false});
 		put(66, new Boolean[] {false, true, true});
-		put(67, new Boolean[] {true, true, false});// A
-		put(68, new Boolean[] {true, false, false,});//
-		put(69, new Boolean[] {false, true, false,});//
-		put(70, new Boolean[] {false, false, false,});//
-		put(71, new Boolean[] {true, true, false,});//
-		put(72, new Boolean[] {true, false, false,});//
-		put(73, new Boolean[] {false, true, false,});//
-		put(74, new Boolean[] {false, false, false,});//
-		put(75, new Boolean[] {true, false, false,});//
-		put(76, new Boolean[] {false, true, false,});//
-		put(77, new Boolean[] {false, false, false,});//
-		put(78, new Boolean[] {false, true, true,});//
-		put(79, new Boolean[] {true, true, false,});//
-		put(80, new Boolean[] {true, false, false,});//
-		put(81, new Boolean[] {false, true, false,});//
-		put(82, new Boolean[] {false, false, false,});//
+		put(67, new Boolean[] {true, true, false});
+		put(68, new Boolean[] {true, false, false,});
+		put(69, new Boolean[] {false, true, false,});
+		put(70, new Boolean[] {false, false, false,});
+		put(71, new Boolean[] {true, true, false,});
+		put(72, new Boolean[] {true, false, false,});
+		put(73, new Boolean[] {false, true, false,});
+		put(74, new Boolean[] {false, false, false,});
+		put(75, new Boolean[] {true, false, false,});
+		put(76, new Boolean[] {false, true, false,});
+		put(77, new Boolean[] {false, false, false,});
+		put(78, new Boolean[] {false, true, true,});
+		put(79, new Boolean[] {true, true, false,});
+		put(80, new Boolean[] {true, false, false,});
+		put(81, new Boolean[] {false, true, false,});
+		put(82, new Boolean[] {false, false, false,});
 	}};
 	Node cloneNode = new Node();
 	
-	public Trumpet(Midis2jam2 context,
-	               List<MidiChannelSpecificEvent> eventList) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-		super(context);
-		
-		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(eventList);
-		
-		this.notePeriods = calculateNotePeriods(justTheNotes);
-		calculateClones(this, TrumpetClone.class);
+	public Trumpet(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
+		super(context, eventList);
 		
 		for (MonophonicClone clone : clones) {
 			TrumpetClone trumpetClone = ((TrumpetClone) clone);
 			cloneNode.attachChild(trumpetClone.hornNode);
-			cloneNode.setLocalTranslation(-31.5f, 60, 10);
-			cloneNode.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
+			groupOfPolyphony.attachChild(cloneNode);
 		}
-		highestLevel.attachChild(cloneNode);
+		
+		groupOfPolyphony.setLocalTranslation(-31.5f, 60, 10);
+		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
+		
+		highestLevel.attachChild(groupOfPolyphony);
 		
 		context.getRootNode().attachChild(highestLevel);
 	}
@@ -81,14 +78,31 @@ public class Trumpet extends MonophonicInstrument {
 		updateClones(time, delta, new Vector3f(0, 10, 0));
 	}
 	
+	@Override
+	protected void moveForMultiChannel() {
+	
+	}
+	
 	public class TrumpetClone extends StretchyClone {
+		
+		/**
+		 * The trumpet has three keys.
+		 */
 		Spatial[] keys = new Spatial[3];
+		/**
+		 * Rotation for just the idle rotation.
+		 */
 		Node idleRotation = new Node();
+		/**
+		 * Rotation for when playing.
+		 */
 		Node playRotation = new Node();
+		/**
+		 * The entire clone.
+		 */
 		Node cloneRotation = new Node();
 		
 		public TrumpetClone() {
-			super();
 			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			Material material = new Material(context.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
 			material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
@@ -107,8 +121,10 @@ public class Trumpet extends MonophonicInstrument {
 			idleRotation.setLocalRotation(new Quaternion().fromAngles(rad(-10), 0, 0));
 			idleRotation.attachChild(body);
 			idleRotation.attachChild(bell);
+			
 			playRotation.attachChild(idleRotation);
 			playRotation.setLocalTranslation(0, 0, 10);
+			
 			cloneRotation.attachChild(playRotation);
 			hornNode.attachChild(cloneRotation);
 		}

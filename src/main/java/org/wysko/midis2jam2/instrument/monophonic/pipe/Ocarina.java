@@ -27,7 +27,7 @@ public class Ocarina extends HandedInstrument {
 	 *  @param context context to midis2jam2
 	 *
 	 */
-	public Ocarina(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+	public Ocarina(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		super(context);
 		
 		List<MidiNoteEvent> notes =

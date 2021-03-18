@@ -27,7 +27,7 @@ public class Flute extends HandedInstrument {
 	 *  @param context context to midis2jam2
 	 * @param events  the events to play
 	 */
-	public Flute(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public Flute(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		
 		super(context);
 		List<MidiNoteEvent> notes =

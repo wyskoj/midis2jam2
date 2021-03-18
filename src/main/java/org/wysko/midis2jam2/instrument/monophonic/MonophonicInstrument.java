@@ -2,12 +2,13 @@ package org.wysko.midis2jam2.instrument.monophonic;
 
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,10 @@ public abstract class MonophonicInstrument extends Instrument {
 	 * Since this is effectively static, we need reference to midis2jam2.
 	 */
 	public final Midis2jam2 context;
+	/**
+	 * Node contains all clones.
+	 */
 	protected final Node groupOfPolyphony = new Node();
-	protected final Node highestLevel = new Node();
 	/**
 	 * Populated by {@link #calculateNotePeriods(List)}.
 	 *
@@ -40,15 +43,28 @@ public abstract class MonophonicInstrument extends Instrument {
 	 * Constructs a monophonic instrument.
 	 *
 	 * @param context context to midis2jam2
+	 * @param eventList
 	 */
-	public MonophonicInstrument(
-			Midis2jam2 context) {
+	public MonophonicInstrument(Midis2jam2 context,
+	                            List<MidiChannelSpecificEvent> eventList) {
 		super(context);
 		this.context = context;
+		this.notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(eventList));
 	}
 	
-	protected void calculateClones(MonophonicInstrument instrument,
-	                               Class<? extends MonophonicClone> cloneClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+	/**
+	 * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number
+	 * of "clones" needed to visualize this and determine which note events shall be assigned to which clones, using
+	 * the least number of clones.
+	 * <p>
+	 * The results are stored in {@link #clones}.
+	 *
+	 * @param instrument the monophonic instrument that is handling the clones
+	 * @param cloneClass the class of the {@link MonophonicClone} to instantiate
+	 * @throws ReflectiveOperationException usually is thrown if an error occurs in the clone constructor
+	 */
+	protected void calculateClones(@NotNull MonophonicInstrument instrument,
+	                               @NotNull Class<? extends MonophonicClone> cloneClass) throws ReflectiveOperationException {
 		clones = new ArrayList<>();
 		Constructor<?> constructor = cloneClass.getDeclaredConstructor(instrument.getClass());
 		clones.add((MonophonicClone) constructor.newInstance(instrument));
@@ -90,7 +106,12 @@ public abstract class MonophonicInstrument extends Instrument {
 		}
 	}
 	
-	
+	/**
+	 * Updates clones, performing the {@link MonophonicClone#tick(double, float)} method and calculating clone offsets.
+	 *
+	 * @param time               the current time, in seconds
+	 * @param delta              the amount of time since the last frame
+	 */
 	protected void updateClones(double time, float delta, Vector3f multiChannelOffset) {
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);

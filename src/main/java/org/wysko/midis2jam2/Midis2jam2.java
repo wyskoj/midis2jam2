@@ -174,7 +174,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * Reads the MIDI file and calculates program events, appropriately creating instances of each instrument and
 	 * assigning the correct events to respective instruments.
 	 */
-	private void calculateInstruments() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+	private void calculateInstruments() throws ReflectiveOperationException {
 		//noinspection unchecked
 		ArrayList<MidiChannelSpecificEvent>[] channels = (ArrayList<MidiChannelSpecificEvent>[]) new ArrayList[16];
 		// Create 16 ArrayLists for each channel
@@ -273,7 +273,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@SuppressWarnings("SpellCheckingInspection")
 	@Nullable
 	private Instrument fromEvents(MidiProgramEvent programEvent,
-	                              List<MidiChannelSpecificEvent> events) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		System.out.println(("the program num is " + programEvent.programNum));
 		switch (programEvent.programNum) {
 			case 0: // Acoustic Grand Piano
@@ -431,7 +431,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		try {
 			calculateInstruments();
-		} catch (InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (ReflectiveOperationException e) {
 			e.printStackTrace();
 		}
 		

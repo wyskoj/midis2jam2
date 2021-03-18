@@ -28,7 +28,7 @@ public class Piccolo extends HandedInstrument {
 	 *  @param context context to midis2jam2
 	 * @param events  the events to play
 	 */
-	public Piccolo(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public Piccolo(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		
 		super(context);
 		List<MidiNoteEvent> notes =

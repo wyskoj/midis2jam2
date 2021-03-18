@@ -2,6 +2,8 @@ package org.wysko.midis2jam2.instrument.monophonic;
 
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
+import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
 
 import java.util.ArrayList;
@@ -37,6 +39,13 @@ public abstract class MonophonicClone {
 		this.notePeriods = new ArrayList<>();
 	}
 	
+	/**
+	 * Determines if this clone is playing at a certain point.
+	 *
+	 * @param midiTick the current midi tick
+	 * @return true if should be playing, false otherwise
+	 */
+	@Contract(pure = true)
 	public boolean isPlayingAtTime(long midiTick) {
 		for (NotePeriod notePeriod : notePeriods) {
 			if (midiTick >= notePeriod.startTick() && midiTick < notePeriod.endTick()) {
@@ -46,8 +55,11 @@ public abstract class MonophonicClone {
 		return false;
 	}
 	
-	public abstract void tick(double time, float delta);
-	
+	/**
+	 * Hides or shows this clone.
+	 *
+	 * @param indexThis the index of this clone
+	 */
 	protected void hideOrShowOnPolyphony(int indexThis) {
 		if (indexThis != 0) {
 			if (currentlyPlaying) {
@@ -59,4 +71,12 @@ public abstract class MonophonicClone {
 			hornNode.setCullHint(Spatial.CullHint.Dynamic);
 		}
 	}
+	
+	/**
+	 * Similar to {@link Instrument#tick(double, float)}.
+	 * @param time the current time
+	 * @param delta the amount of time since last frame
+	 * @see Instrument#tick(double, float)
+	 */
+	protected abstract void tick(double time, float delta);
 }
