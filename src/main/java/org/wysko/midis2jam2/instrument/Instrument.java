@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
@@ -48,10 +47,16 @@ public abstract class Instrument {
 	public boolean visible = false;
 	
 	/**
-	 * This node should contain all animation and geometry. It shall be only used for general positioning.
+	 * This node should contain {@link #instrumentNode}. It shall be only used for general positioning.
 	 */
 	@NotNull
 	public Node highestLevel = new Node();
+	
+	/**
+	 * Should contain geometry and nodes for geometry.
+	 */
+	@NotNull
+	public Node instrumentNode = new Node();
 	
 	/**
 	 * Instantiates a new Instrument.
@@ -63,19 +68,7 @@ public abstract class Instrument {
 	protected Instrument(@NotNull Midis2jam2 context, @NotNull MultiChannelOffsetCalculator offsetCalculator) {
 		this.context = context;
 		this.offsetCalculator = offsetCalculator;
-	}
-	
-	/**
-	 * Filters a list of MIDI channel specific events and returns only the {@link MidiNoteEvent}s.
-	 *
-	 * @param events the event list
-	 * @return only the MidiNoteEvents
-	 * @see MidiNoteEvent
-	 */
-	@NotNull
-	@Contract(pure = true)
-	protected static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull List<MidiChannelSpecificEvent> events) {
-		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	/**

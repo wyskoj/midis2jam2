@@ -20,20 +20,24 @@ import java.util.List;
  * @see MonophonicClone
  */
 public abstract class MonophonicInstrument extends Instrument {
+	
 	/**
 	 * Since this is effectively static, we need reference to midis2jam2.
 	 */
 	public final Midis2jam2 context;
+	
 	/**
 	 * Node contains all clones.
 	 */
 	protected final Node groupOfPolyphony = new Node();
+	
 	/**
 	 * Populated by {@link #calculateNotePeriods(List)}.
 	 *
 	 * @see #calculateNotePeriods(List)
 	 */
 	public List<NotePeriod> notePeriods;
+	
 	/**
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
 	 */
@@ -42,7 +46,7 @@ public abstract class MonophonicInstrument extends Instrument {
 	/**
 	 * Constructs a monophonic instrument.
 	 *
-	 * @param context context to midis2jam2
+	 * @param context   context to midis2jam2
 	 * @param eventList
 	 */
 	public MonophonicInstrument(Midis2jam2 context,
@@ -109,8 +113,8 @@ public abstract class MonophonicInstrument extends Instrument {
 	/**
 	 * Updates clones, performing the {@link MonophonicClone#tick(double, float)} method and calculating clone offsets.
 	 *
-	 * @param time               the current time, in seconds
-	 * @param delta              the amount of time since the last frame
+	 * @param time  the current time, in seconds
+	 * @param delta the amount of time since the last frame
 	 */
 	protected void updateClones(double time, float delta, Vector3f multiChannelOffset) {
 		int othersOfMyType = 0;

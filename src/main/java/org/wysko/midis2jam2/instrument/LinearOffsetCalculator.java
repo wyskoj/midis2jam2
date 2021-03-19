@@ -7,19 +7,17 @@ import org.jetbrains.annotations.NotNull;
 /**
  * For when instruments that should simply move in a linear line when multiple of them are visible.
  */
-public class LinearOffsetCalculator implements MultiChannelOffsetCalculator {
+public class LinearOffsetCalculator extends MultiChannelOffsetCalculator {
 	private final Vector3f locationOffset;
-	private final Node nodeToAdjust;
 	
 	/**
 	 * Instantiates a new linear offset calculator.
-	 *  @param locationOffset the location offset
-	 * @param nodeToAdjust   the node to adjust
+	 * @param locationOffset the location offset
+	 *
 	 */
-	public LinearOffsetCalculator(@NotNull Vector3f locationOffset,
-	                              @NotNull Node nodeToAdjust) {
+	public LinearOffsetCalculator(@NotNull Vector3f locationOffset) {
+		super(new Node());
 		this.locationOffset = locationOffset;
-		this.nodeToAdjust = nodeToAdjust;
 	}
 	
 	@Override

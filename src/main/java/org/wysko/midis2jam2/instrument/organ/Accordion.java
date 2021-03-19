@@ -1,43 +1,67 @@
 package org.wysko.midis2jam2.instrument.organ;
 
-import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.instrument.piano.Key;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.piano.KeyedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.piano.Keyboard.midiValueToColor;
 
-@SuppressWarnings("SpellCheckingInspection")
+/**
+ * Le accordion.
+ */
+@SuppressWarnings("SpellCheckingInspection") // Thanks, Scott.
 public class Accordion extends KeyedInstrument {
-	private final AccordionKey[] keys = new AccordionKey[24]; // Two octaves (the end keys are phantom)
-	private final List<NotePeriod> notePeriods;
-	Node[] rotationNodes = new Node[14];
-	Node accordionNode = new Node();
-	float angle = 4;
+	
+	/**
+	 * The squeezing of the accordion is divided into 14 segments.
+	 */
+	@NotNull
+	Node[] accordionSegments = new Node[14];
+	
+	/**
+	 * The current squeeze angle.
+	 */
+	float squeezeAngle = 4;
+	
+	/**
+	 * True if the accordion should be expanding, false if the accordion should be contracting.
+	 */
 	boolean expanding = true;
-	BitmapText debug;
+	
+	/**
+	 * The current rate to adjust the squeezing by.
+	 */
 	private double squeezingSpeed = 0;
 	
 	
+	/**
+	 * Instantiates a new accordion.
+	 *
+	 * @param context   the context
+	 * @param eventList the event list
+	 */
 	public Accordion(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
+		super(context, new LinearOffsetCalculator(new Vector3f(0, 30, 0)), eventList, 0, 127);
+		
 		// Rotation nodes = [0]: Left Hand and Node; [1-12]: Folds; [13]: Right Hand and Node;
 		
 		// Add rotation nodes
-		IntStream.range(0, 14).forEach(i -> rotationNodes[i] = new Node());
+		IntStream.range(0, 14).forEach(i -> accordionSegments[i] = new Node());
 		
 		// Set node 0
 		Spatial leftHand = context.loadModel("AccordianLeftHand.fbx", "AccordianCase.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -56,14 +80,14 @@ public class Accordion extends KeyedInstrument {
 		Node node0 = new Node();
 		node0.attachChild(leftHand);
 		node0.attachChild(fold);
-		rotationNodes[0] = node0;
+		accordionSegments[0] = node0;
 		
 		
 		// Set nodes 1 - 12
 		for (int i = 1; i <= 12; i++) {
-			rotationNodes[i] = new Node();
+			accordionSegments[i] = new Node();
 			Spatial aFold = context.loadModel("AccordianFold.obj", "AccordianFold.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
-			rotationNodes[i].attachChild(aFold);
+			accordionSegments[i].attachChild(aFold);
 		}
 		
 		// Set node 13
@@ -73,95 +97,84 @@ public class Accordion extends KeyedInstrument {
 		Node node13 = new Node();
 		node13.attachChild(rightHand);
 		node13.attachChild(aFold);
-		rotationNodes[13] = node13;
+		accordionSegments[13] = node13;
 		
 		Node keysNode = new Node();
 		node13.attachChild(keysNode);
 		int whiteCount = 0;
 		for (int i = 0; i < 24; i++) {
-			if (midiValueToColor(i) == Keyboard.KeyColor.WHITE) { // White key
+			if (midiValueToColor(i) == KeyColor.WHITE) { // White key
 				keys[i] = new AccordionKey(i, whiteCount);
 				whiteCount++;
 			} else { // Black key
 				keys[i] = new AccordionKey(i, i);
 			}
 		}
-		for (AccordionKey key : keys) {
-			keysNode.attachChild(key.node);
+		for (Key key : keys) {
+			keysNode.attachChild(key.getKeyNode());
 		}
 		keysNode.setLocalTranslation(-4, 22, -0.8f);
 		
 		/* I hate that I am doing this but putting two dummy white keys on each end */
-		Node dummyLow = whiteKey();
-		Node dummyHigh = whiteKey();
+		Node dummyLow = dummyWhiteKey();
+		Node dummyHigh = dummyWhiteKey();
 		keysNode.attachChild(dummyLow);
 		keysNode.attachChild(dummyHigh);
 		dummyLow.setLocalTranslation(0, 7, 0);
 		dummyHigh.setLocalTranslation(0, -8, 0);
 		
-		for (Node rotationNode : rotationNodes) {
-			accordionNode.attachChild(rotationNode);
+		for (Node rotationNode : accordionSegments) {
+			instrumentNode.attachChild(rotationNode);
 		}
 		
-		context.getRootNode().attachChild(accordionNode);
-		accordionNode.setLocalTranslation(-70, 10, -60);
-		accordionNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(45), rad(-5)));
-		
-		debug = context.debugText(String.valueOf(debug), 2f);
-		accordionNode.attachChild(debug);
-		debug.setCullHint(Spatial.CullHint.Always);
-		
-		int indexThis = (int) context.instruments.stream().filter(i -> i instanceof Accordion).count();
-		accordionNode.move(0, indexThis * 30, 0);
-		
-		notePeriods = Collections.unmodifiableList(calculateNotePeriods(scrapeMidiNoteEvents(eventList)));
+		context.getRootNode().attachChild(instrumentNode);
+		instrumentNode.setLocalTranslation(-70, 10, -60);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(45), rad(-5)));
 	}
 	
-	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode) {
-		if (!beingPressed) {
-			float[] angles = new float[3];
-			node.getLocalRotation().toAngles(angles);
-			if (angles[1] < -0.0001) { // fuck floats
-				node.setLocalRotation(new Quaternion(new float[]
-						{0, Math.min(angles[1] + (0.02f * delta * 50), 0), 0}
-				));
-			} else {
-				node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
-				downNode.setCullHint(Spatial.CullHint.Always);
-				upNode.setCullHint(Spatial.CullHint.Dynamic);
-			}
-		}
-	}
+//	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode) {
+//		if (!beingPressed) {
+//			float[] angles = new float[3];
+//			node.getLocalRotation().toAngles(angles);
+//			if (angles[1] < -0.0001) { // fuck floats
+//				node.setLocalRotation(new Quaternion(new float[]
+//						{0, Math.min(angles[1] + (0.02f * delta * 50), 0), 0}
+//				));
+//			} else {
+//				node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
+//				downNode.setCullHint(Spatial.CullHint.Always);
+//				upNode.setCullHint(Spatial.CullHint.Dynamic);
+//			}
+//		}
+//	}
 	
-	private Node whiteKey() {
+	/**
+	 * Generates a new dummy white key, used on the accordion solely for visual purpose.
+	 *
+	 * @return a dummy white key
+	 */
+	@NotNull
+	@Contract(pure = true)
+	private Node dummyWhiteKey() {
 		Node node = new Node();
-		Spatial upKeyFront = Accordion.this.context.loadModel("AccordianKeyWhiteFront.obj", "AccordianKey.bmp",
-				Midis2jam2.MatType.UNSHADED, 0.9f);
-		// Back Key
-		Spatial upKeyBack = Accordion.this.context.loadModel("AccordianKeyWhiteBack.obj", "AccordianKey.bmp",
-				Midis2jam2.MatType.UNSHADED, 0.9f);
+		
+		Spatial upKeyFront = Accordion.this.context.loadModel("AccordianKeyWhiteFront.obj", "AccordianKey.bmp");
+		Spatial upKeyBack = Accordion.this.context.loadModel("AccordianKeyWhiteBack.obj", "AccordianKey.bmp");
+		
 		node.attachChild(upKeyBack);
 		node.attachChild(upKeyFront);
+		
 		return node;
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		calculateAngle(delta);
-		handleKeys(time, delta);
-		setIdleVisibilityByPeriods(notePeriods, time, accordionNode);
-		
-		for (int i = 0; i < rotationNodes.length; i++) {
-			rotationNodes[i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(angle * (i - 7.5))));
-		}
-		
-		int indexThis = (int) context.instruments.stream().filter(i -> i instanceof Accordion && i.visible).count();
-		accordionNode.setLocalTranslation(0, indexThis * 30, 0);
+		super.tick(time, delta);
+		calculateAccordionSqueeze(delta);
 	}
 	
-	private void calculateAngle(float delta) {
-		boolean playing = Arrays.stream(keys).anyMatch(k -> k.beingPressed);
-		debug.setText(String.format("%.2f", squeezingSpeed));
+	private void calculateAccordionSqueeze(float delta) {
+		boolean playing = Arrays.stream(keys).anyMatch(Key::isBeingPressed);
 		if (playing) {
 			squeezingSpeed = 2;
 			
@@ -172,49 +185,28 @@ public class Accordion extends KeyedInstrument {
 		}
 		
 		if (expanding) {
-			angle += delta * squeezingSpeed;
-			if (angle > 4) {
-				angle = 4;
+			squeezeAngle += delta * squeezingSpeed;
+			if (squeezeAngle > 4) {
+				squeezeAngle = 4;
 				expanding = false;
 			}
 		} else {
-			angle -= delta * squeezingSpeed;
-			if (angle < 1) {
-				angle = 1;
+			squeezeAngle -= delta * squeezingSpeed;
+			if (squeezeAngle < 1) {
+				squeezeAngle = 1;
 				expanding = true;
 			}
 		}
 	}
 	
-	@Override
-	protected void releaseKey(int note) {
-		keys[note % 24].beingPressed = false;
-	}
 	
-	@Override
-	public void transitionAnimation(float delta) {
-		for (AccordionKey key : keys) {
-			handleAKey(delta, key.beingPressed, key.node, key.downNode, key.upNode);
-		}
-	}
-	
-	@Override
-	protected void pushKeyDown(int note) {
-		int key = note % 24;
-		keys[key].node.setLocalRotation(new Quaternion().fromAngles(0, -0.1f, 0));
-		keys[key].beingPressed = true;
-		keys[key].downNode.setCullHint(Spatial.CullHint.Dynamic);
-		keys[key].upNode.setCullHint(Spatial.CullHint.Always);
-	}
-	
+	/**
+	 * The type Accordion key.
+	 */
 	public class AccordionKey extends Key {
 		
-		private final Node upNode = new Node();
-		private final Node downNode = new Node();
-		public Node node = new Node();
-		public boolean beingPressed = false;
-		
 		public AccordionKey(int midiNote, int startPos) {
+			super(midiNote);
 			if (midiValueToColor(midiNote) == Keyboard.KeyColor.WHITE) { // White key
 				
 				/* UP KEY */
@@ -237,10 +229,10 @@ public class Accordion extends KeyedInstrument {
 				downNode.attachChild(downKeyFront);
 				downNode.attachChild(downKeyBack);
 				
-				node.attachChild(upNode);
-				node.attachChild(downNode);
+				keyNode.attachChild(upNode);
+				keyNode.attachChild(downNode);
 				
-				node.move(0, -startPos + 6, 0); // 7 = count(white keys) / 2
+				keyNode.move(0, -startPos + 6, 0); // 7 = count(white keys) / 2
 			} else { // Black key
 				
 				/* Up key */
@@ -253,9 +245,9 @@ public class Accordion extends KeyedInstrument {
 						Midis2jam2.MatType.UNSHADED, 0.9f);
 				downNode.attachChild(blackKeyDown);
 				
-				node.attachChild(upNode);
-				node.attachChild(downNode);
-				node.move(0, -midiNote * (7 / 12f) + 6.2f, 0); // funky math
+				keyNode.attachChild(upNode);
+				keyNode.attachChild(downNode);
+				keyNode.move(0, -midiNote * (7 / 12f) + 6.2f, 0); // funky math
 			}
 			downNode.setCullHint(Spatial.CullHint.Always);
 		}

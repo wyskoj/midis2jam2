@@ -1,68 +1,65 @@
 package org.wysko.midis2jam2.instrument.guitar;
 
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
-import org.jetbrains.annotations.Unmodifiable;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.MultiChannelOffsetCalculator;
+import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-import static org.wysko.midis2jam2.instrument.guitar.FrettedInstrument.FrettedInstrumentPositioning.*;
+import static org.wysko.midis2jam2.instrument.guitar.FrettedInstrument.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ;
 
 /**
  * Any instrument that has strings that can be pushed down to change the pitch (e.g., guitar, bass guitar, violin,
  * banjo, etc.)
  */
-public abstract class FrettedInstrument extends Instrument {
+public abstract class FrettedInstrument extends SustainedInstrument {
 	
-	/**
-	 * Note periods used for determining when to play or not. Mutable.
-	 */
-	protected final List<NotePeriodWithFretboardPosition> notePeriods;
 	/**
 	 * The fretting engine used for this fretted instrument.
 	 */
+	@NotNull
 	protected final FrettingEngine frettingEngine;
 	/**
 	 * The positioning parameters of this fretted instrument.
 	 */
+	@NotNull
 	protected final FrettedInstrumentPositioning positioning;
 	/**
 	 * Contains the current note periods at any given time. Mutable.
 	 */
+	@NotNull
 	protected final List<NotePeriodWithFretboardPosition> currentNotePeriods = new ArrayList<>();
-	/**
-	 * Note periods used for high/show calculation.
-	 */
-	@Unmodifiable
-	protected final List<NotePeriodWithFretboardPosition> finalNotePeriods;
 	/**
 	 * Each of the idle, upper strings.
 	 */
+	@NotNull
 	protected final Spatial[] upperStrings;
 	/**
 	 * Each of the animated, lower strings, by animation frame.
 	 */
+	@NotNull
 	protected final Spatial[][] lowerStrings;
 	/**
 	 * The yellow dot note fingers.
 	 */
+	@NotNull
 	protected final Spatial[] noteFingers;
 	/**
 	 * The body of the instrument.
 	 */
+	@NotNull
 	protected final Spatial instrumentBody;
 	/**
-	 * Contains the instrument geometry.
+	 * The number of strings on this instrument.
 	 */
-	protected final Node instrumentNode = new Node();
 	private final int numberOfStrings;
 	/**
 	 * Which frame of animation for the animated string to use.
@@ -79,26 +76,31 @@ public abstract class FrettedInstrument extends Instrument {
 	 * @param numberOfStrings the number of strings on this instrument
 	 * @param instrumentBody  the body geometry of the instrument
 	 */
-	protected FrettedInstrument(Midis2jam2 context, FrettingEngine frettingEngine,
-	                            List<MidiChannelSpecificEvent> events,
-	                            FrettedInstrumentPositioning positioning,
-	                            int numberOfStrings, Spatial instrumentBody) {
-		super(context);
+	protected FrettedInstrument(@NotNull Midis2jam2 context,
+	                            @NotNull FrettingEngine frettingEngine,
+	                            @NotNull List<MidiChannelSpecificEvent> events,
+	                            @NotNull FrettedInstrumentPositioning positioning,
+	                            int numberOfStrings,
+	                            @NotNull Spatial instrumentBody,
+	                            @NotNull MultiChannelOffsetCalculator offsetCalculator) {
+		super(context, offsetCalculator, events);
+		
 		this.frettingEngine = frettingEngine;
 		this.numberOfStrings = numberOfStrings;
 		this.instrumentBody = instrumentBody;
-		
-		/* Calculate note periods */
-		final List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
-		this.notePeriods = calculateNotePeriods(justTheNotes).stream().map(NotePeriodWithFretboardPosition::fromNotePeriod).collect(Collectors.toList());
 		this.positioning = positioning;
-		finalNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
 		
 		upperStrings = new Spatial[numberOfStrings];
 		noteFingers = new Spatial[numberOfStrings];
 		lowerStrings = new Spatial[numberOfStrings][5];
 		instrumentNode.attachChild(instrumentBody);
 		highestLevel.attachChild(instrumentNode);
+	}
+	
+	@Override
+	public void tick(double time, float delta) {
+		super.tick(time, delta);
+		handleStrings(time, delta);
 	}
 	
 	/**
@@ -201,7 +203,7 @@ public abstract class FrettedInstrument extends Instrument {
 		/* Collect all note periods that should start */
 		List<NotePeriodWithFretboardPosition> notesToBeginPlaying = new ArrayList<>();
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
-			final NotePeriodWithFretboardPosition remove = notePeriods.remove(0);
+			final NotePeriodWithFretboardPosition remove = (NotePeriodWithFretboardPosition) notePeriods.remove(0);
 			notesToBeginPlaying.add(remove);
 			currentNotePeriods.add(remove);
 		}
@@ -321,7 +323,8 @@ public abstract class FrettedInstrument extends Instrument {
 			 */
 			public FrettedInstrumentPositioningWithZ(float topY, float bottomY, Vector3f[] restingStrings, float[] topX,
 			                                         float[] bottomX,
-			                                         FretHeightCalculator fretHeights, float[] top_z, float[] bottom_z) {
+			                                         FretHeightCalculator fretHeights, float[] top_z,
+			                                         float[] bottom_z) {
 				super(topY, bottomY, restingStrings, topX, bottomX, fretHeights);
 				topZ = top_z;
 				bottomZ = bottom_z;

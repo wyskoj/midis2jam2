@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.HashMap;
@@ -60,14 +61,13 @@ public class BassGuitar extends FrettedInstrument {
 							put(22, 0.716f);
 						}})),
 				4,
-				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f)
+				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f),
+				new LinearOffsetCalculator(new Vector3f(7, -2.43f, 0))
 		);
 		
 		
 		for (int i = 0; i < 4; i++) {
-			Spatial string;
-			
-			string = context.loadModel("BassString.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			Spatial string = context.loadModel("BassString.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			upperStrings[i] = string;
 			instrumentNode.attachChild(upperStrings[i]);
 		}
@@ -133,18 +133,5 @@ public class BassGuitar extends FrettedInstrument {
 		highestLevel.setLocalTranslation(BASE_POSITION);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
 		highestLevel.attachChild(instrumentNode);
-		context.getRootNode().attachChild(highestLevel);
-	}
-	
-	
-	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
-		
-		final int indexThis = getIndexOfThis();
-		Vector3f add = new Vector3f(BASE_POSITION).add(new Vector3f(indexThis * 7, indexThis * -2.43f, 0));
-		highestLevel.setLocalTranslation(add);
-		
-		handleStrings(time, delta);
 	}
 }

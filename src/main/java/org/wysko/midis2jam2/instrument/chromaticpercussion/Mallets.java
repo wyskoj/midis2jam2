@@ -21,6 +21,7 @@ import static org.wysko.midis2jam2.instrument.piano.Keyboard.*;
 public class Mallets extends Instrument {
 	public final static double MAX_ANGLE = 50.0;
 	public final static double STRIKE_SPEED = 3;
+	private static final int KEYBOARD_KEY_COUNT = 88;
 	
 	// MalletHitShadow.obj
 	// XylophoneBlackBar.obj
@@ -50,11 +51,11 @@ public class Mallets extends Instrument {
 		
 		int whiteCount = 0;
 		for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
-			if (midiValueToColor(i + A_0) == Keyboard.KeyColor.WHITE) { // White key
-				bars[i] = new MalletBar(i + A_0, whiteCount);
+			if (midiValueToColor(i + rangeLow) == Keyboard.KeyColor.WHITE) { // White key
+				bars[i] = new MalletBar(i + rangeLow, whiteCount);
 				whiteCount++;
 			} else { // Black key
-				bars[i] = new MalletBar(i + A_0, i);
+				bars[i] = new MalletBar(i + rangeLow, i);
 			}
 		}
 		Arrays.stream(bars).forEach(bar -> contents.attachChild(bar.noteNode));
@@ -67,8 +68,8 @@ public class Mallets extends Instrument {
 		eventList.forEach(event -> {
 			if (event instanceof MidiNoteOnEvent) {
 				int midiNote = ((MidiNoteOnEvent) event).note;
-				if (midiNote >= A_0 && midiNote <= C_8) {
-					barStrikes[midiNote - A_0].add(((MidiNoteOnEvent) event));
+				if (midiNote >= rangeLow && midiNote <= rangeHigh) {
+					barStrikes[midiNote - rangeLow].add(((MidiNoteOnEvent) event));
 				}
 			}
 		});
@@ -187,7 +188,7 @@ public class Mallets extends Instrument {
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
 				
-				float scaleFactor = (C_8 - midiNote + 20) / 50f;
+				float scaleFactor = (rangeHigh - midiNote + 20) / 50f;
 				barNode.setLocalScale(0.55f, 1, 0.5f * scaleFactor);
 				noteNode.move(1.333f * (startPos - 26), 0, 0); // 26 = count(white keys) / 2
 				
@@ -200,7 +201,7 @@ public class Mallets extends Instrument {
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
 				
-				float scaleFactor = (C_8 - midiNote + 20) / 50f;
+				float scaleFactor = (rangeHigh - midiNote + 20) / 50f;
 				barNode.setLocalScale(0.6f, 0.7f, 0.5f * scaleFactor);
 				noteNode.move(1.333f * (midiNote * (7 / 12f) - 38.2f), 0, (-midiNote / 50f) + 2.6667f); // funky math
 				
