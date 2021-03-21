@@ -167,12 +167,8 @@ public class Guitar extends FrettedInstrument {
 		}
 		
 		// Position guitar
-		highestLevel = new Node();
-		highestLevel.setLocalTranslation(BASE_POSITION);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3)));
-		highestLevel.attachChild(instrumentNode);
-		context.getRootNode().attachChild(highestLevel);
-		
+		instrumentNode.setLocalTranslation(BASE_POSITION);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3)));
 	}
 	
 	@Override

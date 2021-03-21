@@ -15,6 +15,7 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.StageHorns;
@@ -52,13 +53,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	static long LATENCY_FIX = 250;
 	public final List<Instrument> instruments = new ArrayList<>();
 	public MidiFile file;
+	public BitmapText debugText;
 	Sequencer sequencer;
 	double timeSinceStart = -2;
 	boolean seqHasRunOnce = false;
-	public BitmapText debugText;
+	List<Spatial> guitarShadows = new ArrayList<>();
 	private Spatial pianoStand;
 	private Spatial malletStand;
-	private Spatial pianoShadow;
+	private Spatial keyboardShadow;
+	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -163,12 +166,29 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		if (pianoStand != null)
 			pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
 					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
-		if (pianoShadow != null)
-			pianoShadow.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
+		if (keyboardShadow != null) {
+			keyboardShadow.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
 					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+			keyboardShadow.setLocalScale(
+					1,
+					1,
+					(int) instruments.stream().filter(k -> k instanceof Keyboard && k.visible).count());
+		}
 		if (malletStand != null)
 			malletStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Mallets) ?
 					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		
+		long guitarVisibleCount = instruments.stream().filter(instrument -> instrument instanceof Guitar && instrument.visible).count();
+		for (int i = 0; i < guitarShadows.size(); i++) {
+			if (i < guitarVisibleCount) guitarShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
+			else guitarShadows.get(i).setCullHint(Spatial.CullHint.Always);
+		}
+		long bassGuitarVisibleCount =
+				instruments.stream().filter(instrument -> instrument instanceof BassGuitar && instrument.visible).count();
+		for (int i = 0; i < bassGuitarShadows.size(); i++) {
+			if (i < bassGuitarVisibleCount) bassGuitarShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
+			else bassGuitarShadows.get(i).setCullHint(Spatial.CullHint.Always);
+		}
 		
 	}
 	
@@ -443,15 +463,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			pianoStand.move(-50, 32f, -6);
 			pianoStand.rotate(0, rad(45), 0);
 			
-			pianoShadow = assetManager.loadModel("Assets/PianoShadow.obj");
-			final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			material.setTexture("ColorMap", assetManager.loadTexture("Assets/KeyboardShadow.png"));
-			material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-			pianoShadow.setQueueBucket(RenderQueue.Bucket.Transparent);
-			pianoShadow.setMaterial(material);
-			pianoShadow.move(-47, 0.01f, -3);
-			pianoShadow.rotate(0, rad(45), 0);
-			rootNode.attachChild(pianoShadow);
+			keyboardShadow = shadow("Assets/PianoShadow.obj", "Assets/KeyboardShadow.png");
+			keyboardShadow.move(-47, 0.01f, -3);
+			keyboardShadow.rotate(0, rad(45), 0);
+			rootNode.attachChild(keyboardShadow);
 		}
 		if (instruments.stream().anyMatch(i -> i instanceof Mallets)) {
 			malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
@@ -460,30 +475,24 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			malletStand.rotate(0, rad(33.7), 0);
 			malletStand.scale(2 / 3f);
 		}
-
-//		seqHasRunOnce = true;
-//		new Timer().schedule(new TimerTask() {
-//			@Override
-//			public void run() {
-//				sequencer.setTempoInBPM((float) file.firstTempoInBpm());
-//				bitmapText1.move(0,10,0);
-//
-//
-//
-//				new Timer().scheduleAtFixedRate(new TimerTask() {
-//					@Override
-//					public void run() {
-//						// Find the first tempo we haven't hit and need to execute
-//						long currentMidiTick = sequencer.getTickPosition();
-//						for (MidiTempoEvent tempo : file.tempos) {
-//							if (tempo.time == currentMidiTick) {
-//								sequencer.setTempoInBPM(60_000_000f / tempo.number);
-//							}
-//						}
-//					}
-//				}, 0, 1);
-//			}
-//		}, 5000);
+		
+		// Add guitar shadows
+		for (long i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Guitar).count(); i++) {
+			Spatial shadow = shadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png");
+			guitarShadows.add(shadow);
+			rootNode.attachChild(shadow);
+			shadow.setLocalTranslation(43.431f + (10 * i), 0.1f + (-0.01f * i), 7.063f);
+			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-49), 0));
+		}
+		
+		// Add bass guitar shadows
+		for (long i = 0; i < instruments.stream().filter(instrument -> instrument instanceof BassGuitar).count(); i++) {
+			Spatial shadow = shadow("Assets/BassShadow.obj", "Assets/BassShadow.png");
+			bassGuitarShadows.add(shadow);
+			rootNode.attachChild(shadow);
+			shadow.setLocalTranslation(51.5863f + 7 * i, 0.1f + (-0.01f * i), -16.5817f);
+			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-43.5), 0));
+		}
 		
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -507,6 +516,17 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				}
 			}
 		}, 0, 1);
+	}
+	
+	@Contract(pure = true)
+	private Spatial shadow(String model, String texture) {
+		Spatial shadow = assetManager.loadModel(model);
+		final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		material.setTexture("ColorMap", assetManager.loadTexture(texture));
+		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
+		shadow.setMaterial(material);
+		return shadow;
 	}
 	
 	

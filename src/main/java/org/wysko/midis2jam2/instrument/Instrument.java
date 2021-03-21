@@ -161,6 +161,4 @@ public abstract class Instrument {
 	 */
 	abstract protected void moveForMultiChannel();
 	
-	
-	
 }
