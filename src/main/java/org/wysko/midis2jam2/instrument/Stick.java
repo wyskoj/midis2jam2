@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -27,17 +26,18 @@ public class Stick {
 	 * @return the proposed angle
 	 */
 	@Contract(pure = true)
-	public static double proposedRotation(@NotNull Midis2jam2 context,
-	                                      double time,
-	                                      @Nullable MidiNoteOnEvent nextHit,
-	                                      double maxAngle,
-	                                      double strikeSpeed) {
+	private static double proposedRotation(@NotNull Midis2jam2 context,
+	                                       double time,
+	                                       @Nullable MidiNoteOnEvent nextHit,
+	                                       double maxAngle,
+	                                       double strikeSpeed) {
 		return nextHit == null ? maxAngle + 1 :
 				-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(nextHit));
 	}
 	
-	public static void handleStick(Midis2jam2 context, Node stickNode, double time, float delta,
-	                                        List<MidiNoteOnEvent> strikes, double strikeSpeed, double maxAngle) {
+	public static StickStatus handleStick(Midis2jam2 context, Node stickNode, double time, float delta,
+	                                      List<MidiNoteOnEvent> strikes, double strikeSpeed, double maxAngle) {
+		boolean strike = false;
 		
 		MidiNoteOnEvent nextHit = null;
 		if (!strikes.isEmpty())
@@ -46,8 +46,10 @@ public class Stick {
 		while (!strikes.isEmpty() && context.file.eventInSeconds(strikes.get(0)) <= time) {
 			nextHit = strikes.remove(0);
 		}
-
-
+		
+		if (nextHit != null && context.file.eventInSeconds(nextHit) <= time) {
+			strike = true;
+		}
 		
 		double proposedRotation = proposedRotation(context, time, nextHit, maxAngle, strikeSpeed);
 		
@@ -80,6 +82,43 @@ public class Stick {
 		} else {
 			// Striking or recoiling
 			stickNode.setCullHint(Spatial.CullHint.Dynamic);
+		}
+		return new StickStatus(strike ? nextHit : null, finalAngles[0]);
+	}
+	
+	public enum Pivot {
+		AT_END,
+		NEAR_END;
+	}
+	
+	public static class StickStatus {
+		
+		/**
+		 * True if this stick just striked, false otherwise.
+		 */
+		@Nullable
+		private final MidiNoteOnEvent strike;
+		
+		/**
+		 * The current angle of the stick, in radians.
+		 */
+		private final float rotationAngle;
+		
+		public StickStatus(@Nullable MidiNoteOnEvent strike, float rotationAngle) {
+			this.strike = strike;
+			this.rotationAngle = rotationAngle;
+		}
+		
+		public boolean justStruck() {
+			return strike != null;
+		}
+		
+		public @Nullable MidiNoteOnEvent getStrike() {
+			return strike;
+		}
+		
+		public float getRotationAngle() {
+			return rotationAngle;
 		}
 	}
 }

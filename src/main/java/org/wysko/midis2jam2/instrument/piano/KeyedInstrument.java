@@ -73,7 +73,6 @@ public abstract class KeyedInstrument extends SustainedInstrument {
 	 * @param delta the amount of time since the last frame
 	 */
 	protected void handleKeys(double time, float delta) {
-		context.debugText.setText(String.valueOf(currentNotePeriods));
 		for (Key key : keys) {
 			key.animate(currentNotePeriods.stream().anyMatch(p -> p.midiNote == key.midiNote && p.isPlayingAt(time) && p.endTime - time > 0.05f), delta);
 		}

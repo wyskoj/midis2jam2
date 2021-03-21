@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+@Deprecated
 public class RotationalOffsetCalculator implements OffsetCalculator {
 	
 	private final float initDeg;

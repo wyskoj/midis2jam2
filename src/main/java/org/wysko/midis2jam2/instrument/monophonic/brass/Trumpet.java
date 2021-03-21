@@ -68,7 +68,7 @@ public class Trumpet extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0,10*indexForMoving(),0);
+		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
 	}
 	
 	public class TrumpetClone extends AnimatedKeyClone {
@@ -97,44 +97,6 @@ public class Trumpet extends MonophonicInstrument {
 			
 			idleNode.setLocalRotation(new Quaternion().fromAngles(rad(-10), 0, 0));
 		}
-//
-//		protected void animation(double time, int indexThis, float stretchFactor, float rotationFactor) {
-//
-//
-//			int deg = -15 * indexThis;
-//			cloneRotation.setLocalRotation(new Quaternion().fromAngles(0, rad(deg), 0));
-//			cloneRotation.setLocalTranslation(0, -indexThis * 0.5f, 0);
-//
-//
-//			/* Collect note periods to execute */
-//			while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
-//				currentNotePeriod = notePeriods.remove(0);
-//			}
-//
-//			/* Perform animation */
-//			if (currentNotePeriod != null) {
-//				if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
-//					bell.setLocalScale(1,
-//							1,
-//							(float) ((stretchFactor * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1));
-//					playRotation.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * rotationFactor, 0, 0));
-//					currentlyPlaying = true;
-//					Boolean[] booleans = KEY_MAPPING.get(currentNotePeriod.midiNote);
-//					if (booleans != null) {
-//						for (int i = 0; i < 3; i++) {
-//							if (booleans[i]) {
-//								keys[i].setLocalTranslation(0, -0.5f, 0);
-//							} else {
-//								keys[i].setLocalTranslation(0, 0, 0);
-//							}
-//						}
-//					}
-//				} else {
-//					currentlyPlaying = false;
-//					bell.setLocalScale(1, 1, 1);
-//				}
-//			}
-//		}
 		
 		@Override
 		protected void animateKeys(@NotNull Boolean[] pressed) {
@@ -150,7 +112,7 @@ public class Trumpet extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(10,0,0);
+			offsetNode.setLocalTranslation(10 * indexForMoving(), 0, 0);
 		}
 	}
 }

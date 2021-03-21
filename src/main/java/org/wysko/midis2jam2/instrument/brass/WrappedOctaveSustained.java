@@ -19,12 +19,10 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	 * Instantiates a new wrapped octave sustained.
 	 *
 	 * @param context          the context to the main class
-	 * @param offsetCalculator the offset calculator
 	 * @param eventList        the event list
 	 * @see OffsetCalculator
 	 */
 	protected WrappedOctaveSustained(@NotNull Midis2jam2 context,
-	                                 @NotNull OffsetCalculator offsetCalculator,
 	                                 @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 	}

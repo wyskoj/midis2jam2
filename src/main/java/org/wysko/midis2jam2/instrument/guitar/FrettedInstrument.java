@@ -7,11 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.OffsetCalculator;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,8 +83,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	                            @NotNull List<MidiChannelSpecificEvent> events,
 	                            @NotNull FrettedInstrumentPositioning positioning,
 	                            int numberOfStrings,
-	                            @NotNull Spatial instrumentBody,
-	                            @NotNull OffsetCalculator offsetCalculator) {
+	                            @NotNull Spatial instrumentBody) {
 		super(context, events);
 		
 		this.frettingEngine = frettingEngine;
@@ -187,6 +184,15 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		}
 	}
 	
+	@Override
+	protected void calculateCurrentNotePeriods(double time) {
+		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
+			currentNotePeriods.add(notePeriods.remove(0));
+		}
+		
+		currentNotePeriods.removeIf(notePeriod -> Math.abs(notePeriod.endTime - time) < 0.02);
+	}
+	
 	/**
 	 * Performs the calculations and necessary algorithmic processes to correctly show fretted animation.
 	 *
@@ -201,7 +207,10 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			int finalI = i;
 			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).position.string == finalI).findFirst();
 			if (first.isPresent()) {
-				frettingEngine.applyFretboardPosition(((NotePeriodWithFretboardPosition) first.get()).position);
+				FrettingEngine.FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).position;
+				if (position.string != -1 && position.fret != -1) {
+					frettingEngine.applyFretboardPosition(position);
+				}
 			} else {
 				frettingEngine.releaseString(i);
 			}

@@ -73,8 +73,8 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 								0.47f,
 						}),
 				4,
-				body,
-				offsetCalculator);
+				body
+		);
 		
 		body.setLocalTranslation(0, 0, -1.2f);
 		instrumentNode.attachChild(body);

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * For when instruments (or clones) that should simply move in a linear line when multiple of them are visible.
  */
+@Deprecated
 public class LinearOffsetCalculator implements OffsetCalculator {
 	
 	@NotNull

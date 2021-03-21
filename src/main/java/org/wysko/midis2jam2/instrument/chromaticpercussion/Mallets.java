@@ -6,7 +6,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.DecayedInstrument;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -40,7 +39,7 @@ public class Mallets extends DecayedInstrument {
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
 	               MalletType type) {
 		
-		super(context, new LinearOffsetCalculator(new Vector3f(0, 10, 0)), eventList);
+		super(context, eventList);
 		
 		this.type = type;
 		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -73,31 +72,31 @@ public class Mallets extends DecayedInstrument {
 				}
 			}
 		});
-
-//		Spatial marker = context.loadModel("Piccolo.obj", "SphereMapExplained.bmp",
-//				Midis2jam2.MatType.REFLECTIVE);
-//		positioning.attachChild(marker);
-//		marker.setLocalTranslation(0, 10, 0);
-//		marker.setLocalScale(2, 5, 2);
 		
-		instrumentNode.setLocalTranslation(20, 0, 0);
+		highestLevel.setLocalTranslation(18, 0, -5);
+		
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		
-		
 		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
-			bars[i].tick(time, delta);
-			Stick.handleStick(context, bars[i].malletNode, time, delta, barStrikes[i], STRIKE_SPEED, MAX_ANGLE);
+			bars[i].tick(delta);
+			Stick.StickStatus stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta, barStrikes[i], STRIKE_SPEED, MAX_ANGLE);
+			if (stickStatus.justStruck()) {
+				bars[i].recoilBar();
+			}
+			bars[i].shadow.setLocalScale((float) ((1 - (Math.toDegrees(stickStatus.getRotationAngle()) / MAX_ANGLE)) / 2f));
 		}
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(-50, 26.5f + (2 * (indexForMoving() - 1)), 0);
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * (indexForMoving() - 1), 0));
+//		offsetNode.setLocalTranslation(-50, 26.5f + (2 * (indexForMoving() - 1)), 0);
+		int i1 = indexForMoving() - 2;
+		instrumentNode.setLocalTranslation(-50, 26.5f + (2 * i1), 0);
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
+//		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * (indexForMoving() - 1), 0));
 	}
 	
 	public enum MalletType {
@@ -173,7 +172,7 @@ public class Mallets extends DecayedInstrument {
 			recoilNow = true;
 		}
 		
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			if (barIsRecoiling) {
 				upBar.setCullHint(Spatial.CullHint.Always);
 				downBar.setCullHint(Spatial.CullHint.Dynamic);

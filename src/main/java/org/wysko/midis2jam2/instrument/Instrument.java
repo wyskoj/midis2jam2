@@ -68,15 +68,12 @@ public abstract class Instrument {
 	}
 	
 	/**
-	 * Updates the animation and other necessary frame-dependant calculations. You should call super to automatically
-	 * perform movement for multi channel offsets.
+	 * Updates the animation and other necessary frame-dependant calculations. Always call super!!
 	 *
 	 * @param time  the current time since the beginning of the MIDI file, expressed in seconds
 	 * @param delta the amount of time since the last call this method, expressed in seconds
 	 */
-	public void tick(double time, float delta) {
-		moveForMultiChannel();
-	}
+	public abstract void tick(double time, float delta);
 	
 	/**
 	 * A MIDI file is a sequence of {@link MidiNoteOnEvent}s and {@link MidiNoteOffEvent}s. This method searches the

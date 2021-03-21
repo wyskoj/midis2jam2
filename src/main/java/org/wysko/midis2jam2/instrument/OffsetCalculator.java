@@ -3,6 +3,7 @@ package org.wysko.midis2jam2.instrument;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 
+@Deprecated
 public interface OffsetCalculator {
 	
 	LocationAndRotation calc(int index);

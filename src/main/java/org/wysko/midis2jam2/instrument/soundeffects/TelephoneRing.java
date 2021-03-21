@@ -88,7 +88,7 @@ public class TelephoneRing extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		super.tick(time,delta);
+
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {

@@ -4,38 +4,31 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class Harp extends Instrument {
+public class Harp extends SustainedInstrument {
 	private final List<MidiNoteEvent> notes;
-	private final List<NotePeriod> notePeriods;
-	Node harpNode = new Node();
-	Node highestLevel = new Node();
 	HarpString[] strings = new HarpString[47];
 	
 	public Harp(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context);
-		List<MidiNoteEvent> notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
-		this.notes = notes;
-		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(notes));
-		harpNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f));
-		harpNode.setLocalTranslation(5, 3.6f, 17);
-		harpNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
-		highestLevel.attachChild(harpNode);
+		super(context, eventList);
+		this.notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f));
+		instrumentNode.setLocalTranslation(5, 3.6f, 17);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
+		highestLevel.attachChild(instrumentNode);
 		
 		for (int i = 0; i < 47; i++) {
 			strings[i] = new HarpString(i);
-			harpNode.attachChild(strings[i].stringNode);
+			instrumentNode.attachChild(strings[i].stringNode);
 		}
 		
 		context.getRootNode().attachChild(highestLevel);
@@ -43,9 +36,6 @@ public class Harp extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		super.tick(time,delta);
-
-
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
@@ -106,13 +96,13 @@ public class Harp extends Instrument {
 		}
 		
 		for (HarpString string : strings) {
-			string.tick(time, delta);
+			string.tick(delta);
 		}
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(20,0,0);
+		offsetNode.setLocalTranslation(20, 0, 0);
 	}
 	
 	private class HarpString {
@@ -150,7 +140,7 @@ public class Harp extends Instrument {
 			stringNode.setLocalScale(1, scale, 1);
 		}
 		
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			final double inc = delta / (1 / 60f);
 			this.frame += inc;
 			if (vibrating) {

@@ -67,10 +67,12 @@ public class Keyboard extends KeyedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
+		int i = indexForMoving();
+//		i++;
 		offsetNode.setLocalTranslation(
-				(float) (-5.865f * indexForMoving() * Math.cos(rad(45))),
-				3.03f * indexForMoving(),
-				(float) (-5.865f * indexForMoving() * Math.sin(rad(45))));
+				(float) (-5.865f * i * Math.cos(rad(45))),
+				3.03f * i,
+				(float) (-5.865f * i * Math.sin(rad(45))));
 	}
 	
 	

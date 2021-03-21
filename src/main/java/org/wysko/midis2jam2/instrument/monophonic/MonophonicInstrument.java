@@ -123,6 +123,7 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		updateClones(time, delta);
-		setIdleVisibilityByPeriods(time);
+		
+		
 	}
 }

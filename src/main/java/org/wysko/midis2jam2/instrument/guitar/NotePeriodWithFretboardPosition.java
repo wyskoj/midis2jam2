@@ -17,7 +17,7 @@ public class NotePeriodWithFretboardPosition extends NotePeriod {
 	private NotePeriodWithFretboardPosition(int midiNote, double startTime, double endTime,
 	                                        MidiNoteOnEvent noteOn, MidiNoteOffEvent noteOff) {
 		super(midiNote, startTime, endTime, noteOn, noteOff);
-		position = new FrettingEngine.FretboardPosition(0, 0);
+		position = new FrettingEngine.FretboardPosition(-1, -1);
 	}
 	
 	public static NotePeriodWithFretboardPosition fromNotePeriod(NotePeriod notePeriod) {

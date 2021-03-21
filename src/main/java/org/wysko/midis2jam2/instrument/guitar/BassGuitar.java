@@ -61,8 +61,7 @@ public class BassGuitar extends FrettedInstrument {
 							put(22, 0.716f);
 						}})),
 				4,
-				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f),
-				new LinearOffsetCalculator(new Vector3f())
+				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f)
 		);
 		
 		

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.OffsetCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,10 +146,12 @@ public abstract class Clone {
 		} else {
 			animNode.setLocalRotation(new Quaternion());
 		}
+		
+		moveForPolyphony();
 	}
 	
 	protected int indexForMoving() {
-		return parent.clones.stream().filter(Clone::isPlaying).collect(Collectors.toList()).indexOf(this);
+		return Math.max(0, parent.clones.stream().filter(Clone::isPlaying).collect(Collectors.toList()).indexOf(this));
 	}
 	
 	protected abstract void moveForPolyphony();

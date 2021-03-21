@@ -21,12 +21,10 @@ public abstract class DecayedInstrument extends Instrument {
 	protected final List<MidiNoteOnEvent> hits;
 	
 	/**
-	 * @param context                 the context to the main class
-	 * @param channelOffsetCalculator the offset calculator
-	 * @see OffsetCalculator
+	 * @param context   the context to the main class
+	 * @param eventList the event list
 	 */
 	protected DecayedInstrument(@NotNull Midis2jam2 context,
-	                            @NotNull OffsetCalculator channelOffsetCalculator,
 	                            @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context);
 		this.hits = eventList.stream()
@@ -37,7 +35,7 @@ public abstract class DecayedInstrument extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		super.tick(time, delta);
 		setIdleVisibilityByStrikes(hits, time, instrumentNode);
+		moveForMultiChannel();
 	}
 }

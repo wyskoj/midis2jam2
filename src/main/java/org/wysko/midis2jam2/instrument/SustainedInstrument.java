@@ -83,9 +83,9 @@ public abstract class SustainedInstrument extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		super.tick(time, delta);
 		calculateCurrentNotePeriods(time);
 		setIdleVisibilityByPeriods(time);
+		moveForMultiChannel();
 	}
 	
 	
@@ -104,8 +104,8 @@ public abstract class SustainedInstrument extends Instrument {
 		
 		// TODO fix this
 		
-		boolean show = true;
-		for (NotePeriod notePeriod : notePeriods) {
+		boolean show = false;
+		for (NotePeriod notePeriod : unmodifiableNotePeriods) {
 			// Within 1 second of a note on,
 			// within 4 seconds of a note off,
 			// or during a note, be visible

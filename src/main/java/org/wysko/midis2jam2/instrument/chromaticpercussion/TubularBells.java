@@ -2,12 +2,11 @@ package org.wysko.midis2jam2.instrument.chromaticpercussion;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.DecayedInstrument;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
+import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.instrument.percussion.drumset.PercussionInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
@@ -24,7 +23,7 @@ public class TubularBells extends DecayedInstrument {
 	List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
 	
 	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
-		super(context, new LinearOffsetCalculator(new Vector3f(new Vector3f(-10,0,-10))), events);
+		super(context, events);
 		
 		for (int i = 0; i < 12; i++) {
 			bells[i] = new Bell(i);
@@ -54,54 +53,12 @@ public class TubularBells extends DecayedInstrument {
 			
 			bells[i].tick(time, delta);
 			
-//			MidiNoteOnEvent nextHit = null;
-//			Bell bell = bells[i];
-//			bell.tick(time, delta);
-//			if (!bellStrikes[i].isEmpty())
-//				nextHit = bellStrikes[i].get(0);
-//
-//			while (!bellStrikes[i].isEmpty() && context.file.eventInSeconds(bellStrikes[i].get(0)) <= time)
-//				nextHit = bellStrikes[i].remove(0);
-//
-//			if (nextHit != null && context.file.eventInSeconds(nextHit) <= time) {
-//				bell.recoilBell(nextHit.velocity);
-//			}
-//
-//			if (bell.animTime != -1) bell.animTime += delta;
-//
-//			double proposedRotation = Stick.proposedRotation(context, time, nextHit, MAX_ANGLE, STRIKE_SPEED);
-//
-//			float[] floats = bell.malletNode.getLocalRotation().toAngles(new float[3]);
-//
-////			bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(rad(proposedRotation),0,0));
-//			if (proposedRotation > MAX_ANGLE) {
-//				// Not yet ready to strike
-//				if (floats[0] <= MAX_ANGLE) {
-//					// We have come down, need to recoil
-//					float xAngle = floats[0] + 5f * delta;
-//					xAngle = Math.min(rad(MAX_ANGLE), xAngle);
-//
-//					bell.malletNode.setLocalRotation(new Quaternion().fromAngles(
-//							xAngle, 0, 0
-//					));
-//					float localScale = (float) ((1 - (Math.toDegrees(xAngle) / MAX_ANGLE)) / 2f);
-//				}
-//			} else {
-//				// Striking
-//				bell.malletNode.setLocalRotation(new Quaternion().fromAngles(rad((float) (
-//						Math.max(0, Math.min(MAX_ANGLE, proposedRotation))
-//				)), 0, 0));
-//			}
-//
-//			float[] finalAngles = bell.malletNode.getLocalRotation().toAngles(new float[3]);
-//
-//			if (finalAngles[0] >= rad((float) MAX_ANGLE)) {
-//				// Not yet ready to strike
-//				bell.malletNode.setCullHint(Spatial.CullHint.Always);
-//			} else {
-//				// Striking or recoiling
-//				bell.malletNode.setCullHint(Spatial.CullHint.Dynamic);
-//			}
+			Stick.StickStatus stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta, bellStrikes[i], STRIKE_SPEED, MAX_ANGLE);
+			if (stickStatus.justStruck()) {
+				if (stickStatus.getStrike() != null) {
+					bells[i].recoilBell(stickStatus.getStrike().velocity);
+				}
+			}
 		}
 	}
 	
@@ -147,6 +104,7 @@ public class TubularBells extends DecayedInstrument {
 		}
 		
 		public void tick(double time, float delta) {
+			animTime += delta;
 			if (bellIsRecoiling) {
 				bellNode.getChild(0).setCullHint(Spatial.CullHint.Dynamic); // Show bright
 				bellNode.getChild(1).setCullHint(Spatial.CullHint.Always); // Hide dark

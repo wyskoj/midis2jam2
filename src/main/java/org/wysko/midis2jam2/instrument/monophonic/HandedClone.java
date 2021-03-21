@@ -41,11 +41,14 @@ public abstract class HandedClone extends Clone {
 			final Hands hands = ((HandedInstrument) parent).handMap.get(midiNote);
 			if (hands != null) {
 				// Set the left hands
-				for (int i = 0; i < leftHands.length; i++) {
-					if (i == hands.left) {
-						leftHands[i].setCullHint(Spatial.CullHint.Dynamic);
-					} else {
-						leftHands[i].setCullHint(Spatial.CullHint.Always);
+				if (leftHands != null) {
+					/* May be null because ocarina does not implement left hands */
+					for (int i = 0; i < leftHands.length; i++) {
+						if (i == hands.left) {
+							leftHands[i].setCullHint(Spatial.CullHint.Dynamic);
+						} else {
+							leftHands[i].setCullHint(Spatial.CullHint.Always);
+						}
 					}
 				}
 				// Set the right hands

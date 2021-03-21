@@ -5,7 +5,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.RotationalOffsetCalculator;
 import org.wysko.midis2jam2.instrument.brass.WrappedOctaveSustained;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
@@ -21,7 +20,7 @@ public class StageStrings extends WrappedOctaveSustained {
 	Node[] stringNodes = new Node[12];
 	
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context, new RotationalOffsetCalculator(35.6f, 10.6f), eventList);
+		super(context, eventList);
 		
 		twelfths = new StageStringNote[12];
 		for (int i = 0; i < 12; i++) {
@@ -34,12 +33,6 @@ public class StageStrings extends WrappedOctaveSustained {
 		}
 		
 	}
-
-
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-	}
 	
 	@Override
 	protected void moveForMultiChannel() {
@@ -49,6 +42,7 @@ public class StageStrings extends WrappedOctaveSustained {
 	public class StageStringNote extends TwelfthOfOctave {
 		
 		final Node bowNode = new Node();
+		final Node animStringNode = new Node();
 		final Spatial[] animStrings = new Spatial[5];
 		final Spatial restingString;
 		final Spatial bow;
@@ -64,9 +58,9 @@ public class StageStrings extends WrappedOctaveSustained {
 				animStrings[i] = context.loadModel("StageStringBottom" + i + ".obj", "StageStringPlaying.bmp",
 						Midis2jam2.MatType.UNSHADED, 0);
 				animStrings[i].setCullHint(Spatial.CullHint.Always);
-				animNode.attachChild(animStrings[i]);
+				animStringNode.attachChild(animStrings[i]);
 			}
-			animNode.attachChild(animNode);
+			animNode.attachChild(animStringNode);
 			
 			// Load resting string
 			restingString = context.loadModel("StageString.obj", "StageString.bmp", Midis2jam2.MatType.UNSHADED, 0);
@@ -108,13 +102,13 @@ public class StageStrings extends WrappedOctaveSustained {
 				animNode.setLocalTranslation(0, 0, 2);
 				
 				restingString.setCullHint(Spatial.CullHint.Always);
-				animNode.setCullHint(Spatial.CullHint.Dynamic);
+				animStringNode.setCullHint(Spatial.CullHint.Dynamic);
 			} else {
 				bowNode.setCullHint(Spatial.CullHint.Always);
 				animNode.setLocalTranslation(0, 0, 0);
 				
 				restingString.setCullHint(Spatial.CullHint.Dynamic);
-				animNode.setCullHint(Spatial.CullHint.Always);
+				animStringNode.setCullHint(Spatial.CullHint.Always);
 			}
 			calculateFrameChanges(delta);
 			animateStrings();

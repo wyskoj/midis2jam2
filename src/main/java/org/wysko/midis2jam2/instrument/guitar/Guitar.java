@@ -64,8 +64,7 @@ public class Guitar extends FrettedInstrument {
 							put(22, 0.7158590308f);
 						}})),
 				6,
-				context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f),
-				new LinearOffsetCalculator(new Vector3f(5, -4, 0))
+				context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f)
 		);
 		
 		

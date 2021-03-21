@@ -3,6 +3,7 @@ package org.wysko.midis2jam2.instrument.percussion.drumset;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Tom extends StickDrum {
 	public Tom(Midis2jam2 context, List<MidiNoteOnEvent> hits, TomPitch pitch) {
-		super(context, hits, Pivot.AT_END);
+		super(context, hits, Stick.Pivot.AT_END);
 		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		drum.setLocalScale(pitch.scale);
 		recoilNode.attachChild(drum);
