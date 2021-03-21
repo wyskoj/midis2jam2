@@ -41,4 +41,9 @@ public class Viola extends StringFamilyInstrument {
 		instrumentNode.setLocalScale(1f);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-130), rad(-174), rad(-28.1)));
 	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(20 * indexForMoving(),0,0);
+	}
 }

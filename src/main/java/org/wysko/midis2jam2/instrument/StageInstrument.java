@@ -1,24 +1,22 @@
 package org.wysko.midis2jam2.instrument;
 
 import com.jme3.scene.Node;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.brass.StageInstrumentNote;
+import org.wysko.midis2jam2.instrument.brass.WrappedOctaveSustained.TwelfthOfOctave;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class StageInstrument extends Instrument {
-	protected final List<NotePeriod> notePeriods;
-	protected StageInstrumentNote[] eachNote;
+public abstract class StageInstrument extends SustainedInstrument {
+	protected TwelfthOfOctave[] eachNote;
 	protected Node highestLevel = new Node();
 	
 	protected StageInstrument(Midis2jam2 context,
-	                          List<MidiChannelSpecificEvent> eventList) {
-		super(context);
-		List<MidiNoteEvent> midiNoteEvents = scrapeMidiNoteEvents(eventList);
-		notePeriods = calculateNotePeriods(midiNoteEvents);
+	                          List<MidiChannelSpecificEvent> eventList,
+	                          @NotNull OffsetCalculator offsetCalculator) {
+		super(context, eventList);
 	}
 	
 	protected void playStageInstruments(double time) {

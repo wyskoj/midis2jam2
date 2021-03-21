@@ -2,6 +2,7 @@ package org.wysko.midis2jam2.instrument.piano;
 
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
@@ -17,13 +18,25 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class Keyboard extends KeyedInstrument {
 	
+	/**
+	 * The skin of this keyboard.
+	 */
 	private final KeyboardSkin skin;
 	
+	/**
+	 * Instantiates a new keyboard.
+	 *
+	 * @param context context to midis2jam2
+	 * @param events  the events this keyboard is responsible for
+	 * @param skin    the skin of the keyboard
+	 * @see KeyboardSkin
+	 */
 	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, KeyboardSkin skin) {
 		super(context, new LinearOffsetCalculator(new Vector3f(0, 3.03f, 5.875f)), events, 21, 108);
 		
 		this.skin = skin;
 		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+		instrumentNode.attachChild(pianoCase);
 		
 		int whiteCount = 0;
 		for (int i = 0; i < keyCount(); i++) {
@@ -35,12 +48,8 @@ public class Keyboard extends KeyedInstrument {
 			}
 		}
 		
-		instrumentNode.attachChild(pianoCase);
-		highestLevel.attachChild(instrumentNode);
-		context.getRootNode().attachChild(highestLevel);
-		
-		highestLevel.move(-50, 32f, -6);
-		highestLevel.rotate(0, rad(45), 0);
+		instrumentNode.move(-50, 32f, -6);
+		instrumentNode.rotate(0, rad(45), 0);
 	}
 	
 	/**
@@ -49,10 +58,21 @@ public class Keyboard extends KeyedInstrument {
 	 * @param x the MIDI note value
 	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
 	 */
+	@Contract(pure = true)
+	@NotNull
 	public static KeyColor midiValueToColor(int x) {
 		int note = x % 12;
 		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
 	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(
+				(float) (-5.865f * indexForMoving() * Math.cos(rad(45))),
+				3.03f * indexForMoving(),
+				(float) (-5.865f * indexForMoving() * Math.sin(rad(45))));
+	}
+	
 	
 	/**
 	 * Different types of keyboards have different skins.

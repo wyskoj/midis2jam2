@@ -3,7 +3,9 @@ package org.wysko.midis2jam2.instrument.percussion.drumset;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.OffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;

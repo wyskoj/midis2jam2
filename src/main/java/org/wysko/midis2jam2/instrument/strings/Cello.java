@@ -42,4 +42,9 @@ public class Cello extends StringFamilyInstrument {
 		
 		context.getRootNode().attachChild(highestLevel);
 	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(-20 * indexForMoving(), 0, 0);
+	}
 }

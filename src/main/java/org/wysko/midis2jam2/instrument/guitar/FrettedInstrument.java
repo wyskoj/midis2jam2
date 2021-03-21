@@ -6,13 +6,15 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.MultiChannelOffsetCalculator;
+import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.instrument.OffsetCalculator;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.instrument.guitar.FrettedInstrument.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ;
 
@@ -27,40 +29,42 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 */
 	@NotNull
 	protected final FrettingEngine frettingEngine;
+	
 	/**
 	 * The positioning parameters of this fretted instrument.
 	 */
 	@NotNull
 	protected final FrettedInstrumentPositioning positioning;
-	/**
-	 * Contains the current note periods at any given time. Mutable.
-	 */
-	@NotNull
-	protected final List<NotePeriodWithFretboardPosition> currentNotePeriods = new ArrayList<>();
+	
 	/**
 	 * Each of the idle, upper strings.
 	 */
 	@NotNull
 	protected final Spatial[] upperStrings;
+	
 	/**
 	 * Each of the animated, lower strings, by animation frame.
 	 */
 	@NotNull
 	protected final Spatial[][] lowerStrings;
+	
 	/**
 	 * The yellow dot note fingers.
 	 */
 	@NotNull
 	protected final Spatial[] noteFingers;
+	
 	/**
 	 * The body of the instrument.
 	 */
 	@NotNull
 	protected final Spatial instrumentBody;
+	
 	/**
 	 * The number of strings on this instrument.
 	 */
 	private final int numberOfStrings;
+	
 	/**
 	 * Which frame of animation for the animated string to use.
 	 */
@@ -82,8 +86,8 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	                            @NotNull FrettedInstrumentPositioning positioning,
 	                            int numberOfStrings,
 	                            @NotNull Spatial instrumentBody,
-	                            @NotNull MultiChannelOffsetCalculator offsetCalculator) {
-		super(context, offsetCalculator, events);
+	                            @NotNull OffsetCalculator offsetCalculator) {
+		super(context, events);
 		
 		this.frettingEngine = frettingEngine;
 		this.numberOfStrings = numberOfStrings;
@@ -95,6 +99,8 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		lowerStrings = new Spatial[numberOfStrings][5];
 		instrumentNode.attachChild(instrumentBody);
 		highestLevel.attachChild(instrumentNode);
+		
+		notePeriods = notePeriods.stream().map(NotePeriodWithFretboardPosition::fromNotePeriod).collect(Collectors.toList());
 	}
 	
 	@Override
@@ -190,34 +196,27 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 */
 	protected boolean handleStrings(double time, float delta) {
 		boolean noteStarted = false;
-		/* Stop playing note periods that have elapsed */
-		if (!notePeriods.isEmpty() || !currentNotePeriods.isEmpty()) {
-			for (int i = currentNotePeriods.size() - 1; i >= 0; i--) {
-				if (Math.abs(currentNotePeriods.get(i).endTime - time) < 0.01 || currentNotePeriods.get(i).endTime < time) {
-					final NotePeriodWithFretboardPosition remove = currentNotePeriods.remove(i);
-					frettingEngine.releaseString(remove.position.string);
-				}
+		
+		for (int i = 0; i < numberOfStrings; i++) {
+			int finalI = i;
+			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).position.string == finalI).findFirst();
+			if (first.isPresent()) {
+				frettingEngine.applyFretboardPosition(((NotePeriodWithFretboardPosition) first.get()).position);
+			} else {
+				frettingEngine.releaseString(i);
 			}
 		}
 		
-		/* Collect all note periods that should start */
-		List<NotePeriodWithFretboardPosition> notesToBeginPlaying = new ArrayList<>();
-		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
-			final NotePeriodWithFretboardPosition remove = (NotePeriodWithFretboardPosition) notePeriods.remove(0);
-			notesToBeginPlaying.add(remove);
-			currentNotePeriods.add(remove);
-		}
-		
-		/* For when multiple notes begin at the same time, start with the lowest string first */
-		notesToBeginPlaying.sort(Comparator.comparingInt(o -> o.midiNote));
-		
-		for (NotePeriodWithFretboardPosition notePeriod : notesToBeginPlaying) {
+		for (NotePeriod notePeriod : currentNotePeriods) {
+			if (notePeriod.animationStarted) continue;
+			NotePeriodWithFretboardPosition notePeriod1 = (NotePeriodWithFretboardPosition) notePeriod;
 			noteStarted = true;
-			final FrettingEngine.FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod.midiNote);
+			final FrettingEngine.FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
 			if (guitarPosition != null) {
 				frettingEngine.applyFretboardPosition(guitarPosition);
-				notePeriod.position = guitarPosition;
+				notePeriod1.position = guitarPosition;
 			}
+			notePeriod1.animationStarted = true;
 		}
 		
 		/* Animate strings */

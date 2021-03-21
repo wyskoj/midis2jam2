@@ -5,7 +5,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.DecayedInstrument;
+import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
+import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
@@ -13,53 +15,51 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
-import static org.wysko.midis2jam2.instrument.piano.Keyboard.*;
+import static org.wysko.midis2jam2.instrument.piano.Keyboard.midiValueToColor;
 
-public class Mallets extends Instrument {
-	public final static double MAX_ANGLE = 50.0;
-	public final static double STRIKE_SPEED = 3;
-	private static final int KEYBOARD_KEY_COUNT = 88;
+/**
+ * Any one of vibraphone, glockenspiel, marimba, or xylophone.
+ */
+public class Mallets extends DecayedInstrument {
 	
-	// MalletHitShadow.obj
-	// XylophoneBlackBar.obj
-	// XylophoneBlackBarDown.obj
-	// XylophoneCase.obj
-	// XylophoneLegs.obj
-	// XylophoneMalletWhite.obj
-	// XylophoneWhiteBar.obj
-	// XylophoneWhiteBarDown.obj
+	private final static double MAX_ANGLE = 50.0;
+	private final static double STRIKE_SPEED = 3;
+	private final static int MALLET_BAR_COUNT = 88;
+	private final static int RANGE_LOW = 21;
+	private final static int RANGE_HIGH = 108;
+	
 	
 	Spatial malletCase;
-	Node contents = new Node();
-	Node highestLevel = new Node();
 	MalletType type;
 	
-	MalletBar[] bars = new MalletBar[KEYBOARD_KEY_COUNT];
+	MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
 	List<MidiNoteOnEvent>[] barStrikes;
-	List<MidiNoteOnEvent> strikesForVisibiltyCheck;
 	
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
 	               MalletType type) {
-		super(context);
+		
+		super(context, new LinearOffsetCalculator(new Vector3f(0, 10, 0)), eventList);
+		
 		this.type = type;
 		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		malletCase.setLocalScale(2 / 3f);
-		contents.attachChild(malletCase);
+		instrumentNode.attachChild(malletCase);
 		
 		int whiteCount = 0;
-		for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
-			if (midiValueToColor(i + rangeLow) == Keyboard.KeyColor.WHITE) { // White key
-				bars[i] = new MalletBar(i + rangeLow, whiteCount);
+		for (int i = 0; i < MALLET_BAR_COUNT; i++) {
+			
+			if (midiValueToColor(i + RANGE_LOW) == Keyboard.KeyColor.WHITE) { // White key
+				bars[i] = new MalletBar(i + RANGE_LOW, whiteCount);
 				whiteCount++;
 			} else { // Black key
-				bars[i] = new MalletBar(i + rangeLow, i);
+				bars[i] = new MalletBar(i + RANGE_LOW, i);
 			}
 		}
-		Arrays.stream(bars).forEach(bar -> contents.attachChild(bar.noteNode));
+		Arrays.stream(bars).forEach(bar -> instrumentNode.attachChild(bar.noteNode));
 		
+		//noinspection unchecked
 		barStrikes = new ArrayList[88];
 		for (int i = 0; i < 88; i++) {
 			barStrikes[i] = new ArrayList<>();
@@ -68,12 +68,11 @@ public class Mallets extends Instrument {
 		eventList.forEach(event -> {
 			if (event instanceof MidiNoteOnEvent) {
 				int midiNote = ((MidiNoteOnEvent) event).note;
-				if (midiNote >= rangeLow && midiNote <= rangeHigh) {
-					barStrikes[midiNote - rangeLow].add(((MidiNoteOnEvent) event));
+				if (midiNote >= RANGE_LOW && midiNote <= RANGE_HIGH) {
+					barStrikes[midiNote - RANGE_LOW].add(((MidiNoteOnEvent) event));
 				}
 			}
 		});
-		strikesForVisibiltyCheck = eventList.stream().filter(e -> e instanceof MidiNoteOnEvent).map(e -> ((MidiNoteOnEvent) e)).collect(Collectors.toList());
 
 //		Spatial marker = context.loadModel("Piccolo.obj", "SphereMapExplained.bmp",
 //				Midis2jam2.MatType.REFLECTIVE);
@@ -81,71 +80,24 @@ public class Mallets extends Instrument {
 //		marker.setLocalTranslation(0, 10, 0);
 //		marker.setLocalScale(2, 5, 2);
 		
-		highestLevel.attachChild(contents);
-		context.getRootNode().attachChild(highestLevel);
-		highestLevel.setLocalTranslation(20, 0, 0);
+		instrumentNode.setLocalTranslation(20, 0, 0);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibilityByStrikes(strikesForVisibiltyCheck, time, highestLevel);
-		int i1 =
-				context.instruments.stream().filter(e -> e instanceof Mallets && e.visible).collect(Collectors.toList()).indexOf(this);
-		i1 -= 2;
-		contents.setLocalTranslation(-50, 26.5f + (2 * i1), 0);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
+		super.tick(time, delta);
+		
 		
 		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
-			MalletBar bar = bars[i];
-			bar.tick(time, delta);
-			
-			MidiNoteOnEvent nextHit = null;
-			
-			if (!barStrikes[i].isEmpty())
-				nextHit = barStrikes[i].get(0);
-			
-			while (!barStrikes[i].isEmpty() && context.file.eventInSeconds(barStrikes[i].get(0)) <= time)
-				nextHit = barStrikes[i].remove(0);
-			
-			if (nextHit != null && context.file.eventInSeconds(nextHit) <= time) {
-				bar.recoilBar();
-			}
-			
-			double proposedRotation = nextHit == null ? MAX_ANGLE + 1 :
-					-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / STRIKE_SPEED)) * (time - context.file.eventInSeconds(nextHit));
-			
-			float[] floats = bar.malletNode.getLocalRotation().toAngles(new float[3]);
-			if (proposedRotation > MAX_ANGLE) {
-				// Not yet ready to strike
-				if (floats[0] <= MAX_ANGLE) {
-					// We have come down, need to recoil
-					float xAngle = floats[0] + 5f * delta;
-					xAngle = Math.min(rad(MAX_ANGLE), xAngle);
-					
-					bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(
-							xAngle, 0, 0
-					));
-					float localScale = (float) ((1 - (Math.toDegrees(xAngle) / MAX_ANGLE)) / 2f);
-					bars[i].shadow.setLocalScale(localScale);
-				}
-			} else {
-				// Striking
-				bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(rad((float) (
-						Math.max(0, Math.min(MAX_ANGLE, proposedRotation))
-				)), 0, 0));
-				bars[i].shadow.setLocalScale((float) ((1 - (proposedRotation / MAX_ANGLE)) / 2f));
-			}
-			
-			float[] finalAngles = bars[i].malletNode.getLocalRotation().toAngles(new float[3]);
-			
-			if (finalAngles[0] >= rad((float) MAX_ANGLE)) {
-				// Not yet ready to strike
-				bars[i].malletNode.setCullHint(Spatial.CullHint.Always);
-			} else {
-				// Striking or recoiling
-				bars[i].malletNode.setCullHint(Spatial.CullHint.Dynamic);
-			}
+			bars[i].tick(time, delta);
+			Stick.handleStick(context, bars[i].malletNode, time, delta, barStrikes[i], STRIKE_SPEED, MAX_ANGLE);
 		}
+	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(-50, 26.5f + (2 * (indexForMoving() - 1)), 0);
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * (indexForMoving() - 1), 0));
 	}
 	
 	public enum MalletType {
@@ -188,7 +140,7 @@ public class Mallets extends Instrument {
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
 				
-				float scaleFactor = (rangeHigh - midiNote + 20) / 50f;
+				float scaleFactor = (RANGE_HIGH - midiNote + 20) / 50f;
 				barNode.setLocalScale(0.55f, 1, 0.5f * scaleFactor);
 				noteNode.move(1.333f * (startPos - 26), 0, 0); // 26 = count(white keys) / 2
 				
@@ -201,7 +153,7 @@ public class Mallets extends Instrument {
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
 				
-				float scaleFactor = (rangeHigh - midiNote + 20) / 50f;
+				float scaleFactor = (RANGE_HIGH - midiNote + 20) / 50f;
 				barNode.setLocalScale(0.6f, 0.7f, 0.5f * scaleFactor);
 				noteNode.move(1.333f * (midiNote * (7 / 12f) - 38.2f), 0, (-midiNote / 50f) + 2.6667f); // funky math
 				

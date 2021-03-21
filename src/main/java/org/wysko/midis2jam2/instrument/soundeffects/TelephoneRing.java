@@ -88,7 +88,7 @@ public class TelephoneRing extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestNode);
+		super.tick(time,delta);
 		int othersOfMyType = 0;
 		int mySpot = context.instruments.indexOf(this);
 		for (int i = 0; i < context.instruments.size(); i++) {
@@ -99,7 +99,7 @@ public class TelephoneRing extends Instrument {
 			}
 		}
 		
-		highestNode.setLocalTranslation(othersOfMyType * 13, 0, 0);
+//		highestNode.setLocalTranslation(othersOfMyType * 13, 0, 0);
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
@@ -146,5 +146,10 @@ public class TelephoneRing extends Instrument {
 			force -= 10 * delta;
 			force = Math.max(0, force);
 		}
+	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(13 * indexForMoving(),0,0);
 	}
 }

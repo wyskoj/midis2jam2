@@ -5,7 +5,7 @@ import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
+import org.wysko.midis2jam2.instrument.monophonic.Clone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
@@ -24,20 +24,15 @@ import java.util.stream.Collectors;
  * current animation and note handling for every call.
  *
  * @see MonophonicInstrument
- * @see MonophonicClone
+ * @see Clone
  */
 public abstract class Instrument {
+	
 	/**
 	 * Since these classes are effectively static, we need reference to the main class.
 	 */
 	@NotNull
-	protected final Midis2jam2 context;
-	
-	/**
-	 * Handles the offset of when multiple instruments of the same type are visible.
-	 */
-	@NotNull
-	protected final MultiChannelOffsetCalculator offsetCalculator;
+	public final Midis2jam2 context;
 	
 	/**
 	 * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
@@ -46,9 +41,10 @@ public abstract class Instrument {
 	 */
 	public boolean visible = false;
 	
-	/**
-	 * This node should contain {@link #instrumentNode}. It shall be only used for general positioning.
-	 */
+	
+	@NotNull
+	public Node offsetNode = new Node();
+	
 	@NotNull
 	public Node highestLevel = new Node();
 	
@@ -61,14 +57,14 @@ public abstract class Instrument {
 	/**
 	 * Instantiates a new Instrument.
 	 *
-	 * @param context the context to the main class
-	 * @param offsetCalculator the offset calculator
-	 * @see MultiChannelOffsetCalculator
+	 * @param context                 the context to the main class
+	 * @see OffsetCalculator
 	 */
-	protected Instrument(@NotNull Midis2jam2 context, @NotNull MultiChannelOffsetCalculator offsetCalculator) {
+	protected Instrument(@NotNull Midis2jam2 context) {
 		this.context = context;
-		this.offsetCalculator = offsetCalculator;
-		context.getRootNode().attachChild(highestLevel);
+		highestLevel.attachChild(instrumentNode);
+		offsetNode.attachChild(highestLevel);
+		context.getRootNode().attachChild(offsetNode);
 	}
 	
 	/**
@@ -99,7 +95,6 @@ public abstract class Instrument {
 				for (int j = i + 1; j < noteEventsSize; j++) {
 					MidiNoteEvent check = noteEvents.get(j);
 					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
-						// We found a block
 						notePeriods.add(new NotePeriod(check.note,
 								context.file.eventInSeconds(noteEvent),
 								context.file.eventInSeconds(check),
@@ -121,40 +116,7 @@ public abstract class Instrument {
 			}
 		}
 		return notePeriods;
-	}
-	
-	/**
-	 * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
-	 * <p>
-	 * The instrument should be visible if:
-	 * <ul>
-	 *     <li>There is at least 1 second between now and the start of any note period,</li>
-	 *     <li>There is at least 4 seconds between now and the end of any note period, or</li>
-	 *     <li>Any note period is currently playing</li>
-	 * </ul>
-	 *
-	 * @param notePeriods the note periods to check from
-	 * @param time        the current time
-	 * @param node        the node to hide
-	 */
-	protected void setIdleVisibilityByPeriods(@NotNull List<? extends NotePeriod> notePeriods, double time,
-	                                          @NotNull Node node) {
-		boolean show = false;
-		for (NotePeriod notePeriod : notePeriods) {
-			// Within 1 second of a note on,
-			// within 4 seconds of a note off,
-			// or during a note, be visible
-			if (notePeriod.isPlayingAt(time)
-					|| Math.abs(time - notePeriod.startTime) < 1
-					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
-				visible = true;
-				show = true;
-				break;
-			} else {
-				visible = false;
-			}
-		}
-		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		
 	}
 	
 	/**
@@ -191,7 +153,7 @@ public abstract class Instrument {
 	 * @return the index of this instrument in the list of other instruments of this type that are visible
 	 */
 	@Contract(pure = true)
-	protected int getIndexOfThis() {
+	protected int indexForMoving() {
 		return context.instruments.stream()
 				.filter(e -> this.getClass().isInstance(e) && e.visible)
 				.collect(Collectors.toList()).indexOf(this);
@@ -200,7 +162,8 @@ public abstract class Instrument {
 	/**
 	 * Calculates and moves this instrument for when multiple instances of this instrument are visible.
 	 */
-	protected void moveForMultiChannel() {
-		offsetCalculator.move(getIndexOfThis());
-	}
+	abstract protected void moveForMultiChannel();
+	
+	
+	
 }

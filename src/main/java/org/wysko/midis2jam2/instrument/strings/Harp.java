@@ -30,7 +30,7 @@ public class Harp extends Instrument {
 		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(notes));
 		harpNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f));
 		harpNode.setLocalTranslation(5, 3.6f, 17);
-		harpNode.setLocalRotation(new Quaternion().fromAngles(0,rad(-35),0));
+		harpNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
 		highestLevel.attachChild(harpNode);
 		
 		for (int i = 0; i < 47; i++) {
@@ -43,18 +43,9 @@ public class Harp extends Instrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(notePeriods,time,highestLevel);
-		int othersOfMyType = 0;
-		int mySpot = context.instruments.indexOf(this);
-		for (int i = 0; i < context.instruments.size(); i++) {
-			if (this.getClass().isInstance(context.instruments.get(i)) &&
-					context.instruments.get(i) != this &&
-					i < mySpot) {
-				othersOfMyType++;
-			}
-		}
-		
-		highestLevel.setLocalTranslation(othersOfMyType * 30 * 0.5735764364f, 0, othersOfMyType * 30 * 0.4264235636f);
+		super.tick(time,delta);
+
+
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
@@ -119,43 +110,17 @@ public class Harp extends Instrument {
 		}
 	}
 	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(20,0,0);
+	}
+	
 	private class HarpString {
 		Spatial string;
 		Spatial[] vibratingStrings = new Spatial[5];
 		Node stringNode = new Node();
 		boolean vibrating = false;
 		private double frame = 0;
-		
-		public void tick(double time, float delta) {
-			final double inc = delta / (1 / 60f);
-			this.frame += inc;
-			if (vibrating) {
-				string.setCullHint(Spatial.CullHint.Always);
-				for (int i = 0; i < 5; i++) {
-					frame = frame % 5;
-					if (i == Math.floor(frame)) {
-						vibratingStrings[i].setCullHint(Spatial.CullHint.Dynamic);
-					} else {
-						vibratingStrings[i].setCullHint(Spatial.CullHint.Always);
-					}
-				}
-			} else {
-				string.setCullHint(Spatial.CullHint.Dynamic);
-				for (Spatial vibratingString : vibratingStrings) {
-					vibratingString.setCullHint(Spatial.CullHint.Always);
-				}
-			}
-			
-		}
-		
-		
-		public void beginPlaying() {
-			vibrating = true;
-		}
-		
-		public void endPlaying() {
-			vibrating = false;
-		}
 		
 		public HarpString(int i) {
 			String t;
@@ -183,6 +148,36 @@ public class Harp extends Instrument {
 			float scale = (float) ((2.44816E-4 * Math.pow(i, 2)) + (-0.02866 * i) + 0.97509);
 			System.out.printf("f(%d) = %.3f%n", i, scale);
 			stringNode.setLocalScale(1, scale, 1);
+		}
+		
+		public void tick(double time, float delta) {
+			final double inc = delta / (1 / 60f);
+			this.frame += inc;
+			if (vibrating) {
+				string.setCullHint(Spatial.CullHint.Always);
+				for (int i = 0; i < 5; i++) {
+					frame = frame % 5;
+					if (i == Math.floor(frame)) {
+						vibratingStrings[i].setCullHint(Spatial.CullHint.Dynamic);
+					} else {
+						vibratingStrings[i].setCullHint(Spatial.CullHint.Always);
+					}
+				}
+			} else {
+				string.setCullHint(Spatial.CullHint.Dynamic);
+				for (Spatial vibratingString : vibratingStrings) {
+					vibratingString.setCullHint(Spatial.CullHint.Always);
+				}
+			}
+			
+		}
+		
+		public void beginPlaying() {
+			vibrating = true;
+		}
+		
+		public void endPlaying() {
+			vibrating = false;
 		}
 	}
 }

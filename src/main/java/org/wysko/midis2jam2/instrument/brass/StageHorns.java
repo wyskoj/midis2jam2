@@ -4,15 +4,14 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.StageInstrument;
+import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class StageHorns extends StageInstrument {
+public class StageHorns extends WrappedOctaveSustained {
 	
 	// Horns are 1.5 deg apart
 	// First 16 left from center
@@ -22,41 +21,40 @@ public class StageHorns extends StageInstrument {
 	
 	
 	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
+		super(context, new LinearOffsetCalculator(new Vector3f(0, 0, -5)), eventList);
 		
-		eachNote = new StageHornNote[12];
+		twelfths = new StageHornNote[12];
 		for (int i = 0; i < 12; i++) {
 			hornNodes[i] = new Node();
-			eachNote[i] = new StageHornNote();
-			hornNodes[i].attachChild(eachNote[i].highestLevel);
-			eachNote[i].highestLevel.setLocalTranslation(BASE_POSITION);
+			twelfths[i] = new StageHornNote();
+			hornNodes[i].attachChild(twelfths[i].highestLevel);
+			twelfths[i].highestLevel.setLocalTranslation(BASE_POSITION);
 			hornNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(i * 1.5), 0));
 			highestLevel.attachChild(hornNodes[i]);
 		}
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(16), 0));
-		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(notePeriods, time, highestLevel);
-		final int i1 =
-				context.instruments.stream().filter(e -> e instanceof StageHorns && e.visible).collect(Collectors.toList()).indexOf(this);
-		for (StageInstrumentNote horn : eachNote) {
-			horn.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(new Vector3f(0, 0, -5 * i1)));
-		}
-		
-		/* Collect note periods to execute */
-		playStageInstruments(time);
-		
-		// Tick each string
-		for (StageInstrumentNote string : eachNote) {
-			string.tick(time, delta);
-		}
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(-1.378f * indexForMoving(), 0, 4.806f * indexForMoving());
 	}
+//
+//	@Override
+//	public void tick(double time, float delta) {
+//
+////		final int i1 =
+////				context.instruments.stream().filter(e -> e instanceof StageHorns && e.visible).collect(Collectors.toList()).indexOf(this);
+////		for (StageInstrumentNote horn : eachNote) {
+////			horn.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(new Vector3f(0, 0, -5 * i1)));
+////		}
+////		 Tick each string
+////		for (TwelfthOfOctave horn : twelfths) {
+////			horn.tick(time, delta);
+////		}
+//	}
 	
-	public class StageHornNote extends StageInstrumentNote {
-		
+	public class StageHornNote extends TwelfthOfOctave {
 		
 		public StageHornNote() {
 			// Load horn

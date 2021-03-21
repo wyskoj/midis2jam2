@@ -5,65 +5,48 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Ocarina extends HandedInstrument {
 	
-	private List<NotePeriod> finalNotePeriods;
-	
 	/**
 	 * Constructs an ocarina.
-	 *  @param context context to midis2jam2
 	 *
+	 * @param context context to midis2jam2
 	 */
 	public Ocarina(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
-		super(context);
+		super(context,
+				events,
+				OcarinaClone.class,
+				new OcarinaHandGenerator()
+		);
 		
-		List<MidiNoteEvent> notes =
-				events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> (MidiNoteEvent) e)
-						.collect(Collectors.toList());
-		
-		this.notePeriods = calculateNotePeriods(notes);
-		calculateClones(this, Ocarina.OcarinaClone.class);
-		
-		finalNotePeriods = new ArrayList<>(notePeriods);
-		
-		
-		for (MonophonicClone clone : clones) {
-			OcarinaClone ocarinaClone = ((OcarinaClone) clone);
-			groupOfPolyphony.attachChild(ocarinaClone.hornNode);
-		}
-		
-		highestLevel.attachChild(groupOfPolyphony);
-		context.getRootNode().attachChild(highestLevel);
 		groupOfPolyphony.setLocalTranslation(45, 47, 20);
 		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(0, rad(135), 0));
+		
 	}
 	
-	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
-		updateClones(time, delta, new Vector3f(0, 10, 0));
+	static class OcarinaHandGenerator extends HashMap<Integer, HandedClone.Hands> {
+		@Override
+		public HandedClone.Hands get(Object key) {
+			return new HandedClone.Hands(0, ((int) key + 3) % 12);
+		}
 	}
 	
 	public class OcarinaClone extends HandedClone {
 		public OcarinaClone() {
-			super();
-			hornNode = new Node();
-			horn = context.loadModel("Ocarina.obj", "Ocarina.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			super(Ocarina.this, 0);
+			highestLevel = new Node();
+			Spatial horn = context.loadModel("Ocarina.obj", "Ocarina.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			animNode.attachChild(horn);
-			hornNode.attachChild(animNode);
+			highestLevel.attachChild(animNode);
 			loadHands();
 			for (int i = 0; i < rightHands.length; i++) {
 				if (i == 0) rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
@@ -71,7 +54,8 @@ public class Ocarina extends HandedInstrument {
 			}
 		}
 		
-		private void loadHands() {
+		@Override
+		protected void loadHands() {
 			rightHands = new Spatial[12];
 			for (int i = 0; i < 12; i++) {
 				rightHands[i] = context.loadModel("OcarinaHand" + i + ".obj", "hands.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -79,32 +63,21 @@ public class Ocarina extends HandedInstrument {
 			for (Spatial rightHand : rightHands) {
 				rightHandNode.attachChild(rightHand);
 			}
-			animNode.attachChild(rightHandNode);
 		}
 		
 		@Override
 		public void tick(double time, float delta) {
+			super.tick(time, delta);
 			/* Collect note periods to execute */
-			while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
-				currentNotePeriod = notePeriods.remove(0);
+			if (isPlaying()) {
+				animNode.setLocalTranslation(0,
+						0, 3 * (float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration()));
 			}
-			if (currentNotePeriod != null) {
-				currentlyPlaying = time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime;
-				/* Set the hands */
-				final int midiNote = currentNotePeriod.midiNote;
-				int hand = (midiNote + 3) % 12;
-				for (int i = 0; i < rightHands.length; i++) {
-					if (i == hand) rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
-					else rightHands[i].setCullHint(Spatial.CullHint.Always);
-				}
-				if (currentlyPlaying) {
-					animNode.setLocalTranslation(0,
-							0, 3 * (float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration()));
-				}
-			}
-			final int myIndex = Ocarina.this.clones.indexOf(this);
-			hideOrShowOnPolyphony(myIndex);
-			hornNode.setLocalTranslation(myIndex * 10, 0, 0);
+		}
+		
+		@Override
+		protected void moveForPolyphony() {
+			offsetNode.setLocalTranslation(10*indexForMoving(),0,0);
 		}
 	}
 }

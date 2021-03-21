@@ -62,7 +62,7 @@ public class BassGuitar extends FrettedInstrument {
 						}})),
 				4,
 				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f),
-				new LinearOffsetCalculator(new Vector3f(7, -2.43f, 0))
+				new LinearOffsetCalculator(new Vector3f())
 		);
 		
 		
@@ -129,9 +129,12 @@ public class BassGuitar extends FrettedInstrument {
 		}
 		
 		// Position guitar
-		highestLevel = new Node();
-		highestLevel.setLocalTranslation(BASE_POSITION);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
-		highestLevel.attachChild(instrumentNode);
+		instrumentNode.setLocalTranslation(BASE_POSITION);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
+	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(new Vector3f(7, -2.43f, 0).mult(indexForMoving()));
 	}
 }

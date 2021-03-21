@@ -1,5 +1,6 @@
 package org.wysko.midis2jam2.instrument;
 
+import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -10,7 +11,6 @@ import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,20 +21,18 @@ import java.util.stream.Collectors;
 public abstract class SustainedInstrument extends Instrument {
 	
 	/**
-	 * The list of note periods. This class expects that this variable will be truncated as the MIDI file progresses.
-	 *
-	 * @see NotePeriod
-	 */
-	@NotNull
-	protected final List<NotePeriod> notePeriods;
-	
-	/**
 	 * This list shall not be updated and shall be used for visibility calculations.
 	 */
 	@Unmodifiable
 	@NotNull
 	protected final List<NotePeriod> unmodifiableNotePeriods;
-	
+	/**
+	 * The list of note periods. This class expects that this variable will be truncated as the MIDI file progresses.
+	 *
+	 * @see NotePeriod
+	 */
+	@NotNull
+	protected List<NotePeriod> notePeriods;
 	/**
 	 * The list of current note periods. Will always be updating as the MIDI file progresses.
 	 */
@@ -45,13 +43,11 @@ public abstract class SustainedInstrument extends Instrument {
 	 * Instantiates a new sustained instrument.
 	 *
 	 * @param context          the context to the main class
-	 * @param offsetCalculator the offset calculator
-	 * @see MultiChannelOffsetCalculator
+	 * @see OffsetCalculator
 	 */
 	protected SustainedInstrument(@NotNull Midis2jam2 context,
-	                              @NotNull MultiChannelOffsetCalculator offsetCalculator,
 	                              @NotNull List<MidiChannelSpecificEvent> eventList) {
-		super(context, offsetCalculator);
+		super(context);
 		this.notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(eventList));
 		this.unmodifiableNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
 	}
@@ -78,8 +74,9 @@ public abstract class SustainedInstrument extends Instrument {
 	 * @see #currentNotePeriods
 	 */
 	protected void calculateCurrentNotePeriods(double time) {
-		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time)
+		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
+		}
 		
 		currentNotePeriods.removeIf(notePeriod -> notePeriod.endTime <= time);
 	}
@@ -88,5 +85,42 @@ public abstract class SustainedInstrument extends Instrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		calculateCurrentNotePeriods(time);
+		setIdleVisibilityByPeriods(time);
 	}
+	
+	
+	/**
+	 * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
+	 * <p>
+	 * The instrument should be visible if:
+	 * <ul>
+	 *     <li>There is at least 1 second between now and the start of any note period,</li>
+	 *     <li>There is at least 4 seconds between now and the end of any note period, or</li>
+	 *     <li>Any note period is currently playing</li>
+	 * </ul>
+	 *  @param time        the current time
+	 */
+	protected void setIdleVisibilityByPeriods(double time) {
+		
+		// TODO fix this
+		
+		boolean show = true;
+		for (NotePeriod notePeriod : notePeriods) {
+			// Within 1 second of a note on,
+			// within 4 seconds of a note off,
+			// or during a note, be visible
+			if (notePeriod.isPlayingAt(time)
+					|| Math.abs(time - notePeriod.startTime) < 1
+					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
+				visible = true;
+				show = true;
+				break;
+			} else {
+				visible = false;
+			}
+		}
+		visible = show;
+		instrumentNode.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+	}
+	
 }

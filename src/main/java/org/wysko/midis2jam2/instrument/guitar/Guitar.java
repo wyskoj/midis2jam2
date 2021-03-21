@@ -176,6 +176,11 @@ public class Guitar extends FrettedInstrument {
 		
 	}
 	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(new Vector3f(5, -4, 0).mult(indexForMoving()));
+	}
+	
 	/**
 	 * The type of guitar.
 	 */

@@ -131,7 +131,7 @@ public class Accordion extends KeyedInstrument {
 		instrumentNode.setLocalTranslation(-70, 10, -60);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(45), rad(-5)));
 	}
-	
+
 //	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode) {
 //		if (!beingPressed) {
 //			float[] angles = new float[3];
@@ -171,6 +171,11 @@ public class Accordion extends KeyedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		calculateAccordionSqueeze(delta);
+	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(new Vector3f(0, 30 * indexForMoving(), 0));
 	}
 	
 	private void calculateAccordionSqueeze(float delta) {

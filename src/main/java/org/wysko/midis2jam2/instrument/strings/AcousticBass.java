@@ -42,6 +42,11 @@ public class AcousticBass extends StringFamilyInstrument {
 		highestLevel.attachChild(instrumentNode);
 	}
 	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(new Vector3f(-25 * indexForMoving(), 0, 0));
+	}
+	
 	/**
 	 * The acoustic bass can be played two ways in MIDI, arco (Contrabass) and pizzicato (Acoustic Bass)
 	 */

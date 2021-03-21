@@ -34,10 +34,14 @@ public class Violin extends StringFamilyInstrument {
 				new LinearOffsetCalculator(new Vector3f(20, 0, 0))
 		);
 		
-		highestLevel.setLocalTranslation(10, 57, -15);
-		highestLevel.attachChild(instrumentNode);
+		instrumentNode.setLocalTranslation(10, 57, -15);
 		
 		instrumentNode.setLocalScale(1f);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-130), rad(-174), rad(-28.1)));
+	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(20 * indexForMoving(),0,0);
 	}
 }
