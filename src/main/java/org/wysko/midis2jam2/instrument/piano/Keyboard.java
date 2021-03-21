@@ -1,12 +1,11 @@
 package org.wysko.midis2jam2.instrument.piano;
 
-import com.jme3.math.Vector3f;
+import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class Keyboard extends KeyedInstrument {
 	 * @see KeyboardSkin
 	 */
 	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, KeyboardSkin skin) {
-		super(context, new LinearOffsetCalculator(new Vector3f(0, 3.03f, 5.875f)), events, 21, 108);
+		super(context, events, 21, 108);
 		
 		this.skin = skin;
 		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -52,29 +51,20 @@ public class Keyboard extends KeyedInstrument {
 		instrumentNode.rotate(0, rad(45), 0);
 	}
 	
-	/**
-	 * Calculates if a MIDI note value is a black or white key on a standard piano.
-	 *
-	 * @param x the MIDI note value
-	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
-	 */
-	@Contract(pure = true)
-	@NotNull
-	public static KeyColor midiValueToColor(int x) {
-		int note = x % 12;
-		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
-	}
-	
 	@Override
 	protected void moveForMultiChannel() {
 		int i = indexForMoving();
-//		i++;
 		offsetNode.setLocalTranslation(
 				(float) (-5.865f * i * Math.cos(rad(45))),
 				3.03f * i,
 				(float) (-5.865f * i * Math.sin(rad(45))));
 	}
 	
+	@Override
+	protected @Nullable Key keyByMidiNote(int midiNote) {
+		if (midiNote > rangeHigh || midiNote < rangeLow) return null;
+		return keys[midiNote - rangeLow];
+	}
 	
 	/**
 	 * Different types of keyboards have different skins.
@@ -163,5 +153,6 @@ public class Keyboard extends KeyedInstrument {
 			}
 			downNode.setCullHint(Spatial.CullHint.Always);
 		}
+		
 	}
 }

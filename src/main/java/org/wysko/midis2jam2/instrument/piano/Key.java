@@ -15,7 +15,7 @@ public abstract class Key {
 	 * The MIDI note this key plays.
 	 */
 	protected final int midiNote;
-	
+
 	/**
 	 * Is this key being pressed?
 	 */
@@ -40,16 +40,19 @@ public abstract class Key {
 		this.midiNote = midiNote;
 	}
 	
-	public Node getKeyNode() {
-		return keyNode;
+	public int getMidiNote() {
+		return midiNote;
 	}
 	
 	public boolean isBeingPressed() {
 		return beingPressed;
 	}
 	
-	public void animate(boolean pressed, float delta) {
-		this.beingPressed = pressed;
+	public void setBeingPressed(boolean beingPressed) {
+		this.beingPressed = beingPressed;
+	}
+	
+	public void tick(float delta) {
 		if (beingPressed) {
 			keyNode.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));
 			downNode.setCullHint(Spatial.CullHint.Dynamic);
@@ -59,7 +62,9 @@ public abstract class Key {
 			keyNode.getLocalRotation().toAngles(angles);
 			if (angles[0] > 0.0001) {
 				keyNode.setLocalRotation(new Quaternion(new float[]
-						{Math.max(angles[0] - (0.02f * delta * 50), 0), 0, 0}
+						{
+								Math.max(angles[0] - (0.02f * delta * 50), 0),0,0
+						}
 				));
 			} else {
 				keyNode.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
@@ -68,5 +73,9 @@ public abstract class Key {
 				upNode.setCullHint(Spatial.CullHint.Dynamic);
 			}
 		}
+	}
+	
+	public Node getKeyNode() {
+		return keyNode;
 	}
 }

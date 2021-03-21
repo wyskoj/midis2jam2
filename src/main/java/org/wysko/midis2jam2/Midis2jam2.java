@@ -99,6 +99,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			}
 			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
 				backup = MidiSystem.getMidiDevice(eachInfo);
+				LATENCY_FIX = 0;
 				break;
 			}
 		}

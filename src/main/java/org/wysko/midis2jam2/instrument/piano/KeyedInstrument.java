@@ -1,18 +1,27 @@
 package org.wysko.midis2jam2.instrument.piano;
 
+import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.OffsetCalculator;
+import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.midi.MidiNoteEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Any instrument that visualizes notes by rotating piano keys.
  */
-public abstract class KeyedInstrument extends SustainedInstrument {
+public abstract class KeyedInstrument extends Instrument {
 	
 	/**
 	 * The lowest note this instrument can play.
@@ -23,37 +32,66 @@ public abstract class KeyedInstrument extends SustainedInstrument {
 	 * The highest note this instrument can play.
 	 */
 	protected final int rangeHigh;
+	@NotNull
+	final protected List<MidiNoteEvent> events;
+	
+	@Unmodifiable
+	@NotNull
+	private final List<NotePeriod> notePeriods;
 	
 	/**
-	 * The keys of this instrument
+	 * The keys of this instrument.
 	 */
-	protected final Key[] keys;
+	protected Key[] keys;
 	
 	
 	/**
 	 * Instantiates a new Keyed instrument.
 	 *
-	 * @param context          the context
-	 * @param offsetCalculator the offset calculator
-	 * @param eventList        the event list
-	 * @param rangeLow         the lowest note this instrument can play
-	 * @param rangeHigh        the highest note this instrument can play
+	 * @param context   the context
+	 * @param eventList the event list
+	 * @param rangeLow  the lowest note this instrument can play
+	 * @param rangeHigh the highest note this instrument can play
 	 */
 	protected KeyedInstrument(@NotNull Midis2jam2 context,
-	                          @NotNull OffsetCalculator offsetCalculator,
 	                          @NotNull List<MidiChannelSpecificEvent> eventList,
 	                          int rangeLow,
 	                          int rangeHigh) {
-		super(context, eventList);
+		super(context);
+		this.events = SustainedInstrument.scrapeMidiNoteEvents(eventList);
 		this.rangeLow = rangeLow;
 		this.rangeHigh = rangeHigh;
-		keys = new Key[keyCount()];
+		this.keys = new Key[keyCount()];
+		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(this.events));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		handleKeys(time, delta);
+		setIdleVisibilityByNoteOnAndOff(time);
+		List<MidiNoteEvent> eventsToPerform = new ArrayList<>();
+		if (!events.isEmpty()) {
+			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
+				events.remove(0);
+			}
+			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.file.eventInSeconds(events.get(0)) <= time) ||
+					(events.get(0) instanceof MidiNoteOffEvent && context.file.eventInSeconds(events.get(0)) - time <= 0.05))) {
+				eventsToPerform.add(events.remove(0));
+			}
+		}
+		
+		for (MidiNoteEvent event : eventsToPerform) {
+			Key key = keyByMidiNote(event.note);
+			if (key == null) continue;
+			if (event instanceof MidiNoteOnEvent) {
+				key.setBeingPressed(true);
+			} else if (event instanceof MidiNoteOffEvent) {
+				key.setBeingPressed(false);
+			}
+		}
+		
+		for (Key key : keys) {
+			key.tick(delta);
+		}
 	}
 	
 	/**
@@ -67,17 +105,20 @@ public abstract class KeyedInstrument extends SustainedInstrument {
 	}
 	
 	/**
-	 * Handles the pressing and releasing of keys, and their respective animations.
+	 * Calculates if a MIDI note value is a black or white key on a standard piano.
 	 *
-	 * @param time  the current time
-	 * @param delta the amount of time since the last frame
+	 * @param x the MIDI note value
+	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
 	 */
-	protected void handleKeys(double time, float delta) {
-		for (Key key : keys) {
-			key.animate(currentNotePeriods.stream().anyMatch(p -> p.midiNote == key.midiNote && p.isPlayingAt(time) && p.endTime - time > 0.05f), delta);
-		}
+	@Contract(pure = true)
+	@NotNull
+	public static KeyColor midiValueToColor(int x) {
+		int note = x % 12;
+		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
 	}
 	
+	@Nullable
+	protected abstract Key keyByMidiNote(int midiNote);
 	
 	/**
 	 * Keyboards have two different colored keys: white and black.
@@ -94,4 +135,11 @@ public abstract class KeyedInstrument extends SustainedInstrument {
 		 */
 		BLACK
 	}
+	
+	protected void setIdleVisibilityByNoteOnAndOff(double time) {
+		boolean b = SustainedInstrument.calcVisibility(time, notePeriods);
+		visible = b;
+		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+	}
+	
 }

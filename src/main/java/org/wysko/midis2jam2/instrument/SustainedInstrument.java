@@ -61,7 +61,7 @@ public abstract class SustainedInstrument extends Instrument {
 	 */
 	@NotNull
 	@Contract(pure = true)
-	protected static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull List<MidiChannelSpecificEvent> events) {
+	public static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull List<MidiChannelSpecificEvent> events) {
 		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
 	}
 	
@@ -101,9 +101,12 @@ public abstract class SustainedInstrument extends Instrument {
 	 *  @param time        the current time
 	 */
 	protected void setIdleVisibilityByPeriods(double time) {
-		
-		// TODO fix this
-		
+		boolean b = calcVisibility(time, unmodifiableNotePeriods);
+		visible = b;
+		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+	}
+	
+	public static boolean calcVisibility(double time, @NotNull List<NotePeriod> unmodifiableNotePeriods) {
 		boolean show = false;
 		for (NotePeriod notePeriod : unmodifiableNotePeriods) {
 			// Within 1 second of a note on,
@@ -112,15 +115,11 @@ public abstract class SustainedInstrument extends Instrument {
 			if (notePeriod.isPlayingAt(time)
 					|| Math.abs(time - notePeriod.startTime) < 1
 					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
-				visible = true;
 				show = true;
 				break;
-			} else {
-				visible = false;
 			}
 		}
-		visible = show;
-		instrumentNode.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		return show;
 	}
 	
 }

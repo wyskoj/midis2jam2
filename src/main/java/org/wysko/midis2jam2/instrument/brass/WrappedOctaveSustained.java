@@ -4,7 +4,6 @@ import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.OffsetCalculator;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
@@ -20,7 +19,6 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	 *
 	 * @param context          the context to the main class
 	 * @param eventList        the event list
-	 * @see OffsetCalculator
 	 */
 	protected WrappedOctaveSustained(@NotNull Midis2jam2 context,
 	                                 @NotNull List<MidiChannelSpecificEvent> eventList) {

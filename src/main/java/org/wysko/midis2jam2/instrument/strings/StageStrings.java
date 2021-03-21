@@ -29,7 +29,7 @@ public class StageStrings extends WrappedOctaveSustained {
 			stringNodes[i].attachChild(twelfths[i].highestLevel);
 			twelfths[i].highestLevel.setLocalTranslation(0, 2 * i, -151.76f);
 			stringNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad((9 / 10f) * i), 0));
-			highestLevel.attachChild(stringNodes[i]);
+			instrumentNode.attachChild(stringNodes[i]);
 		}
 		
 	}

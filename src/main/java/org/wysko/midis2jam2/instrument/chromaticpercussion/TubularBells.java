@@ -17,9 +17,12 @@ import java.util.List;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class TubularBells extends DecayedInstrument {
+	
 	private static final double STRIKE_SPEED = 3;
 	private final static double MAX_ANGLE = 50;
 	Bell[] bells = new Bell[12];
+	
+	@SuppressWarnings("unchecked")
 	List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
 	
 	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -48,11 +51,9 @@ public class TubularBells extends DecayedInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		
+		super.tick(time, delta);
 		for (int i = 0, barsLength = 12; i < barsLength; i++) { // For each bar on the instrument
-			
-			bells[i].tick(time, delta);
-			
+			bells[i].tick(delta);
 			Stick.StickStatus stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta, bellStrikes[i], STRIKE_SPEED, MAX_ANGLE);
 			if (stickStatus.justStruck()) {
 				if (stickStatus.getStrike() != null) {
@@ -70,19 +71,16 @@ public class TubularBells extends DecayedInstrument {
 	
 	private class Bell {
 		private final static double BASE_AMPLITUDE = 0.5;
-		private final int WOBBLE_SPEED = 3;
-		private final double DAMPENING = 0.3;
-		private final int i;
+		private final static int WOBBLE_SPEED = 3;
+		private final static double DAMPENING = 0.3;
 		Node highestLevel = new Node();
 		Node bellNode = new Node();
-		Node malletNode = new Node();
+		Node malletNode;
 		private double amplitude = 0.5;
 		private double animTime = -1;
 		private boolean bellIsRecoiling;
-		private boolean recoilNow;
 		
 		public Bell(int i) {
-			this.i = i;
 			bellNode.attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp",
 					Midis2jam2.MatType.REFLECTIVE, 0.9f));
 			
@@ -91,8 +89,7 @@ public class TubularBells extends DecayedInstrument {
 			
 			highestLevel.attachChild(bellNode);
 			bellNode.setLocalTranslation((i - 5) * 4, 0, 0);
-			bellNode.setLocalScale((float) (-0.04545 * this.
-					i) + 1);
+			bellNode.setLocalScale((float) (-0.04545 * i) + 1);
 			
 			malletNode = new Node();
 			Spatial child = context.loadModel("TubularBellMallet.obj", "Wood.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -103,7 +100,7 @@ public class TubularBells extends DecayedInstrument {
 			malletNode.setCullHint(Spatial.CullHint.Always);
 		}
 		
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			animTime += delta;
 			if (bellIsRecoiling) {
 				bellNode.getChild(0).setCullHint(Spatial.CullHint.Dynamic); // Show bright
@@ -131,7 +128,7 @@ public class TubularBells extends DecayedInstrument {
 			amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * BASE_AMPLITUDE;
 			animTime = 0;
 			bellIsRecoiling = true;
-			recoilNow = true;
+			boolean recoilNow = true;
 		}
 	}
 }

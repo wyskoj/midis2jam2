@@ -6,6 +6,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
+import org.wysko.midis2jam2.instrument.piano.KeyedInstrument;
 import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class Harp extends SustainedInstrument {
 			
 			MidiNoteEvent note = (MidiNoteEvent) event;
 			int midiNote = note.note;
-			if (Keyboard.midiValueToColor(note.note) == Keyboard.KeyColor.BLACK) {
+			if (KeyedInstrument.midiValueToColor(note.note) == Keyboard.KeyColor.BLACK) {
 				midiNote--; // round black notes down
 			}
 			int harpString = -1;

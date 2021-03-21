@@ -27,7 +27,7 @@ public class LinearOffsetCalculator implements OffsetCalculator {
 	}
 	
 	/**
-	 * Instantiates a new linear offset calculator.s
+	 * Instantiates a new linear offset calculator.
 	 *
 	 * @param locationOffset the location offset
 	 * @param rotationOffset the rotation offset
