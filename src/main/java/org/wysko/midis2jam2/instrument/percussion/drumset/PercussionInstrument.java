@@ -34,4 +34,9 @@ public abstract class PercussionInstrument extends Instrument {
 	public static double velocityRecoilDampening(@Range(from = 0, to = 127) int x) {
 		return FastMath.sqrt(x) / 11.26942767f;
 	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		// Do nothing!
+	}
 }

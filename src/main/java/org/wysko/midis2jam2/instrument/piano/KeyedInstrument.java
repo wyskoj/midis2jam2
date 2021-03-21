@@ -1,29 +1,74 @@
 package org.wysko.midis2jam2.instrument.piano;
 
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiEvent;
+import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * Any instrument that visualizes notes by rotating piano keys.
+ */
 public abstract class KeyedInstrument extends Instrument {
-	protected final List<MidiChannelSpecificEvent> events;
 	
-	protected KeyedInstrument(Midis2jam2 context,
-	                          List<MidiChannelSpecificEvent> eventList) {
+	/**
+	 * The lowest note this instrument can play.
+	 */
+	protected final int rangeLow;
+	
+	/**
+	 * The highest note this instrument can play.
+	 */
+	protected final int rangeHigh;
+	@NotNull
+	final protected List<MidiNoteEvent> events;
+	
+	@Unmodifiable
+	@NotNull
+	private final List<NotePeriod> notePeriods;
+	
+	/**
+	 * The keys of this instrument.
+	 */
+	protected Key[] keys;
+	
+	
+	/**
+	 * Instantiates a new Keyed instrument.
+	 *
+	 * @param context   the context
+	 * @param eventList the event list
+	 * @param rangeLow  the lowest note this instrument can play
+	 * @param rangeHigh the highest note this instrument can play
+	 */
+	protected KeyedInstrument(@NotNull Midis2jam2 context,
+	                          @NotNull List<MidiChannelSpecificEvent> eventList,
+	                          int rangeLow,
+	                          int rangeHigh) {
 		super(context);
-		this.events = eventList;
+		this.events = SustainedInstrument.scrapeMidiNoteEvents(eventList);
+		this.rangeLow = rangeLow;
+		this.rangeHigh = rangeHigh;
+		this.keys = new Key[keyCount()];
+		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(this.events));
 	}
 	
-	protected void handleKeys(double time, float delta) {
-		List<MidiEvent> eventsToPerform = new ArrayList<>();
+	@Override
+	public void tick(double time, float delta) {
+		setIdleVisibilityByNoteOnAndOff(time);
+		List<MidiNoteEvent> eventsToPerform = new ArrayList<>();
 		if (!events.isEmpty()) {
 			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
 				events.remove(0);
@@ -34,38 +79,67 @@ public abstract class KeyedInstrument extends Instrument {
 			}
 		}
 		
-		for (MidiEvent event : eventsToPerform) {
+		for (MidiNoteEvent event : eventsToPerform) {
+			Key key = keyByMidiNote(event.note);
+			if (key == null) continue;
 			if (event instanceof MidiNoteOnEvent) {
-				pushKeyDown(((MidiNoteOnEvent) event).note);
+				key.setBeingPressed(true);
 			} else if (event instanceof MidiNoteOffEvent) {
-				releaseKey(((MidiNoteOffEvent) event).note);
+				key.setBeingPressed(false);
 			}
 		}
 		
-		transitionAnimation(delta);
-	}
-	
-	protected static void handleAKey(float delta, boolean beingPressed, Node node, Node downNode, Node upNode,
-	                                 Key key) {
-		if (!beingPressed) {
-			float[] angles = new float[3];
-			node.getLocalRotation().toAngles(angles);
-			if (angles[0] > 0.0001) { // fuck floats
-				node.setLocalRotation(new Quaternion(new float[]
-						{Math.max(angles[0] - (0.02f * delta * 50), 0), 0, 0}
-				));
-			} else {
-				node.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
-				
-				downNode.setCullHint(Spatial.CullHint.Always);
-				upNode.setCullHint(Spatial.CullHint.Dynamic);
-			}
+		for (Key key : keys) {
+			key.tick(delta);
 		}
 	}
 	
-	protected abstract void releaseKey(int note);
+	/**
+	 * Returns the number of keys on this instrument.
+	 *
+	 * @return the number of keys on this instrument
+	 */
+	@Contract(pure = true)
+	public int keyCount() {
+		return (rangeHigh - rangeLow) + 1;
+	}
 	
-	public abstract void transitionAnimation(float delta);
+	/**
+	 * Calculates if a MIDI note value is a black or white key on a standard piano.
+	 *
+	 * @param x the MIDI note value
+	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
+	 */
+	@Contract(pure = true)
+	@NotNull
+	public static KeyColor midiValueToColor(int x) {
+		int note = x % 12;
+		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
+	}
 	
-	protected abstract void pushKeyDown(int note);
+	@Nullable
+	protected abstract Key keyByMidiNote(int midiNote);
+	
+	/**
+	 * Keyboards have two different colored keys: white and black.
+	 */
+	public enum KeyColor {
+		
+		/**
+		 * White key color.
+		 */
+		WHITE,
+		
+		/**
+		 * Black key color.
+		 */
+		BLACK
+	}
+	
+	protected void setIdleVisibilityByNoteOnAndOff(double time) {
+		boolean b = SustainedInstrument.calcVisibility(time, notePeriods);
+		visible = b;
+		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+	}
+	
 }

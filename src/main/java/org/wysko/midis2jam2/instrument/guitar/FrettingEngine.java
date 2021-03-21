@@ -1,6 +1,7 @@
 package org.wysko.midis2jam2.instrument.guitar;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -78,10 +79,11 @@ public class FrettingEngine {
 	}
 	
 	/**
-	 * Calculates the best fretboard location for the specified MIDI note with temporal consideration.
+	 * Calculates the best fretboard location for the specified MIDI note with temporal consideration. If no possible
+	 * positions exists (all the strings are occupied), returns null.
 	 *
 	 * @param midiNote the MIDI note to find the best fretboard position
-	 * @return the best fretboard position
+	 * @return the best fretboard position, or null if one does not exist
 	 */
 	@Nullable
 	@Contract(pure = true)
@@ -100,8 +102,7 @@ public class FrettingEngine {
 			
 		}
 		possiblePositions.sort(Comparator.comparingDouble(o -> o.distance(runningAveragePosition())));
-		if (possiblePositions.isEmpty()) return null;
-		return possiblePositions.get(0);
+		return possiblePositions.isEmpty() ? null : possiblePositions.get(0);
 	}
 	
 	/**
@@ -109,7 +110,7 @@ public class FrettingEngine {
 	 *
 	 * @param position the fretboard position to occupy
 	 */
-	public void applyFretboardPosition(FretboardPosition position) {
+	public void applyFretboardPosition(@NotNull FretboardPosition position) {
 		/* Fail if the position is already occupied */
 		assert frets[position.string] == -1 : "The specified string is already occupied.";
 		
@@ -119,10 +120,13 @@ public class FrettingEngine {
 	}
 	
 	/**
-	 * Calculates the running average position.
+	 * Calculates the running average position. If no frets have been previously applied, returns the position at
+	 * {@code 0,0}.
 	 *
-	 * @return the running average position
+	 * @return the running average position, or {@code 0,0} if no frets have been applied yet
 	 */
+	@NotNull
+	@Contract(pure = true)
 	private FretboardPosition runningAveragePosition() {
 		if (runningAverage.isEmpty()) {
 			return new FretboardPosition(0, 0);
@@ -139,11 +143,22 @@ public class FrettingEngine {
 		);
 	}
 	
+	/**
+	 * Releases a string, stopping the animation on it and allowing it to be used for another note.
+	 *
+	 * @param string the string to release
+	 */
 	public void releaseString(int string) {
-		assert string < numberOfStrings : "Can't release a string that does not exist.";
+		assert string < numberOfStrings && string >= 0 : "Can't release a string that does not exist.";
 		frets[string] = -1;
 	}
 	
+	/**
+	 * Returns the current fret configuration.
+	 *
+	 * @return the current fret configuration
+	 */
+	@Contract(pure = true)
 	public int[] getFrets() {
 		return frets;
 	}
@@ -181,7 +196,7 @@ public class FrettingEngine {
 		 * @return the distance
 		 */
 		@Contract(pure = true)
-		double distance(FretboardPosition o) {
+		double distance(@NotNull FretboardPosition o) {
 			return Math.sqrt(Math.pow(string - o.string, 2) + Math.pow(fret - o.fret, 2));
 		}
 	}

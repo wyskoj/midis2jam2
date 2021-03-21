@@ -1,6 +1,7 @@
 package org.wysko.midis2jam2.instrument.percussion.drumset;
 
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class SnareDrum extends StickDrum {
 	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits, Pivot.NEAR_END);
+		super(context, hits, Stick.Pivot.NEAR_END);
 		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);

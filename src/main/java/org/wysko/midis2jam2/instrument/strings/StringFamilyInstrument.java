@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.OffsetCalculator;
 import org.wysko.midis2jam2.instrument.guitar.FrettedInstrument;
 import org.wysko.midis2jam2.instrument.guitar.FrettingEngine;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -28,10 +29,12 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	 * The bow of this string instrument.
 	 */
 	protected final Spatial bow;
+	
 	/**
 	 * The Bow node.
 	 */
 	protected final Node bowNode = new Node();
+	
 	/**
 	 * True if the bow is going left, false if the bow is going right.
 	 */
@@ -45,7 +48,8 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	                                 int[] openStringMidiNotes,
 	                                 int rangeLow,
 	                                 int rangeHigh,
-	                                 Spatial body) {
+	                                 Spatial body,
+	                                 OffsetCalculator offsetCalculator) {
 		super(context,
 				new FrettingEngine(
 						4, 48, openStringMidiNotes, rangeLow, rangeHigh),
@@ -69,7 +73,8 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 								0.47f,
 						}),
 				4,
-				body);
+				body
+		);
 		
 		body.setLocalTranslation(0, 0, -1.2f);
 		instrumentNode.attachChild(body);
@@ -94,6 +99,12 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 		positionUpperStrings();
 		loadLowerStrings();
 		loadNoteFingers();
+	}
+	
+	@Override
+	public void tick(double time, float delta) {
+		super.tick(time, delta);
+		animateBow(delta);
 	}
 	
 	@Override

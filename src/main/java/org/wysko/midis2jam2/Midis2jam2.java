@@ -18,11 +18,11 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.StageHorns;
-import org.wysko.midis2jam2.instrument.monophonic.brass.Trumpet;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.guitar.Guitar;
+import org.wysko.midis2jam2.instrument.monophonic.brass.Trumpet;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Ocarina;
 import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
@@ -37,11 +37,12 @@ import org.wysko.midis2jam2.instrument.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.strings.*;
 import org.wysko.midis2jam2.midi.*;
-import org.wysko.midis2jam2.midi.MidiEvent;
 
-import javax.sound.midi.*;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.Sequence;
+import javax.sound.midi.Sequencer;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -54,7 +55,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	Sequencer sequencer;
 	double timeSinceStart = -2;
 	boolean seqHasRunOnce = false;
-	private BitmapText bitmapText1;
+	public BitmapText debugText;
 	private Spatial pianoStand;
 	private Spatial malletStand;
 	private Spatial pianoShadow;
@@ -98,6 +99,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			}
 			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
 				backup = MidiSystem.getMidiDevice(eachInfo);
+				LATENCY_FIX = 0;
 				break;
 			}
 		}
@@ -159,14 +161,14 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		// Hide/show stands
 		if (pianoStand != null)
-		pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
-				Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+			pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
+					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 		if (pianoShadow != null)
-		pianoShadow.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
-				Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+			pianoShadow.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
+					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 		if (malletStand != null)
-		malletStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Mallets) ?
-				Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+			malletStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Mallets) ?
+					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 		
 	}
 	
@@ -174,7 +176,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * Reads the MIDI file and calculates program events, appropriately creating instances of each instrument and
 	 * assigning the correct events to respective instruments.
 	 */
-	private void calculateInstruments() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+	private void calculateInstruments() throws ReflectiveOperationException {
 		//noinspection unchecked
 		ArrayList<MidiChannelSpecificEvent>[] channels = (ArrayList<MidiChannelSpecificEvent>[]) new ArrayList[16];
 		// Create 16 ArrayLists for each channel
@@ -273,7 +275,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@SuppressWarnings("SpellCheckingInspection")
 	@Nullable
 	private Instrument fromEvents(MidiProgramEvent programEvent,
-	                              List<MidiChannelSpecificEvent> events) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		System.out.println(("the program num is " + programEvent.programNum));
 		switch (programEvent.programNum) {
 			case 0: // Acoustic Grand Piano
@@ -350,11 +352,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 92: // Pad 5 (Bowed)
 				return new StageStrings(this, events);
 			case 56: // Trumpet
-				return new Trumpet(this,events);
+				return new Trumpet(this, events);
 			case 61: // Brass Section
 			case 62: // Synth Brass 1
 			case 63: // Synth Brass 2
-				return new StageHorns(this,events);
+				return new StageHorns(this, events);
 			case 64: // Soprano Sax
 				return new SopranoSax(this, events);
 			case 65: // Alto Sax
@@ -418,11 +420,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		rootNode.attachChild(stage);
 		
 		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-		bitmapText1 = new BitmapText(bitmapFont, false);
-		bitmapText1.setSize(bitmapFont.getCharSet().getRenderedSize());
-		bitmapText1.setText("");
-		bitmapText1.setLocalTranslation(300, bitmapText1.getLineHeight(), 0);
-		guiNode.attachChild(bitmapText1);
+		debugText = new BitmapText(bitmapFont, false);
+		debugText.setSize(bitmapFont.getCharSet().getRenderedSize());
+		debugText.setText("");
+		debugText.setLocalTranslation(300, debugText.getLineHeight(), 0);
+		guiNode.attachChild(debugText);
 
 
 //		DirectionalLight l = new DirectionalLight();
@@ -431,7 +433,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		try {
 			calculateInstruments();
-		} catch (InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
+		} catch (ReflectiveOperationException e) {
 			e.printStackTrace();
 		}
 		
@@ -443,11 +445,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			
 			pianoShadow = assetManager.loadModel("Assets/PianoShadow.obj");
 			final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			material.setTexture("ColorMap",assetManager.loadTexture("Assets/KeyboardShadow.png"));
+			material.setTexture("ColorMap", assetManager.loadTexture("Assets/KeyboardShadow.png"));
 			material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 			pianoShadow.setQueueBucket(RenderQueue.Bucket.Transparent);
 			pianoShadow.setMaterial(material);
-			pianoShadow.move(-47,0.01f,-3);
+			pianoShadow.move(-47, 0.01f, -3);
 			pianoShadow.rotate(0, rad(45), 0);
 			rootNode.attachChild(pianoShadow);
 		}
@@ -507,20 +509,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}, 0, 1);
 	}
 	
-	public BitmapText debugText(String text, float size) {
-		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Console.fnt");
-		BitmapText bText = new BitmapText(bitmapFont, false);
-		bText.setSize(guiFont.getCharSet().getRenderedSize());
-		bText.setText(text);
-		return bText;
-	}
-	
 	
 	/**
 	 * Loads a model given a model and texture paths. Applies unshaded material.
 	 *
-	 * @param m          the path to the model
-	 * @param t          the path to the texture
+	 * @param m the path to the model
+	 * @param t the path to the texture
 	 * @return the model
 	 */
 	public Spatial loadModel(String m, String t) {
@@ -611,7 +605,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				setCamera(camera);
 			} catch (IllegalArgumentException ignored) {
 				if (name.equals("exit")) {
-					sequencer.stop();
+					if (sequencer.isOpen())
+						sequencer.stop();
 					System.exit(0);
 				}
 				

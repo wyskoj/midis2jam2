@@ -4,13 +4,9 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
+import org.wysko.midis2jam2.instrument.monophonic.Clone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +18,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class SopranoSax extends Saxophone {
 	
 	private final static float STRETCH_FACTOR = 2f;
+	
 	/**
 	 * Defines which keys need to be pressed given the corresponding MIDI note.
 	 */
@@ -83,56 +80,30 @@ public class SopranoSax extends Saxophone {
 		put(57, new Integer[] {3, 5, 6, 14, 15, 17, 19, 8}); // B
 		put(56, new Integer[] {3, 5, 6, 14, 15, 17, 19, 10}); // Bb
 	}};
-	private final static float ROTATION_FACTOR = 0.1f;
-	private List<NotePeriod> finalNotePeriods;
 	
 	/**
 	 * Constructs an Soprano saxophone.
-	 *  @param context context to midis2jam2
+	 *
+	 * @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of an Soprano saxophone
 	 */
 	public SopranoSax(Midis2jam2 context,
 	                  List<MidiChannelSpecificEvent> events)
-			throws InstantiationException,
-			IllegalAccessException,
-			InvocationTargetException,
-			NoSuchMethodException {
+			throws ReflectiveOperationException {
 		
-		super(context);
-		
-		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
-		
-		this.notePeriods = calculateNotePeriods(justTheNotes);
-		calculateClones(this, SopranoSaxClone.class);
-		finalNotePeriods = new ArrayList<>(notePeriods);
-		for (MonophonicClone clone : clones) {
-			SopranoSaxClone SopranoClone = ((SopranoSaxClone) clone);
-			groupOfPolyphony.attachChild(SopranoClone.hornNode);
-		}
-		
-		highestLevel.attachChild(groupOfPolyphony);
+		super(context, events, SopranoSaxClone.class);
 		
 		groupOfPolyphony.move(1, 29, -47);
 		groupOfPolyphony.rotate(rad(-25), rad(90), rad(-15));
 		groupOfPolyphony.scale(0.75f);
-		
-		context.getRootNode().attachChild(highestLevel);
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
-		updateClones(time, delta, MULTI_SAX_OFFSET);
-	}
-	
 	
 	/**
-	 * Implements {@link MonophonicClone}, as Soprano saxophone clones.
+	 * Implements {@link Clone}, as Soprano saxophone clones.
 	 */
 	public class SopranoSaxClone extends SaxophoneClone {
 		public SopranoSaxClone() {
-			super(SopranoSax.this);
+			super(SopranoSax.this, STRETCH_FACTOR, KEY_MAPPING);
 			
 			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
 			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -150,21 +121,6 @@ public class SopranoSax extends Saxophone {
 			modelNode.attachChild(this.body);
 			modelNode.attachChild(bell);
 			bell.move(0, -22, 0); // Move bell down to body
-			
-			animNode.attachChild(modelNode);
-			hornNode.attachChild(animNode);
 		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			int indexThis = SopranoSax.this.clones.indexOf(this);
-			animation(time, indexThis, SopranoSax.STRETCH_FACTOR, SopranoSax.ROTATION_FACTOR, SopranoSax.KEY_MAPPING);
-			
-			/* Move depending on degree of polyphony */
-			hornNode.setLocalTranslation((float) 20 * indexThis, 0, 0);
-			// TODO Make saxophones rotate about an origin, and fill any gaps. Write here and then pull up to
-			//  Saxophone or monophonic instrument?
-		}
-		
 	}
 }

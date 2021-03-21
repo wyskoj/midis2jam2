@@ -5,19 +5,14 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.StageInstrument;
-import org.wysko.midis2jam2.instrument.brass.StageInstrumentNote;
+import org.wysko.midis2jam2.instrument.brass.WrappedOctaveSustained;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class StageStrings extends StageInstrument {
-	private final List<NotePeriod> finalNotePeriods;
+public class StageStrings extends WrappedOctaveSustained {
 	
 	// Strings are 9 / 12 degrees apart
 	// Left one is 22 up
@@ -27,38 +22,27 @@ public class StageStrings extends StageInstrument {
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		eachNote = new StageStringNote[12];
+		twelfths = new StageStringNote[12];
 		for (int i = 0; i < 12; i++) {
 			stringNodes[i] = new Node();
-			eachNote[i] = new StageStringNote();
-			stringNodes[i].attachChild(eachNote[i].highestLevel);
-			eachNote[i].highestLevel.setLocalTranslation(0, 2 * i, -151.76f);
+			twelfths[i] = new StageStringNote();
+			stringNodes[i].attachChild(twelfths[i].highestLevel);
+			twelfths[i].highestLevel.setLocalTranslation(0, 2 * i, -151.76f);
 			stringNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad((9 / 10f) * i), 0));
-			highestLevel.attachChild(stringNodes[i]);
+			instrumentNode.attachChild(stringNodes[i]);
 		}
 		
-		context.getRootNode().attachChild(highestLevel);
-		
-		finalNotePeriods = calculateNotePeriods(scrapeMidiNoteEvents(eventList));
 	}
 	
 	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods,time,highestLevel);
-		final int i1 =
-				context.instruments.stream().filter(e -> e instanceof StageStrings).collect(Collectors.toList()).indexOf(this);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (10.6 * i1)), 0));
-		
-		playStageInstruments(time);
-		
-		// Tick each string
-		Arrays.stream(eachNote).forEach(string -> string.tick(time, delta));
+	protected void moveForMultiChannel() {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (10.6 * indexForMoving())), 0));
 	}
 	
-	public class StageStringNote extends StageInstrumentNote {
+	public class StageStringNote extends TwelfthOfOctave {
 		
-		final Node movementNode = new Node();
 		final Node bowNode = new Node();
+		final Node animStringNode = new Node();
 		final Spatial[] animStrings = new Spatial[5];
 		final Spatial restingString;
 		final Spatial bow;
@@ -66,7 +50,7 @@ public class StageStrings extends StageInstrument {
 		
 		public StageStringNote() {
 			// Load holder
-			movementNode.attachChild(context.loadModel("StageStringHolder.obj", "FakeWood.bmp",
+			animNode.attachChild(context.loadModel("StageStringHolder.obj", "FakeWood.bmp",
 					Midis2jam2.MatType.UNSHADED, 0));
 			
 			// Load anim strings
@@ -74,13 +58,13 @@ public class StageStrings extends StageInstrument {
 				animStrings[i] = context.loadModel("StageStringBottom" + i + ".obj", "StageStringPlaying.bmp",
 						Midis2jam2.MatType.UNSHADED, 0);
 				animStrings[i].setCullHint(Spatial.CullHint.Always);
-				animNode.attachChild(animStrings[i]);
+				animStringNode.attachChild(animStrings[i]);
 			}
-			movementNode.attachChild(animNode);
+			animNode.attachChild(animStringNode);
 			
 			// Load resting string
 			restingString = context.loadModel("StageString.obj", "StageString.bmp", Midis2jam2.MatType.UNSHADED, 0);
-			movementNode.attachChild(restingString);
+			animNode.attachChild(restingString);
 			
 			// Load bow
 			bow = context.loadModel("StageStringBow.fbx", "FakeWood.bmp", Midis2jam2.MatType.UNSHADED, 0);
@@ -90,9 +74,9 @@ public class StageStrings extends StageInstrument {
 			bowNode.setLocalTranslation(0, 48, 0);
 			bowNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-60)));
 			bowNode.setCullHint(Spatial.CullHint.Always);
-			movementNode.attachChild(bowNode);
+			animNode.attachChild(bowNode);
 			
-			highestLevel.attachChild(movementNode);
+			highestLevel.attachChild(animNode);
 		}
 		
 		protected void calculateFrameChanges(float delta) {
@@ -115,16 +99,16 @@ public class StageStrings extends StageInstrument {
 				progress += delta / duration;
 				bowNode.setCullHint(Spatial.CullHint.Dynamic);
 				bow.setLocalTranslation(0, (float) (8 * (progress - 0.5)), 0);
-				movementNode.setLocalTranslation(0, 0, 2);
+				animNode.setLocalTranslation(0, 0, 2);
 				
 				restingString.setCullHint(Spatial.CullHint.Always);
-				animNode.setCullHint(Spatial.CullHint.Dynamic);
+				animStringNode.setCullHint(Spatial.CullHint.Dynamic);
 			} else {
 				bowNode.setCullHint(Spatial.CullHint.Always);
-				movementNode.setLocalTranslation(0, 0, 0);
+				animNode.setLocalTranslation(0, 0, 0);
 				
 				restingString.setCullHint(Spatial.CullHint.Dynamic);
-				animNode.setCullHint(Spatial.CullHint.Always);
+				animStringNode.setCullHint(Spatial.CullHint.Always);
 			}
 			calculateFrameChanges(delta);
 			animateStrings();

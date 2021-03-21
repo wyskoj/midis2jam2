@@ -124,4 +124,9 @@ public class Percussion extends Instrument {
 		splash.tick(time, delta);
 		hiHat.tick(time, delta);
 	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		// Do nothing!
+	}
 }

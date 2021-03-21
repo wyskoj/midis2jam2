@@ -4,19 +4,16 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
-import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.instrument.monophonic.Clone;
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
- * The tenor sax.
+ * The Tenor sax.
  */
 public class TenorSax extends Saxophone {
 	
@@ -82,56 +79,30 @@ public class TenorSax extends Saxophone {
 		put(45, new Integer[] {3, 5, 6, 14, 15, 17, 19, 8}); // B
 		put(44, new Integer[] {3, 5, 6, 14, 15, 17, 19, 10}); // Bb
 	}};
-	private final static float ROTATION_FACTOR = 0.1f;
-	final Node groupOfPolyphony = new Node();
-	private List<NotePeriod> finalNotePeriods;
 	
 	/**
 	 * Constructs a tenor sax.
-	 *  @param context context to midis2jam2
+	 *
+	 * @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of a tenor sax
 	 */
 	public TenorSax(Midis2jam2 context,
 	                List<MidiChannelSpecificEvent> events)
-			throws InstantiationException,
-			IllegalAccessException,
-			InvocationTargetException,
-			NoSuchMethodException {
+			throws ReflectiveOperationException {
 		
-		super(context);
-		
-		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
-		
-		this.notePeriods = calculateNotePeriods(justTheNotes);
-		calculateClones(this, TenorSaxClone.class);
-		finalNotePeriods = new ArrayList<>(notePeriods);
-		for (MonophonicClone clone : clones) {
-			TenorSaxClone tenorSaxClone = ((TenorSaxClone) clone);
-			groupOfPolyphony.attachChild(tenorSaxClone.hornNode);
-		}
-		
-		highestLevel.attachChild(groupOfPolyphony);
+		super(context, events, TenorSaxClone.class);
 		
 		groupOfPolyphony.move(0, 32.5f, -3);
 		groupOfPolyphony.rotate(rad(10), rad(30), 0);
 		groupOfPolyphony.scale(1.15f);
-		
-		context.getRootNode().attachChild(highestLevel);
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
-		updateClones(time, delta, MULTI_SAX_OFFSET);
-	}
-	
 	
 	/**
-	 * Implements {@link MonophonicClone}, as tenor sax clones.
+	 * Implements {@link Clone}, as tenor sax clones.
 	 */
 	public class TenorSaxClone extends SaxophoneClone {
 		public TenorSaxClone() {
-			super(TenorSax.this);
+			super(TenorSax.this, STRETCH_FACTOR, KEY_MAPPING);
 			
 			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
 			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -149,17 +120,6 @@ public class TenorSax extends Saxophone {
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
 			bell.move(0, -22, 0); // Move bell down to body
-			
-			animNode.attachChild(modelNode);
-			hornNode.attachChild(animNode);
 		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			int indexThis = TenorSax.this.clones.indexOf(this);
-			animation(time, indexThis, TenorSax.STRETCH_FACTOR, TenorSax.ROTATION_FACTOR, TenorSax.KEY_MAPPING);
-			hornNode.setLocalTranslation((float) 20 * indexThis, 0, 0);
-		}
-		
 	}
 }

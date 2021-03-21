@@ -1,13 +1,14 @@
 package org.wysko.midis2jam2.instrument.monophonic;
 
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.NotePeriod;
+import org.wysko.midis2jam2.instrument.OffsetCalculator;
+import org.wysko.midis2jam2.instrument.SustainedInstrument;
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,43 +16,58 @@ import java.util.List;
  * A monophonic instrument is any instrument that can only play one note at a time (e.g., saxophones, clarinets,
  * ocarinas, etc.). Because this limitation is lifted in MIDI files, midis2jam2 needs to visualize polyphony by
  * spawning "clones" of an instrument. These clones will only appear when necessary.
+ * <p>
+ * It happens to be that every monophonic instrument is also a {@link SustainedInstrument}.
  *
- * @see MonophonicClone
+ * @see Clone
  */
-public abstract class MonophonicInstrument extends Instrument {
+public abstract class MonophonicInstrument extends SustainedInstrument {
+	
 	/**
-	 * Since this is effectively static, we need reference to midis2jam2.
+	 * Node contains all clones.
 	 */
-	public final Midis2jam2 context;
+	@NotNull
 	protected final Node groupOfPolyphony = new Node();
-	protected final Node highestLevel = new Node();
-	/**
-	 * Populated by {@link #calculateNotePeriods(List)}.
-	 *
-	 * @see #calculateNotePeriods(List)
-	 */
-	public List<NotePeriod> notePeriods;
+	
+
 	/**
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
 	 */
-	public List<MonophonicClone> clones;
+	@NotNull
+	public List<Clone> clones;
 	
 	/**
 	 * Constructs a monophonic instrument.
-	 *
-	 * @param context context to midis2jam2
+	 *  @param context                 context to midis2jam2
+	 * @param eventList               the event list
 	 */
-	public MonophonicInstrument(
-			Midis2jam2 context) {
-		super(context);
-		this.context = context;
+	public MonophonicInstrument(@NotNull Midis2jam2 context,
+	                            @NotNull List<MidiChannelSpecificEvent> eventList,
+	                            @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
+		super(context, eventList);
+		this.clones = calculateClones(this, cloneClass);
+		
+		for (Clone clone : clones) {
+			groupOfPolyphony.attachChild(clone.offsetNode);
+		}
+		
+		this.instrumentNode.attachChild(groupOfPolyphony);
 	}
 	
-	protected void calculateClones(MonophonicInstrument instrument,
-	                               Class<? extends MonophonicClone> cloneClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-		clones = new ArrayList<>();
+	/**
+	 * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number
+	 * of "clones" needed to visualize this and determine which note events shall be assigned to which clones, using
+	 * the least number of clones.
+	 *
+	 * @param instrument the monophonic instrument that is handling the clones
+	 * @param cloneClass the class of the {@link Clone} to instantiate
+	 * @throws ReflectiveOperationException usually is thrown if an error occurs in the clone constructor
+	 */
+	protected List<Clone> calculateClones(@NotNull MonophonicInstrument instrument,
+	                                      @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
+		List<Clone> clones = new ArrayList<>();
 		Constructor<?> constructor = cloneClass.getDeclaredConstructor(instrument.getClass());
-		clones.add((MonophonicClone) constructor.newInstance(instrument));
+		clones.add((Clone) constructor.newInstance(instrument));
 		for (int i = 0; i < notePeriods.size(); i++) {
 			for (int j = 0; j < notePeriods.size(); j++) {
 				if (j == i) continue;
@@ -70,15 +86,15 @@ public abstract class MonophonicInstrument extends Instrument {
 //				}
 				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
 					boolean added = false;
-					for (MonophonicClone clone : clones) {
-						if (!clone.isPlayingAtTime(comp1.startTick())) {
+					for (Clone clone : clones) {
+						if (!clone.isPlaying(comp1.startTick())) {
 							clone.notePeriods.add(comp1);
 							added = true;
 							break;
 						}
 					}
 					if (!added) {
-						MonophonicClone e = (MonophonicClone) constructor.newInstance(instrument);
+						Clone e = (Clone) constructor.newInstance(instrument);
 						e.notePeriods.add(comp1);
 						clones.add(e);
 					}
@@ -88,24 +104,26 @@ public abstract class MonophonicInstrument extends Instrument {
 				break;
 			}
 		}
+		return clones;
 	}
 	
-	
-	protected void updateClones(double time, float delta, Vector3f multiChannelOffset) {
-		int othersOfMyType = 0;
-		int mySpot = context.instruments.indexOf(this);
-		for (int i = 0; i < context.instruments.size(); i++) {
-			if (this.getClass().isInstance(context.instruments.get(i)) &&
-					context.instruments.get(i) != this &&
-					i < mySpot && context.instruments.get(i).visible) {
-				othersOfMyType++;
-			}
-		}
-		
-		highestLevel.setLocalTranslation(multiChannelOffset.mult(othersOfMyType));
-		
-		for (MonophonicClone clone : clones) {
+	/**
+	 * Updates clones, performing the {@link Clone#tick(double, float)} method and calculating clone offsets.
+	 *
+	 * @param time  the current time, in seconds
+	 * @param delta the amount of time since the last frame
+	 */
+	protected void updateClones(double time, float delta) {
+		for (Clone clone : clones) {
 			clone.tick(time, delta);
 		}
+	}
+	
+	@Override
+	public void tick(double time, float delta) {
+		super.tick(time, delta);
+		updateClones(time, delta);
+		
+		
 	}
 }

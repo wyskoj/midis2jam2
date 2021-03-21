@@ -18,9 +18,9 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Cymbal extends SingleStickedInstrument {
 	
 	final Node cymbalNode = new Node();
-	private final int WOBBLE_SPEED = 7;
-	private final double DAMPENING = 1;
-	private final double AMPLITUDE = 1.5;
+	private static final int WOBBLE_SPEED = 7;
+	private static final double DAMPENING = 1;
+	private static final double AMPLITUDE = 1.5;
 	double animTime = -1;
 	
 	protected Cymbal(Midis2jam2 context,
@@ -73,7 +73,7 @@ public class Cymbal extends SingleStickedInstrument {
 		CRASH_1(new Vector3f(-18, 45, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f),
 		CRASH_2(new Vector3f(13, 45, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f),
 		SPLASH(new Vector3f(-2, 45, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f),
-		RIDE_1(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f),
+		RIDE_1(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f), // TODO fill these out
 		RIDE_2(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f),
 		CHINA(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f);
 		final float size;

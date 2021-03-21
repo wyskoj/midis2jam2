@@ -1,12 +1,12 @@
 package org.wysko.midis2jam2.instrument.piano;
 
 import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiEvent;
 
 import java.util.List;
 
@@ -17,123 +17,100 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class Keyboard extends KeyedInstrument {
 	
-	public static final int A_0 = 21;
-	public static final int C_8 = 108;
-	public static final int KEYBOARD_KEY_COUNT = 88;
-	public final Node movementNode = new Node();
-	public final Node node = new Node();
-	public final KeyboardKey[] keys = new KeyboardKey[KEYBOARD_KEY_COUNT];
-	private final List<? extends MidiEvent> events;
+	/**
+	 * The skin of this keyboard.
+	 */
 	private final KeyboardSkin skin;
-	private final List<NotePeriod> notePeriods;
 	
+	/**
+	 * Instantiates a new keyboard.
+	 *
+	 * @param context context to midis2jam2
+	 * @param events  the events this keyboard is responsible for
+	 * @param skin    the skin of the keyboard
+	 * @see KeyboardSkin
+	 */
 	public Keyboard(Midis2jam2 context, List<MidiChannelSpecificEvent> events, KeyboardSkin skin) {
-		super(context, events);
-		this.events = events;
+		super(context, events, 21, 108);
+		
 		this.skin = skin;
 		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+		instrumentNode.attachChild(pianoCase);
 		
 		int whiteCount = 0;
-		for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
-			if (midiValueToColor(i + A_0) == KeyColor.WHITE) { // White key
-				keys[i] = new KeyboardKey(i + A_0, whiteCount);
+		for (int i = 0; i < keyCount(); i++) {
+			if (midiValueToColor(i + rangeLow) == KeyColor.WHITE) { // White key
+				keys[i] = new KeyboardKey(i + rangeLow, whiteCount);
 				whiteCount++;
 			} else { // Black key
-				keys[i] = new KeyboardKey(i + A_0, i);
+				keys[i] = new KeyboardKey(i + rangeLow, i);
 			}
 		}
 		
-		movementNode.attachChild(pianoCase);
-		node.attachChild(movementNode);
-		context.getRootNode().attachChild(node);
-		
-		node.move(-50, 32f, -6);
-		node.rotate(0, rad(45), 0);
-		
-		notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(events));
+		instrumentNode.move(-50, 32f, -6);
+		instrumentNode.rotate(0, rad(45), 0);
+	}
+	
+	@Override
+	protected void moveForMultiChannel() {
+		int i = indexForMoving();
+		offsetNode.setLocalTranslation(
+				(float) (-5.865f * i * Math.cos(rad(45))),
+				3.03f * i,
+				(float) (-5.865f * i * Math.sin(rad(45))));
+	}
+	
+	@Override
+	protected @Nullable Key keyByMidiNote(int midiNote) {
+		if (midiNote > rangeHigh || midiNote < rangeLow) return null;
+		return keys[midiNote - rangeLow];
 	}
 	
 	/**
-	 * Calculates if a MIDI note value is a black or white key on a standard piano.
-	 *
-	 * @param x the MIDI note value
-	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
+	 * Different types of keyboards have different skins.
 	 */
-	public static KeyColor midiValueToColor(int x) {
-		x = x % 12;
-		return x == 1
-				|| x == 3
-				|| x == 6
-				|| x == 8
-				|| x == 10 ? KeyColor.BLACK : KeyColor.WHITE;
-	}
-	
-	public void tick(double x, float delta) {
-		// Move if overlapping
-		int keyboardsBeforeMe = 0;
-		int mySpot = context.instruments.indexOf(this);
-		for (int i = 0; i < context.instruments.size(); i++) {
-			if (context.instruments.get(i) instanceof Keyboard &&
-					context.instruments.get(i) != this &&
-					i < mySpot && context.instruments.get(i).visible) {
-				keyboardsBeforeMe++;
-			}
-		}
-		movementNode.setLocalTranslation(0, keyboardsBeforeMe * 3.030f, -keyboardsBeforeMe * (5.865f));
-		setIdleVisibilityByPeriods(notePeriods,x, movementNode);
-		handleKeys(x,delta);
-	}
-	
-	public void pushKeyDown(int midiNote) {
-		if (midiNote < A_0 || midiNote > C_8) return;
-		KeyboardKey key = keys[midiNote - Keyboard.A_0];
-		key.node.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));
-		key.beingPressed = true;
-		key.downNode.setCullHint(Spatial.CullHint.Dynamic);
-		key.upNode.setCullHint(Spatial.CullHint.Always);
-	}
-	
-	public void transitionAnimation(float delta) {
-		for (KeyboardKey key : keys) {
-			handleAKey(delta, key.beingPressed, key.node, key.downNode, key.upNode, key);
-		}
-	}
-	
-	public void releaseKey(int midiNote) {
-		if (midiNote < A_0 || midiNote > C_8) return;
-		KeyboardKey key = keys[midiNote - Keyboard.A_0];
-		key.beingPressed = false;
-	}
-	
 	public enum KeyboardSkin {
+		
+		/**
+		 * Harpsichord keyboard skin.
+		 */
 		HARPSICHORD("HarpsichordSkin.bmp"),
+		
+		/**
+		 * Piano keyboard skin.
+		 */
 		PIANO("PianoSkin.bmp"),
+		
+		/**
+		 * Synth keyboard skin.
+		 */
 		SYNTH("SynthSkin.bmp"),
+		
+		/**
+		 * Wood keyboard skin.
+		 */
 		WOOD("PianoSkin_Wood.bmp");
+		
+		/**
+		 * The texture file.
+		 */
+		@NonNls
+		@NotNull
 		final String textureFile;
 		
-		KeyboardSkin(String textureFile) {
+		KeyboardSkin(@NonNls @NotNull String textureFile) {
 			this.textureFile = textureFile;
 		}
 	}
 	
-	public enum KeyColor {
-		WHITE, BLACK
-	}
 	
+	/**
+	 * The type Keyboard key.
+	 */
 	public class KeyboardKey extends Key {
-		public final int midiNote;
-		public final Node node = new Node();
-		public final Node upNode = new Node();
-		public final Node downNode = new Node();
-		public boolean beingPressed = false;
-		
 		public KeyboardKey(int midiNote, int startPos) {
-			this.midiNote = midiNote;
-			
-			
+			super(midiNote);
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
-				
 				/* UP KEY */
 				// Front key
 				Spatial upKeyFront = Keyboard.this.context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile,
@@ -154,13 +131,12 @@ public class Keyboard extends KeyedInstrument {
 				downNode.attachChild(downKeyFront);
 				downNode.attachChild(downKeyBack);
 				
-				node.attachChild(upNode);
-				node.attachChild(downNode);
+				keyNode.attachChild(upNode);
+				keyNode.attachChild(downNode);
 				
-				Keyboard.this.movementNode.attachChild(node);
-				node.move(startPos - 26, 0, 0); // 26 = count(white keys) / 2
+				Keyboard.this.instrumentNode.attachChild(keyNode);
+				keyNode.move(startPos - 26, 0, 0); // 26 = count(white keys) / 2
 			} else { // Black key
-				
 				/* Up key */
 				Spatial blackKey = Keyboard.this.context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 				upNode.attachChild(blackKey);
@@ -169,13 +145,14 @@ public class Keyboard extends KeyedInstrument {
 						Midis2jam2.MatType.UNSHADED, 0.9f);
 				downNode.attachChild(blackKeyDown);
 				
-				node.attachChild(upNode);
-				node.attachChild(downNode);
+				keyNode.attachChild(upNode);
+				keyNode.attachChild(downNode);
 				
-				Keyboard.this.movementNode.attachChild(node);
-				node.move(midiNote * (7 / 12f) - 38.2f, 0, 0); // funky math
+				Keyboard.this.instrumentNode.attachChild(keyNode);
+				keyNode.move(midiNote * (7 / 12f) - 38.2f, 0, 0); // funky math
 			}
 			downNode.setCullHint(Spatial.CullHint.Always);
 		}
+		
 	}
 }

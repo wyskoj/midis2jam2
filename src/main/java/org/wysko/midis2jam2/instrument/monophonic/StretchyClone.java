@@ -1,45 +1,57 @@
 package org.wysko.midis2jam2.instrument.monophonic;
 
-import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
-
-import java.util.HashMap;
 
 /**
  * Instruments that stretch when they play.
  */
-public abstract class StretchyClone extends FingeredKeyedClone {
+public abstract class StretchyClone extends Clone {
+	
+	/**
+	 * The stretch factor.
+	 */
+	protected final float stretchFactor;
+	
+	/**
+	 * The bell of the instrument.
+	 */
 	protected Spatial bell;
+	
+	/**
+	 * The body of the instrument.
+	 */
 	protected Spatial body;
 	
-	protected void animation(double time, int indexThis, float stretchFactor, float rotationFactor, HashMap<Integer,
-			Integer[]> keyMap) {
-		
-		/* Hide or show depending on degree of polyphony and current playing status */
-		hideOrShowOnPolyphony(indexThis);
-		
-		
-		
-		/* Collect note periods to execute */
-		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
-			currentNotePeriod = notePeriods.remove(0);
-		}
-		
-		/* Perform animation */
-		if (currentNotePeriod != null) {
-			if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
-				bell.setLocalScale(1,
-						(float) ((stretchFactor * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1),
-						1);
-				animNode.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * rotationFactor, 0, 0));
-				currentlyPlaying = true;
-			} else {
-				currentlyPlaying = false;
-				bell.setLocalScale(1, 1, 1);
-			}
-			/* Show hide correct keys */
-			pushOrReleaseKeys(keyMap);
-		}
+	/**
+	 * The axis on which to scale the bell on.
+	 */
+	protected Axis scaleAxis;
+	
+	public StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
+	                     Axis scaleAxis) {
+		super(parent, rotationFactor);
+		this.stretchFactor = stretchFactor;
+		this.scaleAxis = scaleAxis;
 	}
 	
+	@Override
+	protected void tick(double time, float delta) {
+		super.tick(time, delta);
+		
+		/* Stretch the bell of the instrument */
+		
+		if (currentNotePeriod != null) {
+			float scale = (float) ((stretchFactor * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
+			
+			bell.setLocalScale(
+					scaleAxis == Axis.X ? scale : 1,
+					scaleAxis == Axis.Y ? scale : 1,
+					scaleAxis == Axis.Z ? scale : 1
+			);
+			
+		} else {
+			bell.setLocalScale(1, 1, 1);
+		}
+		
+	}
 }

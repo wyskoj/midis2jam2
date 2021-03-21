@@ -5,11 +5,10 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.NotePeriod;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
+import org.wysko.midis2jam2.instrument.monophonic.Clone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,9 +82,6 @@ public class BaritoneSax extends Saxophone {
 		put(38, new Integer[] {3, 5, 6, 14, 15, 17, 19, 8}); // B
 		put(37, new Integer[] {3, 5, 6, 14, 15, 17, 19, 10}); // Bb
 	}};
-	private final static float ROTATION_FACTOR = 0.1f;
-	final Node groupOfPolyphony = new Node();
-	private final ArrayList<NotePeriod> finalNotePeriods;
 	
 	/**
 	 * Constructs a baritone sax.
@@ -94,45 +90,20 @@ public class BaritoneSax extends Saxophone {
 	 */
 	public BaritoneSax(Midis2jam2 context,
 	                   List<MidiChannelSpecificEvent> events)
-			throws InstantiationException,
-			IllegalAccessException,
-			InvocationTargetException,
-			NoSuchMethodException {
+			throws ReflectiveOperationException {
 		
-		super(context);
-		
-		List<MidiNoteEvent> justTheNotes = scrapeMidiNoteEvents(events);
-		
-		this.notePeriods = calculateNotePeriods(justTheNotes);
-		calculateClones(this, BaritoneSaxClone.class);
-		finalNotePeriods = new ArrayList<>(notePeriods);
-		for (MonophonicClone clone : clones) {
-			BaritoneSaxClone baritoneSaxClone = ((BaritoneSaxClone) clone);
-			groupOfPolyphony.attachChild(baritoneSaxClone.hornNode);
-		}
-		
-		highestLevel.attachChild(groupOfPolyphony);
-		
+		super(context, events, BaritoneSaxClone.class);
 		groupOfPolyphony.move(25, 48.5f, -15);
 		groupOfPolyphony.rotate(rad(10), rad(30), 0);
 		groupOfPolyphony.scale(1.5f);
-		
-		context.getRootNode().attachChild(highestLevel);
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
-		updateClones(time, delta, MULTI_SAX_OFFSET);
-	}
-	
 	
 	/**
-	 * Implements {@link MonophonicClone}, as baritone sax clones.
+	 * Implements {@link Clone}, as baritone sax clones.
 	 */
 	public class BaritoneSaxClone extends SaxophoneClone {
 		public BaritoneSaxClone() {
-			super(BaritoneSax.this);
+			super(BaritoneSax.this, STRETCH_FACTOR, KEY_MAPPING);
 			
 			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp");
 			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -153,17 +124,6 @@ public class BaritoneSax extends Saxophone {
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
 			bell.move(0, -10, 0); // Move bell down to body
-			
-			animNode.attachChild(modelNode);
-			hornNode.attachChild(animNode);
 		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			int indexThis = BaritoneSax.this.clones.indexOf(this);
-			animation(time, indexThis, BaritoneSax.STRETCH_FACTOR, BaritoneSax.ROTATION_FACTOR,
-					BaritoneSax.KEY_MAPPING);
-		}
-		
 	}
 }

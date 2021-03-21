@@ -4,6 +4,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public abstract class StickDrum extends SingleStickedInstrument {
 	final Node recoilNode = new Node();
 	Spatial drum;
 	
-	protected StickDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits, Pivot pivot) {
+	protected StickDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits, Stick.Pivot pivot) {
 		super(context, hits);
 	}
 	

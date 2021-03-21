@@ -2,11 +2,11 @@ package org.wysko.midis2jam2.instrument;
 
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicClone;
+import org.wysko.midis2jam2.instrument.monophonic.Clone;
 import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
@@ -24,47 +24,51 @@ import java.util.stream.Collectors;
  * current animation and note handling for every call.
  *
  * @see MonophonicInstrument
- * @see MonophonicClone
+ * @see Clone
  */
 public abstract class Instrument {
+	
 	/**
 	 * Since these classes are effectively static, we need reference to the main class.
 	 */
-	protected final Midis2jam2 context;
+	@NotNull
+	public final Midis2jam2 context;
+	
 	/**
 	 * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
 	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill
 	 * its spot).
 	 */
 	public boolean visible = false;
-	/**
-	 * This node should contain all animation and geometry. It shall be only used for general positioning.
-	 */
+	
+	
+	@NotNull
+	public Node offsetNode = new Node();
+	
+	@NotNull
 	public Node highestLevel = new Node();
+	
+	/**
+	 * Should contain geometry and nodes for geometry.
+	 */
+	@NotNull
+	public Node instrumentNode = new Node();
 	
 	/**
 	 * Instantiates a new Instrument.
 	 *
-	 * @param context the context to the main class
+	 * @param context                 the context to the main class
+	 * @see OffsetCalculator
 	 */
-	protected Instrument(Midis2jam2 context) {
+	protected Instrument(@NotNull Midis2jam2 context) {
 		this.context = context;
+		highestLevel.attachChild(instrumentNode);
+		offsetNode.attachChild(highestLevel);
+		context.getRootNode().attachChild(offsetNode);
 	}
 	
 	/**
-	 * Filters a list of MIDI channel specific events and returns only the {@link MidiNoteEvent}s.
-	 *
-	 * @param events the event list
-	 * @return only the MidiNoteEvents
-	 * @see MidiNoteEvent
-	 */
-	@NotNull
-	protected static List<MidiNoteEvent> scrapeMidiNoteEvents(List<MidiChannelSpecificEvent> events) {
-		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Updates the animation and other necessary frame-dependant calculations.
+	 * Updates the animation and other necessary frame-dependant calculations. Always call super!!
 	 *
 	 * @param time  the current time since the beginning of the MIDI file, expressed in seconds
 	 * @param delta the amount of time since the last call this method, expressed in seconds
@@ -78,7 +82,9 @@ public abstract class Instrument {
 	 *
 	 * @param noteEvents the note events to calculate NotePeriods from
 	 */
-	protected List<NotePeriod> calculateNotePeriods(List<MidiNoteEvent> noteEvents) {
+	@NotNull
+	@Contract(pure = true)
+	protected List<NotePeriod> calculateNotePeriods(@NotNull List<MidiNoteEvent> noteEvents) {
 		List<NotePeriod> notePeriods = new ArrayList<>();
 		for (int i = 0, noteEventsSize = noteEvents.size(); i < noteEventsSize; i++) {
 			MidiNoteEvent noteEvent = noteEvents.get(i);
@@ -86,15 +92,17 @@ public abstract class Instrument {
 				for (int j = i + 1; j < noteEventsSize; j++) {
 					MidiNoteEvent check = noteEvents.get(j);
 					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
-						// We found a block
-						notePeriods.add(new NotePeriod(check.note, context.file.eventInSeconds(noteEvent),
-								context.file.eventInSeconds(check), ((MidiNoteOnEvent) noteEvent)
-								, ((MidiNoteOffEvent) check)));
+						notePeriods.add(new NotePeriod(check.note,
+								context.file.eventInSeconds(noteEvent),
+								context.file.eventInSeconds(check),
+								((MidiNoteOnEvent) noteEvent),
+								((MidiNoteOffEvent) check)));
 						break;
 					}
 				}
 			}
 		}
+		/* Remove exact duplicates */
 		for (int i = notePeriods.size() - 2; i >= 0; i--) {
 			final NotePeriod a = notePeriods.get(i + 1);
 			final NotePeriod b = notePeriods.get(i);
@@ -105,39 +113,7 @@ public abstract class Instrument {
 			}
 		}
 		return notePeriods;
-	}
-	
-	/**
-	 * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
-	 * <p>
-	 * The instrument should be visible if:
-	 * <ul>
-	 *     <li>There is at least 1 second between now and the start of any note period,</li>
-	 *     <li>There is at least 4 seconds between now and the end of any note period, or</li>
-	 *     <li>Any note period is currently playing</li>
-	 * </ul>
-	 *
-	 * @param notePeriods the note periods to check from
-	 * @param time        the current time
-	 * @param node        the node to hide
-	 */
-	protected void setIdleVisibilityByPeriods(List<? extends NotePeriod> notePeriods, double time, Node node) {
-		boolean show = false;
-		for (NotePeriod notePeriod : notePeriods) {
-			// Within 1 second of a note on,
-			// within 4 seconds of a note off,
-			// or during a note, be visible
-			if (notePeriod.isPlayingAt(time)
-					|| Math.abs(time - notePeriod.startTime) < 1
-					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
-				visible = true;
-				show = true;
-				break;
-			} else {
-				visible = false;
-			}
-		}
-		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		
 	}
 	
 	/**
@@ -153,7 +129,7 @@ public abstract class Instrument {
 	 * @param time    the current time
 	 * @param node    the node to hide
 	 */
-	protected void setIdleVisibilityByStrikes(List<MidiNoteOnEvent> strikes, double time, Node node) {
+	protected void setIdleVisibilityByStrikes(@NotNull List<MidiNoteOnEvent> strikes, double time, @NotNull Node node) {
 		boolean show = false;
 		for (MidiNoteOnEvent strike : strikes) {
 			double x = time - context.file.eventInSeconds(strike);
@@ -173,9 +149,18 @@ public abstract class Instrument {
 	 *
 	 * @return the index of this instrument in the list of other instruments of this type that are visible
 	 */
-	protected int getIndexOfThis() {
+	@Contract(pure = true)
+	protected int indexForMoving() {
 		return context.instruments.stream()
 				.filter(e -> this.getClass().isInstance(e) && e.visible)
 				.collect(Collectors.toList()).indexOf(this);
 	}
+	
+	/**
+	 * Calculates and moves this instrument for when multiple instances of this instrument are visible.
+	 */
+	abstract protected void moveForMultiChannel();
+	
+	
+	
 }

@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.HashMap;
@@ -175,20 +176,33 @@ public class Guitar extends FrettedInstrument {
 	}
 	
 	@Override
-	public void tick(double time, float delta) {
-		setIdleVisibilityByPeriods(finalNotePeriods, time, highestLevel);
-		
-		final int indexThis = getIndexOfThis();
-		Vector3f add = new Vector3f(BASE_POSITION).add(new Vector3f(indexThis * 5, indexThis * -4, 0));
-		highestLevel.setLocalTranslation(add);
-		
-		handleStrings(time, delta);
+	protected void moveForMultiChannel() {
+		offsetNode.setLocalTranslation(new Vector3f(5, -4, 0).mult(indexForMoving()));
 	}
 	
+	/**
+	 * The type of guitar.
+	 */
 	public enum GuitarType {
+		
+		/**
+		 * Acoustic guitar type.
+		 */
 		ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"), // TODO Obviously.
+		
+		/**
+		 * Electric guitar type.
+		 */
 		ELECTRIC("Guitar.obj", "GuitarSkin.bmp");
+		
+		/**
+		 * The Model file name.
+		 */
 		final String modelFileName;
+		
+		/**
+		 * The Texture file name.
+		 */
 		final String textureFileName;
 		
 		GuitarType(String modelFileName, String textureFileName) {

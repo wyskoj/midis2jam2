@@ -30,6 +30,8 @@ public class NotePeriod {
 	 */
 	public final MidiNoteOffEvent noteOff;
 	
+	public boolean animationStarted = false;
+	
 	/**
 	 * Instantiates a new Note period.
 	 *
@@ -83,5 +85,14 @@ public class NotePeriod {
 	 */
 	public boolean isPlayingAt(double time) {
 		return time <= endTime && time >= startTime;
+	}
+	
+	@Override
+	public String toString() {
+		return "NotePeriod{" +
+				"midiNote=" + midiNote +
+				", startTime=" + startTime +
+				", endTime=" + endTime +
+				'}';
 	}
 }
