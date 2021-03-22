@@ -14,11 +14,24 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+/**
+ * A special type of music file.
+ */
 public class MidiFile {
+	
+	/**
+	 * The tracks of this MIDI file.
+	 */
 	public MidiTrack[] tracks;
 	
+	/**
+	 * The division, expressed as ticks per quarter-note.
+	 */
 	public short division;
 	
+	/**
+	 * A list of tempos that occur in this MIDI file.
+	 */
 	public List<MidiTempoEvent> tempos = new ArrayList<>();
 	
 	/**
@@ -107,6 +120,9 @@ public class MidiFile {
 		return file;
 	}
 	
+	/**
+	 * @return the first tempo event in the file, expressed in beats per minute
+	 */
 	public double firstTempoInBpm() {
 		MidiTempoEvent event = new MidiTempoEvent(0, 500000);
 		for (int i = 1; i < tracks.length; i++) { // MIDI tracks are 1-indexed
@@ -121,6 +137,9 @@ public class MidiFile {
 		return 6E7 / event.number;
 	}
 	
+	/**
+	 * Calculates the tempo map of this MIDI file.
+	 */
 	private void calculateTempoMap() {
 		List<MidiTempoEvent> tempoEvents = new ArrayList<>();
 		for (MidiTrack track : tracks) { // For each track
@@ -169,10 +188,22 @@ public class MidiFile {
 		return seconds;
 	}
 	
+	/**
+	 * Converts a MIDI event into its time in seconds.
+	 *
+	 * @param event a {@link MidiEvent}
+	 * @return the event's time, expressed in seconds
+	 */
 	public double eventInSeconds(MidiEvent event) {
 		return midiTickInSeconds(event.time);
 	}
 	
+	/**
+	 * Determines the tempo that is effective just before an event.
+	 *
+	 * @param event the event
+	 * @return the effective tempo before the event
+	 */
 	public MidiTempoEvent tempoBefore(MidiNoteOnEvent event) {
 		MidiTempoEvent lastTempo = tempos.get(0);
 		if (tempos.size() > 1) {

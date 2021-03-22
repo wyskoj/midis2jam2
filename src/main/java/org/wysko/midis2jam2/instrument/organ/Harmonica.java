@@ -14,6 +14,9 @@ import java.util.stream.IntStream;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * Numbers 1-4.
+ */
 public class Harmonica extends SustainedInstrument {
 	final SteamPuffer[] puffers = new SteamPuffer[12];
 	

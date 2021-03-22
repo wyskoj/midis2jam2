@@ -1,19 +1,22 @@
 package org.wysko.midis2jam2.midi;
 
-import java.util.Comparator;
-
+/**
+ * MIDI files are made up of events.
+ */
 public abstract class MidiEvent {
-	public long time;
 	
+	/**
+	 * The time at which this MIDI event occurs, expressed in MIDI ticks.
+	 */
+	public final long time;
+	
+	/**
+	 * Instantiates a new MIDI event.
+	 *
+	 * @param time the time
+	 */
 	public MidiEvent(long time) {
 		this.time = time;
 	}
 	
-	public static class MidiEventComparator implements Comparator<MidiEvent> {
-		
-		@Override
-		public int compare(MidiEvent e1, MidiEvent e2) {
-			return (int) (e1.time - e2.time);
-		}
-	}
 }
