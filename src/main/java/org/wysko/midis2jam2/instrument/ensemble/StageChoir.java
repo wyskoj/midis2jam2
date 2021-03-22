@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.brass.BouncyTwelfth;
 import org.wysko.midis2jam2.instrument.brass.WrappedOctaveSustained;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
@@ -36,6 +37,7 @@ public class StageChoir extends WrappedOctaveSustained {
 			peepNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(11.27 + i * -5.636), 0));
 			instrumentNode.attachChild(peepNodes[i]);
 		}
+		
 	}
 	
 	@Override
@@ -48,33 +50,9 @@ public class StageChoir extends WrappedOctaveSustained {
 		}
 	}
 	
-	public class ChoirPeep extends TwelfthOfOctave {
-		
+	public class ChoirPeep extends BouncyTwelfth {
 		public ChoirPeep() {
 			animNode.attachChild(context.loadModel("StageChoir.obj", "ChoirPeep.bmp"));
-		}
-		
-		@Override
-		public void play(double duration) {
-			playing = true;
-			progress = 0;
-			this.duration = duration;
-		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			if (progress >= 1) {
-				playing = false;
-				progress = 0;
-			}
-			if (playing) {
-				progress += delta / duration;
-				float y = (float) (9.5 - 9.5 * progress);
-				y = Math.max(y, 0);
-				animNode.setLocalTranslation(0, y, 0);
-			} else {
-				animNode.setLocalTranslation(0, 0, 0);
-			}
 		}
 	}
 }

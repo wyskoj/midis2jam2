@@ -28,6 +28,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
+		setIdleVisibilityByPeriods(time);
 		if (!currentNotePeriods.isEmpty()) {
 			for (Iterator<NotePeriod> iterator = currentNotePeriods.iterator(); iterator.hasNext(); ) {
 				NotePeriod currentNotePeriod = iterator.next();

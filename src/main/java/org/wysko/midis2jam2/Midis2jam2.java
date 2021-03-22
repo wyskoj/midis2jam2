@@ -314,7 +314,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Nullable
 	private Instrument fromEvents(MidiProgramEvent programEvent,
 	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
-		System.out.println(("the program num is " + programEvent.programNum));
 		switch (programEvent.programNum) {
 			case 0: // Acoustic Grand Piano
 			case 1: // Bright Acoustic Piano

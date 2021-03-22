@@ -109,6 +109,7 @@ public abstract class Clone {
 	 * @param indexThis the index of this clone
 	 */
 	protected void hideOrShowOnPolyphony(int indexThis) {
+		if (indexForMoving() == 0 && indexThis != 0) highestLevel.setCullHint(Spatial.CullHint.Always);
 		if (indexThis != 0) {
 			if (currentNotePeriod != null) {
 				highestLevel.setCullHint(Spatial.CullHint.Dynamic);
@@ -132,8 +133,6 @@ public abstract class Clone {
 	 * @see Instrument#tick(double, float)
 	 */
 	protected void tick(double time, float delta) {
-		hideOrShowOnPolyphony(parent.clones.indexOf(this));
-//		if (this instanceof AltoSax.AltoSaxClone && parent.clones.indexOf(this) == 0) parent.context.debugText.setText(String.valueOf(notePeriods.get(0)));
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriod = notePeriods.remove(0);
 		}
@@ -146,7 +145,7 @@ public abstract class Clone {
 		} else {
 			animNode.setLocalRotation(new Quaternion());
 		}
-		
+		hideOrShowOnPolyphony(parent.clones.indexOf(this));
 		moveForPolyphony();
 	}
 	

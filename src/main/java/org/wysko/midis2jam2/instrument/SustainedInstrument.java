@@ -43,7 +43,6 @@ public abstract class SustainedInstrument extends Instrument {
 	 * Instantiates a new sustained instrument.
 	 *
 	 * @param context          the context to the main class
-	 * @see OffsetCalculator
 	 */
 	protected SustainedInstrument(@NotNull Midis2jam2 context,
 	                              @NotNull List<MidiChannelSpecificEvent> eventList) {
@@ -119,7 +118,7 @@ public abstract class SustainedInstrument extends Instrument {
 				break;
 			}
 		}
-		return true;
+		return show;
 	}
 	
 }

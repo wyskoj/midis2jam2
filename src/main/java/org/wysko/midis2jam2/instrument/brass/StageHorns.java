@@ -28,10 +28,9 @@ public class StageHorns extends WrappedOctaveSustained {
 			twelfths[i] = new StageHornNote();
 			hornNodes[i].attachChild(twelfths[i].highestLevel);
 			twelfths[i].highestLevel.setLocalTranslation(BASE_POSITION);
-			hornNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(i * 1.5), 0));
-			highestLevel.attachChild(hornNodes[i]);
+			hornNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(16 + i * 1.5), 0));
+			instrumentNode.attachChild(hornNodes[i]);
 		}
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(16), 0));
 	}
 	
 	@Override
@@ -39,36 +38,12 @@ public class StageHorns extends WrappedOctaveSustained {
 		offsetNode.setLocalTranslation(-1.378f * indexForMoving(), 0, 4.806f * indexForMoving());
 	}
 	
-	public class StageHornNote extends TwelfthOfOctave {
-		
+	public class StageHornNote extends BouncyTwelfth {
 		public StageHornNote() {
 			super();
 			// Load horn
 			animNode.attachChild(context.loadModel("StageHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE,
 					0.9f));
-		}
-		
-		@Override
-		public void play(double duration) {
-			playing = true;
-			progress = 0;
-			this.duration = duration;
-		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			if (progress >= 1) {
-				playing = false;
-				progress = 0;
-			}
-			if (playing) {
-				progress += delta / duration;
-				float y = (float) (9.5 - 9.5 * progress);
-				y = Math.max(y, 0);
-				animNode.setLocalTranslation(0, y, 0);
-			} else {
-				animNode.setLocalTranslation(0, 0, 0);
-			}
 		}
 	}
 }

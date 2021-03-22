@@ -43,9 +43,8 @@ public class Ocarina extends HandedInstrument {
 	public class OcarinaClone extends HandedClone {
 		public OcarinaClone() {
 			super(Ocarina.this, 0);
-			highestLevel = new Node();
-			Spatial horn = context.loadModel("Ocarina.obj", "Ocarina.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
-			animNode.attachChild(horn);
+			Spatial ocarina = context.loadModel("Ocarina.obj", "Ocarina.bmp");
+			animNode.attachChild(ocarina);
 			highestLevel.attachChild(animNode);
 			loadHands();
 			for (int i = 0; i < rightHands.length; i++) {
