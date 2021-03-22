@@ -37,7 +37,7 @@ public abstract class SustainedInstrument extends Instrument {
 	 * The list of current note periods. Will always be updating as the MIDI file progresses.
 	 */
 	@NotNull
-	protected List<NotePeriod> currentNotePeriods = new ArrayList<>();
+	protected final List<NotePeriod> currentNotePeriods = new ArrayList<>();
 	
 	/**
 	 * Instantiates a new sustained instrument.

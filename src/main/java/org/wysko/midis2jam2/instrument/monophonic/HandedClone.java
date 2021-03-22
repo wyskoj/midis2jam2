@@ -37,6 +37,7 @@ public abstract class HandedClone extends Clone {
 		
 		if (isPlaying()) {
 			/* Set the hands */
+			assert currentNotePeriod != null;
 			final int midiNote = currentNotePeriod.midiNote;
 			final Hands hands = ((HandedInstrument) parent).handMap.get(midiNote);
 			if (hands != null) {

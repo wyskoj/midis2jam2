@@ -3,7 +3,6 @@ package org.wysko.midis2jam2.instrument.strings;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
@@ -31,8 +30,7 @@ public class AcousticBass extends StringFamilyInstrument {
 				new int[] {28, 33, 38, 43},
 				28,
 				91,
-				context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0),
-				new LinearOffsetCalculator(new Vector3f(-25, 0, 0))
+				context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0)
 		);
 		
 		instrumentNode.setLocalScale(2.5f);

@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
-public class HiHat extends SingleStickedInstrument {
+public class HiHat extends SingleStickInstrument {
 	
-	private final int WOBBLE_SPEED = 10;
-	private final double DAMPENING = 2;
-	private final double AMPLITUDE = 0.25;
-	List<MidiNoteOnEvent> hitsToStrike;
-	Node topCymbal = new Node();
-	Node bottomCymbal = new Node();
-	Node wholeHat = new Node();
+	private final static int WOBBLE_SPEED = 10;
+	private final static double DAMPENING = 2;
+	private final static double AMPLITUDE = 0.25;
+	final List<MidiNoteOnEvent> hitsToStrike;
+	final Node topCymbal = new Node();
+	final Node bottomCymbal = new Node();
+	final Node wholeHat = new Node();
 	private double animTime;
 	private HiHatStatus status = HiHatStatus.CLOSED;
 	

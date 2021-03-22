@@ -3,7 +3,6 @@ package org.wysko.midis2jam2.instrument.strings;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
@@ -30,8 +29,7 @@ public class Cello extends StringFamilyInstrument {
 				new int[] {36, 43, 50, 57},
 				36,
 				93,
-				context.loadModel("Cello.obj", "CelloSkin.bmp"),
-				new LinearOffsetCalculator(new Vector3f(-20, 0, 0))
+				context.loadModel("Cello.obj", "CelloSkin.bmp")
 		);
 		
 		highestLevel.setLocalTranslation(-69, 42, -50);

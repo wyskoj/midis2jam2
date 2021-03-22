@@ -15,7 +15,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 /**
  * Cymbals. Excludes the hi hat.
  */
-public class Cymbal extends SingleStickedInstrument {
+public class Cymbal extends SingleStickInstrument {
 	
 	final Node cymbalNode = new Node();
 	private static final int WOBBLE_SPEED = 7;

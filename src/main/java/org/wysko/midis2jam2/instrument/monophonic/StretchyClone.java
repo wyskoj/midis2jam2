@@ -25,7 +25,7 @@ public abstract class StretchyClone extends Clone {
 	/**
 	 * The axis on which to scale the bell on.
 	 */
-	protected Axis scaleAxis;
+	protected final Axis scaleAxis;
 	
 	public StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
 	                     Axis scaleAxis) {

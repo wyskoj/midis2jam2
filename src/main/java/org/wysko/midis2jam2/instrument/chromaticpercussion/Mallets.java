@@ -30,11 +30,11 @@ public class Mallets extends DecayedInstrument {
 	private final static int RANGE_HIGH = 108;
 	
 	
-	Spatial malletCase;
-	MalletType type;
+	final Spatial malletCase;
+	final MalletType type;
 	
-	MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
-	List<MidiNoteOnEvent>[] barStrikes;
+	final MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
+	final List<MidiNoteOnEvent>[] barStrikes;
 	
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
 	               MalletType type) {
@@ -104,7 +104,7 @@ public class Mallets extends DecayedInstrument {
 		MARIMBA("MarimbaBar.bmp"),
 		GLOCKENSPIEL("GlockenspielBar.bmp"),
 		XYLOPHONE("XylophoneBar.bmp");
-		String textureFile;
+		final String textureFile;
 		
 		MalletType(String textureFile) {
 			this.textureFile = textureFile;
@@ -112,15 +112,15 @@ public class Mallets extends DecayedInstrument {
 	}
 	
 	public class MalletBar {
-		Spatial upBar;
-		Spatial downBar;
-		Spatial mallet;
-		Node noteNode = new Node();
-		Node barNode = new Node();
-		Node malletNode = new Node();
+		final Spatial upBar;
+		final Spatial downBar;
+		final Spatial mallet;
+		final Node noteNode = new Node();
+		final Node barNode = new Node();
+		final Node malletNode = new Node();
 		boolean barIsRecoiling = false;
 		boolean recoilNow = false;
-		Spatial shadow;
+		final Spatial shadow;
 		
 		public MalletBar(int midiNote, int startPos) {
 			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);

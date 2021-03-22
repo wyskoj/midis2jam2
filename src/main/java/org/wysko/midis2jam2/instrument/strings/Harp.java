@@ -17,7 +17,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Harp extends SustainedInstrument {
 	private final List<MidiNoteEvent> notes;
-	HarpString[] strings = new HarpString[47];
+	final HarpString[] strings = new HarpString[47];
 	
 	public Harp(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
@@ -106,9 +106,9 @@ public class Harp extends SustainedInstrument {
 	}
 	
 	private class HarpString {
-		Spatial string;
-		Spatial[] vibratingStrings = new Spatial[5];
-		Node stringNode = new Node();
+		final Spatial string;
+		final Spatial[] vibratingStrings = new Spatial[5];
+		final Node stringNode = new Node();
 		boolean vibrating = false;
 		private double frame = 0;
 		

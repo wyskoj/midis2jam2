@@ -14,9 +14,10 @@ public abstract class AnimatedKeyClone extends StretchyClone {
 	 * The keys of the instrument.
 	 */
 	@NotNull
-	protected Spatial[] keys;
+	protected final Spatial[] keys;
 	
 	@NotNull
+	final
 	Map<Integer, Boolean[]> keyMap;
 	
 	public AnimatedKeyClone(MonophonicInstrument parent,

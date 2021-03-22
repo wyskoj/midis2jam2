@@ -43,22 +43,21 @@ public abstract class Instrument {
 	
 	
 	@NotNull
-	public Node offsetNode = new Node();
+	public final Node offsetNode = new Node();
 	
 	@NotNull
-	public Node highestLevel = new Node();
+	public final Node highestLevel = new Node();
 	
 	/**
 	 * Should contain geometry and nodes for geometry.
 	 */
 	@NotNull
-	public Node instrumentNode = new Node();
+	public final Node instrumentNode = new Node();
 	
 	/**
 	 * Instantiates a new Instrument.
 	 *
 	 * @param context                 the context to the main class
-	 * @see OffsetCalculator
 	 */
 	protected Instrument(@NotNull Midis2jam2 context) {
 		this.context = context;

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * A drum that is hit with a stick.
  */
-public abstract class StickDrum extends SingleStickedInstrument {
+public abstract class StickDrum extends SingleStickInstrument {
 	
 	static final float RECOIL_DISTANCE = -2f;
 	/**

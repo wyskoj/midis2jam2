@@ -20,9 +20,10 @@ public class TubularBells extends DecayedInstrument {
 	
 	private static final double STRIKE_SPEED = 3;
 	private final static double MAX_ANGLE = 50;
-	Bell[] bells = new Bell[12];
+	final Bell[] bells = new Bell[12];
 	
 	@SuppressWarnings("unchecked")
+	final
 	List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
 	
 	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
@@ -73,9 +74,9 @@ public class TubularBells extends DecayedInstrument {
 		private final static double BASE_AMPLITUDE = 0.5;
 		private final static int WOBBLE_SPEED = 3;
 		private final static double DAMPENING = 0.3;
-		Node highestLevel = new Node();
-		Node bellNode = new Node();
-		Node malletNode;
+		final Node highestLevel = new Node();
+		final Node bellNode = new Node();
+		final Node malletNode;
 		private double amplitude = 0.5;
 		private double animTime = -1;
 		private boolean bellIsRecoiling;

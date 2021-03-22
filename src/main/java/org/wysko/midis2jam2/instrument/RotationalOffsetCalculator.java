@@ -2,7 +2,6 @@ package org.wysko.midis2jam2.instrument;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import org.jetbrains.annotations.NotNull;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 

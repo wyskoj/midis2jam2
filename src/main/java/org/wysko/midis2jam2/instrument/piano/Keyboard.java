@@ -1,6 +1,5 @@
 package org.wysko.midis2jam2.instrument.piano;
 
-import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;

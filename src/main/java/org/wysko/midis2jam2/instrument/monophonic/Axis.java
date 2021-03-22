@@ -8,21 +8,15 @@ public enum Axis {
 	/**
 	 * The X-axis.
 	 */
-	X(0),
+	X,
 	
 	/**
 	 * The Y-axis.
 	 */
-	Y(1),
+	Y,
 	
 	/**
 	 * The Z-axis
 	 */
-	Z(2);
-	
-	public int index;
-	
-	Axis(int index) {
-		this.index = index;
-	}
+	Z
 }

@@ -22,7 +22,7 @@ public class Accordion extends KeyedInstrument {
 	/**
 	 * The accordion is divided into fourteen sections.
 	 */
-	Node[] accordionSections = new Node[14];
+	final Node[] accordionSections = new Node[14];
 	
 	/**
 	 * The current squeezing angle.
@@ -91,7 +91,7 @@ public class Accordion extends KeyedInstrument {
 		accordionSections[13].attachChild(context.loadModel("AccordianRightHand.obj", "AccordianCase.bmp"));
 		
 		/* Attach accordion sections to node */
-		Arrays.stream(accordionSections).forEach(accordionSection -> instrumentNode.attachChild(accordionSection));
+		Arrays.stream(accordionSections).forEach(instrumentNode::attachChild);
 		
 		instrumentNode.setLocalTranslation(-70, 10, -60);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(45), rad(-5)));

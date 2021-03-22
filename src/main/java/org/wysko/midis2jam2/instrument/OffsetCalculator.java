@@ -9,8 +9,8 @@ public interface OffsetCalculator {
 	LocationAndRotation calc(int index);
 	
 	class LocationAndRotation {
-		public Vector3f location;
-		public Quaternion rotation;
+		public final Vector3f location;
+		public final Quaternion rotation;
 		
 		public LocationAndRotation(Vector3f location, Quaternion rotation) {
 			this.location = location;

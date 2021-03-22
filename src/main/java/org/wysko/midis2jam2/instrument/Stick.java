@@ -88,13 +88,13 @@ public class Stick {
 	
 	public enum Pivot {
 		AT_END,
-		NEAR_END;
+		NEAR_END
 	}
 	
 	public static class StickStatus {
 		
 		/**
-		 * True if this stick just striked, false otherwise.
+		 * True if this stick just struck, false otherwise.
 		 */
 		@Nullable
 		private final MidiNoteOnEvent strike;

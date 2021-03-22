@@ -15,10 +15,10 @@ import java.util.stream.IntStream;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Harmonica extends SustainedInstrument {
-	SteamPuffer[] puffers = new SteamPuffer[12];
-	Node[] pufferNodes = new Node[12];
+	final SteamPuffer[] puffers = new SteamPuffer[12];
+	final Node[] pufferNodes = new Node[12];
 	
-	boolean[] activities = new boolean[12];
+	final boolean[] activities = new boolean[12];
 	
 	public Harmonica(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);

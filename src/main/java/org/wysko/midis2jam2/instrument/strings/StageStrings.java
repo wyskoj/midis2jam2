@@ -17,7 +17,7 @@ public class StageStrings extends WrappedOctaveSustained {
 	// Strings are 9 / 12 degrees apart
 	// Left one is 22 up
 	
-	Node[] stringNodes = new Node[12];
+	final Node[] stringNodes = new Node[12];
 	
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);

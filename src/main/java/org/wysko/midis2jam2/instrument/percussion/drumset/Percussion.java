@@ -29,9 +29,8 @@ public class Percussion extends Instrument {
 	public final Node percussionNode = new Node();
 	public final HiHat hiHat;
 	private final Cymbal crash2;
-	private final Spatial shadow;
 	
-	List<MidiNoteOnEvent> noteOnEvents;
+	final List<MidiNoteOnEvent> noteOnEvents;
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
@@ -93,7 +92,7 @@ public class Percussion extends Instrument {
 		drumSetNode.attachChild(splash.highLevelNode);
 		drumSetNode.attachChild(hiHat.highLevelNode);
 		
-		shadow = context.getAssetManager().loadModel("Assets/DrumShadow.obj");
+		Spatial shadow = context.getAssetManager().loadModel("Assets/DrumShadow.obj");
 		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/DrumShadow.png"));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);

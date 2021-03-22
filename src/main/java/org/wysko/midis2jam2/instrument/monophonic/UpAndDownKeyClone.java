@@ -34,13 +34,13 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	 * Geometry for keys up.
 	 */
 	@NotNull
-	protected Spatial[] keysUp;
+	protected final Spatial[] keysUp;
 	
 	/**
 	 * Geometry for keys down.
 	 */
 	@NotNull
-	protected Spatial[] keysDown;
+	protected final Spatial[] keysDown;
 	
 	/**
 	 * The number of keys on this clone.
@@ -86,27 +86,11 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 		
 	}
 	
-//	protected void animation(double time, int indexThis, float stretchFactor, float rotationFactor, HashMap<Integer, Integer[]> keyMap) {
-//		/* Perform animation */
-//		if (currentNotePeriod != null) {
-//			if (time >= currentNotePeriod.startTime && time <= currentNotePeriod.endTime) {
-//				bell.setLocalScale(1,
-//						(float) ((stretchFactor * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1),
-//						1);
-//				currentlyPlaying = true;
-//			} else {
-//				currentlyPlaying = false;
-//				bell.setLocalScale(1, 1, 1);
-//			}
-//			/* Show hide correct keys */
-//
-//		}
-//	}
-	
 	@Override
 	protected void tick(double time, float delta) {
 		super.tick(time, delta);
 		if (isPlaying()) {
+			assert currentNotePeriod != null;
 			pushOrReleaseKeys(currentNotePeriod.midiNote);
 		}
 	}

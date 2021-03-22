@@ -7,6 +7,7 @@ import org.wysko.midis2jam2.particle.SteamPuffer;
 public abstract class PuffingClone extends HandedClone {
 	
 	@NotNull
+	final
 	SteamPuffer puffer;
 	
 	public PuffingClone(HandedInstrument parent, float rotationFactor, SteamPuffer.SteamPuffType puffType,

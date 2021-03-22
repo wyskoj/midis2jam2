@@ -39,16 +39,16 @@ public abstract class Clone {
 	 * @see NotePeriod
 	 */
 	@NotNull
-	public List<NotePeriod> notePeriods;
-	public Node offsetNode = new Node();
+	public final List<NotePeriod> notePeriods;
+	public final Node offsetNode = new Node();
 	/**
 	 *
 	 */
-	public Node highestLevel = new Node();
+	public final Node highestLevel = new Node();
 	/**
 	 * Used for positioning and rotation.
 	 */
-	public Node idleNode = new Node();
+	public final Node idleNode = new Node();
 	/**
 	 * The current note period that is being handled.
 	 */
@@ -57,7 +57,7 @@ public abstract class Clone {
 	/**
 	 * The {@link MonophonicInstrument} this clone is associated with.
 	 */
-	protected MonophonicInstrument parent;
+	protected final MonophonicInstrument parent;
 	
 	/**
 	 * Instantiates a new clone.

@@ -5,13 +5,10 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -19,12 +16,12 @@ import java.util.stream.Collectors;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class TelephoneRing extends SustainedInstrument {
-	Spatial[] upKeys = new Spatial[12];
-	Spatial[] downKeys = new Spatial[12];
-	Node upNode = new Node();
-	Node downNode = new Node();
-	boolean[] playing = new boolean[12];
-	Spatial handle;
+	final Spatial[] upKeys = new Spatial[12];
+	final Spatial[] downKeys = new Spatial[12];
+	final Node upNode = new Node();
+	final Node downNode = new Node();
+	final boolean[] playing = new boolean[12];
+	final Spatial handle;
 	float force = 0;
 	private final List<MidiNoteEvent> notes;
 	
@@ -64,6 +61,7 @@ public class TelephoneRing extends SustainedInstrument {
 			
 			//noinspection IntegerDivisionInFloatingPointContext
 			upKeys[i].setLocalTranslation(1.2f * (i % 3 - 1), 3.89f, -2.7f - (1.2f * (-i / 3)));
+			//noinspection IntegerDivisionInFloatingPointContext
 			downKeys[i].setLocalTranslation(1.2f * (i % 3 - 1), 3.4f, -2.7f - (1.2f * (-i / 3)));
 			
 			downKeys[i].setCullHint(Spatial.CullHint.Always);

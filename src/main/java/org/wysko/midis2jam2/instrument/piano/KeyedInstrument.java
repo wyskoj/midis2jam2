@@ -42,7 +42,7 @@ public abstract class KeyedInstrument extends Instrument {
 	/**
 	 * The keys of this instrument.
 	 */
-	protected Key[] keys;
+	protected final Key[] keys;
 	
 	
 	/**

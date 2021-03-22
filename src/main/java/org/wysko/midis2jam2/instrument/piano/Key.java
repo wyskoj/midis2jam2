@@ -24,17 +24,17 @@ public abstract class Key {
 	/**
 	 * The uppermost node of this key.
 	 */
-	protected Node keyNode = new Node();
+	protected final Node keyNode = new Node();
 	
 	/**
 	 * Contains geometry for the "up" key.
 	 */
-	protected Node upNode = new Node();
+	protected final Node upNode = new Node();
 	
 	/**
 	 * Contains geometry for the "down" key.
 	 */
-	protected Node downNode = new Node();
+	protected final Node downNode = new Node();
 	
 	public Key(int midiNote) {
 		this.midiNote = midiNote;

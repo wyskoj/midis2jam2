@@ -1,11 +1,8 @@
 package org.wysko.midis2jam2.instrument.monophonic.pipe;
 
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.instrument.monophonic.HandedClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
@@ -69,6 +66,7 @@ public class Ocarina extends HandedInstrument {
 			super.tick(time, delta);
 			/* Collect note periods to execute */
 			if (isPlaying()) {
+				assert currentNotePeriod != null;
 				animNode.setLocalTranslation(0,
 						0, 3 * (float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration()));
 			}
