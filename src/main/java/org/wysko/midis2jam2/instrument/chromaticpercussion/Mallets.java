@@ -24,16 +24,22 @@ import static org.wysko.midis2jam2.instrument.piano.Keyboard.midiValueToColor;
 public class Mallets extends DecayedInstrument {
 	
 	private final static double MAX_ANGLE = 50.0;
+	
 	private final static double STRIKE_SPEED = 3;
+	
 	private final static int MALLET_BAR_COUNT = 88;
+	
 	private final static int RANGE_LOW = 21;
+	
 	private final static int RANGE_HIGH = 108;
 	
 	
 	final Spatial malletCase;
+	
 	final MalletType type;
 	
 	final MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
+	
 	final List<MidiNoteOnEvent>[] barStrikes;
 	
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
@@ -104,6 +110,7 @@ public class Mallets extends DecayedInstrument {
 		MARIMBA("MarimbaBar.bmp"),
 		GLOCKENSPIEL("GlockenspielBar.bmp"),
 		XYLOPHONE("XylophoneBar.bmp");
+		
 		final String textureFile;
 		
 		MalletType(String textureFile) {
@@ -113,14 +120,22 @@ public class Mallets extends DecayedInstrument {
 	
 	public class MalletBar {
 		final Spatial upBar;
+		
 		final Spatial downBar;
+		
 		final Spatial mallet;
+		
 		final Node noteNode = new Node();
+		
 		final Node barNode = new Node();
+		
 		final Node malletNode = new Node();
-		boolean barIsRecoiling = false;
-		boolean recoilNow = false;
+		
 		final Spatial shadow;
+		
+		boolean barIsRecoiling = false;
+		
+		boolean recoilNow = false;
 		
 		public MalletBar(int midiNote, int startPos) {
 			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);

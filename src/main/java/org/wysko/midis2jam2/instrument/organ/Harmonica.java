@@ -16,6 +16,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Harmonica extends SustainedInstrument {
 	final SteamPuffer[] puffers = new SteamPuffer[12];
+	
 	final Node[] pufferNodes = new Node[12];
 	
 	final boolean[] activities = new boolean[12];

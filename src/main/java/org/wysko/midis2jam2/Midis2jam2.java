@@ -52,19 +52,33 @@ import java.util.stream.IntStream;
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
+	
 	static long LATENCY_FIX = 250;
+	
 	public final List<Instrument> instruments = new ArrayList<>();
+	
 	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
+	
 	private final List<Spatial> harpShadows = new ArrayList<>();
+	
 	private final List<Spatial> malletShadows = new ArrayList<>();
+	
 	public MidiFile file;
+	
 	public BitmapText debugText;
+	
 	Sequencer sequencer;
+	
 	double timeSinceStart = -2;
+	
 	boolean seqHasRunOnce = false;
-	List<Spatial> guitarShadows = new ArrayList<>();
+	
+	final List<Spatial> guitarShadows = new ArrayList<>();
+	
 	private Spatial pianoStand;
+	
 	private Spatial malletStand;
+	
 	private Spatial keyboardShadow;
 	
 	public static void main(String[] args) throws Exception {
@@ -569,7 +583,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", assetManager.loadTexture(texture));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-		material.setFloat("AlphaDiscardThreshold",0.01f);
+		material.setFloat("AlphaDiscardThreshold", 0.01f);
 		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
 		shadow.setMaterial(material);
 		return shadow;
@@ -693,7 +707,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	enum Camera {
 		CAMERA_1A(-2, 92, 134, rad(90) - rad(71.56f), rad(180), 0),
 		CAMERA_5(5, 432, 24, rad(90 - 7.125f), rad(180), 0);
+		
 		final Vector3f location;
+		
 		final Quaternion rotation;
 		
 		Camera(float locX, float locY, float locZ, float rotX, float rotY, float rotZ) {

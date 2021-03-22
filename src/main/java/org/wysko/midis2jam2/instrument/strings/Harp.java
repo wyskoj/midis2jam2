@@ -16,8 +16,9 @@ import java.util.stream.Collectors;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Harp extends SustainedInstrument {
-	private final List<MidiNoteEvent> notes;
 	final HarpString[] strings = new HarpString[47];
+	
+	private final List<MidiNoteEvent> notes;
 	
 	public Harp(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
@@ -35,7 +36,7 @@ public class Harp extends SustainedInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		super.tick(time,delta);
+		super.tick(time, delta);
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
@@ -107,9 +108,13 @@ public class Harp extends SustainedInstrument {
 	
 	private class HarpString {
 		final Spatial string;
+		
 		final Spatial[] vibratingStrings = new Spatial[5];
+		
 		final Node stringNode = new Node();
+		
 		boolean vibrating = false;
+		
 		private double frame = 0;
 		
 		public HarpString(int i) {

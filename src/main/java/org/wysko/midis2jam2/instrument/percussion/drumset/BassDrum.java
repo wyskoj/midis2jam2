@@ -19,12 +19,17 @@ public class BassDrum extends PercussionInstrument {
 	private final static int PEDAL_MAX_ANGLE = 20;
 	
 	final Spatial bassDrum;
+	
 	final Spatial bassDrumBeaterArm;
+	
 	final Spatial bassDrumBeaterHolder;
+	
 	final Spatial bassDrumPedal;
 	
 	final Node highLevelNode = new Node();
+	
 	final Node drumNode = new Node();
+	
 	final Node beaterNode = new Node();
 	
 	public BassDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {

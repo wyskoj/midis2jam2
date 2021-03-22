@@ -42,10 +42,15 @@ public class StageStrings extends WrappedOctaveSustained {
 	public class StageStringNote extends TwelfthOfOctave {
 		
 		final Node bowNode = new Node();
+		
 		final Node animStringNode = new Node();
+		
 		final Spatial[] animStrings = new Spatial[5];
+		
 		final Spatial restingString;
+		
 		final Spatial bow;
+		
 		double frame = 0;
 		
 		public StageStringNote() {

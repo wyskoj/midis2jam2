@@ -28,7 +28,7 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	@NotNull
 	protected final Node groupOfPolyphony = new Node();
 	
-
+	
 	/**
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
 	 */
@@ -37,8 +37,9 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	
 	/**
 	 * Constructs a monophonic instrument.
-	 *  @param context                 context to midis2jam2
-	 * @param eventList               the event list
+	 *
+	 * @param context   context to midis2jam2
+	 * @param eventList the event list
 	 */
 	public MonophonicInstrument(@NotNull Midis2jam2 context,
 	                            @NotNull List<MidiChannelSpecificEvent> eventList,

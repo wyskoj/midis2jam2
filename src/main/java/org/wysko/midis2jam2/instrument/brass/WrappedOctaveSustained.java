@@ -17,8 +17,8 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	/**
 	 * Instantiates a new wrapped octave sustained.
 	 *
-	 * @param context          the context to the main class
-	 * @param eventList        the event list
+	 * @param context   the context to the main class
+	 * @param eventList the event list
 	 */
 	protected WrappedOctaveSustained(@NotNull Midis2jam2 context,
 	                                 @NotNull List<MidiChannelSpecificEvent> eventList) {
@@ -47,16 +47,22 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	}
 	
 	public abstract static class TwelfthOfOctave {
+		public final Node highestLevel = new Node();
+		
+		protected final Node animNode = new Node();
+		
+		protected double progress = 0;
+		
+		protected boolean playing = false;
+		
+		protected double duration = 0;
+		
 		public TwelfthOfOctave() {
 			highestLevel.attachChild(animNode);
 		}
 		
-		public final Node highestLevel = new Node();
-		protected final Node animNode = new Node();
-		protected double progress = 0;
-		protected boolean playing = false;
-		protected double duration = 0;
 		public abstract void play(double duration);
+		
 		public abstract void tick(double time, float delta);
 	}
 	

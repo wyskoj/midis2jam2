@@ -16,11 +16,12 @@ public class StageHorns extends WrappedOctaveSustained {
 	// First 16 left from center
 	
 	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5f, -152.65f);
+	
 	final Node[] hornNodes = new Node[12];
 	
 	
 	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context,  eventList);
+		super(context, eventList);
 		
 		twelfths = new StageHornNote[12];
 		for (int i = 0; i < 12; i++) {

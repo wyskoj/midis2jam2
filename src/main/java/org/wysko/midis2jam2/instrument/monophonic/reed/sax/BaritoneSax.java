@@ -18,6 +18,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class BaritoneSax extends Saxophone {
 	
 	private final static float STRETCH_FACTOR = 0.65f;
+	
 	/**
 	 * Defines which keys need to be pressed given the corresponding MIDI note.
 	 */
@@ -82,7 +83,8 @@ public class BaritoneSax extends Saxophone {
 	
 	/**
 	 * Constructs a baritone sax.
-	 *  @param context context to midis2jam2
+	 *
+	 * @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of a baritone sax
 	 */
 	public BaritoneSax(Midis2jam2 context,

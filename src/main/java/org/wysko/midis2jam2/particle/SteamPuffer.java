@@ -17,11 +17,16 @@ import java.util.Random;
 public class SteamPuffer implements ParticleGenerator {
 	
 	public final Node steamPuffNode = new Node();
+	
 	final List<Cloud> clouds = new ArrayList<>();
+	
 	private final Midis2jam2 context;
+	
 	private final SteamPuffType type;
+	
 	private final double scale;
-	List<Cloud> cloudPool = new ArrayList<>();
+	
+	final List<Cloud> cloudPool = new ArrayList<>();
 	
 	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale) {
 		this.context = context;
@@ -80,6 +85,7 @@ public class SteamPuffer implements ParticleGenerator {
 		HARMONICA("SteamPuff_Harmonica.bmp"),
 		POP("SteamPuff_Pop.bmp"),
 		WHISTLE("SteamPuff_Whistle.bmp");
+		
 		String filename;
 		
 		SteamPuffType(String filename) {
@@ -88,12 +94,17 @@ public class SteamPuffer implements ParticleGenerator {
 	}
 	
 	class Cloud implements Particle {
-		Node cloud = new Node();
-		float randY;
-		float randZ;
-		double life = 0;
-		boolean currentlyUsing = false;
 		private final Spatial cube;
+		
+		final Node cloud = new Node();
+		
+		float randY;
+		
+		float randZ;
+		
+		double life = 0;
+		
+		boolean currentlyUsing = false;
 		
 		public Cloud() {
 			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED, 0.9f);
@@ -111,7 +122,7 @@ public class SteamPuffer implements ParticleGenerator {
 					random.nextFloat() * FastMath.TWO_PI,
 			}));
 			life = 0;
-			cloud.setLocalTranslation(0,0,0);
+			cloud.setLocalTranslation(0, 0, 0);
 		}
 		
 		@Override
@@ -121,8 +132,7 @@ public class SteamPuffer implements ParticleGenerator {
 			cloud.setLocalScale((float) ((0.75 * life + 1.2) * scale));
 			life += delta * 1.5;
 			double END_OF_LIFE = 0.7;
-			if (life > END_OF_LIFE) return false;
-			return true;
+			return !(life > END_OF_LIFE);
 		}
 		
 		private float locEase(double x) {

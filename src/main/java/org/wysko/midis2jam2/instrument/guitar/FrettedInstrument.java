@@ -259,26 +259,32 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		 * The y-coordinate of the "upper strings".
 		 */
 		public final float topY;
+		
 		/**
 		 * The y-coordinate of the "lower strings".
 		 */
 		public final float bottomY;
+		
 		/**
 		 * This provides the vertical position of the note fingers.
 		 */
 		public final Vector3f fingerVerticalOffset;
+		
 		/**
 		 * These provide the scales of each string to accommodate for higher strings being thinner.
 		 */
 		public final Vector3f[] restingStrings;
+		
 		/**
 		 * The x-coordinates of each upper string.
 		 */
 		public final float[] topX;
+		
 		/**
 		 * The x-coordinates of each lower string.
 		 */
 		public final float[] bottomX;
+		
 		/**
 		 * The interface for scaling strings.
 		 */
@@ -312,6 +318,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			 * The z-coordinates of the top strings.
 			 */
 			private final float[] topZ;
+			
 			/**
 			 * The z-coordinates of the bottom strings.
 			 */

@@ -15,10 +15,12 @@ import java.util.List;
 public abstract class StickDrum extends SingleStickInstrument {
 	
 	static final float RECOIL_DISTANCE = -2f;
+	
 	/**
 	 * Attach {@link #drum} and {@link #stick} to this and move this for recoil.
 	 */
 	final Node recoilNode = new Node();
+	
 	Spatial drum;
 	
 	protected StickDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits, Stick.Pivot pivot) {

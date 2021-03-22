@@ -15,9 +15,12 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public abstract class SingleStickInstrument extends PercussionInstrument {
 	
-	final static double MAX_ANGLE = 50;
 	protected final static double STRIKE_SPEED = 4;
+	
+	final static double MAX_ANGLE = 50;
+	
 	protected final Spatial stick;
+	
 	final Node stickNode = new Node();
 	
 	protected SingleStickInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {

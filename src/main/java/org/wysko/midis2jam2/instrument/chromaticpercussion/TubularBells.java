@@ -19,7 +19,9 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class TubularBells extends DecayedInstrument {
 	
 	private static final double STRIKE_SPEED = 3;
+	
 	private final static double MAX_ANGLE = 50;
+	
 	final Bell[] bells = new Bell[12];
 	
 	@SuppressWarnings("unchecked")
@@ -72,13 +74,21 @@ public class TubularBells extends DecayedInstrument {
 	
 	private class Bell {
 		private final static double BASE_AMPLITUDE = 0.5;
+		
 		private final static int WOBBLE_SPEED = 3;
+		
 		private final static double DAMPENING = 0.3;
+		
 		final Node highestLevel = new Node();
+		
 		final Node bellNode = new Node();
+		
 		final Node malletNode;
+		
 		private double amplitude = 0.5;
+		
 		private double animTime = -1;
+		
 		private boolean bellIsRecoiling;
 		
 		public Bell(int i) {

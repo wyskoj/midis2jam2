@@ -13,18 +13,22 @@ public class NotePeriod {
 	 * The MIDI pitch of this note period.
 	 */
 	public final int midiNote;
+	
 	/**
 	 * The start time, expressed in seconds.
 	 */
 	public final double startTime;
+	
 	/**
 	 * The end time, expressed in seconds.
 	 */
 	public final double endTime;
+	
 	/**
 	 * The {@link MidiNoteOnEvent}.
 	 */
 	public final MidiNoteOnEvent noteOn;
+	
 	/**
 	 * The {@link MidiNoteOffEvent}.
 	 */

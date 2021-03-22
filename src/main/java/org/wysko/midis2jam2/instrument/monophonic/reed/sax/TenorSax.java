@@ -18,6 +18,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class TenorSax extends Saxophone {
 	
 	private final static float STRETCH_FACTOR = 0.65f;
+	
 	/**
 	 * Defines which keys need to be pressed given the corresponding MIDI note.
 	 */

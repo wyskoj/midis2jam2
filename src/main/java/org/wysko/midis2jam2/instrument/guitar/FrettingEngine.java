@@ -23,30 +23,37 @@ public class FrettingEngine {
 	 * The number of note periods to maintain in the running average.
 	 */
 	private static final int RUNNING_AVERAGE_COUNT = 10;
+	
 	/**
 	 * The array that keeps track of which strings are holding down which frets at any given time.
 	 */
 	private final int[] frets;
+	
 	/**
 	 * The MIDI note of each open string.
 	 */
 	private final int[] openStringMidiNotes;
+	
 	/**
 	 * The lowest note this engine with deal with.
 	 */
 	private final int rangeLow;
+	
 	/**
 	 * The highest note this engine will deal with.
 	 */
 	private final int rangeHigh;
+	
 	/**
 	 * The number of frets on this instrument.
 	 */
 	private final int numberOfFrets;
+	
 	/**
 	 * The number of strings to associate this engine with.
 	 */
 	private final int numberOfStrings;
+	
 	/**
 	 * The list of fretboard positions in the running average.
 	 */
@@ -172,6 +179,7 @@ public class FrettingEngine {
 		 * The string of the position.
 		 */
 		public final int string;
+		
 		/**
 		 * The fret of the position
 		 */

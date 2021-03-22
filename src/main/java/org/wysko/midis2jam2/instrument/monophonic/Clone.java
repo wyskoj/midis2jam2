@@ -25,14 +25,12 @@ public abstract class Clone {
 	 * Used for the rotation while playing.
 	 */
 	public final Node animNode = new Node();
+	
 	/**
 	 * The model node.
 	 */
 	public final Node modelNode = new Node();
-	/**
-	 * The amount to rotate this instrument by when playing.
-	 */
-	private final float rotationFactor;
+	
 	/**
 	 * The note periods for which this clone should be responsible for animating.
 	 *
@@ -40,24 +38,34 @@ public abstract class Clone {
 	 */
 	@NotNull
 	public final List<NotePeriod> notePeriods;
+	
 	public final Node offsetNode = new Node();
+	
 	/**
 	 *
 	 */
 	public final Node highestLevel = new Node();
+	
 	/**
 	 * Used for positioning and rotation.
 	 */
 	public final Node idleNode = new Node();
+	
+	/**
+	 * The {@link MonophonicInstrument} this clone is associated with.
+	 */
+	protected final MonophonicInstrument parent;
+	
+	/**
+	 * The amount to rotate this instrument by when playing.
+	 */
+	private final float rotationFactor;
+	
 	/**
 	 * The current note period that is being handled.
 	 */
 	@Nullable
 	public NotePeriod currentNotePeriod;
-	/**
-	 * The {@link MonophonicInstrument} this clone is associated with.
-	 */
-	protected final MonophonicInstrument parent;
 	
 	/**
 	 * Instantiates a new clone.

@@ -13,6 +13,11 @@ public abstract class StretchyClone extends Clone {
 	protected final float stretchFactor;
 	
 	/**
+	 * The axis on which to scale the bell on.
+	 */
+	protected final Axis scaleAxis;
+	
+	/**
 	 * The bell of the instrument.
 	 */
 	protected Spatial bell;
@@ -21,11 +26,6 @@ public abstract class StretchyClone extends Clone {
 	 * The body of the instrument.
 	 */
 	protected Spatial body;
-	
-	/**
-	 * The axis on which to scale the bell on.
-	 */
-	protected final Axis scaleAxis;
 	
 	public StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
 	                     Axis scaleAxis) {

@@ -35,7 +35,7 @@ public abstract class AnimatedKeyClone extends StretchyClone {
 	/**
 	 * Animates a key.
 	 *
-	 * @param pressed  true if this key is pressed, false otherwise
+	 * @param pressed true if this key is pressed, false otherwise
 	 */
 	protected abstract void animateKeys(@NotNull Boolean[] pressed);
 	

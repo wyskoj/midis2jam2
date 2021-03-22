@@ -65,7 +65,9 @@ public class Tom extends StickDrum {
 				new Quaternion().fromAngles(rad(50), rad(40), 0));
 		
 		final Vector3f scale;
+		
 		final Vector3f location;
+		
 		final Quaternion rotation;
 		
 		TomPitch(Vector3f scale, Vector3f location, Quaternion rotation) {

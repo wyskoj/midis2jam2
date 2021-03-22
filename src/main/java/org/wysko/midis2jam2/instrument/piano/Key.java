@@ -15,11 +15,6 @@ public abstract class Key {
 	 * The MIDI note this key plays.
 	 */
 	protected final int midiNote;
-
-	/**
-	 * Is this key being pressed?
-	 */
-	protected boolean beingPressed = false;
 	
 	/**
 	 * The uppermost node of this key.
@@ -35,6 +30,11 @@ public abstract class Key {
 	 * Contains geometry for the "down" key.
 	 */
 	protected final Node downNode = new Node();
+	
+	/**
+	 * Is this key being pressed?
+	 */
+	protected boolean beingPressed = false;
 	
 	public Key(int midiNote) {
 		this.midiNote = midiNote;
@@ -63,7 +63,7 @@ public abstract class Key {
 			if (angles[0] > 0.0001) {
 				keyNode.setLocalRotation(new Quaternion(new float[]
 						{
-								Math.max(angles[0] - (0.02f * delta * 50), 0),0,0
+								Math.max(angles[0] - (0.02f * delta * 50), 0), 0, 0
 						}
 				));
 			} else {

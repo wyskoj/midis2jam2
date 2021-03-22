@@ -16,21 +16,34 @@ import java.util.stream.Collectors;
 public class Percussion extends Instrument {
 	
 	public final SnareDrum snareDrum;
+	
 	public final BassDrum bassDrum;
+	
 	public final Tom tom1;
+	
 	public final Tom tom2;
+	
 	public final Tom tom3;
+	
 	public final Tom tom4;
+	
 	public final Tom tom5;
+	
 	public final Tom tom6;
+	
 	public final Cymbal crash1;
+	
 	public final Cymbal splash;
+	
 	public final Node drumSetNode = new Node();
+	
 	public final Node percussionNode = new Node();
+	
 	public final HiHat hiHat;
-	private final Cymbal crash2;
 	
 	final List<MidiNoteOnEvent> noteOnEvents;
+	
+	private final Cymbal crash2;
 	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);

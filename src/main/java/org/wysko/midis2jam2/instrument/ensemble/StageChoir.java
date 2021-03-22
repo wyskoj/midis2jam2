@@ -16,6 +16,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class StageChoir extends WrappedOctaveSustained {
 	
 	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5f, -152.65f);
+	
 	final Node[] peepNodes = new Node[12];
 	
 	/**

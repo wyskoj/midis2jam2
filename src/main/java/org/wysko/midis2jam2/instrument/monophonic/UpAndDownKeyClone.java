@@ -12,25 +12,6 @@ import java.util.Map;
 public abstract class UpAndDownKeyClone extends StretchyClone {
 	
 	/**
-	 * Instantiates a new Up and down key clone.
-	 *
-	 * @param keyCount the key count
-	 */
-	public UpAndDownKeyClone(int keyCount,
-	                         @NotNull MonophonicInstrument parent,
-	                         float rotationFactor,
-	                         float stretchFactor,
-	                         @NotNull Map<Integer, Integer[]> keyMap) {
-		
-		super(parent, rotationFactor, stretchFactor, Axis.Y);
-		this.keyCount = keyCount;
-		this.keyMap = keyMap;
-		
-		keysUp = new Spatial[keyCount];
-		keysDown = new Spatial[keyCount];
-	}
-	
-	/**
 	 * Geometry for keys up.
 	 */
 	@NotNull
@@ -49,12 +30,31 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	
 	/**
 	 * The key mapping.
-	 *
+	 * <p>
 	 * The key is the MIDI note and the value is an array of indices relating to the {@link Spatial}s in
 	 * {@link #keysUp} and {@link #keysDown}.
 	 */
 	@NotNull
 	protected final Map<Integer, Integer[]> keyMap;
+	
+	/**
+	 * Instantiates a new Up and down key clone.
+	 *
+	 * @param keyCount the key count
+	 */
+	public UpAndDownKeyClone(int keyCount,
+	                         @NotNull MonophonicInstrument parent,
+	                         float rotationFactor,
+	                         float stretchFactor,
+	                         @NotNull Map<Integer, Integer[]> keyMap) {
+		
+		super(parent, rotationFactor, stretchFactor, Axis.Y);
+		this.keyCount = keyCount;
+		this.keyMap = keyMap;
+		
+		keysUp = new Spatial[keyCount];
+		keysDown = new Spatial[keyCount];
+	}
 	
 	/**
 	 * Given a keymap, presses or releases keys.

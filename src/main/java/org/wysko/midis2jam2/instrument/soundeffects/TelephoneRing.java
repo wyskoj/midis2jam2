@@ -17,13 +17,20 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class TelephoneRing extends SustainedInstrument {
 	final Spatial[] upKeys = new Spatial[12];
+	
 	final Spatial[] downKeys = new Spatial[12];
+	
 	final Node upNode = new Node();
+	
 	final Node downNode = new Node();
+	
 	final boolean[] playing = new boolean[12];
+	
 	final Spatial handle;
-	float force = 0;
+	
 	private final List<MidiNoteEvent> notes;
+	
+	float force = 0;
 	
 	public TelephoneRing(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
@@ -129,6 +136,6 @@ public class TelephoneRing extends SustainedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(13 * indexForMoving(),0,0);
+		offsetNode.setLocalTranslation(13 * indexForMoving(), 0, 0);
 	}
 }

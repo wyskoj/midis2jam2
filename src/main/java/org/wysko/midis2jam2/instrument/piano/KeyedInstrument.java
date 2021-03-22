@@ -32,17 +32,18 @@ public abstract class KeyedInstrument extends Instrument {
 	 * The highest note this instrument can play.
 	 */
 	protected final int rangeHigh;
+	
 	@NotNull
 	final protected List<MidiNoteEvent> events;
-	
-	@Unmodifiable
-	@NotNull
-	private final List<NotePeriod> notePeriods;
 	
 	/**
 	 * The keys of this instrument.
 	 */
 	protected final Key[] keys;
+	
+	@Unmodifiable
+	@NotNull
+	private final List<NotePeriod> notePeriods;
 	
 	
 	/**
@@ -63,6 +64,19 @@ public abstract class KeyedInstrument extends Instrument {
 		this.rangeHigh = rangeHigh;
 		this.keys = new Key[keyCount()];
 		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(this.events));
+	}
+	
+	/**
+	 * Calculates if a MIDI note value is a black or white key on a standard piano.
+	 *
+	 * @param x the MIDI note value
+	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
+	 */
+	@Contract(pure = true)
+	@NotNull
+	public static KeyColor midiValueToColor(int x) {
+		int note = x % 12;
+		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
 	}
 	
 	@Override
@@ -105,21 +119,14 @@ public abstract class KeyedInstrument extends Instrument {
 		return (rangeHigh - rangeLow) + 1;
 	}
 	
-	/**
-	 * Calculates if a MIDI note value is a black or white key on a standard piano.
-	 *
-	 * @param x the MIDI note value
-	 * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
-	 */
-	@Contract(pure = true)
-	@NotNull
-	public static KeyColor midiValueToColor(int x) {
-		int note = x % 12;
-		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
-	}
-	
 	@Nullable
 	protected abstract Key keyByMidiNote(int midiNote);
+	
+	protected void setIdleVisibilityByNoteOnAndOff(double time) {
+		boolean b = SustainedInstrument.calcVisibility(time, notePeriods);
+		visible = b;
+		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+	}
 	
 	/**
 	 * Keyboards have two different colored keys: white and black.
@@ -135,12 +142,6 @@ public abstract class KeyedInstrument extends Instrument {
 		 * Black key color.
 		 */
 		BLACK
-	}
-	
-	protected void setIdleVisibilityByNoteOnAndOff(double time) {
-		boolean b = SustainedInstrument.calcVisibility(time, notePeriods);
-		visible = b;
-		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 public class MidiChannelSpecificEvent extends MidiEvent {
 	public static final Comparator<MidiChannelSpecificEvent> COMPARE_BY_TIME = new CompareByTime();
+	
 	public final int channel;
 	
 	public MidiChannelSpecificEvent(long time, int channel) {

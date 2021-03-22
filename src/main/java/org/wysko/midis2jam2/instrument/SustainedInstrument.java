@@ -26,13 +26,7 @@ public abstract class SustainedInstrument extends Instrument {
 	@Unmodifiable
 	@NotNull
 	protected final List<NotePeriod> unmodifiableNotePeriods;
-	/**
-	 * The list of note periods. This class expects that this variable will be truncated as the MIDI file progresses.
-	 *
-	 * @see NotePeriod
-	 */
-	@NotNull
-	protected List<NotePeriod> notePeriods;
+	
 	/**
 	 * The list of current note periods. Will always be updating as the MIDI file progresses.
 	 */
@@ -40,9 +34,17 @@ public abstract class SustainedInstrument extends Instrument {
 	protected final List<NotePeriod> currentNotePeriods = new ArrayList<>();
 	
 	/**
+	 * The list of note periods. This class expects that this variable will be truncated as the MIDI file progresses.
+	 *
+	 * @see NotePeriod
+	 */
+	@NotNull
+	protected List<NotePeriod> notePeriods;
+	
+	/**
 	 * Instantiates a new sustained instrument.
 	 *
-	 * @param context          the context to the main class
+	 * @param context the context to the main class
 	 */
 	protected SustainedInstrument(@NotNull Midis2jam2 context,
 	                              @NotNull List<MidiChannelSpecificEvent> eventList) {
@@ -62,6 +64,22 @@ public abstract class SustainedInstrument extends Instrument {
 	@Contract(pure = true)
 	public static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull List<MidiChannelSpecificEvent> events) {
 		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+	}
+	
+	public static boolean calcVisibility(double time, @NotNull List<NotePeriod> unmodifiableNotePeriods) {
+		boolean show = false;
+		for (NotePeriod notePeriod : unmodifiableNotePeriods) {
+			// Within 1 second of a note on,
+			// within 4 seconds of a note off,
+			// or during a note, be visible
+			if (notePeriod.isPlayingAt(time)
+					|| Math.abs(time - notePeriod.startTime) < 1
+					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
+				show = true;
+				break;
+			}
+		}
+		return show;
 	}
 	
 	/**
@@ -87,7 +105,6 @@ public abstract class SustainedInstrument extends Instrument {
 		moveForMultiChannel();
 	}
 	
-	
 	/**
 	 * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
 	 * <p>
@@ -103,22 +120,6 @@ public abstract class SustainedInstrument extends Instrument {
 		boolean b = calcVisibility(time, unmodifiableNotePeriods);
 		visible = b;
 		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
-	}
-	
-	public static boolean calcVisibility(double time, @NotNull List<NotePeriod> unmodifiableNotePeriods) {
-		boolean show = false;
-		for (NotePeriod notePeriod : unmodifiableNotePeriods) {
-			// Within 1 second of a note on,
-			// within 4 seconds of a note off,
-			// or during a note, be visible
-			if (notePeriod.isPlayingAt(time)
-					|| Math.abs(time - notePeriod.startTime) < 1
-					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
-				show = true;
-				break;
-			}
-		}
-		return show;
 	}
 	
 }

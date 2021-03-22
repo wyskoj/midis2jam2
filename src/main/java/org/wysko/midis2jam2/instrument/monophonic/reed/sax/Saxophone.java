@@ -28,6 +28,6 @@ public abstract class Saxophone extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0,40 * indexForMoving(),0);
+		offsetNode.setLocalTranslation(0, 40 * indexForMoving(), 0);
 	}
 }

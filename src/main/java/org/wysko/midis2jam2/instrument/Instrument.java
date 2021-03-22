@@ -34,14 +34,6 @@ public abstract class Instrument {
 	@NotNull
 	public final Midis2jam2 context;
 	
-	/**
-	 * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
-	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill
-	 * its spot).
-	 */
-	public boolean visible = false;
-	
-	
 	@NotNull
 	public final Node offsetNode = new Node();
 	
@@ -55,9 +47,16 @@ public abstract class Instrument {
 	public final Node instrumentNode = new Node();
 	
 	/**
+	 * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
+	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill
+	 * its spot).
+	 */
+	public boolean visible = false;
+	
+	/**
 	 * Instantiates a new Instrument.
 	 *
-	 * @param context                 the context to the main class
+	 * @param context the context to the main class
 	 */
 	protected Instrument(@NotNull Midis2jam2 context) {
 		this.context = context;

@@ -8,6 +8,7 @@ import java.util.Map;
 public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	
 	private final static int NUMBER_OF_KEYS = 20;
+	
 	private final static float ROTATION_FACTOR = 0.1f;
 	
 	public SaxophoneClone(Saxophone parent, float stretchFactor, Map<Integer, Integer[]> keyMap) {

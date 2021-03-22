@@ -29,7 +29,7 @@ public class Viola extends StringFamilyInstrument {
 				new int[] {48, 55, 62, 69},
 				48,
 				105,
-				context.loadModel("Violin.obj","ViolaSkin.bmp")
+				context.loadModel("Violin.obj", "ViolaSkin.bmp")
 		);
 		
 		highestLevel.setLocalTranslation(-2, 27, -15);
@@ -41,6 +41,6 @@ public class Viola extends StringFamilyInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(20 * indexForMoving(),0,0);
+		offsetNode.setLocalTranslation(20 * indexForMoving(), 0, 0);
 	}
 }

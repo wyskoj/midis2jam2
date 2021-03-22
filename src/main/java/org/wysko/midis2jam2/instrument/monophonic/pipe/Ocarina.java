@@ -74,7 +74,7 @@ public class Ocarina extends HandedInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(10*indexForMoving(),0,0);
+			offsetNode.setLocalTranslation(10 * indexForMoving(), 0, 0);
 		}
 	}
 }

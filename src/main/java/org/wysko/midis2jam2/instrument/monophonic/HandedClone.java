@@ -8,10 +8,13 @@ import org.wysko.midis2jam2.instrument.monophonic.pipe.HandedInstrument;
  * Instruments that have hands. Includes piccolo, flute, recorder, ocarina.
  */
 public abstract class HandedClone extends Clone {
-
+	
 	protected final Node leftHandNode = new Node();
+	
 	protected final Node rightHandNode = new Node();
+	
 	protected Spatial[] leftHands;
+	
 	protected Spatial[] rightHands;
 	
 	/**

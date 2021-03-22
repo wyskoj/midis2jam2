@@ -16,13 +16,21 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class HiHat extends SingleStickInstrument {
 	
 	private final static int WOBBLE_SPEED = 10;
+	
 	private final static double DAMPENING = 2;
+	
 	private final static double AMPLITUDE = 0.25;
+	
 	final List<MidiNoteOnEvent> hitsToStrike;
+	
 	final Node topCymbal = new Node();
+	
 	final Node bottomCymbal = new Node();
+	
 	final Node wholeHat = new Node();
+	
 	private double animTime;
+	
 	private HiHatStatus status = HiHatStatus.CLOSED;
 	
 	protected HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
