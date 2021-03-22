@@ -31,12 +31,11 @@ public class Harp extends SustainedInstrument {
 			strings[i] = new HarpString(i);
 			instrumentNode.attachChild(strings[i].stringNode);
 		}
-		
-		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
+		super.tick(time,delta);
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
@@ -103,7 +102,7 @@ public class Harp extends SustainedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(20, 0, 0);
+		offsetNode.setLocalTranslation(14.7f * indexForMoving(), 0, 10.3f * indexForMoving());
 	}
 	
 	private class HarpString {

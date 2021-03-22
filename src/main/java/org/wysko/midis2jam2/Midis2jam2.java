@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.StageHorns;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
+import org.wysko.midis2jam2.instrument.ensemble.StageChoir;
 import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.monophonic.brass.Trumpet;
@@ -45,6 +46,7 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
@@ -52,6 +54,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	static long LATENCY_FIX = 250;
 	public final List<Instrument> instruments = new ArrayList<>();
+	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
+	private final List<Spatial> harpShadows = new ArrayList<>();
+	private final List<Spatial> malletShadows = new ArrayList<>();
 	public MidiFile file;
 	public BitmapText debugText;
 	Sequencer sequencer;
@@ -61,7 +66,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	private Spatial pianoStand;
 	private Spatial malletStand;
 	private Spatial keyboardShadow;
-	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
 	
 	public static void main(String[] args) throws Exception {
 		Midis2jam2 midijam = new Midis2jam2();
@@ -188,6 +192,20 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		for (int i = 0; i < bassGuitarShadows.size(); i++) {
 			if (i < bassGuitarVisibleCount) bassGuitarShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
 			else bassGuitarShadows.get(i).setCullHint(Spatial.CullHint.Always);
+		}
+		
+		long harpVisibleCount =
+				instruments.stream().filter(instrument -> instrument instanceof Harp && instrument.visible).count();
+		for (int i = 0; i < harpShadows.size(); i++) {
+			if (i < harpVisibleCount) harpShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
+			else harpShadows.get(i).setCullHint(Spatial.CullHint.Always);
+		}
+		
+		long malletVisibleCount =
+				instruments.stream().filter(instrument -> instrument instanceof Mallets && instrument.visible).count();
+		for (int i = 0; i < malletShadows.size(); i++) {
+			if (i < malletVisibleCount) malletShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
+			else malletShadows.get(i).setCullHint(Spatial.CullHint.Always);
 		}
 		
 	}
@@ -371,6 +389,14 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 51: // Synth Strings 2
 			case 92: // Pad 5 (Bowed)
 				return new StageStrings(this, events);
+			case 52: // Choir Aahs
+			case 53: // Voice Oohs
+			case 54: // Synth Voice
+			case 85: // Lead 6 (Voice)
+			case 91: // Pad 4 (Choir)
+			case 121: // Breath Noise
+			case 126: // Applause
+				return new StageChoir(this, events);
 			case 56: // Trumpet
 				return new Trumpet(this, events);
 			case 61: // Brass Section
@@ -421,6 +447,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	@Override
 	public void simpleInitApp() {
+		
 		flyCam.setMoveSpeed(100f);
 		flyCam.setZoomSpeed(10);
 		flyCam.setEnabled(true);
@@ -494,6 +521,25 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-43.5), 0));
 		}
 		
+		// Add harp shadows
+		for (long i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Harp).count(); i++) {
+			Spatial shadow = shadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png");
+			harpShadows.add(shadow);
+			rootNode.attachChild(shadow);
+			shadow.setLocalTranslation(5 + 14.7f * i, 0.1f, 17 + 10.3f * i);
+			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
+		}
+		
+		// Add mallet shadows
+		List<Instrument> mallets = instruments.stream().filter(instrument -> instrument instanceof Mallets).collect(Collectors.toList());
+		for (int i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Mallets).count(); i++) {
+			Spatial shadow = shadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
+			shadow.setLocalScale(0.6667f);
+			malletShadows.add(shadow);
+			mallets.get(i).highestLevel.attachChild(shadow);
+			shadow.setLocalTranslation(-50, 0.5f + 0.1f * i, 0);
+		}
+		
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
@@ -524,6 +570,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", assetManager.loadTexture(texture));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+		material.setFloat("AlphaDiscardThreshold",0.01f);
 		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
 		shadow.setMaterial(material);
 		return shadow;

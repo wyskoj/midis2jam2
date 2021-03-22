@@ -119,7 +119,7 @@ public abstract class SustainedInstrument extends Instrument {
 				break;
 			}
 		}
-		return show;
+		return true;
 	}
 	
 }

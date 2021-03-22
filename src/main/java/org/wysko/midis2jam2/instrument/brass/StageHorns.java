@@ -4,7 +4,6 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.LinearOffsetCalculator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
@@ -39,28 +38,14 @@ public class StageHorns extends WrappedOctaveSustained {
 	protected void moveForMultiChannel() {
 		offsetNode.setLocalTranslation(-1.378f * indexForMoving(), 0, 4.806f * indexForMoving());
 	}
-//
-//	@Override
-//	public void tick(double time, float delta) {
-//
-////		final int i1 =
-////				context.instruments.stream().filter(e -> e instanceof StageHorns && e.visible).collect(Collectors.toList()).indexOf(this);
-////		for (StageInstrumentNote horn : eachNote) {
-////			horn.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(new Vector3f(0, 0, -5 * i1)));
-////		}
-////		 Tick each string
-////		for (TwelfthOfOctave horn : twelfths) {
-////			horn.tick(time, delta);
-////		}
-//	}
 	
 	public class StageHornNote extends TwelfthOfOctave {
 		
 		public StageHornNote() {
+			super();
 			// Load horn
 			animNode.attachChild(context.loadModel("StageHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE,
 					0.9f));
-			highestLevel.attachChild(animNode);
 		}
 		
 		@Override

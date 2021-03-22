@@ -46,6 +46,10 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	}
 	
 	public abstract static class TwelfthOfOctave {
+		public TwelfthOfOctave() {
+			highestLevel.attachChild(animNode);
+		}
+		
 		public final Node highestLevel = new Node();
 		protected final Node animNode = new Node();
 		protected double progress = 0;
