@@ -136,7 +136,7 @@ public class SteamPuffer implements ParticleGenerator {
 		}
 		
 		private float locEase(double x) {
-			return (float) (1 - Math.pow(1 - x, 4));
+			return (float) x == 1 ? 1 : (float) (1 - Math.pow(2, -10 * x));
 		}
 		
 	}

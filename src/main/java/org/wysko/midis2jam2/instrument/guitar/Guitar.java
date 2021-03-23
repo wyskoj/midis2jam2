@@ -22,7 +22,7 @@ public class Guitar extends FrettedInstrument {
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context,
-				new FrettingEngine(6, 22, new int[] {40, 45, 50, 55, 59, 64}, 40, 79),
+				new StandardFrettingEngine(6, 22, new int[] {40, 45, 50, 55, 59, 64}, 40, 79),
 				events,
 				new FrettedInstrumentPositioning(16.6f,
 						-18.1f,

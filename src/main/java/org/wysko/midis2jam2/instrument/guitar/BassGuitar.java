@@ -22,7 +22,7 @@ public class BassGuitar extends FrettedInstrument {
 	
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context,
-				new FrettingEngine(4, 22, new int[] {28, 33, 38, 43}, 28, 65),
+				new StandardFrettingEngine(4, 22, new int[] {28, 33, 38, 43}, 28, 65),
 				events,
 				new FrettedInstrumentPositioning(19.5F, -26.57f, new Vector3f[] {
 						new Vector3f(1, 1, 1),

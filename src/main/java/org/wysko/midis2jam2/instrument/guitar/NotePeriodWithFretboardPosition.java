@@ -12,12 +12,12 @@ public class NotePeriodWithFretboardPosition extends NotePeriod {
 	/**
 	 * The fretboard position this note period was assigned to.
 	 */
-	public FrettingEngine.FretboardPosition position;
+	public StandardFrettingEngine.FretboardPosition position;
 	
 	private NotePeriodWithFretboardPosition(int midiNote, double startTime, double endTime,
 	                                        MidiNoteOnEvent noteOn, MidiNoteOffEvent noteOff) {
 		super(midiNote, startTime, endTime, noteOn, noteOff);
-		position = new FrettingEngine.FretboardPosition(-1, -1);
+		position = new StandardFrettingEngine.FretboardPosition(-1, -1);
 	}
 	
 	public static NotePeriodWithFretboardPosition fromNotePeriod(NotePeriod notePeriod) {

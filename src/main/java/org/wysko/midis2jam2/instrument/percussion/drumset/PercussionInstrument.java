@@ -13,7 +13,7 @@ import java.util.List;
  * Anything on the percussion channel. This excludes melodic agogos, woodblocks, etc.
  */
 public abstract class PercussionInstrument extends Instrument {
-	static final float DRUM_RECOIL_COMEBACK = 22;
+	public static final float DRUM_RECOIL_COMEBACK = 22;
 	
 	final Node highLevelNode = new Node();
 	

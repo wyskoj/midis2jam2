@@ -19,23 +19,29 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.StageHorns;
+import org.wysko.midis2jam2.instrument.brass.Trumpet;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.ensemble.StageChoir;
+import org.wysko.midis2jam2.instrument.ensemble.StageStrings;
+import org.wysko.midis2jam2.instrument.ensemble.Timpani;
 import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.guitar.Guitar;
-import org.wysko.midis2jam2.instrument.monophonic.brass.Trumpet;
-import org.wysko.midis2jam2.instrument.monophonic.pipe.Flute;
-import org.wysko.midis2jam2.instrument.monophonic.pipe.Ocarina;
-import org.wysko.midis2jam2.instrument.monophonic.pipe.Piccolo;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.AltoSax;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.BaritoneSax;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.SopranoSax;
-import org.wysko.midis2jam2.instrument.monophonic.reed.sax.TenorSax;
 import org.wysko.midis2jam2.instrument.organ.Accordion;
 import org.wysko.midis2jam2.instrument.organ.Harmonica;
 import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
+import org.wysko.midis2jam2.instrument.percussive.MelodicTom;
+import org.wysko.midis2jam2.instrument.percussive.SynthDrum;
+import org.wysko.midis2jam2.instrument.percussive.TaikoDrum;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
+import org.wysko.midis2jam2.instrument.pipe.Flute;
+import org.wysko.midis2jam2.instrument.pipe.Ocarina;
+import org.wysko.midis2jam2.instrument.pipe.PanFlute;
+import org.wysko.midis2jam2.instrument.pipe.Piccolo;
+import org.wysko.midis2jam2.instrument.reed.sax.AltoSax;
+import org.wysko.midis2jam2.instrument.reed.sax.BaritoneSax;
+import org.wysko.midis2jam2.instrument.reed.sax.SopranoSax;
+import org.wysko.midis2jam2.instrument.reed.sax.TenorSax;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.strings.*;
 import org.wysko.midis2jam2.midi.*;
@@ -120,7 +126,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			}
 			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
 				backup = MidiSystem.getMidiDevice(eachInfo);
-				LATENCY_FIX = 0;
 				break;
 			}
 		}
@@ -128,10 +133,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		midijam.sequencer = MidiSystem.getSequencer(false);
 		if ((device == null && backup == null) || USE_DEFAULT_SYNTHESIZER) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
+			System.out.println("using the backup of the backup");
 			LATENCY_FIX = 0;
 		} else {
 			if (device == null) {
-				LATENCY_FIX = 0;
+				System.out.println("using backup");
+				LATENCY_FIX = 100;
 				device = backup;
 			}
 			device.open();
@@ -396,6 +403,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
 			case 46: // Orchestral Harp
 				return new Harp(this, events);
+			case 47: // Timpani
+				return new Timpani(this, events);
 			case 48: // String Ensemble 1
 			case 49: // String Ensemble 2
 			case 50: // Synth Strings 1
@@ -428,6 +437,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Piccolo(this, events);
 			case 73: // Flute
 				return new Flute(this, events);
+			case 75: // Pan Flute
+				return new PanFlute(this, events, PanFlute.PipeSkin.WOOD);
 			case 79: // Ocarina
 				return new Ocarina(this, events);
 			case 80: // Lead 1 (Square)
@@ -450,6 +461,14 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 102: // FX 7 (Echoes)
 			case 103: // FX 8 (Sci-fi)
 				return new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
+			case 82: // Lead 3 (Calliope)
+				return new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
+			case 116: // Taiko Drum
+				return new TaikoDrum(this, events);
+			case 117: // Melodic Tom
+				return new MelodicTom(this, events);
+			case 118: // Synth Drum
+				return new SynthDrum(this, events);
 			case 124: // Telephone Ring
 				return new TelephoneRing(this, events);
 			default:

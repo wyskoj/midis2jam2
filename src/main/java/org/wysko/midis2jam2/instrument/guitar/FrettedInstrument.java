@@ -10,6 +10,7 @@ import org.wysko.midis2jam2.instrument.NotePeriod;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -189,8 +190,18 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}
-		
-		currentNotePeriods.removeIf(notePeriod -> Math.abs(notePeriod.endTime - time) < 0.02);
+		Iterator<NotePeriod> r = currentNotePeriods.iterator();
+		while (r.hasNext()) {
+			NotePeriod next = r.next();
+			if (Math.abs(next.endTime - time) < 0.02 || time > next.endTime) {
+				r.remove();
+				NotePeriodWithFretboardPosition next1 = (NotePeriodWithFretboardPosition) next;
+				int string = next1.position.string;
+				if (string != -1)
+					frettingEngine.releaseString(string);
+			}
+		}
+//		currentNotePeriods.removeIf(notePeriod -> Math.abs(notePeriod.endTime - time) < 0.02);
 	}
 	
 	/**
@@ -207,7 +218,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			int finalI = i;
 			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).position.string == finalI).findFirst();
 			if (first.isPresent()) {
-				FrettingEngine.FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).position;
+				StandardFrettingEngine.FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).position;
 				if (position.string != -1 && position.fret != -1) {
 					frettingEngine.applyFretboardPosition(position);
 				}
@@ -220,7 +231,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			if (notePeriod.animationStarted) continue;
 			NotePeriodWithFretboardPosition notePeriod1 = (NotePeriodWithFretboardPosition) notePeriod;
 			noteStarted = true;
-			final FrettingEngine.FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
+			final StandardFrettingEngine.FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
 			if (guitarPosition != null) {
 				frettingEngine.applyFretboardPosition(guitarPosition);
 				notePeriod1.position = guitarPosition;

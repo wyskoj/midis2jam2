@@ -5,8 +5,6 @@ import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.monophonic.Clone;
-import org.wysko.midis2jam2.instrument.monophonic.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
