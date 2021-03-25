@@ -49,19 +49,19 @@ public class Timpani extends OneDrumOctave {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		for (int i = 0; i < 12; i++) {
-			Stick.StickStatus stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3, 50);
-			if (stickStatus.justStruck()) {
-				animNode.setLocalTranslation(0, -3, 0);
-			}
-		}
-		Vector3f localTranslation = animNode.getLocalTranslation();
-		if (localTranslation.y < -0.0001) {
-			animNode.setLocalTranslation(0, Math.min(0,
-					localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
-		} else {
-			animNode.setLocalTranslation(0, 0, 0);
-		}
+//		for (int i = 0; i < 12; i++) {
+//			Stick.StickStatus stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3, 50);
+//			if (stickStatus.justStruck()) {
+//				animNode.setLocalTranslation(0, -3, 0);
+//			}
+//		}
+//		Vector3f localTranslation = animNode.getLocalTranslation();
+//		if (localTranslation.y < -0.0001) {
+//			animNode.setLocalTranslation(0, Math.min(0,
+//					localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
+//		} else {
+//			animNode.setLocalTranslation(0, 0, 0);
+//		}
 	}
 	
 	@Override

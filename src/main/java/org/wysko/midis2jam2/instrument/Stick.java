@@ -1,7 +1,6 @@
 package org.wysko.midis2jam2.instrument;
 
 import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +13,10 @@ import java.util.List;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public class Stick {
+	
+	public final static double STRIKE_SPEED = 4;
+	
+	public final static double MAX_ANGLE = 50;
 	
 	/**
 	 * Given parameters, calculates the angle a stick should be at to accurately hit the next note.
@@ -35,7 +38,19 @@ public class Stick {
 				-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(nextHit));
 	}
 	
-	public static StickStatus handleStick(Midis2jam2 context, Node stickNode, double time, float delta,
+	/**
+	 * Uses {@link MidiNoteOnEvent}s to calculate the desired rotation and visibility of a stick at any given point.
+	 *
+	 * @param context     context to midis2jam2
+	 * @param stickNode   the node that will rotate and cull to move the stick
+	 * @param time        the current time, in seconds
+	 * @param delta       the amount of time since the last frame
+	 * @param strikes     the list of strikes this stick is responsible for
+	 * @param strikeSpeed the speed at which to strike
+	 * @param maxAngle    the maximum angle to hold the stick at
+	 * @return a {@link StickStatus} describing the current status of the stick
+	 */
+	public static StickStatus handleStick(Midis2jam2 context, Spatial stickNode, double time, float delta,
 	                                      List<MidiNoteOnEvent> strikes, double strikeSpeed, double maxAngle) {
 		boolean strike = false;
 		

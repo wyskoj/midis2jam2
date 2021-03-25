@@ -12,7 +12,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
-import static org.wysko.midis2jam2.instrument.percussion.drumset.StickDrum.MAX_ANGLE;
+import static org.wysko.midis2jam2.instrument.Stick.MAX_ANGLE;
 
 public class BassDrum extends PercussionInstrument {
 	

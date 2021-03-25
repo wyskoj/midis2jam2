@@ -145,7 +145,7 @@ public class Accordion extends KeyedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		// todo
+		offsetNode.setLocalTranslation(0,30 * indexForMoving(), 0);
 	}
 	
 	private class AccordionKey extends Key {

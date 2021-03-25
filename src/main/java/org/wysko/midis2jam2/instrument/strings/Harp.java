@@ -141,7 +141,6 @@ public class Harp extends SustainedInstrument {
 			stringNode.attachChild(string);
 			stringNode.setLocalTranslation(0, 2.1444f + 0.8777f * i, -2.27f + (0.75651f * -i));
 			float scale = (float) ((2.44816E-4 * Math.pow(i, 2)) + (-0.02866 * i) + 0.97509);
-			System.out.printf("f(%d) = %.3f%n", i, scale);
 			stringNode.setLocalScale(1, scale, 1);
 		}
 		
