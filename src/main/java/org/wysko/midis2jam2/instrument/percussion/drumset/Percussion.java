@@ -45,6 +45,12 @@ public class Percussion extends Instrument {
 	
 	private final Cymbal crash2;
 	
+	private final Cymbal china;
+	
+	private final Cymbal ride1;
+	
+	private final RideCymbal ride2;
+	
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
 		/* Percussion only cares about note on. */
@@ -88,6 +94,15 @@ public class Percussion extends Instrument {
 		splash = new Cymbal(context,
 				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.SPLASH);
 		
+		china = new Cymbal(context,
+				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.CHINA);
+		
+		ride1 = new RideCymbal(context,
+				noteOnEvents.stream().filter(e -> e.note == 51).collect(Collectors.toList()), Cymbal.CymbalType.RIDE_1);
+		
+		ride2 = new RideCymbal(context,
+				noteOnEvents.stream().filter(e -> e.note == 59).collect(Collectors.toList()), Cymbal.CymbalType.RIDE_2);
+		
 		hiHat = new HiHat(context,
 				noteOnEvents.stream().filter(e -> e.note == 42 || e.note == 44 || e.note == 46).collect(Collectors.toList()));
 		
@@ -104,7 +119,11 @@ public class Percussion extends Instrument {
 		drumSetNode.attachChild(crash2.highLevelNode);
 		drumSetNode.attachChild(splash.highLevelNode);
 		drumSetNode.attachChild(hiHat.highLevelNode);
+		drumSetNode.attachChild(china.highLevelNode);
+		drumSetNode.attachChild(ride1.highLevelNode);
+		drumSetNode.attachChild(ride2.highLevelNode);
 		
+		/* Add shadow */
 		Spatial shadow = context.getAssetManager().loadModel("Assets/DrumShadow.obj");
 		final Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/DrumShadow.png"));
@@ -116,8 +135,6 @@ public class Percussion extends Instrument {
 		percussionNode.attachChild(drumSetNode);
 		percussionNode.attachChild(shadow);
 		context.getRootNode().attachChild(percussionNode);
-		
-		
 	}
 	
 	@Override
@@ -135,6 +152,9 @@ public class Percussion extends Instrument {
 		crash2.tick(time, delta);
 		splash.tick(time, delta);
 		hiHat.tick(time, delta);
+		china.tick(time, delta);
+		ride1.tick(time, delta);
+		ride2.tick(time, delta);
 	}
 	
 	@Override

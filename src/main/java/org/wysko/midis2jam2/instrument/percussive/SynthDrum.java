@@ -40,11 +40,6 @@ public class SynthDrum extends OneDrumOctave {
 	}
 	
 	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-	}
-	
-	@Override
 	protected void moveForMultiChannel() {
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-25 + indexForMoving() * -16), 0));
 	}

@@ -1,10 +1,13 @@
 package org.wysko.midis2jam2.instrument;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,10 @@ public abstract class DecayedInstrument extends Instrument {
 	@NotNull
 	protected final List<MidiNoteOnEvent> hits;
 	
+	@NotNull
+	@Unmodifiable
+	protected final List<MidiNoteOnEvent> finalHits;
+	
 	/**
 	 * @param context   the context to the main class
 	 * @param eventList the event list
@@ -31,11 +38,12 @@ public abstract class DecayedInstrument extends Instrument {
 				.filter(e -> e instanceof MidiNoteOnEvent)
 				.map(e -> ((MidiNoteOnEvent) e))
 				.collect(Collectors.toList());
+		finalHits = Collections.unmodifiableList(new ArrayList<>(hits));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		setIdleVisibilityByStrikes(hits, time, instrumentNode);
+		setIdleVisibilityByStrikes(finalHits, time, instrumentNode);
 		moveForMultiChannel();
 	}
 }

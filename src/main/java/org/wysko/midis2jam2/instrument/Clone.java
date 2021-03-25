@@ -59,6 +59,8 @@ public abstract class Clone {
 	 */
 	private final float rotationFactor;
 	
+	private final Axis rotationAxis;
+	
 	/**
 	 * The current note period that is being handled.
 	 */
@@ -70,10 +72,12 @@ public abstract class Clone {
 	 *
 	 * @param parent         the parent
 	 * @param rotationFactor the rotation factor
+	 * @param rotationAxis
 	 */
-	public Clone(MonophonicInstrument parent, float rotationFactor) {
+	public Clone(MonophonicInstrument parent, float rotationFactor, Axis rotationAxis) {
 		this.parent = parent;
 		this.rotationFactor = rotationFactor;
+		this.rotationAxis = rotationAxis;
 		
 		idleNode.attachChild(modelNode);
 		animNode.attachChild(idleNode);
@@ -147,7 +151,13 @@ public abstract class Clone {
 		
 		/* Rotate clone on note play */
 		if (currentNotePeriod != null) {
-			animNode.setLocalRotation(new Quaternion().fromAngles(-((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * rotationFactor, 0, 0));
+			float rotate = -((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * rotationFactor;
+			animNode.setLocalRotation(
+					new Quaternion().fromAngles(
+							rotationAxis == Axis.X ? rotate : 0,
+							rotationAxis == Axis.Y ? rotate : 0,
+							rotationAxis == Axis.Z ? rotate : 0
+					));
 		} else {
 			animNode.setLocalRotation(new Quaternion());
 		}

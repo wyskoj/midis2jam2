@@ -111,7 +111,7 @@ public class BaritoneSax extends Saxophone {
 			Material shinyHornSkin2 = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
 			
 			this.body = context.getAssetManager().loadModel("Assets/BaritoneSaxBody.fbx");
-			this.bell = context.getAssetManager().loadModel("Assets/BaritoneSaxHorn.obj");
+			this.bell.attachChild(context.getAssetManager().loadModel("Assets/BaritoneSaxHorn.obj"));
 			
 			Node bodyNode = ((Node) body);
 			

@@ -21,7 +21,7 @@ public class StageHorns extends WrappedOctaveSustained {
 	
 	
 	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
+		super(context, eventList, false);
 		
 		twelfths = new StageHornNote[12];
 		for (int i = 0; i < 12; i++) {

@@ -18,10 +18,10 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.brass.StageHorns;
-import org.wysko.midis2jam2.instrument.brass.Trumpet;
+import org.wysko.midis2jam2.instrument.brass.*;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
+import org.wysko.midis2jam2.instrument.ensemble.PizzicatoStrings;
 import org.wysko.midis2jam2.instrument.ensemble.StageChoir;
 import org.wysko.midis2jam2.instrument.ensemble.StageStrings;
 import org.wysko.midis2jam2.instrument.ensemble.Timpani;
@@ -30,14 +30,9 @@ import org.wysko.midis2jam2.instrument.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.organ.Accordion;
 import org.wysko.midis2jam2.instrument.organ.Harmonica;
 import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
-import org.wysko.midis2jam2.instrument.percussive.MelodicTom;
-import org.wysko.midis2jam2.instrument.percussive.SynthDrum;
-import org.wysko.midis2jam2.instrument.percussive.TaikoDrum;
+import org.wysko.midis2jam2.instrument.percussive.*;
 import org.wysko.midis2jam2.instrument.piano.Keyboard;
-import org.wysko.midis2jam2.instrument.pipe.Flute;
-import org.wysko.midis2jam2.instrument.pipe.Ocarina;
-import org.wysko.midis2jam2.instrument.pipe.PanFlute;
-import org.wysko.midis2jam2.instrument.pipe.Piccolo;
+import org.wysko.midis2jam2.instrument.pipe.*;
 import org.wysko.midis2jam2.instrument.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.reed.sax.SopranoSax;
@@ -63,6 +58,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	public final List<Instrument> instruments = new ArrayList<>();
 	
+	final List<Spatial> guitarShadows = new ArrayList<>();
+	
 	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
 	
 	private final List<Spatial> harpShadows = new ArrayList<>();
@@ -78,8 +75,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	double timeSinceStart = -2;
 	
 	boolean seqHasRunOnce = false;
-	
-	final List<Spatial> guitarShadows = new ArrayList<>();
 	
 	private Spatial pianoStand;
 	
@@ -401,16 +396,19 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Cello(this, events);
 			case 43: // Contrabass
 				return new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
-			case 46: // Orchestral Harp
-				return new Harp(this, events);
-			case 47: // Timpani
-				return new Timpani(this, events);
+			case 44: // Tremolo Strings
 			case 48: // String Ensemble 1
 			case 49: // String Ensemble 2
 			case 50: // Synth Strings 1
 			case 51: // Synth Strings 2
 			case 92: // Pad 5 (Bowed)
 				return new StageStrings(this, events);
+			case 45: // Pizzicato Strings
+				return new PizzicatoStrings(this, events);
+			case 46: // Orchestral Harp
+				return new Harp(this, events);
+			case 47: // Timpani
+				return new Timpani(this, events);
 			case 52: // Choir Aahs
 			case 53: // Voice Oohs
 			case 54: // Synth Voice
@@ -420,7 +418,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			case 126: // Applause
 				return new StageChoir(this, events);
 			case 56: // Trumpet
-				return new Trumpet(this, events);
+				return new Trumpet(this, events, Trumpet.TrumpetType.NORMAL);
+			case 57: // Trombone
+				return new Trombone(this, events);
+			case 58: // Tuba
+				return new Tuba(this, events);
+			case 59: // Muted Trumpet
+				return new Trumpet(this, events, Trumpet.TrumpetType.MUTED);
+			case 60: // French Horn
+				return new FrenchHorn(this, events);
 			case 61: // Brass Section
 			case 62: // Synth Brass 1
 			case 63: // Synth Brass 2
@@ -439,6 +445,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Flute(this, events);
 			case 75: // Pan Flute
 				return new PanFlute(this, events, PanFlute.PipeSkin.WOOD);
+			case 76: // Blown Bottle
+				return new BlownBottle(this, events);
+			case 78: // Whistle
+				return new Whistles(this, events);
 			case 79: // Ocarina
 				return new Ocarina(this, events);
 			case 80: // Lead 1 (Square)
@@ -463,6 +473,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
 			case 82: // Lead 3 (Calliope)
 				return new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
+			case 113: // Agogo
+				return new Agogos(this, events);
+			case 114: // Steel Drums
+				return new SteelDrums(this, events);
+			case 115: // Woodblock
+				return new Woodblocks(this, events);
 			case 116: // Taiko Drum
 				return new TaikoDrum(this, events);
 			case 117: // Melodic Tom

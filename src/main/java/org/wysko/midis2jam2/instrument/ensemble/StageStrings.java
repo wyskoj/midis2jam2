@@ -20,7 +20,7 @@ public class StageStrings extends WrappedOctaveSustained {
 	final Node[] stringNodes = new Node[12];
 	
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
+		super(context, eventList, false);
 		
 		twelfths = new StageStringNote[12];
 		for (int i = 0; i < 12; i++) {
@@ -36,7 +36,7 @@ public class StageStrings extends WrappedOctaveSustained {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (10.6 * indexForMoving())), 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (12.6 * indexForMoving())), 0));
 	}
 	
 	public class StageStringNote extends TwelfthOfOctave {

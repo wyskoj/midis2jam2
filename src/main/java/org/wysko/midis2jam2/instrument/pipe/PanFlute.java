@@ -26,7 +26,7 @@ public class PanFlute extends WrappedOctaveSustained {
 	public PanFlute(@NotNull Midis2jam2 context,
 	                @NotNull List<MidiChannelSpecificEvent> eventList,
 	                @NotNull PipeSkin skin) {
-		super(context, eventList);
+		super(context, eventList, false);
 		twelfths = new PanFlutePipe[12];
 		for (int i = 0; i < 12; i++) {
 			pipeNodes[11 - i] = new Node();

@@ -1,5 +1,6 @@
 package org.wysko.midis2jam2.instrument;
 
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 /**
@@ -20,7 +21,7 @@ public abstract class StretchyClone extends Clone {
 	/**
 	 * The bell of the instrument.
 	 */
-	protected Spatial bell;
+	protected Node bell = new Node();
 	
 	/**
 	 * The body of the instrument.
@@ -28,8 +29,8 @@ public abstract class StretchyClone extends Clone {
 	protected Spatial body;
 	
 	public StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
-	                     Axis scaleAxis) {
-		super(parent, rotationFactor);
+	                     Axis scaleAxis, Axis rotationAxis) {
+		super(parent, rotationFactor, rotationAxis);
 		this.stretchFactor = stretchFactor;
 		this.scaleAxis = scaleAxis;
 	}

@@ -6,7 +6,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.AnimatedKeyClone;
+import org.wysko.midis2jam2.instrument.AnimatedKeyCloneByBooleans;
 import org.wysko.midis2jam2.instrument.Axis;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -55,14 +55,15 @@ public class Trumpet extends MonophonicInstrument {
 		put(82, new Boolean[] {false, false, false,});
 	}};
 	
-	public Trumpet(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
+	public Trumpet(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
+	               TrumpetType type) throws ReflectiveOperationException {
 		super(
 				context,
 				eventList,
-				TrumpetClone.class
+				type == TrumpetType.NORMAL ? TrumpetClone.class : MutedTrumpetClone.class
 		);
 		
-		groupOfPolyphony.setLocalTranslation(-31.5f, 60, 10);
+		groupOfPolyphony.setLocalTranslation(-21.5f, 60, 10);
 		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
 		
 	}
@@ -72,10 +73,15 @@ public class Trumpet extends MonophonicInstrument {
 		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
 	}
 	
-	public class TrumpetClone extends AnimatedKeyClone {
+	public enum TrumpetType {
+		NORMAL,
+		MUTED;
+	}
+	
+	public class TrumpetClone extends AnimatedKeyCloneByBooleans {
 		
 		public TrumpetClone() {
-			super(Trumpet.this, 0.15f, 0.9f, KEY_MAPPING, 3, Axis.Z);
+			super(Trumpet.this, 0.15f, 0.9f, KEY_MAPPING, 3, Axis.Z, Axis.X);
 			
 			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			Material material = new Material(context.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
@@ -84,7 +90,7 @@ public class Trumpet extends MonophonicInstrument {
 			material.setTexture("EnvMap", context.getAssetManager().loadTexture("Assets/HornSkinGrey.bmp"));
 			((Node) body).getChild(1).setMaterial(material);
 			
-			this.bell = context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
+			this.bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
 			this.bell.setLocalTranslation(0, 0, 5.58f);
 			
 			for (int i = 0; i < 3; i++) {
@@ -114,6 +120,14 @@ public class Trumpet extends MonophonicInstrument {
 		@Override
 		protected void moveForPolyphony() {
 			offsetNode.setLocalTranslation(10 * indexForMoving(), 0, 0);
+		}
+	}
+	
+	public class MutedTrumpetClone extends TrumpetClone {
+		
+		public MutedTrumpetClone() {
+			super();
+			this.bell.attachChild(context.loadModel("TrumpetMute.obj", "RubberFoot.bmp"));
 		}
 	}
 }

@@ -24,7 +24,7 @@ public abstract class HandedClone extends Clone {
 	 * @param rotationFactor the rotation factor
 	 */
 	public HandedClone(HandedInstrument parent, float rotationFactor) {
-		super(parent, rotationFactor);
+		super(parent, rotationFactor, Axis.X);
 		modelNode.attachChild(leftHandNode);
 		modelNode.attachChild(rightHandNode);
 	}

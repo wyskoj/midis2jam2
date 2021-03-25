@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class OneDrumOctave extends DecayedInstrument {
+public abstract class TwelveDrumOctave extends DecayedInstrument {
 	
 	protected Node animNode = new Node();
 	
@@ -21,12 +21,14 @@ public abstract class OneDrumOctave extends DecayedInstrument {
 	
 	protected List<MidiNoteOnEvent>[] malletStrikes;
 	
+	protected TwelfthOfOctaveDecayed[] decayeds = new TwelfthOfOctaveDecayed[12];
+	
 	/**
 	 * @param context   the context to the main class
 	 * @param eventList the event list
 	 */
-	protected OneDrumOctave(@NotNull Midis2jam2 context,
-	                        @NotNull List<MidiChannelSpecificEvent> eventList) {
+	protected TwelveDrumOctave(@NotNull Midis2jam2 context,
+	                           @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		malletNodes = new Node[12];
 		malletStrikes = new ArrayList[12];
@@ -44,17 +46,32 @@ public abstract class OneDrumOctave extends DecayedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		for (int i = 0; i < 12; i++) {
-			Stick.StickStatus stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3, 50);
+			Stick.StickStatus stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5, 50);
 			if (stickStatus.justStruck()) {
-				animNode.setLocalTranslation(0, -3, 0);
+				decayeds[i].animNode.setLocalTranslation(0, -3, 0);
+			}
+			Vector3f localTranslation = decayeds[i].animNode.getLocalTranslation();
+			if (localTranslation.y < -0.0001) {
+				decayeds[i].animNode.setLocalTranslation(0, Math.min(0,
+						localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
+			} else {
+				decayeds[i].animNode.setLocalTranslation(0, 0, 0);
 			}
 		}
-		Vector3f localTranslation = animNode.getLocalTranslation();
-		if (localTranslation.y < -0.0001) {
-			animNode.setLocalTranslation(0, Math.min(0,
-					localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
-		} else {
-			animNode.setLocalTranslation(0, 0, 0);
-		}
+		
 	}
+	
+	public abstract static class TwelfthOfOctaveDecayed {
+		
+		public final Node highestLevel = new Node();
+		
+		protected final Node animNode = new Node();
+		
+		public TwelfthOfOctaveDecayed() {
+			highestLevel.attachChild(animNode);
+		}
+		
+		public abstract void tick(double time, float delta);
+	}
+	
 }

@@ -45,11 +45,6 @@ public class TaikoDrum extends OneDrumOctave {
 	}
 	
 	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-	}
-	
-	@Override
 	protected void moveForMultiChannel() {
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27.9 + indexForMoving() * -11), 0));
 	}

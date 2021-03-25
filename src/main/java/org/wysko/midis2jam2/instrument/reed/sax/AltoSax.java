@@ -109,7 +109,7 @@ public class AltoSax extends Saxophone {
 			black.setColor("Color", ColorRGBA.Black);
 			
 			this.body = context.getAssetManager().loadModel("Assets/AltoSaxBody.fbx");
-			this.bell = context.getAssetManager().loadModel("Assets/AltoSaxHorn.obj");
+			this.bell.attachChild(context.getAssetManager().loadModel("Assets/AltoSaxHorn.obj"));
 			
 			Node bodyNode = ((Node) body);
 			

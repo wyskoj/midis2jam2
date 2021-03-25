@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public abstract class AnimatedKeyClone extends StretchyClone {
+public abstract class AnimatedKeyCloneByBooleans extends StretchyClone {
 	
 	/**
 	 * The keys of the instrument.
@@ -17,14 +17,14 @@ public abstract class AnimatedKeyClone extends StretchyClone {
 	final
 	Map<Integer, Boolean[]> keyMap;
 	
-	public AnimatedKeyClone(MonophonicInstrument parent,
-	                        float rotationFactor,
-	                        float stretchFactor,
-	                        @NotNull Map<Integer, Boolean[]> keyMap,
-	                        int numberOfKeys,
-	                        Axis stretchAxis) {
+	public AnimatedKeyCloneByBooleans(MonophonicInstrument parent,
+	                                  float rotationFactor,
+	                                  float stretchFactor,
+	                                  @NotNull Map<Integer, Boolean[]> keyMap,
+	                                  int numberOfKeys,
+	                                  Axis stretchAxis, Axis rotationAxis) {
 		
-		super(parent, rotationFactor, stretchFactor, stretchAxis);
+		super(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis);
 		this.keys = new Spatial[numberOfKeys];
 		this.keyMap = keyMap;
 	}

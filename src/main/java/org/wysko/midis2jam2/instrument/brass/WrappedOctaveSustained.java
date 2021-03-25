@@ -14,15 +14,20 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	
 	protected TwelfthOfOctave[] twelfths = new TwelfthOfOctave[12];
 	
+	final boolean inverted;
+	
 	/**
 	 * Instantiates a new wrapped octave sustained.
 	 *
 	 * @param context   the context to the main class
 	 * @param eventList the event list
+	 * @param inverted
 	 */
 	protected WrappedOctaveSustained(@NotNull Midis2jam2 context,
-	                                 @NotNull List<MidiChannelSpecificEvent> eventList) {
+	                                 @NotNull List<MidiChannelSpecificEvent> eventList,
+	                                 boolean inverted) {
 		super(context, eventList);
+		this.inverted = inverted;
 	}
 	
 	@Override
@@ -35,6 +40,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 				
 				int midiNote = currentNotePeriod.midiNote;
 				int index = 11 - ((midiNote + 3) % 12);
+				if (inverted) index = 11 - index;
 				twelfths[index].play(currentNotePeriod.duration());
 				
 				iterator.remove();

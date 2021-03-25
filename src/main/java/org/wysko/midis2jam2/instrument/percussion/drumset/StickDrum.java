@@ -14,7 +14,7 @@ import java.util.List;
  */
 public abstract class StickDrum extends SingleStickInstrument {
 	
-	static final float RECOIL_DISTANCE = -2f;
+	public static final float RECOIL_DISTANCE = -2f;
 	
 	/**
 	 * Attach {@link #drum} and {@link #stick} to this and move this for recoil.

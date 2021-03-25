@@ -110,7 +110,7 @@ public class SopranoSax extends Saxophone {
 			black.setColor("Color", ColorRGBA.Black);
 			
 			this.body = context.getAssetManager().loadModel("Assets/SapranoSaxBody.fbx");
-			this.bell = context.getAssetManager().loadModel("Assets/SapranoSaxHorn.obj");
+			this.bell.attachChild(context.getAssetManager().loadModel("Assets/SapranoSaxHorn.obj"));
 			
 			Node bodyNode = ((Node) body);
 			

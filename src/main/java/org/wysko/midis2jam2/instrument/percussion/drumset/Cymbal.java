@@ -31,7 +31,9 @@ public class Cymbal extends SingleStickInstrument {
 	                 List<MidiNoteOnEvent> hits, CymbalType type) {
 		super(context, hits);
 		
-		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
+		final Spatial cymbal = context.loadModel(type == CymbalType.CHINA ? "DrumSet_ChinaCymbal.obj" :
+						"DrumSet_Cymbal.obj",
+				"CymbalSkinSphereMap.bmp",
 				Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		cymbalNode.attachChild(cymbal);
 		cymbalNode.setLocalScale(type.size);
@@ -77,9 +79,10 @@ public class Cymbal extends SingleStickInstrument {
 		CRASH_1(new Vector3f(-18, 45, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f),
 		CRASH_2(new Vector3f(13, 45, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f),
 		SPLASH(new Vector3f(-2, 45, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f),
-		RIDE_1(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f), // TODO fill these out
-		RIDE_2(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f),
-		CHINA(new Vector3f(), new Quaternion().fromAngles(0, 0, 0), 1.0f);
+		RIDE_1(new Vector3f(22, 40, -77.8f), new Quaternion().fromAngles(rad(107 - 90), rad(291), rad(-9.45)), 2f),
+		RIDE_2(new Vector3f(-23, 37, -78.8f), new Quaternion().fromAngles(rad(20), rad(37.9), rad(-3.49)), 2f),
+		CHINA(new Vector3f(32.7f, 31.4f, -68.4f), new Quaternion().fromAngles(rad(108 - 90), rad(-89.2), rad(-10)),
+				2.0f);
 		
 		final float size;
 		

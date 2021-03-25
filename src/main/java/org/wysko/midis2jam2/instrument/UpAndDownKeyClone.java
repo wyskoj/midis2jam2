@@ -48,7 +48,7 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	                         float stretchFactor,
 	                         @NotNull Map<Integer, Integer[]> keyMap) {
 		
-		super(parent, rotationFactor, stretchFactor, Axis.Y);
+		super(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X);
 		this.keyCount = keyCount;
 		this.keyMap = keyMap;
 		
