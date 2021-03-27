@@ -36,7 +36,13 @@ public class StageHorns extends WrappedOctaveSustained {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(-1.378f * indexForMoving(), 0, 4.806f * indexForMoving());
+		for (TwelfthOfOctave twelfth : twelfths) {
+			StageHornNote peep = (StageHornNote) twelfth;
+			peep.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(
+					new Vector3f(0, 0, -5).mult(indexForMoving())
+			));
+		}
+//		offsetNode.setLocalTranslation(-1.378f * indexForMoving(), 0, 4.806f * indexForMoving());
 	}
 	
 	public class StageHornNote extends BouncyTwelfth {

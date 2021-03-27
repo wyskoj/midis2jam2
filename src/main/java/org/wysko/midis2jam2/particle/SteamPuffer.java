@@ -43,13 +43,7 @@ public class SteamPuffer implements ParticleGenerator {
 		if (active) {
 			// Spawn clouds
 			double numberOfCloudsToSpawn = (delta / (1f / 60f));
-			if (numberOfCloudsToSpawn < 1) {
-				if (new Random().nextDouble() < numberOfCloudsToSpawn) {
-					numberOfCloudsToSpawn = 1;
-				} else {
-					numberOfCloudsToSpawn = 0;
-				}
-			}
+			numberOfCloudsToSpawn = Math.max(numberOfCloudsToSpawn, 1);
 			for (int i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
 				Cloud cloud;
 				if (!cloudPool.isEmpty())
@@ -107,7 +101,7 @@ public class SteamPuffer implements ParticleGenerator {
 		boolean currentlyUsing = false;
 		
 		public Cloud() {
-			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename, Midis2jam2.MatType.UNSHADED, 0.9f);
+			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename);
 			randomInit();
 			cloud.attachChild(cube);
 		}

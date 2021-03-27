@@ -12,6 +12,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
@@ -37,6 +38,8 @@ import org.wysko.midis2jam2.instrument.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.reed.sax.TenorSax;
+import org.wysko.midis2jam2.instrument.soundeffects.Gunshot;
+import org.wysko.midis2jam2.instrument.soundeffects.Helicopter;
 import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.strings.*;
 import org.wysko.midis2jam2.midi.*;
@@ -54,6 +57,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	
+	public static Midis2jam2 context;
+	
 	static long LATENCY_FIX = 250;
 	
 	public final List<Instrument> instruments = new ArrayList<>();
@@ -70,6 +75,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	public BitmapText debugText;
 	
+	public BitmapFont bitmapFont;
+	
 	Sequencer sequencer;
 	
 	double timeSinceStart = -2;
@@ -83,9 +90,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	private Spatial keyboardShadow;
 	
 	public static void main(String[] args) throws Exception {
-		Midis2jam2 midijam = new Midis2jam2();
 		
-		File rawFile = new File("testmidi/curvesnointro.mid");
+		Midis2jam2 midijam = new Midis2jam2();
+		context = midijam;
+		
+		File folder = new File("testmidi/");
+		File[] files = folder.listFiles();
+		File rawFile = files[new Random().nextInt(files.length)];
 		
 		if (args.length > 0) {
 			rawFile = new File(args[0]);
@@ -93,19 +104,20 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		midijam.file = MidiFile.readMidiFile(rawFile);
 		
-		// Define settings
 		AppSettings settings = new AppSettings(true);
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
-		settings.setFullscreen(false);
-		settings.setResolution(1024, 768);
+//		settings.setFullscreen(true);
+		settings.setResolution(1920, 800);
 		settings.setResizable(true);
 		settings.setSamples(4);
+		
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
 		midijam.start();
 		midijam.setPauseOnLostFocus(false);
 		
+		// Define settings
 		
 		// Create a sequencer for the sequence
 		Sequence sequence = MidiSystem.getSequence(rawFile);
@@ -169,8 +181,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
 	@Override
 	public void simpleUpdate(float tpf) {
+		
 		super.simpleUpdate(tpf);
-//		bitmapText1.setText(String.valueOf(timeSinceStart));
+		
 		if (sequencer == null) return;
 		if (sequencer.isOpen())
 			timeSinceStart += tpf;
@@ -182,6 +195,21 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				instrument.tick(timeSinceStart, tpf);
 		}
 		
+		updateShadowsAndStands();
+
+//		showAll(rootNode);
+	}
+	
+	private void showAll(Node rootNode) {
+		for (Spatial child : rootNode.getChildren()) {
+			child.setCullHint(Spatial.CullHint.Dynamic);
+			if (child instanceof Node) {
+				showAll((Node) child);
+			}
+		}
+	}
+	
+	private void updateShadowsAndStands() {
 		// Hide/show stands
 		if (pianoStand != null)
 			pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
@@ -223,7 +251,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (i < malletVisibleCount) malletShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
 			else malletShadows.get(i).setCullHint(Spatial.CullHint.Always);
 		}
-		
 	}
 	
 	/**
@@ -443,6 +470,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Piccolo(this, events);
 			case 73: // Flute
 				return new Flute(this, events);
+			case 74: // Recorder
+				return new Recorder(this, events);
 			case 75: // Pan Flute
 				return new PanFlute(this, events, PanFlute.PipeSkin.WOOD);
 			case 76: // Blown Bottle
@@ -487,6 +516,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new SynthDrum(this, events);
 			case 124: // Telephone Ring
 				return new TelephoneRing(this, events);
+			case 125: // Helicopter
+				return new Helicopter(this, events);
+			case 127: // Gunshot
+				return new Gunshot(this, events);
 			default:
 				return null;
 		}
@@ -504,27 +537,12 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		setCamera(Camera.CAMERA_1A);
 		setDisplayStatView(false);
 		setDisplayFps(false);
-//
-//		cam.setLocation(new Vector3f(0,0,3500));
-//		cam.setRotation(new Quaternion().fromAngles(0,rad(180),0));
-//		cam.setLocation(new Vector3f(0,3800,0));
-//		cam.setRotation(new Quaternion().fromAngles(rad(90),rad(180),0));
-//		cam.setFrustumPerspective(3,1024/768f,0.1f, 1E6F);
 		
 		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED, 0.9f);
 		rootNode.attachChild(stage);
 		
-		BitmapFont bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-		debugText = new BitmapText(bitmapFont, false);
-		debugText.setSize(bitmapFont.getCharSet().getRenderedSize());
-		debugText.setText("");
-		debugText.setLocalTranslation(300, debugText.getLineHeight(), 0);
-		guiNode.attachChild(debugText);
-
-
-//		DirectionalLight l = new DirectionalLight();
-//		l.setDirection(new Vector3f(0, -1, -1));
-//		rootNode.addLight(l);
+		initDebugText();
+		
 		
 		try {
 			calculateInstruments();
@@ -532,6 +550,47 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			e.printStackTrace();
 		}
 		
+		addShadowsAndStands();
+		
+		new Timer(true).scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				if (timeSinceStart + (LATENCY_FIX / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
+					sequencer.setTempoInBPM((float) file.firstTempoInBpm());
+					sequencer.start();
+					seqHasRunOnce = true;
+					new Timer(true).scheduleAtFixedRate(new TimerTask() {
+						@Override
+						public void run() {
+							// Find the first tempo we haven't hit and need to execute
+							long currentMidiTick = sequencer.getTickPosition();
+							for (MidiTempoEvent tempo : file.tempos) {
+								if (tempo.time == currentMidiTick) {
+									sequencer.setTempoInBPM(60_000_000f / tempo.number);
+								}
+							}
+						}
+					}, 0, 1);
+				}
+			}
+		}, 0, 1);
+
+//		NiftyJmeDisplay niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
+//		Nifty nifty = niftyDisplay.getNifty();
+//		nifty.fromXml("Interface/test.xml", "start");
+//		guiViewPort.addProcessor(niftyDisplay);
+	}
+	
+	private void initDebugText() {
+		bitmapFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+		debugText = new BitmapText(bitmapFont, false);
+		debugText.setSize(bitmapFont.getCharSet().getRenderedSize());
+		debugText.setText("");
+		debugText.setLocalTranslation(300, debugText.getLineHeight(), 0);
+		guiNode.attachChild(debugText);
+	}
+	
+	private void addShadowsAndStands() {
 		if (instruments.stream().anyMatch(i -> i instanceof Keyboard)) {
 			pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(pianoStand);
@@ -587,33 +646,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			mallets.get(i).highestLevel.attachChild(shadow);
 			shadow.setLocalTranslation(-50, 0.5f + 0.1f * i, 0);
 		}
-		
-		new Timer().scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				if (timeSinceStart + (LATENCY_FIX / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
-					sequencer.setTempoInBPM((float) file.firstTempoInBpm());
-					sequencer.start();
-					seqHasRunOnce = true;
-					new Timer().scheduleAtFixedRate(new TimerTask() {
-						@Override
-						public void run() {
-							// Find the first tempo we haven't hit and need to execute
-							long currentMidiTick = sequencer.getTickPosition();
-							for (MidiTempoEvent tempo : file.tempos) {
-								if (tempo.time == currentMidiTick) {
-									sequencer.setTempoInBPM(60_000_000f / tempo.number);
-								}
-							}
-						}
-					}, 0, 1);
-				}
-			}
-		}, 0, 1);
 	}
 	
 	@Contract(pure = true)
-	private Spatial shadow(String model, String texture) {
+	public Spatial shadow(String model, String texture) {
 		Spatial shadow = assetManager.loadModel(model);
 		final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", assetManager.loadTexture(texture));
@@ -728,7 +764,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			}
 		}
 	}
-	
 	
 	public enum MatType {
 		UNSHADED,

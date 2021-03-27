@@ -34,8 +34,7 @@ public class Stick {
 	                                       @Nullable MidiNoteOnEvent nextHit,
 	                                       double maxAngle,
 	                                       double strikeSpeed) {
-		return nextHit == null ? maxAngle + 1 :
-				-1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(nextHit));
+		return nextHit == null ? maxAngle + 1 : -1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(nextHit));
 	}
 	
 	/**

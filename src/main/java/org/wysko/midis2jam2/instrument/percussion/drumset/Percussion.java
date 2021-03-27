@@ -95,7 +95,7 @@ public class Percussion extends Instrument {
 				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.SPLASH);
 		
 		china = new Cymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.CHINA);
+				noteOnEvents.stream().filter(e -> e.note == 52).collect(Collectors.toList()), Cymbal.CymbalType.CHINA);
 		
 		ride1 = new RideCymbal(context,
 				noteOnEvents.stream().filter(e -> e.note == 51).collect(Collectors.toList()), Cymbal.CymbalType.RIDE_1);

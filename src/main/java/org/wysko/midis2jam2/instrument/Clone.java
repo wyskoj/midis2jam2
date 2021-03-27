@@ -67,6 +67,8 @@ public abstract class Clone {
 	@Nullable
 	public NotePeriod currentNotePeriod;
 	
+	protected boolean visible;
+	
 	/**
 	 * Instantiates a new clone.
 	 *
@@ -117,24 +119,37 @@ public abstract class Clone {
 	 * Hides or shows this clone.
 	 *
 	 * @param indexThis the index of this clone
+	 * @param time
 	 */
-	protected void hideOrShowOnPolyphony(int indexThis) {
-		if (indexForMoving() == 0 && indexThis != 0) highestLevel.setCullHint(Spatial.CullHint.Always);
+	protected void hideOrShowOnPolyphony(int indexThis, double time) {
+		if (indexForMoving() == 0 && indexThis != 0) {
+			visible = false;
+			highestLevel.setCullHint(Spatial.CullHint.Always);
+		}
 		if (indexThis != 0) {
 			if (currentNotePeriod != null) {
 				highestLevel.setCullHint(Spatial.CullHint.Dynamic);
+				visible = true;
 			} else {
-				highestLevel.setCullHint(Spatial.CullHint.Always);
+				if (!notePeriods.isEmpty() && notePeriods.get(0).startTime - time < 0.5) {
+					highestLevel.setCullHint(Spatial.CullHint.Dynamic);
+					visible = true;
+				} else {
+					highestLevel.setCullHint(Spatial.CullHint.Always);
+					visible = false;
+				}
+				
 			}
 		} else {
 			highestLevel.setCullHint(Spatial.CullHint.Dynamic);
+			visible = true;
 		}
 	}
 	
 	/**
 	 * Similar to {@link Instrument#tick(double, float)}.
 	 * <ul>
-	 *     <li>Calls {@link #hideOrShowOnPolyphony(int)}</li>
+	 *     <li>Calls {@link #hideOrShowOnPolyphony(int, double)}</li>
 	 *     <li>Rotates clone based on playing</li>
 	 * </ul>
 	 *
@@ -161,12 +176,16 @@ public abstract class Clone {
 		} else {
 			animNode.setLocalRotation(new Quaternion());
 		}
-		hideOrShowOnPolyphony(parent.clones.indexOf(this));
+		hideOrShowOnPolyphony(parent.clones.indexOf(this), time);
 		moveForPolyphony();
 	}
 	
 	protected int indexForMoving() {
-		return Math.max(0, parent.clones.stream().filter(Clone::isPlaying).collect(Collectors.toList()).indexOf(this));
+		return Math.max(0, parent.clones.stream().filter(Clone::isVisible).collect(Collectors.toList()).indexOf(this));
+	}
+	
+	public boolean isVisible() {
+		return visible;
 	}
 	
 	protected abstract void moveForPolyphony();

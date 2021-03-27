@@ -36,7 +36,7 @@ public class AcousticBass extends StringFamilyInstrument {
 		instrumentNode.setLocalScale(2.5f);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-15), rad(45), 0));
 		
-		highestLevel.setLocalTranslation(-50, 45, -95);
+		highestLevel.setLocalTranslation(-50, 46, -95);
 		highestLevel.attachChild(instrumentNode);
 	}
 	

@@ -1,5 +1,6 @@
 package org.wysko.midis2jam2.instrument.organ;
 
+import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -52,7 +53,14 @@ public class Accordion extends KeyedInstrument {
 		IntStream.range(0, 14).forEach(i -> accordionSections[i] = new Node());
 		
 		/* Set case left hand */
-		accordionSections[0].attachChild(context.loadModel("AccordianLeftHand.fbx", "AccordianCase.bmp"));
+		Spatial leftHandCase = context.loadModel("AccordianLeftHand.fbx", "AccordianCase.bmp");
+		accordionSections[0].attachChild(leftHandCase);
+		Material leatherStrap = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		leatherStrap.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/LeatherStrap.bmp"));
+		Material rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		rubberFoot.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
+		((Node) leftHandCase).getChild(1).setMaterial(leatherStrap);
+		((Node) leftHandCase).getChild(0).setMaterial(rubberFoot);
 		
 		Node keysNode = new Node();
 		accordionSections[13].attachChild(keysNode);
