@@ -28,14 +28,11 @@ public class Trombone extends MonophonicInstrument {
 	public Trombone(@NotNull Midis2jam2 context,
 	                @NotNull List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
 		super(context, eventList, TromboneClone.class);
-		
-		groupOfPolyphony.setLocalTranslation(-78.8f, 70.2f, -123.2f);
-		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(80.3 - 90), rad(29.9), rad(-7.26)));
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-	
+		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
 	}
 	
 	public class TromboneClone extends Clone {
@@ -54,6 +51,8 @@ public class Trombone extends MonophonicInstrument {
 			
 			slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			modelNode.attachChild(slide);
+			modelNode.setLocalRotation(new Quaternion().fromAngles(rad(-10), 0, 0));
+			highestLevel.setLocalTranslation(0, 65, -200);
 		}
 		
 		private void moveToPosition(@Range(from = 1, to = 7) int position) {
@@ -86,7 +85,9 @@ public class Trombone extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			highestLevel.setLocalTranslation(10 * indexForMoving(), 0, 0);
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(30 + indexForMoving() * -3), 0));
+			offsetNode.setLocalTranslation(0, indexForMoving(), 0);
+			
 		}
 	}
 }

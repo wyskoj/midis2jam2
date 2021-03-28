@@ -25,7 +25,7 @@ public class Ocarina extends HandedInstrument {
 				new OcarinaHandGenerator()
 		);
 		
-		groupOfPolyphony.setLocalTranslation(45, 47, 20);
+		groupOfPolyphony.setLocalTranslation(32, 47, 30);
 		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(0, rad(135), 0));
 		
 	}
@@ -48,6 +48,7 @@ public class Ocarina extends HandedInstrument {
 				if (i == 0) rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
 				else rightHands[i].setCullHint(Spatial.CullHint.Always);
 			}
+			highestLevel.setLocalTranslation(0, 0, 18);
 		}
 		
 		@Override
@@ -74,7 +75,7 @@ public class Ocarina extends HandedInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(10 * indexForMoving(), 0, 0);
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(17 * indexForMoving()), 0));
 		}
 	}
 }

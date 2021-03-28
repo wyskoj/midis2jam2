@@ -538,7 +538,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		setDisplayStatView(false);
 		setDisplayFps(false);
 		
-		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED, 0.9f);
+		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED, 0.9f);
 		rootNode.attachChild(stage);
 		
 		initDebugText();

@@ -98,7 +98,7 @@ public class Recorder extends HandedInstrument {
 		);
 		
 		// positioning
-		groupOfPolyphony.setLocalTranslation(-4.4f, 50.6f, -18.5f);
+		groupOfPolyphony.setLocalTranslation(-7, 35, -30);
 	}
 	
 	@Override
@@ -127,13 +127,14 @@ public class Recorder extends HandedInstrument {
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);
 			
-			highestLevel.attachChild(horn);
-			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(45.5 - 90), rad(8), rad(14.4)));
+			modelNode.attachChild(horn);
+			animNode.setLocalTranslation(0, 0, 23);
+			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(45.5 - 90), 0, 0));
 		}
 		
 		@Override
 		protected void moveForPolyphony() {
-			highestLevel.setLocalTranslation(indexForMoving() * 10, 0, 0);
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(15 + indexForMoving() * 15), 0));
 		}
 		
 		@Override

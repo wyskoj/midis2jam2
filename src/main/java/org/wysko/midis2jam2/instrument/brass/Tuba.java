@@ -80,13 +80,13 @@ public class Tuba extends MonophonicInstrument {
 				TubaClone.class
 		);
 		
-		groupOfPolyphony.setLocalTranslation(-61, 28.9f, -97.9f);
+		groupOfPolyphony.setLocalTranslation(-71, 28.9f, -97.9f);
 		
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 30 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 40 * indexForMoving(), 0);
 	}
 	
 	public class TubaClone extends AnimatedKeyCloneByIntegers {
@@ -114,11 +114,13 @@ public class Tuba extends MonophonicInstrument {
 //			modelNode.attachChild(bell);
 //
 			idleNode.setLocalRotation(new Quaternion().fromAngles(rad(-10), rad(90), 0));
+			
+			highestLevel.setLocalTranslation(10, 0, 0);
 		}
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(0, 0, -15 * indexForMoving());
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(50 * indexForMoving()), 0));
 		}
 		
 		@Override

@@ -64,7 +64,7 @@ public class FrenchHorn extends MonophonicInstrument {
 				FrenchHornClone.class
 		);
 		
-		groupOfPolyphony.setLocalTranslation(-63.1f, 41.6f, -63.7f);
+		groupOfPolyphony.setLocalTranslation(-83.1f, 41.6f, -63.7f);
 		
 	}
 	
@@ -76,7 +76,7 @@ public class FrenchHorn extends MonophonicInstrument {
 	public class FrenchHornClone extends AnimatedKeyCloneByIntegers {
 		
 		public FrenchHornClone() {
-			super(FrenchHorn.this, -0.2f, 0.9f, KEY_MAPPING, 4, Axis.Y, Axis.Z);
+			super(FrenchHorn.this, 0.1f, 0.9f, KEY_MAPPING, 4, Axis.Y, Axis.X);
 			
 			body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE,
@@ -88,10 +88,7 @@ public class FrenchHorn extends MonophonicInstrument {
 			
 			bell.setLocalTranslation(0, -4.63f, -1.87f);
 			bell.setLocalRotation(new Quaternion().fromAngles(rad(112 - 90), 0, 0));
-
-//			this.bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
-//			this.bell.setLocalTranslation(0, 0, 5.58f);
-//
+			
 			for (int i = 0; i < 4; i++) {
 				String id = i == 0 ? "Trigger" : "Key" + (i);
 				keys[i] = context.loadModel("FrenchHorn" + id + ".obj", "HornSkinGrey.bmp",
@@ -99,25 +96,23 @@ public class FrenchHorn extends MonophonicInstrument {
 				modelNode.attachChild(keys[i]);
 			}
 			keys[0].setLocalTranslation(0, 0, 1);
-//
-//			modelNode.attachChild(body);
-//			modelNode.attachChild(bell);
-//
-			idleNode.setLocalRotation(new Quaternion().fromAngles(rad(110 - 90), rad(90), 0));
+			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(110 - 90), rad(90), 0));
+			
+			animNode.setLocalTranslation(0, 0, 20);
 		}
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(0, 0, -15 * indexForMoving());
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(47 * indexForMoving()), 0));
 		}
 		
 		@Override
 		protected void animateKeys(@NotNull Integer[] pressed) {
-			/* Trumpet keys move down when pressed */
+			/* French horn keys rotate when pressed */
 			for (int i = 0; i < 4; i++) {
 				int finalI = i;
 				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
-					if (i == 0)
+					if (i == 0) // Trigger key, so rotate on different axis
 						keys[i].setLocalRotation(new Quaternion().fromAngles(rad(-25), 0, 0));
 					else
 						keys[i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-30)));

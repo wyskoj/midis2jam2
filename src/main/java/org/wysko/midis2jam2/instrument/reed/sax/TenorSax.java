@@ -2,6 +2,7 @@ package org.wysko.midis2jam2.instrument.reed.sax;
 
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Clone;
@@ -93,9 +94,8 @@ public class TenorSax extends Saxophone {
 		
 		super(context, events, TenorSaxClone.class);
 		
-		groupOfPolyphony.move(0, 32.5f, -3);
-		groupOfPolyphony.rotate(rad(10), rad(30), 0);
-		groupOfPolyphony.scale(1.15f);
+		groupOfPolyphony.setLocalTranslation(-11, 34.5f, -22);
+		groupOfPolyphony.setLocalScale(1.15f);
 	}
 	
 	/**
@@ -121,6 +121,9 @@ public class TenorSax extends Saxophone {
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
 			bell.move(0, -22, 0); // Move bell down to body
+			
+			animNode.setLocalTranslation(0, 0, 20);
+			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(10), rad(30), 0));
 		}
 	}
 }

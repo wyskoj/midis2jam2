@@ -2,6 +2,7 @@ package org.wysko.midis2jam2.instrument.reed.sax;
 
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Clone;
@@ -92,8 +93,7 @@ public class BaritoneSax extends Saxophone {
 			throws ReflectiveOperationException {
 		
 		super(context, events, BaritoneSaxClone.class);
-		groupOfPolyphony.move(25, 48.5f, -15);
-		groupOfPolyphony.rotate(rad(10), rad(30), 0);
+		groupOfPolyphony.move(10, 48.5f, -42);
 		groupOfPolyphony.scale(1.5f);
 	}
 	
@@ -123,6 +123,9 @@ public class BaritoneSax extends Saxophone {
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
 			bell.move(0, -10, 0); // Move bell down to body
+			
+			animNode.setLocalTranslation(0, 0, 20);
+			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(10), rad(30), 0));
 		}
 	}
 }

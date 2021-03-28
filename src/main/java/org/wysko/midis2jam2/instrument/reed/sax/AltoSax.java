@@ -2,6 +2,7 @@ package org.wysko.midis2jam2.instrument.reed.sax;
 
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Clone;
@@ -93,8 +94,8 @@ public class AltoSax extends Saxophone {
 	public AltoSax(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		super(context, events, AltoSaxClone.class);
 		
-		groupOfPolyphony.move(-14, 41.5f, -45);
-		groupOfPolyphony.rotate(rad(13), rad(75), 0);
+		groupOfPolyphony.setLocalTranslation(-32, 46.5f, -50);
+		
 	}
 	
 	/**
@@ -120,7 +121,10 @@ public class AltoSax extends Saxophone {
 			modelNode.attachChild(this.body);
 			modelNode.attachChild(bell);
 			bell.move(0, -22, 0); // Move bell down to body
+			
+			animNode.setLocalTranslation(0, 0, 20);
+			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(13), rad(75), 0));
+//			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(90), 0));
 		}
-		
 	}
 }

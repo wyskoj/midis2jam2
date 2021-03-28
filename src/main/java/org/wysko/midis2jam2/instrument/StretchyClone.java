@@ -19,7 +19,7 @@ public abstract class StretchyClone extends Clone {
 	protected final Axis scaleAxis;
 	
 	/**
-	 * The bell of the instrument.
+	 * The bell of the instrument. This must be a node to account for variations of the bell (e.g., Muted Trumpet).
 	 */
 	protected Node bell = new Node();
 	

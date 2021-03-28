@@ -1,9 +1,12 @@
 package org.wysko.midis2jam2.instrument.reed.sax;
 
+import com.jme3.math.Quaternion;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.UpAndDownKeyClone;
 
 import java.util.Map;
+
+import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	
@@ -27,6 +30,6 @@ public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	
 	@Override
 	protected void moveForPolyphony() {
-		offsetNode.setLocalTranslation(20 * indexForMoving(), 0, 0);
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25 * indexForMoving()), 0));
 	}
 }

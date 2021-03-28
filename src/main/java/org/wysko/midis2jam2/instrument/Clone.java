@@ -131,13 +131,13 @@ public abstract class Clone {
 				highestLevel.setCullHint(Spatial.CullHint.Dynamic);
 				visible = true;
 			} else {
-				if (!notePeriods.isEmpty() && notePeriods.get(0).startTime - time < 0.5) {
-					highestLevel.setCullHint(Spatial.CullHint.Dynamic);
-					visible = true;
-				} else {
-					highestLevel.setCullHint(Spatial.CullHint.Always);
-					visible = false;
-				}
+//				if (!notePeriods.isEmpty() && notePeriods.get(0).startTime - time < 0.5) {
+//					highestLevel.setCullHint(Spatial.CullHint.Dynamic);
+//					visible = true;
+//				} else {
+				highestLevel.setCullHint(Spatial.CullHint.Always);
+				visible = false;
+//				}
 				
 			}
 		} else {

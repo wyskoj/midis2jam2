@@ -63,7 +63,7 @@ public class Trumpet extends MonophonicInstrument {
 				type == TrumpetType.NORMAL ? TrumpetClone.class : MutedTrumpetClone.class
 		);
 		
-		groupOfPolyphony.setLocalTranslation(-21.5f, 60, 10);
+		groupOfPolyphony.setLocalTranslation(-36.5f, 60, 10);
 		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
 		
 	}
@@ -103,6 +103,8 @@ public class Trumpet extends MonophonicInstrument {
 			modelNode.attachChild(bell);
 			
 			idleNode.setLocalRotation(new Quaternion().fromAngles(rad(-10), 0, 0));
+			
+			animNode.setLocalTranslation(0, 0, 15);
 		}
 		
 		@Override
@@ -119,12 +121,12 @@ public class Trumpet extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(10 * indexForMoving(), 0, 0);
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-10 * indexForMoving()), 0));
+			offsetNode.setLocalTranslation(0, indexForMoving() * -1, 0);
 		}
 	}
 	
 	public class MutedTrumpetClone extends TrumpetClone {
-		
 		public MutedTrumpetClone() {
 			super();
 			this.bell.attachChild(context.loadModel("TrumpetMute.obj", "RubberFoot.bmp"));
