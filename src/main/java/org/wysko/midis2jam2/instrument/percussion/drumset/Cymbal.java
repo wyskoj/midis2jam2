@@ -6,6 +6,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
@@ -40,7 +41,10 @@ public class Cymbal extends SingleStickInstrument {
 		highLevelNode.setLocalTranslation(type.location);
 		highLevelNode.setLocalRotation(type.rotation);
 		highLevelNode.attachChild(cymbalNode);
-		stickNode.setLocalTranslation(0, 0, 15);
+		stick.setLocalTranslation(0, 0, -0);
+		stick.setLocalTranslation(0, 0, -2.6f);
+		stick.setLocalRotation(new Quaternion().fromAngles(rad(-20), 0, 0));
+		stickNode.setLocalTranslation(0, 2, 18);
 	}
 	
 	/**
@@ -72,16 +76,16 @@ public class Cymbal extends SingleStickInstrument {
 		cymbalNode.setLocalRotation(new Quaternion().fromAngles(rotationAmount(), 0, 0));
 		if (animTime != -1) animTime += delta;
 		
-		handleStick(time, delta, hits);
+		Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 	}
 	
 	public enum CymbalType {
-		CRASH_1(new Vector3f(-18, 45, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f),
-		CRASH_2(new Vector3f(13, 45, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f),
-		SPLASH(new Vector3f(-2, 45, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f),
-		RIDE_1(new Vector3f(22, 40, -77.8f), new Quaternion().fromAngles(rad(107 - 90), rad(291), rad(-9.45)), 2f),
-		RIDE_2(new Vector3f(-23, 37, -78.8f), new Quaternion().fromAngles(rad(20), rad(37.9), rad(-3.49)), 2f),
-		CHINA(new Vector3f(32.7f, 31.4f, -68.4f), new Quaternion().fromAngles(rad(108 - 90), rad(-89.2), rad(-10)),
+		CRASH_1(new Vector3f(-18, 48, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f),
+		CRASH_2(new Vector3f(13, 48, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f),
+		SPLASH(new Vector3f(-2, 48, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f),
+		RIDE_1(new Vector3f(22, 43, -77.8f), new Quaternion().fromAngles(rad(107 - 90), rad(291), rad(-9.45)), 2f),
+		RIDE_2(new Vector3f(-23, 40, -78.8f), new Quaternion().fromAngles(rad(20), rad(37.9), rad(-3.49)), 2f),
+		CHINA(new Vector3f(32.7f, 34.4f, -68.4f), new Quaternion().fromAngles(rad(108 - 90), rad(-89.2), rad(-10)),
 				2.0f);
 		
 		final float size;

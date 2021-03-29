@@ -110,7 +110,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		settings.setFullscreen(true);
 		settings.setResolution(1920, 800);
 		settings.setResizable(true);
-		settings.setSamples(4);
+		settings.setSamples(16);
 		
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
@@ -187,8 +187,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		if (sequencer == null) return;
 		if (sequencer.isOpen())
 			timeSinceStart += tpf;
-		
-		
+
+//		sequencer.setTempoFactor(0.5f);
 		// Update animation
 		for (Instrument instrument : instruments) {
 			if (instrument != null) // Null if not implemented yet
@@ -368,6 +368,11 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
 			case 6: // Harpsichord
 				return new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
+			case 8: // Celesta
+			case 14: // Tubular Bells
+			case 98: // FX 3 (Crystal)
+			case 112: // Tinkle Bell
+				return new TubularBells(this, events);
 			case 9: // Glockenspiel
 				return new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
 			case 11: // Vibraphone
@@ -376,10 +381,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new Mallets(this, events, Mallets.MalletType.MARIMBA);
 			case 13: // Xylophone
 				return new Mallets(this, events, Mallets.MalletType.XYLOPHONE);
-			case 14: // Tubular Bells
-			case 98: // FX 3 (Crystal)
-			case 112: // Tinkle Bell
-				return new TubularBells(this, events);
 			case 15: // Dulcimer
 			case 16: // Drawbar Organ
 			case 17: // Percussive Organ
@@ -538,7 +539,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		setDisplayStatView(false);
 		setDisplayFps(false);
 		
-		Spatial stage = loadModel("Stage.obj", "stageuv.bmp", MatType.UNSHADED, 0.9f);
+		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED, 0.9f);
 		rootNode.attachChild(stage);
 		
 		initDebugText();
@@ -643,8 +644,9 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			Spatial shadow = shadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
 			shadow.setLocalScale(0.6667f);
 			malletShadows.add(shadow);
-			mallets.get(i).highestLevel.attachChild(shadow);
-			shadow.setLocalTranslation(-50, 0.5f + 0.1f * i, 0);
+			mallets.get(i).instrumentNode.attachChild(shadow);
+//			shadow.setLocalTranslation(-50, 0.5f + 0.1f * i, 0);
+			shadow.setLocalTranslation(0, -22 - 2 * i, 0);
 		}
 	}
 	

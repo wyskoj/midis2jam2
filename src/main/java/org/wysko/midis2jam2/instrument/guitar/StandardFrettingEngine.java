@@ -137,6 +137,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 	@NotNull
 	@Contract(pure = true)
 	private FretboardPosition runningAveragePosition() {
+		// TODO Experiment with harmonic/geometric mean?
 		if (runningAverage.isEmpty()) {
 			return new FretboardPosition(0, 0);
 		}

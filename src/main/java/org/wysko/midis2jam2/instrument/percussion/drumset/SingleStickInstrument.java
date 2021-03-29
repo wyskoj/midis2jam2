@@ -18,8 +18,6 @@ import static org.wysko.midis2jam2.instrument.Stick.STRIKE_SPEED;
  */
 public abstract class SingleStickInstrument extends PercussionInstrument {
 	
-	
-	
 	protected final Spatial stick;
 	
 	final Node stickNode = new Node();
@@ -28,9 +26,8 @@ public abstract class SingleStickInstrument extends PercussionInstrument {
 		super(context, hits);
 		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		stickNode.attachChild(stick);
-		stick.setLocalTranslation(0, 0, 0); // Offset set the stick so the pivot is at the base of the stick
+//		stick.setLocalTranslation(0, 0, 0); // Offset set the stick so the pivot is at the base of the stick
 		highLevelNode.attachChild(stickNode);
-		
 		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
 	}
 	
