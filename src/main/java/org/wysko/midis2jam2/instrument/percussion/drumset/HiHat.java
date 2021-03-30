@@ -1,11 +1,11 @@
 package org.wysko.midis2jam2.instrument.percussion.drumset;
 
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
@@ -28,6 +28,8 @@ public class HiHat extends SingleStickInstrument {
 	final Node bottomCymbal = new Node();
 	
 	final Node wholeHat = new Node();
+	
+	private final CymbalAnimator animator;
 	
 	private double animTime;
 	
@@ -56,17 +58,19 @@ public class HiHat extends SingleStickInstrument {
 		highLevelNode.detachChild(stickNode);
 		wholeHat.attachChild(stickNode);
 		stickNode.setLocalTranslation(0, 1, 13);
+		this.animator = new CymbalAnimator(AMPLITUDE, WOBBLE_SPEED, DAMPENING);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		
+		animator.tick(delta);
 		MidiNoteOnEvent recoil = null;
 		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
 			recoil = hits.remove(0);
 		}
 		
 		if (recoil != null) {
+			animator.strike();
 			wholeHat.setLocalTranslation(0, (float) (-0.7 * velocityRecoilDampening(recoil.velocity)), -14);
 			if (recoil.note == 46) {
 				status = HiHatStatus.OPEN;
@@ -77,7 +81,7 @@ public class HiHat extends SingleStickInstrument {
 			}
 			animTime = 0;
 		}
-		topCymbal.setLocalRotation(new Quaternion().fromAngles(rotationAmount(), 0, 0));
+		topCymbal.setLocalRotation(new Quaternion().fromAngles(status == HiHatStatus.CLOSED ? 0 : animator.rotationAmount(), 0, 0));
 		if (animTime != -1) animTime += delta;
 		handleStick(time, delta, hitsToStrike);
 		
@@ -87,18 +91,6 @@ public class HiHat extends SingleStickInstrument {
 			localTranslation.y = Math.min(localTranslation.y, 0);
 			wholeHat.setLocalTranslation(localTranslation);
 		}
-	}
-	
-	
-	float rotationAmount() {
-		if (status == HiHatStatus.CLOSED) return 0;
-		if (animTime >= 0) {
-			if (animTime < 4.5)
-				return (float) (AMPLITUDE * (Math.cos(animTime * WOBBLE_SPEED * FastMath.PI) / (3 + Math.pow(animTime, 3) * WOBBLE_SPEED * DAMPENING * FastMath.PI)));
-			else
-				return 0;
-		}
-		return 0;
 	}
 	
 	private enum HiHatStatus {
