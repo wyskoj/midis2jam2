@@ -110,7 +110,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		settings.setFullscreen(true);
 		settings.setResolution(1920, 800);
 		settings.setResizable(true);
-		settings.setSamples(16);
+		settings.setSamples(4);
 		
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
@@ -302,17 +302,22 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
 				programEvents.add(new MidiProgramEvent(0, j, 0));
 			}
-			// Remove duplicate events (either at duplicate time or same program number)
-			int d = 0;
-			while (programEvents.size() > 1 && d < programEvents.size() - 1) {
-				while (d < programEvents.size() - 1 && (
-						programEvents.get(d + 1).time == programEvents.get(d).time
-								|| programEvents.get(d + 1).programNum == programEvents.get(d).programNum
-				)) {
-					programEvents.remove(d);
+		
+			for (int i = 0; i < programEvents.size() - 1; i++) {
+				final MidiProgramEvent a = programEvents.get(i);
+				final MidiProgramEvent b = programEvents.get(i + 1);
+				/* Remove program events at same time (keep the last one) */
+				if (a.time == b.time) {
+					programEvents.remove(i);
+					i--;
+					continue;
 				}
-				d++;
+				/* Remove program events with same value (keep the first one) */
+				if (a.programNum == b.programNum) {
+					programEvents.remove(i + 1);
+				}
 			}
+			
 			if (programEvents.size() == 1) {
 				instruments.add(fromEvents(programEvents.get(0), channel));
 			} else {
