@@ -5,6 +5,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Stick;
+import org.wysko.midis2jam2.instrument.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
@@ -16,14 +17,6 @@ import static org.wysko.midis2jam2.instrument.Stick.STRIKE_SPEED;
  * Cymbals. Excludes the hi hat.
  */
 public class RideCymbal extends Cymbal {
-	
-	private static final int WOBBLE_SPEED = 5;
-	
-	private static final double DAMPENING = 2;
-	
-	private static final double AMPLITUDE = 0.3;
-	
-	
 	protected RideCymbal(Midis2jam2 context,
 	                     List<MidiNoteOnEvent> hits, Cymbal.CymbalType type) {
 		super(context, hits, type);
@@ -36,6 +29,7 @@ public class RideCymbal extends Cymbal {
 		highLevelNode.setLocalRotation(type.rotation);
 		highLevelNode.attachChild(cymbalNode);
 		stickNode.setLocalTranslation(0, 0, 15);
+		this.animator = new CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening);
 	}
 	
 	@Override
@@ -46,22 +40,12 @@ public class RideCymbal extends Cymbal {
 		}
 		
 		if (recoil != null) {
-			animTime = 0;
+			animator.strike();
 		}
-		cymbalNode.setLocalRotation(new Quaternion().fromAngles(rotationAmount(), 0, 0));
-		if (animTime != -1) animTime += delta;
+		cymbalNode.setLocalRotation(new Quaternion().fromAngles(animator.rotationAmount(), 0, 0));
+		animator.tick(delta);
 		
 		handleStick(time, delta, hits);
-	}
-	
-	float rotationAmount() {
-		if (animTime >= 0) {
-			if (animTime < 4.5)
-				return (float) (AMPLITUDE * (Math.cos(animTime * WOBBLE_SPEED * FastMath.PI) / (3 + Math.pow(animTime, 3) * WOBBLE_SPEED * DAMPENING * FastMath.PI)));
-			else
-				return 0;
-		}
-		return 0;
 	}
 	
 	@Override
