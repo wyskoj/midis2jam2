@@ -48,7 +48,7 @@ public class MidiFile {
 		if (System.getProperty("os.name").startsWith("Windows")) {
 			midiCsvArgs = new String[] {"midicsv.exe", midiFile.getAbsolutePath(), "midi.csv"};
 		} else {
-			midiCsvArgs = new String[] {"midicsv", midiFile.getAbsolutePath(), "midi.csv"};
+			midiCsvArgs = new String[] {"./midicsv", midiFile.getAbsolutePath(), "midi.csv"};
 		}
 		
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
