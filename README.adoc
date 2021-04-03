@@ -16,7 +16,7 @@ $ gradlew shadowjar
 Copy the `.jar` from `build/libs` and `Midicsv.exe` to a new folder. Then run the program.
 
 ----
-java -jar midis2jam2.jar your_midi_file.mid
+$ java -jar midis2jam2.jar your_midi_file.mid
 ----
 
 == FAQ
