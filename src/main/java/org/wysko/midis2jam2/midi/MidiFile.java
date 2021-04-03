@@ -55,7 +55,7 @@ public class MidiFile {
 		proc.waitFor();
 		
 		// Clean up your goddamn windows-1252 characters that fucks up CSV parsing
-		Scanner scanner = new Scanner(new File("midi.csv"));
+		Scanner scanner = new Scanner(new File("midi.csv"), "Windows-1252");
 		FileWriter stream = new FileWriter("cleanmidi.csv");
 		Pattern titlePattern = Pattern.compile("\\d+, \\d+, Title_t,");
 		Pattern copyrightPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
