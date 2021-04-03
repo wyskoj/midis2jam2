@@ -93,13 +93,16 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		Midis2jam2 midijam = new Midis2jam2();
 		context = midijam;
-		
-		File folder = new File("testmidi/");
-		File[] files = folder.listFiles();
-		File rawFile = files[new Random().nextInt(files.length)];
+
+//		File folder = new File("testmidi/");
+//		File[] files = folder.listFiles();
+		File rawFile = null;
 		
 		if (args.length > 0) {
 			rawFile = new File(args[0]);
+		} else {
+			System.err.println("You did not specify a midi file!");
+			System.exit(1);
 		}
 		
 		midijam.file = MidiFile.readMidiFile(rawFile);
@@ -108,7 +111,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 //		settings.setFullscreen(true);
-		settings.setResolution(1920, 800);
+		settings.setResolution(1920, 1920 / 2);
 		settings.setResizable(true);
 		settings.setSamples(4);
 		
