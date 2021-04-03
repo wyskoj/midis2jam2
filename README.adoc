@@ -45,9 +45,13 @@ Then copy `midicsv` to the same folder where you execute the `.jar` file.
 
 For either method, ensure https://github.com/wyskoj/midis2jam2/blob/master/src/main/java/org/wysko/midis2jam2/midi/MidiFile.java#L51[this line] is prepended with a `./` if `midicsv` is a file (manual build), otherwise nothing (`apt` or `brew`).
 
+=== I'm trying to download the source but I see `'git' is not recognized as an internal or external command` or `git: command not found`
+
+Simply https://gist.github.com/derhuerst/1b15ff4652a867391f03[install Git]. 
+
 == Contributing
 
-Fork and make a pull request to directly make changes. Open an issue to request features and report bugs. Please ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
+Fork and make a pull request to directly make changes. Open an issue to request features and report bugs. Please ensure you use a template, or ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
 
 == License
 
