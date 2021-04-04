@@ -32,10 +32,10 @@ public class Cello extends StringFamilyInstrument {
 				context.loadModel("Cello.obj", "CelloSkin.bmp")
 		);
 		
-		highestLevel.setLocalTranslation(-69, 42, -50);
+		highestLevel.setLocalTranslation(-69, 39.5f, -49.6f);
 		highestLevel.attachChild(instrumentNode);
 		
-		instrumentNode.setLocalScale(2f);
+		instrumentNode.setLocalScale(1.86f);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-15), rad(45), 0));
 		
 		context.getRootNode().attachChild(highestLevel);

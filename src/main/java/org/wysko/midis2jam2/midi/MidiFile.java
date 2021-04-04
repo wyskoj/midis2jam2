@@ -5,11 +5,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * A special type of music file.
@@ -51,8 +54,26 @@ public class MidiFile {
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
 		proc.waitFor();
 		
+		// Clean up your goddamn windows-1252 characters that fucks up CSV parsing
+		Scanner scanner = new Scanner(new File("midi.csv"), "Windows-1252");
+		FileWriter stream = new FileWriter("cleanmidi.csv");
+		Pattern titlePattern = Pattern.compile("\\d+, \\d+, Title_t,");
+		Pattern copyrightPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
+		Pattern markerPattern = Pattern.compile("\\d+, \\d+, Marker_t,");
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			if (!titlePattern.matcher(line).find() &&
+					!copyrightPattern.matcher(line).find() &&
+					!markerPattern.matcher(line).find()) {
+				stream.write(line);
+				stream.write("\n");
+			}
+		}
+		stream.close();
+		
 		// Parse CSV file
-		CSVParser parse = CSVParser.parse(new File("midi.csv"), Charset.forName("windows-1252"), CSVFormat.DEFAULT);
+		CSVParser parse = CSVParser.parse(new File("cleanmidi.csv"), Charset.forName("windows-1252"),
+				CSVFormat.DEFAULT);
 		List<CSVRecord> records = parse.getRecords();
 		
 		// Build midi from data

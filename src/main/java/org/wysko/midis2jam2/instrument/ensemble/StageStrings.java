@@ -36,7 +36,7 @@ public class StageStrings extends WrappedOctaveSustained {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (12.6 * indexForMoving())), 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (11.6 * indexForMoving())), 0));
 	}
 	
 	public class StageStringNote extends TwelfthOfOctave {
