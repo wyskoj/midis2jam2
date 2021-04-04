@@ -4,3 +4,7 @@
 /build/classes/java/main/
 midi.csv
 cleanmidi.csv
+liblwjgl64.so
+libopenal64.so
+lwjgl64.dll
+OpenAL64.dll
