@@ -57,4 +57,4 @@ Fork and make a pull request to directly make changes. Open an issue to request 
 
 * midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
 * Assets Copyright &copy; 2007 Scott Haag.
-* https://asdf.com[Test MIDI files] Copyright &copy; various authors. 
+* https://github.com/wyskoj/midis2jam2/tree/master/testmidi[Test MIDI files] Copyright &copy; various authors.
