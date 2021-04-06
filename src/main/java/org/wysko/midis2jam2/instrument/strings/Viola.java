@@ -24,7 +24,7 @@ public class Viola extends StringFamilyInstrument {
 		super(context,
 				events,
 				true,
-				0,
+				180,
 				new Vector3f(1, 1, 1),
 				new int[] {48, 55, 62, 69},
 				48,
