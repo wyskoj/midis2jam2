@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <instruments>
     <instrument name="Trumpet" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="52">
                 <key>1</key>
                 <key>2</key>
@@ -102,8 +101,7 @@
         </mapping>
     </instrument>
     <instrument name="FrenchHorn" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="46">
                 <key>1</key>
             </map>
@@ -226,8 +224,7 @@
         </mapping>
     </instrument>
     <instrument name="Tuba" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="22"/>
             <map note="23">
                 <key>2</key>
@@ -382,8 +379,7 @@
         </mapping>
     </instrument>
     <instrument name="Flute" mapping-type="hands">
-
-        <mapping>
+       <mapping>
             <map note="60" lh="4" rh="0"/>
             <map note="61" lh="4" rh="2"/>
             <map note="62" lh="4" rh="3"/>
@@ -424,8 +420,7 @@
         </mapping>
     </instrument>
     <instrument name="Piccolo" mapping-type="hands">
-
-        <mapping>
+       <mapping>
             <map note="72" lh="4" rh="0"/>
             <map note="73" lh="4" rh="2"/>
             <map note="74" lh="4" rh="3"/>
@@ -466,8 +461,7 @@
         </mapping>
     </instrument>
     <instrument name="Recorder" mapping-type="hands">
-
-        <mapping>
+       <mapping>
             <map note="36" lh="0" rh="0"/>
             <map note="37" lh="0" rh="1"/>
             <map note="38" lh="0" rh="2"/>
@@ -532,8 +526,7 @@
         </mapping>
     </instrument>
     <instrument name="SopranoSax" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="87">
                 <key>2</key>
                 <key>1</key>
@@ -720,8 +713,7 @@
         </mapping>
     </instrument>
     <instrument name="AltoSax" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="80">
                 <key>2</key>
                 <key>1</key>
@@ -908,8 +900,7 @@
         </mapping>
     </instrument>
     <instrument name="TenorSax" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="75">
                 <key>2</key>
                 <key>1</key>
@@ -1096,8 +1087,7 @@
         </mapping>
     </instrument>
     <instrument name="BaritoneSax" mapping-type="pressed_keys">
-
-        <mapping>
+       <mapping>
             <map note="68">
                 <key>2</key>
                 <key>1</key>

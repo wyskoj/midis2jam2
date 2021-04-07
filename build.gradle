@@ -7,7 +7,7 @@ plugins {
 
 apply plugin: 'java'
 
-group 'org.example'
+group 'org.wysko'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -16,11 +16,10 @@ repositories {
     maven {
         url  "https://dl.bintray.com/jmonkeyengine/org.jmonkeyengine"
     }
-
 }
 
 application {
-    mainClassName = 'org.wysko.midis2jam2.Midis2jam2'
+    mainClass.set('org.wysko.midis2jam2.Midis2jam2')
 }
 
 dependencies {

@@ -114,7 +114,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		settings.setFullscreen(true);
 		settings.setResolution(1920, 1920 / 2);
 		settings.setResizable(true);
-//		settings.setSamples(4);
+		settings.setSamples(4);
 		
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);

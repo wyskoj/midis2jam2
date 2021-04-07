@@ -77,8 +77,7 @@ public class Stick {
 		double proposedRotation = proposedRotation(context, time, nextHit, maxAngle, strikeSpeed);
 		
 		float[] floats = stickNode.getLocalRotation().toAngles(new float[3]);
-
-//			bars[i].malletNode.setLocalRotation(new Quaternion().fromAngles(rad(proposedRotation),0,0));
+		
 		if (proposedRotation > maxAngle) {
 			// Not yet ready to strike
 			if (floats[0] <= maxAngle) {
