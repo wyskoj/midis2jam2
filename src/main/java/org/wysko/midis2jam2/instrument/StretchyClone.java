@@ -28,6 +28,15 @@ public abstract class StretchyClone extends Clone {
 	 */
 	protected Spatial body;
 	
+	/**
+	 * Instantiates a new Stretchy clone.
+	 *
+	 * @param parent         the parent
+	 * @param rotationFactor the rotation factor
+	 * @param stretchFactor  the stretch factor
+	 * @param scaleAxis      the scale axis
+	 * @param rotationAxis   the rotation axis
+	 */
 	public StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
 	                     Axis scaleAxis, Axis rotationAxis) {
 		super(parent, rotationFactor, rotationAxis);
@@ -53,6 +62,5 @@ public abstract class StretchyClone extends Clone {
 		} else {
 			bell.setLocalScale(1, 1, 1);
 		}
-		
 	}
 }

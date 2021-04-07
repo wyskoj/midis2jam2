@@ -4,10 +4,14 @@ import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Clone;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
+import org.wysko.midis2jam2.instrument.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
+/**
+ * Shared code for Saxophones.
+ */
 public abstract class Saxophone extends MonophonicInstrument {
 	
 	/**
@@ -19,11 +23,13 @@ public abstract class Saxophone extends MonophonicInstrument {
 	 */
 	public Saxophone(Midis2jam2 context,
 	                 @NotNull List<MidiChannelSpecificEvent> eventList,
-	                 @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
+	                 @NotNull Class<? extends Clone> cloneClass,
+	                 @NotNull PressedKeysFingeringManager fingeringManager) throws ReflectiveOperationException {
 		
 		super(context,
 				eventList,
-				cloneClass);
+				cloneClass,
+				fingeringManager);
 	}
 	
 	@Override

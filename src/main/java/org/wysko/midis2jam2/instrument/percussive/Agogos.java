@@ -16,9 +16,15 @@ import java.util.stream.IntStream;
 import static com.jme3.math.FastMath.HALF_PI;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Agogos.
+ */
 public class Agogos extends TwelveDrumOctave {
 	
-	Node[] woodBlockNodes = new Node[12];
+	/**
+	 * The Agogo nodes.
+	 */
+	Node[] agogoNodes = new Node[12];
 	
 	/**
 	 * @param context   the context to the main class
@@ -28,7 +34,7 @@ public class Agogos extends TwelveDrumOctave {
 	              @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		IntStream.range(0, 12).forEach(i -> woodBlockNodes[i] = new Node());
+		IntStream.range(0, 12).forEach(i -> agogoNodes[i] = new Node());
 		
 		
 		for (int i = 0; i < 12; i++) {
@@ -39,14 +45,14 @@ public class Agogos extends TwelveDrumOctave {
 			malletNodes[i].attachChild(child);
 			Node oneBlock = new Node();
 			oneBlock.attachChild(malletNodes[i]);
-			Woodblock woodblock = new Woodblock(i);
-			decayeds[i] = woodblock;
-			oneBlock.attachChild(woodblock.highestLevel);
-			woodBlockNodes[i].attachChild(oneBlock);
+			Agogo agogo = new Agogo(i);
+			twelfths[i] = agogo;
+			oneBlock.attachChild(agogo.highestLevel);
+			agogoNodes[i].attachChild(oneBlock);
 			oneBlock.setLocalTranslation(0, 0, 15);
-			woodBlockNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
-			woodBlockNodes[i].setLocalTranslation(0, 0.3f * i, 0);
-			instrumentNode.attachChild(woodBlockNodes[i]);
+			agogoNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
+			agogoNodes[i].setLocalTranslation(0, 0.3f * i, 0);
+			instrumentNode.attachChild(agogoNodes[i]);
 		}
 		
 		instrumentNode.setLocalTranslation(75, 0, -35);
@@ -56,7 +62,7 @@ public class Agogos extends TwelveDrumOctave {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		for (TwelfthOfOctaveDecayed woodblock : decayeds) {
+		for (TwelfthOfOctaveDecayed woodblock : twelfths) {
 			woodblock.tick(time, delta);
 		}
 	}
@@ -67,9 +73,17 @@ public class Agogos extends TwelveDrumOctave {
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, -HALF_PI + HALF_PI * indexForMoving(), 0));
 	}
 	
-	public class Woodblock extends TwelfthOfOctaveDecayed {
+	/**
+	 * A single agogo.
+	 */
+	public class Agogo extends TwelfthOfOctaveDecayed {
 		
-		public Woodblock(int i) {
+		/**
+		 * Instantiates a new Agogo.
+		 *
+		 * @param i the index of this agogo
+		 */
+		public Agogo(int i) {
 			Spatial mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", Midis2jam2.MatType.REFLECTIVE,
 					0.9f);
 			mesh.setLocalScale(1 - 0.036363636f * i);
@@ -77,6 +91,7 @@ public class Agogos extends TwelveDrumOctave {
 			
 		}
 		
+		@Override
 		public void tick(double time, float delta) {
 			Vector3f localTranslation = highestLevel.getLocalTranslation();
 			if (localTranslation.y < -0.0001) {

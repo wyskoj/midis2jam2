@@ -17,17 +17,20 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Trombone.
+ */
 public class Trombone extends MonophonicInstrument {
 	
 	/**
-	 * Instantiates a new sustained instrument.
+	 * Instantiates a new Trombone.
 	 *
 	 * @param context   the context to the main class
-	 * @param eventList
+	 * @param eventList the event list
 	 */
 	public Trombone(@NotNull Midis2jam2 context,
 	                @NotNull List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
-		super(context, eventList, TromboneClone.class);
+		super(context, eventList, TromboneClone.class, null);
 	}
 	
 	@Override
@@ -35,9 +38,14 @@ public class Trombone extends MonophonicInstrument {
 		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
 	}
 	
+	/**
+	 * A single trombone.
+	 */
 	public class TromboneClone extends Clone {
 		
-		
+		/**
+		 * The slide.
+		 */
 		private final Spatial slide;
 		
 		public TromboneClone() {
@@ -55,10 +63,21 @@ public class Trombone extends MonophonicInstrument {
 			highestLevel.setLocalTranslation(0, 65, -200);
 		}
 		
+		/**
+		 * Moves the slide of the trombone to a given position, from first to 7th position.
+		 *
+		 * @param position the trombone position
+		 */
 		private void moveToPosition(@Range(from = 1, to = 7) int position) {
 			slide.setLocalTranslation(slidePosition(position));
 		}
 		
+		/**
+		 * Returns the 3D vector for a given slide position.
+		 *
+		 * @param position the position
+		 * @return the translation vector
+		 */
 		private Vector3f slidePosition(@Range(from = 1, to = 7) int position) {
 			return new Vector3f(0, 0, 3.33f * position - 1);
 		}
@@ -70,16 +89,6 @@ public class Trombone extends MonophonicInstrument {
 				if (currentNotePeriod != null) {
 					moveToPosition((currentNotePeriod.midiNote % 7) + 1);
 				}
-			} else {
-//				if (!notePeriods.isEmpty() && time - notePeriods.get(0).startTime < 1) {
-//					Vector3f slidePosition = slidePosition(notePeriods.get(0).midiNote % 7);
-//					Vector3f localTranslation = slide.getLocalTranslation();
-//					if (localTranslation.z - slidePosition.z > 0.01) {
-//						slide.move(0, 0, -10 * delta);
-//					} else if (localTranslation.z - slidePosition.z < 0.01) {
-//						slide.move(0, 0, 10 * delta);
-//					}
-//				}
 			}
 		}
 		
@@ -87,7 +96,6 @@ public class Trombone extends MonophonicInstrument {
 		protected void moveForPolyphony() {
 			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(30 + indexForMoving() * -3), 0));
 			offsetNode.setLocalTranslation(0, indexForMoving(), 0);
-			
 		}
 	}
 }

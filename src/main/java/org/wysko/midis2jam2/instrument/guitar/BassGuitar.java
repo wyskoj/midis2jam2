@@ -18,8 +18,15 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class BassGuitar extends FrettedInstrument {
 	
+	
 	private final static Vector3f BASE_POSITION = new Vector3f(51.5863f, 54.5902f, -16.5817f);
 	
+	/**
+	 * Instantiates a new Bass guitar.
+	 *
+	 * @param context the context
+	 * @param events  the events
+	 */
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context,
 				new StandardFrettingEngine(4, 22, new int[] {28, 33, 38, 43}, 28, 65),

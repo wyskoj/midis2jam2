@@ -17,19 +17,22 @@ import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Helicopter.
+ */
 public class Helicopter extends MonophonicInstrument {
+	
 	/**
-	 * Constructs a monophonic instrument.
+	 * Instantiates a new Helicopter.
 	 *
-	 * @param context   context to midis2jam2
+	 * @param context   the context
 	 * @param eventList the event list
 	 */
 	public Helicopter(@NotNull Midis2jam2 context,
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
-		super(context, eventList, HelicopterClone.class);
+		super(context, eventList, HelicopterClone.class, null);
 		
 		groupOfPolyphony.setLocalTranslation(20, 40, -300);
-		
 	}
 	
 	@Override
@@ -37,14 +40,26 @@ public class Helicopter extends MonophonicInstrument {
 		highestLevel.setLocalTranslation(50 * indexForMoving(), 0, 0);
 	}
 	
+	/**
+	 * A single helicopter.
+	 */
 	public class HelicopterClone extends Clone {
 		
+		/**
+		 * The rotor which spins.
+		 */
 		private final Spatial rotor;
 		
+		/**
+		 * The simplex noise generator.
+		 */
 		FastNoiseLite noise = new FastNoiseLite((int) System.currentTimeMillis());
 		
 		float rotXRand, rotYRand, rotZRand;
 		
+		/**
+		 * The amount of height and random movement.
+		 */
 		float force = 0;
 		
 		public HelicopterClone() {
@@ -88,6 +103,12 @@ public class Helicopter extends MonophonicInstrument {
 			highestLevel.setLocalTranslation(0, -120 + 120 * ease(force), 0);
 		}
 		
+		/**
+		 * Sinusoidal easing.
+		 *
+		 * @param x in
+		 * @return out
+		 */
 		private float ease(float x) {
 			return (float) (-(cos(PI * x) - 1) / 2);
 		}

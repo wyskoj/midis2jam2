@@ -13,14 +13,23 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The choir.
+ */
 public class StageChoir extends WrappedOctaveSustained {
 	
+	/**
+	 * The base position.
+	 */
 	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5f, -152.65f);
 	
+	/**
+	 * Each choir peep.
+	 */
 	final Node[] peepNodes = new Node[12];
 	
 	/**
-	 * Instantiates a new wrapped octave sustained.
+	 * Instantiates a new choir.
 	 *
 	 * @param context   the context to the main class
 	 * @param eventList the event list
@@ -51,7 +60,11 @@ public class StageChoir extends WrappedOctaveSustained {
 		}
 	}
 	
+	/**
+	 * A single choir peep.
+	 */
 	public class ChoirPeep extends BouncyTwelfth {
+		
 		public ChoirPeep() {
 			animNode.attachChild(context.loadModel("StageChoir.obj", "ChoirPeep.bmp"));
 		}

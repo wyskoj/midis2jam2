@@ -1,7 +1,5 @@
 package org.wysko.midis2jam2.instrument.percussion.drumset;
 
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Stick;
@@ -14,13 +12,22 @@ import static org.wysko.midis2jam2.instrument.Stick.MAX_ANGLE;
 import static org.wysko.midis2jam2.instrument.Stick.STRIKE_SPEED;
 
 /**
- * Cymbals. Excludes the hi hat.
+ * The ride cymbal.
  */
 public class RideCymbal extends Cymbal {
+	
+	/**
+	 * Instantiates a new Ride cymbal.
+	 *
+	 * @param context the context
+	 * @param hits    the hits
+	 * @param type    the type
+	 */
 	protected RideCymbal(Midis2jam2 context,
 	                     List<MidiNoteOnEvent> hits, Cymbal.CymbalType type) {
 		super(context, hits, type);
-		if (type != CymbalType.RIDE_1 && type != CymbalType.RIDE_2) throw new IllegalArgumentException();
+		assert type == CymbalType.RIDE_1 || type == CymbalType.RIDE_2 : "Ride cymbal type is wrong.";
+		
 		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
 				Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		cymbalNode.attachChild(cymbal);
@@ -34,17 +41,7 @@ public class RideCymbal extends Cymbal {
 	
 	@Override
 	public void tick(double time, float delta) {
-		MidiNoteOnEvent recoil = null;
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
-			recoil = hits.remove(0);
-		}
-		
-		if (recoil != null) {
-			animator.strike();
-		}
-		cymbalNode.setLocalRotation(new Quaternion().fromAngles(animator.rotationAmount(), 0, 0));
-		animator.tick(delta);
-		
+		handleCymbalStrikes(time, delta);
 		handleStick(time, delta, hits);
 	}
 	

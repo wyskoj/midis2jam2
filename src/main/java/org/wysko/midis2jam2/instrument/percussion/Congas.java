@@ -14,27 +14,57 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Congas.
+ */
 public class Congas extends NonDrumSetPercussion {
+	
+	/**
+	 * The Right hand node.
+	 */
 	private final Node rightHandNode = new Node();
 	
+	/**
+	 * The Left hand node.
+	 */
 	private final Node leftHandNode = new Node();
 	
+	/**
+	 * The Left conga anim node.
+	 */
 	private final Node leftCongaAnimNode = new Node();
 	
+	/**
+	 * The Right conga anim node.
+	 */
 	private final Node rightCongaAnimNode = new Node();
 	
-	private final Node leftCongaNode = new Node();
-	
-	private final Node rightCongaNode = new Node();
-	
+	/**
+	 * The Muted hand node.
+	 */
 	private final Node mutedHandNode = new Node();
 	
+	/**
+	 * The Low conga hits.
+	 */
 	private final List<MidiNoteOnEvent> lowCongaHits;
 	
+	/**
+	 * The High conga hits.
+	 */
 	private final List<MidiNoteOnEvent> highCongaHits;
 	
+	/**
+	 * The Muted conga hits.
+	 */
 	private final List<MidiNoteOnEvent> mutedCongaHits;
 	
+	/**
+	 * Instantiates new congas.
+	 *
+	 * @param context the context
+	 * @param hits    the hits
+	 */
 	public Congas(Midis2jam2 context,
 	              List<MidiNoteOnEvent> hits) {
 		super(context, hits);
@@ -48,7 +78,9 @@ public class Congas extends NonDrumSetPercussion {
 		leftCongaAnimNode.attachChild(leftConga);
 		rightCongaAnimNode.attachChild(context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp"));
 		
+		Node leftCongaNode = new Node();
 		leftCongaNode.attachChild(leftCongaAnimNode);
+		Node rightCongaNode = new Node();
 		rightCongaNode.attachChild(rightCongaAnimNode);
 		
 		instrumentNode.attachChild(leftCongaNode);

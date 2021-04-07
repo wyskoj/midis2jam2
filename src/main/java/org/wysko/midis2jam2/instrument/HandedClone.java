@@ -4,17 +4,31 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.instrument.pipe.HandedInstrument;
 
+import static org.wysko.midis2jam2.instrument.HandPositionFingeringManager.Hands;
+
 /**
  * Instruments that have hands. Includes piccolo, flute, recorder, ocarina.
  */
 public abstract class HandedClone extends Clone {
 	
+	/**
+	 * The Left hand node.
+	 */
 	protected final Node leftHandNode = new Node();
 	
+	/**
+	 * The Right hand node.
+	 */
 	protected final Node rightHandNode = new Node();
 	
+	/**
+	 * The Left hands.
+	 */
 	protected Spatial[] leftHands;
 	
+	/**
+	 * The Right hands.
+	 */
 	protected Spatial[] rightHands;
 	
 	/**
@@ -42,7 +56,7 @@ public abstract class HandedClone extends Clone {
 			/* Set the hands */
 			assert currentNotePeriod != null;
 			final int midiNote = currentNotePeriod.midiNote;
-			final Hands hands = ((HandedInstrument) parent).handMap.get(midiNote);
+			final Hands hands = (Hands) parent.manager.fingering(midiNote);
 			if (hands != null) {
 				// Set the left hands
 				if (leftHands != null) {
@@ -64,35 +78,6 @@ public abstract class HandedClone extends Clone {
 					}
 				}
 			}
-		}
-	}
-	
-	/**
-	 * Defines the indices for left and right hands.
-	 */
-	public static class Hands {
-		
-		/**
-		 * The index of the left hand.
-		 */
-		public final int left;
-		
-		/**
-		 * The index of the right hand.
-		 */
-		public final int right;
-		
-		public Hands(int left, int right) {
-			this.left = left;
-			this.right = right;
-		}
-		
-		@Override
-		public String toString() {
-			return "Hands{" +
-					"left=" + left +
-					", right=" + right +
-					'}';
 		}
 	}
 }

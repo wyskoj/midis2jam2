@@ -15,23 +15,57 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * <i>You used to call me on my cellphone...</i>
+ */
 public class TelephoneRing extends SustainedInstrument {
+	
+	/**
+	 * The Up keys.
+	 */
 	final Spatial[] upKeys = new Spatial[12];
 	
+	/**
+	 * The Down keys.
+	 */
 	final Spatial[] downKeys = new Spatial[12];
 	
+	/**
+	 * The Up node.
+	 */
 	final Node upNode = new Node();
 	
+	/**
+	 * The Down node.
+	 */
 	final Node downNode = new Node();
 	
+	/**
+	 * For each key, is it playing?
+	 */
 	final boolean[] playing = new boolean[12];
 	
+	/**
+	 * The Handle.
+	 */
 	final Spatial handle;
 	
+	/**
+	 * The Notes.
+	 */
 	private final List<MidiNoteEvent> notes;
 	
+	/**
+	 * The amount to shake the handle.
+	 */
 	float force = 0;
 	
+	/**
+	 * Instantiates a new Telephone ring.
+	 *
+	 * @param context   the context
+	 * @param eventList the event list
+	 */
 	public TelephoneRing(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());

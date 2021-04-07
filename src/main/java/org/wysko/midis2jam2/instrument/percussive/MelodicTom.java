@@ -12,8 +12,10 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Melodic tom.
+ */
 public class MelodicTom extends OneDrumOctave {
-	
 	
 	/**
 	 * @param context   the context to the main class

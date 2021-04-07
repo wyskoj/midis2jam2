@@ -66,6 +66,13 @@ public abstract class SustainedInstrument extends Instrument {
 		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
 	}
 	
+	/**
+	 * Calculate the current visibility.
+	 *
+	 * @param time                    the time
+	 * @param unmodifiableNotePeriods the unmodifiable note periods
+	 * @return true if this instrument should be visible, false otherwise
+	 */
 	public static boolean calcVisibility(double time, @NotNull List<NotePeriod> unmodifiableNotePeriods) {
 		boolean show = false;
 		for (NotePeriod notePeriod : unmodifiableNotePeriods) {

@@ -3,8 +3,9 @@ package org.wysko.midis2jam2.instrument;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-
+/**
+ * Animates keys by indices of keys.
+ */
 public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	
 	/**
@@ -13,20 +14,25 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	@NotNull
 	protected final Spatial[] keys;
 	
-	@NotNull
-	final
-	Map<Integer, Integer[]> keyMap;
 	
+	/**
+	 * Instantiates a new Animated key clone by integers.
+	 *
+	 * @param parent         the parent
+	 * @param rotationFactor the rotation factor
+	 * @param stretchFactor  the stretch factor
+	 * @param numberOfKeys   the number of keys
+	 * @param stretchAxis    the stretch axis
+	 * @param rotationAxis   the rotation axis
+	 */
 	public AnimatedKeyCloneByIntegers(MonophonicInstrument parent,
 	                                  float rotationFactor,
 	                                  float stretchFactor,
-	                                  @NotNull Map<Integer, Integer[]> keyMap,
 	                                  int numberOfKeys,
 	                                  Axis stretchAxis, Axis rotationAxis) {
 		
 		super(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis);
 		this.keys = new Spatial[numberOfKeys];
-		this.keyMap = keyMap;
 	}
 	
 	/**
@@ -40,7 +46,8 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	protected void tick(double time, float delta) {
 		super.tick(time, delta);
 		if (currentNotePeriod != null) {
-			Integer[] Integers = keyMap.get(currentNotePeriod.midiNote);
+			assert parent.manager != null;
+			Integer[] Integers = (Integer[]) parent.manager.fingering(currentNotePeriod.midiNote);
 			if (Integers != null) {
 				animateKeys(Integers);
 			}

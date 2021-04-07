@@ -1,6 +1,10 @@
 package org.wysko.midis2jam2.instrument.brass;
 
+/**
+ * A single instance of some visual that "bounces" to visualize (e.g., choir peep, stage horn).
+ */
 public class BouncyTwelfth extends WrappedOctaveSustained.TwelfthOfOctave {
+	
 	@Override
 	public void play(double duration) {
 		playing = true;

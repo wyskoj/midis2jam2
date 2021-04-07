@@ -4,7 +4,9 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.VibratingStringAnimator;
 import org.wysko.midis2jam2.instrument.brass.WrappedOctaveSustained;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
@@ -12,16 +14,19 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The stage strings.
+ */
 public class StageStrings extends WrappedOctaveSustained {
 	
-	// Strings are 9 / 12 degrees apart
-	// Left one is 22 up
-	
+	/**
+	 * Nodes that contain each string.
+	 */
+	@NotNull
 	final Node[] stringNodes = new Node[12];
 	
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList, false);
-		
 		twelfths = new StageStringNote[12];
 		for (int i = 0; i < 12; i++) {
 			stringNodes[i] = new Node();
@@ -39,19 +44,40 @@ public class StageStrings extends WrappedOctaveSustained {
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (11.6 * indexForMoving())), 0));
 	}
 	
+	/**
+	 * A single string.
+	 */
 	public class StageStringNote extends TwelfthOfOctave {
 		
+		/**
+		 * Contains the bow.
+		 */
 		final Node bowNode = new Node();
 		
+		/**
+		 * Contains the anim strings.
+		 */
 		final Node animStringNode = new Node();
 		
+		/**
+		 * Each frame of the anim strings.
+		 */
 		final Spatial[] animStrings = new Spatial[5];
 		
+		/**
+		 * The resting string.
+		 */
 		final Spatial restingString;
 		
+		/**
+		 * The bow.
+		 */
 		final Spatial bow;
 		
-		double frame = 0;
+		/**
+		 * The anim string animator.
+		 */
+		final VibratingStringAnimator animator;
 		
 		public StageStringNote() {
 			// Load holder
@@ -82,19 +108,17 @@ public class StageStrings extends WrappedOctaveSustained {
 			animNode.attachChild(bowNode);
 			
 			highestLevel.attachChild(animNode);
+			animator = new VibratingStringAnimator(animStrings);
 		}
 		
-		protected void calculateFrameChanges(float delta) {
-			final double inc = delta / 0.016666668f;
-			this.frame += inc;
-		}
-		
+		@Override
 		public void play(double duration) {
 			playing = true;
 			progress = 0;
 			this.duration = duration;
 		}
 		
+		@Override
 		public void tick(double time, float delta) {
 			if (progress >= 1) {
 				playing = false;
@@ -115,19 +139,7 @@ public class StageStrings extends WrappedOctaveSustained {
 				restingString.setCullHint(Spatial.CullHint.Dynamic);
 				animStringNode.setCullHint(Spatial.CullHint.Always);
 			}
-			calculateFrameChanges(delta);
-			animateStrings();
-		}
-		
-		private void animateStrings() {
-			for (int i = 0; i < 5; i++) {
-				frame = frame % 5;
-				if (i == Math.floor(frame)) {
-					animStrings[i].setCullHint(Spatial.CullHint.Dynamic);
-				} else {
-					animStrings[i].setCullHint(Spatial.CullHint.Always);
-				}
-			}
+			animator.tick(delta);
 		}
 	}
 }

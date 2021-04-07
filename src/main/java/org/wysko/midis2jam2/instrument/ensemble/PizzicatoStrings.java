@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.TwelveDrumOctave;
+import org.wysko.midis2jam2.instrument.VibratingStringAnimator;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -16,8 +17,14 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The pizzicato strings.
+ */
 public class PizzicatoStrings extends DecayedInstrument {
 	
+	/**
+	 * Each string.
+	 */
 	PizzicatoString[] strings = new PizzicatoString[12];
 	
 	/**
@@ -36,7 +43,6 @@ public class PizzicatoStrings extends DecayedInstrument {
 		}
 		
 		instrumentNode.setLocalTranslation(0, 6.7f, -138f);
-		
 	}
 	
 	
@@ -60,19 +66,40 @@ public class PizzicatoStrings extends DecayedInstrument {
 		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(45 + 12 * indexForMoving()), 0));
 	}
 	
+	/**
+	 * A single string.
+	 */
 	public class PizzicatoString extends TwelveDrumOctave.TwelfthOfOctaveDecayed {
+		
+		/**
+		 * Contains the anim strings.
+		 */
 		final Node animStringNode = new Node();
 		
+		/**
+		 * The resting string.
+		 */
 		final Spatial restingString;
 		
-		double frame = 0;
-		
+		/**
+		 * Each frame of animation.
+		 */
 		Spatial[] animStrings = new Spatial[5];
 		
+		/**
+		 * Is this string currently playing?
+		 */
 		boolean playing = false;
 		
-		private double progress = 0;
+		/**
+		 * Animates the anim strings.
+		 */
+		VibratingStringAnimator stringAnimator;
 		
+		/**
+		 * The amount of progress playing the current note.
+		 */
+		private double progress = 0;
 		
 		public PizzicatoString() {
 			animNode.attachChild(context.loadModel("PizzicatoStringHolder.obj", "Wood.bmp"));
@@ -83,15 +110,14 @@ public class PizzicatoStrings extends DecayedInstrument {
 				animStrings[k].setCullHint(Spatial.CullHint.Always);
 				animStringNode.attachChild(animStrings[k]);
 			}
+			stringAnimator = new VibratingStringAnimator(animStrings);
 			animNode.attachChild(animStringNode);
 			animNode.attachChild(restingString);
 		}
 		
 		@Override
 		public void tick(double time, float delta) {
-			
-			calculateFrameChanges(delta);
-			animateStrings();
+			stringAnimator.tick(delta);
 			
 			if (progress >= 1) playing = false;
 			
@@ -108,22 +134,9 @@ public class PizzicatoStrings extends DecayedInstrument {
 			progress += delta * 7;
 		}
 		
-		protected void calculateFrameChanges(float delta) {
-			final double inc = delta / 0.016666668f;
-			this.frame += inc;
-		}
-		
-		private void animateStrings() {
-			for (int i = 0; i < 5; i++) {
-				frame = frame % 5;
-				if (i == Math.floor(frame)) {
-					animStrings[i].setCullHint(Spatial.CullHint.Dynamic);
-				} else {
-					animStrings[i].setCullHint(Spatial.CullHint.Always);
-				}
-			}
-		}
-		
+		/**
+		 * Begin playing this string.
+		 */
 		public void play() {
 			playing = true;
 			progress = 0;

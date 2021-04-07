@@ -16,17 +16,18 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The tubular bells.
+ */
 public class TubularBells extends DecayedInstrument {
 	
-	private static final double STRIKE_SPEED = 3;
-	
-	private final static double MAX_ANGLE = 50;
-	
+	/**
+	 * Each of the twelve bells.
+	 */
 	final Bell[] bells = new Bell[12];
 	
 	@SuppressWarnings("unchecked")
-	final
-	List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
+	final List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
 	
 	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context, events);
@@ -57,7 +58,8 @@ public class TubularBells extends DecayedInstrument {
 		super.tick(time, delta);
 		for (int i = 0, barsLength = 12; i < barsLength; i++) { // For each bar on the instrument
 			bells[i].tick(delta);
-			Stick.StickStatus stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta, bellStrikes[i], STRIKE_SPEED, MAX_ANGLE);
+			Stick.StickStatus stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta,
+					bellStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 			if (stickStatus.justStruck()) {
 				if (stickStatus.getStrike() != null) {
 					bells[i].recoilBell(stickStatus.getStrike().velocity);
@@ -71,24 +73,54 @@ public class TubularBells extends DecayedInstrument {
 		offsetNode.setLocalTranslation(-10 * indexForMoving(), 0, -10 * indexForMoving());
 	}
 	
-	
+	/**
+	 * A single bell.
+	 */
 	private class Bell {
+		
+		/**
+		 * The base amplitude of the strike.
+		 */
 		private final static double BASE_AMPLITUDE = 0.5;
 		
+		/**
+		 * The speed the bell will wobble at.
+		 */
 		private final static int WOBBLE_SPEED = 3;
 		
+		/**
+		 * How quickly the bell will return to rest.
+		 */
 		private final static double DAMPENING = 0.3;
 		
+		/**
+		 * The highest level node.
+		 */
 		final Node highestLevel = new Node();
 		
+		/**
+		 * Contains the tubular bell.
+		 */
 		final Node bellNode = new Node();
 		
+		/**
+		 * Contains the mallet.
+		 */
 		final Node malletNode;
 		
+		/**
+		 * The current amplitude of the recoil.
+		 */
 		private double amplitude = 0.5;
 		
+		/**
+		 * The current time of animation, or -1 if the animation has never started yet.
+		 */
 		private double animTime = -1;
 		
+		/**
+		 * True if this bell is recoiling, false if not.
+		 */
 		private boolean bellIsRecoiling;
 		
 		public Bell(int i) {
@@ -111,6 +143,11 @@ public class TubularBells extends DecayedInstrument {
 			malletNode.setCullHint(Spatial.CullHint.Always);
 		}
 		
+		/**
+		 * Updates animation.
+		 *
+		 * @param delta the amount of time since the last frame update
+		 */
 		public void tick(float delta) {
 			animTime += delta;
 			if (bellIsRecoiling) {
@@ -123,6 +160,11 @@ public class TubularBells extends DecayedInstrument {
 			}
 		}
 		
+		/**
+		 * Calculates the rotation during the recoil.
+		 *
+		 * @return the rotation amount
+		 */
 		float rotationAmount() {
 			if (animTime >= 0) {
 				if (animTime < 2)
@@ -135,11 +177,15 @@ public class TubularBells extends DecayedInstrument {
 			return 0;
 		}
 		
+		/**
+		 * Recoils the bell.
+		 *
+		 * @param velocity the velocity of the MIDI note
+		 */
 		public void recoilBell(int velocity) {
 			amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * BASE_AMPLITUDE;
 			animTime = 0;
 			bellIsRecoiling = true;
-			boolean recoilNow = true;
 		}
 	}
 }

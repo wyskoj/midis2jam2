@@ -16,8 +16,14 @@ import java.util.stream.IntStream;
 import static com.jme3.math.FastMath.HALF_PI;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Woodblocks.
+ */
 public class Woodblocks extends TwelveDrumOctave {
 	
+	/**
+	 * The Wood block nodes.
+	 */
 	Node[] woodBlockNodes = new Node[12];
 	
 	/**
@@ -40,7 +46,7 @@ public class Woodblocks extends TwelveDrumOctave {
 			Node oneBlock = new Node();
 			oneBlock.attachChild(malletNodes[i]);
 			Woodblock woodblock = new Woodblock(i);
-			decayeds[i] = woodblock;
+			twelfths[i] = woodblock;
 			oneBlock.attachChild(woodblock.highestLevel);
 			woodBlockNodes[i].attachChild(oneBlock);
 			oneBlock.setLocalTranslation(0, 0, 20);
@@ -56,7 +62,7 @@ public class Woodblocks extends TwelveDrumOctave {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		for (TwelfthOfOctaveDecayed woodblock : decayeds) {
+		for (TwelfthOfOctaveDecayed woodblock : twelfths) {
 			woodblock.tick(time, delta);
 		}
 	}
@@ -67,15 +73,23 @@ public class Woodblocks extends TwelveDrumOctave {
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, -HALF_PI + HALF_PI * indexForMoving(), 0));
 	}
 	
+	/**
+	 * A single Woodblock.
+	 */
 	public class Woodblock extends TwelveDrumOctave.TwelfthOfOctaveDecayed {
 		
+		/**
+		 * Instantiates a new Woodblock.
+		 *
+		 * @param i the index of this woodblock
+		 */
 		public Woodblock(int i) {
 			Spatial mesh = context.loadModel("WoodBlockSingle.obj", "SimpleWood.bmp");
 			mesh.setLocalScale(1 - 0.036363636f * i);
 			animNode.attachChild(mesh);
-			
 		}
 		
+		@Override
 		public void tick(double time, float delta) {
 			Vector3f localTranslation = highestLevel.getLocalTranslation();
 			if (localTranslation.y < -0.0001) {

@@ -29,6 +29,7 @@ public class MidiChannelSpecificEvent extends MidiEvent {
 	}
 	
 	private static class CompareByTime implements Comparator<MidiChannelSpecificEvent> {
+		
 		@Override
 		public int compare(MidiChannelSpecificEvent o1, MidiChannelSpecificEvent o2) {
 			return Long.compare(o1.time, o2.time);

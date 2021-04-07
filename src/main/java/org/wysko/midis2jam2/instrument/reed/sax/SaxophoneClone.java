@@ -4,18 +4,31 @@ import com.jme3.math.Quaternion;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.UpAndDownKeyClone;
 
-import java.util.Map;
-
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * Shared code for sax clones.
+ */
 public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	
+	/**
+	 * The number of keys on a saxophone.
+	 */
 	private final static int NUMBER_OF_KEYS = 20;
 	
+	/**
+	 * The amount to rotate the sax by when playing.
+	 */
 	private final static float ROTATION_FACTOR = 0.1f;
 	
-	public SaxophoneClone(Saxophone parent, float stretchFactor, Map<Integer, Integer[]> keyMap) {
-		super(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor, keyMap);
+	/**
+	 * Instantiates a new Saxophone clone.
+	 *
+	 * @param parent        the parent
+	 * @param stretchFactor the stretch factor
+	 */
+	public SaxophoneClone(Saxophone parent, float stretchFactor) {
+		super(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor);
 		
 		for (int i = 0; i < keyCount; i++) {
 			keysUp[i] = parent.context.loadModel(String.format("AltoSaxKeyUp%d.obj", i),

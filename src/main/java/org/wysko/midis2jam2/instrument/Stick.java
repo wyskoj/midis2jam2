@@ -12,10 +12,19 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Stick.
+ */
 public class Stick {
 	
+	/**
+	 * The constant STRIKE_SPEED.
+	 */
 	public final static double STRIKE_SPEED = 4;
 	
+	/**
+	 * The constant MAX_ANGLE.
+	 */
 	public final static double MAX_ANGLE = 50;
 	
 	/**
@@ -100,11 +109,9 @@ public class Stick {
 		return new StickStatus(strike ? nextHit : null, finalAngles[0]);
 	}
 	
-	public enum Pivot {
-		AT_END,
-		NEAR_END
-	}
-	
+	/**
+	 * What's the stick been up to?
+	 */
 	public static class StickStatus {
 		
 		/**
@@ -123,6 +130,11 @@ public class Stick {
 			this.rotationAngle = rotationAngle;
 		}
 		
+		/**
+		 * Did the stick just strike?
+		 *
+		 * @return true if the stick just struck, false otherwise
+		 */
 		public boolean justStruck() {
 			return strike != null;
 		}

@@ -12,16 +12,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Twelve drums for each note.
+ */
 public abstract class TwelveDrumOctave extends DecayedInstrument {
 	
+	/**
+	 * The Anim node.
+	 */
 	protected Node animNode = new Node();
 	
+	/**
+	 * The Mallet nodes.
+	 */
 	@NotNull
 	protected Node[] malletNodes;
 	
+	/**
+	 * The Mallet strikes.
+	 */
 	protected List<MidiNoteOnEvent>[] malletStrikes;
 	
-	protected TwelfthOfOctaveDecayed[] decayeds = new TwelfthOfOctaveDecayed[12];
+	/**
+	 * Each twelfth of the octave.
+	 */
+	protected TwelfthOfOctaveDecayed[] twelfths = new TwelfthOfOctaveDecayed[12];
 	
 	/**
 	 * @param context   the context to the main class
@@ -48,29 +63,47 @@ public abstract class TwelveDrumOctave extends DecayedInstrument {
 		for (int i = 0; i < 12; i++) {
 			Stick.StickStatus stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5, 50);
 			if (stickStatus.justStruck()) {
-				decayeds[i].animNode.setLocalTranslation(0, -3, 0);
+				twelfths[i].animNode.setLocalTranslation(0, -3, 0);
 			}
-			Vector3f localTranslation = decayeds[i].animNode.getLocalTranslation();
+			Vector3f localTranslation = twelfths[i].animNode.getLocalTranslation();
 			if (localTranslation.y < -0.0001) {
-				decayeds[i].animNode.setLocalTranslation(0, Math.min(0,
+				twelfths[i].animNode.setLocalTranslation(0, Math.min(0,
 						localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
 			} else {
-				decayeds[i].animNode.setLocalTranslation(0, 0, 0);
+				twelfths[i].animNode.setLocalTranslation(0, 0, 0);
 			}
 		}
 		
 	}
 	
+	/**
+	 * The Twelfth of octave that is decayed.
+	 */
 	public abstract static class TwelfthOfOctaveDecayed {
 		
+		/**
+		 * The Highest level.
+		 */
 		public final Node highestLevel = new Node();
 		
+		/**
+		 * The Anim node.
+		 */
 		protected final Node animNode = new Node();
 		
+		/**
+		 * Instantiates a new Twelfth of octave decayed.
+		 */
 		public TwelfthOfOctaveDecayed() {
 			highestLevel.attachChild(animNode);
 		}
 		
+		/**
+		 * Update animation and note handling.
+		 *
+		 * @param time  the current time
+		 * @param delta the amount of time since the last frame update
+		 */
 		public abstract void tick(double time, float delta);
 	}
 	

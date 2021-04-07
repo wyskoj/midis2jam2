@@ -18,6 +18,9 @@ import java.util.stream.IntStream;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.piano.KeyedInstrument.KeyColor.WHITE;
 
+/**
+ * L'accordéon.
+ */
 public class Accordion extends KeyedInstrument {
 	
 	/**
@@ -105,6 +108,11 @@ public class Accordion extends KeyedInstrument {
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(0), rad(45), rad(-5)));
 	}
 	
+	/**
+	 * Returns an AccordionWhiteKey that does nothing.
+	 *
+	 * @return a dummy white key
+	 */
 	private Node dummyWhiteKey() {
 		Node node = new Node();
 		Spatial upKeyFront = Accordion.this.context.loadModel("AccordianKeyWhiteFront.obj", "AccordianKey.bmp",
@@ -117,6 +125,11 @@ public class Accordion extends KeyedInstrument {
 		return node;
 	}
 	
+	/**
+	 * Calculates the amount of squeeze to apply to the accordion.
+	 *
+	 * @param delta the amount of time since the last frame update
+	 */
 	private void calculateAngle(float delta) {
 		boolean playing = Arrays.stream(keys).anyMatch(Key::isBeingPressed);
 		if (playing) {
@@ -153,10 +166,14 @@ public class Accordion extends KeyedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0,30 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 30 * indexForMoving(), 0);
 	}
 	
+	/**
+	 * A single key on the accordion.
+	 */
 	private class AccordionKey extends Key {
+		
 		public AccordionKey(int midiNote, int startPos) {
 			super(midiNote);
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key

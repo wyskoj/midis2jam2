@@ -33,6 +33,9 @@ public abstract class KeyedInstrument extends Instrument {
 	 */
 	protected final int rangeHigh;
 	
+	/**
+	 * The events associated with this instrument.
+	 */
 	@NotNull
 	final protected List<MidiNoteEvent> events;
 	
@@ -41,6 +44,9 @@ public abstract class KeyedInstrument extends Instrument {
 	 */
 	protected final Key[] keys;
 	
+	/**
+	 * The Note periods to play.
+	 */
 	@Unmodifiable
 	@NotNull
 	private final List<NotePeriod> notePeriods;
@@ -119,9 +125,21 @@ public abstract class KeyedInstrument extends Instrument {
 		return (rangeHigh - rangeLow) + 1;
 	}
 	
+	/**
+	 * Returns the key associated with the MIDI note.
+	 *
+	 * @param midiNote the midi note
+	 * @return the key
+	 */
 	@Nullable
 	protected abstract Key keyByMidiNote(int midiNote);
 	
+	
+	/**
+	 * Sets idle visibility by note on and off events.
+	 *
+	 * @param time the current time
+	 */
 	protected void setIdleVisibilityByNoteOnAndOff(double time) {
 		boolean b = SustainedInstrument.calcVisibility(time, notePeriods);
 		visible = b;

@@ -20,13 +20,13 @@ public class SteamPuffer implements ParticleGenerator {
 	
 	final List<Cloud> clouds = new ArrayList<>();
 	
+	final List<Cloud> cloudPool = new ArrayList<>();
+	
 	private final Midis2jam2 context;
 	
 	private final SteamPuffType type;
 	
 	private final double scale;
-	
-	final List<Cloud> cloudPool = new ArrayList<>();
 	
 	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale) {
 		this.context = context;
@@ -88,9 +88,10 @@ public class SteamPuffer implements ParticleGenerator {
 	}
 	
 	class Cloud implements Particle {
-		private final Spatial cube;
 		
 		final Node cloud = new Node();
+		
+		private final Spatial cube;
 		
 		float randY;
 		

@@ -18,10 +18,23 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class Cymbal extends SingleStickInstrument {
 	
+	/**
+	 * The Cymbal node.
+	 */
 	final Node cymbalNode = new Node();
 	
+	/**
+	 * The Animator.
+	 */
 	protected CymbalAnimator animator;
 	
+	/**
+	 * Instantiates a new Cymbal.
+	 *
+	 * @param context the context
+	 * @param hits    the hits
+	 * @param type    the type of cymbal
+	 */
 	protected Cymbal(Midis2jam2 context,
 	                 List<MidiNoteOnEvent> hits, CymbalType type) {
 		super(context, hits);
@@ -45,38 +58,92 @@ public class Cymbal extends SingleStickInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
+		handleCymbalStrikes(time, delta);
+		
+		Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+	}
+	
+	/**
+	 * Handle cymbal strikes.
+	 *
+	 * @param time  the time
+	 * @param delta the amount of time since the last frame update
+	 */
+	void handleCymbalStrikes(double time, float delta) {
 		MidiNoteOnEvent recoil = null;
 		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
 			recoil = hits.remove(0);
 		}
-		
 		if (recoil != null) {
 			animator.strike();
 		}
 		cymbalNode.setLocalRotation(new Quaternion().fromAngles(animator.rotationAmount(), 0, 0));
 		animator.tick(delta);
-		
-		Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 	}
 	
+	/**
+	 * The type of cymbal.
+	 */
 	public enum CymbalType {
+		
+		/**
+		 * The Crash 1 cymbal.
+		 */
 		CRASH_1(new Vector3f(-18, 48, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0f, 2.5, 4.5, 1.5),
+		
+		/**
+		 * The Crash 2 cymbal.
+		 */
 		CRASH_2(new Vector3f(13, 48, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5f, 2.5, 5, 1.5),
+		
+		/**
+		 * The Splash cymbal.
+		 */
 		SPLASH(new Vector3f(-2, 48, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0f, 2, 5, 1.5),
+		
+		/**
+		 * The Ride 1 cymbal.
+		 */
 		RIDE_1(new Vector3f(22, 43, -77.8f), new Quaternion().fromAngles(rad(107 - 90), rad(291), rad(-9.45)), 2f, 0.5, 3, 1.5),
+		
+		/**
+		 * The Ride 2 cymbal.
+		 */
 		RIDE_2(new Vector3f(-23, 40, -78.8f), new Quaternion().fromAngles(rad(20), rad(37.9), rad(-3.49)), 2f, 0.5, 3, 1.5),
+		
+		/**
+		 * The China cymbal.
+		 */
 		CHINA(new Vector3f(32.7f, 34.4f, -68.4f), new Quaternion().fromAngles(rad(108 - 90), rad(-89.2), rad(-10)), 2.0f, 2, 5, 1.5);
 		
+		/**
+		 * The size of ths cymbal (the scale).
+		 */
 		final float size;
 		
+		/**
+		 * The Location.
+		 */
 		final Vector3f location;
 		
+		/**
+		 * The Rotation.
+		 */
 		final Quaternion rotation;
 		
+		/**
+		 * The amplitude of the cymbal when struck.
+		 */
 		final double amplitude;
 		
+		/**
+		 * The wobble speed.
+		 */
 		final double wobbleSpeed;
 		
+		/**
+		 * The dampening.
+		 */
 		final double dampening;
 		
 		CymbalType(Vector3f location, Quaternion rotation, float size, double amplitude, double wobbleSpeed,

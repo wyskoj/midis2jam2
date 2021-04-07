@@ -8,60 +8,28 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.AnimatedKeyCloneByIntegers;
 import org.wysko.midis2jam2.instrument.Axis;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
+import org.wysko.midis2jam2.instrument.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
- *
+ * The French Horn.
  */
 public class FrenchHorn extends MonophonicInstrument {
 	
-	private static final HashMap<Integer, Integer[]> KEY_MAPPING = new HashMap<Integer, Integer[]>() {{
-		put(46, new Integer[] {1,});
-		put(47, new Integer[] {2, 3, 4,});
-		put(48, new Integer[] {2, 4,});
-		put(49, new Integer[] {3, 4,});
-		put(50, new Integer[] {2, 3,});
-		put(51, new Integer[] {2,});
-		put(52, new Integer[] {3,});
-		put(53, new Integer[] {});
-		put(54, new Integer[] {3, 4,});
-		put(55, new Integer[] {2, 3,});
-		put(56, new Integer[] {2,});
-		put(57, new Integer[] {3,});
-		put(58, new Integer[] {});
-		put(59, new Integer[] {2, 3,});
-		put(60, new Integer[] {2,});
-		put(61, new Integer[] {1, 3, 4,});
-		put(62, new Integer[] {1, 2, 3,});
-		put(63, new Integer[] {1, 2,});
-		put(64, new Integer[] {1, 3,});
-		put(65, new Integer[] {1,});
-		put(66, new Integer[] {1, 3, 4,});
-		put(67, new Integer[] {1, 2, 3,});
-		put(68, new Integer[] {1, 2,});
-		put(69, new Integer[] {1, 3,});
-		put(70, new Integer[] {1,});
-		put(71, new Integer[] {1, 3,});
-		put(72, new Integer[] {1,});
-		put(73, new Integer[] {1, 3, 4,});
-		put(74, new Integer[] {1, 2, 3,});
-		put(75, new Integer[] {1, 2,});
-		put(76, new Integer[] {1, 3,});
-		put(77, new Integer[] {1,});
-	}};
+	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(FrenchHorn.class);
 	
 	public FrenchHorn(Midis2jam2 context,
 	                  List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
 		super(
 				context,
 				eventList,
-				FrenchHornClone.class
+				FrenchHornClone.class,
+				FINGERING_MANAGER
 		);
 		
 		groupOfPolyphony.setLocalTranslation(-83.1f, 41.6f, -63.7f);
@@ -76,7 +44,7 @@ public class FrenchHorn extends MonophonicInstrument {
 	public class FrenchHornClone extends AnimatedKeyCloneByIntegers {
 		
 		public FrenchHornClone() {
-			super(FrenchHorn.this, 0.1f, 0.9f, KEY_MAPPING, 4, Axis.Y, Axis.X);
+			super(FrenchHorn.this, 0.1f, 0.9f, 4, Axis.Y, Axis.X);
 			
 			body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE,

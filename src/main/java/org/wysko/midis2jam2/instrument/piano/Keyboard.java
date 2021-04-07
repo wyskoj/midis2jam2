@@ -107,6 +107,7 @@ public class Keyboard extends KeyedInstrument {
 	 * The type Keyboard key.
 	 */
 	public class KeyboardKey extends Key {
+		
 		public KeyboardKey(int midiNote, int startPos) {
 			super(midiNote);
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key

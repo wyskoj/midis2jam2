@@ -13,8 +13,14 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Pan flute.
+ */
 public class PanFlute extends WrappedOctaveSustained {
 	
+	/**
+	 * The Pipe nodes.
+	 */
 	Node[] pipeNodes = new Node[12];
 	
 	/**
@@ -52,12 +58,31 @@ public class PanFlute extends WrappedOctaveSustained {
 		offsetNode.setLocalTranslation(0, indexForMoving() * 4.6f, 0);
 	}
 	
+	/**
+	 * The Pipe skin.
+	 */
 	public enum PipeSkin {
+		
+		/**
+		 * Gold pipe skin.
+		 */
 		GOLD("HornSkin.bmp"),
+		
+		/**
+		 * Wood pipe skin.
+		 */
 		WOOD("Wood.bmp");
 		
+		/**
+		 * The Texture file.
+		 */
 		String textureFile;
 		
+		/**
+		 * Instantiates a new Pipe skin.
+		 *
+		 * @param textureFile the texture file
+		 */
 		PipeSkin(String textureFile) {
 			this.textureFile = textureFile;
 		}

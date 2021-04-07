@@ -14,22 +14,49 @@ import java.util.List;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.Stick.MAX_ANGLE;
 
+/**
+ * The bass drum, or kick drum.
+ */
 public class BassDrum extends PercussionInstrument {
 	
+	/**
+	 * The maximum angle the pedal will fall back to when at rest.
+	 */
 	private final static int PEDAL_MAX_ANGLE = 20;
 	
+	/**
+	 * The Bass drum.
+	 */
 	final Spatial bassDrum;
 	
+	/**
+	 * The Bass drum beater arm.
+	 */
 	final Spatial bassDrumBeaterArm;
 	
+	/**
+	 * The Bass drum beater holder.
+	 */
 	final Spatial bassDrumBeaterHolder;
 	
+	/**
+	 * The Bass drum pedal.
+	 */
 	final Spatial bassDrumPedal;
 	
+	/**
+	 * The High level node.
+	 */
 	final Node highLevelNode = new Node();
 	
+	/**
+	 * The Drum node.
+	 */
 	final Node drumNode = new Node();
 	
+	/**
+	 * The Beater node.
+	 */
 	final Node beaterNode = new Node();
 	
 	public BassDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
@@ -114,7 +141,5 @@ public class BassDrum extends PercussionInstrument {
 					pedalAngle, 0, 0
 			));
 		}
-		
-		
 	}
 }

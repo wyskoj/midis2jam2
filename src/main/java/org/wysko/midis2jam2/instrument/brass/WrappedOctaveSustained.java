@@ -10,18 +10,27 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * A sustained instrument that wraps around the octave to visualize notes (e.g., choir, stage brass, stage strings).
+ */
 public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	
-	protected TwelfthOfOctave[] twelfths = new TwelfthOfOctave[12];
-	
+	/**
+	 * True if the order of notes should be reversed, false otherwise.
+	 */
 	final boolean inverted;
+	
+	/**
+	 * Each "twelfth" or note of the octave.
+	 */
+	protected TwelfthOfOctave[] twelfths = new TwelfthOfOctave[12];
 	
 	/**
 	 * Instantiates a new wrapped octave sustained.
 	 *
 	 * @param context   the context to the main class
 	 * @param eventList the event list
-	 * @param inverted
+	 * @param inverted  should the notes be reversed?
 	 */
 	protected WrappedOctaveSustained(@NotNull Midis2jam2 context,
 	                                 @NotNull List<MidiChannelSpecificEvent> eventList,
@@ -52,15 +61,34 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		}
 	}
 	
+	/**
+	 * One note out of the twelve for the octave.
+	 */
 	public abstract static class TwelfthOfOctave {
+		
+		/**
+		 * The highest level node.
+		 */
 		public final Node highestLevel = new Node();
 		
+		/**
+		 * The animation node.
+		 */
 		protected final Node animNode = new Node();
 		
+		/**
+		 * This note's current progress playing the note.
+		 */
 		protected double progress = 0;
 		
+		/**
+		 * Is this twelfth currently playing?
+		 */
 		protected boolean playing = false;
 		
+		/**
+		 * The amount of time, in seconds, this note should be playing for.
+		 */
 		protected double duration = 0;
 		
 		public TwelfthOfOctave() {
@@ -71,5 +99,4 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		
 		public abstract void tick(double time, float delta);
 	}
-	
 }

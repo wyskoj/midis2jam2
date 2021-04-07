@@ -40,7 +40,7 @@ public abstract class Clone {
 	public final Node offsetNode = new Node();
 	
 	/**
-	 *
+	 * The highest level.
 	 */
 	public final Node highestLevel = new Node();
 	
@@ -119,7 +119,7 @@ public abstract class Clone {
 	 * Hides or shows this clone.
 	 *
 	 * @param indexThis the index of this clone
-	 * @param time
+	 * @param time the current time
 	 */
 	protected void hideOrShowOnPolyphony(int indexThis, double time) {
 		if (indexForMoving() == 0 && indexThis != 0) {
@@ -131,14 +131,9 @@ public abstract class Clone {
 				highestLevel.setCullHint(Spatial.CullHint.Dynamic);
 				visible = true;
 			} else {
-//				if (!notePeriods.isEmpty() && notePeriods.get(0).startTime - time < 0.5) {
-//					highestLevel.setCullHint(Spatial.CullHint.Dynamic);
-//					visible = true;
-//				} else {
 				highestLevel.setCullHint(Spatial.CullHint.Always);
 				visible = false;
-//				}
-				
+				// TODO make clones stick if going to play again in a short while
 			}
 		} else {
 			highestLevel.setCullHint(Spatial.CullHint.Dynamic);
@@ -188,5 +183,8 @@ public abstract class Clone {
 		return visible;
 	}
 	
+	/**
+	 * Move as to not overlap with other clones.
+	 */
 	protected abstract void moveForPolyphony();
 }

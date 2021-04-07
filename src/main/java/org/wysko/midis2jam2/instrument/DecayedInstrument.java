@@ -23,6 +23,9 @@ public abstract class DecayedInstrument extends Instrument {
 	@NotNull
 	protected final List<MidiNoteOnEvent> hits;
 	
+	/**
+	 * The list of unmodifiable hits.
+	 */
 	@NotNull
 	@Unmodifiable
 	protected final List<MidiNoteOnEvent> finalHits;

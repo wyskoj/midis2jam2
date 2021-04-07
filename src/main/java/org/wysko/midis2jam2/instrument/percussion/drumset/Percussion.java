@@ -5,7 +5,6 @@ import com.jme3.material.RenderState;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.percussion.Congas;
@@ -16,18 +15,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The Percussion.
+ */
 public class Percussion extends Instrument {
 	
 	
-	public final Node drumSetNode = new Node();
+	/**
+	 * The Percussion node.
+	 */
+	private final Node percussionNode = new Node();
 	
-	public final Node percussionNode = new Node();
+	/**
+	 * The Note on events.
+	 */
+	private final List<MidiNoteOnEvent> noteOnEvents;
 	
-	final List<MidiNoteOnEvent> noteOnEvents;
-	
-	
+	/**
+	 * Each percussion instrument.
+	 */
 	private final List<PercussionInstrument> instruments = new ArrayList<>();
 	
+	/**
+	 * Instantiates the percussion.
+	 *
+	 * @param context the context
+	 * @param events  the events
+	 */
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
 		/* Percussion only cares about note on. */
@@ -43,6 +57,7 @@ public class Percussion extends Instrument {
 		/* For some reason, the bass drum needs special attention ?? */
 		BassDrum e1 = new BassDrum(context,
 				noteOnEvents.stream().filter(e -> e.note == 35 || e.note == 36).collect(Collectors.toList()));
+		Node drumSetNode = new Node();
 		drumSetNode.attachChild(e1.highLevelNode);
 		instruments.add(e1);
 		
@@ -116,21 +131,6 @@ public class Percussion extends Instrument {
 		percussionNode.attachChild(drumSetNode);
 		percussionNode.attachChild(shadow);
 		context.getRootNode().attachChild(percussionNode);
-	}
-	
-	protected void setPercussionVisibility(@NotNull List<MidiNoteOnEvent> strikes, double time, @NotNull Node node) {
-		boolean show = false;
-		for (MidiNoteOnEvent strike : strikes) {
-			double x = time - context.file.eventInSeconds(strike);
-			if (x < 4 && x > -1) {
-				visible = true;
-				show = true;
-				break;
-			} else {
-				visible = false;
-			}
-		}
-		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	
 	@Override

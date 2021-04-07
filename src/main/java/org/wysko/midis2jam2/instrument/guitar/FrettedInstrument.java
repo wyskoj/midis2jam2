@@ -97,7 +97,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		lowerStrings = new Spatial[numberOfStrings][5];
 		instrumentNode.attachChild(instrumentBody);
 		highestLevel.attachChild(instrumentNode);
-		
+		// TODO Refactor so that a VibratingStringAnimator can be used
 		notePeriods = notePeriods.stream().map(NotePeriodWithFretboardPosition::fromNotePeriod).collect(Collectors.toList());
 	}
 	
@@ -125,7 +125,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 */
 	@Contract(pure = true)
 	protected float fretToDistance(@Range(from = 0, to = 22) int fret) {
-		return positioning.fretHeights.scale(fret);
+		return positioning.fretHeights.calculateScale(fret);
 	}
 	
 	/**
@@ -201,7 +201,6 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 					frettingEngine.releaseString(string);
 			}
 		}
-//		currentNotePeriods.removeIf(notePeriod -> Math.abs(notePeriod.endTime - time) < 0.02);
 	}
 	
 	/**
@@ -218,7 +217,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			int finalI = i;
 			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).position.string == finalI).findFirst();
 			if (first.isPresent()) {
-				StandardFrettingEngine.FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).position;
+				FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).position;
 				if (position.string != -1 && position.fret != -1) {
 					frettingEngine.applyFretboardPosition(position);
 				}
@@ -231,7 +230,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			if (notePeriod.animationStarted) continue;
 			NotePeriodWithFretboardPosition notePeriod1 = (NotePeriodWithFretboardPosition) notePeriod;
 			noteStarted = true;
-			final StandardFrettingEngine.FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
+			final FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
 			if (guitarPosition != null) {
 				frettingEngine.applyFretboardPosition(guitarPosition);
 				notePeriod1.position = guitarPosition;
@@ -266,6 +265,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 * @see FretHeightCalculator
 	 */
 	public static class FrettedInstrumentPositioning {
+		
 		/**
 		 * The y-coordinate of the "upper strings".
 		 */
@@ -325,6 +325,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		}
 		
 		public static class FrettedInstrumentPositioningWithZ extends FrettedInstrumentPositioning {
+			
 			/**
 			 * The z-coordinates of the top strings.
 			 */

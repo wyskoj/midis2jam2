@@ -15,9 +15,22 @@ import java.util.stream.IntStream;
 import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Blown bottle.
+ */
 public class BlownBottle extends WrappedOctaveSustained {
+	
+	/**
+	 * The Bottle nodes.
+	 */
 	Node[] bottleNodes = new Node[12];
 	
+	/**
+	 * Instantiates a new Blown bottle.
+	 *
+	 * @param context the context
+	 * @param events  the events
+	 */
 	public BlownBottle(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context, events, true);
 		
@@ -45,9 +58,21 @@ public class BlownBottle extends WrappedOctaveSustained {
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(), 0));
 	}
 	
+	/**
+	 * A single Bottle.
+	 */
 	public class Bottle extends WrappedOctaveSustained.TwelfthOfOctave {
+		
+		/**
+		 * The puffer that blows across the top of the bottle.
+		 */
 		SteamPuffer puffer;
 		
+		/**
+		 * Instantiates a new Bottle.
+		 *
+		 * @param i the index of this bottle
+		 */
 		public Bottle(int i) {
 			this.puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.POP, 1);
 			highestLevel.attachChild(context.loadModel("PopBottle.obj", "PopBottle.bmp", REFLECTIVE, 0.9f));

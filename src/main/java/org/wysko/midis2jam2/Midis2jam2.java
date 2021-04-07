@@ -50,8 +50,11 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.io.File;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.util.logging.Level.SEVERE;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
@@ -93,9 +96,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		Midis2jam2 midijam = new Midis2jam2();
 		context = midijam;
-
-//		File folder = new File("testmidi/");
-//		File[] files = folder.listFiles();
+		
 		File rawFile = null;
 		
 		if (args.length > 0) {
@@ -113,7 +114,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 //		settings.setFullscreen(true);
 		settings.setResolution(1920, 1920 / 2);
 		settings.setResizable(true);
-		settings.setSamples(4);
+//		settings.setSamples(4);
 		
 		midijam.setSettings(settings);
 		midijam.setShowSettings(false);
@@ -305,7 +306,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
 				programEvents.add(new MidiProgramEvent(0, j, 0));
 			}
-		
+			
 			for (int i = 0; i < programEvents.size() - 1; i++) {
 				final MidiProgramEvent a = programEvents.get(i);
 				final MidiProgramEvent b = programEvents.get(i + 1);

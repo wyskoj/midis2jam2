@@ -18,15 +18,24 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  * Numbers 1-4.
  */
 public class Harmonica extends SustainedInstrument {
+	
+	/**
+	 * Each note on the harmonica has a separate puffer.
+	 */
 	final SteamPuffer[] puffers = new SteamPuffer[12];
 	
+	/**
+	 * Contains each puffer.
+	 */
 	final Node[] pufferNodes = new Node[12];
 	
-	final boolean[] activities = new boolean[12];
+	/**
+	 * For each note, true if it is playing, false otherwise.
+	 */
+	final boolean[] eachNotePlaying = new boolean[12];
 	
 	public Harmonica(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
-		
 		
 		instrumentNode.attachChild(context.loadModel("Harmonica.obj", "Harmonica.bmp"));
 		
@@ -49,14 +58,14 @@ public class Harmonica extends SustainedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
-		Arrays.fill(activities, false);
+		Arrays.fill(eachNotePlaying, false);
 		
 		for (NotePeriod currentNotePeriod : currentNotePeriods) {
 			int i = currentNotePeriod.midiNote % 12;
-			activities[i] = true;
+			eachNotePlaying[i] = true;
 		}
 		
-		IntStream.range(0, puffers.length).forEach(i -> puffers[i].tick(time, delta, activities[i]));
+		IntStream.range(0, puffers.length).forEach(i -> puffers[i].tick(time, delta, eachNotePlaying[i]));
 	}
 	
 	@Override

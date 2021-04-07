@@ -15,24 +15,37 @@ import java.util.stream.IntStream;
 import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The whistles.
+ */
 public class Whistles extends WrappedOctaveSustained {
-	Node[] bottleNodes = new Node[12];
 	
+	/**
+	 * The Whistle nodes.
+	 */
+	Node[] whistleNodes = new Node[12];
+	
+	/**
+	 * Instantiates a new Whistles.
+	 *
+	 * @param context the context
+	 * @param events  the events
+	 */
 	public Whistles(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context, events, true);
 		
 		twelfths = new Whistle[12];
 		
-		IntStream.range(0, 12).forEach(i -> bottleNodes[i] = new Node());
+		IntStream.range(0, 12).forEach(i -> whistleNodes[i] = new Node());
 		
 		for (int i = 0; i < 12; i++) {
 			twelfths[i] = new Whistle(i);
 			twelfths[i].highestLevel.setLocalTranslation(-12, 0, 0);
 			
-			bottleNodes[i].attachChild(twelfths[i].highestLevel);
-			bottleNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
-			bottleNodes[i].setLocalTranslation(0, 0.1f * i, 0);
-			instrumentNode.attachChild(bottleNodes[i]);
+			whistleNodes[i].attachChild(twelfths[i].highestLevel);
+			whistleNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
+			whistleNodes[i].setLocalTranslation(0, 0.1f * i, 0);
+			instrumentNode.attachChild(whistleNodes[i]);
 		}
 		
 		
@@ -45,9 +58,21 @@ public class Whistles extends WrappedOctaveSustained {
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(), 0));
 	}
 	
+	/**
+	 * A single Whistle.
+	 */
 	public class Whistle extends TwelfthOfOctave {
+		
+		/**
+		 * The Puffer.
+		 */
 		SteamPuffer puffer;
 		
+		/**
+		 * Instantiates a new Whistle.
+		 *
+		 * @param i the whistle index
+		 */
 		public Whistle(int i) {
 			super();
 			this.puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.WHISTLE, 1);

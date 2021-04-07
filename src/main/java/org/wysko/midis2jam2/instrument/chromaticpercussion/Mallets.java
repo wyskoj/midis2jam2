@@ -23,23 +23,39 @@ import static org.wysko.midis2jam2.instrument.piano.Keyboard.midiValueToColor;
  */
 public class Mallets extends DecayedInstrument {
 	
-	private final static double MAX_ANGLE = 50.0;
-	
-	private final static double STRIKE_SPEED = 3;
-	
+	/**
+	 * The number of bars on the mallets instrument.
+	 */
 	private final static int MALLET_BAR_COUNT = 88;
 	
+	/**
+	 * The lowest note mallets can play.
+	 */
 	private final static int RANGE_LOW = 21;
 	
+	/**
+	 * The highest note mallets can play.
+	 */
 	private final static int RANGE_HIGH = 108;
 	
-	
+	/**
+	 * The black case that contains the bars.
+	 */
 	final Spatial malletCase;
 	
+	/**
+	 * The type of mallets.
+	 */
 	final MalletType type;
 	
+	/**
+	 * Each bar of the 88.
+	 */
 	final MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
 	
+	/**
+	 * Array of lists, where each list contains the strikes corresponding to that bar's MIDI note.
+	 */
 	final List<MidiNoteOnEvent>[] barStrikes;
 	
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
@@ -88,29 +104,45 @@ public class Mallets extends DecayedInstrument {
 		super.tick(time, delta);
 		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
 			bars[i].tick(delta);
-			Stick.StickStatus stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta, barStrikes[i], STRIKE_SPEED, MAX_ANGLE);
+			Stick.StickStatus stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta, barStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 			if (stickStatus.justStruck()) {
 				bars[i].recoilBar();
 			}
-			bars[i].shadow.setLocalScale((float) ((1 - (Math.toDegrees(stickStatus.getRotationAngle()) / MAX_ANGLE)) / 2f));
+			bars[i].shadow.setLocalScale((float) ((1 - (Math.toDegrees(stickStatus.getRotationAngle()) / Stick.MAX_ANGLE)) / 2f));
 		}
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-//		offsetNode.setLocalTranslation(-50, 26.5f + (2 * (indexForMoving() - 1)), 0);
 		int i1 = indexForMoving() - 2;
 		instrumentNode.setLocalTranslation(-50, 26.5f + (2 * i1), 0);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
-//		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * (indexForMoving() - 1), 0));
 	}
 	
+	/**
+	 * The type of mallets.
+	 */
 	public enum MalletType {
+		/**
+		 * The vibraphone.
+		 */
 		VIBES("VibesBar.bmp"),
+		/**
+		 * The marimba.
+		 */
 		MARIMBA("MarimbaBar.bmp"),
+		/**
+		 * The glockenspiel.
+		 */
 		GLOCKENSPIEL("GlockenspielBar.bmp"),
+		/**
+		 * The xylophone.
+		 */
 		XYLOPHONE("XylophoneBar.bmp");
 		
+		/**
+		 * The texture file of this type of mallet.
+		 */
 		final String textureFile;
 		
 		MalletType(String textureFile) {
@@ -118,23 +150,54 @@ public class Mallets extends DecayedInstrument {
 		}
 	}
 	
+	/**
+	 * A single bar out of the 88 for the mallets.
+	 */
 	public class MalletBar {
+		
+		/**
+		 * The model in the up position.
+		 */
 		final Spatial upBar;
 		
+		/**
+		 * The model in the down position.
+		 */
 		final Spatial downBar;
 		
+		/**
+		 * The mallet that hits this bar.
+		 */
 		final Spatial mallet;
 		
+		/**
+		 * Contains the entire note geometry.
+		 */
 		final Node noteNode = new Node();
 		
+		/**
+		 * Contains the bar.
+		 */
 		final Node barNode = new Node();
 		
+		/**
+		 * Contains the mallet.
+		 */
 		final Node malletNode = new Node();
 		
+		/**
+		 * The small, circular shadow that appears as the mallet is striking.
+		 */
 		final Spatial shadow;
 		
+		/**
+		 * True if the bar is recoiling, false otherwise.
+		 */
 		boolean barIsRecoiling = false;
 		
+		/**
+		 * True if the bar should begin recoiling.
+		 */
 		boolean recoilNow = false;
 		
 		public MalletBar(int midiNote, int startPos) {
@@ -182,11 +245,19 @@ public class Mallets extends DecayedInstrument {
 			shadow.setLocalScale(0);
 		}
 		
+		/**
+		 * Begins recoiling the bar.
+		 */
 		public void recoilBar() {
 			barIsRecoiling = true;
 			recoilNow = true;
 		}
 		
+		/**
+		 * Animates the mallet and the bar.
+		 *
+		 * @param delta the amount of time since the last frame update
+		 */
 		public void tick(float delta) {
 			if (barIsRecoiling) {
 				upBar.setCullHint(Spatial.CullHint.Always);

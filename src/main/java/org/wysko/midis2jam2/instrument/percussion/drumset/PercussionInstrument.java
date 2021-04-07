@@ -15,15 +15,34 @@ import java.util.List;
  * Anything on the percussion channel. This excludes melodic agogos, woodblocks, etc.
  */
 public abstract class PercussionInstrument extends Instrument {
+	
+	/**
+	 * The rate at which an instrument recoils.
+	 */
 	public static final float DRUM_RECOIL_COMEBACK = 22;
 	
+	/**
+	 * The High level node.
+	 */
 	final Node highLevelNode = new Node(); // TODO this needs to go bye-bye
 	
+	/**
+	 * The Recoil node.
+	 */
 	final Node recoilNode = new Node();
 	
+	/**
+	 * The hits.
+	 */
 	final List<MidiNoteOnEvent> hits;
 	
 	
+	/**
+	 * Instantiates a new Percussion instrument.
+	 *
+	 * @param context the context
+	 * @param hits    the hits
+	 */
 	protected PercussionInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context);
 		this.hits = hits;
@@ -43,14 +62,22 @@ public abstract class PercussionInstrument extends Instrument {
 		return FastMath.sqrt(x) / 11.26942767f;
 	}
 	
-	public static void recoilDrum(Spatial drum, boolean push, int velocity, float delta) {
+	/**
+	 * Animates a drum recoiling. Call this method on every frame to ensure animation is handled.
+	 *
+	 * @param drum     the drum
+	 * @param struck   true if the drum should go down, false otherwise
+	 * @param velocity the velocity of the strike
+	 * @param delta    the amount of time since the last frame update
+	 */
+	public static void recoilDrum(Spatial drum, boolean struck, int velocity, float delta) {
 		Vector3f localTranslation = drum.getLocalTranslation();
 		if (localTranslation.y < -0.0001) {
 			drum.setLocalTranslation(0, Math.min(0, localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
 		} else {
 			drum.setLocalTranslation(0, 0, 0);
 		}
-		if (push) {
+		if (struck) {
 			drum.setLocalTranslation(0, (float) (velocityRecoilDampening(velocity) * StickDrum.RECOIL_DISTANCE), 0);
 		}
 	}

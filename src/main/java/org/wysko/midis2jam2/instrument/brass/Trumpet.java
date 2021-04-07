@@ -6,12 +6,13 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.AnimatedKeyCloneByBooleans;
+import org.wysko.midis2jam2.instrument.AnimatedKeyCloneByIntegers;
 import org.wysko.midis2jam2.instrument.Axis;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
+import org.wysko.midis2jam2.instrument.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -21,51 +22,19 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class Trumpet extends MonophonicInstrument {
 	
-	private static final HashMap<Integer, Boolean[]> KEY_MAPPING = new HashMap<Integer, Boolean[]>() {{
-		put(52, new Boolean[] {true, true, true});
-		put(53, new Boolean[] {true, false, true});
-		put(54, new Boolean[] {false, true, true});
-		put(55, new Boolean[] {true, true, false});
-		put(56, new Boolean[] {true, false, false});
-		put(57, new Boolean[] {false, true, false});
-		put(58, new Boolean[] {false, false, false});
-		put(59, new Boolean[] {true, true, true});
-		put(60, new Boolean[] {true, false, true});
-		put(61, new Boolean[] {false, true, true});
-		put(62, new Boolean[] {true, true, false});
-		put(63, new Boolean[] {true, false, false});
-		put(64, new Boolean[] {false, true, false});
-		put(65, new Boolean[] {false, false, false});
-		put(66, new Boolean[] {false, true, true});
-		put(67, new Boolean[] {true, true, false});
-		put(68, new Boolean[] {true, false, false,});
-		put(69, new Boolean[] {false, true, false,});
-		put(70, new Boolean[] {false, false, false,});
-		put(71, new Boolean[] {true, true, false,});
-		put(72, new Boolean[] {true, false, false,});
-		put(73, new Boolean[] {false, true, false,});
-		put(74, new Boolean[] {false, false, false,});
-		put(75, new Boolean[] {true, false, false,});
-		put(76, new Boolean[] {false, true, false,});
-		put(77, new Boolean[] {false, false, false,});
-		put(78, new Boolean[] {false, true, true,});
-		put(79, new Boolean[] {true, true, false,});
-		put(80, new Boolean[] {true, false, false,});
-		put(81, new Boolean[] {false, true, false,});
-		put(82, new Boolean[] {false, false, false,});
-	}};
+	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(Trumpet.class);
 	
 	public Trumpet(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
 	               TrumpetType type) throws ReflectiveOperationException {
 		super(
 				context,
 				eventList,
-				type == TrumpetType.NORMAL ? TrumpetClone.class : MutedTrumpetClone.class
+				type == TrumpetType.NORMAL ? TrumpetClone.class : MutedTrumpetClone.class,
+				FINGERING_MANAGER
 		);
 		
 		groupOfPolyphony.setLocalTranslation(-36.5f, 60, 10);
 		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
-		
 	}
 	
 	@Override
@@ -73,15 +42,25 @@ public class Trumpet extends MonophonicInstrument {
 		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
 	}
 	
+	/**
+	 * The type of trumpet.
+	 */
 	public enum TrumpetType {
+		/**
+		 * The normal, open trumpet.
+		 */
 		NORMAL,
-		MUTED;
+		
+		/**
+		 * The muted trumpet.
+		 */
+		MUTED
 	}
 	
-	public class TrumpetClone extends AnimatedKeyCloneByBooleans {
+	public class TrumpetClone extends AnimatedKeyCloneByIntegers {
 		
 		public TrumpetClone() {
-			super(Trumpet.this, 0.15f, 0.9f, KEY_MAPPING, 3, Axis.Z, Axis.X);
+			super(Trumpet.this, 0.15f, 0.9f, 3, Axis.Z, Axis.X);
 			
 			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			Material material = new Material(context.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
@@ -108,10 +87,10 @@ public class Trumpet extends MonophonicInstrument {
 		}
 		
 		@Override
-		protected void animateKeys(@NotNull Boolean[] pressed) {
-			/* Trumpet keys move down when pressed */
+		protected void animateKeys(@NotNull Integer[] pressed) {
 			for (int i = 0; i < 3; i++) {
-				if (pressed[i]) {
+				int finalI = i;
+				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
 					keys[i].setLocalTranslation(0, -0.5f, 0);
 				} else {
 					keys[i].setLocalTranslation(0, 0, 0);
@@ -127,6 +106,7 @@ public class Trumpet extends MonophonicInstrument {
 	}
 	
 	public class MutedTrumpetClone extends TrumpetClone {
+		
 		public MutedTrumpetClone() {
 			super();
 			this.bell.attachChild(context.loadModel("TrumpetMute.obj", "RubberFoot.bmp"));

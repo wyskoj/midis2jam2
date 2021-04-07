@@ -11,9 +11,22 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Cowbell.
+ */
 public class Cowbell extends NonDrumSetPercussion {
+	
+	/**
+	 * The stick node.
+	 */
 	private final Node stickNode = new Node();
 	
+	/**
+	 * Instantiates a new Cowbell.
+	 *
+	 * @param context the context
+	 * @param hits    the hits
+	 */
 	protected Cowbell(Midis2jam2 context,
 	                  List<MidiNoteOnEvent> hits) {
 		super(context, hits);
@@ -33,7 +46,6 @@ public class Cowbell extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		Stick.StickStatus stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
-//		PercussionInstrument.recoilDrum();
-		recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().velocity : 0, delta);
+		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().velocity : 0, delta);
 	}
 }

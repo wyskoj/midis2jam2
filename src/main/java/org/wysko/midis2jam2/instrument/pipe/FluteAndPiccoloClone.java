@@ -2,10 +2,22 @@ package org.wysko.midis2jam2.instrument.pipe;
 
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.pipe.Flute.FluteClone;
+import org.wysko.midis2jam2.instrument.pipe.Piccolo.PiccoloClone;
 import org.wysko.midis2jam2.particle.SteamPuffer;
 
+/**
+ * Contains shared code between the {@link FluteClone} and {@link PiccoloClone}
+ */
 public class FluteAndPiccoloClone extends PuffingClone {
 	
+	/**
+	 * Instantiates a new flute/piccolo clone.
+	 *
+	 * @param parent    the parent
+	 * @param puffType  the puff type
+	 * @param puffScale the puff scale
+	 */
 	public FluteAndPiccoloClone(HandedInstrument parent,
 	                            SteamPuffer.SteamPuffType puffType,
 	                            float puffScale) {
@@ -13,7 +25,6 @@ public class FluteAndPiccoloClone extends PuffingClone {
 		super(parent, 0, puffType, puffScale);
 		
 	}
-	
 	
 	/**
 	 * Loads the left and right hands for flute and piccolo.

@@ -3,20 +3,25 @@ package org.wysko.midis2jam2.instrument.pipe;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.HandPositionFingeringManager;
 import org.wysko.midis2jam2.instrument.HandedClone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Ocarina.
+ */
 public class Ocarina extends HandedInstrument {
 	
+	
 	/**
-	 * Constructs an ocarina.
+	 * Instantiates a new Ocarina.
 	 *
-	 * @param context context to midis2jam2
+	 * @param context the context
+	 * @param events  the events
 	 */
 	public Ocarina(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		super(context,
@@ -30,14 +35,23 @@ public class Ocarina extends HandedInstrument {
 		
 	}
 	
-	static class OcarinaHandGenerator extends HashMap<Integer, HandedClone.Hands> {
+	/**
+	 * The ocarina hand positions are from 0 to 11 and wrap around the octave. So this is easily calculable and
+	 * doesn't need to be stored in XML.
+	 */
+	static class OcarinaHandGenerator extends HandPositionFingeringManager {
+		
 		@Override
-		public HandedClone.Hands get(Object key) {
-			return new HandedClone.Hands(0, ((int) key + 3) % 12);
+		public Hands fingering(int midiNote) {
+			return new Hands(0, (midiNote + 3) % 12);
 		}
 	}
 	
+	/**
+	 * A single ocarina.
+	 */
 	public class OcarinaClone extends HandedClone {
+		
 		public OcarinaClone() {
 			super(Ocarina.this, 0);
 			Spatial ocarina = context.loadModel("Ocarina.obj", "Ocarina.bmp");

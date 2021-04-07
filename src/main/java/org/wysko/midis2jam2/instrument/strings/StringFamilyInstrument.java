@@ -39,6 +39,19 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	 */
 	boolean bowGoesLeft = false;
 	
+	/**
+	 * Instantiates a new String family instrument.
+	 *
+	 * @param context             the context
+	 * @param events              the events
+	 * @param showBow             true if the bow should be seen, false otherwise
+	 * @param bowRotation         the bow rotation
+	 * @param bowScale            the bow scale
+	 * @param openStringMidiNotes the midi notes of each string in open position
+	 * @param rangeLow            the lowest note that can be played
+	 * @param rangeHigh           the highest note that can be played
+	 * @param body                the body of the instrument
+	 */
 	protected StringFamilyInstrument(Midis2jam2 context,
 	                                 List<MidiChannelSpecificEvent> events,
 	                                 boolean showBow,

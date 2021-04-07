@@ -17,10 +17,19 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Gunshot.
+ */
 public class Gunshot extends DecayedInstrument {
 	
+	/**
+	 * The Pistols.
+	 */
 	Pistol[] pistols = new Pistol[12];
 	
+	/**
+	 * The Gun nodes.
+	 */
 	Node[] gunNodes = new Node[12];
 	
 	/**
@@ -63,14 +72,29 @@ public class Gunshot extends DecayedInstrument {
 		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-70 + 20 * indexForMoving()), 0));
 	}
 	
+	/**
+	 * A single pistol.
+	 */
 	public class Pistol extends TwelveDrumOctave.TwelfthOfOctaveDecayed {
 		
+		/**
+		 * The blast effect.
+		 */
 		private final Spatial blast;
 		
+		/**
+		 * Has this pistol fired once?
+		 */
 		private boolean firedOnce = false;
 		
+		/**
+		 * The scale of the blast.
+		 */
 		private float scale = 0;
 		
+		/**
+		 * Instantiates a new Pistol.
+		 */
 		public Pistol() {
 			Spatial pistol = context.loadModel("Pistol.obj", "PistolSkin.png");
 			blast = context.shadow("Assets/PistolBlast.fbx", "Assets/Explosion.png");
@@ -109,6 +133,9 @@ public class Gunshot extends DecayedInstrument {
 			}
 		}
 		
+		/**
+		 * Fire the pistol.
+		 */
 		public void fire() {
 			animNode.setLocalTranslation(0, 0, -5);
 			animNode.setLocalRotation(new Quaternion().fromAngles(rad(-30), 0, 0));

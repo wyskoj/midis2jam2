@@ -15,11 +15,27 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Harp.
+ */
 public class Harp extends SustainedInstrument {
+	
+	/**
+	 * The harp strings.
+	 */
 	final HarpString[] strings = new HarpString[47];
 	
+	/**
+	 * The notes to play.
+	 */
 	private final List<MidiNoteEvent> notes;
 	
+	/**
+	 * Instantiates a new Harp.
+	 *
+	 * @param context   the context
+	 * @param eventList the event list
+	 */
 	public Harp(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		this.notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
@@ -106,17 +122,41 @@ public class Harp extends SustainedInstrument {
 		offsetNode.setLocalTranslation(14.7f * indexForMoving(), 0, 10.3f * indexForMoving());
 	}
 	
+	/**
+	 * A single harp string.
+	 */
 	private class HarpString {
+		
+		/**
+		 * The idle string.
+		 */
 		final Spatial string;
 		
+		/**
+		 * The Vibrating strings.
+		 */
 		final Spatial[] vibratingStrings = new Spatial[5];
 		
+		/**
+		 * The String node.
+		 */
 		final Node stringNode = new Node();
 		
+		/**
+		 * True if this string is vibrating, false otherwise.
+		 */
 		boolean vibrating = false;
 		
+		/**
+		 * The current frame of animation.
+		 */
 		private double frame = 0;
 		
+		/**
+		 * Instantiates a new Harp string.
+		 *
+		 * @param i the string index
+		 */
 		public HarpString(int i) {
 			String t;
 			String vt;
@@ -142,8 +182,14 @@ public class Harp extends SustainedInstrument {
 			stringNode.setLocalTranslation(0, 2.1444f + 0.8777f * i, -2.27f + (0.75651f * -i));
 			float scale = (float) ((2.44816E-4 * Math.pow(i, 2)) + (-0.02866 * i) + 0.97509);
 			stringNode.setLocalScale(1, scale, 1);
+			// TODO Use vibrating string animator
 		}
 		
+		/**
+		 * Update animation and notes.
+		 *
+		 * @param delta the amount of time since the last frame update
+		 */
 		public void tick(float delta) {
 			final double inc = delta / (1 / 60f);
 			this.frame += inc;
@@ -166,10 +212,16 @@ public class Harp extends SustainedInstrument {
 			
 		}
 		
+		/**
+		 * Begin playing this string.
+		 */
 		public void beginPlaying() {
 			vibrating = true;
 		}
 		
+		/**
+		 * End playing this string.
+		 */
 		public void endPlaying() {
 			vibrating = false;
 		}

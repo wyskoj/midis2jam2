@@ -32,9 +32,15 @@ public abstract class Instrument {
 	@NotNull
 	public final Midis2jam2 context;
 	
+	/**
+	 * The Offset node.
+	 */
 	@NotNull
 	public final Node offsetNode = new Node();
 	
+	/**
+	 * The Highest level.
+	 */
 	@NotNull
 	public final Node highestLevel = new Node();
 	

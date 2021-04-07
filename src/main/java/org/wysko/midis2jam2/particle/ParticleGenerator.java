@@ -4,6 +4,7 @@ package org.wysko.midis2jam2.particle;
  * Generates particles.
  */
 public interface ParticleGenerator {
+	
 	/**
 	 * Updates the animation of this generator.
 	 *

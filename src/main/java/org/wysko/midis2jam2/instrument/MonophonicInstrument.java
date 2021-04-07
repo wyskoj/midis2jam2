@@ -2,6 +2,7 @@ package org.wysko.midis2jam2.instrument;
 
 import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
@@ -33,6 +34,9 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	@NotNull
 	public List<Clone> clones;
 	
+	@Nullable
+	public FingeringManager<?> manager;
+	
 	/**
 	 * Constructs a monophonic instrument.
 	 *
@@ -41,7 +45,8 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	 */
 	public MonophonicInstrument(@NotNull Midis2jam2 context,
 	                            @NotNull List<MidiChannelSpecificEvent> eventList,
-	                            @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
+	                            @NotNull Class<? extends Clone> cloneClass,
+	                            @Nullable FingeringManager<?> manager) throws ReflectiveOperationException {
 		super(context, eventList);
 		this.clones = calculateClones(this, cloneClass);
 		
@@ -50,6 +55,7 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 		}
 		
 		this.instrumentNode.attachChild(groupOfPolyphony);
+		this.manager = manager;
 	}
 	
 	/**
@@ -115,7 +121,5 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		updateClones(time, delta);
-		
-		
 	}
 }

@@ -12,13 +12,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A drum that is hit at different spots to represent the notse in an octave.
+ */
 public abstract class OneDrumOctave extends DecayedInstrument {
 	
+	/**
+	 * The Anim node.
+	 */
 	protected Node animNode = new Node();
 	
+	/**
+	 * The Mallet nodes.
+	 */
 	@NotNull
 	protected Node[] malletNodes;
 	
+	/**
+	 * The Mallet strikes.
+	 */
 	protected List<MidiNoteOnEvent>[] malletStrikes;
 	
 	/**

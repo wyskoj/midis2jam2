@@ -14,6 +14,9 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Taiko drum.
+ */
 public class TaikoDrum extends OneDrumOctave {
 	
 	/**

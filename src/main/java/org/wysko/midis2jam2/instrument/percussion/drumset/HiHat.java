@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The hi-hat.
+ */
 public class HiHat extends SingleStickInstrument {
 	
 	private final static int WOBBLE_SPEED = 10;
@@ -21,18 +24,36 @@ public class HiHat extends SingleStickInstrument {
 	
 	private final static double AMPLITUDE = 0.25;
 	
-	final List<MidiNoteOnEvent> hitsToStrike;
+	/**
+	 * The list of NoteOn events that the stick needs to worry about (closed and open).
+	 */
+	private final List<MidiNoteOnEvent> hitsToStrike;
 	
-	final Node topCymbal = new Node();
+	/**
+	 * The Top cymbal.
+	 */
+	private final Node topCymbal = new Node();
 	
-	final Node bottomCymbal = new Node();
+	/**
+	 * The Whole hat.
+	 */
+	private final Node wholeHat = new Node();
 	
-	final Node wholeHat = new Node();
-	
+	/**
+	 * The cymbal animator.
+	 */
 	private final CymbalAnimator animator;
 	
+	/**
+	 * The current animation time.
+	 */
 	private double animTime;
 	
+	/**
+	 * The current status of the hi-hat.
+	 *
+	 * @see HiHatStatus
+	 */
 	private HiHatStatus status = HiHatStatus.CLOSED;
 	
 	protected HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
@@ -46,6 +67,7 @@ public class HiHat extends SingleStickInstrument {
 		
 		topCymbal.setLocalTranslation(0, 1.2f, 0);
 		topCymbal.attachChild(topCymbalModel);
+		Node bottomCymbal = new Node();
 		bottomCymbal.attachChild(bottomCymbalModel);
 		wholeHat.attachChild(topCymbal);
 		wholeHat.attachChild(bottomCymbal);
@@ -93,8 +115,18 @@ public class HiHat extends SingleStickInstrument {
 		}
 	}
 	
+	/**
+	 * The status of the hi-hat.
+	 */
 	private enum HiHatStatus {
+		/**
+		 * The hat is closed, meaning the top cymbal and bottom cymbal are together.
+		 */
 		CLOSED,
+		
+		/**
+		 * The hat is open, meaning the top cymbal is raised.
+		 */
 		OPEN
 	}
 }

@@ -5,7 +5,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 /**
- * A key is any key on a keyed instrument.
+ * Any key on a keyed instrument.
  *
  * @see KeyedInstrument
  */
@@ -36,6 +36,11 @@ public abstract class Key {
 	 */
 	protected boolean beingPressed = false;
 	
+	/**
+	 * Instantiates a new Key.
+	 *
+	 * @param midiNote the midi note
+	 */
 	public Key(int midiNote) {
 		this.midiNote = midiNote;
 	}
@@ -52,6 +57,11 @@ public abstract class Key {
 		this.beingPressed = beingPressed;
 	}
 	
+	/**
+	 * Animates the motion of the key.
+	 *
+	 * @param delta the amount of time since the last frame update
+	 */
 	public void tick(float delta) {
 		if (beingPressed) {
 			keyNode.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));

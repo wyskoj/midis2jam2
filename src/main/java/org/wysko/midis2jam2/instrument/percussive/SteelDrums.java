@@ -12,6 +12,9 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The Steel drums.
+ */
 public class SteelDrums extends OneDrumOctave {
 	
 	

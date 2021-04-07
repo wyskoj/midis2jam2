@@ -4,7 +4,6 @@ import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * Instruments that have separate geometry for up keys and down keys.
@@ -29,15 +28,6 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	protected final int keyCount;
 	
 	/**
-	 * The key mapping.
-	 * <p>
-	 * The key is the MIDI note and the value is an array of indices relating to the {@link Spatial}s in
-	 * {@link #keysUp} and {@link #keysDown}.
-	 */
-	@NotNull
-	protected final Map<Integer, Integer[]> keyMap;
-	
-	/**
 	 * Instantiates a new Up and down key clone.
 	 *
 	 * @param keyCount the key count
@@ -45,12 +35,10 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	public UpAndDownKeyClone(int keyCount,
 	                         @NotNull MonophonicInstrument parent,
 	                         float rotationFactor,
-	                         float stretchFactor,
-	                         @NotNull Map<Integer, Integer[]> keyMap) {
+	                         float stretchFactor) {
 		
 		super(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X);
 		this.keyCount = keyCount;
-		this.keyMap = keyMap;
 		
 		keysUp = new Spatial[keyCount];
 		keysDown = new Spatial[keyCount];
@@ -65,7 +53,8 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	 * @param midiNote the MIDI note
 	 */
 	protected void pushOrReleaseKeys(int midiNote) {
-		Integer[] keysToGoDown = keyMap.get(midiNote);
+		assert parent.manager != null;
+		Integer[] keysToGoDown = (Integer[]) parent.manager.fingering(midiNote);
 		
 		if (keysToGoDown == null) { // A note outside of the range of the instrument
 			keysToGoDown = new Integer[0];

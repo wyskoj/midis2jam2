@@ -22,7 +22,7 @@ public class FretHeightByTable implements FretHeightCalculator {
 	}
 	
 	@Override
-	public float scale(int fret) {
+	public float calculateScale(int fret) {
 		return lookupTable.get(fret);
 	}
 }

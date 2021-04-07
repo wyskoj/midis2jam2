@@ -7,6 +7,7 @@ import java.util.List;
  * MIDI files are composed of up to 65535 tracks.
  */
 public class MidiTrack {
+	
 	/**
 	 * The events in this track.
 	 */

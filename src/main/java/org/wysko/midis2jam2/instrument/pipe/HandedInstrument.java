@@ -3,24 +3,31 @@ package org.wysko.midis2jam2.instrument.pipe;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Clone;
-import org.wysko.midis2jam2.instrument.HandedClone;
+import org.wysko.midis2jam2.instrument.HandPositionFingeringManager;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Any instrument that animates using hands.
+ */
 public abstract class HandedInstrument extends MonophonicInstrument {
 	
-	@NotNull
-	public Map<Integer, HandedClone.Hands> handMap;
-	
+	/**
+	 * Instantiates a new Handed instrument.
+	 *
+	 * @param context   the context
+	 * @param eventList the event list
+	 * @param clazz     the class of the clone
+	 * @param manager   the fingering manager
+	 * @throws ReflectiveOperationException if clone constructor errors
+	 */
 	public HandedInstrument(@NotNull Midis2jam2 context,
 	                        @NotNull List<MidiChannelSpecificEvent> eventList,
 	                        @NotNull Class<? extends Clone> clazz,
-	                        @NotNull Map<Integer, HandedClone.Hands> handMap) throws ReflectiveOperationException {
-		super(context, eventList, clazz);
-		this.handMap = handMap;
+	                        @NotNull HandPositionFingeringManager manager) throws ReflectiveOperationException {
+		super(context, eventList, clazz, manager);
 	}
 	
 	@Override

@@ -10,15 +10,17 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * Section brass.
+ */
 public class StageHorns extends WrappedOctaveSustained {
-	
-	// Horns are 1.5 deg apart
-	// First 16 left from center
 	
 	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5f, -152.65f);
 	
+	/**
+	 * Contains each horn.
+	 */
 	final Node[] hornNodes = new Node[12];
-	
 	
 	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList, false);
@@ -42,10 +44,13 @@ public class StageHorns extends WrappedOctaveSustained {
 					new Vector3f(0, 0, -5).mult(indexForMoving())
 			));
 		}
-//		offsetNode.setLocalTranslation(-1.378f * indexForMoving(), 0, 4.806f * indexForMoving());
 	}
 	
+	/**
+	 * A single horn.
+	 */
 	public class StageHornNote extends BouncyTwelfth {
+		
 		public StageHornNote() {
 			super();
 			// Load horn

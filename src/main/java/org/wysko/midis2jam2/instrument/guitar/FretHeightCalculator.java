@@ -11,5 +11,5 @@ public interface FretHeightCalculator {
 	 * @param fret the fret
 	 * @return the scale of the strings
 	 */
-	float scale(int fret);
+	float calculateScale(int fret);
 }
