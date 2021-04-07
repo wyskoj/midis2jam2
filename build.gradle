@@ -19,7 +19,7 @@ repositories {
 }
 
 application {
-    mainClass.set('org.wysko.midis2jam2.Midis2jam2')
+    mainClassName = 'org.wysko.midis2jam2.Midis2jam2'
 }
 
 dependencies {
