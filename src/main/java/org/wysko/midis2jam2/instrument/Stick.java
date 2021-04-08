@@ -13,7 +13,7 @@ import java.util.List;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
- * The Stick.
+ * Handles behavior for drum sticks.
  */
 public class Stick {
 	

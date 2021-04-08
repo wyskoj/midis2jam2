@@ -8,12 +8,15 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.debug.WireBox;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Contract;
@@ -21,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.brass.*;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
+import org.wysko.midis2jam2.instrument.chromaticpercussion.MusicBox;
 import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.ensemble.PizzicatoStrings;
 import org.wysko.midis2jam2.instrument.ensemble.StageChoir;
@@ -50,46 +54,99 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.io.File;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.logging.Level.SEVERE;
+import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
+	/**
+	 * When true, midis2jam2 will load the default internal Java MIDI synthesizer, even if an external device is set.
+	 */
 	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
 	
 	public static Midis2jam2 context;
 	
+	/**
+	 * Video offset to account for synthesis audio delay.
+	 */
 	static long LATENCY_FIX = 250;
 	
+	/**
+	 * The list of instruments.
+	 */
 	public final List<Instrument> instruments = new ArrayList<>();
 	
+	/**
+	 * The list of guitar shadows.
+	 */
 	final List<Spatial> guitarShadows = new ArrayList<>();
 	
+	/**
+	 * The list of bass guitar shadows.
+	 */
 	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
 	
+	/**
+	 * The list of harp shadows
+	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
 	
+	/**
+	 * The list of mallet shadows.
+	 */
 	private final List<Spatial> malletShadows = new ArrayList<>();
 	
+	/**
+	 * The MIDI file.
+	 */
 	public MidiFile file;
 	
+	/**
+	 * 3D text for debugging.
+	 */
 	public BitmapText debugText;
 	
+	/**
+	 * The bitmap font.
+	 */
 	public BitmapFont bitmapFont;
 	
+	/**
+	 * The MIDI sequencer.
+	 */
 	Sequencer sequencer;
 	
+	/**
+	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback)
+	 * since the MIDI began playback
+	 */
 	double timeSinceStart = -2;
 	
+	/**
+	 * True if {@link #sequencer} has begun playing, false otherwise.
+	 */
 	boolean seqHasRunOnce = false;
 	
+	/**
+	 * The current camera position.
+	 */
+	Camera currentCamera = CAMERA_1A;
+	
+	/**
+	 * The piano stand.
+	 */
 	private Spatial pianoStand;
 	
+	/**
+	 * The mallet stand.
+	 */
 	private Spatial malletStand;
 	
+	/**
+	 * The keyboard shadow.
+	 */
 	private Spatial keyboardShadow;
 	
 	public static void main(String[] args) throws Exception {
@@ -112,7 +169,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 //		settings.setFullscreen(true);
-		settings.setResolution(1920, 1920 / 2);
+		settings.setResolution(1024, 768);
 		settings.setResizable(true);
 		settings.setSamples(4);
 		
@@ -200,8 +257,21 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		updateShadowsAndStands();
-
 //		showAll(rootNode);
+	}
+	
+	public Geometry boundingBox(Spatial spatial) {
+		if (spatial == null) {
+			return null;
+		}
+		Geometry boundingVolume = WireBox.makeGeometry((com.jme3.bounding.BoundingBox) spatial.getWorldBound());
+		Material material = new Material(getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		material.setColor("Color", ColorRGBA.Blue);
+		boundingVolume.setMaterial(material);
+		boundingVolume.setLocalTranslation(spatial.getLocalTranslation());
+		boundingVolume.setLocalRotation(spatial.getLocalRotation());
+		boundingVolume.setLocalScale(spatial.getLocalScale());
+		return boundingVolume;
 	}
 	
 	private void showAll(Node rootNode) {
@@ -248,13 +318,13 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (i < harpVisibleCount) harpShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
 			else harpShadows.get(i).setCullHint(Spatial.CullHint.Always);
 		}
-		
-		long malletVisibleCount =
-				instruments.stream().filter(instrument -> instrument instanceof Mallets && instrument.visible).count();
-		for (int i = 0; i < malletShadows.size(); i++) {
-			if (i < malletVisibleCount) malletShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
-			else malletShadows.get(i).setCullHint(Spatial.CullHint.Always);
-		}
+//
+//		long malletVisibleCount =
+//				instruments.stream().filter(instrument -> instrument instanceof Mallets && instrument.visible).count();
+//		for (int i = 0; i < malletShadows.size(); i++) {
+//			if (i < malletVisibleCount) malletShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
+//			else malletShadows.get(i).setCullHint(Spatial.CullHint.Always);
+//		}
 	}
 	
 	/**
@@ -384,6 +454,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				return new TubularBells(this, events);
 			case 9: // Glockenspiel
 				return new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
+			case 10: // Music Box
+				return new MusicBox(this, events);
 			case 11: // Vibraphone
 				return new Mallets(this, events, Mallets.MalletType.VIBES);
 			case 12: // Marimba
@@ -535,7 +607,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 	}
 	
-	
 	@Override
 	public void simpleInitApp() {
 		
@@ -544,7 +615,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		flyCam.setEnabled(true);
 		flyCam.setDragToRotate(true);
 		setupKeys();
-		setCamera(Camera.CAMERA_1A);
+		setCamera(CAMERA_1A);
 		setDisplayStatView(false);
 		setDisplayFps(false);
 		
@@ -553,7 +624,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		initDebugText();
 		
-		
 		try {
 			calculateInstruments();
 		} catch (ReflectiveOperationException e) {
@@ -561,6 +631,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		addShadowsAndStands();
+
+//		for (Instrument instrument : instruments) {
+//			Sphere sphere = new Sphere(10, 10, 5);
+//			Geometry geom = new Geometry("sphere", sphere);
+//			Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+//			mat.setColor("Color", ColorRGBA.Blue);
+//			geom.setMaterial(mat);
+//			instrument.instrumentNode.attachChild(geom);
+//		}
 		
 		new Timer(true).scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -654,7 +733,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			shadow.setLocalScale(0.6667f);
 			malletShadows.add(shadow);
 			mallets.get(i).instrumentNode.attachChild(shadow);
-//			shadow.setLocalTranslation(-50, 0.5f + 0.1f * i, 0);
 			shadow.setLocalTranslation(0, -22 - 2 * i, 0);
 		}
 	}
@@ -670,7 +748,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		shadow.setMaterial(material);
 		return shadow;
 	}
-	
 	
 	/**
 	 * Loads a model given a model and texture paths. Applies unshaded material.
@@ -732,11 +809,23 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	private void setupKeys() {
 		inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
 		
-		inputManager.addMapping(Camera.CAMERA_1A.name(), new KeyTrigger(KeyInput.KEY_1));
-		inputManager.addListener(this, Camera.CAMERA_1A.name());
+		inputManager.addMapping("cam1", new KeyTrigger(KeyInput.KEY_1));
+		inputManager.addListener(this, "cam1");
 		
-		inputManager.addMapping(Camera.CAMERA_5.name(), new KeyTrigger(KeyInput.KEY_5));
-		inputManager.addListener(this, Camera.CAMERA_5.name());
+		inputManager.addMapping("cam2", new KeyTrigger(KeyInput.KEY_2));
+		inputManager.addListener(this, "cam2");
+		
+		inputManager.addMapping("cam3", new KeyTrigger(KeyInput.KEY_3));
+		inputManager.addListener(this, "cam3");
+		
+		inputManager.addMapping("cam4", new KeyTrigger(KeyInput.KEY_4));
+		inputManager.addListener(this, "cam4");
+		
+		inputManager.addMapping("cam5", new KeyTrigger(KeyInput.KEY_5));
+		inputManager.addListener(this, "cam5");
+		
+		inputManager.addMapping("cam6", new KeyTrigger(KeyInput.KEY_6));
+		inputManager.addListener(this, "cam6");
 		
 		inputManager.addMapping("slow", new KeyTrigger(KeyInput.KEY_LCONTROL));
 		inputManager.addListener(this, "slow");
@@ -761,17 +850,43 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
 		this.flyCam.setMoveSpeed(name.equals("slow") && isPressed ? 10 : 100);
-		if (isPressed) {
+		if (name.equals("exit")) {
+			if (sequencer.isOpen())
+				sequencer.stop();
+			System.exit(0);
+		}
+		if (isPressed && name.startsWith("cam")) {
+			System.out.println("name = " + name);
 			try {
-				Camera camera = Camera.valueOf(name);
+				switch (name) {
+					case "cam1":
+						if (currentCamera == CAMERA_1A) {
+							currentCamera = CAMERA_1B;
+						} else if (currentCamera == CAMERA_1B) {
+							currentCamera = CAMERA_1C;
+						} else {
+							currentCamera = CAMERA_1A;
+						}
+						break;
+					case "cam2":
+						currentCamera = currentCamera == CAMERA_2A ? CAMERA_2B : CAMERA_2A;
+						break;
+					case "cam3":
+						currentCamera = currentCamera == CAMERA_3A ? CAMERA_3B : CAMERA_3A;
+						break;
+					case "cam4":
+						currentCamera = currentCamera == CAMERA_4A ? CAMERA_4B : CAMERA_4A;
+						break;
+					case "cam5":
+						currentCamera = CAMERA_5;
+						break;
+					case "cam6":
+						currentCamera = CAMERA_6;
+						break;
+				}
+				Camera camera = valueOf(currentCamera.name());
 				setCamera(camera);
 			} catch (IllegalArgumentException ignored) {
-				if (name.equals("exit")) {
-					if (sequencer.isOpen())
-						sequencer.stop();
-					System.exit(0);
-				}
-				
 			}
 		}
 	}
@@ -786,8 +901,17 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * Defines angles for cameras.
 	 */
 	enum Camera {
-		CAMERA_1A(-2, 92, 134, rad(90) - rad(71.56f), rad(180), 0),
-		CAMERA_5(5, 432, 24, rad(90 - 7.125f), rad(180), 0);
+		CAMERA_1A(-2, 92, 134, rad(90 - 71.56f), rad(180), 0),
+		CAMERA_1B(60, 92, 124, rad(90 - 71.5), rad(180 + 24.4), 0),
+		CAMERA_1C(-59.5f, 90.8f, 94.4f, rad(90 - 66.1), rad(180 - 26.4), 0),
+		CAMERA_2A(0, 71.8f, 44.5f, rad(90 - 74.3), rad(180 + 44.9), 0),
+		CAMERA_2B(-35, 76.4f, 33.6f, rad(90 - 34.2), rad(180 + 18.5), 0),
+		CAMERA_3A(-0.2f, 61.6f, 38.6f, rad(90 - 74.5), rad(180), 0),
+		CAMERA_3B(-19.6f, 78.7f, 3.8f, rad(90 - 62.3), rad(180 - 16.2), 0),
+		CAMERA_4A(0.2f, 81.1f, 32.2f, rad(90 - 69), rad(180 - 48.2), rad(-0.5)),
+		CAMERA_4B(35, 25.4f, -19, rad(90 - 140), rad(180 - 61), rad(-2.5)),
+		CAMERA_5(5, 432, 24, rad(90 - 7.125f), rad(180), 0),
+		CAMERA_6(17, 30.5f, 42.9f, rad(90 - 96.7), rad(180 - 35.7), 0);
 		
 		final Vector3f location;
 		
