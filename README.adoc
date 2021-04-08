@@ -13,7 +13,7 @@ $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2
 $ gradlew shadowjar
 ----
-Copy the `.jar` from `build/libs` and `Midicsv.exe` to a new folder. Then run the program.
+Copy the `.jar` from `build/libs` and `Midicsv.exe` to a new folder.Then run the program.
 
 ----
 $ java -jar midis2jam2.jar your_midi_file.mid
@@ -21,40 +21,70 @@ $ java -jar midis2jam2.jar your_midi_file.mid
 
 == FAQ
 
-=== How do I change the soundfont?
+=== Program questions
 
-midis2jam2 does not handle the playback of MIDI files, unless a preferred MIDI synth is not active on your machine (the program reverts to the internal Java MIDI synth). For Windows, I recommend  https://coolsoft.altervista.org/en/virtualmidisynth[VirtualMIDISynth]. The preferred MIDI synth device can be adjusted by editing https://github.com/wyskoj/midis2jam2/blob/master/src/main/java/org/wysko/midis2jam2/Midis2jam2.java#L133[the main class] and rebuilding.
+==== _Something is broken!!1_
+
+Check the issues page and make sure there isn't already a relevant issue open.
+If there isn't, create an issue and use the bug report template.
+
+==== How do I change the soundfont?
+
+midis2jam2 does not handle the playback of MIDI files, unless a preferred MIDI synth is not active on your machine (the program reverts to the internal Java MIDI synth).
+For Windows, I recommend  https://coolsoft.altervista.org/en/virtualmidisynth[VirtualMIDISynth].
+The preferred MIDI synth device can be adjusted by editing https://github.com/wyskoj/midis2jam2/blob/master/src/main/java/org/wysko/midis2jam2/Midis2jam2.java#L133[the main class] and rebuilding.
 
 In the future, this process will be simpler.
 
-=== I'm on MacOS/Linux and I can't run `midicsv.exe`.
+==== Why doesn't instrument _X_ appear?
+
+It's likely I haven't implemented it yet.
+Check link:implementation.adoc[this page] for more information.
+
+=== Building issues
+
+==== I'm on MacOS/Linux so `midicsv.exe` won't work.
 
 If you can use `apt`, run
+
 ----
 $ sudo apt install midicsv
 ----
+
 If you can use `brew`, run
+
 ----
 $ brew install midicsv
 ----
+
+Or if you use some other package manager, try installing `midicsv` through that.
+
 Otherwise, download and extract https://www.fourmilab.ch/webtools/midicsv/midicsv-1.1.tar.gz[the source], then run
+
 ----
 $ make
 ----
+
 Then copy `midicsv` to the same folder where you execute the `.jar` file.
 
-For either method, ensure https://github.com/wyskoj/midis2jam2/blob/master/src/main/java/org/wysko/midis2jam2/midi/MidiFile.java#L51[this line] is prepended with a `./` if `midicsv` is a file (manual build), otherwise nothing (`apt` or `brew`).
+For either method, ensure https://github.com/wyskoj/midis2jam2/blob/master/src/main/java/org/wysko/midis2jam2/midi/MidiFile.java#L51[this line] is prepended with a `./` if `midicsv` is a file (manual build), otherwise nothing (`apt`, `brew`, etc.).
 
-=== I'm trying to download the source but I see `'git' is not recognized as an internal or external command` or `git: command not found`
+==== I'm trying to download the source but I see `'git' is not recognized as an internal or external command` or `git: command not found`
 
-Simply https://gist.github.com/derhuerst/1b15ff4652a867391f03[install Git]. 
+Simply https://gist.github.com/derhuerst/1b15ff4652a867391f03[install Git].
+
+==== I'm getting `Could not find tools.jar`
+
+Ensure that you have https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html[JDK 1.8] installed and configured as your default JDK.
 
 == Contributing
 
-Fork and make a pull request to directly make changes. Open an issue to request features and report bugs. Please ensure you use a template, or ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
+Fork and make a pull request to directly make changes.
+Open an issue to request features and report bugs.
+Please ensure you use a template, or ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
 
 == License
 
 * midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
-* Assets Copyright &copy; 2007 Scott Haag.
+* Assets Copyright &copy; 2007 Scott Haag (used with permission).
 * https://github.com/wyskoj/midis2jam2/tree/master/testmidi[Test MIDI files] Copyright &copy; various authors.
