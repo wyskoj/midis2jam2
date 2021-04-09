@@ -165,17 +165,23 @@ public class MidiFile {
 	}
 	
 	/**
-	 * Given a MIDI tick, returns the tick as expressed in seconds, calculated by the tempo map of this MIDI file.
+	 * Given a MIDI tick, returns the tick as expressed in seconds, calculated by the tempo map of this MIDI file. If
+	 * the MIDI tick value is negative, the method uses the first tempo and extrapolates backwards.
 	 *
 	 * @param midiTick the MIDI tick to convert to seconds
 	 * @return the tick as expressed in seconds
 	 */
 	public double midiTickInSeconds(long midiTick) {
 		List<MidiTempoEvent> temposToConsider = new ArrayList<>();
-		for (MidiTempoEvent tempo : tempos) {
-			if (tempo.time <= midiTick) {
-				temposToConsider.add(tempo);
+		if (midiTick >= 0) {
+			for (MidiTempoEvent tempo : tempos) {
+				if (tempo.time <= midiTick) {
+					temposToConsider.add(tempo);
+				}
 			}
+		} else {
+			temposToConsider.add(tempos.get(0));
+			
 		}
 		if (temposToConsider.size() == 1) {
 			return ((double) midiTick / division) * (60 / (6E7 / temposToConsider.get(0).number));

@@ -8,6 +8,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.percussion.Congas;
+import org.wysko.midis2jam2.instrument.percussion.Timbales;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -105,6 +106,9 @@ public class Percussion extends Instrument {
 		
 		instruments.add(new Cowbell(context,
 				noteOnEvents.stream().filter(e -> e.note == 56).collect(Collectors.toList())));
+		
+		instruments.add(new Timbales(context,
+				noteOnEvents.stream().filter(e -> e.note == 65 || e.note == 66).collect(Collectors.toList())));
 		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {
