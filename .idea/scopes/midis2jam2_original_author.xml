@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="midis2jam2 original author" pattern="(file[midis2jam2.main]:resources/instrument_mapping.xml&amp;&amp;!file[midis2jam2.main]:resources/Assets//*||file[midis2jam2.main]:java//*)&amp;&amp;!file[midis2jam2.main]:java/org/wysko/midis2jam2/FastNoiseLite.java" />
+</component>

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2021 Jacob Wysko
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see https://www.gnu.org/licenses/.
+ */
+
 package org.wysko.midis2jam2;
 
 import com.jme3.app.SimpleApplication;
@@ -22,30 +39,30 @@ import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.brass.*;
-import org.wysko.midis2jam2.instrument.chromaticpercussion.Mallets;
-import org.wysko.midis2jam2.instrument.chromaticpercussion.MusicBox;
-import org.wysko.midis2jam2.instrument.chromaticpercussion.TubularBells;
-import org.wysko.midis2jam2.instrument.ensemble.PizzicatoStrings;
-import org.wysko.midis2jam2.instrument.ensemble.StageChoir;
-import org.wysko.midis2jam2.instrument.ensemble.StageStrings;
-import org.wysko.midis2jam2.instrument.ensemble.Timpani;
-import org.wysko.midis2jam2.instrument.guitar.BassGuitar;
-import org.wysko.midis2jam2.instrument.guitar.Guitar;
-import org.wysko.midis2jam2.instrument.organ.Accordion;
-import org.wysko.midis2jam2.instrument.organ.Harmonica;
-import org.wysko.midis2jam2.instrument.percussion.drumset.Percussion;
-import org.wysko.midis2jam2.instrument.percussive.*;
-import org.wysko.midis2jam2.instrument.piano.Keyboard;
-import org.wysko.midis2jam2.instrument.pipe.*;
-import org.wysko.midis2jam2.instrument.reed.sax.AltoSax;
-import org.wysko.midis2jam2.instrument.reed.sax.BaritoneSax;
-import org.wysko.midis2jam2.instrument.reed.sax.SopranoSax;
-import org.wysko.midis2jam2.instrument.reed.sax.TenorSax;
-import org.wysko.midis2jam2.instrument.soundeffects.Gunshot;
-import org.wysko.midis2jam2.instrument.soundeffects.Helicopter;
-import org.wysko.midis2jam2.instrument.soundeffects.TelephoneRing;
-import org.wysko.midis2jam2.instrument.strings.*;
+import org.wysko.midis2jam2.instrument.family.brass.*;
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox;
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells;
+import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings;
+import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir;
+import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings;
+import org.wysko.midis2jam2.instrument.family.ensemble.Timpani;
+import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar;
+import org.wysko.midis2jam2.instrument.family.guitar.Guitar;
+import org.wysko.midis2jam2.instrument.family.organ.Accordion;
+import org.wysko.midis2jam2.instrument.family.organ.Harmonica;
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.Percussion;
+import org.wysko.midis2jam2.instrument.family.percussive.*;
+import org.wysko.midis2jam2.instrument.family.piano.Keyboard;
+import org.wysko.midis2jam2.instrument.family.pipe.*;
+import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax;
+import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax;
+import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax;
+import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax;
+import org.wysko.midis2jam2.instrument.family.soundeffects.Gunshot;
+import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter;
+import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
+import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.MidiDevice;
@@ -92,12 +109,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * The list of harp shadows
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
-	
-	/**
-	 * The list of mallet shadows.
-	 */
-	private final List<Spatial> malletShadows = new ArrayList<>();
-	
+
 	/**
 	 * The MIDI file.
 	 */
@@ -318,13 +330,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (i < harpVisibleCount) harpShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
 			else harpShadows.get(i).setCullHint(Spatial.CullHint.Always);
 		}
-//
-//		long malletVisibleCount =
-//				instruments.stream().filter(instrument -> instrument instanceof Mallets && instrument.visible).count();
-//		for (int i = 0; i < malletShadows.size(); i++) {
-//			if (i < malletVisibleCount) malletShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
-//			else malletShadows.get(i).setCullHint(Spatial.CullHint.Always);
-//		}
 	}
 	
 	/**
@@ -631,15 +636,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		}
 		
 		addShadowsAndStands();
-
-//		for (Instrument instrument : instruments) {
-//			Sphere sphere = new Sphere(10, 10, 5);
-//			Geometry geom = new Geometry("sphere", sphere);
-//			Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-//			mat.setColor("Color", ColorRGBA.Blue);
-//			geom.setMaterial(mat);
-//			instrument.instrumentNode.attachChild(geom);
-//		}
 		
 		new Timer(true).scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -663,11 +659,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 				}
 			}
 		}, 0, 1);
-
-//		NiftyJmeDisplay niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
-//		Nifty nifty = niftyDisplay.getNifty();
-//		nifty.fromXml("Interface/test.xml", "start");
-//		guiViewPort.addProcessor(niftyDisplay);
 	}
 	
 	private void initDebugText() {
@@ -731,7 +722,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		for (int i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Mallets).count(); i++) {
 			Spatial shadow = shadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
 			shadow.setLocalScale(0.6667f);
-			malletShadows.add(shadow);
 			mallets.get(i).instrumentNode.attachChild(shadow);
 			shadow.setLocalTranslation(0, -22 - 2 * i, 0);
 		}

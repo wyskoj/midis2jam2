@@ -26,7 +26,7 @@ Check this page to see the progress of each instrument's implementation.
 |===
 |*Bass*|*Strings*|*Ensemble*|*Brass*
 |_33_ Acoustic Bass✔️|_41_ Violin✔️|_49_ String Ensemble 1✔️|_57_ Trumpet✔️
-|_34_ Electric Bass (finger)✔️|_42_ Viola✔️|_50_ String Ensemble 2✔️|_58_ Trombone✔️
+|_34_ Electric Bass (finger)✔️|_42_ Viola✔️|_50_ String Ensemble 2✔️|_58_ Trombone⚙️
 |_35_ Electric Bass (pick)✔️|_43_ Cello✔️|_51_ Synth Strings 1✔️|_59_ Tuba✔️
 |_36_ Fretless Bass✔️|_44_ Contrabass✔️|_52_ Synth Strings 2✔️|_60_ Muted Trumpet✔️
 |_37_ Slap Bass 1✔️|_45_ Tremolo Strings✔️|_53_ Choir Aahs✔️|_61_ French Horn✔️
@@ -65,7 +65,7 @@ Check this page to see the progress of each instrument's implementation.
 |27 High Q❌|35 Acoustic Bass Drum✔️|43 High Floor Tom✔️|51 Ride Cymbal 1✔️
 |28 Slap❌|36 Electric Bass Drum✔️|44 Pedal Hi-hat✔️|52 Chinese Cymbal✔️
 |29 Scratch Push❌|37 Side Stick❌|45 Low Tom✔️|53 Ride Bell❌
-|30 Scratch Pull❌|38 Acoustic Snare✔️|46 Open Hi-hat✔️|54 Tambourine❌
+|30 Scratch Pull❌|38 Acoustic Snare✔️|46 Open Hi-hat✔️|54 Tambourine✔️
 |31 Sticks❌|39 Hand Clap❌|47 Low-Mid Tom✔️|55 Splash Cymbal✔️
 |32 Square Click❌|40 Electric Snare✔️|48 Hi-Mid Tom✔️|56 Cowbell✔️
 |33 Metronome Click❌|41 Low Floor Tom✔️|49 Crash Cymbal 1✔️|57 Crash Cymbal 2✔️
