@@ -36,6 +36,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.WireBox;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
+import org.apache.commons.cli.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.instrument.Instrument;
@@ -63,14 +64,14 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.Gunshot;
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter;
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
+import org.wysko.midis2jam2.midi.MidiEvent;
 import org.wysko.midis2jam2.midi.*;
 
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
+import javax.sound.midi.*;
 import java.io.File;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -78,17 +79,17 @@ import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	
-	/**
-	 * When true, midis2jam2 will load the default internal Java MIDI synthesizer, even if an external device is set.
-	 */
-	private static final boolean USE_DEFAULT_SYNTHESIZER = false;
-	
-	public static Midis2jam2 context;
+	public final static Logger LOGGER = Logger.getLogger("org.wysko.midis2jam2");
 	
 	/**
 	 * Video offset to account for synthesis audio delay.
 	 */
 	static long LATENCY_FIX = 250;
+	
+	/**
+	 * When true, midis2jam2 will load the default internal Java MIDI synthesizer, even if an external device is set.
+	 */
+	private static boolean useDefaultSynthesizer = false;
 	
 	/**
 	 * The list of instruments.
@@ -109,7 +110,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 * The list of harp shadows
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
-
+	
 	/**
 	 * The MIDI file.
 	 */
@@ -130,11 +131,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 */
 	Sequencer sequencer;
 	
-	/**
-	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback)
-	 * since the MIDI began playback
-	 */
-	double timeSinceStart = -2;
+	private static Receiver receiver;
 	
 	/**
 	 * True if {@link #sequencer} has begun playing, false otherwise.
@@ -161,27 +158,56 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	 */
 	private Spatial keyboardShadow;
 	
+	/**
+	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
+	 * the MIDI began playback
+	 */
+	double timeSinceStart = -2;
+	
 	public static void main(String[] args) throws Exception {
-		
 		Midis2jam2 midijam = new Midis2jam2();
-		context = midijam;
+		Logger.getLogger("com.jme3").setLevel(Level.SEVERE);
+		LOGGER.setLevel(Level.ALL);
 		
-		File rawFile = null;
+		Options options = new Options();
 		
-		if (args.length > 0) {
-			rawFile = new File(args[0]);
-		} else {
-			System.err.println("You did not specify a midi file!");
+		Option midiFileInput = new Option("i", "midi", true, "Path to MIDI file");
+		midiFileInput.setRequired(true);
+		options.addOption(midiFileInput);
+		
+		Option midiDevice = new Option("d", "device", true, "MIDI playback device name");
+		midiDevice.setRequired(false);
+		options.addOption(midiDevice);
+		
+		Option overrideInternalSynth = new Option("s", "internal-synth", false, "Force use of internal Java MIDI synth");
+		options.addOption(overrideInternalSynth);
+		
+		CommandLineParser parser = new DefaultParser();
+		HelpFormatter formatter = new HelpFormatter();
+		CommandLine cmd = null;
+		
+		try {
+			cmd = parser.parse(options, args);
+		} catch (ParseException e) {
+			System.err.println(e.getMessage());
+			formatter.printHelp("midis2jam2", options);
 			System.exit(1);
 		}
 		
-		midijam.file = MidiFile.readMidiFile(rawFile);
+		useDefaultSynthesizer = cmd.hasOption('s');
+		
+		String midiFilePath = cmd.getOptionValue("midi");
+		String midiDeviceName = cmd.getOptionValue("device");
+		
+		File midiFile = new File(midiFilePath);
+		midijam.file = MidiFile.readMidiFile(midiFile);
 		
 		AppSettings settings = new AppSettings(true);
+		
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 //		settings.setFullscreen(true);
-		settings.setResolution(1024, 768);
+		settings.setResolution(1900, 1900 / 2);
 		settings.setResizable(true);
 		settings.setSamples(4);
 		
@@ -193,42 +219,45 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		// Define settings
 		
 		// Create a sequencer for the sequence
-		Sequence sequence = MidiSystem.getSequence(rawFile);
+		Sequence sequence = MidiSystem.getSequence(midiFile);
 		
 		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
 		MidiDevice device = null;
 		MidiDevice backup = null;
+		
 		for (MidiDevice.Info eachInfo : info) {
-			System.out.println("eachInfo = " + eachInfo);
-			if (eachInfo.getName().equals("VirtualMIDISynth #1")) {
-				device = MidiSystem.getMidiDevice(eachInfo);
-				break;
+			LOGGER.info("MIDI Device = " + eachInfo.getName());
+			if (midiDeviceName != null) {
+				if (eachInfo.getName().equals(midiDeviceName)) {
+					device = MidiSystem.getMidiDevice(eachInfo);
+				}
 			}
+			
 			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
 				backup = MidiSystem.getMidiDevice(eachInfo);
-				break;
 			}
+			
 		}
 		
 		midijam.sequencer = MidiSystem.getSequencer(false);
-		if ((device == null && backup == null) || USE_DEFAULT_SYNTHESIZER) {
+		if ((device == null && backup == null) || useDefaultSynthesizer) {
 			midijam.sequencer = MidiSystem.getSequencer(true);
-			System.out.println("using the backup of the backup");
+			receiver = midijam.sequencer.getReceiver();
 			LATENCY_FIX = 0;
 		} else {
 			if (device == null) {
-				System.out.println("using backup");
 				LATENCY_FIX = 100;
 				device = backup;
 			}
 			device.open();
 			midijam.sequencer = MidiSystem.getSequencer(false);
-			midijam.sequencer.getTransmitter().setReceiver(device.getReceiver());
+			receiver = device.getReceiver();
+			midijam.sequencer.getTransmitter().setReceiver(receiver);
 		}
 		
 		midijam.sequencer.open();
 		midijam.sequencer.setSequence(sequence);
-		
+	
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> midijam.sequencer.stop()));
 	}
 	
@@ -430,8 +459,8 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	}
 	
 	/**
-	 * Given a program event and list of events, returns a new instrument of the correct type containing the
-	 * specified events. Follows the GM-1 standard.
+	 * Given a program event and list of events, returns a new instrument of the correct type containing the specified
+	 * events. Follows the GM-1 standard.
 	 *
 	 * @param programEvent the program event, from which the program number is used
 	 * @param events       the list of events to apply to this instrument
@@ -619,12 +648,15 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		flyCam.setZoomSpeed(10);
 		flyCam.setEnabled(true);
 		flyCam.setDragToRotate(true);
+		
 		setupKeys();
 		setCamera(CAMERA_1A);
 		setDisplayStatView(false);
 		setDisplayFps(false);
 		
+		
 		Spatial stage = loadModel("Stage.obj", "Stage.bmp", MatType.UNSHADED, 0.9f);
+		
 		rootNode.attachChild(stage);
 		
 		initDebugText();
@@ -723,7 +755,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			Spatial shadow = shadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
 			shadow.setLocalScale(0.6667f);
 			mallets.get(i).instrumentNode.attachChild(shadow);
-			shadow.setLocalTranslation(0, -22 - 2 * i, 0);
+			shadow.setLocalTranslation(0, -22, 0);
 		}
 	}
 	

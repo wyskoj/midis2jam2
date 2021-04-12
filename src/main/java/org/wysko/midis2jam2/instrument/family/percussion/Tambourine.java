@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion;
 
+import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -62,17 +63,27 @@ public class Tambourine extends NonDrumSetPercussion {
 		super(context, hits);
 		this.hits = hits;
 		
-		Spatial tambourineHand = context.loadModel("hand_tambourine.obj", "hands.bmp");
+		Spatial tambourineHand = context.loadModel("hand_tambourine.fbx", "hands.bmp");
+		
+		/* Set tambourine materials */
+		Material tambourineWoodMat = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		tambourineWoodMat.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/TambourineWood.bmp"));
+		((Node) tambourineHand).getChild(2).setMaterial(tambourineWoodMat);
+		
+		Material metalTexture = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		metalTexture.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/MetalTexture.bmp"));
+		((Node) tambourineHand).getChild(1).setMaterial(metalTexture);
+		
 		tambourineHand.setLocalTranslation(0, 0, -2);
 		tambourineHandNode.attachChild(tambourineHand);
 		
 		Spatial hand = context.loadModel("hand_right.obj", "hands.bmp");
 		hand.setLocalTranslation(0, 0, -2);
-		hand.setLocalRotation(new Quaternion().fromAngles(0,0,PI));
+		hand.setLocalRotation(new Quaternion().fromAngles(0, 0, PI));
 		emptyHandNode.attachChild(hand);
 		
-		instrumentNode.setLocalTranslation(12,42.3f,-48.4f);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(90),rad(-90),0));
+		instrumentNode.setLocalTranslation(12, 42.3f, -48.4f);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(90), rad(-70), 0));
 		
 		instrumentNode.attachChild(tambourineHandNode);
 		instrumentNode.attachChild(emptyHandNode);

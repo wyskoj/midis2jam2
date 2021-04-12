@@ -24,6 +24,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.family.percussion.Bongos;
 import org.wysko.midis2jam2.instrument.family.percussion.Congas;
 import org.wysko.midis2jam2.instrument.family.percussion.Tambourine;
 import org.wysko.midis2jam2.instrument.family.percussion.Timbales;
@@ -127,6 +128,9 @@ public class Percussion extends Instrument {
 		
 		instruments.add(new Timbales(context,
 				noteOnEvents.stream().filter(e -> e.note == 65 || e.note == 66).collect(Collectors.toList())));
+		
+		instruments.add(new Bongos(context,
+				noteOnEvents.stream().filter(e -> e.note == 61 || e.note == 60).collect(Collectors.toList())));
 		
 		instruments.add(new Tambourine(context,
 				noteOnEvents.stream().filter(e -> e.note == 54).collect(Collectors.toList())));

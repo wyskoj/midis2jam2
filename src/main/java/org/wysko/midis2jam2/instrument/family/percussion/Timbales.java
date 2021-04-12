@@ -51,12 +51,12 @@ public class Timbales extends NonDrumSetPercussion {
 	private final Node lowStickNode = new Node();
 	
 	/**
-	 * The Left conga anim node.
+	 * The Left timbale anim node.
 	 */
 	private final Node lowTimbaleAnimNode = new Node();
 	
 	/**
-	 * The Right conga anim node.
+	 * The Right timbale anim node.
 	 */
 	private final Node highTimbaleAnimNode = new Node();
 	
