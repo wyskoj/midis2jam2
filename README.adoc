@@ -9,9 +9,7 @@ Future versions may add extended features, such as custom graphics, real-time MI
 == Running
 
 To begin, download a build from the https://www.midis2jam2.xyz/builds/[builds page].
-
-Move `midis2jam2-xxxxxxxx.jar`, as well as https://www.fourmilab.ch/webtools/midicsv/midicsv-1.1.zip[midicsv.exe] to a new folder.
-If you are not on Windows, follow link:#unix_instructions[these steps] to ensure midicsv is working.
+Move `midis2jam2-xxxxxxxx.jar` to a new folder.
 
 To run midis2jam2, you need to specify command line arguments that specify the playback device and MIDI file path.
 If you just want to specify the MIDI file and let midis2jam2 determine the best MIDI synth for your machine, run
@@ -58,34 +56,34 @@ In the future, this process will be simpler.
 It's likely I haven't implemented it yet.
 Check link:implementation.adoc[this page] for more information.
 
-=== Building issues
-
-[#unix_instructions]
-==== I'm on macOS/Linux so `midicsv.exe` won't work.
-
-If you can use `apt`, run
-
-----
-$ sudo apt install midicsv
-----
-
-If you can use `brew`, run
-
-----
-$ brew install midicsv
-----
-
-Or if you use some other package manager, try installing `midicsv` through that.
-
-Otherwise, download and extract https://www.fourmilab.ch/webtools/midicsv/midicsv-1.1.tar.gz[the source], then run
-
-----
-$ make
-----
-
-Then copy `midicsv` to the same folder where you execute the `.jar` file.
-
-For either method, ensure link:src/main/java/org/wysko/midis2jam2/midi/MidiFile.java[the midicsv exec string] is prepended with a `./` if `midicsv` is a file (manual build), otherwise nothing (`apt`, `brew`, etc.).
+//=== Building issues
+//
+//[#unix_instructions]
+//==== I'm on macOS/Linux so `midicsv.exe` won't work.
+//
+//If you can use `apt`, run
+//
+//----
+//$ sudo apt install midicsv
+//----
+//
+//If you can use `brew`, run
+//
+//----
+//$ brew install midicsv
+//----
+//
+//Or if you use some other package manager, try installing `midicsv` through that.
+//
+//Otherwise, download and extract https://www.fourmilab.ch/webtools/midicsv/midicsv-1.1.tar.gz[the source], then run
+//
+//----
+//$ make
+//----
+//
+//Then copy `midicsv` to the same folder where you execute the `.jar` file.
+//
+//For either method, ensure link:src/main/java/org/wysko/midis2jam2/midi/MidiFile.java[the midicsv exec string] is prepended with a `./` if `midicsv` is a file (manual build), otherwise nothing (`apt`, `brew`, etc.).
 
 ==== I'm trying to download the source, but I see `'git' is not recognized as an internal or external command` or `git: command not found`
 
