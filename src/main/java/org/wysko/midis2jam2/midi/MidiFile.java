@@ -21,9 +21,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -63,9 +61,15 @@ public class MidiFile {
 		// Run midicsv
 		String[] midiCsvArgs;
 		if (System.getProperty("os.name").startsWith("Windows")) {
-			midiCsvArgs = new String[] {"midicsv.exe", midiFile.getAbsolutePath(), "midi.csv"};
+			InputStream input = MidiFile.class.getResourceAsStream("/Midicsv.exe");
+			FileOutputStream output = new FileOutputStream("Midicsv.exe");
+			extractFileFromJar(input, output);
+			midiCsvArgs = new String[]{"midicsv.exe", midiFile.getAbsolutePath(), "midi.csv"};
 		} else {
-			midiCsvArgs = new String[] {"midicsv", midiFile.getAbsolutePath(), "midi.csv"};
+			InputStream input = MidiFile.class.getResourceAsStream("/midicsv");
+			FileOutputStream output = new FileOutputStream("midicsv");
+			extractFileFromJar(input, output);
+			midiCsvArgs = new String[]{"./midicsv", midiFile.getAbsolutePath(), "midi.csv"};
 		}
 		
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
@@ -136,6 +140,17 @@ public class MidiFile {
 		}
 		file.calculateTempoMap();
 		return file;
+	}
+	
+	private static void extractFileFromJar(InputStream input, FileOutputStream output) throws IOException {
+		byte[] buffer = new byte[4096];
+		int bytesRead = input.read(buffer);
+		while (bytesRead != -1) {
+			output.write(buffer, 0, bytesRead);
+			bytesRead = input.read(buffer);
+		}
+		output.close();
+		input.close();
 	}
 	
 	/**

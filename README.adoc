@@ -8,15 +8,10 @@ Future versions may add extended features, such as custom graphics, real-time MI
 
 == Running
 
-Download and build from source.
+To begin, download a build from the https://www.midis2jam2.xyz/builds/[builds page].
 
-----
-$ git clone https://github.com/wyskoj/midis2jam2
-$ cd midis2jam2
-$ gradlew shadowjar
-----
-
-Copy the `.jar` from `build/libs` and `Midicsv.exe` to a new folder.
+Move `midis2jam2-xxxxxxxx.jar`, as well as https://www.fourmilab.ch/webtools/midicsv/midicsv-1.1.zip[midicsv.exe] to a new folder.
+If you are not on Windows, follow link:#unix_instructions[these steps] to ensure midicsv is working.
 
 To run midis2jam2, you need to specify command line arguments that specify the playback device and MIDI file path.
 If you just want to specify the MIDI file and let midis2jam2 determine the best MIDI synth for your machine, run
@@ -65,6 +60,7 @@ Check link:implementation.adoc[this page] for more information.
 
 === Building issues
 
+[#unix_instructions]
 ==== I'm on macOS/Linux so `midicsv.exe` won't work.
 
 If you can use `apt`, run
