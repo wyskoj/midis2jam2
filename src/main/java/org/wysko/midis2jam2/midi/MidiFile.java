@@ -70,6 +70,7 @@ public class MidiFile {
 			FileOutputStream output = new FileOutputStream("midicsv");
 			extractFileFromJar(input, output);
 			midiCsvArgs = new String[]{"./midicsv", midiFile.getAbsolutePath(), "midi.csv"};
+			new ProcessBuilder(new String[]{"chmod", "u+x", "midicsv"}).start().waitFor();
 		}
 		
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
