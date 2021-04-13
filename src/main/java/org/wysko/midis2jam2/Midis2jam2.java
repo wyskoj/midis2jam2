@@ -171,10 +171,6 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		
 		Options options = new Options();
 		
-		Option midiFileInput = new Option("i", "midi", true, "Path to MIDI file");
-		midiFileInput.setRequired(true);
-		options.addOption(midiFileInput);
-		
 		Option midiDevice = new Option("d", "device", true, "MIDI playback device name");
 		midiDevice.setRequired(false);
 		options.addOption(midiDevice);
@@ -186,17 +182,20 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd = null;
 		
+		String midiFilePath = null;
 		try {
 			cmd = parser.parse(options, args);
+			List<String> argList = cmd.getArgList();
+			if (argList.size() == 0) throw new ParseException("");
+			midiFilePath = argList.get(0);
 		} catch (ParseException e) {
-			System.err.println(e.getMessage());
-			formatter.printHelp("midis2jam2", options);
+			System.out.println("usage: midis2jam2 [-d <arg>] [-s] [midifile] \n" +
+					" -d,--device <arg>     MIDI playback device name\n" +
+					" -s,--internal-synth   Force use of internal Java MIDI synth");
 			System.exit(1);
 		}
 		
 		useDefaultSynthesizer = cmd.hasOption('s');
-		
-		String midiFilePath = cmd.getOptionValue("midi");
 		String midiDeviceName = cmd.getOptionValue("device");
 		
 		File midiFile = new File(midiFilePath);
