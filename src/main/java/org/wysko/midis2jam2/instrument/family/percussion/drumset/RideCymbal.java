@@ -40,8 +40,8 @@ public class RideCymbal extends Cymbal {
 	 * @param hits    the hits
 	 * @param type    the type
 	 */
-	protected RideCymbal(Midis2jam2 context,
-	                     List<MidiNoteOnEvent> hits, Cymbal.CymbalType type) {
+	public RideCymbal(Midis2jam2 context,
+	                  List<MidiNoteOnEvent> hits, Cymbal.CymbalType type) {
 		super(context, hits, type);
 		assert type == CymbalType.RIDE_1 || type == CymbalType.RIDE_2 : "Ride cymbal type is wrong.";
 		

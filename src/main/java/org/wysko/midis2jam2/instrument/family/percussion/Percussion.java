@@ -15,7 +15,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset;
+package org.wysko.midis2jam2.instrument.family.percussion;
 
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
@@ -24,10 +24,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.family.percussion.Bongos;
-import org.wysko.midis2jam2.instrument.family.percussion.Congas;
-import org.wysko.midis2jam2.instrument.family.percussion.Tambourine;
-import org.wysko.midis2jam2.instrument.family.percussion.Timbales;
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.*;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -134,6 +131,12 @@ public class Percussion extends Instrument {
 		
 		instruments.add(new Tambourine(context,
 				noteOnEvents.stream().filter(e -> e.note == 54).collect(Collectors.toList())));
+		
+		instruments.add(new HandClap(context,
+				noteOnEvents.stream().filter(e -> e.note == 39).collect(Collectors.toList())));
+		
+		instruments.add(new Sticks(context,
+				noteOnEvents.stream().filter(e -> e.note == 31).collect(Collectors.toList())));
 		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {

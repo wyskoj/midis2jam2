@@ -44,8 +44,8 @@ public class Cowbell extends NonDrumSetPercussion {
 	 * @param context the context
 	 * @param hits    the hits
 	 */
-	protected Cowbell(Midis2jam2 context,
-	                  List<MidiNoteOnEvent> hits) {
+	public Cowbell(Midis2jam2 context,
+	               List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
 		recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));

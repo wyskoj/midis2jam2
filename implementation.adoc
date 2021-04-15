@@ -13,73 +13,73 @@ Check this page to see the progress of each instrument's implementation.
 
 |===
 |*Piano*|*Chromatic Percussion*|*Organ*|*Guitar*
-|_1_ Acoustic Grand Piano✔️|_9_ Celesta✔️|_17_ Drawbar Organ✔️|_25_ Acoustic Guitar (nylon)✔️
-|_2_ Bright Acoustic Piano✔️|_10_ Glockenspiel✔️|_18_ Percussive Organ✔️|_26_ Acoustic Guitar (steel)✔️
-|_3_ Electric Grand Piano✔️|_11_ Music Box⚙️|_19_ Rock Organ✔️|_27_ Electric Guitar (jazz)✔️
-|_4_ Honky-tonk Piano✔️|_12_ Vibraphone✔️|_20_ Church Organ✔️|_28_ Electric Guitar (clean)✔️
-|_5_ Electric Piano _1_✔️|_13_ Marimba✔️|_21_ Reed Organ✔️|_29_ Electric Guitar (muted)✔️
-|_6_ Electric Piano _2_✔️|_14_ Xylophone✔️|_22_ Accordion✔️|_30_ Overdriven Guitar✔️
-|_7_ Harpsichord✔️|_15_ Tubular Bells✔️|_23_ Harmonica✔️|_31_ Distortion Guitar✔️
-|_8_ Clavi✔️|_16_ Dulcimer✔️|_24_ Tango Accordion✔️|_32_ Guitar Harmonics✔️
+|_1_ Acoustic Grand Piano ✔️|_9_ Celesta ✔️|_17_ Drawbar Organ ✔️|_25_ Acoustic Guitar (nylon) ✔️
+|_2_ Bright Acoustic Piano ✔️|_10_ Glockenspiel ✔️|_18_ Percussive Organ ✔️|_26_ Acoustic Guitar (steel) ✔️
+|_3_ Electric Grand Piano ✔️|_11_ Music Box ❌|_19_ Rock Organ ✔️|_27_ Electric Guitar (jazz) ✔️
+|_4_ Honky-tonk Piano ✔️|_12_ Vibraphone ✔️|_20_ Church Organ ✔️|_28_ Electric Guitar (clean) ✔️
+|_5_ Electric Piano _1_ ✔️|_13_ Marimba ✔️|_21_ Reed Organ ✔️|_29_ Electric Guitar (muted) ✔️
+|_6_ Electric Piano _2_ ✔️|_14_ Xylophone ✔️|_22_ Accordion ✔️|_30_ Overdriven Guitar ✔️
+|_7_ Harpsichord ✔️|_15_ Tubular Bells ✔️|_23_ Harmonica ✔️|_31_ Distortion Guitar ✔️
+|_8_ Clavi ✔️|_16_ Dulcimer ✔️|_24_ Tango Accordion ✔️|_32_ Guitar Harmonics ✔️
 |===
 
 |===
 |*Bass*|*Strings*|*Ensemble*|*Brass*
-|_33_ Acoustic Bass✔️|_41_ Violin✔️|_49_ String Ensemble 1✔️|_57_ Trumpet✔️
-|_34_ Electric Bass (finger)✔️|_42_ Viola✔️|_50_ String Ensemble 2✔️|_58_ Trombone⚙️
-|_35_ Electric Bass (pick)✔️|_43_ Cello✔️|_51_ Synth Strings 1✔️|_59_ Tuba✔️
-|_36_ Fretless Bass✔️|_44_ Contrabass✔️|_52_ Synth Strings 2✔️|_60_ Muted Trumpet✔️
-|_37_ Slap Bass 1✔️|_45_ Tremolo Strings✔️|_53_ Choir Aahs✔️|_61_ French Horn✔️
-|_38_ Slap Bass 2✔️|_46_ Pizzicato Strings✔️|_54_ Voice Oohs✔️|_62_ Brass Section✔️
-|_39_ Synth Bass 1✔️|_47_ Orchestral Harp✔️|_55_ Synth Voice✔️|_63_ Synth Brass 1✔️
-|_40_ Synth Bass 2✔️|_48_ Timpani✔️|_56_ Orchestra Hit✔️|_64_ Synth Brass 2✔️
+|_33_ Acoustic Bass ✔️|_41_ Violin ✔️|_49_ String Ensemble 1 ✔️|_57_ Trumpet ✔️
+|_34_ Electric Bass (finger) ✔️|_42_ Viola ✔️|_50_ String Ensemble 2 ✔️|_58_ Trombone ⚙️
+|_35_ Electric Bass (pick) ✔️|_43_ Cello ✔️|_51_ Synth Strings 1 ✔️|_59_ Tuba ✔️
+|_36_ Fretless Bass ✔️|_44_ Contrabass ✔️|_52_ Synth Strings 2 ✔️|_60_ Muted Trumpet ✔️
+|_37_ Slap Bass 1 ✔️|_45_ Tremolo Strings ✔️|_53_ Choir Aahs ✔️|_61_ French Horn ✔️
+|_38_ Slap Bass 2 ✔️|_46_ Pizzicato Strings ✔️|_54_ Voice Oohs ✔️|_62_ Brass Section ✔️
+|_39_ Synth Bass 1 ✔️|_47_ Orchestral Harp ✔️|_55_ Synth Voice ✔️|_63_ Synth Brass 1 ✔️
+|_40_ Synth Bass 2 ✔️|_48_ Timpani ✔️|_56_ Orchestra Hit ✔️|_64_ Synth Brass 2 ✔️
 |===
 
 |===
 |*Reed*|*Pipe*|*Synth Lead*|*Synth Pad*
-|_65_ Soprano Sax✔️|_73_ Piccolo✔️|_81_ Lead 1 (square)✔️|_89_ Pad 1 (new age)✔️
-|_66_ Alto Sax✔️|_74_ Flute✔️|_82_ Lead 2 (sawtooth)✔️|_90_ Pad 2 (warm)✔️
-|_67_ Tenor Sax✔️|_75_ Recorder✔️|_83_ Lead 3 (calliope)✔️|_91_ Pad 3 (polysynth)✔️
-|_68_ Baritone Sax✔️|_76_ Pan Flute✔️|_84_ Lead 4 (chiff)✔️|_92_ Pad 4 (choir)✔️
-|_69_ Oboe❌|_77_ Blown bottle✔️|_85_ Lead 5 (charang)✔️|_93_ Pad 5 (bowed)✔️
-|_70_ English Horn❌|_78_ Shakuhachi❌|_86_ Lead 6 (voice)✔️|_94_ Pad 6 (metallic)✔️
-|_71_ Bassoon❌|_79_ Whistle✔️|_87_ Lead 7 (fifths)✔️|_95_ Pad 7 (halo)✔️
-|_72_ Clarinet❌|_80_ Ocarina✔️|_88_ Lead 8 (bass + lead)✔️|_96_ Pad 8 (sweep)✔️
+|_65_ Soprano Sax ✔️|_73_ Piccolo ✔️|_81_ Lead 1 (square) ✔️|_89_ Pad 1 (new age) ✔️
+|_66_ Alto Sax ✔️|_74_ Flute ✔️|_82_ Lead 2 (sawtooth) ✔️|_90_ Pad 2 (warm) ✔️
+|_67_ Tenor Sax ✔️|_75_ Recorder ✔️|_83_ Lead 3 (calliope) ✔️|_91_ Pad 3 (polysynth) ✔️
+|_68_ Baritone Sax ✔️|_76_ Pan Flute ✔️|_84_ Lead 4 (chiff) ✔️|_92_ Pad 4 (choir) ✔️
+|_69_ Oboe ❌|_77_ Blown bottle ✔️|_85_ Lead 5 (charang) ✔️|_93_ Pad 5 (bowed) ✔️
+|_70_ English Horn ❌|_78_ Shakuhachi ❌|_86_ Lead 6 (voice) ✔️|_94_ Pad 6 (metallic) ✔️
+|_71_ Bassoon ❌|_79_ Whistle ✔️|_87_ Lead 7 (fifths) ✔️|_95_ Pad 7 (halo) ✔️
+|_72_ Clarinet ❌|_80_ Ocarina ✔️|_88_ Lead 8 (bass + lead) ✔️|_96_ Pad 8 (sweep) ✔️
 |===
 
 |===
 |*Synth FX*|*Ethnic*|*Percussive*|*Sound Effects*
-|_97_ FX 1 (rain)✔️|_105_ Sitar❌|_113_ Tinkle Bell✔️|_121_ Guitar Fret Noise✔️
-|_98_ FX 2 (soundtrack)✔️|_106_ Banjo❌|_114_ Agogô✔️|_122_ Breath Noise✔️
-|_99_ FX 3 (crystal)✔️|_107_ Shamisen❌|_115_ Steel Drums✔️|_123_ Seashore❌
-|_100_ FX 4 (atmosphere)✔️|_108_ Koto❌|_116_ Woodblock✔️|_124_ Bird Tweet❌
-|_101_ FX 5 (brightness)✔️|_109_ Kalimba❌|_117_ Taiko Drum✔️|_125_ Telephone Ring✔️
-|_102_ FX 6 (goblins)✔️|_110_ Bag pipe❌|_118_ Melodic Tom✔️|_126_ Helicopter⚠️
-|_103_ FX 7 (echoes)✔️|_111_ Fiddle✔️|_119_ Synth Drum✔️|_127_ Applause✔️
-|_104_ FX 8 (sci-fi)✔️|_112_ Shanai❌|_120_ Reverse Cymbal❌|_128_ Gunshot⚠️
+|_97_ FX 1 (rain) ✔️|_105_ Sitar ❌|_113_ Tinkle Bell ✔️|_121_ Guitar Fret Noise ✔️
+|_98_ FX 2 (soundtrack) ✔️|_106_ Banjo ❌|_114_ Agogô ✔️|_122_ Breath Noise ✔️
+|_99_ FX 3 (crystal) ✔️|_107_ Shamisen ❌|_115_ Steel Drums ✔️|_123_ Seashore ❌
+|_100_ FX 4 (atmosphere) ✔️|_108_ Koto ❌|_116_ Woodblock ✔️|_124_ Bird Tweet ❌
+|_101_ FX 5 (brightness) ✔️|_109_ Kalimba ❌|_117_ Taiko Drum ✔️|_125_ Telephone Ring ✔️
+|_102_ FX 6 (goblins) ✔️|_110_ Bag pipe ❌|_118_ Melodic Tom ✔️|_126_ Helicopter ⚠️
+|_103_ FX 7 (echoes) ✔️|_111_ Fiddle ✔️|_119_ Synth Drum ✔️|_127_ Applause ✔️
+|_104_ FX 8 (sci-fi) ✔️|_112_ Shanai ❌|_120_ Reverse Cymbal ❌|_128_ Gunshot ⚠️
 |===
 
 == Percussion instruments
 
 |===
-|27 High Q❌|35 Acoustic Bass Drum✔️|43 High Floor Tom✔️|51 Ride Cymbal 1✔️
-|28 Slap❌|36 Electric Bass Drum✔️|44 Pedal Hi-hat✔️|52 Chinese Cymbal✔️
-|29 Scratch Push❌|37 Side Stick❌|45 Low Tom✔️|53 Ride Bell❌
-|30 Scratch Pull❌|38 Acoustic Snare✔️|46 Open Hi-hat✔️|54 Tambourine✔️
-|31 Sticks❌|39 Hand Clap❌|47 Low-Mid Tom✔️|55 Splash Cymbal✔️
-|32 Square Click❌|40 Electric Snare✔️|48 Hi-Mid Tom✔️|56 Cowbell✔️
-|33 Metronome Click❌|41 Low Floor Tom✔️|49 Crash Cymbal 1✔️|57 Crash Cymbal 2✔️
-|34 Metronome Bell❌|42 Closed Hi-hat✔️|50 High Tom✔️|58 Vibra Slap❌
+|27 High Q ❌|35 Acoustic Bass Drum ✔️|43 High Floor Tom ✔️|51 Ride Cymbal 1 ✔️
+|28 Slap ❌|36 Electric Bass Drum ✔️|44 Pedal Hi-hat ✔️|52 Chinese Cymbal ✔️
+|29 Scratch Push ❌|37 Side Stick ❌|45 Low Tom ✔️|53 Ride Bell ❌
+|30 Scratch Pull ❌|38 Acoustic Snare ✔️|46 Open Hi-hat ✔️|54 Tambourine ✔️
+|31 Sticks ✔️|39 Hand Clap ✔️|47 Low-Mid Tom ✔️|55 Splash Cymbal ✔️
+|32 Square Click ❌|40 Electric Snare ✔️|48 Hi-Mid Tom ✔️|56 Cowbell ✔️
+|33 Metronome Click ❌|41 Low Floor Tom ✔️|49 Crash Cymbal 1 ✔️|57 Crash Cymbal 2 ✔️
+|34 Metronome Bell ❌|42 Closed Hi-hat ✔️|50 High Tom ✔️|58 Vibra Slap ❌
 |===
 
 |===
-|59 Ride Cymbal 2❌|67 High Agogô❌|75 Claves❌|83 Jingle Bell❌
-|60 High Bongo✔️|68 Low Agogô❌|76 High Woodblock❌|84 Belltree❌
-|61 Low Bongo✔️|69 Cabasa❌|77 Low Woodblock❌|85 Castanets❌
-|62 Mute High Conga✔️|70 Maracas❌|78 Mute Cuica❌|86 Mute Surdo❌
-|63 Open High Conga✔️|71 Short Whistle❌|79 Open Cuica❌|87 Open Surdo❌
-|64 Low Conga✔️|72 Long Whistle❌|80 Mute Triangle❌|
-|65 High Timbale✔️|73 Short Guiro❌|81 Open Triangle❌|
-|66 Low Timbale✔️|74 Long Guiro❌|82 Shaker❌|
+|59 Ride Cymbal 2 ❌|67 High Agogô ❌|75 Claves ❌|83 Jingle Bell ❌
+|60 High Bongo ✔️|68 Low Agogô ❌|76 High Woodblock ❌|84 Belltree ❌
+|61 Low Bongo ✔️|69 Cabasa ❌|77 Low Woodblock ❌|85 Castanets ❌
+|62 Mute High Conga ✔️|70 Maracas ❌|78 Mute Cuica ❌|86 Mute Surdo ❌
+|63 Open High Conga ✔️|71 Short Whistle ❌|79 Open Cuica ❌|87 Open Surdo ❌
+|64 Low Conga ✔️|72 Long Whistle ❌|80 Mute Triangle ❌|
+|65 High Timbale ✔️|73 Short Guiro ❌|81 Open Triangle ❌|
+|66 Low Timbale ✔️|74 Long Guiro ❌|82 Shaker ❌|
 |===
 

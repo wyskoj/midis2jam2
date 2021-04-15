@@ -52,7 +52,7 @@ import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.family.organ.Accordion;
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.Percussion;
+import org.wysko.midis2jam2.instrument.family.percussion.Percussion;
 import org.wysko.midis2jam2.instrument.family.percussive.*;
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.family.pipe.*;

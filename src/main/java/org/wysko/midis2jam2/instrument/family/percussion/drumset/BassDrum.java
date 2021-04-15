@@ -64,7 +64,7 @@ public class BassDrum extends PercussionInstrument {
 	/**
 	 * The High level node.
 	 */
-	final Node highLevelNode = new Node();
+	public final Node highLevelNode = new Node();
 	
 	/**
 	 * The Drum node.

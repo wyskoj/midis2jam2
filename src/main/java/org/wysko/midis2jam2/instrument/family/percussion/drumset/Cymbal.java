@@ -52,8 +52,8 @@ public class Cymbal extends SingleStickInstrument {
 	 * @param hits    the hits
 	 * @param type    the type of cymbal
 	 */
-	protected Cymbal(Midis2jam2 context,
-	                 List<MidiNoteOnEvent> hits, CymbalType type) {
+	public Cymbal(Midis2jam2 context,
+	              List<MidiNoteOnEvent> hits, CymbalType type) {
 		super(context, hits);
 		
 		final Spatial cymbal = context.loadModel(type == CymbalType.CHINA ? "DrumSet_ChinaCymbal.obj" :

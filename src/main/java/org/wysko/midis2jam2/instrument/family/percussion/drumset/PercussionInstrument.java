@@ -41,7 +41,7 @@ public abstract class PercussionInstrument extends Instrument {
 	/**
 	 * The High level node.
 	 */
-	final Node highLevelNode = new Node(); // TODO this needs to go bye-bye
+	public final Node highLevelNode = new Node(); // TODO this needs to go bye-bye
 	
 	/**
 	 * The Recoil node.

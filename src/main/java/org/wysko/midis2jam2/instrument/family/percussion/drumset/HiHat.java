@@ -73,7 +73,7 @@ public class HiHat extends SingleStickInstrument {
 	 */
 	private HiHatStatus status = HiHatStatus.CLOSED;
 	
-	protected HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
+	public HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		hitsToStrike = hits.stream().filter(h -> h.note == 42 || h.note == 46).collect(Collectors.toList());
 		Spatial topCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
