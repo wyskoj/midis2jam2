@@ -73,7 +73,7 @@ Check this page to see the progress of each instrument's implementation.
 |===
 
 |===
-|59 Ride Cymbal 2 ❌|67 High Agogô ❌|75 Claves ❌|83 Jingle Bell ❌
+|59 Ride Cymbal 2 ❌|67 High Agogô ❌|75 Claves ❌|83 Jingle Bell ✔️
 |60 High Bongo ✔️|68 Low Agogô ❌|76 High Woodblock ❌|84 Belltree ❌
 |61 Low Bongo ✔️|69 Cabasa ❌|77 Low Woodblock ❌|85 Castanets ❌
 |62 Mute High Conga ✔️|70 Maracas ❌|78 Mute Cuica ❌|86 Mute Surdo ❌

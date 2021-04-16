@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.midi;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.wysko.midis2jam2.util.StreamGobbler;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -74,6 +75,12 @@ public class MidiFile {
 		}
 		
 		Process proc = new ProcessBuilder(midiCsvArgs).start();
+		
+		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
+		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
+		errorGobbler.start();
+		outputGobbler.start();
+		
 		proc.waitFor();
 		
 		// Clean up your goddamn windows-1252 characters that fucks up CSV parsing
@@ -94,8 +101,7 @@ public class MidiFile {
 		stream.close();
 		
 		// Parse CSV file
-		CSVParser parse = CSVParser.parse(new File("cleanmidi.csv"), Charset.forName("windows-1252"),
-				CSVFormat.DEFAULT);
+		CSVParser parse = CSVParser.parse(new File("cleanmidi.csv"), Charset.forName("windows-1252"), CSVFormat.DEFAULT);
 		List<CSVRecord> records = parse.getRecords();
 		
 		// Build midi from data

@@ -644,7 +644,7 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 	public void simpleInitApp() {
 		
 		flyCam.setMoveSpeed(100f);
-		flyCam.setZoomSpeed(10);
+		flyCam.setZoomSpeed(-10);
 		flyCam.setEnabled(true);
 		flyCam.setDragToRotate(true);
 		
