@@ -24,10 +24,7 @@ import org.wysko.midis2jam2.util.StreamGobbler;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -59,7 +56,7 @@ public class MidiFile {
 	 * @throws InterruptedException MIDICSV error
 	 */
 	public static MidiFile readMidiFile(File midiFile) throws IOException, InterruptedException {
-		// Run midicsv
+		// Run midicsv_x86
 		String[] midiCsvArgs;
 		if (System.getProperty("os.name").startsWith("Windows")) {
 			InputStream input = MidiFile.class.getResourceAsStream("/Midicsv.exe");
@@ -67,11 +64,19 @@ public class MidiFile {
 			extractFileFromJar(input, output);
 			midiCsvArgs = new String[]{"midicsv.exe", midiFile.getAbsolutePath(), "midi.csv"};
 		} else {
-			InputStream input = MidiFile.class.getResourceAsStream("/midicsv");
+			String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+			InputStream input;
+			
+			// I really hope this works...
+			if (arch.startsWith("x86"))
+				input = MidiFile.class.getResourceAsStream("/midicsv_x86");
+			else
+				input = MidiFile.class.getResourceAsStream("/midicsv_amd");
+			
 			FileOutputStream output = new FileOutputStream("midicsv");
 			extractFileFromJar(input, output);
-			midiCsvArgs = new String[]{"./midicsv", midiFile.getAbsolutePath(), "midi.csv"};
-			new ProcessBuilder(new String[]{"chmod", "u+x", "midicsv"}).start().waitFor();
+			midiCsvArgs = new String[]{"midicsv", midiFile.getAbsolutePath(), "midi.csv"};
+			new ProcessBuilder("chmod", "u+x", "midicsv").start().waitFor();
 		}
 		
 		Process proc = new ProcessBuilder(midiCsvArgs).start();

@@ -175,6 +175,10 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 		midiDevice.setRequired(false);
 		options.addOption(midiDevice);
 		
+		Option latency = new Option("l", "latency", true, "Latency offset for A/V sync, in ms");
+		latency.setRequired(false);
+		options.addOption(latency);
+		
 		Option overrideInternalSynth = new Option("s", "internal-synth", false, "Force use of internal Java MIDI synth");
 		options.addOption(overrideInternalSynth);
 		
@@ -189,14 +193,24 @@ public class Midis2jam2 extends SimpleApplication implements ActionListener {
 			if (argList.size() == 0) throw new ParseException("");
 			midiFilePath = argList.get(0);
 		} catch (ParseException e) {
-			System.out.println("usage: midis2jam2 [-d <arg>] [-s] [midifile] \n" +
+			System.out.println("usage: midis2jam2 [-d <arg>] [-s] [-l <arg>] [midifile] \n" +
 					" -d,--device <arg>     MIDI playback device name\n" +
-					" -s,--internal-synth   Force use of internal Java MIDI synth");
+					" -s,--internal-synth   Force use of internal Java MIDI synth\n" +
+					" -l,--latency <arg>    Latency offset for A/V sync, in ms");
 			System.exit(1);
 		}
 		
 		useDefaultSynthesizer = cmd.hasOption('s');
 		String midiDeviceName = cmd.getOptionValue("device");
+		
+		if (cmd.hasOption("l")) {
+			try {
+				LATENCY_FIX = Integer.parseInt(cmd.getOptionValue('l'));
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid latency. Reverting to defaults.");
+				e.printStackTrace();
+			}
+		}
 		
 		File midiFile = new File(midiFilePath);
 		midijam.file = MidiFile.readMidiFile(midiFile);
