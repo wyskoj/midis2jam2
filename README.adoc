@@ -54,13 +54,8 @@ Copy this to a new folder and run it as mentioned above.
 
 == FAQ & Troubleshooting
 
-=== The program keeps playing after I've closed the window.
+=== The program closed, but all the notes are sustaining.
 
-The problem is that the AWT display is closing, but it's not stopping the threads that are keeping the MIDI sequencer alive.
-I haven't figured out how to fix this problem yet.
-
-However, you can halt execution of the program by pressing `CTRL+C` in the terminal, or simply close it.
-Be aware that any synths that are not the internal Java MIDI synth and Microsoft GS Wavetable Synth will likely have notes stuck on when you halt the program.
 Press the MIDI panic button on your synthesizer to stop the sound.
 
 === The audio is out of sync with the video.
