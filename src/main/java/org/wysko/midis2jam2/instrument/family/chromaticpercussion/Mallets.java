@@ -73,7 +73,7 @@ public class Mallets extends DecayedInstrument {
 	/**
 	 * Array of lists, where each list contains the strikes corresponding to that bar's MIDI note.
 	 */
-	final List<MidiNoteOnEvent>[] barStrikes;
+	final List<List<MidiNoteOnEvent>> barStrikes;
 	
 	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
 	               MalletType type) {
@@ -97,17 +97,17 @@ public class Mallets extends DecayedInstrument {
 		}
 		Arrays.stream(bars).forEach(bar -> instrumentNode.attachChild(bar.noteNode));
 		
-		//noinspection unchecked
-		barStrikes = new ArrayList[88];
+		barStrikes = new ArrayList<>();
+		
 		for (int i = 0; i < 88; i++) {
-			barStrikes[i] = new ArrayList<>();
+			barStrikes.add(new ArrayList<>());
 		}
 		
 		eventList.forEach(event -> {
 			if (event instanceof MidiNoteOnEvent) {
 				int midiNote = ((MidiNoteOnEvent) event).note;
 				if (midiNote >= RANGE_LOW && midiNote <= RANGE_HIGH) {
-					barStrikes[midiNote - RANGE_LOW].add(((MidiNoteOnEvent) event));
+					barStrikes.get(midiNote - RANGE_LOW).add(((MidiNoteOnEvent) event));
 				}
 			}
 		});
@@ -121,7 +121,9 @@ public class Mallets extends DecayedInstrument {
 		super.tick(time, delta);
 		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
 			bars[i].tick(delta);
-			Stick.StickStatus stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta, barStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+			Stick.StickStatus stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta,
+					barStrikes.get(i),
+					Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 			if (stickStatus.justStruck()) {
 				bars[i].recoilBar();
 			}

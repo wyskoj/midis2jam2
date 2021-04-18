@@ -54,7 +54,6 @@ public class StageChoir extends WrappedOctaveSustained {
 	public StageChoir(@NotNull Midis2jam2 context,
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList, true);
-		System.out.println("construct");
 		twelfths = new ChoirPeep[12];
 		for (int i = 0; i < 12; i++) {
 			peepNodes[i] = new Node();

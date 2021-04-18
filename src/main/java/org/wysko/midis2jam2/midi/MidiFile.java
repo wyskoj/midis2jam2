@@ -75,7 +75,7 @@ public class MidiFile {
 			
 			FileOutputStream output = new FileOutputStream("midicsv");
 			extractFileFromJar(input, output);
-			midiCsvArgs = new String[]{"midicsv", midiFile.getAbsolutePath(), "midi.csv"};
+			midiCsvArgs = new String[]{"./midicsv", midiFile.getAbsolutePath(), "midi.csv"};
 			new ProcessBuilder("chmod", "u+x", "midicsv").start().waitFor();
 		}
 		

@@ -16,7 +16,7 @@ repositories {
 }
 
 application {
-    mainClassName = 'org.wysko.midis2jam2.Midis2jam2'
+    mainClassName = 'org.wysko.midis2jam2.Launcher'
 }
 
 dependencies {
@@ -42,4 +42,12 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
 }

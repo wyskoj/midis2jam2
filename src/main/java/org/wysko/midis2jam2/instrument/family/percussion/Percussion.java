@@ -161,7 +161,7 @@ public class Percussion extends Instrument {
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
 		shadow.setMaterial(material);
-		shadow.move(0, 0.01f, -80);
+		shadow.move(0, 0.1f, -80);
 		
 		percussionNode.attachChild(drumSetNode);
 		percussionNode.attachChild(shadow);
