@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi;
 
+import java.util.Objects;
+
 /**
  * A MIDI event that adjusts a controller.
  */
@@ -50,5 +52,19 @@ public class MidiControlEvent extends MidiEvent {
 		this.channel = channel;
 		this.controlNum = controlNum;
 		this.value = value;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		MidiControlEvent that = (MidiControlEvent) o;
+		return controlNum == that.controlNum && value == that.value && channel == that.channel;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), controlNum, value, channel);
 	}
 }

@@ -15,32 +15,20 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.midi;
+package org.wysko.midis2jam2.instrument.algorithmic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.jme3.bounding.BoundingBox;
 
 /**
- * MIDI files are composed of up to 65535 tracks.
+ * Instruments that implement this interface are responsible for handling {@link #box()}. It is used for the improved
+ * auto-cam implementation.
  */
-public class MidiTrack {
+public interface Boundable {
 	
 	/**
-	 * The events in this track.
+	 * Returns a bounding box of this instrument.
+	 *
+	 * @return a bounding box
 	 */
-	public final List<MidiEvent> events = new ArrayList<>();
-	
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		MidiTrack track = (MidiTrack) o;
-		return Objects.equals(events, track.events);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(events);
-	}
+	public BoundingBox box();
 }

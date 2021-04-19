@@ -41,4 +41,9 @@ public class MidiNoteOffEvent extends MidiNoteEvent {
 				", note=" + note +
 				'}';
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return super.equals(o);
+	}
 }

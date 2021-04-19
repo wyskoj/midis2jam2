@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.midi;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * Any MIDI event that is specific to a certain channel.
@@ -51,5 +52,19 @@ public class MidiChannelSpecificEvent extends MidiEvent {
 		public int compare(MidiChannelSpecificEvent o1, MidiChannelSpecificEvent o2) {
 			return Long.compare(o1.time, o2.time);
 		}
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		MidiChannelSpecificEvent event = (MidiChannelSpecificEvent) o;
+		return channel == event.channel;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), channel);
 	}
 }

@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi;
 
+import java.util.Objects;
+
 /**
  * Signals a note should begin playing.
  */
@@ -48,5 +50,19 @@ public class MidiNoteOnEvent extends MidiNoteEvent {
 				", note=" + note +
 				", velocity=" + velocity +
 				'}';
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		MidiNoteOnEvent that = (MidiNoteOnEvent) o;
+		return velocity == that.velocity;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), velocity);
 	}
 }

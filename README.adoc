@@ -108,30 +108,6 @@ Ensure that you have https://www.oracle.com/java/technologies/javase/javase-jdk8
 This can happen if you attempt to use ghost/phantom MIDI ports that appear visible on your machine.
 Try restarting your computer or reconnecting your MIDI devices.
 
-=== `FileNotFoundException: midi.csv (No such file or directory)`
-
-This is likely an issue that arises when the program attempts to run `midicsv`.
-Because it is hard for me to account for all machines and architectures, the ones I have packaged may not be compatible with your machine.
-
-You can confirm this if you also see `./midicsv: ./midicsv: cannot execute binary file`, although the absence of this line does not rule out the possibility that this fix will work.
-
-To fix this, download https://www.fourmilab.ch/webtools/midicsv/midicsv-1.1.tar.gz[the source for midicsv] and extract to a folder. `cd` into the folder, then run
-
-----
-$ make
-----
-
-You should then see a file named `midicsv`.
-
-link:#_building_locally[Clone the source of midis2jam2].
-In `src/main/resources`, paste the `midicsv` file here.
-Delete any other files that have `midicsv` in their name.
-
-Edit the link:src/main/java/org/wysko/midis2jam2/midi/MidiFile.java[`MidiFile readMidiFile(File)`] method to use your file.
-Chances are, if you need to do this, you are not on Windows.
-So you should edit the else block.
-Replace the if conditional checking the architecture with `input = MidiFile.class.getResourceAsStream("/midicsv");` Then continue with the build process.
-
 === I'm getting errors on an old build.
 
 https://www.midis2jam2.xyz/builds/[Update]!!

@@ -17,15 +17,13 @@
 
 package org.wysko.midis2jam2.midi;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.wysko.midis2jam2.util.StreamGobbler;
+import com.sun.media.sound.StandardMidiFileReader;
 
-import java.io.*;
-import java.nio.charset.Charset;
+import javax.sound.midi.*;
+import javax.sound.midi.spi.MidiFileReader;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * A special type of music file.
@@ -55,114 +53,48 @@ public class MidiFile {
 	 * @throws IOException          an i/o error occurred
 	 * @throws InterruptedException MIDICSV error
 	 */
-	public static MidiFile readMidiFile(File midiFile) throws IOException, InterruptedException {
-		// Run midicsv_x86
-		String[] midiCsvArgs;
-		if (System.getProperty("os.name").startsWith("Windows")) {
-			InputStream input = MidiFile.class.getResourceAsStream("/Midicsv.exe");
-			FileOutputStream output = new FileOutputStream("Midicsv.exe");
-			extractFileFromJar(input, output);
-			midiCsvArgs = new String[]{"midicsv.exe", midiFile.getAbsolutePath(), "midi.csv"};
-		} else {
-			String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
-			InputStream input;
-			
-			// I really hope this works...
-			if (arch.startsWith("x86"))
-				input = MidiFile.class.getResourceAsStream("/midicsv_x86");
-			else
-				input = MidiFile.class.getResourceAsStream("/midicsv_amd");
-			
-			FileOutputStream output = new FileOutputStream("midicsv");
-			extractFileFromJar(input, output);
-			midiCsvArgs = new String[]{"./midicsv", midiFile.getAbsolutePath(), "midi.csv"};
-			new ProcessBuilder("chmod", "u+x", "midicsv").start().waitFor();
-		}
-		
-		Process proc = new ProcessBuilder(midiCsvArgs).start();
-		
-		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
-		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
-		errorGobbler.start();
-		outputGobbler.start();
-		
-		proc.waitFor();
-		
-		// Clean up your goddamn windows-1252 characters that fucks up CSV parsing
-		Scanner scanner = new Scanner(new File("midi.csv"), "Windows-1252");
-		FileWriter stream = new FileWriter("cleanmidi.csv");
-		Pattern titlePattern = Pattern.compile("\\d+, \\d+, Title_t,");
-		Pattern copyrightPattern = Pattern.compile("\\d+, \\d+, Copyright_t,");
-		Pattern markerPattern = Pattern.compile("\\d+, \\d+, Marker_t,");
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (!titlePattern.matcher(line).find() &&
-					!copyrightPattern.matcher(line).find() &&
-					!markerPattern.matcher(line).find()) {
-				stream.write(line);
-				stream.write("\n");
-			}
-		}
-		stream.close();
-		
-		// Parse CSV file
-		CSVParser parse = CSVParser.parse(new File("cleanmidi.csv"), Charset.forName("windows-1252"), CSVFormat.DEFAULT);
-		List<CSVRecord> records = parse.getRecords();
-		
-		// Build midi from data
+	public static MidiFile readMidiFile(File midiFile) throws IOException, InterruptedException, InvalidMidiDataException {
+		MidiFileReader midiFileReader = new StandardMidiFileReader();
+		Sequence sequence = midiFileReader.getSequence(midiFile);
 		MidiFile file = new MidiFile();
-		int numberOfTracks = Integer.parseInt(records.get(0).get(4).trim());
-		file.division = Short.parseShort(records.get(0).get(5).trim());
-		file.tracks = new MidiTrack[numberOfTracks + 1];
-		for (CSVRecord record : records) {
-			int track = Integer.parseInt(record.get(0).trim());
-			if (file.tracks[track] == null && track != 0) file.tracks[track] = new MidiTrack();
-			String instruction = record.get(2).trim();
-			long time = Long.parseLong(record.get(1).trim());
-			switch (instruction) {
-				case "Tempo":
-					int tempo = Integer.parseInt(record.get(3).trim());
-					MidiTempoEvent e = new MidiTempoEvent(time, tempo);
-					file.tracks[track].events.add(e);
-					break;
-				case "Note_on_c":
-					int noteOnChannel = Integer.parseInt(record.get(3).trim());
-					int noteOnNote = Integer.parseInt(record.get(4).trim());
-					int velocity = Integer.parseInt(record.get(5).trim());
-					MidiNoteEvent noteOn;
-					if (velocity > 0)
-						noteOn = new MidiNoteOnEvent(time, noteOnChannel, noteOnNote, velocity);
-					else
-						noteOn = new MidiNoteOffEvent(time, noteOnChannel, noteOnNote);
-					file.tracks[track].events.add(noteOn);
-					break;
-				case "Note_off_c":
-					int channel = Integer.parseInt(record.get(3).trim());
-					int note = Integer.parseInt(record.get(4).trim());
-					MidiNoteOffEvent noteOff = new MidiNoteOffEvent(time, channel, note);
-					file.tracks[track].events.add(noteOff);
-					break;
-				case "Program_c":
-					int channelProg = Integer.parseInt(record.get(3).trim());
-					int programNum = Integer.parseInt(record.get(4).trim());
-					MidiProgramEvent programEvent = new MidiProgramEvent(time, channelProg, programNum);
-					file.tracks[track].events.add(programEvent);
-				default:
+		file.division = (short) sequence.getResolution();
+		file.tracks = new MidiTrack[sequence.getTracks().length + 1];
+		for (int j = 1; j <= sequence.getTracks().length; j++) { // For each sequence track
+			file.tracks[j] = new MidiTrack();
+			Track track = sequence.getTracks()[j - 1];
+			for (int i = 0; i < track.size(); i++) {
+				javax.sound.midi.MidiEvent midiEvent = track.get(i);
+				if (midiEvent.getMessage() instanceof MetaMessage) {
+					MetaMessage message = (MetaMessage) midiEvent.getMessage();
+					if (message.getType() == 0x51) { // Tempo
+						byte[] data = message.getData();
+						int tempo = (data[0] & 0xff) << 16 | (data[1] & 0xff) << 8 | (data[2] & 0xff);
+						file.tracks[j].events.add(new MidiTempoEvent(midiEvent.getTick(), tempo));
+					}
+				} else if (midiEvent.getMessage() instanceof ShortMessage) {
+					ShortMessage message = (ShortMessage) midiEvent.getMessage();
+					if (message.getCommand() == ShortMessage.NOTE_ON) {
+						int note = message.getData1();
+						int velocity = message.getData2();
+						int channel = message.getChannel();
+						if (velocity == 0)
+							file.tracks[j].events.add(new MidiNoteOffEvent(midiEvent.getTick(), channel, note));
+						else
+							file.tracks[j].events.add(new MidiNoteOnEvent(midiEvent.getTick(), channel, note, velocity));
+					} else if (message.getCommand() == ShortMessage.NOTE_OFF) {
+						int note = message.getData1();
+						int channel = message.getChannel();
+						file.tracks[j].events.add(new MidiNoteOffEvent(midiEvent.getTick(), channel, note));
+					} else if (message.getCommand() == ShortMessage.PROGRAM_CHANGE) {
+						int preset = message.getData1();
+						int channel = message.getChannel();
+						file.tracks[j].events.add(new MidiProgramEvent(midiEvent.getTick(), channel, preset));
+					}
+				}
 			}
 		}
 		file.calculateTempoMap();
 		return file;
-	}
-	
-	private static void extractFileFromJar(InputStream input, FileOutputStream output) throws IOException {
-		byte[] buffer = new byte[4096];
-		int bytesRead = input.read(buffer);
-		while (bytesRead != -1) {
-			output.write(buffer, 0, bytesRead);
-			bytesRead = input.read(buffer);
-		}
-		output.close();
-		input.close();
 	}
 	
 	/**
@@ -267,5 +199,20 @@ public class MidiFile {
 			}
 		}
 		return lastTempo;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		MidiFile midiFile = (MidiFile) o;
+		return division == midiFile.division && Arrays.equals(tracks, midiFile.tracks) && Objects.equals(tempos, midiFile.tempos);
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = Objects.hash(division, tempos);
+		result = 31 * result + Arrays.hashCode(tracks);
+		return result;
 	}
 }

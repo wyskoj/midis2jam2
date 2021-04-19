@@ -787,7 +787,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			System.exit(0);
 		}
 		if (isPressed && name.startsWith("cam")) {
-			System.out.println("name = " + name);
 			try {
 				switch (name) {
 					case "cam1":

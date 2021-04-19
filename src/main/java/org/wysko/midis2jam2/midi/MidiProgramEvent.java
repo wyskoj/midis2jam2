@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi;
 
+import java.util.Objects;
+
 /**
  * Indicates which instrument should be playing at a certain time.
  */
@@ -37,5 +39,19 @@ public class MidiProgramEvent extends MidiChannelSpecificEvent {
 	public MidiProgramEvent(long time, int channel, int programNum) {
 		super(time, channel);
 		this.programNum = programNum;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		MidiProgramEvent that = (MidiProgramEvent) o;
+		return programNum == that.programNum;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), programNum);
 	}
 }

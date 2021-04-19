@@ -22,10 +22,7 @@ import com.jme3.system.AppSettings;
 import org.apache.commons.cli.*;
 import org.wysko.midis2jam2.midi.MidiFile;
 
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
+import javax.sound.midi.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -156,7 +153,7 @@ public class Launcher extends SimpleApplication {
 			midis2jam2.file = MidiFile.readMidiFile(midiFile);
 			midis2jam2.sequencer = sequencer;
 			midis2jam2.latencyFix = latencyFix;
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException | InterruptedException | InvalidMidiDataException e) {
 			e.printStackTrace();
 		}
 	}

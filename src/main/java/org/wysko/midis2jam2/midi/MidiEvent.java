@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi;
 
+import java.util.Objects;
+
 /**
  * MIDI files are made up of events.
  */
@@ -36,4 +38,16 @@ public abstract class MidiEvent {
 		this.time = time;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		MidiEvent midiEvent = (MidiEvent) o;
+		return time == midiEvent.time;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(time);
+	}
 }

@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi;
 
+import java.util.Objects;
+
 /**
  * Indicates the channel's pitch is to change.
  */
@@ -37,5 +39,19 @@ public class MidiPitchBendEvent extends MidiChannelSpecificEvent {
 	public MidiPitchBendEvent(long time, int channel, int value) {
 		super(time, channel);
 		this.value = value;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		MidiPitchBendEvent that = (MidiPitchBendEvent) o;
+		return value == that.value;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), value);
 	}
 }

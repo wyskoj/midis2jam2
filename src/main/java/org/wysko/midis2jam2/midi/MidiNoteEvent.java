@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi;
 
+import java.util.Objects;
+
 /**
  * A {@link MidiNoteOnEvent} or a {@link MidiNoteOffEvent}.
  */
@@ -37,5 +39,19 @@ public class MidiNoteEvent extends MidiChannelSpecificEvent {
 	protected MidiNoteEvent(long time, int channel, int note) {
 		super(time, channel);
 		this.note = note;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		MidiNoteEvent that = (MidiNoteEvent) o;
+		return note == that.note;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), note);
 	}
 }
