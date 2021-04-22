@@ -11,7 +11,7 @@
     <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/javadoc" />
     <option name="OPTION_SCOPE" value="private" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="corretto-1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_15" default="true" project-jdk-name="adopt-openjdk-15" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
