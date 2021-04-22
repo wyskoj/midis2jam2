@@ -7,8 +7,12 @@ plugins {
 }
 
 apply plugin: 'java'
-sourceCompatibility = 15
-targetCompatibility = 15
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
+}
 
 repositories {
     mavenCentral()
