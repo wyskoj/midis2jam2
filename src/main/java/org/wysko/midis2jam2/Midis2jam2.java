@@ -65,6 +65,7 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
 
+import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,7 +75,27 @@ import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
+	/**
+	 * The list of instruments.
+	 */
+	public final List<Instrument> instruments = new ArrayList<>();
+	
+	/**
+	 * The list of guitar shadows.
+	 */
+	final List<Spatial> guitarShadows = new ArrayList<>();
+	
 	private final Node rootNode = new Node("root");
+	
+	/**
+	 * The list of bass guitar shadows.
+	 */
+	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
+	
+	/**
+	 * The list of harp shadows
+	 */
+	private final List<Spatial> harpShadows = new ArrayList<>();
 	
 	/**
 	 * When true, midis2jam2 will load the default internal Java MIDI synthesizer, even if an external device is set.
@@ -82,11 +103,76 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	public boolean useDefaultSynthesizer = false;
 	
 	/**
+	 * The MIDI file.
+	 */
+	public MidiFile file;
+	
+	/**
+	 * 3D text for debugging.
+	 */
+	public BitmapText debugText;
+	
+	/**
+	 * The bitmap font.
+	 */
+	public BitmapFont bitmapFont;
+	
+	public Sequence sequence;
+	
+	/**
 	 * Video offset to account for synthesis audio delay.
 	 */
 	int latencyFix = 250;
 	
+	/**
+	 * The MIDI sequencer.
+	 */
+	Sequencer sequencer;
+	
+	/**
+	 * True if {@link #sequencer} has begun playing, false otherwise.
+	 */
+	boolean seqHasRunOnce = false;
+	
+	/**
+	 * The current camera position.
+	 */
+	Camera currentCamera = CAMERA_1A;
+	
+	/**
+	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
+	 * the MIDI began playback
+	 */
+	double timeSinceStart = -2;
+	
 	private SimpleApplication app;
+	
+	boolean tpfHack = false;
+	
+	/**
+	 * The piano stand.
+	 */
+	private Spatial pianoStand;
+	
+	/**
+	 * The mallet stand.
+	 */
+	private Spatial malletStand;
+	
+	/**
+	 * The keyboard shadow.
+	 */
+	private Spatial keyboardShadow;
+	
+	/**
+	 * Converts an angle expressed in degrees to radians.
+	 *
+	 * @param deg the angle expressed in degrees
+	 * @return the angle expressed in radians
+	 */
+	public static float rad(float deg) {
+		return deg / 180 * FastMath.PI;
+	}
 	
 	public Node getRootNode() {
 		return rootNode;
@@ -94,6 +180,16 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
 	public AssetManager getAssetManager() {
 		return app.getAssetManager();
+	}
+	
+	/**
+	 * Converts an angle expressed in degrees to radians.
+	 *
+	 * @param deg the angle expressed in degrees
+	 * @return the angle expressed in radians
+	 */
+	public static float rad(double deg) {
+		return (float) (deg / 180 * FastMath.PI);
 	}
 	
 	@Override
@@ -146,102 +242,20 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				}
 			}
 		}, 0, 1);
-	}
-	
-	/**
-	 * The list of instruments.
-	 */
-	public final List<Instrument> instruments = new ArrayList<>();
-	
-	/**
-	 * The list of guitar shadows.
-	 */
-	final List<Spatial> guitarShadows = new ArrayList<>();
-	
-	/**
-	 * The list of bass guitar shadows.
-	 */
-	private final List<Spatial> bassGuitarShadows = new ArrayList<>();
-	
-	/**
-	 * The list of harp shadows
-	 */
-	private final List<Spatial> harpShadows = new ArrayList<>();
-	
-	/**
-	 * The MIDI file.
-	 */
-	public MidiFile file;
-	
-	/**
-	 * 3D text for debugging.
-	 */
-	public BitmapText debugText;
-	
-	/**
-	 * The bitmap font.
-	 */
-	public BitmapFont bitmapFont;
-	
-	/**
-	 * The MIDI sequencer.
-	 */
-	Sequencer sequencer;
-	
-	/**
-	 * True if {@link #sequencer} has begun playing, false otherwise.
-	 */
-	boolean seqHasRunOnce = false;
-	
-	/**
-	 * The current camera position.
-	 */
-	Camera currentCamera = CAMERA_1A;
-	
-	/**
-	 * The piano stand.
-	 */
-	private Spatial pianoStand;
-	
-	/**
-	 * The mallet stand.
-	 */
-	private Spatial malletStand;
-	
-	/**
-	 * The keyboard shadow.
-	 */
-	private Spatial keyboardShadow;
-	
-	/**
-	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
-	 * the MIDI began playback
-	 */
-	double timeSinceStart = -2;
-	
-	/**
-	 * Converts an angle expressed in degrees to radians.
-	 *
-	 * @param deg the angle expressed in degrees
-	 * @return the angle expressed in radians
-	 */
-	public static float rad(float deg) {
-		return deg / 180 * FastMath.PI;
-	}
-	
-	/**
-	 * Converts an angle expressed in degrees to radians.
-	 *
-	 * @param deg the angle expressed in degrees
-	 * @return the angle expressed in radians
-	 */
-	public static float rad(double deg) {
-		return (float) (deg / 180 * FastMath.PI);
+		
+		
 	}
 	
 	@Override
 	public void update(float tpf) {
 		super.update(tpf);
+		
+		if (tpf > 1 && !tpfHack) {
+			/* TODO This is a hack. When the appstate inits, any time spent on the main screen is added to tpf
+				on the first launch. */
+			tpf = 0;
+			tpfHack = true;
+		}
 		
 		if (sequencer == null) return;
 		if (sequencer.isOpen())
@@ -253,6 +267,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		
 		updateShadowsAndStands();
+		
+		if (timeSinceStart > (sequence.getMicrosecondLength() / 1E6) + 3) {
+			Launcher.launcher.goBackToMainScreen();
+		}
+		
 	}
 	
 	@Override
@@ -261,20 +280,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		sequencer.stop();
 		sequencer.close();
 	}
-	
-	//	public Geometry boundingBox(Spatial spatial) {
-//		if (spatial == null) {
-//			return null;
-//		}
-//		Geometry boundingVolume = WireBox.makeGeometry((com.jme3.bounding.BoundingBox) spatial.getWorldBound());
-//		Material material = new Material(getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-//		material.setColor("Color", ColorRGBA.Blue);
-//		boundingVolume.setMaterial(material);
-//		boundingVolume.setLocalTranslation(spatial.getLocalTranslation());
-//		boundingVolume.setLocalRotation(spatial.getLocalRotation());
-//		boundingVolume.setLocalScale(spatial.getLocalScale());
-//		return boundingVolume;
-//	}
 	
 	private void showAll(Node rootNode) {
 		for (Spatial child : rootNode.getChildren()) {
@@ -286,7 +291,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	private void updateShadowsAndStands() {
-		// Hide/show stands
 		if (pianoStand != null)
 			pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
 					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
@@ -334,11 +338,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		// For each track
 		for (MidiTrack track : file.tracks) {
-			if (track == null) continue; // Skip non-existent tracks
-//			/* Skip tracks with no note-on events */
-//			boolean aNoteOn = track.events.stream().anyMatch(event -> event instanceof MidiNoteOnEvent);
-//			if (!aNoteOn) continue;
-			
+			if (track == null) continue;
 			// Add important events
 			for (MidiEvent event : track.events) {
 				if (event instanceof MidiChannelSpecificEvent) {
@@ -431,175 +431,174 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	@Nullable
 	private Instrument fromEvents(MidiProgramEvent programEvent,
 	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
-		switch (programEvent.programNum) {
-			case 0: // Acoustic Grand Piano
-			case 1: // Bright Acoustic Piano
-			case 2: // Electric Grand Piano
-			case 3: // Honky-tonk Piano
-			case 4: // Electric Piano 1
-			case 5: // Electric Piano 2
-			case 7: // Clavi
-				return (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
-			case 6: // Harpsichord
-				return new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
-			case 8: // Celesta
-			case 14: // Tubular Bells
-			case 98: // FX 3 (Crystal)
-			case 112: // Tinkle Bell
-				return new TubularBells(this, events);
-			case 9: // Glockenspiel
-				return new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
-			case 10: // Music Box
-				return new MusicBox(this, events);
-			case 11: // Vibraphone
-				return new Mallets(this, events, Mallets.MalletType.VIBES);
-			case 12: // Marimba
-				return new Mallets(this, events, Mallets.MalletType.MARIMBA);
-			case 13: // Xylophone
-				return new Mallets(this, events, Mallets.MalletType.XYLOPHONE);
-			case 15: // Dulcimer
-			case 16: // Drawbar Organ
-			case 17: // Percussive Organ
-			case 18: // Rock Organ
-			case 19: // Church Organ
-			case 20: // Reed Organ
-			case 55: // Orchestra Hit
-				return new Keyboard(this, events, Keyboard.KeyboardSkin.WOOD);
-			case 21: // Accordion
-			case 23: // Tango Accordion
-				return new Accordion(this, events);
-			case 22: // Harmonica
-				return new Harmonica(this, events);
-			case 24: // Acoustic Guitar (Nylon)
-			case 25: // Acoustic Guitar (Steel)
-				return new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
-			case 26: // Electric Guitar (jazz)
-			case 27: // Electric Guitar (clean)
-			case 28: // Electric Guitar (muted)
-			case 29: // Overdriven Guitar
-			case 30: // Distortion Guitar
-			case 31: // Guitar Harmonics
-			case 120: // Guitar Fret Noise
-				return new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
-			case 32: // Acoustic Bass
-				return new AcousticBass(this, events, AcousticBass.PlayingStyle.PIZZICATO);
-			case 33: // Electric Bass (finger)
-			case 34: // Electric Bass (pick)
-			case 35: // Fretless Bass
-			case 36: // Slap Bass 1
-			case 37: // Slap Bass 2
-			case 38: // Synth Bass 1
-			case 39: // Synth Bass 2
-				return new BassGuitar(this, events);
-			case 40: // Violin
-			case 110: // Fiddle
-				return new Violin(this, events);
-			case 41: // Viola
-				return new Viola(this, events);
-			case 42: // Cello
-				return new Cello(this, events);
-			case 43: // Contrabass
-				return new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
-			case 44: // Tremolo Strings
-			case 48: // String Ensemble 1
-			case 49: // String Ensemble 2
-			case 50: // Synth Strings 1
-			case 51: // Synth Strings 2
-			case 92: // Pad 5 (Bowed)
-				return new StageStrings(this, events);
-			case 45: // Pizzicato Strings
-				return new PizzicatoStrings(this, events);
-			case 46: // Orchestral Harp
-				return new Harp(this, events);
-			case 47: // Timpani
-				return new Timpani(this, events);
-			case 52: // Choir Aahs
-			case 53: // Voice Oohs
-			case 54: // Synth Voice
-			case 85: // Lead 6 (Voice)
-			case 91: // Pad 4 (Choir)
-			case 121: // Breath Noise
-			case 126: // Applause
-				return new StageChoir(this, events);
-			case 56: // Trumpet
-				return new Trumpet(this, events, Trumpet.TrumpetType.NORMAL);
-			case 57: // Trombone
-				return new Trombone(this, events);
-			case 58: // Tuba
-				return new Tuba(this, events);
-			case 59: // Muted Trumpet
-				return new Trumpet(this, events, Trumpet.TrumpetType.MUTED);
-			case 60: // French Horn
-				return new FrenchHorn(this, events);
-			case 61: // Brass Section
-			case 62: // Synth Brass 1
-			case 63: // Synth Brass 2
-				return new StageHorns(this, events);
-			case 64: // Soprano Sax
-				return new SopranoSax(this, events);
-			case 65: // Alto Sax
-				return new AltoSax(this, events);
-			case 66: // Tenor Sax
-				return new TenorSax(this, events);
-			case 67: // Baritone Sax
-				return new BaritoneSax(this, events);
-			case 72: // Piccolo
-				return new Piccolo(this, events);
-			case 73: // Flute
-				return new Flute(this, events);
-			case 74: // Recorder
-				return new Recorder(this, events);
-			case 75: // Pan Flute
-				return new PanFlute(this, events, PanFlute.PipeSkin.WOOD);
-			case 76: // Blown Bottle
-				return new BlownBottle(this, events);
-			case 78: // Whistle
-				return new Whistles(this, events);
-			case 79: // Ocarina
-				return new Ocarina(this, events);
-			case 80: // Lead 1 (Square)
-			case 81: // Lead 2 (Sawtooth)
-			case 83: // Lead 4 (Chiff)
-			case 84: // Lead 5 (Charang)
-			case 86: // Lead 7 (Fifths)
-			case 87: // Lead 8 (Bass + Lead)
-			case 88: // Pad 1 (New Age)
-			case 89: // Pad 2 (Warm)
-			case 90: // Pad 3 (Polysynth)
-			case 93: // Pad 6 (Metallic)
-			case 94: // Pad 7 (Halo)
-			case 95: // Pad 8 (Sweep)
-			case 96: // FX 1 (Rain)
-			case 97: // FX 2 (Soundtrack)
-			case 99: // FX 4 (Atmosphere)
-			case 100: // FX 5 (Brightness)
-			case 101: // FX 6 (Goblins)
-			case 102: // FX 7 (Echoes)
-			case 103: // FX 8 (Sci-fi)
-				return new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
-			case 82: // Lead 3 (Calliope)
-				return new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
-			case 113: // Agogo
-				return new Agogos(this, events);
-			case 114: // Steel Drums
-				return new SteelDrums(this, events);
-			case 115: // Woodblock
-				return new Woodblocks(this, events);
-			case 116: // Taiko Drum
-				return new TaikoDrum(this, events);
-			case 117: // Melodic Tom
-				return new MelodicTom(this, events);
-			case 118: // Synth Drum
-				return new SynthDrum(this, events);
-			case 124: // Telephone Ring
-				return new TelephoneRing(this, events);
-			case 125: // Helicopter
-				return new Helicopter(this, events);
-			case 127: // Gunshot
-				return new Gunshot(this, events);
-			default:
-				return null;
-		}
+		return switch (programEvent.programNum) {
+			// Acoustic Grand Piano
+			// Bright Acoustic Piano
+			// Electric Grand Piano
+			// Honky-tonk Piano
+			// Electric Piano 1
+			// Electric Piano 2
+			// Clavi
+			case 0, 1, 2, 3, 4, 5, 7 -> (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
+			// Harpsichord
+			case 6 -> new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
+			// Celesta
+			// Tubular Bells
+			// FX 3 (Crystal)
+			// Tinkle Bell
+			case 8, 14, 98, 112 -> new TubularBells(this, events);
+			// Glockenspiel
+			case 9 -> new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
+			// Music Box
+			case 10 -> new MusicBox(this, events);
+			// Vibraphone
+			case 11 -> new Mallets(this, events, Mallets.MalletType.VIBES);
+			// Marimba
+			case 12 -> new Mallets(this, events, Mallets.MalletType.MARIMBA);
+			// Xylophone
+			case 13 -> new Mallets(this, events, Mallets.MalletType.XYLOPHONE);
+			// Dulcimer
+			// Drawbar Organ
+			// Percussive Organ
+			// Rock Organ
+			// Church Organ
+			// Reed Organ
+			// Orchestra Hit
+			case 15, 16, 17, 18, 19, 20, 55 -> new Keyboard(this, events, Keyboard.KeyboardSkin.WOOD);
+			// Accordion
+			// Tango Accordion
+			case 21, 23 -> new Accordion(this, events);
+			// Harmonica
+			case 22 -> new Harmonica(this, events);
+			// Acoustic Guitar (Nylon)
+			// Acoustic Guitar (Steel)
+			case 24, 25 -> new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
+			// Electric Guitar (jazz)
+			// Electric Guitar (clean)
+			// Electric Guitar (muted)
+			// Overdriven Guitar
+			// Distortion Guitar
+			// Guitar Harmonics
+			// Guitar Fret Noise
+			case 26, 27, 28, 29, 30, 31, 120 -> new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
+			// Acoustic Bass
+			case 32 -> new AcousticBass(this, events, AcousticBass.PlayingStyle.PIZZICATO);
+			// Electric Bass (finger)
+			// Electric Bass (pick)
+			// Fretless Bass
+			// Slap Bass 1
+			// Slap Bass 2
+			// Synth Bass 1
+			// Synth Bass 2
+			case 33, 34, 35, 36, 37, 38, 39 -> new BassGuitar(this, events);
+			// Violin
+			// Fiddle
+			case 40, 110 -> new Violin(this, events);
+			// Viola
+			case 41 -> new Viola(this, events);
+			// Cello
+			case 42 -> new Cello(this, events);
+			// Contrabass
+			case 43 -> new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
+			// Tremolo Strings
+			// String Ensemble 1
+			// String Ensemble 2
+			// Synth Strings 1
+			// Synth Strings 2
+			// Pad 5 (Bowed)
+			case 44, 48, 49, 50, 51, 92 -> new StageStrings(this, events);
+			// Pizzicato Strings
+			case 45 -> new PizzicatoStrings(this, events);
+			// Orchestral Harp
+			case 46 -> new Harp(this, events);
+			// Timpani
+			case 47 -> new Timpani(this, events);
+			// Choir Aahs
+			// Voice Oohs
+			// Synth Voice
+			// Lead 6 (Voice)
+			// Pad 4 (Choir)
+			// Breath Noise
+			// Applause
+			case 52, 53, 54, 85, 91, 121, 126 -> new StageChoir(this, events);
+			// Trumpet
+			case 56 -> new Trumpet(this, events, Trumpet.TrumpetType.NORMAL);
+			// Trombone
+			case 57 -> new Trombone(this, events);
+			// Tuba
+			case 58 -> new Tuba(this, events);
+			// Muted Trumpet
+			case 59 -> new Trumpet(this, events, Trumpet.TrumpetType.MUTED);
+			// French Horn
+			case 60 -> new FrenchHorn(this, events);
+			// Brass Section
+			// Synth Brass 1
+			// Synth Brass 2
+			case 61, 62, 63 -> new StageHorns(this, events);
+			// Soprano Sax
+			case 64 -> new SopranoSax(this, events);
+			// Alto Sax
+			case 65 -> new AltoSax(this, events);
+			// Tenor Sax
+			case 66 -> new TenorSax(this, events);
+			// Baritone Sax
+			case 67 -> new BaritoneSax(this, events);
+			// Piccolo
+			case 72 -> new Piccolo(this, events);
+			// Flute
+			case 73 -> new Flute(this, events);
+			// Recorder
+			case 74 -> new Recorder(this, events);
+			// Pan Flute
+			case 75 -> new PanFlute(this, events, PanFlute.PipeSkin.WOOD);
+			// Blown Bottle
+			case 76 -> new BlownBottle(this, events);
+			// Whistle
+			case 78 -> new Whistles(this, events);
+			// Ocarina
+			case 79 -> new Ocarina(this, events);
+			// Lead 1 (Square)
+			// Lead 2 (Sawtooth)
+			// Lead 4 (Chiff)
+			// Lead 5 (Charang)
+			// Lead 7 (Fifths)
+			// Lead 8 (Bass + Lead)
+			// Pad 1 (New Age)
+			// Pad 2 (Warm)
+			// Pad 3 (Polysynth)
+			// Pad 6 (Metallic)
+			// Pad 7 (Halo)
+			// Pad 8 (Sweep)
+			// FX 1 (Rain)
+			// FX 2 (Soundtrack)
+			// FX 4 (Atmosphere)
+			// FX 5 (Brightness)
+			// FX 6 (Goblins)
+			// FX 7 (Echoes)
+			// FX 8 (Sci-fi)
+			case 80, 81, 83, 84, 86, 87, 88, 89, 90, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103 -> new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
+			// Lead 3 (Calliope)
+			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
+			// Agogo
+			case 113 -> new Agogos(this, events);
+			// Steel Drums
+			case 114 -> new SteelDrums(this, events);
+			// Woodblock
+			case 115 -> new Woodblocks(this, events);
+			// Taiko Drum
+			case 116 -> new TaikoDrum(this, events);
+			// Melodic Tom
+			case 117 -> new MelodicTom(this, events);
+			// Synth Drum
+			case 118 -> new SynthDrum(this, events);
+			// Telephone Ring
+			case 124 -> new TelephoneRing(this, events);
+			// Helicopter
+			case 125 -> new Helicopter(this, events);
+			// Gunshot
+			case 127 -> new Gunshot(this, events);
+			default -> null;
+		};
 	}
 	
 	private void initDebugText() {
@@ -705,22 +704,21 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		Texture texture = this.app.getAssetManager().loadTexture("Assets/" + t);
 		Material material;
 		switch (type) {
-			case UNSHADED:
+			case UNSHADED -> {
 				material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 				material.setTexture("ColorMap", texture);
-				break;
-			case SHADED:
+			}
+			case SHADED -> {
 				material = new Material(this.app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
 				material.setTexture("DiffuseMap", texture);
-				break;
-			case REFLECTIVE:
+			}
+			case REFLECTIVE -> {
 				material = new Material(this.app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
 				material.setVector3("FresnelParams", new Vector3f(0.1f, brightness, 0.1f));
 				material.setBoolean("EnvMapAsSphereMap", true);
 				material.setTexture("EnvMap", texture);
-				break;
-			default:
-				throw new IllegalStateException("Unexpected value: " + type);
+			}
+			default -> throw new IllegalStateException("Unexpected value: " + type);
 		}
 		model.setMaterial(material);
 		return model;
@@ -784,7 +782,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		if (name.equals("exit")) {
 			if (sequencer.isOpen())
 				sequencer.stop();
-			System.exit(0);
+			Launcher.launcher.goBackToMainScreen();
 		}
 		if (isPressed && name.startsWith("cam")) {
 			try {

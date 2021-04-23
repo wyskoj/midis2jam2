@@ -19,119 +19,43 @@ package org.wysko.midis2jam2;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
-import org.apache.commons.cli.*;
 import org.wysko.midis2jam2.midi.MidiFile;
 
 import javax.sound.midi.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Launcher extends SimpleApplication {
 	
+	public static Launcher launcher;
+	
 	private static File midiFile;
 	
-	private static Sequencer sequencer;
-	
 	private static int latencyFix;
+	
+	private MainScreen screen;
 	
 	private Midis2jam2 midis2jam2;
 	
 	public static void main(String[] args) throws Exception {
 		Logger.getLogger("com.jme3").setLevel(Level.SEVERE);
-		Options options = new Options();
-		
-		Option midiDevice = new Option("d", "device", true, "MIDI playback device name");
-		midiDevice.setRequired(false);
-		options.addOption(midiDevice);
-		
-		Option latency = new Option("l", "latency", true, "Latency offset for A/V sync, in ms");
-		latency.setRequired(false);
-		options.addOption(latency);
-		
-		Option overrideInternalSynth = new Option("s", "internal-synth", false, "Force use of internal Java MIDI synth");
-		options.addOption(overrideInternalSynth);
-		
-		CommandLineParser parser = new DefaultParser();
-		CommandLine cmd = null;
-		
-		String midiFilePath = null;
-		try {
-			cmd = parser.parse(options, args);
-			List<String> argList = cmd.getArgList();
-			if (argList.size() == 0) throw new ParseException("");
-			midiFilePath = argList.get(0);
-		} catch (ParseException e) {
-			System.out.println("usage: midis2jam2 [-d <arg>] [-s] [-l <arg>] [midifile] \n" +
-					" -d,--device <arg>     MIDI playback device name\n" +
-					" -s,--internal-synth   Force use of internal Java MIDI synth\n" +
-					" -l,--latency <arg>    Latency offset for A/V sync, in ms");
-			System.exit(1);
-		}
-		
-		boolean useDefaultSynthesizer = cmd.hasOption('s');
-		String midiDeviceName = cmd.getOptionValue("device");
-		
-		
-		midiFile = new File(midiFilePath);
-		
-		// Create a sequencer for the sequence
-		Sequence sequence = MidiSystem.getSequence(midiFile);
-		
-		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
-		MidiDevice device = null;
-		MidiDevice backup = null;
-		
-		for (MidiDevice.Info eachInfo : info) {
-			if (midiDeviceName != null) {
-				if (eachInfo.getName().equals(midiDeviceName)) {
-					device = MidiSystem.getMidiDevice(eachInfo);
-				}
-			}
-			if (eachInfo.getName().equals("Microsoft GS Wavetable Synth")) {
-				backup = MidiSystem.getMidiDevice(eachInfo);
-				latencyFix = 0;
-			}
-		}
-		
-		
-		if (cmd.hasOption("l")) {
-			try {
-				latencyFix = Integer.parseInt(cmd.getOptionValue('l'));
-			} catch (NumberFormatException e) {
-				System.err.println("Invalid latency. Reverting to defaults.");
-				e.printStackTrace();
-			}
-		}
-		sequencer = MidiSystem.getSequencer(false);
-		if ((device == null && backup == null) || useDefaultSynthesizer) {
-			sequencer = MidiSystem.getSequencer(true);
-		} else {
-			if (device == null) {
-				device = backup;
-			}
-			device.open();
-			sequencer = MidiSystem.getSequencer(false);
-			sequencer.getTransmitter().setReceiver(device.getReceiver());
-		}
-		
-		sequencer.open();
-		sequencer.setSequence(sequence);
-		
-		new Launcher().start();
+		launcher = new Launcher();
+		launcher.start();
 	}
+	
 	
 	@Override
 	public void start() {
 		AppSettings settings = new AppSettings(true);
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
-//		settings.setFullscreen(true);
 		settings.setResolution(1900, 1900 / 2);
 		settings.setResizable(true);
 		settings.setSamples(4);
+		setDisplayStatView(false);
+		setDisplayFps(false);
 		setSettings(settings);
 		setPauseOnLostFocus(false);
 		setShowSettings(false);
@@ -141,20 +65,61 @@ public class Launcher extends SimpleApplication {
 	@Override
 	public void initialize() {
 		super.initialize(); // simpleInitApp
-		stateManager.attach(midis2jam2);
+		
+		screen = new MainScreen();
+		stateManager.attach(screen);
+	}
+	
+	public void loadScene(File midiFile, MidiDevice.Info device) {
+		stateManager.detach(screen);
+		
+		midis2jam2 = new Midis2jam2();
+		
+		try {
+			Sequencer sequencer = getSequencer(device);
+			Sequence sequence = initMidiFile(midiFile, sequencer);
+			midis2jam2.file = MidiFile.readMidiFile(midiFile);
+			midis2jam2.sequencer = sequencer;
+			midis2jam2.latencyFix = latencyFix;
+			midis2jam2.sequence = sequence;
+		} catch (IOException | InterruptedException | InvalidMidiDataException | MidiUnavailableException e) {
+			e.printStackTrace();
+		}
 		
 		rootNode.attachChild(midis2jam2.getRootNode());
+		stateManager.attach(midis2jam2);
+	}
+	
+	private Sequencer getSequencer(MidiDevice.Info info) throws MidiUnavailableException {
+		MidiDevice device1 = MidiSystem.getMidiDevice(info);
+		Sequencer sequencer;
+		System.out.println("info.getName() = " + info.getName());
+		if (info.getName().equals("Gervill")) {
+			sequencer = MidiSystem.getSequencer(true);
+		} else {
+			device1.open();
+			sequencer = MidiSystem.getSequencer(false);
+			sequencer.getTransmitter().setReceiver(device1.getReceiver());
+		}
+		return sequencer;
+	}
+	
+	
+	public void goBackToMainScreen() {
+		rootNode.detachChild(midis2jam2.getRootNode());
+		stateManager.detach(midis2jam2);
+		stateManager.attach(screen);
+	}
+	
+	private Sequence initMidiFile(File file, Sequencer sequencer) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+		Sequence sequence = MidiSystem.getSequence(file);
+		sequencer.open();
+		sequencer.setSequence(sequence);
+		return sequence;
 	}
 	
 	@Override
 	public void simpleInitApp() {
-		midis2jam2 = new Midis2jam2();
-		try {
-			midis2jam2.file = MidiFile.readMidiFile(midiFile);
-			midis2jam2.sequencer = sequencer;
-			midis2jam2.latencyFix = latencyFix;
-		} catch (IOException | InterruptedException | InvalidMidiDataException e) {
-			e.printStackTrace();
-		}
+	
 	}
 }
