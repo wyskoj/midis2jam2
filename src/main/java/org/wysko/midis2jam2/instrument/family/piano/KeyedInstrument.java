@@ -107,8 +107,8 @@ public abstract class KeyedInstrument extends Instrument {
 			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
 				events.remove(0);
 			}
-			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.file.eventInSeconds(events.get(0)) <= time) ||
-					(events.get(0) instanceof MidiNoteOffEvent && context.file.eventInSeconds(events.get(0)) - time <= 0.05))) {
+			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(events.get(0)) <= time) ||
+					(events.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(events.get(0)) - time <= 0.05))) {
 				eventsToPerform.add(events.remove(0));
 			}
 		}

@@ -123,7 +123,7 @@ public class BassDrum extends PercussionInstrument {
 	@Override
 	public void tick(double time, float delta) {
 		MidiNoteOnEvent nextHit = null;
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time)
+		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time)
 			nextHit = hits.remove(0);
 		
 		if (nextHit != null) {

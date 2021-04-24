@@ -23,7 +23,7 @@ application {
 }
 
 tasks.jpackage{
-    dependsOn("build")
+    dependsOn("shadowJar")
 
     appName = "midis2jam2"
     appVersion = "0.1.0"
@@ -33,7 +33,7 @@ tasks.jpackage{
     licenseFile = "LICENSE"
     input  = "$buildDir/libs"
     destination = "$buildDir/package/midis2jam2"
-    mainJar = "midis2jam2.jar"
+    mainJar = "midis2jam2-all.jar"
     mainClass = "org.wysko.midis2jam2.Launcher"
     javaOptions = ["-Dfile.encoding=UTF-8"].asList()
 
@@ -73,8 +73,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
-
-    implementation 'com.formdev:flatlaf:1.1.2'
 }
 
 test {

@@ -62,24 +62,24 @@ Check this page to see the progress of each instrument's implementation.
 == Percussion instruments
 
 |===
-|27 High Q ❌|35 Acoustic Bass Drum ✔️|43 High Floor Tom ✔️|51 Ride Cymbal 1 ✔️
-|28 Slap ❌|36 Electric Bass Drum ✔️|44 Pedal Hi-hat ✔️|52 Chinese Cymbal ✔️
-|29 Scratch Push ❌|37 Side Stick ❌|45 Low Tom ✔️|53 Ride Bell ❌
-|30 Scratch Pull ❌|38 Acoustic Snare ✔️|46 Open Hi-hat ✔️|54 Tambourine ✔️
-|31 Sticks ✔️|39 Hand Clap ✔️|47 Low-Mid Tom ✔️|55 Splash Cymbal ✔️
-|32 Square Click ❌|40 Electric Snare ✔️|48 Hi-Mid Tom ✔️|56 Cowbell ✔️
-|33 Metronome Click ❌|41 Low Floor Tom ✔️|49 Crash Cymbal 1 ✔️|57 Crash Cymbal 2 ✔️
-|34 Metronome Bell ❌|42 Closed Hi-hat ✔️|50 High Tom ✔️|58 Vibra Slap ❌
+|__27__ High Q ❌|__35__ Acoustic Bass Drum ✔️|__43__ High Floor Tom ✔️|__51__ Ride Cymbal 1 ✔️
+|__28__ Slap ❌|__36__ Electric Bass Drum ✔️|__44__ Pedal Hi-hat ✔️|_52_ Chinese Cymbal ✔️
+|_29_ Scratch Push ❌|_37_ Side Stick ❌|_45_ Low Tom ✔️|_53_ Ride Bell ❌
+|_30_ Scratch Pull ❌|_38_ Acoustic Snare ✔️|_46_ Open Hi-hat ✔️|_54_ Tambourine ✔️
+|_31_ Sticks ✔️|_39_ Hand Clap ✔️|_47_ Low-Mid Tom ✔️|_55_ Splash Cymbal ✔️
+|_32_ Square Click ❌|_40_ Electric Snare ✔️|_48_ Hi-Mid Tom ✔️|_56_ Cowbell ✔️
+|_33_ Metronome Click ❌|_41_ Low Floor Tom ✔️|_49_ Crash Cymbal 1 ✔️|_57_ Crash Cymbal 2 ✔️
+|_34_ Metronome Bell ❌|_42_ Closed Hi-hat ✔️|_50_ High Tom ✔️|_58_ Vibra Slap ❌
 |===
 
 |===
-|59 Ride Cymbal 2 ❌|67 High Agogô ❌|75 Claves ❌|83 Jingle Bell ✔️
-|60 High Bongo ✔️|68 Low Agogô ❌|76 High Woodblock ❌|84 Belltree ❌
-|61 Low Bongo ✔️|69 Cabasa ❌|77 Low Woodblock ❌|85 Castanets ❌
-|62 Mute High Conga ✔️|70 Maracas ❌|78 Mute Cuica ❌|86 Mute Surdo ❌
-|63 Open High Conga ✔️|71 Short Whistle ❌|79 Open Cuica ❌|87 Open Surdo ❌
-|64 Low Conga ✔️|72 Long Whistle ❌|80 Mute Triangle ❌|
-|65 High Timbale ✔️|73 Short Guiro ❌|81 Open Triangle ❌|
-|66 Low Timbale ✔️|74 Long Guiro ❌|82 Shaker ❌|
+|_59_ Ride Cymbal 2 ❌|_67_ High Agogô ❌|_75_ Claves ❌|_83_ Jingle Bell ✔️
+|_60_ High Bongo ✔️|_68_ Low Agogô ❌|_76_ High Woodblock ❌|_84_ Belltree ❌
+|_61_ Low Bongo ✔️|_69_ Cabasa ❌|_77_ Low Woodblock ❌|_85_ Castanets ❌
+|_62_ Mute High Conga ✔️|_70_ Maracas ❌|_78_ Mute Cuica ❌|_86_ Mute Surdo ❌
+|_63_ Open High Conga ✔️|_71_ Short Whistle ❌|_79_ Open Cuica ❌|_87_ Open Surdo ❌
+|_64_ Low Conga ✔️|_72_ Long Whistle ❌|_80_ Mute Triangle ❌|
+|_65_ High Timbale ✔️|_73_ Short Guiro ❌|_81_ Open Triangle ❌|
+|_66_ Low Timbale ✔️|_74_ Long Guiro ❌|_82_ Shaker ❌|
 |===
 

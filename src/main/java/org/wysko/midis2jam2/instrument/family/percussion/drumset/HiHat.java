@@ -104,7 +104,7 @@ public class HiHat extends SingleStickInstrument {
 	public void tick(double time, float delta) {
 		animator.tick(delta);
 		MidiNoteOnEvent recoil = null;
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
+		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time) {
 			recoil = hits.remove(0);
 		}
 		

@@ -88,7 +88,7 @@ public class Cymbal extends SingleStickInstrument {
 	 */
 	void handleCymbalStrikes(double time, float delta) {
 		MidiNoteOnEvent recoil = null;
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
+		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time) {
 			recoil = hits.remove(0);
 		}
 		if (recoil != null) {

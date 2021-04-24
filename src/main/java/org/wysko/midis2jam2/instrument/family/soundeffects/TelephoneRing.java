@@ -141,9 +141,9 @@ public class TelephoneRing extends SustainedInstrument {
 		
 		if (!notes.isEmpty())
 			while (notes.size() != 0 &&
-					((notes.get(0) instanceof MidiNoteOnEvent && context.file.eventInSeconds(notes.get(0)) <= time)
+					((notes.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(notes.get(0)) <= time)
 							||
-							(notes.get(0) instanceof MidiNoteOffEvent && context.file.eventInSeconds(notes.get(0)) <= time - 0.01))
+							(notes.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(notes.get(0)) <= time - 0.01))
 			) {
 				eventsToPerform.add(notes.remove(0));
 			}

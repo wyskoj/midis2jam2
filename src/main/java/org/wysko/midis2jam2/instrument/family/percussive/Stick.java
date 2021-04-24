@@ -60,7 +60,7 @@ public class Stick {
 	                                       @Nullable MidiNoteOnEvent nextHit,
 	                                       double maxAngle,
 	                                       double strikeSpeed) {
-		return nextHit == null ? maxAngle + 1 : -1000 * ((6E7 / context.file.tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(nextHit));
+		return nextHit == null ? maxAngle + 1 : -1000 * ((6E7 / context.getFile().tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.getFile().eventInSeconds(nextHit));
 	}
 	
 	/**
@@ -83,11 +83,11 @@ public class Stick {
 		if (!strikes.isEmpty())
 			nextHit = strikes.get(0);
 		
-		while (!strikes.isEmpty() && context.file.eventInSeconds(strikes.get(0)) <= time) {
+		while (!strikes.isEmpty() && context.getFile().eventInSeconds(strikes.get(0)) <= time) {
 			nextHit = strikes.remove(0);
 		}
 		
-		if (nextHit != null && context.file.eventInSeconds(nextHit) <= time) {
+		if (nextHit != null && context.getFile().eventInSeconds(nextHit) <= time) {
 			strike = true;
 		}
 		

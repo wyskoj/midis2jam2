@@ -56,7 +56,7 @@ public abstract class StickDrum extends SingleStickInstrument {
 	 */
 	protected void drumRecoil(double time, float delta) {
 		MidiNoteOnEvent recoil = null;
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
+		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time) {
 			recoil = hits.remove(0);
 		}
 		PercussionInstrument.recoilDrum(drum, recoil != null, recoil != null ? recoil.velocity : 0, delta);

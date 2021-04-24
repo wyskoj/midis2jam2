@@ -72,7 +72,7 @@ public class Gunshot extends DecayedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		List<MidiNoteOnEvent> ons = new ArrayList<>();
-		while (!hits.isEmpty() && context.file.eventInSeconds(hits.get(0)) <= time) {
+		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time) {
 			ons.add(hits.remove(0));
 		}
 		for (MidiNoteOnEvent on : ons) {

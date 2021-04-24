@@ -22,7 +22,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
@@ -35,9 +34,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
@@ -71,9 +70,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.jme3.scene.Spatial.CullHint.Always;
+import static com.jme3.scene.Spatial.CullHint.Dynamic;
 import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
+	
+	private static final String LIGHTING_MAT = "Common/MatDefs/Light/Lighting.j3md";
 	
 	/**
 	 * The list of instruments.
@@ -96,28 +99,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * The list of harp shadows
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
-	
-	/**
-	 * When true, midis2jam2 will load the default internal Java MIDI synthesizer, even if an external device is set.
-	 */
-	public boolean useDefaultSynthesizer = false;
-	
-	/**
-	 * The MIDI file.
-	 */
-	public MidiFile file;
-	
-	/**
-	 * 3D text for debugging.
-	 */
-	public BitmapText debugText;
-	
-	/**
-	 * The bitmap font.
-	 */
-	public BitmapFont bitmapFont;
-	
-	public Sequence sequence;
 	
 	/**
 	 * Video offset to account for synthesis audio delay.
@@ -145,9 +126,21 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	double timeSinceStart = -2;
 	
-	private SimpleApplication app;
-	
 	boolean tpfHack = false;
+	
+	/**
+	 * The MIDI file.
+	 */
+	private MidiFile file;
+	
+	/**
+	 * 3D text for debugging.
+	 */
+	private BitmapText debugText;
+	
+	private Sequence sequence;
+	
+	private SimpleApplication app;
 	
 	/**
 	 * The piano stand.
@@ -174,14 +167,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		return deg / 180 * FastMath.PI;
 	}
 	
-	public Node getRootNode() {
-		return rootNode;
-	}
-	
-	public AssetManager getAssetManager() {
-		return app.getAssetManager();
-	}
-	
 	/**
 	 * Converts an angle expressed in degrees to radians.
 	 *
@@ -190,6 +175,14 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	public static float rad(double deg) {
 		return (float) (deg / 180 * FastMath.PI);
+	}
+	
+	public Node getRootNode() {
+		return rootNode;
+	}
+	
+	public AssetManager getAssetManager() {
+		return app.getAssetManager();
 	}
 	
 	@Override
@@ -224,7 +217,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			@Override
 			public void run() {
 				if (timeSinceStart + (latencyFix / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
-					sequencer.setTempoInBPM((float) file.firstTempoInBpm());
+					sequencer.setTempoInBPM((float) getFile().firstTempoInBpm());
 					sequencer.start();
 					seqHasRunOnce = true;
 					new Timer(true).scheduleAtFixedRate(new TimerTask() {
@@ -232,7 +225,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 						public void run() {
 							// Find the first tempo we haven't hit and need to execute
 							long currentMidiTick = sequencer.getTickPosition();
-							for (MidiTempoEvent tempo : file.tempos) {
+							for (MidiTempoEvent tempo : getFile().tempos) {
 								if (tempo.time == currentMidiTick) {
 									sequencer.setTempoInBPM(60_000_000f / tempo.number);
 								}
@@ -251,8 +244,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		super.update(tpf);
 		
 		if (tpf > 1 && !tpfHack) {
-			/* TODO This is a hack. When the appstate inits, any time spent on the main screen is added to tpf
-				on the first launch. */
+			/* TODO This is a hack. When the appstate inits, any time spent on the main screen is added to tpf on the first launch. */
 			tpf = 0;
 			tpfHack = true;
 		}
@@ -267,63 +259,73 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		
 		updateShadowsAndStands();
-		
-		if (timeSinceStart > (sequence.getMicrosecondLength() / 1E6) + 3) {
-			Launcher.launcher.goBackToMainScreen();
-		}
-		
+
+//		if (timeSinceStart > (getSequence().getMicrosecondLength() / 1E6) + 3) {
+//			Launcher.launcher.goBackToMainScreen();
+//			System.out.println("Going back to main screen because song is finished.");
+//		}
 	}
 	
 	@Override
 	public void cleanup() {
-		System.out.println("CLEANUP!");
 		sequencer.stop();
 		sequencer.close();
 	}
 	
+	@TestOnly
+	@SuppressWarnings("unused")
 	private void showAll(Node rootNode) {
 		for (Spatial child : rootNode.getChildren()) {
-			child.setCullHint(Spatial.CullHint.Dynamic);
+			child.setCullHint(Dynamic);
 			if (child instanceof Node) {
 				showAll((Node) child);
 			}
 		}
 	}
 	
+	/**
+	 * Shows/hides a stand (that the piano/mallets) rest on depending on if any instrument of that type exists.
+	 *
+	 * @param stand the stand
+	 * @param clazz the class of the instrument
+	 */
+	private void setStandVisibility(Spatial stand, Class<? extends Instrument> clazz) {
+		if (stand == null) return;
+		stand.setCullHint(
+				instruments.stream()
+						.filter(Objects::nonNull)
+						.anyMatch(i -> i.visible && clazz.isInstance(i)) ? Dynamic : Always);
+	}
+	
+	/**
+	 * For instruments that have multiple shadows for multiple instances of an instrument (e.g., guitar, bass guitar,
+	 * harp), sets the correct number of shadows that should be visible. Note: the shadows for mallets are direct
+	 * children of their respective {@link Instrument#instrumentNode}, so those are already being handled by its
+	 * visibility calculation.
+	 *
+	 * @param shadows the list of shadows
+	 * @param clazz   the class of the instrument
+	 */
+	private void updateArrayShadows(List<Spatial> shadows, Class<? extends Instrument> clazz) {
+		long numVisible = instruments.stream().filter(i -> clazz.isInstance(i) && i.visible).count();
+		for (var i = 0; i < shadows.size(); i++) {
+			shadows.get(i).setCullHint(i < numVisible ? Dynamic : Always);
+		}
+	}
+	
 	private void updateShadowsAndStands() {
-		if (pianoStand != null)
-			pianoStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
-					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
-		if (keyboardShadow != null) {
-			keyboardShadow.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Keyboard) ?
-					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
-			keyboardShadow.setLocalScale(
-					1,
-					1,
-					(int) instruments.stream().filter(k -> k instanceof Keyboard && k.visible).count());
-		}
-		if (malletStand != null)
-			malletStand.setCullHint(instruments.stream().filter(Objects::nonNull).anyMatch(i -> i.visible && i instanceof Mallets) ?
-					Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		// Keyboard stand and shadow
+		setStandVisibility(pianoStand, Keyboard.class);
+		if (keyboardShadow != null)
+			keyboardShadow.setLocalScale(1, 1, instruments.stream().filter(k -> k instanceof Keyboard && k.visible).count());
 		
-		long guitarVisibleCount = instruments.stream().filter(instrument -> instrument instanceof Guitar && instrument.visible).count();
-		for (int i = 0; i < guitarShadows.size(); i++) {
-			if (i < guitarVisibleCount) guitarShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
-			else guitarShadows.get(i).setCullHint(Spatial.CullHint.Always);
-		}
-		long bassGuitarVisibleCount =
-				instruments.stream().filter(instrument -> instrument instanceof BassGuitar && instrument.visible).count();
-		for (int i = 0; i < bassGuitarShadows.size(); i++) {
-			if (i < bassGuitarVisibleCount) bassGuitarShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
-			else bassGuitarShadows.get(i).setCullHint(Spatial.CullHint.Always);
-		}
+		// Mallet stand
+		setStandVisibility(malletStand, Mallets.class);
 		
-		long harpVisibleCount =
-				instruments.stream().filter(instrument -> instrument instanceof Harp && instrument.visible).count();
-		for (int i = 0; i < harpShadows.size(); i++) {
-			if (i < harpVisibleCount) harpShadows.get(i).setCullHint(Spatial.CullHint.Dynamic);
-			else harpShadows.get(i).setCullHint(Spatial.CullHint.Always);
-		}
+		// Guitar, bass guitar, and harp shadows
+		updateArrayShadows(bassGuitarShadows, BassGuitar.class);
+		updateArrayShadows(guitarShadows, Guitar.class);
+		updateArrayShadows(harpShadows, Harp.class);
 	}
 	
 	/**
@@ -337,7 +339,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		IntStream.range(0, 16).forEach(i -> channels.add(new ArrayList<>()));
 		
 		// For each track
-		for (MidiTrack track : file.tracks) {
+		for (MidiTrack track : getFile().tracks) {
 			if (track == null) continue;
 			// Add important events
 			for (MidiEvent event : track.events) {
@@ -353,68 +355,68 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		for (int j = 0, channelsLength = channels.size(); j < channelsLength; j++) {
 			ArrayList<MidiChannelSpecificEvent> channel = channels.get(j);
-			if (j == 9) { // Percussion channel
-				Percussion percussion = new Percussion(this, channel);
-				instruments.add(percussion);
-				continue;
-			}
-			/* Skip channels with no note-on events */
-			boolean hasANoteOn = channel.stream().anyMatch(e -> e instanceof MidiNoteOnEvent);
-			if (!hasANoteOn) continue;
-			List<MidiProgramEvent> programEvents = new ArrayList<>();
-			for (MidiChannelSpecificEvent channelEvent : channel) {
-				if (channelEvent instanceof MidiProgramEvent) {
-					programEvents.add(((MidiProgramEvent) channelEvent));
+			if (j != 9) { // A melodic channel
+				boolean hasANoteOn = channel.stream().anyMatch(MidiNoteOnEvent.class::isInstance);
+				if (!hasANoteOn) continue; // Skip silent channels
+				
+				List<MidiProgramEvent> programEvents = new ArrayList<>();
+				for (MidiChannelSpecificEvent channelEvent : channel) {
+					if (channelEvent instanceof MidiProgramEvent) {
+						programEvents.add(((MidiProgramEvent) channelEvent));
+					}
 				}
-			}
-			
-			if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
-				programEvents.add(new MidiProgramEvent(0, j, 0));
-			}
-			
-			for (int i = 0; i < programEvents.size() - 1; i++) {
-				final MidiProgramEvent a = programEvents.get(i);
-				final MidiProgramEvent b = programEvents.get(i + 1);
-				/* Remove program events at same time (keep the last one) */
-				if (a.time == b.time) {
-					programEvents.remove(i);
-					i--;
-					continue;
+				
+				if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
+					programEvents.add(new MidiProgramEvent(0, j, 0));
 				}
-				/* Remove program events with same value (keep the first one) */
-				if (a.programNum == b.programNum) {
-					programEvents.remove(i + 1);
+				
+				for (var i = 0; i < programEvents.size() - 1; i++) {
+					final MidiProgramEvent a = programEvents.get(i);
+					final MidiProgramEvent b = programEvents.get(i + 1);
+					/* Remove program events at same time (keep the last one) */
+					if (a.time == b.time) {
+						programEvents.remove(i);
+						i--;
+						continue;
+					}
+					/* Remove program events with same value (keep the first one) */
+					if (a.programNum == b.programNum) {
+						programEvents.remove(i + 1);
+					}
 				}
-			}
-			
-			if (programEvents.size() == 1) {
-				instruments.add(fromEvents(programEvents.get(0), channel));
-			} else {
-				for (int i = 0; i < programEvents.size() - 1; i++) {
-					List<MidiChannelSpecificEvent> events = new ArrayList<>();
-					for (MidiChannelSpecificEvent eventInChannel : channel) {
-						if (eventInChannel.time < programEvents.get(i + 1).time) {
-							if (i > 0) {
-								if (eventInChannel.time >= programEvents.get(i).time) {
+				
+				if (programEvents.size() == 1) {
+					instruments.add(fromEvents(programEvents.get(0), channel));
+				} else {
+					for (var i = 0; i < programEvents.size() - 1; i++) {
+						List<MidiChannelSpecificEvent> events = new ArrayList<>();
+						for (MidiChannelSpecificEvent eventInChannel : channel) {
+							if (eventInChannel.time < programEvents.get(i + 1).time) {
+								if (i > 0) {
+									if (eventInChannel.time >= programEvents.get(i).time) {
+										events.add(eventInChannel);
+									}
+								} else {
 									events.add(eventInChannel);
 								}
 							} else {
-								events.add(eventInChannel);
+								break;
 							}
-						} else {
-							break;
+						}
+						instruments.add(fromEvents(programEvents.get(i), events));
+					}
+					List<MidiChannelSpecificEvent> lastInstrumentEvents = new ArrayList<>();
+					MidiProgramEvent lastProgramEvent = programEvents.get(programEvents.size() - 1);
+					for (MidiChannelSpecificEvent channelEvent : channel) {
+						if (channelEvent.time >= lastProgramEvent.time) {
+							lastInstrumentEvents.add(channelEvent);
 						}
 					}
-					instruments.add(fromEvents(programEvents.get(i), events));
+					instruments.add(fromEvents(lastProgramEvent, lastInstrumentEvents));
 				}
-				List<MidiChannelSpecificEvent> lastInstrumentEvents = new ArrayList<>();
-				MidiProgramEvent lastProgramEvent = programEvents.get(programEvents.size() - 1);
-				for (MidiChannelSpecificEvent channelEvent : channel) {
-					if (channelEvent.time >= lastProgramEvent.time) {
-						lastInstrumentEvents.add(channelEvent);
-					}
-				}
-				instruments.add(fromEvents(lastProgramEvent, lastInstrumentEvents));
+			} else {
+				Percussion percussion = new Percussion(this, channel);
+				instruments.add(percussion);
 			}
 		}
 	}
@@ -602,16 +604,16 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	private void initDebugText() {
-		bitmapFont = this.app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
-		debugText = new BitmapText(bitmapFont, false);
-		debugText.setSize(bitmapFont.getCharSet().getRenderedSize());
-		debugText.setText("");
-		debugText.setLocalTranslation(300, debugText.getLineHeight(), 0);
-		this.app.getGuiNode().attachChild(debugText);
+		var bitmapFont = this.app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
+		setDebugText(new BitmapText(bitmapFont, false));
+		getDebugText().setSize(bitmapFont.getCharSet().getRenderedSize());
+		getDebugText().setText("");
+		getDebugText().setLocalTranslation(300, getDebugText().getLineHeight(), 0);
+		this.app.getGuiNode().attachChild(getDebugText());
 	}
 	
 	private void addShadowsAndStands() {
-		if (instruments.stream().anyMatch(i -> i instanceof Keyboard)) {
+		if (instruments.stream().anyMatch(Keyboard.class::isInstance)) {
 			pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(pianoStand);
 			pianoStand.move(-50, 32f, -6);
@@ -622,16 +624,17 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			keyboardShadow.rotate(0, rad(45), 0);
 			rootNode.attachChild(keyboardShadow);
 		}
-		if (instruments.stream().anyMatch(i -> i instanceof Mallets)) {
+		
+		if (instruments.stream().anyMatch(Mallets.class::isInstance)) {
 			malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
 			rootNode.attachChild(malletStand);
 			malletStand.setLocalTranslation(new Vector3f(-22, 22.2f, 23));
 			malletStand.rotate(0, rad(33.7), 0);
-			malletStand.scale(2 / 3f);
+			malletStand.scale(0.6666667f);
 		}
 		
 		// Add guitar shadows
-		for (long i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Guitar).count(); i++) {
+		for (var i = 0; i < instruments.stream().filter(Guitar.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png");
 			guitarShadows.add(shadow);
 			rootNode.attachChild(shadow);
@@ -640,7 +643,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		
 		// Add bass guitar shadows
-		for (long i = 0; i < instruments.stream().filter(instrument -> instrument instanceof BassGuitar).count(); i++) {
+		for (var i = 0; i < instruments.stream().filter(BassGuitar.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/BassShadow.obj", "Assets/BassShadow.png");
 			bassGuitarShadows.add(shadow);
 			rootNode.attachChild(shadow);
@@ -649,7 +652,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		
 		// Add harp shadows
-		for (long i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Harp).count(); i++) {
+		for (var i = 0; i < instruments.stream().filter(Harp.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png");
 			harpShadows.add(shadow);
 			rootNode.attachChild(shadow);
@@ -658,8 +661,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		
 		// Add mallet shadows
-		List<Instrument> mallets = instruments.stream().filter(instrument -> instrument instanceof Mallets).collect(Collectors.toList());
-		for (int i = 0; i < instruments.stream().filter(instrument -> instrument instanceof Mallets).count(); i++) {
+		List<Instrument> mallets = instruments.stream().filter(Mallets.class::isInstance).collect(Collectors.toList());
+		for (var i = 0; i < instruments.stream().filter(Mallets.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
 			shadow.setLocalScale(0.6667f);
 			mallets.get(i).instrumentNode.attachChild(shadow);
@@ -670,7 +673,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	@Contract(pure = true)
 	public Spatial shadow(String model, String texture) {
 		Spatial shadow = this.app.getAssetManager().loadModel(model);
-		final Material material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", this.app.getAssetManager().loadTexture(texture));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 		material.setFloat("AlphaDiscardThreshold", 0.01f);
@@ -700,8 +703,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @return the model
 	 */
 	public Spatial loadModel(String m, String t, MatType type, float brightness) {
-		Spatial model = this.app.getAssetManager().loadModel("Assets/" + m);
-		Texture texture = this.app.getAssetManager().loadTexture("Assets/" + t);
+		var model = this.app.getAssetManager().loadModel("Assets/" + m);
+		var texture = this.app.getAssetManager().loadTexture("Assets/" + t);
 		Material material;
 		switch (type) {
 			case UNSHADED -> {
@@ -709,11 +712,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				material.setTexture("ColorMap", texture);
 			}
 			case SHADED -> {
-				material = new Material(this.app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+				material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
 				material.setTexture("DiffuseMap", texture);
 			}
 			case REFLECTIVE -> {
-				material = new Material(this.app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+				material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
 				material.setVector3("FresnelParams", new Vector3f(0.1f, brightness, 0.1f));
 				material.setBoolean("EnvMapAsSphereMap", true);
 				material.setTexture("EnvMap", texture);
@@ -725,7 +728,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	public Material reflectiveMaterial(String reflectiveTextureFile) {
-		Material material = new Material(this.app.getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+		var material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
 		material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
 		material.setBoolean("EnvMapAsSphereMap", true);
 		material.setTexture("EnvMap", this.app.getAssetManager().loadTexture(reflectiveTextureFile));
@@ -783,40 +786,52 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			if (sequencer.isOpen())
 				sequencer.stop();
 			Launcher.launcher.goBackToMainScreen();
+			System.out.println("Going to back to main screen because of ESC key.");
 		}
 		if (isPressed && name.startsWith("cam")) {
 			try {
-				switch (name) {
-					case "cam1":
-						if (currentCamera == CAMERA_1A) {
-							currentCamera = CAMERA_1B;
-						} else if (currentCamera == CAMERA_1B) {
-							currentCamera = CAMERA_1C;
-						} else {
-							currentCamera = CAMERA_1A;
-						}
-						break;
-					case "cam2":
-						currentCamera = currentCamera == CAMERA_2A ? CAMERA_2B : CAMERA_2A;
-						break;
-					case "cam3":
-						currentCamera = currentCamera == CAMERA_3A ? CAMERA_3B : CAMERA_3A;
-						break;
-					case "cam4":
-						currentCamera = currentCamera == CAMERA_4A ? CAMERA_4B : CAMERA_4A;
-						break;
-					case "cam5":
-						currentCamera = CAMERA_5;
-						break;
-					case "cam6":
-						currentCamera = CAMERA_6;
-						break;
-				}
-				Camera camera = valueOf(currentCamera.name());
-				setCamera(camera);
+				currentCamera = switch (name) {
+					case "cam1" -> switch (currentCamera) {
+						case CAMERA_1A -> CAMERA_1B;
+						case CAMERA_1B -> CAMERA_1C;
+						default -> CAMERA_1A;
+					};
+					case "cam2" -> currentCamera == CAMERA_2A ? CAMERA_2B : CAMERA_2A;
+					case "cam3" -> currentCamera == CAMERA_3A ? CAMERA_3B : CAMERA_3A;
+					case "cam4" -> currentCamera == CAMERA_4A ? CAMERA_4B : CAMERA_4A;
+					case "cam5" -> CAMERA_5;
+					case "cam6" -> CAMERA_6;
+					default -> throw new IllegalStateException("Unexpected value: " + name);
+				};
+				setCamera(valueOf(currentCamera.name()));
 			} catch (IllegalArgumentException ignored) {
+				System.err.println("Bad camera string.");
 			}
 		}
+	}
+	
+	public MidiFile getFile() {
+		return file;
+	}
+	
+	public void setFile(MidiFile file) {
+		this.file = file;
+	}
+	
+	public BitmapText getDebugText() {
+		return debugText;
+	}
+	
+	public void setDebugText(BitmapText debugText) {
+		this.debugText = debugText;
+	}
+	
+	public Sequence getSequence() {
+		return sequence;
+	}
+	
+	public void setSequence(Sequence sequence) {
+		this.sequence = sequence;
 	}
 	
 	public enum MatType {
@@ -829,17 +844,17 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * Defines angles for cameras.
 	 */
 	enum Camera {
-		CAMERA_1A(-2, 92, 134, rad(90 - 71.56f), rad(180), 0),
-		CAMERA_1B(60, 92, 124, rad(90 - 71.5), rad(180 + 24.4), 0),
-		CAMERA_1C(-59.5f, 90.8f, 94.4f, rad(90 - 66.1), rad(180 - 26.4), 0),
-		CAMERA_2A(0, 71.8f, 44.5f, rad(90 - 74.3), rad(180 + 44.9), 0),
-		CAMERA_2B(-35, 76.4f, 33.6f, rad(90 - 34.2), rad(180 + 18.5), 0),
-		CAMERA_3A(-0.2f, 61.6f, 38.6f, rad(90 - 74.5), rad(180), 0),
-		CAMERA_3B(-19.6f, 78.7f, 3.8f, rad(90 - 62.3), rad(180 - 16.2), 0),
-		CAMERA_4A(0.2f, 81.1f, 32.2f, rad(90 - 69), rad(180 - 48.2), rad(-0.5)),
-		CAMERA_4B(35, 25.4f, -19, rad(90 - 140), rad(180 - 61), rad(-2.5)),
-		CAMERA_5(5, 432, 24, rad(90 - 7.125f), rad(180), 0),
-		CAMERA_6(17, 30.5f, 42.9f, rad(90 - 96.7), rad(180 - 35.7), 0);
+		CAMERA_1A(-2, 92, 134, rad(18.44f), rad(180), 0),
+		CAMERA_1B(60, 92, 124, rad(18.5), rad(204.4), 0),
+		CAMERA_1C(-59.5f, 90.8f, 94.4f, rad(23.9), rad(153.6), 0),
+		CAMERA_2A(0, 71.8f, 44.5f, rad(15.7), rad(224.9), 0),
+		CAMERA_2B(-35, 76.4f, 33.6f, rad(55.8), rad(198.5), 0),
+		CAMERA_3A(-0.2f, 61.6f, 38.6f, rad(15.5), rad(180), 0),
+		CAMERA_3B(-19.6f, 78.7f, 3.8f, rad(27.7), rad(163.8), 0),
+		CAMERA_4A(0.2f, 81.1f, 32.2f, rad(21), rad(131.8), rad(-0.5)),
+		CAMERA_4B(35, 25.4f, -19, rad(-50), rad(119), rad(-2.5)),
+		CAMERA_5(5, 432, 24, rad(82.875f), rad(180), 0),
+		CAMERA_6(17, 30.5f, 42.9f, rad(-6.7), rad(144.3), 0);
 		
 		final Vector3f location;
 		

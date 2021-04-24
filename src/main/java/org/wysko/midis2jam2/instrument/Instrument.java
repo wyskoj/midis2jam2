@@ -114,8 +114,8 @@ public abstract class Instrument {
 					MidiNoteEvent check = noteEvents.get(j);
 					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
 						notePeriods.add(new NotePeriod(check.note,
-								context.file.eventInSeconds(noteEvent),
-								context.file.eventInSeconds(check),
+								context.getFile().eventInSeconds(noteEvent),
+								context.getFile().eventInSeconds(check),
 								((MidiNoteOnEvent) noteEvent),
 								((MidiNoteOffEvent) check)));
 						break;
@@ -153,7 +153,7 @@ public abstract class Instrument {
 	protected void setIdleVisibilityByStrikes(@NotNull List<MidiNoteOnEvent> strikes, double time, @NotNull Node node) {
 		boolean show = false;
 		for (MidiNoteOnEvent strike : strikes) {
-			double x = time - context.file.eventInSeconds(strike);
+			double x = time - context.getFile().eventInSeconds(strike);
 			if (x < 4 && x > -1) {
 				visible = true;
 				show = true;
