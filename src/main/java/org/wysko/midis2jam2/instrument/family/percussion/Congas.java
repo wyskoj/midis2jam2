@@ -22,7 +22,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.StickDrum;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -95,9 +94,9 @@ public class Congas extends NonDrumSetPercussion {
 		leftCongaAnimNode.attachChild(leftConga);
 		rightCongaAnimNode.attachChild(context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp"));
 		
-		Node leftCongaNode = new Node();
+		var leftCongaNode = new Node();
 		leftCongaNode.attachChild(leftCongaAnimNode);
-		Node rightCongaNode = new Node();
+		var rightCongaNode = new Node();
 		rightCongaNode.attachChild(rightCongaAnimNode);
 		
 		instrumentNode.attachChild(leftCongaNode);
@@ -144,22 +143,22 @@ public class Congas extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			StickDrum.recoilDrum(rightCongaAnimNode, true, strike.velocity, delta);
+			recoilDrum(rightCongaAnimNode, true, strike.velocity, delta);
 		} else {
-			StickDrum.recoilDrum(rightCongaAnimNode, false, 0, delta);
+			recoilDrum(rightCongaAnimNode, false, 0, delta);
 		}
 		
 		if (statusHigh.justStruck() || statusMuted.justStruck()) {
 			MidiNoteOnEvent highStrike = statusHigh.getStrike();
 			MidiNoteOnEvent mutedStrike = statusMuted.getStrike();
-			int maxVelocity = 0;
+			var maxVelocity = 0;
 			
 			if (highStrike != null && highStrike.velocity > maxVelocity) maxVelocity = highStrike.velocity;
 			if (mutedStrike != null && mutedStrike.velocity > maxVelocity) maxVelocity = mutedStrike.velocity;
 			
-			StickDrum.recoilDrum(leftCongaAnimNode, true, maxVelocity, delta);
+			recoilDrum(leftCongaAnimNode, true, maxVelocity, delta);
 		} else {
-			StickDrum.recoilDrum(leftCongaAnimNode, false, 0, delta);
+			recoilDrum(leftCongaAnimNode, false, 0, delta);
 		}
 	}
 }

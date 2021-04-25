@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +44,7 @@ public class NonDrumSetPercussion extends PercussionInstrument {
 	                               List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		this.finalHits = Collections.unmodifiableList(new ArrayList<>(hits));
+		this.finalHits = List.copyOf(hits);
 	}
 	
 	@Override

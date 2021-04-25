@@ -49,13 +49,13 @@ public class TubularBells extends DecayedInstrument {
 	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context, events);
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			bells[i] = new Bell(i);
 			instrumentNode.attachChild(bells[i].highestLevel);
 		}
 		
 		// Hide the bright ones
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			bells[i].bellNode.getChild(0).setCullHint(Spatial.CullHint.Always);
 			bellStrikes[i] = new ArrayList<>();
 		}
@@ -75,19 +75,17 @@ public class TubularBells extends DecayedInstrument {
 		super.tick(time, delta);
 		for (int i = 0, barsLength = 12; i < barsLength; i++) { // For each bar on the instrument
 			bells[i].tick(delta);
-			Stick.StickStatus stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta,
+			var stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta,
 					bellStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
-			if (stickStatus.justStruck()) {
-				if (stickStatus.getStrike() != null) {
-					bells[i].recoilBell(stickStatus.getStrike().velocity);
-				}
+			if (stickStatus.justStruck() && stickStatus.getStrike() != null) {
+				bells[i].recoilBell(stickStatus.getStrike().velocity);
 			}
 		}
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(-10 * indexForMoving(), 0, -10 * indexForMoving());
+		offsetNode.setLocalTranslation(-10f * indexForMoving(), 0, -10f * indexForMoving());
 	}
 	
 	/**
@@ -98,17 +96,17 @@ public class TubularBells extends DecayedInstrument {
 		/**
 		 * The base amplitude of the strike.
 		 */
-		private final static double BASE_AMPLITUDE = 0.5;
+		private static final double BASE_AMPLITUDE = 0.5;
 		
 		/**
 		 * The speed the bell will wobble at.
 		 */
-		private final static int WOBBLE_SPEED = 3;
+		private static final int WOBBLE_SPEED = 3;
 		
 		/**
 		 * How quickly the bell will return to rest.
 		 */
-		private final static double DAMPENING = 0.3;
+		private static final double DAMPENING = 0.3;
 		
 		/**
 		 * The highest level node.
@@ -148,14 +146,14 @@ public class TubularBells extends DecayedInstrument {
 					Midis2jam2.MatType.REFLECTIVE, 0.5f));
 			
 			highestLevel.attachChild(bellNode);
-			bellNode.setLocalTranslation((i - 5) * 4, 0, 0);
+			bellNode.setLocalTranslation((i - 5) * 4f, 0, 0);
 			bellNode.setLocalScale((float) (-0.04545 * i) + 1);
 			
 			malletNode = new Node();
 			Spatial child = context.loadModel("TubularBellMallet.obj", "Wood.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			child.setLocalTranslation(0, 5, 0);
 			malletNode.attachChild(child);
-			malletNode.setLocalTranslation((i - 5) * 4, -25, 4);
+			malletNode.setLocalTranslation((i - 5) * 4f, -25, 4);
 			highestLevel.attachChild(malletNode);
 			malletNode.setCullHint(Spatial.CullHint.Always);
 		}

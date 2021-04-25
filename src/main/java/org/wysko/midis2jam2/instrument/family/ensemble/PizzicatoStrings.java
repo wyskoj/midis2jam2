@@ -52,10 +52,10 @@ public class PizzicatoStrings extends DecayedInstrument {
 	                        @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			strings[i] = new PizzicatoString();
 			instrumentNode.attachChild(strings[i].highestLevel);
-			strings[i].highestLevel.setLocalTranslation(i * 2, i * 0.5f, 0);
+			strings[i].highestLevel.setLocalTranslation(i * 2f, i * 0.5f, 0);
 			strings[i].highestLevel.setLocalScale(1, 0.5f - 0.019f * i, 1);
 		}
 		
@@ -80,7 +80,7 @@ public class PizzicatoStrings extends DecayedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(45 + 12 * indexForMoving()), 0));
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(45f + 12 * indexForMoving()), 0));
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public class PizzicatoStrings extends DecayedInstrument {
 		public PizzicatoString() {
 			animNode.attachChild(context.loadModel("PizzicatoStringHolder.obj", "Wood.bmp"));
 			restingString = context.loadModel("StageString.obj", "StageString.bmp");
-			for (int k = 0; k < 5; k++) {
+			for (var k = 0; k < 5; k++) {
 				animStrings[k] = context.loadModel("StageStringBottom" + k + ".obj", "StageStringPlaying.bmp",
 						Midis2jam2.MatType.UNSHADED, 0);
 				animStrings[k].setCullHint(Spatial.CullHint.Always);

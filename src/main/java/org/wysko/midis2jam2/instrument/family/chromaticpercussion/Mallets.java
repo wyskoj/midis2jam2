@@ -24,7 +24,6 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.instrument.family.piano.Keyboard;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -34,6 +33,7 @@ import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.piano.Keyboard.midiValueToColor;
+import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHITE;
 
 /**
  * Any one of vibraphone, glockenspiel, marimba, or xylophone.
@@ -43,17 +43,17 @@ public class Mallets extends DecayedInstrument {
 	/**
 	 * The number of bars on the mallets instrument.
 	 */
-	private final static int MALLET_BAR_COUNT = 88;
+	private static final int MALLET_BAR_COUNT = 88;
 	
 	/**
 	 * The lowest note mallets can play.
 	 */
-	private final static int RANGE_LOW = 21;
+	private static final int RANGE_LOW = 21;
 	
 	/**
 	 * The highest note mallets can play.
 	 */
-	private final static int RANGE_HIGH = 108;
+	private static final int RANGE_HIGH = 108;
 	
 	/**
 	 * The black case that contains the bars.
@@ -85,10 +85,9 @@ public class Mallets extends DecayedInstrument {
 		malletCase.setLocalScale(2 / 3f);
 		instrumentNode.attachChild(malletCase);
 		
-		int whiteCount = 0;
-		for (int i = 0; i < MALLET_BAR_COUNT; i++) {
-			
-			if (midiValueToColor(i + RANGE_LOW) == Keyboard.KeyColor.WHITE) { // White key
+		var whiteCount = 0;
+		for (var i = 0; i < MALLET_BAR_COUNT; i++) {
+			if (midiValueToColor(i + RANGE_LOW) == WHITE) { // White key
 				bars[i] = new MalletBar(i + RANGE_LOW, whiteCount);
 				whiteCount++;
 			} else { // Black key
@@ -99,7 +98,7 @@ public class Mallets extends DecayedInstrument {
 		
 		barStrikes = new ArrayList<>();
 		
-		for (int i = 0; i < 88; i++) {
+		for (var i = 0; i < 88; i++) {
 			barStrikes.add(new ArrayList<>());
 		}
 		
@@ -121,7 +120,7 @@ public class Mallets extends DecayedInstrument {
 		super.tick(time, delta);
 		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
 			bars[i].tick(delta);
-			Stick.StickStatus stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta,
+			var stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta,
 					barStrikes.get(i),
 					Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 			if (stickStatus.justStruck()) {
@@ -229,7 +228,7 @@ public class Mallets extends DecayedInstrument {
 			
 			shadow = Mallets.this.context.loadModel("MalletHitShadow.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			
-			if (midiValueToColor(midiNote) == Keyboard.KeyColor.WHITE) {
+			if (midiValueToColor(midiNote) == WHITE) {
 				upBar = Mallets.this.context.loadModel("XylophoneWhiteBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 				downBar = Mallets.this.context.loadModel("XylophoneWhiteBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 				

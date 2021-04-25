@@ -155,7 +155,7 @@ public abstract class KeyedInstrument extends Instrument {
 	 */
 	protected void setIdleVisibilityByNoteOnAndOff(double time) {
 		boolean b = SustainedInstrument.calcVisibility(time, notePeriods);
-		visible = b;
+		setVisible(b);
 		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	

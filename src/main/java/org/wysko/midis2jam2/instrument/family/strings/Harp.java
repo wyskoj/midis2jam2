@@ -22,7 +22,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
-import org.wysko.midis2jam2.instrument.family.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument;
 import org.wysko.midis2jam2.midi.*;
 
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.BLACK;
 
 /**
  * The Harp.
@@ -55,13 +55,16 @@ public class Harp extends SustainedInstrument {
 	 */
 	public Harp(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
-		this.notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		this.notes = eventList.stream()
+				.filter(MidiNoteEvent.class::isInstance)
+				.map(MidiNoteEvent.class::cast)
+				.collect(Collectors.toList());
 		instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f));
 		instrumentNode.setLocalTranslation(5, 3.6f, 17);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
 		highestLevel.attachChild(instrumentNode);
 		
-		for (int i = 0; i < 47; i++) {
+		for (var i = 0; i < 47; i++) {
 			strings[i] = new HarpString(i);
 			instrumentNode.attachChild(strings[i].stringNode);
 		}
@@ -73,10 +76,10 @@ public class Harp extends SustainedInstrument {
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
-			while (notes.size() != 0 &&
-					((notes.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(notes.get(0)) <= time)
-							||
-							(notes.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(notes.get(0)) <= time - 0.01))
+			while (
+					!notes.isEmpty()
+							&& ((notes.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(notes.get(0)) <= time)
+							|| (notes.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(notes.get(0)) <= time - 0.01))
 			) {
 				eventsToPerform.add(notes.remove(0));
 			}
@@ -87,45 +90,30 @@ public class Harp extends SustainedInstrument {
 			
 			MidiNoteEvent note = (MidiNoteEvent) event;
 			int midiNote = note.note;
-			if (KeyedInstrument.midiValueToColor(note.note) == Keyboard.KeyColor.BLACK) {
+			if (KeyedInstrument.midiValueToColor(note.note) == BLACK) {
 				midiNote--; // round black notes down
 			}
 			int harpString = -1;
 			if (midiNote >= 24 && midiNote <= 103) { // In range of harp
 				int mod = midiNote % 12;
-				switch (mod) {
-					case 0:
-						harpString = 0;
-						break;
-					case 2:
-						harpString = 1;
-						break;
-					case 4:
-						harpString = 2;
-						break;
-					case 5:
-						harpString = 3;
-						break;
-					case 7:
-						harpString = 4;
-						break;
-					case 9:
-						harpString = 5;
-						break;
-					case 11:
-						harpString = 6;
-						break;
-				}
+				harpString = switch (mod) {
+					case 0 -> 0;
+					case 2 -> 1;
+					case 4 -> 2;
+					case 5 -> 3;
+					case 7 -> 4;
+					case 9 -> 5;
+					case 11 -> 6;
+					default -> throw new IllegalStateException("Unexpected value: " + mod);
+				};
 				harpString += ((midiNote - 24) / 12) * 7;
 			}
 			if (event instanceof MidiNoteOnEvent) {
 				if (harpString != -1) {
 					strings[harpString].beginPlaying();
 				}
-			} else if (event instanceof MidiNoteOffEvent) {
-				if (harpString != -1) {
-					strings[harpString].endPlaying();
-				}
+			} else if (event instanceof MidiNoteOffEvent && harpString != -1) {
+				strings[harpString].endPlaying();
 			}
 		}
 		
@@ -189,7 +177,7 @@ public class Harp extends SustainedInstrument {
 			}
 			string = context.loadModel("HarpString.obj", t, Midis2jam2.MatType.UNSHADED, 0.9f);
 			
-			for (int v = 0; v < 5; v++) {
+			for (var v = 0; v < 5; v++) {
 				vibratingStrings[v] = context.loadModel("HarpStringPlaying" + v + ".obj", vt,
 						Midis2jam2.MatType.UNSHADED, 0);
 				vibratingStrings[v].setCullHint(Spatial.CullHint.Always);

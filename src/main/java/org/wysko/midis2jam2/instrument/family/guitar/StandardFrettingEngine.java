@@ -89,7 +89,8 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 */
 	public StandardFrettingEngine(int numberOfStrings, int numberOfFrets, int[] openStringMidiNotes, int rangeLow,
 	                              int rangeHigh) {
-		assert openStringMidiNotes.length == numberOfStrings : "The number of strings does not equal the number of data in the open string MIDI notes.";
+		if (openStringMidiNotes.length != numberOfStrings)
+			throw new IllegalArgumentException("The number of strings does not equal the number of data in the open string MIDI notes.");
 		
 		/* Initialize frets array */
 		frets = new int[numberOfStrings];
@@ -116,7 +117,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 		List<FretboardPosition> possiblePositions = new ArrayList<>();
 		if (midiNote >= rangeLow && midiNote <= rangeHigh) {
 			// String starting notes
-			for (int i = 0; i < numberOfStrings; i++) {
+			for (var i = 0; i < numberOfStrings; i++) {
 				int fret = midiNote - openStringMidiNotes[i];
 				if (fret < 0 || fret > numberOfFrets || frets[i] != -1) {
 					// The note will not fit on this string, or we are not allowed to
@@ -138,7 +139,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 	@Override
 	public void applyFretboardPosition(@NotNull FretboardPosition position) {
 		/* Fail if the position is already occupied */
-		assert frets[position.string] == -1 : "The specified string is already occupied.";
+		if (frets[position.string] != -1) throw new IllegalStateException("The specified string is already occupied.");
 		
 		frets[position.string] = position.fret;
 		runningAverage.add(position);
@@ -158,8 +159,8 @@ public class StandardFrettingEngine implements FrettingEngine {
 		if (runningAverage.isEmpty()) {
 			return new FretboardPosition(0, 0);
 		}
-		int stringAvg = 0;
-		int fretAvg = 0;
+		var stringAvg = 0;
+		var fretAvg = 0;
 		for (FretboardPosition pos : runningAverage) {
 			stringAvg += pos.string;
 			fretAvg += pos.fret;
@@ -177,7 +178,8 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 */
 	@Override
 	public void releaseString(int string) {
-		assert string < numberOfStrings && string >= 0 : "Can't release a string that does not exist.";
+		if (string >= numberOfStrings || string < 0)
+			throw new IllegalArgumentException("Can't release a string that does not exist.");
 		frets[string] = -1;
 	}
 	

@@ -45,11 +45,11 @@ public class StageStrings extends WrappedOctaveSustained {
 	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList, false);
 		twelfths = new StageStringNote[12];
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			stringNodes[i] = new Node();
 			twelfths[i] = new StageStringNote();
 			stringNodes[i].attachChild(twelfths[i].highestLevel);
-			twelfths[i].highestLevel.setLocalTranslation(0, 2 * i, -151.76f);
+			twelfths[i].highestLevel.setLocalTranslation(0, 2f * i, -151.76f);
 			stringNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad((9 / 10f) * i), 0));
 			instrumentNode.attachChild(stringNodes[i]);
 		}
@@ -102,7 +102,7 @@ public class StageStrings extends WrappedOctaveSustained {
 					Midis2jam2.MatType.UNSHADED, 0));
 			
 			// Load anim strings
-			for (int i = 0; i < 5; i++) {
+			for (var i = 0; i < 5; i++) {
 				animStrings[i] = context.loadModel("StageStringBottom" + i + ".obj", "StageStringPlaying.bmp",
 						Midis2jam2.MatType.UNSHADED, 0);
 				animStrings[i].setCullHint(Spatial.CullHint.Always);
@@ -116,8 +116,7 @@ public class StageStrings extends WrappedOctaveSustained {
 			
 			// Load bow
 			bow = context.loadModel("StageStringBow.fbx", "FakeWood.bmp", Midis2jam2.MatType.UNSHADED, 0);
-			Node bowAsNode = (Node) this.bow;
-			bowAsNode.getChild(1).setMaterial(((Geometry) restingString).getMaterial());
+			((Node) this.bow).getChild(1).setMaterial(((Geometry) restingString).getMaterial());
 			bowNode.attachChild(this.bow);
 			bowNode.setLocalTranslation(0, 48, 0);
 			bowNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-60)));

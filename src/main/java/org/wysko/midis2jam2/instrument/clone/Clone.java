@@ -97,7 +97,7 @@ public abstract class Clone {
 	 * @param rotationFactor the rotation factor
 	 * @param rotationAxis   the axis to rotate on when playing
 	 */
-	public Clone(MonophonicInstrument parent, float rotationFactor, Axis rotationAxis) {
+	protected Clone(MonophonicInstrument parent, float rotationFactor, Axis rotationAxis) {
 		this.parent = parent;
 		this.rotationFactor = rotationFactor;
 		this.rotationAxis = rotationAxis;

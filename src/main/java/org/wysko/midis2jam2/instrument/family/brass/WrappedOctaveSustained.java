@@ -62,7 +62,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		setIdleVisibilityByPeriods(time);
 		if (!currentNotePeriods.isEmpty()) {
 			for (Iterator<NotePeriod> iterator = currentNotePeriods.iterator(); iterator.hasNext(); ) {
-				NotePeriod currentNotePeriod = iterator.next();
+				var currentNotePeriod = iterator.next();
 				
 				int midiNote = currentNotePeriod.midiNote;
 				int index = 11 - ((midiNote + 3) % 12);
@@ -108,7 +108,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		 */
 		protected double duration = 0;
 		
-		public TwelfthOfOctave() {
+		protected TwelfthOfOctave() {
 			highestLevel.attachChild(animNode);
 		}
 		

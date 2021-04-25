@@ -65,7 +65,7 @@ public class Cymbal extends SingleStickInstrument {
 		highLevelNode.setLocalTranslation(type.location);
 		highLevelNode.setLocalRotation(type.rotation);
 		highLevelNode.attachChild(cymbalNode);
-		stick.setLocalTranslation(0, 0, -0);
+		stick.setLocalTranslation(0, 0, 0);
 		stick.setLocalTranslation(0, 0, -2.6f);
 		stick.setLocalRotation(new Quaternion().fromAngles(rad(-20), 0, 0));
 		stickNode.setLocalTranslation(0, 2, 18);
@@ -121,7 +121,7 @@ public class Cymbal extends SingleStickInstrument {
 		/**
 		 * The Ride 1 cymbal.
 		 */
-		RIDE_1(new Vector3f(22, 43, -77.8f), new Quaternion().fromAngles(rad(107 - 90), rad(291), rad(-9.45)), 2f, 0.5, 3, 1.5),
+		RIDE_1(new Vector3f(22, 43, -77.8f), new Quaternion().fromAngles(rad(17), rad(291), rad(-9.45)), 2f, 0.5, 3, 1.5),
 		
 		/**
 		 * The Ride 2 cymbal.
@@ -131,7 +131,7 @@ public class Cymbal extends SingleStickInstrument {
 		/**
 		 * The China cymbal.
 		 */
-		CHINA(new Vector3f(32.7f, 34.4f, -68.4f), new Quaternion().fromAngles(rad(108 - 90), rad(-89.2), rad(-10)), 2.0f, 2, 5, 1.5);
+		CHINA(new Vector3f(32.7f, 34.4f, -68.4f), new Quaternion().fromAngles(rad(18), rad(-89.2), rad(-10)), 2.0f, 2, 5, 1.5);
 		
 		/**
 		 * The size of ths cymbal (the scale).

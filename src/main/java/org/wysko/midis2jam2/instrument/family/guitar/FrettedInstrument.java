@@ -156,10 +156,10 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		}
 		
 		float fretDistance = fretToDistance(fret);
-		final Vector3f localScale = new Vector3f(positioning.restingStrings[string]);
+		final var localScale = new Vector3f(positioning.restingStrings[string]);
 		localScale.setY(fretDistance);
 		upperStrings[string].setLocalScale(localScale);
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			frame = frame % 5;
 			if (i == Math.floor(frame)) {
 				lowerStrings[string][i].setCullHint(Spatial.CullHint.Dynamic);
@@ -206,7 +206,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			if (Math.abs(next.endTime - time) < 0.02 || time > next.endTime) {
 				r.remove();
 				NotePeriodWithFretboardPosition next1 = (NotePeriodWithFretboardPosition) next;
-				int string = next1.position.string;
+				int string = next1.getPosition().string;
 				if (string != -1)
 					frettingEngine.releaseString(string);
 			}
@@ -221,13 +221,13 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 * @return true if a new note was played, false otherwise
 	 */
 	protected boolean handleStrings(double time, float delta) {
-		boolean noteStarted = false;
+		var noteStarted = false;
 		
-		for (int i = 0; i < numberOfStrings; i++) {
+		for (var i = 0; i < numberOfStrings; i++) {
 			int finalI = i;
-			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).position.string == finalI).findFirst();
+			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).getPosition().string == finalI).findFirst();
 			if (first.isPresent()) {
-				FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).position;
+				FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).getPosition();
 				if (position.string != -1 && position.fret != -1) {
 					frettingEngine.applyFretboardPosition(position);
 				}
@@ -240,16 +240,16 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			if (notePeriod.animationStarted) continue;
 			NotePeriodWithFretboardPosition notePeriod1 = (NotePeriodWithFretboardPosition) notePeriod;
 			noteStarted = true;
-			final FretboardPosition guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
+			final var guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
 			if (guitarPosition != null) {
 				frettingEngine.applyFretboardPosition(guitarPosition);
-				notePeriod1.position = guitarPosition;
+				notePeriod1.setPosition(guitarPosition);
 			}
 			notePeriod1.animationStarted = true;
 		}
 		
 		/* Animate strings */
-		for (int i = 0; i < numberOfStrings; i++) {
+		for (var i = 0; i < numberOfStrings; i++) {
 			animateString(i, frettingEngine.getFrets()[i]);
 		}
 		
@@ -360,11 +360,11 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			 */
 			public FrettedInstrumentPositioningWithZ(float topY, float bottomY, Vector3f[] restingStrings, float[] topX,
 			                                         float[] bottomX,
-			                                         FretHeightCalculator fretHeights, float[] top_z,
-			                                         float[] bottom_z) {
+			                                         FretHeightCalculator fretHeights, float[] topZ,
+			                                         float[] bottomZ) {
 				super(topY, bottomY, restingStrings, topX, bottomX, fretHeights);
-				topZ = top_z;
-				bottomZ = bottom_z;
+				this.topZ = topZ;
+				this.bottomZ = bottomZ;
 			}
 		}
 	}

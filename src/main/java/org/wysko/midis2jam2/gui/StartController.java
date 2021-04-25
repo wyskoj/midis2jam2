@@ -47,8 +47,8 @@ public class StartController extends DefaultScreenController {
 	
 	static File pickedFile = null;
 	
-	public void chooseFile() throws ReflectiveOperationException, UnsupportedLookAndFeelException {
-		JFileChooser fileChooser = new JFileChooser();
+	public void chooseFile() {
+		var fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setFileFilter(MIDI_FILE_FILTER);
 		fileChooser.setAcceptAllFileFilterUsed(false);
@@ -57,7 +57,7 @@ public class StartController extends DefaultScreenController {
 		int choose = fileChooser.showDialog(null, "Load");
 		
 		if (choose == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = fileChooser.getSelectedFile();
+			var selectedFile = fileChooser.getSelectedFile();
 			if (selectedFile == null) return;
 			pickedFile = selectedFile;
 			TextRenderer midiFilePath = MainScreen.nifty.getCurrentScreen().findElementById("midiFilePath").getRenderer(TextRenderer.class);
@@ -73,7 +73,7 @@ public class StartController extends DefaultScreenController {
 			return;
 		}
 		
-		Launcher.launcher.loadScene(pickedFile, ((MidiDevice.Info) MainScreen.midiDeviceDropDown.getSelection().get(0)));
+		Launcher.app().loadScene(pickedFile, ((MidiDevice.Info) MainScreen.midiDeviceDropDown.getSelection().get(0)));
 	}
 	
 }

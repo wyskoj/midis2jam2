@@ -21,6 +21,7 @@ import org.w3c.dom.*;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -47,15 +48,18 @@ public class PressedKeysFingeringManager implements FingeringManager<Integer[]> 
 	 */
 	public static PressedKeysFingeringManager from(Class<? extends Instrument> clazz) {
 		String className = clazz.getSimpleName();
-		PressedKeysFingeringManager manager = new PressedKeysFingeringManager();
+		var manager = new PressedKeysFingeringManager();
 		/* XML Parsing */
 		try {
-			Document xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream("/instrument_mapping.xml"));
+			final var df = DocumentBuilderFactory.newInstance();
+			df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+			Document xmlDoc = df.newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream("/instrument_mapping.xml"));
 			
 			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
 			
 			/* For each instrument */
-			for (int i = 0; i < instrumentList.getLength(); i++) {
+			for (var i = 0; i < instrumentList.getLength(); i++) {
 				Node instrument = instrumentList.item(i);
 				NamedNodeMap instrumentAttributes = instrument.getAttributes();
 				/* Find instrument with matching name */
@@ -69,12 +73,12 @@ public class PressedKeysFingeringManager implements FingeringManager<Integer[]> 
 					NodeList maps = ((Element) mapping).getElementsByTagName("map");
 					int mapSize = maps.getLength();
 					/* For each defined note */
-					for (int j = 0; j < mapSize; j++) {
+					for (var j = 0; j < mapSize; j++) {
 						Node note = maps.item(j);
 						NodeList keys = ((Element) note).getElementsByTagName("key");
-						Integer[] keyInts = new Integer[keys.getLength()];
+						var keyInts = new Integer[keys.getLength()];
 						/* Collect pressed keys */
-						for (int k = 0; k < keys.getLength(); k++) {
+						for (var k = 0; k < keys.getLength(); k++) {
 							keyInts[k] = Integer.parseInt(keys.item(k).getTextContent());
 						}
 						manager.fingerTable.put(Integer.parseInt(((Element) note).getAttribute("note")), keyInts);

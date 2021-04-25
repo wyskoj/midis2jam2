@@ -61,11 +61,10 @@ public abstract class OneDrumOctave extends DecayedInstrument {
 		super(context, eventList);
 		malletNodes = new Node[12];
 		malletStrikes = new ArrayList[12];
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletStrikes[i] = new ArrayList<>();
 		}
-		List<MidiNoteOnEvent> collect =
-				eventList.stream().filter(e -> e instanceof MidiNoteOnEvent).map(e -> ((MidiNoteOnEvent) e)).collect(Collectors.toList());
+		List<MidiNoteOnEvent> collect = eventList.stream().filter(MidiNoteOnEvent.class::isInstance).map(MidiNoteOnEvent.class::cast).collect(Collectors.toList());
 		for (MidiNoteOnEvent noteOn : collect) {
 			malletStrikes[(noteOn.note + 3) % 12].add(noteOn);
 		}
@@ -74,8 +73,8 @@ public abstract class OneDrumOctave extends DecayedInstrument {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		for (int i = 0; i < 12; i++) {
-			Stick.StickStatus stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3, 50);
+		for (var i = 0; i < 12; i++) {
+			var stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3, 50);
 			if (stickStatus.justStruck()) {
 				animNode.setLocalTranslation(0, -3, 0);
 			}

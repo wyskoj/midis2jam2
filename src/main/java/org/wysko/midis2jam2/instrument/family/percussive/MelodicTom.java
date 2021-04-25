@@ -42,7 +42,7 @@ public class MelodicTom extends OneDrumOctave {
 		super(context, eventList);
 		Spatial drum = context.loadModel("MelodicTom.obj", "DrumShell_MelodicTom.bmp");
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
 			Spatial mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 			malletNodes[i].attachChild(mallet);
@@ -51,7 +51,7 @@ public class MelodicTom extends OneDrumOctave {
 			animNode.attachChild(malletNodes[i]);
 		}
 		
-		drum.setLocalRotation(new Quaternion().fromAngles(rad(126 - 90), 0, 0));
+		drum.setLocalRotation(new Quaternion().fromAngles(rad(36), 0, 0));
 		
 		animNode.attachChild(drum);
 		instrumentNode.attachChild(animNode);

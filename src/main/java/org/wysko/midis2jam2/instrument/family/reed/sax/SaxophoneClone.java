@@ -31,12 +31,12 @@ public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	/**
 	 * The number of keys on a saxophone.
 	 */
-	private final static int NUMBER_OF_KEYS = 20;
+	private static final int NUMBER_OF_KEYS = 20;
 	
 	/**
 	 * The amount to rotate the sax by when playing.
 	 */
-	private final static float ROTATION_FACTOR = 0.1f;
+	private static final float ROTATION_FACTOR = 0.1f;
 	
 	/**
 	 * Instantiates a new Saxophone clone.
@@ -44,10 +44,10 @@ public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	 * @param parent        the parent
 	 * @param stretchFactor the stretch factor
 	 */
-	public SaxophoneClone(Saxophone parent, float stretchFactor) {
+	protected SaxophoneClone(Saxophone parent, float stretchFactor) {
 		super(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor);
 		
-		for (int i = 0; i < keyCount; i++) {
+		for (var i = 0; i < keyCount; i++) {
 			keysUp[i] = parent.context.loadModel(String.format("AltoSaxKeyUp%d.obj", i),
 					"HornSkinGrey.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 			
@@ -60,6 +60,6 @@ public abstract class SaxophoneClone extends UpAndDownKeyClone {
 	
 	@Override
 	protected void moveForPolyphony() {
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25 * indexForMoving()), 0));
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25f * indexForMoving()), 0));
 	}
 }

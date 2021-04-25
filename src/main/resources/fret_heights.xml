@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (C) 2021 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+<instruments>
+    <instrument name="BassGuitar">
+        <value fret="0" scale="0.0"/>
+        <value fret="1" scale="0.05"/>
+        <value fret="2" scale="0.1"/>
+        <value fret="3" scale="0.15"/>
+        <value fret="4" scale="0.20"/>
+        <value fret="5" scale="0.24"/>
+        <value fret="6" scale="0.285"/>
+        <value fret="7" scale="0.325"/>
+        <value fret="8" scale="0.364"/>
+        <value fret="9" scale="0.4"/>
+        <value fret="10" scale="0.43"/>
+        <value fret="11" scale="0.464"/>
+        <value fret="12" scale="0.494"/>
+        <value fret="13" scale="0.523"/>
+        <value fret="14" scale="0.55"/>
+        <value fret="15" scale="0.575"/>
+        <value fret="16" scale="0.6"/>
+        <value fret="17" scale="0.62"/>
+        <value fret="18" scale="0.643"/>
+        <value fret="19" scale="0.663"/>
+        <value fret="20" scale="0.68"/>
+        <value fret="21" scale="0.698"/>
+        <value fret="22" scale="0.716"/>
+    </instrument>
+    <instrument name="Guitar">
+        <value fret="0" scale="0"/>
+        <value fret="1" scale="0.03744493392"/>
+        <value fret="2" scale="0.09691629956"/>
+        <value fret="3" scale="0.1431718062"/>
+        <value fret="4" scale="0.1916299559"/>
+        <value fret="5" scale="0.2400881057"/>
+        <value fret="6" scale="0.2841409692"/>
+        <value fret="7" scale="0.3193832599"/>
+        <value fret="8" scale="0.359030837"/>
+        <value fret="9" scale="0.3920704846"/>
+        <value fret="10" scale="0.4295154185"/>
+        <value fret="11" scale="0.4603524229"/>
+        <value fret="12" scale="0.4911894273"/>
+        <value fret="13" scale="0.5176211454"/>
+        <value fret="14" scale="0.5440528634"/>
+        <value fret="15" scale="0.5726872247"/>
+        <value fret="16" scale="0.5947136564"/>
+        <value fret="17" scale="0.6189427313"/>
+        <value fret="18" scale="0.6387665198"/>
+        <value fret="19" scale="0.6585903084"/>
+        <value fret="20" scale="0.6806167401"/>
+        <value fret="21" scale="0.6982378855"/>
+        <value fret="22" scale="0.7158590308"/>
+    </instrument>
+</instruments>

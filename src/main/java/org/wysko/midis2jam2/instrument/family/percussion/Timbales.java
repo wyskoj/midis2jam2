@@ -22,7 +22,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.StickDrum;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -90,9 +89,9 @@ public class Timbales extends NonDrumSetPercussion {
 		lowTimbaleAnimNode.attachChild(lowTimbale);
 		highTimbaleAnimNode.attachChild(highTimbale);
 		
-		Node lowTimbaleNode = new Node();
+		var lowTimbaleNode = new Node();
 		lowTimbaleNode.attachChild(lowTimbaleAnimNode);
-		Node highTimbaleNode = new Node();
+		var highTimbaleNode = new Node();
 		highTimbaleNode.attachChild(highTimbaleAnimNode);
 		
 		instrumentNode.attachChild(lowTimbaleNode);
@@ -124,17 +123,17 @@ public class Timbales extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			StickDrum.recoilDrum(lowTimbaleAnimNode, true, strike.velocity, delta);
+			recoilDrum(lowTimbaleAnimNode, true, strike.velocity, delta);
 		} else {
-			StickDrum.recoilDrum(lowTimbaleAnimNode, false, 0, delta);
+			recoilDrum(lowTimbaleAnimNode, false, 0, delta);
 		}
 		
 		if (statusHigh.justStruck()) {
 			MidiNoteOnEvent strike = statusHigh.getStrike();
 			assert strike != null;
-			StickDrum.recoilDrum(highTimbaleAnimNode, true, strike.velocity, delta);
+			recoilDrum(highTimbaleAnimNode, true, strike.velocity, delta);
 		} else {
-			StickDrum.recoilDrum(highTimbaleAnimNode, false, 0, delta);
+			recoilDrum(highTimbaleAnimNode, false, 0, delta);
 		}
 	}
 }

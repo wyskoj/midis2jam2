@@ -43,9 +43,9 @@ public class SteelDrums extends OneDrumOctave {
 		super(context, eventList);
 		Spatial drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 		
-		Node[] adjustments = new Node[12];
+		var adjustments = new Node[12];
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			adjustments[i] = new Node();
 			malletNodes[i] = new Node();
 			
@@ -96,7 +96,7 @@ public class SteelDrums extends OneDrumOctave {
 		adjustments[11].setLocalTranslation(-4.33f, 4.95f, 16.2f);
 		adjustments[11].setLocalRotation(new Quaternion().fromAngles(rad(-30), rad(-15), 0));
 		
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(119 - 90), 0, 0));
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(29), 0, 0));
 		
 		drum.setLocalTranslation(0, 2, 0);
 		animNode.attachChild(drum);
@@ -105,15 +105,8 @@ public class SteelDrums extends OneDrumOctave {
 		highestLevel.attachChild(instrumentNode);
 	}
 	
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-	}
-	
-	
 	@Override
 	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-37 - 15 * indexForMoving()), 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-37f - 15 * indexForMoving()), 0));
 	}
 }

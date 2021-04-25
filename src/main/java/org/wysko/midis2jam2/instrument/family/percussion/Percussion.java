@@ -63,8 +63,8 @@ public class Percussion extends Instrument {
 		super(context);
 		/* Percussion only cares about note on. */
 		this.noteOnEvents = events.stream()
-				.filter(e -> e instanceof MidiNoteOnEvent)
-				.map(e -> ((MidiNoteOnEvent) e))
+				.filter(MidiNoteOnEvent.class::isInstance)
+				.map(MidiNoteOnEvent.class::cast)
 				.collect(Collectors.toList());
 		
 		
@@ -72,9 +72,9 @@ public class Percussion extends Instrument {
 				noteOnEvents.stream().filter(e -> e.note == 40 || e.note == 38).collect(Collectors.toList())));
 		
 		/* For some reason, the bass drum needs special attention ?? */
-		BassDrum e1 = new BassDrum(context,
+		var e1 = new BassDrum(context,
 				noteOnEvents.stream().filter(e -> e.note == 35 || e.note == 36).collect(Collectors.toList()));
-		Node drumSetNode = new Node();
+		var drumSetNode = new Node();
 		drumSetNode.attachChild(e1.highLevelNode);
 		instruments.add(e1);
 		
@@ -156,7 +156,7 @@ public class Percussion extends Instrument {
 		
 		/* Add shadow */
 		Spatial shadow = context.getAssetManager().loadModel("Assets/DrumShadow.obj");
-		Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/DrumShadow.png"));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);

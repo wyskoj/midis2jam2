@@ -34,7 +34,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.apache.commons.lang3.Range;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.instrument.Instrument;
@@ -64,19 +66,28 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
 
-import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.jme3.scene.Spatial.CullHint.Always;
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
+import static java.util.logging.Level.INFO;
 import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
+	
+	public static final Logger logger = Logger.getLogger(Midis2jam2.class.getName());
+	
 	private static final String LIGHTING_MAT = "Common/MatDefs/Light/Lighting.j3md";
+	
+	static {
+		logger.setLevel(Level.ALL);
+	}
 	
 	/**
 	 * The list of instruments.
@@ -88,6 +99,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	final List<Spatial> guitarShadows = new ArrayList<>();
 	
+	/**
+	 * The root note of the scene.
+	 */
 	private final Node rootNode = new Node("root");
 	
 	/**
@@ -137,8 +151,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * 3D text for debugging.
 	 */
 	private BitmapText debugText;
-	
-	private Sequence sequence;
 	
 	private SimpleApplication app;
 	
@@ -190,6 +202,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		super.initialize(stateManager, app);
 		this.app = (Launcher) app;
 		
+		// Initialize camera settings
 		this.app.getFlyByCamera().setMoveSpeed(100f);
 		this.app.getFlyByCamera().setZoomSpeed(-10);
 		this.app.getFlyByCamera().setEnabled(true);
@@ -198,13 +211,13 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		setupKeys();
 		setCamera(CAMERA_1A);
 		
-		
+		// Load stage
 		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
-		
 		rootNode.attachChild(stage);
 		
 		initDebugText();
 		
+		// Instrument calculation
 		try {
 			calculateInstruments();
 		} catch (ReflectiveOperationException e) {
@@ -213,6 +226,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		addShadowsAndStands();
 		
+		// Begin MIDI playback
 		new Timer(true).scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
@@ -235,8 +249,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				}
 			}
 		}, 0, 1);
-		
-		
 	}
 	
 	@Override
@@ -244,7 +256,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		super.update(tpf);
 		
 		if (tpf > 1 && !tpfHack) {
-			/* TODO This is a hack. When the appstate inits, any time spent on the main screen is added to tpf on the first launch. */
+			/* TODO This is a hack. When the app-state inits, any time spent on the main screen is added to tpf on
+			    the first launch. */
 			tpf = 0;
 			tpfHack = true;
 		}
@@ -254,24 +267,26 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			timeSinceStart += tpf;
 		
 		for (Instrument instrument : instruments) {
-			if (instrument != null) // Null if not implemented yet
+			if (instrument != null) { // Null if not implemented yet
 				instrument.tick(timeSinceStart, tpf);
+			}
 		}
 		
 		updateShadowsAndStands();
-
-//		if (timeSinceStart > (getSequence().getMicrosecondLength() / 1E6) + 3) {
-//			Launcher.launcher.goBackToMainScreen();
-//			System.out.println("Going back to main screen because song is finished.");
-//		}
 	}
 	
 	@Override
 	public void cleanup() {
+		logger.log(INFO, "Cleaning up.");
 		sequencer.stop();
 		sequencer.close();
 	}
 	
+	/**
+	 * For testing purposes, recursively sets all children of a given node to not cull.
+	 *
+	 * @param rootNode the node
+	 */
 	@TestOnly
 	@SuppressWarnings("unused")
 	private void showAll(Node rootNode) {
@@ -294,7 +309,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		stand.setCullHint(
 				instruments.stream()
 						.filter(Objects::nonNull)
-						.anyMatch(i -> i.visible && clazz.isInstance(i)) ? Dynamic : Always);
+						.anyMatch(i -> i.isVisible() && clazz.isInstance(i)) ? Dynamic : Always);
 	}
 	
 	/**
@@ -307,17 +322,27 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @param clazz   the class of the instrument
 	 */
 	private void updateArrayShadows(List<Spatial> shadows, Class<? extends Instrument> clazz) {
-		long numVisible = instruments.stream().filter(i -> clazz.isInstance(i) && i.visible).count();
+		long numVisible = instruments.stream().filter(i -> clazz.isInstance(i) && i.isVisible()).count();
 		for (var i = 0; i < shadows.size(); i++) {
 			shadows.get(i).setCullHint(i < numVisible ? Dynamic : Always);
 		}
 	}
 	
+	/**
+	 * Updates the visible shadows and stands on the stage.
+	 * <p>
+	 * For the keyboard, the stand is visible is there is at least one visible keyboard. The shadow is scaled along the
+	 * z-axis by the number of visible keyboards.
+	 * <p>
+	 * For the mallets, the stand is visible is there is at least one visible mallet.
+	 * <p>
+	 * For the guitar, bass guitar, and harp, calls {@link #updateArrayShadows(List, Class)}.
+	 */
 	private void updateShadowsAndStands() {
 		// Keyboard stand and shadow
 		setStandVisibility(pianoStand, Keyboard.class);
 		if (keyboardShadow != null)
-			keyboardShadow.setLocalScale(1, 1, instruments.stream().filter(k -> k instanceof Keyboard && k.visible).count());
+			keyboardShadow.setLocalScale(1, 1, instruments.stream().filter(k -> k instanceof Keyboard && k.isVisible()).count());
 		
 		// Mallet stand
 		setStandVisibility(malletStand, Mallets.class);
@@ -338,102 +363,176 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		// Create 16 ArrayLists for each channel
 		IntStream.range(0, 16).forEach(i -> channels.add(new ArrayList<>()));
 		
-		// For each track
-		for (MidiTrack track : getFile().tracks) {
-			if (track == null) continue;
-			// Add important events
-			for (MidiEvent event : track.events) {
-				if (event instanceof MidiChannelSpecificEvent) {
-					MidiChannelSpecificEvent channelEvent = (MidiChannelSpecificEvent) event;
-					int channel = channelEvent.channel;
-					channels.get(channel).add(channelEvent);
-				}
-			}
-		}
+		// For each track, assign each event to the corresponding channel
+		Arrays.stream(getFile().tracks)
+				.filter(Objects::nonNull)
+				.forEach(track -> track.events.stream()
+						.filter(MidiChannelSpecificEvent.class::isInstance)
+						.map(MidiChannelSpecificEvent.class::cast)
+						.forEach(channelEvent -> channels.get(channelEvent.channel).add(channelEvent)
+						));
+		
+		// Sort channels by time of event (stable)
 		for (ArrayList<MidiChannelSpecificEvent> channelEvent : channels) {
 			channelEvent.sort(MidiChannelSpecificEvent.COMPARE_BY_TIME);
 		}
+		
+		// For each channel
 		for (int j = 0, channelsLength = channels.size(); j < channelsLength; j++) {
-			ArrayList<MidiChannelSpecificEvent> channel = channels.get(j);
-			if (j != 9) { // A melodic channel
-				boolean hasANoteOn = channel.stream().anyMatch(MidiNoteOnEvent.class::isInstance);
+			ArrayList<MidiChannelSpecificEvent> channelEvents = channels.get(j);
+			if (j == 9) {
+				instruments.add(new Percussion(this, channelEvents));
+			} else {
+				// A melodic channel
+				boolean hasANoteOn = channelEvents.stream().anyMatch(MidiNoteOnEvent.class::isInstance);
 				if (!hasANoteOn) continue; // Skip silent channels
 				
-				List<MidiProgramEvent> programEvents = new ArrayList<>();
-				for (MidiChannelSpecificEvent channelEvent : channel) {
-					if (channelEvent instanceof MidiProgramEvent) {
-						programEvents.add(((MidiProgramEvent) channelEvent));
-					}
+				// Collect program events
+				List<MidiProgramEvent> programEvents = channelEvents.stream()
+						.filter(MidiProgramEvent.class::isInstance)
+						.map(MidiProgramEvent.class::cast)
+						.collect(Collectors.toList());
+				
+				// Add instrument 0 if there is no program events or there is none at the beginning
+				if (programEvents.isEmpty() || programEvents.stream().noneMatch(e -> e.time == 0)) {
+					programEvents.add(0, new MidiProgramEvent(0, j, 0));
 				}
 				
-				if (programEvents.isEmpty()) { // It is possible for no program event, revert to instrument 0
-					programEvents.add(new MidiProgramEvent(0, j, 0));
-				}
-				
-				for (var i = 0; i < programEvents.size() - 1; i++) {
-					final MidiProgramEvent a = programEvents.get(i);
-					final MidiProgramEvent b = programEvents.get(i + 1);
-					/* Remove program events at same time (keep the last one) */
-					if (a.time == b.time) {
-						programEvents.remove(i);
-						i--;
-						continue;
-					}
-					/* Remove program events with same value (keep the first one) */
-					if (a.programNum == b.programNum) {
-						programEvents.remove(i + 1);
-					}
-				}
-				
-				if (programEvents.size() == 1) {
-					instruments.add(fromEvents(programEvents.get(0), channel));
-				} else {
-					for (var i = 0; i < programEvents.size() - 1; i++) {
-						List<MidiChannelSpecificEvent> events = new ArrayList<>();
-						for (MidiChannelSpecificEvent eventInChannel : channel) {
-							if (eventInChannel.time < programEvents.get(i + 1).time) {
-								if (i > 0) {
-									if (eventInChannel.time >= programEvents.get(i).time) {
-										events.add(eventInChannel);
-									}
-								} else {
-									events.add(eventInChannel);
-								}
-							} else {
-								break;
-							}
-						}
-						instruments.add(fromEvents(programEvents.get(i), events));
-					}
-					List<MidiChannelSpecificEvent> lastInstrumentEvents = new ArrayList<>();
-					MidiProgramEvent lastProgramEvent = programEvents.get(programEvents.size() - 1);
-					for (MidiChannelSpecificEvent channelEvent : channel) {
-						if (channelEvent.time >= lastProgramEvent.time) {
-							lastInstrumentEvents.add(channelEvent);
-						}
-					}
-					instruments.add(fromEvents(lastProgramEvent, lastInstrumentEvents));
-				}
-			} else {
-				Percussion percussion = new Percussion(this, channel);
-				instruments.add(percussion);
+				removeDuplicateProgramEvents(programEvents);
+				assignChannelEventsToInstruments(channelEvents, programEvents);
 			}
 		}
 	}
 	
 	/**
-	 * Given a program event and list of events, returns a new instrument of the correct type containing the specified
-	 * events. Follows the GM-1 standard.
+	 * Given a list of channel-specific events and program events, assigns events to new instruments, adhering to the
+	 * program event list. Essentially, it determines which instrument should play which notes.
+	 * <p>
+	 * This method's implementation is different from that in MIDIJam. In MIDIJam, when a channel would switch programs,
+	 * it would spawn a new instrument every time. For example, if a channel played 8th notes and switched between two
+	 * different instruments on each note, a new instrument would be spawned for each note.
+	 * <p>
+	 * This method consolidates duplicate instrument types to reduce bloating. That is, if two program events in this
+	 * channel appear, containing the same program number, the events that occur in each will be merged into a single
+	 * instrument.
+	 * <p>
+	 * Because it is possible for a program event to occur in between a note on event and the corresponding note off
+	 * event, the method keeps track of which instrument each note on event occurs on. Then, when a note off event
+	 * occurs, rather than checking the last program event to determine which instrument it should apply to, it applies
+	 * it to the instrument of the last note on with the same note value.
 	 *
-	 * @param programEvent the program event, from which the program number is used
-	 * @param events       the list of events to apply to this instrument
-	 * @return a new instrument of the correct type containing the specified events
+	 * @param channelEvents the list of all events in this channel
+	 * @param programEvents the list of all program events in this channel
+	 * @throws ReflectiveOperationException if there was an error creating instruments
+	 */
+	private void assignChannelEventsToInstruments(ArrayList<MidiChannelSpecificEvent> channelEvents, List<MidiProgramEvent> programEvents) throws ReflectiveOperationException {
+		if (programEvents.size() == 1) {
+			// If there is only one program event, just assign all events to that
+			instruments.add(fromEvents(programEvents.get(0).programNum, channelEvents));
+			return;
+		}
+		
+		// Maps program numbers to the list of events
+		HashMap<Integer, List<MidiChannelSpecificEvent>> lastProgramForNote = new HashMap<>();
+		
+		// Initializes map with empty list
+		for (MidiProgramEvent programEvent : programEvents) {
+			lastProgramForNote.putIfAbsent(programEvent.programNum, new ArrayList<>());
+		}
+		
+		// The key here is MIDI note, the value is the program that that note applied to
+		HashMap<Integer, MidiProgramEvent> noteOnPrograms = new HashMap<>();
+		
+		// For each channel event
+		for (MidiChannelSpecificEvent event : channelEvents) {
+			// If NOT a note off
+			if (!(event instanceof MidiNoteOffEvent)) {
+				// For each program event
+				for (var i = 0; i < programEvents.size(); i++) {
+					// If the event occurs within the range of these program events
+					if (i == programEvents.size() - 1 || Range.between(programEvents.get(i).time, programEvents.get(i + 1).time).contains(event.time)) {
+						// Add this event
+						lastProgramForNote.get(programEvents.get(i).programNum).add(event);
+						if (event instanceof MidiNoteOnEvent) {
+							// Keep track of the program if note on, for note off link
+							noteOnPrograms.put(((MidiNoteOnEvent) event).note, programEvents.get(i));
+						}
+						break;
+					}
+				}
+			} else {
+				// Note off events need to be added to the program of the last MIDI note on with that same value
+				lastProgramForNote.get(noteOnPrograms.get(((MidiNoteOffEvent) event).note).programNum).add(event);
+			}
+		}
+		
+		// Create instruments from each program and list
+		for (Map.Entry<Integer, List<MidiChannelSpecificEvent>> integerListEntry : lastProgramForNote.entrySet()) {
+			instruments.add(fromEvents(integerListEntry.getKey(), integerListEntry.getValue()));
+		}
+	}
+	
+	/**
+	 * Given a list of program events, removes duplicate events. There are two types of duplicate events:
+	 * <ul>
+	 *     <li>Events that occur at the same time</li>
+	 *     <li>Events that have the same program value</li>
+	 * </ul>
+	 * <p>
+	 *      For events at the same time, the last of two events is kept (in the order of the list). So, if a list contained
+	 *      <pre>
+	 *          [time = 0, num = 43], [time = 0, num = 24], [time = 0, num = 69]
+	 *      </pre>
+	 *      it would afterwards contain
+	 *      <pre>
+	 *           [time = 0, num = 69]
+	 *      </pre>
+	 * </p>
+	 * <p>
+	 *      For events that have the same program value, the first of two events is kept (in the order of the list). So,
+	 *      if a list contained
+	 *      <pre>
+	 *           [time = 0, num = 50], [time = 128, num = 50], [time = 3000, num = 50]
+	 *      </pre>
+	 *      it would afterwards contain
+	 *      <pre>
+	 *          [time = 0, num = 50]
+	 *      </pre>
+	 * </p>
+	 *
+	 * @param programEvents the list of program events
+	 */
+	private void removeDuplicateProgramEvents(@NotNull List<MidiProgramEvent> programEvents) {
+		// Remove program events at same time (keep the last one)
+		for (int i = programEvents.size() - 2; i >= 0; i--) {
+			while (programEvents.get(i).time == programEvents.get(i + 1).time) {
+				programEvents.remove(i);
+			}
+		}
+		
+		// Remove program events with same value (keep the first one)
+		for (int i = programEvents.size() - 2; i >= 0; i--) {
+			while (i != programEvents.size() - 1 && programEvents.get(i).programNum == programEvents.get(i + 1).programNum) {
+				programEvents.remove(i + 1);
+			}
+		}
+	}
+	
+	/**
+	 * Given a program number and list of events, returns a new instrument of the correct type containing the specified
+	 * events. Follows the GM-1 standard. If the instrument associated with the program number is not yet implemented,
+	 * returns null.
+	 *
+	 * @param programNum the number of the program event
+	 * @param events     the list of events to apply to this instrument
+	 * @return a new instrument of the correct type containing the specified events, or null if the instrument is not
+	 * yet implemented
 	 */
 	@SuppressWarnings("SpellCheckingInspection")
 	@Nullable
-	private Instrument fromEvents(MidiProgramEvent programEvent,
+	private Instrument fromEvents(int programNum,
 	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
-		return switch (programEvent.programNum) {
+		return switch (programNum) {
 			// Acoustic Grand Piano
 			// Bright Acoustic Piano
 			// Electric Grand Piano
@@ -603,6 +702,10 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		};
 	}
 	
+	/**
+	 * Initializes on-screen debug text.
+	 */
+	@TestOnly
 	private void initDebugText() {
 		var bitmapFont = this.app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
 		setDebugText(new BitmapText(bitmapFont, false));
@@ -612,6 +715,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.app.getGuiNode().attachChild(getDebugText());
 	}
 	
+	/**
+	 * Loads and adds shadows and stands for the keyboard, mallets, guitar, bass guitar, and harp.
+	 */
 	private void addShadowsAndStands() {
 		if (instruments.stream().anyMatch(Keyboard.class::isInstance)) {
 			pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
@@ -670,6 +776,13 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Given a model and texture, returns the shadow object with correct transparency.
+	 *
+	 * @param model   the shadow model
+	 * @param texture the shadow texture
+	 * @return the shadow object
+	 */
 	@Contract(pure = true)
 	public Spatial shadow(String model, String texture) {
 		Spatial shadow = this.app.getAssetManager().loadModel(model);
@@ -727,6 +840,12 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		return model;
 	}
 	
+	/**
+	 * Returns a reflective material given a texture file.
+	 *
+	 * @param reflectiveTextureFile the path to the texture
+	 * @return the reflective material
+	 */
 	public Material reflectiveMaterial(String reflectiveTextureFile) {
 		var material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
 		material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
@@ -785,8 +904,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		if (name.equals("exit")) {
 			if (sequencer.isOpen())
 				sequencer.stop();
-			Launcher.launcher.goBackToMainScreen();
-			System.out.println("Going to back to main screen because of ESC key.");
+			Launcher.app().goBackToMainScreen();
+			logger.info("Going to back to main screen because of ESC key.");
 		}
 		if (isPressed && name.startsWith("cam")) {
 			try {
@@ -805,7 +924,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				};
 				setCamera(valueOf(currentCamera.name()));
 			} catch (IllegalArgumentException ignored) {
-				System.err.println("Bad camera string.");
+				logger.warning("Bad camera string.");
 			}
 		}
 	}
@@ -824,14 +943,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
 	public void setDebugText(BitmapText debugText) {
 		this.debugText = debugText;
-	}
-	
-	public Sequence getSequence() {
-		return sequence;
-	}
-	
-	public void setSequence(Sequence sequence) {
-		this.sequence = sequence;
 	}
 	
 	public enum MatType {

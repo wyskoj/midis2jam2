@@ -55,7 +55,7 @@ public class Whistles extends WrappedOctaveSustained {
 		
 		IntStream.range(0, 12).forEach(i -> whistleNodes[i] = new Node());
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			twelfths[i] = new Whistle(i);
 			twelfths[i].highestLevel.setLocalTranslation(-12, 0, 0);
 			

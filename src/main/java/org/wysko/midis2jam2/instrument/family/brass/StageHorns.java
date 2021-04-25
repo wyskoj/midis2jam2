@@ -55,7 +55,7 @@ public class StageHorns extends WrappedOctaveSustained {
 		super(context, eventList, false);
 		
 		twelfths = new StageHornNote[12];
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			hornNodes[i] = new Node();
 			twelfths[i] = new StageHornNote();
 			hornNodes[i].attachChild(twelfths[i].highestLevel);

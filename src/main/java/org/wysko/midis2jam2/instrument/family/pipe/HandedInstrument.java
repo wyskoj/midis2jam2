@@ -40,15 +40,15 @@ public abstract class HandedInstrument extends MonophonicInstrument {
 	 * @param manager   the fingering manager
 	 * @throws ReflectiveOperationException if clone constructor errors
 	 */
-	public HandedInstrument(@NotNull Midis2jam2 context,
-	                        @NotNull List<MidiChannelSpecificEvent> eventList,
-	                        @NotNull Class<? extends Clone> clazz,
-	                        @NotNull HandPositionFingeringManager manager) throws ReflectiveOperationException {
+	protected HandedInstrument(@NotNull Midis2jam2 context,
+	                           @NotNull List<MidiChannelSpecificEvent> eventList,
+	                           @NotNull Class<? extends Clone> clazz,
+	                           @NotNull HandPositionFingeringManager manager) throws ReflectiveOperationException {
 		super(context, eventList, clazz, manager);
 	}
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 10f * indexForMoving(), 0);
 	}
 }

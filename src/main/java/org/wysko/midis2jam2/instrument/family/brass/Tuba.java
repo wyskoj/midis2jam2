@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument.family.brass;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +57,7 @@ public class Tuba extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 40 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 40f * indexForMoving(), 0);
 	}
 	
 	/**
@@ -76,11 +75,10 @@ public class Tuba extends MonophonicInstrument {
 			bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
-			Material material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
-			((Node) body).getChild(1).setMaterial(material);
+			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
 			/* Load tuba keys */
-			for (int i = 0; i < 4; i++) {
+			for (var i = 0; i < 4; i++) {
 				keys[i] = context.loadModel("TubaKey" + (i + 1) + ".obj", "HornSkinGrey.bmp",
 						Midis2jam2.MatType.REFLECTIVE, 0.9f);
 				modelNode.attachChild(keys[i]);
@@ -92,13 +90,13 @@ public class Tuba extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(50 * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(50f * indexForMoving()), 0));
 		}
 		
 		@Override
 		protected void animateKeys(@NotNull Integer[] pressed) {
 			/* Tuba keys move down when pressed */
-			for (int i = 0; i < 4; i++) {
+			for (var i = 0; i < 4; i++) {
 				int finalI = i;
 				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
 					keys[i].setLocalTranslation(0, -0.5f, 0);

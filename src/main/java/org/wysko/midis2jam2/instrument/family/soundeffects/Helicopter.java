@@ -54,7 +54,7 @@ public class Helicopter extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		highestLevel.setLocalTranslation(50 * indexForMoving(), 0, 0);
+		highestLevel.setLocalTranslation(50f * indexForMoving(), 0, 0);
 	}
 	
 	/**
@@ -94,7 +94,7 @@ public class Helicopter extends MonophonicInstrument {
 			noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
 			
 			
-			Random random = new Random();
+			var random = new Random();
 			rotXRand = random.nextFloat();
 			rotYRand = random.nextFloat();
 			rotZRand = random.nextFloat();
@@ -136,7 +136,7 @@ public class Helicopter extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalTranslation(0, 0, -100 * indexForMoving());
+			offsetNode.setLocalTranslation(0, 0, -100f * indexForMoving());
 		}
 	}
 }

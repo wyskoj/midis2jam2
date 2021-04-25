@@ -41,7 +41,7 @@ public class AltoSax extends Saxophone {
 	/**
 	 * The amount to stretch the bell of this instrument by.
 	 */
-	private final static float STRETCH_FACTOR = 0.65f;
+	private static final float STRETCH_FACTOR = 0.65f;
 	
 	/**
 	 * Constructs an alto saxophone.
@@ -67,8 +67,8 @@ public class AltoSax extends Saxophone {
 		public AltoSaxClone() {
 			super(AltoSax.this, STRETCH_FACTOR);
 			
-			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp");
-			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+			var shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp");
+			var black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 			black.setColor("Color", ColorRGBA.Black);
 			
 			this.body = context.getAssetManager().loadModel("Assets/AltoSaxBody.fbx");

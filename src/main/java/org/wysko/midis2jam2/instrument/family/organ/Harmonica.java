@@ -56,7 +56,7 @@ public class Harmonica extends SustainedInstrument {
 		
 		instrumentNode.attachChild(context.loadModel("Harmonica.obj", "Harmonica.bmp"));
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			pufferNodes[i] = new Node();
 			puffers[i] = new SteamPuffer(context, SteamPuffer.SteamPuffType.HARMONICA, 0.75);
 			puffers[i].steamPuffNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-90), 0));
@@ -87,6 +87,6 @@ public class Harmonica extends SustainedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 10f * indexForMoving(), 0);
 	}
 }

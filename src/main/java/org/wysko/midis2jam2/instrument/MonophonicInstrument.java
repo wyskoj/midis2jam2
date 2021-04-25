@@ -24,7 +24,6 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager;
 import org.wysko.midis2jam2.instrument.clone.Clone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.NotePeriod;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -32,8 +31,8 @@ import java.util.List;
 
 /**
  * A monophonic instrument is any instrument that can only play one note at a time (e.g., saxophones, clarinets,
- * ocarinas, etc.). Because this limitation is lifted in MIDI files, midis2jam2 needs to visualize polyphony by
- * spawning "clones" of an instrument. These clones will only appear when necessary.
+ * ocarinas, etc.). Because this limitation is lifted in MIDI files, midis2jam2 needs to visualize polyphony by spawning
+ * "clones" of an instrument. These clones will only appear when necessary.
  * <p>
  * It happens to be that every monophonic instrument is also a {@link SustainedInstrument}.
  *
@@ -46,7 +45,6 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	 */
 	@NotNull
 	public final Node groupOfPolyphony = new Node();
-	
 	
 	/**
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
@@ -63,10 +61,10 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	 * @param context   context to midis2jam2
 	 * @param eventList the event list
 	 */
-	public MonophonicInstrument(@NotNull Midis2jam2 context,
-	                            @NotNull List<MidiChannelSpecificEvent> eventList,
-	                            @NotNull Class<? extends Clone> cloneClass,
-	                            @Nullable FingeringManager<?> manager) throws ReflectiveOperationException {
+	protected MonophonicInstrument(@NotNull Midis2jam2 context,
+	                               @NotNull List<MidiChannelSpecificEvent> eventList,
+	                               @NotNull Class<? extends Clone> cloneClass,
+	                               @Nullable FingeringManager<?> manager) throws ReflectiveOperationException {
 		super(context, eventList);
 		this.clones = calculateClones(this, cloneClass);
 		
@@ -79,9 +77,9 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	}
 	
 	/**
-	 * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number
-	 * of "clones" needed to visualize this and determine which note events shall be assigned to which clones, using
-	 * the least number of clones.
+	 * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
+	 * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
+	 * least number of clones.
 	 *
 	 * @param instrument the monophonic instrument that is handling the clones
 	 * @param cloneClass the class of the {@link Clone} to instantiate
@@ -89,22 +87,22 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	 */
 	protected List<Clone> calculateClones(@NotNull MonophonicInstrument instrument,
 	                                      @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
-		List<Clone> clones = new ArrayList<>();
+		List<Clone> calcClones = new ArrayList<>();
 		Constructor<?> constructor = cloneClass.getDeclaredConstructor(instrument.getClass());
-		clones.add((Clone) constructor.newInstance(instrument));
-		for (int i = 0; i < notePeriods.size(); i++) {
-			for (int j = 0; j < notePeriods.size(); j++) {
+		calcClones.add((Clone) constructor.newInstance(instrument));
+		for (var i = 0; i < notePeriods.size(); i++) {
+			for (var j = 0; j < notePeriods.size(); j++) {
 				if (j == i && i != notePeriods.size() - 1) continue;
-				NotePeriod comp1 = notePeriods.get(i);
-				NotePeriod comp2 = notePeriods.get(j);
+				var comp1 = notePeriods.get(i);
+				var comp2 = notePeriods.get(j);
 				if (comp1.startTick() > comp2.endTick()) continue;
 				if (comp1.endTick() < comp2.startTick()) {
-					clones.get(0).notePeriods.add(comp1);
+					calcClones.get(0).notePeriods.add(comp1);
 					break;
 				}
 				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
-					boolean added = false;
-					for (Clone clone : clones) {
+					var added = false;
+					for (Clone clone : calcClones) {
 						if (!clone.isPlaying(comp1.startTick())) {
 							clone.notePeriods.add(comp1);
 							added = true;
@@ -114,15 +112,15 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 					if (!added) {
 						Clone e = (Clone) constructor.newInstance(instrument);
 						e.notePeriods.add(comp1);
-						clones.add(e);
+						calcClones.add(e);
 					}
 				} else {
-					clones.get(0).notePeriods.add(comp1);
+					calcClones.get(0).notePeriods.add(comp1);
 				}
 				break;
 			}
 		}
-		return clones;
+		return calcClones;
 	}
 	
 	/**

@@ -23,7 +23,6 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -46,42 +45,18 @@ public class BassGuitar extends FrettedInstrument {
 	 */
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context,
-				new StandardFrettingEngine(4, 22, new int[] {28, 33, 38, 43}, 28, 65),
+				new StandardFrettingEngine(4, 22, new int[]{28, 33, 38, 43}, 28, 65),
 				events,
-				new FrettedInstrumentPositioning(19.5F, -26.57f, new Vector3f[] {
+				new FrettedInstrumentPositioning(19.5F, -26.57f, new Vector3f[]{
 						new Vector3f(1, 1, 1),
 						new Vector3f(1, 1, 1),
 						new Vector3f(1, 1, 1),
 						new Vector3f(1, 1, 1)
 					
 				},
-						new float[] {-0.85f, -0.31f, 0.20f, 0.70f},
-						new float[] {-1.86f, -0.85f, 0.34f, 1.37f},
-						new FretHeightByTable(new HashMap<Integer, Float>() {{
-							put(0, 0.0f);
-							put(1, 0.05f);
-							put(2, 0.1f);
-							put(3, 0.15f);
-							put(4, 0.20f);
-							put(5, 0.24f);
-							put(6, 0.285f);
-							put(7, 0.325f);
-							put(8, 0.364f);
-							put(9, 0.4f);
-							put(10, 0.43f);
-							put(11, 0.464f);
-							put(12, 0.494f);
-							put(13, 0.523f);
-							put(14, 0.55f);
-							put(15, 0.575f);
-							put(16, 0.6f);
-							put(17, 0.62f);
-							put(18, 0.643f);
-							put(19, 0.663f);
-							put(20, 0.68f);
-							put(21, 0.698f);
-							put(22, 0.716f);
-						}})),
+						new float[]{-0.85f, -0.31f, 0.20f, 0.70f},
+						new float[]{-1.86f, -0.85f, 0.34f, 1.37f},
+						FretHeightByTable.fromXml(BassGuitar.class)),
 				4,
 				context.loadModel("Bass.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f)
 		);

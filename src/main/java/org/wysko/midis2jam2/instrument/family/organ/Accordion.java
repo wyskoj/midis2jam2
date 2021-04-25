@@ -75,19 +75,19 @@ public class Accordion extends KeyedInstrument {
 		/* Set case left hand */
 		Spatial leftHandCase = context.loadModel("AccordionLeftHand.fbx", "AccordionCase.bmp");
 		accordionSections[0].attachChild(leftHandCase);
-		Material leatherStrap = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var leatherStrap = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		leatherStrap.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/LeatherStrap.bmp"));
-		Material rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		rubberFoot.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
 		((Node) leftHandCase).getChild(1).setMaterial(leatherStrap);
 		((Node) leftHandCase).getChild(0).setMaterial(rubberFoot);
 		
-		Node keysNode = new Node();
+		var keysNode = new Node();
 		accordionSections[13].attachChild(keysNode);
 		
 		/* Add the keys */
-		int whiteCount = 0;
-		for (int i = 0; i < 24; i++) {
+		var whiteCount = 0;
+		for (var i = 0; i < 24; i++) {
 			if (midiValueToColor(i) == WHITE) { // White key
 				keys[i] = new AccordionKey(i, whiteCount);
 				whiteCount++;
@@ -110,7 +110,7 @@ public class Accordion extends KeyedInstrument {
 		keysNode.setLocalTranslation(-4, 22, -0.8f);
 		
 		/* Set accordion folds */
-		for (int i = 0; i < 14; i++) {
+		for (var i = 0; i < 14; i++) {
 			accordionSections[i].attachChild(
 					context.loadModel("AccordionFold.obj", "AccordionFold.bmp")
 			);
@@ -131,7 +131,7 @@ public class Accordion extends KeyedInstrument {
 	 * @return a dummy white key
 	 */
 	private Node dummyWhiteKey() {
-		Node node = new Node();
+		var node = new Node();
 		Spatial upKeyFront = Accordion.this.context.loadModel("AccordionKeyWhiteFront.obj", "AccordionKey.bmp",
 				Midis2jam2.MatType.UNSHADED, 0.9f);
 		// Back Key
@@ -171,7 +171,7 @@ public class Accordion extends KeyedInstrument {
 		super.tick(time, delta);
 		
 		calculateAngle(delta);
-		for (int i = 0; i < accordionSections.length; i++) {
+		for (var i = 0; i < accordionSections.length; i++) {
 			accordionSections[i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(angle * (i - 7.5))));
 		}
 	}
@@ -183,7 +183,7 @@ public class Accordion extends KeyedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 30 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 30f * indexForMoving(), 0);
 	}
 	
 	/**
@@ -218,7 +218,7 @@ public class Accordion extends KeyedInstrument {
 				keyNode.attachChild(upNode);
 				keyNode.attachChild(downNode);
 				
-				keyNode.move(0, -startPos + 6, 0); // 7 = count(white keys) / 2
+				keyNode.move(0, -startPos + 6f, 0); // 7 = count(white keys) / 2
 			} else { // Black key
 				
 				/* Up key */
@@ -245,7 +245,7 @@ public class Accordion extends KeyedInstrument {
 				downNode.setCullHint(Spatial.CullHint.Dynamic);
 				upNode.setCullHint(Spatial.CullHint.Always);
 			} else {
-				float[] angles = new float[3];
+				var angles = new float[3];
 				keyNode.getLocalRotation().toAngles(angles);
 				if (angles[1] < -0.0001) {
 					keyNode.setLocalRotation(new Quaternion(new float[]
@@ -254,7 +254,7 @@ public class Accordion extends KeyedInstrument {
 							}
 					));
 				} else {
-					keyNode.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
+					keyNode.setLocalRotation(new Quaternion(new float[]{0, 0, 0}));
 					
 					downNode.setCullHint(Spatial.CullHint.Always);
 					upNode.setCullHint(Spatial.CullHint.Dynamic);

@@ -37,12 +37,15 @@ public class Stick {
 	/**
 	 * The constant STRIKE_SPEED.
 	 */
-	public final static double STRIKE_SPEED = 4;
+	public static final double STRIKE_SPEED = 4;
 	
 	/**
 	 * The constant MAX_ANGLE.
 	 */
-	public final static double MAX_ANGLE = 50;
+	public static final double MAX_ANGLE = 50;
+	
+	private Stick() {
+	}
 	
 	/**
 	 * Given parameters, calculates the angle a stick should be at to accurately hit the next note.
@@ -77,7 +80,7 @@ public class Stick {
 	 */
 	public static StickStatus handleStick(Midis2jam2 context, Spatial stickNode, double time, float delta,
 	                                      List<MidiNoteOnEvent> strikes, double strikeSpeed, double maxAngle) {
-		boolean strike = false;
+		var strike = false;
 		
 		MidiNoteOnEvent nextHit = null;
 		if (!strikes.isEmpty())
@@ -114,17 +117,14 @@ public class Stick {
 		}
 		
 		float[] finalAngles = stickNode.getLocalRotation().toAngles(new float[3]);
-		boolean showing;
 		if (finalAngles[0] >= rad((float) maxAngle)) {
 			// Not yet ready to strike
 			stickNode.setCullHint(Spatial.CullHint.Always);
-			showing = false;
 		} else {
 			// Striking or recoiling
 			stickNode.setCullHint(Spatial.CullHint.Dynamic);
-			showing = true;
 		}
-		return new StickStatus(strike ? nextHit : null, finalAngles[0],showing );
+		return new StickStatus(strike ? nextHit : null, finalAngles[0]);
 	}
 	
 	/**
@@ -143,12 +143,9 @@ public class Stick {
 		 */
 		private final float rotationAngle;
 		
-		private final boolean showing;
-		
-		public StickStatus(@Nullable MidiNoteOnEvent strike, float rotationAngle, boolean showing) {
+		public StickStatus(@Nullable MidiNoteOnEvent strike, float rotationAngle) {
 			this.strike = strike;
 			this.rotationAngle = rotationAngle;
-			this.showing = showing;
 		}
 		
 		/**
@@ -168,8 +165,5 @@ public class Stick {
 			return rotationAngle;
 		}
 		
-		public boolean isShowing() {
-			return showing;
-		}
 	}
 }

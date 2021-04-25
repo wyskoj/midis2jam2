@@ -22,7 +22,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.StickDrum;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -90,9 +89,9 @@ public class Bongos extends NonDrumSetPercussion {
 		lowBongoAnimNode.attachChild(lowBongo);
 		highBongoAnimNode.attachChild(highBongo);
 		
-		Node lowBongoNode = new Node();
+		var lowBongoNode = new Node();
 		lowBongoNode.attachChild(lowBongoAnimNode);
-		Node highBongoNode = new Node();
+		var highBongoNode = new Node();
 		highBongoNode.attachChild(highBongoAnimNode);
 		
 		instrumentNode.attachChild(lowBongoNode);
@@ -124,17 +123,17 @@ public class Bongos extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			StickDrum.recoilDrum(lowBongoAnimNode, true, strike.velocity, delta);
+			recoilDrum(lowBongoAnimNode, true, strike.velocity, delta);
 		} else {
-			StickDrum.recoilDrum(lowBongoAnimNode, false, 0, delta);
+			recoilDrum(lowBongoAnimNode, false, 0, delta);
 		}
 		
 		if (statusHigh.justStruck()) {
 			MidiNoteOnEvent strike = statusHigh.getStrike();
 			assert strike != null;
-			StickDrum.recoilDrum(highBongoAnimNode, true, strike.velocity, delta);
+			recoilDrum(highBongoAnimNode, true, strike.velocity, delta);
 		} else {
-			StickDrum.recoilDrum(highBongoAnimNode, false, 0, delta);
+			recoilDrum(highBongoAnimNode, false, 0, delta);
 		}
 	}
 }

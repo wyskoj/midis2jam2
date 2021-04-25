@@ -39,7 +39,7 @@ public class MainScreen extends AbstractAppState {
 		super.initialize(stateManager, app);
 		((Launcher) app).getFlyByCamera().setEnabled(false);
 		
-		NiftyJmeDisplay niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
+		var niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
 				app.getAssetManager(),
 				app.getInputManager(),
 				app.getAudioRenderer(),
@@ -55,7 +55,6 @@ public class MainScreen extends AbstractAppState {
 		for (MidiDevice.Info anInfo : info) {
 			if (anInfo.getName().equals("Real Time Sequencer")) continue;
 			midiDeviceDropDown.addItem(anInfo);
-			System.out.println(anInfo);
 		}
 		
 		app.getViewPort().addProcessor(niftyDisplay);

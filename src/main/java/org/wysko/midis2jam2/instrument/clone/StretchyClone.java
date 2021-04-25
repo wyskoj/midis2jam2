@@ -56,8 +56,8 @@ public abstract class StretchyClone extends Clone {
 	 * @param scaleAxis      the scale axis
 	 * @param rotationAxis   the rotation axis
 	 */
-	public StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
-	                     Axis scaleAxis, Axis rotationAxis) {
+	protected StretchyClone(MonophonicInstrument parent, float rotationFactor, float stretchFactor,
+	                        Axis scaleAxis, Axis rotationAxis) {
 		super(parent, rotationFactor, rotationAxis);
 		this.stretchFactor = stretchFactor;
 		this.scaleAxis = scaleAxis;

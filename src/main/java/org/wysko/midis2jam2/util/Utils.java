@@ -17,13 +17,15 @@
 
 package org.wysko.midis2jam2.util;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class Utils {
 	
+	private Utils() {
+	}
+	
 	public static String exceptionToLines(Exception e) {
-		StringBuilder b = new StringBuilder();
-		for (StackTraceElement element : e.getStackTrace()) {
-			b.append(element.toString()).append("\n");
-		}
-		return b.toString();
+		return Arrays.stream(e.getStackTrace()).map(element -> element.toString() + "\n").collect(Collectors.joining());
 	}
 }

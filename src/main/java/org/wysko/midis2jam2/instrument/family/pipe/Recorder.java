@@ -56,7 +56,7 @@ public class Recorder extends HandedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 10f * indexForMoving(), 0);
 	}
 	
 	/**
@@ -87,13 +87,13 @@ public class Recorder extends HandedInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(15 + indexForMoving() * 15), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(15f + indexForMoving() * 15), 0));
 		}
 		
 		@Override
 		protected void loadHands() {
 			leftHands = new Spatial[13];
-			for (int i = 0; i < 13; i++) {
+			for (var i = 0; i < 13; i++) {
 				leftHands[i] = parent.context.loadModel(String.format("RecorderHandLeft%d.obj", i), "hands.bmp");
 				leftHandNode.attachChild(leftHands[i]);
 				if (i != 0) {
@@ -101,7 +101,7 @@ public class Recorder extends HandedInstrument {
 				}
 			}
 			rightHands = new Spatial[11];
-			for (int i = 0; i < 11; i++) {
+			for (var i = 0; i < 11; i++) {
 				rightHands[i] = parent.context.loadModel("RecorderHandRight" + i + ".obj", "hands.bmp");
 				rightHandNode.attachChild(rightHands[i]);
 				if (i != 0) {

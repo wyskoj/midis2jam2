@@ -65,16 +65,16 @@ public class BaritoneSax extends Saxophone {
 		public BaritoneSaxClone() {
 			super(BaritoneSax.this, STRETCH_FACTOR);
 			
-			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp");
-			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+			var shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp");
+			var black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 			black.setColor("Color", ColorRGBA.Black);
 			
-			Material shinyHornSkin2 = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
+			var shinyHornSkin2 = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
 			
 			this.body = context.getAssetManager().loadModel("Assets/BaritoneSaxBody.fbx");
 			this.bell.attachChild(context.getAssetManager().loadModel("Assets/BaritoneSaxHorn.obj"));
 			
-			Node bodyNode = ((Node) body);
+			var bodyNode = ((Node) body);
 			
 			bodyNode.getChild(0).setMaterial(shinyHornSkin);
 			bodyNode.getChild(1).setMaterial(shinyHornSkin2);

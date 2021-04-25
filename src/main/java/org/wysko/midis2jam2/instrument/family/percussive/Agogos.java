@@ -53,15 +53,15 @@ public class Agogos extends TwelveDrumOctave {
 		IntStream.range(0, 12).forEach(i -> agogoNodes[i] = new Node());
 		
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
 			Spatial child = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 			child.setLocalTranslation(0, 0, -5);
 			malletNodes[i].setLocalTranslation(0, 0, 18);
 			malletNodes[i].attachChild(child);
-			Node oneBlock = new Node();
+			var oneBlock = new Node();
 			oneBlock.attachChild(malletNodes[i]);
-			Agogo agogo = new Agogo(i);
+			var agogo = new Agogo(i);
 			twelfths[i] = agogo;
 			oneBlock.attachChild(agogo.highestLevel);
 			agogoNodes[i].attachChild(oneBlock);

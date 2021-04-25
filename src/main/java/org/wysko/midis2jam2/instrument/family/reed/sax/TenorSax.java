@@ -37,7 +37,7 @@ public class TenorSax extends Saxophone {
 	
 	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(TenorSax.class);
 	
-	private final static float STRETCH_FACTOR = 0.65f;
+	private static final float STRETCH_FACTOR = 0.65f;
 	
 	/**
 	 * Constructs a tenor sax.
@@ -66,14 +66,14 @@ public class TenorSax extends Saxophone {
 		public TenorSaxClone() {
 			super(TenorSax.this, STRETCH_FACTOR);
 			
-			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
-			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+			var shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
+			var black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 			black.setColor("Color", ColorRGBA.Black);
 			
 			this.body = context.getAssetManager().loadModel("Assets/TenorSaxBody.fbx");
 			this.bell.attachChild(context.getAssetManager().loadModel("Assets/TenorSaxHorn.obj"));
 			
-			Node bodyNode = ((Node) body);
+			var bodyNode = ((Node) body);
 			
 			bodyNode.getChild(0).setMaterial(shinyHornSkin);
 			bodyNode.getChild(1).setMaterial(black);

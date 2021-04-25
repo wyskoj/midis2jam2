@@ -21,6 +21,7 @@ import org.w3c.dom.*;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -46,15 +47,18 @@ public class HandPositionFingeringManager implements FingeringManager<Hands> {
 	 */
 	public static HandPositionFingeringManager from(Class<? extends Instrument> clazz) {
 		String className = clazz.getSimpleName();
-		HandPositionFingeringManager manager = new HandPositionFingeringManager();
+		var manager = new HandPositionFingeringManager();
 		/* XML Parsing */
 		try {
-			Document xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream("/instrument_mapping.xml"));
+			final var df = DocumentBuilderFactory.newInstance();
+			df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+			Document xmlDoc = df.newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream("/instrument_mapping.xml"));
 			
 			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
 			
 			/* For each instrument */
-			for (int i = 0; i < instrumentList.getLength(); i++) {
+			for (var i = 0; i < instrumentList.getLength(); i++) {
 				Node instrument = instrumentList.item(i);
 				NamedNodeMap instrumentAttributes = instrument.getAttributes();
 				/* Find instrument with matching name */
@@ -68,11 +72,11 @@ public class HandPositionFingeringManager implements FingeringManager<Hands> {
 					NodeList maps = ((Element) mapping).getElementsByTagName("map");
 					int mapSize = maps.getLength();
 					/* For each defined note */
-					for (int j = 0; j < mapSize; j++) {
+					for (var j = 0; j < mapSize; j++) {
 						NamedNodeMap attributes = maps.item(j).getAttributes();
-						int note = Integer.parseInt(attributes.getNamedItem("note").getTextContent());
-						int leftHand = Integer.parseInt(attributes.getNamedItem("lh").getTextContent());
-						int rightHand = Integer.parseInt(attributes.getNamedItem("rh").getTextContent());
+						var note = Integer.parseInt(attributes.getNamedItem("note").getTextContent());
+						var leftHand = Integer.parseInt(attributes.getNamedItem("lh").getTextContent());
+						var rightHand = Integer.parseInt(attributes.getNamedItem("rh").getTextContent());
 						manager.table.put(note, new Hands(leftHand, rightHand));
 					}
 					break;

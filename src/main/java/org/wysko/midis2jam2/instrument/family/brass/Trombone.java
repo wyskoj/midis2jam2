@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument.family.brass;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -54,7 +53,7 @@ public class Trombone extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 10 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 10f * indexForMoving(), 0);
 	}
 	
 	/**
@@ -78,8 +77,7 @@ public class Trombone extends MonophonicInstrument {
 			modelNode.attachChild(body);
 			
 			/* Set horn skin grey material */
-			Material material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
-			((Node) body).getChild(1).setMaterial(material);
+			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
 			/* Load and attach slide */
 			slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
@@ -110,17 +108,15 @@ public class Trombone extends MonophonicInstrument {
 		@Override
 		public void tick(double time, float delta) {
 			super.tick(time, delta);
-			if (isPlaying()) {
-				if (currentNotePeriod != null) {
-					moveToPosition((currentNotePeriod.midiNote % 7) + 1);
-				}
+			if (isPlaying() && currentNotePeriod != null) {
+				moveToPosition((currentNotePeriod.midiNote % 7) + 1);
 			}
 			// TODO Animate the slide so that it moves to the next position if there is time.
 		}
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(30 + indexForMoving() * -3), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(30f + indexForMoving() * -3), 0));
 			offsetNode.setLocalTranslation(0, indexForMoving(), 0);
 		}
 	}

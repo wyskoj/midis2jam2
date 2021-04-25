@@ -26,7 +26,7 @@ tasks.jpackage{
     dependsOn("shadowJar")
 
     appName = "midis2jam2"
-    appVersion = "0.1.0"
+    appVersion = "1.0.0"
     vendor = "Jacob Wysko"
     copyright = "Copyright (c) 2021 Jacob Wysko"
     runtimeImage = System.getProperty("java.home")
@@ -67,12 +67,13 @@ dependencies {
     implementation 'org.jmonkeyengine:jme3-niftygui:3.3.2-stable'
     implementation 'org.jmonkeyengine:jme3-vr:3.3.2-stable'
 
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
     implementation 'org.jetbrains:annotations:20.1.0'
-
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
 }
 
 test {

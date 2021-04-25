@@ -45,6 +45,8 @@ public class SteamPuffer implements ParticleGenerator {
 	
 	private final double scale;
 	
+	private static final Random RANDOM = new Random();
+	
 	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale) {
 		this.context = context;
 		this.type = type;
@@ -52,7 +54,7 @@ public class SteamPuffer implements ParticleGenerator {
 	}
 	
 	private void despawnCloud(Cloud cloud) {
-		steamPuffNode.detachChild(cloud.cloud);
+		steamPuffNode.detachChild(cloud.cloudNode);
 	}
 	
 	@Override
@@ -61,7 +63,7 @@ public class SteamPuffer implements ParticleGenerator {
 			// Spawn clouds
 			double numberOfCloudsToSpawn = (delta / (1f / 60f));
 			numberOfCloudsToSpawn = Math.max(numberOfCloudsToSpawn, 1);
-			for (int i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
+			for (var i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
 				Cloud cloud;
 				if (!cloudPool.isEmpty())
 					cloud = cloudPool.remove(0);
@@ -71,13 +73,13 @@ public class SteamPuffer implements ParticleGenerator {
 				clouds.add(cloud);
 				cloud.currentlyUsing = true;
 				cloud.randomInit();
-				steamPuffNode.attachChild(cloud.cloud);
+				steamPuffNode.attachChild(cloud.cloudNode);
 			}
 		}
 		
 		Iterator<Cloud> iterator = clouds.iterator();
 		while (iterator.hasNext()) {
-			Cloud cloud = iterator.next();
+			var cloud = iterator.next();
 			if (cloud != null) {
 				boolean tick = cloud.tick(delta);
 				if (!tick) {
@@ -106,7 +108,7 @@ public class SteamPuffer implements ParticleGenerator {
 	
 	class Cloud implements Particle {
 		
-		final Node cloud = new Node();
+		final Node cloudNode = new Node();
 		
 		private final Spatial cube;
 		
@@ -121,30 +123,30 @@ public class SteamPuffer implements ParticleGenerator {
 		public Cloud() {
 			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename);
 			randomInit();
-			cloud.attachChild(cube);
+			cloudNode.attachChild(cube);
 		}
 		
 		private void randomInit() {
-			Random random = new Random();
-			randY = (random.nextFloat() - 0.5f) * 1.5f;
-			randZ = (random.nextFloat() - 0.5f) * 1.5f;
-			cube.setLocalRotation(new Quaternion().fromAngles(new float[] {
-					random.nextFloat() * FastMath.TWO_PI,
-					random.nextFloat() * FastMath.TWO_PI,
-					random.nextFloat() * FastMath.TWO_PI,
+			
+			randY = (RANDOM.nextFloat() - 0.5f) * 1.5f;
+			randZ = (RANDOM.nextFloat() - 0.5f) * 1.5f;
+			cube.setLocalRotation(new Quaternion().fromAngles(new float[]{
+					RANDOM.nextFloat() * FastMath.TWO_PI,
+					RANDOM.nextFloat() * FastMath.TWO_PI,
+					RANDOM.nextFloat() * FastMath.TWO_PI,
 			}));
 			life = 0;
-			cloud.setLocalTranslation(0, 0, 0);
+			cloudNode.setLocalTranslation(0, 0, 0);
 		}
 		
 		@Override
 		public boolean tick(float delta) {
 			if (!currentlyUsing) return false;
-			cloud.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
-			cloud.setLocalScale((float) ((0.75 * life + 1.2) * scale));
+			cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
+			cloudNode.setLocalScale((float) ((0.75 * life + 1.2) * scale));
 			life += delta * 1.5;
-			double END_OF_LIFE = 0.7;
-			return !(life > END_OF_LIFE);
+			var endOfLife = 0.7;
+			return life <= endOfLife;
 		}
 		
 		private float locEase(double x) {

@@ -53,8 +53,8 @@ public class Keyboard extends KeyedInstrument {
 		Spatial pianoCase = context.loadModel("PianoCase.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
 		instrumentNode.attachChild(pianoCase);
 		
-		int whiteCount = 0;
-		for (int i = 0; i < keyCount(); i++) {
+		var whiteCount = 0;
+		for (var i = 0; i < keyCount(); i++) {
 			if (midiValueToColor(i + rangeLow) == KeyColor.WHITE) { // White key
 				keys[i] = new KeyboardKey(i + rangeLow, whiteCount);
 				whiteCount++;
@@ -152,7 +152,7 @@ public class Keyboard extends KeyedInstrument {
 				keyNode.attachChild(downNode);
 				
 				Keyboard.this.instrumentNode.attachChild(keyNode);
-				keyNode.move(startPos - 26, 0, 0); // 26 = count(white keys) / 2
+				keyNode.move(startPos - 26f, 0, 0); // 26 = count(white keys) / 2
 			} else { // Black key
 				/* Up key */
 				Spatial blackKey = Keyboard.this.context.loadModel("PianoBlackKey.obj", skin.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);

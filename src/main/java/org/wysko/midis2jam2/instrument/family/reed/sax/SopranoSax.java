@@ -37,7 +37,7 @@ public class SopranoSax extends Saxophone {
 	
 	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(SopranoSax.class);
 	
-	private final static float STRETCH_FACTOR = 2f;
+	private static final float STRETCH_FACTOR = 2f;
 	
 	/**
 	 * Constructs an Soprano saxophone.
@@ -66,14 +66,14 @@ public class SopranoSax extends Saxophone {
 		public SopranoSaxClone() {
 			super(SopranoSax.this, STRETCH_FACTOR);
 			
-			Material shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
-			Material black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+			var shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
+			var black = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 			black.setColor("Color", ColorRGBA.Black);
 			
 			this.body = context.getAssetManager().loadModel("Assets/SopranoSaxBody.fbx");
 			this.bell.attachChild(context.getAssetManager().loadModel("Assets/SopranoSaxHorn.obj"));
 			
-			Node bodyNode = ((Node) body);
+			var bodyNode = ((Node) body);
 			
 			bodyNode.getChild(0).setMaterial(shinyHornSkin);
 			bodyNode.getChild(1).setMaterial(black);
@@ -89,7 +89,7 @@ public class SopranoSax extends Saxophone {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(20 * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(20f * indexForMoving()), 0));
 		}
 		
 	}

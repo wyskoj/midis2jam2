@@ -60,6 +60,6 @@ public class Cello extends StringFamilyInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(-20 * indexForMoving(), 0, 0);
+		offsetNode.setLocalTranslation(-20f * indexForMoving(), 0, 0);
 	}
 }

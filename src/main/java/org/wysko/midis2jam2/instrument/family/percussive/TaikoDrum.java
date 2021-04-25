@@ -21,7 +21,6 @@ import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -43,11 +42,11 @@ public class TaikoDrum extends OneDrumOctave {
 	                 @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		Spatial drum = context.loadModel("Taiko.fbx", "TaikoHead.bmp");
-		Texture woodTexture = context.getAssetManager().loadTexture("Assets/Wood.bmp");
-		Material material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var woodTexture = context.getAssetManager().loadTexture("Assets/Wood.bmp");
+		var material = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setTexture("ColorMap", woodTexture);
 		((Node) drum).getChild(0).setMaterial(material);
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
 			Spatial mallet = context.loadModel("TaikoStick.obj", "Wood.bmp");
 			malletNodes[i].attachChild(mallet);

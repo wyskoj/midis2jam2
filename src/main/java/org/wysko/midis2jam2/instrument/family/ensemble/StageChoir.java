@@ -55,7 +55,7 @@ public class StageChoir extends WrappedOctaveSustained {
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList, true);
 		twelfths = new ChoirPeep[12];
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			peepNodes[i] = new Node();
 			twelfths[i] = new ChoirPeep();
 			peepNodes[i].attachChild(twelfths[i].highestLevel);

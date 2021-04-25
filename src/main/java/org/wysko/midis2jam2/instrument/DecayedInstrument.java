@@ -23,14 +23,12 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A DecayedInstrument is any instrument that only depends on {@link MidiNoteOnEvent}s to function. The note off
- * event is discarded.
+ * A DecayedInstrument is any instrument that only depends on {@link MidiNoteOnEvent}s to function. The note off event
+ * is discarded.
  */
 public abstract class DecayedInstrument extends Instrument {
 	
@@ -55,10 +53,10 @@ public abstract class DecayedInstrument extends Instrument {
 	                            @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context);
 		this.hits = eventList.stream()
-				.filter(e -> e instanceof MidiNoteOnEvent)
-				.map(e -> ((MidiNoteOnEvent) e))
+				.filter(MidiNoteOnEvent.class::isInstance)
+				.map(MidiNoteOnEvent.class::cast)
 				.collect(Collectors.toList());
-		finalHits = Collections.unmodifiableList(new ArrayList<>(hits));
+		finalHits = List.copyOf(hits);
 	}
 	
 	@Override

@@ -35,11 +35,11 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class HiHat extends SingleStickInstrument {
 	
-	private final static int WOBBLE_SPEED = 10;
+	private static final int WOBBLE_SPEED = 10;
 	
-	private final static double DAMPENING = 2;
+	private static final double DAMPENING = 2;
 	
-	private final static double AMPLITUDE = 0.25;
+	private static final double AMPLITUDE = 0.25;
 	
 	/**
 	 * The list of NoteOn events that the stick needs to worry about (closed and open).
@@ -84,7 +84,7 @@ public class HiHat extends SingleStickInstrument {
 		
 		topCymbal.setLocalTranslation(0, 1.2f, 0);
 		topCymbal.attachChild(topCymbalModel);
-		Node bottomCymbal = new Node();
+		var bottomCymbal = new Node();
 		bottomCymbal.attachChild(bottomCymbalModel);
 		wholeHat.attachChild(topCymbal);
 		wholeHat.attachChild(bottomCymbal);
@@ -126,7 +126,7 @@ public class HiHat extends SingleStickInstrument {
 		
 		wholeHat.move(0, 0.025f, 0);
 		if (wholeHat.getLocalTranslation().y > 0) {
-			Vector3f localTranslation = new Vector3f(wholeHat.getLocalTranslation());
+			var localTranslation = new Vector3f(wholeHat.getLocalTranslation());
 			localTranslation.y = Math.min(localTranslation.y, 0);
 			wholeHat.setLocalTranslation(localTranslation);
 		}

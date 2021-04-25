@@ -55,7 +55,7 @@ public class BlownBottle extends WrappedOctaveSustained {
 		
 		IntStream.range(0, 12).forEach(i -> bottleNodes[i] = new Node());
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			twelfths[i] = new Bottle(i);
 			twelfths[i].highestLevel.setLocalTranslation(-15, 0, 0);
 			

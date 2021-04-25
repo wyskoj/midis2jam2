@@ -29,7 +29,7 @@ public class NotePeriodWithFretboardPosition extends NotePeriod {
 	/**
 	 * The fretboard position this note period was assigned to.
 	 */
-	public FretboardPosition position;
+	private FretboardPosition position;
 	
 	
 	/**
@@ -44,7 +44,7 @@ public class NotePeriodWithFretboardPosition extends NotePeriod {
 	private NotePeriodWithFretboardPosition(int midiNote, double startTime, double endTime,
 	                                        MidiNoteOnEvent noteOn, MidiNoteOffEvent noteOff) {
 		super(midiNote, startTime, endTime, noteOn, noteOff);
-		position = new FretboardPosition(-1, -1);
+		setPosition(new FretboardPosition(-1, -1));
 	}
 	
 	/**
@@ -56,5 +56,13 @@ public class NotePeriodWithFretboardPosition extends NotePeriod {
 	public static NotePeriodWithFretboardPosition fromNotePeriod(NotePeriod notePeriod) {
 		return new NotePeriodWithFretboardPosition(notePeriod.midiNote, notePeriod.startTime, notePeriod.endTime,
 				notePeriod.noteOn, notePeriod.noteOff);
+	}
+	
+	public FretboardPosition getPosition() {
+		return position;
+	}
+	
+	public void setPosition(FretboardPosition position) {
+		this.position = position;
 	}
 }

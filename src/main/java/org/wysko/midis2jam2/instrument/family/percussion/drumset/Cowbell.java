@@ -56,13 +56,13 @@ public class Cowbell extends NonDrumSetPercussion {
 		
 		recoilNode.attachChild(stickNode);
 		highestLevel.setLocalTranslation(-9.7f, 40, -99);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(114 - 90), rad(26.7), rad(-3.81)));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(24), rad(26.7), rad(-3.81)));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		Stick.StickStatus stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
 		//noinspection ConstantConditions
 		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().velocity : 0, delta);
 	}

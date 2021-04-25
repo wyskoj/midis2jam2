@@ -38,11 +38,6 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Tambourine extends NonDrumSetPercussion {
 	
 	/**
-	 * The list of hits.
-	 */
-	private final List<MidiNoteOnEvent> hits;
-	
-	/**
 	 * Contains the hand with the tambourine.
 	 */
 	private final Node tambourineHandNode = new Node();
@@ -66,11 +61,11 @@ public class Tambourine extends NonDrumSetPercussion {
 		Spatial tambourineHand = context.loadModel("hand_tambourine.fbx", "hands.bmp");
 		
 		/* Set tambourine materials */
-		Material tambourineWoodMat = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var tambourineWoodMat = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		tambourineWoodMat.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/TambourineWood.bmp"));
 		((Node) tambourineHand).getChild(2).setMaterial(tambourineWoodMat);
 		
-		Material metalTexture = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var metalTexture = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		metalTexture.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/MetalTexture.bmp"));
 		((Node) tambourineHand).getChild(1).setMaterial(metalTexture);
 		

@@ -34,7 +34,7 @@ public abstract class MidiEvent {
 	 *
 	 * @param time the time
 	 */
-	public MidiEvent(long time) {
+	protected MidiEvent(long time) {
 		this.time = time;
 	}
 	
@@ -42,7 +42,7 @@ public abstract class MidiEvent {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		MidiEvent midiEvent = (MidiEvent) o;
+		var midiEvent = (MidiEvent) o;
 		return time == midiEvent.time;
 	}
 	

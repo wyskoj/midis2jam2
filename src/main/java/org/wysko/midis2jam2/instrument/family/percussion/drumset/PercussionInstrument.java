@@ -51,7 +51,7 @@ public abstract class PercussionInstrument extends Instrument {
 	/**
 	 * The hits.
 	 */
-	final List<MidiNoteOnEvent> hits;
+	protected List<MidiNoteOnEvent> hits;
 	
 	
 	/**

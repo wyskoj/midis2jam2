@@ -23,7 +23,6 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
@@ -43,7 +42,7 @@ public class Guitar extends FrettedInstrument {
 				events,
 				new FrettedInstrumentPositioning(16.6f,
 						-18.1f,
-						new Vector3f[] {
+						new Vector3f[]{
 								new Vector3f(0.8f, 1, 0.8f),
 								new Vector3f(0.75f, 1, 0.75f),
 								new Vector3f(0.7f, 1, 0.7f),
@@ -51,33 +50,9 @@ public class Guitar extends FrettedInstrument {
 								new Vector3f(0.75f, 1, 0.75f),
 								new Vector3f(0.7f, 1, 0.7f),
 						},
-						new float[] {-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f},
-						new float[] {-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f},
-						new FretHeightByTable(new HashMap<Integer, Float>() {{
-							put(0, 0f);
-							put(1, 0.03744493392f);
-							put(2, 0.09691629956f);
-							put(3, 0.1431718062f);
-							put(4, 0.1916299559f);
-							put(5, 0.2400881057f);
-							put(6, 0.2841409692f);
-							put(7, 0.3193832599f);
-							put(8, 0.359030837f);
-							put(9, 0.3920704846f);
-							put(10, 0.4295154185f);
-							put(11, 0.4603524229f);
-							put(12, 0.4911894273f);
-							put(13, 0.5176211454f);
-							put(14, 0.5440528634f);
-							put(15, 0.5726872247f);
-							put(16, 0.5947136564f);
-							put(17, 0.6189427313f);
-							put(18, 0.6387665198f);
-							put(19, 0.6585903084f);
-							put(20, 0.6806167401f);
-							put(21, 0.6982378855f);
-							put(22, 0.7158590308f);
-						}})),
+						new float[]{-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f},
+						new float[]{-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f},
+						FretHeightByTable.fromXml(Guitar.class)),
 				6,
 				context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f)
 		);

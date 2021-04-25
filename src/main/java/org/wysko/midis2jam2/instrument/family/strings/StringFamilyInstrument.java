@@ -117,7 +117,7 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 			bowNode.setCullHint(Spatial.CullHint.Always);
 		}
 		
-		for (int i = 0; i < 4; i++) {
+		for (var i = 0; i < 4; i++) {
 			Spatial string;
 			string = context.loadModel("ViolinString.obj", "ViolinSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			upperStrings[i] = string;
@@ -168,8 +168,8 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	 */
 	protected void loadLowerStrings() {
 		// Lower strings
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 5; j++) {
+		for (var i = 0; i < 4; i++) {
+			for (var j = 0; j < 5; j++) {
 				lowerStrings[i][j] = context.loadModel("ViolinStringPlayed" + j + ".obj", "DoubleBassSkin.bmp",
 						Midis2jam2.MatType.UNSHADED, 0.9f);
 				instrumentNode.attachChild(lowerStrings[i][j]);
@@ -178,27 +178,27 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 		
 		
 		// Position lower strings
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[0][i].setLocalTranslation(positioning.bottomX[0], positioning.bottomY, 0.47f);
 			lowerStrings[0][i].setLocalRotation(new Quaternion().fromAngles(rad(-4), 0, rad(-1.61)));
 		}
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[1][i].setLocalTranslation(positioning.bottomX[1], positioning.bottomY, 0.58f);
 			lowerStrings[1][i].setLocalRotation(new Quaternion().fromAngles(rad(-4.6), 0, rad(-0.663)));
 		}
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[2][i].setLocalTranslation(positioning.bottomX[2], positioning.bottomY, 0.58f);
 			lowerStrings[2][i].setLocalRotation(new Quaternion().fromAngles(rad(-4.6), 0, rad(0.647)));
 		}
 		
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[3][i].setLocalTranslation(positioning.bottomX[3], positioning.bottomY, 0.47f);
 			lowerStrings[3][i].setLocalRotation(new Quaternion().fromAngles(rad(-4), 0, rad(1.65)));
 		}
 		
 		// Hide all wobbly strings
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 5; j++) {
+		for (var i = 0; i < 4; i++) {
+			for (var j = 0; j < 5; j++) {
 				lowerStrings[i][j].setCullHint(Spatial.CullHint.Always);
 			}
 		}
@@ -209,7 +209,7 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	 */
 	protected void loadNoteFingers() {
 		// Initialize note fingers
-		for (int i = 0; i < 4; i++) {
+		for (var i = 0; i < 4; i++) {
 			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			instrumentNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);

@@ -27,6 +27,7 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,11 +35,7 @@ import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 public class Launcher extends SimpleApplication {
 	
-	public static Launcher launcher;
-	
-	private static File midiFile;
-	
-	private static int latencyFix;
+	private static Launcher launcher;
 	
 	private MainScreen screen;
 	
@@ -48,31 +45,36 @@ public class Launcher extends SimpleApplication {
 	
 	public static void main(String[] args) throws Exception {
 		Logger.getLogger("com.jme3").setLevel(Level.SEVERE);
+		Logger.getLogger("de.lessvoid").setLevel(Level.OFF);
 		launcher = new Launcher();
-		launcher.start();
+		app().start();
 		if (args.length != 0) {
 			var file = new File(args[0]);
-			launcher.skipMainScreen = true;
-			launcher.loadScene(file, MidiSystem.getMidiDeviceInfo()[0]);
+			app().skipMainScreen = true;
+			app().loadScene(file, MidiSystem.getMidiDeviceInfo()[0]);
 		}
+	}
+	
+	public static Launcher app() {
+		return launcher;
 	}
 	
 	
 	@Override
 	public void start() {
-		AppSettings settings = new AppSettings(true);
+		var settings = new AppSettings(true);
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 		try {
 			var icons = new BufferedImage[]{
-					ImageIO.read(getClass().getResource("/icon16.png")),
-					ImageIO.read(getClass().getResource("/icon32.png")),
-					ImageIO.read(getClass().getResource("/icon128.png")),
-					ImageIO.read(getClass().getResource("/icon256.png"))
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon16.png"))),
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon32.png"))),
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon128.png"))),
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon256.png")))
 			};
 			settings.setIcons(icons);
 		} catch (IOException e) {
-			System.err.println("Failed to set window icon.");
+			Midis2jam2.logger.warning("Failed to set window icon.");
 			e.printStackTrace();
 		}
 		settings.setResolution(1900, 1900 / 2);
@@ -88,22 +90,25 @@ public class Launcher extends SimpleApplication {
 	
 	@Override
 	public void initialize() {
-		super.initialize(); // simpleInitApp
+		super.initialize();
 		screen = new MainScreen();
 		if (!skipMainScreen)
 			stateManager.attach(screen);
+	}
+	
+	@Override
+	public void simpleInitApp() {
+		// Don't need to do anything
 	}
 	
 	public void loadScene(File midiFile, MidiDevice.Info device) {
 		midis2jam2 = new Midis2jam2();
 		
 		try {
-			Sequencer sequencer = getSequencer(device);
-			Sequence sequence = initMidiFile(midiFile, sequencer);
+			var sequencer = getSequencer(device);
+			initMidiFile(midiFile, sequencer);
 			midis2jam2.setFile(MidiFile.readMidiFile(midiFile));
 			midis2jam2.sequencer = sequencer;
-			midis2jam2.latencyFix = latencyFix;
-			midis2jam2.setSequence(sequence);
 			rootNode.attachChild(midis2jam2.getRootNode());
 			stateManager.detach(screen);
 			stateManager.attach(midis2jam2);
@@ -121,9 +126,9 @@ public class Launcher extends SimpleApplication {
 	}
 	
 	private Sequencer getSequencer(MidiDevice.Info info) throws MidiUnavailableException {
-		MidiDevice device1 = MidiSystem.getMidiDevice(info);
+		var device1 = MidiSystem.getMidiDevice(info);
 		Sequencer sequencer;
-		System.out.println("info.getName() = " + info.getName());
+		
 		if (info.getName().equals("Gervill")) {
 			sequencer = MidiSystem.getSequencer(true);
 		} else {
@@ -141,16 +146,10 @@ public class Launcher extends SimpleApplication {
 		stateManager.attach(screen);
 	}
 	
-	private Sequence initMidiFile(File file, Sequencer sequencer) throws InvalidMidiDataException, IOException,
+	private void initMidiFile(File file, Sequencer sequencer) throws InvalidMidiDataException, IOException,
 			MidiUnavailableException {
-		Sequence sequence = MidiSystem.getSequence(file);
+		var sequence = MidiSystem.getSequence(file);
 		sequencer.open();
 		sequencer.setSequence(sequence);
-		return sequence;
-	}
-	
-	@Override
-	public void simpleInitApp() {
-	
 	}
 }

@@ -55,6 +55,6 @@ public class FretboardPosition {
 	 */
 	@Contract(pure = true)
 	double distance(@NotNull FretboardPosition o) {
-		return Math.sqrt(Math.pow(string - o.string, 2) + Math.pow(fret - o.fret, 2));
+		return Math.sqrt(Math.pow((double) string - o.string, 2) + Math.pow((double) fret - o.fret, 2));
 	}
 }

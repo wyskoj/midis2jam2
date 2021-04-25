@@ -89,28 +89,28 @@ public class Tom extends StickDrum {
 		 * The Low tom.
 		 */
 		LOW(new Vector3f(1.2f, 1.2f, 1.2f),
-				new Vector3f(10f, 27 + 2, -82),
+				new Vector3f(10f, 29, -82),
 				new Quaternion().fromAngles(rad(60), rad(-30), 0)),
 		
 		/**
 		 * The Low mid tom.
 		 */
 		LOW_MID(new Vector3f(1f, 1f, 1f),
-				new Vector3f(0, 30 + 2, -85),
+				new Vector3f(0, 32, -85),
 				new Quaternion().fromAngles(rad(60), 0, 0)),
 		
 		/**
 		 * The High mid tom.
 		 */
 		HIGH_MID(new Vector3f(0.8f, 0.8f, 0.8f),
-				new Vector3f(-9, 29 + 2, -82),
+				new Vector3f(-9, 31, -82),
 				new Quaternion().fromAngles(rad(60), rad(20), 0)),
 		
 		/**
 		 * The High tom.
 		 */
 		HIGH(new Vector3f(0.6f, 0.6f, 0.6f),
-				new Vector3f(-15, 27 + 2, -78),
+				new Vector3f(-15, 29, -78),
 				new Quaternion().fromAngles(rad(50), rad(40), 0));
 		
 		/**

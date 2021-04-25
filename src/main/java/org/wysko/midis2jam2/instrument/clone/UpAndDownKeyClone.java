@@ -51,10 +51,10 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	 *
 	 * @param keyCount the key count
 	 */
-	public UpAndDownKeyClone(int keyCount,
-	                         @NotNull MonophonicInstrument parent,
-	                         float rotationFactor,
-	                         float stretchFactor) {
+	protected UpAndDownKeyClone(int keyCount,
+	                            @NotNull MonophonicInstrument parent,
+	                            float rotationFactor,
+	                            float stretchFactor) {
 		
 		super(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X);
 		this.keyCount = keyCount;
@@ -79,7 +79,7 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 			keysToGoDown = new Integer[0];
 		}
 		
-		for (int i = 0; i < keyCount; i++) {
+		for (var i = 0; i < keyCount; i++) {
 			int finalI = i;
 			if (Arrays.stream(keysToGoDown).anyMatch(a -> a == finalI)) {
 				// This is a key that needs to be pressed down.
@@ -104,7 +104,7 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	}
 	
 	protected void attachKeys() {
-		for (int i = 0; i < keyCount; i++) {
+		for (var i = 0; i < keyCount; i++) {
 			modelNode.attachChild(keysUp[i]);
 			modelNode.attachChild(keysDown[i]);
 			

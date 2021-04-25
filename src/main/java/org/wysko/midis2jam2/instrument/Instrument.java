@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments
- * for each channel, and also creates new instruments when the program of a channel changes (i.e., the MIDI
- * instrument of the channel changes).
+ * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments for
+ * each channel, and also creates new instruments when the program of a channel changes (i.e., the MIDI instrument of
+ * the channel changes).
  * <p>
- * Classes that implement Instrument are responsible for handling {@link #tick}, which updates the
- * current animation and note handling for every call.
+ * Classes that implement Instrument are responsible for handling {@link #tick}, which updates the current animation and
+ * note handling for every call.
  *
  * @see MonophonicInstrument
  * @see Clone
@@ -71,10 +71,10 @@ public abstract class Instrument {
 	
 	/**
 	 * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
-	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill
-	 * its spot).
+	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill its
+	 * spot).
 	 */
-	public boolean visible = false;
+	private boolean visible = false;
 	
 	/**
 	 * Instantiates a new Instrument.
@@ -98,8 +98,8 @@ public abstract class Instrument {
 	
 	/**
 	 * A MIDI file is a sequence of {@link MidiNoteOnEvent}s and {@link MidiNoteOffEvent}s. This method searches the
-	 * files and connects corresponding events together. This is effectively calculating the "blocks" you would see
-	 * in a piano roll editor.
+	 * files and connects corresponding events together. This is effectively calculating the "blocks" you would see in a
+	 * piano roll editor.
 	 *
 	 * @param noteEvents the note events to calculate NotePeriods from
 	 */
@@ -125,8 +125,8 @@ public abstract class Instrument {
 		}
 		/* Remove exact duplicates */
 		for (int i = notePeriods.size() - 2; i >= 0; i--) {
-			final NotePeriod a = notePeriods.get(i + 1);
-			final NotePeriod b = notePeriods.get(i);
+			var a = notePeriods.get(i + 1);
+			var b = notePeriods.get(i);
 			if (a.startTick() == b.startTick() &&
 					a.endTick() == b.endTick() &&
 					a.midiNote == b.midiNote) {
@@ -151,15 +151,15 @@ public abstract class Instrument {
 	 * @param node    the node to hide
 	 */
 	protected void setIdleVisibilityByStrikes(@NotNull List<MidiNoteOnEvent> strikes, double time, @NotNull Node node) {
-		boolean show = false;
+		var show = false;
 		for (MidiNoteOnEvent strike : strikes) {
 			double x = time - context.getFile().eventInSeconds(strike);
 			if (x < 4 && x > -1) {
-				visible = true;
+				setVisible(true);
 				show = true;
 				break;
 			} else {
-				visible = false;
+				setVisible(false);
 			}
 		}
 		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
@@ -173,13 +173,20 @@ public abstract class Instrument {
 	@Contract(pure = true)
 	protected int indexForMoving() {
 		return context.instruments.stream()
-				.filter(e -> this.getClass().isInstance(e) && e.visible)
+				.filter(e -> this.getClass().isInstance(e) && e.isVisible())
 				.collect(Collectors.toList()).indexOf(this);
 	}
 	
 	/**
 	 * Calculates and moves this instrument for when multiple instances of this instrument are visible.
 	 */
-	abstract protected void moveForMultiChannel();
+	protected abstract void moveForMultiChannel();
 	
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
 }

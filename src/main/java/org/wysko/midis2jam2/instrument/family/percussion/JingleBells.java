@@ -41,11 +41,6 @@ public class JingleBells extends NonDrumSetPercussion {
 	private final Node jingleBellNode = new Node();
 	
 	/**
-	 * The list of hits
-	 */
-	private final List<MidiNoteOnEvent> hits;
-	
-	/**
 	 * Instantiates new jingle bells.
 	 *
 	 * @param context the context
@@ -56,7 +51,7 @@ public class JingleBells extends NonDrumSetPercussion {
 		this.hits = hits;
 		
 		Spatial stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp");
-		Material stickSkin = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var stickSkin = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		stickSkin.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/StickSkin.bmp"));
 		((Node) stick).getChild(0).setMaterial(stickSkin);
 		jingleBellNode.attachChild(stick);

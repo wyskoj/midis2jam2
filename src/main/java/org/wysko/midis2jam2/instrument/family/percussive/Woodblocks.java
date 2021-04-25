@@ -53,15 +53,15 @@ public class Woodblocks extends TwelveDrumOctave {
 		IntStream.range(0, 12).forEach(i -> woodBlockNodes[i] = new Node());
 		
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
 			Spatial child = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 			child.setLocalTranslation(0, 0, -5);
 			malletNodes[i].setLocalTranslation(0, 0, 18);
 			malletNodes[i].attachChild(child);
-			Node oneBlock = new Node();
+			var oneBlock = new Node();
 			oneBlock.attachChild(malletNodes[i]);
-			Woodblock woodblock = new Woodblock(i);
+			var woodblock = new Woodblock(i);
 			twelfths[i] = woodblock;
 			oneBlock.attachChild(woodblock.highestLevel);
 			woodBlockNodes[i].attachChild(oneBlock);

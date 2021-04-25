@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument.family.ensemble;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -45,10 +44,9 @@ public class Timpani extends OneDrumOctave {
 		
 		Spatial body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
 		Spatial head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp");
-		Material grey = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
-		((Node) body).getChild(1).setMaterial(grey);
+		((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
 			Spatial mallet = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp");
 			malletNodes[i].attachChild(mallet);
@@ -65,6 +63,6 @@ public class Timpani extends OneDrumOctave {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27 + indexForMoving() * -18), 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27f + indexForMoving() * -18), 0));
 	}
 }

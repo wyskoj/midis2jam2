@@ -37,11 +37,6 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class HandClap extends NonDrumSetPercussion {
 	
 	/**
-	 * The list of hits.
-	 */
-	private final List<MidiNoteOnEvent> hits;
-	
-	/**
 	 * Contains the left hand.
 	 */
 	private final Node leftHandNode = new Node();

@@ -58,7 +58,7 @@ public abstract class Key {
 	 *
 	 * @param midiNote the midi note
 	 */
-	public Key(int midiNote) {
+	protected Key(int midiNote) {
 		this.midiNote = midiNote;
 	}
 	
@@ -81,7 +81,7 @@ public abstract class Key {
 			downNode.setCullHint(Spatial.CullHint.Dynamic);
 			upNode.setCullHint(Spatial.CullHint.Always);
 		} else {
-			float[] angles = new float[3];
+			var angles = new float[3];
 			keyNode.getLocalRotation().toAngles(angles);
 			if (angles[0] > 0.0001) {
 				keyNode.setLocalRotation(new Quaternion(new float[]
@@ -90,7 +90,7 @@ public abstract class Key {
 						}
 				));
 			} else {
-				keyNode.setLocalRotation(new Quaternion(new float[] {0, 0, 0}));
+				keyNode.setLocalRotation(new Quaternion(new float[]{0, 0, 0}));
 				
 				downNode.setCullHint(Spatial.CullHint.Always);
 				upNode.setCullHint(Spatial.CullHint.Dynamic);

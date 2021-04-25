@@ -75,7 +75,7 @@ public class Ocarina extends HandedInstrument {
 			animNode.attachChild(ocarina);
 			highestLevel.attachChild(animNode);
 			loadHands();
-			for (int i = 0; i < rightHands.length; i++) {
+			for (var i = 0; i < rightHands.length; i++) {
 				if (i == 0) rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
 				else rightHands[i].setCullHint(Spatial.CullHint.Always);
 			}
@@ -85,7 +85,7 @@ public class Ocarina extends HandedInstrument {
 		@Override
 		protected void loadHands() {
 			rightHands = new Spatial[12];
-			for (int i = 0; i < 12; i++) {
+			for (var i = 0; i < 12; i++) {
 				rightHands[i] = context.loadModel("OcarinaHand" + i + ".obj", "hands.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 			}
 			for (Spatial rightHand : rightHands) {
@@ -106,7 +106,7 @@ public class Ocarina extends HandedInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(17 * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(17f * indexForMoving()), 0));
 		}
 	}
 }

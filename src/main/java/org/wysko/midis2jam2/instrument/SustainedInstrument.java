@@ -28,7 +28,6 @@ import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.NotePeriod;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,7 +67,7 @@ public abstract class SustainedInstrument extends Instrument {
 	                              @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context);
 		this.notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(eventList));
-		this.unmodifiableNotePeriods = Collections.unmodifiableList(new ArrayList<>(notePeriods));
+		this.unmodifiableNotePeriods = List.copyOf(notePeriods);
 	}
 	
 	/**
@@ -81,7 +80,7 @@ public abstract class SustainedInstrument extends Instrument {
 	@NotNull
 	@Contract(pure = true)
 	public static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull List<MidiChannelSpecificEvent> events) {
-		return events.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		return events.stream().filter(MidiNoteEvent.class::isInstance).map(MidiNoteEvent.class::cast).collect(Collectors.toList());
 	}
 	
 	/**
@@ -92,7 +91,7 @@ public abstract class SustainedInstrument extends Instrument {
 	 * @return true if this instrument should be visible, false otherwise
 	 */
 	public static boolean calcVisibility(double time, @NotNull List<NotePeriod> unmodifiableNotePeriods) {
-		boolean show = false;
+		var show = false;
 		for (NotePeriod notePeriod : unmodifiableNotePeriods) {
 			// Within 1 second of a note on,
 			// within 4 seconds of a note off,
@@ -139,11 +138,11 @@ public abstract class SustainedInstrument extends Instrument {
 	 *     <li>There is at least 4 seconds between now and the end of any note period, or</li>
 	 *     <li>Any note period is currently playing</li>
 	 * </ul>
-	 *  @param time        the current time
+	 *  @param time the current time
 	 */
 	protected void setIdleVisibilityByPeriods(double time) {
 		boolean b = calcVisibility(time, unmodifiableNotePeriods);
-		visible = b;
+		setVisible(b);
 		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	

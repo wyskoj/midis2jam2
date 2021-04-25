@@ -22,7 +22,6 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
@@ -39,12 +38,12 @@ public class BassDrum extends PercussionInstrument {
 	/**
 	 * The maximum angle the pedal will fall back to when at rest.
 	 */
-	private final static int PEDAL_MAX_ANGLE = 20;
+	private static final int PEDAL_MAX_ANGLE = 20;
 	
 	/**
 	 * The Bass drum.
 	 */
-	final Spatial bassDrum;
+	final Spatial drumModel;
 	
 	/**
 	 * The Bass drum beater arm.
@@ -62,11 +61,6 @@ public class BassDrum extends PercussionInstrument {
 	final Spatial bassDrumPedal;
 	
 	/**
-	 * The High level node.
-	 */
-	public final Node highLevelNode = new Node();
-	
-	/**
 	 * The Drum node.
 	 */
 	final Node drumNode = new Node();
@@ -78,20 +72,20 @@ public class BassDrum extends PercussionInstrument {
 	
 	public BassDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		bassDrum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		drumModel = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", "MetalTexture.bmp",
 				Midis2jam2.MatType.UNSHADED, 0.9f);
 		
 		// Apply materials
 		final Node arm = (Node) bassDrumBeaterArm;
 		
-		final Texture shinySilverTexture = context.getAssetManager().loadTexture("Assets/ShinySilver.bmp");
-		final Material shinySilverMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		final var shinySilverTexture = context.getAssetManager().loadTexture("Assets/ShinySilver.bmp");
+		final var shinySilverMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		shinySilverMaterial.setTexture("ColorMap", shinySilverTexture);
 		arm.getChild(0).setMaterial(shinySilverMaterial);
 		
-		final Texture darkMetalTexture = context.getAssetManager().loadTexture("Assets/MetalTextureDark.bmp");
-		final Material darkMetalMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		final var darkMetalTexture = context.getAssetManager().loadTexture("Assets/MetalTextureDark.bmp");
+		final var darkMetalMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		darkMetalMaterial.setTexture("ColorMap", darkMetalTexture);
 		arm.getChild(1).setMaterial(darkMetalMaterial);
 		
@@ -104,7 +98,7 @@ public class BassDrum extends PercussionInstrument {
 		
 		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		
-		drumNode.attachChild(bassDrum);
+		drumNode.attachChild(drumModel);
 		beaterNode.attachChild(this.bassDrumBeaterArm);
 		beaterNode.attachChild(bassDrumBeaterHolder);
 		beaterNode.attachChild(bassDrumPedal);

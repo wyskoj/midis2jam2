@@ -55,7 +55,7 @@ public abstract class HandedClone extends Clone {
 	 * @param parent         the parent
 	 * @param rotationFactor the rotation factor
 	 */
-	public HandedClone(HandedInstrument parent, float rotationFactor) {
+	protected HandedClone(HandedInstrument parent, float rotationFactor) {
 		super(parent, rotationFactor, Axis.X);
 		modelNode.attachChild(leftHandNode);
 		modelNode.attachChild(rightHandNode);
@@ -75,12 +75,12 @@ public abstract class HandedClone extends Clone {
 			assert currentNotePeriod != null;
 			final int midiNote = currentNotePeriod.midiNote;
 			assert parent.manager != null;
-			final Hands hands = (Hands) parent.manager.fingering(midiNote);
+			var hands = (Hands) parent.manager.fingering(midiNote);
 			if (hands != null) {
 				// Set the left hands
 				if (leftHands != null) {
 					/* May be null because ocarina does not implement left hands */
-					for (int i = 0; i < leftHands.length; i++) {
+					for (var i = 0; i < leftHands.length; i++) {
 						if (i == hands.left) {
 							leftHands[i].setCullHint(Spatial.CullHint.Dynamic);
 						} else {
@@ -89,7 +89,7 @@ public abstract class HandedClone extends Clone {
 					}
 				}
 				// Set the right hands
-				for (int i = 0; i < rightHands.length; i++) {
+				for (var i = 0; i < rightHands.length; i++) {
 					if (i == hands.right) {
 						rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
 					} else {

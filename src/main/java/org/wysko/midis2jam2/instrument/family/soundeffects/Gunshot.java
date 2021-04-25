@@ -57,7 +57,7 @@ public class Gunshot extends DecayedInstrument {
 	               @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			gunNodes[i] = new Node();
 			pistols[i] = new Pistol();
 			Node highestLevel = pistols[i].highestLevel;
@@ -86,7 +86,7 @@ public class Gunshot extends DecayedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-70 + 20 * indexForMoving()), 0));
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-70f + 20 * indexForMoving()), 0));
 	}
 	
 	/**
@@ -117,7 +117,7 @@ public class Gunshot extends DecayedInstrument {
 			blast = context.shadow("Assets/PistolBlast.fbx", "Assets/Explosion.png");
 			blast.setLocalScale(0);
 			blast.setLocalTranslation(0, 3, 5.5f);
-			Node modelNode = new Node();
+			var modelNode = new Node();
 			modelNode.attachChild(pistol);
 			highestLevel.attachChild(blast);
 			animNode.attachChild(modelNode);

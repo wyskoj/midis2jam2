@@ -38,10 +38,10 @@ public abstract class Saxophone extends MonophonicInstrument {
 	 * @param eventList  the list of events for this instrument
 	 * @param cloneClass the class of the clone
 	 */
-	public Saxophone(Midis2jam2 context,
-	                 @NotNull List<MidiChannelSpecificEvent> eventList,
-	                 @NotNull Class<? extends Clone> cloneClass,
-	                 @NotNull PressedKeysFingeringManager fingeringManager) throws ReflectiveOperationException {
+	protected Saxophone(Midis2jam2 context,
+	                    @NotNull List<MidiChannelSpecificEvent> eventList,
+	                    @NotNull Class<? extends Clone> cloneClass,
+	                    @NotNull PressedKeysFingeringManager fingeringManager) throws ReflectiveOperationException {
 		
 		super(context,
 				eventList,

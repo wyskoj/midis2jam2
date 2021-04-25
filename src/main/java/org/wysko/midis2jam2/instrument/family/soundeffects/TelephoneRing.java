@@ -85,13 +85,16 @@ public class TelephoneRing extends SustainedInstrument {
 	 */
 	public TelephoneRing(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
-		notes = eventList.stream().filter(e -> e instanceof MidiNoteEvent).map(e -> ((MidiNoteEvent) e)).collect(Collectors.toList());
+		notes = eventList.stream()
+				.filter(MidiNoteEvent.class::isInstance)
+				.map(MidiNoteEvent.class::cast)
+				.collect(Collectors.toList());
 		this.notePeriods = calculateNotePeriods(notes);
 		
 		Spatial base = context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
 		
 		Node base1 = (Node) base;
-		Material rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		var rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		rubberFoot.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
 		base1.getChild(0).setMaterial(rubberFoot);
 		
@@ -99,7 +102,7 @@ public class TelephoneRing extends SustainedInstrument {
 		instrumentNode.attachChild(base);
 		instrumentNode.attachChild(handle);
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			String val;
 			if (i < 9) {
 				val = String.valueOf(i + 1);
@@ -117,10 +120,9 @@ public class TelephoneRing extends SustainedInstrument {
 					0.9f);
 			
 			
-			//noinspection IntegerDivisionInFloatingPointContext
-			upKeys[i].setLocalTranslation(1.2f * (i % 3 - 1), 3.89f, -2.7f - (1.2f * (-i / 3)));
-			//noinspection IntegerDivisionInFloatingPointContext
-			downKeys[i].setLocalTranslation(1.2f * (i % 3 - 1), 3.4f, -2.7f - (1.2f * (-i / 3)));
+			final var row = -i / 3;
+			upKeys[i].setLocalTranslation(1.2f * (i % 3 - 1), 3.89f, -2.7f - (1.2f * row));
+			downKeys[i].setLocalTranslation(1.2f * (i % 3 - 1), 3.4f, -2.7f - (1.2f * row));
 			
 			downKeys[i].setCullHint(Spatial.CullHint.Always);
 			upNode.attachChild(upKeys[i]);
@@ -140,7 +142,7 @@ public class TelephoneRing extends SustainedInstrument {
 		List<MidiEvent> eventsToPerform = new ArrayList<>();
 		
 		if (!notes.isEmpty())
-			while (notes.size() != 0 &&
+			while (!notes.isEmpty() &&
 					((notes.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(notes.get(0)) <= time)
 							||
 							(notes.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(notes.get(0)) <= time - 0.01))
@@ -166,7 +168,7 @@ public class TelephoneRing extends SustainedInstrument {
 		}
 		
 		// Animate the phone
-		boolean isPlaying = false;
+		var isPlaying = false;
 		for (boolean b : playing) {
 			if (b) {
 				isPlaying = true;
@@ -187,6 +189,6 @@ public class TelephoneRing extends SustainedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(13 * indexForMoving(), 0, 0);
+		offsetNode.setLocalTranslation(13f * indexForMoving(), 0, 0);
 	}
 }

@@ -39,8 +39,8 @@ public abstract class PuffingClone extends HandedClone {
 	 * @param puffType       the puff type
 	 * @param pufferScale    the puffer scale
 	 */
-	public PuffingClone(HandedInstrument parent, float rotationFactor, SteamPuffer.SteamPuffType puffType,
-	                    float pufferScale) {
+	protected PuffingClone(HandedInstrument parent, float rotationFactor, SteamPuffer.SteamPuffType puffType,
+	                       float pufferScale) {
 		super(parent, rotationFactor);
 		
 		puffer = new SteamPuffer(parent.context, puffType, pufferScale);

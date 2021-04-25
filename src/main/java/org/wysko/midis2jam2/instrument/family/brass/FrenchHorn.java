@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument.family.brass;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +60,7 @@ public class FrenchHorn extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 15 * indexForMoving(), 0);
+		offsetNode.setLocalTranslation(0, 15f * indexForMoving(), 0);
 	}
 	
 	/**
@@ -84,15 +83,14 @@ public class FrenchHorn extends MonophonicInstrument {
 			modelNode.attachChild(bell);
 			
 			/* Set grey metal material */
-			Material material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp");
-			((Node) body).getChild(1).setMaterial(material);
+			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
 			/* Move bell to body of horn */
 			bell.setLocalTranslation(0, -4.63f, -1.87f);
-			bell.setLocalRotation(new Quaternion().fromAngles(rad(112 - 90), 0, 0));
+			bell.setLocalRotation(new Quaternion().fromAngles(rad(22), 0, 0));
 			
 			/* Load keys */
-			for (int i = 0; i < 4; i++) {
+			for (var i = 0; i < 4; i++) {
 				String id = i == 0 ? "Trigger" : "Key" + (i);
 				keys[i] = context.loadModel("FrenchHorn" + id + ".obj", "HornSkinGrey.bmp",
 						Midis2jam2.MatType.REFLECTIVE, 0.9f);
@@ -100,19 +98,19 @@ public class FrenchHorn extends MonophonicInstrument {
 			}
 			
 			keys[0].setLocalTranslation(0, 0, 1);
-			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(110 - 90), rad(90), 0));
+			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(20), rad(90), 0));
 			animNode.setLocalTranslation(0, 0, 20);
 		}
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(47 * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(47f * indexForMoving()), 0));
 		}
 		
 		@Override
 		protected void animateKeys(@NotNull Integer[] pressed) {
 			/* French horn keys rotate when pressed */
-			for (int i = 0; i < 4; i++) {
+			for (var i = 0; i < 4; i++) {
 				int finalI = i;
 				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
 					if (i == 0) // Trigger key, so rotate on different axis

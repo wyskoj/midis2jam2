@@ -42,7 +42,7 @@ public class SynthDrum extends OneDrumOctave {
 		super(context, eventList);
 		Spatial drum = context.loadModel("SynthDrum.obj", "SynthDrum.bmp");
 		
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
 			Spatial mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 			malletNodes[i].attachChild(mallet);
@@ -51,7 +51,7 @@ public class SynthDrum extends OneDrumOctave {
 			animNode.attachChild(malletNodes[i]);
 		}
 		
-		drum.setLocalRotation(new Quaternion().fromAngles(rad(135 - 90), 0, 0));
+		drum.setLocalRotation(new Quaternion().fromAngles(rad(45), 0, 0));
 		
 		animNode.attachChild(drum);
 		instrumentNode.attachChild(animNode);
@@ -60,6 +60,6 @@ public class SynthDrum extends OneDrumOctave {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-25 + indexForMoving() * -16), 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-25f + indexForMoving() * -16), 0));
 	}
 }
