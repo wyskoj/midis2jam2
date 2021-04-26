@@ -24,7 +24,6 @@ import org.wysko.midis2jam2.MainScreen;
 
 import javax.sound.midi.MidiDevice;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
 import java.util.Locale;
@@ -32,34 +31,23 @@ import java.util.Locale;
 @SuppressWarnings("unused")
 public class StartController extends DefaultScreenController {
 	
-	static final FileFilter MIDI_FILE_FILTER = new FileFilter() {
-		@Override
-		public boolean accept(File pathname) {
-			String s = pathname.getName().toLowerCase(Locale.ROOT);
-			return s.endsWith(".mid") || s.endsWith(".midi") || pathname.isDirectory();
-		}
-		
-		@Override
-		public String getDescription() {
-			return "MIDI Files (*.mid; *.midi)";
-		}
-	};
-	
 	static File pickedFile = null;
 	
 	public void chooseFile() {
-		var fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.setFileFilter(MIDI_FILE_FILTER);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.setMultiSelectionEnabled(false);
-		fileChooser.setPreferredSize(new Dimension(800, 600));
-		int choose = fileChooser.showDialog(null, "Load");
-		
-		if (choose == JFileChooser.APPROVE_OPTION) {
-			var selectedFile = fileChooser.getSelectedFile();
-			if (selectedFile == null) return;
-			pickedFile = selectedFile;
+		var dialog = new FileDialog((Dialog) null);
+		dialog.setFilenameFilter((dir, name) -> {
+			var s = name.toLowerCase(Locale.ROOT);
+			return s.endsWith(".mid") || s.endsWith(".midi");
+		});
+		dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		dialog.setMode(FileDialog.LOAD);
+		dialog.setTitle("Load MIDI file");
+		dialog.setMultipleMode(false);
+		dialog.setVisible(true);
+		var file = dialog.getFile();
+		var dir = dialog.getDirectory();
+		if (file != null) {
+			pickedFile = new File(dir, file);
 			TextRenderer midiFilePath = MainScreen.nifty.getCurrentScreen().findElementById("midiFilePath").getRenderer(TextRenderer.class);
 			assert midiFilePath != null;
 			midiFilePath.setText(pickedFile.getAbsolutePath());

@@ -42,7 +42,6 @@ import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings;
 import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir;
@@ -239,7 +238,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 						public void run() {
 							// Find the first tempo we haven't hit and need to execute
 							long currentMidiTick = sequencer.getTickPosition();
-							for (MidiTempoEvent tempo : getFile().tempos) {
+							for (MidiTempoEvent tempo : getFile().getTempos()) {
 								if (tempo.time == currentMidiTick) {
 									sequencer.setTempoInBPM(60_000_000f / tempo.number);
 								}
@@ -364,7 +363,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		IntStream.range(0, 16).forEach(i -> channels.add(new ArrayList<>()));
 		
 		// For each track, assign each event to the corresponding channel
-		Arrays.stream(getFile().tracks)
+		Arrays.stream(getFile().getTracks())
 				.filter(Objects::nonNull)
 				.forEach(track -> track.events.stream()
 						.filter(MidiChannelSpecificEvent.class::isInstance)
@@ -450,7 +449,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				// For each program event
 				for (var i = 0; i < programEvents.size(); i++) {
 					// If the event occurs within the range of these program events
-					if (i == programEvents.size() - 1 || Range.between(programEvents.get(i).time, programEvents.get(i + 1).time).contains(event.time)) {
+					if (i == programEvents.size() - 1 || (event.time >= programEvents.get(i).time && event.time < programEvents.get(i+1).time)) {
 						// Add this event
 						lastProgramForNote.get(programEvents.get(i).programNum).add(event);
 						if (event instanceof MidiNoteOnEvent) {
@@ -476,7 +475,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * Given a list of program events, removes duplicate events. There are two types of duplicate events:
 	 * <ul>
 	 *     <li>Events that occur at the same time</li>
-	 *     <li>Events that have the same program value</li>
+	 *     <li>Adjacent events that have the same program value</li>
 	 * </ul>
 	 * <p>
 	 *      For events at the same time, the last of two events is kept (in the order of the list). So, if a list contained
@@ -551,7 +550,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			// Glockenspiel
 			case 9 -> new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
 			// Music Box
-			case 10 -> new MusicBox(this, events);
+//			case 10 -> new MusicBox(this, events);
 			// Vibraphone
 			case 11 -> new Mallets(this, events, Mallets.MalletType.VIBES);
 			// Marimba
