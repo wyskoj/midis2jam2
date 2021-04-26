@@ -117,7 +117,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	/**
 	 * Video offset to account for synthesis audio delay.
 	 */
-	int latencyFix = 250;
+	int latencyFix = 0;
 	
 	/**
 	 * The MIDI sequencer.
@@ -505,7 +505,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	private void removeDuplicateProgramEvents(@NotNull List<MidiProgramEvent> programEvents) {
 		// Remove program events at same time (keep the last one)
 		for (int i = programEvents.size() - 2; i >= 0; i--) {
-			while (programEvents.get(i).time == programEvents.get(i + 1).time) {
+			while (i < programEvents.size() - 1 && programEvents.get(i).time == programEvents.get(i + 1).time) {
 				programEvents.remove(i);
 			}
 		}

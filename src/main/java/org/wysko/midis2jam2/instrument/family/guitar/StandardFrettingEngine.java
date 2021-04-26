@@ -139,7 +139,9 @@ public class StandardFrettingEngine implements FrettingEngine {
 	@Override
 	public void applyFretboardPosition(@NotNull FretboardPosition position) {
 		/* Fail if the position is already occupied */
-		if (frets[position.string] != -1) throw new IllegalStateException("The specified string is already occupied.");
+//		if (frets[position.string] != -1) {
+//			throw new IllegalStateException("The specified string is already occupied.");
+//		}
 		
 		frets[position.string] = position.fret;
 		runningAverage.add(position);
