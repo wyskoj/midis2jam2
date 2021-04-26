@@ -67,10 +67,10 @@ public class Launcher extends SimpleApplication {
 		settings.setTitle("midis2jam2");
 		try {
 			var icons = new BufferedImage[]{
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon16.png"))),
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon32.png"))),
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon128.png"))),
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/icon256.png")))
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon16.png"))),
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon32.png"))),
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon128.png"))),
+					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon256.png")))
 			};
 			settings.setIcons(icons);
 		} catch (IOException e) {

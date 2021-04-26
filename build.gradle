@@ -27,6 +27,7 @@ tasks.jpackage{
 
     appName = "midis2jam2"
     appVersion = "1.0.0"
+    appDescription = "midis2jam2 is a remaster of MIDIJam, the original 3D MIDI file visualizer."
     vendor = "Jacob Wysko"
     copyright = "Copyright (c) 2021 Jacob Wysko"
     runtimeImage = System.getProperty("java.home")
@@ -38,13 +39,20 @@ tasks.jpackage{
     javaOptions = ["-Dfile.encoding=UTF-8"].asList()
 
     // Mac and Linux icon
-    icon = "src/main/resources/icon.png"
+    icon = "src/main/resources/ico/icon512.png"
     windows {
-        icon = "src/main/resources/icon.ico"
+        icon = "src/main/resources/ico/icon.ico"
+    }
+    macPackageIdentifier = "org.wysko.midis2jam2"
+    mac {
+        icon = "src/main/resources/ico/icon.icns"
     }
     // Windows specific parameters will be processed only during Windows build
     winMenu = true // Adds shortcut to Start Menu
     winDirChooser = true // Allows user to choose install dir
+    winMenuGroup = "midis2jam2"
+    winShortcut = true
+
 
     linuxShortcut = true
     linuxDebMaintainer = "jacob@wysko.org"
