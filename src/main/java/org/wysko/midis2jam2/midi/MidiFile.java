@@ -18,8 +18,11 @@
 package org.wysko.midis2jam2.midi;
 
 import com.sun.media.sound.StandardMidiFileReader;
+import org.jetbrains.annotations.NotNull;
 
-import javax.sound.midi.*;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MetaMessage;
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.spi.MidiFileReader;
 import java.io.File;
 import java.io.IOException;
@@ -73,28 +76,63 @@ public class MidiFile {
 					}
 				} else if (midiEvent.getMessage() instanceof ShortMessage) {
 					ShortMessage message = (ShortMessage) midiEvent.getMessage();
-					if (message.getCommand() == ShortMessage.NOTE_ON) {
-						int note = message.getData1();
-						int velocity = message.getData2();
-						int channel = message.getChannel();
-						if (velocity == 0)
-							file.getTracks()[j].events.add(new MidiNoteOffEvent(midiEvent.getTick(), channel, note));
-						else
-							file.getTracks()[j].events.add(new MidiNoteOnEvent(midiEvent.getTick(), channel, note, velocity));
-					} else if (message.getCommand() == ShortMessage.NOTE_OFF) {
-						int note = message.getData1();
-						int channel = message.getChannel();
-						file.getTracks()[j].events.add(new MidiNoteOffEvent(midiEvent.getTick(), channel, note));
-					} else if (message.getCommand() == ShortMessage.PROGRAM_CHANGE) {
-						int preset = message.getData1();
-						int channel = message.getChannel();
-						file.getTracks()[j].events.add(new MidiProgramEvent(midiEvent.getTick(), channel, preset));
+					int command = message.getCommand();
+					if (command == ShortMessage.NOTE_ON) {
+						if (message.getData2() == 0) {
+							file.getTracks()[j].events.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+						} else {
+							file.getTracks()[j].events.add(midiNoteOnFromData(midiEvent.getTick(), message.getData1(), message.getData2(), message.getChannel()));
+						}
+					} else if (command == ShortMessage.NOTE_OFF) {
+						file.getTracks()[j].events.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+					} else if (command == ShortMessage.PROGRAM_CHANGE) {
+						file.getTracks()[j].events.add(programEventFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 					}
 				}
 			}
 		}
 		file.calculateTempoMap();
 		return file;
+	}
+	
+	/**
+	 * Given data, returns a {@link MidiNoteOnEvent}.
+	 *
+	 * @param tick     the MIDI tick
+	 * @param note     the note
+	 * @param velocity the velocity
+	 * @param channel  the channel
+	 * @return a new {@link MidiNoteOnEvent}
+	 */
+	@NotNull
+	private static MidiNoteOnEvent midiNoteOnFromData(long tick, int note, int velocity, int channel) {
+		return new MidiNoteOnEvent(tick, channel, note, velocity);
+	}
+	
+	/**
+	 * Given data, returns a {@link MidiNoteOffEvent}.
+	 *
+	 * @param tick    the MIDI tick
+	 * @param note    the note
+	 * @param channel the channel
+	 * @return a new {@link MidiNoteOffEvent}
+	 */
+	@NotNull
+	private static MidiNoteOffEvent midiNoteOffFromData(long tick, int note, int channel) {
+		return new MidiNoteOffEvent(tick, channel, note);
+	}
+	
+	/**
+	 * Given data, returns a {@link MidiProgramEvent}.
+	 *
+	 * @param tick    the MIDI tick
+	 * @param preset  the preset
+	 * @param channel the channel
+	 * @return a new {@link MidiProgramEvent}
+	 */
+	@NotNull
+	private static MidiProgramEvent programEventFromData(long tick, int preset, int channel) {
+		return new MidiProgramEvent(tick, channel, preset);
 	}
 	
 	/**

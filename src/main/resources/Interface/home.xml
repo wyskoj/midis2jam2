@@ -2,28 +2,8 @@
 <nifty xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
     <useStyles filename="nifty-default-styles.xml"/>
     <useControls filename="nifty-default-controls.xml"/>
-
     <screen id="start" controller="org.wysko.midis2jam2.gui.StartController">
         <layer id="foreground" childLayout="vertical" visibleToMouse="true">
-            <!--            <panel childLayout="center" height="50%">-->
-            <!--                <panel childLayout="center" height="100%" width="100%">-->
-            <!--                    <panel childLayout="center" width="50%" height="50%">-->
-            <!--                        <text text="midis2jam2" font="Interface/Fonts/Default.fnt" valign="top"/>-->
-            <!--                    </panel>-->
-            <!--                    <panel childLayout="center" width="50%" height="50%">-->
-            <!--                        <control name="button" label="Start" id="StartButton" align="center" valign="center">-->
-            <!--                            <interact onClick="start()"/>-->
-            <!--                        </control>-->
-            <!--                    </panel>-->
-            <!--                </panel>-->
-
-            <!--                <panel childLayout="center" height="100%" width="50%">-->
-            <!--                    <text text="Select MIDI device" font="Interface/Fonts/Default.fnt" valign="center"/>-->
-            <!--                    <control name="listBox" label="Select MIDI Device" id="MIDIDeviceDropDown" align="center"-->
-            <!--                             valign="bottom">-->
-            <!--                    </control>-->
-            <!--                </panel>-->
-            <!--            </panel>-->
             <panel childLayout="center" height="25%" width="100%">
                 <text height="100%" text="m i d i s 2 j a m 2" font="Interface/Fonts/Default.fnt"/>
             </panel>
