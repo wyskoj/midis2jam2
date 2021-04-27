@@ -17,6 +17,11 @@
 
 package org.wysko.midis2jam2.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -27,5 +32,19 @@ public class Utils {
 	
 	public static String exceptionToLines(Exception e) {
 		return Arrays.stream(e.getStackTrace()).map(element -> element.toString() + "\n").collect(Collectors.joining());
+	}
+	
+	public static String getHTML(String urlToRead) throws IOException {
+		var result = new StringBuilder();
+		var url = new URL(urlToRead);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		try (var reader = new BufferedReader(
+				new InputStreamReader(conn.getInputStream()))) {
+			for (String line; (line = reader.readLine()) != null; ) {
+				result.append(line);
+			}
+		}
+		return result.toString();
 	}
 }

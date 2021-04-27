@@ -20,17 +20,21 @@ package org.wysko.midis2jam2;
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import org.wysko.midis2jam2.midi.MidiFile;
+import org.wysko.midis2jam2.util.Utils;
 
 import javax.imageio.ImageIO;
 import javax.sound.midi.*;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.Objects.requireNonNull;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 public class Launcher extends SimpleApplication {
@@ -43,9 +47,12 @@ public class Launcher extends SimpleApplication {
 	
 	private boolean skipMainScreen = false;
 	
+	private static String version;
+	
 	public static void main(String[] args) throws Exception {
 		Logger.getLogger("com.jme3").setLevel(Level.SEVERE);
 		Logger.getLogger("de.lessvoid").setLevel(Level.OFF);
+		version = new Scanner(requireNonNull(Launcher.class.getResourceAsStream("/version.txt"))).next();
 		launcher = new Launcher();
 		app().start();
 		if (args.length != 0) {
@@ -59,6 +66,10 @@ public class Launcher extends SimpleApplication {
 		return launcher;
 	}
 	
+	public static String getVersion() {
+		return version;
+	}
+	
 	
 	@Override
 	public void start() {
@@ -67,10 +78,10 @@ public class Launcher extends SimpleApplication {
 		settings.setTitle("midis2jam2");
 		try {
 			var icons = new BufferedImage[]{
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon16.png"))),
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon32.png"))),
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon128.png"))),
-					ImageIO.read(Objects.requireNonNull(getClass().getResource("/ico/icon256.png")))
+					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon16.png"))),
+					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon32.png"))),
+					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon128.png"))),
+					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon256.png")))
 			};
 			settings.setIcons(icons);
 		} catch (IOException e) {
@@ -92,8 +103,22 @@ public class Launcher extends SimpleApplication {
 	public void initialize() {
 		super.initialize();
 		screen = new MainScreen();
-		if (!skipMainScreen)
+		if (!skipMainScreen) {
 			stateManager.attach(screen);
+			// Check for updates
+			EventQueue.invokeLater(() -> {
+				try {
+					var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
+					if (html.contains("Out of")) {
+						JOptionPane.showMessageDialog(null, "This version is out of date! Update now to use the latest features.",
+								"Update available", WARNING_MESSAGE);
+						Midis2jam2.logger.warning("Out of date!!");
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
 	}
 	
 	@Override

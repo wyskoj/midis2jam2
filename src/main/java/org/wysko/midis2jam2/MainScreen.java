@@ -23,10 +23,12 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.listbox.ListBoxControl;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 public class MainScreen extends AbstractAppState {
 	
@@ -51,11 +53,13 @@ public class MainScreen extends AbstractAppState {
 		
 		MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
 		
-		midiDeviceDropDown = Objects.requireNonNull(nifty.getCurrentScreen()).findControl("MIDIDeviceDropDown", ListBoxControl.class);
+		midiDeviceDropDown = requireNonNull(nifty.getCurrentScreen()).findControl("MIDIDeviceDropDown", ListBoxControl.class);
 		for (MidiDevice.Info anInfo : info) {
 			if (anInfo.getName().equals("Real Time Sequencer")) continue;
 			midiDeviceDropDown.addItem(anInfo);
 		}
+		
+		requireNonNull(requireNonNull(nifty.getCurrentScreen().findElementById("version")).getRenderer(TextRenderer.class)).setText("v%s ".formatted(Launcher.getVersion()));
 		
 		app.getViewPort().addProcessor(niftyDisplay);
 		

@@ -53,7 +53,7 @@
         </layer>
         <layer childLayout="absolute">
             <panel width="100%" height="100%" childLayout="center">
-                <text align="right" valign="bottom" text="v0.1.0 " font="Interface/Fonts/Default.fnt"/>
+                <text id="version" align="right" text="v????? " valign="bottom" font="Interface/Fonts/Default.fnt"/>
             </panel>
         </layer>
 

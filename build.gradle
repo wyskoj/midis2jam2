@@ -22,19 +22,25 @@ application {
     mainClassName = 'org.wysko.midis2jam2.Launcher'
 }
 
-tasks.jpackage{
+shadowJar {
+    doFirst {
+        new File(projectDir, "src/main/resources/version.txt").text = getArchiveVersion().get()
+    }
+}
+
+tasks.jpackage {
     dependsOn("shadowJar")
 
     appName = "midis2jam2"
-    appVersion = "1.0.0"
+    appVersion = version
     appDescription = "midis2jam2 is a remaster of MIDIJam, the original 3D MIDI file visualizer."
     vendor = "Jacob Wysko"
     copyright = "Copyright (c) 2021 Jacob Wysko"
     runtimeImage = System.getProperty("java.home")
     licenseFile = "LICENSE"
-    input  = "$buildDir/libs"
+    input = "$buildDir/libs"
     destination = "$buildDir/package/midis2jam2"
-    mainJar = "midis2jam2-all.jar"
+    mainJar = "midis2jam2-" + version + "-all.jar"
     mainClass = "org.wysko.midis2jam2.Launcher"
     javaOptions = ["-Dfile.encoding=UTF-8"].asList()
 
