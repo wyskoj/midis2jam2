@@ -1,56 +1,64 @@
 = midis2jam2
 
-*midis2jam2* is a remaster, sequel, v2.0, etc., to MIDIJam, a MIDI file visualizer made by Scott Haag, last updated in 2007.
+*midis2jam2* is a remaster of http://www.gamesbyscott.com/midijam.htm[MIDIJam], a MIDI file visualizer made by Scott Haag, last updated in 2007.
 
-midis2jam2 aims to faithfully recreate MIDIJam while fixing bugs and completing the GM-1 implementation.
+== About
+
+midis2jam2 provides a faithful recreation, staying true to the original look and feel, as closely as possible.
+The models and textures used in midis2jam2 are the original assets from MIDIJam, designed by MIDIJam's creator Scott Haag. midis2jam2 will complete the GM-1 implementation, allowing every MIDI instrument to be visualized.
 
 Future versions may add extended features, such as custom graphics, real-time MIDI visualization, and others.
 
 [#_running]
 == Running
 
-=== Using a CI build
+=== Easy mode
+
+Simply download https://midis2jam2.xyz[the latest version] and run the file for your system.
+Follow the on-screen instructions for installing midis2jam2.
+
+=== Hard mode
+
+If you want to experience the latest midis2jam2 updates in between releases, you can download a CI build.
+Note: these builds are unstable, and I won't provide any support for them (although, you should submit issues for pertinent bugs).
+
+==== Getting the binary
+
+You can either use a prebuilt binary or build from source.
+
+===== Using a prebuilt binary
 
 To begin, download a build from the https://www.midis2jam2.xyz/builds/[builds page].
 Move `midis2jam2-xxxxxxxx.jar` to a new folder (the Xs are a placeholder here; when you download the jar, this is the beginning of the commit hash).
 
-To run midis2jam2, you need to specify command line arguments that specify the playback device and MIDI file path.
-If you just want to specify the MIDI file and let midis2jam2 determine the best MIDI synth for your machine, run
-
-----
-$ java -jar midis2jam2-xxxxxxxx.jar mymidifile.mid
-----
-
-If you want to specify a playback device also (in this example, `VirtualMIDISynth #1` is used), run
-
-----
-$ java -jar midis2jam2-xxxxxxxx.jar -d "VirtualMIDISynth #1" mymidifile.mid
-----
-
-You can optionally specify `-s` to force midis2jam2 to use the internal Java synthesizer.
-
-The full help screen is here:
-
-----
-usage: midis2jam2 [-d <arg>] [-s] [-l <arg>] [midifile]
- -d,--device <arg>     MIDI playback device name
- -s,--internal-synth   Force use of internal Java MIDI synth
- -l,--latency <arg>    Latency offset for A/V sync, in ms
-----
-
-[#_building_locally]
-=== Building locally
+===== Building from source
 
 To build midis2jam2, run
 
 ----
 $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2
-$ gradlew shadowJar
+$ ./gradlew shadowjar
 ----
 
 The jar file appears in `build/libs`.
-Copy this to a new folder and run it as mentioned above.
+Copy it to a new folder.
+
+You will need at least _Java 15_ in order for a successful build.
+
+==== Running
+
+To run midis2jam2, simply execute the jar file:
+
+----
+$ java -jar midis2jam2.jar
+----
+
+You can optionally specify the relative or absolute path to a MIDI file; midis2jam2 will load and play the file using the default synthesizer Gervill:
+
+----
+$ java -jar midis2jam2.jar path/to/midifile.mid
+----
 
 == FAQ & Troubleshooting
 
@@ -61,56 +69,35 @@ Press the MIDI panic button on your synthesizer to stop the sound.
 === The audio is out of sync with the video.
 
 This can arise if your MIDI synthesizer is known to have a delay or buffer.
-You can use link:#_running[the `-l` CLI arg]
-to specify the output buffer.
+Adjust the buffer on your device to reduce it as much as possible.
 
 In some rare cases, the audio may be misaligned because the program took too long to load, and therefore did not have enough time to catch up before the MIDI began playback.
 Most of the time, this only occurs on first launch.
 
 If it continues to be a problem, add some silence to the beginning of the MIDI file.
 
-=== _Something is broken!!1_
+=== I think something is broken.
 
 Check the issues page and make sure there isn't already a relevant issue open.
 If there isn't, create an issue and use the bug report template.
 
 === How do I change the soundfont?
 
-midis2jam2 does not handle the playback of MIDI files, unless a preferred MIDI synth is not active on your machine (the program reverts to the internal Java MIDI synth).
-For Windows, I recommend  https://coolsoft.altervista.org/en/virtualmidisynth[VirtualMIDISynth].
-The preferred MIDI synth device can be specified by passing a link:#_running[command line argument].
+midis2jam2 does not handle the playback of MIDI files; it is offloaded to either an external synth or the internal Java MIDI synth Gervill.
 
-In the future, this process will be simpler.
+For Windows, I recommend  https://coolsoft.altervista.org/en/virtualmidisynth[VirtualMIDISynth].
+It allows you to specify the soundfont you would like to use.
+It will appear in midis2jam2 as `VirtualMIDISynth #1`.
 
 === Why doesn't instrument _X_ appear?
 
 It's likely I haven't implemented it yet.
 Check link:implementation.adoc[this page] for more information.
 
-=== `'git' is not recognized as an internal or external command`
-
-Simply https://gist.github.com/derhuerst/1b15ff4652a867391f03[install Git].
-Restart your terminal.
-
-=== `'java' is not recognized as an internal or external command`
-
-Simply https://javadl.oracle.com/webapps/download/AutoDL?BundleId=244068_89d678f2be164786b292527658ca1605[install Java].
-Restart your terminal.
-
-If you are still getting this error after installing, ensure it is https://java.com/en/download/help/path.html[added to your PATH].
-
-=== I'm getting `Could not find tools.jar`
-
-Ensure that you have https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html[JDK 1.8] installed and configured as your default JDK.
-
-=== `MidiUnavailableException: There is not enough memory available for this task`...
+=== MidiUnavailableException: There is not enough memory available for this task...
 
 This can happen if you attempt to use ghost/phantom MIDI ports that appear visible on your machine.
 Try restarting your computer or reconnecting your MIDI devices.
-
-=== I'm getting errors on an old build.
-
-https://www.midis2jam2.xyz/builds/[Update]!!
 
 == Contributing
 
@@ -121,5 +108,6 @@ Please ensure you use a template, or ensure you https://medium.com/nyc-planning-
 == License
 
 * midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
-* Assets Copyright &copy; 2007 Scott Haag (used with permission).
-* https://github.com/wyskoj/midis2jam2/tree/master/testmidi[Test MIDI files] Copyright &copy; various authors.
+The software comes with no warranty.
+* Assets Copyright © 2007 http://www.gamesbyscott.com/[Scott Haag] (used with permission).
+* https://github.com/wyskoj/midis2jam2/tree/master/testmidi[Test MIDI files] Copyright © various authors.
