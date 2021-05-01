@@ -36,12 +36,16 @@ public class MainScreen extends AbstractAppState {
 	
 	public static ListBoxControl midiDeviceDropDown;
 	
+	private Application app;
+	
+	private NiftyJmeDisplay niftyDisplay;
+	
 	@Override
 	public void initialize(AppStateManager stateManager, Application app) {
 		super.initialize(stateManager, app);
 		((Launcher) app).getFlyByCamera().setEnabled(false);
 		
-		var niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
+		niftyDisplay = NiftyJmeDisplay.newNiftyJmeDisplay(
 				app.getAssetManager(),
 				app.getInputManager(),
 				app.getAudioRenderer(),
@@ -61,7 +65,8 @@ public class MainScreen extends AbstractAppState {
 		
 		requireNonNull(requireNonNull(nifty.getCurrentScreen().findElementById("version")).getRenderer(TextRenderer.class)).setText("v%s ".formatted(Launcher.getVersion()));
 		
-		app.getViewPort().addProcessor(niftyDisplay);
+		this.app = app;
+		this.app.getViewPort().addProcessor(niftyDisplay);
 		
 	}
 	
@@ -69,5 +74,6 @@ public class MainScreen extends AbstractAppState {
 	public void cleanup() {
 		super.cleanup();
 		nifty.exit();
+		this.app.getViewPort().removeProcessor(niftyDisplay);
 	}
 }

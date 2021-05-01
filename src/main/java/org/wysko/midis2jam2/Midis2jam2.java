@@ -34,7 +34,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import org.apache.commons.lang3.Range;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,6 +65,7 @@ import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Synthesizer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,6 +112,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * The list of harp shadows
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
+	
+	public Synthesizer synthesizer;
 	
 	/**
 	 * Video offset to account for synthesis audio delay.
@@ -279,6 +281,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		logger.log(INFO, "Cleaning up.");
 		sequencer.stop();
 		sequencer.close();
+		if (synthesizer != null) {
+			synthesizer.close();
+		}
 	}
 	
 	/**

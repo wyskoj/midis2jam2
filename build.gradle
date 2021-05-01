@@ -33,7 +33,7 @@ tasks.jpackage {
 
     appName = "midis2jam2"
     appVersion = version
-    appDescription = "midis2jam2 is a remaster of MIDIJam, the original 3D MIDI file visualizer."
+    appDescription = "midis2jam2"
     vendor = "Jacob Wysko"
     copyright = "Copyright (c) 2021 Jacob Wysko"
     runtimeImage = System.getProperty("java.home")
@@ -87,6 +87,13 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
+    implementation 'com.formdev:flatlaf:1.1.2'
+
+    // https://mvnrepository.com/artifact/org.openjfx/javafx-controls
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: '16'
+
+
 
 }
 

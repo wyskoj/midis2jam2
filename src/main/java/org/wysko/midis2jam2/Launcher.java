@@ -19,6 +19,7 @@ package org.wysko.midis2jam2;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.util.Utils;
 
@@ -130,10 +131,11 @@ public class Launcher extends SimpleApplication {
 		midis2jam2 = new Midis2jam2();
 		
 		try {
-			var sequencer = getSequencer(device);
-			initMidiFile(midiFile, sequencer);
+			var pair = getSequencer(device);
+			initMidiFile(midiFile, pair.getLeft());
 			midis2jam2.setFile(MidiFile.readMidiFile(midiFile));
-			midis2jam2.sequencer = sequencer;
+			midis2jam2.sequencer = pair.getLeft();
+			midis2jam2.synthesizer = pair.getRight();
 			rootNode.attachChild(midis2jam2.getRootNode());
 			stateManager.detach(screen);
 			stateManager.attach(midis2jam2);
@@ -150,18 +152,43 @@ public class Launcher extends SimpleApplication {
 		}
 	}
 	
-	private Sequencer getSequencer(MidiDevice.Info info) throws MidiUnavailableException {
+	private Pair<Sequencer, Synthesizer> getSequencer(MidiDevice.Info info) throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		var device1 = MidiSystem.getMidiDevice(info);
 		Sequencer sequencer;
-		
+		Synthesizer synthesizer = null;
 		if (info.getName().equals("Gervill")) {
-			sequencer = MidiSystem.getSequencer(true);
+			File pickedSf2 = null;
+			synthesizer = MidiSystem.getSynthesizer();
+			if (pickedSf2 == null) {
+				sequencer = MidiSystem.getSequencer(true);
+			} else {
+				sequencer = MidiSystem.getSequencer(false);
+				synthesizer.open();
+				synthesizer.loadAllInstruments(MidiSystem.getSoundbank(pickedSf2));
+				sequencer.getTransmitter().setReceiver(synthesizer.getReceiver());
+			}
 		} else {
 			device1.open();
 			sequencer = MidiSystem.getSequencer(false);
 			sequencer.getTransmitter().setReceiver(device1.getReceiver());
 		}
-		return sequencer;
+		var finalSynthesizer = synthesizer;
+		return new Pair<>() {
+			@Override
+			public Sequencer getLeft() {
+				return sequencer;
+			}
+			
+			@Override
+			public Synthesizer getRight() {
+				return finalSynthesizer;
+			}
+			
+			@Override
+			public Synthesizer setValue(Synthesizer value) {
+				return null;
+			}
+		};
 	}
 	
 	
