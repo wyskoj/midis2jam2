@@ -139,10 +139,7 @@ public class Launcher extends SimpleApplication {
 			rootNode.attachChild(midis2jam2.getRootNode());
 			stateManager.detach(screen);
 			stateManager.attach(midis2jam2);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
 		} catch (IOException | InvalidMidiDataException | MidiUnavailableException e) {
-			
 			JOptionPane.showMessageDialog(null,
 					new JScrollPane(new JTextArea(
 							"There was an error loading the MIDI file.\n\n%s: %s\n%s".formatted(e.getClass().getName(),

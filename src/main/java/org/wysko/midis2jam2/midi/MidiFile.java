@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.ShortMessage;
-import javax.sound.midi.spi.MidiFileReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -56,9 +55,8 @@ public class MidiFile {
 	 * @throws IOException          an i/o error occurred
 	 * @throws InterruptedException MIDICSV error
 	 */
-	public static MidiFile readMidiFile(File midiFile) throws IOException, InterruptedException, InvalidMidiDataException {
-		MidiFileReader midiFileReader = new StandardMidiFileReader();
-		var sequence = midiFileReader.getSequence(midiFile);
+	public static MidiFile readMidiFile(File midiFile) throws IOException, InvalidMidiDataException {
+		var sequence = new StandardMidiFileReader().getSequence(midiFile);
 		var file = new MidiFile();
 		file.setDivision((short) sequence.getResolution());
 		file.setTracks(new MidiTrack[sequence.getTracks().length + 1]);

@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.GridBagLayout ) {
 			"$columnSpecs": "0:1.0"
-			"$rowSpecs": "127, 29, 72, 0"
+			"$rowSpecs": "127, 140, 72, 0, 0"
 			"$hGap": 5
 			"$vGap": 5
 			"$alignLeft": true
@@ -14,6 +14,7 @@ new FormModel {
 			name: "this"
 			"title": "midis2jam2"
 			"iconImage": new com.jformdesigner.model.SwingIcon( 0, "/ico/icon16.png" )
+			"resizable": false
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "logo"
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/logo.png" )
@@ -22,8 +23,8 @@ new FormModel {
 				"insets": new java.awt.Insets( 10, 0, 0, 0 )
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
-				"$columnSpecs": "98, 136:1.0, 87, 0"
-				"$rowSpecs": "0, 0, 4"
+				"$columnSpecs": "82, 136:1.0, 87, 0"
+				"$rowSpecs": "0, 0, 4, 0"
 				"$hGap": 5
 				"$vGap": 5
 				"$alignLeft": true
@@ -39,12 +40,15 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 				add( new FormComponent( "javax.swing.JTextField" ) {
 					name: "midiFilePathTextField"
+					"editable": false
+					"toolTipText": "Specify the MIDI file to play."
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1
 				} )
 				add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 					name: "loadMidiFileButton"
 					"text": "Load..."
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/open.png" )
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "loadMidiFileButtonActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 2
@@ -59,12 +63,17 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JComboBox" ) {
 					name: "midiDeviceDropDown"
+					"toolTipText": "Select the MIDI device to play from. Gervill is\nthe default device and can play soundfonts."
+					auxiliary() {
+						"JavaCodeGenerator.typeParameters": "MidiDevice.Info"
+					}
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "midiDeviceDropDownActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1
 					"gridy": 1
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label3"
+					name: "soundfontLabel"
 					"text": "SoundFont:"
 					"horizontalAlignment": 4
 					"labelFor": new FormReference( "soundFontPathTextField" )
@@ -73,16 +82,27 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JTextField" ) {
 					name: "soundFontPathTextField"
+					"editable": false
+					"toolTipText": "Optionally specify a soundfont."
+					"text": "Default SoundFont"
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1
 					"gridy": 2
 				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
+				add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 					name: "loadSoundFontButton"
 					"text": "Load..."
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/open.png" )
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "loadSoundFontButtonActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 2
+					"gridy": 2
+				} )
+				add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
+					name: "button1"
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/reset.png" )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 3
 					"gridy": 2
 				} )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
@@ -127,14 +147,23 @@ new FormModel {
 				"gridy": 2
 				"insets": #Insets0
 			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
+			add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 				name: "startButton"
 				"text": "Start!"
 				"font": new java.awt.Font( "Segoe UI", 2, 16 )
+				"icon": new com.jformdesigner.model.SwingIcon( 0, "/music.png" )
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "startButtonPressed", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 				"gridy": 3
 				"hAlign": 0
 				"insets": new java.awt.Insets( 10, 0, 0, 0 )
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "versionText"
+				"text": "text"
+				"horizontalAlignment": 4
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 4
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 5, 5 )

@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class Utils {
 	
@@ -31,7 +29,12 @@ public class Utils {
 	}
 	
 	public static String exceptionToLines(Exception e) {
-		return Arrays.stream(e.getStackTrace()).map(element -> element.toString() + "\n").collect(Collectors.joining());
+		var sb = new StringBuilder();
+		sb.append(e.getClass().getSimpleName()).append(": ").append(e.getMessage()).append("\n");
+		for (StackTraceElement element : e.getStackTrace()) {
+			sb.append(element.toString()).append("\n");
+		}
+		return sb.toString();
 	}
 	
 	public static String getHTML(String urlToRead) throws IOException {

@@ -1,0 +1,34 @@
+JFDML JFormDesigner: "7.0.3.0.337" Java: "11.0.10" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			"maximumSize": new java.awt.Dimension( 100, 100 )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "errorMessage"
+				"text": "text"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "North"
+			} )
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "scrollPane1"
+				"maximumSize": new java.awt.Dimension( 100, 100 )
+				"verticalScrollBarPolicy": 22
+				auxiliary() {
+					"JavaCodeGenerator.postInitCode": "${field}.revalidate();"
+				}
+				add( new FormComponent( "javax.swing.JTextArea" ) {
+					name: "errorStacktrace"
+					"maximumSize": new java.awt.Dimension( 100, 100 )
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 400, 125 )
+		} )
+	}
+}
