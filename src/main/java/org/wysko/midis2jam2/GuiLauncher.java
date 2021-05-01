@@ -8,6 +8,7 @@ import com.formdev.flatlaf.IntelliJTheme;
 import org.wysko.midis2jam2.gui.ExceptionDisplay;
 import org.wysko.midis2jam2.gui.JResizedIconButton;
 import org.wysko.midis2jam2.midi.MidiFile;
+import org.wysko.midis2jam2.util.Utils;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
@@ -15,6 +16,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Soundbank;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,10 +28,12 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import static java.awt.Cursor.getPredefinedCursor;
 import static java.util.Objects.requireNonNull;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.*;
+import static org.wysko.midis2jam2.Launcher.getVersion;
 
 /**
  * @author Jacob Wysko
@@ -50,6 +54,8 @@ public class GuiLauncher extends JFrame {
 	public GuiLauncher() {
 		initComponents();
 	}
+	
+	private JResizedIconButton resetSoundFontButton;
 	
 	public static void main(String[] args) {
 		// Initialize GUI
@@ -75,6 +81,35 @@ public class GuiLauncher extends JFrame {
 		// Set version number
 		String version = new BufferedReader(new InputStreamReader(requireNonNull(GuiLauncher.class.getResourceAsStream("/version.txt")))).lines().collect(Collectors.joining("\n"));
 		guiLauncher.versionText.setText(version);
+		
+		// Check for updates
+		EventQueue.invokeLater(() -> {
+			try {
+				var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
+				var jep = new JEditorPane();
+				jep.setContentType("text/html");
+				jep.setText("<html>This version is out of date and is no longer supported. <a " +
+						"href=\"https://midis2jam2.xyz\">Download the latest version.</a></html>\"");
+				jep.setEditable(false);//so its not editable
+				jep.setOpaque(false);//so we dont see whit background
+				jep.addHyperlinkListener(hle -> {
+					if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+						try {
+							Desktop.getDesktop().browse(hle.getURL().toURI());
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				});
+				if (html.contains("Out of")) {
+					JOptionPane.showMessageDialog(guiLauncher, jep,
+							"Update available", WARNING_MESSAGE);
+					Midis2jam2.logger.warning("Out of date!!");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	/**
@@ -98,7 +133,7 @@ public class GuiLauncher extends JFrame {
 		});
 		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
 		f.setFileSelectionMode(FILES_ONLY);
-		if (f.showDialog(this, "Load...") == APPROVE_OPTION) {
+		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
 			selectedMidiFile = f.getSelectedFile();
 			midiFilePathTextField.setText(selectedMidiFile.getAbsolutePath());
 		}
@@ -125,7 +160,7 @@ public class GuiLauncher extends JFrame {
 		});
 		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
 		f.setFileSelectionMode(FILES_ONLY);
-		if (f.showDialog(this, "Load...") == APPROVE_OPTION) {
+		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
 			selectedSf2File = f.getSelectedFile();
 			soundFontPathTextField.setText(selectedSf2File.getAbsolutePath());
 		}
@@ -136,35 +171,37 @@ public class GuiLauncher extends JFrame {
 			soundfontLabel.setEnabled(false);
 			soundFontPathTextField.setEnabled(false);
 			loadSoundFontButton.setEnabled(false);
+			resetSoundFontButton.setEnabled(false);
 		} else {
 			soundfontLabel.setEnabled(true);
 			soundFontPathTextField.setEnabled(true);
 			loadSoundFontButton.setEnabled(true);
+			resetSoundFontButton.setEnabled(true);
 		}
 	}
 	
 	private void startButtonPressed(ActionEvent e) {
 		// Collect MIDI file
-		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		this.setCursor(getPredefinedCursor(Cursor.WAIT_CURSOR));
 		if (midiFilePathTextField.getText().isBlank()) {
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, "You must specify a MIDI file.", "No MIDI file selected", INFORMATION_MESSAGE);
 			return;
 		}
 		var midiFile = new File(midiFilePathTextField.getText());
 		if (!midiFile.exists()) {
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, "The specified MIDI file does not exist.", "MIDI file does not exist", ERROR_MESSAGE);
 			return;
 		}
 		try {
 			MidiFile.readMidiFile(midiFile);
 		} catch (IOException ioException) {
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, new ExceptionDisplay("There was an error reading the MIDI file.", ioException), "I/O error", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (InvalidMidiDataException invalidMidiDataException) {
-			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, new ExceptionDisplay("The MIDI file has invalid data, or is not a Standard MIDI " +
 					"file.", invalidMidiDataException), "Bad MIDI file", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -172,10 +209,10 @@ public class GuiLauncher extends JFrame {
 		
 		// Collect sf2
 		Soundbank soundfont = null;
-		if (!soundFontPathTextField.getText().isBlank()) {
+		if (!soundFontPathTextField.getText().equals("Default SoundFont")) {
 			var soundfontFile = new File(soundFontPathTextField.getText());
 			if (!soundfontFile.exists()) {
-				this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, "The specified SoundFont does not exist.", "SoundFont file does not exist",
 						ERROR_MESSAGE);
 				return;
@@ -183,24 +220,44 @@ public class GuiLauncher extends JFrame {
 			try {
 				MidiSystem.getSoundbank(soundfontFile);
 			} catch (InvalidMidiDataException invalidMidiDataException) {
-				this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, new ExceptionDisplay("The SoundFont file has invalid data, or is not a " +
 						"SoundFont file.", invalidMidiDataException), "Bad SoundFont file", JOptionPane.ERROR_MESSAGE);
 				return;
 			} catch (IOException ioException) {
-				this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, new ExceptionDisplay("There was an error reading the SoundFont file.",
 						ioException), "I/O error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}
-		
-		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
-	private void clearSoundFontButtonActionPerformed(ActionEvent e) {
-		soundFontPathTextField.setText("");
+	private void resetSoundFontButtonActionPerformed(ActionEvent e) {
+		soundFontPathTextField.setText("Default SoundFont");
 	}
+	
+	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JLabel logo;
+	
+	private JPanel panel1;
+	
+	private JLabel label1;
+	
+	private JTextField midiFilePathTextField;
+	
+	private JResizedIconButton loadMidiFileButton;
+	
+	private JLabel label2;
+	
+	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
+	
+	private JLabel soundfontLabel;
+	
+	private JTextField soundFontPathTextField;
+	
+	private JResizedIconButton loadSoundFontButton;
 	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -214,7 +271,7 @@ public class GuiLauncher extends JFrame {
 		soundfontLabel = new JLabel();
 		soundFontPathTextField = new JTextField();
 		loadSoundFontButton = new JResizedIconButton();
-		button1 = new JResizedIconButton();
+		resetSoundFontButton = new JResizedIconButton();
 		panel2 = new JPanel();
 		hSpacer1 = new JPanel(null);
 		label4 = new JLabel();
@@ -312,9 +369,11 @@ public class GuiLauncher extends JFrame {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
-			//---- button1 ----
-			button1.setIcon(new ImageIcon(getClass().getResource("/reset.png")));
-			panel1.add(button1, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
+			//---- resetSoundFontButton ----
+			resetSoundFontButton.setIcon(new ImageIcon(getClass().getResource("/reset.png")));
+			resetSoundFontButton.setToolTipText("Reset to the default SoundFont.");
+			resetSoundFontButton.addActionListener(e -> resetSoundFontButtonActionPerformed(e));
+			panel1.add(resetSoundFontButton, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 0), 0, 0));
 		}
@@ -368,34 +427,11 @@ public class GuiLauncher extends JFrame {
 		versionText.setHorizontalAlignment(SwingConstants.RIGHT);
 		contentPane.add(versionText, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+				new Insets(0, 0, 10, 5), 0, 0));
 		pack();
 		setLocationRelativeTo(getOwner());
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
-	
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	private JLabel logo;
-	
-	private JPanel panel1;
-	
-	private JLabel label1;
-	
-	private JTextField midiFilePathTextField;
-	
-	private JResizedIconButton loadMidiFileButton;
-	
-	private JLabel label2;
-	
-	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
-	
-	private JLabel soundfontLabel;
-	
-	private JTextField soundFontPathTextField;
-	
-	private JResizedIconButton loadSoundFontButton;
-	
-	private JResizedIconButton button1;
 	
 	private JPanel panel2;
 	

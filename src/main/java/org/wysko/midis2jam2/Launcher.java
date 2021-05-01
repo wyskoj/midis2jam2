@@ -21,12 +21,9 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.wysko.midis2jam2.midi.MidiFile;
-import org.wysko.midis2jam2.util.Utils;
 
-import javax.imageio.ImageIO;
 import javax.sound.midi.*;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.imageio.ImageIO.read;
 import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 public class Launcher extends SimpleApplication {
@@ -68,9 +65,9 @@ public class Launcher extends SimpleApplication {
 	}
 	
 	public static String getVersion() {
+		version = new Scanner(requireNonNull(Launcher.class.getResourceAsStream("/version.txt"))).next();
 		return version;
 	}
-	
 	
 	@Override
 	public void start() {
@@ -79,10 +76,10 @@ public class Launcher extends SimpleApplication {
 		settings.setTitle("midis2jam2");
 		try {
 			var icons = new BufferedImage[]{
-					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon16.png"))),
-					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon32.png"))),
-					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon128.png"))),
-					ImageIO.read(requireNonNull(getClass().getResource("/ico/icon256.png")))
+					read(requireNonNull(getClass().getResource("/ico/icon16.png"))),
+					read(requireNonNull(getClass().getResource("/ico/icon32.png"))),
+					read(requireNonNull(getClass().getResource("/ico/icon128.png"))),
+					read(requireNonNull(getClass().getResource("/ico/icon256.png")))
 			};
 			settings.setIcons(icons);
 		} catch (IOException e) {
@@ -107,18 +104,7 @@ public class Launcher extends SimpleApplication {
 		if (!skipMainScreen) {
 			stateManager.attach(screen);
 			// Check for updates
-			EventQueue.invokeLater(() -> {
-				try {
-					var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
-					if (html.contains("Out of")) {
-						JOptionPane.showMessageDialog(null, "This version is out of date! Update now to use the latest features.",
-								"Update available", WARNING_MESSAGE);
-						Midis2jam2.logger.warning("Out of date!!");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			});
+			
 		}
 	}
 	

@@ -19,7 +19,7 @@ repositories {
 }
 
 application {
-    mainClassName = 'org.wysko.midis2jam2.Launcher'
+    mainClassName = 'org.wysko.midis2jam2.GuiLauncher'
 }
 
 shadowJar {
@@ -92,9 +92,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.openjfx/javafx-controls
     implementation group: 'org.openjfx', name: 'javafx-controls', version: '16'
-
-
-
 }
 
 test {
