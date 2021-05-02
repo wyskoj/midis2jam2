@@ -20,10 +20,8 @@ package org.wysko.midis2jam2;
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import org.apache.commons.lang3.tuple.Pair;
-import org.wysko.midis2jam2.midi.MidiFile;
 
 import javax.sound.midi.*;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +31,6 @@ import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
 import static javax.imageio.ImageIO.read;
-import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 public class Launcher extends SimpleApplication {
 	
@@ -114,25 +111,25 @@ public class Launcher extends SimpleApplication {
 	}
 	
 	public void loadScene(File midiFile, MidiDevice.Info device) {
-		midis2jam2 = new Midis2jam2();
-		
-		try {
-			var pair = getSequencer(device);
-			initMidiFile(midiFile, pair.getLeft());
-			midis2jam2.setFile(MidiFile.readMidiFile(midiFile));
-			midis2jam2.sequencer = pair.getLeft();
-			midis2jam2.synthesizer = pair.getRight();
-			rootNode.attachChild(midis2jam2.getRootNode());
-			stateManager.detach(screen);
-			stateManager.attach(midis2jam2);
-		} catch (IOException | InvalidMidiDataException | MidiUnavailableException e) {
-			JOptionPane.showMessageDialog(null,
-					new JScrollPane(new JTextArea(
-							"There was an error loading the MIDI file.\n\n%s: %s\n%s".formatted(e.getClass().getName(),
-									e.getMessage(),
-									exceptionToLines(e))
-					)), "MIDI file error", JOptionPane.ERROR_MESSAGE);
-		}
+//		midis2jam2 = new Midis2jam2();
+//
+//		try {
+//			var pair = getSequencer(device);
+//			initMidiFile(midiFile, pair.getLeft());
+//			midis2jam2.setFile(MidiFile.readMidiFile(midiFile));
+//			midis2jam2.sequencer = pair.getLeft();
+//			midis2jam2.synthesizer = pair.getRight();
+//			rootNode.attachChild(midis2jam2.getRootNode());
+//			stateManager.detach(screen);
+//			stateManager.attach(midis2jam2);
+//		} catch (IOException | InvalidMidiDataException | MidiUnavailableException e) {
+//			JOptionPane.showMessageDialog(null,
+//					new JScrollPane(new JTextArea(
+//							"There was an error loading the MIDI file.\n\n%s: %s\n%s".formatted(e.getClass().getName(),
+//									e.getMessage(),
+//									exceptionToLines(e))
+//					)), "MIDI file error", JOptionPane.ERROR_MESSAGE);
+//		}
 	}
 	
 	private Pair<Sequencer, Synthesizer> getSequencer(MidiDevice.Info info) throws MidiUnavailableException, InvalidMidiDataException, IOException {

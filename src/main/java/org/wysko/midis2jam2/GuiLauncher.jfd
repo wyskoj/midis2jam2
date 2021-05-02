@@ -23,7 +23,7 @@ new FormModel {
 				"insets": new java.awt.Insets( 10, 0, 0, 0 )
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
-				"$columnSpecs": "82, 136:1.0, 87, 0"
+				"$columnSpecs": "104, 136:1.0, 87, 0"
 				"$rowSpecs": "0, 0, 4, 0"
 				"$hGap": 5
 				"$vGap": 5
@@ -83,7 +83,7 @@ new FormModel {
 				add( new FormComponent( "javax.swing.JTextField" ) {
 					name: "soundFontPathTextField"
 					"editable": false
-					"toolTipText": "Optionally specify a soundfont."
+					"toolTipText": "Optionally specify a SoundFont."
 					"text": "Default SoundFont"
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1
@@ -130,12 +130,16 @@ new FormModel {
 					name: "label4"
 					"text": "Latency fix (in milliseconds):"
 					"labelFor": new FormReference( "latencySpinner" )
+					"toolTipText": "The audio and video may be out of\nsync. Adjust this number to align them.\nGervill tends to need a value of 100."
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1
 				} )
 				add( new FormComponent( "javax.swing.JSpinner" ) {
 					name: "latencySpinner"
-					"model": new javax.swing.SpinnerNumberModel
+					"model": new javax.swing.SpinnerNumberModel {
+						value: 100
+					}
+					"toolTipText": "The audio and video may be out of\nsync. Adjust this number to align them.\nGervill tends to need a value of 100."
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 2
 				} )

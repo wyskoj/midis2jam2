@@ -65,7 +65,6 @@ import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
 
 import javax.sound.midi.Sequencer;
-import javax.sound.midi.Synthesizer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,6 +78,68 @@ import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
+	private Midis2jam2() {
+	}
+	
+	public Midis2jam2(Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
+		this.sequencer = sequencer;
+		this.file = midiFile;
+		this.latencyFix = settings.latency;
+	}
+	
+	@Override
+	public void initialize(AppStateManager stateManager, Application app) {
+		super.initialize(stateManager, app);
+		this.app = (Liaison) app;
+		
+		// Initialize camera settings
+		this.app.getFlyByCamera().setMoveSpeed(100f);
+		this.app.getFlyByCamera().setZoomSpeed(-10);
+		this.app.getFlyByCamera().setEnabled(true);
+		this.app.getFlyByCamera().setDragToRotate(true);
+		
+		setupKeys();
+		setCamera(CAMERA_1A);
+		
+		// Load stage
+		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
+		rootNode.attachChild(stage);
+		
+		initDebugText();
+		
+		// Instrument calculation
+		try {
+			calculateInstruments();
+		} catch (ReflectiveOperationException e) {
+			e.printStackTrace();
+		}
+		
+		addShadowsAndStands();
+		
+		// Begin MIDI playback
+		new Timer(true).scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				if (timeSinceStart + (latencyFix / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
+					sequencer.setTempoInBPM((float) getFile().firstTempoInBpm());
+					sequencer.start();
+					seqHasRunOnce = true;
+					new Timer(true).scheduleAtFixedRate(new TimerTask() {
+						@Override
+						public void run() {
+							// Find the first tempo we haven't hit and need to execute
+							long currentMidiTick = sequencer.getTickPosition();
+							for (MidiTempoEvent tempo : getFile().getTempos()) {
+								if (tempo.time == currentMidiTick) {
+									sequencer.setTempoInBPM(60_000_000f / tempo.number);
+								}
+							}
+						}
+					}, 0, 1);
+				}
+			}
+		}, 0, 1);
+	}
 	
 	public static final Logger logger = Logger.getLogger(Midis2jam2.class.getName());
 	
@@ -112,8 +173,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * The list of harp shadows
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
-	
-	public Synthesizer synthesizer;
 	
 	/**
 	 * Video offset to account for synthesis audio delay.
@@ -199,57 +258,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	@Override
-	public void initialize(AppStateManager stateManager, Application app) {
-		super.initialize(stateManager, app);
-		this.app = (Launcher) app;
-		
-		// Initialize camera settings
-		this.app.getFlyByCamera().setMoveSpeed(100f);
-		this.app.getFlyByCamera().setZoomSpeed(-10);
-		this.app.getFlyByCamera().setEnabled(true);
-		this.app.getFlyByCamera().setDragToRotate(true);
-		
-		setupKeys();
-		setCamera(CAMERA_1A);
-		
-		// Load stage
-		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
-		rootNode.attachChild(stage);
-		
-		initDebugText();
-		
-		// Instrument calculation
-		try {
-			calculateInstruments();
-		} catch (ReflectiveOperationException e) {
-			e.printStackTrace();
-		}
-		
-		addShadowsAndStands();
-		
-		// Begin MIDI playback
-		new Timer(true).scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				if (timeSinceStart + (latencyFix / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
-					sequencer.setTempoInBPM((float) getFile().firstTempoInBpm());
-					sequencer.start();
-					seqHasRunOnce = true;
-					new Timer(true).scheduleAtFixedRate(new TimerTask() {
-						@Override
-						public void run() {
-							// Find the first tempo we haven't hit and need to execute
-							long currentMidiTick = sequencer.getTickPosition();
-							for (MidiTempoEvent tempo : getFile().getTempos()) {
-								if (tempo.time == currentMidiTick) {
-									sequencer.setTempoInBPM(60_000_000f / tempo.number);
-								}
-							}
-						}
-					}, 0, 1);
-				}
-			}
-		}, 0, 1);
+	public void cleanup() {
+		logger.log(INFO, "Cleaning up.");
+		sequencer.stop();
+		sequencer.close();
+		((Liaison) app).enableLauncher();
 	}
 	
 	@Override
@@ -277,12 +290,32 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	@Override
-	public void cleanup() {
-		logger.log(INFO, "Cleaning up.");
-		sequencer.stop();
-		sequencer.close();
-		if (synthesizer != null) {
-			synthesizer.close();
+	public void onAction(String name, boolean isPressed, float tpf) {
+		this.app.getFlyByCamera().setMoveSpeed(name.equals("slow") && isPressed ? 10 : 100);
+		if (name.equals("exit")) {
+			if (sequencer.isOpen()) sequencer.stop();
+			logger.info("Going to back to main screen because of ESC key.");
+			app.stop();
+		}
+		if (isPressed && name.startsWith("cam")) {
+			try {
+				currentCamera = switch (name) {
+					case "cam1" -> switch (currentCamera) {
+						case CAMERA_1A -> CAMERA_1B;
+						case CAMERA_1B -> CAMERA_1C;
+						default -> CAMERA_1A;
+					};
+					case "cam2" -> currentCamera == CAMERA_2A ? CAMERA_2B : CAMERA_2A;
+					case "cam3" -> currentCamera == CAMERA_3A ? CAMERA_3B : CAMERA_3A;
+					case "cam4" -> currentCamera == CAMERA_4A ? CAMERA_4B : CAMERA_4A;
+					case "cam5" -> CAMERA_5;
+					case "cam6" -> CAMERA_6;
+					default -> throw new IllegalStateException("Unexpected value: " + name);
+				};
+				setCamera(valueOf(currentCamera.name()));
+			} catch (IllegalArgumentException ignored) {
+				logger.warning("Bad camera string.");
+			}
 		}
 	}
 	
@@ -902,34 +935,16 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.app.getCamera().setRotation(camera.rotation);
 	}
 	
-	@Override
-	public void onAction(String name, boolean isPressed, float tpf) {
-		this.app.getFlyByCamera().setMoveSpeed(name.equals("slow") && isPressed ? 10 : 100);
-		if (name.equals("exit")) {
-			if (sequencer.isOpen())
-				sequencer.stop();
-			Launcher.app().goBackToMainScreen();
-			logger.info("Going to back to main screen because of ESC key.");
+	public static class M2J2Settings {
+		
+		private int latency;
+		
+		private M2J2Settings(int latency) {
+			this.latency = latency;
 		}
-		if (isPressed && name.startsWith("cam")) {
-			try {
-				currentCamera = switch (name) {
-					case "cam1" -> switch (currentCamera) {
-						case CAMERA_1A -> CAMERA_1B;
-						case CAMERA_1B -> CAMERA_1C;
-						default -> CAMERA_1A;
-					};
-					case "cam2" -> currentCamera == CAMERA_2A ? CAMERA_2B : CAMERA_2A;
-					case "cam3" -> currentCamera == CAMERA_3A ? CAMERA_3B : CAMERA_3A;
-					case "cam4" -> currentCamera == CAMERA_4A ? CAMERA_4B : CAMERA_4A;
-					case "cam5" -> CAMERA_5;
-					case "cam6" -> CAMERA_6;
-					default -> throw new IllegalStateException("Unexpected value: " + name);
-				};
-				setCamera(valueOf(currentCamera.name()));
-			} catch (IllegalArgumentException ignored) {
-				logger.warning("Bad camera string.");
-			}
+		
+		public static M2J2Settings create(int latency) {
+			return new M2J2Settings(latency);
 		}
 	}
 	
