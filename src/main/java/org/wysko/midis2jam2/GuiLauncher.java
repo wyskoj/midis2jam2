@@ -86,8 +86,8 @@ public class GuiLauncher extends JFrame {
 				jep.setContentType("text/html");
 				jep.setText("<html>This version is out of date and is no longer supported. <a " +
 						"href=\"https://midis2jam2.xyz\">Download the latest version.</a></html>\"");
-				jep.setEditable(false);//so its not editable
-				jep.setOpaque(false);//so we dont see whit background
+				jep.setEditable(false);
+				jep.setOpaque(false);
 				jep.addHyperlinkListener(hle -> {
 					if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
 						try {
@@ -106,6 +106,11 @@ public class GuiLauncher extends JFrame {
 				e.printStackTrace();
 			}
 		});
+		
+		if (args.length == 1) {
+			guiLauncher.midiFilePathTextField.setText(args[0]);
+			guiLauncher.startButtonPressed(null);
+		}
 	}
 	
 	/**
@@ -135,32 +140,7 @@ public class GuiLauncher extends JFrame {
 		}
 	}
 	
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	private JLabel logo;
 	
-	private JPanel panel1;
-	
-	private JLabel label1;
-	
-	private JTextField midiFilePathTextField;
-	
-	private JResizedIconButton loadMidiFileButton;
-	
-	private void resetSoundFontButtonActionPerformed(ActionEvent e) {
-		soundFontPathTextField.setText("Default SoundFont");
-	}
-	
-	private JLabel label2;
-	
-	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
-	
-	private JLabel soundfontLabel;
-	
-	private JTextField soundFontPathTextField;
-	
-	private JResizedIconButton loadSoundFontButton;
-	
-	private JResizedIconButton resetSoundFontButton;
 	
 	/**
 	 * Prompts the user to load a soundfont file, the result is stored in {@link #selectedSf2File}.
@@ -188,7 +168,7 @@ public class GuiLauncher extends JFrame {
 			soundFontPathTextField.setText(selectedSf2File.getAbsolutePath());
 		}
 	}
-
+	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
 		if (((MidiDevice.Info) midiDeviceDropDown.getSelectedItem()).getName().equals("Gervill")) {
 			soundfontLabel.setEnabled(true);
@@ -205,7 +185,7 @@ public class GuiLauncher extends JFrame {
 		}
 		
 	}
-
+	
 	private void startButtonPressed(ActionEvent e) {
 		// Collect MIDI file
 		this.setCursor(getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -295,6 +275,10 @@ public class GuiLauncher extends JFrame {
 		} catch (MidiUnavailableException | InvalidMidiDataException | IOException midiUnavailableException) {
 			midiUnavailableException.printStackTrace();
 		}
+	}
+	
+	private void resetSoundFontButtonActionPerformed(ActionEvent e) {
+		soundFontPathTextField.setText("Default SoundFont");
 	}
 	
 	public void disableAll() {
@@ -480,12 +464,42 @@ public class GuiLauncher extends JFrame {
 		setLocationRelativeTo(getOwner());
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
+	
+	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JLabel logo;
+	
+	private JPanel panel1;
+	
+	private JLabel label1;
+	
+	private JTextField midiFilePathTextField;
+	
+	private JResizedIconButton loadMidiFileButton;
+	
+	private JLabel label2;
+	
+	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
+	
+	private JLabel soundfontLabel;
+	
+	private JTextField soundFontPathTextField;
+	
+	private JResizedIconButton loadSoundFontButton;
+	
+	private JResizedIconButton resetSoundFontButton;
+	
 	private JPanel panel2;
+	
 	private JPanel hSpacer1;
+	
 	private JLabel label4;
+	
 	private JSpinner latencySpinner;
+	
 	private JPanel hSpacer2;
+	
 	private JResizedIconButton startButton;
+	
 	private JLabel versionText;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

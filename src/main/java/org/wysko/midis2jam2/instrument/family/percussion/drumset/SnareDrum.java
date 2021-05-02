@@ -17,17 +17,54 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset;
 
+import com.jme3.math.Quaternion;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE;
+import static org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED;
 
 /**
  * The Snare drum.
  */
-public class SnareDrum extends StickDrum {
+public class SnareDrum extends PercussionInstrument {
+	
+	/**
+	 * The list of hits for regular notes.
+	 */
+	List<MidiNoteOnEvent> regularHits;
+	
+	/**
+	 * The list of hits for side sticks.
+	 */
+	List<MidiNoteOnEvent> sideHits;
+	
+	/**
+	 * The snare drum.
+	 */
+	Spatial drum;
+	
+	/**
+	 * Contains the {@link #regularStick}.
+	 */
+	Node regularStickNode = new Node();
+	
+	/**
+	 * Contains the side stick.
+	 */
+	Node sideStickNode = new Node();
+	
+	/**
+	 * The stick used for regular hits.
+	 */
+	private final Spatial regularStick;
 	
 	/**
 	 * Instantiates a new Snare drum.
@@ -37,19 +74,42 @@ public class SnareDrum extends StickDrum {
 	 */
 	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
+		this.regularHits = hits.stream().filter(e -> e.note == 40 || e.note == 38).collect(Collectors.toList());
+		this.sideHits = hits.stream().filter(e -> e.note == 37).collect(Collectors.toList());
 		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
+		Spatial sideStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
+		regularStickNode.attachChild(regularStick);
+		sideStickNode.attachChild(sideStick);
 		recoilNode.attachChild(drum);
-		recoilNode.attachChild(stickNode);
+		recoilNode.attachChild(regularStickNode);
+		recoilNode.attachChild(sideStickNode);
 		highLevelNode.attachChild(recoilNode);
 		highLevelNode.move(-10.9f, 16, -72.5f);
 		highLevelNode.rotate(rad(10), 0, rad(-10));
-		stickNode.rotate(0, rad(80), 0);
-		stickNode.move(10, 0, 3);
+		regularStickNode.rotate(0, rad(80), 0);
+		regularStickNode.move(10, 0, 3);
+		sideStick.setLocalTranslation(0, 0, -2);
+		sideStick.setLocalRotation(new Quaternion().fromAngles(0, rad(-20), 0));
+		sideStickNode.setLocalTranslation(-1, 0.4f, 6);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		drumRecoil(time, delta);
-		handleStick(time, delta, hits);
+		var regularStickStatus = Stick.handleStick(context, regularStick, time, delta, regularHits, STRIKE_SPEED, MAX_ANGLE);
+		var sideStickStatus = Stick.handleStick(context, sideStickNode, time, delta, sideHits, STRIKE_SPEED, MAX_ANGLE);
+		
+		var regVel = 0;
+		var sideVel = 0;
+		if (regularStickStatus.justStruck()) {
+			assert regularStickStatus.getStrike() != null;
+			regVel = regularStickStatus.getStrike().velocity;
+		}
+		if (sideStickStatus.justStruck()) {
+			assert sideStickStatus.getStrike() != null;
+			sideVel = (int) (sideStickStatus.getStrike().velocity * 0.5);
+		}
+		int velocity = Math.max(regVel, sideVel);
+		PercussionInstrument.recoilDrum(recoilNode, velocity != 0, velocity, delta);
 	}
 }

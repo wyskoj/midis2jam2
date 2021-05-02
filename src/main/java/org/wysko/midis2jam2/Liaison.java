@@ -48,8 +48,8 @@ public class Liaison extends SimpleApplication {
 	
 	@Override
 	public void start() {
-		// Set settings
 		var settings = new AppSettings(true);
+		// Set settings
 		settings.setFrameRate(120);
 		settings.setTitle("midis2jam2");
 		try {

@@ -69,7 +69,7 @@ public class Percussion extends Instrument {
 		
 		
 		instruments.add(new SnareDrum(context,
-				noteOnEvents.stream().filter(e -> e.note == 40 || e.note == 38).collect(Collectors.toList())));
+				noteOnEvents.stream().filter(e -> e.note == 40 || e.note == 38 || e.note == 37).collect(Collectors.toList())));
 		
 		/* For some reason, the bass drum needs special attention ?? */
 		var e1 = new BassDrum(context,

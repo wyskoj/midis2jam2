@@ -78,9 +78,6 @@ import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
-	private Midis2jam2() {
-	}
-	
 	public Midis2jam2(Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
 		this.sequencer = sequencer;
 		this.file = midiFile;
@@ -487,7 +484,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				// For each program event
 				for (var i = 0; i < programEvents.size(); i++) {
 					// If the event occurs within the range of these program events
-					if (i == programEvents.size() - 1 || (event.time >= programEvents.get(i).time && event.time < programEvents.get(i+1).time)) {
+					if (i == programEvents.size() - 1 || (event.time >= programEvents.get(i).time && event.time < programEvents.get(i + 1).time)) {
 						// Add this event
 						lastProgramForNote.get(programEvents.get(i).programNum).add(event);
 						if (event instanceof MidiNoteOnEvent) {
