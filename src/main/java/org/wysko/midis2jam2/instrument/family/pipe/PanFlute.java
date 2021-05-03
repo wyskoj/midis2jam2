@@ -82,12 +82,12 @@ public class PanFlute extends WrappedOctaveSustained {
 		/**
 		 * Gold pipe skin.
 		 */
-		GOLD("HornSkin.bmp"),
+		GOLD("HornSkin.bmp", true),
 		
 		/**
 		 * Wood pipe skin.
 		 */
-		WOOD("Wood.bmp");
+		WOOD("Wood.bmp", false);
 		
 		/**
 		 * The Texture file.
@@ -95,12 +95,19 @@ public class PanFlute extends WrappedOctaveSustained {
 		final String textureFile;
 		
 		/**
+		 * True if this pan flute should be reflective, false otherwise.
+		 */
+		final boolean reflective;
+		
+		/**
 		 * Instantiates a new Pipe skin.
 		 *
 		 * @param textureFile the texture file
+		 * @param reflective  true if this pan flute should be reflective, false otherwise
 		 */
-		PipeSkin(String textureFile) {
+		PipeSkin(String textureFile, boolean reflective) {
 			this.textureFile = textureFile;
+			this.reflective = reflective;
 		}
 	}
 	
@@ -127,6 +134,9 @@ public class PanFlute extends WrappedOctaveSustained {
 		 */
 		public PanFlutePipe(PipeSkin skin) {
 			pipe = context.loadModel("PanPipe.obj", skin.textureFile);
+			if (skin.reflective) {
+				pipe.setMaterial(context.reflectiveMaterial("/Assets/" + skin.textureFile));
+			}
 			this.highestLevel.attachChild(pipe);
 			puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.NORMAL, 1.0f);
 			this.highestLevel.attachChild(puffer.steamPuffNode);

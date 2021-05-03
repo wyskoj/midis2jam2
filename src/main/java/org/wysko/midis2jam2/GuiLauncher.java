@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import static java.awt.Cursor.getPredefinedCursor;
@@ -31,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.*;
-import static org.wysko.midis2jam2.Launcher.getVersion;
 
 /**
  * @author Jacob Wysko
@@ -107,10 +107,17 @@ public class GuiLauncher extends JFrame {
 			}
 		});
 		
+		// Launch directly into midis2jam2 if a MIDI file is specified
 		if (args.length == 1) {
 			guiLauncher.midiFilePathTextField.setText(args[0]);
 			guiLauncher.startButtonPressed(null);
 		}
+		
+		guiLauncher.bringToFront();
+	}
+	
+	public static String getVersion() {
+		return new Scanner(requireNonNull(GuiLauncher.class.getResourceAsStream("/version.txt"))).next();
 	}
 	
 	/**
@@ -139,7 +146,6 @@ public class GuiLauncher extends JFrame {
 			midiFilePathTextField.setText(selectedMidiFile.getAbsolutePath());
 		}
 	}
-	
 	
 	
 	/**
@@ -238,7 +244,7 @@ public class GuiLauncher extends JFrame {
 				return;
 			}
 		}
-		this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		
 		
 		// Initialize MIDI
 		try {
@@ -270,10 +276,21 @@ public class GuiLauncher extends JFrame {
 			
 			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile),
 					M2J2Settings.create(((int) latencySpinner.getValue())));
-			new Thread(liaison::start).start();
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
 			
-		} catch (MidiUnavailableException | InvalidMidiDataException | IOException midiUnavailableException) {
-			midiUnavailableException.printStackTrace();
+		} catch (MidiUnavailableException midiUnavailableException) {
+			showMessageDialog(this, new ExceptionDisplay("The requested MIDI component cannot be opened or created " +
+					"because it is unavailable.", midiUnavailableException), "MIDI Unavailable Error", ERROR_MESSAGE);
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		} catch (InvalidMidiDataException invalidMidiDataException) {
+			showMessageDialog(this, new ExceptionDisplay("Inappropriate MIDI data was encountered.",
+					invalidMidiDataException), "Invalid MIDI data Error", ERROR_MESSAGE);
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		} catch (IOException ioException) {
+			showMessageDialog(this, new ExceptionDisplay("An I/O error occurred.",
+					ioException), "I/O Error", ERROR_MESSAGE);
+			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
 	
@@ -287,6 +304,14 @@ public class GuiLauncher extends JFrame {
 	
 	public void enableAll() {
 		this.setEnabled(true);
+		bringToFront();
+	}
+	
+	private void bringToFront() {
+		SwingUtilities.invokeLater(() -> {
+			this.toFront();
+			this.repaint();
+		});
 	}
 	
 	private void initComponents() {

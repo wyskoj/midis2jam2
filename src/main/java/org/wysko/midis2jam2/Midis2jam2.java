@@ -266,12 +266,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	public void update(float tpf) {
 		super.update(tpf);
 		
-		if (tpf > 1 && !tpfHack) {
-			/* TODO This is a hack. When the app-state inits, any time spent on the main screen is added to tpf on
-			    the first launch. */
-			tpf = 0;
-			tpfHack = true;
-		}
 		
 		if (sequencer == null) return;
 		if (sequencer.isOpen())
