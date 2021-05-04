@@ -103,7 +103,7 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
 					var added = false;
 					for (Clone clone : calcClones) {
-						if (!clone.isPlaying(comp1.startTick())) {
+						if (!clone.isPlaying(comp1.startTick() + context.getFile().getDivision() / 4)) {
 							clone.notePeriods.add(comp1);
 							added = true;
 							break;

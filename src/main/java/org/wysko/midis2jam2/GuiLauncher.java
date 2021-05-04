@@ -5,9 +5,9 @@
 package org.wysko.midis2jam2;
 
 import com.formdev.flatlaf.IntelliJTheme;
+import com.google.gson.Gson;
 import org.wysko.midis2jam2.Midis2jam2.M2J2Settings;
-import org.wysko.midis2jam2.gui.ExceptionDisplay;
-import org.wysko.midis2jam2.gui.JResizedIconButton;
+import org.wysko.midis2jam2.gui.*;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.util.Utils;
 
@@ -18,10 +18,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
@@ -39,19 +36,13 @@ import static javax.swing.JOptionPane.*;
 @SuppressWarnings("unused")
 public class GuiLauncher extends JFrame {
 	
-	/**
-	 * The selected soundfont (sf2) file.
-	 */
-	private File selectedSf2File;
-	
-	/**
-	 * The selected Standard MIDI file.
-	 */
-	private File selectedMidiFile;
-	
 	public GuiLauncher() {
 		initComponents();
 	}
+	
+	private static final File SETTINGS_FILE = new File("midis2jam2.conf");
+	
+	private transient LauncherSettings settings;
 	
 	public static void main(String[] args) {
 		// Initialize GUI
@@ -98,7 +89,7 @@ public class GuiLauncher extends JFrame {
 					}
 				});
 				if (html.contains("Out of")) {
-					JOptionPane.showMessageDialog(guiLauncher, jep,
+					showMessageDialog(guiLauncher, jep,
 							"Update available", WARNING_MESSAGE);
 					Midis2jam2.logger.warning("Out of date!!");
 				}
@@ -113,7 +104,43 @@ public class GuiLauncher extends JFrame {
 			guiLauncher.startButtonPressed(null);
 		}
 		
+		// Bring GUI to front
 		guiLauncher.bringToFront();
+		
+		
+		// Load YAML
+		if (SETTINGS_FILE.exists()) {
+			try {
+				guiLauncher.settings = new Gson().fromJson(new FileReader(SETTINGS_FILE), LauncherSettings.class);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		} else {
+			guiLauncher.settings = new LauncherSettings();
+			guiLauncher.settings.getSoundFontPaths().add(null); // Default SoundFont
+		}
+		
+		guiLauncher.updateSf2List();
+	}
+	
+	public void updateSf2List() {
+		soundFontPathDropDown.removeAllItems();
+		settings.getSoundFontPaths().forEach(e -> soundFontPathDropDown.addItem(e));
+		soundFontPathDropDown.revalidate();
+		settings.setSoundFontPaths(settings.getSoundFontPaths());
+		settings.setLastMidiDir(settings.getLastMidiDir());
+		saveSettings();
+	}
+	
+	private void saveSettings() {
+		try {
+			var writer = new FileWriter(SETTINGS_FILE);
+			new Gson().toJson(settings, writer);
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static String getVersion() {
@@ -121,7 +148,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	/**
-	 * Prompts the user to load a MIDI file, the result is stored in {@link #selectedMidiFile}.
+	 * Prompts the user to load a MIDI file.
 	 */
 	private void loadMidiFileButtonActionPerformed(ActionEvent e) {
 		var f = new JFileChooser();
@@ -141,52 +168,42 @@ public class GuiLauncher extends JFrame {
 		});
 		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
 		f.setFileSelectionMode(FILES_ONLY);
+		f.setCurrentDirectory(new File(settings.getLastMidiDir().getPath()));
 		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
-			selectedMidiFile = f.getSelectedFile();
+			var selectedMidiFile = f.getSelectedFile();
 			midiFilePathTextField.setText(selectedMidiFile.getAbsolutePath());
+			settings.setLastMidiDir(selectedMidiFile.getParentFile());
+			saveSettings();
 		}
 	}
 	
 	
 	/**
-	 * Prompts the user to load a soundfont file, the result is stored in {@link #selectedSf2File}.
+	 * Prompts the user to load a soundfont file.
 	 */
 	private void loadSoundFontButtonActionPerformed(ActionEvent e) {
-		var f = new JFileChooser();
-		f.setPreferredSize(new Dimension(800, 600));
-		f.setDialogTitle("Load SoundFont file");
-		f.setMultiSelectionEnabled(false);
-		f.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".sf2");
-			}
-			
-			@Override
-			public String getDescription() {
-				return "SoundFont files (*.sf2)";
-			}
-		});
-		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
-		f.setFileSelectionMode(FILES_ONLY);
-		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
-			selectedSf2File = f.getSelectedFile();
-			soundFontPathTextField.setText(selectedSf2File.getAbsolutePath());
-		}
+		
+		var dialog = new JDialog(this, "SoundFont list editor", true);
+		dialog.getContentPane().add(new SoundFontList(this.settings.getSoundFontPaths(), this));
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		dialog.setLocation(dim.width / 2 - getSize().width / 2,
+				dim.height / 2 - getSize().height / 2);
+		dialog.setPreferredSize(new Dimension(600, 400));
+		dialog.pack();
+		dialog.setVisible(true);
+		
 	}
 	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
 		if (((MidiDevice.Info) midiDeviceDropDown.getSelectedItem()).getName().equals("Gervill")) {
 			soundfontLabel.setEnabled(true);
-			soundFontPathTextField.setEnabled(true);
+			soundFontPathDropDown.setEnabled(true);
 			loadSoundFontButton.setEnabled(true);
-			resetSoundFontButton.setEnabled(true);
 			latencySpinner.setValue(100);
 		} else {
 			soundfontLabel.setEnabled(false);
-			soundFontPathTextField.setEnabled(false);
+			soundFontPathDropDown.setEnabled(false);
 			loadSoundFontButton.setEnabled(false);
-			resetSoundFontButton.setEnabled(false);
 			latencySpinner.setValue(0);
 		}
 		
@@ -211,36 +228,36 @@ public class GuiLauncher extends JFrame {
 			sequence = MidiSystem.getSequence(midiFile);
 		} catch (IOException ioException) {
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			showMessageDialog(this, new ExceptionDisplay("There was an error reading the MIDI file.", ioException), "I/O error", JOptionPane.ERROR_MESSAGE);
+			showMessageDialog(this, new ExceptionDisplay("There was an error reading the MIDI file.", ioException), "I/O error", ERROR_MESSAGE);
 			return;
 		} catch (InvalidMidiDataException invalidMidiDataException) {
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, new ExceptionDisplay("The MIDI file has invalid data, or is not a Standard MIDI " +
-					"file.", invalidMidiDataException), "Bad MIDI file", JOptionPane.ERROR_MESSAGE);
+					"file.", invalidMidiDataException), "Bad MIDI file", ERROR_MESSAGE);
 			return;
 		}
 		
 		// Collect sf2
 		Soundbank soundfont = null;
-		if (!soundFontPathTextField.getText().equals("Default SoundFont")) {
-			var soundfontFile = new File(soundFontPathTextField.getText());
-			if (!soundfontFile.exists()) {
+		var soundFontFile = (File) soundFontPathDropDown.getSelectedItem();
+		if (soundFontFile != null) {
+			if (!soundFontFile.exists()) {
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, "The specified SoundFont does not exist.", "SoundFont file does not exist",
 						ERROR_MESSAGE);
 				return;
 			}
 			try {
-				soundfont = MidiSystem.getSoundbank(soundfontFile);
+				soundfont = MidiSystem.getSoundbank(soundFontFile);
 			} catch (InvalidMidiDataException invalidMidiDataException) {
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, new ExceptionDisplay("The SoundFont file has invalid data, or is not a " +
-						"SoundFont file.", invalidMidiDataException), "Bad SoundFont file", JOptionPane.ERROR_MESSAGE);
+						"SoundFont file.", invalidMidiDataException), "Bad SoundFont file", ERROR_MESSAGE);
 				return;
 			} catch (IOException ioException) {
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, new ExceptionDisplay("There was an error reading the SoundFont file.",
-						ioException), "I/O error", JOptionPane.ERROR_MESSAGE);
+						ioException), "I/O error", ERROR_MESSAGE);
 				return;
 			}
 		}
@@ -294,10 +311,6 @@ public class GuiLauncher extends JFrame {
 		}
 	}
 	
-	private void resetSoundFontButtonActionPerformed(ActionEvent e) {
-		soundFontPathTextField.setText("Default SoundFont");
-	}
-	
 	public void disableAll() {
 		this.setEnabled(false);
 	}
@@ -321,17 +334,21 @@ public class GuiLauncher extends JFrame {
 		label1 = new JLabel();
 		midiFilePathTextField = new JTextField();
 		loadMidiFileButton = new JResizedIconButton();
+		label3 = new JLabel();
 		label2 = new JLabel();
 		midiDeviceDropDown = new JComboBox<>();
+		label5 = new JLabel();
 		soundfontLabel = new JLabel();
-		soundFontPathTextField = new JTextField();
+		soundFontPathDropDown = new JComboBox<>();
+		soundFontPathDropDown.setRenderer(new SoundFontListCellRenderer());
 		loadSoundFontButton = new JResizedIconButton();
-		resetSoundFontButton = new JResizedIconButton();
+		label6 = new JLabel();
 		panel2 = new JPanel();
 		hSpacer1 = new JPanel(null);
 		label4 = new JLabel();
 		latencySpinner = new JSpinner();
 		hSpacer2 = new JPanel(null);
+		label7 = new JLabel();
 		startButton = new JResizedIconButton();
 		versionText = new JLabel();
 		
@@ -372,7 +389,6 @@ public class GuiLauncher extends JFrame {
 			
 			//---- midiFilePathTextField ----
 			midiFilePathTextField.setEditable(false);
-			midiFilePathTextField.setToolTipText("Specify the MIDI file to play.");
 			panel1.add(midiFilePathTextField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
@@ -385,6 +401,13 @@ public class GuiLauncher extends JFrame {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
+			//---- label3 ----
+			label3.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			label3.setToolTipText("Press \"Load...\" to select a MIDI file to play.");
+			panel1.add(label3, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
 			//---- label2 ----
 			label2.setText("MIDI Device:");
 			label2.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -394,43 +417,46 @@ public class GuiLauncher extends JFrame {
 					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- midiDeviceDropDown ----
-			midiDeviceDropDown.setToolTipText("Select the MIDI device to play from. Gervill is\nthe default device and can play soundfonts.");
 			midiDeviceDropDown.addActionListener(e -> midiDeviceDropDownActionPerformed(e));
 			panel1.add(midiDeviceDropDown, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
+			//---- label5 ----
+			label5.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			label5.setToolTipText("This dropdown shows a list of active MIDI devices available on your\ncomputer. Gervill is the default Java MIDI synthesizer and can play\nwith SoundFonts.");
+			panel1.add(label5, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- soundfontLabel ----
 			soundfontLabel.setText("SoundFont:");
 			soundfontLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-			soundfontLabel.setLabelFor(soundFontPathTextField);
+			soundfontLabel.setLabelFor(soundFontPathDropDown);
 			panel1.add(soundfontLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
-			//---- soundFontPathTextField ----
-			soundFontPathTextField.setEditable(false);
-			soundFontPathTextField.setToolTipText("Optionally specify a SoundFont.");
-			soundFontPathTextField.setText("Default SoundFont");
-			panel1.add(soundFontPathTextField, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+			//---- soundFontPathDropDown ----
+			soundFontPathDropDown.setEditable(false);
+			panel1.add(soundFontPathDropDown, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- loadSoundFontButton ----
-			loadSoundFontButton.setText("Load...");
-			loadSoundFontButton.setIcon(new ImageIcon(getClass().getResource("/open.png")));
+			loadSoundFontButton.setText("Edit...");
+			loadSoundFontButton.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
 			loadSoundFontButton.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
 			panel1.add(loadSoundFontButton, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
-			//---- resetSoundFontButton ----
-			resetSoundFontButton.setIcon(new ImageIcon(getClass().getResource("/reset.png")));
-			resetSoundFontButton.setToolTipText("Reset to the default SoundFont.");
-			resetSoundFontButton.addActionListener(e -> resetSoundFontButtonActionPerformed(e));
-			panel1.add(resetSoundFontButton, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
+			//---- label6 ----
+			label6.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			label6.setToolTipText("Press \"Edit...\" to edit the list of SoundFonts available to use. To \nplay a MIDI file with a SoundFont, ensure Gervill is the currently\nenabled MIDI device.");
+			panel1.add(label6, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 		}
 		contentPane.add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -440,9 +466,9 @@ public class GuiLauncher extends JFrame {
 		{
 			panel2.setBorder(new TitledBorder(null, "Settings", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[]{0, 27, 0, 0, 0};
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[]{0, 27, 0, 0, 0, 0};
 			((GridBagLayout) panel2.getLayout()).rowHeights = new int[]{0, 0};
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout) panel2.getLayout()).rowWeights = new double[]{0.0, 1.0E-4};
 			panel2.add(hSpacer1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -451,20 +477,25 @@ public class GuiLauncher extends JFrame {
 			//---- label4 ----
 			label4.setText("Latency fix (in milliseconds):");
 			label4.setLabelFor(latencySpinner);
-			label4.setToolTipText("The audio and video may be out of\nsync. Adjust this number to align them.\nGervill tends to need a value of 100.");
 			panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 0, 5), 0, 0));
 			
 			//---- latencySpinner ----
 			latencySpinner.setModel(new SpinnerNumberModel(100, null, null, 1));
-			latencySpinner.setToolTipText("The audio and video may be out of\nsync. Adjust this number to align them.\nGervill tends to need a value of 100.");
 			panel2.add(latencySpinner, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 0, 5), 0, 0));
 			panel2.add(hSpacer2, new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+					new Insets(0, 0, 0, 5), 0, 0));
+			
+			//---- label7 ----
+			label7.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			label7.setToolTipText("The audio and video may be out of sync. Adjust this number to align\nthem. Gervill tends to need a value of 100.");
+			panel2.add(label7, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 		}
 		contentPane.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -501,17 +532,21 @@ public class GuiLauncher extends JFrame {
 	
 	private JResizedIconButton loadMidiFileButton;
 	
+	private JLabel label3;
+	
 	private JLabel label2;
 	
 	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
 	
+	private JLabel label5;
+	
 	private JLabel soundfontLabel;
 	
-	private JTextField soundFontPathTextField;
+	private JComboBox<File> soundFontPathDropDown;
 	
 	private JResizedIconButton loadSoundFontButton;
 	
-	private JResizedIconButton resetSoundFontButton;
+	private JLabel label6;
 	
 	private JPanel panel2;
 	
@@ -522,6 +557,8 @@ public class GuiLauncher extends JFrame {
 	private JSpinner latencySpinner;
 	
 	private JPanel hSpacer2;
+	
+	private JLabel label7;
 	
 	private JResizedIconButton startButton;
 	

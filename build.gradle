@@ -90,8 +90,7 @@ dependencies {
 
     implementation 'com.formdev:flatlaf:1.1.2'
 
-    // https://mvnrepository.com/artifact/org.openjfx/javafx-controls
-    implementation group: 'org.openjfx', name: 'javafx-controls', version: '16'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
 
 test {

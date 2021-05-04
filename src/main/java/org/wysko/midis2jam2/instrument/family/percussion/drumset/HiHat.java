@@ -124,7 +124,7 @@ public class HiHat extends SingleStickInstrument {
 		if (animTime != -1) animTime += delta;
 		handleStick(time, delta, hitsToStrike);
 		
-		wholeHat.move(0, 0.025f, 0);
+		wholeHat.move(0, 5 * delta, 0);
 		if (wholeHat.getLocalTranslation().y > 0) {
 			var localTranslation = new Vector3f(wholeHat.getLocalTranslation());
 			localTranslation.y = Math.min(localTranslation.y, 0);
