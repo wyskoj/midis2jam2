@@ -25,8 +25,7 @@ public class SoundFontListCellRenderer extends DefaultListCellRenderer {
 	
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-		var file = (File) value;
-		String text = file == null ? "Default SoundFont" : file.getName();
+		var text = value == null ? "Default SoundFont" : new File(((String) value)).getName();
 		return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
 	}
 }

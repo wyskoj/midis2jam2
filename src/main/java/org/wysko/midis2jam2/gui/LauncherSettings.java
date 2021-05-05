@@ -17,41 +17,44 @@
 
 package org.wysko.midis2jam2.gui;
 
+import com.google.gson.annotations.Expose;
+
 import javax.swing.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LauncherSettings {
 	
-	private File lastMidiDir;
+	@Expose
+	private String lastMidiDir;
 	
-	private List<File> soundFontPaths;
+	@Expose
+	private List<String> soundFontPaths;
 	
-	public File getLastMidiDir() {
-		return lastMidiDir;
-	}
-	
-	public void setLastMidiDir(File lastMidiDir) {
-		this.lastMidiDir = lastMidiDir;
-	}
-	
-	public void setSoundFontPaths(List<File> soundFontPaths) {
-		this.soundFontPaths = soundFontPaths;
-	}
-	
-	public List<File> getSoundFontPaths() {
-		return soundFontPaths;
-	}
-	
-	public LauncherSettings(File lastMidiDir, List<File> soundFontPaths) {
+	public LauncherSettings(String lastMidiDir, List<String> soundFontPaths) {
 		this.lastMidiDir = lastMidiDir;
 		this.soundFontPaths = soundFontPaths;
 	}
 	
 	public LauncherSettings() {
-		lastMidiDir = new JFileChooser().getFileSystemView().getDefaultDirectory();
+		lastMidiDir = new JFileChooser().getFileSystemView().getDefaultDirectory().getAbsolutePath();
 		soundFontPaths = new ArrayList<>();
+	}
+	
+	public String getLastMidiDir() {
+		return lastMidiDir;
+	}
+	
+	public void setLastMidiDir(String lastMidiDir) {
+		this.lastMidiDir = lastMidiDir;
+	}
+	
+	public List<String> getSoundFontPaths() {
+		return soundFontPaths;
+	}
+	
+	public void setSoundFontPaths(List<String> soundFontPaths) {
+		this.soundFontPaths = soundFontPaths;
 	}
 	
 	@Override

@@ -174,7 +174,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	/**
 	 * Video offset to account for synthesis audio delay.
 	 */
-	int latencyFix = 0;
+	int latencyFix;
 	
 	/**
 	 * The MIDI sequencer.
@@ -196,8 +196,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * the MIDI began playback
 	 */
 	double timeSinceStart = -2;
-	
-	boolean tpfHack = false;
 	
 	/**
 	 * The MIDI file.
@@ -928,7 +926,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
 	public static class M2J2Settings {
 		
-		private int latency;
+		private final int latency;
 		
 		private M2J2Settings(int latency) {
 			this.latency = latency;

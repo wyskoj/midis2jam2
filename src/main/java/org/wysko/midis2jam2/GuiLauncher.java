@@ -6,6 +6,7 @@ package org.wysko.midis2jam2;
 
 import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.wysko.midis2jam2.Midis2jam2.M2J2Settings;
 import org.wysko.midis2jam2.gui.*;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -109,13 +110,12 @@ public class GuiLauncher extends JFrame {
 		
 		
 		// Load YAML
-		if (SETTINGS_FILE.exists()) {
-			try {
-				guiLauncher.settings = new Gson().fromJson(new FileReader(SETTINGS_FILE), LauncherSettings.class);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		} else {
+		
+		try {
+			final LauncherSettings settings = new Gson().fromJson(new FileReader(SETTINGS_FILE), LauncherSettings.class);
+			if (settings == null) throw new Exception();
+			guiLauncher.settings = settings;
+		} catch (Exception e) {
 			guiLauncher.settings = new LauncherSettings();
 			guiLauncher.settings.getSoundFontPaths().add(null); // Default SoundFont
 		}
@@ -135,7 +135,8 @@ public class GuiLauncher extends JFrame {
 	private void saveSettings() {
 		try {
 			var writer = new FileWriter(SETTINGS_FILE);
-			new Gson().toJson(settings, writer);
+			var gsonBuilder = new GsonBuilder();
+			gsonBuilder.excludeFieldsWithoutExposeAnnotation().create().toJson(settings, writer);
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -168,11 +169,11 @@ public class GuiLauncher extends JFrame {
 		});
 		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
 		f.setFileSelectionMode(FILES_ONLY);
-		f.setCurrentDirectory(new File(settings.getLastMidiDir().getPath()));
+		f.setCurrentDirectory(new File(settings.getLastMidiDir()));
 		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
 			var selectedMidiFile = f.getSelectedFile();
 			midiFilePathTextField.setText(selectedMidiFile.getAbsolutePath());
-			settings.setLastMidiDir(selectedMidiFile.getParentFile());
+			settings.setLastMidiDir(selectedMidiFile.getParentFile().getAbsolutePath());
 			saveSettings();
 		}
 	}
@@ -195,7 +196,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
-		if (((MidiDevice.Info) midiDeviceDropDown.getSelectedItem()).getName().equals("Gervill")) {
+		if (((MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem())).getName().equals("Gervill")) {
 			soundfontLabel.setEnabled(true);
 			soundFontPathDropDown.setEnabled(true);
 			loadSoundFontButton.setEnabled(true);
@@ -239,8 +240,9 @@ public class GuiLauncher extends JFrame {
 		
 		// Collect sf2
 		Soundbank soundfont = null;
-		var soundFontFile = (File) soundFontPathDropDown.getSelectedItem();
-		if (soundFontFile != null) {
+		final String selectedSf2Path = (String) soundFontPathDropDown.getSelectedItem();
+		if (selectedSf2Path != null) {
+			var soundFontFile = new File(selectedSf2Path);
 			if (!soundFontFile.exists()) {
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, "The specified SoundFont does not exist.", "SoundFont file does not exist",
@@ -542,7 +544,7 @@ public class GuiLauncher extends JFrame {
 	
 	private JLabel soundfontLabel;
 	
-	private JComboBox<File> soundFontPathDropDown;
+	private JComboBox<String> soundFontPathDropDown;
 	
 	private JResizedIconButton loadSoundFontButton;
 	

@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "7.0.3.0.337" Java: "11.0.10" encoding: "UTF-8"
+JFDML JFormDesigner: "7.0.2.4.305" Java: "11.0.10" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -31,7 +31,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JList" ) {
 						name: "soundFontJList"
 						auxiliary() {
-							"JavaCodeGenerator.typeParameters": "File"
+							"JavaCodeGenerator.typeParameters": "String"
 							"JavaCodeGenerator.postCreateCode": "${field}.setCellRenderer(new SoundFontListCellRenderer());"
 						}
 					} )

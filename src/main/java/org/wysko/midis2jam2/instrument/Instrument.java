@@ -172,9 +172,9 @@ public abstract class Instrument {
 	 */
 	@Contract(pure = true)
 	protected int indexForMoving() {
-		return context.instruments.stream()
+		return Math.max(0, (context.instruments.stream()
 				.filter(e -> this.getClass().isInstance(e) && e.isVisible())
-				.collect(Collectors.toList()).indexOf(this);
+				.collect(Collectors.toList()).indexOf(this)));
 	}
 	
 	/**
