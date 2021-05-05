@@ -153,7 +153,8 @@ public class Accordion extends KeyedInstrument {
 			squeezingSpeed = 2;
 		} else {
 			if (squeezingSpeed > 0) {
-				squeezingSpeed -= 0.02;
+				squeezingSpeed -= delta * 3;
+				squeezingSpeed = Math.max(squeezingSpeed, 0);
 			}
 		}
 		
