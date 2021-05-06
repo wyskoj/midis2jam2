@@ -20,9 +20,11 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.awt.Cursor.getPredefinedCursor;
@@ -293,8 +295,22 @@ public class GuiLauncher extends JFrame {
 			sequencer.open();
 			sequencer.setSequence(sequence);
 			
-			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile),
-					M2J2Settings.create(((int) latencySpinner.getValue())));
+			var value = (int) latencySpinner.getValue();
+			if (midiDevice.getDeviceInfo().getName().startsWith("VirtualMIDISynth")) {
+				var vmsConfigFile = new File("C:\\Program Files\\VirtualMIDISynth\\VirtualMIDISynth.conf");
+				if (vmsConfigFile.exists()) {
+					var vmsConfigData = Files.readString(vmsConfigFile.toPath());
+					var matcher = Pattern.compile("AdditionalBuffer=(\\d+)").matcher(vmsConfigData);
+					if (matcher.find()) {
+						var additionalBuffer = matcher.group(1);
+						value += Integer.parseInt(additionalBuffer);
+					} else {
+						value += 250;
+					}
+				}
+				
+			}
+			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), M2J2Settings.create(value));
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
 			
