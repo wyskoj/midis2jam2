@@ -276,16 +276,30 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 		
 		updateShadowsAndStands();
+		preventCameraFromLeaving();
+	}
+	
+	private void preventCameraFromLeaving() {
+		var location = app.getCamera().getLocation();
+		app.getCamera().setLocation(new Vector3f(
+				location.x > 0 ? Math.min(location.x, 400) : Math.max(location.x, -400),
+				location.y > 0 ? Math.min(location.y, 400) : Math.max(location.y, -400),
+				location.z > 0 ? Math.min(location.z, 400) : Math.max(location.z, -400)
+		));
 	}
 	
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
-		this.app.getFlyByCamera().setMoveSpeed(name.equals("slow") && isPressed ? 10 : 100);
+		setCameraSpeed(name, isPressed);
 		if (name.equals("exit")) {
 			if (sequencer.isOpen()) sequencer.stop();
 			logger.info("Going to back to main screen because of ESC key.");
 			app.stop();
 		}
+		handleCameraSetting(name, isPressed);
+	}
+	
+	private void handleCameraSetting(String name, boolean isPressed) {
 		if (isPressed && name.startsWith("cam")) {
 			try {
 				currentCamera = switch (name) {
@@ -305,6 +319,16 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			} catch (IllegalArgumentException ignored) {
 				logger.warning("Bad camera string.");
 			}
+		}
+	}
+	
+	private void setCameraSpeed(String name, boolean isPressed) {
+		if (name.equals("slow") && isPressed) {
+			this.app.getFlyByCamera().setMoveSpeed(10);
+		} else if (name.equals("fast") && isPressed) {
+			this.app.getFlyByCamera().setMoveSpeed(200);
+		} else {
+			this.app.getFlyByCamera().setMoveSpeed(100);
 		}
 	}
 	
@@ -906,6 +930,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		this.app.getInputManager().addMapping("slow", new KeyTrigger(KeyInput.KEY_LCONTROL));
 		this.app.getInputManager().addListener(this, "slow");
+		
+		this.app.getInputManager().addMapping("fast", new KeyTrigger(KeyInput.KEY_LSHIFT));
+		this.app.getInputManager().addListener(this, "fast");
 		
 		this.app.getInputManager().addMapping("freeCam", new KeyTrigger(KeyInput.KEY_GRAVE));
 		this.app.getInputManager().addListener(this, "freeCam");
