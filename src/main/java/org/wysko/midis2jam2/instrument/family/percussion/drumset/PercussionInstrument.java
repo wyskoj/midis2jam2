@@ -46,7 +46,7 @@ public abstract class PercussionInstrument extends Instrument {
 	/**
 	 * The Recoil node.
 	 */
-	final Node recoilNode = new Node();
+	protected final Node recoilNode = new Node();
 	
 	/**
 	 * The hits.

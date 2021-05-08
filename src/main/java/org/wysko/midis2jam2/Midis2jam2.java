@@ -41,6 +41,7 @@ import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells;
 import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings;
 import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir;
@@ -77,66 +78,6 @@ import static java.util.logging.Level.INFO;
 import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
-	
-	public Midis2jam2(Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
-		this.sequencer = sequencer;
-		this.file = midiFile;
-		this.latencyFix = settings.latency;
-	}
-	
-	@Override
-	public void initialize(AppStateManager stateManager, Application app) {
-		super.initialize(stateManager, app);
-		this.app = (Liaison) app;
-		
-		// Initialize camera settings
-		this.app.getFlyByCamera().setMoveSpeed(100f);
-		this.app.getFlyByCamera().setZoomSpeed(-10);
-		this.app.getFlyByCamera().setEnabled(true);
-		this.app.getFlyByCamera().setDragToRotate(true);
-		
-		setupKeys();
-		setCamera(CAMERA_1A);
-		
-		// Load stage
-		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
-		rootNode.attachChild(stage);
-		
-		initDebugText();
-		
-		// Instrument calculation
-		try {
-			calculateInstruments();
-		} catch (ReflectiveOperationException e) {
-			e.printStackTrace();
-		}
-		
-		addShadowsAndStands();
-		
-		// Begin MIDI playback
-		new Timer(true).scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				if (timeSinceStart + (latencyFix / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
-					sequencer.setTempoInBPM((float) getFile().firstTempoInBpm());
-					sequencer.start();
-					seqHasRunOnce = true;
-					new Timer(true).scheduleAtFixedRate(new TimerTask() {
-						@Override
-						public void run() {
-							// Find the first tempo we haven't hit and need to execute
-							long currentMidiTick = sequencer.getTickPosition();
-							for (MidiTempoEvent tempo : getFile().getTempos()) {
-								if (tempo.time == currentMidiTick) {
-									sequencer.setTempoInBPM(60_000_000f / tempo.number);
-								}
-							}
-						}
-					}, 0, 1);
-				}
-			}
-		}, 0, 1);
-	}
 	
 	public static final Logger logger = Logger.getLogger(Midis2jam2.class.getName());
 	
@@ -224,6 +165,12 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	private Spatial keyboardShadow;
 	
+	public Midis2jam2(Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
+		this.sequencer = sequencer;
+		this.file = midiFile;
+		this.latencyFix = settings.latency;
+	}
+	
 	/**
 	 * Converts an angle expressed in degrees to radians.
 	 *
@@ -242,6 +189,64 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	public static float rad(double deg) {
 		return (float) (deg / 180 * FastMath.PI);
+	}
+	
+	@Override
+	public void initialize(AppStateManager stateManager, Application app) {
+		super.initialize(stateManager, app);
+		this.app = (Liaison) app;
+		
+		// Initialize camera settings
+		this.app.getFlyByCamera().setMoveSpeed(100f);
+		this.app.getFlyByCamera().setZoomSpeed(-10);
+		this.app.getFlyByCamera().setEnabled(true);
+		this.app.getFlyByCamera().setDragToRotate(true);
+		
+		setupKeys();
+		setCamera(CAMERA_1A);
+		
+		// Load stage
+		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
+		rootNode.attachChild(stage);
+		
+		initDebugText();
+		
+		// Instrument calculation
+		try {
+			calculateInstruments();
+		} catch (ReflectiveOperationException e) {
+			e.printStackTrace();
+		}
+		
+		addShadowsAndStands();
+		
+		// Begin MIDI playback
+		new Timer(true).scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				if (timeSinceStart + (latencyFix / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
+					sequencer.setTempoInBPM((float) getFile().firstTempoInBpm());
+					sequencer.start();
+					seqHasRunOnce = true;
+					new Timer(true).scheduleAtFixedRate(new TimerTask() {
+						@Override
+						public void run() {
+							// Find the first tempo we haven't hit and need to execute
+							long currentMidiTick = sequencer.getTickPosition();
+							for (MidiTempoEvent tempo : getFile().getTempos()) {
+								if (tempo.time == currentMidiTick) {
+									sequencer.setTempoInBPM(60_000_000f / tempo.number);
+								}
+							}
+						}
+					}, 0, 1);
+				}
+			}
+		}, 0, 1);
+	}
+	
+	public Sequencer getSequencer() {
+		return sequencer;
 	}
 	
 	public Node getRootNode() {
@@ -601,7 +606,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			// Glockenspiel
 			case 9 -> new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
 			// Music Box
-//			case 10 -> new MusicBox(this, events);
+			case 10 -> new MusicBox(this, events);
 			// Vibraphone
 			case 11 -> new Mallets(this, events, Mallets.MalletType.VIBES);
 			// Marimba
@@ -951,19 +956,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.app.getCamera().setRotation(camera.rotation);
 	}
 	
-	public static class M2J2Settings {
-		
-		private final int latency;
-		
-		private M2J2Settings(int latency) {
-			this.latency = latency;
-		}
-		
-		public static M2J2Settings create(int latency) {
-			return new M2J2Settings(latency);
-		}
-	}
-	
 	public MidiFile getFile() {
 		return file;
 	}
@@ -1009,6 +1001,19 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		Camera(float locX, float locY, float locZ, float rotX, float rotY, float rotZ) {
 			location = new Vector3f(locX, locY, locZ);
 			rotation = new Quaternion().fromAngles(rotX, rotY, rotZ);
+		}
+	}
+	
+	public static class M2J2Settings {
+		
+		private final int latency;
+		
+		private M2J2Settings(int latency) {
+			this.latency = latency;
+		}
+		
+		public static M2J2Settings create(int latency) {
+			return new M2J2Settings(latency);
 		}
 	}
 }

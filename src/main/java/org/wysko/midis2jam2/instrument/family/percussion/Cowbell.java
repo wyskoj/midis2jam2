@@ -15,12 +15,14 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset;
+package org.wysko.midis2jam2.instrument.family.percussion;
 
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 

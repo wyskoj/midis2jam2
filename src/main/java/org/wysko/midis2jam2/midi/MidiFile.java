@@ -173,7 +173,7 @@ public class MidiFile {
 				tempoEvents.remove(i);
 			}
 		}
-		setTempos(tempoEvents);
+		this.tempos = tempoEvents;
 	}
 	
 	/**
@@ -218,16 +218,44 @@ public class MidiFile {
 	}
 	
 	/**
+	 * Converts a MIDI event into its time in seconds.
+	 *
+	 * @param time the MIDI tick of the event
+	 * @return the event's time, expressed in seconds
+	 */
+	public double eventInSeconds(long time) {
+		return midiTickInSeconds(time);
+	}
+	
+	/**
 	 * Determines the tempo that is effective just before an event.
 	 *
 	 * @param event the event
 	 * @return the effective tempo before the event
 	 */
 	public MidiTempoEvent tempoBefore(MidiNoteOnEvent event) {
+		return tempoBefore(event.time);
+	}
+	
+	public MidiTempoEvent tempoBefore(long tick) {
 		MidiTempoEvent lastTempo = getTempos().get(0);
 		if (getTempos().size() > 1) {
 			for (MidiTempoEvent tempo : getTempos()) {
-				if (tempo.time < event.time) {
+				if (tempo.time < tick) {
+					lastTempo = tempo;
+				} else {
+					return lastTempo;
+				}
+			}
+		}
+		return lastTempo;
+	}
+	
+	public MidiTempoEvent tempoAt(long tick) {
+		MidiTempoEvent lastTempo = getTempos().get(0);
+		if (getTempos().size() > 1) {
+			for (MidiTempoEvent tempo : getTempos()) {
+				if (tempo.time <= tick) {
 					lastTempo = tempo;
 				} else {
 					return lastTempo;
@@ -254,10 +282,6 @@ public class MidiFile {
 	
 	public List<MidiTempoEvent> getTempos() {
 		return tempos;
-	}
-	
-	public void setTempos(List<MidiTempoEvent> tempos) {
-		this.tempos = tempos;
 	}
 	
 	public short getDivision() {
