@@ -15,7 +15,7 @@ Check this page to see the progress of each instrument's implementation.
 |*Piano*|*Chromatic Percussion*|*Organ*|*Guitar*
 |_1_ Acoustic Grand Piano ✔️|_9_ Celesta ✔️|_17_ Drawbar Organ ✔️|_25_ Acoustic Guitar (nylon) ✔️
 |_2_ Bright Acoustic Piano ✔️|_10_ Glockenspiel ✔️|_18_ Percussive Organ ✔️|_26_ Acoustic Guitar (steel) ✔️
-|_3_ Electric Grand Piano ✔️|_11_ Music Box ❌|_19_ Rock Organ ✔️|_27_ Electric Guitar (jazz) ✔️
+|_3_ Electric Grand Piano ✔️|_11_ Music Box ✔️|_19_ Rock Organ ✔️|_27_ Electric Guitar (jazz) ✔️
 |_4_ Honky-tonk Piano ✔️|_12_ Vibraphone ✔️|_20_ Church Organ ✔️|_28_ Electric Guitar (clean) ✔️
 |_5_ Electric Piano _1_ ✔️|_13_ Marimba ✔️|_21_ Reed Organ ✔️|_29_ Electric Guitar (muted) ✔️
 |_6_ Electric Piano _2_ ✔️|_14_ Xylophone ✔️|_22_ Accordion ✔️|_30_ Overdriven Guitar ✔️
