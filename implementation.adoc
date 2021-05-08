@@ -62,7 +62,7 @@ Check this page to see the progress of each instrument's implementation.
 == Percussion instruments
 
 |===
-|__27__ High Q ❌|__35__ Acoustic Bass Drum ✔️|__43__ High Floor Tom ✔️|__51__ Ride Cymbal 1 ✔️
+|__27__ High Q ✔️|__35__ Acoustic Bass Drum ✔️|__43__ High Floor Tom ✔️|__51__ Ride Cymbal 1 ✔️
 |__28__ Slap ❌|__36__ Electric Bass Drum ✔️|__44__ Pedal Hi-hat ✔️|_52_ Chinese Cymbal ✔️
 |_29_ Scratch Push ❌|_37_ Side Stick ✔️|_45_ Low Tom ✔️|_53_ Ride Bell ❌
 |_30_ Scratch Pull ❌|_38_ Acoustic Snare ✔️|_46_ Open Hi-hat ✔️|_54_ Tambourine ✔️

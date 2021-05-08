@@ -144,6 +144,9 @@ public class Percussion extends Instrument {
 		instruments.add(new Castanets(context,
 				noteOnEvents.stream().filter(e -> e.note == 85).collect(Collectors.toList())));
 		
+		instruments.add(new HighQ(context,
+				noteOnEvents.stream().filter(e -> e.note == 27).collect(Collectors.toList())));
+		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {
 			if (instrument instanceof SnareDrum
