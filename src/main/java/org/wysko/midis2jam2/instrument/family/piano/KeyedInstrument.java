@@ -119,7 +119,15 @@ public abstract class KeyedInstrument extends Instrument {
 			if (event instanceof MidiNoteOnEvent) {
 				key.setBeingPressed(true);
 			} else if (event instanceof MidiNoteOffEvent) {
-				key.setBeingPressed(false);
+				// If there is a note off event and a note on event in this frame for the same note, you won't see it
+				// because the key will be turned off before the frame renders. So, move the note off event back to the
+				// list of event to be rendered on the next frame.
+				if (eventsToPerform.stream().anyMatch(e -> e.note == event.note && e instanceof MidiNoteOnEvent)) {
+					// bonk. you get to go to the next frame
+					events.add(0, event);
+				} else {
+					key.setBeingPressed(false);
+				}
 			}
 		}
 		
