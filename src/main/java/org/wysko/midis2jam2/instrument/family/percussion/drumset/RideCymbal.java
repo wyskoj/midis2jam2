@@ -53,7 +53,7 @@ public class RideCymbal extends Cymbal {
 		highLevelNode.setLocalTranslation(type.location);
 		highLevelNode.setLocalRotation(type.rotation);
 		highLevelNode.attachChild(cymbalNode);
-		stickNode.setLocalTranslation(0, 0, 15);
+		stickNode.setLocalTranslation(0, 0, 20);
 		this.animator = new CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening);
 	}
 	

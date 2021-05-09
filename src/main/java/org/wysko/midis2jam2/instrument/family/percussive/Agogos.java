@@ -65,7 +65,7 @@ public class Agogos extends TwelveDrumOctave {
 			twelfths[i] = agogo;
 			oneBlock.attachChild(agogo.highestLevel);
 			agogoNodes[i].attachChild(oneBlock);
-			oneBlock.setLocalTranslation(0, 0, 15);
+			oneBlock.setLocalTranslation(0, 0, 17);
 			agogoNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
 			agogoNodes[i].setLocalTranslation(0, 0.3f * i, 0);
 			instrumentNode.attachChild(agogoNodes[i]);

@@ -71,7 +71,7 @@ public class Whistles extends WrappedOctaveSustained {
 	
 	@Override
 	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 25 + indexForMoving() * 6.8f, 0);
+		offsetNode.setLocalTranslation(0, 22.5f + indexForMoving() * 6.8f, 0);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(), 0));
 	}
 	

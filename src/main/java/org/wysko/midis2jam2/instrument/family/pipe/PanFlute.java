@@ -55,7 +55,7 @@ public class PanFlute extends WrappedOctaveSustained {
 			pipeNodes[11 - i] = new Node();
 			twelfths[11 - i] = new PanFlutePipe(skin);
 			
-			instrumentNode.setLocalTranslation(72, 22, -37);
+			instrumentNode.setLocalTranslation(75, 22, -35);
 			// Set the pivot of the pipe
 			pipeNodes[11 - i].setLocalRotation(new Quaternion().fromAngles(0, rad((7.272 * i) + 75), 0));
 			// Set the pipe offset
