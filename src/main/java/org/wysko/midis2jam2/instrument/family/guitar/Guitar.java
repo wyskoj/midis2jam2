@@ -38,7 +38,7 @@ public class Guitar extends FrettedInstrument {
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context,
-				new StandardFrettingEngine(6, 22, new int[] {40, 45, 50, 55, 59, 64}, 40, 79),
+				new StandardFrettingEngine(6, 22, new int[]{40, 45, 50, 55, 59, 64}, 40, 79),
 				events,
 				new FrettedInstrumentPositioning(16.6f,
 						-18.1f,
@@ -54,23 +54,23 @@ public class Guitar extends FrettedInstrument {
 						new float[]{-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f},
 						FretHeightByTable.fromXml(Guitar.class)),
 				6,
-				context.loadModel(type.modelFileName, type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f)
+				context.loadModel(type.modelFileName, type.textureFileName)
 		);
 		
 		
-		for (int i = 0; i < 6; i++) {
+		for (var i = 0; i < 6; i++) {
 			Spatial string;
 			if (i < 3) {
-				string = context.loadModel("GuitarStringLow.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+				string = context.loadModel("GuitarStringLow.obj", type.textureFileName);
 			} else {
-				string = context.loadModel("GuitarStringHigh.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+				string = context.loadModel("GuitarStringHigh.obj", type.textureFileName);
 			}
 			upperStrings[i] = string;
 			instrumentNode.attachChild(upperStrings[i]);
 		}
 		
 		// Position each string
-		final float forward = 0.125f;
+		var forward = 0.125f;
 		upperStrings[0].setLocalTranslation(positioning.topX[0], positioning.topY, forward);
 		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
 		upperStrings[0].setLocalScale(positioning.restingStrings[0]);
@@ -96,62 +96,62 @@ public class Guitar extends FrettedInstrument {
 		upperStrings[5].setLocalScale(positioning.restingStrings[5]);
 		
 		// Lower strings
-		for (int i = 0; i < 6; i++) {
-			for (int j = 0; j < 5; j++) {
+		for (var i = 0; i < 6; i++) {
+			for (var j = 0; j < 5; j++) {
 				if (i < 3)
-					lowerStrings[i][j] = context.loadModel("GuitarLowStringBottom" + j + ".obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+					lowerStrings[i][j] = context.loadModel("GuitarLowStringBottom" + j + ".obj", type.textureFileName);
 				else
-					lowerStrings[i][j] = context.loadModel("GuitarHighStringBottom" + j + ".obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+					lowerStrings[i][j] = context.loadModel("GuitarHighStringBottom" + j + ".obj", type.textureFileName);
 				instrumentNode.attachChild(lowerStrings[i][j]);
 			}
 		}
 		
 		// Position lower strings
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[0][i].setLocalTranslation(positioning.bottomX[0], positioning.bottomY, forward);
 			lowerStrings[0][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
 			lowerStrings[0][i].setLocalScale(positioning.restingStrings[0]);
 		}
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[1][i].setLocalTranslation(positioning.bottomX[1], positioning.bottomY, forward);
 			lowerStrings[1][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.62)));
 			lowerStrings[1][i].setLocalScale(positioning.restingStrings[0]);
 		}
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[2][i].setLocalTranslation(positioning.bottomX[2], positioning.bottomY, forward);
 			lowerStrings[2][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.22)));
 			lowerStrings[2][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[3][i].setLocalTranslation(positioning.bottomX[3], positioning.bottomY, forward);
 			lowerStrings[3][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.08)));
 			lowerStrings[3][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[4][i].setLocalTranslation(positioning.bottomX[4], positioning.bottomY, forward);
 			lowerStrings[4][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.45)));
 			lowerStrings[4][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			lowerStrings[5][i].setLocalTranslation(positioning.bottomX[5], positioning.bottomY, forward);
 			lowerStrings[5][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.9)));
 			lowerStrings[5][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
 		// Hide all wobbly strings
-		for (int i = 0; i < 6; i++) {
-			for (int j = 0; j < 5; j++) {
+		for (var i = 0; i < 6; i++) {
+			for (var j = 0; j < 5; j++) {
 				lowerStrings[i][j].setCullHint(Spatial.CullHint.Always);
 			}
 		}
 		
 		
 		// Initialize note fingers
-		for (int i = 0; i < 6; i++) {
-			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", type.textureFileName, Midis2jam2.MatType.UNSHADED, 0.9f);
+		for (var i = 0; i < 6; i++) {
+			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", type.textureFileName);
 			instrumentNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 		}

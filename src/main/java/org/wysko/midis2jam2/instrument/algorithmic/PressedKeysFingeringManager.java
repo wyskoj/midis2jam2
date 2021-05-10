@@ -19,10 +19,9 @@ package org.wysko.midis2jam2.instrument.algorithmic;
 
 import org.w3c.dom.*;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.util.Utils;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,11 +50,7 @@ public class PressedKeysFingeringManager implements FingeringManager<Integer[]> 
 		var manager = new PressedKeysFingeringManager();
 		/* XML Parsing */
 		try {
-			final var df = DocumentBuilderFactory.newInstance();
-			df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-			Document xmlDoc = df.newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream("/instrument_mapping.xml"));
-			
+			Document xmlDoc = Utils.instantiateXmlParser("/instrument_mapping.xml");
 			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
 			
 			/* For each instrument */
