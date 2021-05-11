@@ -46,27 +46,27 @@ public class Woodblock extends NonDrumSetPercussion {
 	private final Node leftStickNode = new Node();
 	
 	/**
-	 * The Left conga anim node.
+	 * The Left woodblock anim node.
 	 */
 	private final Node leftWoodblockAnimNode = new Node();
 	
 	/**
-	 * The Right conga anim node.
+	 * The Right woodblock anim node.
 	 */
 	private final Node rightWoodblockAnimNode = new Node();
 	
 	/**
-	 * The Low conga hits.
+	 * The Low woodblock hits.
 	 */
 	private final List<MidiNoteOnEvent> leftHits;
 	
 	/**
-	 * The High conga hits.
+	 * The High woodblock hits.
 	 */
 	private final List<MidiNoteOnEvent> rightHits;
 	
 	/**
-	 * Instantiates new congas.
+	 * Instantiates new woodblocks.
 	 *
 	 * @param context the context
 	 * @param hits    the hits

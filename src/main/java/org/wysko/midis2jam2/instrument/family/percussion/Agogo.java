@@ -17,28 +17,41 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion;
 
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
+import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.lang.Math.max;
+import static org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick;
 
 /**
  * The agogo.
  */
 public class Agogo extends NonDrumSetPercussion {
 	
+	/**
+	 * The left stick.
+	 */
 	private final Spatial leftStick;
 	
+	/**
+	 * The right stick.
+	 */
 	private final Spatial rightStick;
 	
-	private final Node recoilNode = new Node();
-	
+	/**
+	 * The hits for the high agogo.
+	 */
 	private final List<MidiNoteOnEvent> highHits;
 	
+	/**
+	 * The hits for the low agogo.
+	 */
 	private final List<MidiNoteOnEvent> lowHits;
 	
 	/**
@@ -51,18 +64,33 @@ public class Agogo extends NonDrumSetPercussion {
 		super(context, hits);
 		highHits = hits.stream().filter(a -> a.note == 67).collect(Collectors.toList());
 		lowHits = hits.stream().filter(a -> a.note == 68).collect(Collectors.toList());
+		
 		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		
 		recoilNode.attachChild(leftStick);
 		recoilNode.attachChild(rightStick);
+		
+		leftStick.setLocalTranslation(3, 0, 13);
+		rightStick.setLocalTranslation(10, 0, 11);
+		
 		recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp")); // sic
 		
+		instrumentNode.setLocalTranslation(-5, 50, -85);
 		instrumentNode.attachChild(recoilNode);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
+		
+		var leftStatus = handleStick(context, leftStick, time, delta, highHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+		var rightStatus = handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+		
+		var velocity = 0;
+		if (leftStatus.getStrike() != null) velocity = max(velocity, leftStatus.getStrike().velocity);
+		if (rightStatus.getStrike() != null) velocity = max(velocity, rightStatus.getStrike().velocity);
+		
+		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta);
 	}
 }

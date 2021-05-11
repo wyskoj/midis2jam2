@@ -73,10 +73,10 @@ Check this page to see the progress of each instrument's implementation.
 |===
 
 |===
-|_59_ Ride Cymbal 2 ✔️|_67_ High Agogô ❌|_75_ Claves ❌|_83_ Jingle Bell ✔️
-|_60_ High Bongo ✔️|_68_ Low Agogô ❌|_76_ High Woodblock ❌|_84_ Belltree ❌
-|_61_ Low Bongo ✔️|_69_ Cabasa ❌|_77_ Low Woodblock ❌|_85_ Castanets ✔️
-|_62_ Mute High Conga ✔️|_70_ Maracas ❌|_78_ Mute Cuica ❌|_86_ Mute Surdo ❌
+|_59_ Ride Cymbal 2 ✔️|_67_ High Agogô ✔️|_75_ Claves ❌|_83_ Jingle Bell ✔️
+|_60_ High Bongo ✔️|_68_ Low Agogô ✔️|_76_ High Woodblock ✔️|_84_ Belltree ❌
+|_61_ Low Bongo ✔️|_69_ Cabasa ❌|_77_ Low Woodblock ✔️|_85_ Castanets ✔️
+|_62_ Mute High Conga ✔️|_70_ Maracas ✔️|_78_ Mute Cuica ❌|_86_ Mute Surdo ❌
 |_63_ Open High Conga ✔️|_71_ Short Whistle ❌|_79_ Open Cuica ❌|_87_ Open Surdo ❌
 |_64_ Low Conga ✔️|_72_ Long Whistle ❌|_80_ Mute Triangle ❌|
 |_65_ High Timbale ✔️|_73_ Short Guiro ❌|_81_ Open Triangle ❌|
