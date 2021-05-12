@@ -80,6 +80,6 @@ Check this page to see the progress of each instrument's implementation.
 |_63_ Open High Conga ✔️|_71_ Short Whistle ❌|_79_ Open Cuica ❌|_87_ Open Surdo ❌
 |_64_ Low Conga ✔️|_72_ Long Whistle ❌|_80_ Mute Triangle ❌|
 |_65_ High Timbale ✔️|_73_ Short Guiro ❌|_81_ Open Triangle ❌|
-|_66_ Low Timbale ✔️|_74_ Long Guiro ❌|_82_ Shaker ❌|
+|_66_ Low Timbale ✔️|_74_ Long Guiro ❌|_82_ Shaker ✔️|
 |===
 
