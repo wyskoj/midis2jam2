@@ -646,7 +646,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			// Slap Bass 2
 			// Synth Bass 1
 			// Synth Bass 2
-			case 33, 34, 35, 36, 37, 38, 39 -> new BassGuitar(this, events);
+			case 33, 34, 36, 37, 38, 39 -> new BassGuitar(this, events, BassGuitar.BassGuitarType.STANDARD);
+			case 35 -> new BassGuitar(this, events, BassGuitar.BassGuitarType.FRETLESS);
 			// Violin
 			// Fiddle
 			case 40, 110 -> new Violin(this, events);

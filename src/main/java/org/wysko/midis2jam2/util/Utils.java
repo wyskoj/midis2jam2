@@ -17,6 +17,13 @@
 
 package org.wysko.midis2jam2.util;
 
+import org.w3c.dom.Document;
+import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
+import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,5 +56,12 @@ public class Utils {
 			}
 		}
 		return result.toString();
+	}
+	
+	public static Document instantiateXmlParser(String resourceName) throws SAXException, ParserConfigurationException, IOException {
+		final var df = DocumentBuilderFactory.newInstance();
+		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		return df.newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream(resourceName));
 	}
 }

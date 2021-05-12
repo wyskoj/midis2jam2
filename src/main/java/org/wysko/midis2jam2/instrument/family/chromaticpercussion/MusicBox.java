@@ -122,7 +122,7 @@ public class MusicBox extends DecayedInstrument {
 				aPoint.setLocalRotation(new Quaternion().fromAngles((float) (-PI / 2), 0, 0));
 				points.add(aPoint);
 				pointRotations.put(aPoint, 0f);
-				aPoint.setLocalTranslation((hit.note % 12) - 5.5f, 0, 0);
+				aPoint.setLocalTranslation(((hit.note + 3) % 12) - 5.5f, 0, 0);
 				iterator.remove();
 			}
 		}
@@ -142,7 +142,7 @@ public class MusicBox extends DecayedInstrument {
 			performingRecoils.add(hitsForRecoil.remove(0));
 		}
 		for (MidiNoteOnEvent performingRecoil : performingRecoils) {
-			notes[performingRecoil.note % 12].play();
+			notes[(performingRecoil.note + 3) % 12].play();
 		}
 		// Tick the hanging notes
 		for (OneMusicBoxNote note : notes) {

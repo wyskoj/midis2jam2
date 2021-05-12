@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2.M2J2Settings;
 import org.wysko.midis2jam2.midi.MidiFile;
 
 import javax.sound.midi.Sequencer;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -39,11 +40,15 @@ public class Liaison extends SimpleApplication {
 	
 	private final M2J2Settings m2j2settings;
 	
-	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
+	private final boolean fullscreen;
+	
+	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings,
+	               boolean fullscreen) {
 		this.sequencer = sequencer;
 		this.midiFile = midiFile;
 		this.guiLauncher = guiLauncher;
 		this.m2j2settings = settings;
+		this.fullscreen = fullscreen;
 	}
 	
 	@Override
@@ -64,9 +69,18 @@ public class Liaison extends SimpleApplication {
 			Midis2jam2.logger.warning("Failed to set window icon.");
 			e.printStackTrace();
 		}
-		settings.setResolution(1900, 1900 / 2);
+		var dim = Toolkit.getDefaultToolkit().getScreenSize();
+		if (fullscreen) {
+			settings.setFullscreen(true);
+			settings.setResolution(dim.width, dim.height);
+		} else {
+			settings.setFullscreen(false);
+			settings.setResolution((int) (dim.width * 0.95), (int) (dim.height * 0.85));
+		}
+		settings.setVSync(true);
 		settings.setResizable(true);
 		settings.setSamples(4);
+		settings.setGammaCorrection(true);
 		setSettings(settings);
 		setDisplayStatView(false);
 		setDisplayFps(false);

@@ -40,6 +40,30 @@ import static javax.swing.JFileChooser.FILES_ONLY;
  */
 public class SoundFontList extends JPanel {
 	
+	public static final FileFilter DLS_FILE_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".dls");
+		}
+		
+		@Override
+		public String getDescription() {
+			return "Downloadable sounds (*.dls)";
+		}
+	};
+	
+	public static final FileFilter SF2_FILE_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".sf2");
+		}
+		
+		@Override
+		public String getDescription() {
+			return "SoundFont files (*.sf2)";
+		}
+	};
+	
 	private final transient List<String> soundFonts;
 	
 	private final GuiLauncher guiLauncher;
@@ -59,17 +83,8 @@ public class SoundFontList extends JPanel {
 		f.setPreferredSize(new Dimension(800, 600));
 		f.setDialogTitle("Load SoundFont file");
 		f.setMultiSelectionEnabled(true);
-		f.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".sf2");
-			}
-			
-			@Override
-			public String getDescription() {
-				return "SoundFont files (*.sf2)";
-			}
-		});
+		f.setFileFilter(SF2_FILE_FILTER);
+		f.addChoosableFileFilter(DLS_FILE_FILTER);
 		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
 		f.setFileSelectionMode(FILES_ONLY);
 		f.setCurrentDirectory(lastDir);

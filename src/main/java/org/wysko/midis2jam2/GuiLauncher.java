@@ -52,7 +52,7 @@ public class GuiLauncher extends JFrame {
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
 		var guiLauncher = new GuiLauncher();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		guiLauncher.setSize(new Dimension(535, 450));
+		guiLauncher.setSize(new Dimension(535, 480));
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
 		guiLauncher.setVisible(true);
 		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -310,7 +310,8 @@ public class GuiLauncher extends JFrame {
 				}
 				
 			}
-			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), M2J2Settings.create(value));
+			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), M2J2Settings.create(value),
+					fullscreenCheckbox.isSelected());
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
 			
@@ -367,6 +368,8 @@ public class GuiLauncher extends JFrame {
 		latencySpinner = new JSpinner();
 		hSpacer2 = new JPanel(null);
 		label7 = new JLabel();
+		fullscreenCheckbox = new JCheckBox();
+		label8 = new JLabel();
 		startButton = new JResizedIconButton();
 		versionText = new JLabel();
 		
@@ -485,35 +488,49 @@ public class GuiLauncher extends JFrame {
 			panel2.setBorder(new TitledBorder(null, "Settings", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 			panel2.setLayout(new GridBagLayout());
 			((GridBagLayout) panel2.getLayout()).columnWidths = new int[]{0, 27, 0, 0, 0, 0};
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[]{0, 0};
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[]{0, 0, 0, 0};
 			((GridBagLayout) panel2.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[]{0.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 1.0E-4};
 			panel2.add(hSpacer1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- label4 ----
 			label4.setText("Latency fix (in milliseconds):");
 			label4.setLabelFor(latencySpinner);
 			panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- latencySpinner ----
 			latencySpinner.setModel(new SpinnerNumberModel(100, null, null, 1));
 			panel2.add(latencySpinner, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 			panel2.add(hSpacer2, new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- label7 ----
 			label7.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			label7.setToolTipText("The audio and video may be out of sync. Adjust this number to align\nthem. Gervill tends to need a value of 100.");
 			panel2.add(label7, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
+			
+			//---- fullscreenCheckbox ----
+			fullscreenCheckbox.setText("Fullscreen");
+			fullscreenCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
+			panel2.add(fullscreenCheckbox, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
+			//---- label8 ----
+			label8.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			label8.setToolTipText("When checked, midis2jam2 will run infullscreen at your montior's resolution.\nOtherwise, midis2jam2 will run in windowed mode at 90% resolution.");
+			panel2.add(label8, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 		}
 		contentPane.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -577,6 +594,10 @@ public class GuiLauncher extends JFrame {
 	private JPanel hSpacer2;
 	
 	private JLabel label7;
+	
+	private JCheckBox fullscreenCheckbox;
+	
+	private JLabel label8;
 	
 	private JResizedIconButton startButton;
 	

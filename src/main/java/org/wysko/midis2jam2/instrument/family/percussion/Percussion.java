@@ -147,6 +147,18 @@ public class Percussion extends Instrument {
 		instruments.add(new HighQ(context,
 				noteOnEvents.stream().filter(e -> e.note == 27).collect(Collectors.toList())));
 		
+		instruments.add(new Woodblock(context,
+				noteOnEvents.stream().filter(e -> e.note == 77 || e.note == 76).collect(Collectors.toList())));
+		
+		instruments.add(new Agogo(context,
+				noteOnEvents.stream().filter(e -> e.note == 67 || e.note == 68).collect(Collectors.toList())));
+		
+		instruments.add(new Shaker(context,
+				noteOnEvents.stream().filter(e -> e.note == 82).collect(Collectors.toList())));
+		
+		instruments.add(new Maracas(context,
+				noteOnEvents.stream().filter(e -> e.note == 70).collect(Collectors.toList())));
+		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {
 			if (instrument instanceof SnareDrum
