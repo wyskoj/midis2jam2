@@ -4,10 +4,10 @@
 
 == About
 
-midis2jam2 provides a faithful recreation, staying true to the original look and feel, as closely as possible.
+midis2jam2 provides a faithful recreation, staying true to the original look and feel as closely as possible.
 The models and textures used in midis2jam2 are the original assets from MIDIJam, designed by MIDIJam's creator Scott Haag. midis2jam2 will complete the GM-1 implementation, allowing every MIDI instrument to be visualized.
 
-Future versions may add extended features, such as custom graphics, real-time MIDI visualization, and others.
+Future versions may add extended features, such as custom graphics, real time MIDI visualization, and others.
 
 [#_running]
 == Running
@@ -20,7 +20,7 @@ Follow the on-screen instructions for installing midis2jam2.
 === Hard mode
 
 If you want to experience the latest midis2jam2 updates in between releases, you can download a CI build.
-Note: these builds are unstable, and I won't provide any support for them (although, you should submit issues for pertinent bugs).
+Note: these builds are unstable, so I won't provide any support for them (although, you should submit issues for pertinent bugs).
 
 ==== Getting the binary
 
@@ -35,6 +35,7 @@ Move `midis2jam2-xxxxxxxx.jar` to a new folder (the Xs are a placeholder here; w
 
 To build midis2jam2, run
 
+[source,bash]
 ----
 $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2
@@ -50,12 +51,14 @@ You will need at least _Java 15_ in order for a successful build.
 
 To run midis2jam2, simply execute the jar file:
 
+[source,bash]
 ----
 $ java -jar midis2jam2.jar
 ----
 
-You can optionally specify the relative or absolute path to a MIDI file; midis2jam2 will load and play the file using the default synthesizer Gervill:
+You can optionally specify the relative or absolute path to a MIDI file. midis2jam2 will load and play the file using the default synthesizer Gervill:
 
+[source,bash]
 ----
 $ java -jar midis2jam2.jar path/to/midifile.mid
 ----
@@ -103,7 +106,7 @@ Try restarting your computer or reconnecting your MIDI devices.
 
 Fork and make a pull request to directly make changes.
 Open an issue to request features and report bugs.
-Please ensure you use a template, or ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
+Please ensure you use a template, and ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
 
 == License
 
