@@ -86,7 +86,7 @@ public class Ocarina extends HandedInstrument {
 		protected void loadHands() {
 			rightHands = new Spatial[12];
 			for (var i = 0; i < 12; i++) {
-				rightHands[i] = context.loadModel("OcarinaHand" + i + ".obj", "hands.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+				rightHands[i] = context.loadModel("OcarinaHand" + i + ".obj", "hands.bmp");
 			}
 			for (Spatial rightHand : rightHands) {
 				rightHandNode.attachChild(rightHand);

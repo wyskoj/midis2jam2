@@ -166,8 +166,8 @@ public class MusicBox extends DecayedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 0, indexForMoving() * -18f);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 0, indexForMoving(delta) * -18f);
 	}
 	
 	public class OneMusicBoxNote extends TwelveDrumOctave.TwelfthOfOctaveDecayed {

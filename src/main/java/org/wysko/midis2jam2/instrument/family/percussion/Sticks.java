@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class Sticks extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
-		Stick.StickStatus status = Stick.handleStick(context, leftStickNode, time, delta, hits, 2, 30);
+		Stick.StickStatus status = Stick.handleStick(context, leftStickNode, time, delta, hits, 2, 30, Axis.X);
 		leftStickNode.setCullHint(Dynamic);
 		rightStickNode.setLocalRotation(new Quaternion().fromAngles(-status.getRotationAngle(), 0, 0));
 	}

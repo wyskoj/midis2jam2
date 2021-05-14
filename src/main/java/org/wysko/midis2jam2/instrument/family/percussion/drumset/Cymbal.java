@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class Cymbal extends SingleStickInstrument {
 	public void tick(double time, float delta) {
 		handleCymbalStrikes(time, delta);
 		
-		Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+		Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 	}
 	
 	/**

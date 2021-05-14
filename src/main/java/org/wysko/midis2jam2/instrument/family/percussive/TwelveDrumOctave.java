@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,7 @@ public abstract class TwelveDrumOctave extends DecayedInstrument {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		for (var i = 0; i < 12; i++) {
-			var stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5, 50);
+			var stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5, 50, Axis.X);
 			if (stickStatus.justStruck()) {
 				twelfths[i].animNode.setLocalTranslation(0, -3, 0);
 			}

@@ -58,8 +58,8 @@ public class AcousticBass extends StringFamilyInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(new Vector3f(-25f * indexForMoving(), 0, 0));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(new Vector3f(-25f * indexForMoving(delta), 0, 0));
 	}
 	
 	/**

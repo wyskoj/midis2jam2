@@ -62,7 +62,7 @@ public class Timpani extends OneDrumOctave {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27f + indexForMoving() * -18), 0));
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27f + indexForMoving(delta) * -18), 0));
 	}
 }

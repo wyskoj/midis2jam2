@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.wysko.midis2jam2.M2J2Settings.InstrumentTransition.NONE;
+
 /**
  * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments for
  * each channel, and also creates new instruments when the program of a channel changes (i.e., the MIDI instrument of
@@ -44,6 +46,16 @@ import java.util.stream.Collectors;
  * @see Clone
  */
 public abstract class Instrument {
+	
+	/**
+	 * The number of seconds an instrument should be spawn before its first note.
+	 */
+	public static final float START_BUFFER = 1;
+	
+	/**
+	 * The number of seconds an instrument should be spawn after its last note.
+	 */
+	public static final float END_BUFFER = 5;
 	
 	/**
 	 * Since these classes are effectively static, we need reference to the main class.
@@ -154,7 +166,7 @@ public abstract class Instrument {
 		var show = false;
 		for (MidiNoteOnEvent strike : strikes) {
 			double x = time - context.getFile().eventInSeconds(strike);
-			if (x < 4 && x > -1) {
+			if (x < END_BUFFER && x > -START_BUFFER) {
 				setVisible(true);
 				show = true;
 				break;
@@ -165,22 +177,43 @@ public abstract class Instrument {
 		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
 	}
 	
+	private double index = 0;
+	
 	/**
 	 * Returns the index of this instrument in the list of other instruments of this type that are visible.
 	 *
+	 * @param delta
 	 * @return the index of this instrument in the list of other instruments of this type that are visible
 	 */
 	@Contract(pure = true)
-	protected int indexForMoving() {
-		return Math.max(0, (context.instruments.stream()
+	protected float indexForMoving(float delta) {
+		long target;
+		
+		if (!isVisible()) target = context.instruments.stream()
+				.filter(e -> this.getClass().isInstance(e) && e.isVisible())
+				.count() - 1;
+		else target = Math.max(0, (context.instruments.stream()
 				.filter(e -> this.getClass().isInstance(e) && e.isVisible())
 				.collect(Collectors.toList()).indexOf(this)));
+		
+		var transitionSpeed = context.settings.getTransitionSpeed();
+		
+		if (transitionSpeed != NONE) {
+			double animationCoefficient = transitionSpeed.speed;
+			index += ((delta * 2500) * (target - index)) / (animationCoefficient);
+			return (float) index;
+		} else {
+			return target;
+		}
+		
 	}
 	
 	/**
 	 * Calculates and moves this instrument for when multiple instances of this instrument are visible.
+	 *
+	 * @param delta
 	 */
-	protected abstract void moveForMultiChannel();
+	protected abstract void moveForMultiChannel(float delta);
 	
 	public boolean isVisible() {
 		return visible;

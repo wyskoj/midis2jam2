@@ -63,7 +63,7 @@ public class BassGuitar extends FrettedInstrument {
 		
 		
 		for (var i = 0; i < 4; i++) {
-			Spatial string = context.loadModel("BassString.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			Spatial string = context.loadModel("BassString.obj", "BassSkin.bmp");
 			upperStrings[i] = string;
 			instrumentNode.attachChild(upperStrings[i]);
 		}
@@ -119,7 +119,7 @@ public class BassGuitar extends FrettedInstrument {
 		
 		// Initialize note fingers
 		for (var i = 0; i < 4; i++) {
-			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp");
 			instrumentNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 		}
@@ -130,8 +130,8 @@ public class BassGuitar extends FrettedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(new Vector3f(7, -2.43f, 0).mult(indexForMoving()));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(new Vector3f(7, -2.43f, 0).mult(indexForMoving(delta)));
 	}
 	
 	public enum BassGuitarType {

@@ -23,6 +23,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -47,7 +48,7 @@ public abstract class SingleStickInstrument extends PercussionInstrument {
 	
 	protected SingleStickInstrument(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		stickNode.attachChild(stick);
 		highLevelNode.attachChild(stickNode);
 		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
@@ -61,6 +62,6 @@ public abstract class SingleStickInstrument extends PercussionInstrument {
 	 * @param hits  the running list of hits
 	 */
 	void handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
-		Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE);
+		Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 	}
 }

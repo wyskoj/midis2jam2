@@ -56,8 +56,8 @@ public class Tuba extends MonophonicInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 40f * indexForMoving(), 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 40f * indexForMoving(delta), 0);
 	}
 	
 	/**

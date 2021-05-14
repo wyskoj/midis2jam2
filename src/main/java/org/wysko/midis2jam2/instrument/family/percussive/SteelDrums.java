@@ -106,7 +106,7 @@ public class SteelDrums extends OneDrumOctave {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-37f - 15 * indexForMoving()), 0));
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-37f - 15 * indexForMoving(delta)), 0));
 	}
 }

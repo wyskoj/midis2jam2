@@ -69,9 +69,9 @@ public class PanFlute extends WrappedOctaveSustained {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(((80 / 11f) * 12) * indexForMoving()), 0));
-		offsetNode.setLocalTranslation(0, indexForMoving() * 4.6f, 0);
+	protected void moveForMultiChannel(float delta) {
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(((80 / 11f) * 12) * indexForMoving(delta)), 0));
+		offsetNode.setLocalTranslation(0, indexForMoving(delta) * 4.6f, 0);
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public class PanFlute extends WrappedOctaveSustained {
 				pipe.setMaterial(context.reflectiveMaterial("/Assets/" + skin.textureFile));
 			}
 			this.highestLevel.attachChild(pipe);
-			puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.NORMAL, 1.0f);
+			puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.NORMAL, 1.0f, SteamPuffer.PuffBehavior.OUTWARDS);
 			this.highestLevel.attachChild(puffer.steamPuffNode);
 			
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(90)));

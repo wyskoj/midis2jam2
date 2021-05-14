@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstr
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class TubularBells extends DecayedInstrument {
 		for (int i = 0, barsLength = 12; i < barsLength; i++) { // For each bar on the instrument
 			bells[i].tick(delta);
 			var stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta,
-					bellStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+					bellStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 			if (stickStatus.justStruck() && stickStatus.getStrike() != null) {
 				bells[i].recoilBell(stickStatus.getStrike().velocity);
 			}
@@ -84,8 +85,8 @@ public class TubularBells extends DecayedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(-10f * indexForMoving(), 0, -10f * indexForMoving());
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(-10f * indexForMoving(delta), 0, -10f * indexForMoving(delta));
 	}
 	
 	/**
@@ -150,7 +151,7 @@ public class TubularBells extends DecayedInstrument {
 			bellNode.setLocalScale((float) (-0.04545 * i) + 1);
 			
 			malletNode = new Node();
-			Spatial child = context.loadModel("TubularBellMallet.obj", "Wood.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			Spatial child = context.loadModel("TubularBellMallet.obj", "Wood.bmp");
 			child.setLocalTranslation(0, 5, 0);
 			malletNode.attachChild(child);
 			malletNode.setLocalTranslation((i - 5) * 4f, -25, 4);

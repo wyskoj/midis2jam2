@@ -43,7 +43,7 @@ public abstract class PuffingClone extends HandedClone {
 	                       float pufferScale) {
 		super(parent, rotationFactor);
 		
-		puffer = new SteamPuffer(parent.context, puffType, pufferScale);
+		puffer = new SteamPuffer(parent.context, puffType, pufferScale, SteamPuffer.PuffBehavior.OUTWARDS);
 		modelNode.attachChild(puffer.steamPuffNode);
 	}
 	

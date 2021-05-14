@@ -59,7 +59,7 @@ public class MelodicTom extends OneDrumOctave {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-26.3 + indexForMoving() * -15), 0));
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-26.3 + indexForMoving(delta) * -15), 0));
 	}
 }

@@ -53,8 +53,8 @@ public class Helicopter extends MonophonicInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalTranslation(50f * indexForMoving(), 0, 0);
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalTranslation(50f * indexForMoving(delta), 0, 0);
 	}
 	
 	/**

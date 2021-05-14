@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class HandClap extends NonDrumSetPercussion {
 		super.tick(time, delta);
 		
 		Stick.StickStatus status = Stick.handleStick(context, leftHandNode, time, delta, hits,
-				Stick.STRIKE_SPEED * 0.8, 40);
+				Stick.STRIKE_SPEED * 0.8, 40, Axis.X);
 		leftHandNode.setCullHint(Dynamic);
 		rightHandNode.setLocalRotation(new Quaternion().fromAngles(-status.getRotationAngle(), 0, 0));
 	}

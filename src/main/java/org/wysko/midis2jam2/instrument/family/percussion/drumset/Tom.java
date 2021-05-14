@@ -41,7 +41,7 @@ public class Tom extends StickDrum {
 	 */
 	public Tom(Midis2jam2 context, List<MidiNoteOnEvent> hits, TomPitch pitch) {
 		super(context, hits);
-		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp");
 		drum.setLocalScale(pitch.scale);
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);

@@ -23,6 +23,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class HighQ extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
-		var stickStatus = handleStick(context, gunNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE);
+		var stickStatus = handleStick(context, gunNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 		if (stickStatus.justStruck()) {
 			laser.setCullHint(Dynamic);
 			laserShowTime = 0;

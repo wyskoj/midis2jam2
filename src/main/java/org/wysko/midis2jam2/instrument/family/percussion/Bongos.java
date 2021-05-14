@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -117,8 +118,8 @@ public class Bongos extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
-		Stick.StickStatus statusLow = Stick.handleStick(context, lowStickNode, time, delta, lowBongoHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
-		Stick.StickStatus statusHigh = Stick.handleStick(context, highStickNode, time, delta, highBongoHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+		Stick.StickStatus statusLow = Stick.handleStick(context, lowStickNode, time, delta, lowBongoHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
+		Stick.StickStatus statusHigh = Stick.handleStick(context, highStickNode, time, delta, highBongoHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 		
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();

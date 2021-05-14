@@ -66,11 +66,11 @@ public class StageHorns extends WrappedOctaveSustained {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
+	protected void moveForMultiChannel(float delta) {
 		for (TwelfthOfOctave twelfth : twelfths) {
 			StageHornNote horn = (StageHornNote) twelfth;
 			horn.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(
-					new Vector3f(0, 0, -5).mult(indexForMoving())
+					new Vector3f(0, 0, -5).mult(indexForMoving(delta))
 			));
 		}
 	}

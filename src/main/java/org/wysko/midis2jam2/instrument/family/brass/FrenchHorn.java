@@ -59,8 +59,8 @@ public class FrenchHorn extends MonophonicInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 15f * indexForMoving(), 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 15f * indexForMoving(delta), 0);
 	}
 	
 	/**

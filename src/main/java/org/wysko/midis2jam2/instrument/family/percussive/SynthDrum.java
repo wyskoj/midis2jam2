@@ -59,7 +59,7 @@ public class SynthDrum extends OneDrumOctave {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-25f + indexForMoving() * -16), 0));
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-25f + indexForMoving(delta) * -16), 0));
 	}
 }

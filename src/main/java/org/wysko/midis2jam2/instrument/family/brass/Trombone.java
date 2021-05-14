@@ -22,11 +22,11 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.instrument.clone.Clone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.midi.NotePeriod;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
@@ -52,8 +52,8 @@ public class Trombone extends MonophonicInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 10f * indexForMoving(), 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 10f * indexForMoving(delta), 0);
 	}
 	
 	/**
@@ -91,7 +91,7 @@ public class Trombone extends MonophonicInstrument {
 		 *
 		 * @param position the trombone position
 		 */
-		private void moveToPosition(@Range(from = 1, to = 7) int position) {
+		private void moveToPosition(double position) {
 			slide.setLocalTranslation(slidePosition(position));
 		}
 		
@@ -101,17 +101,46 @@ public class Trombone extends MonophonicInstrument {
 		 * @param position the position
 		 * @return the translation vector
 		 */
-		private Vector3f slidePosition(@Range(from = 1, to = 7) int position) {
-			return new Vector3f(0, 0, 3.33f * position - 1);
+		private Vector3f slidePosition(double position) {
+			return new Vector3f(0, 0, (float) (((3.333333) * position) - 1));
+		}
+		
+		/**
+		 * Returns the current slide position.
+		 *
+		 * @return the current slide position
+		 */
+		private double getCurrentSlidePosition() {
+			var pos = slide.getLocalTranslation();
+			return 0.3 * (pos.z + 1);
 		}
 		
 		@Override
 		public void tick(double time, float delta) {
 			super.tick(time, delta);
 			if (isPlaying() && currentNotePeriod != null) {
-				moveToPosition((currentNotePeriod.midiNote % 7) + 1);
+				moveToPosition(getSlidePositionFromNote(currentNotePeriod));
 			}
-			// TODO Animate the slide so that it moves to the next position if there is time.
+			if (!notePeriods.isEmpty() && !isPlaying()) {
+				var notePeriod = notePeriods.get(0);
+				var startTime = notePeriod.startTime;
+				if (startTime - time <= 1) {
+					var targetPos = getSlidePositionFromNote(notePeriod);
+					var currentPos = getCurrentSlidePosition();
+					moveToPosition(getCurrentSlidePosition() + ((targetPos - currentPos) / (startTime - time)) * delta);
+				}
+			}
+		}
+		
+		
+		/**
+		 * Gets slide position from note.
+		 *
+		 * @param period the period
+		 * @return the slide position from note
+		 */
+		private int getSlidePositionFromNote(NotePeriod period) {
+			return (period.midiNote % 7) + 1;
 		}
 		
 		@Override

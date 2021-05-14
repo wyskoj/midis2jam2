@@ -84,9 +84,9 @@ public class Agogos extends TwelveDrumOctave {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 18 + 3.6f * indexForMoving(), 0);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, -HALF_PI + HALF_PI * indexForMoving(), 0));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 18 + 3.6f * indexForMoving(delta), 0);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, -HALF_PI + HALF_PI * indexForMoving(delta), 0));
 	}
 	
 	/**

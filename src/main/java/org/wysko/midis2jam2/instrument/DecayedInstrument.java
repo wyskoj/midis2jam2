@@ -62,6 +62,6 @@ public abstract class DecayedInstrument extends Instrument {
 	@Override
 	public void tick(double time, float delta) {
 		setIdleVisibilityByStrikes(finalHits, time, instrumentNode);
-		moveForMultiChannel();
+		moveForMultiChannel(delta);
 	}
 }

@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class Tambourine extends NonDrumSetPercussion {
 		super.tick(time, delta);
 		
 		Stick.StickStatus status = Stick.handleStick(context, tambourineHandNode, time, delta, hits,
-				2, 30);
+				2, 30, Axis.X);
 		tambourineHandNode.setCullHint(Dynamic);
 		emptyHandNode.setLocalRotation(new Quaternion().fromAngles(-status.getRotationAngle(), 0, 0));
 	}

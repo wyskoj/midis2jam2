@@ -67,11 +67,11 @@ public class StageChoir extends WrappedOctaveSustained {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
+	protected void moveForMultiChannel(float delta) {
 		for (TwelfthOfOctave twelfth : twelfths) {
 			ChoirPeep peep = (ChoirPeep) twelfth;
 			peep.highestLevel.setLocalTranslation(new Vector3f(BASE_POSITION).add(
-					new Vector3f(0, 10, -15).mult(indexForMoving())
+					new Vector3f(0, 10, -15).mult(indexForMoving(delta))
 			));
 		}
 	}

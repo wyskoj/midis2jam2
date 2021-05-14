@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -76,11 +77,18 @@ public class Stick {
 	 * @param strikes     the list of strikes this stick is responsible for
 	 * @param strikeSpeed the speed at which to strike
 	 * @param maxAngle    the maximum angle to hold the stick at
+	 * @param axis
 	 * @return a {@link StickStatus} describing the current status of the stick
 	 */
 	public static StickStatus handleStick(Midis2jam2 context, Spatial stickNode, double time, float delta,
-	                                      List<MidiNoteOnEvent> strikes, double strikeSpeed, double maxAngle) {
+	                                      List<MidiNoteOnEvent> strikes, double strikeSpeed, double maxAngle, Axis axis) {
 		var strike = false;
+		
+		int rotComp = switch (axis) {
+			case X -> 0;
+			case Y -> 1;
+			case Z -> 2;
+		};
 		
 		MidiNoteOnEvent nextHit = null;
 		if (!strikes.isEmpty())
@@ -100,31 +108,45 @@ public class Stick {
 		
 		if (proposedRotation > maxAngle) {
 			// Not yet ready to strike
-			if (floats[0] <= maxAngle) {
+			if (floats[rotComp] <= maxAngle) {
 				// We have come down, need to recoil
-				float xAngle = floats[0] + 5f * delta;
-				xAngle = Math.min(rad(maxAngle), xAngle);
-				
-				stickNode.setLocalRotation(new Quaternion().fromAngles(
-						xAngle, 0, 0
-				));
+				float angle = floats[rotComp] + 5f * delta;
+				angle = Math.min(rad(maxAngle), angle);
+				if (axis == Axis.X) {
+					stickNode.setLocalRotation(new Quaternion().fromAngles(
+							angle, 0, 0
+					));
+				} else if (axis == Axis.Y) {
+					stickNode.setLocalRotation(new Quaternion().fromAngles(
+							0, angle, 0
+					));
+				} else {
+					stickNode.setLocalRotation(new Quaternion().fromAngles(
+							0, 0, angle
+					));
+				}
 			}
 		} else {
 			// Striking
-			stickNode.setLocalRotation(new Quaternion().fromAngles(rad((float) (
-					Math.max(0, Math.min(maxAngle, proposedRotation))
-			)), 0, 0));
+			var angle = Math.max(0, Math.min(maxAngle, proposedRotation));
+			if (axis == Axis.X) {
+				stickNode.setLocalRotation(new Quaternion().fromAngles(rad((float) angle), 0, 0));
+			} else if (axis == Axis.Y) {
+				stickNode.setLocalRotation(new Quaternion().fromAngles(0, rad((float) angle), 0));
+			} else {
+				stickNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad((float) angle)));
+			}
 		}
 		
 		float[] finalAngles = stickNode.getLocalRotation().toAngles(new float[3]);
-		if (finalAngles[0] >= rad((float) maxAngle)) {
+		if (finalAngles[rotComp] >= rad((float) maxAngle)) {
 			// Not yet ready to strike
 			stickNode.setCullHint(Spatial.CullHint.Always);
 		} else {
 			// Striking or recoiling
 			stickNode.setCullHint(Spatial.CullHint.Dynamic);
 		}
-		return new StickStatus(strike ? nextHit : null, finalAngles[0]);
+		return new StickStatus(strike ? nextHit : null, finalAngles[rotComp], proposedRotation > maxAngle ? null : nextHit);
 	}
 	
 	/**
@@ -143,9 +165,16 @@ public class Stick {
 		 */
 		private final float rotationAngle;
 		
-		public StickStatus(@Nullable MidiNoteOnEvent strike, float rotationAngle) {
+		/**
+		 * The note that this stick is currently in the midst of striking for. Null if the stick is not striking.
+		 */
+		@Nullable
+		private final MidiNoteOnEvent strikingFor;
+		
+		public StickStatus(@Nullable MidiNoteOnEvent strike, float rotationAngle, @Nullable MidiNoteOnEvent strikingFor) {
 			this.strike = strike;
 			this.rotationAngle = rotationAngle;
+			this.strikingFor = strikingFor;
 		}
 		
 		/**
@@ -163,6 +192,10 @@ public class Stick {
 		
 		public float getRotationAngle() {
 			return rotationAngle;
+		}
+		
+		public @Nullable MidiNoteOnEvent strikingFor() {
+			return strikingFor;
 		}
 		
 	}

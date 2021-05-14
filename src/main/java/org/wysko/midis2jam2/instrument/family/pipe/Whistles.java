@@ -70,9 +70,9 @@ public class Whistles extends WrappedOctaveSustained {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 22.5f + indexForMoving() * 6.8f, 0);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(), 0));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 22.5f + indexForMoving(delta) * 6.8f, 0);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(delta), 0));
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class Whistles extends WrappedOctaveSustained {
 		 */
 		public Whistle(int i) {
 			super();
-			this.puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.WHISTLE, 1);
+			this.puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.WHISTLE, 1, SteamPuffer.PuffBehavior.OUTWARDS);
 			Spatial whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f);
 			animNode.attachChild(whistle);
 			float scale = 2 + -0.0909091f * i;

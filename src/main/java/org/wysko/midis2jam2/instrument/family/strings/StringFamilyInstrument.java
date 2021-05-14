@@ -106,7 +106,7 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 		
 		body.setLocalTranslation(0, 0, -1.2f);
 		instrumentNode.attachChild(body);
-		bow = context.loadModel("ViolinBow.obj", "ViolinSkin.bmp", Midis2jam2.MatType.UNSHADED, 1);
+		bow = context.loadModel("ViolinBow.obj", "ViolinSkin.bmp");
 		bowNode.attachChild(bow);
 		instrumentNode.attachChild(bowNode);
 		bowNode.setLocalScale(bowScale);
@@ -119,7 +119,7 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 		
 		for (var i = 0; i < 4; i++) {
 			Spatial string;
-			string = context.loadModel("ViolinString.obj", "ViolinSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			string = context.loadModel("ViolinString.obj", "ViolinSkin.bmp");
 			upperStrings[i] = string;
 			instrumentNode.attachChild(upperStrings[i]);
 		}
@@ -210,7 +210,7 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	protected void loadNoteFingers() {
 		// Initialize note fingers
 		for (var i = 0; i < 4; i++) {
-			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp");
 			instrumentNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 			noteFingers[i].setLocalScale(0.75f);

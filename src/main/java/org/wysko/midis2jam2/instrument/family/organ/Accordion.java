@@ -183,8 +183,8 @@ public class Accordion extends KeyedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 30f * indexForMoving(), 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 30f * indexForMoving(delta), 0);
 	}
 	
 	/**

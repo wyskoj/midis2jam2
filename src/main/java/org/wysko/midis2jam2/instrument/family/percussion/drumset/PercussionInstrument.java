@@ -100,7 +100,7 @@ public abstract class PercussionInstrument extends Instrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
+	protected void moveForMultiChannel(float delta) {
 		// Do nothing!
 	}
 }

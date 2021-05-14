@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercu
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class Cowbell extends NonDrumSetPercussion {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 		//noinspection ConstantConditions
 		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().velocity : 0, delta);
 	}

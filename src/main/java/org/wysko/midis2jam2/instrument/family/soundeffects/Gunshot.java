@@ -85,8 +85,8 @@ public class Gunshot extends DecayedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-70f + 20 * indexForMoving()), 0));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-70f + 20 * indexForMoving(delta)), 0));
 	}
 	
 	/**

@@ -23,6 +23,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -60,6 +61,6 @@ public class Shaker extends NonDrumSetPercussion {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		handleStick(context, shakerNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE);
+		handleStick(context, shakerNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 	}
 }

@@ -57,8 +57,8 @@ public class StageStrings extends WrappedOctaveSustained {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (11.6 * indexForMoving())), 0));
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (11.6 * indexForMoving(delta))), 0));
 	}
 	
 	/**
@@ -111,11 +111,11 @@ public class StageStrings extends WrappedOctaveSustained {
 			animNode.attachChild(animStringNode);
 			
 			// Load resting string
-			restingString = context.loadModel("StageString.obj", "StageString.bmp", Midis2jam2.MatType.UNSHADED, 0);
+			restingString = context.loadModel("StageString.obj", "StageString.bmp");
 			animNode.attachChild(restingString);
 			
 			// Load bow
-			bow = context.loadModel("StageStringBow.fbx", "FakeWood.bmp", Midis2jam2.MatType.UNSHADED, 0);
+			bow = context.loadModel("StageStringBow.fbx", "FakeWood.bmp");
 			((Node) this.bow).getChild(1).setMaterial(((Geometry) restingString).getMaterial());
 			bowNode.attachChild(this.bow);
 			bowNode.setLocalTranslation(0, 48, 0);

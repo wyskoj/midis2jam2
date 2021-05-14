@@ -91,14 +91,14 @@ public class TelephoneRing extends SustainedInstrument {
 				.collect(Collectors.toList());
 		this.notePeriods = calculateNotePeriods(notes);
 		
-		Spatial base = context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		Spatial base = context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp");
 		
 		Node base1 = (Node) base;
 		var rubberFoot = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		rubberFoot.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/RubberFoot.bmp"));
 		base1.getChild(0).setMaterial(rubberFoot);
 		
-		handle = context.loadModel("TelePhoneHandle.obj", "TelephoneHandle.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		handle = context.loadModel("TelePhoneHandle.obj", "TelephoneHandle.bmp");
 		instrumentNode.attachChild(base);
 		instrumentNode.attachChild(handle);
 		
@@ -188,7 +188,7 @@ public class TelephoneRing extends SustainedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(13f * indexForMoving(), 0, 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(13f * indexForMoving(delta), 0, 0);
 	}
 }

@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -46,8 +47,7 @@ public class RideCymbal extends Cymbal {
 		if (!(type == CymbalType.RIDE_1 || type == CymbalType.RIDE_2))
 			throw new IllegalArgumentException("Ride cymbal type is wrong.");
 		
-		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
-				Midis2jam2.MatType.REFLECTIVE, 0.7f);
+		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		cymbalNode.attachChild(cymbal);
 		cymbalNode.setLocalScale(type.size);
 		highLevelNode.setLocalTranslation(type.location);
@@ -65,6 +65,11 @@ public class RideCymbal extends Cymbal {
 	
 	@Override
 	void handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
-		Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE);
+		var stickStatus = Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
+		var strikingFor = stickStatus.strikingFor();
+		if (strikingFor != null) {
+			stickNode.setLocalTranslation(0, 0, strikingFor.note == 53 ? 15 : 20);
+		}
+		
 	}
 }

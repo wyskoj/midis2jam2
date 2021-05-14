@@ -97,8 +97,8 @@ public abstract class SustainedInstrument extends Instrument {
 			// within 4 seconds of a note off,
 			// or during a note, be visible
 			if (notePeriod.isPlayingAt(time)
-					|| Math.abs(time - notePeriod.startTime) < 1
-					|| (Math.abs(time - notePeriod.endTime) < 4 && time > notePeriod.endTime)) {
+					|| Math.abs(time - notePeriod.startTime) < START_BUFFER
+					|| (Math.abs(time - notePeriod.endTime) < END_BUFFER && time > notePeriod.endTime)) {
 				show = true;
 				break;
 			}
@@ -126,7 +126,7 @@ public abstract class SustainedInstrument extends Instrument {
 	public void tick(double time, float delta) {
 		calculateCurrentNotePeriods(time);
 		setIdleVisibilityByPeriods(time);
-		moveForMultiChannel();
+		moveForMultiChannel(delta);
 	}
 	
 	/**

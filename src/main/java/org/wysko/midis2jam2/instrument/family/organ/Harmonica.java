@@ -58,7 +58,7 @@ public class Harmonica extends SustainedInstrument {
 		
 		for (var i = 0; i < 12; i++) {
 			pufferNodes[i] = new Node();
-			puffers[i] = new SteamPuffer(context, SteamPuffer.SteamPuffType.HARMONICA, 0.75);
+			puffers[i] = new SteamPuffer(context, SteamPuffer.SteamPuffType.HARMONICA, 0.75, SteamPuffer.PuffBehavior.OUTWARDS);
 			puffers[i].steamPuffNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-90), 0));
 			puffers[i].steamPuffNode.setLocalTranslation(0, 0, 7.2f);
 			pufferNodes[i].attachChild(puffers[i].steamPuffNode);
@@ -86,7 +86,7 @@ public class Harmonica extends SustainedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 10f * indexForMoving(), 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 10f * indexForMoving(delta), 0);
 	}
 }

@@ -7,7 +7,8 @@ package org.wysko.midis2jam2;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.wysko.midis2jam2.Midis2jam2.M2J2Settings;
+import org.ini4j.Ini;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.gui.*;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.util.Utils;
@@ -39,6 +40,8 @@ import static javax.swing.JOptionPane.*;
 @SuppressWarnings("unused")
 public class GuiLauncher extends JFrame {
 	
+	private static final File INI_FILE = new File("midis2jam2.ini");
+	
 	public GuiLauncher() {
 		initComponents();
 	}
@@ -52,7 +55,7 @@ public class GuiLauncher extends JFrame {
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
 		var guiLauncher = new GuiLauncher();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		guiLauncher.setSize(new Dimension(535, 480));
+		guiLauncher.setSize(new Dimension(535, 520));
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
 		guiLauncher.setVisible(true);
 		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -111,11 +114,11 @@ public class GuiLauncher extends JFrame {
 		guiLauncher.bringToFront();
 		
 		
-		// Load YAML
+		// Load GSON
 		
 		try {
 			final LauncherSettings settings = new Gson().fromJson(new FileReader(SETTINGS_FILE), LauncherSettings.class);
-			if (settings == null) throw new Exception();
+			if (settings == null) throw new IOException();
 			guiLauncher.settings = settings;
 		} catch (Exception e) {
 			guiLauncher.settings = new LauncherSettings();
@@ -123,6 +126,15 @@ public class GuiLauncher extends JFrame {
 		}
 		
 		guiLauncher.updateSf2List();
+		
+		// Load INI
+		
+		var ini = guiLauncher.ini();
+		if (ini.get("visuals", "transition") != null) {
+			for (Component component : guiLauncher.transitionSpeedPanel.getComponents()) {
+				((JRadioButton) component).setSelected(component.getName().equals(ini.get("visuals", "transition")));
+			}
+		}
 	}
 	
 	public void updateSf2List() {
@@ -132,6 +144,14 @@ public class GuiLauncher extends JFrame {
 		settings.setSoundFontPaths(settings.getSoundFontPaths());
 		settings.setLastMidiDir(settings.getLastMidiDir());
 		saveSettings();
+	}
+	
+	private Ini ini() {
+		try {
+			return new Ini(INI_FILE);
+		} catch (IOException e) {
+			return new Ini();
+		}
 	}
 	
 	private void saveSettings() {
@@ -144,6 +164,34 @@ public class GuiLauncher extends JFrame {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private void saveIni(ActionEvent e) {
+		
+		// Get transition speed
+		JRadioButton button = getSelectedTransitionRadioButton();
+		
+		var ini = ini();
+		
+		ini.put("visuals", "transition", button.getName());
+		try {
+			ini.store(INI_FILE);
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+	}
+	
+	@NotNull
+	private JRadioButton getSelectedTransitionRadioButton() {
+		JRadioButton button = null;
+		for (Component component : transitionSpeedPanel.getComponents()) {
+			if (((JRadioButton) component).isSelected()) {
+				button = (JRadioButton) component;
+				break;
+			}
+		}
+		assert button != null;
+		return button;
 	}
 	
 	public static String getVersion() {
@@ -213,6 +261,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void startButtonPressed(ActionEvent e) {
+		saveIni(e);
 		// Collect MIDI file
 		this.setCursor(getPredefinedCursor(Cursor.WAIT_CURSOR));
 		if (midiFilePathTextField.getText().isBlank()) {
@@ -310,7 +359,8 @@ public class GuiLauncher extends JFrame {
 				}
 				
 			}
-			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), M2J2Settings.create(value),
+			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
+					M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
 					fullscreenCheckbox.isSelected());
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
@@ -368,8 +418,16 @@ public class GuiLauncher extends JFrame {
 		latencySpinner = new JSpinner();
 		hSpacer2 = new JPanel(null);
 		label7 = new JLabel();
+		label11 = new JLabel();
 		fullscreenCheckbox = new JCheckBox();
 		label8 = new JLabel();
+		label9 = new JLabel();
+		transitionSpeedPanel = new JPanel();
+		transitionSpeedNoneButton = new JRadioButton();
+		transitionSpeedSlowButton = new JRadioButton();
+		transitionSpeedNormalButton = new JRadioButton();
+		transitionSpeedFastButton = new JRadioButton();
+		label10 = new JLabel();
 		startButton = new JResizedIconButton();
 		versionText = new JLabel();
 		
@@ -488,9 +546,9 @@ public class GuiLauncher extends JFrame {
 			panel2.setBorder(new TitledBorder(null, "Settings", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 			panel2.setLayout(new GridBagLayout());
 			((GridBagLayout) panel2.getLayout()).columnWidths = new int[]{0, 27, 0, 0, 0, 0};
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[]{0, 0, 0, 0};
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[]{0, 0, 0, 6, 0};
 			((GridBagLayout) panel2.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			panel2.add(hSpacer1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
@@ -518,17 +576,81 @@ public class GuiLauncher extends JFrame {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
+			//---- label11 ----
+			label11.setText("Display:");
+			panel2.add(label11, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
 			//---- fullscreenCheckbox ----
 			fullscreenCheckbox.setText("Fullscreen");
 			fullscreenCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
-			panel2.add(fullscreenCheckbox, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			panel2.add(fullscreenCheckbox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
 			//---- label8 ----
 			label8.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label8.setToolTipText("When checked, midis2jam2 will run infullscreen at your montior's resolution.\nOtherwise, midis2jam2 will run in windowed mode at 90% resolution.");
+			label8.setToolTipText("When checked, midis2jam2 will run in fullscreen at your monitor's resolution.\nOtherwise, midis2jam2 will run in windowed mode at 90% resolution.");
 			panel2.add(label8, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
+			//---- label9 ----
+			label9.setText("Transition speed:");
+			panel2.add(label9, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
+			//======== transitionSpeedPanel ========
+			{
+				transitionSpeedPanel.setLayout(new GridBagLayout());
+				((GridBagLayout) transitionSpeedPanel.getLayout()).columnWidths = new int[]{0, 0, 0};
+				((GridBagLayout) transitionSpeedPanel.getLayout()).rowHeights = new int[]{0, 0, 0};
+				((GridBagLayout) transitionSpeedPanel.getLayout()).columnWeights = new double[]{0.0, 0.0, 1.0E-4};
+				((GridBagLayout) transitionSpeedPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 1.0E-4};
+				
+				//---- transitionSpeedNoneButton ----
+				transitionSpeedNoneButton.setText("None");
+				transitionSpeedNoneButton.setName("NONE");
+				transitionSpeedNoneButton.addActionListener(e -> saveIni(e));
+				transitionSpeedPanel.add(transitionSpeedNoneButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+				
+				//---- transitionSpeedSlowButton ----
+				transitionSpeedSlowButton.setText("Slow");
+				transitionSpeedSlowButton.setName("SLOW");
+				transitionSpeedSlowButton.addActionListener(e -> saveIni(e));
+				transitionSpeedPanel.add(transitionSpeedSlowButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+				
+				//---- transitionSpeedNormalButton ----
+				transitionSpeedNormalButton.setText("Normal");
+				transitionSpeedNormalButton.setSelected(true);
+				transitionSpeedNormalButton.setName("NORMAL");
+				transitionSpeedNormalButton.addActionListener(e -> saveIni(e));
+				transitionSpeedPanel.add(transitionSpeedNormalButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+				
+				//---- transitionSpeedFastButton ----
+				transitionSpeedFastButton.setText("Fast");
+				transitionSpeedFastButton.setName("FAST");
+				transitionSpeedFastButton.addActionListener(e -> saveIni(e));
+				transitionSpeedPanel.add(transitionSpeedFastButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
+			}
+			panel2.add(transitionSpeedPanel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 5, 5), 0, 0));
+			
+			//---- label10 ----
+			label10.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			label10.setToolTipText("When instruments spawn, or one despawns in a stack of instruments,\ninstruments can gradually move instead of snapping.");
+			panel2.add(label10, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 		}
@@ -553,6 +675,13 @@ public class GuiLauncher extends JFrame {
 				new Insets(0, 0, 10, 5), 0, 0));
 		pack();
 		setLocationRelativeTo(getOwner());
+		
+		//---- buttonGroup1 ----
+		var buttonGroup1 = new ButtonGroup();
+		buttonGroup1.add(transitionSpeedNoneButton);
+		buttonGroup1.add(transitionSpeedSlowButton);
+		buttonGroup1.add(transitionSpeedNormalButton);
+		buttonGroup1.add(transitionSpeedFastButton);
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 	
@@ -595,9 +724,25 @@ public class GuiLauncher extends JFrame {
 	
 	private JLabel label7;
 	
+	private JLabel label11;
+	
 	private JCheckBox fullscreenCheckbox;
 	
 	private JLabel label8;
+	
+	private JLabel label9;
+	
+	private JPanel transitionSpeedPanel;
+	
+	private JRadioButton transitionSpeedNoneButton;
+	
+	private JRadioButton transitionSpeedSlowButton;
+	
+	private JRadioButton transitionSpeedNormalButton;
+	
+	private JRadioButton transitionSpeedFastButton;
+	
+	private JLabel label10;
 	
 	private JResizedIconButton startButton;
 	

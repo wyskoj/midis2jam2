@@ -101,7 +101,7 @@ public abstract class KeyedInstrument extends Instrument {
 	@Override
 	public void tick(double time, float delta) {
 		setIdleVisibilityByNoteOnAndOff(time);
-		moveForMultiChannel();
+		moveForMultiChannel(delta);
 		List<MidiNoteEvent> eventsToPerform = new ArrayList<>();
 		if (!events.isEmpty()) {
 			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {

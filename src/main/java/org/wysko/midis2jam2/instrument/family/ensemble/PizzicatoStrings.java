@@ -79,8 +79,8 @@ public class PizzicatoStrings extends DecayedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(45f + 12 * indexForMoving()), 0));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(45f + 12 * indexForMoving(delta)), 0));
 	}
 	
 	/**

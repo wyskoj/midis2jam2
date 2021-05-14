@@ -56,7 +56,7 @@ public class Violin extends StringFamilyInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(20f * indexForMoving(), 0, 0);
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(20f * indexForMoving(delta), 0, 0);
 	}
 }

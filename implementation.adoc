@@ -26,7 +26,7 @@ Check this page to see the progress of each instrument's implementation.
 |===
 |*Bass*|*Strings*|*Ensemble*|*Brass*
 |_33_ Acoustic Bass ✔️|_41_ Violin ✔️|_49_ String Ensemble 1 ✔️|_57_ Trumpet ✔️
-|_34_ Electric Bass (finger) ✔️|_42_ Viola ✔️|_50_ String Ensemble 2 ✔️|_58_ Trombone ⚙️
+|_34_ Electric Bass (finger) ✔️|_42_ Viola ✔️|_50_ String Ensemble 2 ✔️|_58_ Trombone ✔️
 |_35_ Electric Bass (pick) ✔️|_43_ Cello ✔️|_51_ Synth Strings 1 ✔️|_59_ Tuba ✔️
 |_36_ Fretless Bass ✔️|_44_ Contrabass ✔️|_52_ Synth Strings 2 ✔️|_60_ Muted Trumpet ✔️
 |_37_ Slap Bass 1 ✔️|_45_ Tremolo Strings ✔️|_53_ Choir Aahs ✔️|_61_ French Horn ✔️
@@ -64,22 +64,22 @@ Check this page to see the progress of each instrument's implementation.
 |===
 |__27__ High Q ✔️|__35__ Acoustic Bass Drum ✔️|__43__ High Floor Tom ✔️|__51__ Ride Cymbal 1 ✔️
 |__28__ Slap ❌|__36__ Electric Bass Drum ✔️|__44__ Pedal Hi-hat ✔️|_52_ Chinese Cymbal ✔️
-|_29_ Scratch Push ❌|_37_ Side Stick ✔️|_45_ Low Tom ✔️|_53_ Ride Bell ❌
+|_29_ Scratch Push ❌|_37_ Side Stick ✔️|_45_ Low Tom ✔️|_53_ Ride Bell ✔️
 |_30_ Scratch Pull ❌|_38_ Acoustic Snare ✔️|_46_ Open Hi-hat ✔️|_54_ Tambourine ✔️
 |_31_ Sticks ✔️|_39_ Hand Clap ✔️|_47_ Low-Mid Tom ✔️|_55_ Splash Cymbal ✔️
-|_32_ Square Click ❌|_40_ Electric Snare ✔️|_48_ Hi-Mid Tom ✔️|_56_ Cowbell ✔️
-|_33_ Metronome Click ❌|_41_ Low Floor Tom ✔️|_49_ Crash Cymbal 1 ✔️|_57_ Crash Cymbal 2 ✔️
-|_34_ Metronome Bell ❌|_42_ Closed Hi-hat ✔️|_50_ High Tom ✔️|_58_ Vibra Slap ❌
+|_32_ Square Click ✔️|_40_ Electric Snare ✔️|_48_ Hi-Mid Tom ✔️|_56_ Cowbell ✔️
+|_33_ Metronome Click ✔️|_41_ Low Floor Tom ✔️|_49_ Crash Cymbal 1 ✔️|_57_ Crash Cymbal 2 ✔️
+|_34_ Metronome Bell ✔️|_42_ Closed Hi-hat ✔️|_50_ High Tom ✔️|_58_ Vibra Slap ❌
 |===
 
 |===
-|_59_ Ride Cymbal 2 ✔️|_67_ High Agogô ✔️|_75_ Claves ❌|_83_ Jingle Bell ✔️
+|_59_ Ride Cymbal 2 ✔️|_67_ High Agogô ✔️|_75_ Claves ✔️|_83_ Jingle Bell ✔️
 |_60_ High Bongo ✔️|_68_ Low Agogô ✔️|_76_ High Woodblock ✔️|_84_ Belltree ❌
-|_61_ Low Bongo ✔️|_69_ Cabasa ❌|_77_ Low Woodblock ✔️|_85_ Castanets ✔️
+|_61_ Low Bongo ✔️|_69_ Cabasa ✔️|_77_ Low Woodblock ✔️|_85_ Castanets ✔️
 |_62_ Mute High Conga ✔️|_70_ Maracas ✔️|_78_ Mute Cuica ❌|_86_ Mute Surdo ❌
-|_63_ Open High Conga ✔️|_71_ Short Whistle ❌|_79_ Open Cuica ❌|_87_ Open Surdo ❌
-|_64_ Low Conga ✔️|_72_ Long Whistle ❌|_80_ Mute Triangle ❌|
-|_65_ High Timbale ✔️|_73_ Short Guiro ❌|_81_ Open Triangle ❌|
+|_63_ Open High Conga ✔️|_71_ Short Whistle ✔️|_79_ Open Cuica ❌|_87_ Open Surdo ❌
+|_64_ Low Conga ✔️|_72_ Long Whistle ✔️|_80_ Mute Triangle ✔️|
+|_65_ High Timbale ✔️|_73_ Short Guiro ❌|_81_ Open Triangle ✔️|
 |_66_ Low Timbale ✔️|_74_ Long Guiro ❌|_82_ Shaker ✔️|
 |===
 

@@ -112,10 +112,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
 	
-	/**
-	 * Video offset to account for synthesis audio delay.
-	 */
-	int latencyFix;
+	public final M2J2Settings settings;
 	
 	/**
 	 * The MIDI sequencer.
@@ -168,7 +165,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	public Midis2jam2(Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
 		this.sequencer = sequencer;
 		this.file = midiFile;
-		this.latencyFix = settings.latency;
+		this.settings = settings;
 	}
 	
 	/**
@@ -224,7 +221,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		new Timer(true).scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				if (timeSinceStart + (latencyFix / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
+				if (timeSinceStart + (settings.getLatencyFix() / 1000.0) >= 0 && !seqHasRunOnce && sequencer.isOpen()) {
 					sequencer.setTempoInBPM((float) getFile().firstTempoInBpm());
 					sequencer.start();
 					seqHasRunOnce = true;
@@ -911,6 +908,18 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	/**
+	 * Returns a reflective material given a texture file.
+	 *
+	 * @param texture the path to the texture
+	 * @return the reflective material
+	 */
+	public Material unshadedMaterial(String texture) {
+		var material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+		material.setTexture("ColorMap", this.app.getAssetManager().loadTexture("Assets/" + texture));
+		return material;
+	}
+	
+	/**
 	 * Registers key handling.
 	 */
 	private void setupKeys() {
@@ -1005,16 +1014,4 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 	}
 	
-	public static class M2J2Settings {
-		
-		private final int latency;
-		
-		private M2J2Settings(int latency) {
-			this.latency = latency;
-		}
-		
-		public static M2J2Settings create(int latency) {
-			return new M2J2Settings(latency);
-		}
-	}
 }

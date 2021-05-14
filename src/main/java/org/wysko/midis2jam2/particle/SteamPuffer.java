@@ -47,10 +47,17 @@ public class SteamPuffer implements ParticleGenerator {
 	
 	private static final Random RANDOM = new Random();
 	
-	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale) {
+	private final PuffBehavior behavior;
+	
+	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale, PuffBehavior behavior) {
 		this.context = context;
 		this.type = type;
 		this.scale = scale;
+		this.behavior = behavior;
+	}
+	
+	public enum PuffBehavior {
+		OUTWARDS, UPWARDS
 	}
 	
 	private void despawnCloud(Cloud cloud) {
@@ -142,7 +149,12 @@ public class SteamPuffer implements ParticleGenerator {
 		@Override
 		public boolean tick(float delta) {
 			if (!currentlyUsing) return false;
-			cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
+			if (behavior == PuffBehavior.OUTWARDS) {
+				cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
+			} else {
+				cloudNode.setLocalTranslation(locEase(life) * 6, (float) life * 10, locEase(life) * randZ);
+			}
+			
 			cloudNode.setLocalScale((float) ((0.75 * life + 1.2) * scale));
 			life += delta * 1.5;
 			var endOfLife = 0.7;

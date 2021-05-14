@@ -26,6 +26,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +82,7 @@ public class Mallets extends DecayedInstrument {
 		super(context, eventList);
 		
 		this.type = type;
-		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp");
 		malletCase.setLocalScale(2 / 3f);
 		instrumentNode.attachChild(malletCase);
 		
@@ -122,7 +123,7 @@ public class Mallets extends DecayedInstrument {
 			bars[i].tick(delta);
 			var stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta,
 					barStrikes.get(i),
-					Stick.STRIKE_SPEED, Stick.MAX_ANGLE);
+					Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 			if (stickStatus.justStruck()) {
 				bars[i].recoilBar();
 			}
@@ -131,8 +132,8 @@ public class Mallets extends DecayedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		int i1 = indexForMoving() - 2;
+	protected void moveForMultiChannel(float delta) {
+		float i1 = indexForMoving(delta) - 2;
 		instrumentNode.setLocalTranslation(-50, 26.5f + (2 * i1), 0);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
 	}
@@ -219,18 +220,18 @@ public class Mallets extends DecayedInstrument {
 		boolean recoilNow = false;
 		
 		public MalletBar(int midiNote, int startPos) {
-			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile);
 			malletNode.attachChild(mallet);
 			malletNode.setLocalScale(0.667f);
 			malletNode.setLocalRotation(new Quaternion().fromAngles(rad(50), 0, 0));
 			mallet.setLocalTranslation(0, 0, -2);
 			malletNode.move(0, 0, 2);
 			
-			shadow = Mallets.this.context.loadModel("MalletHitShadow.obj", "Black.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+			shadow = Mallets.this.context.loadModel("MalletHitShadow.obj", "Black.bmp");
 			
 			if (midiValueToColor(midiNote) == WHITE) {
-				upBar = Mallets.this.context.loadModel("XylophoneWhiteBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
-				downBar = Mallets.this.context.loadModel("XylophoneWhiteBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+				upBar = Mallets.this.context.loadModel("XylophoneWhiteBar.obj", Mallets.this.type.textureFile);
+				downBar = Mallets.this.context.loadModel("XylophoneWhiteBarDown.obj", Mallets.this.type.textureFile);
 				
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
@@ -242,8 +243,8 @@ public class Mallets extends DecayedInstrument {
 				malletNode.setLocalTranslation(0, 1.35f, (-midiNote / 11.5f) + 19);
 				shadow.setLocalTranslation(0, 0.75f, (-midiNote / 11.5f) + 11);
 			} else {
-				upBar = Mallets.this.context.loadModel("XylophoneBlackBar.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
-				downBar = Mallets.this.context.loadModel("XylophoneBlackBarDown.obj", Mallets.this.type.textureFile, Midis2jam2.MatType.UNSHADED, 0.9f);
+				upBar = Mallets.this.context.loadModel("XylophoneBlackBar.obj", Mallets.this.type.textureFile);
+				downBar = Mallets.this.context.loadModel("XylophoneBlackBarDown.obj", Mallets.this.type.textureFile);
 				
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);

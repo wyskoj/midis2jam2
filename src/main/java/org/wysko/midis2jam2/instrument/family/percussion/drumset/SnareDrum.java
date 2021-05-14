@@ -23,6 +23,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,7 +77,7 @@ public class SnareDrum extends PercussionInstrument {
 		super(context, hits);
 		this.regularHits = hits.stream().filter(e -> e.note == 40 || e.note == 38).collect(Collectors.toList());
 		this.sideHits = hits.stream().filter(e -> e.note == 37).collect(Collectors.toList());
-		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp", Midis2jam2.MatType.UNSHADED, 0.9f);
+		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
 		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		Spatial sideStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		regularStickNode.attachChild(regularStick);
@@ -96,8 +97,8 @@ public class SnareDrum extends PercussionInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		var regularStickStatus = Stick.handleStick(context, regularStick, time, delta, regularHits, STRIKE_SPEED, MAX_ANGLE);
-		var sideStickStatus = Stick.handleStick(context, sideStickNode, time, delta, sideHits, STRIKE_SPEED, MAX_ANGLE);
+		var regularStickStatus = Stick.handleStick(context, regularStick, time, delta, regularHits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
+		var sideStickStatus = Stick.handleStick(context, sideStickNode, time, delta, sideHits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 		
 		var regVel = 0;
 		var sideVel = 0;

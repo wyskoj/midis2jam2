@@ -59,7 +59,7 @@ public class Harp extends SustainedInstrument {
 				.filter(MidiNoteEvent.class::isInstance)
 				.map(MidiNoteEvent.class::cast)
 				.collect(Collectors.toList());
-		instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp", Midis2jam2.MatType.UNSHADED, 0.9f));
+		instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp"));
 		instrumentNode.setLocalTranslation(5, 3.6f, 17);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
 		highestLevel.attachChild(instrumentNode);
@@ -123,8 +123,8 @@ public class Harp extends SustainedInstrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(14.7f * indexForMoving(), 0, 10.3f * indexForMoving());
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(14.7f * indexForMoving(delta), 0, 10.3f * indexForMoving(delta));
 	}
 	
 	/**
@@ -175,7 +175,7 @@ public class Harp extends SustainedInstrument {
 				t = "HarpStringWhite.bmp";
 				vt = "HarpStringWhitePlaying.bmp";
 			}
-			string = context.loadModel("HarpString.obj", t, Midis2jam2.MatType.UNSHADED, 0.9f);
+			string = context.loadModel("HarpString.obj", t);
 			
 			for (var v = 0; v < 5; v++) {
 				vibratingStrings[v] = context.loadModel("HarpStringPlaying" + v + ".obj", vt,

@@ -63,7 +63,7 @@ public class TaikoDrum extends OneDrumOctave {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27.9 + indexForMoving() * -11), 0));
+	protected void moveForMultiChannel(float delta) {
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27.9 + indexForMoving(delta) * -11), 0));
 	}
 }

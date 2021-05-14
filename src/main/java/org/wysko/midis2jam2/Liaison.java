@@ -19,7 +19,6 @@ package org.wysko.midis2jam2;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
-import org.wysko.midis2jam2.Midis2jam2.M2J2Settings;
 import org.wysko.midis2jam2.midi.MidiFile;
 
 import javax.sound.midi.Sequencer;

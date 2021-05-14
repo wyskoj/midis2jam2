@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.wysko.midis2jam2.instrument.family.percussion.drumset.Cymbal.CymbalType.RIDE_1;
+import static org.wysko.midis2jam2.instrument.family.percussion.drumset.Cymbal.CymbalType.RIDE_2;
+
 /**
  * The Percussion.
  */
@@ -108,11 +111,32 @@ public class Percussion extends Instrument {
 		instruments.add(new Cymbal(context,
 				noteOnEvents.stream().filter(e -> e.note == 52).collect(Collectors.toList()), Cymbal.CymbalType.CHINA));
 		
-		instruments.add(new RideCymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 51).collect(Collectors.toList()), Cymbal.CymbalType.RIDE_1));
+		// CALCULATE RIDE CYMBAL NOTES
+		var allRideNotes = noteOnEvents.stream().filter(e -> e.note == 51 || e.note == 59 || e.note == 53).collect(Collectors.toList());
+		var currentRideCymbal = RIDE_1;
+		List<MidiNoteOnEvent> ride1Notes = new ArrayList<>();
+		List<MidiNoteOnEvent> ride2Notes = new ArrayList<>();
+		for (MidiNoteOnEvent note : allRideNotes) {
+			if (note.note == 51) {
+				ride1Notes.add(note);
+				currentRideCymbal = RIDE_1;
+			} else if (note.note == 59) {
+				ride2Notes.add(note);
+				currentRideCymbal = RIDE_2;
+			} else {
+				if (currentRideCymbal == RIDE_1) {
+					ride1Notes.add(note);
+				} else {
+					ride2Notes.add(note);
+				}
+			}
+		}
 		
 		instruments.add(new RideCymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 59).collect(Collectors.toList()), Cymbal.CymbalType.RIDE_2));
+				ride1Notes, RIDE_1));
+		
+		instruments.add(new RideCymbal(context,
+				ride2Notes, RIDE_2));
 		
 		instruments.add(new HiHat(context,
 				noteOnEvents.stream().filter(e -> e.note == 42 || e.note == 44 || e.note == 46).collect(Collectors.toList())));
@@ -156,8 +180,31 @@ public class Percussion extends Instrument {
 		instruments.add(new Shaker(context,
 				noteOnEvents.stream().filter(e -> e.note == 82).collect(Collectors.toList())));
 		
+		instruments.add(new Cabasa(context,
+				noteOnEvents.stream().filter(e -> e.note == 69).collect(Collectors.toList())));
+		
 		instruments.add(new Maracas(context,
 				noteOnEvents.stream().filter(e -> e.note == 70).collect(Collectors.toList())));
+		
+		instruments.add(new Claves(context,
+				noteOnEvents.stream().filter(e -> e.note == 75).collect(Collectors.toList())));
+		
+		instruments.add(new Triangle(context,
+				noteOnEvents.stream().filter(e -> e.note == 81).collect(Collectors.toList()),
+				Triangle.TriangleType.OPEN));
+		
+		instruments.add(new Triangle(context,
+				noteOnEvents.stream().filter(e -> e.note == 80).collect(Collectors.toList()),
+				Triangle.TriangleType.MUTED));
+		
+		instruments.add(new SquareClick(context,
+				noteOnEvents.stream().filter(e -> e.note == 32).collect(Collectors.toList())));
+		
+		instruments.add(new Metronome(context,
+				noteOnEvents.stream().filter(e -> e.note == 33 || e.note == 34).collect(Collectors.toList())));
+		
+		instruments.add(new Whistle(context,
+				noteOnEvents.stream().filter(e -> e.note == 71 || e.note == 72).collect(Collectors.toList())));
 		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {
@@ -193,7 +240,7 @@ public class Percussion extends Instrument {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
+	protected void moveForMultiChannel(float delta) {
 		// Do nothing!
 	}
 }

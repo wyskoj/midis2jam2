@@ -70,9 +70,9 @@ public class BlownBottle extends WrappedOctaveSustained {
 	}
 	
 	@Override
-	protected void moveForMultiChannel() {
-		offsetNode.setLocalTranslation(0, 20 + indexForMoving() * 3.6f, 0);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(), 0));
+	protected void moveForMultiChannel(float delta) {
+		offsetNode.setLocalTranslation(0, 20 + indexForMoving(delta) * 3.6f, 0);
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, FastMath.HALF_PI * indexForMoving(delta), 0));
 	}
 	
 	/**
@@ -91,7 +91,7 @@ public class BlownBottle extends WrappedOctaveSustained {
 		 * @param i the index of this bottle
 		 */
 		public Bottle(int i) {
-			this.puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.POP, 1);
+			this.puffer = new SteamPuffer(context, SteamPuffer.SteamPuffType.POP, 1, SteamPuffer.PuffBehavior.OUTWARDS);
 			highestLevel.attachChild(context.loadModel("PopBottle.obj", "PopBottle.bmp", REFLECTIVE, 0.9f));
 			Spatial label = context.loadModel("PopBottleLabel.obj", "PopLabel.bmp");
 			label.setLocalRotation(new Quaternion().fromAngles(0, FastMath.PI, 0));
