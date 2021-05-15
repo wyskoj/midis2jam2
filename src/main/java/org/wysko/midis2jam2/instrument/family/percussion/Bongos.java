@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.midi.Midi.HIGH_BONGO;
+import static org.wysko.midis2jam2.midi.Midi.LOW_BONGO;
 
 /**
  * The bongos.
@@ -80,8 +82,8 @@ public class Bongos extends NonDrumSetPercussion {
 	              List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		lowBongoHits = hits.stream().filter(h -> h.note == 61).collect(Collectors.toList());
-		highBongoHits = hits.stream().filter(h -> h.note == 60).collect(Collectors.toList());
+		lowBongoHits = hits.stream().filter(h -> h.note == LOW_BONGO).collect(Collectors.toList());
+		highBongoHits = hits.stream().filter(h -> h.note == HIGH_BONGO).collect(Collectors.toList());
 		
 		lowBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
 		highBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");

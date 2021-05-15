@@ -52,7 +52,6 @@ public class Triangle extends NonDrumSetPercussion {
 		triangleNode.attachChild(triangle);
 		
 		if (type == MUTED) {
-			
 			var hands = context.unshadedMaterial("hands.bmp");
 			((Node) triangle).getChild(1).setMaterial(hands);
 		}

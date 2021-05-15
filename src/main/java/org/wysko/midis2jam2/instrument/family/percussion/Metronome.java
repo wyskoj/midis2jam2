@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick;
+import static org.wysko.midis2jam2.midi.Midi.METRONOME_BELL;
+import static org.wysko.midis2jam2.midi.Midi.METRONOME_CLICK;
 
 /**
  * The metronome.
@@ -66,8 +68,8 @@ public class Metronome extends NonDrumSetPercussion {
 	protected Metronome(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		bellHits = hits.stream().filter(hit -> hit.note == 34).collect(Collectors.toList());
-		clickHits = hits.stream().filter(hit -> hit.note == 33).collect(Collectors.toList());
+		bellHits = hits.stream().filter(hit -> hit.note == METRONOME_BELL).collect(Collectors.toList());
+		clickHits = hits.stream().filter(hit -> hit.note == METRONOME_CLICK).collect(Collectors.toList());
 		
 		instrumentNode.attachChild(context.loadModel("MetronomeBox.obj", "Wood.bmp"));
 		

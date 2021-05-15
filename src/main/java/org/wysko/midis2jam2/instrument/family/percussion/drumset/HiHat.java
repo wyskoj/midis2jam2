@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.midi.Midi.CLOSED_HI_HAT;
+import static org.wysko.midis2jam2.midi.Midi.OPEN_HI_HAT;
 
 /**
  * The hi-hat.
@@ -75,11 +77,9 @@ public class HiHat extends SingleStickInstrument {
 	
 	public HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		hitsToStrike = hits.stream().filter(h -> h.note == 42 || h.note == 46).collect(Collectors.toList());
-		Spatial topCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
-				Midis2jam2.MatType.REFLECTIVE, 0.7f);
-		Spatial bottomCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp",
-				Midis2jam2.MatType.REFLECTIVE, 0.7f);
+		hitsToStrike = hits.stream().filter(h -> h.note == OPEN_HI_HAT || h.note == CLOSED_HI_HAT).collect(Collectors.toList());
+		Spatial topCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
+		Spatial bottomCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		bottomCymbalModel.setLocalRotation(new Quaternion().fromAngles(rad(180), 0, 0));
 		
 		topCymbal.setLocalTranslation(0, 1.2f, 0);
@@ -111,7 +111,7 @@ public class HiHat extends SingleStickInstrument {
 		if (recoil != null) {
 			animator.strike();
 			wholeHat.setLocalTranslation(0, (float) (-0.7 * velocityRecoilDampening(recoil.velocity)), -14);
-			if (recoil.note == 46) {
+			if (recoil.note == OPEN_HI_HAT) {
 				status = HiHatStatus.OPEN;
 				topCymbal.setLocalTranslation(0, 2, 0);
 			} else {

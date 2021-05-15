@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED;
+import static org.wysko.midis2jam2.midi.Midi.ACOUSTIC_SNARE;
+import static org.wysko.midis2jam2.midi.Midi.ELECTRIC_SNARE;
 
 /**
  * The Snare drum.
@@ -75,7 +77,8 @@ public class SnareDrum extends PercussionInstrument {
 	 */
 	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		this.regularHits = hits.stream().filter(e -> e.note == 40 || e.note == 38).collect(Collectors.toList());
+		this.regularHits =
+				hits.stream().filter(e -> e.note == ACOUSTIC_SNARE || e.note == ELECTRIC_SNARE).collect(Collectors.toList());
 		this.sideHits = hits.stream().filter(e -> e.note == 37).collect(Collectors.toList());
 		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
 		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");

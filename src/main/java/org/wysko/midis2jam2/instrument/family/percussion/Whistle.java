@@ -33,6 +33,8 @@ import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.LONG;
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.SHORT;
+import static org.wysko.midis2jam2.midi.Midi.LONG_WHISTLE;
+import static org.wysko.midis2jam2.midi.Midi.SHORT_WHISTLE;
 import static org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.UPWARDS;
 import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.NORMAL;
 import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE;
@@ -59,8 +61,8 @@ public class Whistle extends NonDrumSetPercussion {
 	protected Whistle(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		shortWhistles = hits.stream().filter(e -> e.note == 71).collect(Collectors.toList());
-		longWhistles = hits.stream().filter(e -> e.note == 72).collect(Collectors.toList());
+		shortWhistles = hits.stream().filter(e -> e.note == SHORT_WHISTLE).collect(Collectors.toList());
+		longWhistles = hits.stream().filter(e -> e.note == LONG_WHISTLE).collect(Collectors.toList());
 		
 		shortWhistle = new PercussionWhistle(SHORT);
 		longWhistle = new PercussionWhistle(LONG);
@@ -85,7 +87,7 @@ public class Whistle extends NonDrumSetPercussion {
 		
 		for (MidiNoteOnEvent nextHit : nextHits) {
 			if (nextHit != null) {
-				if (nextHit.note == 71)
+				if (nextHit.note == SHORT_WHISTLE)
 					shortWhistle.play(0.2);
 				else
 					longWhistle.play(0.4);

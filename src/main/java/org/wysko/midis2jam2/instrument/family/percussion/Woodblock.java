@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.midi.Midi.HIGH_WOODBLOCK;
+import static org.wysko.midis2jam2.midi.Midi.LOW_WOODBLOCK;
 
 /**
  * The woodblock. High and low.
@@ -76,8 +78,8 @@ public class Woodblock extends NonDrumSetPercussion {
 	                 List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		leftHits = hits.stream().filter(h -> h.note == 77).collect(Collectors.toList());
-		rightHits = hits.stream().filter(h -> h.note == 76).collect(Collectors.toList());
+		leftHits = hits.stream().filter(h -> h.note == LOW_WOODBLOCK).collect(Collectors.toList());
+		rightHits = hits.stream().filter(h -> h.note == HIGH_WOODBLOCK).collect(Collectors.toList());
 		
 		leftWoodblockAnimNode.attachChild(context.loadModel("WoodBlockHigh.obj", "SimpleWood.bmp"));
 		rightWoodblockAnimNode.attachChild(context.loadModel("WoodBlockLow.obj", "SimpleWood.bmp"));

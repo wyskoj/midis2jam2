@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.midi.Midi.HIGH_TIMBALE;
+import static org.wysko.midis2jam2.midi.Midi.LOW_TIMBALE;
 
 /**
  * The timbales.
@@ -80,8 +82,8 @@ public class Timbales extends NonDrumSetPercussion {
 	                List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		lowTimbaleHits = hits.stream().filter(h -> h.note == 66).collect(Collectors.toList());
-		highTimbaleHits = hits.stream().filter(h -> h.note == 65).collect(Collectors.toList());
+		lowTimbaleHits = hits.stream().filter(h -> h.note == LOW_TIMBALE).collect(Collectors.toList());
+		highTimbaleHits = hits.stream().filter(h -> h.note == HIGH_TIMBALE).collect(Collectors.toList());
 		
 		lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
 		highTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");

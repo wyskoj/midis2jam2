@@ -432,13 +432,12 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		// For each channel
 		for (int j = 0, channelsLength = channels.size(); j < channelsLength; j++) {
 			ArrayList<MidiChannelSpecificEvent> channelEvents = channels.get(j);
+			boolean hasANoteOn = channelEvents.stream().anyMatch(MidiNoteOnEvent.class::isInstance);
+			if (!hasANoteOn) continue; // Skip silent channels
 			if (j == 9) {
 				instruments.add(new Percussion(this, channelEvents));
 			} else {
 				// A melodic channel
-				boolean hasANoteOn = channelEvents.stream().anyMatch(MidiNoteOnEvent.class::isInstance);
-				if (!hasANoteOn) continue; // Skip silent channels
-				
 				// Collect program events
 				List<MidiProgramEvent> programEvents = channelEvents.stream()
 						.filter(MidiProgramEvent.class::isInstance)

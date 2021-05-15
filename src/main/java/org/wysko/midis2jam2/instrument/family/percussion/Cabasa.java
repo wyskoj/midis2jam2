@@ -40,7 +40,7 @@ public class Cabasa extends NonDrumSetPercussion {
 	 */
 	private final Node cabasaNode = new Node();
 	
-	private final Spatial cabasa;
+	private final Spatial cabasaModel;
 	
 	/**
 	 * Instantiates a new cabasa.
@@ -51,9 +51,9 @@ public class Cabasa extends NonDrumSetPercussion {
 	protected Cabasa(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		cabasa = context.loadModel("Cabasa.obj", "Cabasa.bmp");
-		cabasa.setLocalTranslation(0, 0, -3);
-		cabasaNode.attachChild(cabasa);
+		cabasaModel = context.loadModel("Cabasa.obj", "Cabasa.bmp");
+		cabasaModel.setLocalTranslation(0, 0, -3);
+		cabasaNode.attachChild(cabasaModel);
 		
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(45)));
 		instrumentNode.setLocalTranslation(-10, 48, -50);
@@ -64,6 +64,6 @@ public class Cabasa extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		var stickStatus = handleStick(context, cabasaNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
-		cabasa.setLocalRotation(new Quaternion().fromAngles(0, stickStatus.getRotationAngle(), 0));
+		cabasaModel.setLocalRotation(new Quaternion().fromAngles(0, stickStatus.getRotationAngle(), 0));
 	}
 }

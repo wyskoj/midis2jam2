@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.midi.Midi.*;
 
 /**
  * The Congas.
@@ -86,9 +87,9 @@ public class Congas extends NonDrumSetPercussion {
 	              List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		lowCongaHits = hits.stream().filter(h -> h.note == 64).collect(Collectors.toList());
-		highCongaHits = hits.stream().filter(h -> h.note == 63).collect(Collectors.toList());
-		mutedCongaHits = hits.stream().filter(h -> h.note == 62).collect(Collectors.toList());
+		lowCongaHits = hits.stream().filter(h -> h.note == LOW_CONGA).collect(Collectors.toList());
+		highCongaHits = hits.stream().filter(h -> h.note == OPEN_HIGH_CONGA).collect(Collectors.toList());
+		mutedCongaHits = hits.stream().filter(h -> h.note == MUTE_HIGH_CONGA).collect(Collectors.toList());
 		
 		Spatial leftConga = context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp");
 		leftConga.setLocalScale(0.92f);

@@ -142,7 +142,7 @@ public class SteamPuffer implements ParticleGenerator {
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 			}));
-			life = 0;
+			life = RANDOM.nextFloat() * 0.02f;
 			cloudNode.setLocalTranslation(0, 0, 0);
 		}
 		

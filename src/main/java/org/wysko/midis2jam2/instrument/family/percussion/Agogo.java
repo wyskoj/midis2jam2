@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick;
+import static org.wysko.midis2jam2.midi.Midi.HIGH_AGOGO;
+import static org.wysko.midis2jam2.midi.Midi.LOW_AGOGO;
 
 /**
  * The agogo.
@@ -63,8 +65,8 @@ public class Agogo extends NonDrumSetPercussion {
 	 */
 	protected Agogo(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		highHits = hits.stream().filter(a -> a.note == 67).collect(Collectors.toList());
-		lowHits = hits.stream().filter(a -> a.note == 68).collect(Collectors.toList());
+		highHits = hits.stream().filter(a -> a.note == HIGH_AGOGO).collect(Collectors.toList());
+		lowHits = hits.stream().filter(a -> a.note == LOW_AGOGO).collect(Collectors.toList());
 		
 		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");

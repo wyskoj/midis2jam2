@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.instrument.family.percussion.drumset.Cymbal.CymbalType.RIDE_1;
 import static org.wysko.midis2jam2.instrument.family.percussion.drumset.Cymbal.CymbalType.RIDE_2;
+import static org.wysko.midis2jam2.midi.Midi.*;
 
 /**
  * The Percussion.
@@ -72,55 +73,62 @@ public class Percussion extends Instrument {
 		
 		
 		instruments.add(new SnareDrum(context,
-				noteOnEvents.stream().filter(e -> e.note == 40 || e.note == 38 || e.note == 37).collect(Collectors.toList())));
+				noteOnEvents.stream().filter(e -> e.note == ACOUSTIC_SNARE || e.note == ELECTRIC_SNARE || e.note == SIDE_STICK).collect(Collectors.toList())));
 		
 		/* For some reason, the bass drum needs special attention ?? */
 		var e1 = new BassDrum(context,
-				noteOnEvents.stream().filter(e -> e.note == 35 || e.note == 36).collect(Collectors.toList()));
+				noteOnEvents.stream().filter(e -> e.note == ACOUSTIC_BASS_DRUM || e.note == ELECTRIC_BASS_DRUM).collect(Collectors.toList()));
 		var drumSetNode = new Node();
 		drumSetNode.attachChild(e1.highLevelNode);
 		instruments.add(e1);
 		
 		instruments.add(new Tom(context,
-				noteOnEvents.stream().filter(e -> e.note == 41).collect(Collectors.toList()), Tom.TomPitch.LOW_FLOOR));
+				noteOnEvents.stream().filter(e -> e.note == LOW_FLOOR_TOM).collect(Collectors.toList()), Tom.TomPitch.LOW_FLOOR));
 		
 		instruments.add(new Tom(context,
-				noteOnEvents.stream().filter(e -> e.note == 43).collect(Collectors.toList()), Tom.TomPitch.HIGH_FLOOR));
+				noteOnEvents.stream().filter(e -> e.note == HIGH_FLOOR_TOM).collect(Collectors.toList()),
+				Tom.TomPitch.HIGH_FLOOR));
 		
 		instruments.add(new Tom(context,
-				noteOnEvents.stream().filter(e -> e.note == 45).collect(Collectors.toList()), Tom.TomPitch.LOW));
+				noteOnEvents.stream().filter(e -> e.note == LOW_TOM).collect(Collectors.toList()), Tom.TomPitch.LOW));
 		
 		instruments.add(new Tom(context,
-				noteOnEvents.stream().filter(e -> e.note == 47).collect(Collectors.toList()), Tom.TomPitch.LOW_MID));
+				noteOnEvents.stream().filter(e -> e.note == LOW_MID_TOM).collect(Collectors.toList()), Tom.TomPitch.LOW_MID));
 		
 		instruments.add(new Tom(context,
-				noteOnEvents.stream().filter(e -> e.note == 48).collect(Collectors.toList()), Tom.TomPitch.HIGH_MID));
+				noteOnEvents.stream().filter(e -> e.note == HI_MID_TOM).collect(Collectors.toList()),
+				Tom.TomPitch.HIGH_MID));
 		
 		instruments.add(new Tom(context,
-				noteOnEvents.stream().filter(e -> e.note == 50).collect(Collectors.toList()), Tom.TomPitch.HIGH));
+				noteOnEvents.stream().filter(e -> e.note == HIGH_TOM).collect(Collectors.toList()), Tom.TomPitch.HIGH));
 		
 		instruments.add(new Cymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 49).collect(Collectors.toList()), Cymbal.CymbalType.CRASH_1));
+				noteOnEvents.stream().filter(e -> e.note == CRASH_CYMBAL_1).collect(Collectors.toList()),
+				Cymbal.CymbalType.CRASH_1));
 		
 		instruments.add(new Cymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 57).collect(Collectors.toList()), Cymbal.CymbalType.CRASH_2));
+				noteOnEvents.stream().filter(e -> e.note == CRASH_CYMBAL_2).collect(Collectors.toList()),
+				Cymbal.CymbalType.CRASH_2));
 		
 		instruments.add(new Cymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 55).collect(Collectors.toList()), Cymbal.CymbalType.SPLASH));
+				noteOnEvents.stream().filter(e -> e.note == SPLASH_CYMBAL).collect(Collectors.toList()),
+				Cymbal.CymbalType.SPLASH));
 		
 		instruments.add(new Cymbal(context,
-				noteOnEvents.stream().filter(e -> e.note == 52).collect(Collectors.toList()), Cymbal.CymbalType.CHINA));
+				noteOnEvents.stream().filter(e -> e.note == CHINESE_CYMBAL).collect(Collectors.toList()),
+				Cymbal.CymbalType.CHINA));
 		
 		// CALCULATE RIDE CYMBAL NOTES
-		var allRideNotes = noteOnEvents.stream().filter(e -> e.note == 51 || e.note == 59 || e.note == 53).collect(Collectors.toList());
+		var allRideNotes =
+				noteOnEvents.stream().filter(e -> e.note == RIDE_CYMBAL_1 || e.note == RIDE_CYMBAL_2 || e.note == RIDE_BELL).collect(Collectors.toList());
 		var currentRideCymbal = RIDE_1;
 		List<MidiNoteOnEvent> ride1Notes = new ArrayList<>();
 		List<MidiNoteOnEvent> ride2Notes = new ArrayList<>();
 		for (MidiNoteOnEvent note : allRideNotes) {
-			if (note.note == 51) {
+			if (note.note == RIDE_CYMBAL_1) {
 				ride1Notes.add(note);
 				currentRideCymbal = RIDE_1;
-			} else if (note.note == 59) {
+			} else if (note.note == RIDE_CYMBAL_2) {
 				ride2Notes.add(note);
 				currentRideCymbal = RIDE_2;
 			} else {
@@ -139,72 +147,92 @@ public class Percussion extends Instrument {
 				ride2Notes, RIDE_2));
 		
 		instruments.add(new HiHat(context,
-				noteOnEvents.stream().filter(e -> e.note == 42 || e.note == 44 || e.note == 46).collect(Collectors.toList())));
+				noteOnEvents.stream().filter(e -> e.note == CLOSED_HI_HAT || e.note == OPEN_HI_HAT || e.note == PEDAL_HI_HAT).collect(Collectors.toList())));
 		
-		instruments.add(new Congas(context,
-				noteOnEvents.stream().filter(e -> e.note <= 64 && e.note >= 62).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == LOW_CONGA || e.note == MUTE_HIGH_CONGA || e.note == OPEN_HIGH_CONGA))
+			instruments.add(new Congas(context, noteOnEvents.stream().filter(e -> e.note == LOW_CONGA || e.note == MUTE_HIGH_CONGA || e.note == OPEN_HIGH_CONGA).collect(Collectors.toList())));
 		
-		instruments.add(new Cowbell(context,
-				noteOnEvents.stream().filter(e -> e.note == 56).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == COWBELL))
+			instruments.add(new Cowbell(context,
+					noteOnEvents.stream().filter(e -> e.note == COWBELL).collect(Collectors.toList())));
 		
-		instruments.add(new Timbales(context,
-				noteOnEvents.stream().filter(e -> e.note == 65 || e.note == 66).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == LOW_TIMBALE || e.note == HIGH_TIMBALE))
+			instruments.add(new Timbales(context,
+					noteOnEvents.stream().filter(e -> e.note == LOW_TIMBALE || e.note == HIGH_TIMBALE).collect(Collectors.toList())));
 		
-		instruments.add(new Bongos(context,
-				noteOnEvents.stream().filter(e -> e.note == 61 || e.note == 60).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == LOW_BONGO || e.note == HIGH_BONGO))
+			instruments.add(new Bongos(context,
+					noteOnEvents.stream().filter(e -> e.note == LOW_BONGO || e.note == HIGH_BONGO).collect(Collectors.toList())));
 		
-		instruments.add(new Tambourine(context,
-				noteOnEvents.stream().filter(e -> e.note == 54).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == TAMBOURINE))
+			instruments.add(new Tambourine(context,
+					noteOnEvents.stream().filter(e -> e.note == TAMBOURINE).collect(Collectors.toList())));
 		
-		instruments.add(new HandClap(context,
-				noteOnEvents.stream().filter(e -> e.note == 39).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == HAND_CLAP))
+			instruments.add(new HandClap(context,
+					noteOnEvents.stream().filter(e -> e.note == HAND_CLAP).collect(Collectors.toList())));
 		
-		instruments.add(new Sticks(context,
-				noteOnEvents.stream().filter(e -> e.note == 31).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == STICKS))
+			instruments.add(new Sticks(context,
+					noteOnEvents.stream().filter(e -> e.note == STICKS).collect(Collectors.toList())));
 		
-		instruments.add(new JingleBells(context,
-				noteOnEvents.stream().filter(e -> e.note == 83).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == JINGLE_BELL))
+			instruments.add(new JingleBells(context,
+					noteOnEvents.stream().filter(e -> e.note == JINGLE_BELL).collect(Collectors.toList())));
 		
-		instruments.add(new Castanets(context,
-				noteOnEvents.stream().filter(e -> e.note == 85).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == CASTANETS))
+			instruments.add(new Castanets(context,
+					noteOnEvents.stream().filter(e -> e.note == CASTANETS).collect(Collectors.toList())));
 		
-		instruments.add(new HighQ(context,
-				noteOnEvents.stream().filter(e -> e.note == 27).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == HIGH_Q))
+			instruments.add(new HighQ(context,
+					noteOnEvents.stream().filter(e -> e.note == HIGH_Q).collect(Collectors.toList())));
 		
-		instruments.add(new Woodblock(context,
-				noteOnEvents.stream().filter(e -> e.note == 77 || e.note == 76).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == LOW_WOODBLOCK || e.note == HIGH_WOODBLOCK))
+			instruments.add(new Woodblock(context,
+					noteOnEvents.stream().filter(e -> e.note == LOW_WOODBLOCK || e.note == HIGH_WOODBLOCK).collect(Collectors.toList())));
 		
-		instruments.add(new Agogo(context,
-				noteOnEvents.stream().filter(e -> e.note == 67 || e.note == 68).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == LOW_AGOGO || e.note == HIGH_AGOGO))
+			instruments.add(new Agogo(context,
+					noteOnEvents.stream().filter(e -> e.note == LOW_AGOGO || e.note == HIGH_AGOGO).collect(Collectors.toList())));
 		
-		instruments.add(new Shaker(context,
-				noteOnEvents.stream().filter(e -> e.note == 82).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == SHAKER))
+			instruments.add(new Shaker(context,
+					noteOnEvents.stream().filter(e -> e.note == SHAKER).collect(Collectors.toList())));
 		
-		instruments.add(new Cabasa(context,
-				noteOnEvents.stream().filter(e -> e.note == 69).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == CABASA))
+			instruments.add(new Cabasa(context,
+					noteOnEvents.stream().filter(e -> e.note == CABASA).collect(Collectors.toList())));
 		
-		instruments.add(new Maracas(context,
-				noteOnEvents.stream().filter(e -> e.note == 70).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == MARACAS))
+			instruments.add(new Maracas(context,
+					noteOnEvents.stream().filter(e -> e.note == MARACAS).collect(Collectors.toList())));
 		
-		instruments.add(new Claves(context,
-				noteOnEvents.stream().filter(e -> e.note == 75).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == CLAVES))
+			instruments.add(new Claves(context,
+					noteOnEvents.stream().filter(e -> e.note == CLAVES).collect(Collectors.toList())));
 		
-		instruments.add(new Triangle(context,
-				noteOnEvents.stream().filter(e -> e.note == 81).collect(Collectors.toList()),
-				Triangle.TriangleType.OPEN));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == OPEN_TRIANGLE))
+			instruments.add(new Triangle(context,
+					noteOnEvents.stream().filter(e -> e.note == OPEN_TRIANGLE).collect(Collectors.toList()),
+					Triangle.TriangleType.OPEN));
 		
-		instruments.add(new Triangle(context,
-				noteOnEvents.stream().filter(e -> e.note == 80).collect(Collectors.toList()),
-				Triangle.TriangleType.MUTED));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == MUTE_TRIANGLE))
+			instruments.add(new Triangle(context,
+					noteOnEvents.stream().filter(e -> e.note == MUTE_TRIANGLE).collect(Collectors.toList()),
+					Triangle.TriangleType.MUTED));
 		
-		instruments.add(new SquareClick(context,
-				noteOnEvents.stream().filter(e -> e.note == 32).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == SQUARE_CLICK))
+			instruments.add(new SquareClick(context,
+					noteOnEvents.stream().filter(e -> e.note == SQUARE_CLICK).collect(Collectors.toList())));
 		
-		instruments.add(new Metronome(context,
-				noteOnEvents.stream().filter(e -> e.note == 33 || e.note == 34).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == METRONOME_BELL || e.note == METRONOME_CLICK))
+			instruments.add(new Metronome(context,
+					noteOnEvents.stream().filter(e -> e.note == METRONOME_BELL || e.note == METRONOME_CLICK).collect(Collectors.toList())));
 		
-		instruments.add(new Whistle(context,
-				noteOnEvents.stream().filter(e -> e.note == 71 || e.note == 72).collect(Collectors.toList())));
+		if (noteOnEvents.stream().anyMatch(e -> e.note == SHORT_WHISTLE || e.note == LONG_WHISTLE))
+			instruments.add(new Whistle(context,
+					noteOnEvents.stream().filter(e -> e.note == SHORT_WHISTLE || e.note == LONG_WHISTLE).collect(Collectors.toList())));
 		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {

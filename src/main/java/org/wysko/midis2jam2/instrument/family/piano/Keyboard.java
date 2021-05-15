@@ -130,21 +130,17 @@ public class Keyboard extends KeyedInstrument {
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
 				/* UP KEY */
 				// Front key
-				Spatial upKeyFront = Keyboard.this.context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+				Spatial upKeyFront = Keyboard.this.context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile);
 				// Back Key
-				Spatial upKeyBack = Keyboard.this.context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+				Spatial upKeyBack = Keyboard.this.context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile);
 				
 				upNode.attachChild(upKeyFront);
 				upNode.attachChild(upKeyBack);
 				/* DOWN KEY */
 				// Front key
-				Spatial downKeyFront = Keyboard.this.context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+				Spatial downKeyFront = Keyboard.this.context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile);
 				// Back key
-				Spatial downKeyBack = Keyboard.this.context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+				Spatial downKeyBack = Keyboard.this.context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile);
 				downNode.attachChild(downKeyFront);
 				downNode.attachChild(downKeyBack);
 				
