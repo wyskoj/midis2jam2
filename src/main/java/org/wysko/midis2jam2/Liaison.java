@@ -41,6 +41,31 @@ public class Liaison extends SimpleApplication {
 	
 	private final boolean fullscreen;
 	
+	private static final AppSettings midis2Jam2Settings = new AppSettings(true);
+	
+	static {
+		// Set settings
+		midis2Jam2Settings.setFrameRate(120);
+		midis2Jam2Settings.setTitle("midis2jam2");
+		midis2Jam2Settings.setFrequency(60);
+		try {
+			var icons = new BufferedImage[]{
+					read(requireNonNull(Liaison.class.getResource("/ico/icon16.png"))),
+					read(requireNonNull(Liaison.class.getResource("/ico/icon32.png"))),
+					read(requireNonNull(Liaison.class.getResource("/ico/icon128.png"))),
+					read(requireNonNull(Liaison.class.getResource("/ico/icon256.png")))
+			};
+			midis2Jam2Settings.setIcons(icons);
+		} catch (IOException e) {
+			Midis2jam2.logger.warning("Failed to set window icon.");
+			e.printStackTrace();
+		}
+		midis2Jam2Settings.setVSync(true);
+		midis2Jam2Settings.setResizable(true);
+		midis2Jam2Settings.setSamples(4);
+		midis2Jam2Settings.setGammaCorrection(true);
+	}
+	
 	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings,
 	               boolean fullscreen) {
 		this.sequencer = sequencer;
@@ -52,35 +77,17 @@ public class Liaison extends SimpleApplication {
 	
 	@Override
 	public void start() {
-		var settings = new AppSettings(true);
-		// Set settings
-		settings.setFrameRate(120);
-		settings.setTitle("midis2jam2");
-		try {
-			var icons = new BufferedImage[]{
-					read(requireNonNull(getClass().getResource("/ico/icon16.png"))),
-					read(requireNonNull(getClass().getResource("/ico/icon32.png"))),
-					read(requireNonNull(getClass().getResource("/ico/icon128.png"))),
-					read(requireNonNull(getClass().getResource("/ico/icon256.png")))
-			};
-			settings.setIcons(icons);
-		} catch (IOException e) {
-			Midis2jam2.logger.warning("Failed to set window icon.");
-			e.printStackTrace();
-		}
 		var dim = Toolkit.getDefaultToolkit().getScreenSize();
 		if (fullscreen) {
-			settings.setFullscreen(true);
-			settings.setResolution(dim.width, dim.height);
+			midis2Jam2Settings.setFullscreen(true);
+			midis2Jam2Settings.setResolution(dim.width, dim.height);
 		} else {
-			settings.setFullscreen(false);
-			settings.setResolution((int) (dim.width * 0.95), (int) (dim.height * 0.85));
+			midis2Jam2Settings.setFullscreen(false);
+			midis2Jam2Settings.setResolution((int) (dim.width * 0.95), (int) (dim.height * 0.85));
 		}
-		settings.setVSync(true);
-		settings.setResizable(true);
-		settings.setSamples(4);
-		settings.setGammaCorrection(true);
-		setSettings(settings);
+		midis2Jam2Settings.setResizable(true);
+		
+		setSettings(midis2Jam2Settings);
 		setDisplayStatView(false);
 		setDisplayFps(false);
 		setPauseOnLostFocus(false);

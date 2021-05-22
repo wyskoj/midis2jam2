@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.midi;
 
-import com.sun.media.sound.StandardMidiFileReader;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sound.midi.InvalidMidiDataException;

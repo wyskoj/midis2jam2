@@ -20,6 +20,9 @@ package org.wysko.midis2jam2.midi;
 @SuppressWarnings("unused")
 public class Midi {
 	
+	private Midi() {
+	}
+	
 	public static final int HIGH_Q = 27;
 	public static final int SLAP = 28;
 	public static final int SCRATCH_PUSH = 29;
