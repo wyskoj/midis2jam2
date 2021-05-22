@@ -199,7 +199,7 @@ public abstract class Instrument {
 		var transitionSpeed = context.settings.getTransitionSpeed();
 		
 		if (transitionSpeed != NONE) {
-			double animationCoefficient = transitionSpeed.speed;
+			double animationCoefficient = transitionSpeed.getSpeed();
 			index += ((delta * 2500) * (target - index)) / (animationCoefficient);
 			return (float) index;
 		} else {

@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.FILES_ONLY;
@@ -162,6 +163,7 @@ public class SoundFontList extends JPanel {
 	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		ResourceBundle bundle = ResourceBundle.getBundle("i18n.soundfontlist");
 		dialogPane = new JPanel();
 		buttonBar = new JPanel();
 		okButton = new JButton();
@@ -186,15 +188,15 @@ public class SoundFontList extends JPanel {
 			{
 				buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
 				buttonBar.setLayout(new GridBagLayout());
-				((GridBagLayout)buttonBar.getLayout()).columnWidths = new int[] {0, 85, 80};
-				((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0};
-
+				((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[]{0, 85, 80};
+				((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[]{1.0, 0.0, 0.0};
+				
 				//---- okButton ----
-				okButton.setText("OK");
+				okButton.setText(bundle.getString("SoundFontList.okButton.text"));
 				okButton.addActionListener(e -> okButtonActionPerformed(e));
 				buttonBar.add(okButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			dialogPane.add(buttonBar, BorderLayout.SOUTH);
 
@@ -207,38 +209,42 @@ public class SoundFontList extends JPanel {
 			//======== panel1 ========
 			{
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
-				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
-				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-
+				((GridBagLayout) panel1.getLayout()).columnWidths = new int[]{0, 0};
+				((GridBagLayout) panel1.getLayout()).rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+				((GridBagLayout) panel1.getLayout()).columnWeights = new double[]{1.0, 1.0E-4};
+				((GridBagLayout) panel1.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+				
 				//---- addButton ----
 				addButton.setIcon(new ImageIcon(getClass().getResource("/add.png")));
+				addButton.setToolTipText(bundle.getString("SoundFontList.addSoundFont"));
 				addButton.addActionListener(e -> addButtonActionPerformed(e));
 				panel1.add(addButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
-
+						GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+						new Insets(0, 0, 0, 0), 0, 0));
+				
 				//---- removeButton ----
 				removeButton.setIcon(new ImageIcon(getClass().getResource("/remove.png")));
+				removeButton.setToolTipText(bundle.getString("SoundFontList.removeSoundFont"));
 				removeButton.addActionListener(e -> removeButtonActionPerformed(e));
 				panel1.add(removeButton, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
-
+						GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+						new Insets(0, 0, 0, 0), 0, 0));
+				
 				//---- upButton ----
 				upButton.setIcon(new ImageIcon(getClass().getResource("/up.png")));
+				upButton.setToolTipText(bundle.getString("SoundFontList.moveUp"));
 				upButton.addActionListener(e -> upButtonActionPerformed(e));
 				panel1.add(upButton, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-					GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
-
+						GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+						new Insets(0, 0, 0, 0), 0, 0));
+				
 				//---- downButton ----
 				downButton.setIcon(new ImageIcon(getClass().getResource("/down.png")));
+				downButton.setToolTipText(bundle.getString("SoundFontList.moveDown"));
 				downButton.addActionListener(e -> downButtonActionPerformed(e));
 				panel1.add(downButton, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
-					GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
+						GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			dialogPane.add(panel1, BorderLayout.EAST);
 		}

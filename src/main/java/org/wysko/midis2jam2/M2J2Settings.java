@@ -36,13 +36,18 @@ public class M2J2Settings {
 		return transitionSpeed;
 	}
 	
+	@SuppressWarnings("unused")
 	public enum InstrumentTransition {
 		NONE(0), FAST(200), NORMAL(500), SLOW(1000);
 		
-		public double speed;
+		private final double speed;
 		
 		InstrumentTransition(double speed) {
 			this.speed = speed;
+		}
+		
+		public double getSpeed() {
+			return speed;
 		}
 	}
 }

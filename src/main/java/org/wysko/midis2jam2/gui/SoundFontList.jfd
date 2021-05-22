@@ -1,6 +1,9 @@
-JFDML JFormDesigner: "7.0.2.4.305" Java: "11.0.10" encoding: "UTF-8"
+JFDML JFormDesigner: "7.0.4.0.355" Java: "11.0.10" encoding: "UTF-8"
 
 new FormModel {
+	"i18n.bundlePackage": "i18n"
+	"i18n.bundleName": "soundfontlist"
+	"i18n.keyPrefix": "SoundFontList"
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
@@ -18,7 +21,7 @@ new FormModel {
 					"border": new javax.swing.border.EmptyBorder( 12, 0, 0, 0 )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "okButton"
-						"text": "OK"
+						"text": new FormMessage( null, "SoundFontList.okButton.text" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "okButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 2
@@ -48,11 +51,13 @@ new FormModel {
 					add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 						name: "addButton"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/add.png" )
+						"toolTipText": new FormMessage( null, "SoundFontList.addSoundFont" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "addButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 					add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 						name: "removeButton"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/remove.png" )
+						"toolTipText": new FormMessage( null, "SoundFontList.removeSoundFont" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "removeButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 2
@@ -60,6 +65,7 @@ new FormModel {
 					add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 						name: "upButton"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/up.png" )
+						"toolTipText": new FormMessage( null, "SoundFontList.moveUp" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "upButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 4
@@ -67,6 +73,7 @@ new FormModel {
 					add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 						name: "downButton"
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/down.png" )
+						"toolTipText": new FormMessage( null, "SoundFontList.moveDown" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "downButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 6
