@@ -4,6 +4,7 @@
 
 package org.wysko.midis2jam2;
 
+import java.util.*;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -55,7 +56,7 @@ public class GuiLauncher extends JFrame {
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
 		var guiLauncher = new GuiLauncher();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		guiLauncher.setSize(new Dimension(535, 520));
+		guiLauncher.setSize(new Dimension(590, 520));
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
 		guiLauncher.setVisible(true);
 		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -72,9 +73,12 @@ public class GuiLauncher extends JFrame {
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		
 		// Set version number
-		String version = new BufferedReader(new InputStreamReader(requireNonNull(GuiLauncher.class.getResourceAsStream("/version.txt")))).lines().collect(Collectors.joining("\n"));
-		guiLauncher.versionText.setText(version);
-		
+		try {
+			String version = new BufferedReader(new InputStreamReader(requireNonNull(GuiLauncher.class.getResourceAsStream("/version.txt")))).lines().collect(Collectors.joining("\n"));
+			guiLauncher.versionText.setText(version);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		// Check for updates
 		EventQueue.invokeLater(() -> {
 			try {
@@ -247,14 +251,14 @@ public class GuiLauncher extends JFrame {
 	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
 		if (((MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem())).getName().equals("Gervill")) {
-			soundfontLabel.setEnabled(true);
+			soundFontLabel.setEnabled(true);
 			soundFontPathDropDown.setEnabled(true);
-			loadSoundFontButton.setEnabled(true);
+			editSoundFontsButton.setEnabled(true);
 			latencySpinner.setValue(100);
 		} else {
-			soundfontLabel.setEnabled(false);
+			soundFontLabel.setEnabled(false);
 			soundFontPathDropDown.setEnabled(false);
-			loadSoundFontButton.setEnabled(false);
+			editSoundFontsButton.setEnabled(false);
 			latencySpinner.setValue(0);
 		}
 		
@@ -398,323 +402,324 @@ public class GuiLauncher extends JFrame {
 	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		ResourceBundle bundle = ResourceBundle.getBundle("i18n.guilauncher");
 		logo = new JLabel();
-		panel1 = new JPanel();
-		label1 = new JLabel();
+		configurationPanel = new JPanel();
+		midiFileLabel = new JLabel();
 		midiFilePathTextField = new JTextField();
 		loadMidiFileButton = new JResizedIconButton();
-		label3 = new JLabel();
-		label2 = new JLabel();
+		midiFileHelp = new JLabel();
+		midiDeviceLabel = new JLabel();
 		midiDeviceDropDown = new JComboBox<>();
-		label5 = new JLabel();
-		soundfontLabel = new JLabel();
+		midiDeviceHelp = new JLabel();
+		soundFontLabel = new JLabel();
 		soundFontPathDropDown = new JComboBox<>();
 		soundFontPathDropDown.setRenderer(new SoundFontListCellRenderer());
-		loadSoundFontButton = new JResizedIconButton();
-		label6 = new JLabel();
-		panel2 = new JPanel();
+		editSoundFontsButton = new JResizedIconButton();
+		soundFontHelp = new JLabel();
+		settingsPanel = new JPanel();
 		hSpacer1 = new JPanel(null);
-		label4 = new JLabel();
+		latencyFixLabel = new JLabel();
 		latencySpinner = new JSpinner();
 		hSpacer2 = new JPanel(null);
-		label7 = new JLabel();
-		label11 = new JLabel();
+		latencyHelp = new JLabel();
+		displayLabel = new JLabel();
 		fullscreenCheckbox = new JCheckBox();
-		label8 = new JLabel();
-		label9 = new JLabel();
+		fullscreenHelp = new JLabel();
+		transitionSpeedLabel = new JLabel();
 		transitionSpeedPanel = new JPanel();
 		transitionSpeedNoneButton = new JRadioButton();
 		transitionSpeedSlowButton = new JRadioButton();
 		transitionSpeedNormalButton = new JRadioButton();
 		transitionSpeedFastButton = new JRadioButton();
-		label10 = new JLabel();
+		transitionSpeedHelp = new JLabel();
 		startButton = new JResizedIconButton();
 		versionText = new JLabel();
-		
+
 		//======== this ========
-		setTitle("midis2jam2");
+		setTitle(bundle.getString("GuiLauncher.this.title"));
 		setIconImage(new ImageIcon(getClass().getResource("/ico/icon16.png")).getImage());
 		setResizable(false);
 		var contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
-		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0};
-		((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{132, 145, 77, 0, 0, 0};
-		((GridBagLayout) contentPane.getLayout()).columnWeights = new double[]{1.0, 1.0E-4};
-		((GridBagLayout) contentPane.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-		
+		((GridBagLayout)contentPane.getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)contentPane.getLayout()).rowHeights = new int[] {132, 145, 77, 0, 0, 0};
+		((GridBagLayout)contentPane.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)contentPane.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+
 		//---- logo ----
 		logo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
 		logo.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(logo, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(10, 0, 5, 0), 0, 0));
-		
-		//======== panel1 ========
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(10, 0, 5, 0), 0, 0));
+
+		//======== configurationPanel ========
 		{
-			panel1.setBorder(new TitledBorder(null, "Configuration", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
-			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[]{109, 141, 92, 0, 0};
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[]{0, 0, 9, 0, 0};
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			
-			//---- label1 ----
-			label1.setText("MIDI File:");
-			label1.setHorizontalAlignment(SwingConstants.RIGHT);
-			label1.setLabelFor(midiFilePathTextField);
-			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			configurationPanel.setBorder(new TitledBorder(null, bundle.getString("GuiLauncher.configurationPanel.border"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+			configurationPanel.setLayout(new GridBagLayout());
+			((GridBagLayout)configurationPanel.getLayout()).columnWidths = new int[] {109, 141, 92, 0, 0};
+			((GridBagLayout)configurationPanel.getLayout()).rowHeights = new int[] {0, 0, 9, 0, 0};
+			((GridBagLayout)configurationPanel.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)configurationPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+
+			//---- midiFileLabel ----
+			midiFileLabel.setText(bundle.getString("GuiLauncher.midiFileLabel.text"));
+			midiFileLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			midiFileLabel.setLabelFor(midiFilePathTextField);
+			configurationPanel.add(midiFileLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiFilePathTextField ----
 			midiFilePathTextField.setEditable(false);
-			panel1.add(midiFilePathTextField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			configurationPanel.add(midiFilePathTextField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- loadMidiFileButton ----
-			loadMidiFileButton.setText("Load...");
+			loadMidiFileButton.setText(bundle.getString("GuiLauncher.loadMidiFileButton.text"));
 			loadMidiFileButton.setIcon(new ImageIcon(getClass().getResource("/open.png")));
 			loadMidiFileButton.addActionListener(e -> loadMidiFileButtonActionPerformed(e));
-			panel1.add(loadMidiFileButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label3 ----
-			label3.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label3.setToolTipText("Press \"Load...\" to select a MIDI file to play.");
-			panel1.add(label3, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label2 ----
-			label2.setText("MIDI Device:");
-			label2.setHorizontalAlignment(SwingConstants.RIGHT);
-			label2.setLabelFor(midiDeviceDropDown);
-			panel1.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			configurationPanel.add(loadMidiFileButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- midiFileHelp ----
+			midiFileHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			midiFileHelp.setToolTipText(bundle.getString("GuiLauncher.midiFileHelp.toolTipText"));
+			configurationPanel.add(midiFileHelp, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- midiDeviceLabel ----
+			midiDeviceLabel.setText(bundle.getString("GuiLauncher.midiDeviceLabel.text"));
+			midiDeviceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			midiDeviceLabel.setLabelFor(midiDeviceDropDown);
+			configurationPanel.add(midiDeviceLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiDeviceDropDown ----
 			midiDeviceDropDown.addActionListener(e -> midiDeviceDropDownActionPerformed(e));
-			panel1.add(midiDeviceDropDown, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label5 ----
-			label5.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label5.setToolTipText("This dropdown shows a list of active MIDI devices available on your\ncomputer. Gervill is the default Java MIDI synthesizer and can play\nwith SoundFonts.");
-			panel1.add(label5, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- soundfontLabel ----
-			soundfontLabel.setText("SoundFont:");
-			soundfontLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-			soundfontLabel.setLabelFor(soundFontPathDropDown);
-			panel1.add(soundfontLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			configurationPanel.add(midiDeviceDropDown, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- midiDeviceHelp ----
+			midiDeviceHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			midiDeviceHelp.setToolTipText(bundle.getString("GuiLauncher.midiDeviceHelp.toolTipText"));
+			configurationPanel.add(midiDeviceHelp, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- soundFontLabel ----
+			soundFontLabel.setText(bundle.getString("GuiLauncher.soundFontLabel.text"));
+			soundFontLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			soundFontLabel.setLabelFor(soundFontPathDropDown);
+			configurationPanel.add(soundFontLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- soundFontPathDropDown ----
 			soundFontPathDropDown.setEditable(false);
-			panel1.add(soundFontPathDropDown, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- loadSoundFontButton ----
-			loadSoundFontButton.setText("Edit...");
-			loadSoundFontButton.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
-			loadSoundFontButton.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
-			panel1.add(loadSoundFontButton, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label6 ----
-			label6.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label6.setToolTipText("Press \"Edit...\" to edit the list of SoundFonts available to use. To \nplay a MIDI file with a SoundFont, ensure Gervill is the currently\nenabled MIDI device.");
-			panel1.add(label6, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-		}
-		contentPane.add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			configurationPanel.add(soundFontPathDropDown, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 10, 5), 0, 0));
-		
-		//======== panel2 ========
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- editSoundFontsButton ----
+			editSoundFontsButton.setText(bundle.getString("GuiLauncher.editSoundFontsButton.text"));
+			editSoundFontsButton.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
+			editSoundFontsButton.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
+			configurationPanel.add(editSoundFontsButton, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- soundFontHelp ----
+			soundFontHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			soundFontHelp.setToolTipText(bundle.getString("GuiLauncher.soundFontHelp.toolTipText"));
+			configurationPanel.add(soundFontHelp, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+		}
+		contentPane.add(configurationPanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 10, 5), 0, 0));
+
+		//======== settingsPanel ========
 		{
-			panel2.setBorder(new TitledBorder(null, "Settings", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
-			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[]{0, 27, 0, 0, 0, 0};
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[]{0, 0, 0, 6, 0};
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			panel2.add(hSpacer1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label4 ----
-			label4.setText("Latency fix (in milliseconds):");
-			label4.setLabelFor(latencySpinner);
-			panel2.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			settingsPanel.setBorder(new TitledBorder(null, bundle.getString("GuiLauncher.settingsPanel.border"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+			settingsPanel.setLayout(new GridBagLayout());
+			((GridBagLayout)settingsPanel.getLayout()).columnWidths = new int[] {0, 27, 0, 0, 0, 0};
+			((GridBagLayout)settingsPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 6, 0};
+			((GridBagLayout)settingsPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)settingsPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			settingsPanel.add(hSpacer1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- latencyFixLabel ----
+			latencyFixLabel.setText(bundle.getString("GuiLauncher.latencyFixLabel.text"));
+			latencyFixLabel.setLabelFor(latencySpinner);
+			settingsPanel.add(latencyFixLabel, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- latencySpinner ----
 			latencySpinner.setModel(new SpinnerNumberModel(100, null, null, 1));
-			panel2.add(latencySpinner, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			panel2.add(hSpacer2, new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label7 ----
-			label7.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label7.setToolTipText("The audio and video may be out of sync. Adjust this number to align\nthem. Gervill tends to need a value of 100.");
-			panel2.add(label7, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label11 ----
-			label11.setText("Display:");
-			panel2.add(label11, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			settingsPanel.add(latencySpinner, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+			settingsPanel.add(hSpacer2, new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- latencyHelp ----
+			latencyHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			latencyHelp.setToolTipText(bundle.getString("GuiLauncher.latencyHelp.toolTipText"));
+			settingsPanel.add(latencyHelp, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- displayLabel ----
+			displayLabel.setText(bundle.getString("GuiLauncher.displayLabel.text"));
+			settingsPanel.add(displayLabel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- fullscreenCheckbox ----
-			fullscreenCheckbox.setText("Fullscreen");
+			fullscreenCheckbox.setText(bundle.getString("GuiLauncher.fullscreenCheckbox.text"));
 			fullscreenCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
-			panel2.add(fullscreenCheckbox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label8 ----
-			label8.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label8.setToolTipText("When checked, midis2jam2 will run in fullscreen at your monitor's resolution.\nOtherwise, midis2jam2 will run in windowed mode at 90% resolution.");
-			panel2.add(label8, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label9 ----
-			label9.setText("Transition speed:");
-			panel2.add(label9, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			settingsPanel.add(fullscreenCheckbox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- fullscreenHelp ----
+			fullscreenHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			fullscreenHelp.setToolTipText(bundle.getString("GuiLauncher.fullscreenHelp.toolTipText"));
+			settingsPanel.add(fullscreenHelp, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- transitionSpeedLabel ----
+			transitionSpeedLabel.setText(bundle.getString("GuiLauncher.transitionSpeedLabel.text"));
+			settingsPanel.add(transitionSpeedLabel, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//======== transitionSpeedPanel ========
 			{
 				transitionSpeedPanel.setLayout(new GridBagLayout());
-				((GridBagLayout) transitionSpeedPanel.getLayout()).columnWidths = new int[]{0, 0, 0};
-				((GridBagLayout) transitionSpeedPanel.getLayout()).rowHeights = new int[]{0, 0, 0};
-				((GridBagLayout) transitionSpeedPanel.getLayout()).columnWeights = new double[]{0.0, 0.0, 1.0E-4};
-				((GridBagLayout) transitionSpeedPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 1.0E-4};
-				
+				((GridBagLayout)transitionSpeedPanel.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)transitionSpeedPanel.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)transitionSpeedPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)transitionSpeedPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+
 				//---- transitionSpeedNoneButton ----
-				transitionSpeedNoneButton.setText("None");
+				transitionSpeedNoneButton.setText(bundle.getString("GuiLauncher.transitionSpeedNoneButton.text"));
 				transitionSpeedNoneButton.setName("NONE");
 				transitionSpeedNoneButton.addActionListener(e -> saveIni(e));
 				transitionSpeedPanel.add(transitionSpeedNoneButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-				
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+
 				//---- transitionSpeedSlowButton ----
-				transitionSpeedSlowButton.setText("Slow");
+				transitionSpeedSlowButton.setText(bundle.getString("GuiLauncher.transitionSpeedSlowButton.text"));
 				transitionSpeedSlowButton.setName("SLOW");
 				transitionSpeedSlowButton.addActionListener(e -> saveIni(e));
 				transitionSpeedPanel.add(transitionSpeedSlowButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
-				
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+
 				//---- transitionSpeedNormalButton ----
-				transitionSpeedNormalButton.setText("Normal");
+				transitionSpeedNormalButton.setText(bundle.getString("GuiLauncher.transitionSpeedNormalButton.text"));
 				transitionSpeedNormalButton.setSelected(true);
 				transitionSpeedNormalButton.setName("NORMAL");
 				transitionSpeedNormalButton.addActionListener(e -> saveIni(e));
 				transitionSpeedPanel.add(transitionSpeedNormalButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
-				
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
 				//---- transitionSpeedFastButton ----
-				transitionSpeedFastButton.setText("Fast");
+				transitionSpeedFastButton.setText(bundle.getString("GuiLauncher.transitionSpeedFastButton.text"));
 				transitionSpeedFastButton.setName("FAST");
 				transitionSpeedFastButton.addActionListener(e -> saveIni(e));
 				transitionSpeedPanel.add(transitionSpeedFastButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
-			}
-			panel2.add(transitionSpeedPanel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
-			//---- label10 ----
-			label10.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			label10.setToolTipText("When instruments spawn, or one despawns in a stack of instruments,\ninstruments can gradually move instead of snapping.");
-			panel2.add(label10, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-		}
-		contentPane.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			settingsPanel.add(transitionSpeedPanel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- transitionSpeedHelp ----
+			transitionSpeedHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			transitionSpeedHelp.setToolTipText(bundle.getString("GuiLauncher.transitionSpeedHelp.toolTipText"));
+			settingsPanel.add(transitionSpeedHelp, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 10, 5), 0, 0));
-		
+				new Insets(0, 0, 5, 5), 0, 0));
+		}
+		contentPane.add(settingsPanel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 10, 5), 0, 0));
+
 		//---- startButton ----
-		startButton.setText("Start!");
+		startButton.setText(bundle.getString("GuiLauncher.startButton.text"));
 		startButton.setFont(new Font("Segoe UI", Font.ITALIC, 16));
 		startButton.setIcon(new ImageIcon(getClass().getResource("/music.png")));
 		startButton.addActionListener(e -> startButtonPressed(e));
 		contentPane.add(startButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-				new Insets(10, 0, 5, 0), 0, 0));
-		
+			GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+			new Insets(10, 0, 5, 0), 0, 0));
+
 		//---- versionText ----
-		versionText.setText("text");
+		versionText.setText(bundle.getString("GuiLauncher.versionText.text"));
 		versionText.setHorizontalAlignment(SwingConstants.RIGHT);
 		contentPane.add(versionText, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 10, 5), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 10, 5), 0, 0));
 		pack();
 		setLocationRelativeTo(getOwner());
-		
-		//---- buttonGroup1 ----
-		var buttonGroup1 = new ButtonGroup();
-		buttonGroup1.add(transitionSpeedNoneButton);
-		buttonGroup1.add(transitionSpeedSlowButton);
-		buttonGroup1.add(transitionSpeedNormalButton);
-		buttonGroup1.add(transitionSpeedFastButton);
+
+		//---- transitionSpeedButtonGroup ----
+		var transitionSpeedButtonGroup = new ButtonGroup();
+		transitionSpeedButtonGroup.add(transitionSpeedNoneButton);
+		transitionSpeedButtonGroup.add(transitionSpeedSlowButton);
+		transitionSpeedButtonGroup.add(transitionSpeedNormalButton);
+		transitionSpeedButtonGroup.add(transitionSpeedFastButton);
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JLabel logo;
-	private JPanel panel1;
-	private JLabel label1;
+	private JPanel configurationPanel;
+	private JLabel midiFileLabel;
 	private JTextField midiFilePathTextField;
 	private JResizedIconButton loadMidiFileButton;
-	private JLabel label3;
-	private JLabel label2;
+	private JLabel midiFileHelp;
+	private JLabel midiDeviceLabel;
 	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
-	private JLabel label5;
-	private JLabel soundfontLabel;
+	private JLabel midiDeviceHelp;
+	private JLabel soundFontLabel;
 	private JComboBox<String> soundFontPathDropDown;
-	private JResizedIconButton loadSoundFontButton;
-	private JLabel label6;
-	private JPanel panel2;
+	private JResizedIconButton editSoundFontsButton;
+	private JLabel soundFontHelp;
+	private JPanel settingsPanel;
 	private JPanel hSpacer1;
-	private JLabel label4;
+	private JLabel latencyFixLabel;
 	private JSpinner latencySpinner;
 	private JPanel hSpacer2;
-	private JLabel label7;
-	private JLabel label11;
+	private JLabel latencyHelp;
+	private JLabel displayLabel;
 	private JCheckBox fullscreenCheckbox;
-	private JLabel label8;
-	private JLabel label9;
+	private JLabel fullscreenHelp;
+	private JLabel transitionSpeedLabel;
 	private JPanel transitionSpeedPanel;
 	private JRadioButton transitionSpeedNoneButton;
 	private JRadioButton transitionSpeedSlowButton;
 	private JRadioButton transitionSpeedNormalButton;
 	private JRadioButton transitionSpeedFastButton;
-	private JLabel label10;
+	private JLabel transitionSpeedHelp;
 	private JResizedIconButton startButton;
 	private JLabel versionText;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
