@@ -56,7 +56,7 @@ public class GuiLauncher extends JFrame {
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
 		var guiLauncher = new GuiLauncher();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		guiLauncher.setSize(new Dimension(590, 520));
+		guiLauncher.setSize(new Dimension(590, 530));
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
 		guiLauncher.setVisible(true);
 		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -80,7 +80,7 @@ public class GuiLauncher extends JFrame {
 			e.printStackTrace();
 		}
 		// Check for updates
-		EventQueue.invokeLater(() -> {
+		EventQueue.invokeLater(() -> new Thread(() -> {
 			try {
 				var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
 				var jep = new JEditorPane();
@@ -106,7 +106,7 @@ public class GuiLauncher extends JFrame {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		});
+		}));
 		
 		// Launch directly into midis2jam2 if a MIDI file is specified
 		if (args.length == 1) {
