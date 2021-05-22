@@ -69,28 +69,10 @@ $ java -jar midis2jam2.jar path/to/midifile.mid
 
 Press the MIDI panic button on your synthesizer to stop the sound.
 
-=== The audio is out of sync with the video.
-
-This can arise if your MIDI synthesizer is known to have a delay or buffer.
-Adjust the buffer on your device to reduce it as much as possible.
-
-In some rare cases, the audio may be misaligned because the program took too long to load, and therefore did not have enough time to catch up before the MIDI began playback.
-Most of the time, this only occurs on first launch.
-
-If it continues to be a problem, add some silence to the beginning of the MIDI file.
-
 === I think something is broken.
 
 Check the issues page and make sure there isn't already a relevant issue open.
 If there isn't, create an issue and use the bug report template.
-
-=== How do I change the soundfont?
-
-midis2jam2 does not handle the playback of MIDI files; it is offloaded to either an external synth or the internal Java MIDI synth Gervill.
-
-For Windows, I recommend  https://coolsoft.altervista.org/en/virtualmidisynth[VirtualMIDISynth].
-It allows you to specify the soundfont you would like to use.
-It will appear in midis2jam2 as `VirtualMIDISynth #1`.
 
 === Why doesn't instrument _X_ appear?
 
@@ -110,7 +92,5 @@ Please ensure you use a template, and ensure you https://medium.com/nyc-planning
 
 == License
 
-* midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
-The software comes with no warranty.
-* Assets Copyright © 2007 http://www.gamesbyscott.com/[Scott Haag] (used with permission).
-* https://github.com/wyskoj/midis2jam2/tree/master/testmidi[Test MIDI files] Copyright © various authors.
+midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
+The software comes with no warranty. Assets Copyright © 2007 http://www.gamesbyscott.com/[Scott Haag] (used with permission).
