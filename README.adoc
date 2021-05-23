@@ -1,5 +1,11 @@
 = midis2jam2
 
+image:https://img.shields.io/github/v/release/wyskoj/midis2jam2[]
+image:https://img.shields.io/github/license/wyskoj/midis2jam2[]
+image:https://img.shields.io/appveyor/build/wyskoj/midis2jam2[]
+image:https://img.shields.io/tokei/lines/github/wyskoj/midis2jam2[]
+image:https://img.shields.io/github/issues-closed/wyskoj/midis2jam2[]
+
 *midis2jam2* is a remaster of http://www.gamesbyscott.com/midijam.htm[MIDIJam], a MIDI file visualizer made by Scott Haag, last updated in 2007.
 
 == About
