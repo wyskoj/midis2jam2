@@ -590,10 +590,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			// Honky-tonk Piano
 			// Electric Piano 1
 			// Electric Piano 2
-			// Clavi
-			case 0, 1, 2, 3, 4, 5, 7 -> (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
+			case 0, 1, 2, 3, 4, 5 -> (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
 			// Harpsichord
 			case 6 -> new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
+			// Clavi
+			case 7 -> new Keyboard(this, events, Keyboard.KeyboardSkin.CLAVICHORD);
 			// Celesta
 			// Tubular Bells
 			// FX 3 (Crystal)
@@ -645,8 +646,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 33, 34, 36, 37, 38, 39 -> new BassGuitar(this, events, BassGuitar.BassGuitarType.STANDARD);
 			case 35 -> new BassGuitar(this, events, BassGuitar.BassGuitarType.FRETLESS);
 			// Violin
-			// Fiddle
-			case 40, 110 -> new Violin(this, events);
+			case 40 -> new Violin(this, events);
 			// Viola
 			case 41 -> new Viola(this, events);
 			// Cello
@@ -732,6 +732,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 80, 81, 83, 84, 86, 87, 88, 89, 90, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103 -> new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
 			// Lead 3 (Calliope)
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
+			// Fiddle
+			case 110 -> new Fiddle(this, events);
 			// Agogo
 			case 113 -> new Agogos(this, events);
 			// Steel Drums

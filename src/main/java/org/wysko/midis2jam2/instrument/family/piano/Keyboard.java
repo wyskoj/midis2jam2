@@ -105,7 +105,12 @@ public class Keyboard extends KeyedInstrument {
 		/**
 		 * Wood keyboard skin.
 		 */
-		WOOD("PianoSkin_Wood.bmp");
+		WOOD("PianoSkin_Wood.bmp"),
+		
+		/**
+		 * Clavichord keyboard skin.
+		 */
+		CLAVICHORD("ClaviSkin.png");
 		
 		/**
 		 * The texture file.
