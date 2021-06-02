@@ -55,6 +55,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.Percussion;
 import org.wysko.midis2jam2.instrument.family.percussive.*;
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.family.pipe.*;
+import org.wysko.midis2jam2.instrument.family.reed.Clarinet;
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax;
@@ -696,6 +697,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 66 -> new TenorSax(this, events);
 			// Baritone Sax
 			case 67 -> new BaritoneSax(this, events);
+			// Clarinet
+			case 71 -> new Clarinet(this, events);
 			// Piccolo
 			case 72 -> new Piccolo(this, events);
 			// Flute
