@@ -189,6 +189,18 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		return (float) (deg / 180 * FastMath.PI);
 	}
 	
+	private static void printNames(Node node) {
+		for (Spatial child : node.getChildren()) {
+			if (child instanceof Node) {
+				printNames((Node) child);
+			} else {
+				var key = child.getKey();
+				if (key != null)
+					System.out.println(key.getName());
+			}
+		}
+	}
+	
 	@Override
 	public void initialize(AppStateManager stateManager, Application app) {
 		super.initialize(stateManager, app);
@@ -215,6 +227,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		} catch (ReflectiveOperationException e) {
 			e.printStackTrace();
 		}
+		printNames(rootNode);
+		
 		
 		addShadowsAndStands();
 		
@@ -286,7 +300,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		var location = app.getCamera().getLocation();
 		app.getCamera().setLocation(new Vector3f(
 				location.x > 0 ? Math.min(location.x, 400) : Math.max(location.x, -400),
-				location.y > 0 ? Math.min(location.y, 400) : Math.max(location.y, -400),
+				location.y > 0 ? Math.min(location.y, 432) : Math.max(location.y, -432),
 				location.z > 0 ? Math.min(location.z, 400) : Math.max(location.z, -400)
 		));
 	}

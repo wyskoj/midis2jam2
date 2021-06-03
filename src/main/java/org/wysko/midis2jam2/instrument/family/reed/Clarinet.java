@@ -85,7 +85,7 @@ public class Clarinet extends HandedInstrument {
 		protected void loadHands() {
 			leftHands = new Spatial[20];
 			for (var i = 0; i < 20; i++) {
-				leftHands[i] = parent.context.loadModel(String.format("ClarinetLeftHand%d.obj", i + 1), "hands.bmp");
+				leftHands[i] = parent.context.loadModel(String.format("ClarinetLeftHand%d.obj", i), "hands.bmp");
 				leftHandNode.attachChild(leftHands[i]);
 				if (i != 0) {
 					leftHands[i].setCullHint(Spatial.CullHint.Always);
@@ -93,7 +93,7 @@ public class Clarinet extends HandedInstrument {
 			}
 			rightHands = new Spatial[13];
 			for (var i = 0; i < 13; i++) {
-				rightHands[i] = parent.context.loadModel("ClarinetRightHand%d.obj".formatted(i + 1), "hands.bmp");
+				rightHands[i] = parent.context.loadModel("ClarinetRightHand%d.obj".formatted(i), "hands.bmp");
 				rightHandNode.attachChild(rightHands[i]);
 				if (i != 0) {
 					rightHands[i].setCullHint(Spatial.CullHint.Always);
@@ -104,14 +104,23 @@ public class Clarinet extends HandedInstrument {
 		@Override
 		public void tick(double time, float delta) {
 			super.tick(time, delta);
+			/* Stretch bell */
 			if (currentNotePeriod != null) {
-				float scale = (float) ((0.7 * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
 				
-				horn.setLocalScale(
-						scaleAxis == Axis.X ? scale : 1,
-						scaleAxis == Axis.Y ? scale : 1,
-						scaleAxis == Axis.Z ? scale : 1
-				);
+				var hands = (HandPositionFingeringManager.Hands) parent.manager.fingering(currentNotePeriod.midiNote);
+				if (hands != null) {
+					context.getDebugText().setText(hands.toString());
+					float scale = (float) ((0.7 * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
+					
+					horn.setLocalScale(
+							scaleAxis == Axis.X ? scale : 1,
+							scaleAxis == Axis.Y ? scale : 1,
+							scaleAxis == Axis.Z ? scale : 1
+					);
+				} else {
+					animNode.setLocalRotation(new Quaternion()); // override rotation
+				}
+				
 				
 			} else {
 				horn.setLocalScale(1, 1, 1);
