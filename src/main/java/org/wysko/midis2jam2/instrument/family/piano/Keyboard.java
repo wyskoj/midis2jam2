@@ -110,7 +110,37 @@ public class Keyboard extends KeyedInstrument {
 		/**
 		 * Clavichord keyboard skin.
 		 */
-		CLAVICHORD("ClaviSkin.png");
+		CLAVICHORD("ClaviSkin.png"),
+		
+		/**
+		 * Bright keyboard skin.
+		 */
+		BRIGHT("BrightAcousticSkin.png"),
+		
+		/**
+		 * Honky tonk keyboard skin.
+		 */
+		HONKY_TONK("HonkyTonkSkin.png"),
+		
+		/**
+		 * Electric grand keyboard skin.
+		 */
+		ELECTRIC_GRAND("ElectricGrandSkin.png"),
+		
+		/**
+		 * Electric 1 keyboard skin.
+		 */
+		ELECTRIC_1("ElectricPiano1Skin.png"),
+		
+		/**
+		 * Electric 2 keyboard skin.
+		 */
+		ELECTRIC_2("ElectricPiano2Skin.png"),
+		
+		/**
+		 * Celesta keyboard skin.
+		 */
+		CELESTA("CelestaSkin.png");
 		
 		/**
 		 * The texture file.

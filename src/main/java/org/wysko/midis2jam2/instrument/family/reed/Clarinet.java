@@ -109,7 +109,6 @@ public class Clarinet extends HandedInstrument {
 				
 				var hands = (HandPositionFingeringManager.Hands) parent.manager.fingering(currentNotePeriod.midiNote);
 				if (hands != null) {
-					context.getDebugText().setText(hands.toString());
 					float scale = (float) ((0.7 * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
 					
 					horn.setLocalScale(

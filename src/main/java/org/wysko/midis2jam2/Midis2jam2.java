@@ -600,21 +600,27 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		return switch (programNum) {
 			// Acoustic Grand Piano
+			case 0 -> (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
 			// Bright Acoustic Piano
+			case 1 -> new Keyboard(this, events, Keyboard.KeyboardSkin.BRIGHT);
 			// Electric Grand Piano
+			case 2 -> new Keyboard(this, events, Keyboard.KeyboardSkin.ELECTRIC_GRAND);
 			// Honky-tonk Piano
+			case 3 -> new Keyboard(this, events, Keyboard.KeyboardSkin.HONKY_TONK);
 			// Electric Piano 1
+			case 4 -> new Keyboard(this, events, Keyboard.KeyboardSkin.ELECTRIC_1);
 			// Electric Piano 2
-			case 0, 1, 2, 3, 4, 5 -> (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
+			case 5 -> new Keyboard(this, events, Keyboard.KeyboardSkin.ELECTRIC_2);
 			// Harpsichord
 			case 6 -> new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
 			// Clavi
 			case 7 -> new Keyboard(this, events, Keyboard.KeyboardSkin.CLAVICHORD);
 			// Celesta
+			case 8 -> new Keyboard(this, events, Keyboard.KeyboardSkin.CELESTA);
 			// Tubular Bells
 			// FX 3 (Crystal)
 			// Tinkle Bell
-			case 8, 14, 98, 112 -> new TubularBells(this, events);
+			case 14, 98, 112 -> new TubularBells(this, events);
 			// Glockenspiel
 			case 9 -> new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
 			// Music Box
