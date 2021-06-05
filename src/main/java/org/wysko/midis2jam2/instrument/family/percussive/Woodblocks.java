@@ -79,7 +79,7 @@ public class Woodblocks extends TwelveDrumOctave {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		for (TwelfthOfOctaveDecayed woodblock : twelfths) {
-			woodblock.tick(time, delta);
+			woodblock.tick(delta);
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class Woodblocks extends TwelveDrumOctave {
 		}
 		
 		@Override
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			Vector3f localTranslation = highestLevel.getLocalTranslation();
 			if (localTranslation.y < -0.0001) {
 				highestLevel.setLocalTranslation(0, Math.min(0, localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);

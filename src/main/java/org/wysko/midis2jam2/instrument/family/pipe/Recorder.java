@@ -68,7 +68,7 @@ public class Recorder extends HandedInstrument {
 		 * Instantiates a new Flute clone.
 		 */
 		public RecorderClone() {
-			super(Recorder.this, 0, SteamPuffer.SteamPuffType.POP, 1f);
+			super(Recorder.this, SteamPuffer.SteamPuffType.POP, 1f);
 			
 			Spatial horn = Recorder.this.context.loadModel(
 					"Recorder.obj",
@@ -77,7 +77,7 @@ public class Recorder extends HandedInstrument {
 			
 			loadHands();
 			
-			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
+			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[]{0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);
 			
 			modelNode.attachChild(horn);
@@ -90,8 +90,7 @@ public class Recorder extends HandedInstrument {
 			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(15f + indexForMoving() * 15), 0));
 		}
 		
-		@Override
-		protected void loadHands() {
+		private void loadHands() {
 			leftHands = new Spatial[13];
 			for (var i = 0; i < 13; i++) {
 				leftHands[i] = parent.context.loadModel(String.format("RecorderHandLeft%d.obj", i), "hands.bmp");

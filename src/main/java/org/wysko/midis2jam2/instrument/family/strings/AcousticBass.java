@@ -44,7 +44,7 @@ public class AcousticBass extends StringFamilyInstrument {
 				style == PlayingStyle.ARCO,
 				20,
 				new Vector3f(0.75f, 0.75f, 0.75f),
-				new int[] {28, 33, 38, 43},
+				new int[]{28, 33, 38, 43},
 				28,
 				91,
 				context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0)

@@ -144,8 +144,8 @@ public class StandardFrettingEngine implements FrettingEngine {
 	}
 	
 	/**
-	 * Calculates the running average position. If no frets have been previously applied, returns the position at
-	 * {@code 0,0}.
+	 * Calculates the running average position. If no frets have been previously applied, returns the position at {@code
+	 * 0,0}.
 	 *
 	 * @return the running average position, or {@code 0,0} if no frets have been applied yet
 	 */

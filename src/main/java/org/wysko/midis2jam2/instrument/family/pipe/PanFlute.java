@@ -152,7 +152,7 @@ public class PanFlute extends WrappedOctaveSustained {
 		}
 		
 		@Override
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			if (progress >= 1) {
 				playing = false;
 				progress = 0;

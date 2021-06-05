@@ -43,7 +43,7 @@ public class Viola extends StringFamilyInstrument {
 				true,
 				180,
 				new Vector3f(1, 1, 1),
-				new int[] {48, 55, 62, 69},
+				new int[]{48, 55, 62, 69},
 				48,
 				105,
 				context.loadModel("Violin.obj", "ViolaSkin.bmp")

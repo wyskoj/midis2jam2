@@ -33,8 +33,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Monophonic instruments ({@link MonophonicInstrument}) use Clones to visualize polyphony on monophonic instruments. A
- * clone is required for each degree of polyphony.
+ * {@link MonophonicInstrument}s use Clones to visualize polyphony on monophonic instruments. A clone is required for
+ * each degree of polyphony.
+ * <p>
+ * The calculation of clones (that is, determining how many clones are needed and which clones should be responsible for
+ * each note) is performed in {@link MonophonicInstrument}.
  *
  * @see MonophonicInstrument
  */
@@ -58,6 +61,9 @@ public abstract class Clone {
 	@NotNull
 	public final List<NotePeriod> notePeriods;
 	
+	/**
+	 * Used for moving with {@link #indexForMoving()}.
+	 */
 	public final Node offsetNode = new Node();
 	
 	/**
@@ -88,6 +94,10 @@ public abstract class Clone {
 	@Nullable
 	public NotePeriod currentNotePeriod;
 	
+	/**
+	 * Keeps track of whether or not this clone is currently visible. The 0-clone (the clone at index 0) is always
+	 * visible, that is if the instrument itself is visible).
+	 */
 	protected boolean visible;
 	
 	/**
@@ -111,7 +121,8 @@ public abstract class Clone {
 	}
 	
 	/**
-	 * Determines if this clone is playing at a certain point.
+	 * Determines if this clone is playing at a certain point. Since {@link #notePeriods} is always losing note periods
+	 * that have fully elapsed, this method is likely not reliable for checking events in the past.
 	 *
 	 * @param midiTick the current midi tick
 	 * @return true if should be playing, false otherwise
@@ -138,8 +149,8 @@ public abstract class Clone {
 	
 	/**
 	 * Hides or shows this clone.
-	 *  @param indexThis the index of this clone
 	 *
+	 * @param indexThis the index of this clone
 	 */
 	protected void hideOrShowOnPolyphony(int indexThis) {
 		if (indexForMoving() == 0 && indexThis != 0) {
@@ -153,7 +164,6 @@ public abstract class Clone {
 			} else {
 				highestLevel.setCullHint(Spatial.CullHint.Always);
 				visible = false;
-				// TODO make clones stick if going to play again in a short while
 			}
 		} else {
 			highestLevel.setCullHint(Spatial.CullHint.Dynamic);
@@ -195,10 +205,20 @@ public abstract class Clone {
 		moveForPolyphony();
 	}
 	
+	/**
+	 * Returns the index for moving so that clones do not overlap.
+	 *
+	 * @return the index for moving so that clones do not overlap
+	 */
 	protected int indexForMoving() {
 		return Math.max(0, parent.clones.stream().filter(Clone::isVisible).collect(Collectors.toList()).indexOf(this));
 	}
 	
+	/**
+	 * Returns true if this clone is visible, false otherwise.
+	 *
+	 * @return true if this clone is visible, false otherwise
+	 */
 	public boolean isVisible() {
 		return visible;
 	}

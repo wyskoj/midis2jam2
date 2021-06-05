@@ -43,7 +43,7 @@ public class Cello extends StringFamilyInstrument {
 				true,
 				20,
 				new Vector3f(0.75f, 0.75f, 0.75f),
-				new int[] {36, 43, 50, 57},
+				new int[]{36, 43, 50, 57},
 				36,
 				93,
 				context.loadModel("Cello.obj", "CelloSkin.bmp")

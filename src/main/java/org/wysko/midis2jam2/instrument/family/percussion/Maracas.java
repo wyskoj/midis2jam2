@@ -33,10 +33,6 @@ import static org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStic
 
 public class Maracas extends NonDrumSetPercussion {
 	
-	private final Node leftMaracaNode = new Node();
-	
-	private final Node rightMaracaNode = new Node();
-	
 	private final Spatial leftMaraca;
 	
 	private final Spatial rightMaraca;
@@ -53,7 +49,9 @@ public class Maracas extends NonDrumSetPercussion {
 		leftMaraca = context.loadModel("Maraca.obj", "Maraca.bmp");
 		rightMaraca = leftMaraca.clone();
 		
+		Node leftMaracaNode = new Node();
 		leftMaracaNode.attachChild(leftMaraca);
+		Node rightMaracaNode = new Node();
 		rightMaracaNode.attachChild(rightMaraca);
 		
 		/* Tilt maracas */

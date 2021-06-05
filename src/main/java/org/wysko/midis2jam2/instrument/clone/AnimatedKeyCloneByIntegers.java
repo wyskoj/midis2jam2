@@ -23,7 +23,9 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.world.Axis;
 
 /**
- * Animates keys by indices of keys.
+ * Instruments, such as the trumpet, french horn, tuba, etc., animate by transforming models of keys. The specific
+ * transformation is handled by the implementing class, but the determining of which keys to press is handled here in
+ * {@link #tick(double, float)}. It calls {@link #animateKeys(Integer[])} which is implemented in the subclass.
  */
 public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	
@@ -32,7 +34,6 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	 */
 	@NotNull
 	protected final Spatial[] keys;
-	
 	
 	/**
 	 * Instantiates a new Animated key clone by integers.
@@ -44,11 +45,7 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	 * @param stretchAxis    the stretch axis
 	 * @param rotationAxis   the rotation axis
 	 */
-	protected AnimatedKeyCloneByIntegers(MonophonicInstrument parent,
-	                                     float rotationFactor,
-	                                     float stretchFactor,
-	                                     int numberOfKeys,
-	                                     Axis stretchAxis, Axis rotationAxis) {
+	protected AnimatedKeyCloneByIntegers(@NotNull MonophonicInstrument parent, float rotationFactor, float stretchFactor, int numberOfKeys, Axis stretchAxis, Axis rotationAxis) {
 		
 		super(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis);
 		this.keys = new Spatial[numberOfKeys];

@@ -85,7 +85,7 @@ public class Triangle extends NonDrumSetPercussion {
 	public enum TriangleType {
 		OPEN("Triangle.obj"), MUTED("MutedTriangle.fbx");
 		
-		String modelFile;
+		private final String modelFile;
 		
 		TriangleType(String modelFile) {
 			this.modelFile = modelFile;

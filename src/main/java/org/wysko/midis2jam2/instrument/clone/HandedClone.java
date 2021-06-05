@@ -22,10 +22,17 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument;
 import org.wysko.midis2jam2.world.Axis;
 
+import static com.jme3.scene.Spatial.CullHint.Always;
+import static com.jme3.scene.Spatial.CullHint.Dynamic;
 import static org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands;
 
 /**
- * Instruments that have hands. Includes piccolo, flute, recorder, ocarina.
+ * Some instruments visualize notes by showing hands in different playing positions. To do this, a separate 3D model for
+ * each hand in each "shape" is created, then they are seamlessly swapped out during playback to give the illusion that
+ * the hands are moving.
+ * <p>
+ * Wouldn't it be easier to do some .bvh? Maybe, but I'm sticking with the implementation from MIDIJam and just creating
+ * a different file for each position.
  */
 public abstract class HandedClone extends Clone {
 	
@@ -50,7 +57,7 @@ public abstract class HandedClone extends Clone {
 	protected Spatial[] rightHands;
 	
 	/**
-	 * Instantiates a new clone.
+	 * Instantiates a new handed clone.
 	 *
 	 * @param parent         the parent
 	 * @param rotationFactor the rotation factor
@@ -61,11 +68,6 @@ public abstract class HandedClone extends Clone {
 		modelNode.attachChild(rightHandNode);
 	}
 	
-	/**
-	 * Loads the hands appropriate to this instrument.
-	 */
-	protected abstract void loadHands();
-	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
@@ -73,29 +75,31 @@ public abstract class HandedClone extends Clone {
 		if (isPlaying()) {
 			/* Set the hands */
 			assert currentNotePeriod != null;
-			final int midiNote = currentNotePeriod.midiNote;
 			assert parent.manager != null;
-			var hands = (Hands) parent.manager.fingering(midiNote);
+			
+			var hands = (Hands) parent.manager.fingering(currentNotePeriod.midiNote);
 			if (hands != null) {
-				// Set the left hands
 				if (leftHands != null) {
 					/* May be null because ocarina does not implement left hands */
-					for (var i = 0; i < leftHands.length; i++) {
-						if (i == hands.left) {
-							leftHands[i].setCullHint(Spatial.CullHint.Dynamic);
-						} else {
-							leftHands[i].setCullHint(Spatial.CullHint.Always);
-						}
-					}
+					setHand(leftHands, hands.left);
 				}
-				// Set the right hands
-				for (var i = 0; i < rightHands.length; i++) {
-					if (i == hands.right) {
-						rightHands[i].setCullHint(Spatial.CullHint.Dynamic);
-					} else {
-						rightHands[i].setCullHint(Spatial.CullHint.Always);
-					}
-				}
+				setHand(rightHands, hands.right);
+			}
+		}
+	}
+	
+	/**
+	 * Sets the visibility of hands so that only the desired hand is visible.
+	 *
+	 * @param hands        the array of hands
+	 * @param handPosition the index of the hand that should be visible
+	 */
+	private void setHand(Spatial[] hands, int handPosition) {
+		for (var i = 0; i < hands.length; i++) {
+			if (i == handPosition) {
+				hands[i].setCullHint(Dynamic);
+			} else {
+				hands[i].setCullHint(Always);
 			}
 		}
 	}

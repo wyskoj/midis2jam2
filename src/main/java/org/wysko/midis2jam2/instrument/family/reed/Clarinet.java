@@ -21,28 +21,49 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher;
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager;
+import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher;
 import org.wysko.midis2jam2.instrument.clone.HandedClone;
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
+/**
+ * The clarinet has both hand positions and a stretchy bell.
+ *
+ * <a href="https://bit.ly/34Quj4e">Fingering chart</a>
+ */
 public class Clarinet extends HandedInstrument {
 	
 	public static final HandPositionFingeringManager FINGERING_MANAGER = HandPositionFingeringManager.from(Clarinet.class);
 	
 	/**
-	 * Constructs a monophonic instrument.
+	 * Constructs a clarinet.
 	 *
 	 * @param context   context to midis2jam2
 	 * @param eventList the event list
 	 */
 	public Clarinet(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
-		super(context, eventList, ClarinetClone.class, FINGERING_MANAGER);
+		super(context,
+				/* Strip notes outside of standard range */
+				Stream.concat(
+						eventList.stream()
+								.filter(MidiNoteEvent.class::isInstance)
+								.map(MidiNoteEvent.class::cast)
+								.filter(note -> note.note >= 50 && note.note <= 90),
+						eventList.stream()
+								.filter(obj -> !(obj instanceof MidiNoteEvent))
+				).collect(Collectors.toList()),
+				ClarinetClone.class,
+				FINGERING_MANAGER);
 		instrumentNode.setLocalTranslation(-25, 50, 0);
 		instrumentNode.setLocalScale(0.9f); // haha yes
 	}
@@ -52,28 +73,35 @@ public class Clarinet extends HandedInstrument {
 		offsetNode.setLocalTranslation(0, 20 * indexForMoving(delta), 0);
 	}
 	
+	/**
+	 * The type Clarinet clone.
+	 */
 	public class ClarinetClone extends HandedClone {
 		
-		private final Spatial horn;
-		private final Axis scaleAxis = Axis.Y;
+		/**
+		 * The bell stretcher.
+		 */
+		private final BellStretcher bellStretcher;
 		
 		/**
-		 * Instantiates a new clone.
+		 * Instantiates a new clarinet clone.
 		 */
 		public ClarinetClone() {
 			super(Clarinet.this, 0.075f);
 			
-			Spatial body = context.loadModel("ClarinetBody.obj", "ClarinetSkin.png");
-			modelNode.attachChild(body);
+			/* Load body */
+			modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"));
 			
-			horn = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png");
-			modelNode.attachChild(horn);
-			
-			horn.setLocalTranslation(0, -20.7125f, 0);
+			/* Load bell */
+			Spatial bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png");
+			modelNode.attachChild(bell);
+			bell.setLocalTranslation(0, -20.7125f, 0);
 			
 			loadHands();
 			animNode.setLocalTranslation(0, 0, 10);
 			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(-25), rad(45), 0));
+			
+			bellStretcher = new StandardBellStretcher(0.7f, Axis.Y, bell);
 		}
 		
 		@Override
@@ -81,8 +109,7 @@ public class Clarinet extends HandedInstrument {
 			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25f * indexForMoving()), 0));
 		}
 		
-		@Override
-		protected void loadHands() {
+		private void loadHands() {
 			leftHands = new Spatial[20];
 			for (var i = 0; i < 20; i++) {
 				leftHands[i] = parent.context.loadModel(String.format("ClarinetLeftHand%d.obj", i), "hands.bmp");
@@ -104,26 +131,9 @@ public class Clarinet extends HandedInstrument {
 		@Override
 		public void tick(double time, float delta) {
 			super.tick(time, delta);
+			
 			/* Stretch bell */
-			if (currentNotePeriod != null) {
-				
-				var hands = (HandPositionFingeringManager.Hands) parent.manager.fingering(currentNotePeriod.midiNote);
-				if (hands != null) {
-					float scale = (float) ((0.7 * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
-					
-					horn.setLocalScale(
-							scaleAxis == Axis.X ? scale : 1,
-							scaleAxis == Axis.Y ? scale : 1,
-							scaleAxis == Axis.Z ? scale : 1
-					);
-				} else {
-					animNode.setLocalRotation(new Quaternion()); // override rotation
-				}
-				
-				
-			} else {
-				horn.setLocalScale(1, 1, 1);
-			}
+			bellStretcher.tick(currentNotePeriod, time);
 		}
 	}
 }

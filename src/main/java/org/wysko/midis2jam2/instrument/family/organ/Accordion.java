@@ -193,7 +193,7 @@ public class Accordion extends KeyedInstrument {
 	private class AccordionKey extends Key {
 		
 		public AccordionKey(int midiNote, int startPos) {
-			super(midiNote);
+			super();
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
 				
 				/* UP KEY */

@@ -72,18 +72,12 @@ tasks.jpackage {
 
 dependencies {
     // JMonkeyEngine
-    implementation "org.jmonkeyengine:jme3-core:3.3.2-stable"
-    implementation "org.jmonkeyengine:jme3-desktop:3.3.2-stable"
-    implementation "org.jmonkeyengine:jme3-lwjgl:3.3.2-stable"
-    implementation 'org.jmonkeyengine:jme3-blender:3.3.2-stable'
-    implementation 'org.jmonkeyengine:jme3-plugins:3.3.2-stable'
-    implementation 'org.jmonkeyengine:jme3-jogg:3.3.2-stable'
-    implementation 'org.jmonkeyengine:jme3-niftygui:3.3.2-stable'
-    implementation 'org.jmonkeyengine:jme3-vr:3.3.2-stable'
+    implementation "org.jmonkeyengine:jme3-core:3.4.0-stable"
+    implementation "org.jmonkeyengine:jme3-desktop:3.4.0-stable"
+    implementation "org.jmonkeyengine:jme3-lwjgl:3.4.0-stable"
+    implementation 'org.jmonkeyengine:jme3-plugins:3.4.0-stable'
 
     implementation 'org.jetbrains:annotations:20.1.0'
-    // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'

@@ -75,7 +75,7 @@ public class PizzicatoStrings extends DecayedInstrument {
 			strings[stringIndex].play();
 		}
 		
-		Arrays.stream(strings).forEach(string -> string.tick(time, delta));
+		Arrays.stream(strings).forEach(string -> string.tick(delta));
 	}
 	
 	@Override
@@ -133,7 +133,7 @@ public class PizzicatoStrings extends DecayedInstrument {
 		}
 		
 		@Override
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			stringAnimator.tick(delta);
 			
 			if (progress >= 1) playing = false;

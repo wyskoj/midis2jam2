@@ -75,7 +75,7 @@ public class Flute extends HandedInstrument {
 			
 			loadHands();
 			
-			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[] {0, 0, rad(-90)}));
+			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[]{0, 0, rad(-90)}));
 			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);
 			
 			highestLevel.attachChild(horn);

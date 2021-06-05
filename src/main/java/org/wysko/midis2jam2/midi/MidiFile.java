@@ -51,7 +51,7 @@ public class MidiFile {
 	 *
 	 * @param midiFile the system file of the MIDI file
 	 * @return the MIDI file
-	 * @throws IOException          an i/o error occurred
+	 * @throws IOException              an i/o error occurred
 	 * @throws InvalidMidiDataException if the MIDI file is bad
 	 */
 	public static MidiFile readMidiFile(File midiFile) throws IOException, InvalidMidiDataException {

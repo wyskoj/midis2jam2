@@ -37,11 +37,6 @@ import java.util.stream.Collectors;
 public abstract class TwelveDrumOctave extends DecayedInstrument {
 	
 	/**
-	 * The Anim node.
-	 */
-	protected Node animNode = new Node();
-	
-	/**
 	 * The Mallet nodes.
 	 */
 	@NotNull
@@ -120,10 +115,9 @@ public abstract class TwelveDrumOctave extends DecayedInstrument {
 		/**
 		 * Update animation and note handling.
 		 *
-		 * @param time  the current time
 		 * @param delta the amount of time since the last frame update
 		 */
-		public abstract void tick(double time, float delta);
+		public abstract void tick(float delta);
 	}
 	
 }

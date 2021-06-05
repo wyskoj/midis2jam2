@@ -45,10 +45,10 @@ public class VibratingStringAnimator {
 	 */
 	public void tick(float delta) {
 		
-		final double inc = delta / 0.016666668f;
+		final double inc = delta * 60;
 		this.frame += inc;
 		
-		for (int i = 0; i < 5; i++) {
+		for (var i = 0; i < 5; i++) {
 			frame = frame % 5;
 			if (i == Math.floor(frame)) {
 				stringFrames[i].setCullHint(Spatial.CullHint.Dynamic);

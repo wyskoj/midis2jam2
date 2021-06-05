@@ -23,10 +23,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.clone.Clone;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.midi.NotePeriod;
+import org.wysko.midis2jam2.midi.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +110,7 @@ public abstract class Instrument {
 	 * files and connects corresponding events together. This is effectively calculating the "blocks" you would see in a
 	 * piano roll editor.
 	 *
-	 * @param noteEvents the note events to calculate NotePeriods from
+	 * @param noteEvents the note events to calculate into {@link NotePeriod}s
 	 */
 	@NotNull
 	@Contract(pure = true)
@@ -182,7 +179,7 @@ public abstract class Instrument {
 	/**
 	 * Returns the index of this instrument in the list of other instruments of this type that are visible.
 	 *
-	 * @param delta
+	 * @param delta the amount of time that has passed since the last frame
 	 * @return the index of this instrument in the list of other instruments of this type that are visible
 	 */
 	@Contract(pure = true)
@@ -211,7 +208,7 @@ public abstract class Instrument {
 	/**
 	 * Calculates and moves this instrument for when multiple instances of this instrument are visible.
 	 *
-	 * @param delta
+	 * @param delta the amount of time that has passed since the last frame
 	 */
 	protected abstract void moveForMultiChannel(float delta);
 	

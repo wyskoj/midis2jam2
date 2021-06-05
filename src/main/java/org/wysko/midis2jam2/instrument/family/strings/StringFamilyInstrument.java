@@ -84,17 +84,17 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 				events,
 				new FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ(8.84f,
 						-6.17f,
-						new Vector3f[] {
+						new Vector3f[]{
 								new Vector3f(1, 1, 1),
 								new Vector3f(1, 1, 1),
 								new Vector3f(1, 1, 1),
 								new Vector3f(1, 1, 1)
 						},
-						new float[] {-0.369f, -0.122f, 0.126f, 0.364f},
-						new float[] {-0.8f, -0.3f, 0.3f, 0.8f},
+						new float[]{-0.369f, -0.122f, 0.126f, 0.364f},
+						new float[]{-0.8f, -0.3f, 0.3f, 0.8f},
 						fret -> 1 - ((float) (((0.0003041886 * Math.pow(fret, 2)) + (-0.0312677 * fret)) + 1)),
-						new float[] {-0.6f, -0.6f, -0.6f, -0.6f},
-						new float[] {
+						new float[]{-0.6f, -0.6f, -0.6f, -0.6f},
+						new float[]{
 								0.47f,
 								0.58f,
 								0.58f,

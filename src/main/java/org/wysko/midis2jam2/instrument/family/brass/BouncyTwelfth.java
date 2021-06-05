@@ -18,12 +18,12 @@
 package org.wysko.midis2jam2.instrument.family.brass;
 
 /**
- * A single instance of some visual that "bounces" to visualize (e.g., choir peep, stage horn). Specifically, when
- * the note begins playing, the model rises up into the air, then slowly falls back down for the duration of the note.
+ * A single instance of some visual that "bounces" to visualize (e.g., choir peep, stage horn). Specifically, when the
+ * note begins playing, the model rises up into the air, then slowly falls back down for the duration of the note.
  * <p>
- * BouncyTwelfths animate by keeping track of how much time has elapsed since {@link #play(double)} is called, which
- * is passed the number of seconds the twelfth should fall for. This does mean that the rate at which the twelfth
- * falls is not proportional to the current tempo of the MIDI file, which is something I believe MIDIJam does.
+ * BouncyTwelfths animate by keeping track of how much time has elapsed since {@link #play(double)} is called, which is
+ * passed the number of seconds the twelfth should fall for. This does mean that the rate at which the twelfth falls is
+ * not proportional to the current tempo of the MIDI file, which is something I believe MIDIJam does.
  * <p>
  * If a Twelfth's {@code play} method is called before it is finished falling, the animation resets.
  */
@@ -37,7 +37,7 @@ public class BouncyTwelfth extends WrappedOctaveSustained.TwelfthOfOctave {
 	}
 	
 	@Override
-	public void tick(double time, float delta) {
+	public void tick(float delta) {
 		if (progress >= 1) {
 			playing = false;
 			progress = 0;

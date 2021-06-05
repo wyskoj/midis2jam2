@@ -175,15 +175,15 @@ public class SoundFontList extends JPanel {
 		removeButton = new JResizedIconButton();
 		upButton = new JResizedIconButton();
 		downButton = new JResizedIconButton();
-
+		
 		//======== this ========
 		setLayout(new BorderLayout());
-
+		
 		//======== dialogPane ========
 		{
 			dialogPane.setBorder(new EmptyBorder(12, 12, 12, 12));
 			dialogPane.setLayout(new BorderLayout());
-
+			
 			//======== buttonBar ========
 			{
 				buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
@@ -199,13 +199,13 @@ public class SoundFontList extends JPanel {
 						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			dialogPane.add(buttonBar, BorderLayout.SOUTH);
-
+			
 			//======== scrollPane1 ========
 			{
 				scrollPane1.setViewportView(soundFontJList);
 			}
 			dialogPane.add(scrollPane1, BorderLayout.CENTER);
-
+			
 			//======== panel1 ========
 			{
 				panel1.setLayout(new GridBagLayout());

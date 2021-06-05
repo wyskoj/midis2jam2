@@ -74,7 +74,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		}
 		
 		for (TwelfthOfOctave twelfth : twelfths) {
-			twelfth.tick(time, delta);
+			twelfth.tick(delta);
 		}
 	}
 	
@@ -114,6 +114,6 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		
 		public abstract void play(double duration);
 		
-		public abstract void tick(double time, float delta);
+		public abstract void tick(float delta);
 	}
 }

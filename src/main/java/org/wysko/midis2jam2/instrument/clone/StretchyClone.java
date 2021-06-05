@@ -20,6 +20,8 @@ package org.wysko.midis2jam2.instrument.clone;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
+import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher;
+import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher;
 import org.wysko.midis2jam2.world.Axis;
 
 /**
@@ -48,6 +50,11 @@ public abstract class StretchyClone extends Clone {
 	protected Spatial body;
 	
 	/**
+	 * The bell stretcher.
+	 */
+	private final BellStretcher bellStretcher;
+	
+	/**
 	 * Instantiates a new Stretchy clone.
 	 *
 	 * @param parent         the parent
@@ -61,6 +68,7 @@ public abstract class StretchyClone extends Clone {
 		super(parent, rotationFactor, rotationAxis);
 		this.stretchFactor = stretchFactor;
 		this.scaleAxis = scaleAxis;
+		this.bellStretcher = new StandardBellStretcher(stretchFactor, scaleAxis, bell);
 	}
 	
 	@Override
@@ -68,18 +76,6 @@ public abstract class StretchyClone extends Clone {
 		super.tick(time, delta);
 		
 		/* Stretch the bell of the instrument */
-		
-		if (currentNotePeriod != null) {
-			float scale = (float) ((stretchFactor * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
-			
-			bell.setLocalScale(
-					scaleAxis == Axis.X ? scale : 1,
-					scaleAxis == Axis.Y ? scale : 1,
-					scaleAxis == Axis.Z ? scale : 1
-			);
-			
-		} else {
-			bell.setLocalScale(1, 1, 1);
-		}
+		bellStretcher.tick(currentNotePeriod, time);
 	}
 }

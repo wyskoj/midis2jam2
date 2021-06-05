@@ -29,19 +29,18 @@ public abstract class PuffingClone extends HandedClone {
 	/**
 	 * The steam puffer.
 	 */
-	@NotNull final SteamPuffer puffer;
+	@NotNull
+	final SteamPuffer puffer;
 	
 	/**
 	 * Instantiates a new Puffing clone.
 	 *
-	 * @param parent         the parent
-	 * @param rotationFactor the rotation factor
-	 * @param puffType       the puff type
-	 * @param pufferScale    the puffer scale
+	 * @param parent      the parent
+	 * @param puffType    the puff type
+	 * @param pufferScale the puffer scale
 	 */
-	protected PuffingClone(HandedInstrument parent, float rotationFactor, SteamPuffer.SteamPuffType puffType,
-	                       float pufferScale) {
-		super(parent, rotationFactor);
+	protected PuffingClone(HandedInstrument parent, SteamPuffer.SteamPuffType puffType, float pufferScale) {
+		super(parent, (float) 0);
 		
 		puffer = new SteamPuffer(parent.context, puffType, pufferScale, SteamPuffer.PuffBehavior.OUTWARDS);
 		modelNode.attachChild(puffer.steamPuffNode);

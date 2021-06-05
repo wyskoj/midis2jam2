@@ -24,7 +24,8 @@ public interface ParticleGenerator {
 	
 	/**
 	 * Updates the animation of this generator.
-	 *  @param delta  the amount of time since the last frame
+	 *
+	 * @param delta  the amount of time since the last frame
 	 * @param active true if this particle generator should be generating
 	 */
 	void tick(float delta, boolean active);

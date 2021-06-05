@@ -22,6 +22,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
+import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator;
 import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument;
 import org.wysko.midis2jam2.midi.*;
 
@@ -33,7 +34,8 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.BLACK;
 
 /**
- * The Harp.
+ * The harp is a diatonic instrument, so chromatic notes are rounded down to the nearest white key. For example, if a
+ * C# is to be played, a C is instead played.
  */
 public class Harp extends SustainedInstrument {
 	
@@ -48,7 +50,7 @@ public class Harp extends SustainedInstrument {
 	private final List<MidiNoteEvent> notes;
 	
 	/**
-	 * Instantiates a new Harp.
+	 * Instantiates a new harp.
 	 *
 	 * @param context   the context
 	 * @param eventList the event list
@@ -59,11 +61,14 @@ public class Harp extends SustainedInstrument {
 				.filter(MidiNoteEvent.class::isInstance)
 				.map(MidiNoteEvent.class::cast)
 				.collect(Collectors.toList());
+		
+		/* Load model */
 		instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp"));
 		instrumentNode.setLocalTranslation(5, 3.6f, 17);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
 		highestLevel.attachChild(instrumentNode);
 		
+		/* Create harp strings */
 		for (var i = 0; i < 47; i++) {
 			strings[i] = new HarpString(i);
 			instrumentNode.attachChild(strings[i].stringNode);
@@ -135,27 +140,27 @@ public class Harp extends SustainedInstrument {
 		/**
 		 * The idle string.
 		 */
-		final Spatial string;
+		private final Spatial string;
 		
 		/**
 		 * The Vibrating strings.
 		 */
-		final Spatial[] vibratingStrings = new Spatial[5];
+		private final Spatial[] vibratingStrings = new Spatial[5];
 		
 		/**
 		 * The String node.
 		 */
-		final Node stringNode = new Node();
+		private final Node stringNode = new Node();
 		
 		/**
 		 * True if this string is vibrating, false otherwise.
 		 */
-		boolean vibrating = false;
+		private boolean vibrating = false;
 		
 		/**
-		 * The current frame of animation.
+		 * The string animator.
 		 */
-		private double frame = 0;
+		private final VibratingStringAnimator stringAnimator;
 		
 		/**
 		 * Instantiates a new Harp string.
@@ -163,6 +168,8 @@ public class Harp extends SustainedInstrument {
 		 * @param i the string index
 		 */
 		public HarpString(int i) {
+			
+			/* Select correct texture from note */
 			String t;
 			String vt;
 			if (i % 7 == 0) {
@@ -177,17 +184,20 @@ public class Harp extends SustainedInstrument {
 			}
 			string = context.loadModel("HarpString.obj", t);
 			
+			/* Load vibrating strings */
 			for (var v = 0; v < 5; v++) {
-				vibratingStrings[v] = context.loadModel("HarpStringPlaying" + v + ".obj", vt,
-						Midis2jam2.MatType.UNSHADED, 0);
+				vibratingStrings[v] = context.loadModel("HarpStringPlaying" + v + ".obj", vt, Midis2jam2.MatType.UNSHADED, 0);
 				vibratingStrings[v].setCullHint(Spatial.CullHint.Always);
 				stringNode.attachChild(vibratingStrings[v]);
 			}
 			stringNode.attachChild(string);
+			
+			/* Funky math to polynomially scale each string */
 			stringNode.setLocalTranslation(0, 2.1444f + 0.8777f * i, -2.27f + (0.75651f * -i));
 			float scale = (float) ((2.44816E-4 * Math.pow(i, 2)) + (-0.02866 * i) + 0.97509);
 			stringNode.setLocalScale(1, scale, 1);
-			// TODO Use vibrating string animator
+			
+			stringAnimator = new VibratingStringAnimator(vibratingStrings);
 		}
 		
 		/**
@@ -196,25 +206,15 @@ public class Harp extends SustainedInstrument {
 		 * @param delta the amount of time since the last frame update
 		 */
 		public void tick(float delta) {
-			final double inc = delta / (1 / 60f);
-			this.frame += inc;
 			if (vibrating) {
 				string.setCullHint(Spatial.CullHint.Always);
-				for (int i = 0; i < 5; i++) {
-					frame = frame % 5;
-					if (i == Math.floor(frame)) {
-						vibratingStrings[i].setCullHint(Spatial.CullHint.Dynamic);
-					} else {
-						vibratingStrings[i].setCullHint(Spatial.CullHint.Always);
-					}
-				}
+				stringAnimator.tick(delta);
 			} else {
 				string.setCullHint(Spatial.CullHint.Dynamic);
 				for (Spatial vibratingString : vibratingStrings) {
 					vibratingString.setCullHint(Spatial.CullHint.Always);
 				}
 			}
-			
 		}
 		
 		/**

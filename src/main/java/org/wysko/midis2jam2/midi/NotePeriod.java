@@ -18,8 +18,8 @@
 package org.wysko.midis2jam2.midi;
 
 /**
- * A note period is pair of a {@link MidiNoteOnEvent} and a {@link MidiNoteOffEvent}. A note period is the equivalent
- * of the blocks you would see in a MIDI piano roll editor.
+ * A note period is pair of a {@link MidiNoteOnEvent} and a {@link MidiNoteOffEvent}. A note period is the equivalent of
+ * the blocks you would see in a MIDI piano roll editor.
  */
 public class NotePeriod {
 	

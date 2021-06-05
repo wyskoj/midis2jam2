@@ -169,6 +169,7 @@ public class Guitar extends FrettedInstrument {
 	/**
 	 * The type of guitar.
 	 */
+	@SuppressWarnings("SameParameterValue")
 	public enum GuitarType {
 		
 		/**

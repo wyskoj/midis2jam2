@@ -29,11 +29,6 @@ import com.jme3.scene.Spatial;
 public abstract class Key {
 	
 	/**
-	 * The MIDI note this key plays.
-	 */
-	protected final int midiNote;
-	
-	/**
 	 * The uppermost node of this key.
 	 */
 	protected final Node keyNode = new Node();
@@ -56,10 +51,8 @@ public abstract class Key {
 	/**
 	 * Instantiates a new Key.
 	 *
-	 * @param midiNote the midi note
 	 */
-	protected Key(int midiNote) {
-		this.midiNote = midiNote;
+	protected Key() {
 	}
 	
 	public boolean isBeingPressed() {

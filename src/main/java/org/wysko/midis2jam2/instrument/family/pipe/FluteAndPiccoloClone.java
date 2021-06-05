@@ -38,14 +38,13 @@ public class FluteAndPiccoloClone extends PuffingClone {
 	                            SteamPuffer.SteamPuffType puffType,
 	                            float puffScale) {
 		
-		super(parent, 0, puffType, puffScale);
+		super(parent, puffType, puffScale);
 		
 	}
 	
 	/**
 	 * Loads the left and right hands for flute and piccolo.
 	 */
-	@Override
 	protected void loadHands() {
 		leftHands = new Spatial[13];
 		for (int i = 0; i < 13; i++) {

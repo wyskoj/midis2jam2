@@ -78,6 +78,11 @@ public class TelephoneRing extends SustainedInstrument {
 	float force = 0;
 	
 	/**
+	 * Random for phone animation.
+	 */
+	private final Random random = new Random();
+	
+	/**
 	 * Instantiates a new Telephone ring.
 	 *
 	 * @param context   the context
@@ -175,9 +180,9 @@ public class TelephoneRing extends SustainedInstrument {
 				break;
 			}
 		}
-		handle.setLocalTranslation(0, (float) (2 + (new Random().nextGaussian() * 0.3)) * force, 0);
-		handle.setLocalRotation(new Quaternion().fromAngles(rad(new Random().nextGaussian() * 3) * force,
-				rad(new Random().nextGaussian() * 3) * force, 0));
+		handle.setLocalTranslation(0, (float) (2 + (random.nextGaussian() * 0.3)) * force, 0);
+		handle.setLocalRotation(new Quaternion().fromAngles(rad(random.nextGaussian() * 3) * force,
+				rad(random.nextGaussian() * 3) * force, 0));
 		if (isPlaying) {
 			force += 12 * delta;
 			force = Math.min(1, force);

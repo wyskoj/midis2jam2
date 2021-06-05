@@ -43,27 +43,27 @@
     </instrument>
     <instrument name="Guitar">
         <value fret="0" scale="0"/>
-        <value fret="1" scale="0.03744493392"/>
-        <value fret="2" scale="0.09691629956"/>
-        <value fret="3" scale="0.1431718062"/>
-        <value fret="4" scale="0.1916299559"/>
-        <value fret="5" scale="0.2400881057"/>
-        <value fret="6" scale="0.2841409692"/>
-        <value fret="7" scale="0.3193832599"/>
-        <value fret="8" scale="0.359030837"/>
-        <value fret="9" scale="0.3920704846"/>
-        <value fret="10" scale="0.4295154185"/>
-        <value fret="11" scale="0.4603524229"/>
-        <value fret="12" scale="0.4911894273"/>
-        <value fret="13" scale="0.5176211454"/>
-        <value fret="14" scale="0.5440528634"/>
-        <value fret="15" scale="0.5726872247"/>
-        <value fret="16" scale="0.5947136564"/>
-        <value fret="17" scale="0.6189427313"/>
-        <value fret="18" scale="0.6387665198"/>
-        <value fret="19" scale="0.6585903084"/>
-        <value fret="20" scale="0.6806167401"/>
-        <value fret="21" scale="0.6982378855"/>
-        <value fret="22" scale="0.7158590308"/>
+        <value fret="1" scale="0.0374"/>
+        <value fret="2" scale="0.0969"/>
+        <value fret="3" scale="0.1431"/>
+        <value fret="4" scale="0.1916"/>
+        <value fret="5" scale="0.2400"/>
+        <value fret="6" scale="0.2841"/>
+        <value fret="7" scale="0.3193"/>
+        <value fret="8" scale="0.3590"/>
+        <value fret="9" scale="0.3920"/>
+        <value fret="10" scale="0.4295"/>
+        <value fret="11" scale="0.4603"/>
+        <value fret="12" scale="0.4911"/>
+        <value fret="13" scale="0.5176"/>
+        <value fret="14" scale="0.5440"/>
+        <value fret="15" scale="0.5726"/>
+        <value fret="16" scale="0.5947"/>
+        <value fret="17" scale="0.6189"/>
+        <value fret="18" scale="0.6387"/>
+        <value fret="19" scale="0.6585"/>
+        <value fret="20" scale="0.6806"/>
+        <value fret="21" scale="0.6982"/>
+        <value fret="22" scale="0.7158"/>
     </instrument>
 </instruments>

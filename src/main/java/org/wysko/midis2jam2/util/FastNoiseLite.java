@@ -54,6 +54,7 @@ package org.wysko.midis2jam2.util;// MIT License
 
 @SuppressWarnings("ALL")
 public class FastNoiseLite {
+	
 	private static final float[] Gradients2D = {
 			0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
 			0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
@@ -2441,6 +2442,7 @@ public class FastNoiseLite {
 	
 	@SuppressWarnings("unused")
 	public static class Vector2 {
+		
 		public /*FNLfloat*/ float x;
 		
 		public /*FNLfloat*/ float y;
@@ -2453,6 +2455,7 @@ public class FastNoiseLite {
 	
 	@SuppressWarnings("unused")
 	public static class Vector3 {
+		
 		public /*FNLfloat*/ float x;
 		
 		public /*FNLfloat*/ float y;

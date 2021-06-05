@@ -77,7 +77,7 @@ public class Stick {
 	 * @param strikes     the list of strikes this stick is responsible for
 	 * @param strikeSpeed the speed at which to strike
 	 * @param maxAngle    the maximum angle to hold the stick at
-	 * @param axis
+	 * @param axis        the axis on which to rotate the stick
 	 * @return a {@link StickStatus} describing the current status of the stick
 	 */
 	public static StickStatus handleStick(Midis2jam2 context, Spatial stickNode, double time, float delta,
@@ -194,6 +194,11 @@ public class Stick {
 			return rotationAngle;
 		}
 		
+		/**
+		 * Returns the {@link MidiNoteOnEvent} that this sticking is striking for.
+		 *
+		 * @return the MIDI note this stick is currently striking for
+		 */
 		public @Nullable MidiNoteOnEvent strikingFor() {
 			return strikingFor;
 		}

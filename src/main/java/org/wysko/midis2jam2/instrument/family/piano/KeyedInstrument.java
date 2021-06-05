@@ -50,7 +50,7 @@ public abstract class KeyedInstrument extends Instrument {
 	 * The events associated with this instrument.
 	 */
 	@NotNull
-	final protected List<MidiNoteEvent> events;
+	protected final List<MidiNoteEvent> events;
 	
 	/**
 	 * The keys of this instrument.
@@ -63,7 +63,6 @@ public abstract class KeyedInstrument extends Instrument {
 	@Unmodifiable
 	@NotNull
 	private final List<NotePeriod> notePeriods;
-	
 	
 	/**
 	 * Instantiates a new Keyed instrument.
@@ -102,19 +101,10 @@ public abstract class KeyedInstrument extends Instrument {
 	public void tick(double time, float delta) {
 		setIdleVisibilityByNoteOnAndOff(time);
 		moveForMultiChannel(delta);
-		List<MidiNoteEvent> eventsToPerform = new ArrayList<>();
-		if (!events.isEmpty()) {
-			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
-				events.remove(0);
-			}
-			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(events.get(0)) <= time) ||
-					(events.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(events.get(0)) - time <= 0.05))) {
-				eventsToPerform.add(events.remove(0));
-			}
-		}
+		List<MidiNoteEvent> eventsToPerform = getElapsedEvents(time);
 		
 		for (MidiNoteEvent event : eventsToPerform) {
-			Key key = keyByMidiNote(event.note);
+			var key = keyByMidiNote(event.note);
 			if (key == null) continue;
 			if (event instanceof MidiNoteOnEvent) {
 				key.setBeingPressed(true);
@@ -134,6 +124,28 @@ public abstract class KeyedInstrument extends Instrument {
 		for (Key key : keys) {
 			key.tick(delta);
 		}
+	}
+	
+	/**
+	 * Searches {@link #events} for those that should be animated now, taking special keyboard considerations into
+	 * place.
+	 *
+	 * @param time the current time, in seconds
+	 * @return the list of events that need animation
+	 */
+	@NotNull
+	private List<MidiNoteEvent> getElapsedEvents(double time) {
+		List<MidiNoteEvent> eventsToPerform = new ArrayList<>();
+		if (!events.isEmpty()) {
+			if (!(events.get(0) instanceof MidiNoteOnEvent) && !(events.get(0) instanceof MidiNoteOffEvent)) {
+				events.remove(0);
+			}
+			while (!events.isEmpty() && ((events.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(events.get(0)) <= time) ||
+					(events.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(events.get(0)) - time <= 0.05))) {
+				eventsToPerform.add(events.remove(0));
+			}
+		}
+		return eventsToPerform;
 	}
 	
 	/**

@@ -47,8 +47,7 @@ public class FretboardPosition {
 	}
 	
 	/**
-	 * Calculates the distance from this position to another, but ignores variable spacing. Good ol' distance
-	 * formula.
+	 * Calculates the distance from this position to another, but ignores variable spacing. Good ol' distance formula.
 	 *
 	 * @param o the other fret to find the distance
 	 * @return the distance

@@ -27,13 +27,11 @@ import org.wysko.midis2jam2.particle.SteamPuffer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.LONG;
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.SHORT;
-import static org.wysko.midis2jam2.midi.Midi.LONG_WHISTLE;
 import static org.wysko.midis2jam2.midi.Midi.SHORT_WHISTLE;
 import static org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.UPWARDS;
 import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.NORMAL;
@@ -44,12 +42,14 @@ import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE;
  */
 public class Whistle extends NonDrumSetPercussion {
 	
-	private final List<MidiNoteOnEvent> shortWhistles;
-	
-	private final List<MidiNoteOnEvent> longWhistles;
-	
+	/**
+	 * The short whistle.
+	 */
 	private final PercussionWhistle shortWhistle;
 	
+	/**
+	 * The long whistle.
+	 */
 	private final PercussionWhistle longWhistle;
 	
 	/**
@@ -60,9 +60,6 @@ public class Whistle extends NonDrumSetPercussion {
 	 */
 	protected Whistle(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		
-		shortWhistles = hits.stream().filter(e -> e.note == SHORT_WHISTLE).collect(Collectors.toList());
-		longWhistles = hits.stream().filter(e -> e.note == LONG_WHISTLE).collect(Collectors.toList());
 		
 		shortWhistle = new PercussionWhistle(SHORT);
 		longWhistle = new PercussionWhistle(LONG);

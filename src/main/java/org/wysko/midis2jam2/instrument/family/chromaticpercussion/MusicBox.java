@@ -61,12 +61,12 @@ public class MusicBox extends DecayedInstrument {
 	/**
 	 * List of points that are currently active.
 	 */
-	List<Spatial> points = new ArrayList<>();
+	private final List<Spatial> points = new ArrayList<>();
 	
 	/**
 	 * Keeps track of how many radians each point has rotated.
 	 */
-	HashMap<Spatial, Float> pointRotations = new HashMap<>();
+	private final HashMap<Spatial, Float> pointRotations = new HashMap<>();
 	
 	/**
 	 * Model of the music box point.
@@ -101,7 +101,7 @@ public class MusicBox extends DecayedInstrument {
 		pointModel = context.loadModel("MusicBoxPoint.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f);
 	}
 	
-	List<Spatial> pool = new ArrayList<>();
+	private final List<Spatial> pool = new ArrayList<>();
 	
 	@Override
 	public void tick(double time, float delta) {
@@ -146,7 +146,7 @@ public class MusicBox extends DecayedInstrument {
 		}
 		// Tick the hanging notes
 		for (OneMusicBoxNote note : notes) {
-			note.tick(time, delta);
+			note.tick(delta);
 		}
 	}
 	
@@ -208,7 +208,7 @@ public class MusicBox extends DecayedInstrument {
 		}
 		
 		@Override
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			if (playing) {
 				animT += delta * 4;
 			}

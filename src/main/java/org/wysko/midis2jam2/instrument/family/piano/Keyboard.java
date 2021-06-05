@@ -161,7 +161,7 @@ public class Keyboard extends KeyedInstrument {
 	public class KeyboardKey extends Key {
 		
 		public KeyboardKey(int midiNote, int startPos) {
-			super(midiNote);
+			super();
 			if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
 				/* UP KEY */
 				// Front key

@@ -139,7 +139,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	/**
 	 * The MIDI file.
 	 */
-	private MidiFile file;
+	private final MidiFile file;
 	
 	/**
 	 * 3D text for debugging.
@@ -291,6 +291,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				instrument.tick(timeSinceStart, tpf);
 			}
 		}
+		
+		getDebugText().setText("%.5f".formatted(((double) sequencer.getMicrosecondPosition() / sequencer.getMicrosecondLength()) * 100));
 		
 		updateShadowsAndStands();
 		preventCameraFromLeaving();
@@ -545,26 +547,24 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 *     <li>Adjacent events that have the same program value</li>
 	 * </ul>
 	 * <p>
-	 *      For events at the same time, the last of two events is kept (in the order of the list). So, if a list contained
-	 *      <pre>
-	 *          [time = 0, num = 43], [time = 0, num = 24], [time = 0, num = 69]
-	 *      </pre>
-	 *      it would afterwards contain
-	 *      <pre>
-	 *           [time = 0, num = 69]
-	 *      </pre>
-	 * </p>
+	 * For events at the same time, the last of two events is kept (in the order of the list). So, if a list contained
+	 * <pre>
+	 *     [time = 0, num = 43], [time = 0, num = 24], [time = 0, num = 69]
+	 * </pre>
+	 * it would afterwards contain
+	 * <pre>
+	 *      [time = 0, num = 69]
+	 * </pre>
 	 * <p>
-	 *      For events that have the same program value, the first of two events is kept (in the order of the list). So,
-	 *      if a list contained
-	 *      <pre>
-	 *           [time = 0, num = 50], [time = 128, num = 50], [time = 3000, num = 50]
-	 *      </pre>
-	 *      it would afterwards contain
-	 *      <pre>
-	 *          [time = 0, num = 50]
-	 *      </pre>
-	 * </p>
+	 * For events that have the same program value, the first of two events is kept (in the order of the list). So,
+	 * if a list contained
+	 * <pre>
+	 *      [time = 0, num = 50], [time = 128, num = 50], [time = 3000, num = 50]
+	 * </pre>
+	 * it would afterwards contain
+	 * <pre>
+	 *     [time = 0, num = 50]
+	 * </pre>
 	 *
 	 * @param programEvents the list of program events
 	 */
@@ -992,10 +992,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
 	public MidiFile getFile() {
 		return file;
-	}
-	
-	public void setFile(MidiFile file) {
-		this.file = file;
 	}
 	
 	public BitmapText getDebugText() {

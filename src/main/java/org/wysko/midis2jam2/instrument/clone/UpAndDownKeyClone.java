@@ -51,10 +51,7 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	 *
 	 * @param keyCount the key count
 	 */
-	protected UpAndDownKeyClone(int keyCount,
-	                            @NotNull MonophonicInstrument parent,
-	                            float rotationFactor,
-	                            float stretchFactor) {
+	protected UpAndDownKeyClone(int keyCount, @NotNull MonophonicInstrument parent, float rotationFactor, float stretchFactor) {
 		
 		super(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X);
 		this.keyCount = keyCount;
@@ -66,8 +63,8 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	/**
 	 * Given a keymap, presses or releases keys.
 	 * <p>
-	 * If the instrument cannot play the specified MIDI note, the instrument plays will all keys up (this is
-	 * technically incorrect on saxophones, since all open keys is a standard fingering for middle C#, but whatever).
+	 * If the instrument cannot play the specified MIDI note, the instrument plays will all keys up (this is technically
+	 * incorrect on saxophones, since all open keys is a standard fingering for middle C#, but whatever).
 	 *
 	 * @param midiNote the MIDI note
 	 */
@@ -103,6 +100,9 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 		}
 	}
 	
+	/**
+	 * Attach all the {@link #keysUp} and {@link #keysDown} to the {@link #modelNode}, hiding all the key down models.
+	 */
 	protected void attachKeys() {
 		for (var i = 0; i < keyCount; i++) {
 			modelNode.attachChild(keysUp[i]);

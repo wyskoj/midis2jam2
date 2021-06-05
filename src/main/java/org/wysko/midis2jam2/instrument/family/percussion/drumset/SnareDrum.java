@@ -42,27 +42,17 @@ public class SnareDrum extends PercussionInstrument {
 	/**
 	 * The list of hits for regular notes.
 	 */
-	List<MidiNoteOnEvent> regularHits;
+	private final List<MidiNoteOnEvent> regularHits;
 	
 	/**
 	 * The list of hits for side sticks.
 	 */
-	List<MidiNoteOnEvent> sideHits;
-	
-	/**
-	 * The snare drum.
-	 */
-	Spatial drum;
-	
-	/**
-	 * Contains the {@link #regularStick}.
-	 */
-	Node regularStickNode = new Node();
+	private final List<MidiNoteOnEvent> sideHits;
 	
 	/**
 	 * Contains the side stick.
 	 */
-	Node sideStickNode = new Node();
+	private final Node sideStickNode = new Node();
 	
 	/**
 	 * The stick used for regular hits.
@@ -80,9 +70,10 @@ public class SnareDrum extends PercussionInstrument {
 		this.regularHits =
 				hits.stream().filter(e -> e.note == ACOUSTIC_SNARE || e.note == ELECTRIC_SNARE).collect(Collectors.toList());
 		this.sideHits = hits.stream().filter(e -> e.note == 37).collect(Collectors.toList());
-		drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
+		Spatial drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
 		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		Spatial sideStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
+		Node regularStickNode = new Node();
 		regularStickNode.attachChild(regularStick);
 		sideStickNode.attachChild(sideStick);
 		recoilNode.attachChild(drum);

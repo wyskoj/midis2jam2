@@ -53,8 +53,8 @@ public class Ocarina extends HandedInstrument {
 	}
 	
 	/**
-	 * The ocarina hand positions are from 0 to 11 and wrap around the octave. So this is easily calculable and
-	 * doesn't need to be stored in XML.
+	 * The ocarina hand positions are from 0 to 11 and wrap around the octave. So this is easily calculable and doesn't
+	 * need to be stored in XML.
 	 */
 	static class OcarinaHandGenerator extends HandPositionFingeringManager {
 		
@@ -82,8 +82,7 @@ public class Ocarina extends HandedInstrument {
 			highestLevel.setLocalTranslation(0, 0, 18);
 		}
 		
-		@Override
-		protected void loadHands() {
+		private void loadHands() {
 			rightHands = new Spatial[12];
 			for (var i = 0; i < 12; i++) {
 				rightHands[i] = context.loadModel("OcarinaHand" + i + ".obj", "hands.bmp");

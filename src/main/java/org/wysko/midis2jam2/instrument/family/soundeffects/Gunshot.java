@@ -80,7 +80,7 @@ public class Gunshot extends DecayedInstrument {
 			pistols[i].fire();
 		}
 		for (Pistol pistol : pistols) {
-			pistol.tick(time, delta);
+			pistol.tick(delta);
 		}
 	}
 	
@@ -124,7 +124,7 @@ public class Gunshot extends DecayedInstrument {
 		}
 		
 		@Override
-		public void tick(double time, float delta) {
+		public void tick(float delta) {
 			Vector3f localTranslation = animNode.getLocalTranslation();
 			Quaternion localRotation = animNode.getLocalRotation();
 			blast.setLocalScale(Math.max(0, blast.getLocalScale().x - delta * 10));
