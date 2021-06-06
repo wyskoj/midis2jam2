@@ -19,13 +19,15 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Scanner;
+import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,21 @@ public class GuiLauncher extends JFrame {
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
 		guiLauncher.setVisible(true);
 		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		// Register drag and drop
+		guiLauncher.midiFilePathTextField.setDropTarget(new DropTarget() {
+			@Override
+			public synchronized void drop(DropTargetDropEvent evt) {
+				try {
+					evt.acceptDrop(DnDConstants.ACTION_COPY);
+					//noinspection unchecked
+					List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+					guiLauncher.midiFilePathTextField.setText(droppedFiles.get(0).getAbsolutePath());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
 		
 		// Load MIDI devices
 		var infoArr = MidiSystem.getMidiDeviceInfo();
