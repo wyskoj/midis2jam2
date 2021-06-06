@@ -134,7 +134,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
 	 * the MIDI began playback
 	 */
-	double timeSinceStart = -2;
+	double timeSinceStart = -4;
 	
 	/**
 	 * The MIDI file.
@@ -227,7 +227,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		} catch (ReflectiveOperationException e) {
 			e.printStackTrace();
 		}
-		printNames(rootNode);
+//		printNames(rootNode);
 		
 		
 		addShadowsAndStands();
@@ -291,8 +291,18 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				instrument.tick(timeSinceStart, tpf);
 			}
 		}
+
+//		getDebugText().setText("%.5f".formatted(((double) sequencer.getMicrosecondPosition() / sequencer.getMicrosecondLength()) * 100));
 		
-		getDebugText().setText("%.5f".formatted(((double) sequencer.getMicrosecondPosition() / sequencer.getMicrosecondLength()) * 100));
+		if (sequencer.getMicrosecondPosition() == sequencer.getMicrosecondLength()) {
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					exit();
+				}
+			}, 3000);
+			sequencer.setMicrosecondPosition(0);
+		}
 		
 		updateShadowsAndStands();
 		preventCameraFromLeaving();
@@ -311,11 +321,14 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	public void onAction(String name, boolean isPressed, float tpf) {
 		setCameraSpeed(name, isPressed);
 		if (name.equals("exit")) {
-			if (sequencer.isOpen()) sequencer.stop();
-			logger.info("Going to back to main screen because of ESC key.");
-			app.stop();
+			exit();
 		}
 		handleCameraSetting(name, isPressed);
+	}
+	
+	private void exit() {
+		if (sequencer.isOpen()) sequencer.stop();
+		app.stop();
 	}
 	
 	private void handleCameraSetting(String name, boolean isPressed) {

@@ -20,16 +20,12 @@ package org.wysko.midis2jam2;
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
+import org.wysko.midis2jam2.gui.Midis2jam2Display;
 import org.wysko.midis2jam2.midi.MidiFile;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-
-import static java.util.Objects.requireNonNull;
-import static javax.imageio.ImageIO.read;
 
 public class Liaison extends SimpleApplication {
 	
@@ -48,28 +44,17 @@ public class Liaison extends SimpleApplication {
 	static {
 		// Set settings
 		midis2Jam2Settings.setFrameRate(120);
-		midis2Jam2Settings.setTitle("midis2jam2");
 		midis2Jam2Settings.setFrequency(60);
-		try {
-			var icons = new BufferedImage[]{
-					read(requireNonNull(Liaison.class.getResource("/ico/icon16.png"))),
-					read(requireNonNull(Liaison.class.getResource("/ico/icon32.png"))),
-					read(requireNonNull(Liaison.class.getResource("/ico/icon128.png"))),
-					read(requireNonNull(Liaison.class.getResource("/ico/icon256.png")))
-			};
-			midis2Jam2Settings.setIcons(icons);
-		} catch (IOException e) {
-			Midis2jam2.logger.warning("Failed to set window icon.");
-			e.printStackTrace();
-		}
 		midis2Jam2Settings.setVSync(true);
 		midis2Jam2Settings.setResizable(true);
 		midis2Jam2Settings.setSamples(4);
-		midis2Jam2Settings.setRenderer(AppSettings.LWJGL_OPENGL30);
+		midis2Jam2Settings.setGammaCorrection(false);
 	}
 	
-	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings,
-	               boolean fullscreen) {
+	private Midis2jam2Display display;
+	private Canvas canvas;
+	
+	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings, boolean fullscreen) {
 		this.sequencer = sequencer;
 		this.midiFile = midiFile;
 		this.guiLauncher = guiLauncher;
@@ -79,53 +64,43 @@ public class Liaison extends SimpleApplication {
 	
 	@Override
 	public void start() {
-		Liaison thiz = this;
-		SwingUtilities.invokeLater(() -> {
-			AppSettings settings = new AppSettings(true);
-			settings.setWidth(640);
-			settings.setHeight(480);
+		setDisplayStatView(false);
+		setDisplayFps(false);
+		setPauseOnLostFocus(false);
+		setShowSettings(false);
+		var screen = Toolkit.getDefaultToolkit().getScreenSize();
+		
+		if (fullscreen) {
+			midis2Jam2Settings.setFullscreen(true);
+			midis2Jam2Settings.setResolution(screen.width, screen.height);
 			setSettings(midis2Jam2Settings);
-			setDisplayStatView(false);
-			setDisplayFps(false);
-			setPauseOnLostFocus(false);
-			setShowSettings(false);
-			createCanvas(); // create canvas!
-			JmeCanvasContext ctx = (JmeCanvasContext) getContext();
-			ctx.setSystemListener(thiz);
-			Dimension dim = new Dimension(640, 480);
-			ctx.getCanvas().setPreferredSize(dim);
-			
-			JFrame window = new JFrame("Swing Application");
-			window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			
-			JPanel panel = new JPanel(new FlowLayout());
-			panel.add(ctx.getCanvas());
-			
-			window.add(panel);
-			window.pack();
-			window.setVisible(true);
-			
-			startCanvas();
-		});
-
-
-//		var dim = Toolkit.getDefaultToolkit().getScreenSize();
-//		if (fullscreen) {
-//			midis2Jam2Settings.setFullscreen(true);
-//			midis2Jam2Settings.setResolution(dim.width, dim.height);
-//		} else {
-//			midis2Jam2Settings.setFullscreen(false);
-//			midis2Jam2Settings.setResolution((int) (dim.width * 0.95), (int) (dim.height * 0.85));
-//		}
-//		midis2Jam2Settings.setResizable(true);
-//
-//		setSettings(midis2Jam2Settings);
-//		setDisplayStatView(false);
-//		setDisplayFps(false);
-//		setPauseOnLostFocus(false);
-//		setShowSettings(false);
-//		super.start();
-//		guiLauncher.disableAll();
+			super.start();
+			guiLauncher.disableAll();
+		} else {
+			var thisLiaison = this;
+			SwingUtilities.invokeLater(() -> {
+				
+				setSettings(midis2Jam2Settings);
+				setDisplayStatView(false);
+				setDisplayFps(false);
+				setPauseOnLostFocus(false);
+				setShowSettings(false);
+				createCanvas();
+				
+				JmeCanvasContext ctx = (JmeCanvasContext) getContext();
+				ctx.setSystemListener(thisLiaison);
+				
+				
+				var dim = new Dimension((int) (screen.width * 0.95), (int) (screen.height * 0.85));
+				canvas = ctx.getCanvas();
+				canvas.setPreferredSize(dim);
+				
+				display = new Midis2jam2Display(this, ctx.getCanvas());
+				display.display();
+				
+				startCanvas();
+			});
+		}
 	}
 	
 	@Override
@@ -138,6 +113,10 @@ public class Liaison extends SimpleApplication {
 	@Override
 	public void stop() {
 		super.stop();
+		if (!fullscreen) {
+			display.setVisible(false);
+			canvas.setEnabled(false);
+		}
 		enableLauncher();
 	}
 	
