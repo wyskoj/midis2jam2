@@ -14,3 +14,5 @@ midicsv.exe
 /install/
 midis2jam2.conf
 midis2jam2.ini
+/javadoc
+/.idea/sonarlint
