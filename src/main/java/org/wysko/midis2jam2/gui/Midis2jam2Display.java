@@ -51,6 +51,8 @@ public class Midis2jam2Display extends JFrame {
 		panel1 = new JPanel();
 		
 		//======== this ========
+		setIconImage(new ImageIcon(getClass().getResource("/ico/icon16.png")).getImage());
+		setTitle("midis2jam2");
 		var contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0};

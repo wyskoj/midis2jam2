@@ -44,7 +44,7 @@ Check this page to see the progress of each instrument's implementation.
 |_69_ Oboe ❌|_77_ Blown bottle ✔️|_85_ Lead 5 (charang) ✔️|_93_ Pad 5 (bowed) ✔️
 |_70_ English Horn ❌|_78_ Shakuhachi ❌|_86_ Lead 6 (voice) ✔️|_94_ Pad 6 (metallic) ✔️
 |_71_ Bassoon ❌|_79_ Whistle ✔️|_87_ Lead 7 (fifths) ✔️|_95_ Pad 7 (halo) ✔️
-|_72_ Clarinet ❌|_80_ Ocarina ✔️|_88_ Lead 8 (bass + lead) ✔️|_96_ Pad 8 (sweep) ✔️
+|_72_ Clarinet ✔️|_80_ Ocarina ✔️|_88_ Lead 8 (bass + lead) ✔️|_96_ Pad 8 (sweep) ✔️
 |===
 
 |===

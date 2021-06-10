@@ -12,6 +12,8 @@ new FormModel {
 			"$alignTop": true
 		} ) {
 			name: "this"
+			"iconImage": new com.jformdesigner.model.SwingIcon( 0, "/ico/icon16.png" )
+			"title": "midis2jam2"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "panel1"
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
