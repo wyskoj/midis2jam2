@@ -81,7 +81,7 @@ public class Helicopter extends SustainedInstrument {
 		rotYRand = random.nextFloat();
 		rotZRand = random.nextFloat();
 		
-		highestLevel.attachChild(animNode);
+		instrumentNode.attachChild(animNode);
 		
 	}
 	
