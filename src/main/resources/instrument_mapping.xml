@@ -18,7 +18,7 @@
 
 <instruments>
     <instrument name="Trumpet" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="52">
                 <key>1</key>
                 <key>2</key>
@@ -118,7 +118,7 @@
         </mapping>
     </instrument>
     <instrument name="FrenchHorn" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="46">
                 <key>1</key>
             </map>
@@ -241,7 +241,7 @@
         </mapping>
     </instrument>
     <instrument name="Tuba" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="22"/>
             <map note="23">
                 <key>2</key>
@@ -395,8 +395,227 @@
             <map note="70"/>
         </mapping>
     </instrument>
+    <instrument name="Trombone" mapping-type="slide_position">
+        <!-- Multiple pos tags within a single map indicate multiple slide positions that equally work; the Trombone
+        should just pick the closest one when playing. -->
+        <mapping>
+            <map note="21">
+                <pos>2</pos>
+            </map>
+            <map note="22">
+                <pos>1</pos>
+            </map>
+            <map note="23">
+                <pos>7</pos>
+            </map>
+            <map note="24">
+                <pos>6</pos>
+            </map>
+            <map note="25">
+                <pos>5</pos>
+            </map>
+            <map note="26">
+                <pos>4</pos>
+            </map>
+            <map note="27">
+                <pos>3</pos>
+            </map>
+            <map note="28">
+                <pos>2</pos>
+            </map>
+            <map note="29">
+                <pos>1</pos>
+            </map>
+            <map note="30">
+                <pos>5</pos>
+            </map>
+            <map note="31">
+                <pos>4</pos>
+            </map>
+            <map note="32">
+                <pos>3</pos>
+            </map>
+            <map note="33">
+                <pos>2</pos>
+            </map>
+            <map note="34">
+                <pos>1</pos>
+            </map>
+            <map note="35">
+                <pos>7</pos>
+            </map>
+            <map note="36">
+                <pos>6</pos>
+            </map>
+            <map note="37">
+                <pos>5</pos>
+            </map>
+            <map note="38">
+                <pos>4</pos>
+            </map>
+            <map note="39">
+                <pos>3</pos>
+            </map>
+            <map note="40">
+                <pos>7</pos>
+                <pos>2</pos>
+            </map>
+            <map note="41">
+                <pos>6</pos>
+                <pos>1</pos>
+            </map>
+            <map note="42">
+                <pos>5</pos>
+            </map>
+            <map note="43">
+                <pos>4</pos>
+            </map>
+            <map note="44">
+                <pos>3</pos>
+            </map>
+            <map note="45">
+                <pos>2</pos>
+            </map>
+            <map note="46">
+                <pos>1</pos>
+            </map>
+            <map note="47">
+                <pos>7</pos>
+            </map>
+            <map note="48">
+                <pos>6</pos>
+            </map>
+            <map note="49">
+                <pos>5</pos>
+            </map>
+            <map note="50">
+                <pos>4</pos>
+            </map>
+            <map note="51">
+                <pos>3</pos>
+            </map>
+            <map note="52">
+                <pos>2</pos>
+                <pos>7</pos>
+            </map>
+            <map note="53">
+                <pos>6</pos>
+                <pos>1</pos>
+            </map>
+            <map note="54">
+                <pos>5</pos>
+            </map>
+            <map note="55">
+                <pos>4</pos>
+            </map>
+            <map note="56">
+                <pos>7</pos>
+                <pos>3</pos>
+            </map>
+            <map note="57">
+                <pos>2</pos>
+                <pos>6</pos>
+            </map>
+            <map note="58">
+                <pos>1</pos>
+                <pos>5</pos>
+            </map>
+            <map note="59">
+                <pos>4</pos>
+                <pos>7</pos>
+            </map>
+            <map note="60">
+                <pos>3</pos>
+                <pos>6</pos>
+            </map>
+            <map note="61">
+                <pos>2</pos>
+                <pos>5</pos>
+            </map>
+            <map note="62">
+                <pos>1</pos>
+                <pos>4</pos>
+                <pos>7</pos>
+            </map>
+            <map note="63">
+                <pos>3</pos>
+                <pos>6</pos>
+            </map>
+            <map note="64">
+                <pos>2</pos>
+                <pos>5</pos>
+                <pos>7</pos>
+            </map>
+            <map note="65">
+                <pos>1</pos>
+                <pos>4</pos>
+                <pos>6</pos>
+            </map>
+            <map note="66">
+                <pos>3</pos>
+                <pos>5</pos>
+                <pos>7</pos>
+            </map>
+            <map note="67">
+                <pos>2</pos>
+                <pos>4</pos>
+                <pos>6</pos>
+            </map>
+            <map note="68">
+                <pos>1</pos>
+                <pos>3</pos>
+                <pos>5</pos>
+            </map>
+            <map note="69">
+                <pos>2</pos>
+                <pos>4</pos>
+                <pos>6</pos>
+            </map>
+            <map note="70">
+                <pos>1</pos>
+                <pos>3</pos>
+                <pos>5</pos>
+            </map>
+            <map note="71">
+                <pos>2</pos>
+                <pos>4</pos>
+                <pos>5</pos>
+            </map>
+            <map note="72">
+                <pos>1</pos>
+                <pos>3</pos>
+                <pos>4</pos>
+            </map>
+            <map note="73">
+                <pos>3</pos>
+                <pos>2</pos>
+            </map>
+            <map note="74">
+                <pos>2</pos>
+            </map>
+            <map note="75">
+                <pos>1</pos>
+            </map>
+            <map note="76">
+                <pos>3</pos>
+            </map>
+            <map note="77">
+                <pos>2</pos>
+            </map>
+            <map note="78">
+                <pos>3</pos>
+            </map>
+            <map note="79">
+                <pos>2</pos>
+            </map>
+            <map note="80">
+                <pos>1</pos>
+            </map>
+        </mapping>
+
+    </instrument>
     <instrument name="Flute" mapping-type="hands">
-       <mapping>
+        <mapping>
             <map note="60" lh="4" rh="0"/>
             <map note="61" lh="4" rh="2"/>
             <map note="62" lh="4" rh="3"/>
@@ -437,7 +656,7 @@
         </mapping>
     </instrument>
     <instrument name="Piccolo" mapping-type="hands">
-       <mapping>
+        <mapping>
             <map note="72" lh="4" rh="0"/>
             <map note="73" lh="4" rh="2"/>
             <map note="74" lh="4" rh="3"/>
@@ -523,7 +742,7 @@
         </mapping>
     </instrument>
     <instrument name="Recorder" mapping-type="hands">
-       <mapping>
+        <mapping>
             <map note="36" lh="0" rh="0"/>
             <map note="37" lh="0" rh="1"/>
             <map note="38" lh="0" rh="2"/>
@@ -588,7 +807,7 @@
         </mapping>
     </instrument>
     <instrument name="SopranoSax" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="87">
                 <key>2</key>
                 <key>1</key>
@@ -775,7 +994,7 @@
         </mapping>
     </instrument>
     <instrument name="AltoSax" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="80">
                 <key>2</key>
                 <key>1</key>
@@ -962,7 +1181,7 @@
         </mapping>
     </instrument>
     <instrument name="TenorSax" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="75">
                 <key>2</key>
                 <key>1</key>
@@ -1149,7 +1368,7 @@
         </mapping>
     </instrument>
     <instrument name="BaritoneSax" mapping-type="pressed_keys">
-       <mapping>
+        <mapping>
             <map note="68">
                 <key>2</key>
                 <key>1</key>

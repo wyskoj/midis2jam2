@@ -24,6 +24,7 @@ import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.MonophonicInstrument;
+import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager;
 import org.wysko.midis2jam2.instrument.clone.Clone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.NotePeriod;
@@ -34,11 +35,14 @@ import java.util.List;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
- * The trombone animates by moving a slide on the instrument. The slide position can be determined by calculating {@code
- * note % 7} since there are only 7 slide positions. To be implemented: the slide will slowly move to the next position
- * if there is time for it to move.
+ * The trombone animates by moving a slide on the instrument.
  */
 public class Trombone extends MonophonicInstrument {
+	
+	/**
+	 * The slide position manager.
+	 */
+	public static final SlidePositionManager SLIDE_MANAGER = SlidePositionManager.from(Trombone.class);
 	
 	/**
 	 * Instantiates a new Trombone.
@@ -102,7 +106,7 @@ public class Trombone extends MonophonicInstrument {
 		 * @return the translation vector
 		 */
 		private Vector3f slidePosition(double position) {
-			return new Vector3f(0, 0, (float) (((3.333333) * position) - 1));
+			return new Vector3f(0, 0, (float) (((3.333_333) * position) - 1));
 		}
 		
 		/**
@@ -123,11 +127,14 @@ public class Trombone extends MonophonicInstrument {
 			}
 			if (!notePeriods.isEmpty() && !isPlaying()) {
 				var notePeriod = notePeriods.get(0);
-				var startTime = notePeriod.startTime;
-				if (startTime - time <= 1) {
-					var targetPos = getSlidePositionFromNote(notePeriod);
-					var currentPos = getCurrentSlidePosition();
-					moveToPosition(getCurrentSlidePosition() + ((targetPos - currentPos) / (startTime - time)) * delta);
+				if (notePeriod.midiNote >= 21 && notePeriod.midiNote <= 80) { // Strip out of range notes
+					var startTime = notePeriod.startTime;
+					if (startTime - time <= 1) { // Slide only if it is within 1 second
+						var targetPos = getSlidePositionFromNote(notePeriod);
+						var currentPos = getCurrentSlidePosition();
+						if (startTime - time >= delta) // Don't try and slide if the difference is less than delta
+							moveToPosition(getCurrentSlidePosition() + ((targetPos - currentPos) / (startTime - time)) * delta);
+					}
 				}
 			}
 		}
@@ -140,7 +147,32 @@ public class Trombone extends MonophonicInstrument {
 		 * @return the slide position from note
 		 */
 		private int getSlidePositionFromNote(NotePeriod period) {
-			return (period.midiNote % 7) + 1;
+			var fingering = SLIDE_MANAGER.fingering(period.midiNote);
+			
+			/* If there is just one position, use that */
+			if (fingering.size() == 1) return fingering.get(0);
+			
+			/* There are more; find the one closest to the current position. */
+			var scores = new double[fingering.size()][2];
+			
+			/* Map each position to a score of how far away it is */
+			for (var i = 0; i < fingering.size(); i++) {
+				scores[i][0] = fingering.get(i);
+				scores[i][1] = Math.abs(scores[i][0] - getCurrentSlidePosition());
+			}
+			
+			/* Find the smallest */
+			var indexOfSmallest = 0;
+			var smallest = Double.MAX_VALUE;
+			for (var i = 0; i < scores.length; i++) {
+				if (scores[i][1] < smallest) {
+					smallest = scores[i][1];
+					indexOfSmallest = i;
+				}
+			}
+			
+			/* Return the best position */
+			return (int) scores[indexOfSmallest][0];
 		}
 		
 		@Override
