@@ -52,7 +52,7 @@ public class Tuba extends MonophonicInstrument {
 		super(context, eventList, TubaClone.class, FINGERING_MANAGER);
 		
 		/* Tuba positioning */
-		groupOfPolyphony.setLocalTranslation(-71, 28.9f, -97.9f);
+		groupOfPolyphony.setLocalTranslation(-110, 25, -30);
 	}
 	
 	@Override
