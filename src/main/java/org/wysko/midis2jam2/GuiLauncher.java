@@ -7,7 +7,6 @@ package org.wysko.midis2jam2;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.ini4j.Ini;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.gui.*;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -16,6 +15,7 @@ import org.wysko.midis2jam2.util.Utils;
 import javax.sound.midi.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
@@ -43,17 +43,18 @@ import static javax.swing.JOptionPane.*;
 @SuppressWarnings("unused")
 public class GuiLauncher extends JFrame {
 	
-	private static final File INI_FILE = new File("midis2jam2.ini");
+	private static final File SETTINGS_FILE = new File("settings.json");
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public GuiLauncher() {
 		initComponents();
+		settings = new LauncherSettings();
 	}
-	
-	private static final File SETTINGS_FILE = new File("midis2jam2.conf");
 	
 	private transient LauncherSettings settings;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		
 		// Initialize GUI
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
 		var guiLauncher = new GuiLauncher();
@@ -81,9 +82,10 @@ public class GuiLauncher extends JFrame {
 		// Load MIDI devices
 		var infoArr = MidiSystem.getMidiDeviceInfo();
 		var aModel = new DefaultComboBoxModel<MidiDevice.Info>();
+		
+		// Populate MIDI devices (but don't add Real Time Sequencer)
 		aModel.addAll(Arrays.stream(infoArr).filter(i -> !i.getName().equals("Real Time Sequencer")).collect(Collectors.toList()));
 		guiLauncher.midiDeviceDropDown.setModel(aModel);
-		guiLauncher.midiDeviceDropDown.setSelectedIndex(0);
 		
 		// Set tooltip values
 		ToolTipManager.sharedInstance().setInitialDelay(200);
@@ -96,6 +98,7 @@ public class GuiLauncher extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		// Check for updates
 		EventQueue.invokeLater(() -> new Thread(() -> {
 			try {
@@ -134,27 +137,48 @@ public class GuiLauncher extends JFrame {
 		// Bring GUI to front
 		guiLauncher.bringToFront();
 		
-		
-		// Load GSON
-		
+		// Load settings
 		try {
-			final LauncherSettings settings = new Gson().fromJson(new FileReader(SETTINGS_FILE), LauncherSettings.class);
-			if (settings == null) throw new IOException();
-			guiLauncher.settings = settings;
+			var json = new String(Files.readAllBytes(SETTINGS_FILE.toPath()));
+			if (json.isBlank()) throw new IllegalStateException();
+			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
 		} catch (Exception e) {
 			guiLauncher.settings = new LauncherSettings();
-			guiLauncher.settings.getSoundFontPaths().add(null); // Default SoundFont
+			guiLauncher.saveSettings();
+		} finally {
+			guiLauncher.reloadSettings();
+		}
+	}
+	
+	private void reloadSettings() {
+		
+		updateSf2List();
+		
+		// Set instrument transition
+		for (Component component : transitionSpeedPanel.getComponents()) {
+			((JRadioButton) component).setSelected(component.getName().equals(settings.getTransition().name()));
 		}
 		
-		guiLauncher.updateSf2List();
-		
-		// Load INI
-		
-		var ini = guiLauncher.ini();
-		if (ini.get("visuals", "transition") != null) {
-			for (Component component : guiLauncher.transitionSpeedPanel.getComponents()) {
-				((JRadioButton) component).setSelected(component.getName().equals(ini.get("visuals", "transition")));
+		// Set MIDI device
+		for (var i = 0; i < midiDeviceDropDown.getItemCount(); i++) {
+			if (midiDeviceDropDown.getItemAt(i).getName().equals(settings.getMidiDevice())) {
+				midiDeviceDropDown.setSelectedIndex(i);
+				break;
 			}
+		}
+		
+		fullscreenCheckbox.setSelected(settings.isFullscreen());
+		setLatencySpinnerFromDeviceDropdown();
+	}
+	
+	/**
+	 * Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}.
+	 */
+	private void saveSettings() {
+		try (var writer = new FileWriter(SETTINGS_FILE)) {
+			writer.write(GSON.toJson(settings));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -165,41 +189,6 @@ public class GuiLauncher extends JFrame {
 		settings.setSoundFontPaths(settings.getSoundFontPaths());
 		settings.setLastMidiDir(settings.getLastMidiDir());
 		saveSettings();
-	}
-	
-	private Ini ini() {
-		try {
-			return new Ini(INI_FILE);
-		} catch (IOException e) {
-			return new Ini();
-		}
-	}
-	
-	private void saveSettings() {
-		try {
-			var writer = new FileWriter(SETTINGS_FILE);
-			var gsonBuilder = new GsonBuilder();
-			gsonBuilder.excludeFieldsWithoutExposeAnnotation().create().toJson(settings, writer);
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	private void saveIni(ActionEvent e) {
-		
-		// Get transition speed
-		JRadioButton button = getSelectedTransitionRadioButton();
-		
-		var ini = ini();
-		
-		ini.put("visuals", "transition", button.getName());
-		try {
-			ini.store(INI_FILE);
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-		}
 	}
 	
 	@NotNull
@@ -263,26 +252,25 @@ public class GuiLauncher extends JFrame {
 		dialog.setPreferredSize(new Dimension(600, 400));
 		dialog.pack();
 		dialog.setVisible(true);
-		
 	}
 	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
-		if (((MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem())).getName().equals("Gervill")) {
+		var info = (MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem());
+		if (info.getName().equals("Gervill")) {
 			soundFontLabel.setEnabled(true);
 			soundFontPathDropDown.setEnabled(true);
 			editSoundFontsButton.setEnabled(true);
-			latencySpinner.setValue(100);
 		} else {
 			soundFontLabel.setEnabled(false);
 			soundFontPathDropDown.setEnabled(false);
 			editSoundFontsButton.setEnabled(false);
-			latencySpinner.setValue(0);
 		}
-		
+		latencySpinner.setValue(settings.getLatencyForDevice(info.getName()));
+		settings.setMidiDevice(info.getName());
+		saveSettings();
 	}
 	
 	private void startButtonPressed(ActionEvent e) {
-		saveIni(e);
 		// Collect MIDI file
 		this.setCursor(getPredefinedCursor(Cursor.WAIT_CURSOR));
 		if (midiFilePathTextField.getText().isBlank()) {
@@ -390,10 +378,12 @@ public class GuiLauncher extends JFrame {
 			showMessageDialog(this, new ExceptionDisplay("The requested MIDI component cannot be opened or created " +
 					"because it is unavailable.", midiUnavailableException), "MIDI Unavailable Error", ERROR_MESSAGE);
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
 		} catch (InvalidMidiDataException invalidMidiDataException) {
 			showMessageDialog(this, new ExceptionDisplay("Inappropriate MIDI data was encountered.",
 					invalidMidiDataException), "Invalid MIDI data Error", ERROR_MESSAGE);
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
 		} catch (IOException ioException) {
 			showMessageDialog(this, new ExceptionDisplay("An I/O error occurred.",
 					ioException), "I/O Error", ERROR_MESSAGE);
@@ -415,6 +405,28 @@ public class GuiLauncher extends JFrame {
 			this.toFront();
 			this.repaint();
 		});
+	}
+	
+	private void transitionSpeedNoneButtonActionPerformed(ActionEvent e) {
+		settings.setTransition(M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName()));
+		saveSettings();
+	}
+	
+	private void fullscreenCheckboxActionPerformed(ActionEvent e) {
+		settings.setFullscreen(fullscreenCheckbox.isSelected());
+		saveSettings();
+	}
+	
+	private void latencySpinnerStateChanged(ChangeEvent e) {
+		setLatencySpinnerFromDeviceDropdown();
+		saveSettings();
+	}
+	
+	private void setLatencySpinnerFromDeviceDropdown() {
+		settings.setLatencyForDevice(
+				((MidiDevice.Info) midiDeviceDropDown.getSelectedItem()).getName(),
+				(int) latencySpinner.getValue()
+		);
 	}
 	
 	private void initComponents() {
@@ -584,6 +596,7 @@ public class GuiLauncher extends JFrame {
 			
 			//---- latencySpinner ----
 			latencySpinner.setModel(new SpinnerNumberModel(100, null, null, 1));
+			latencySpinner.addChangeListener(e -> latencySpinnerStateChanged(e));
 			settingsPanel.add(latencySpinner, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 5, 5), 0, 0));
@@ -607,6 +620,7 @@ public class GuiLauncher extends JFrame {
 			//---- fullscreenCheckbox ----
 			fullscreenCheckbox.setText(bundle.getString("GuiLauncher.fullscreenCheckbox.text"));
 			fullscreenCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
+			fullscreenCheckbox.addActionListener(e -> fullscreenCheckboxActionPerformed(e));
 			settingsPanel.add(fullscreenCheckbox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 5, 5), 0, 0));
@@ -635,7 +649,7 @@ public class GuiLauncher extends JFrame {
 				//---- transitionSpeedNoneButton ----
 				transitionSpeedNoneButton.setText(bundle.getString("GuiLauncher.transitionSpeedNoneButton.text"));
 				transitionSpeedNoneButton.setName("NONE");
-				transitionSpeedNoneButton.addActionListener(e -> saveIni(e));
+				transitionSpeedNoneButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedNoneButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 5, 5), 0, 0));
@@ -643,7 +657,7 @@ public class GuiLauncher extends JFrame {
 				//---- transitionSpeedSlowButton ----
 				transitionSpeedSlowButton.setText(bundle.getString("GuiLauncher.transitionSpeedSlowButton.text"));
 				transitionSpeedSlowButton.setName("SLOW");
-				transitionSpeedSlowButton.addActionListener(e -> saveIni(e));
+				transitionSpeedSlowButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedSlowButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 5, 0), 0, 0));
@@ -652,7 +666,7 @@ public class GuiLauncher extends JFrame {
 				transitionSpeedNormalButton.setText(bundle.getString("GuiLauncher.transitionSpeedNormalButton.text"));
 				transitionSpeedNormalButton.setSelected(true);
 				transitionSpeedNormalButton.setName("NORMAL");
-				transitionSpeedNormalButton.addActionListener(e -> saveIni(e));
+				transitionSpeedNormalButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedNormalButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 5), 0, 0));
@@ -660,7 +674,7 @@ public class GuiLauncher extends JFrame {
 				//---- transitionSpeedFastButton ----
 				transitionSpeedFastButton.setText(bundle.getString("GuiLauncher.transitionSpeedFastButton.text"));
 				transitionSpeedFastButton.setName("FAST");
-				transitionSpeedFastButton.addActionListener(e -> saveIni(e));
+				transitionSpeedFastButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedFastButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));

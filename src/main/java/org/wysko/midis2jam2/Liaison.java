@@ -120,6 +120,9 @@ public class Liaison extends SimpleApplication {
 		enableLauncher();
 	}
 	
+	/**
+	 * Unlock the {@link #guiLauncher} so the user can use it.
+	 */
 	public void enableLauncher() {
 		guiLauncher.enableAll();
 	}

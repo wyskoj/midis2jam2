@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "7.0.4.0.355" Java: "11.0.10" encoding: "UTF-8"
+JFDML JFormDesigner: "7.0.4.0.360" Java: "11.0.11" encoding: "UTF-8"
 
 new FormModel {
 	"i18n.bundlePackage": "i18n"
@@ -158,6 +158,7 @@ new FormModel {
 					"model": new javax.swing.SpinnerNumberModel {
 						value: 100
 					}
+					addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "latencySpinnerStateChanged", true ) )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 2
 				} )
@@ -186,6 +187,7 @@ new FormModel {
 					name: "fullscreenCheckbox"
 					"text": new FormMessage( null, "GuiLauncher.fullscreenCheckbox.text" )
 					"horizontalAlignment": 0
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "fullscreenCheckboxActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 2
 					"gridy": 1
@@ -220,14 +222,14 @@ new FormModel {
 						"text": new FormMessage( null, "GuiLauncher.transitionSpeedNoneButton.text" )
 						"$buttonGroup": new FormReference( "transitionSpeedButtonGroup" )
 						"name": "NONE"
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "saveIni", true ) )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "transitionSpeedNoneButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 					add( new FormComponent( "javax.swing.JRadioButton" ) {
 						name: "transitionSpeedSlowButton"
 						"text": new FormMessage( null, "GuiLauncher.transitionSpeedSlowButton.text" )
 						"$buttonGroup": new FormReference( "transitionSpeedButtonGroup" )
 						"name": "SLOW"
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "saveIni", true ) )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "transitionSpeedNoneButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 1
 					} )
@@ -237,7 +239,7 @@ new FormModel {
 						"selected": true
 						"$buttonGroup": new FormReference( "transitionSpeedButtonGroup" )
 						"name": "NORMAL"
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "saveIni", true ) )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "transitionSpeedNoneButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 1
 					} )
@@ -246,7 +248,7 @@ new FormModel {
 						"text": new FormMessage( null, "GuiLauncher.transitionSpeedFastButton.text" )
 						"$buttonGroup": new FormReference( "transitionSpeedButtonGroup" )
 						"name": "FAST"
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "saveIni", true ) )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "transitionSpeedNoneButtonActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 1
 						"gridy": 1

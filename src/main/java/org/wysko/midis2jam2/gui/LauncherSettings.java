@@ -17,28 +17,48 @@
 
 package org.wysko.midis2jam2.gui;
 
-import com.google.gson.annotations.Expose;
+import org.wysko.midis2jam2.M2J2Settings.InstrumentTransition;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LauncherSettings {
 	
-	@Expose
 	private String lastMidiDir;
-	
-	@Expose
 	private List<String> soundFontPaths;
+	private InstrumentTransition transition;
+	private String midiDevice;
+	private boolean fullscreen;
+	private final Map<String, Integer> deviceLatencyMap;
 	
-	public LauncherSettings(String lastMidiDir, List<String> soundFontPaths) {
-		this.lastMidiDir = lastMidiDir;
-		this.soundFontPaths = soundFontPaths;
+	public int getLatencyForDevice(String deviceName) {
+		var integer = deviceLatencyMap.get(deviceName);
+		return integer == null ? 0 : integer;
+	}
+	
+	public void setLatencyForDevice(String deviceName, int value) {
+		deviceLatencyMap.put(deviceName, value);
+	}
+	
+	public boolean isFullscreen() {
+		return fullscreen;
+	}
+	
+	public void setFullscreen(boolean fullscreen) {
+		this.fullscreen = fullscreen;
 	}
 	
 	public LauncherSettings() {
 		lastMidiDir = new JFileChooser().getFileSystemView().getDefaultDirectory().getAbsolutePath();
 		soundFontPaths = new ArrayList<>();
+		transition = InstrumentTransition.NORMAL;
+		midiDevice = "Gervill";
+		fullscreen = false;
+		deviceLatencyMap = new HashMap<>();
+		deviceLatencyMap.put("Gervill", 100);
 	}
 	
 	public String getLastMidiDir() {
@@ -57,11 +77,29 @@ public class LauncherSettings {
 		this.soundFontPaths = soundFontPaths;
 	}
 	
+	public InstrumentTransition getTransition() {
+		return transition;
+	}
+	
+	public void setTransition(InstrumentTransition transition) {
+		this.transition = transition;
+	}
+	
+	public String getMidiDevice() {
+		return midiDevice;
+	}
+	
+	public void setMidiDevice(String midiDevice) {
+		this.midiDevice = midiDevice;
+	}
+	
 	@Override
 	public String toString() {
 		return "LauncherSettings{" +
-				"midiFilePath=" + lastMidiDir +
+				"lastMidiDir='" + lastMidiDir + '\'' +
 				", soundFontPaths=" + soundFontPaths +
+				", transition=" + transition +
+				", midiDevice='" + midiDevice + '\'' +
 				'}';
 	}
 }
