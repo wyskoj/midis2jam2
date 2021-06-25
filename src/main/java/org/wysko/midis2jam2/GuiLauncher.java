@@ -121,18 +121,13 @@ public class GuiLauncher extends JFrame {
 				if (html.contains("Out of")) {
 					showMessageDialog(guiLauncher, jep,
 							"Update available", WARNING_MESSAGE);
-					Midis2jam2.logger.warning("Out of date!!");
+					Midis2jam2.LOGGER.warning("Out of date!!");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}));
 		
-		// Launch directly into midis2jam2 if a MIDI file is specified
-		if (args.length == 1) {
-			guiLauncher.midiFilePathTextField.setText(args[0]);
-			guiLauncher.startButtonPressed(null);
-		}
 		
 		// Bring GUI to front
 		guiLauncher.bringToFront();
@@ -147,6 +142,12 @@ public class GuiLauncher extends JFrame {
 			guiLauncher.saveSettings();
 		} finally {
 			guiLauncher.reloadSettings();
+		}
+		
+		// Launch directly into midis2jam2 if a MIDI file is specified
+		if (args.length == 1) {
+			guiLauncher.midiFilePathTextField.setText(args[0]);
+			guiLauncher.startButtonPressed(null);
 		}
 	}
 	
@@ -372,7 +373,7 @@ public class GuiLauncher extends JFrame {
 					M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
 					fullscreenCheckbox.isSelected());
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
+			SwingUtilities.invokeLater(() -> new Thread(() -> liaison.start(getDisplayType())).start());
 			
 		} catch (MidiUnavailableException midiUnavailableException) {
 			showMessageDialog(this, new ExceptionDisplay("The requested MIDI component cannot be opened or created " +
@@ -389,6 +390,13 @@ public class GuiLauncher extends JFrame {
 					ioException), "I/O Error", ERROR_MESSAGE);
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
+	}
+	
+	private Class<? extends Displays> getDisplayType() {
+		if (simpleWindowRadio.isSelected()) return Midis2jam2Display.class;
+		else if (hudWindowRadio.isSelected()) return AdvancedDisplay.class;
+		Midis2jam2.LOGGER.severe("One of the display types was not pressed!");
+		return null;
 	}
 	
 	public void disableAll() {
@@ -463,6 +471,9 @@ public class GuiLauncher extends JFrame {
 		transitionSpeedFastButton = new JRadioButton();
 		transitionSpeedHelp = new JLabel();
 		startButton = new JResizedIconButton();
+		panel1 = new JPanel();
+		simpleWindowRadio = new JRadioButton();
+		hudWindowRadio = new JRadioButton();
 		versionText = new JLabel();
 		
 		//======== this ========
@@ -471,17 +482,17 @@ public class GuiLauncher extends JFrame {
 		setResizable(false);
 		var contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
-		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0};
-		((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{132, 145, 77, 0, 0, 0};
-		((GridBagLayout) contentPane.getLayout()).columnWeights = new double[]{1.0, 1.0E-4};
-		((GridBagLayout) contentPane.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0, 0, 0};
+		((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{132, 145, 77, 0, 0, 0, 0};
+		((GridBagLayout) contentPane.getLayout()).columnWeights = new double[]{1.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout) contentPane.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 		
 		//---- logo ----
 		logo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
 		logo.setHorizontalAlignment(SwingConstants.CENTER);
-		contentPane.add(logo, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+		contentPane.add(logo, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(10, 0, 5, 0), 0, 0));
+				new Insets(10, 0, 5, 5), 0, 0));
 		
 		//======== configurationPanel ========
 		{
@@ -571,9 +582,9 @@ public class GuiLauncher extends JFrame {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 		}
-		contentPane.add(configurationPanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+		contentPane.add(configurationPanel, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 10, 5), 0, 0));
+				new Insets(5, 5, 10, 10), 0, 0));
 		
 		//======== settingsPanel ========
 		{
@@ -690,9 +701,9 @@ public class GuiLauncher extends JFrame {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 		}
-		contentPane.add(settingsPanel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+		contentPane.add(settingsPanel, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 10, 5), 0, 0));
+				new Insets(5, 5, 10, 10), 0, 0));
 		
 		//---- startButton ----
 		startButton.setText(bundle.getString("GuiLauncher.startButton.text"));
@@ -700,15 +711,40 @@ public class GuiLauncher extends JFrame {
 		startButton.setIcon(new ImageIcon(getClass().getResource("/music.png")));
 		startButton.addActionListener(e -> startButtonPressed(e));
 		contentPane.add(startButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-				new Insets(10, 0, 5, 0), 0, 0));
+				GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(10, 0, 5, 5), 0, 0));
+		
+		//======== panel1 ========
+		{
+			panel1.setLayout(new GridBagLayout());
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[]{0, 0};
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[]{0, 0, 0};
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[]{1.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[]{0.0, 0.0, 1.0E-4};
+			
+			//---- simpleWindowRadio ----
+			simpleWindowRadio.setText("Simple window");
+			simpleWindowRadio.setSelected(true);
+			panel1.add(simpleWindowRadio, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+			
+			//---- hudWindowRadio ----
+			hudWindowRadio.setText("HUD window");
+			panel1.add(hudWindowRadio, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
+		}
+		contentPane.add(panel1, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
 		
 		//---- versionText ----
 		versionText.setText(bundle.getString("GuiLauncher.versionText.text"));
 		versionText.setHorizontalAlignment(SwingConstants.RIGHT);
-		contentPane.add(versionText, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+		contentPane.add(versionText, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 10, 5), 0, 0));
+				new Insets(0, 0, 15, 10), 0, 0));
 		pack();
 		setLocationRelativeTo(getOwner());
 		
@@ -718,6 +754,11 @@ public class GuiLauncher extends JFrame {
 		transitionSpeedButtonGroup.add(transitionSpeedSlowButton);
 		transitionSpeedButtonGroup.add(transitionSpeedNormalButton);
 		transitionSpeedButtonGroup.add(transitionSpeedFastButton);
+		
+		//---- windowTypeGroup ----
+		var windowTypeGroup = new ButtonGroup();
+		windowTypeGroup.add(simpleWindowRadio);
+		windowTypeGroup.add(hudWindowRadio);
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 	
@@ -752,6 +793,9 @@ public class GuiLauncher extends JFrame {
 	private JRadioButton transitionSpeedFastButton;
 	private JLabel transitionSpeedHelp;
 	private JResizedIconButton startButton;
+	private JPanel panel1;
+	private JRadioButton simpleWindowRadio;
+	private JRadioButton hudWindowRadio;
 	private JLabel versionText;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

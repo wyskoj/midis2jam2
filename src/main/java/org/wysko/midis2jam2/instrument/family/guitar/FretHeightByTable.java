@@ -67,7 +67,7 @@ public class FretHeightByTable implements FretHeightCalculator {
 			}
 			return new FretHeightByTable(lookup);
 		} catch (Exception e) {
-			Midis2jam2.logger.log(Level.SEVERE, "Failed to load fret height from XML for %s.".formatted(clazz.getName()));
+			Midis2jam2.LOGGER.log(Level.SEVERE, "Failed to load fret height from XML for %s.".formatted(clazz.getName()));
 			e.printStackTrace();
 			return new FretHeightByTable(new HashMap<>());
 		}

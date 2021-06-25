@@ -24,8 +24,10 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
@@ -38,6 +40,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
+import org.wysko.midis2jam2.gui.AdvancedDisplay;
+import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
@@ -60,11 +64,11 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax;
-import org.wysko.midis2jam2.instrument.family.soundeffects.Gunshot;
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter;
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.world.Camera;
 
 import javax.sound.midi.Sequencer;
 import java.util.*;
@@ -76,17 +80,19 @@ import java.util.stream.IntStream;
 import static com.jme3.scene.Spatial.CullHint.Always;
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
 import static java.util.logging.Level.INFO;
-import static org.wysko.midis2jam2.Midis2jam2.Camera.*;
+import static org.wysko.midis2jam2.world.Camera.*;
 
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
-	public static final Logger logger = Logger.getLogger(Midis2jam2.class.getName());
+	public static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
 	
 	private static final String LIGHTING_MAT = "Common/MatDefs/Light/Lighting.j3md";
 	
 	static {
-		logger.setLevel(Level.ALL);
+		LOGGER.setLevel(Level.ALL);
 	}
+	
+	private Displays window = null;
 	
 	/**
 	 * The list of instruments.
@@ -212,7 +218,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.app.getFlyByCamera().setEnabled(true);
 		this.app.getFlyByCamera().setDragToRotate(true);
 		
-		setupKeys();
+		setupInputMappings();
 		setCamera(CAMERA_1A);
 		
 		// Load stage
@@ -271,7 +277,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
 	@Override
 	public void cleanup() {
-		logger.log(INFO, "Cleaning up.");
+		LOGGER.log(INFO, "Cleaning up.");
 		sequencer.stop();
 		sequencer.close();
 		((Liaison) app).enableLauncher();
@@ -280,7 +286,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	@Override
 	public void update(float tpf) {
 		super.update(tpf);
-		
 		
 		if (sequencer == null) return;
 		if (sequencer.isOpen())
@@ -291,8 +296,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				instrument.tick(timeSinceStart, tpf);
 			}
 		}
-
-//		getDebugText().setText("%.5f".formatted(((double) sequencer.getMicrosecondPosition() / sequencer.getMicrosecondLength()) * 100));
 		
 		if (sequencer.getMicrosecondPosition() == sequencer.getMicrosecondLength()) {
 			new Timer().schedule(new TimerTask() {
@@ -306,8 +309,26 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		updateShadowsAndStands();
 		preventCameraFromLeaving();
+		
+		// Update window
+		if (window != null && window instanceof AdvancedDisplay) {
+			var window = (AdvancedDisplay) this.window;
+			window.setProgressText(progressText(),
+					(double) sequencer.getMicrosecondPosition() / sequencer.getMicrosecondLength());
+		}
 	}
 	
+	private String progressText() {
+		if (sequencer == null) return null;
+		double totalSeconds = sequencer.getMicrosecondLength() / 1E6;
+		double currentSeconds = sequencer.getMicrosecondPosition() / 1E6;
+		return "%.1f / 100.0".formatted(
+				100 * currentSeconds / totalSeconds);
+	}
+	
+	/**
+	 * Checks the camera's position and ensures it stays within a certain bounding box.
+	 */
 	private void preventCameraFromLeaving() {
 		var location = app.getCamera().getLocation();
 		app.getCamera().setLocation(new Vector3f(
@@ -323,14 +344,24 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		if (name.equals("exit")) {
 			exit();
 		}
+		if (name.equals("lmb") && window != null) window.showCursor(isPressed);
 		handleCameraSetting(name, isPressed);
 	}
 	
+	/**
+	 * Stops the app state.
+	 */
 	private void exit() {
 		if (sequencer.isOpen()) sequencer.stop();
 		app.stop();
 	}
 	
+	/**
+	 * Handles when a key is pressed, setting the correct camera position.
+	 *
+	 * @param name      the name of the key bind pressed
+	 * @param isPressed is key pressed?
+	 */
 	private void handleCameraSetting(String name, boolean isPressed) {
 		if (isPressed && name.startsWith("cam")) {
 			try {
@@ -349,10 +380,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				};
 				setCamera(valueOf(currentCamera.name()));
 			} catch (IllegalArgumentException ignored) {
-				logger.warning("Bad camera string.");
+				LOGGER.warning("Bad camera string.");
 			}
 		}
 	}
+	
 	
 	private void setCameraSpeed(String name, boolean isPressed) {
 		if (name.equals("slow") && isPressed) {
@@ -787,7 +819,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			// Helicopter
 			case 125 -> new Helicopter(this, events);
 			// Gunshot
-			case 127 -> new Gunshot(this, events);
+//			case 127 -> new Gunshot(this, events);
 			default -> null;
 		};
 	}
@@ -957,9 +989,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	/**
-	 * Registers key handling.
+	 * Registers key and mouse handling.
 	 */
-	private void setupKeys() {
+	private void setupInputMappings() {
 		this.app.getInputManager().deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
 		
 		this.app.getInputManager().addMapping("cam1", new KeyTrigger(KeyInput.KEY_1));
@@ -991,6 +1023,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		this.app.getInputManager().addMapping("exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
 		this.app.getInputManager().addListener(this, "exit");
+		
+		this.app.getInputManager().addMapping("lmb", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+		this.app.getInputManager().addListener(this, "lmb");
 	}
 	
 	/**
@@ -1015,36 +1050,14 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.debugText = debugText;
 	}
 	
+	public void setWindow(Displays window) {
+		this.window = window;
+	}
+	
 	public enum MatType {
 		UNSHADED,
 		SHADED,
 		REFLECTIVE
-	}
-	
-	/**
-	 * Defines angles for cameras.
-	 */
-	enum Camera {
-		CAMERA_1A(-2, 92, 134, rad(18.44f), rad(180), 0),
-		CAMERA_1B(60, 92, 124, rad(18.5), rad(204.4), 0),
-		CAMERA_1C(-59.5f, 90.8f, 94.4f, rad(23.9), rad(153.6), 0),
-		CAMERA_2A(0, 71.8f, 44.5f, rad(15.7), rad(224.9), 0),
-		CAMERA_2B(-35, 76.4f, 33.6f, rad(55.8), rad(198.5), 0),
-		CAMERA_3A(-0.2f, 61.6f, 38.6f, rad(15.5), rad(180), 0),
-		CAMERA_3B(-19.6f, 78.7f, 3.8f, rad(27.7), rad(163.8), 0),
-		CAMERA_4A(0.2f, 81.1f, 32.2f, rad(21), rad(131.8), rad(-0.5)),
-		CAMERA_4B(35, 25.4f, -19, rad(-50), rad(119), rad(-2.5)),
-		CAMERA_5(5, 432, 24, rad(82.875f), rad(180), 0),
-		CAMERA_6(17, 30.5f, 42.9f, rad(-6.7), rad(144.3), 0);
-		
-		final Vector3f location;
-		
-		final Quaternion rotation;
-		
-		Camera(float locX, float locY, float locZ, float rotX, float rotY, float rotZ) {
-			location = new Vector3f(locX, locY, locZ);
-			rotation = new Quaternion().fromAngles(rotX, rotY, rotZ);
-		}
 	}
 	
 }

@@ -7,8 +7,8 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.GridBagLayout ) {
-			"$columnSpecs": "0:1.0"
-			"$rowSpecs": "127, 140, 72, 0, 0"
+			"$columnSpecs": "0:1.0, 0:1.0, 0"
+			"$rowSpecs": "127, 140, 72, 0, 0, 0"
 			"$hGap": 5
 			"$vGap": 5
 			"$alignLeft": true
@@ -24,6 +24,7 @@ new FormModel {
 				"horizontalAlignment": 0
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 				"insets": new java.awt.Insets( 10, 0, 0, 0 )
+				"gridwidth": 2
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 				"$columnSpecs": "104, 136:1.0, 87, 0"
@@ -130,6 +131,7 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 				"gridy": 1
 				"insets": &Insets1 new java.awt.Insets( 5, 5, 5, 5 )
+				"gridwidth": 2
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 				"$rowSpecs": "0, 0, 0, 6"
@@ -269,6 +271,7 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 				"gridy": 2
 				"insets": #Insets1
+				"gridwidth": 2
 			} )
 			add( new FormComponent( "org.wysko.midis2jam2.gui.JResizedIconButton" ) {
 				name: "startButton"
@@ -278,8 +281,35 @@ new FormModel {
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "startButtonPressed", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 				"gridy": 3
-				"hAlign": 0
+				"hAlign": 4
 				"insets": new java.awt.Insets( 10, 0, 0, 0 )
+				"vAlign": 0
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0:1.0"
+				"$rowSpecs": "0, 0"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignLeft": true
+				"$alignTop": true
+			} ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "simpleWindowRadio"
+					"text": "Simple window"
+					"$buttonGroup": new FormReference( "windowTypeGroup" )
+					"selected": true
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "hudWindowRadio"
+					"text": "HUD window"
+					"$buttonGroup": new FormReference( "windowTypeGroup" )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+				} )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridx": 1
+				"gridy": 3
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "versionText"
@@ -288,15 +318,21 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 				"gridy": 4
 				"insets": new java.awt.Insets( 0, 0, 10, 5 )
+				"gridx": 1
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 5, 5 )
-			"size": new java.awt.Dimension( 590, 545 )
+			"location": new java.awt.Point( 10, 5 )
+			"size": new java.awt.Dimension( 625, 560 )
 		} )
 		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
 			name: "transitionSpeedButtonGroup"
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 0, 566 )
+			"location": new java.awt.Point( 25, 660 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "windowTypeGroup"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 380, 620 )
 		} )
 	}
 }

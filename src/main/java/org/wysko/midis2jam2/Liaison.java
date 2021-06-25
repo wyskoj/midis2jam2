@@ -20,12 +20,14 @@ package org.wysko.midis2jam2;
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
-import org.wysko.midis2jam2.gui.Midis2jam2Display;
+import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.midi.MidiFile;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class Liaison extends SimpleApplication {
 	
@@ -51,8 +53,9 @@ public class Liaison extends SimpleApplication {
 		midis2Jam2Settings.setGammaCorrection(false);
 	}
 	
-	private Midis2jam2Display display;
+	private Displays display;
 	private Canvas canvas;
+	private Midis2jam2 midis2jam2;
 	
 	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings, boolean fullscreen) {
 		this.sequencer = sequencer;
@@ -62,8 +65,8 @@ public class Liaison extends SimpleApplication {
 		this.fullscreen = fullscreen;
 	}
 	
-	@Override
-	public void start() {
+	
+	public void start(Class<? extends Displays> displayType) {
 		setDisplayStatView(false);
 		setDisplayFps(false);
 		setPauseOnLostFocus(false);
@@ -85,19 +88,23 @@ public class Liaison extends SimpleApplication {
 				setDisplayFps(false);
 				setPauseOnLostFocus(false);
 				setShowSettings(false);
-				createCanvas();
 				
+				createCanvas();
 				JmeCanvasContext ctx = (JmeCanvasContext) getContext();
 				ctx.setSystemListener(thisLiaison);
-				
 				
 				var dim = new Dimension((int) (screen.width * 0.95), (int) (screen.height * 0.85));
 				canvas = ctx.getCanvas();
 				canvas.setPreferredSize(dim);
 				
-				display = new Midis2jam2Display(this, ctx.getCanvas());
-				display.display();
-				
+				try {
+					Constructor<? extends Displays> constructor = displayType.getConstructor(Liaison.class,
+							Canvas.class, Midis2jam2.class);
+					display = constructor.newInstance(this, ctx.getCanvas(), midis2jam2);
+					display.display();
+				} catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
 				startCanvas();
 			});
 		}
@@ -105,9 +112,11 @@ public class Liaison extends SimpleApplication {
 	
 	@Override
 	public void simpleInitApp() {
-		var midis2jam2 = new Midis2jam2(sequencer, midiFile, m2j2settings);
+		midis2jam2 = new Midis2jam2(sequencer, midiFile, m2j2settings);
+		midis2jam2.setWindow(display);
 		stateManager.attach(midis2jam2);
 		rootNode.attachChild(midis2jam2.getRootNode());
+		
 	}
 	
 	@Override
