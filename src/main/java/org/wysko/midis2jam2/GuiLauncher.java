@@ -43,7 +43,7 @@ import static javax.swing.JOptionPane.*;
 @SuppressWarnings("unused")
 public class GuiLauncher extends JFrame {
 	
-	private static final File SETTINGS_FILE = new File("settings.json");
+	private static final File SETTINGS_FILE = new File(System.getProperty("user.home"), "midis2jam2.settings");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public GuiLauncher() {
