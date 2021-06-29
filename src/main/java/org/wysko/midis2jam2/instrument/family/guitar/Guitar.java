@@ -71,27 +71,27 @@ public class Guitar extends FrettedInstrument {
 		
 		// Position each string
 		var forward = 0.125f;
-		upperStrings[0].setLocalTranslation(positioning.topX[0], positioning.topY, forward);
+		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward);
 		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
 		upperStrings[0].setLocalScale(positioning.restingStrings[0]);
 		
-		upperStrings[1].setLocalTranslation(positioning.topX[1], positioning.topY, forward);
+		upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward);
 		upperStrings[1].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.62)));
 		upperStrings[1].setLocalScale(positioning.restingStrings[1]);
 		
-		upperStrings[2].setLocalTranslation(positioning.topX[2], positioning.topY, forward);
+		upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward);
 		upperStrings[2].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.22)));
 		upperStrings[2].setLocalScale(positioning.restingStrings[2]);
 		
-		upperStrings[3].setLocalTranslation(positioning.topX[3], positioning.topY, forward);
+		upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward);
 		upperStrings[3].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.08)));
 		upperStrings[3].setLocalScale(positioning.restingStrings[3]);
 		
-		upperStrings[4].setLocalTranslation(positioning.topX[4], positioning.topY, forward);
+		upperStrings[4].setLocalTranslation(positioning.upperX[4], positioning.upperY, forward);
 		upperStrings[4].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.45)));
 		upperStrings[4].setLocalScale(positioning.restingStrings[4]);
 		
-		upperStrings[5].setLocalTranslation(positioning.topX[5], positioning.topY, forward);
+		upperStrings[5].setLocalTranslation(positioning.upperX[5], positioning.upperY, forward);
 		upperStrings[5].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.9)));
 		upperStrings[5].setLocalScale(positioning.restingStrings[5]);
 		
@@ -108,35 +108,35 @@ public class Guitar extends FrettedInstrument {
 		
 		// Position lower strings
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[0][i].setLocalTranslation(positioning.bottomX[0], positioning.bottomY, forward);
+			lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward);
 			lowerStrings[0][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
 			lowerStrings[0][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[1][i].setLocalTranslation(positioning.bottomX[1], positioning.bottomY, forward);
+			lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward);
 			lowerStrings[1][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.62)));
 			lowerStrings[1][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[2][i].setLocalTranslation(positioning.bottomX[2], positioning.bottomY, forward);
+			lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward);
 			lowerStrings[2][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.22)));
 			lowerStrings[2][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[3][i].setLocalTranslation(positioning.bottomX[3], positioning.bottomY, forward);
+			lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward);
 			lowerStrings[3][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.08)));
 			lowerStrings[3][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[4][i].setLocalTranslation(positioning.bottomX[4], positioning.bottomY, forward);
+			lowerStrings[4][i].setLocalTranslation(positioning.lowerX[4], positioning.lowerY, forward);
 			lowerStrings[4][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.45)));
 			lowerStrings[4][i].setLocalScale(positioning.restingStrings[0]);
 		}
 		
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[5][i].setLocalTranslation(positioning.bottomX[5], positioning.bottomY, forward);
+			lowerStrings[5][i].setLocalTranslation(positioning.lowerX[5], positioning.lowerY, forward);
 			lowerStrings[5][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.9)));
 			lowerStrings[5][i].setLocalScale(positioning.restingStrings[0]);
 		}

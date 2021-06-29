@@ -150,16 +150,16 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	 */
 	protected void positionUpperStrings() {
 		final float forward = -0.6f;
-		upperStrings[0].setLocalTranslation(positioning.topX[0], positioning.topY, forward);
+		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward);
 		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(rad(-4), 0, rad(-1.63)));
 		
-		upperStrings[1].setLocalTranslation(positioning.topX[1], positioning.topY, forward);
+		upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward);
 		upperStrings[1].setLocalRotation(new Quaternion().fromAngles(rad(-4.6), 0, rad(-0.685)));
 		
-		upperStrings[2].setLocalTranslation(positioning.topX[2], positioning.topY, forward);
+		upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward);
 		upperStrings[2].setLocalRotation(new Quaternion().fromAngles(rad(-4.6), 0, rad(0.667)));
 		
-		upperStrings[3].setLocalTranslation(positioning.topX[3], positioning.topY, forward);
+		upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward);
 		upperStrings[3].setLocalRotation(new Quaternion().fromAngles(rad(-4), 0, rad(1.69)));
 	}
 	
@@ -179,20 +179,20 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 		
 		// Position lower strings
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[0][i].setLocalTranslation(positioning.bottomX[0], positioning.bottomY, 0.47f);
+			lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, 0.47f);
 			lowerStrings[0][i].setLocalRotation(new Quaternion().fromAngles(rad(-4), 0, rad(-1.61)));
 		}
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[1][i].setLocalTranslation(positioning.bottomX[1], positioning.bottomY, 0.58f);
+			lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, 0.58f);
 			lowerStrings[1][i].setLocalRotation(new Quaternion().fromAngles(rad(-4.6), 0, rad(-0.663)));
 		}
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[2][i].setLocalTranslation(positioning.bottomX[2], positioning.bottomY, 0.58f);
+			lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, 0.58f);
 			lowerStrings[2][i].setLocalRotation(new Quaternion().fromAngles(rad(-4.6), 0, rad(0.647)));
 		}
 		
 		for (var i = 0; i < 5; i++) {
-			lowerStrings[3][i].setLocalTranslation(positioning.bottomX[3], positioning.bottomY, 0.47f);
+			lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, 0.47f);
 			lowerStrings[3][i].setLocalRotation(new Quaternion().fromAngles(rad(-4), 0, rad(1.65)));
 		}
 		

@@ -66,4 +66,24 @@
         <value fret="21" scale="0.6982"/>
         <value fret="22" scale="0.7158"/>
     </instrument>
+    <instrument name="Banjo">
+        <value fret="0" scale="0"/>
+        <value fret="1" scale="0.0472"/>
+        <value fret="2" scale="0.1020"/>
+        <value fret="3" scale="0.1476"/>
+        <value fret="4" scale="0.1918"/>
+        <value fret="5" scale="0.2344"/>
+        <value fret="6" scale="0.2725"/>
+        <value fret="7" scale="0.3090"/>
+        <value fret="8" scale="0.3425"/>
+        <value fret="9" scale="0.3760"/>
+        <value fret="10" scale="0.4049"/>
+        <value fret="11" scale="0.4338"/>
+        <value fret="12" scale="0.4597"/>
+        <value fret="13" scale="0.4855"/>
+        <value fret="14" scale="0.5084"/>
+        <value fret="15" scale="0.5297"/>
+        <value fret="16" scale="0.5510"/>
+        <value fret="17" scale="0.5693"/>
+    </instrument>
 </instruments>

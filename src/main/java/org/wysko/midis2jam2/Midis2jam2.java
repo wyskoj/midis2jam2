@@ -51,6 +51,7 @@ import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings;
 import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir;
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings;
 import org.wysko.midis2jam2.instrument.family.ensemble.Timpani;
+import org.wysko.midis2jam2.instrument.family.guitar.Banjo;
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar;
 import org.wysko.midis2jam2.instrument.family.organ.Accordion;
@@ -800,6 +801,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 80, 81, 83, 84, 86, 87, 88, 89, 90, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103 -> new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
 			// Lead 3 (Calliope)
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
+			// Banjo
+			case 105 -> new Banjo(this, events);
 			// Fiddle
 			case 110 -> new Fiddle(this, events);
 			// Agogo

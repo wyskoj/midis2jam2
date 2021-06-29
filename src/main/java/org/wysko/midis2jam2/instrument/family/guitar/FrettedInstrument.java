@@ -124,7 +124,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 */
 	@Contract(pure = true)
 	private float stringHeight() {
-		return positioning.topY - positioning.bottomY;
+		return positioning.upperY - positioning.lowerY;
 	}
 	
 	/**
@@ -178,13 +178,13 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 				float z =
 						(((positioningWithZ.topZ[string] - positioningWithZ.bottomZ[string]) * fretDistance + positioningWithZ.topZ[string]) * -1.3f) - 2;
 				fingerPosition = new Vector3f(
-						(positioningWithZ.bottomX[string] - positioningWithZ.topX[string]) * fretDistance + positioningWithZ.topX[string],
+						(positioningWithZ.lowerX[string] - positioningWithZ.upperX[string]) * fretDistance + positioningWithZ.upperX[string],
 						positioningWithZ.fingerVerticalOffset.y - stringHeight() * fretDistance,
 						z
 				);
 			} else {
 				fingerPosition = new Vector3f(
-						((positioning.bottomX[string] - positioning.topX[string]) * fretDistance) + positioning.topX[string],
+						((positioning.lowerX[string] - positioning.upperX[string]) * fretDistance) + positioning.upperX[string],
 						positioning.fingerVerticalOffset.y - (stringHeight() * fretDistance),
 						0
 				);
@@ -279,12 +279,12 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		/**
 		 * The y-coordinate of the "upper strings".
 		 */
-		public final float topY;
+		public final float upperY;
 		
 		/**
 		 * The y-coordinate of the "lower strings".
 		 */
-		public final float bottomY;
+		public final float lowerY;
 		
 		/**
 		 * This provides the vertical position of the note fingers.
@@ -299,12 +299,12 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		/**
 		 * The x-coordinates of each upper string.
 		 */
-		public final float[] topX;
+		public final float[] upperX;
 		
 		/**
 		 * The x-coordinates of each lower string.
 		 */
-		public final float[] bottomX;
+		public final float[] lowerX;
 		
 		/**
 		 * The interface for scaling strings.
@@ -315,22 +315,22 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		/**
 		 * Instantiates a fretted instrument positioning.
 		 *
-		 * @see #topY
-		 * @see #bottomY
+		 * @see #upperY
+		 * @see #lowerY
 		 * @see #restingStrings
-		 * @see #topX
-		 * @see #bottomX
+		 * @see #upperX
+		 * @see #lowerX
 		 * @see #fretHeights
 		 */
-		public FrettedInstrumentPositioning(float topY, float bottomY,
-		                                    Vector3f[] restingStrings, float[] topX, float[] bottomX,
+		public FrettedInstrumentPositioning(float upperY, float lowerY,
+		                                    Vector3f[] restingStrings, float[] upperX, float[] lowerX,
 		                                    FretHeightCalculator fretHeights) {
-			this.topY = topY;
-			this.bottomY = bottomY;
-			this.fingerVerticalOffset = new Vector3f(0, topY, 0);
+			this.upperY = upperY;
+			this.lowerY = lowerY;
+			this.fingerVerticalOffset = new Vector3f(0, upperY, 0);
 			this.restingStrings = restingStrings;
-			this.topX = topX;
-			this.bottomX = bottomX;
+			this.upperX = upperX;
+			this.lowerX = lowerX;
 			this.fretHeights = fretHeights;
 		}
 		
@@ -349,11 +349,11 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			/**
 			 * Instantiates a fretted instrument positioning.
 			 *
-			 * @see #topY
-			 * @see #bottomY
+			 * @see #upperY
+			 * @see #lowerY
 			 * @see #restingStrings
-			 * @see #topX
-			 * @see #bottomX
+			 * @see #upperX
+			 * @see #lowerX
 			 * @see #fretHeights
 			 * @see #topZ
 			 * @see #bottomZ
