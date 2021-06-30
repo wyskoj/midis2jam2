@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Sat May 01 01:00:38 EDT 2021
+ * Copyright (C) 2021 Jacob Wysko
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
 package org.wysko.midis2jam2;
@@ -24,7 +37,9 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
@@ -59,7 +74,7 @@ public class GuiLauncher extends JFrame {
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
 		var guiLauncher = new GuiLauncher();
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		guiLauncher.setSize(new Dimension(590, 530));
+		guiLauncher.pack();
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
 		guiLauncher.setVisible(true);
 		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -91,16 +106,10 @@ public class GuiLauncher extends JFrame {
 		ToolTipManager.sharedInstance().setInitialDelay(200);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		
-		// Set version number
-		try {
-			String version = new BufferedReader(new InputStreamReader(requireNonNull(GuiLauncher.class.getResourceAsStream("/version.txt")))).lines().collect(Collectors.joining("\n"));
-			guiLauncher.versionText.setText(version);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		
 		// Check for updates
-		EventQueue.invokeLater(() -> new Thread(() -> {
+		new Thread(() -> {
+			Midis2jam2.LOGGER.info("Checking for updates.");
 			try {
 				var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
 				var jep = new JEditorPane();
@@ -121,12 +130,15 @@ public class GuiLauncher extends JFrame {
 				if (html.contains("Out of")) {
 					showMessageDialog(guiLauncher, jep,
 							"Update available", WARNING_MESSAGE);
-					Midis2jam2.LOGGER.warning("Out of date!!");
+					Midis2jam2.LOGGER.warning("Out of date!");
+				} else {
+					Midis2jam2.LOGGER.info("Up to date.");
 				}
 			} catch (IOException e) {
+				Midis2jam2.LOGGER.warning("Failed to check for updates.");
 				e.printStackTrace();
 			}
-		}));
+		}).start();
 		
 		
 		// Bring GUI to front
@@ -170,6 +182,7 @@ public class GuiLauncher extends JFrame {
 		
 		fullscreenCheckbox.setSelected(settings.isFullscreen());
 		setLatencySpinnerFromDeviceDropdown();
+		legacyEngineCheckbox.setSelected(settings.isLegacyDisplay());
 	}
 	
 	/**
@@ -369,11 +382,19 @@ public class GuiLauncher extends JFrame {
 				}
 				
 			}
-			var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
-					M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
-					fullscreenCheckbox.isSelected());
-			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			SwingUtilities.invokeLater(() -> new Thread(() -> liaison.start(Midis2jam2Display.class)).start());
+			if (legacyEngineCheckbox.isSelected()) {
+				var liaison = new LegacyLiaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
+						M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
+						fullscreenCheckbox.isSelected());
+				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
+			} else {
+				var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
+						M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
+						fullscreenCheckbox.isSelected());
+				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				SwingUtilities.invokeLater(() -> new Thread(() -> liaison.start(Midis2jam2Display.class)).start());
+			}
 			
 		} catch (MidiUnavailableException midiUnavailableException) {
 			showMessageDialog(this, new ExceptionDisplay("The requested MIDI component cannot be opened or created " +
@@ -437,9 +458,30 @@ public class GuiLauncher extends JFrame {
 		);
 	}
 	
+	private void exitMenuItemActionPerformed(ActionEvent e) {
+		System.exit(0);
+	}
+	
+	private void aboutMenuItemActionPerformed(ActionEvent e) {
+		About about = new About(this, true);
+		about.setVisible(true);
+	}
+
+	private void legacyEngineCheckboxActionPerformed(ActionEvent e) {
+		settings.setLegacyDisplay(legacyEngineCheckbox.isSelected());
+		saveSettings();
+	}
+	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n.guilauncher");
+		menuBar1 = new JMenuBar();
+		fileMenu = new JMenu();
+		openMidiFileMenuItem = new MenuItemResizedIcon();
+		editSoundFontsMenuItem = new MenuItemResizedIcon();
+		exitMenuItem = new MenuItemResizedIcon();
+		menu1 = new JMenu();
+		aboutMenuItem = new JMenuItem();
 		logo = new JLabel();
 		configurationPanel = new JPanel();
 		midiFileLabel = new JLabel();
@@ -463,6 +505,8 @@ public class GuiLauncher extends JFrame {
 		displayLabel = new JLabel();
 		fullscreenCheckbox = new JCheckBox();
 		fullscreenHelp = new JLabel();
+		legacyEngineCheckbox = new JCheckBox();
+		fullscreenHelp2 = new JLabel();
 		transitionSpeedLabel = new JLabel();
 		transitionSpeedPanel = new JPanel();
 		transitionSpeedNoneButton = new JRadioButton();
@@ -471,252 +515,301 @@ public class GuiLauncher extends JFrame {
 		transitionSpeedFastButton = new JRadioButton();
 		transitionSpeedHelp = new JLabel();
 		startButton = new JResizedIconButton();
-		versionText = new JLabel();
-		
+
 		//======== this ========
 		setTitle(bundle.getString("GuiLauncher.this.title"));
 		setIconImage(new ImageIcon(getClass().getResource("/ico/icon16.png")).getImage());
 		setResizable(false);
+		setMinimumSize(new Dimension(605, 575));
 		var contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
-		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0, 0, 0};
-		((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{132, 145, 77, 0, 0, 0, 0};
-		((GridBagLayout) contentPane.getLayout()).columnWeights = new double[]{1.0, 1.0, 0.0, 1.0E-4};
-		((GridBagLayout) contentPane.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-		
+		((GridBagLayout)contentPane.getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)contentPane.getLayout()).rowHeights = new int[] {132, 145, 77, 0, 0};
+		((GridBagLayout)contentPane.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)contentPane.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 1.0E-4};
+
+		//======== menuBar1 ========
+		{
+
+			//======== fileMenu ========
+			{
+				fileMenu.setText("File");
+
+				//---- openMidiFileMenuItem ----
+				openMidiFileMenuItem.setText("Open MIDI file...");
+				openMidiFileMenuItem.setIcon(new ImageIcon(getClass().getResource("/open.png")));
+				openMidiFileMenuItem.addActionListener(e -> loadMidiFileButtonActionPerformed(e));
+				fileMenu.add(openMidiFileMenuItem);
+
+				//---- editSoundFontsMenuItem ----
+				editSoundFontsMenuItem.setText("Edit SountFonts...");
+				editSoundFontsMenuItem.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
+				editSoundFontsMenuItem.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
+				fileMenu.add(editSoundFontsMenuItem);
+				fileMenu.addSeparator();
+
+				//---- exitMenuItem ----
+				exitMenuItem.setText("Exit");
+				exitMenuItem.setIcon(new ImageIcon(getClass().getResource("/exit.png")));
+				exitMenuItem.addActionListener(e -> exitMenuItemActionPerformed(e));
+				fileMenu.add(exitMenuItem);
+			}
+			menuBar1.add(fileMenu);
+
+			//======== menu1 ========
+			{
+				menu1.setText("Help");
+
+				//---- aboutMenuItem ----
+				aboutMenuItem.setText("About");
+				aboutMenuItem.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+				aboutMenuItem.addActionListener(e -> aboutMenuItemActionPerformed(e));
+				menu1.add(aboutMenuItem);
+			}
+			menuBar1.add(menu1);
+		}
+		setJMenuBar(menuBar1);
+
 		//---- logo ----
 		logo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
 		logo.setHorizontalAlignment(SwingConstants.CENTER);
-		contentPane.add(logo, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(10, 0, 5, 5), 0, 0));
-		
+		contentPane.add(logo, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(10, 0, 5, 0), 0, 0));
+
 		//======== configurationPanel ========
 		{
 			configurationPanel.setBorder(new TitledBorder(null, bundle.getString("GuiLauncher.configurationPanel.border"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 			configurationPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) configurationPanel.getLayout()).columnWidths = new int[]{109, 141, 92, 0, 0};
-			((GridBagLayout) configurationPanel.getLayout()).rowHeights = new int[]{0, 0, 9, 0, 0};
-			((GridBagLayout) configurationPanel.getLayout()).columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout) configurationPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			
+			((GridBagLayout)configurationPanel.getLayout()).columnWidths = new int[] {109, 141, 92, 0, 0};
+			((GridBagLayout)configurationPanel.getLayout()).rowHeights = new int[] {0, 0, 9, 0, 0};
+			((GridBagLayout)configurationPanel.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)configurationPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+
 			//---- midiFileLabel ----
 			midiFileLabel.setText(bundle.getString("GuiLauncher.midiFileLabel.text"));
 			midiFileLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 			midiFileLabel.setLabelFor(midiFilePathTextField);
 			configurationPanel.add(midiFileLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiFilePathTextField ----
 			midiFilePathTextField.setEditable(false);
 			configurationPanel.add(midiFilePathTextField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- loadMidiFileButton ----
 			loadMidiFileButton.setText(bundle.getString("GuiLauncher.loadMidiFileButton.text"));
 			loadMidiFileButton.setIcon(new ImageIcon(getClass().getResource("/open.png")));
 			loadMidiFileButton.addActionListener(e -> loadMidiFileButtonActionPerformed(e));
 			configurationPanel.add(loadMidiFileButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiFileHelp ----
 			midiFileHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			midiFileHelp.setToolTipText(bundle.getString("GuiLauncher.midiFileHelp.toolTipText"));
 			configurationPanel.add(midiFileHelp, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiDeviceLabel ----
 			midiDeviceLabel.setText(bundle.getString("GuiLauncher.midiDeviceLabel.text"));
 			midiDeviceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 			midiDeviceLabel.setLabelFor(midiDeviceDropDown);
 			configurationPanel.add(midiDeviceLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiDeviceDropDown ----
 			midiDeviceDropDown.addActionListener(e -> midiDeviceDropDownActionPerformed(e));
 			configurationPanel.add(midiDeviceDropDown, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- midiDeviceHelp ----
 			midiDeviceHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			midiDeviceHelp.setToolTipText(bundle.getString("GuiLauncher.midiDeviceHelp.toolTipText"));
 			configurationPanel.add(midiDeviceHelp, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- soundFontLabel ----
 			soundFontLabel.setText(bundle.getString("GuiLauncher.soundFontLabel.text"));
 			soundFontLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 			soundFontLabel.setLabelFor(soundFontPathDropDown);
 			configurationPanel.add(soundFontLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- soundFontPathDropDown ----
 			soundFontPathDropDown.setEditable(false);
 			configurationPanel.add(soundFontPathDropDown, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- editSoundFontsButton ----
 			editSoundFontsButton.setText(bundle.getString("GuiLauncher.editSoundFontsButton.text"));
 			editSoundFontsButton.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
 			editSoundFontsButton.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
 			configurationPanel.add(editSoundFontsButton, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- soundFontHelp ----
 			soundFontHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			soundFontHelp.setToolTipText(bundle.getString("GuiLauncher.soundFontHelp.toolTipText"));
 			configurationPanel.add(soundFontHelp, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-		}
-		contentPane.add(configurationPanel, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 10, 10), 0, 0));
-		
+				new Insets(0, 0, 5, 5), 0, 0));
+		}
+		contentPane.add(configurationPanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 10, 5), 0, 0));
+
 		//======== settingsPanel ========
 		{
 			settingsPanel.setBorder(new TitledBorder(null, bundle.getString("GuiLauncher.settingsPanel.border"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 			settingsPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) settingsPanel.getLayout()).columnWidths = new int[]{0, 27, 0, 0, 0, 0};
-			((GridBagLayout) settingsPanel.getLayout()).rowHeights = new int[]{0, 0, 0, 6, 0};
-			((GridBagLayout) settingsPanel.getLayout()).columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout) settingsPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)settingsPanel.getLayout()).columnWidths = new int[] {0, 27, 0, 0, 0, 0};
+			((GridBagLayout)settingsPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 6, 0};
+			((GridBagLayout)settingsPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)settingsPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			settingsPanel.add(hSpacer1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- latencyFixLabel ----
 			latencyFixLabel.setText(bundle.getString("GuiLauncher.latencyFixLabel.text"));
 			latencyFixLabel.setLabelFor(latencySpinner);
 			settingsPanel.add(latencyFixLabel, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- latencySpinner ----
 			latencySpinner.setModel(new SpinnerNumberModel(100, null, null, 1));
 			latencySpinner.addChangeListener(e -> latencySpinnerStateChanged(e));
 			settingsPanel.add(latencySpinner, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
+				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
 			settingsPanel.add(hSpacer2, new GridBagConstraints(3, 0, 1, 1, 1.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- latencyHelp ----
 			latencyHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			latencyHelp.setToolTipText(bundle.getString("GuiLauncher.latencyHelp.toolTipText"));
 			settingsPanel.add(latencyHelp, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- displayLabel ----
 			displayLabel.setText(bundle.getString("GuiLauncher.displayLabel.text"));
 			settingsPanel.add(displayLabel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- fullscreenCheckbox ----
 			fullscreenCheckbox.setText(bundle.getString("GuiLauncher.fullscreenCheckbox.text"));
 			fullscreenCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
 			fullscreenCheckbox.addActionListener(e -> fullscreenCheckboxActionPerformed(e));
 			settingsPanel.add(fullscreenCheckbox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- fullscreenHelp ----
 			fullscreenHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			fullscreenHelp.setToolTipText(bundle.getString("GuiLauncher.fullscreenHelp.toolTipText"));
 			settingsPanel.add(fullscreenHelp, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- legacyEngineCheckbox ----
+			legacyEngineCheckbox.setText("Legacy engine");
+			legacyEngineCheckbox.addActionListener(e -> legacyEngineCheckboxActionPerformed(e));
+			settingsPanel.add(legacyEngineCheckbox, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
+			//---- fullscreenHelp2 ----
+			fullscreenHelp2.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			fullscreenHelp2.setToolTipText(bundle.getString("GuiLauncher.legacyEngineHelp"));
+			settingsPanel.add(fullscreenHelp2, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- transitionSpeedLabel ----
 			transitionSpeedLabel.setText(bundle.getString("GuiLauncher.transitionSpeedLabel.text"));
-			settingsPanel.add(transitionSpeedLabel, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			settingsPanel.add(transitionSpeedLabel, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//======== transitionSpeedPanel ========
 			{
 				transitionSpeedPanel.setLayout(new GridBagLayout());
-				((GridBagLayout) transitionSpeedPanel.getLayout()).columnWidths = new int[]{0, 0, 0};
-				((GridBagLayout) transitionSpeedPanel.getLayout()).rowHeights = new int[]{0, 0, 0};
-				((GridBagLayout) transitionSpeedPanel.getLayout()).columnWeights = new double[]{0.0, 0.0, 1.0E-4};
-				((GridBagLayout) transitionSpeedPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 1.0E-4};
-				
+				((GridBagLayout)transitionSpeedPanel.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)transitionSpeedPanel.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)transitionSpeedPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)transitionSpeedPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+
 				//---- transitionSpeedNoneButton ----
 				transitionSpeedNoneButton.setText(bundle.getString("GuiLauncher.transitionSpeedNoneButton.text"));
 				transitionSpeedNoneButton.setName("NONE");
 				transitionSpeedNoneButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedNoneButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-				
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
+
 				//---- transitionSpeedSlowButton ----
 				transitionSpeedSlowButton.setText(bundle.getString("GuiLauncher.transitionSpeedSlowButton.text"));
 				transitionSpeedSlowButton.setName("SLOW");
 				transitionSpeedSlowButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedSlowButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
-				
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+
 				//---- transitionSpeedNormalButton ----
 				transitionSpeedNormalButton.setText(bundle.getString("GuiLauncher.transitionSpeedNormalButton.text"));
 				transitionSpeedNormalButton.setSelected(true);
 				transitionSpeedNormalButton.setName("NORMAL");
 				transitionSpeedNormalButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedNormalButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
-				
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
 				//---- transitionSpeedFastButton ----
 				transitionSpeedFastButton.setText(bundle.getString("GuiLauncher.transitionSpeedFastButton.text"));
 				transitionSpeedFastButton.setName("FAST");
 				transitionSpeedFastButton.addActionListener(e -> transitionSpeedNoneButtonActionPerformed(e));
 				transitionSpeedPanel.add(transitionSpeedFastButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			settingsPanel.add(transitionSpeedPanel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 5, 5), 0, 0));
-			
+			settingsPanel.add(transitionSpeedPanel, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+
 			//---- transitionSpeedHelp ----
 			transitionSpeedHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
 			transitionSpeedHelp.setToolTipText(bundle.getString("GuiLauncher.transitionSpeedHelp.toolTipText"));
-			settingsPanel.add(transitionSpeedHelp, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-		}
-		contentPane.add(settingsPanel, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
+			settingsPanel.add(transitionSpeedHelp, new GridBagConstraints(4, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 10, 10), 0, 0));
-		
+				new Insets(0, 0, 5, 5), 0, 0));
+		}
+		contentPane.add(settingsPanel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 10, 5), 0, 0));
+
 		//---- startButton ----
 		startButton.setText(bundle.getString("GuiLauncher.startButton.text"));
 		startButton.setFont(new Font("Segoe UI", Font.ITALIC, 16));
 		startButton.setIcon(new ImageIcon(getClass().getResource("/music.png")));
 		startButton.addActionListener(e -> startButtonPressed(e));
-		contentPane.add(startButton, new GridBagConstraints(0, 3, 2, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE,
-				new Insets(10, 0, 5, 5), 0, 0));
-		
-		//---- versionText ----
-		versionText.setText(bundle.getString("GuiLauncher.versionText.text"));
-		versionText.setHorizontalAlignment(SwingConstants.RIGHT);
-		contentPane.add(versionText, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 15, 10), 0, 0));
+		contentPane.add(startButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(10, 0, 0, 0), 0, 0));
 		pack();
 		setLocationRelativeTo(getOwner());
 
@@ -730,6 +823,13 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JMenuBar menuBar1;
+	private JMenu fileMenu;
+	private MenuItemResizedIcon openMidiFileMenuItem;
+	private MenuItemResizedIcon editSoundFontsMenuItem;
+	private MenuItemResizedIcon exitMenuItem;
+	private JMenu menu1;
+	private JMenuItem aboutMenuItem;
 	private JLabel logo;
 	private JPanel configurationPanel;
 	private JLabel midiFileLabel;
@@ -752,6 +852,8 @@ public class GuiLauncher extends JFrame {
 	private JLabel displayLabel;
 	private JCheckBox fullscreenCheckbox;
 	private JLabel fullscreenHelp;
+	private JCheckBox legacyEngineCheckbox;
+	private JLabel fullscreenHelp2;
 	private JLabel transitionSpeedLabel;
 	private JPanel transitionSpeedPanel;
 	private JRadioButton transitionSpeedNoneButton;
@@ -760,6 +862,5 @@ public class GuiLauncher extends JFrame {
 	private JRadioButton transitionSpeedFastButton;
 	private JLabel transitionSpeedHelp;
 	private JResizedIconButton startButton;
-	private JLabel versionText;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

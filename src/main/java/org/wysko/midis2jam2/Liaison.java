@@ -31,15 +31,15 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Liaison extends SimpleApplication {
 	
-	private final Sequencer sequencer;
+	protected final Sequencer sequencer;
 	
-	private final MidiFile midiFile;
+	protected final MidiFile midiFile;
 	
-	private final GuiLauncher guiLauncher;
+	protected final GuiLauncher guiLauncher;
 	
-	private final M2J2Settings m2j2settings;
+	protected final M2J2Settings m2j2settings;
 	
-	private final boolean fullscreen;
+	protected final boolean fullscreen;
 	
 	private static final AppSettings midis2Jam2Settings = new AppSettings(true);
 	

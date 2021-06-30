@@ -33,6 +33,7 @@ public class LauncherSettings {
 	private String midiDevice;
 	private boolean fullscreen;
 	private final Map<String, Integer> deviceLatencyMap;
+	private boolean legacyDisplay;
 	
 	public int getLatencyForDevice(String deviceName) {
 		var integer = deviceLatencyMap.get(deviceName);
@@ -59,6 +60,7 @@ public class LauncherSettings {
 		fullscreen = false;
 		deviceLatencyMap = new HashMap<>();
 		deviceLatencyMap.put("Gervill", 100);
+		legacyDisplay = false;
 	}
 	
 	public String getLastMidiDir() {
@@ -101,5 +103,13 @@ public class LauncherSettings {
 				", transition=" + transition +
 				", midiDevice='" + midiDevice + '\'' +
 				'}';
+	}
+	
+	public boolean isLegacyDisplay() {
+		return legacyDisplay;
+	}
+	
+	public void setLegacyDisplay(boolean legacyDisplay) {
+		this.legacyDisplay = legacyDisplay;
 	}
 }
