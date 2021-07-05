@@ -234,6 +234,10 @@ public class Percussion extends Instrument {
 			instruments.add(new Whistle(context,
 					noteOnEvents.stream().filter(e -> e.note == SHORT_WHISTLE || e.note == LONG_WHISTLE).collect(Collectors.toList())));
 		
+		if (noteOnEvents.stream().anyMatch(e -> e.note == OPEN_SURDO || e.note == MUTE_SURDO))
+			instruments.add(new Surdo(context,
+					noteOnEvents.stream().filter(e -> e.note == OPEN_SURDO || e.note == MUTE_SURDO).collect(Collectors.toList())));
+		
 		// Attach nodes to group node
 		for (PercussionInstrument instrument : instruments) {
 			if (instrument instanceof SnareDrum
