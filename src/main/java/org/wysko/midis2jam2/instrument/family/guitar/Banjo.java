@@ -33,7 +33,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Banjo extends FrettedInstrument {
 	
 	
-	private static final Vector3f BASE_POSITION = new Vector3f(58.5863f, 45.5902f, -0.5817f);
+	private static final Vector3f BASE_POSITION = new Vector3f(54.6f, 48.7f, 2f);
 	
 	/**
 	 * Instantiates a new Bass guitar.
@@ -126,7 +126,7 @@ public class Banjo extends FrettedInstrument {
 		
 		// Position guitar
 		instrumentNode.setLocalTranslation(BASE_POSITION);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
+		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(0.8), rad(-43.3), rad(-40.5)));
 	}
 	
 	@Override
