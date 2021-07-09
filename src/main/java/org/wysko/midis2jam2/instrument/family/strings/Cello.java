@@ -54,8 +54,6 @@ public class Cello extends StringFamilyInstrument {
 		
 		instrumentNode.setLocalScale(1.86f);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-15), rad(45), 0));
-		
-		context.getRootNode().attachChild(highestLevel);
 	}
 	
 	@Override
