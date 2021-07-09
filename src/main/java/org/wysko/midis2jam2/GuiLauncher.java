@@ -581,18 +581,18 @@ public class GuiLauncher extends JFrame {
 		{
 			configurationPanel.setBorder(new TitledBorder(null, bundle.getString("GuiLauncher.configurationPanel.border"), TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 			configurationPanel.setLayout(new GridBagLayout());
-			((GridBagLayout)configurationPanel.getLayout()).columnWidths = new int[] {109, 141, 92, 0, 0};
-			((GridBagLayout)configurationPanel.getLayout()).rowHeights = new int[] {0, 0, 9, 0, 0};
-			((GridBagLayout)configurationPanel.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)configurationPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
-
+			((GridBagLayout) configurationPanel.getLayout()).columnWidths = new int[]{109, 141, 92, 0, 0};
+			((GridBagLayout) configurationPanel.getLayout()).rowHeights = new int[]{35, 35, 9, 0, 0};
+			((GridBagLayout) configurationPanel.getLayout()).columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout) configurationPanel.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			
 			//---- midiFileLabel ----
 			midiFileLabel.setText(bundle.getString("GuiLauncher.midiFileLabel.text"));
 			midiFileLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 			midiFileLabel.setLabelFor(midiFilePathTextField);
 			configurationPanel.add(midiFileLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
 			//---- midiFilePathTextField ----
 			midiFilePathTextField.setEditable(false);
