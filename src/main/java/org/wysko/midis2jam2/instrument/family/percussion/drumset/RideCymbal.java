@@ -59,17 +59,17 @@ public class RideCymbal extends Cymbal {
 	
 	@Override
 	public void tick(double time, float delta) {
-		handleCymbalStrikes(time, delta);
-		handleStick(time, delta, hits);
+		var stickStatus = handleStick(time, delta, hits);
+		handleCymbalStrikes(time, delta, stickStatus.justStruck());
 	}
 	
 	@Override
-	void handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
+	Stick.StickStatus handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
 		var stickStatus = Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 		var strikingFor = stickStatus.strikingFor();
 		if (strikingFor != null) {
 			stickNode.setLocalTranslation(0, 0, strikingFor.note == 53 ? 15 : 20);
 		}
-		
+		return stickStatus;
 	}
 }

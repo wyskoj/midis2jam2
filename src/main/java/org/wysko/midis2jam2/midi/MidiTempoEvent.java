@@ -40,6 +40,24 @@ public class MidiTempoEvent extends MidiEvent {
 		this.number = number;
 	}
 	
+	/**
+	 * Expresses this tempo event in beats per minute.
+	 *
+	 * @return the tempo, in beats per minute
+	 */
+	public double bpm() {
+		return 6E7D / number;
+	}
+	
+	/**
+	 * Returns the number of seconds that elapse in a single beat.
+	 *
+	 * @return the number of seconds that elapse in a single beat
+	 */
+	public double secondsPerBeat() {
+		return 60 / bpm();
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

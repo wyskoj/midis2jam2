@@ -23,9 +23,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
@@ -40,6 +38,7 @@ public class Cymbal extends SingleStickInstrument {
 	 * The Cymbal node.
 	 */
 	final Node cymbalNode = new Node();
+	private final CymbalType type;
 	
 	/**
 	 * The Animator.
@@ -55,10 +54,11 @@ public class Cymbal extends SingleStickInstrument {
 	 */
 	public Cymbal(Midis2jam2 context, List<MidiNoteOnEvent> hits, CymbalType type) {
 		super(context, hits);
-		
+		this.type = type;
 		/* Load cymbal model */
 		final Spatial cymbal;
-		if (type == CymbalType.CHINA)
+		
+		if (this.type == CymbalType.CHINA)
 			cymbal = context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		else
 			cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
@@ -81,9 +81,8 @@ public class Cymbal extends SingleStickInstrument {
 	
 	@Override
 	public void tick(double time, float delta) {
-		handleCymbalStrikes(time, delta);
-		
-		Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
+		var stickStatus = handleStick(time, delta, hits);
+		handleCymbalStrikes(time, delta, stickStatus.justStruck());
 	}
 	
 	/**
@@ -92,12 +91,8 @@ public class Cymbal extends SingleStickInstrument {
 	 * @param time  the time
 	 * @param delta the amount of time since the last frame update
 	 */
-	void handleCymbalStrikes(double time, float delta) {
-		MidiNoteOnEvent recoil = null;
-		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time) {
-			recoil = hits.remove(0);
-		}
-		if (recoil != null) {
+	void handleCymbalStrikes(double time, float delta, boolean struck) {
+		if (struck) {
 			animator.strike();
 		}
 		cymbalNode.setLocalRotation(new Quaternion().fromAngles(animator.rotationAmount(), 0, 0));

@@ -26,8 +26,12 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import org.wysko.midis2jam2.world.Axis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static com.jme3.scene.Spatial.CullHint.Always;
+import static com.jme3.scene.Spatial.CullHint.Dynamic;
 import static org.wysko.midis2jam2.Midis2jam2.rad;
 
 /**
@@ -67,6 +71,8 @@ public class Stick {
 		return nextHit == null ? maxAngle + 1 : -1000 * ((6E7 / context.getFile().tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.getFile().eventInSeconds(nextHit));
 	}
 	
+	public static final Map<Spatial, MidiNoteOnEvent> LAST_HIT_MAP = new HashMap<>();
+	
 	/**
 	 * Uses {@link MidiNoteOnEvent}s to calculate the desired rotation and visibility of a stick at any given point.
 	 *
@@ -94,8 +100,11 @@ public class Stick {
 		if (!strikes.isEmpty())
 			nextHit = strikes.get(0);
 		
+		MidiNoteOnEvent lastHit = LAST_HIT_MAP.get(stickNode);
+		
 		while (!strikes.isEmpty() && context.getFile().eventInSeconds(strikes.get(0)) <= time) {
 			nextHit = strikes.remove(0);
+			LAST_HIT_MAP.put(stickNode, nextHit);
 		}
 		
 		if (nextHit != null && context.getFile().eventInSeconds(nextHit) <= time) {
@@ -141,11 +150,20 @@ public class Stick {
 		float[] finalAngles = stickNode.getLocalRotation().toAngles(new float[3]);
 		if (finalAngles[rotComp] >= rad((float) maxAngle)) {
 			// Not yet ready to strike
-			stickNode.setCullHint(Spatial.CullHint.Always);
+			stickNode.setCullHint(Always);
 		} else {
 			// Striking or recoiling
-			stickNode.setCullHint(Spatial.CullHint.Dynamic);
+			stickNode.setCullHint(Dynamic);
 		}
+		
+		// Keep stick visible if another strike is imminent within the next quarter note.
+		if (!strikes.isEmpty() && lastHit != null) {
+			if (context.getFile().eventInSeconds(strikes.get(0)) - time <= context.getFile().tempoBefore(strikes.get(0)).secondsPerBeat()
+					&& time - context.getFile().eventInSeconds(lastHit) <= context.getFile().tempoBefore(lastHit).secondsPerBeat()) {
+				stickNode.setCullHint(Dynamic);
+			}
+		}
+		
 		return new StickStatus(strike ? nextHit : null, finalAngles[rotComp], proposedRotation > maxAngle ? null : nextHit);
 	}
 	

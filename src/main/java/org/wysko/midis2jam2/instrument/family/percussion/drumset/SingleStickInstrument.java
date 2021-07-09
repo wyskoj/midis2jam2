@@ -61,7 +61,7 @@ public abstract class SingleStickInstrument extends PercussionInstrument {
 	 * @param delta the amount of time since the last frame update
 	 * @param hits  the running list of hits
 	 */
-	void handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
-		Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
+	Stick.StickStatus handleStick(double time, float delta, List<MidiNoteOnEvent> hits) {
+		return Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 	}
 }
