@@ -593,7 +593,7 @@ public class GuiLauncher extends JFrame {
 			configurationPanel.add(midiFileLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
-
+			
 			//---- midiFilePathTextField ----
 			midiFilePathTextField.setEditable(false);
 			configurationPanel.add(midiFilePathTextField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
