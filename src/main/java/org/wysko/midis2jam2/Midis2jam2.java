@@ -54,6 +54,7 @@ import org.wysko.midis2jam2.instrument.family.ensemble.Timpani;
 import org.wysko.midis2jam2.instrument.family.guitar.Banjo;
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar;
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar;
+import org.wysko.midis2jam2.instrument.family.guitar.Shamisen;
 import org.wysko.midis2jam2.instrument.family.organ.Accordion;
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica;
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion;
@@ -803,6 +804,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
 			// Banjo
 			case 105 -> new Banjo(this, events);
+			// Shamisen
+			case 106 -> new Shamisen(this, events);
 			// Fiddle
 			case 110 -> new Fiddle(this, events);
 			// Agogo
