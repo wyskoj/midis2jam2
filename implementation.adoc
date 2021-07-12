@@ -50,13 +50,13 @@ Check this page to see the progress of each instrument's implementation.
 |===
 |*Synth FX*|*Ethnic*|*Percussive*|*Sound Effects*
 |_97_ FX 1 (rain) ✔️|_105_ Sitar ❌|_113_ Tinkle Bell ✔️|_121_ Guitar Fret Noise ✔️
-|_98_ FX 2 (soundtrack) ✔️|_106_ Banjo ⚠️|_114_ Agogô ✔️|_122_ Breath Noise ✔️
-|_99_ FX 3 (crystal) ✔️|_107_ Shamisen ❌|_115_ Steel Drums ✔️|_123_ Seashore ❌
+|_98_ FX 2 (soundtrack) ✔️|_106_ Banjo ✔️|_114_ Agogô ✔️|_122_ Breath Noise ✔️
+|_99_ FX 3 (crystal) ✔️|_107_ Shamisen ✔️|_115_ Steel Drums ✔️|_123_ Seashore ❌
 |_100_ FX 4 (atmosphere) ✔️|_108_ Koto ❌|_116_ Woodblock ✔️|_124_ Bird Tweet ❌
 |_101_ FX 5 (brightness) ✔️|_109_ Kalimba ❌|_117_ Taiko Drum ✔️|_125_ Telephone Ring ✔️
-|_102_ FX 6 (goblins) ✔️|_110_ Bag pipe ❌|_118_ Melodic Tom ✔️|_126_ Helicopter ⚠️
+|_102_ FX 6 (goblins) ✔️|_110_ Bag pipe ❌|_118_ Melodic Tom ✔️|_126_ Helicopter ✔️
 |_103_ FX 7 (echoes) ✔️|_111_ Fiddle ✔️|_119_ Synth Drum ✔️|_127_ Applause ✔️
-|_104_ FX 8 (sci-fi) ✔️|_112_ Shanai ❌|_120_ Reverse Cymbal ❌|_128_ Gunshot ⚠️
+|_104_ FX 8 (sci-fi) ✔️|_112_ Shanai ❌|_120_ Reverse Cymbal ❌|_128_ Gunshot ❌
 |===
 
 == Percussion instruments
