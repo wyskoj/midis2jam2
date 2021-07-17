@@ -18,3 +18,7 @@ midis2jam2.ini
 /.idea/sonarlint
 settings.json
 *.blend1
+.classpath
+.project
+/bin
+/.settings

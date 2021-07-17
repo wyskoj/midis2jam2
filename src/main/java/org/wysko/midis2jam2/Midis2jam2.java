@@ -1060,9 +1060,23 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.window = window;
 	}
 	
+	/**
+	 * A material type.
+	 */
 	public enum MatType {
+		/**
+		 * An unshaded material.
+		 */
 		UNSHADED,
+		
+		/**
+		 * A shaded material.
+		 */
 		SHADED,
+		
+		/**
+		 * A reflective material.
+		 */
 		REFLECTIVE
 	}
 	

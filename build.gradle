@@ -86,9 +86,6 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    // https://mvnrepository.com/artifact/org.ini4j/ini4j
-    implementation group: 'org.ini4j', name: 'ini4j', version: '0.5.4'
-
 }
 
 test {
