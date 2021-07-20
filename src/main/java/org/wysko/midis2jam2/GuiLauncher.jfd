@@ -206,7 +206,7 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JCheckBox" ) {
 					name: "legacyEngineCheckbox"
-					"text": "Legacy engine"
+					"text": new FormMessage( null, "GuiLauncher.legacyEngineCheckbox.text" )
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "legacyEngineCheckboxActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 2
@@ -308,16 +308,16 @@ new FormModel {
 				name: "menuBar1"
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "fileMenu"
-					"text": "File"
+					"text": new FormMessage( null, "GuiLauncher.fileMenu.text" )
 					add( new FormComponent( "org.wysko.midis2jam2.gui.MenuItemResizedIcon" ) {
 						name: "openMidiFileMenuItem"
-						"text": "Open MIDI file..."
+						"text": new FormMessage( null, "GuiLauncher.openMidiFileMenuItem.text" )
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/open.png" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "loadMidiFileButtonActionPerformed", true ) )
 					} )
 					add( new FormComponent( "org.wysko.midis2jam2.gui.MenuItemResizedIcon" ) {
 						name: "editSoundFontsMenuItem"
-						"text": "Edit SountFonts..."
+						"text": new FormMessage( null, "GuiLauncher.editSoundFontsMenuItem.text" )
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/soundfont.png" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "loadSoundFontButtonActionPerformed", true ) )
 					} )
@@ -326,17 +326,17 @@ new FormModel {
 					} )
 					add( new FormComponent( "org.wysko.midis2jam2.gui.MenuItemResizedIcon" ) {
 						name: "exitMenuItem"
-						"text": "Exit"
+						"text": new FormMessage( null, "GuiLauncher.exitMenuItem.text" )
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/exit.png" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exitMenuItemActionPerformed", true ) )
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "menu1"
-					"text": "Help"
+					"text": new FormMessage( null, "GuiLauncher.menu1.text" )
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
 						name: "aboutMenuItem"
-						"text": "About"
+						"text": new FormMessage( null, "GuiLauncher.aboutMenuItem.text" )
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/help.png" )
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "aboutMenuItemActionPerformed", true ) )
 					} )
