@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The Violin.
@@ -44,19 +44,17 @@ public class Fiddle extends StringFamilyInstrument {
 				180,
 				new Vector3f(1, 1, 1),
 				new int[]{55, 62, 69, 76},
-				55,
-				112,
 				context.loadModel("Violin.obj", "FiddleSkin.png")
 		);
 		
 		instrumentNode.setLocalTranslation(-10, 67, -15);
 		
-		instrumentNode.setLocalScale(1f);
+		instrumentNode.setLocalScale(1);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-130), rad(-174), rad(-28.1)));
 	}
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(20f * indexForMoving(delta), 0, 0);
+		offsetNode.setLocalTranslation(20 * indexForMoving(delta), 0, 0);
 	}
 }

@@ -27,20 +27,14 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstr
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.jme3.math.FastMath.HALF_PI;
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * The Woodblocks.
+ * The Woodblocks consist of 12 blocks.
  */
-public class Woodblocks extends TwelveDrumOctave {
-	
-	/**
-	 * The Wood block nodes.
-	 */
-	final Node[] woodBlockNodes = new Node[12];
+public class Woodblocks extends OctavePercussion {
 	
 	/**
 	 * @param context   the context to the main class
@@ -50,25 +44,29 @@ public class Woodblocks extends TwelveDrumOctave {
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		IntStream.range(0, 12).forEach(i -> woodBlockNodes[i] = new Node());
-		
-		
 		for (var i = 0; i < 12; i++) {
+			/* Load drum stick */
+			Spatial stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
+			stick.setLocalTranslation(0, 0, -5);
+			
+			/* Initialize node and attach stick */
 			malletNodes[i] = new Node();
-			Spatial child = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-			child.setLocalTranslation(0, 0, -5);
 			malletNodes[i].setLocalTranslation(0, 0, 18);
-			malletNodes[i].attachChild(child);
+			malletNodes[i].attachChild(stick);
+			
 			var oneBlock = new Node();
 			oneBlock.attachChild(malletNodes[i]);
+			
 			var woodblock = new Woodblock(i);
 			twelfths[i] = woodblock;
+			
 			oneBlock.attachChild(woodblock.highestLevel);
-			woodBlockNodes[i].attachChild(oneBlock);
+			percussionNodes[i].attachChild(oneBlock);
 			oneBlock.setLocalTranslation(0, 0, 20);
-			woodBlockNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
-			woodBlockNodes[i].setLocalTranslation(0, 0.3f * i, 0);
-			instrumentNode.attachChild(woodBlockNodes[i]);
+			percussionNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
+			percussionNodes[i].setLocalTranslation(0, 0.3F * i, 0);
+			
+			instrumentNode.attachChild(percussionNodes[i]);
 		}
 		
 		instrumentNode.setLocalTranslation(75, 0, -35);
@@ -78,6 +76,8 @@ public class Woodblocks extends TwelveDrumOctave {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
+		
+		
 		for (TwelfthOfOctaveDecayed woodblock : twelfths) {
 			woodblock.tick(delta);
 		}
@@ -85,7 +85,7 @@ public class Woodblocks extends TwelveDrumOctave {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 15 + 3.6f * indexForMoving(delta), 0);
+		offsetNode.setLocalTranslation(0, 15 + 3.6F * indexForMoving(delta), 0);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, -HALF_PI + HALF_PI * indexForMoving(delta), 0));
 	}
 	
@@ -101,7 +101,7 @@ public class Woodblocks extends TwelveDrumOctave {
 		 */
 		public Woodblock(int i) {
 			Spatial mesh = context.loadModel("WoodBlockSingle.obj", "SimpleWood.bmp");
-			mesh.setLocalScale(1 - 0.036363636f * i);
+			mesh.setLocalScale(1 - 0.036F * i);
 			animNode.attachChild(mesh);
 		}
 		
@@ -109,7 +109,11 @@ public class Woodblocks extends TwelveDrumOctave {
 		public void tick(float delta) {
 			Vector3f localTranslation = highestLevel.getLocalTranslation();
 			if (localTranslation.y < -0.0001) {
-				highestLevel.setLocalTranslation(0, Math.min(0, localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
+				highestLevel.setLocalTranslation(
+						0,
+						Math.min(0, localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)),
+						0
+				);
 			} else {
 				highestLevel.setLocalTranslation(0, 0, 0);
 			}

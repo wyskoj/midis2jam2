@@ -20,8 +20,10 @@ package org.wysko.midis2jam2.instrument.family.percussion;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
+import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import org.wysko.midis2jam2.world.Axis;
 
@@ -29,17 +31,36 @@ import java.util.List;
 
 import static com.jme3.scene.Spatial.CullHint.Always;
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.*;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * The High Q. Looks like a laser gun.
+ * The High Q. Looks like a laser gun. To animate the laser gun, I just used {@link Stick#handleStick}. The laser that
+ * shoots out of the gun is stationary and appears for {@link #LASER_LIFE} seconds.
  */
 public class HighQ extends NonDrumSetPercussion {
 	
+	/**
+	 * The amount of time the laser should appear for when the laser gun shoots, expressed in seconds.
+	 */
+	public static final double LASER_LIFE = 0.05;
+	
+	/**
+	 * Contains the laser gun.
+	 */
+	@NotNull
 	private final Node gunNode = new Node();
 	
+	/**
+	 * The green beam that "shoots" out of the laser gun.
+	 */
+	@NotNull
 	private final Spatial laser;
+	
+	/**
+	 * Timer for keeping track of how long the laser has been visible.
+	 */
+	private double laserShowTime;
 	
 	/**
 	 * Instantiates a new high Q.
@@ -50,33 +71,41 @@ public class HighQ extends NonDrumSetPercussion {
 	protected HighQ(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
+		/* Load laser gun */
 		gunNode.attachChild(context.loadModel("Zapper.obj", "Zapper.bmp"));
 		instrumentNode.attachChild(gunNode);
+		
+		/* Load laser */
 		laser = context.loadModel("ZapperLaser.obj", "Laser.bmp");
 		instrumentNode.attachChild(laser);
+		
+		/* Positioning */
 		laser.setLocalTranslation(0, 0, -14);
-		laser.setCullHint(Always);
 		instrumentNode.setLocalTranslation(-6, 45, -74);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(135), 0));
+		
+		/* Hide the laser to begin with */
+		laser.setCullHint(Always);
 	}
-	
-	private double laserShowTime = 0;
 	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
 		var stickStatus = handleStick(context, gunNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
+		
+		/* If the laser gun just fired, show the laser and start the timer */
 		if (stickStatus.justStruck()) {
 			laser.setCullHint(Dynamic);
 			laserShowTime = 0;
 		}
 		
+		/* Increment counter */
 		laserShowTime += delta;
 		
-		if (laserShowTime > 0.05) {
+		/* If the counter has surpassed the maximum time, hide the laser */
+		if (laserShowTime > LASER_LIFE) {
 			laser.setCullHint(Always);
 		}
-		
 	}
 }

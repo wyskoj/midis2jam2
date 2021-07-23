@@ -28,20 +28,22 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The alto saxophone.
  */
 public class AltoSax extends Saxophone {
 	
-	
+	/**
+	 * The Alto Sax fingering manager.
+	 */
 	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(AltoSax.class);
 	
 	/**
 	 * The amount to stretch the bell of this instrument by.
 	 */
-	private static final float STRETCH_FACTOR = 0.65f;
+	private static final float STRETCH_FACTOR = 0.65F;
 	
 	/**
 	 * Constructs an alto saxophone.
@@ -51,9 +53,7 @@ public class AltoSax extends Saxophone {
 	 */
 	public AltoSax(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		super(context, events, AltoSaxClone.class, FINGERING_MANAGER);
-		
-		groupOfPolyphony.setLocalTranslation(-32, 46.5f, -50);
-		
+		groupOfPolyphony.setLocalTranslation(-32, 46.5F, -50);
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class AltoSax extends Saxophone {
 			this.body = context.getAssetManager().loadModel("Assets/AltoSaxBody.fbx");
 			this.bell.attachChild(context.getAssetManager().loadModel("Assets/AltoSaxHorn.obj"));
 			
-			Node bodyNode = ((Node) body);
+			var bodyNode = ((Node) body);
 			
 			bodyNode.getChild(0).setMaterial(shinyHornSkin);
 			bodyNode.getChild(1).setMaterial(black);
@@ -82,7 +82,9 @@ public class AltoSax extends Saxophone {
 			
 			modelNode.attachChild(this.body);
 			modelNode.attachChild(bell);
-			bell.move(0, -22, 0); // Move bell down to body
+			
+			/* The bell has to be moved down to attach to the body */
+			bell.move(0, -22, 0);
 			
 			animNode.setLocalTranslation(0, 0, 20);
 			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(13), rad(75), 0));

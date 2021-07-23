@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The stage horns are positioned back and to the left. There are 12 of them for each note in the octave. Stage horns
@@ -38,12 +38,7 @@ public class StageHorns extends WrappedOctaveSustained {
 	/**
 	 * The base position of a horn.
 	 */
-	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5f, -152.65f);
-	
-	/**
-	 * Contains each horn.
-	 */
-	final Node[] hornNodes = new Node[12];
+	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5F, -152.65F);
 	
 	/**
 	 * Instantiates new stage horns.
@@ -55,6 +50,7 @@ public class StageHorns extends WrappedOctaveSustained {
 		super(context, eventList, false);
 		
 		twelfths = new StageHornNote[12];
+		var hornNodes = new Node[12];
 		for (var i = 0; i < 12; i++) {
 			hornNodes[i] = new Node();
 			twelfths[i] = new StageHornNote();
@@ -86,7 +82,7 @@ public class StageHorns extends WrappedOctaveSustained {
 		public StageHornNote() {
 			super();
 			// Load horn
-			animNode.attachChild(context.loadModel("StageHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
+			animNode.attachChild(context.loadModel("StageHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
 		}
 	}
 }

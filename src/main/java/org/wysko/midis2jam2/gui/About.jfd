@@ -8,7 +8,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
-			"title": "About midis2jam2"
+			"title": new FormMessage( null, "About.this.title" )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 				"$columnSpecs": "center:683:1.0"
 				"$rowSpecs": "0, 0, 0, 0, 0, 0, 0"
@@ -44,24 +44,24 @@ new FormModel {
 					"gridy": 3
 				} )
 				add( new FormComponent( "javax.swing.JEditorPane" ) {
-					name: "editorPane1"
+					name: "websiteLink"
 					"background": &SwingColor0 new com.jformdesigner.model.SwingColor( "darcula.background" )
 					"contentType": "text/html"
-					"text": "<html><a href=\"https://midis2jam2.xyz\">Website</a></html>"
+					"text": new FormMessage( null, "About.websiteLink.text" )
 					"editable": false
 					"opaque": false
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 4
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label5"
-					"text": "<html>\n<div style=\"text-align:center;\">\nCopyright © 2021 Jacob Wysko<br/>\n<small>Assets Copyright © 2007 Scott Haag (used with permission)</small>\n</div>\n</html>"
+					name: "copyrightInfo"
+					"text": "<html>\n<div style=\"text-align:center;\">\nCopyright © 2021 Jacob Wysko<br/>\n<small>Some assets Copyright © 2007 Scott Haag (used with permission)</small>\n</div>\n</html>"
 					"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, -2, false )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 5
 				} )
 				add( new FormComponent( "javax.swing.JEditorPane" ) {
-					name: "editorPane2"
+					name: "licenseInfo"
 					"background": #SwingColor0
 					"contentType": "text/html"
 					"text": "<html>\n<div style=\"text-align:center\">\nThis program comes with absolutely no warranty.<br/>\nSee the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\">GNU General Public License, version 3</a> for details.\n</div>\n</html>\n\n"

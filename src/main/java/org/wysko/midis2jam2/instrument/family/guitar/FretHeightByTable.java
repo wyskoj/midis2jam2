@@ -17,25 +17,29 @@
 
 package org.wysko.midis2jam2.instrument.family.guitar;
 
+import org.jetbrains.annotations.Contract;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.util.Utils;
+import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
+
+import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 /**
  * Calculates fret heights using a lookup table.
  */
 public class FretHeightByTable implements FretHeightCalculator {
 	
-	
 	/**
 	 * The lookup table. The key is the fret and the value is the scaling.
 	 */
-	final Map<Integer, Float> lookupTable;
+	private final Map<Integer, Float> lookupTable;
 	
 	/**
 	 * Instantiates a new Fret height by table.
@@ -46,16 +50,28 @@ public class FretHeightByTable implements FretHeightCalculator {
 		this.lookupTable = lookupTable;
 	}
 	
+	/**
+	 * Given the class of a {@link FrettedInstrument}, returns the XML data defined in {@code fret_heights.xml} for that
+	 * specific instrument.
+	 *
+	 * @param clazz the class of the instrument to get data
+	 * @return a {@link FretHeightByTable} for that instrument, containing the data in the XML
+	 */
 	public static FretHeightByTable fromXml(Class<? extends FrettedInstrument> clazz) {
 		try {
-			var xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(FretHeightByTable.class.getResourceAsStream("/fret_heights.xml"));
+			var xmlDoc = Utils.instantiateXmlParser("/fret_heights.xml");
 			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
 			Map<Integer, Float> lookup = new HashMap<>();
+			
+			/* For each instrument */
 			for (var i = 0; i < instrumentList.getLength(); i++) {
+				/* If the name of class equals the name of the currently indexed instrument */
 				if (instrumentList.item(i).getAttributes().getNamedItem("name").getTextContent().equals(clazz.getSimpleName())) {
 					var instrument = instrumentList.item(i);
 					var fretHeights = ((Element) instrument).getElementsByTagName("value");
-					for (int j = 0; j < fretHeights.getLength(); j++) {
+					/* For each fret height definition */
+					for (var j = 0; j < fretHeights.getLength(); j++) {
+						/* Store attributes to the lookup table */
 						var attributes = fretHeights.item(j).getAttributes();
 						lookup.put(
 								Integer.parseInt(attributes.getNamedItem("fret").getTextContent()),
@@ -66,15 +82,16 @@ public class FretHeightByTable implements FretHeightCalculator {
 				}
 			}
 			return new FretHeightByTable(lookup);
-		} catch (Exception e) {
-			Midis2jam2.LOGGER.log(Level.SEVERE, "Failed to load fret height from XML for %s.".formatted(clazz.getName()));
-			e.printStackTrace();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			Midis2jam2.getLOGGER().severe("Failed to load fret height from XML for %s.%n%s"
+					.formatted(clazz.getName(), exceptionToLines(e)));
 			return new FretHeightByTable(new HashMap<>());
 		}
 		
 	}
 	
 	@Override
+	@Contract(pure = true)
 	public float calculateScale(int fret) {
 		return lookupTable.get(fret);
 	}

@@ -28,12 +28,20 @@ import java.util.Map;
 public class LauncherSettings {
 	
 	private String lastMidiDir;
+	
 	private List<String> soundFontPaths;
+	
 	private InstrumentTransition transition;
+	
 	private String midiDevice;
+	
 	private boolean fullscreen;
+	
 	private final Map<String, Integer> deviceLatencyMap;
+	
 	private boolean legacyDisplay;
+	
+	private String locale;
 	
 	public int getLatencyForDevice(String deviceName) {
 		var integer = deviceLatencyMap.get(deviceName);
@@ -61,6 +69,7 @@ public class LauncherSettings {
 		deviceLatencyMap = new HashMap<>();
 		deviceLatencyMap.put("Gervill", 100);
 		legacyDisplay = false;
+		locale = "en";
 	}
 	
 	public String getLastMidiDir() {
@@ -111,5 +120,13 @@ public class LauncherSettings {
 	
 	public void setLegacyDisplay(boolean legacyDisplay) {
 		this.legacyDisplay = legacyDisplay;
+	}
+	
+	public String getLocale() {
+		return locale;
+	}
+	
+	public void setLocale(String locale) {
+		this.locale = locale;
 	}
 }

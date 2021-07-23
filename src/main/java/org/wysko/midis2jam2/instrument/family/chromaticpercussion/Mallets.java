@@ -21,6 +21,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
@@ -32,14 +33,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.piano.Keyboard.midiValueToColor;
 import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHITE;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * Any one of vibraphone, glockenspiel, marimba, or xylophone.
  */
 public class Mallets extends DecayedInstrument {
+	
+	/**
+	 * The mallet case is scaled by this value to appear correct.
+	 */
+	public static final float MALLET_CASE_SCALE = 0.667F;
 	
 	/**
 	 * The number of bars on the mallets instrument.
@@ -57,41 +63,34 @@ public class Mallets extends DecayedInstrument {
 	private static final int RANGE_HIGH = 108;
 	
 	/**
-	 * The black case that contains the bars.
+	 * List of lists, where each list contains the strikes corresponding to that bar's MIDI note.
 	 */
-	final Spatial malletCase;
+	private final List<List<MidiNoteOnEvent>> barStrikes;
 	
 	/**
 	 * The type of mallets.
 	 */
-	final MalletType type;
+	private final MalletType type;
 	
 	/**
-	 * Each bar of the 88.
+	 * Each bar of the instrument. There are {@link #MALLET_BAR_COUNT} bars.
 	 */
-	final MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
+	private final MalletBar[] bars = new MalletBar[MALLET_BAR_COUNT];
 	
-	/**
-	 * Array of lists, where each list contains the strikes corresponding to that bar's MIDI note.
-	 */
-	final List<List<MidiNoteOnEvent>> barStrikes;
-	
-	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList,
-	               MalletType type) {
-		
+	public Mallets(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList, MalletType type) {
 		super(context, eventList);
-		
 		this.type = type;
-		malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp");
-		malletCase.setLocalScale(2 / 3f);
+		
+		Spatial malletCase = context.loadModel("XylophoneCase.obj", "Black.bmp");
+		malletCase.setLocalScale(MALLET_CASE_SCALE);
 		instrumentNode.attachChild(malletCase);
 		
 		var whiteCount = 0;
 		for (var i = 0; i < MALLET_BAR_COUNT; i++) {
-			if (midiValueToColor(i + RANGE_LOW) == WHITE) { // White key
+			if (midiValueToColor(i + RANGE_LOW) == WHITE) {
 				bars[i] = new MalletBar(i + RANGE_LOW, whiteCount);
 				whiteCount++;
-			} else { // Black key
+			} else {
 				bars[i] = new MalletBar(i + RANGE_LOW, i);
 			}
 		}
@@ -103,7 +102,7 @@ public class Mallets extends DecayedInstrument {
 			barStrikes.add(new ArrayList<>());
 		}
 		
-		eventList.forEach(event -> {
+		eventList.forEach((MidiChannelSpecificEvent event) -> {
 			if (event instanceof MidiNoteOnEvent) {
 				int midiNote = ((MidiNoteOnEvent) event).note;
 				if (midiNote >= RANGE_LOW && midiNote <= RANGE_HIGH) {
@@ -119,7 +118,7 @@ public class Mallets extends DecayedInstrument {
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		for (int i = 0, barsLength = bars.length; i < barsLength; i++) { // For each bar on the instrument
+		for (int i = 0, barsLength = bars.length; i < barsLength; i++) {
 			bars[i].tick(delta);
 			var stickStatus = Stick.handleStick(context, bars[i].malletNode, time, delta,
 					barStrikes.get(i),
@@ -127,14 +126,15 @@ public class Mallets extends DecayedInstrument {
 			if (stickStatus.justStruck()) {
 				bars[i].recoilBar();
 			}
-			bars[i].shadow.setLocalScale((float) ((1 - (Math.toDegrees(stickStatus.getRotationAngle()) / Stick.MAX_ANGLE)) / 2f));
+			bars[i].shadow.setLocalScale((float)
+					((1 - (Math.toDegrees(stickStatus.getRotationAngle()) / Stick.MAX_ANGLE)) / 2));
 		}
 	}
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
 		float i1 = indexForMoving(delta) - 2;
-		instrumentNode.setLocalTranslation(-50, 26.5f + (2 * i1), 0);
+		instrumentNode.setLocalTranslation(-50, 26.5F + (2 * i1), 0);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-18) * i1, 0));
 	}
 	
@@ -142,18 +142,22 @@ public class Mallets extends DecayedInstrument {
 	 * The type of mallets.
 	 */
 	public enum MalletType {
+		
 		/**
 		 * The vibraphone.
 		 */
 		VIBES("VibesBar.bmp"),
+		
 		/**
 		 * The marimba.
 		 */
 		MARIMBA("MarimbaBar.bmp"),
+		
 		/**
 		 * The glockenspiel.
 		 */
 		GLOCKENSPIEL("GlockenspielBar.bmp"),
+		
 		/**
 		 * The xylophone.
 		 */
@@ -162,7 +166,7 @@ public class Mallets extends DecayedInstrument {
 		/**
 		 * The texture file of this type of mallet.
 		 */
-		final String textureFile;
+		private final String textureFile;
 		
 		MalletType(String textureFile) {
 			this.textureFile = textureFile;
@@ -177,58 +181,52 @@ public class Mallets extends DecayedInstrument {
 		/**
 		 * The model in the up position.
 		 */
-		final Spatial upBar;
+		private final Spatial upBar;
 		
 		/**
 		 * The model in the down position.
 		 */
-		final Spatial downBar;
-		
-		/**
-		 * The mallet that hits this bar.
-		 */
-		final Spatial mallet;
+		private final Spatial downBar;
 		
 		/**
 		 * Contains the entire note geometry.
 		 */
-		final Node noteNode = new Node();
-		
-		/**
-		 * Contains the bar.
-		 */
-		final Node barNode = new Node();
+		@NotNull
+		private final Node noteNode = new Node();
 		
 		/**
 		 * Contains the mallet.
 		 */
-		final Node malletNode = new Node();
+		@NotNull
+		private final Node malletNode = new Node();
 		
 		/**
 		 * The small, circular shadow that appears as the mallet is striking.
 		 */
-		final Spatial shadow;
+		@NotNull
+		private final Spatial shadow;
 		
 		/**
 		 * True if the bar is recoiling, false otherwise.
 		 */
-		boolean barIsRecoiling = false;
+		private boolean barIsRecoiling;
 		
 		/**
 		 * True if the bar should begin recoiling.
 		 */
-		boolean recoilNow = false;
+		private boolean recoilNow;
 		
 		public MalletBar(int midiNote, int startPos) {
-			mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile);
+			Spatial mallet = Mallets.this.context.loadModel("XylophoneMalletWhite.obj", Mallets.this.type.textureFile);
 			malletNode.attachChild(mallet);
-			malletNode.setLocalScale(0.667f);
+			malletNode.setLocalScale(MALLET_CASE_SCALE);
 			malletNode.setLocalRotation(new Quaternion().fromAngles(rad(50), 0, 0));
 			mallet.setLocalTranslation(0, 0, -2);
 			malletNode.move(0, 0, 2);
 			
 			shadow = Mallets.this.context.loadModel("MalletHitShadow.obj", "Black.bmp");
 			
+			var barNode = new Node();
 			if (midiValueToColor(midiNote) == WHITE) {
 				upBar = Mallets.this.context.loadModel("XylophoneWhiteBar.obj", Mallets.this.type.textureFile);
 				downBar = Mallets.this.context.loadModel("XylophoneWhiteBarDown.obj", Mallets.this.type.textureFile);
@@ -236,12 +234,12 @@ public class Mallets extends DecayedInstrument {
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
 				
-				float scaleFactor = (RANGE_HIGH - midiNote + 20) / 50f;
-				barNode.setLocalScale(0.55f, 1, 0.5f * scaleFactor);
-				noteNode.move(1.333f * (startPos - 26), 0, 0); // 26 = count(white keys) / 2
+				float scaleFactor = (RANGE_HIGH - midiNote + 20) / 50F;
+				barNode.setLocalScale(0.55F, 1, 0.5F * scaleFactor);
+				noteNode.move(1.333F * (startPos - 26), 0, 0);
 				
-				malletNode.setLocalTranslation(0, 1.35f, (-midiNote / 11.5f) + 19);
-				shadow.setLocalTranslation(0, 0.75f, (-midiNote / 11.5f) + 11);
+				malletNode.setLocalTranslation(0, 1.35F, (-midiNote / 11.5F) + 19);
+				shadow.setLocalTranslation(0, 0.75F, (-midiNote / 11.5F) + 11);
 			} else {
 				upBar = Mallets.this.context.loadModel("XylophoneBlackBar.obj", Mallets.this.type.textureFile);
 				downBar = Mallets.this.context.loadModel("XylophoneBlackBarDown.obj", Mallets.this.type.textureFile);
@@ -249,12 +247,12 @@ public class Mallets extends DecayedInstrument {
 				barNode.attachChild(upBar);
 				barNode.attachChild(downBar);
 				
-				float scaleFactor = (RANGE_HIGH - midiNote + 20) / 50f;
-				barNode.setLocalScale(0.6f, 0.7f, 0.5f * scaleFactor);
-				noteNode.move(1.333f * (midiNote * (7 / 12f) - 38.2f), 0, (-midiNote / 50f) + 2.6667f); // funky math
+				float scaleFactor = (RANGE_HIGH - midiNote + 20) / 50F;
+				barNode.setLocalScale(0.6F, 0.7F, 0.5F * scaleFactor);
+				noteNode.move(1.333F * (midiNote * (0.583F) - 38.2F), 0, (-midiNote / 50F) + 2.667F);
 				
-				malletNode.setLocalTranslation(0, 2.6f, (midiNote / 12.5f) - 2);
-				shadow.setLocalTranslation(0, 2f, (midiNote / 12.5f) - 10);
+				malletNode.setLocalTranslation(0, 2.6F, (midiNote / 12.5F) - 2);
+				shadow.setLocalTranslation(0, 2, (midiNote / 12.5F) - 10);
 			}
 			downBar.setCullHint(Spatial.CullHint.Always);
 			barNode.attachChild(upBar);
@@ -284,10 +282,10 @@ public class Mallets extends DecayedInstrument {
 				Vector3f barRecoil = downBar.getLocalTranslation();
 				if (recoilNow) {
 					// The bar needs to go all the way down
-					downBar.setLocalTranslation(0, -0.5f, 0);
+					downBar.setLocalTranslation(0, -0.5F, 0);
 				} else {
 					if (barRecoil.y < -0.0001) {
-						downBar.move(0, 5f * delta, 0);
+						downBar.move(0, 5 * delta, 0);
 						Vector3f localTranslation = downBar.getLocalTranslation();
 						downBar.setLocalTranslation(new Vector3f(
 								localTranslation.x,

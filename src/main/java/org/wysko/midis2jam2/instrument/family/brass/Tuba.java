@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The tuba. Has four keys and animates just like other {@link MonophonicInstrument}s.
@@ -40,6 +40,7 @@ public class Tuba extends MonophonicInstrument {
 	/**
 	 * The tuba fingering manager.
 	 */
+	@NotNull
 	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(Tuba.class);
 	
 	/**
@@ -48,7 +49,8 @@ public class Tuba extends MonophonicInstrument {
 	 * @param context   the context
 	 * @param eventList the event list
 	 */
-	public Tuba(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
+	public Tuba(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> eventList)
+			throws ReflectiveOperationException {
 		super(context, eventList, TubaClone.class, FINGERING_MANAGER);
 		
 		/* Tuba positioning */
@@ -57,7 +59,7 @@ public class Tuba extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 40f * indexForMoving(delta), 0);
+		offsetNode.setLocalTranslation(0, 40 * indexForMoving(delta), 0);
 	}
 	
 	/**
@@ -69,10 +71,10 @@ public class Tuba extends MonophonicInstrument {
 		 * Instantiates a new tuba clone.
 		 */
 		public TubaClone() {
-			super(Tuba.this, -0.05f, 0.8f, 4, Axis.Y, Axis.Z);
+			super(Tuba.this, -0.05F, 0.8F, 4, Axis.Y, Axis.Z);
 			
-			body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
-			bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
+			body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+			bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
@@ -80,7 +82,7 @@ public class Tuba extends MonophonicInstrument {
 			/* Load tuba keys */
 			for (var i = 0; i < 4; i++) {
 				keys[i] = context.loadModel("TubaKey" + (i + 1) + ".obj", "HornSkinGrey.bmp",
-						Midis2jam2.MatType.REFLECTIVE, 0.9f);
+						Midis2jam2.MatType.REFLECTIVE, 0.9F);
 				modelNode.attachChild(keys[i]);
 			}
 			
@@ -90,7 +92,7 @@ public class Tuba extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(50f * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(50F * indexForMoving()), 0));
 		}
 		
 		@Override
@@ -99,7 +101,7 @@ public class Tuba extends MonophonicInstrument {
 			for (var i = 0; i < 4; i++) {
 				int finalI = i;
 				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
-					keys[i].setLocalTranslation(0, -0.5f, 0);
+					keys[i].setLocalTranslation(0, -0.5F, 0);
 				} else {
 					keys[i].setLocalTranslation(0, 0, 0);
 				}

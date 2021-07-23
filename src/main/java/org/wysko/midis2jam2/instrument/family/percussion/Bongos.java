@@ -29,24 +29,14 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.midi.Midi.HIGH_BONGO;
 import static org.wysko.midis2jam2.midi.Midi.LOW_BONGO;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The bongos.
  */
 public class Bongos extends NonDrumSetPercussion {
-	
-	/**
-	 * The low bongo.
-	 */
-	final Spatial lowBongo;
-	
-	/**
-	 * The high bongo.
-	 */
-	final Spatial highBongo;
 	
 	private final List<MidiNoteOnEvent> lowBongoHits;
 	
@@ -55,12 +45,12 @@ public class Bongos extends NonDrumSetPercussion {
 	/**
 	 * The Right hand node.
 	 */
-	private final Node highStickNode = new Node();
+	private final Node highHandNode = new Node();
 	
 	/**
 	 * The Left hand node.
 	 */
-	private final Node lowStickNode = new Node();
+	private final Node lowHandNode = new Node();
 	
 	/**
 	 * The Left bongo anim node.
@@ -82,47 +72,57 @@ public class Bongos extends NonDrumSetPercussion {
 	              List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
+		/* Separate high and low bongo hits */
 		lowBongoHits = hits.stream().filter(h -> h.note == LOW_BONGO).collect(Collectors.toList());
 		highBongoHits = hits.stream().filter(h -> h.note == HIGH_BONGO).collect(Collectors.toList());
 		
-		lowBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
-		highBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
-		highBongo.setLocalScale(0.9f);
+		/* Load bongos */
+		Spatial lowBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
+		Spatial highBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
+		highBongo.setLocalScale(0.9F);
 		
+		/* Attach bongos */
 		lowBongoAnimNode.attachChild(lowBongo);
 		highBongoAnimNode.attachChild(highBongo);
 		
 		var lowBongoNode = new Node();
-		lowBongoNode.attachChild(lowBongoAnimNode);
 		var highBongoNode = new Node();
+		lowBongoNode.attachChild(lowBongoAnimNode);
 		highBongoNode.attachChild(highBongoAnimNode);
 		
 		instrumentNode.attachChild(lowBongoNode);
 		instrumentNode.attachChild(highBongoNode);
 		
-		lowStickNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"));
-		highStickNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"));
+		/* Load hands */
+		lowHandNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"));
+		highHandNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"));
 		
-		lowBongoAnimNode.attachChild(lowStickNode);
-		highBongoAnimNode.attachChild(highStickNode);
+		/* Attach hands */
+		lowBongoAnimNode.attachChild(lowHandNode);
+		highBongoAnimNode.attachChild(highHandNode);
 		
-		lowBongoNode.setLocalTranslation(-35.88f, 40.4f, -62.6f);
+		/* Positioning */
+		lowBongoNode.setLocalTranslation(-35.88F, 40.4F, -62.6F);
 		lowBongoNode.setLocalRotation(new Quaternion().fromAngles(rad(32.7), rad(61.2), rad(-3.6)));
 		
-		highBongoNode.setLocalTranslation(-38.3f, 40.2f, -54.5f);
+		highBongoNode.setLocalTranslation(-38.3F, 40.2F, -54.5F);
 		highBongoNode.setLocalRotation(new Quaternion().fromAngles(rad(32.9), rad(68.1), rad(-0.86)));
 		
-		lowStickNode.setLocalTranslation(0, 0, 5);
-		highStickNode.setLocalTranslation(0, 0, 5);
+		lowHandNode.setLocalTranslation(0, 0, 5);
+		highHandNode.setLocalTranslation(0, 0, 5);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
-		Stick.StickStatus statusLow = Stick.handleStick(context, lowStickNode, time, delta, lowBongoHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		Stick.StickStatus statusHigh = Stick.handleStick(context, highStickNode, time, delta, highBongoHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
+		/* Animate hands */
+		Stick.StickStatus statusLow = Stick.handleStick(context, lowHandNode, time, delta, lowBongoHits,
+				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
+		Stick.StickStatus statusHigh = Stick.handleStick(context, highHandNode, time, delta, highBongoHits,
+				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 		
+		/* Animate low bongo recoil */
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
@@ -131,6 +131,7 @@ public class Bongos extends NonDrumSetPercussion {
 			recoilDrum(lowBongoAnimNode, false, 0, delta);
 		}
 		
+		/* Animate high bongo recoil */
 		if (statusHigh.justStruck()) {
 			MidiNoteOnEvent strike = statusHigh.getStrike();
 			assert strike != null;

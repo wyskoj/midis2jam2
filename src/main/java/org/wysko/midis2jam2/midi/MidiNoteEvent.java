@@ -25,6 +25,11 @@ import java.util.Objects;
 public class MidiNoteEvent extends MidiChannelSpecificEvent {
 	
 	/**
+	 * The max value a MIDI note can have.
+	 */
+	public static final int MIDI_MAX_NOTE = 127;
+	
+	/**
 	 * The MIDI note.
 	 */
 	public final int note;

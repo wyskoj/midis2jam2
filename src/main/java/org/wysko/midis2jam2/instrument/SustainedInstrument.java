@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument;
 
-import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -28,8 +27,12 @@ import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
 import org.wysko.midis2jam2.midi.NotePeriod;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.jme3.scene.Spatial.CullHint.Always;
+import static com.jme3.scene.Spatial.CullHint.Dynamic;
 
 /**
  * A sustained instrument is any instrument that also depends on knowing the {@link MidiNoteOffEvent} for proper
@@ -63,6 +66,7 @@ public abstract class SustainedInstrument extends Instrument {
 	 *
 	 * @param context the context to the main class
 	 */
+	@SuppressWarnings("java:S1699")
 	protected SustainedInstrument(@NotNull Midis2jam2 context,
 	                              @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context);
@@ -79,8 +83,11 @@ public abstract class SustainedInstrument extends Instrument {
 	 */
 	@NotNull
 	@Contract(pure = true)
-	public static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull List<MidiChannelSpecificEvent> events) {
-		return events.stream().filter(MidiNoteEvent.class::isInstance).map(MidiNoteEvent.class::cast).collect(Collectors.toList());
+	public static List<MidiNoteEvent> scrapeMidiNoteEvents(@NotNull Collection<MidiChannelSpecificEvent> events) {
+		return events.stream()
+				.filter(MidiNoteEvent.class::isInstance)
+				.map(MidiNoteEvent.class::cast)
+				.collect(Collectors.toList());
 	}
 	
 	/**
@@ -90,7 +97,7 @@ public abstract class SustainedInstrument extends Instrument {
 	 * @param unmodifiableNotePeriods the unmodifiable note periods
 	 * @return true if this instrument should be visible, false otherwise
 	 */
-	public static boolean calcVisibility(double time, @NotNull List<NotePeriod> unmodifiableNotePeriods) {
+	public static boolean calcVisibility(double time, @NotNull Iterable<NotePeriod> unmodifiableNotePeriods) {
 		var show = false;
 		for (NotePeriod notePeriod : unmodifiableNotePeriods) {
 			// Within 1 second of a note on,
@@ -143,7 +150,11 @@ public abstract class SustainedInstrument extends Instrument {
 	protected void setIdleVisibilityByPeriods(double time) {
 		boolean b = calcVisibility(time, unmodifiableNotePeriods);
 		setVisible(b);
-		instrumentNode.setCullHint(b ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		if (b) {
+			instrumentNode.setCullHint(Dynamic);
+		} else {
+			instrumentNode.setCullHint(Always);
+		}
 	}
 	
 }

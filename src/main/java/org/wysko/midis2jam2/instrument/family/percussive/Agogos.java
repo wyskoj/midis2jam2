@@ -27,20 +27,15 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstr
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.jme3.math.FastMath.HALF_PI;
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * The Agogos.
+ * The melodic agogos.
  */
-public class Agogos extends TwelveDrumOctave {
-	
-	/**
-	 * The Agogo nodes.
-	 */
-	final Node[] agogoNodes = new Node[12];
+public class Agogos extends OctavePercussion {
 	
 	/**
 	 * @param context   the context to the main class
@@ -49,9 +44,6 @@ public class Agogos extends TwelveDrumOctave {
 	public Agogos(@NotNull Midis2jam2 context,
 	              @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
-		
-		IntStream.range(0, 12).forEach(i -> agogoNodes[i] = new Node());
-		
 		
 		for (var i = 0; i < 12; i++) {
 			malletNodes[i] = new Node();
@@ -64,11 +56,11 @@ public class Agogos extends TwelveDrumOctave {
 			var agogo = new Agogo(i);
 			twelfths[i] = agogo;
 			oneBlock.attachChild(agogo.highestLevel);
-			agogoNodes[i].attachChild(oneBlock);
+			percussionNodes[i].attachChild(oneBlock);
 			oneBlock.setLocalTranslation(0, 0, 17);
-			agogoNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
-			agogoNodes[i].setLocalTranslation(0, 0.3f * i, 0);
-			instrumentNode.attachChild(agogoNodes[i]);
+			percussionNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(7.5 * i), 0));
+			percussionNodes[i].setLocalTranslation(0, 0.3F * i, 0);
+			instrumentNode.attachChild(percussionNodes[i]);
 		}
 		
 		instrumentNode.setLocalTranslation(75, 0, -35);
@@ -85,7 +77,7 @@ public class Agogos extends TwelveDrumOctave {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 18 + 3.6f * indexForMoving(delta), 0);
+		offsetNode.setLocalTranslation(0, 18 + 3.6F * indexForMoving(delta), 0);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, -HALF_PI + HALF_PI * indexForMoving(delta), 0));
 	}
 	
@@ -100,9 +92,8 @@ public class Agogos extends TwelveDrumOctave {
 		 * @param i the index of this agogo
 		 */
 		public Agogo(int i) {
-			Spatial mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", Midis2jam2.MatType.REFLECTIVE,
-					0.9f);
-			mesh.setLocalScale(1 - 0.036363636f * i);
+			Spatial mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9F);
+			mesh.setLocalScale(1 - 0.036F * i);
 			animNode.attachChild(mesh);
 			
 		}
@@ -111,7 +102,11 @@ public class Agogos extends TwelveDrumOctave {
 		public void tick(float delta) {
 			Vector3f localTranslation = highestLevel.getLocalTranslation();
 			if (localTranslation.y < -0.0001) {
-				highestLevel.setLocalTranslation(0, Math.min(0, localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
+				highestLevel.setLocalTranslation(
+						0,
+						Math.min(0, localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)),
+						0
+				);
 			} else {
 				highestLevel.setLocalTranslation(0, 0, 0);
 			}

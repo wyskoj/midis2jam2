@@ -21,6 +21,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
@@ -32,7 +33,7 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The tubular bells.
@@ -42,12 +43,17 @@ public class TubularBells extends DecayedInstrument {
 	/**
 	 * Each of the twelve bells.
 	 */
-	final Bell[] bells = new Bell[12];
+	@NotNull
+	private final Bell[] bells = new Bell[12];
 	
+	/**
+	 * Contains the list of strikes for each of the 12 bells.
+	 */
+	@NotNull
 	@SuppressWarnings("unchecked")
-	final List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
+	private final List<MidiNoteOnEvent>[] bellStrikes = new ArrayList[12];
 	
-	public TubularBells(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
+	public TubularBells(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> events) {
 		super(context, events);
 		
 		for (var i = 0; i < 12; i++) {
@@ -86,7 +92,7 @@ public class TubularBells extends DecayedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(-10f * indexForMoving(delta), 0, -10f * indexForMoving(delta));
+		offsetNode.setLocalTranslation(-10F * indexForMoving(delta), 0, -10F * indexForMoving(delta));
 	}
 	
 	/**
@@ -112,17 +118,20 @@ public class TubularBells extends DecayedInstrument {
 		/**
 		 * The highest level node.
 		 */
-		final Node highestLevel = new Node();
+		@NotNull
+		private final Node highestLevel = new Node();
 		
 		/**
 		 * Contains the tubular bell.
 		 */
-		final Node bellNode = new Node();
+		@NotNull
+		private final Node bellNode = new Node();
 		
 		/**
 		 * Contains the mallet.
 		 */
-		final Node malletNode;
+		@NotNull
+		private final Node malletNode;
 		
 		/**
 		 * The current amplitude of the recoil.
@@ -141,10 +150,10 @@ public class TubularBells extends DecayedInstrument {
 		
 		public Bell(int i) {
 			bellNode.attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp",
-					Midis2jam2.MatType.REFLECTIVE, 0.9f));
+					Midis2jam2.MatType.REFLECTIVE, 0.9F));
 			
 			bellNode.attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp",
-					Midis2jam2.MatType.REFLECTIVE, 0.5f));
+					Midis2jam2.MatType.REFLECTIVE, 0.5F));
 			
 			highestLevel.attachChild(bellNode);
 			bellNode.setLocalTranslation((i - 5) * 4f, 0, 0);

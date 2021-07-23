@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The Viola.
@@ -44,8 +44,6 @@ public class Viola extends StringFamilyInstrument {
 				180,
 				new Vector3f(1, 1, 1),
 				new int[]{48, 55, 62, 69},
-				48,
-				105,
 				context.loadModel("Violin.obj", "ViolaSkin.bmp")
 		);
 		

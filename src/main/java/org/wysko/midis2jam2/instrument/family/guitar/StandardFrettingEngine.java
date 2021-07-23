@@ -20,11 +20,13 @@ package org.wysko.midis2jam2.instrument.family.guitar;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.wysko.midis2jam2.midi.NotePeriod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The fretting engine handles the calculations of determining which frets to press.
@@ -37,7 +39,7 @@ import java.util.List;
 public class StandardFrettingEngine implements FrettingEngine {
 	
 	/**
-	 * The number of note periods to maintain in the running average.
+	 * The number of {@link NotePeriod NotePeriods} to maintain in the running average.
 	 */
 	private static final int RUNNING_AVERAGE_COUNT = 10;
 	
@@ -49,7 +51,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 	/**
 	 * The MIDI note of each open string.
 	 */
-	private final int[] openStringMidiNotes;
+	private final List<Integer> openStringMidiNotes;
 	
 	/**
 	 * The lowest note this engine with deal with.
@@ -74,6 +76,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 	/**
 	 * The list of fretboard positions in the running average.
 	 */
+	@NotNull
 	private final List<FretboardPosition> runningAverage = new ArrayList<>();
 	
 	/**
@@ -82,23 +85,21 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 * @param numberOfStrings     the number of strings this instrument has (e.g., a guitar has 6)
 	 * @param numberOfFrets       the number of frets on this instrument, that is, the highest fret value
 	 * @param openStringMidiNotes the MIDI note of each string, if played with no pressed fret (open string)
-	 * @param rangeLow            the lowest MIDI note this instrument can play (the MIDI note of the lowest open
-	 *                            string)
-	 * @param rangeHigh           the highest MIDI note this instrument can play (the MIDI note of the highest fret on
-	 *                            the highest string)
 	 */
-	public StandardFrettingEngine(int numberOfStrings, int numberOfFrets, int[] openStringMidiNotes, int rangeLow,
-	                              int rangeHigh) {
-		if (openStringMidiNotes.length != numberOfStrings)
-			throw new IllegalArgumentException("The number of strings does not equal the number of data in the open string MIDI notes.");
+	public StandardFrettingEngine(int numberOfStrings, int numberOfFrets, int[] openStringMidiNotes) {
+		if (openStringMidiNotes.length != numberOfStrings) {
+			throw new IllegalArgumentException("The number of strings does not equal the number of data in the open " +
+					"string MIDI notes.");
+		}
 		
 		/* Initialize frets array */
 		frets = new int[numberOfStrings];
 		Arrays.fill(frets, -1);
 		
-		this.openStringMidiNotes = openStringMidiNotes;
-		this.rangeLow = rangeLow;
-		this.rangeHigh = rangeHigh;
+		/* Make open string notes very final */
+		this.openStringMidiNotes = Arrays.stream(openStringMidiNotes).boxed().collect(Collectors.toUnmodifiableList());
+		this.rangeLow = openStringMidiNotes[0];
+		this.rangeHigh = openStringMidiNotes[openStringMidiNotes.length - 1] + numberOfFrets;
 		this.numberOfFrets = numberOfFrets;
 		this.numberOfStrings = numberOfStrings;
 	}
@@ -118,7 +119,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 		if (midiNote >= rangeLow && midiNote <= rangeHigh) {
 			// String starting notes
 			for (var i = 0; i < numberOfStrings; i++) {
-				int fret = midiNote - openStringMidiNotes[i];
+				int fret = midiNote - openStringMidiNotes.get(i);
 				if (fret < 0 || fret > numberOfFrets || frets[i] != -1) {
 					// The note will not fit on this string, or we are not allowed to
 					continue;
@@ -140,7 +141,9 @@ public class StandardFrettingEngine implements FrettingEngine {
 	public void applyFretboardPosition(@NotNull FretboardPosition position) {
 		frets[position.string] = position.fret;
 		runningAverage.add(position);
-		if (runningAverage.size() > RUNNING_AVERAGE_COUNT) runningAverage.remove(0);
+		if (runningAverage.size() > RUNNING_AVERAGE_COUNT) {
+			runningAverage.remove(0);
+		}
 	}
 	
 	/**
@@ -163,7 +166,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 			fretAvg += pos.fret;
 		}
 		return new FretboardPosition(
-				(int) (Math.round((double) stringAvg / runningAverage.size())),
+				(int) Math.round((double) stringAvg / runningAverage.size()),
 				(int) Math.round((double) fretAvg / runningAverage.size())
 		);
 	}
@@ -175,8 +178,9 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 */
 	@Override
 	public void releaseString(int string) {
-		if (string >= numberOfStrings || string < 0)
+		if (string >= numberOfStrings || string < 0) {
 			throw new IllegalArgumentException("Can't release a string that does not exist.");
+		}
 		frets[string] = -1;
 	}
 	
@@ -187,8 +191,8 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 */
 	@Override
 	@Contract(pure = true)
-	public int[] getFrets() {
-		return frets;
+	public List<Integer> getFrets() {
+		return Arrays.stream(frets).boxed().collect(Collectors.toUnmodifiableList());
 	}
 	
 }

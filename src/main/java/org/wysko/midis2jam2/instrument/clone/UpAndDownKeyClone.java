@@ -51,7 +51,10 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 	 *
 	 * @param keyCount the key count
 	 */
-	protected UpAndDownKeyClone(int keyCount, @NotNull MonophonicInstrument parent, float rotationFactor, float stretchFactor) {
+	protected UpAndDownKeyClone(int keyCount,
+	                            @NotNull MonophonicInstrument parent,
+	                            float rotationFactor,
+	                            float stretchFactor) {
 		
 		super(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X);
 		this.keyCount = keyCount;
@@ -72,23 +75,23 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 		assert parent.manager != null;
 		Integer[] keysToGoDown = (Integer[]) parent.manager.fingering(midiNote);
 		
-		if (keysToGoDown == null) { // A note outside of the range of the instrument
+		/* keysToGoDown is null if the note is outside of the instrument's range */
+		if (keysToGoDown == null) {
 			keysToGoDown = new Integer[0];
 		}
 		
 		for (var i = 0; i < keyCount; i++) {
 			int finalI = i;
 			if (Arrays.stream(keysToGoDown).anyMatch(a -> a == finalI)) {
-				// This is a key that needs to be pressed down.
-				keysDown[i].setCullHint(Spatial.CullHint.Dynamic); // Show the key down
-				keysUp[i].setCullHint(Spatial.CullHint.Always); // Hide the key up
+				/* This is a key that needs to be pressed down */
+				keysDown[i].setCullHint(Spatial.CullHint.Dynamic);
+				keysUp[i].setCullHint(Spatial.CullHint.Always);
 			} else {
-				// This is a key that needs to be released.
-				keysDown[i].setCullHint(Spatial.CullHint.Always); // Hide the key down
-				keysUp[i].setCullHint(Spatial.CullHint.Dynamic); // Show the key up
+				/* This is a key that needs to be released */
+				keysDown[i].setCullHint(Spatial.CullHint.Always);
+				keysUp[i].setCullHint(Spatial.CullHint.Dynamic);
 			}
 		}
-		
 	}
 	
 	@Override

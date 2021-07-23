@@ -28,11 +28,13 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.List;
 
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.*;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * The castanets.
+ * The castanets animate similarly to the {@link HandClap}.
+ *
+ * @see HandClap
  */
 public class Castanets extends NonDrumSetPercussion {
 	
@@ -55,19 +57,22 @@ public class Castanets extends NonDrumSetPercussion {
 	protected Castanets(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
+		/* Load castanets */
 		Spatial topCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp");
 		Spatial bottomCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp");
 		
+		/* Attach to nodes */
 		topCastanetNode.attachChild(topCastanet);
 		bottomCastanetNode.attachChild(bottomCastanet);
 		
-		// Move castanets away from pivot
+		/* Move castanets away from pivot */
 		topCastanet.setLocalTranslation(0, 0, -3);
 		bottomCastanet.setLocalTranslation(0, 0, -3);
 		
+		/* Positioning */
 		bottomCastanet.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(180)));
 		
-		instrumentNode.setLocalTranslation(12, 45, -55f);
+		instrumentNode.setLocalTranslation(12, 45, -55);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-45), 0));
 		instrumentNode.attachChild(topCastanetNode);
 		instrumentNode.attachChild(bottomCastanetNode);

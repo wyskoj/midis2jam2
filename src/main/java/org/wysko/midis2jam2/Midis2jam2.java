@@ -30,7 +30,6 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
@@ -40,7 +39,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
-import org.wysko.midis2jam2.gui.AdvancedDisplay;
 import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.family.brass.*;
@@ -70,6 +68,7 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter;
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.util.Utils;
 import org.wysko.midis2jam2.world.Camera;
 
 import javax.sound.midi.Sequencer;
@@ -81,20 +80,37 @@ import java.util.stream.IntStream;
 
 import static com.jme3.scene.Spatial.CullHint.Always;
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static java.util.logging.Level.INFO;
+import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 import static org.wysko.midis2jam2.world.Camera.*;
 
+/**
+ * Contains all the code relevant to operating the 3D scene.
+ */
 public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
-	public static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
+	/**
+	 * Provides all-around logging for midis2jam2.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
 	
-	private static final String LIGHTING_MAT = "Common/MatDefs/Light/Lighting.j3md";
+	/**
+	 * Provides the definition for the j3md lighting material.
+	 */
+	public static final String LIGHTING_MAT = "Common/MatDefs/Light/Lighting.j3md";
+	
+	/**
+	 * Provides the definition for the jm3d unshaded material.
+	 */
+	public static final String UNSHADED_MAT = "Common/MatDefs/Misc/Unshaded.j3md";
+	
+	/**
+	 * Defines the texture channel for materials.
+	 */
+	public static final String COLOR_MAP = "ColorMap";
 	
 	static {
 		LOGGER.setLevel(Level.ALL);
 	}
-	
-	private Displays window = null;
 	
 	/**
 	 * The list of instruments.
@@ -102,9 +118,14 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	public final List<Instrument> instruments = new ArrayList<>();
 	
 	/**
+	 * The {@link M2J2Settings} for this instantiation of midis2jam2.
+	 */
+	public final M2J2Settings settings;
+	
+	/**
 	 * The list of guitar shadows.
 	 */
-	final List<Spatial> guitarShadows = new ArrayList<>();
+	private final List<Spatial> guitarShadows = new ArrayList<>();
 	
 	/**
 	 * The root note of the scene.
@@ -121,39 +142,48 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	private final List<Spatial> harpShadows = new ArrayList<>();
 	
-	public final M2J2Settings settings;
-	
-	/**
-	 * The MIDI sequencer.
-	 */
-	Sequencer sequencer;
-	
-	/**
-	 * True if {@link #sequencer} has begun playing, false otherwise.
-	 */
-	boolean seqHasRunOnce = false;
-	
-	/**
-	 * The current camera position.
-	 */
-	Camera currentCamera = CAMERA_1A;
-	
-	/**
-	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
-	 * the MIDI began playback
-	 */
-	double timeSinceStart = -4;
-	
 	/**
 	 * The MIDI file.
 	 */
 	private final MidiFile file;
 	
 	/**
+	 * The MIDI sequencer.
+	 */
+	private final Sequencer sequencer;
+	
+	/**
+	 * True if {@link #sequencer} has begun playing, false otherwise.
+	 */
+	private boolean seqHasRunOnce;
+	
+	/**
+	 * The current camera position.
+	 */
+	private Camera currentCamera = CAMERA_1A;
+	
+	/**
+	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
+	 * the MIDI began playback.
+	 */
+	private double timeSinceStart = -4;
+	
+	/**
+	 * Reference to the Swing window that is encapsulating the canvas that holds midis2jam2.
+	 */
+	private Displays window;
+	
+	/**
 	 * 3D text for debugging.
 	 */
 	private BitmapText debugText;
 	
+	/**
+	 * The application that called this.
+	 *
+	 * @see Liaison
+	 * @see LegacyLiaison
+	 */
 	private SimpleApplication app;
 	
 	/**
@@ -171,42 +201,21 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	private Spatial keyboardShadow;
 	
+	/**
+	 * Instantiates a midis2jam2 {@link AbstractAppState}.
+	 *
+	 * @param sequencer the sequencer
+	 * @param midiFile  the MIDI file
+	 * @param settings  the settings
+	 */
 	public Midis2jam2(Sequencer sequencer, MidiFile midiFile, M2J2Settings settings) {
 		this.sequencer = sequencer;
 		this.file = midiFile;
 		this.settings = settings;
 	}
 	
-	/**
-	 * Converts an angle expressed in degrees to radians.
-	 *
-	 * @param deg the angle expressed in degrees
-	 * @return the angle expressed in radians
-	 */
-	public static float rad(float deg) {
-		return deg / 180 * FastMath.PI;
-	}
-	
-	/**
-	 * Converts an angle expressed in degrees to radians.
-	 *
-	 * @param deg the angle expressed in degrees
-	 * @return the angle expressed in radians
-	 */
-	public static float rad(double deg) {
-		return (float) (deg / 180 * FastMath.PI);
-	}
-	
-	private static void printNames(Node node) {
-		for (Spatial child : node.getChildren()) {
-			if (child instanceof Node) {
-				printNames((Node) child);
-			} else {
-				var key = child.getKey();
-				if (key != null)
-					System.out.println(key.getName());
-			}
-		}
+	public static Logger getLOGGER() {
+		return LOGGER;
 	}
 	
 	@Override
@@ -214,8 +223,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		super.initialize(stateManager, app);
 		this.app = (Liaison) app;
 		
-		// Initialize camera settings
-		this.app.getFlyByCamera().setMoveSpeed(100f);
+		/* Initialize camera settings */
+		this.app.getFlyByCamera().setMoveSpeed(100);
 		this.app.getFlyByCamera().setZoomSpeed(-10);
 		this.app.getFlyByCamera().setEnabled(true);
 		this.app.getFlyByCamera().setDragToRotate(true);
@@ -223,24 +232,31 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		setupInputMappings();
 		setCamera(CAMERA_1A);
 		
-		// Load stage
+		/* Load stage */
 		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
 		rootNode.attachChild(stage);
 		
 		initDebugText();
 		
-		// Instrument calculation
+		/* Instrument calculation */
 		try {
 			calculateInstruments();
 		} catch (ReflectiveOperationException e) {
-			e.printStackTrace();
+			LOGGER.severe(() -> "There was an error calculating instruments.\n" + exceptionToLines(e));
 		}
-//		printNames(rootNode);
-		
 		
 		addShadowsAndStands();
 		
-		// Begin MIDI playback
+		/* To begin MIDI playback, I perform a check every millisecond to see if it is time to begin the playback of
+		the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
+		beginning of the file. It starts as a negative number to represent that time is to pass before the file will
+		play. Once it reaches 0, playback should begin.
+		 
+		 The Java MIDI sequencer has a bug where the first tempo of the file will not be applied, so once the
+		 sequencer is ready to play, we set the tempo. And, sometimes it will miss a tempo change in the file. To
+		 reduce the complications from this (unfortunately, it does not solve the issue; it only partially treats it)
+		 we perform a check every millisecond and apply any tempos that should be applied now. */
+		
 		new Timer(true).scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
@@ -251,11 +267,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 					new Timer(true).scheduleAtFixedRate(new TimerTask() {
 						@Override
 						public void run() {
-							// Find the first tempo we haven't hit and need to execute
+							/* Find the first tempo we haven't hit and need to execute */
 							long currentMidiTick = sequencer.getTickPosition();
 							for (MidiTempoEvent tempo : getFile().getTempos()) {
 								if (tempo.time == currentMidiTick) {
-									sequencer.setTempoInBPM(60_000_000f / tempo.number);
+									sequencer.setTempoInBPM(60_000_000F / tempo.number);
 								}
 							}
 						}
@@ -273,15 +289,24 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		return rootNode;
 	}
 	
+	/**
+	 * Returns the {@link AssetManager}.
+	 *
+	 * @return the asset manager
+	 */
 	public AssetManager getAssetManager() {
 		return app.getAssetManager();
 	}
 	
 	@Override
 	public void cleanup() {
-		LOGGER.log(INFO, "Cleaning up.");
+		LOGGER.info("Cleaning up.");
+		
+		LOGGER.fine("Stopping and closing sequencer.");
 		sequencer.stop();
 		sequencer.close();
+		
+		LOGGER.fine("Enabling GuiLauncher.");
 		((Liaison) app).enableLauncher();
 	}
 	
@@ -289,17 +314,26 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	public void update(float tpf) {
 		super.update(tpf);
 		
-		if (sequencer == null) return;
-		if (sequencer.isOpen())
+		/* Don't do anything if we don't have the sequencer */
+		if (sequencer == null) {
+			return;
+		}
+		
+		if (sequencer.isOpen()) {
+			/* Increment time if sequencer is ready / playing */
 			timeSinceStart += tpf;
+		}
 		
 		for (Instrument instrument : instruments) {
-			if (instrument != null) { // Null if not implemented yet
+			/* Null if not implemented yet */
+			if (instrument != null) {
 				instrument.tick(timeSinceStart, tpf);
 			}
 		}
 		
+		/* If at the end of the file */
 		if (sequencer.getMicrosecondPosition() == sequencer.getMicrosecondLength()) {
+			/* Wait 3 seconds to close */
 			new Timer().schedule(new TimerTask() {
 				@Override
 				public void run() {
@@ -311,26 +345,12 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		updateShadowsAndStands();
 		preventCameraFromLeaving();
-		
-		// Update window
-		if (window != null && window instanceof AdvancedDisplay) {
-			var window = (AdvancedDisplay) this.window;
-			window.setProgressText(progressText(),
-					(double) sequencer.getMicrosecondPosition() / sequencer.getMicrosecondLength());
-		}
-	}
-	
-	private String progressText() {
-		if (sequencer == null) return null;
-		double totalSeconds = sequencer.getMicrosecondLength() / 1E6;
-		double currentSeconds = sequencer.getMicrosecondPosition() / 1E6;
-		return "%.1f / 100.0".formatted(
-				100 * currentSeconds / totalSeconds);
 	}
 	
 	/**
 	 * Checks the camera's position and ensures it stays within a certain bounding box.
 	 */
+	@SuppressWarnings("java:S1774")
 	private void preventCameraFromLeaving() {
 		var location = app.getCamera().getLocation();
 		app.getCamera().setLocation(new Vector3f(
@@ -343,10 +363,12 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
 		setCameraSpeed(name, isPressed);
-		if (name.equals("exit")) {
+		if ("exit".equals(name)) {
 			exit();
 		}
-		if (name.equals("lmb") && window != null) window.showCursor(isPressed);
+		if ("lmb".equals(name) && window != null) {
+			window.hideCursor(isPressed);
+		}
 		handleCameraSetting(name, isPressed);
 	}
 	
@@ -354,7 +376,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * Stops the app state.
 	 */
 	private void exit() {
-		if (sequencer.isOpen()) sequencer.stop();
+		if (sequencer.isOpen()) {
+			sequencer.stop();
+		}
 		app.stop();
 	}
 	
@@ -364,6 +388,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @param name      the name of the key bind pressed
 	 * @param isPressed is key pressed?
 	 */
+	@SuppressWarnings({"java:S1541", "java:S1774", "java:S1821"})
 	private void handleCameraSetting(String name, boolean isPressed) {
 		if (isPressed && name.startsWith("cam")) {
 			try {
@@ -387,11 +412,16 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		}
 	}
 	
-	
+	/**
+	 * Sets the speed of the camera.
+	 *
+	 * @param name      "slow" OR "fast"
+	 * @param isPressed true if the key is pressed, false otherwise
+	 */
 	private void setCameraSpeed(String name, boolean isPressed) {
-		if (name.equals("slow") && isPressed) {
+		if ("slow".equals(name) && isPressed) {
 			this.app.getFlyByCamera().setMoveSpeed(10);
-		} else if (name.equals("fast") && isPressed) {
+		} else if ("fast".equals(name) && isPressed) {
 			this.app.getFlyByCamera().setMoveSpeed(200);
 		} else {
 			this.app.getFlyByCamera().setMoveSpeed(100);
@@ -405,7 +435,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	@TestOnly
 	@SuppressWarnings("unused")
-	private void showAll(Node rootNode) {
+	private static void showAll(Node rootNode) {
 		for (Spatial child : rootNode.getChildren()) {
 			child.setCullHint(Dynamic);
 			if (child instanceof Node) {
@@ -415,17 +445,23 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	}
 	
 	/**
-	 * Shows/hides a stand (that the piano/mallets) rest on depending on if any instrument of that type exists.
+	 * Shows/hides a stand (that the piano/mallets) rest on depending on if any instrument of that type is currently
+	 * visible.
 	 *
 	 * @param stand the stand
 	 * @param clazz the class of the instrument
 	 */
 	private void setStandVisibility(Spatial stand, Class<? extends Instrument> clazz) {
-		if (stand == null) return;
-		stand.setCullHint(
-				instruments.stream()
-						.filter(Objects::nonNull)
-						.anyMatch(i -> i.isVisible() && clazz.isInstance(i)) ? Dynamic : Always);
+		if (stand == null) {
+			return;
+		}
+		if (instruments.stream()
+				.filter(Objects::nonNull)
+				.anyMatch(i -> i.isVisible() && clazz.isInstance(i))) {
+			stand.setCullHint(Dynamic);
+		} else {
+			stand.setCullHint(Always);
+		}
 	}
 	
 	/**
@@ -440,7 +476,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	private void updateArrayShadows(List<Spatial> shadows, Class<? extends Instrument> clazz) {
 		long numVisible = instruments.stream().filter(i -> clazz.isInstance(i) && i.isVisible()).count();
 		for (var i = 0; i < shadows.size(); i++) {
-			shadows.get(i).setCullHint(i < numVisible ? Dynamic : Always);
+			if (i < numVisible) {
+				shadows.get(i).setCullHint(Dynamic);
+			} else {
+				shadows.get(i).setCullHint(Always);
+			}
 		}
 	}
 	
@@ -455,15 +495,16 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * For the guitar, bass guitar, and harp, calls {@link #updateArrayShadows(List, Class)}.
 	 */
 	private void updateShadowsAndStands() {
-		// Keyboard stand and shadow
+		/* Keyboard stand and shadow */
 		setStandVisibility(pianoStand, Keyboard.class);
-		if (keyboardShadow != null)
+		if (keyboardShadow != null) {
 			keyboardShadow.setLocalScale(1, 1, instruments.stream().filter(k -> k instanceof Keyboard && k.isVisible()).count());
+		}
 		
-		// Mallet stand
+		/* Mallet stand */
 		setStandVisibility(malletStand, Mallets.class);
 		
-		// Guitar, bass guitar, and harp shadows
+		/* Guitar, bass guitar, and harp shadows */
 		updateArrayShadows(bassGuitarShadows, BassGuitar.class);
 		updateArrayShadows(guitarShadows, Guitar.class);
 		updateArrayShadows(harpShadows, Harp.class);
@@ -474,12 +515,12 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * assigning the correct events to respective instruments.
 	 */
 	private void calculateInstruments() throws ReflectiveOperationException {
-		
 		List<ArrayList<MidiChannelSpecificEvent>> channels = new ArrayList<>();
-		// Create 16 ArrayLists for each channel
+		
+		/* Create 16 ArrayLists for each channel */
 		IntStream.range(0, 16).forEach(i -> channels.add(new ArrayList<>()));
 		
-		// For each track, assign each event to the corresponding channel
+		/* For each track, assign each event to the corresponding channel */
 		Arrays.stream(getFile().getTracks())
 				.filter(Objects::nonNull)
 				.forEach(track -> track.events.stream()
@@ -488,27 +529,32 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 						.forEach(channelEvent -> channels.get(channelEvent.channel).add(channelEvent)
 						));
 		
-		// Sort channels by time of event (stable)
+		/* Sort channels by time of event (stable) */
 		for (ArrayList<MidiChannelSpecificEvent> channelEvent : channels) {
 			channelEvent.sort(MidiChannelSpecificEvent.COMPARE_BY_TIME);
 		}
 		
-		// For each channel
+		/* For each channel */
 		for (int j = 0, channelsLength = channels.size(); j < channelsLength; j++) {
 			ArrayList<MidiChannelSpecificEvent> channelEvents = channels.get(j);
 			boolean hasANoteOn = channelEvents.stream().anyMatch(MidiNoteOnEvent.class::isInstance);
-			if (!hasANoteOn) continue; // Skip silent channels
+			
+			/* Skip channels with no notes */
+			if (!hasANoteOn) {
+				continue;
+			}
+			
 			if (j == 9) {
 				instruments.add(new Percussion(this, channelEvents));
 			} else {
-				// A melodic channel
-				// Collect program events
+				/* A melodic channel */
+				/* Collect program events */
 				List<MidiProgramEvent> programEvents = channelEvents.stream()
 						.filter(MidiProgramEvent.class::isInstance)
 						.map(MidiProgramEvent.class::cast)
 						.collect(Collectors.toList());
 				
-				// Add instrument 0 if there is no program events or there is none at the beginning
+				/* Add instrument 0 if there is no program events or there is none at the beginning */
 				if (programEvents.isEmpty() || programEvents.stream().noneMatch(e -> e.time == 0)) {
 					programEvents.add(0, new MidiProgramEvent(0, j, 0));
 				}
@@ -540,48 +586,52 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @param programEvents the list of all program events in this channel
 	 * @throws ReflectiveOperationException if there was an error creating instruments
 	 */
-	private void assignChannelEventsToInstruments(ArrayList<MidiChannelSpecificEvent> channelEvents, List<MidiProgramEvent> programEvents) throws ReflectiveOperationException {
+	private void assignChannelEventsToInstruments(ArrayList<MidiChannelSpecificEvent> channelEvents,
+	                                              List<MidiProgramEvent> programEvents)
+			throws ReflectiveOperationException {
+		
+		/* If there is only one program event, just assign all events to that */
 		if (programEvents.size() == 1) {
-			// If there is only one program event, just assign all events to that
 			instruments.add(fromEvents(programEvents.get(0).programNum, channelEvents));
 			return;
 		}
 		
-		// Maps program numbers to the list of events
+		/* Maps program numbers to the list of events */
 		HashMap<Integer, List<MidiChannelSpecificEvent>> lastProgramForNote = new HashMap<>();
 		
-		// Initializes map with empty list
+		/* Initializes map with empty list */
 		for (MidiProgramEvent programEvent : programEvents) {
 			lastProgramForNote.putIfAbsent(programEvent.programNum, new ArrayList<>());
 		}
 		
-		// The key here is MIDI note, the value is the program that that note applied to
+		/* The key here is MIDI note, the value is the program that that note applied to */
 		HashMap<Integer, MidiProgramEvent> noteOnPrograms = new HashMap<>();
 		
-		// For each channel event
+		/* For each channel event */
 		for (MidiChannelSpecificEvent event : channelEvents) {
-			// If NOT a note off
+			/* If NOT a note off */
 			if (!(event instanceof MidiNoteOffEvent)) {
-				// For each program event
+				/* For each program event */
 				for (var i = 0; i < programEvents.size(); i++) {
-					// If the event occurs within the range of these program events
-					if (i == programEvents.size() - 1 || (event.time >= programEvents.get(i).time && event.time < programEvents.get(i + 1).time)) {
-						// Add this event
+					/* If the event occurs within the range of these program events */
+					if (i == programEvents.size() - 1 ||
+							(event.time >= programEvents.get(i).time && event.time < programEvents.get(i + 1).time)) {
+						/* Add this event */
 						lastProgramForNote.get(programEvents.get(i).programNum).add(event);
 						if (event instanceof MidiNoteOnEvent) {
-							// Keep track of the program if note on, for note off link
+							/* Keep track of the program if note on, for note off link */
 							noteOnPrograms.put(((MidiNoteOnEvent) event).note, programEvents.get(i));
 						}
 						break;
 					}
 				}
 			} else {
-				// Note off events need to be added to the program of the last MIDI note on with that same value
+				/* Note off events need to be added to the program of the last MIDI note on with that same value */
 				lastProgramForNote.get(noteOnPrograms.get(((MidiNoteOffEvent) event).note).programNum).add(event);
 			}
 		}
 		
-		// Create instruments from each program and list
+		/* Create instruments from each program and list */
 		for (Map.Entry<Integer, List<MidiChannelSpecificEvent>> integerListEntry : lastProgramForNote.entrySet()) {
 			instruments.add(fromEvents(integerListEntry.getKey(), integerListEntry.getValue()));
 		}
@@ -615,15 +665,15 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 *
 	 * @param programEvents the list of program events
 	 */
-	private void removeDuplicateProgramEvents(@NotNull List<MidiProgramEvent> programEvents) {
-		// Remove program events at same time (keep the last one)
+	private static void removeDuplicateProgramEvents(@NotNull List<MidiProgramEvent> programEvents) {
+		/* Remove program events at same time (keep the last one) */
 		for (int i = programEvents.size() - 2; i >= 0; i--) {
 			while (i < programEvents.size() - 1 && programEvents.get(i).time == programEvents.get(i + 1).time) {
 				programEvents.remove(i);
 			}
 		}
 		
-		// Remove program events with same value (keep the first one)
+		/* Remove program events with same value (keep the first one) */
 		for (int i = programEvents.size() - 2; i >= 0; i--) {
 			while (i != programEvents.size() - 1 && programEvents.get(i).programNum == programEvents.get(i + 1).programNum) {
 				programEvents.remove(i + 1);
@@ -641,191 +691,189 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @return a new instrument of the correct type containing the specified events, or null if the instrument is not
 	 * yet implemented
 	 */
-	@SuppressWarnings("SpellCheckingInspection")
 	@Nullable
+	@SuppressWarnings({"java:S1541", "java:S1479", "SpellCheckingInspection"})
 	private Instrument fromEvents(int programNum,
 	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		return switch (programNum) {
-			// Acoustic Grand Piano
+			/* Acoustic Grand Piano */
 			case 0 -> (new Keyboard(this, events, Keyboard.KeyboardSkin.PIANO));
-			// Bright Acoustic Piano
+			/* Bright Acoustic Piano */
 			case 1 -> new Keyboard(this, events, Keyboard.KeyboardSkin.BRIGHT);
-			// Electric Grand Piano
+			/* Electric Grand Piano */
 			case 2 -> new Keyboard(this, events, Keyboard.KeyboardSkin.ELECTRIC_GRAND);
-			// Honky-tonk Piano
+			/* Honky-tonk Piano */
 			case 3 -> new Keyboard(this, events, Keyboard.KeyboardSkin.HONKY_TONK);
-			// Electric Piano 1
+			/* Electric Piano 1 */
 			case 4 -> new Keyboard(this, events, Keyboard.KeyboardSkin.ELECTRIC_1);
-			// Electric Piano 2
+			/* Electric Piano 2 */
 			case 5 -> new Keyboard(this, events, Keyboard.KeyboardSkin.ELECTRIC_2);
-			// Harpsichord
+			/* Harpsichord */
 			case 6 -> new Keyboard(this, events, Keyboard.KeyboardSkin.HARPSICHORD);
-			// Clavi
+			/* Clavi */
 			case 7 -> new Keyboard(this, events, Keyboard.KeyboardSkin.CLAVICHORD);
-			// Celesta
+			/* Celesta */
 			case 8 -> new Keyboard(this, events, Keyboard.KeyboardSkin.CELESTA);
-			// Tubular Bells
-			// FX 3 (Crystal)
-			// Tinkle Bell
+			/* Tubular Bells */
+			/* FX 3 (Crystal) */
+			/* Tinkle Bell */
 			case 14, 98, 112 -> new TubularBells(this, events);
-			// Glockenspiel
+			/* Glockenspiel */
 			case 9 -> new Mallets(this, events, Mallets.MalletType.GLOCKENSPIEL);
-			// Music Box
+			/* Music Box */
 			case 10 -> new MusicBox(this, events);
-			// Vibraphone
+			/* Vibraphone */
 			case 11 -> new Mallets(this, events, Mallets.MalletType.VIBES);
-			// Marimba
+			/* Marimba */
 			case 12 -> new Mallets(this, events, Mallets.MalletType.MARIMBA);
-			// Xylophone
+			/* Xylophone */
 			case 13 -> new Mallets(this, events, Mallets.MalletType.XYLOPHONE);
-			// Dulcimer
-			// Drawbar Organ
-			// Percussive Organ
-			// Rock Organ
-			// Church Organ
-			// Reed Organ
-			// Orchestra Hit
+			/* Dulcimer */
+			/* Drawbar Organ */
+			/* Percussive Organ */
+			/* Rock Organ */
+			/* Church Organ */
+			/* Reed Organ */
+			/* Orchestra Hit */
 			case 15, 16, 17, 18, 19, 20, 55 -> new Keyboard(this, events, Keyboard.KeyboardSkin.WOOD);
-			// Accordion
-			// Tango Accordion
+			/* Accordion */
+			/* Tango Accordion */
 			case 21, 23 -> new Accordion(this, events);
-			// Harmonica
+			/* Harmonica */
 			case 22 -> new Harmonica(this, events);
-			// Acoustic Guitar (Nylon)
-			// Acoustic Guitar (Steel)
+			/* Acoustic Guitar (Nylon) */
+			/* Acoustic Guitar (Steel) */
 			case 24, 25 -> new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
-			// Electric Guitar (jazz)
-			// Electric Guitar (clean)
-			// Electric Guitar (muted)
-			// Overdriven Guitar
-			// Distortion Guitar
-			// Guitar Harmonics
-			// Guitar Fret Noise
+			/* Electric Guitar (jazz) */
+			/* Electric Guitar (clean) */
+			/* Electric Guitar (muted) */
+			/* Overdriven Guitar */
+			/* Distortion Guitar */
+			/* Guitar Harmonics */
+			/* Guitar Fret Noise */
 			case 26, 27, 28, 29, 30, 31, 120 -> new Guitar(this, events, Guitar.GuitarType.ELECTRIC);
-			// Acoustic Bass
+			/* Acoustic Bass */
 			case 32 -> new AcousticBass(this, events, AcousticBass.PlayingStyle.PIZZICATO);
-			// Electric Bass (finger)
-			// Electric Bass (pick)
-			// Fretless Bass
-			// Slap Bass 1
-			// Slap Bass 2
-			// Synth Bass 1
-			// Synth Bass 2
+			/* Electric Bass (finger) */
+			/* Electric Bass (pick) */
+			/* Fretless Bass */
+			/* Slap Bass 1 */
+			/* Slap Bass 2 */
+			/* Synth Bass 1 */
+			/* Synth Bass 2 */
 			case 33, 34, 36, 37, 38, 39 -> new BassGuitar(this, events, BassGuitar.BassGuitarType.STANDARD);
 			case 35 -> new BassGuitar(this, events, BassGuitar.BassGuitarType.FRETLESS);
-			// Violin
+			/* Violin */
 			case 40 -> new Violin(this, events);
-			// Viola
+			/* Viola */
 			case 41 -> new Viola(this, events);
-			// Cello
+			/* Cello */
 			case 42 -> new Cello(this, events);
-			// Contrabass
+			/* Contrabass */
 			case 43 -> new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
-			// Tremolo Strings
-			// String Ensemble 1
-			// String Ensemble 2
-			// Synth Strings 1
-			// Synth Strings 2
-			// Pad 5 (Bowed)
+			/* Tremolo Strings */
+			/* String Ensemble 1 */
+			/* String Ensemble 2 */
+			/* Synth Strings 1 */
+			/* Synth Strings 2 */
+			/* Pad 5 (Bowed) */
 			case 44, 48, 49, 50, 51, 92 -> new StageStrings(this, events);
-			// Pizzicato Strings
+			/* Pizzicato Strings */
 			case 45 -> new PizzicatoStrings(this, events);
-			// Orchestral Harp
+			/* Orchestral Harp */
 			case 46 -> new Harp(this, events);
-			// Timpani
+			/* Timpani */
 			case 47 -> new Timpani(this, events);
-			// Choir Aahs
-			// Voice Oohs
-			// Synth Voice
-			// Lead 6 (Voice)
-			// Pad 4 (Choir)
-			// Breath Noise
-			// Applause
+			/* Choir Aahs */
+			/* Voice Oohs */
+			/* Synth Voice */
+			/* Lead 6 (Voice) */
+			/* Pad 4 (Choir) */
+			/* Breath Noise */
+			/* Applause */
 			case 52, 53, 54, 85, 91, 121, 126 -> new StageChoir(this, events);
-			// Trumpet
+			/* Trumpet */
 			case 56 -> new Trumpet(this, events, Trumpet.TrumpetType.NORMAL);
-			// Trombone
+			/* Trombone */
 			case 57 -> new Trombone(this, events);
-			// Tuba
+			/* Tuba */
 			case 58 -> new Tuba(this, events);
-			// Muted Trumpet
+			/* Muted Trumpet */
 			case 59 -> new Trumpet(this, events, Trumpet.TrumpetType.MUTED);
-			// French Horn
+			/* French Horn */
 			case 60 -> new FrenchHorn(this, events);
-			// Brass Section
-			// Synth Brass 1
-			// Synth Brass 2
+			/* Brass Section */
+			/* Synth Brass 1 */
+			/* Synth Brass 2 */
 			case 61, 62, 63 -> new StageHorns(this, events);
-			// Soprano Sax
+			/* Soprano Sax */
 			case 64 -> new SopranoSax(this, events);
-			// Alto Sax
+			/* Alto Sax */
 			case 65 -> new AltoSax(this, events);
-			// Tenor Sax
+			/* Tenor Sax */
 			case 66 -> new TenorSax(this, events);
-			// Baritone Sax
+			/* Baritone Sax */
 			case 67 -> new BaritoneSax(this, events);
-			// Clarinet
+			/* Clarinet */
 			case 71 -> new Clarinet(this, events);
-			// Piccolo
+			/* Piccolo */
 			case 72 -> new Piccolo(this, events);
-			// Flute
+			/* Flute */
 			case 73 -> new Flute(this, events);
-			// Recorder
+			/* Recorder */
 			case 74 -> new Recorder(this, events);
-			// Pan Flute
+			/* Pan Flute */
 			case 75 -> new PanFlute(this, events, PanFlute.PipeSkin.WOOD);
-			// Blown Bottle
+			/* Blown Bottle */
 			case 76 -> new BlownBottle(this, events);
-			// Whistle
+			/* Whistle */
 			case 78 -> new Whistles(this, events);
-			// Ocarina
+			/* Ocarina */
 			case 79 -> new Ocarina(this, events);
-			// Lead 1 (Square)
-			// Lead 2 (Sawtooth)
-			// Lead 4 (Chiff)
-			// Lead 5 (Charang)
-			// Lead 7 (Fifths)
-			// Lead 8 (Bass + Lead)
-			// Pad 1 (New Age)
-			// Pad 2 (Warm)
-			// Pad 3 (Polysynth)
-			// Pad 6 (Metallic)
-			// Pad 7 (Halo)
-			// Pad 8 (Sweep)
-			// FX 1 (Rain)
-			// FX 2 (Soundtrack)
-			// FX 4 (Atmosphere)
-			// FX 5 (Brightness)
-			// FX 6 (Goblins)
-			// FX 7 (Echoes)
-			// FX 8 (Sci-fi)
+			/* Lead 1 (Square) */
+			/* Lead 2 (Sawtooth) */
+			/* Lead 4 (Chiff) */
+			/* Lead 5 (Charang) */
+			/* Lead 7 (Fifths) */
+			/* Lead 8 (Bass + Lead) */
+			/* Pad 1 (New Age) */
+			/* Pad 2 (Warm) */
+			/* Pad 3 (Polysynth) */
+			/* Pad 6 (Metallic) */
+			/* Pad 7 (Halo) */
+			/* Pad 8 (Sweep) */
+			/* FX 1 (Rain) */
+			/* FX 2 (Soundtrack) */
+			/* FX 4 (Atmosphere) */
+			/* FX 5 (Brightness) */
+			/* FX 6 (Goblins) */
+			/* FX 7 (Echoes) */
+			/* FX 8 (Sci-fi) */
 			case 80, 81, 83, 84, 86, 87, 88, 89, 90, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103 -> new Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH);
-			// Lead 3 (Calliope)
+			/* Lead 3 (Calliope) */
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
-			// Banjo
+			/* Banjo */
 			case 105 -> new Banjo(this, events);
 			// Shamisen
 			case 106 -> new Shamisen(this, events);
-			// Fiddle
+			/* Fiddle */
 			case 110 -> new Fiddle(this, events);
-			// Agogo
+			/* Agogo */
 			case 113 -> new Agogos(this, events);
-			// Steel Drums
+			/* Steel Drums */
 			case 114 -> new SteelDrums(this, events);
-			// Woodblock
+			/* Woodblock */
 			case 115 -> new Woodblocks(this, events);
-			// Taiko Drum
+			/* Taiko Drum */
 			case 116 -> new TaikoDrum(this, events);
-			// Melodic Tom
+			/* Melodic Tom */
 			case 117 -> new MelodicTom(this, events);
-			// Synth Drum
+			/* Synth Drum */
 			case 118 -> new SynthDrum(this, events);
-			// Telephone Ring
+			/* Telephone Ring */
 			case 124 -> new TelephoneRing(this, events);
-			// Helicopter
+			/* Helicopter */
 			case 125 -> new Helicopter(this, events);
-			// Gunshot
-//			case 127 -> new Gunshot(this, events);
 			default -> null;
 		};
 	}
@@ -848,57 +896,57 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	private void addShadowsAndStands() {
 		if (instruments.stream().anyMatch(Keyboard.class::isInstance)) {
-			pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
+			pianoStand = loadModel("PianoStand.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9F);
 			rootNode.attachChild(pianoStand);
-			pianoStand.move(-50, 32f, -6);
-			pianoStand.rotate(0, rad(45), 0);
+			pianoStand.move(-50, 32, -6);
+			pianoStand.rotate(0, Utils.rad(45), 0);
 			
 			keyboardShadow = shadow("Assets/PianoShadow.obj", "Assets/KeyboardShadow.png");
-			keyboardShadow.move(-47, 0.1f, -3);
-			keyboardShadow.rotate(0, rad(45), 0);
+			keyboardShadow.move(-47, 0.1F, -3);
+			keyboardShadow.rotate(0, Utils.rad(45), 0);
 			rootNode.attachChild(keyboardShadow);
 		}
 		
 		if (instruments.stream().anyMatch(Mallets.class::isInstance)) {
-			malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9f);
+			malletStand = loadModel("XylophoneLegs.obj", "RubberFoot.bmp", MatType.UNSHADED, 0.9F);
 			rootNode.attachChild(malletStand);
-			malletStand.setLocalTranslation(new Vector3f(-22, 22.2f, 23));
-			malletStand.rotate(0, rad(33.7), 0);
-			malletStand.scale(0.6666667f);
+			malletStand.setLocalTranslation(new Vector3f(-22, 22.2F, 23));
+			malletStand.rotate(0, Utils.rad(33.7), 0);
+			malletStand.scale(0.6666667F);
 		}
 		
-		// Add guitar shadows
+		/* Add guitar shadows */
 		for (var i = 0; i < instruments.stream().filter(Guitar.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png");
 			guitarShadows.add(shadow);
 			rootNode.attachChild(shadow);
-			shadow.setLocalTranslation(43.431f + (10 * i), 0.1f + (0.01f * i), 7.063f);
-			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-49), 0));
+			shadow.setLocalTranslation(43.431F + (10 * i), 0.1F + (0.01F * i), 7.063F);
+			shadow.setLocalRotation(new Quaternion().fromAngles(0, Utils.rad(-49), 0));
 		}
 		
-		// Add bass guitar shadows
+		/* Add bass guitar shadows */
 		for (var i = 0; i < instruments.stream().filter(BassGuitar.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/BassShadow.obj", "Assets/BassShadow.png");
 			bassGuitarShadows.add(shadow);
 			rootNode.attachChild(shadow);
-			shadow.setLocalTranslation(51.5863f + 7 * i, 0.1f + (0.01f * i), -16.5817f);
-			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-43.5), 0));
+			shadow.setLocalTranslation(51.5863F + 7 * i, 0.1F + (0.01F * i), -16.5817F);
+			shadow.setLocalRotation(new Quaternion().fromAngles(0, Utils.rad(-43.5), 0));
 		}
 		
-		// Add harp shadows
+		/* Add harp shadows */
 		for (var i = 0; i < instruments.stream().filter(Harp.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png");
 			harpShadows.add(shadow);
 			rootNode.attachChild(shadow);
-			shadow.setLocalTranslation(5 + 14.7f * i, 0.1f, 17 + 10.3f * i);
-			shadow.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
+			shadow.setLocalTranslation(5 + 14.7F * i, 0.1F, 17 + 10.3F * i);
+			shadow.setLocalRotation(new Quaternion().fromAngles(0, Utils.rad(-35), 0));
 		}
 		
-		// Add mallet shadows
+		/* Add mallet shadows */
 		List<Instrument> mallets = instruments.stream().filter(Mallets.class::isInstance).collect(Collectors.toList());
 		for (var i = 0; i < instruments.stream().filter(Mallets.class::isInstance).count(); i++) {
 			Spatial shadow = shadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
-			shadow.setLocalScale(0.6667f);
+			shadow.setLocalScale(0.6667F);
 			mallets.get(i).instrumentNode.attachChild(shadow);
 			shadow.setLocalTranslation(0, -22, 0);
 		}
@@ -914,10 +962,10 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	@Contract(pure = true)
 	public Spatial shadow(String model, String texture) {
 		Spatial shadow = this.app.getAssetManager().loadModel(model);
-		var material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		material.setTexture("ColorMap", this.app.getAssetManager().loadTexture(texture));
+		var material = new Material(this.app.getAssetManager(), UNSHADED_MAT);
+		material.setTexture(COLOR_MAP, this.app.getAssetManager().loadTexture(texture));
 		material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-		material.setFloat("AlphaDiscardThreshold", 0.01f);
+		material.setFloat("AlphaDiscardThreshold", 0.01F);
 		shadow.setQueueBucket(RenderQueue.Bucket.Transparent);
 		shadow.setMaterial(material);
 		return shadow;
@@ -943,13 +991,14 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @param brightness the brightness of the reflection
 	 * @return the model
 	 */
+	@SuppressWarnings("java:S5194")
 	public Spatial loadModel(String m, String t, MatType type, float brightness) {
-		var model = this.app.getAssetManager().loadModel("Assets/" + m);
-		var texture = this.app.getAssetManager().loadTexture("Assets/" + t);
-		Material material;
+		final var PREFIX = "Assets/";
+		var texture = this.app.getAssetManager().loadTexture(PREFIX + t);
+		var material = new Material(this.app.getAssetManager(), UNSHADED_MAT);
 		switch (type) {
 			case UNSHADED -> {
-				material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				material = new Material(this.app.getAssetManager(), UNSHADED_MAT);
 				material.setTexture("ColorMap", texture);
 			}
 			case SHADED -> {
@@ -964,6 +1013,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			}
 			default -> throw new IllegalStateException("Unexpected value: " + type);
 		}
+		var model = this.app.getAssetManager().loadModel(PREFIX + m);
 		model.setMaterial(material);
 		return model;
 	}
@@ -976,7 +1026,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	public Material reflectiveMaterial(String reflectiveTextureFile) {
 		var material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
-		material.setVector3("FresnelParams", new Vector3f(0.1f, 0.9f, 0.1f));
+		material.setVector3("FresnelParams", new Vector3f(0.1F, 0.9F, 0.1F));
 		material.setBoolean("EnvMapAsSphereMap", true);
 		material.setTexture("EnvMap", this.app.getAssetManager().loadTexture(reflectiveTextureFile));
 		return material;
@@ -989,8 +1039,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * @return the reflective material
 	 */
 	public Material unshadedMaterial(String texture) {
-		var material = new Material(this.app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		material.setTexture("ColorMap", this.app.getAssetManager().loadTexture("Assets/" + texture));
+		var material = new Material(this.app.getAssetManager(), UNSHADED_MAT);
+		material.setTexture(COLOR_MAP, this.app.getAssetManager().loadTexture("Assets/" + texture));
 		return material;
 	}
 	

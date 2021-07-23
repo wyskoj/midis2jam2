@@ -55,24 +55,53 @@ import static javax.swing.JOptionPane.*;
 /**
  * @author Jacob Wysko
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class GuiLauncher extends JFrame {
 	
+	private static final Map<String, String> supportedLocales = new HashMap<>();
+	
+	static {
+		supportedLocales.put("English", "en");
+		supportedLocales.put("Español", "es");
+		supportedLocales.put("Français", "fr");
+	}
+	
 	private static final File SETTINGS_FILE = new File(System.getProperty("user.home"), "midis2jam2.settings");
+	
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
-	public GuiLauncher() {
-		initComponents();
-		settings = new LauncherSettings();
+	public static Map<String, String> getSupportedLocales() {
+		return supportedLocales;
+	}
+	
+	public LauncherSettings getSettings() {
+		return settings;
 	}
 	
 	private transient LauncherSettings settings;
 	
+	public GuiLauncher() {
+		settings = new LauncherSettings();
+	}
+	
 	public static void main(String[] args) throws IOException {
-		
 		// Initialize GUI
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
+		
 		var guiLauncher = new GuiLauncher();
+		
+		try {
+			var json = new String(Files.readAllBytes(SETTINGS_FILE.toPath()));
+			if (json.isBlank()) throw new IllegalStateException();
+			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
+		} catch (Exception e) {
+			guiLauncher.settings = new LauncherSettings();
+			guiLauncher.saveSettings();
+		}
+		Locale.setDefault(new Locale(guiLauncher.settings.getLocale()));
+		
+		guiLauncher.initComponents();
+		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		guiLauncher.pack();
 		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
@@ -81,11 +110,11 @@ public class GuiLauncher extends JFrame {
 		
 		// Register drag and drop
 		guiLauncher.midiFilePathTextField.setDropTarget(new DropTarget() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public synchronized void drop(DropTargetDropEvent evt) {
 				try {
 					evt.acceptDrop(DnDConstants.ACTION_COPY);
-					//noinspection unchecked
 					List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 					guiLauncher.midiFilePathTextField.setText(droppedFiles.get(0).getAbsolutePath());
 				} catch (Exception ex) {
@@ -109,13 +138,13 @@ public class GuiLauncher extends JFrame {
 		
 		// Check for updates
 		new Thread(() -> {
-			Midis2jam2.LOGGER.info("Checking for updates.");
+			Midis2jam2.getLOGGER().info("Checking for updates.");
 			try {
+				final var bundle = ResourceBundle.getBundle("i18n.updater");
 				var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
 				var jep = new JEditorPane();
 				jep.setContentType("text/html");
-				jep.setText("<html>This version is out of date and is no longer supported. <a " +
-						"href=\"https://midis2jam2.xyz\">Download the latest version.</a></html>\"");
+				jep.setText(bundle.getString("warning"));
 				jep.setEditable(false);
 				jep.setOpaque(false);
 				jep.addHyperlinkListener(hle -> {
@@ -128,14 +157,13 @@ public class GuiLauncher extends JFrame {
 					}
 				});
 				if (html.contains("Out of")) {
-					showMessageDialog(guiLauncher, jep,
-							"Update available", WARNING_MESSAGE);
-					Midis2jam2.LOGGER.warning("Out of date!");
+					showMessageDialog(guiLauncher, jep, bundle.getString("update_available"), WARNING_MESSAGE);
+					Midis2jam2.getLOGGER().warning("Out of date!");
 				} else {
-					Midis2jam2.LOGGER.info("Up to date.");
+					Midis2jam2.getLOGGER().info("Up to date.");
 				}
 			} catch (IOException e) {
-				Midis2jam2.LOGGER.warning("Failed to check for updates.");
+				Midis2jam2.getLOGGER().warning("Failed to check for updates.");
 				e.printStackTrace();
 			}
 		}).start();
@@ -145,22 +173,25 @@ public class GuiLauncher extends JFrame {
 		guiLauncher.bringToFront();
 		
 		// Load settings
-		try {
-			var json = new String(Files.readAllBytes(SETTINGS_FILE.toPath()));
-			if (json.isBlank()) throw new IllegalStateException();
-			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
-		} catch (Exception e) {
-			guiLauncher.settings = new LauncherSettings();
-			guiLauncher.saveSettings();
-		} finally {
-			guiLauncher.reloadSettings();
-		}
+		guiLauncher.reloadSettings();
+		
 		
 		// Launch directly into midis2jam2 if a MIDI file is specified
 		if (args.length == 1) {
 			guiLauncher.midiFilePathTextField.setText(args[0]);
 			guiLauncher.startButtonPressed(null);
 		}
+		
+		ResourceBundle.clearCache();
+	}
+	
+	/**
+	 * Returns the current version of the program.
+	 *
+	 * @return the current version of the program
+	 */
+	public static String getVersion() {
+		return Utils.resourceToString("/version.txt");
 	}
 	
 	private void reloadSettings() {
@@ -183,12 +214,14 @@ public class GuiLauncher extends JFrame {
 		fullscreenCheckbox.setSelected(settings.isFullscreen());
 		setLatencySpinnerFromDeviceDropdown();
 		legacyEngineCheckbox.setSelected(settings.isLegacyDisplay());
+		
+		Locale.setDefault(new Locale(settings.getLocale()));
 	}
 	
 	/**
 	 * Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}.
 	 */
-	private void saveSettings() {
+	public void saveSettings() {
 		try (var writer = new FileWriter(SETTINGS_FILE)) {
 			writer.write(GSON.toJson(settings));
 		} catch (IOException e) {
@@ -216,10 +249,6 @@ public class GuiLauncher extends JFrame {
 		}
 		assert button != null;
 		return button;
-	}
-	
-	public static String getVersion() {
-		return new Scanner(requireNonNull(GuiLauncher.class.getResourceAsStream("/version.txt"))).next();
 	}
 	
 	/**
@@ -251,7 +280,6 @@ public class GuiLauncher extends JFrame {
 			saveSettings();
 		}
 	}
-	
 	
 	/**
 	 * Prompts the user to load a soundfont file.
@@ -412,13 +440,6 @@ public class GuiLauncher extends JFrame {
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
-
-//	private Class<? extends Displays> getDisplayType() {
-//		if (simpleWindowRadio.isSelected()) return Midis2jam2Display.class;
-//		else if (hudWindowRadio.isSelected()) return AdvancedDisplay.class;
-//		Midis2jam2.LOGGER.severe("One of the display types was not pressed!");
-//		return null;
-//	}
 	
 	public void disableAll() {
 		this.setEnabled(false);
@@ -453,7 +474,7 @@ public class GuiLauncher extends JFrame {
 	
 	private void setLatencySpinnerFromDeviceDropdown() {
 		settings.setLatencyForDevice(
-				((MidiDevice.Info) midiDeviceDropDown.getSelectedItem()).getName(),
+				((MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem())).getName(),
 				(int) latencySpinner.getValue()
 		);
 	}
@@ -463,7 +484,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void aboutMenuItemActionPerformed(ActionEvent e) {
-		About about = new About(this, true);
+		var about = new About(this, true);
 		about.setVisible(true);
 	}
 	
@@ -472,6 +493,12 @@ public class GuiLauncher extends JFrame {
 		saveSettings();
 	}
 	
+	private void localeMenuItemActionPerformed(ActionEvent e) {
+		var localeSelect = new LocaleSelect(this);
+		localeSelect.setVisible(true);
+	}
+	
+	@SuppressWarnings("all")
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		ResourceBundle bundle = ResourceBundle.getBundle("i18n.guilauncher");
@@ -481,6 +508,7 @@ public class GuiLauncher extends JFrame {
 		editSoundFontsMenuItem = new MenuItemResizedIcon();
 		exitMenuItem = new MenuItemResizedIcon();
 		menu1 = new JMenu();
+		localeMenuItem = new MenuItemResizedIcon();
 		aboutMenuItem = new JMenuItem();
 		logo = new JLabel();
 		configurationPanel = new JPanel();
@@ -559,6 +587,12 @@ public class GuiLauncher extends JFrame {
 			//======== menu1 ========
 			{
 				menu1.setText(bundle.getString("GuiLauncher.menu1.text"));
+				
+				//---- localeMenuItem ----
+				localeMenuItem.setText(bundle.getString("GuiLauncher.localeMenuItem.text"));
+				localeMenuItem.setIcon(new ImageIcon(getClass().getResource("/locale.png")));
+				localeMenuItem.addActionListener(e -> localeMenuItemActionPerformed(e));
+				menu1.add(localeMenuItem);
 				
 				//---- aboutMenuItem ----
 				aboutMenuItem.setText(bundle.getString("GuiLauncher.aboutMenuItem.text"));
@@ -824,20 +858,37 @@ public class GuiLauncher extends JFrame {
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JMenuBar menuBar1;
+	
 	private JMenu fileMenu;
+	
 	private MenuItemResizedIcon openMidiFileMenuItem;
+	
 	private MenuItemResizedIcon editSoundFontsMenuItem;
+	
 	private MenuItemResizedIcon exitMenuItem;
+	
 	private JMenu menu1;
+	
+	private MenuItemResizedIcon localeMenuItem;
+	
 	private JMenuItem aboutMenuItem;
+	
 	private JLabel logo;
+	
 	private JPanel configurationPanel;
+	
 	private JLabel midiFileLabel;
+	
 	private JTextField midiFilePathTextField;
+	
 	private JResizedIconButton loadMidiFileButton;
+	
 	private JLabel midiFileHelp;
+	
 	private JLabel midiDeviceLabel;
+	
 	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
+	
 	private JLabel midiDeviceHelp;
 	private JLabel soundFontLabel;
 	private JComboBox<String> soundFontPathDropDown;

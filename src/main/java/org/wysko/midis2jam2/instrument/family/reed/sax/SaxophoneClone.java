@@ -21,7 +21,7 @@ import com.jme3.math.Quaternion;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.clone.UpAndDownKeyClone;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * Shared code for sax clones.

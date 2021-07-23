@@ -17,18 +17,19 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The bass drum, or kick drum.
@@ -41,84 +42,73 @@ public class BassDrum extends PercussionInstrument {
 	private static final int PEDAL_MAX_ANGLE = 20;
 	
 	/**
-	 * The Bass drum.
-	 */
-	final Spatial drumModel;
-	
-	/**
 	 * The Bass drum beater arm.
 	 */
-	final Spatial bassDrumBeaterArm;
-	
-	/**
-	 * The Bass drum beater holder.
-	 */
-	final Spatial bassDrumBeaterHolder;
+	@NotNull
+	private final Spatial bassDrumBeaterArm;
 	
 	/**
 	 * The Bass drum pedal.
 	 */
-	final Spatial bassDrumPedal;
+	@NotNull
+	private final Spatial bassDrumPedal;
 	
 	/**
 	 * The Drum node.
 	 */
-	final Node drumNode = new Node();
+	@NotNull
+	private final Node drumNode = new Node();
 	
-	/**
-	 * The Beater node.
-	 */
-	final Node beaterNode = new Node();
-	
-	public BassDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
+	public BassDrum(@NotNull Midis2jam2 context, @NotNull List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		drumModel = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp");
-		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", "MetalTexture.bmp",
-				Midis2jam2.MatType.UNSHADED, 0.9f);
 		
-		// Apply materials
+		/* Load bass drum */
+		Spatial drumModel = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp");
+		
+		/* Load beater arm */
+		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", "MetalTexture.bmp");
+		
+		
+		
+		/* Load beater holder */
+		Spatial bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", "MetalTexture.bmp");
+		final Node holder = (Node) bassDrumBeaterHolder;
+		
+		/* Apply materials */
 		final Node arm = (Node) bassDrumBeaterArm;
 		
-		final var shinySilverTexture = context.getAssetManager().loadTexture("Assets/ShinySilver.bmp");
-		final var shinySilverMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		shinySilverMaterial.setTexture("ColorMap", shinySilverTexture);
+		final var shinySilverMaterial = context.reflectiveMaterial("Assets/ShinySilver.bmp");
 		arm.getChild(0).setMaterial(shinySilverMaterial);
 		
-		final var darkMetalTexture = context.getAssetManager().loadTexture("Assets/MetalTextureDark.bmp");
-		final var darkMetalMaterial = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		darkMetalMaterial.setTexture("ColorMap", darkMetalTexture);
+		final var darkMetalMaterial = context.unshadedMaterial("MetalTextureDark.bmp");
 		arm.getChild(1).setMaterial(darkMetalMaterial);
-		
-		bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", "MetalTexture.bmp",
-				Midis2jam2.MatType.UNSHADED, 0.9f);
-		final Node holder = (Node) bassDrumBeaterHolder;
 		
 		holder.getChild(0).setMaterial(darkMetalMaterial);
 		
-		
+		/* Load pedal */
 		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp");
 		
 		drumNode.attachChild(drumModel);
+		
+		Node beaterNode = new Node();
 		beaterNode.attachChild(this.bassDrumBeaterArm);
 		beaterNode.attachChild(bassDrumBeaterHolder);
 		beaterNode.attachChild(bassDrumPedal);
 		highLevelNode.attachChild(drumNode);
 		highLevelNode.attachChild(beaterNode);
 		
-		this.bassDrumBeaterArm.setLocalTranslation(0, 5.5f, 1.35f);
+		this.bassDrumBeaterArm.setLocalTranslation(0, 5.5F, 1.35F);
 		this.bassDrumBeaterArm.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
 		bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(rad(PEDAL_MAX_ANGLE), 0, 0));
-		bassDrumPedal.setLocalTranslation(0, 0.5f, 7.5f);
-		beaterNode.setLocalTranslation(0, 0, 1.5f);
+		bassDrumPedal.setLocalTranslation(0, 0.5F, 7.5F);
+		beaterNode.setLocalTranslation(0, 0, 1.5F);
 		
 		highLevelNode.setLocalTranslation(0, 0, -80);
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
-		MidiNoteOnEvent nextHit = null;
-		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time)
-			nextHit = hits.remove(0);
+		MidiNoteOnEvent nextHit = NoteQueue.collectOne(hits, context, time);
 		
 		if (nextHit != null) {
 			// We need to strike

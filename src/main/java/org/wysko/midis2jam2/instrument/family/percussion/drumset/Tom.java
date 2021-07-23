@@ -19,13 +19,14 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The toms.
@@ -39,13 +40,18 @@ public class Tom extends StickDrum {
 	 * @param hits    the hits
 	 * @param pitch   the tom pitch
 	 */
-	public Tom(Midis2jam2 context, List<MidiNoteOnEvent> hits, TomPitch pitch) {
+	public Tom(@NotNull Midis2jam2 context, @NotNull List<MidiNoteOnEvent> hits, @NotNull TomPitch pitch) {
 		super(context, hits);
+		/* Load the tom */
 		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp");
-		drum.setLocalScale(pitch.scale);
+		
+		/* Attach to nodes */
 		recoilNode.attachChild(drum);
 		recoilNode.attachChild(stickNode);
 		highLevelNode.attachChild(recoilNode);
+		
+		/* Set tom pitch properties */
+		drum.setLocalScale(pitch.scale);
 		highLevelNode.setLocalTranslation(pitch.location);
 		highLevelNode.setLocalRotation(pitch.rotation);
 		
@@ -74,59 +80,59 @@ public class Tom extends StickDrum {
 		 * The Low floor tom.
 		 */
 		LOW_FLOOR(
-				new Vector3f(1.5f, 1.5f, 1.5f),
+				new Vector3f(1.5F, 1.5F, 1.5F),
 				new Vector3f(20, 20, -60),
 				new Quaternion().fromAngles(rad(-2), rad(180), rad(-10))),
 		
 		/**
 		 * The High floor tom.
 		 */
-		HIGH_FLOOR(new Vector3f(1.4f, 1.4f, 1.4f),
+		HIGH_FLOOR(new Vector3f(1.4F, 1.4F, 1.4F),
 				new Vector3f(17, 21, -75),
 				new Quaternion().fromAngles(rad(-5), rad(180), rad(-15))),
 		
 		/**
 		 * The Low tom.
 		 */
-		LOW(new Vector3f(1.2f, 1.2f, 1.2f),
-				new Vector3f(10f, 29, -82),
+		LOW(new Vector3f(1.2F, 1.2F, 1.2F),
+				new Vector3f(10, 29, -82),
 				new Quaternion().fromAngles(rad(60), rad(-30), 0)),
 		
 		/**
 		 * The Low mid tom.
 		 */
-		LOW_MID(new Vector3f(1f, 1f, 1f),
+		LOW_MID(new Vector3f(1, 1, 1),
 				new Vector3f(0, 32, -85),
 				new Quaternion().fromAngles(rad(60), 0, 0)),
 		
 		/**
 		 * The High mid tom.
 		 */
-		HIGH_MID(new Vector3f(0.8f, 0.8f, 0.8f),
+		HIGH_MID(new Vector3f(0.8F, 0.8F, 0.8F),
 				new Vector3f(-9, 31, -82),
 				new Quaternion().fromAngles(rad(60), rad(20), 0)),
 		
 		/**
 		 * The High tom.
 		 */
-		HIGH(new Vector3f(0.6f, 0.6f, 0.6f),
+		HIGH(new Vector3f(0.6F, 0.6F, 0.6F),
 				new Vector3f(-15, 29, -78),
 				new Quaternion().fromAngles(rad(50), rad(40), 0));
 		
 		/**
 		 * The Scale.
 		 */
-		final Vector3f scale;
+		private final Vector3f scale;
 		
 		/**
 		 * The Location.
 		 */
-		final Vector3f location;
+		private final Vector3f location;
 		
 		/**
 		 * The Rotation.
 		 */
-		final Quaternion rotation;
+		private final Quaternion rotation;
 		
 		/**
 		 * Instantiates a new Tom pitch.

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The clarinet has both hand positions and a stretchy bell.
@@ -51,7 +51,8 @@ public class Clarinet extends HandedInstrument {
 	 * @param context   context to midis2jam2
 	 * @param eventList the event list
 	 */
-	public Clarinet(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> eventList) throws ReflectiveOperationException {
+	public Clarinet(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> eventList)
+			throws ReflectiveOperationException {
 		super(context,
 				/* Strip notes outside of standard range */
 				Stream.concat(
@@ -65,7 +66,7 @@ public class Clarinet extends HandedInstrument {
 				ClarinetClone.class,
 				FINGERING_MANAGER);
 		instrumentNode.setLocalTranslation(-25, 50, 0);
-		instrumentNode.setLocalScale(0.9f); // haha yes
+		instrumentNode.setLocalScale(0.9F);
 	}
 	
 	@Override
@@ -87,7 +88,7 @@ public class Clarinet extends HandedInstrument {
 		 * Instantiates a new clarinet clone.
 		 */
 		public ClarinetClone() {
-			super(Clarinet.this, 0.075f);
+			super(Clarinet.this, 0.075F);
 			
 			/* Load body */
 			modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"));
@@ -95,18 +96,18 @@ public class Clarinet extends HandedInstrument {
 			/* Load bell */
 			Spatial bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png");
 			modelNode.attachChild(bell);
-			bell.setLocalTranslation(0, -20.7125f, 0);
+			bell.setLocalTranslation(0, -20.7125F, 0);
 			
 			loadHands();
 			animNode.setLocalTranslation(0, 0, 10);
 			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(-25), rad(45), 0));
 			
-			bellStretcher = new StandardBellStretcher(0.7f, Axis.Y, bell);
+			bellStretcher = new StandardBellStretcher(0.7F, Axis.Y, bell);
 		}
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25f * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25 * indexForMoving()), 0));
 		}
 		
 		private void loadHands() {

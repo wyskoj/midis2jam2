@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The upright bass.
@@ -39,18 +39,17 @@ public class AcousticBass extends StringFamilyInstrument {
 	 * @param style   the style
 	 */
 	public AcousticBass(Midis2jam2 context, List<MidiChannelSpecificEvent> events, PlayingStyle style) {
-		super(context,
+		super(
+				context,
 				events,
 				style == PlayingStyle.ARCO,
 				20,
-				new Vector3f(0.75f, 0.75f, 0.75f),
+				new Vector3f(0.75F, 0.75F, 0.75F),
 				new int[]{28, 33, 38, 43},
-				28,
-				91,
 				context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0)
 		);
 		
-		instrumentNode.setLocalScale(2.5f);
+		instrumentNode.setLocalScale(2.5F);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-15), rad(45), 0));
 		
 		highestLevel.setLocalTranslation(-50, 46, -95);
@@ -59,7 +58,7 @@ public class AcousticBass extends StringFamilyInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(new Vector3f(-25f * indexForMoving(delta), 0, 0));
+		offsetNode.setLocalTranslation(new Vector3f(-25 * indexForMoving(delta), 0, 0));
 	}
 	
 	/**

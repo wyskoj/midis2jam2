@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.util;
 
+import com.jme3.math.FastMath;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
 import org.xml.sax.SAXException;
@@ -29,12 +31,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Provides various utility functions.
+ */
 public class Utils {
 	
 	private Utils() {
 	}
 	
+	/**
+	 * Given an {@link Exception}, converts it to a {@link String}, including the exception name and stack trace. For
+	 * example:
+	 * <pre>
+	 * ArithmeticException: / by zero
+	 * UtilsTest.exceptionToLines(UtilsTest.java:27)
+	 * java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	 * ...
+	 * </pre>
+	 *
+	 * @param e the exception
+	 * @return a formatted string containing the exception and a stack trace
+	 */
 	public static String exceptionToLines(Exception e) {
 		var sb = new StringBuilder();
 		sb.append(e.getClass().getSimpleName()).append(": ").append(e.getMessage()).append("\n");
@@ -44,13 +65,18 @@ public class Utils {
 		return sb.toString();
 	}
 	
-	public static String getHTML(String urlToRead) throws IOException {
+	/**
+	 * Given a URL, retrieves the contents through HTTP GET.
+	 *
+	 * @param url the URL to fetch
+	 * @return a string containing the response
+	 * @throws IOException if there was an error fetching data
+	 */
+	public static String getHTML(String url) throws IOException {
 		var result = new StringBuilder();
-		var url = new URL(urlToRead);
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		var conn = (HttpURLConnection) new URL(url).openConnection();
 		conn.setRequestMethod("GET");
-		try (var reader = new BufferedReader(
-				new InputStreamReader(conn.getInputStream()))) {
+		try (var reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
 			for (String line; (line = reader.readLine()) != null; ) {
 				result.append(line);
 			}
@@ -58,10 +84,52 @@ public class Utils {
 		return result.toString();
 	}
 	
+	/**
+	 * Given the file name of a resource file, instantiates and configures an XML parser for reading data from the
+	 * specified file. Pass a resource string, for example, {@code "/instrument_mapping.xml"}.
+	 *
+	 * @param resourceName the filename of a resource file
+	 * @return a {@link Document} ready for traversal
+	 * @throws SAXException                 if there was an error parsing the XML file
+	 * @throws ParserConfigurationException if there was an error instantiating the document parser
+	 * @throws IOException                  if there was an IO error
+	 */
 	public static Document instantiateXmlParser(String resourceName) throws SAXException, ParserConfigurationException, IOException {
 		final var df = DocumentBuilderFactory.newInstance();
 		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		return df.newDocumentBuilder().parse(PressedKeysFingeringManager.class.getResourceAsStream(resourceName));
+	}
+	
+	/**
+	 * Converts an angle expressed in degrees to radians.
+	 *
+	 * @param deg the angle expressed in degrees
+	 * @return the angle expressed in radians
+	 */
+	public static float rad(float deg) {
+		return deg / 180 * FastMath.PI;
+	}
+	
+	/**
+	 * Converts an angle expressed in degrees to radians.
+	 *
+	 * @param deg the angle expressed in degrees
+	 * @return the angle expressed in radians
+	 */
+	public static float rad(double deg) {
+		return (float) (deg / 180 * FastMath.PI);
+	}
+	
+	/**
+	 * Given a string containing the path to a resource file, retrives the contents of the file and returns it as a
+	 * string.
+	 *
+	 * @param file the file to read
+	 * @return the contents
+	 */
+	@NotNull
+	public static String resourceToString(String file) {
+		return new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream(file)))).lines().collect(Collectors.joining("\n"));
 	}
 }

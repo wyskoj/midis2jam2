@@ -24,13 +24,12 @@ import org.wysko.midis2jam2.midi.NotePeriod;
 /**
  * Note periods that also need to keep track of where they have been assigned to on the fretboard.
  */
-public class NotePeriodWithFretboardPosition extends NotePeriod {
+public final class NotePeriodWithFretboardPosition extends NotePeriod {
 	
 	/**
 	 * The fretboard position this note period was assigned to.
 	 */
 	private FretboardPosition position;
-	
 	
 	/**
 	 * Instantiates a new NotePeriodWithFretboardPosition with default position (-1, -1).

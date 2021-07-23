@@ -45,7 +45,12 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 	 * @param stretchAxis    the stretch axis
 	 * @param rotationAxis   the rotation axis
 	 */
-	protected AnimatedKeyCloneByIntegers(@NotNull MonophonicInstrument parent, float rotationFactor, float stretchFactor, int numberOfKeys, Axis stretchAxis, Axis rotationAxis) {
+	protected AnimatedKeyCloneByIntegers(@NotNull MonophonicInstrument parent,
+	                                     float rotationFactor,
+	                                     float stretchFactor,
+	                                     int numberOfKeys,
+	                                     Axis stretchAxis,
+	                                     Axis rotationAxis) {
 		
 		super(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis);
 		this.keys = new Spatial[numberOfKeys];
@@ -63,7 +68,7 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 		super.tick(time, delta);
 		if (currentNotePeriod != null) {
 			assert parent.manager != null;
-			Integer[] ints = (Integer[]) parent.manager.fingering(currentNotePeriod.midiNote);
+			var ints = (Integer[]) parent.manager.fingering(currentNotePeriod.midiNote);
 			if (ints != null) {
 				animateKeys(ints);
 			}

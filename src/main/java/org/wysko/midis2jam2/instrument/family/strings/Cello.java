@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The Cello.
@@ -38,26 +38,25 @@ public class Cello extends StringFamilyInstrument {
 	 * @param events  the events
 	 */
 	public Cello(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
-		super(context,
+		super(
+				context,
 				events,
 				true,
 				20,
-				new Vector3f(0.75f, 0.75f, 0.75f),
+				new Vector3f(0.75F, 0.75F, 0.75F),
 				new int[]{36, 43, 50, 57},
-				36,
-				93,
 				context.loadModel("Cello.obj", "CelloSkin.bmp")
 		);
 		
-		highestLevel.setLocalTranslation(-69, 39.5f, -49.6f);
+		highestLevel.setLocalTranslation(-69, 39.5F, -49.6F);
 		highestLevel.attachChild(instrumentNode);
 		
-		instrumentNode.setLocalScale(1.86f);
+		instrumentNode.setLocalScale(1.86F);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-15), rad(45), 0));
 	}
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(-20f * indexForMoving(delta), 0, 0);
+		offsetNode.setLocalTranslation(-20 * indexForMoving(delta), 0, 0);
 	}
 }

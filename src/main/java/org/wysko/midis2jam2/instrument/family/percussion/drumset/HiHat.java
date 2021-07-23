@@ -28,9 +28,9 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.midi.Midi.CLOSED_HI_HAT;
 import static org.wysko.midis2jam2.midi.Midi.OPEN_HI_HAT;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The hi-hat.

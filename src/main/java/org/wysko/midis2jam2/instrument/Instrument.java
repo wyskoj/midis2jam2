@@ -18,18 +18,24 @@
 package org.wysko.midis2jam2.instrument;
 
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.clone.Clone;
-import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.midi.MidiNoteEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.midi.NotePeriod;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.jme3.scene.Spatial.CullHint.Always;
+import static com.jme3.scene.Spatial.CullHint.Dynamic;
 import static org.wysko.midis2jam2.M2J2Settings.InstrumentTransition.NONE;
+import static org.wysko.midis2jam2.midi.MidiNoteEvent.MIDI_MAX_NOTE;
 
 /**
  * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments for
@@ -53,6 +59,11 @@ public abstract class Instrument {
 	 * The number of seconds an instrument should be spawn after its last note.
 	 */
 	public static final float END_BUFFER = 5;
+	
+	/**
+	 * How fast instruments move when transitioning.
+	 */
+	private static final int TRANSITION_SPEED = 2500;
 	
 	/**
 	 * Since these classes are effectively static, we need reference to the main class.
@@ -83,7 +94,13 @@ public abstract class Instrument {
 	 * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill its
 	 * spot).
 	 */
-	private boolean visible = false;
+	private boolean visible;
+	
+	/**
+	 * The index of this instrument in the stack of similar instruments. Can be a decimal when instrument transition
+	 * easing is enabled.
+	 */
+	private double index;
 	
 	/**
 	 * Instantiates a new Instrument.
@@ -114,36 +131,41 @@ public abstract class Instrument {
 	 */
 	@NotNull
 	@Contract(pure = true)
-	protected List<NotePeriod> calculateNotePeriods(@NotNull List<MidiNoteEvent> noteEvents) {
+	protected final List<NotePeriod> calculateNotePeriods(@NotNull List<MidiNoteEvent> noteEvents) {
 		List<NotePeriod> notePeriods = new ArrayList<>();
-		for (int i = 0, noteEventsSize = noteEvents.size(); i < noteEventsSize; i++) {
-			MidiNoteEvent noteEvent = noteEvents.get(i);
+		
+		var onEvents = new MidiNoteOnEvent[MIDI_MAX_NOTE + 1];
+		
+		/* To calculate NotePeriods, we iterate over each MidiNoteEvent and keep track of when a NoteOnEvent occurs.
+		 * When it does, we insert it into the array at the index of the note's value. Then, when a NoteOffEvent occurs,
+		 * we lookup the NoteOnEvent by the NoteOffEvent's value and create a NotePeriod from that.
+		 *
+		 * I wrote this with the assumption that there would not be duplicate notes of the same value that overlap,
+		 * so I'm not sure how it will handle in that scenario.
+		 *
+		 * Runs in O(n) time.
+		 */
+		for (MidiNoteEvent noteEvent : noteEvents) {
 			if (noteEvent instanceof MidiNoteOnEvent) {
-				for (int j = i + 1; j < noteEventsSize; j++) {
-					MidiNoteEvent check = noteEvents.get(j);
-					if (check instanceof MidiNoteOffEvent && check.note == noteEvent.note) {
-						notePeriods.add(new NotePeriod(check.note,
-								context.getFile().eventInSeconds(noteEvent),
-								context.getFile().eventInSeconds(check),
-								((MidiNoteOnEvent) noteEvent),
-								((MidiNoteOffEvent) check)));
-						break;
-					}
+				final var noteOn = (MidiNoteOnEvent) noteEvent;
+				onEvents[noteOn.note] = noteOn;
+			} else {
+				final var noteOff = (MidiNoteOffEvent) noteEvent;
+				if (onEvents[noteOff.note] != null) {
+					final var onEvent = onEvents[noteOff.note];
+					notePeriods.add(new NotePeriod(noteOff.note,
+							context.getFile().eventInSeconds(onEvent.time),
+							context.getFile().eventInSeconds(noteOff.time),
+							onEvent,
+							noteOff));
+					onEvents[noteOff.note] = null;
 				}
 			}
 		}
-		/* Remove exact duplicates */
-		for (int i = notePeriods.size() - 2; i >= 0; i--) {
-			var a = notePeriods.get(i + 1);
-			var b = notePeriods.get(i);
-			if (a.startTick() == b.startTick() &&
-					a.endTick() == b.endTick() &&
-					a.midiNote == b.midiNote) {
-				notePeriods.remove(i + 1);
-			}
-		}
-		return notePeriods;
 		
+		/* Remove exact duplicates */
+		notePeriods = new ArrayList<>(new LinkedHashSet<>(notePeriods));
+		return notePeriods;
 	}
 	
 	/**
@@ -171,10 +193,12 @@ public abstract class Instrument {
 				setVisible(false);
 			}
 		}
-		node.setCullHint(show ? Spatial.CullHint.Dynamic : Spatial.CullHint.Always);
+		if (show) {
+			node.setCullHint(Dynamic);
+		} else {
+			node.setCullHint(Always);
+		}
 	}
-	
-	private double index = 0;
 	
 	/**
 	 * Returns the index of this instrument in the list of other instruments of this type that are visible.
@@ -186,18 +210,21 @@ public abstract class Instrument {
 	protected float indexForMoving(float delta) {
 		long target;
 		
-		if (!isVisible()) target = context.instruments.stream()
-				.filter(e -> this.getClass().isInstance(e) && e.isVisible())
-				.count() - 1;
-		else target = Math.max(0, (context.instruments.stream()
-				.filter(e -> this.getClass().isInstance(e) && e.isVisible())
-				.collect(Collectors.toList()).indexOf(this)));
+		if (!isVisible()) {
+			target = context.instruments.stream()
+					.filter(e -> this.getClass().isInstance(e) && e.isVisible())
+					.count() - 1;
+		} else {
+			target = Math.max(0, (context.instruments.stream()
+					.filter(e -> this.getClass().isInstance(e) && e.isVisible())
+					.collect(Collectors.toList()).indexOf(this)));
+		}
 		
 		var transitionSpeed = context.settings.getTransitionSpeed();
 		
 		if (transitionSpeed != NONE) {
 			double animationCoefficient = transitionSpeed.getSpeed();
-			index += ((delta * 2500) * (target - index)) / (animationCoefficient);
+			index += ((delta * TRANSITION_SPEED) * (target - index)) / (animationCoefficient);
 			return (float) index;
 		} else {
 			return target;

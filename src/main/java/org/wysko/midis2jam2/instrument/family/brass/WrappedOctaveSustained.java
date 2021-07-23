@@ -35,7 +35,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 	/**
 	 * True if the order of notes should be reversed, false otherwise.
 	 */
-	final boolean inverted;
+	private final boolean inverted;
 	
 	/**
 	 * Each "twelfth" or note of the octave.
@@ -66,7 +66,9 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 				
 				int midiNote = currentNotePeriod.midiNote;
 				int index = 11 - ((midiNote + 3) % 12);
-				if (inverted) index = 11 - index;
+				if (inverted) {
+					index = 11 - index;
+				}
 				twelfths[index].play(currentNotePeriod.duration());
 				
 				iterator.remove();
@@ -96,17 +98,17 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 		/**
 		 * This note's current progress playing the note.
 		 */
-		protected double progress = 0;
+		protected double progress;
 		
 		/**
 		 * Is this twelfth currently playing?
 		 */
-		protected boolean playing = false;
+		protected boolean playing;
 		
 		/**
 		 * The amount of time, in seconds, this note should be playing for.
 		 */
-		protected double duration = 0;
+		protected double duration;
 		
 		protected TwelfthOfOctave() {
 			highestLevel.attachChild(animNode);

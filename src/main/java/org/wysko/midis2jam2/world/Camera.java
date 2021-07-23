@@ -19,23 +19,24 @@ package org.wysko.midis2jam2.world;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import org.wysko.midis2jam2.Midis2jam2;
+
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * Defines angles for cameras.
  */
 public enum Camera {
-	CAMERA_1A(-2, 92, 134, Midis2jam2.rad(18.44f), Midis2jam2.rad(180), 0),
-	CAMERA_1B(60, 92, 124, Midis2jam2.rad(18.5), Midis2jam2.rad(204.4), 0),
-	CAMERA_1C(-59.5f, 90.8f, 94.4f, Midis2jam2.rad(23.9), Midis2jam2.rad(153.6), 0),
-	CAMERA_2A(0, 71.8f, 44.5f, Midis2jam2.rad(15.7), Midis2jam2.rad(224.9), 0),
-	CAMERA_2B(-35, 76.4f, 33.6f, Midis2jam2.rad(55.8), Midis2jam2.rad(198.5), 0),
-	CAMERA_3A(-0.2f, 61.6f, 38.6f, Midis2jam2.rad(15.5), Midis2jam2.rad(180), 0),
-	CAMERA_3B(-19.6f, 78.7f, 3.8f, Midis2jam2.rad(27.7), Midis2jam2.rad(163.8), 0),
-	CAMERA_4A(0.2f, 81.1f, 32.2f, Midis2jam2.rad(21), Midis2jam2.rad(131.8), Midis2jam2.rad(-0.5)),
-	CAMERA_4B(35, 25.4f, -19, Midis2jam2.rad(-50), Midis2jam2.rad(119), Midis2jam2.rad(-2.5)),
-	CAMERA_5(5, 432, 24, Midis2jam2.rad(82.875f), Midis2jam2.rad(180), 0),
-	CAMERA_6(17, 30.5f, 42.9f, Midis2jam2.rad(-6.7), Midis2jam2.rad(144.3), 0);
+	CAMERA_1A(-2, 92, 134, rad(18.44F), rad(180), 0),
+	CAMERA_1B(60, 92, 124, rad(18.5), rad(204.4), 0),
+	CAMERA_1C(-59.5F, 90.8F, 94.4F, rad(23.9), rad(153.6), 0),
+	CAMERA_2A(0, 71.8F, 44.5F, rad(15.7), rad(224.9), 0),
+	CAMERA_2B(-35, 76.4F, 33.6F, rad(55.8), rad(198.5), 0),
+	CAMERA_3A(-0.2F, 61.6F, 38.6F, rad(15.5), rad(180), 0),
+	CAMERA_3B(-19.6F, 78.7F, 3.8F, rad(27.7), rad(163.8), 0),
+	CAMERA_4A(0.2F, 81.1F, 32.2F, rad(21), rad(131.8), rad(-0.5)),
+	CAMERA_4B(35, 25.4F, -19, rad(-50), rad(119), rad(-2.5)),
+	CAMERA_5(5, 432, 24, rad(82.875F), rad(180), 0),
+	CAMERA_6(17, 30.5F, 42.9F, rad(-6.7), rad(144.3), 0);
 	
 	public final Vector3f location;
 	

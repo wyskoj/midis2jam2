@@ -20,8 +20,15 @@ package org.wysko.midis2jam2.instrument.family.guitar;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
- * Represents a position on the fretboard.
+ * Represents a position on the fretboard. The position consists of two components: the string and fret.
+ * <p>
+ * The string is notated as its index, where the lowest/thickest string is {@code 0}. The fret is notated as its index
+ * from the top of the fretboard, where {@code 0} is no fret, {@code 1} is the first fret, etc.
+ * <p>
+ * For example, the {@code FretBoardPosition} for the lowest string with an open fret is {@code {string=0,fret=0}}.
  */
 public class FretboardPosition {
 	
@@ -31,7 +38,7 @@ public class FretboardPosition {
 	public final int string;
 	
 	/**
-	 * The fret of the position
+	 * The fret of the position.
 	 */
 	public final int fret;
 	
@@ -53,7 +60,28 @@ public class FretboardPosition {
 	 * @return the distance
 	 */
 	@Contract(pure = true)
-	double distance(@NotNull FretboardPosition o) {
+	public double distance(@NotNull FretboardPosition o) {
 		return Math.sqrt(Math.pow((double) string - o.string, 2) + Math.pow((double) fret - o.fret, 2));
+	}
+	
+	@Override
+	public String toString() {
+		return "FretboardPosition{" +
+				"string=" + string +
+				", fret=" + fret +
+				'}';
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		FretboardPosition that = (FretboardPosition) o;
+		return string == that.string && fret == that.fret;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(string, fret);
 	}
 }

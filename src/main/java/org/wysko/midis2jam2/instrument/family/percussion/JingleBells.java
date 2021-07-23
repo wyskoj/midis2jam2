@@ -17,10 +17,10 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion;
 
-import com.jme3.material.Material;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
@@ -29,16 +29,17 @@ import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * <i>Jingle bells...</i>
+ * <i>Jingle bells...</i> Animates with only {@link Stick#handleStick}, nothing special.
  */
 public class JingleBells extends NonDrumSetPercussion {
 	
 	/**
 	 * Contains the jingle bell.
 	 */
+	@NotNull
 	private final Node jingleBellNode = new Node();
 	
 	/**
@@ -51,14 +52,15 @@ public class JingleBells extends NonDrumSetPercussion {
 		super(context, hits);
 		this.hits = hits;
 		
+		/* Load stick and materials */
 		Spatial stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp");
-		var stickSkin = new Material(context.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-		stickSkin.setTexture("ColorMap", context.getAssetManager().loadTexture("Assets/StickSkin.bmp"));
-		((Node) stick).getChild(0).setMaterial(stickSkin);
+		((Node) stick).getChild(0).setMaterial(context.unshadedMaterial("StickSkin.bmp"));
+		
+		/* Positioning */
 		jingleBellNode.attachChild(stick);
 		stick.setLocalTranslation(0, 0, -2);
 		instrumentNode.attachChild(jingleBellNode);
-		instrumentNode.setLocalTranslation(8.5f, 45.3f, -69.3f);
+		instrumentNode.setLocalTranslation(8.5F, 45.3F, -69.3F);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7)));
 	}
 	

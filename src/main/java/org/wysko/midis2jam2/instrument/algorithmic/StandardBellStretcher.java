@@ -64,6 +64,7 @@ public class StandardBellStretcher implements BellStretcher {
 	 *
 	 * @param scale the scale of the bell
 	 */
+	@SuppressWarnings("java:S1774")
 	private void scaleBell(float scale) {
 		bell.setLocalScale(
 				stretchAxis == Axis.X ? scale : 1,
@@ -77,7 +78,7 @@ public class StandardBellStretcher implements BellStretcher {
 			float scale = (float) ((stretchiness * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
 			scaleBell(scale);
 		} else {
-			scaleBell(1.0f);
+			scaleBell(1);
 		}
 	}
 }

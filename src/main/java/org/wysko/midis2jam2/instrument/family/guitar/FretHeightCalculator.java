@@ -17,8 +17,13 @@
 
 package org.wysko.midis2jam2.instrument.family.guitar;
 
+import org.jetbrains.annotations.Contract;
+
 /**
  * The fret height calculator returns the amount to scale upper and lower strings by.
+ *
+ * @see FrettedInstrument
+ * @see FretHeightByTable
  */
 public interface FretHeightCalculator {
 	
@@ -28,5 +33,6 @@ public interface FretHeightCalculator {
 	 * @param fret the fret
 	 * @return the scale of the strings
 	 */
+	@Contract(pure = true)
 	float calculateScale(int fret);
 }

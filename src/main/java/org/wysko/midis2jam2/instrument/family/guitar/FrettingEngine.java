@@ -21,8 +21,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
- * The fretting engine handles the calculations of determining which frets to press.
+ * The fretting engine handles the calculations of determining which frets to press. It attempts to calculate the best
+ * fretboard position for a given note, given context. The context that the engine takes into consideration is
+ * determined by implementations of this interface.
  */
 public interface FrettingEngine {
 	
@@ -57,6 +61,6 @@ public interface FrettingEngine {
 	 * @return the current fret configuration
 	 */
 	@Contract(pure = true)
-	int[] getFrets();
+	List<Integer> getFrets();
 	
 }

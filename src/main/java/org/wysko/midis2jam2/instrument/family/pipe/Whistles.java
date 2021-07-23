@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The whistles.

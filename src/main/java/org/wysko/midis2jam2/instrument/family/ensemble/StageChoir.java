@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The choir.
@@ -38,12 +38,7 @@ public class StageChoir extends WrappedOctaveSustained {
 	/**
 	 * The base position.
 	 */
-	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5f, -152.65f);
-	
-	/**
-	 * Each choir peep.
-	 */
-	final Node[] peepNodes = new Node[12];
+	private static final Vector3f BASE_POSITION = new Vector3f(0, 29.5F, -152.65F);
 	
 	/**
 	 * Instantiates a new choir.
@@ -55,6 +50,7 @@ public class StageChoir extends WrappedOctaveSustained {
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList, true);
 		twelfths = new ChoirPeep[12];
+		var peepNodes = new Node[12];
 		for (var i = 0; i < 12; i++) {
 			peepNodes[i] = new Node();
 			twelfths[i] = new ChoirPeep();

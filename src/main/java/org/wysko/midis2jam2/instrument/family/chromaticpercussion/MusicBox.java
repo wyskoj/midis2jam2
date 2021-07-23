@@ -46,32 +46,45 @@ public class MusicBox extends DecayedInstrument {
 	/**
 	 * Each of the hanging notes.
 	 */
-	final OneMusicBoxNote[] notes = new OneMusicBoxNote[12];
+	@NotNull
+	private final OneMusicBoxNote[] notes = new OneMusicBoxNote[12];
 	
 	/**
 	 * Contains the spindle.
 	 */
-	final Node cylinder = new Node();
+	@NotNull
+	private final Node cylinder = new Node();
 	
 	/**
 	 * List of hits for hanging key recoils.
 	 */
+	@NotNull
 	private final List<MidiNoteOnEvent> hitsForRecoil;
 	
 	/**
 	 * List of points that are currently active.
 	 */
+	@NotNull
 	private final List<Spatial> points = new ArrayList<>();
 	
 	/**
 	 * Keeps track of how many radians each point has rotated.
 	 */
+	@NotNull
 	private final HashMap<Spatial, Float> pointRotations = new HashMap<>();
 	
 	/**
 	 * Model of the music box point.
 	 */
+	@NotNull
 	private final Spatial pointModel;
+	
+	/**
+	 * Contains a pool of spatials that are music box notes. This is so that a new music box note doesn't have to be
+	 * spawned every time there is a new note.
+	 */
+	@NotNull
+	private final List<Spatial> pool = new ArrayList<>();
 	
 	/**
 	 * @param context   the context to the main class
@@ -91,17 +104,15 @@ public class MusicBox extends DecayedInstrument {
 		}
 		
 		instrumentNode.attachChild(context.loadModel("MusicBoxCase.obj", "Wood.bmp"));
-		instrumentNode.attachChild(context.loadModel("MusicBoxTopBlade.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f));
+		instrumentNode.attachChild(context.loadModel("MusicBoxTopBlade.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F));
 		
-		var spindle = context.loadModel("MusicBoxSpindle.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f);
+		var spindle = context.loadModel("MusicBoxSpindle.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F);
 		cylinder.attachChild(spindle);
 		instrumentNode.attachChild(cylinder);
 		instrumentNode.setLocalTranslation(37, 7, -5);
 		
-		pointModel = context.loadModel("MusicBoxPoint.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f);
+		pointModel = context.loadModel("MusicBoxPoint.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F);
 	}
-	
-	private final List<Spatial> pool = new ArrayList<>();
 	
 	@Override
 	public void tick(double time, float delta) {
@@ -121,8 +132,8 @@ public class MusicBox extends DecayedInstrument {
 				instrumentNode.attachChild(aPoint);
 				aPoint.setLocalRotation(new Quaternion().fromAngles((float) (-PI / 2), 0, 0));
 				points.add(aPoint);
-				pointRotations.put(aPoint, 0f);
-				aPoint.setLocalTranslation(((hit.note + 3) % 12) - 5.5f, 0, 0);
+				pointRotations.put(aPoint, 0F);
+				aPoint.setLocalTranslation(((hit.note + 3) % 12) - 5.5F, 0, 0);
 				iterator.remove();
 			}
 		}
@@ -158,10 +169,12 @@ public class MusicBox extends DecayedInstrument {
 	private void rotateCylinder(float delta) {
 		var tick = context.getSequencer().getTickPosition();
 		var xAngle = (float) (0.5 * PI * delta * (6E7 / context.getFile().tempoAt(tick).number) / 60.0);
-		points.forEach(point -> {
+		
+		for (Spatial point : points) {
 			point.rotate(xAngle, 0, 0);
 			pointRotations.put(point, pointRotations.get(point) + xAngle);
-		});
+		}
+		
 		cylinder.rotate(xAngle, 0, 0);
 	}
 	
@@ -180,12 +193,12 @@ public class MusicBox extends DecayedInstrument {
 		/**
 		 * The animation progress.
 		 */
-		private double animT = 0;
+		private double animT;
 		
 		/**
 		 * True if this note is recoiling, false otherwise.
 		 */
-		private boolean playing = false;
+		private boolean playing;
 		
 		/**
 		 * Instantiates a music box note.
@@ -193,10 +206,10 @@ public class MusicBox extends DecayedInstrument {
 		 * @param i the index
 		 */
 		public OneMusicBoxNote(int i) {
-			key = context.loadModel("MusicBoxKey.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f);
+			key = context.loadModel("MusicBoxKey.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F);
 			highestLevel.attachChild(key);
-			key.setLocalTranslation(i - 5.5f, 7, 0);
-			key.setLocalScale(-0.0454f * i + 1, 1, 1);
+			key.setLocalTranslation(i - 5.5F, 7, 0);
+			key.setLocalScale(-0.0454F * i + 1, 1, 1);
 		}
 		
 		/**

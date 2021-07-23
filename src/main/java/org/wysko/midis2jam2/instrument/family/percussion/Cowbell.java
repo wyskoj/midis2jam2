@@ -29,20 +29,21 @@ import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static java.util.Objects.requireNonNull;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * The Cowbell.
+ * The cowbell. Simply animates with {@link Stick#handleStick} and {@link PercussionInstrument#recoilDrum}.
  */
 public class Cowbell extends NonDrumSetPercussion {
 	
 	/**
-	 * The stick node.
+	 * Contains the stick.
 	 */
 	private final Node stickNode = new Node();
 	
 	/**
-	 * Instantiates a new Cowbell.
+	 * Instantiates a new cowbell.
 	 *
 	 * @param context the context
 	 * @param hits    the hits
@@ -51,22 +52,31 @@ public class Cowbell extends NonDrumSetPercussion {
 	               List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
+		/* Load cowbell */
+		recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+		
+		/* Load and position stick */
 		Spatial stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		stick.setLocalTranslation(0, 0, -2);
 		stickNode.attachChild(stick);
 		stickNode.setLocalTranslation(0, 0, 14);
 		
+		/* Positioning */
 		recoilNode.attachChild(stickNode);
-		highestLevel.setLocalTranslation(-9.7f, 40, -99);
+		highestLevel.setLocalTranslation(-9.7F, 40, -99);
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(24), rad(26.7), rad(-3.81)));
 	}
 	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		//noinspection ConstantConditions
-		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().velocity : 0, delta);
+		
+		/* Animate stick */
+		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED,
+				Stick.MAX_ANGLE, Axis.X);
+		
+		/* Animate cowbell */
+		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(),
+				stickStatus.justStruck() ? requireNonNull(stickStatus.getStrike()).velocity : 0, delta);
 	}
 }

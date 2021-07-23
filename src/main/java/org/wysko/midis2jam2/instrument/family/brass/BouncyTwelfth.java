@@ -38,10 +38,12 @@ public class BouncyTwelfth extends WrappedOctaveSustained.TwelfthOfOctave {
 	
 	@Override
 	public void tick(float delta) {
+		/* If finished playing */
 		if (progress >= 1) {
 			playing = false;
 			progress = 0;
 		}
+		
 		if (playing) {
 			progress += delta / duration;
 			float y = (float) (9.5 - 9.5 * progress);

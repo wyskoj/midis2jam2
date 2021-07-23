@@ -85,8 +85,8 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 	 * @param cloneClass the class of the {@link Clone} to instantiate
 	 * @throws ReflectiveOperationException usually is thrown if an error occurs in the clone constructor
 	 */
-	protected List<Clone> calculateClones(@NotNull MonophonicInstrument instrument,
-	                                      @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
+	protected final List<Clone> calculateClones(@NotNull MonophonicInstrument instrument,
+	                                            @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
 		List<Clone> calcClones = new ArrayList<>();
 		Constructor<?> constructor = cloneClass.getDeclaredConstructor(instrument.getClass());
 		calcClones.add((Clone) constructor.newInstance(instrument));
@@ -100,7 +100,8 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 					calcClones.get(0).notePeriods.add(comp1);
 					break;
 				}
-				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) { // Overlapping note
+				/* Check if notes are overlapping */
+				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) {
 					var added = false;
 					for (Clone clone : calcClones) {
 						if (!clone.isPlaying(comp1.startTick() + context.getFile().getDivision() / 4)) {
@@ -123,21 +124,13 @@ public abstract class MonophonicInstrument extends SustainedInstrument {
 		return calcClones;
 	}
 	
-	/**
-	 * Updates clones, performing the {@link Clone#tick(double, float)} method and calculating clone offsets.
-	 *
-	 * @param time  the current time, in seconds
-	 * @param delta the amount of time since the last frame
-	 */
-	protected void updateClones(double time, float delta) {
-		for (Clone clone : clones) {
-			clone.tick(time, delta);
-		}
-	}
-	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		updateClones(time, delta);
+		
+		/* Tick clones */
+		for (Clone clone : clones) {
+			clone.tick(time, delta);
+		}
 	}
 }

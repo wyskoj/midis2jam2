@@ -32,7 +32,7 @@ import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The trombone animates by moving a slide on the instrument.
@@ -57,7 +57,7 @@ public class Trombone extends MonophonicInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 10f * indexForMoving(delta), 0);
+		offsetNode.setLocalTranslation(0, 10 * indexForMoving(delta), 0);
 	}
 	
 	/**
@@ -74,17 +74,17 @@ public class Trombone extends MonophonicInstrument {
 		 * Instantiates a new Trombone clone.
 		 */
 		public TromboneClone() {
-			super(Trombone.this, 0.1f, Axis.X);
+			super(Trombone.this, 0.1F, Axis.X);
 			
 			/* Load and attach trombone */
-			Spatial body = context.loadModel("Trombone.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
+			Spatial body = context.loadModel("Trombone.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
 			modelNode.attachChild(body);
 			
 			/* Set horn skin grey material */
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
 			/* Load and attach slide */
-			slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
+			slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
 			modelNode.attachChild(slide);
 			modelNode.setLocalRotation(new Quaternion().fromAngles(rad(-10), 0, 0));
 			highestLevel.setLocalTranslation(0, 65, -200);
@@ -127,13 +127,17 @@ public class Trombone extends MonophonicInstrument {
 			}
 			if (!notePeriods.isEmpty() && !isPlaying()) {
 				var notePeriod = notePeriods.get(0);
-				if (notePeriod.midiNote >= 21 && notePeriod.midiNote <= 80) { // Strip out of range notes
+				/* If within range */
+				if (notePeriod.midiNote >= 21 && notePeriod.midiNote <= 80) {
 					var startTime = notePeriod.startTime;
-					if (startTime - time <= 1) { // Slide only if it is within 1 second
+					/* Slide only if there is 1 or less seconds between now and the beginning of the note */
+					if (startTime - time <= 1) {
 						var targetPos = getSlidePositionFromNote(notePeriod);
 						var currentPos = getCurrentSlidePosition();
-						if (startTime - time >= delta) // Don't try and slide if the difference is less than delta
+						/* Don't try and slide if the difference is less than delta */
+						if (startTime - time >= delta) {
 							moveToPosition(getCurrentSlidePosition() + ((targetPos - currentPos) / (startTime - time)) * delta);
+						}
 					}
 				}
 			}
@@ -177,7 +181,7 @@ public class Trombone extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(30f + indexForMoving() * -3), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(30 + indexForMoving() * -3F), 0));
 			offsetNode.setLocalTranslation(0, indexForMoving(), 0);
 		}
 	}

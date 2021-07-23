@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The shamisen.
@@ -42,7 +42,7 @@ public class Shamisen extends FrettedInstrument {
 	public Shamisen(@NotNull Midis2jam2 context,
 	                @NotNull List<MidiChannelSpecificEvent> events) {
 		super(context,
-				new StandardFrettingEngine(3, 15, new int[]{50, 57, 62}, 50, 77),
+				new StandardFrettingEngine(3, 15, new int[]{50, 57, 62}),
 				events,
 				new FrettedInstrumentPositioning(38.814f,
 						-6.1f,

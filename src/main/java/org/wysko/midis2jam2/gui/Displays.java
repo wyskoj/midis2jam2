@@ -32,8 +32,14 @@ public abstract class Displays extends JFrame {
 		setVisible(true);
 	}
 	
-	public void showCursor(boolean isPressed) {
-		if (isPressed) {
+	/**
+	 * Shows or hides the cursor.
+	 *
+	 * @param hide if true, hides the cursor, false shows the cursor
+	 */
+	@SuppressWarnings("java:S2301")
+	public void hideCursor(boolean hide) {
+		if (hide) {
 			this.setCursor(this.getToolkit().createCustomCursor(
 					new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
 					new Point(),

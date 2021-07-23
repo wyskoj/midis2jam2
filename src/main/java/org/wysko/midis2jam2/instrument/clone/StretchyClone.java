@@ -25,7 +25,8 @@ import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher;
 import org.wysko.midis2jam2.world.Axis;
 
 /**
- * Instruments that stretch when they play.
+ * Instruments that stretch when they play. More formally, the {@link #bell} is scaled by the inverse of the current
+ * note's elapsed duration.
  */
 public abstract class StretchyClone extends Clone {
 	

@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.particle.SteamPuffer;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The Flute.
@@ -64,19 +64,19 @@ public class Flute extends HandedInstrument {
 		 * Instantiates a new Flute clone.
 		 */
 		public FluteClone() {
-			super(Flute.this, SteamPuffer.SteamPuffType.WHISTLE, 1f);
+			super(Flute.this, SteamPuffer.SteamPuffType.WHISTLE, 1);
 			
 			Spatial horn = Flute.this.context.loadModel(
 					"Flute.obj",
 					"ShinySilver.bmp",
 					Midis2jam2.MatType.REFLECTIVE,
-					0.9f
+					0.9F
 			);
 			
 			loadHands();
 			
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[]{0, 0, rad(-90)}));
-			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);
+			puffer.steamPuffNode.setLocalTranslation(0, -12.3F, 0);
 			
 			highestLevel.attachChild(horn);
 		}

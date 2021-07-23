@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 
 /**
@@ -65,8 +65,6 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	 * @param bowRotation         the bow rotation
 	 * @param bowScale            the bow scale
 	 * @param openStringMidiNotes the midi notes of each string in open position
-	 * @param rangeLow            the lowest note that can be played
-	 * @param rangeHigh           the highest note that can be played
 	 * @param body                the body of the instrument
 	 */
 	protected StringFamilyInstrument(Midis2jam2 context,
@@ -75,12 +73,10 @@ public abstract class StringFamilyInstrument extends FrettedInstrument {
 	                                 double bowRotation,
 	                                 Vector3f bowScale,
 	                                 int[] openStringMidiNotes,
-	                                 int rangeLow,
-	                                 int rangeHigh,
 	                                 Spatial body) {
 		super(context,
 				new StandardFrettingEngine(
-						4, 48, openStringMidiNotes, rangeLow, rangeHigh),
+						4, 48, openStringMidiNotes),
 				events,
 				new FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ(8.84f,
 						-6.17f,

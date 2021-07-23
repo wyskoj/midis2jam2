@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The trumpet has three keys, and are simply animated. It handles much like other {@link MonophonicInstrument}s.
@@ -51,7 +51,7 @@ public class Trumpet extends MonophonicInstrument {
 				FINGERING_MANAGER
 		);
 		
-		groupOfPolyphony.setLocalTranslation(-36.5f, 60, 10);
+		groupOfPolyphony.setLocalTranslation(-36.5F, 60, 10);
 		groupOfPolyphony.setLocalRotation(new Quaternion().fromAngles(rad(-2), rad(90), 0));
 	}
 	
@@ -84,17 +84,17 @@ public class Trumpet extends MonophonicInstrument {
 		 * Instantiates a new trumpet clone.
 		 */
 		public TrumpetClone() {
-			super(Trumpet.this, 0.15f, 0.9f, 3, Axis.Z, Axis.X);
+			super(Trumpet.this, 0.15F, 0.9F, 3, Axis.Z, Axis.X);
 			
-			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
+			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
-			this.bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
-			this.bell.setLocalTranslation(0, 0, 5.58f);
+			this.bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+			this.bell.setLocalTranslation(0, 0, 5.58F);
 			
 			for (var i = 0; i < 3; i++) {
 				keys[i] = context.loadModel("TrumpetKey" + (i + 1) + ".obj", "HornSkinGrey.bmp",
-						Midis2jam2.MatType.REFLECTIVE, 0.9f);
+						Midis2jam2.MatType.REFLECTIVE, 0.9F);
 				modelNode.attachChild(keys[i]);
 			}
 			
@@ -111,7 +111,7 @@ public class Trumpet extends MonophonicInstrument {
 			for (var i = 0; i < 3; i++) {
 				int finalI = i;
 				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
-					keys[i].setLocalTranslation(0, -0.5f, 0);
+					keys[i].setLocalTranslation(0, -0.5F, 0);
 				} else {
 					keys[i].setLocalTranslation(0, 0, 0);
 				}

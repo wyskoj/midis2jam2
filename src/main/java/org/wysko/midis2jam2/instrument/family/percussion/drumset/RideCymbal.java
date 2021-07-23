@@ -44,17 +44,18 @@ public class RideCymbal extends Cymbal {
 	public RideCymbal(Midis2jam2 context,
 	                  List<MidiNoteOnEvent> hits, Cymbal.CymbalType type) {
 		super(context, hits, type);
-		if (!(type == CymbalType.RIDE_1 || type == CymbalType.RIDE_2))
+		if (!(type == CymbalType.RIDE_1 || type == CymbalType.RIDE_2)) {
 			throw new IllegalArgumentException("Ride cymbal type is wrong.");
+		}
 		
 		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
 		cymbalNode.attachChild(cymbal);
-		cymbalNode.setLocalScale(type.size);
-		highLevelNode.setLocalTranslation(type.location);
-		highLevelNode.setLocalRotation(type.rotation);
+		cymbalNode.setLocalScale(type.getSize());
+		highLevelNode.setLocalTranslation(type.getLocation());
+		highLevelNode.setLocalRotation(type.getRotation());
 		highLevelNode.attachChild(cymbalNode);
 		stickNode.setLocalTranslation(0, 0, 20);
-		this.animator = new CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening);
+		this.animator = new CymbalAnimator(type.getAmplitude(), type.getWobbleSpeed(), type.getDampening());
 	}
 	
 	@Override

@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("all")
 public class CustomTicker {
 	
 	public static void main(String[] args) throws MidiUnavailableException, InvalidMidiDataException, IOException {

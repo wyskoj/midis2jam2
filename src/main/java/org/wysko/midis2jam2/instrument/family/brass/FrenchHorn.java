@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The French Horn. It animates like most other {@link MonophonicInstrument}s.
@@ -55,12 +55,12 @@ public class FrenchHorn extends MonophonicInstrument {
 		super(context, eventList, FrenchHornClone.class, FINGERING_MANAGER);
 		
 		/* Position French Horn */
-		groupOfPolyphony.setLocalTranslation(-83.1f, 41.6f, -63.7f);
+		groupOfPolyphony.setLocalTranslation(-83.1F, 41.6F, -63.7F);
 	}
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 15f * indexForMoving(delta), 0);
+		offsetNode.setLocalTranslation(0, 15 * indexForMoving(delta), 0);
 	}
 	
 	/**
@@ -72,11 +72,11 @@ public class FrenchHorn extends MonophonicInstrument {
 		 * Instantiates a new French Horn clone.
 		 */
 		public FrenchHornClone() {
-			super(FrenchHorn.this, 0.1f, 0.9f, 4, Axis.Y, Axis.X);
+			super(FrenchHorn.this, 0.1F, 0.9F, 4, Axis.Y, Axis.X);
 			
 			/* Load models */
-			body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
-			bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f));
+			body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+			bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
 			
 			/* Attach models */
 			modelNode.attachChild(body);
@@ -86,14 +86,13 @@ public class FrenchHorn extends MonophonicInstrument {
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
 			/* Move bell to body of horn */
-			bell.setLocalTranslation(0, -4.63f, -1.87f);
+			bell.setLocalTranslation(0, -4.63F, -1.87F);
 			bell.setLocalRotation(new Quaternion().fromAngles(rad(22), 0, 0));
 			
 			/* Load keys */
 			for (var i = 0; i < 4; i++) {
 				String id = i == 0 ? "Trigger" : "Key" + (i);
-				keys[i] = context.loadModel("FrenchHorn" + id + ".obj", "HornSkinGrey.bmp",
-						Midis2jam2.MatType.REFLECTIVE, 0.9f);
+				keys[i] = context.loadModel("FrenchHorn" + id + ".obj", "HornSkinGrey.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
 				modelNode.attachChild(keys[i]);
 			}
 			
@@ -104,7 +103,7 @@ public class FrenchHorn extends MonophonicInstrument {
 		
 		@Override
 		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(47f * indexForMoving()), 0));
+			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(47 * indexForMoving()), 0));
 		}
 		
 		@Override
@@ -113,10 +112,12 @@ public class FrenchHorn extends MonophonicInstrument {
 			for (var i = 0; i < 4; i++) {
 				int finalI = i;
 				if (Arrays.stream(pressed).anyMatch(integer -> integer == finalI)) {
-					if (i == 0) // Trigger key, so rotate on different axis
+					/* If animating the trigger key, rotate on different axis */
+					if (i == 0) {
 						keys[i].setLocalRotation(new Quaternion().fromAngles(rad(-25), 0, 0));
-					else
+					} else {
 						keys[i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-30)));
+					}
 				} else {
 					keys[i].setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
 				}

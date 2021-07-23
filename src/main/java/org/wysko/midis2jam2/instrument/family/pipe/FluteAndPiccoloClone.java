@@ -47,7 +47,7 @@ public class FluteAndPiccoloClone extends PuffingClone {
 	 */
 	protected void loadHands() {
 		leftHands = new Spatial[13];
-		for (int i = 0; i < 13; i++) {
+		for (var i = 0; i < 13; i++) {
 			leftHands[i] = parent.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp");
 			leftHandNode.attachChild(leftHands[i]);
 			if (i != 0) {
@@ -55,7 +55,7 @@ public class FluteAndPiccoloClone extends PuffingClone {
 			}
 		}
 		rightHands = new Spatial[12];
-		for (int i = 0; i < 12; i++) {
+		for (var i = 0; i < 12; i++) {
 			rightHands[i] = parent.context.loadModel(String.format("Flute_RightHand%02d.obj", i), "hands.bmp");
 			rightHandNode.attachChild(rightHands[i]);
 			if (i != 0) {

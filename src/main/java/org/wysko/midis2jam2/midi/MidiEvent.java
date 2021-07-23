@@ -22,7 +22,7 @@ import java.util.Objects;
 /**
  * MIDI files are made up of events.
  */
-public abstract class MidiEvent {
+public class MidiEvent {
 	
 	/**
 	 * The time at which this MIDI event occurs, expressed in MIDI ticks.

@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The timpani.
@@ -42,7 +42,7 @@ public class Timpani extends OneDrumOctave {
 	               @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		Spatial body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
+		Spatial body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
 		Spatial head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp");
 		((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 		
@@ -50,7 +50,7 @@ public class Timpani extends OneDrumOctave {
 			malletNodes[i] = new Node();
 			Spatial mallet = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp");
 			malletNodes[i].attachChild(mallet);
-			malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 31, 15);
+			malletNodes[i].setLocalTranslation(1.8F * (i - 5.5F), 31, 15);
 			mallet.setLocalTranslation(0, 0, -5);
 			animNode.attachChild(malletNodes[i]);
 		}
@@ -63,6 +63,6 @@ public class Timpani extends OneDrumOctave {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27f + indexForMoving(delta) * -18), 0));
+		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-27 + indexForMoving(delta) * -18), 0));
 	}
 }

@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion;
 
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
@@ -40,21 +41,25 @@ public class Agogo extends NonDrumSetPercussion {
 	/**
 	 * The left stick.
 	 */
+	@NotNull
 	private final Spatial leftStick;
 	
 	/**
 	 * The right stick.
 	 */
+	@NotNull
 	private final Spatial rightStick;
 	
 	/**
 	 * The hits for the high agogo.
 	 */
+	@NotNull
 	private final List<MidiNoteOnEvent> highHits;
 	
 	/**
 	 * The hits for the low agogo.
 	 */
+	@NotNull
 	private final List<MidiNoteOnEvent> lowHits;
 	
 	/**
@@ -63,7 +68,7 @@ public class Agogo extends NonDrumSetPercussion {
 	 * @param context the context
 	 * @param hits    the hits
 	 */
-	protected Agogo(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
+	protected Agogo(@NotNull Midis2jam2 context, @NotNull List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		highHits = hits.stream().filter(a -> a.note == HIGH_AGOGO).collect(Collectors.toList());
 		lowHits = hits.stream().filter(a -> a.note == LOW_AGOGO).collect(Collectors.toList());
@@ -91,8 +96,12 @@ public class Agogo extends NonDrumSetPercussion {
 		var rightStatus = handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 		
 		var velocity = 0;
-		if (leftStatus.getStrike() != null) velocity = max(velocity, leftStatus.getStrike().velocity);
-		if (rightStatus.getStrike() != null) velocity = max(velocity, rightStatus.getStrike().velocity);
+		if (leftStatus.getStrike() != null) {
+			velocity = max(velocity, leftStatus.getStrike().velocity);
+		}
+		if (rightStatus.getStrike() != null) {
+			velocity = max(velocity, rightStatus.getStrike().velocity);
+		}
 		
 		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta);
 	}

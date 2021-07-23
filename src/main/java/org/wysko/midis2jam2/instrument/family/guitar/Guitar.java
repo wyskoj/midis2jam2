@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The guitar. What more do you want?
@@ -38,7 +38,7 @@ public class Guitar extends FrettedInstrument {
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context,
-				new StandardFrettingEngine(6, 22, new int[]{40, 45, 50, 55, 59, 64}, 40, 79),
+				new StandardFrettingEngine(6, 22, new int[]{40, 45, 50, 55, 59, 64}),
 				events,
 				new FrettedInstrumentPositioning(16.6f,
 						-18.1f,
@@ -175,7 +175,7 @@ public class Guitar extends FrettedInstrument {
 		/**
 		 * Acoustic guitar type.
 		 */
-		ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"), // TODO Obviously.
+		ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"),
 		
 		/**
 		 * Electric guitar type.

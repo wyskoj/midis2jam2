@@ -334,6 +334,12 @@ new FormModel {
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "menu1"
 					"text": new FormMessage( null, "GuiLauncher.menu1.text" )
+					add( new FormComponent( "org.wysko.midis2jam2.gui.MenuItemResizedIcon" ) {
+						name: "localeMenuItem"
+						"text": new FormMessage( null, "GuiLauncher.localeMenuItem.text" )
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/locale.png" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "localeMenuItemActionPerformed", true ) )
+					} )
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
 						name: "aboutMenuItem"
 						"text": new FormMessage( null, "GuiLauncher.aboutMenuItem.text" )

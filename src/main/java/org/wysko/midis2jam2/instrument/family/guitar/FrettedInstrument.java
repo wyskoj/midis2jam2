@@ -21,7 +21,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
@@ -78,7 +77,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	/**
 	 * Which frame of animation for the animated string to use.
 	 */
-	protected double frame = 0;
+	protected double frame;
 	
 	/**
 	 * Instantiates a fretted instrument.
@@ -134,7 +133,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 	 * @return the vertical ratio
 	 */
 	@Contract(pure = true)
-	protected float fretToDistance(@Range(from = 0, to = 22) int fret) {
+	protected float fretToDistance(int fret) {
 		return positioning.fretHeights.calculateScale(fret);
 	}
 	
@@ -175,13 +174,17 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 			final Vector3f fingerPosition;
 			if (positioning instanceof FrettedInstrumentPositioningWithZ) {
 				FrettedInstrumentPositioningWithZ positioningWithZ = (FrettedInstrumentPositioningWithZ) positioning;
-				float z =
-						(((positioningWithZ.topZ[string] - positioningWithZ.bottomZ[string]) * fretDistance + positioningWithZ.topZ[string]) * -1.3f) - 2;
+				
+				float z = (((positioningWithZ.topZ[string] - positioningWithZ.bottomZ[string])
+						* fretDistance + positioningWithZ.topZ[string]) * -1.3F) - 2;
+				
 				fingerPosition = new Vector3f(
-						(positioningWithZ.lowerX[string] - positioningWithZ.upperX[string]) * fretDistance + positioningWithZ.upperX[string],
+						(positioningWithZ.lowerX[string] - positioningWithZ.upperX[string])
+								* fretDistance + positioningWithZ.upperX[string],
 						positioningWithZ.fingerVerticalOffset.y - stringHeight() * fretDistance,
 						z
 				);
+				
 			} else {
 				fingerPosition = new Vector3f(
 						((positioning.lowerX[string] - positioning.upperX[string]) * fretDistance) + positioning.upperX[string],
@@ -207,8 +210,9 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 				r.remove();
 				NotePeriodWithFretboardPosition next1 = (NotePeriodWithFretboardPosition) next;
 				int string = next1.getPosition().string;
-				if (string != -1)
+				if (string != -1) {
 					frettingEngine.releaseString(string);
+				}
 			}
 		}
 	}
@@ -225,7 +229,9 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		
 		for (var i = 0; i < numberOfStrings; i++) {
 			int finalI = i;
-			Optional<NotePeriod> first = currentNotePeriods.stream().filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).getPosition().string == finalI).findFirst();
+			Optional<NotePeriod> first = currentNotePeriods.stream()
+					.filter(notePeriod -> ((NotePeriodWithFretboardPosition) notePeriod).getPosition().string == finalI)
+					.findFirst();
 			if (first.isPresent()) {
 				FretboardPosition position = ((NotePeriodWithFretboardPosition) first.get()).getPosition();
 				if (position.string != -1 && position.fret != -1) {
@@ -237,7 +243,9 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		}
 		
 		for (NotePeriod notePeriod : currentNotePeriods) {
-			if (notePeriod.animationStarted) continue;
+			if (notePeriod.animationStarted) {
+				continue;
+			}
 			NotePeriodWithFretboardPosition notePeriod1 = (NotePeriodWithFretboardPosition) notePeriod;
 			noteStarted = true;
 			final var guitarPosition = frettingEngine.bestFretboardPosition(notePeriod1.midiNote);
@@ -250,10 +258,10 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		
 		/* Animate strings */
 		for (var i = 0; i < numberOfStrings; i++) {
-			animateString(i, frettingEngine.getFrets()[i]);
+			animateString(i, frettingEngine.getFrets().get(i));
 		}
 		
-		final double inc = delta / (1 / 60f);
+		final double inc = delta / (1 / 60F);
 		this.frame += inc;
 		
 		return noteStarted;

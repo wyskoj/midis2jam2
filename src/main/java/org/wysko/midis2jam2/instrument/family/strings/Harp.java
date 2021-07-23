@@ -20,33 +20,40 @@ package org.wysko.midis2jam2.instrument.family.strings;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue;
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator;
 import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument;
-import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.midi.MidiNoteEvent;
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.BLACK;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
- * The harp is a diatonic instrument, so chromatic notes are rounded down to the nearest white key. For example, if a
- * C# is to be played, a C is instead played.
+ * The harp is a diatonic instrument, so chromatic notes are rounded down to the nearest white key. For example, if a C#
+ * is to be played, a C is instead played.
  */
 public class Harp extends SustainedInstrument {
 	
 	/**
-	 * The harp strings.
+	 * The harp strings. The harp contains 47 strings.
 	 */
-	final HarpString[] strings = new HarpString[47];
+	@NotNull
+	private final HarpString[] strings = new HarpString[47];
 	
 	/**
 	 * The notes to play.
 	 */
+	@NotNull
 	private final List<MidiNoteEvent> notes;
 	
 	/**
@@ -64,7 +71,7 @@ public class Harp extends SustainedInstrument {
 		
 		/* Load model */
 		instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp"));
-		instrumentNode.setLocalTranslation(5, 3.6f, 17);
+		instrumentNode.setLocalTranslation(5, 3.6F, 17);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-35), 0));
 		highestLevel.attachChild(instrumentNode);
 		
@@ -75,53 +82,65 @@ public class Harp extends SustainedInstrument {
 		}
 	}
 	
+	/**
+	 * Given a note within an octave, represented as an integer (0 = C, 2 = D, 4 = E, 5 = F, etc.), returns the harp
+	 * string number to animate.
+	 *
+	 * @param noteNumber the note number
+	 * @return the harp string number
+	 * @throws IllegalArgumentException if you specify a black key
+	 */
+	@Range(from = 0, to = 6)
+	@Contract(pure = true)
+	private static int getHarpString(int noteNumber) throws IllegalArgumentException {
+		int harpString;
+		harpString = switch (noteNumber) {
+			case 0 -> 0;
+			case 2 -> 1;
+			case 4 -> 2;
+			case 5 -> 3;
+			case 7 -> 4;
+			case 9 -> 5;
+			case 11 -> 6;
+			default -> throw new IllegalArgumentException("Unexpected value: " + noteNumber);
+		};
+		return harpString;
+	}
+	
 	@Override
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
-		List<MidiEvent> eventsToPerform = new ArrayList<>();
+		List<MidiNoteEvent> eventsToPerform = NoteQueue.collectWithOffGap(notes, context, time);
 		
-		if (!notes.isEmpty())
-			while (
-					!notes.isEmpty()
-							&& ((notes.get(0) instanceof MidiNoteOnEvent && context.getFile().eventInSeconds(notes.get(0)) <= time)
-							|| (notes.get(0) instanceof MidiNoteOffEvent && context.getFile().eventInSeconds(notes.get(0)) <= time - 0.01))
-			) {
-				eventsToPerform.add(notes.remove(0));
-			}
-		
-		
-		for (MidiEvent event : eventsToPerform) {
-			if (!(event instanceof MidiNoteEvent)) continue;
+		for (MidiNoteEvent event : eventsToPerform) {
 			
-			MidiNoteEvent note = (MidiNoteEvent) event;
-			int midiNote = note.note;
-			if (KeyedInstrument.midiValueToColor(note.note) == BLACK) {
-				midiNote--; // round black notes down
+			int midiNote = event.note;
+			
+			/* If the note falls on a black key (if it were played on a piano) we need to "round it down" to the
+			 * nearest white key. */
+			if (KeyedInstrument.midiValueToColor(midiNote) == BLACK) {
+				midiNote--;
 			}
 			int harpString = -1;
-			if (midiNote >= 24 && midiNote <= 103) { // In range of harp
-				int mod = midiNote % 12;
-				harpString = switch (mod) {
-					case 0 -> 0;
-					case 2 -> 1;
-					case 4 -> 2;
-					case 5 -> 3;
-					case 7 -> 4;
-					case 9 -> 5;
-					case 11 -> 6;
-					default -> throw new IllegalStateException("Unexpected value: " + mod);
-				};
+			
+			/* Only consider notes within the range of the instrument */
+			if (midiNote >= 24 && midiNote <= 103) {
+				harpString = getHarpString(midiNote % 12);
 				harpString += ((midiNote - 24) / 12) * 7;
 			}
 			if (event instanceof MidiNoteOnEvent) {
 				if (harpString != -1) {
 					strings[harpString].beginPlaying();
 				}
-			} else if (event instanceof MidiNoteOffEvent && harpString != -1) {
-				strings[harpString].endPlaying();
+			} else {
+				if (harpString != -1) {
+					strings[harpString].endPlaying();
+				}
 			}
+			
 		}
 		
+		/* Update each harp string */
 		for (HarpString string : strings) {
 			string.tick(delta);
 		}
@@ -129,7 +148,7 @@ public class Harp extends SustainedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(14.7f * indexForMoving(delta), 0, 10.3f * indexForMoving(delta));
+		offsetNode.setLocalTranslation(14.7F * indexForMoving(delta), 0, 10.3F * indexForMoving(delta));
 	}
 	
 	/**
@@ -153,14 +172,14 @@ public class Harp extends SustainedInstrument {
 		private final Node stringNode = new Node();
 		
 		/**
-		 * True if this string is vibrating, false otherwise.
-		 */
-		private boolean vibrating = false;
-		
-		/**
 		 * The string animator.
 		 */
 		private final VibratingStringAnimator stringAnimator;
+		
+		/**
+		 * True if this string is vibrating, false otherwise.
+		 */
+		private boolean vibrating;
 		
 		/**
 		 * Instantiates a new Harp string.
@@ -193,7 +212,7 @@ public class Harp extends SustainedInstrument {
 			stringNode.attachChild(string);
 			
 			/* Funky math to polynomially scale each string */
-			stringNode.setLocalTranslation(0, 2.1444f + 0.8777f * i, -2.27f + (0.75651f * -i));
+			stringNode.setLocalTranslation(0, 2.1444F + 0.8777F * i, -2.27F + (0.75651F * -i));
 			float scale = (float) ((2.44816E-4 * Math.pow(i, 2)) + (-0.02866 * i) + 0.97509);
 			stringNode.setLocalScale(1, scale, 1);
 			

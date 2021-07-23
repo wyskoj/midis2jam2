@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.List;
 
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The sticks.

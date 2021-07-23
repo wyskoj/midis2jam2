@@ -33,19 +33,19 @@ import java.util.Random;
  */
 public class SteamPuffer implements ParticleGenerator {
 	
+	private static final Random RANDOM = new Random();
+	
 	public final Node steamPuffNode = new Node();
 	
-	final List<Cloud> clouds = new ArrayList<>();
+	private final List<Cloud> clouds = new ArrayList<>();
 	
-	final List<Cloud> cloudPool = new ArrayList<>();
+	private final List<Cloud> cloudPool = new ArrayList<>();
 	
 	private final Midis2jam2 context;
 	
 	private final SteamPuffType type;
 	
 	private final double scale;
-	
-	private static final Random RANDOM = new Random();
 	
 	private final PuffBehavior behavior;
 	
@@ -54,10 +54,6 @@ public class SteamPuffer implements ParticleGenerator {
 		this.type = type;
 		this.scale = scale;
 		this.behavior = behavior;
-	}
-	
-	public enum PuffBehavior {
-		OUTWARDS, UPWARDS
 	}
 	
 	private void despawnCloud(Cloud cloud) {
@@ -99,6 +95,10 @@ public class SteamPuffer implements ParticleGenerator {
 		}
 	}
 	
+	public enum PuffBehavior {
+		OUTWARDS, UPWARDS
+	}
+	
 	@SuppressWarnings("unused")
 	public enum SteamPuffType {
 		NORMAL("SteamPuff.bmp"),
@@ -135,14 +135,14 @@ public class SteamPuffer implements ParticleGenerator {
 		
 		private void randomInit() {
 			
-			randY = (RANDOM.nextFloat() - 0.5f) * 1.5f;
-			randZ = (RANDOM.nextFloat() - 0.5f) * 1.5f;
+			randY = (RANDOM.nextFloat() - 0.5F) * 1.5f;
+			randZ = (RANDOM.nextFloat() - 0.5F) * 1.5f;
 			cube.setLocalRotation(new Quaternion().fromAngles(new float[]{
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 			}));
-			life = RANDOM.nextFloat() * 0.02f;
+			life = RANDOM.nextFloat() * 0.02F;
 			cloudNode.setLocalTranslation(0, 0, 0);
 		}
 		
@@ -161,8 +161,10 @@ public class SteamPuffer implements ParticleGenerator {
 			return life <= endOfLife;
 		}
 		
+		@SuppressWarnings("java:S109")
 		private float locEase(double x) {
-			return (float) x == 1 ? 1 : (float) (1 - Math.pow(2, -10 * x));
+			if (x == 1) return 1F;
+			return (float) (1 - Math.pow(2, -10 * x));
 		}
 		
 	}

@@ -94,7 +94,7 @@ public abstract class HandedClone extends Clone {
 	 * @param hands        the array of hands
 	 * @param handPosition the index of the hand that should be visible
 	 */
-	private void setHand(Spatial[] hands, int handPosition) {
+	private static void setHand(Spatial[] hands, int handPosition) {
 		for (var i = 0; i < hands.length; i++) {
 			if (i == handPosition) {
 				hands[i].setCullHint(Dynamic);

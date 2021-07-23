@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2;
 
-import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import org.wysko.midis2jam2.midi.MidiFile;
 
@@ -47,7 +46,7 @@ public class LegacyLiaison extends Liaison {
 			};
 			midis2Jam2Settings.setIcons(icons);
 		} catch (IOException e) {
-			Midis2jam2.LOGGER.warning("Failed to set window icon.");
+			Midis2jam2.getLOGGER().warning("Failed to set window icon.");
 			e.printStackTrace();
 		}
 		midis2Jam2Settings.setVSync(true);

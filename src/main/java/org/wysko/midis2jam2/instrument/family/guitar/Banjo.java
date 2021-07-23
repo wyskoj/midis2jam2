@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * @see FrettedInstrument
@@ -33,7 +33,7 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
 public class Banjo extends FrettedInstrument {
 	
 	
-	private static final Vector3f BASE_POSITION = new Vector3f(54.6f, 48.7f, 2f);
+	private static final Vector3f BASE_POSITION = new Vector3f(54.6F, 48.7F, 2);
 	
 	/**
 	 * Instantiates a new Bass guitar.
@@ -43,19 +43,19 @@ public class Banjo extends FrettedInstrument {
 	 */
 	public Banjo(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context,
-				new StandardFrettingEngine(4, 17, new int[]{48, 55, 62, 69}, 48, 86),
+				new StandardFrettingEngine(4, 17, new int[]{48, 55, 62, 69}),
 				events,
 				new FrettedInstrumentPositioning(
-						13.93f,
-						-19.54f,
+						13.93F,
+						-19.54F,
 						new Vector3f[]{
 								new Vector3f(1, 1, 1),
 								new Vector3f(1, 1, 1),
 								new Vector3f(1, 1, 1),
 								new Vector3f(1, 1, 1)
 						},
-						new float[]{-0.53f, -0.13f, 0.28f, 0.68f},
-						new float[]{-1.14f, -0.40f, 0.47f, 1.21f},
+						new float[]{-0.53F, -0.13F, 0.28F, 0.68F},
+						new float[]{-1.14F, -0.40F, 0.47F, 1.21F},
 						FretHeightByTable.fromXml(Banjo.class)),
 				4,
 				context.loadModel("Banjo.fbx", "BanjoSkin.png")
@@ -85,8 +85,7 @@ public class Banjo extends FrettedInstrument {
 		// Lower strings
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 5; j++) {
-				lowerStrings[i][j] = context.loadModel("BanjoStringBottom%d.fbx".formatted(j), "BassSkin.bmp",
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+				lowerStrings[i][j] = context.loadModel("BanjoStringBottom%d.fbx".formatted(j), "BassSkin.bmp");
 				instrumentNode.attachChild(lowerStrings[i][j]);
 			}
 		}
@@ -131,6 +130,6 @@ public class Banjo extends FrettedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(new Vector3f(7, -2.43f, 0).mult(indexForMoving(delta)));
+		offsetNode.setLocalTranslation(new Vector3f(7, -2.43F, 0).mult(indexForMoving(delta)));
 	}
 }

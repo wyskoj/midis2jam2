@@ -46,11 +46,13 @@ public abstract class Clone {
 	/**
 	 * Used for the rotation while playing.
 	 */
+	@NotNull
 	public final Node animNode = new Node();
 	
 	/**
 	 * The model node.
 	 */
+	@NotNull
 	public final Node modelNode = new Node();
 	
 	/**
@@ -64,21 +66,25 @@ public abstract class Clone {
 	/**
 	 * Used for moving with {@link #indexForMoving()}.
 	 */
+	@NotNull
 	public final Node offsetNode = new Node();
 	
 	/**
 	 * The highest level.
 	 */
+	@NotNull
 	public final Node highestLevel = new Node();
 	
 	/**
 	 * Used for positioning and rotation.
 	 */
+	@NotNull
 	public final Node idleNode = new Node();
 	
 	/**
 	 * The {@link MonophonicInstrument} this clone is associated with.
 	 */
+	@NotNull
 	protected final MonophonicInstrument parent;
 	
 	/**
@@ -86,6 +92,10 @@ public abstract class Clone {
 	 */
 	private final float rotationFactor;
 	
+	/**
+	 * The axis on which this clone rotates when playing.
+	 */
+	@NotNull
 	private final Axis rotationAxis;
 	
 	/**
@@ -107,16 +117,18 @@ public abstract class Clone {
 	 * @param rotationFactor the rotation factor
 	 * @param rotationAxis   the axis to rotate on when playing
 	 */
-	protected Clone(MonophonicInstrument parent, float rotationFactor, Axis rotationAxis) {
+	protected Clone(@NotNull MonophonicInstrument parent, float rotationFactor, @NotNull Axis rotationAxis) {
 		this.parent = parent;
 		this.rotationFactor = rotationFactor;
 		this.rotationAxis = rotationAxis;
 		
+		/* Connect node chain hierarchy */
 		idleNode.attachChild(modelNode);
 		animNode.attachChild(idleNode);
 		highestLevel.attachChild(animNode);
 		offsetNode.attachChild(highestLevel);
 		parent.groupOfPolyphony.attachChild(offsetNode);
+		
 		notePeriods = new ArrayList<>();
 	}
 	
@@ -182,12 +194,15 @@ public abstract class Clone {
 	 * @param delta the amount of time since last frame
 	 * @see Instrument#tick(double, float)
 	 */
+	@SuppressWarnings("java:S1774")
 	public void tick(double time, float delta) {
 		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
 			currentNotePeriod = notePeriods.remove(0);
 		}
 		
-		if (currentNotePeriod != null && currentNotePeriod.endTime <= time) currentNotePeriod = null;
+		if (currentNotePeriod != null && currentNotePeriod.endTime <= time) {
+			currentNotePeriod = null;
+		}
 		
 		/* Rotate clone on note play */
 		if (currentNotePeriod != null) {

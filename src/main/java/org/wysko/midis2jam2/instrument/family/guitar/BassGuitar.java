@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * Adam Neely would be proud.
@@ -34,8 +34,15 @@ import static org.wysko.midis2jam2.Midis2jam2.rad;
  */
 public class BassGuitar extends FrettedInstrument {
 	
+	/**
+	 * The bass skin texture file.
+	 */
+	public static final String BASS_SKIN_BMP = "BassSkin.bmp";
 	
-	private static final Vector3f BASE_POSITION = new Vector3f(51.5863f, 54.5902f, -16.5817f);
+	/**
+	 * The base position of the bass guitar.
+	 */
+	private static final Vector3f BASE_POSITION = new Vector3f(51.5863F, 54.5902F, -16.5817F);
 	
 	/**
 	 * Instantiates a new Bass guitar.
@@ -45,17 +52,17 @@ public class BassGuitar extends FrettedInstrument {
 	 */
 	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, BassGuitarType type) {
 		super(context,
-				new StandardFrettingEngine(4, 22, new int[]{28, 33, 38, 43}, 28, 65),
+				new StandardFrettingEngine(4, 22, new int[]{28, 33, 38, 43}),
 				events,
-				new FrettedInstrumentPositioning(19.5F, -26.57f, new Vector3f[]{
+				new FrettedInstrumentPositioning(19.5F, -26.57F, new Vector3f[]{
 						new Vector3f(1, 1, 1),
 						new Vector3f(1, 1, 1),
 						new Vector3f(1, 1, 1),
 						new Vector3f(1, 1, 1)
 					
 				},
-						new float[]{-0.85f, -0.31f, 0.20f, 0.70f},
-						new float[]{-1.86f, -0.85f, 0.34f, 1.37f},
+						new float[]{-0.85F, -0.31F, 0.20F, 0.70F},
+						new float[]{-1.86F, -0.85F, 0.34F, 1.37F},
 						FretHeightByTable.fromXml(BassGuitar.class)),
 				4,
 				context.loadModel(type.modelFile, type.textureFile)
@@ -63,13 +70,13 @@ public class BassGuitar extends FrettedInstrument {
 		
 		
 		for (var i = 0; i < 4; i++) {
-			Spatial string = context.loadModel("BassString.obj", "BassSkin.bmp");
+			Spatial string = context.loadModel("BassString.obj", BASS_SKIN_BMP);
 			upperStrings[i] = string;
 			instrumentNode.attachChild(upperStrings[i]);
 		}
 		
-		// Position each string
-		var forward = 0.125f;
+		/* Position each string */
+		var forward = 0.125F;
 		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward);
 		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1.24)));
 		
@@ -82,16 +89,16 @@ public class BassGuitar extends FrettedInstrument {
 		upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward);
 		upperStrings[3].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.824)));
 		
-		// Lower strings
+		/* Lower strings */
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 5; j++) {
-				lowerStrings[i][j] = context.loadModel("BassStringBottom" + j + ".obj", "BassSkin.bmp",
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+				lowerStrings[i][j] = context.loadModel("BassStringBottom" + j + ".obj", BASS_SKIN_BMP,
+						Midis2jam2.MatType.UNSHADED, 0.9F);
 				instrumentNode.attachChild(lowerStrings[i][j]);
 			}
 		}
 		
-		// Position lower strings
+		/* Position lower strings */
 		for (var i = 0; i < 5; i++) {
 			lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward);
 			lowerStrings[0][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1.24)));
@@ -110,32 +117,32 @@ public class BassGuitar extends FrettedInstrument {
 			lowerStrings[3][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.824)));
 		}
 		
-		// Hide all wobbly strings
+		/* Hide all wobbly strings */
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 5; j++) {
 				lowerStrings[i][j].setCullHint(Spatial.CullHint.Always);
 			}
 		}
 		
-		// Initialize note fingers
+		/* Initialize note fingers */
 		for (var i = 0; i < 4; i++) {
-			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BassSkin.bmp");
+			noteFingers[i] = context.loadModel("BassNoteFinger.obj", BASS_SKIN_BMP);
 			instrumentNode.attachChild(noteFingers[i]);
 			noteFingers[i].setCullHint(Spatial.CullHint.Always);
 		}
 		
-		// Position guitar
+		/* Position guitar */
 		instrumentNode.setLocalTranslation(BASE_POSITION);
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
 	}
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(new Vector3f(7, -2.43f, 0).mult(indexForMoving(delta)));
+		offsetNode.setLocalTranslation(new Vector3f(7, -2.43F, 0).mult(indexForMoving(delta)));
 	}
 	
 	public enum BassGuitarType {
-		STANDARD("Bass.obj", "BassSkin.bmp"),
+		STANDARD("Bass.obj", BASS_SKIN_BMP),
 		FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
 		
 		public final String modelFile;

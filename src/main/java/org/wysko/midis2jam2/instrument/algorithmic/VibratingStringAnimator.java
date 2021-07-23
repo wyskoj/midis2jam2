@@ -18,6 +18,12 @@
 package org.wysko.midis2jam2.instrument.algorithmic;
 
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.List;
+
+import static com.jme3.scene.Spatial.CullHint.Always;
+import static com.jme3.scene.Spatial.CullHint.Dynamic;
 
 /**
  * Animates vibrating strings, as seen on the guitar, violin, etc.
@@ -25,17 +31,23 @@ import com.jme3.scene.Spatial;
 public class VibratingStringAnimator {
 	
 	/**
+	 * The number of frames that are used for animation.
+	 */
+	private static final int FRAME_COUNT = 5;
+	
+	/**
 	 * Each frame of the animation.
 	 */
-	final Spatial[] stringFrames;
+	@Unmodifiable
+	private final List<Spatial> stringFrames;
 	
 	/**
 	 * The current frame to show.
 	 */
-	double frame;
+	private double frame;
 	
 	public VibratingStringAnimator(Spatial... frames) {
-		stringFrames = frames;
+		stringFrames = List.of(frames);
 	}
 	
 	/**
@@ -48,12 +60,12 @@ public class VibratingStringAnimator {
 		final double inc = delta * 60;
 		this.frame += inc;
 		
-		for (var i = 0; i < 5; i++) {
-			frame = frame % 5;
-			if (i == Math.floor(frame)) {
-				stringFrames[i].setCullHint(Spatial.CullHint.Dynamic);
+		for (var i = 0; i < FRAME_COUNT; i++) {
+			frame = frame % FRAME_COUNT;
+			if (i == (int) Math.floor(frame)) {
+				stringFrames.get(i).setCullHint(Dynamic);
 			} else {
-				stringFrames[i].setCullHint(Spatial.CullHint.Always);
+				stringFrames.get(i).setCullHint(Always);
 			}
 		}
 	}

@@ -29,9 +29,9 @@ import org.wysko.midis2jam2.world.Axis;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
 import static org.wysko.midis2jam2.midi.Midi.HIGH_WOODBLOCK;
 import static org.wysko.midis2jam2.midi.Midi.LOW_WOODBLOCK;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The woodblock. High and low.

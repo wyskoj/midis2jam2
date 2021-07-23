@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.instrument.algorithmic;
 
 import org.w3c.dom.*;
+import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.util.Utils;
 import org.xml.sax.SAXException;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import static org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands;
+import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 /**
  * Handles fingering that uses hands.
@@ -59,8 +61,10 @@ public class HandPositionFingeringManager implements FingeringManager<Hands> {
 				/* Find instrument with matching name */
 				if (instrumentAttributes.getNamedItem("name").getTextContent().equals(className)) {
 					String mappingType = instrumentAttributes.getNamedItem("mapping-type").getTextContent();
-					if (!mappingType.equals("hands")) throw new InvalidMappingType(String.format("XML has a " +
-							"mapping type of %s.", mappingType));
+					if (!"hands".equals(mappingType)) {
+						Midis2jam2.getLOGGER().severe(() -> "XML has a mapping type of %s.".formatted(mappingType));
+						return manager;
+					}
 					
 					/* Get key mapping */
 					Node mapping = ((Element) instrument).getElementsByTagName("mapping").item(0);
@@ -77,8 +81,8 @@ public class HandPositionFingeringManager implements FingeringManager<Hands> {
 					break;
 				}
 			}
-		} catch (SAXException | IOException | ParserConfigurationException | InvalidMappingType e) {
-			e.printStackTrace();
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			Midis2jam2.getLOGGER().severe(exceptionToLines(e));
 		}
 		return manager;
 	}

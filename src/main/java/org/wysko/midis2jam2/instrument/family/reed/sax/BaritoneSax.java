@@ -21,6 +21,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
+import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.instrument.clone.Clone;
@@ -28,16 +29,23 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.rad;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * The baritone sax.
  */
 public class BaritoneSax extends Saxophone {
 	
-	public static final PressedKeysFingeringManager FINGERING_MANAGER = PressedKeysFingeringManager.from(BaritoneSax.class);
+	/**
+	 * The baritone sax fingering manager.
+	 */
+	public static final PressedKeysFingeringManager FINGERING_MANAGER =
+			PressedKeysFingeringManager.from(BaritoneSax.class);
 	
-	private final static float STRETCH_FACTOR = 0.65f;
+	/**
+	 * The amount to stretch the baritone sax.
+	 */
+	private static final float STRETCH_FACTOR = 0.65F;
 	
 	/**
 	 * Constructs a baritone sax.
@@ -45,13 +53,11 @@ public class BaritoneSax extends Saxophone {
 	 * @param context context to midis2jam2
 	 * @param events  all events that pertain to this instance of a baritone sax
 	 */
-	public BaritoneSax(Midis2jam2 context,
-	                   List<MidiChannelSpecificEvent> events)
+	public BaritoneSax(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> events)
 			throws ReflectiveOperationException {
-		
 		super(context, events, BaritoneSaxClone.class, FINGERING_MANAGER);
-		groupOfPolyphony.move(10, 48.5f, -42);
-		groupOfPolyphony.scale(1.5f);
+		groupOfPolyphony.move(10, 48.5F, -42);
+		groupOfPolyphony.scale(1.5F);
 	}
 	
 	/**
@@ -83,7 +89,9 @@ public class BaritoneSax extends Saxophone {
 			
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
-			bell.move(0, -10, 0); // Move bell down to body
+			
+			/* The bell has to be moved down to attach to the body */
+			bell.move(0, -10, 0);
 			
 			animNode.setLocalTranslation(0, 0, 20);
 			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(10), rad(30), 0));

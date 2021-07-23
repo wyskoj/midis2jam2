@@ -34,7 +34,7 @@ import java.util.List;
 public abstract class PercussionInstrument extends Instrument {
 	
 	/**
-	 * The rate at which an instrument recoils.
+	 * The unitless rate at which an instrument recoils.
 	 */
 	public static final float DRUM_RECOIL_COMEBACK = 22;
 	
@@ -76,7 +76,7 @@ public abstract class PercussionInstrument extends Instrument {
 	 */
 	@Range(from = 0, to = 1)
 	public static double velocityRecoilDampening(@Range(from = 0, to = 127) int x) {
-		return FastMath.sqrt(x) / 11.26942767f;
+		return FastMath.sqrt(x) / 11.26942767F;
 	}
 	
 	/**

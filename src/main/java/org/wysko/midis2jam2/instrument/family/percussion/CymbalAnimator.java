@@ -18,9 +18,11 @@
 package org.wysko.midis2jam2.instrument.family.percussion;
 
 import com.jme3.math.FastMath;
+import org.jetbrains.annotations.Contract;
 
 /**
- * Animates the wobble on cymbals.
+ * Animates the wobble on cymbals using <a href="https://www.desmos.com/calculator/vvbwlit9he">a sinusoidal
+ * function</a>.
  */
 public class CymbalAnimator {
 	
@@ -58,17 +60,19 @@ public class CymbalAnimator {
 	}
 	
 	/**
-	 * <a href="https://www.desmos.com/calculator/vvbwlit9he">link</a>
+	 * Calculates the current rotation angle, based on the {@link #animTime}.
 	 *
 	 * @return the amount to rotate the cymbal, due to wobble
 	 */
+	@Contract(pure = true)
 	public float rotationAmount() {
 		if (animTime >= 0) {
-			if (animTime < 4.5)
-				return (float) (amplitude * (Math.cos(animTime * wobbleSpeed * FastMath.PI) / (3 + Math.pow(animTime,
-						3) * wobbleSpeed * dampening * FastMath.PI)));
-			else
+			if (animTime < 4.5) {
+				return (float) (amplitude * (Math.cos(animTime * wobbleSpeed * FastMath.PI) /
+						(3 + Math.pow(animTime, 3) * wobbleSpeed * dampening * FastMath.PI)));
+			} else {
 				return 0;
+			}
 		}
 		return 0;
 	}
@@ -86,7 +90,8 @@ public class CymbalAnimator {
 	 * @param delta the amount of time since the last frame
 	 */
 	public void tick(float delta) {
-		if (animTime != -1)
+		if (animTime != -1) {
 			this.animTime += delta;
+		}
 	}
 }

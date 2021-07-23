@@ -27,13 +27,12 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Displays an exception and its stack trace to help debugging.
+ *
  * @author Jacob Wysko
  */
+@SuppressWarnings({"java:S1213", "FieldCanBeLocal", "java:S1450"})
 public class ExceptionDisplay extends JPanel {
-	
-	public ExceptionDisplay() {
-		initComponents();
-	}
 	
 	public ExceptionDisplay(String message, Exception e) {
 		initComponents();
@@ -42,6 +41,7 @@ public class ExceptionDisplay extends JPanel {
 		this.errorStacktrace.setText(Utils.exceptionToLines(e));
 	}
 	
+	@SuppressWarnings("all")
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		errorMessage = new JLabel();
