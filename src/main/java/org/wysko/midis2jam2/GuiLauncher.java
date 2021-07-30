@@ -64,6 +64,7 @@ public class GuiLauncher extends JFrame {
 		supportedLocales.put("English", "en");
 		supportedLocales.put("Español", "es");
 		supportedLocales.put("Français", "fr");
+		supportedLocales.put("UwU", "uwu");
 	}
 	
 	private static final File SETTINGS_FILE = new File(System.getProperty("user.home"), "midis2jam2.settings");
