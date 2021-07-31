@@ -214,7 +214,7 @@ new FormModel {
 					"hAlign": 2
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "fullscreenHelp2"
+					name: "legacyEngineHelp"
 					"icon": #SwingIcon0
 					"toolTipText": new FormMessage( null, "GuiLauncher.legacyEngineHelp" )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {

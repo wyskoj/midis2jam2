@@ -46,14 +46,14 @@ public class StageHorns extends WrappedOctaveSustained {
 	 * @param context   the context
 	 * @param eventList the event list
 	 */
-	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
+	public StageHorns(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList, StageHornsType type) {
 		super(context, eventList, false);
 		
 		twelfths = new StageHornNote[12];
 		var hornNodes = new Node[12];
 		for (var i = 0; i < 12; i++) {
 			hornNodes[i] = new Node();
-			twelfths[i] = new StageHornNote();
+			twelfths[i] = new StageHornNote(type);
 			hornNodes[i].attachChild(twelfths[i].highestLevel);
 			twelfths[i].highestLevel.setLocalTranslation(BASE_POSITION);
 			hornNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(16 + i * 1.5), 0));
@@ -78,11 +78,34 @@ public class StageHorns extends WrappedOctaveSustained {
 		
 		/**
 		 * Instantiates a new stage horn note.
+		 *
+		 * @param type the type of stage horn
 		 */
-		public StageHornNote() {
+		public StageHornNote(StageHornsType type) {
 			super();
 			// Load horn
-			animNode.attachChild(context.loadModel("StageHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+			animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, Midis2jam2.MatType.REFLECTIVE, 0.9F));
+		}
+	}
+	
+	public enum StageHornsType {
+		/**
+		 * Brass section stage horns type.
+		 */
+		BRASS_SECTION("HornSkin.bmp"),
+		/**
+		 * Synth brass 1 stage horns type.
+		 */
+		SYNTH_BRASS_1("HornSkinGrey.bmp"),
+		/**
+		 * Synth brass 2 stage horns type.
+		 */
+		SYNTH_BRASS_2("HornSkinCopper.png");
+		
+		private final String texture;
+		
+		StageHornsType(String texture) {
+			this.texture = texture;
 		}
 	}
 }

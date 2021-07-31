@@ -891,28 +891,51 @@ public class GuiLauncher extends JFrame {
 	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
 	
 	private JLabel midiDeviceHelp;
+	
 	private JLabel soundFontLabel;
+	
 	private JComboBox<String> soundFontPathDropDown;
+	
 	private JResizedIconButton editSoundFontsButton;
+	
 	private JLabel soundFontHelp;
+	
 	private JPanel settingsPanel;
+	
 	private JPanel hSpacer1;
+	
 	private JLabel latencyFixLabel;
+	
 	private JSpinner latencySpinner;
+	
 	private JPanel hSpacer2;
+	
 	private JLabel latencyHelp;
+	
 	private JLabel displayLabel;
+	
 	private JCheckBox fullscreenCheckbox;
+	
 	private JLabel fullscreenHelp;
+	
 	private JCheckBox legacyEngineCheckbox;
+	
 	private JLabel fullscreenHelp2;
+	
 	private JLabel transitionSpeedLabel;
+	
 	private JPanel transitionSpeedPanel;
+	
 	private JRadioButton transitionSpeedNoneButton;
+	
 	private JRadioButton transitionSpeedSlowButton;
+	
 	private JRadioButton transitionSpeedNormalButton;
+	
 	private JRadioButton transitionSpeedFastButton;
+	
 	private JLabel transitionSpeedHelp;
+	
 	private JResizedIconButton startButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -803,9 +803,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* French Horn */
 			case 60 -> new FrenchHorn(this, events);
 			/* Brass Section */
+			case 61 -> new StageHorns(this, events, StageHorns.StageHornsType.BRASS_SECTION);
 			/* Synth Brass 1 */
+			case 62 -> new StageHorns(this, events, StageHorns.StageHornsType.SYNTH_BRASS_1);
 			/* Synth Brass 2 */
-			case 61, 62, 63 -> new StageHorns(this, events);
+			case 63 -> new StageHorns(this, events, StageHorns.StageHornsType.SYNTH_BRASS_2);
 			/* Soprano Sax */
 			case 64 -> new SopranoSax(this, events);
 			/* Alto Sax */
