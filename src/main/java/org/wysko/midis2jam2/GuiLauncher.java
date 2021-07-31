@@ -62,8 +62,8 @@ public class GuiLauncher extends JFrame {
 	
 	static {
 		supportedLocales.put("English", "en");
-		supportedLocales.put("Español", "es");
-		supportedLocales.put("Français", "fr");
+		supportedLocales.put("Espa\u00F1ol", "es");
+		supportedLocales.put("Fran\u00E7ais", "fr");
 		supportedLocales.put("UwU", "uwu");
 	}
 	
