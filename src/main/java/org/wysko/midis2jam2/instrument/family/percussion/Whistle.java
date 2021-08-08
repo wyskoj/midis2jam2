@@ -28,13 +28,13 @@ import org.wysko.midis2jam2.particle.SteamPuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.LONG;
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.SHORT;
 import static org.wysko.midis2jam2.midi.Midi.SHORT_WHISTLE;
 import static org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.UPWARDS;
 import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.NORMAL;
 import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE;
+import static org.wysko.midis2jam2.util.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**

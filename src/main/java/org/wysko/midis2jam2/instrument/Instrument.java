@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 import static com.jme3.scene.Spatial.CullHint.Always;
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static org.wysko.midis2jam2.M2J2Settings.InstrumentTransition.NONE;
 import static org.wysko.midis2jam2.midi.MidiNoteEvent.MIDI_MAX_NOTE;
+import static org.wysko.midis2jam2.util.M2J2Settings.InstrumentTransition.NONE;
 
 /**
  * An <i>Instrument</i> is any visual representation of a MIDI instrument. midis2jam2 displays separate instruments for

@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class RideCymbal extends Cymbal {
 			throw new IllegalArgumentException("Ride cymbal type is wrong.");
 		}
 		
-		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
+		final Spatial cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f);
 		cymbalNode.attachChild(cymbal);
 		cymbalNode.setLocalScale(type.getSize());
 		highLevelNode.setLocalTranslation(type.getLocation());

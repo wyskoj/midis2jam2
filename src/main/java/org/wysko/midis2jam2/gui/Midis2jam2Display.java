@@ -21,8 +21,8 @@
 
 package org.wysko.midis2jam2.gui;
 
-import org.wysko.midis2jam2.Liaison;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.starter.Liaison;
 
 import javax.swing.*;
 import java.awt.*;

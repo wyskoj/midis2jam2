@@ -21,6 +21,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class AcousticBass extends StringFamilyInstrument {
 				20,
 				new Vector3f(0.75F, 0.75F, 0.75F),
 				new int[]{28, 33, 38, 43},
-				context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", Midis2jam2.MatType.UNSHADED, 0)
+				context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", MatType.UNSHADED, 0)
 		);
 		
 		instrumentNode.setLocalScale(2.5F);

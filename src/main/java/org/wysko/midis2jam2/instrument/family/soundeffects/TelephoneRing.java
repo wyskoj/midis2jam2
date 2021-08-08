@@ -24,6 +24,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.*;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,9 +120,9 @@ public class TelephoneRing extends SustainedInstrument {
 				val = "Pound";
 			}
 			upKeys[i] = context.loadModel("TelePhoneKey.obj", "TelePhoneKey" + val + "Dark.bmp",
-					Midis2jam2.MatType.UNSHADED, 0.9f);
+					MatType.UNSHADED, 0.9f);
 			downKeys[i] = context.loadModel("TelePhoneKey.obj", "TelePhoneKey" + val + ".bmp",
-					Midis2jam2.MatType.UNSHADED,
+					MatType.UNSHADED,
 					0.9f);
 			
 			

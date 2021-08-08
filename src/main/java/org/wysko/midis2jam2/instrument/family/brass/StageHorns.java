@@ -22,6 +22,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class StageHorns extends WrappedOctaveSustained {
 		public StageHornNote(StageHornsType type) {
 			super();
 			// Load horn
-			animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, Midis2jam2.MatType.REFLECTIVE, 0.9F));
+			animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, MatType.REFLECTIVE, 0.9F));
 		}
 	}
 	

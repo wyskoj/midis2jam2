@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import java.util.List;
 
 import static com.jme3.math.FastMath.HALF_PI;
-import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
+import static org.wysko.midis2jam2.util.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**

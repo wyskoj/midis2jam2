@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.Arrays;
@@ -75,8 +76,8 @@ public class FrenchHorn extends MonophonicInstrument {
 			super(FrenchHorn.this, 0.1F, 0.9F, 4, Axis.Y, Axis.X);
 			
 			/* Load models */
-			body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
-			bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+			body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F);
+			bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F));
 			
 			/* Attach models */
 			modelNode.attachChild(body);
@@ -92,7 +93,7 @@ public class FrenchHorn extends MonophonicInstrument {
 			/* Load keys */
 			for (var i = 0; i < 4; i++) {
 				String id = i == 0 ? "Trigger" : "Key" + (i);
-				keys[i] = context.loadModel("FrenchHorn" + id + ".obj", "HornSkinGrey.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+				keys[i] = context.loadModel("FrenchHorn" + id + ".obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9F);
 				modelNode.attachChild(keys[i]);
 			}
 			

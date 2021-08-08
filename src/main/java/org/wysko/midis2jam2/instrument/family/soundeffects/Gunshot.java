@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.world.ShadowController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +115,7 @@ public class Gunshot extends DecayedInstrument {
 		 */
 		public Pistol() {
 			Spatial pistol = context.loadModel("Pistol.obj", "PistolSkin.png");
-			blast = context.shadow("Assets/PistolBlast.fbx", "Assets/Explosion.png");
+			blast = ShadowController.shadow(context, "Assets/PistolBlast.fbx", "Assets/Explosion.png");
 			blast.setLocalScale(0);
 			blast.setLocalTranslation(0, 3, 5.5f);
 			var modelNode = new Node();

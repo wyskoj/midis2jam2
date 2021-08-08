@@ -26,6 +26,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.NotePeriod;
+import org.wysko.midis2jam2.world.ShadowController;
 
 import java.util.List;
 import java.util.Random;
@@ -100,11 +101,12 @@ public class Helicopter extends SustainedInstrument {
 		
 		/* Load helicopter */
 		Spatial copter = context.loadModel("HelicopterBody.fbx", "Helicopter.png");
-		rotor.attachChild(context.shadow("Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterRotor.png"));
+		rotor.attachChild(ShadowController.shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterRotor" +
+				".png"));
 		
 		/* Load lights */
 		for (var i = 1; i <= 12; i++) {
-			var light = context.shadow("Assets/HelicopterRotorPlane.fbx",
+			var light = ShadowController.shadow(context, "Assets/HelicopterRotorPlane.fbx",
 					"Assets/HelicopterLights%d.png".formatted(i));
 			this.lights[i - 1] = light;
 			rotor.attachChild(light);
@@ -159,7 +161,7 @@ public class Helicopter extends SustainedInstrument {
 			force += delta;
 			force = Math.min(force, 1);
 		} else {
-			/* Otherwise decrease force but cup at 0. */
+			/* Otherwise, decrease force but cup at 0. */
 			force -= delta;
 			force = Math.max(force, 0);
 		}

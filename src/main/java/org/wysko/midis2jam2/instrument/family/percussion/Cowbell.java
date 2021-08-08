@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercu
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public class Cowbell extends NonDrumSetPercussion {
 		super(context, hits);
 		
 		/* Load cowbell */
-		recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+		recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", MatType.REFLECTIVE, 0.9F));
 		
 		/* Load and position stick */
 		Spatial stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");

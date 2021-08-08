@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstr
 import org.wysko.midis2jam2.instrument.family.percussive.Stick;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.ArrayList;
@@ -150,10 +151,10 @@ public class TubularBells extends DecayedInstrument {
 		
 		public Bell(int i) {
 			bellNode.attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp",
-					Midis2jam2.MatType.REFLECTIVE, 0.9F));
+					MatType.REFLECTIVE, 0.9F));
 			
 			bellNode.attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp",
-					Midis2jam2.MatType.REFLECTIVE, 0.5F));
+					MatType.REFLECTIVE, 0.5F));
 			
 			highestLevel.attachChild(bellNode);
 			bellNode.setLocalTranslation((i - 5) * 4f, 0, 0);

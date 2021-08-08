@@ -15,14 +15,17 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2;
+package org.wysko.midis2jam2.gui;
 
 import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.gui.*;
+import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiFile;
+import org.wysko.midis2jam2.starter.LegacyLiaison;
+import org.wysko.midis2jam2.starter.Liaison;
+import org.wysko.midis2jam2.util.M2J2Settings;
 import org.wysko.midis2jam2.util.Utils;
 
 import javax.sound.midi.*;

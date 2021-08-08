@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.Arrays;
@@ -86,15 +87,15 @@ public class Trumpet extends MonophonicInstrument {
 		public TrumpetClone() {
 			super(Trumpet.this, 0.15F, 0.9F, 3, Axis.Z, Axis.X);
 			
-			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+			body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F);
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
-			this.bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+			this.bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F));
 			this.bell.setLocalTranslation(0, 0, 5.58F);
 			
 			for (var i = 0; i < 3; i++) {
 				keys[i] = context.loadModel("TrumpetKey" + (i + 1) + ".obj", "HornSkinGrey.bmp",
-						Midis2jam2.MatType.REFLECTIVE, 0.9F);
+						MatType.REFLECTIVE, 0.9F);
 				modelNode.attachChild(keys[i]);
 			}
 			

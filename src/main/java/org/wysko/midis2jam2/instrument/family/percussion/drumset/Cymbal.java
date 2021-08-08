@@ -24,6 +24,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -59,9 +60,9 @@ public class Cymbal extends SingleStickInstrument {
 		final Spatial cymbal;
 		
 		if (this.type == CymbalType.CHINA)
-			cymbal = context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7F);
+			cymbal = context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7F);
 		else
-			cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7F);
+			cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7F);
 		
 		cymbalNode.attachChild(cymbal);
 		cymbalNode.setLocalScale(type.size);

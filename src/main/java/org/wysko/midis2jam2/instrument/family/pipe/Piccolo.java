@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.particle.SteamPuffer;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -67,7 +68,7 @@ public class Piccolo extends HandedInstrument {
 			super(Piccolo.this, SteamPuffer.SteamPuffType.NORMAL, 1f);
 			
 			Spatial horn = Piccolo.this.context.loadModel("Piccolo.obj", "CymbalSkinSphereMap.bmp",
-					Midis2jam2.MatType.REFLECTIVE, 0.9f);
+					MatType.REFLECTIVE, 0.9f);
 			
 			loadHands();
 			

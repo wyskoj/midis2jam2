@@ -18,6 +18,8 @@
 package org.wysko.midis2jam2.util;
 
 import com.jme3.math.FastMath;
+import com.jme3.scene.Spatial.CullHint;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
@@ -38,9 +40,30 @@ import static java.util.Objects.requireNonNull;
 /**
  * Provides various utility functions.
  */
-public class Utils {
+public final class Utils {
 	
 	private Utils() {
+	}
+	
+	/**
+	 * Returns an appropriate {@link CullHint} for the passed boolean. Essentially, it returns the correct {@link
+	 * CullHint} assuming {@code true} means the object should be visible, otherwise it should not be visible.
+	 * <p>
+	 * When {@code true} is passed, returns {@link CullHint#Dynamic}. Otherwise, returns {@link CullHint#Always}. Useful
+	 * for avoiding writing {@code b ? Dynamic : Always}.
+	 *
+	 * @param b true if an object should be visible, false otherwise
+	 * @return {@link CullHint#Dynamic} or {@link CullHint#Always}
+	 */
+	@SuppressWarnings("java:S2301")
+	@Contract(pure = true)
+	@NotNull
+	public static CullHint cullHint(boolean b) {
+		if (b) {
+			return CullHint.Dynamic;
+		} else {
+			return CullHint.Always;
+		}
 	}
 	
 	/**
@@ -56,7 +79,7 @@ public class Utils {
 	 * @param e the exception
 	 * @return a formatted string containing the exception and a stack trace
 	 */
-	public static String exceptionToLines(Exception e) {
+	public static String exceptionToLines(Throwable e) {
 		var sb = new StringBuilder();
 		sb.append(e.getClass().getSimpleName()).append(": ").append(e.getMessage()).append("\n");
 		for (StackTraceElement element : e.getStackTrace()) {
@@ -72,6 +95,7 @@ public class Utils {
 	 * @return a string containing the response
 	 * @throws IOException if there was an error fetching data
 	 */
+	@SuppressWarnings("java:S1943")
 	public static String getHTML(String url) throws IOException {
 		var result = new StringBuilder();
 		var conn = (HttpURLConnection) new URL(url).openConnection();
@@ -94,7 +118,9 @@ public class Utils {
 	 * @throws ParserConfigurationException if there was an error instantiating the document parser
 	 * @throws IOException                  if there was an IO error
 	 */
-	public static Document instantiateXmlParser(String resourceName) throws SAXException, ParserConfigurationException, IOException {
+	@SuppressWarnings("java:S1160")
+	public static Document instantiateXmlParser(String resourceName)
+			throws SAXException, ParserConfigurationException, IOException {
 		final var df = DocumentBuilderFactory.newInstance();
 		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
@@ -122,14 +148,16 @@ public class Utils {
 	}
 	
 	/**
-	 * Given a string containing the path to a resource file, retrives the contents of the file and returns it as a
+	 * Given a string containing the path to a resource file, retrieves the contents of the file and returns it as a
 	 * string.
 	 *
 	 * @param file the file to read
 	 * @return the contents
 	 */
 	@NotNull
+	@SuppressWarnings("java:S1943")
 	public static String resourceToString(String file) {
-		return new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream(file)))).lines().collect(Collectors.joining("\n"));
+		return new BufferedReader(new InputStreamReader(requireNonNull(Utils.class.getResourceAsStream(file))))
+				.lines().collect(Collectors.joining("\n"));
 	}
 }

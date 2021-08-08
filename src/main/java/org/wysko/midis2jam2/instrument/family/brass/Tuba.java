@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument;
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.Arrays;
@@ -73,8 +74,8 @@ public class Tuba extends MonophonicInstrument {
 		public TubaClone() {
 			super(Tuba.this, -0.05F, 0.8F, 4, Axis.Y, Axis.Z);
 			
-			body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
-			bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F));
+			body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F);
+			bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F));
 			modelNode.attachChild(body);
 			modelNode.attachChild(bell);
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
@@ -82,7 +83,7 @@ public class Tuba extends MonophonicInstrument {
 			/* Load tuba keys */
 			for (var i = 0; i < 4; i++) {
 				keys[i] = context.loadModel("TubaKey" + (i + 1) + ".obj", "HornSkinGrey.bmp",
-						Midis2jam2.MatType.REFLECTIVE, 0.9F);
+						MatType.REFLECTIVE, 0.9F);
 				modelNode.attachChild(keys[i]);
 			}
 			

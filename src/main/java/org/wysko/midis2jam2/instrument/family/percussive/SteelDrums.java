@@ -23,6 +23,7 @@ import com.jme3.scene.Spatial;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class SteelDrums extends OneDrumOctave {
 	public SteelDrums(@NotNull Midis2jam2 context,
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
-		Spatial drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9f);
+		Spatial drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f);
 		
 		var adjustments = new Node[12];
 		

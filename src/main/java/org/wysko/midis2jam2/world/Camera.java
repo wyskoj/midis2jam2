@@ -46,4 +46,19 @@ public enum Camera {
 		location = new Vector3f(locX, locY, locZ);
 		rotation = new Quaternion().fromAngles(rotX, rotY, rotZ);
 	}
+	
+	/**
+	 * Checks the camera's position and ensures it stays within a certain bounding box.
+	 *
+	 * @param camera the camera
+	 */
+	@SuppressWarnings("java:S1774")
+	public static void preventCameraFromLeaving(com.jme3.renderer.Camera camera) {
+		var location = camera.getLocation();
+		camera.setLocation(new Vector3f(
+				location.x > 0 ? Math.min(location.x, 400) : Math.max(location.x, -400),
+				location.y > 0 ? Math.min(location.y, 432) : Math.max(location.y, -432),
+				location.z > 0 ? Math.min(location.z, 400) : Math.max(location.z, -400)
+		));
+	}
 }

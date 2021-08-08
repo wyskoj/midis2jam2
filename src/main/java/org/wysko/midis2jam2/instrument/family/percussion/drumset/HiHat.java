@@ -24,6 +24,7 @@ import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,8 +79,8 @@ public class HiHat extends SingleStickInstrument {
 	public HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		hitsToStrike = hits.stream().filter(h -> h.note == OPEN_HI_HAT || h.note == CLOSED_HI_HAT).collect(Collectors.toList());
-		Spatial topCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
-		Spatial bottomCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", Midis2jam2.MatType.REFLECTIVE, 0.7f);
+		Spatial topCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f);
+		Spatial bottomCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f);
 		bottomCymbalModel.setLocalRotation(new Quaternion().fromAngles(rad(180), 0, 0));
 		
 		topCymbal.setLocalTranslation(0, 1.2f, 0);

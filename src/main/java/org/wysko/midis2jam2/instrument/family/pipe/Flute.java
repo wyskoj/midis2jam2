@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.particle.SteamPuffer;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class Flute extends HandedInstrument {
 			Spatial horn = Flute.this.context.loadModel(
 					"Flute.obj",
 					"ShinySilver.bmp",
-					Midis2jam2.MatType.REFLECTIVE,
+					MatType.REFLECTIVE,
 					0.9F
 			);
 			

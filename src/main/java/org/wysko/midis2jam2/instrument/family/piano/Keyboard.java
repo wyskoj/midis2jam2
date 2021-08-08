@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -140,14 +141,35 @@ public class Keyboard extends KeyedInstrument {
 		/**
 		 * Celesta keyboard skin.
 		 */
-		CELESTA("CelestaSkin.png");
+		CELESTA("CelestaSkin.png"),
+		
+		/**
+		 * Square wave keyboard skin.
+		 */
+		SQUARE_WAVE("SquareSynthSkin.png"),
+		
+		/**
+		 * Saw wave keyboard skin.
+		 */
+		SAW_WAVE("SawtoothWaveSynthSkin.png"),
+		
+		/**
+		 * Charang keyboard skin.
+		 */
+		CHARANG("CharangSynthSkin.png"),
+		
+		/**
+		 * Choir keyboard skin.
+		 */
+		CHOIR("ChoirSynthSkin.png"),
+		;
 		
 		/**
 		 * The texture file.
 		 */
 		@NonNls
 		@NotNull
-		final String textureFile;
+		private final String textureFile;
 		
 		KeyboardSkin(@NonNls @NotNull String textureFile) {
 			this.textureFile = textureFile;
@@ -190,7 +212,7 @@ public class Keyboard extends KeyedInstrument {
 				upNode.attachChild(blackKey);
 				/* Up key */
 				Spatial blackKeyDown = Keyboard.this.context.loadModel("PianoKeyBlackDown.obj", skin.textureFile,
-						Midis2jam2.MatType.UNSHADED, 0.9f);
+						MatType.UNSHADED, 0.9f);
 				downNode.attachChild(blackKeyDown);
 				
 				keyNode.attachChild(upNode);

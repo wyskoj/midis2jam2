@@ -22,6 +22,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class BassGuitar extends FrettedInstrument {
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 5; j++) {
 				lowerStrings[i][j] = context.loadModel("BassStringBottom" + j + ".obj", BASS_SKIN_BMP,
-						Midis2jam2.MatType.UNSHADED, 0.9F);
+						MatType.UNSHADED, 0.9F);
 				instrumentNode.attachChild(lowerStrings[i][j]);
 			}
 		}

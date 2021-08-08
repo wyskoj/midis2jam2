@@ -15,13 +15,16 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2;
+package org.wysko.midis2jam2.starter;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
+import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.gui.Displays;
+import org.wysko.midis2jam2.gui.GuiLauncher;
 import org.wysko.midis2jam2.midi.MidiFile;
+import org.wysko.midis2jam2.util.M2J2Settings;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.*;

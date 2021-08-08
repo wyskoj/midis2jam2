@@ -15,7 +15,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2;
+package org.wysko.midis2jam2.util;
 
 public class M2J2Settings {
 	
@@ -23,7 +23,7 @@ public class M2J2Settings {
 	
 	private final InstrumentTransition transitionSpeed;
 	
-	M2J2Settings(int latencyFix, InstrumentTransition transitionSpeed) {
+	public M2J2Settings(int latencyFix, InstrumentTransition transitionSpeed) {
 		this.latencyFix = latencyFix;
 		this.transitionSpeed = transitionSpeed;
 	}

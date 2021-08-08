@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.PI;
-import static org.wysko.midis2jam2.Midis2jam2.MatType.REFLECTIVE;
+import static org.wysko.midis2jam2.util.MatType.REFLECTIVE;
 
 /**
  * The music box has several animation components. The first is the spindle/cylinder. The spindle spins at a rate of 1/4

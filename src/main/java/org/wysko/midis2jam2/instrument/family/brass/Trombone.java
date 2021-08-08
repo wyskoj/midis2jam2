@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager;
 import org.wysko.midis2jam2.instrument.clone.Clone;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.NotePeriod;
+import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.world.Axis;
 
 import java.util.List;
@@ -77,14 +78,14 @@ public class Trombone extends MonophonicInstrument {
 			super(Trombone.this, 0.1F, Axis.X);
 			
 			/* Load and attach trombone */
-			Spatial body = context.loadModel("Trombone.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+			Spatial body = context.loadModel("Trombone.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F);
 			modelNode.attachChild(body);
 			
 			/* Set horn skin grey material */
 			((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 			
 			/* Load and attach slide */
-			slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+			slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F);
 			modelNode.attachChild(slide);
 			modelNode.setLocalRotation(new Quaternion().fromAngles(rad(-10), 0, 0));
 			highestLevel.setLocalTranslation(0, 65, -200);

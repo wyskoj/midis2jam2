@@ -26,6 +26,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator;
 import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -99,12 +100,12 @@ public class StageStrings extends WrappedOctaveSustained {
 		public StageStringNote() {
 			// Load holder
 			animNode.attachChild(context.loadModel("StageStringHolder.obj", "FakeWood.bmp",
-					Midis2jam2.MatType.UNSHADED, 0));
+					MatType.UNSHADED, 0));
 			
 			// Load anim strings
 			for (var i = 0; i < 5; i++) {
 				animStrings[i] = context.loadModel("StageStringBottom" + i + ".obj", "StageStringPlaying.bmp",
-						Midis2jam2.MatType.UNSHADED, 0);
+						MatType.UNSHADED, 0);
 				animStrings[i].setCullHint(Spatial.CullHint.Always);
 				animStringNode.attachChild(animStrings[i]);
 			}

@@ -15,25 +15,24 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.world;
+package org.wysko.midis2jam2.util;
 
 /**
- * Each axis in 3D space.
+ * A material type.
  */
-public enum Axis {
+public enum MatType {
+	/**
+	 * An unshaded material.
+	 */
+	UNSHADED,
 	
 	/**
-	 * The X-axis.
+	 * A shaded material.
 	 */
-	X,
+	SHADED,
 	
 	/**
-	 * The Y-axis.
+	 * A reflective material.
 	 */
-	Y,
-	
-	/**
-	 * The Z-axis
-	 */
-	Z
+	REFLECTIVE
 }

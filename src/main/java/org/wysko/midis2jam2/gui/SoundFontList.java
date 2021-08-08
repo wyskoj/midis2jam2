@@ -21,8 +21,6 @@
 
 package org.wysko.midis2jam2.gui;
 
-import org.wysko.midis2jam2.GuiLauncher;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;

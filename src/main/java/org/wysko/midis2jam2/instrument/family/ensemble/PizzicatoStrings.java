@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator;
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +124,7 @@ public class PizzicatoStrings extends DecayedInstrument {
 			restingString = context.loadModel("StageString.obj", "StageString.bmp");
 			for (var k = 0; k < 5; k++) {
 				animStrings[k] = context.loadModel("StageStringBottom" + k + ".obj", "StageStringPlaying.bmp",
-						Midis2jam2.MatType.UNSHADED, 0);
+						MatType.UNSHADED, 0);
 				animStrings[k].setCullHint(Spatial.CullHint.Always);
 				animStringNode.attachChild(animStrings[k]);
 			}

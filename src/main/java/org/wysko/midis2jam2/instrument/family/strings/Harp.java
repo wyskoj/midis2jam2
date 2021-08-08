@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.midi.MidiNoteEvent;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -205,7 +206,7 @@ public class Harp extends SustainedInstrument {
 			
 			/* Load vibrating strings */
 			for (var v = 0; v < 5; v++) {
-				vibratingStrings[v] = context.loadModel("HarpStringPlaying" + v + ".obj", vt, Midis2jam2.MatType.UNSHADED, 0);
+				vibratingStrings[v] = context.loadModel("HarpStringPlaying" + v + ".obj", vt, MatType.UNSHADED, 0);
 				vibratingStrings[v].setCullHint(Spatial.CullHint.Always);
 				stringNode.attachChild(vibratingStrings[v]);
 			}

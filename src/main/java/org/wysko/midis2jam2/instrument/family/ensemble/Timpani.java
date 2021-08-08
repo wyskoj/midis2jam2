@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
+import org.wysko.midis2jam2.util.MatType;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class Timpani extends OneDrumOctave {
 	               @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
 		
-		Spatial body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", Midis2jam2.MatType.REFLECTIVE, 0.9F);
+		Spatial body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9F);
 		Spatial head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp");
 		((Node) body).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"));
 		
