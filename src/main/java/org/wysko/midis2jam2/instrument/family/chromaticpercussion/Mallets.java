@@ -36,6 +36,7 @@ import java.util.List;
 import static org.wysko.midis2jam2.instrument.family.piano.Keyboard.midiValueToColor;
 import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHITE;
 import static org.wysko.midis2jam2.util.Utils.rad;
+import static org.wysko.midis2jam2.world.ShadowController.shadow;
 
 /**
  * Any one of vibraphone, glockenspiel, marimba, or xylophone.
@@ -113,6 +114,11 @@ public class Mallets extends DecayedInstrument {
 		
 		highestLevel.setLocalTranslation(18, 0, -5);
 		
+		/* Add shadow */
+		Spatial shadow = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
+		shadow.setLocalScale(2 / 3f);
+		instrumentNode.attachChild(shadow);
+		shadow.setLocalTranslation(0, -22, 0);
 	}
 	
 	@Override
