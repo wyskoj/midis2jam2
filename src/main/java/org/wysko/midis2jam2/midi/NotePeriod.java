@@ -48,7 +48,7 @@ public class NotePeriod {
 	 */
 	public final MidiNoteOffEvent noteOff;
 	
-	public boolean animationStarted = false;
+	private boolean animationStarted;
 	
 	/**
 	 * Instantiates a new Note period.
@@ -112,5 +112,13 @@ public class NotePeriod {
 				", startTime=" + startTime +
 				", endTime=" + endTime +
 				'}';
+	}
+	
+	public boolean hasAnimationStarted() {
+		return animationStarted;
+	}
+	
+	public void setAnimationStarted(boolean animationStarted) {
+		this.animationStarted = animationStarted;
 	}
 }

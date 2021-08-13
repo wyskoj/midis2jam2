@@ -9,9 +9,10 @@ new FormModel {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
 			"title": new FormMessage( null, "About.this.title" )
+			"resizable": false
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 				"$columnSpecs": "center:683:1.0"
-				"$rowSpecs": "0, 0, 0, 0, 0, 0, 0"
+				"$rowSpecs": "0, 0, 0, 0, 0, 0, 0, 0"
 				"$hGap": 5
 				"$vGap": 5
 				"$alignTop": true
@@ -60,6 +61,12 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 5
 				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "otherContribs"
+					"text": "<html><small>Other contributors: jlachniet • nikitalita • Mr. Tremolo Measure</small></html>"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 6
+				} )
 				add( new FormComponent( "javax.swing.JEditorPane" ) {
 					name: "licenseInfo"
 					"background": #SwingColor0
@@ -68,7 +75,7 @@ new FormModel {
 					"editable": false
 					"opaque": false
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-					"gridy": 6
+					"gridy": 7
 					"insets": new java.awt.Insets( 0, 0, 15, 0 )
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {

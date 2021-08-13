@@ -64,13 +64,13 @@ public class SteamPuffer implements ParticleGenerator {
 	public void tick(float delta, boolean active) {
 		if (active) {
 			// Spawn clouds
-			double numberOfCloudsToSpawn = (delta / (1f / 60f));
+			double numberOfCloudsToSpawn = (delta / (1F / 60F));
 			numberOfCloudsToSpawn = Math.max(numberOfCloudsToSpawn, 1);
 			for (var i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
 				Cloud cloud;
-				if (!cloudPool.isEmpty())
+				if (!cloudPool.isEmpty()) {
 					cloud = cloudPool.remove(0);
-				else {
+				} else {
 					cloud = new Cloud();
 				}
 				clouds.add(cloud);
@@ -115,17 +115,17 @@ public class SteamPuffer implements ParticleGenerator {
 	
 	class Cloud implements Particle {
 		
-		final Node cloudNode = new Node();
+		private final Node cloudNode = new Node();
 		
 		private final Spatial cube;
 		
-		float randY;
+		private float randY;
 		
-		float randZ;
+		private float randZ;
 		
-		double life = 0;
+		private double life;
 		
-		boolean currentlyUsing = false;
+		private boolean currentlyUsing;
 		
 		public Cloud() {
 			cube = SteamPuffer.this.context.loadModel("SteamCloud.obj", type.filename);
@@ -135,8 +135,8 @@ public class SteamPuffer implements ParticleGenerator {
 		
 		private void randomInit() {
 			
-			randY = (RANDOM.nextFloat() - 0.5F) * 1.5f;
-			randZ = (RANDOM.nextFloat() - 0.5F) * 1.5f;
+			randY = (RANDOM.nextFloat() - 0.5F) * 1.5F;
+			randZ = (RANDOM.nextFloat() - 0.5F) * 1.5F;
 			cube.setLocalRotation(new Quaternion().fromAngles(new float[]{
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 					RANDOM.nextFloat() * FastMath.TWO_PI,

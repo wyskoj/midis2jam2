@@ -65,15 +65,15 @@ public class Piccolo extends HandedInstrument {
 		 * Instantiates a new Piccolo clone.
 		 */
 		public PiccoloClone() {
-			super(Piccolo.this, SteamPuffer.SteamPuffType.NORMAL, 1f);
+			super(Piccolo.this, SteamPuffer.SteamPuffType.NORMAL, 1);
 			
 			Spatial horn = Piccolo.this.context.loadModel("Piccolo.obj", "CymbalSkinSphereMap.bmp",
-					MatType.REFLECTIVE, 0.9f);
+					MatType.REFLECTIVE, 0.9F);
 			
 			loadHands();
 			
 			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[]{0, 0, rad(-90)}));
-			puffer.steamPuffNode.setLocalTranslation(0, -8.6f, 0);
+			puffer.steamPuffNode.setLocalTranslation(0, -8.6F, 0);
 			
 			highestLevel.attachChild(horn);
 		}

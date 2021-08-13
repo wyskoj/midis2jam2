@@ -38,8 +38,14 @@ import static org.wysko.midis2jam2.util.Utils.rad;
  */
 public class Timbales extends NonDrumSetPercussion {
 	
+	/**
+	 * List of hits for the low timbale.
+	 */
 	private final List<MidiNoteOnEvent> lowTimbaleHits;
 	
+	/**
+	 * List of hits for the high timbale.
+	 */
 	private final List<MidiNoteOnEvent> highTimbaleHits;
 	
 	/**
@@ -63,16 +69,6 @@ public class Timbales extends NonDrumSetPercussion {
 	private final Node highTimbaleAnimNode = new Node();
 	
 	/**
-	 * The low timbale.
-	 */
-	final Spatial lowTimbale;
-	
-	/**
-	 * The high timbale.
-	 */
-	final Spatial highTimbale;
-	
-	/**
 	 * Instantiates timbales.
 	 *
 	 * @param context the context
@@ -82,13 +78,16 @@ public class Timbales extends NonDrumSetPercussion {
 	                List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
+		/* Separate hits */
 		lowTimbaleHits = hits.stream().filter(h -> h.note == LOW_TIMBALE).collect(Collectors.toList());
 		highTimbaleHits = hits.stream().filter(h -> h.note == HIGH_TIMBALE).collect(Collectors.toList());
 		
-		lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
-		highTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
-		highTimbale.setLocalScale(0.75f);
+		/* Load timbales */
+		Spatial lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
+		Spatial highTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
+		highTimbale.setLocalScale(0.75F);
 		
+		/* Attach to nodes */
 		lowTimbaleAnimNode.attachChild(lowTimbale);
 		highTimbaleAnimNode.attachChild(highTimbale);
 		
@@ -100,16 +99,18 @@ public class Timbales extends NonDrumSetPercussion {
 		instrumentNode.attachChild(lowTimbaleNode);
 		instrumentNode.attachChild(highTimbaleNode);
 		
+		/* Load sticks */
 		lowStickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"));
 		highStickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"));
 		
+		/* Attach & position sticks */
 		lowTimbaleAnimNode.attachChild(lowStickNode);
 		highTimbaleAnimNode.attachChild(highStickNode);
 		
-		lowTimbaleNode.setLocalTranslation(-45.9f, 50.2f, -59.1f);
+		lowTimbaleNode.setLocalTranslation(-45.9F, 50.2F, -59.1F);
 		lowTimbaleNode.setLocalRotation(new Quaternion().fromAngles(rad(32), rad(56.6), rad(-2.6)));
 		
-		highTimbaleNode.setLocalTranslation(-39, 50.1f, -69.7f);
+		highTimbaleNode.setLocalTranslation(-39, 50.1F, -69.7F);
 		highTimbaleNode.setLocalRotation(new Quaternion().fromAngles(rad(33.8), rad(59.4), rad(-1.8)));
 		
 		lowStickNode.setLocalTranslation(0, 0, 10);

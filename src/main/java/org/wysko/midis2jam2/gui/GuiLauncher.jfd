@@ -16,7 +16,7 @@ new FormModel {
 		} ) {
 			name: "this"
 			"title": new FormMessage( null, "GuiLauncher.this.title" )
-			"iconImage": new com.jformdesigner.model.SwingIcon( 0, "/ico/icon16.png" )
+			"iconImage": new com.jformdesigner.model.SwingIcon( 0, "/ico/icon48.png" )
 			"resizable": false
 			"minimumSize": new java.awt.Dimension( 605, 575 )
 			add( new FormComponent( "javax.swing.JLabel" ) {

@@ -27,17 +27,17 @@ public class MidiControlEvent extends MidiEvent {
 	/**
 	 * The number of the controller.
 	 */
-	final int controlNum;
+	public final int controlNum;
 	
 	/**
 	 * The value.
 	 */
-	final int value;
+	public final int value;
 	
 	/**
 	 * The channel.
 	 */
-	final int channel;
+	public final int channel;
 	
 	/**
 	 * Instantiates a new MIDI control event.
@@ -53,7 +53,6 @@ public class MidiControlEvent extends MidiEvent {
 		this.controlNum = controlNum;
 		this.value = value;
 	}
-	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

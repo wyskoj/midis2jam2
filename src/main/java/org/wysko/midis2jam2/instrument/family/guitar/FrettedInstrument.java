@@ -243,7 +243,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		}
 		
 		for (NotePeriod notePeriod : currentNotePeriods) {
-			if (notePeriod.animationStarted) {
+			if (notePeriod.hasAnimationStarted()) {
 				continue;
 			}
 			NotePeriodWithFretboardPosition notePeriod1 = (NotePeriodWithFretboardPosition) notePeriod;
@@ -253,7 +253,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 				frettingEngine.applyFretboardPosition(guitarPosition);
 				notePeriod1.setPosition(guitarPosition);
 			}
-			notePeriod1.animationStarted = true;
+			notePeriod1.setAnimationStarted(true);
 		}
 		
 		/* Animate strings */

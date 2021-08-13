@@ -45,7 +45,7 @@ public class FluteAndPiccoloClone extends PuffingClone {
 	/**
 	 * Loads the left and right hands for flute and piccolo.
 	 */
-	protected void loadHands() {
+	protected final void loadHands() {
 		leftHands = new Spatial[13];
 		for (var i = 0; i < 13; i++) {
 			leftHands[i] = parent.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp");

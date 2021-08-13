@@ -26,7 +26,7 @@ import com.jme3.scene.Spatial;
  *
  * @see KeyedInstrument
  */
-public abstract class Key {
+public class Key {
 	
 	/**
 	 * The uppermost node of this key.
@@ -46,7 +46,7 @@ public abstract class Key {
 	/**
 	 * Is this key being pressed?
 	 */
-	protected boolean beingPressed = false;
+	protected boolean beingPressed;
 	
 	/**
 	 * Instantiates a new Key.
@@ -70,7 +70,7 @@ public abstract class Key {
 	 */
 	public void tick(float delta) {
 		if (beingPressed) {
-			keyNode.setLocalRotation(new Quaternion().fromAngles(0.1f, 0, 0));
+			keyNode.setLocalRotation(new Quaternion().fromAngles(0.1F, 0, 0));
 			downNode.setCullHint(Spatial.CullHint.Dynamic);
 			upNode.setCullHint(Spatial.CullHint.Always);
 		} else {
@@ -79,7 +79,7 @@ public abstract class Key {
 			if (angles[0] > 0.0001) {
 				keyNode.setLocalRotation(new Quaternion(new float[]
 						{
-								Math.max(angles[0] - (0.02f * delta * 50), 0), 0, 0
+								Math.max(angles[0] - (0.02F * delta * 50), 0), 0, 0
 						}
 				));
 			} else {

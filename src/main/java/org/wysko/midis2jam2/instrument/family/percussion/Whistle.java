@@ -21,11 +21,11 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue;
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
 import org.wysko.midis2jam2.particle.SteamPuffer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.LONG;
@@ -78,29 +78,41 @@ public class Whistle extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		
-		List<MidiNoteOnEvent> nextHits = new ArrayList<>();
-		while (!hits.isEmpty() && context.getFile().eventInSeconds(hits.get(0)) <= time)
-			nextHits.add(hits.remove(0));
+		List<MidiNoteOnEvent> nextHits = NoteQueue.collect(hits, context, time);
 		
 		for (MidiNoteOnEvent nextHit : nextHits) {
 			if (nextHit != null) {
-				if (nextHit.note == SHORT_WHISTLE)
+				if (nextHit.note == SHORT_WHISTLE) {
 					shortWhistle.play(0.2);
-				else
+				} else {
 					longWhistle.play(0.4);
+				}
 			}
 		}
-		
 		
 		shortWhistle.tick(delta);
 		longWhistle.tick(delta);
 		
 		// Override if still playing
-		if (shortWhistle.playing || longWhistle.playing) instrumentNode.setCullHint(Spatial.CullHint.Dynamic);
+		if (shortWhistle.playing || longWhistle.playing) {
+			instrumentNode.setCullHint(Spatial.CullHint.Dynamic);
+		}
 	}
 	
+	/**
+	 * The enum Whistle length.
+	 */
 	enum WhistleLength {
-		SHORT, LONG
+		
+		/**
+		 * Short whistle length.
+		 */
+		SHORT,
+		
+		/**
+		 * Long whistle length.
+		 */
+		LONG
 	}
 	
 	/**
@@ -108,21 +120,35 @@ public class Whistle extends NonDrumSetPercussion {
 	 */
 	public class PercussionWhistle {
 		
+		/**
+		 * The Anim node.
+		 */
+		private final Node animNode = new Node();
 		
-		final Node animNode = new Node();
-		
-		final Node highestLevel = new Node();
+		/**
+		 * The Highest level.
+		 */
+		private final Node highestLevel = new Node();
 		
 		/**
 		 * The Puffer.
 		 */
-		final SteamPuffer puffer;
+		private final SteamPuffer puffer;
 		
-		private boolean playing = false;
+		/**
+		 * True if this whistle is currently playing, false otherwise.
+		 */
+		private boolean playing;
 		
-		private double progress = 0;
+		/**
+		 * The current amount of progress this whistle has made playing.
+		 */
+		private double progress;
 		
-		private double duration = 0;
+		/**
+		 * How long this whistle should play for.
+		 */
+		private double duration;
 		
 		/**
 		 * Instantiates a new Whistle.
@@ -130,10 +156,10 @@ public class Whistle extends NonDrumSetPercussion {
 		public PercussionWhistle(WhistleLength length) {
 			
 			puffer = new SteamPuffer(context, length == LONG ? WHISTLE : NORMAL, 1, UPWARDS);
-			Spatial whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f);
+			Spatial whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F);
 			
 			puffer.steamPuffNode.setLocalTranslation(0, 4, 0);
-			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(0, -1.57f, 0));
+			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(0, -1.57F, 0));
 			
 			animNode.attachChild(whistle);
 			animNode.attachChild(puffer.steamPuffNode);
@@ -141,12 +167,22 @@ public class Whistle extends NonDrumSetPercussion {
 			highestLevel.attachChild(animNode);
 		}
 		
+		/**
+		 * Plays a note.
+		 *
+		 * @param duration the duration
+		 */
 		public void play(double duration) {
 			playing = true;
 			progress = 0;
 			this.duration = duration;
 		}
 		
+		/**
+		 * Tick.
+		 *
+		 * @param delta the amount of time since the last frame update
+		 */
 		public void tick(float delta) {
 			if (progress >= 1) {
 				playing = false;

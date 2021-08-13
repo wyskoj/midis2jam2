@@ -27,11 +27,6 @@ public enum MatType {
 	UNSHADED,
 	
 	/**
-	 * A shaded material.
-	 */
-	SHADED,
-	
-	/**
 	 * A reflective material.
 	 */
 	REFLECTIVE

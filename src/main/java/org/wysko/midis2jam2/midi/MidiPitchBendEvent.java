@@ -27,7 +27,7 @@ public class MidiPitchBendEvent extends MidiChannelSpecificEvent {
 	/**
 	 * The pitch bend amount.
 	 */
-	final int value;
+	public final int value;
 	
 	/**
 	 * Instantiates a new MIDI pitch bend event.

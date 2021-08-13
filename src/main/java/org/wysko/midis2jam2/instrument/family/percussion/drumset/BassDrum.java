@@ -68,8 +68,6 @@ public class BassDrum extends PercussionInstrument {
 		/* Load beater arm */
 		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", "MetalTexture.bmp");
 		
-		
-		
 		/* Load beater holder */
 		Spatial bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", "MetalTexture.bmp");
 		final Node holder = (Node) bassDrumBeaterHolder;
@@ -90,7 +88,7 @@ public class BassDrum extends PercussionInstrument {
 		
 		drumNode.attachChild(drumModel);
 		
-		Node beaterNode = new Node();
+		var beaterNode = new Node();
 		beaterNode.attachChild(this.bassDrumBeaterArm);
 		beaterNode.attachChild(bassDrumBeaterHolder);
 		beaterNode.attachChild(bassDrumPedal);
@@ -128,7 +126,7 @@ public class BassDrum extends PercussionInstrument {
 			
 			// Beater comeback
 			float[] beaterAngles = bassDrumBeaterArm.getLocalRotation().toAngles(new float[3]);
-			float beaterAngle = beaterAngles[0] + 8f * delta;
+			float beaterAngle = beaterAngles[0] + 8F * delta;
 			beaterAngle = Math.min(rad((float) MAX_ANGLE), beaterAngle);
 			bassDrumBeaterArm.setLocalRotation(new Quaternion().fromAngles(
 					beaterAngle, 0, 0
@@ -136,8 +134,8 @@ public class BassDrum extends PercussionInstrument {
 			
 			// Pedal comeback
 			float[] pedalAngles = bassDrumPedal.getLocalRotation().toAngles(new float[3]);
-			float pedalAngle = (float) (pedalAngles[0] + 8f * delta * (PEDAL_MAX_ANGLE / MAX_ANGLE));
-			pedalAngle = Math.min(rad((float) PEDAL_MAX_ANGLE), pedalAngle);
+			float pedalAngle = (float) (pedalAngles[0] + 8F * delta * (PEDAL_MAX_ANGLE / MAX_ANGLE));
+			pedalAngle = Math.min(rad(PEDAL_MAX_ANGLE), pedalAngle);
 			bassDrumPedal.setLocalRotation(new Quaternion().fromAngles(
 					pedalAngle, 0, 0
 			));

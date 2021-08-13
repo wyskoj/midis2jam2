@@ -116,7 +116,7 @@ public class Mallets extends DecayedInstrument {
 		
 		/* Add shadow */
 		Spatial shadow = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png");
-		shadow.setLocalScale(2 / 3f);
+		shadow.setLocalScale(2 / 3F);
 		instrumentNode.attachChild(shadow);
 		shadow.setLocalTranslation(0, -22, 0);
 	}

@@ -33,10 +33,19 @@ import static org.wysko.midis2jam2.instrument.family.percussion.Triangle.Triangl
 import static org.wysko.midis2jam2.util.MatType.REFLECTIVE;
 import static org.wysko.midis2jam2.util.Utils.rad;
 
+/**
+ * The triangle.
+ */
 public class Triangle extends NonDrumSetPercussion {
 	
+	/**
+	 * The Triangle node.
+	 */
 	private final Node triangleNode = new Node();
 	
+	/**
+	 * The Beater node.
+	 */
 	private final Node beaterNode = new Node();
 	
 	/**
@@ -48,24 +57,25 @@ public class Triangle extends NonDrumSetPercussion {
 	protected Triangle(Midis2jam2 context, List<MidiNoteOnEvent> hits, TriangleType type) {
 		super(context, hits);
 		
-		var triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", REFLECTIVE, 0.9f);
+		/* Load triangle */
+		var triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", REFLECTIVE, 0.9F);
 		triangleNode.attachChild(triangle);
 		
+		/* Fix material if a muted triangle */
 		if (type == MUTED) {
 			var hands = context.unshadedMaterial("hands.bmp");
 			((Node) triangle).getChild(1).setMaterial(hands);
 		}
 		
-		
-		beaterNode.attachChild(context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f));
-		
+		/* Load beater */
+		beaterNode.attachChild(context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F));
 		beaterNode.setLocalTranslation(0, 2, 4);
 		
-		triangleNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(45)));
-		
+		/* Attach nodes and position */
 		instrumentNode.attachChild(triangleNode);
 		instrumentNode.attachChild(beaterNode);
 		
+		triangleNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(45)));
 		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-45)));
 		
 		if (type == OPEN) {
@@ -82,11 +92,31 @@ public class Triangle extends NonDrumSetPercussion {
 		PercussionInstrument.recoilDrum(triangleNode, stickStatus.justStruck(), stickStatus.getStrike() == null ? 0 : stickStatus.getStrike().velocity, delta);
 	}
 	
+	/**
+	 * The type of triangle.
+	 */
 	public enum TriangleType {
-		OPEN("Triangle.obj"), MUTED("MutedTriangle.fbx");
 		
+		/**
+		 * Open triangle type.
+		 */
+		OPEN("Triangle.obj"),
+		
+		/**
+		 * Muted triangle type.
+		 */
+		MUTED("MutedTriangle.fbx");
+		
+		/**
+		 * The file name of the model.
+		 */
 		private final String modelFile;
 		
+		/**
+		 * Instantiates a new triangle type.
+		 *
+		 * @param modelFile the file name of the model
+		 */
 		TriangleType(String modelFile) {
 			this.modelFile = modelFile;
 		}

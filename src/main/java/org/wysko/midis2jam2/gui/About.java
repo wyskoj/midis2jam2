@@ -76,10 +76,12 @@ public class About extends JDialog {
 		label4 = new JLabel();
 		websiteLink = new JEditorPane();
 		copyrightInfo = new JLabel();
+		otherContribs = new JLabel();
 		licenseInfo = new JEditorPane();
 		
 		//======== this ========
 		setTitle(bundle.getString("About.this.title"));
+		setResizable(false);
 		var contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		
@@ -87,9 +89,9 @@ public class About extends JDialog {
 		{
 			panel1.setLayout(new GridBagLayout());
 			((GridBagLayout) panel1.getLayout()).columnWidths = new int[]{683, 0};
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
 			((GridBagLayout) panel1.getLayout()).columnWeights = new double[]{1.0, 1.0E-4};
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 			
 			//---- label1 ----
 			label1.setIcon(new ImageIcon(getClass().getResource("/rounded.png")));
@@ -133,13 +135,19 @@ public class About extends JDialog {
 					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 5, 0), 0, 0));
 			
+			//---- otherContribs ----
+			otherContribs.setText("<html><small>Other contributors: jlachniet \u2022 nikitalita \u2022 Mr. Tremolo Measure</small></html>");
+			panel1.add(otherContribs, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 5, 0), 0, 0));
+			
 			//---- licenseInfo ----
 			licenseInfo.setBackground(UIManager.getColor("darcula.background"));
 			licenseInfo.setContentType("text/html");
 			licenseInfo.setText("<html>\n<div style=\"text-align:center\">\nThis program comes with absolutely no warranty.<br/>\nSee the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\">GNU General Public License, version 3</a> for details.\n</div>\n</html>\n\n");
 			licenseInfo.setEditable(false);
 			licenseInfo.setOpaque(false);
-			panel1.add(licenseInfo, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+			panel1.add(licenseInfo, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 15, 0), 0, 0));
 		}
@@ -172,6 +180,8 @@ public class About extends JDialog {
 	private JEditorPane websiteLink;
 	
 	private JLabel copyrightInfo;
+	
+	private JLabel otherContribs;
 	
 	private JEditorPane licenseInfo;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables

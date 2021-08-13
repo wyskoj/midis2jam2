@@ -205,6 +205,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		super.initialize(stateManager, app);
 		this.app = (Liaison) app;
 		
+		app.getRenderer().setDefaultAnisotropicFilter(4);
+		
 		/* Initialize camera settings */
 		this.app.getFlyByCamera().setMoveSpeed(100);
 		this.app.getFlyByCamera().setZoomSpeed(-10);
@@ -331,8 +333,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		shadowController.tick();
 		standController.tick();
-
-//		preventCameraFromLeaving(app.getCamera());
+		
+		preventCameraFromLeaving(app.getCamera());
 	}
 	
 	@Override
@@ -424,7 +426,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		/* Sort channels by time of event (stable) */
 		for (ArrayList<MidiChannelSpecificEvent> channelEvent : channels) {
-			channelEvent.sort(MidiChannelSpecificEvent.COMPARE_BY_TIME);
+			channelEvent.sort(Comparator.comparingLong(e -> e.time));
 		}
 		
 		/* For each channel */
@@ -541,7 +543,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * yet implemented
 	 */
 	@Nullable
-	@SuppressWarnings({"java:S1541", "java:S1479", "SpellCheckingInspection"})
+	@SuppressWarnings({"java:S138", "java:S1541", "java:S1479", "SpellCheckingInspection"})
 	private Instrument fromEvents(int programNum,
 	                              List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
 		return switch (programNum) {
@@ -783,39 +785,33 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	@SuppressWarnings("java:S5194")
 	public Spatial loadModel(String m, String t, MatType type, float brightness) {
 		final var PREFIX = "Assets/";
-		var texture = this.app.getAssetManager().loadTexture(PREFIX + t);
-		Material material;
-		switch (type) {
-			case UNSHADED -> {
-				material = new Material(this.app.getAssetManager(), UNSHADED_MAT);
-				material.setTexture(COLOR_MAP, texture);
-			}
-			case SHADED -> {
-				material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
-				material.setTexture(DIFFUSE_MAP, texture);
-			}
-			case REFLECTIVE -> {
-				material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
-				material.setVector3(FRESNEL_PARAMS, new Vector3f(0.1F, brightness, 0.1F));
-				material.setBoolean(ENV_MAP_AS_SPHERE_MAP, true);
-				material.setTexture(ENV_MAP, texture);
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + type);
-		}
+		Material material = type == MatType.UNSHADED ? unshadedMaterial(PREFIX + t) : reflectiveMaterial(PREFIX + t,
+				brightness);
 		var model = this.app.getAssetManager().loadModel(PREFIX + m);
 		model.setMaterial(material);
 		return model;
 	}
 	
 	/**
-	 * Returns a reflective material given a texture file.
+	 * Returns a reflective material given a texture file. Equivalent to {@code reflectiveMaterial(..., 0.9F)}.
 	 *
 	 * @param reflectiveTextureFile the path to the texture
 	 * @return the reflective material
 	 */
 	public Material reflectiveMaterial(String reflectiveTextureFile) {
+		return reflectiveMaterial(reflectiveTextureFile, 0.9F);
+	}
+	
+	/**
+	 * Returns a reflective material given a texture file.
+	 *
+	 * @param reflectiveTextureFile the path to the texture
+	 * @param brightness            the brightness of the reflective material
+	 * @return the reflective material
+	 */
+	public Material reflectiveMaterial(String reflectiveTextureFile, float brightness) {
 		var material = new Material(this.app.getAssetManager(), LIGHTING_MAT);
-		material.setVector3(FRESNEL_PARAMS, new Vector3f(0.1F, 0.9F, 0.1F));
+		material.setVector3(FRESNEL_PARAMS, new Vector3f(0.1F, brightness, 0.1F));
 		material.setBoolean(ENV_MAP_AS_SPHERE_MAP, true);
 		material.setTexture(ENV_MAP, this.app.getAssetManager().loadTexture(reflectiveTextureFile));
 		return material;
@@ -881,10 +877,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	private void setCamera(Camera camera) {
 		this.app.getCamera().setLocation(camera.location);
 		this.app.getCamera().setRotation(camera.rotation);
-	}
-	
-	public SimpleApplication getApp() {
-		return app;
 	}
 	
 	public MidiFile getFile() {

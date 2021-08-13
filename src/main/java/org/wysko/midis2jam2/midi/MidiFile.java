@@ -25,11 +25,12 @@ import javax.sound.midi.ShortMessage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A special type of music file.
  */
-public class MidiFile {
+public final class MidiFile {
 	
 	/**
 	 * The tracks of this MIDI file.
@@ -46,6 +47,10 @@ public class MidiFile {
 	 */
 	private List<MidiTempoEvent> tempos = new ArrayList<>();
 	
+	public MidiFile() {
+		// Populated in implementation
+	}
+	
 	/**
 	 * Reads a MIDI file and parses pertinent information.
 	 *
@@ -54,21 +59,28 @@ public class MidiFile {
 	 * @throws IOException              an i/o error occurred
 	 * @throws InvalidMidiDataException if the MIDI file is bad
 	 */
+	@SuppressWarnings({"StatementWithEmptyBody", "java:S1160"})
 	public static MidiFile readMidiFile(File midiFile) throws IOException, InvalidMidiDataException {
+		/* Init vars */
 		var sequence = new StandardMidiFileReader().getSequence(midiFile);
 		var file = new MidiFile();
+		
+		/* Division and track count */
 		file.setDivision((short) sequence.getResolution());
 		file.setTracks(new MidiTrack[sequence.getTracks().length + 1]);
-		for (var j = 1; j <= sequence.getTracks().length; j++) { // For each sequence track
+		
+		/* For each track */
+		for (var j = 1; j <= sequence.getTracks().length; j++) {
 			file.getTracks()[j] = new MidiTrack();
 			var track = sequence.getTracks()[j - 1];
+			
 			for (var i = 0; i < track.size(); i++) {
 				var midiEvent = track.get(i);
 				if (midiEvent.getMessage() instanceof MetaMessage) {
 					MetaMessage message = (MetaMessage) midiEvent.getMessage();
 					if (message.getType() == 0x51) { // Tempo
 						byte[] data = message.getData();
-						int tempo = ((data[0] & 0xff) << 16 | ((data[1] & 0xff) << 8)) | (data[2] & 0xff);
+						int tempo = (((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8)) | (data[2] & 0xff);
 						file.getTracks()[j].events.add(new MidiTempoEvent(midiEvent.getTick(), tempo));
 					}
 				} else if (midiEvent.getMessage() instanceof ShortMessage) {
@@ -76,15 +88,23 @@ public class MidiFile {
 					int command = message.getCommand();
 					if (command == ShortMessage.NOTE_ON) {
 						if (message.getData2() == 0) {
-							file.getTracks()[j].events.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+							file.getTracks()[j].events
+									.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 						} else {
-							file.getTracks()[j].events.add(midiNoteOnFromData(midiEvent.getTick(), message.getData1(), message.getData2(), message.getChannel()));
+							file.getTracks()[j].events
+									.add(midiNoteOnFromData(midiEvent.getTick(), message.getData1(), message.getData2(), message.getChannel()));
 						}
 					} else if (command == ShortMessage.NOTE_OFF) {
-						file.getTracks()[j].events.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+						file.getTracks()[j].events
+								.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 					} else if (command == ShortMessage.PROGRAM_CHANGE) {
-						file.getTracks()[j].events.add(programEventFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+						file.getTracks()[j].events
+								.add(programEventFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+					} else {
+						// Ignore message
 					}
+				} else {
+					// Ignore message
 				}
 			}
 		}
@@ -136,15 +156,17 @@ public class MidiFile {
 	 * @return the first tempo event in the file, expressed in beats per minute
 	 */
 	public double firstTempoInBpm() {
-		var event = new MidiTempoEvent(0, 500000);
-		for (var i = 1; i < getTracks().length; i++) { // MIDI tracks are 1-indexed
+		var event = new MidiTempoEvent(0, 500_000);
+		
+		/* For each track */
+		for (var i = 1; i < getTracks().length; i++) {
 			MidiTrack track = getTracks()[i];
-			for (MidiEvent midiEvent : track.events) {
-				if (midiEvent instanceof MidiTempoEvent) {
-					event = ((MidiTempoEvent) midiEvent);
-					break;
-				}
-			}
+			
+			event = track.events.stream()
+					.filter(MidiTempoEvent.class::isInstance)
+					.findFirst()
+					.map(MidiTempoEvent.class::cast)
+					.orElse(event);
 		}
 		return 6E7 / event.number;
 	}
@@ -154,16 +176,20 @@ public class MidiFile {
 	 */
 	private void calculateTempoMap() {
 		List<MidiTempoEvent> tempoEvents = new ArrayList<>();
-		for (MidiTrack track : getTracks()) { // For each track
+		
+		/* For each MIDI track */
+		for (MidiTrack track : getTracks()) {
+			/* Skip if null */
 			if (track == null) continue;
-			for (MidiEvent event : track.events) { // For each event
-				if (event instanceof MidiTempoEvent) {
-					tempoEvents.add((MidiTempoEvent) event);
-				}
-			}
+			
+			tempoEvents.addAll(track.events.stream()
+					.filter(MidiTempoEvent.class::isInstance)
+					.map(MidiTempoEvent.class::cast)
+					.collect(Collectors.toList()));
 		}
-		if (tempoEvents.isEmpty())
-			tempoEvents.add(new MidiTempoEvent(0, 500000));
+		if (tempoEvents.isEmpty()) {
+			tempoEvents.add(new MidiTempoEvent(0, 500_000));
+		}
 		tempoEvents.sort(Comparator.comparingLong(o -> o.time));
 		
 		/* Remove overlapping tempos (fuck you if you have two different tempos at the same time) */
@@ -199,7 +225,8 @@ public class MidiFile {
 		}
 		double seconds = 0;
 		for (var i = 0; i < temposToConsider.size() - 1; i++) {
-			seconds += ((double) (temposToConsider.get(i + 1).time - temposToConsider.get(i).time) / getDivision()) * (60 / (6E7 / temposToConsider.get(i).number));
+			seconds += ((double) (temposToConsider.get(i + 1).time - temposToConsider.get(i).time) / getDivision())
+					* (60 / (6E7 / temposToConsider.get(i).number));
 		}
 		MidiTempoEvent lastTempo = temposToConsider.get(temposToConsider.size() - 1);
 		seconds += ((double) (midiTick - lastTempo.time) / getDivision()) * (60 / (6E7 / lastTempo.number));
@@ -269,7 +296,8 @@ public class MidiFile {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		var midiFile = (MidiFile) o;
-		return getDivision() == midiFile.getDivision() && Arrays.equals(getTracks(), midiFile.getTracks()) && Objects.equals(getTempos(), midiFile.getTempos());
+		return getDivision() == midiFile.getDivision()
+				&& Arrays.equals(getTracks(), midiFile.getTracks()) && Objects.equals(getTempos(), midiFile.getTempos());
 	}
 	
 	@Override

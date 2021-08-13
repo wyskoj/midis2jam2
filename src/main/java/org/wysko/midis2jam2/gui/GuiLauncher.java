@@ -536,7 +536,7 @@ public class GuiLauncher extends JFrame {
 		fullscreenCheckbox = new JCheckBox();
 		fullscreenHelp = new JLabel();
 		legacyEngineCheckbox = new JCheckBox();
-		fullscreenHelp2 = new JLabel();
+		legacyEngineHelp = new JLabel();
 		transitionSpeedLabel = new JLabel();
 		transitionSpeedPanel = new JPanel();
 		transitionSpeedNoneButton = new JRadioButton();
@@ -548,7 +548,7 @@ public class GuiLauncher extends JFrame {
 		
 		//======== this ========
 		setTitle(bundle.getString("GuiLauncher.this.title"));
-		setIconImage(new ImageIcon(getClass().getResource("/ico/icon16.png")).getImage());
+		setIconImage(new ImageIcon(getClass().getResource("/ico/icon48.png")).getImage());
 		setResizable(false);
 		setMinimumSize(new Dimension(605, 575));
 		var contentPane = getContentPane();
@@ -570,14 +570,14 @@ public class GuiLauncher extends JFrame {
 				openMidiFileMenuItem.setIcon(new ImageIcon(getClass().getResource("/open.png")));
 				openMidiFileMenuItem.addActionListener(e -> loadMidiFileButtonActionPerformed(e));
 				fileMenu.add(openMidiFileMenuItem);
-				
+
 				//---- editSoundFontsMenuItem ----
 				editSoundFontsMenuItem.setText(bundle.getString("GuiLauncher.editSoundFontsMenuItem.text"));
 				editSoundFontsMenuItem.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
 				editSoundFontsMenuItem.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
 				fileMenu.add(editSoundFontsMenuItem);
 				fileMenu.addSeparator();
-				
+
 				//---- exitMenuItem ----
 				exitMenuItem.setText(bundle.getString("GuiLauncher.exitMenuItem.text"));
 				exitMenuItem.setIcon(new ImageIcon(getClass().getResource("/exit.png")));
@@ -769,10 +769,10 @@ public class GuiLauncher extends JFrame {
 					GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
-			//---- fullscreenHelp2 ----
-			fullscreenHelp2.setIcon(new ImageIcon(getClass().getResource("/help.png")));
-			fullscreenHelp2.setToolTipText(bundle.getString("GuiLauncher.legacyEngineHelp"));
-			settingsPanel.add(fullscreenHelp2, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
+			//---- legacyEngineHelp ----
+			legacyEngineHelp.setIcon(new ImageIcon(getClass().getResource("/help.png")));
+			legacyEngineHelp.setToolTipText(bundle.getString("GuiLauncher.legacyEngineHelp"));
+			settingsPanel.add(legacyEngineHelp, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 			
@@ -860,45 +860,25 @@ public class GuiLauncher extends JFrame {
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JMenuBar menuBar1;
-	
 	private JMenu fileMenu;
-	
 	private MenuItemResizedIcon openMidiFileMenuItem;
-	
 	private MenuItemResizedIcon editSoundFontsMenuItem;
-	
 	private MenuItemResizedIcon exitMenuItem;
-	
 	private JMenu menu1;
-	
 	private MenuItemResizedIcon localeMenuItem;
-	
 	private JMenuItem aboutMenuItem;
-	
 	private JLabel logo;
-	
 	private JPanel configurationPanel;
-	
 	private JLabel midiFileLabel;
-	
 	private JTextField midiFilePathTextField;
-	
 	private JResizedIconButton loadMidiFileButton;
-	
 	private JLabel midiFileHelp;
-	
 	private JLabel midiDeviceLabel;
-	
 	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
-	
 	private JLabel midiDeviceHelp;
-	
 	private JLabel soundFontLabel;
-	
 	private JComboBox<String> soundFontPathDropDown;
-	
 	private JResizedIconButton editSoundFontsButton;
-	
 	private JLabel soundFontHelp;
 	
 	private JPanel settingsPanel;
@@ -921,7 +901,7 @@ public class GuiLauncher extends JFrame {
 	
 	private JCheckBox legacyEngineCheckbox;
 	
-	private JLabel fullscreenHelp2;
+	private JLabel legacyEngineHelp;
 	
 	private JLabel transitionSpeedLabel;
 	
