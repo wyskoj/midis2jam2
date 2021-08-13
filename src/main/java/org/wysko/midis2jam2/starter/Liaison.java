@@ -81,7 +81,7 @@ public class Liaison extends SimpleApplication {
 			midis2Jam2Settings.setResolution(screen.width, screen.height);
 			setSettings(midis2Jam2Settings);
 			super.start();
-			guiLauncher.disableAll();
+			
 		} else {
 			var thisLiaison = this;
 			SwingUtilities.invokeLater(() -> {
@@ -111,6 +111,8 @@ public class Liaison extends SimpleApplication {
 				startCanvas();
 			});
 		}
+		
+		guiLauncher.disableAll();
 	}
 	
 	@Override
