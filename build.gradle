@@ -19,7 +19,7 @@ repositories {
 }
 
 application {
-    mainClassName = 'org.wysko.midis2jam2.GuiLauncher'
+    mainClassName = 'org.wysko.midis2jam2.gui.GuiLauncher'
 }
 
 shadowJar {

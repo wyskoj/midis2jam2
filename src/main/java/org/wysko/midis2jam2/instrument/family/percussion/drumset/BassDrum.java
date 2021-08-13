@@ -78,7 +78,7 @@ public class BassDrum extends PercussionInstrument {
 		final var shinySilverMaterial = context.reflectiveMaterial("Assets/ShinySilver.bmp");
 		arm.getChild(0).setMaterial(shinySilverMaterial);
 		
-		final var darkMetalMaterial = context.unshadedMaterial("MetalTextureDark.bmp");
+		final var darkMetalMaterial = context.unshadedMaterial("Assets/MetalTextureDark.bmp");
 		arm.getChild(1).setMaterial(darkMetalMaterial);
 		
 		holder.getChild(0).setMaterial(darkMetalMaterial);

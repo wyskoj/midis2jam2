@@ -32,6 +32,7 @@ import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.gui.Displays;
@@ -784,12 +785,20 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	@SuppressWarnings("java:S5194")
 	public Spatial loadModel(String m, String t, MatType type, float brightness) {
-		final var PREFIX = "Assets/";
-		Material material = type == MatType.UNSHADED ? unshadedMaterial(PREFIX + t) : reflectiveMaterial(PREFIX + t,
-				brightness);
-		var model = this.app.getAssetManager().loadModel(PREFIX + m);
+		Material material = type == MatType.UNSHADED ? unshadedMaterial(assetPrefix(t)) : reflectiveMaterial(assetPrefix(t), brightness);
+		var model = this.app.getAssetManager().loadModel(assetPrefix(m));
 		model.setMaterial(material);
 		return model;
+	}
+	
+	@Contract(pure = true)
+	private static String assetPrefix(String t) {
+		final var PREFIX = "Assets/";
+		if (!t.startsWith(PREFIX)) {
+			return PREFIX + t;
+		} else {
+			return t;
+		}
 	}
 	
 	/**
@@ -825,7 +834,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 */
 	public Material unshadedMaterial(String texture) {
 		var material = new Material(this.app.getAssetManager(), UNSHADED_MAT);
-		material.setTexture(COLOR_MAP, this.app.getAssetManager().loadTexture("Assets/" + texture));
+		material.setTexture(COLOR_MAP, this.app.getAssetManager().loadTexture(texture));
 		return material;
 	}
 	

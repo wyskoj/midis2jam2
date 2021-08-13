@@ -33,6 +33,9 @@ new FormModel {
 						name: "panel1"
 						add( new FormComponent( "javax.swing.JComboBox" ) {
 							name: "localeSpinner"
+							auxiliary() {
+								"JavaCodeGenerator.typeParameters": "String"
+							}
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "Center"

@@ -73,7 +73,7 @@ public class LocaleSelect extends JDialog {
 		contentPanel = new JPanel();
 		selectLocaleLabel = new JLabel();
 		panel1 = new JPanel();
-		localeSpinner = new JComboBox();
+		localeSpinner = new JComboBox<>();
 		buttonBar = new JPanel();
 		okButton = new JButton();
 		cancelButton = new JButton();
@@ -83,20 +83,20 @@ public class LocaleSelect extends JDialog {
 		setTitle(bundle.getString("LocaleSelect.locale"));
 		var contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		
+
 		//======== dialogPane ========
 		{
 			dialogPane.setBorder(new EmptyBorder(12, 12, 12, 12));
 			dialogPane.setLayout(new BorderLayout());
-			
+
 			//======== contentPanel ========
 			{
 				contentPanel.setLayout(new BorderLayout());
-				
+
 				//---- selectLocaleLabel ----
 				selectLocaleLabel.setText(bundle.getString("LocaleSelect.selectLocaleLabel.text"));
 				contentPanel.add(selectLocaleLabel, BorderLayout.NORTH);
-				
+
 				//======== panel1 ========
 				{
 					panel1.setLayout(new GridBagLayout());
@@ -162,7 +162,7 @@ public class LocaleSelect extends JDialog {
 	
 	private JPanel panel1;
 	
-	private JComboBox localeSpinner;
+	private JComboBox<String> localeSpinner;
 	
 	private JPanel buttonBar;
 	

@@ -37,7 +37,7 @@ import static org.wysko.midis2jam2.util.Utils.rad;
 /**
  * Handles behavior for drum sticks.
  */
-public class Stick {
+public final class Stick {
 	
 	/**
 	 * The constant STRIKE_SPEED.
@@ -97,8 +97,9 @@ public class Stick {
 		};
 		
 		MidiNoteOnEvent nextHit = null;
-		if (!strikes.isEmpty())
+		if (!strikes.isEmpty()) {
 			nextHit = strikes.get(0);
+		}
 		
 		MidiNoteOnEvent lastHit = LAST_HIT_MAP.get(stickNode);
 		
@@ -157,12 +158,12 @@ public class Stick {
 		}
 		
 		// Keep stick visible if another strike is imminent within the next quarter note.
-		if (!strikes.isEmpty() && lastHit != null) {
-			if (context.getFile().eventInSeconds(strikes.get(0)) - time <= context.getFile().tempoBefore(strikes.get(0)).secondsPerBeat()
-					&& time - context.getFile().eventInSeconds(lastHit) <= context.getFile().tempoBefore(lastHit).secondsPerBeat()) {
-				stickNode.setCullHint(Dynamic);
-			}
-		}
+//		if (!strikes.isEmpty() && lastHit != null) {
+//			if (context.getFile().eventInSeconds(strikes.get(0)) - time <= context.getFile().tempoBefore(strikes.get(0)).secondsPerBeat()
+//					&& time - context.getFile().eventInSeconds(lastHit) <= context.getFile().tempoBefore(lastHit).secondsPerBeat()) {
+//				stickNode.setCullHint(Dynamic);
+//			}
+//		}
 		
 		return new StickStatus(strike ? nextHit : null, finalAngles[rotComp], proposedRotation > maxAngle ? null : nextHit);
 	}
