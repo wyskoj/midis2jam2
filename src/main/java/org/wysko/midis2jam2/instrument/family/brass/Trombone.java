@@ -154,6 +154,11 @@ public class Trombone extends MonophonicInstrument {
 		private int getSlidePositionFromNote(NotePeriod period) {
 			var fingering = SLIDE_MANAGER.fingering(period.midiNote);
 			
+			/* If out of range, return current position */
+			if (fingering == null) {
+				return (int) getCurrentSlidePosition();
+			}
+			
 			/* If there is just one position, use that */
 			if (fingering.size() == 1) return fingering.get(0);
 			
