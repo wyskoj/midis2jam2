@@ -28,45 +28,25 @@ Follow the on-screen instructions for installing midis2jam2.
 If you want to experience the latest midis2jam2 updates in between releases, you can download a CI build.
 Note: these builds are unstable, so I won't provide any support for them (although, you should submit issues for pertinent bugs).
 
-==== Getting the binary
+==== Using a prebuilt binary
 
-You can either use a prebuilt binary or build from source.
-
-===== Using a prebuilt binary
-
-To begin, download a build from the https://www.midis2jam2.xyz/builds/[builds page].
+Download a build from the https://www.midis2jam2.xyz/builds/[builds page].
 Move `midis2jam2-xxxxxxxx.jar` to a new folder (the Xs are a placeholder here; when you download the jar, this is the beginning of the commit hash).
+Run
 
-===== Building from source
+[source,bash]
+----
+$ java -jar midis2jam2-xxxxxxxx.jar
+----
 
-To build midis2jam2, run
+==== Building from source
+
+To build and run midis2jam2, run
 
 [source,bash]
 ----
 $ git clone https://github.com/wyskoj/midis2jam2
-$ cd midis2jam2
-$ ./gradlew shadowjar
-----
-
-The jar file appears in `build/libs`.
-Copy it to a new folder.
-
-You will need at least _Java 15_ in order for a successful build.
-
-==== Running
-
-To run midis2jam2, simply execute the jar file:
-
-[source,bash]
-----
-$ java -jar midis2jam2.jar
-----
-
-You can optionally specify the relative or absolute path to a MIDI file. midis2jam2 will load and play the file using the default synthesizer Gervill:
-
-[source,bash]
-----
-$ java -jar midis2jam2.jar path/to/midifile.mid
+$ cd midis2jam2 && ./gradlew run
 ----
 
 == FAQ & Troubleshooting
