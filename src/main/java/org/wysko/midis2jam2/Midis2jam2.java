@@ -357,6 +357,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		if (sequencer.isOpen()) {
 			sequencer.stop();
 		}
+		app.getStateManager().detach(this);
 		app.stop();
 	}
 	
