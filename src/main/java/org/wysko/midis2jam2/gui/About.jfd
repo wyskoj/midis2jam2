@@ -11,8 +11,8 @@ new FormModel {
 			"title": new FormMessage( null, "About.this.title" )
 			"resizable": false
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
-				"$columnSpecs": "center:683:1.0"
-				"$rowSpecs": "0, 0, 0, 0, 0, 0, 0, 0"
+				"$columnSpecs": "700:1.0"
+				"$rowSpecs": "0, 0, 0, 0, 0, 0, 0, 0, 0, 208"
 				"$hGap": 5
 				"$vGap": 5
 				"$alignTop": true
@@ -24,6 +24,7 @@ new FormModel {
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/rounded.png" )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"insets": new java.awt.Insets( 15, 0, 0, 0 )
+					"hAlign": 0
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "label2"
@@ -31,18 +32,21 @@ new FormModel {
 					"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 1
+					"hAlign": 0
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "label3"
 					"text": "vX.X.X"
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 2
+					"hAlign": 0
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "label4"
 					"text": new FormMessage( null, "About.what_is_midis2jam2" )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 3
+					"hAlign": 0
 				} )
 				add( new FormComponent( "javax.swing.JEditorPane" ) {
 					name: "websiteLink"
@@ -53,17 +57,21 @@ new FormModel {
 					"opaque": false
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 4
+					"hAlign": 0
 				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
+				add( new FormComponent( "javax.swing.JEditorPane" ) {
 					name: "copyrightInfo"
-					"text": "<html>\n<div style=\"text-align:center;\">\nCopyright © 2021 Jacob Wysko<br/>\n<small>Some assets Copyright © 2007 Scott Haag (used with permission)</small>\n</div>\n</html>"
-					"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, -2, false )
+					"contentType": "text/html"
+					"text": "<html>\n  <head>\n\n  </head>\n  <body>\n    <p style=\"margin-top: 0; text-align: center;\">\n      Copyright &copy; MMXXI Jacob Wysko<br/>\n      <small>Some assets Copyright &copy; Scott Haag 2007</small>\n    </p>\n  </body>\n</html>\n"
+					"editable": false
+					"background": &SwingColor1 new com.jformdesigner.model.SwingColor( "Button.background" )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 5
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "otherContribs"
 					"text": "<html><small>Other contributors: jlachniet • nikitalita • Mr. Tremolo Measure</small></html>"
+					"horizontalAlignment": 0
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridy": 6
 				} )
@@ -78,12 +86,32 @@ new FormModel {
 					"gridy": 7
 					"insets": new java.awt.Insets( 0, 0, 15, 0 )
 				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label5"
+					"text": "Open source libraries"
+					"horizontalAlignment": 0
+					"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 8
+				} )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPane1"
+					add( new FormComponent( "javax.swing.JEditorPane" ) {
+						name: "oslText"
+						"background": #SwingColor1
+						"contentType": "text/html"
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, -2, false )
+						"editable": false
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 9
+				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "Center"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 570, 505 )
+			"size": new java.awt.Dimension( 700, 560 )
 		} )
 	}
 }

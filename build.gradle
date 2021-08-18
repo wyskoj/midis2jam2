@@ -1,6 +1,7 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
     id "org.panteleyev.jpackageplugin" version "1.3.0"
+    id "com.github.hierynomus.license-report" version "0.15.0"
     id 'java'
     id 'idea'
     id 'application'
@@ -26,48 +27,6 @@ shadowJar {
     doFirst {
         new File(projectDir, "src/main/resources/version.txt").text = getArchiveVersion().get()
     }
-}
-
-tasks.jpackage {
-    dependsOn("shadowJar")
-
-    appName = "midis2jam2"
-    appVersion = version
-    appDescription = "midis2jam2"
-    vendor = "Jacob Wysko"
-    copyright = "Copyright (c) 2021 Jacob Wysko"
-    runtimeImage = System.getProperty("java.home")
-    licenseFile = "LICENSE"
-    input = "$buildDir/libs"
-    destination = "$buildDir/package/midis2jam2"
-    mainJar = "midis2jam2-" + version + "-all.jar"
-    mainClass = "org.wysko.midis2jam2.Launcher"
-    javaOptions = ["-Dfile.encoding=UTF-8"].asList()
-
-    // Mac and Linux icon
-    icon = "src/main/resources/ico/icon512.png"
-    windows {
-        icon = "src/main/resources/ico/icon.ico"
-    }
-    macPackageIdentifier = "org.wysko.midis2jam2"
-    mac {
-        icon = "src/main/resources/ico/icon.icns"
-    }
-    // Windows specific parameters will be processed only during Windows build
-    winMenu = true // Adds shortcut to Start Menu
-    winDirChooser = true // Allows user to choose install dir
-    winMenuGroup = "midis2jam2"
-    winShortcut = true
-
-
-    linuxShortcut = true
-    linuxDebMaintainer = "jacob@wysko.org"
-    linuxRpmLicenseType = "GPLv3"
-    linux {
-        installDir = "/usr" // Linux installation prefix (/usr/bin/app, /usr/lib/app, etc.)
-    }
-
-
 }
 
 dependencies {
@@ -103,5 +62,18 @@ allprojects {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "--add-exports" << "java.desktop/com.sun.media.sound=ALL-UNNAMED"
         }
+    }
+}
+
+downloadLicenses {
+    includeProjectDependencies = true
+    dependencyConfiguration = "compileClasspath"
+}
+
+compileJava {
+    dependsOn "downloadLicenses"
+    copy {
+        from "build/reports/license/dependency-license.html"
+        into "src/main/resources"
     }
 }
