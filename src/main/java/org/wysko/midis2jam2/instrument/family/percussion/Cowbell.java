@@ -78,6 +78,6 @@ public class Cowbell extends NonDrumSetPercussion {
 		
 		/* Animate cowbell */
 		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(),
-				stickStatus.justStruck() ? requireNonNull(stickStatus.getStrike()).velocity : 0, delta);
+				stickStatus.justStruck() ? requireNonNull(stickStatus.getStrike()).getVelocity() : 0, delta);
 	}
 }

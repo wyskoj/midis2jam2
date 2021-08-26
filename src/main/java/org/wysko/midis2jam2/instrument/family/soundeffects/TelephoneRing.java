@@ -160,13 +160,13 @@ public class TelephoneRing extends SustainedInstrument {
 		for (MidiEvent event : eventsToPerform) {
 			if (event instanceof MidiNoteOnEvent) {
 				MidiNoteOnEvent noteOn = (MidiNoteOnEvent) event;
-				int keyIndex = (noteOn.note + 3) % 12;
+				int keyIndex = (noteOn.getNote() + 3) % 12;
 				playing[keyIndex] = true;
 				upKeys[keyIndex].setCullHint(Spatial.CullHint.Always);
 				downKeys[keyIndex].setCullHint(Spatial.CullHint.Dynamic);
 			} else if (event instanceof MidiNoteOffEvent) {
 				MidiNoteOffEvent noteOff = (MidiNoteOffEvent) event;
-				int keyIndex = (noteOff.note + 3) % 12;
+				int keyIndex = (noteOff.getNote() + 3) % 12;
 				playing[keyIndex] = false;
 				upKeys[keyIndex].setCullHint(Spatial.CullHint.Dynamic);
 				downKeys[keyIndex].setCullHint(Spatial.CullHint.Always);

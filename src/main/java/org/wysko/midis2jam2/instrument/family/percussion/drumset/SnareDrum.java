@@ -68,8 +68,8 @@ public class SnareDrum extends PercussionInstrument {
 	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		this.regularHits =
-				hits.stream().filter(e -> e.note == ACOUSTIC_SNARE || e.note == ELECTRIC_SNARE).collect(Collectors.toList());
-		this.sideHits = hits.stream().filter(e -> e.note == 37).collect(Collectors.toList());
+				hits.stream().filter(e -> e.getNote() == ACOUSTIC_SNARE || e.getNote() == ELECTRIC_SNARE).collect(Collectors.toList());
+		this.sideHits = hits.stream().filter(e -> e.getNote() == 37).collect(Collectors.toList());
 		Spatial drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
 		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		Spatial sideStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
@@ -98,11 +98,11 @@ public class SnareDrum extends PercussionInstrument {
 		var sideVel = 0;
 		if (regularStickStatus.justStruck()) {
 			assert regularStickStatus.getStrike() != null;
-			regVel = regularStickStatus.getStrike().velocity;
+			regVel = regularStickStatus.getStrike().getVelocity();
 		}
 		if (sideStickStatus.justStruck()) {
 			assert sideStickStatus.getStrike() != null;
-			sideVel = (int) (sideStickStatus.getStrike().velocity * 0.5);
+			sideVel = (int) (sideStickStatus.getStrike().getVelocity() * 0.5);
 		}
 		int velocity = Math.max(regVel, sideVel);
 		PercussionInstrument.recoilDrum(recoilNode, velocity != 0, velocity, delta);

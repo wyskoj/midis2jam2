@@ -105,7 +105,7 @@ public class Mallets extends DecayedInstrument {
 		
 		eventList.forEach((MidiChannelSpecificEvent event) -> {
 			if (event instanceof MidiNoteOnEvent) {
-				int midiNote = ((MidiNoteOnEvent) event).note;
+				int midiNote = ((MidiNoteOnEvent) event).getNote();
 				if (midiNote >= RANGE_LOW && midiNote <= RANGE_HIGH) {
 					barStrikes.get(midiNote - RANGE_LOW).add(((MidiNoteOnEvent) event));
 				}

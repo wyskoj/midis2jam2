@@ -153,7 +153,7 @@ public class Helicopter extends SustainedInstrument {
 		
 		/* Turn on active lights */
 		for (NotePeriod notePeriod : currentNotePeriods) {
-			lights[11 - ((notePeriod.midiNote + 3) % 12)].setCullHint(Spatial.CullHint.Dynamic);
+			lights[11 - ((notePeriod.getMidiNote() + 3) % 12)].setCullHint(Spatial.CullHint.Dynamic);
 		}
 		
 		/* If playing a note, increase the force, but cap it at 1. */

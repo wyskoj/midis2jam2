@@ -99,7 +99,7 @@ public class Ocarina extends HandedInstrument {
 			if (isPlaying()) {
 				assert currentNotePeriod != null;
 				animNode.setLocalTranslation(0,
-						0, 3 * (float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration()));
+						0, 3 * (float) ((currentNotePeriod.getEndTime() - time) / currentNotePeriod.duration()));
 			}
 		}
 		

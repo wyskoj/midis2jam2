@@ -82,7 +82,7 @@ public class Whistle extends NonDrumSetPercussion {
 		
 		for (MidiNoteOnEvent nextHit : nextHits) {
 			if (nextHit != null) {
-				if (nextHit.note == SHORT_WHISTLE) {
+				if (nextHit.getNote() == SHORT_WHISTLE) {
 					shortWhistle.play(0.2);
 				} else {
 					longWhistle.play(0.4);

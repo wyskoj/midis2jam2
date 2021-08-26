@@ -79,8 +79,8 @@ public class Timbales extends NonDrumSetPercussion {
 		super(context, hits);
 		
 		/* Separate hits */
-		lowTimbaleHits = hits.stream().filter(h -> h.note == LOW_TIMBALE).collect(Collectors.toList());
-		highTimbaleHits = hits.stream().filter(h -> h.note == HIGH_TIMBALE).collect(Collectors.toList());
+		lowTimbaleHits = hits.stream().filter(h -> h.getNote() == LOW_TIMBALE).collect(Collectors.toList());
+		highTimbaleHits = hits.stream().filter(h -> h.getNote() == HIGH_TIMBALE).collect(Collectors.toList());
 		
 		/* Load timbales */
 		Spatial lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
@@ -127,7 +127,7 @@ public class Timbales extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			recoilDrum(lowTimbaleAnimNode, true, strike.velocity, delta);
+			recoilDrum(lowTimbaleAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(lowTimbaleAnimNode, false, 0, delta);
 		}
@@ -135,7 +135,7 @@ public class Timbales extends NonDrumSetPercussion {
 		if (statusHigh.justStruck()) {
 			MidiNoteOnEvent strike = statusHigh.getStrike();
 			assert strike != null;
-			recoilDrum(highTimbaleAnimNode, true, strike.velocity, delta);
+			recoilDrum(highTimbaleAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(highTimbaleAnimNode, false, 0, delta);
 		}

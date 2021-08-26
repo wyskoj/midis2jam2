@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.guitar
 
-package org.wysko.midis2jam2.instrument.family.guitar;
-
-import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Contract
 
 /**
  * The fret height calculator returns the amount to scale upper and lower strings by.
@@ -25,14 +24,11 @@ import org.jetbrains.annotations.Contract;
  * @see FrettedInstrument
  * @see FretHeightByTable
  */
-public interface FretHeightCalculator {
-	
-	/**
-	 * Calculates the scale of the strings given a fret.
-	 *
-	 * @param fret the fret
-	 * @return the scale of the strings
-	 */
-	@Contract(pure = true)
-	float calculateScale(int fret);
+@FunctionalInterface
+interface FretHeightCalculator {
+    /**
+     * Returns the scale of the strings given a [fret].
+     */
+    @Contract(pure = true)
+    fun calculateScale(fret: Int): Float
 }

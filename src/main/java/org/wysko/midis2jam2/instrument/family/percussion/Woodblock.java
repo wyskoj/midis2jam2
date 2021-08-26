@@ -78,8 +78,8 @@ public class Woodblock extends NonDrumSetPercussion {
 	                 List<MidiNoteOnEvent> hits) {
 		super(context, hits);
 		
-		leftHits = hits.stream().filter(h -> h.note == LOW_WOODBLOCK).collect(Collectors.toList());
-		rightHits = hits.stream().filter(h -> h.note == HIGH_WOODBLOCK).collect(Collectors.toList());
+		leftHits = hits.stream().filter(h -> h.getNote() == LOW_WOODBLOCK).collect(Collectors.toList());
+		rightHits = hits.stream().filter(h -> h.getNote() == HIGH_WOODBLOCK).collect(Collectors.toList());
 		
 		leftWoodblockAnimNode.attachChild(context.loadModel("WoodBlockHigh.obj", "SimpleWood.bmp"));
 		rightWoodblockAnimNode.attachChild(context.loadModel("WoodBlockLow.obj", "SimpleWood.bmp"));
@@ -126,7 +126,7 @@ public class Woodblock extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			recoilDrum(rightWoodblockAnimNode, true, strike.velocity, delta);
+			recoilDrum(rightWoodblockAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(rightWoodblockAnimNode, false, 0, delta);
 		}
@@ -134,7 +134,7 @@ public class Woodblock extends NonDrumSetPercussion {
 		if (statusHigh.justStruck()) {
 			MidiNoteOnEvent strike = statusHigh.getStrike();
 			assert strike != null;
-			recoilDrum(leftWoodblockAnimNode, true, strike.velocity, delta);
+			recoilDrum(leftWoodblockAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(leftWoodblockAnimNode, false, 0, delta);
 		}

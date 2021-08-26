@@ -77,7 +77,7 @@ public abstract class HandedClone extends Clone {
 			assert currentNotePeriod != null;
 			assert parent.manager != null;
 			
-			var hands = (Hands) parent.manager.fingering(currentNotePeriod.midiNote);
+			var hands = (Hands) parent.manager.fingering(currentNotePeriod.getMidiNote());
 			if (hands != null) {
 				if (leftHands != null) {
 					/* May be null because ocarina does not implement left hands */

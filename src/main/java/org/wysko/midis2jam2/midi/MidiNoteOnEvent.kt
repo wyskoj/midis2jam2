@@ -14,33 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-
-package org.wysko.midis2jam2.midi;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+package org.wysko.midis2jam2.midi
 
 /**
- * MIDI files are composed of up to 65535 tracks.
+ * Signals a note should begin playing.
  */
-public class MidiTrack {
-	
-	/**
-	 * The events in this track.
-	 */
-	public final List<MidiEvent> events = new ArrayList<>();
-	
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		MidiTrack track = (MidiTrack) o;
-		return Objects.equals(events, track.events);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(events);
-	}
-}
+data class MidiNoteOnEvent(
+    override val time: Long,
+    override val channel: Int,
+    override val note: Int,
+    val velocity: Int,
+) : MidiNoteEvent(time, channel, note)

@@ -259,8 +259,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 							/* Find the first tempo we haven't hit and need to execute */
 							long currentMidiTick = sequencer.getTickPosition();
 							for (MidiTempoEvent tempo : getFile().getTempos()) {
-								if (tempo.time == currentMidiTick) {
-									sequencer.setTempoInBPM(60_000_000F / tempo.number);
+								if (tempo.getTime() == currentMidiTick) {
+									sequencer.setTempoInBPM(60_000_000F / tempo.getNumber());
 								}
 							}
 						}
@@ -420,15 +420,15 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		/* For each track, assign each event to the corresponding channel */
 		Arrays.stream(getFile().getTracks())
 				.filter(Objects::nonNull)
-				.forEach(track -> track.events.stream()
+				.forEach(track -> track.getEvents().stream()
 						.filter(MidiChannelSpecificEvent.class::isInstance)
 						.map(MidiChannelSpecificEvent.class::cast)
-						.forEach(channelEvent -> channels.get(channelEvent.channel).add(channelEvent)
+						.forEach(channelEvent -> channels.get(channelEvent.getChannel()).add(channelEvent)
 						));
 		
 		/* Sort channels by time of event (stable) */
 		for (ArrayList<MidiChannelSpecificEvent> channelEvent : channels) {
-			channelEvent.sort(Comparator.comparingLong(e -> e.time));
+			channelEvent.sort(Comparator.comparingLong(MidiChannelSpecificEvent::getTime));
 		}
 		
 		/* For each channel */
@@ -452,7 +452,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 						.collect(Collectors.toList());
 				
 				/* Add instrument 0 if there is no program events or there is none at the beginning */
-				if (programEvents.isEmpty() || programEvents.stream().noneMatch(e -> e.time == 0)) {
+				if (programEvents.isEmpty() || programEvents.stream().noneMatch(e -> e.getTime() == 0)) {
 					programEvents.add(0, new MidiProgramEvent(0, j, 0));
 				}
 				
@@ -489,7 +489,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		/* If there is only one program event, just assign all events to that */
 		if (programEvents.size() == 1) {
-			instruments.add(fromEvents(programEvents.get(0).programNum, channelEvents));
+			instruments.add(fromEvents(programEvents.get(0).getProgramNum(), channelEvents));
 			return;
 		}
 		
@@ -498,7 +498,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		/* Initializes map with empty list */
 		for (MidiProgramEvent programEvent : programEvents) {
-			lastProgramForNote.putIfAbsent(programEvent.programNum, new ArrayList<>());
+			lastProgramForNote.putIfAbsent(programEvent.getProgramNum(), new ArrayList<>());
 		}
 		
 		/* The key here is MIDI note, the value is the program that that note applied to */
@@ -512,19 +512,19 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				for (var i = 0; i < programEvents.size(); i++) {
 					/* If the event occurs within the range of these program events */
 					if (i == programEvents.size() - 1 ||
-							(event.time >= programEvents.get(i).time && event.time < programEvents.get(i + 1).time)) {
+							(event.getTime() >= programEvents.get(i).getTime() && event.getTime() < programEvents.get(i + 1).getTime())) {
 						/* Add this event */
-						lastProgramForNote.get(programEvents.get(i).programNum).add(event);
+						lastProgramForNote.get(programEvents.get(i).getProgramNum()).add(event);
 						if (event instanceof MidiNoteOnEvent) {
 							/* Keep track of the program if note on, for note off link */
-							noteOnPrograms.put(((MidiNoteOnEvent) event).note, programEvents.get(i));
+							noteOnPrograms.put(((MidiNoteOnEvent) event).getNote(), programEvents.get(i));
 						}
 						break;
 					}
 				}
 			} else {
 				/* Note off events need to be added to the program of the last MIDI note on with that same value */
-				lastProgramForNote.get(noteOnPrograms.get(((MidiNoteOffEvent) event).note).programNum).add(event);
+				lastProgramForNote.get(noteOnPrograms.get(((MidiNoteOffEvent) event).getNote()).getProgramNum()).add(event);
 			}
 		}
 		

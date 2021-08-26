@@ -63,7 +63,7 @@ public class Triangle extends NonDrumSetPercussion {
 		
 		/* Fix material if a muted triangle */
 		if (type == MUTED) {
-			var hands = context.unshadedMaterial("hands.bmp");
+			var hands = context.unshadedMaterial("Assets/hands.bmp");
 			((Node) triangle).getChild(1).setMaterial(hands);
 		}
 		
@@ -89,7 +89,7 @@ public class Triangle extends NonDrumSetPercussion {
 	public void tick(double time, float delta) {
 		super.tick(time, delta);
 		var stickStatus = Stick.handleStick(context, beaterNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		PercussionInstrument.recoilDrum(triangleNode, stickStatus.justStruck(), stickStatus.getStrike() == null ? 0 : stickStatus.getStrike().velocity, delta);
+		PercussionInstrument.recoilDrum(triangleNode, stickStatus.justStruck(), stickStatus.getStrike() == null ? 0 : stickStatus.getStrike().getVelocity(), delta);
 	}
 	
 	/**

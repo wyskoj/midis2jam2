@@ -70,7 +70,7 @@ public class RideCymbal extends Cymbal {
 		var stickStatus = Stick.handleStick(context, stick, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
 		var strikingFor = stickStatus.strikingFor();
 		if (strikingFor != null) {
-			stickNode.setLocalTranslation(0, 0, strikingFor.note == 53 ? 15 : 20);
+			stickNode.setLocalTranslation(0, 0, strikingFor.getNote() == 53 ? 15 : 20);
 		}
 		return stickStatus;
 	}

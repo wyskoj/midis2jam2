@@ -64,7 +64,7 @@ public abstract class WrappedOctaveSustained extends SustainedInstrument {
 			for (Iterator<NotePeriod> iterator = currentNotePeriods.iterator(); iterator.hasNext(); ) {
 				var currentNotePeriod = iterator.next();
 				
-				int midiNote = currentNotePeriod.midiNote;
+				int midiNote = currentNotePeriod.getMidiNote();
 				int index = 11 - ((midiNote + 3) % 12);
 				if (inverted) {
 					index = 11 - index;

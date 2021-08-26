@@ -69,7 +69,7 @@ public class TubularBells extends DecayedInstrument {
 		}
 		
 		for (MidiNoteOnEvent event : hits) {
-			int midiNote = event.note;
+			int midiNote = event.getNote();
 			int bellNumber = (midiNote + 3) % 12;
 			bellStrikes[bellNumber].add(event);
 		}
@@ -86,9 +86,11 @@ public class TubularBells extends DecayedInstrument {
 			var stickStatus = Stick.handleStick(context, bells[i].malletNode, time, delta,
 					bellStrikes[i], Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 			if (stickStatus.justStruck() && stickStatus.getStrike() != null) {
-				bells[i].recoilBell(stickStatus.getStrike().velocity);
+				bells[i].recoilBell(stickStatus.getStrike().getVelocity());
 			}
 		}
+		
+		
 	}
 	
 	@Override

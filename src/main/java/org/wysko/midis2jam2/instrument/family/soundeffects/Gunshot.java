@@ -77,7 +77,7 @@ public class Gunshot extends DecayedInstrument {
 			ons.add(hits.remove(0));
 		}
 		for (MidiNoteOnEvent on : ons) {
-			int i = (on.note + 3) % 12;
+			int i = (on.getNote() + 3) % 12;
 			pistols[i].fire();
 		}
 		for (Pistol pistol : pistols) {

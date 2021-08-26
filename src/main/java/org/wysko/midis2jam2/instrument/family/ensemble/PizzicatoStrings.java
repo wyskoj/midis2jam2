@@ -72,7 +72,7 @@ public class PizzicatoStrings extends DecayedInstrument {
 			eventsToDoOn.add(hits.remove(0));
 		}
 		for (MidiNoteOnEvent midiNoteOnEvent : eventsToDoOn) {
-			int stringIndex = (midiNoteOnEvent.note + 3) % 12;
+			int stringIndex = (midiNoteOnEvent.getNote() + 3) % 12;
 			strings[stringIndex].play();
 		}
 		

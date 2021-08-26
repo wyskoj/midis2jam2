@@ -104,8 +104,8 @@ public abstract class SustainedInstrument extends Instrument {
 			// within 4 seconds of a note off,
 			// or during a note, be visible
 			if (notePeriod.isPlayingAt(time)
-					|| Math.abs(time - notePeriod.startTime) < START_BUFFER
-					|| (Math.abs(time - notePeriod.endTime) < END_BUFFER && time > notePeriod.endTime)) {
+					|| Math.abs(time - notePeriod.getStartTime()) < START_BUFFER
+					|| (Math.abs(time - notePeriod.getEndTime()) < END_BUFFER && time > notePeriod.getEndTime())) {
 				show = true;
 				break;
 			}
@@ -122,11 +122,11 @@ public abstract class SustainedInstrument extends Instrument {
 	 * @see #currentNotePeriods
 	 */
 	protected void calculateCurrentNotePeriods(double time) {
-		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
+		while (!notePeriods.isEmpty() && notePeriods.get(0).getStartTime() <= time) {
 			currentNotePeriods.add(notePeriods.remove(0));
 		}
 		
-		currentNotePeriods.removeIf(notePeriod -> notePeriod.endTime <= time);
+		currentNotePeriods.removeIf(notePeriod -> notePeriod.getEndTime() <= time);
 	}
 	
 	@Override

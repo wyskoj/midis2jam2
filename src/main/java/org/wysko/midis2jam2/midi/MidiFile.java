@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.midi;
 
 import org.jetbrains.annotations.NotNull;
+import org.wysko.midis2jam2.Midis2jam2;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A special type of music file.
+ * A special type of music file {@link Midis2jam2 new name}.
  */
 public final class MidiFile {
 	
@@ -81,24 +82,24 @@ public final class MidiFile {
 					if (message.getType() == 0x51) { // Tempo
 						byte[] data = message.getData();
 						int tempo = (((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8)) | (data[2] & 0xff);
-						file.getTracks()[j].events.add(new MidiTempoEvent(midiEvent.getTick(), tempo));
+						file.getTracks()[j].getEvents().add(new MidiTempoEvent(midiEvent.getTick(), tempo));
 					}
 				} else if (midiEvent.getMessage() instanceof ShortMessage) {
 					ShortMessage message = (ShortMessage) midiEvent.getMessage();
 					int command = message.getCommand();
 					if (command == ShortMessage.NOTE_ON) {
 						if (message.getData2() == 0) {
-							file.getTracks()[j].events
+							file.getTracks()[j].getEvents()
 									.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 						} else {
-							file.getTracks()[j].events
+							file.getTracks()[j].getEvents()
 									.add(midiNoteOnFromData(midiEvent.getTick(), message.getData1(), message.getData2(), message.getChannel()));
 						}
 					} else if (command == ShortMessage.NOTE_OFF) {
-						file.getTracks()[j].events
+						file.getTracks()[j].getEvents()
 								.add(midiNoteOffFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 					} else if (command == ShortMessage.PROGRAM_CHANGE) {
-						file.getTracks()[j].events
+						file.getTracks()[j].getEvents()
 								.add(programEventFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 					} else {
 						// Ignore message
@@ -162,13 +163,13 @@ public final class MidiFile {
 		for (var i = 1; i < getTracks().length; i++) {
 			MidiTrack track = getTracks()[i];
 			
-			event = track.events.stream()
+			event = track.getEvents().stream()
 					.filter(MidiTempoEvent.class::isInstance)
 					.findFirst()
 					.map(MidiTempoEvent.class::cast)
 					.orElse(event);
 		}
-		return 6E7 / event.number;
+		return 6E7 / event.getNumber();
 	}
 	
 	/**
@@ -182,7 +183,7 @@ public final class MidiFile {
 			/* Skip if null */
 			if (track == null) continue;
 			
-			tempoEvents.addAll(track.events.stream()
+			tempoEvents.addAll(track.getEvents().stream()
 					.filter(MidiTempoEvent.class::isInstance)
 					.map(MidiTempoEvent.class::cast)
 					.collect(Collectors.toList()));
@@ -190,11 +191,11 @@ public final class MidiFile {
 		if (tempoEvents.isEmpty()) {
 			tempoEvents.add(new MidiTempoEvent(0, 500_000));
 		}
-		tempoEvents.sort(Comparator.comparingLong(o -> o.time));
+		tempoEvents.sort(Comparator.comparingLong(MidiTempoEvent::getTime));
 		
 		/* Remove overlapping tempos (fuck you if you have two different tempos at the same time) */
 		for (int i = 0, numberOfTempoEvents = tempoEvents.size(); i < numberOfTempoEvents; i++) {
-			while (i < tempoEvents.size() - 1 && tempoEvents.get(i).time == tempoEvents.get(i + 1).time) {
+			while (i < tempoEvents.size() - 1 && tempoEvents.get(i).getTime() == tempoEvents.get(i + 1).getTime()) {
 				tempoEvents.remove(i);
 			}
 		}
@@ -212,7 +213,7 @@ public final class MidiFile {
 		List<MidiTempoEvent> temposToConsider = new ArrayList<>();
 		if (midiTick >= 0) {
 			for (MidiTempoEvent tempo : getTempos()) {
-				if (tempo.time <= midiTick) {
+				if (tempo.getTime() <= midiTick) {
 					temposToConsider.add(tempo);
 				}
 			}
@@ -221,15 +222,15 @@ public final class MidiFile {
 			
 		}
 		if (temposToConsider.size() == 1) {
-			return ((double) midiTick / getDivision()) * (60 / (6E7 / temposToConsider.get(0).number));
+			return ((double) midiTick / getDivision()) * (60 / (6E7 / temposToConsider.get(0).getNumber()));
 		}
 		double seconds = 0;
 		for (var i = 0; i < temposToConsider.size() - 1; i++) {
-			seconds += ((double) (temposToConsider.get(i + 1).time - temposToConsider.get(i).time) / getDivision())
-					* (60 / (6E7 / temposToConsider.get(i).number));
+			seconds += ((double) (temposToConsider.get(i + 1).getTime() - temposToConsider.get(i).getTime()) / getDivision())
+					* (60 / (6E7 / temposToConsider.get(i).getNumber()));
 		}
 		MidiTempoEvent lastTempo = temposToConsider.get(temposToConsider.size() - 1);
-		seconds += ((double) (midiTick - lastTempo.time) / getDivision()) * (60 / (6E7 / lastTempo.number));
+		seconds += ((double) (midiTick - lastTempo.getTime()) / getDivision()) * (60 / (6E7 / lastTempo.getNumber()));
 		return seconds;
 	}
 	
@@ -240,7 +241,7 @@ public final class MidiFile {
 	 * @return the event's time, expressed in seconds
 	 */
 	public double eventInSeconds(MidiEvent event) {
-		return midiTickInSeconds(event.time);
+		return midiTickInSeconds(event.getTime());
 	}
 	
 	/**
@@ -259,15 +260,16 @@ public final class MidiFile {
 	 * @param event the event
 	 * @return the effective tempo before the event
 	 */
+	@SuppressWarnings("java:S2325")
 	public MidiTempoEvent tempoBefore(MidiNoteOnEvent event) {
-		return tempoBefore(event.time);
+		return tempoBefore(event.getTime());
 	}
 	
 	public MidiTempoEvent tempoBefore(long tick) {
 		MidiTempoEvent lastTempo = getTempos().get(0);
 		if (getTempos().size() > 1) {
 			for (MidiTempoEvent tempo : getTempos()) {
-				if (tempo.time < tick) {
+				if (tempo.getTime() < tick) {
 					lastTempo = tempo;
 				} else {
 					return lastTempo;
@@ -281,7 +283,7 @@ public final class MidiFile {
 		MidiTempoEvent lastTempo = getTempos().get(0);
 		if (getTempos().size() > 1) {
 			for (MidiTempoEvent tempo : getTempos()) {
-				if (tempo.time <= tick) {
+				if (tempo.getTime() <= tick) {
 					lastTempo = tempo;
 				} else {
 					return lastTempo;

@@ -68,7 +68,7 @@ public abstract class AnimatedKeyCloneByIntegers extends StretchyClone {
 		super.tick(time, delta);
 		if (currentNotePeriod != null) {
 			assert parent.manager != null;
-			var ints = (Integer[]) parent.manager.fingering(currentNotePeriod.midiNote);
+			var ints = (Integer[]) parent.manager.fingering(currentNotePeriod.getMidiNote());
 			if (ints != null) {
 				animateKeys(ints);
 			}

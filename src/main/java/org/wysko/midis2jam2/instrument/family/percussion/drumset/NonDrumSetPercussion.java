@@ -60,8 +60,8 @@ public class NonDrumSetPercussion extends PercussionInstrument {
 	 */
 	public boolean calculateVisibility(double time) {
 		for (MidiNoteOnEvent hit : finalHits) {
-			double leftMarginTime = context.getFile().midiTickInSeconds(hit.time - (context.getFile().getDivision()));
-			double rightMarginTime = context.getFile().midiTickInSeconds(hit.time + (context.getFile().getDivision() / 2));
+			double leftMarginTime = context.getFile().midiTickInSeconds(hit.getTime() - (context.getFile().getDivision()));
+			double rightMarginTime = context.getFile().midiTickInSeconds(hit.getTime() + (context.getFile().getDivision() / 2));
 			if (time >= leftMarginTime && time <= rightMarginTime) {
 				return true;
 			}

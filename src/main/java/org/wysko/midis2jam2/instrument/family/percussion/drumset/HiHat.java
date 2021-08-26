@@ -78,7 +78,7 @@ public class HiHat extends SingleStickInstrument {
 	
 	public HiHat(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		hitsToStrike = hits.stream().filter(h -> h.note == OPEN_HI_HAT || h.note == CLOSED_HI_HAT).collect(Collectors.toList());
+		hitsToStrike = hits.stream().filter(h -> h.getNote() == OPEN_HI_HAT || h.getNote() == CLOSED_HI_HAT).collect(Collectors.toList());
 		Spatial topCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f);
 		Spatial bottomCymbalModel = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f);
 		bottomCymbalModel.setLocalRotation(new Quaternion().fromAngles(rad(180), 0, 0));
@@ -111,8 +111,8 @@ public class HiHat extends SingleStickInstrument {
 		
 		if (recoil != null) {
 			animator.strike();
-			wholeHat.setLocalTranslation(0, (float) (-0.7 * velocityRecoilDampening(recoil.velocity)), -14);
-			if (recoil.note == OPEN_HI_HAT) {
+			wholeHat.setLocalTranslation(0, (float) (-0.7 * velocityRecoilDampening(recoil.getVelocity())), -14);
+			if (recoil.getNote() == OPEN_HI_HAT) {
 				status = HiHatStatus.OPEN;
 				topCymbal.setLocalTranslation(0, 2, 0);
 			} else {

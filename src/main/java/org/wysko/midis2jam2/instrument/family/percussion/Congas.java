@@ -96,9 +96,9 @@ public class Congas extends NonDrumSetPercussion {
 		super(context, hits);
 		
 		/* Separate notes */
-		lowCongaHits = hits.stream().filter(h -> h.note == LOW_CONGA).collect(Collectors.toList());
-		highCongaHits = hits.stream().filter(h -> h.note == OPEN_HIGH_CONGA).collect(Collectors.toList());
-		mutedCongaHits = hits.stream().filter(h -> h.note == MUTE_HIGH_CONGA).collect(Collectors.toList());
+		lowCongaHits = hits.stream().filter(h -> h.getNote() == LOW_CONGA).collect(Collectors.toList());
+		highCongaHits = hits.stream().filter(h -> h.getNote() == OPEN_HIGH_CONGA).collect(Collectors.toList());
+		mutedCongaHits = hits.stream().filter(h -> h.getNote() == MUTE_HIGH_CONGA).collect(Collectors.toList());
 		
 		/* Load left conga */
 		Spatial leftConga = context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp");
@@ -170,7 +170,7 @@ public class Congas extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			recoilDrum(rightCongaAnimNode, true, strike.velocity, delta);
+			recoilDrum(rightCongaAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(rightCongaAnimNode, false, 0, delta);
 		}
@@ -184,12 +184,12 @@ public class Congas extends NonDrumSetPercussion {
 			MidiNoteOnEvent mutedStrike = statusMuted.getStrike();
 			var maxVelocity = 0;
 			
-			if (highStrike != null && highStrike.velocity > maxVelocity) {
-				maxVelocity = highStrike.velocity;
+			if (highStrike != null && highStrike.getVelocity() > maxVelocity) {
+				maxVelocity = highStrike.getVelocity();
 			}
 			
-			if (mutedStrike != null && mutedStrike.velocity > maxVelocity) {
-				maxVelocity = mutedStrike.velocity;
+			if (mutedStrike != null && mutedStrike.getVelocity() > maxVelocity) {
+				maxVelocity = mutedStrike.getVelocity();
 			}
 			
 			recoilDrum(leftCongaAnimNode, true, maxVelocity, delta);

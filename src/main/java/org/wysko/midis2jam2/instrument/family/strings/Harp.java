@@ -115,7 +115,7 @@ public class Harp extends SustainedInstrument {
 		
 		for (MidiNoteEvent event : eventsToPerform) {
 			
-			int midiNote = event.note;
+			int midiNote = event.getNote();
 			
 			/* If the note falls on a black key (if it were played on a piano) we need to "round it down" to the
 			 * nearest white key. */

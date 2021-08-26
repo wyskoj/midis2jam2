@@ -137,8 +137,8 @@ public class Metronome extends NonDrumSetPercussion {
 		super(context, hits);
 		
 		/* Extract separate hits for the bell and the click */
-		bellHits = hits.stream().filter(hit -> hit.note == METRONOME_BELL).collect(Collectors.toList());
-		clickHits = hits.stream().filter(hit -> hit.note == METRONOME_CLICK).collect(Collectors.toList());
+		bellHits = hits.stream().filter(hit -> hit.getNote() == METRONOME_BELL).collect(Collectors.toList());
+		clickHits = hits.stream().filter(hit -> hit.getNote() == METRONOME_CLICK).collect(Collectors.toList());
 		
 		/* Load box */
 		instrumentNode.attachChild(context.loadModel("MetronomeBox.obj", "Wood.bmp"));

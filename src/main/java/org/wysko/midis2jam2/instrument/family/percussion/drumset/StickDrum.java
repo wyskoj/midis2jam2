@@ -57,6 +57,6 @@ public abstract class StickDrum extends SingleStickInstrument {
 	 */
 	protected final void drumRecoil(double time, float delta) {
 		final var recoil = NoteQueue.collectOne(hits, context, time);
-		PercussionInstrument.recoilDrum(drum, recoil != null, recoil != null ? recoil.velocity : 0, delta);
+		PercussionInstrument.recoilDrum(drum, recoil != null, recoil != null ? recoil.getVelocity() : 0, delta);
 	}
 }

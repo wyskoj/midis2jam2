@@ -67,7 +67,7 @@ public abstract class OneDrumOctave extends DecayedInstrument {
 		}
 		List<MidiNoteOnEvent> collect = eventList.stream().filter(MidiNoteOnEvent.class::isInstance).map(MidiNoteOnEvent.class::cast).collect(Collectors.toList());
 		for (MidiNoteOnEvent noteOn : collect) {
-			malletStrikes[(noteOn.note + 3) % 12].add(noteOn);
+			malletStrikes[(noteOn.getNote() + 3) % 12].add(noteOn);
 		}
 	}
 	

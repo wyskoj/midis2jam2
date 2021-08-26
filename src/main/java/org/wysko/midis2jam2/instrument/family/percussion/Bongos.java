@@ -73,8 +73,8 @@ public class Bongos extends NonDrumSetPercussion {
 		super(context, hits);
 		
 		/* Separate high and low bongo hits */
-		lowBongoHits = hits.stream().filter(h -> h.note == LOW_BONGO).collect(Collectors.toList());
-		highBongoHits = hits.stream().filter(h -> h.note == HIGH_BONGO).collect(Collectors.toList());
+		lowBongoHits = hits.stream().filter(h -> h.getNote() == LOW_BONGO).collect(Collectors.toList());
+		highBongoHits = hits.stream().filter(h -> h.getNote() == HIGH_BONGO).collect(Collectors.toList());
 		
 		/* Load bongos */
 		Spatial lowBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
@@ -126,7 +126,7 @@ public class Bongos extends NonDrumSetPercussion {
 		if (statusLow.justStruck()) {
 			MidiNoteOnEvent strike = statusLow.getStrike();
 			assert strike != null;
-			recoilDrum(lowBongoAnimNode, true, strike.velocity, delta);
+			recoilDrum(lowBongoAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(lowBongoAnimNode, false, 0, delta);
 		}
@@ -135,7 +135,7 @@ public class Bongos extends NonDrumSetPercussion {
 		if (statusHigh.justStruck()) {
 			MidiNoteOnEvent strike = statusHigh.getStrike();
 			assert strike != null;
-			recoilDrum(highBongoAnimNode, true, strike.velocity, delta);
+			recoilDrum(highBongoAnimNode, true, strike.getVelocity(), delta);
 		} else {
 			recoilDrum(highBongoAnimNode, false, 0, delta);
 		}

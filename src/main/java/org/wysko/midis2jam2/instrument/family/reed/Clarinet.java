@@ -59,7 +59,7 @@ public class Clarinet extends HandedInstrument {
 						eventList.stream()
 								.filter(MidiNoteEvent.class::isInstance)
 								.map(MidiNoteEvent.class::cast)
-								.filter(note -> note.note >= 50 && note.note <= 90),
+								.filter(note -> note.getNote() >= 50 && note.getNote() <= 90),
 						eventList.stream()
 								.filter(obj -> !(obj instanceof MidiNoteEvent))
 				).collect(Collectors.toList()),

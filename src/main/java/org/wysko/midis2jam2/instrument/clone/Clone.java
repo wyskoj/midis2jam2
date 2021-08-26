@@ -196,17 +196,17 @@ public abstract class Clone {
 	 */
 	@SuppressWarnings("java:S1774")
 	public void tick(double time, float delta) {
-		while (!notePeriods.isEmpty() && notePeriods.get(0).startTime <= time) {
+		while (!notePeriods.isEmpty() && notePeriods.get(0).getStartTime() <= time) {
 			currentNotePeriod = notePeriods.remove(0);
 		}
 		
-		if (currentNotePeriod != null && currentNotePeriod.endTime <= time) {
+		if (currentNotePeriod != null && currentNotePeriod.getEndTime() <= time) {
 			currentNotePeriod = null;
 		}
 		
 		/* Rotate clone on note play */
 		if (currentNotePeriod != null) {
-			float rotate = -((float) ((currentNotePeriod.endTime - time) / currentNotePeriod.duration())) * rotationFactor;
+			float rotate = -((float) ((currentNotePeriod.getEndTime() - time) / currentNotePeriod.duration())) * rotationFactor;
 			animNode.setLocalRotation(
 					new Quaternion().fromAngles(
 							rotationAxis == Axis.X ? rotate : 0,

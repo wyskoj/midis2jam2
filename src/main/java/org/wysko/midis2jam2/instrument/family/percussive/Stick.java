@@ -68,7 +68,7 @@ public final class Stick {
 	                                       @Nullable MidiNoteOnEvent nextHit,
 	                                       double maxAngle,
 	                                       double strikeSpeed) {
-		return nextHit == null ? maxAngle + 1 : -1000 * ((6E7 / context.getFile().tempoBefore(nextHit).number) / (1000f / strikeSpeed)) * (time - context.getFile().eventInSeconds(nextHit));
+		return nextHit == null ? maxAngle + 1 : -1000 * ((6E7 / context.getFile().tempoBefore(nextHit).getNumber()) / (1000f / strikeSpeed)) * (time - context.getFile().eventInSeconds(nextHit));
 	}
 	
 	public static final Map<Spatial, MidiNoteOnEvent> LAST_HIT_MAP = new HashMap<>();

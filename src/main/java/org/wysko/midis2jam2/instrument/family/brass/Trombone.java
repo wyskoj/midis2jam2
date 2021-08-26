@@ -129,8 +129,8 @@ public class Trombone extends MonophonicInstrument {
 			if (!notePeriods.isEmpty() && !isPlaying()) {
 				var notePeriod = notePeriods.get(0);
 				/* If within range */
-				if (notePeriod.midiNote >= 21 && notePeriod.midiNote <= 80) {
-					var startTime = notePeriod.startTime;
+				if (notePeriod.getMidiNote() >= 21 && notePeriod.getMidiNote() <= 80) {
+					var startTime = notePeriod.getStartTime();
 					/* Slide only if there is 1 or less seconds between now and the beginning of the note */
 					if (startTime - time <= 1) {
 						var targetPos = getSlidePositionFromNote(notePeriod);
@@ -152,7 +152,7 @@ public class Trombone extends MonophonicInstrument {
 		 * @return the slide position from note
 		 */
 		private int getSlidePositionFromNote(NotePeriod period) {
-			var fingering = SLIDE_MANAGER.fingering(period.midiNote);
+			var fingering = SLIDE_MANAGER.fingering(period.getMidiNote());
 			
 			/* If out of range, return current position */
 			if (fingering == null) {

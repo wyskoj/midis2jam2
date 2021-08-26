@@ -79,7 +79,7 @@ public class Harmonica extends SustainedInstrument {
 		/* For each current note playing */
 		for (NotePeriod currentNotePeriod : currentNotePeriods) {
 			/* Determine its index position and flag it true */
-			int i = currentNotePeriod.midiNote % 12;
+			int i = currentNotePeriod.getMidiNote() % 12;
 			eachNotePlaying[i] = true;
 		}
 		

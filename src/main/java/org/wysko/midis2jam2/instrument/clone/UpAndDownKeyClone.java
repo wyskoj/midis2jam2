@@ -99,7 +99,7 @@ public abstract class UpAndDownKeyClone extends StretchyClone {
 		super.tick(time, delta);
 		if (isPlaying()) {
 			assert currentNotePeriod != null;
-			pushOrReleaseKeys(currentNotePeriod.midiNote);
+			pushOrReleaseKeys(currentNotePeriod.getMidiNote());
 		}
 	}
 	

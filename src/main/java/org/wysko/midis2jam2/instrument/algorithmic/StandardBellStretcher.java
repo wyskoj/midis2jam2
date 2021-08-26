@@ -75,7 +75,7 @@ public class StandardBellStretcher implements BellStretcher {
 	
 	public void tick(NotePeriod currentNotePeriod, double time) {
 		if (currentNotePeriod != null) {
-			float scale = (float) ((stretchiness * (currentNotePeriod.endTime - time) / currentNotePeriod.duration()) + 1);
+			float scale = (float) ((stretchiness * (currentNotePeriod.getEndTime() - time) / currentNotePeriod.duration()) + 1);
 			scaleBell(scale);
 		} else {
 			scaleBell(1);

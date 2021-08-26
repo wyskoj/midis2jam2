@@ -139,7 +139,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 */
 	@Override
 	public void applyFretboardPosition(@NotNull FretboardPosition position) {
-		frets[position.string] = position.fret;
+		frets[position.getString()] = position.getFret();
 		runningAverage.add(position);
 		if (runningAverage.size() > RUNNING_AVERAGE_COUNT) {
 			runningAverage.remove(0);
@@ -162,8 +162,8 @@ public class StandardFrettingEngine implements FrettingEngine {
 		var stringAvg = 0;
 		var fretAvg = 0;
 		for (FretboardPosition pos : runningAverage) {
-			stringAvg += pos.string;
-			fretAvg += pos.fret;
+			stringAvg += pos.getString();
+			fretAvg += pos.getFret();
 		}
 		return new FretboardPosition(
 				(int) Math.round((double) stringAvg / runningAverage.size()),
@@ -191,7 +191,7 @@ public class StandardFrettingEngine implements FrettingEngine {
 	 */
 	@Override
 	@Contract(pure = true)
-	public List<Integer> getFrets() {
+	public @NotNull List<Integer> getFrets() {
 		return Arrays.stream(frets).boxed().collect(Collectors.toUnmodifiableList());
 	}
 	

@@ -14,40 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-
-package org.wysko.midis2jam2.midi;
-
-import java.util.Objects;
+package org.wysko.midis2jam2.midi
 
 /**
- * MIDI files are made up of events.
+ * Indicates the channel's pitch is to change.
  */
-public class MidiEvent {
-	
-	/**
-	 * The time at which this MIDI event occurs, expressed in MIDI ticks.
-	 */
-	public final long time;
-	
-	/**
-	 * Instantiates a new MIDI event.
-	 *
-	 * @param time the time
-	 */
-	protected MidiEvent(long time) {
-		this.time = time;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		var midiEvent = (MidiEvent) o;
-		return time == midiEvent.time;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(time);
-	}
-}
+data class MidiPitchBendEvent(override val time: Long, override val channel: Int, val value: Int) :
+    MidiChannelSpecificEvent(time, channel)

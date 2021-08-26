@@ -93,12 +93,12 @@ public class Surdo extends NonDrumSetPercussion {
 		super.tick(time, delta);
 		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
 		//noinspection ConstantConditions
-		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().velocity : 0, delta);
+		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().getVelocity() : 0, delta);
 		
 		if (stickStatus.justStruck()) {
 			var strike = stickStatus.getStrike();
 			assert strike != null;
-			moveHand(strike.note == Midi.OPEN_SURDO ? HandPosition.UP : HandPosition.DOWN);
+			moveHand(strike.getNote() == Midi.OPEN_SURDO ? HandPosition.UP : HandPosition.DOWN);
 		}
 	}
 	

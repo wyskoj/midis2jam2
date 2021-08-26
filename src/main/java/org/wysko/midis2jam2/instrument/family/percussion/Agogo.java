@@ -70,8 +70,8 @@ public class Agogo extends NonDrumSetPercussion {
 	 */
 	protected Agogo(@NotNull Midis2jam2 context, @NotNull List<MidiNoteOnEvent> hits) {
 		super(context, hits);
-		highHits = hits.stream().filter(a -> a.note == HIGH_AGOGO).collect(Collectors.toList());
-		lowHits = hits.stream().filter(a -> a.note == LOW_AGOGO).collect(Collectors.toList());
+		highHits = hits.stream().filter(a -> a.getNote() == HIGH_AGOGO).collect(Collectors.toList());
+		lowHits = hits.stream().filter(a -> a.getNote() == LOW_AGOGO).collect(Collectors.toList());
 		
 		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
 		rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
@@ -97,10 +97,10 @@ public class Agogo extends NonDrumSetPercussion {
 		
 		var velocity = 0;
 		if (leftStatus.getStrike() != null) {
-			velocity = max(velocity, leftStatus.getStrike().velocity);
+			velocity = max(velocity, leftStatus.getStrike().getVelocity());
 		}
 		if (rightStatus.getStrike() != null) {
-			velocity = max(velocity, rightStatus.getStrike().velocity);
+			velocity = max(velocity, rightStatus.getStrike().getVelocity());
 		}
 		
 		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta);

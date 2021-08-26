@@ -122,7 +122,7 @@ public class MusicBox extends DecayedInstrument {
 		for (Iterator<MidiNoteOnEvent> iterator = hits.iterator(); iterator.hasNext(); ) {
 			MidiNoteOnEvent hit = iterator.next();
 			// If it is within one quarter note of the hit
-			if (context.getFile().eventInSeconds(hit.time - context.getFile().getDivision()) <= time) {
+			if (context.getFile().eventInSeconds(hit.getTime() - context.getFile().getDivision()) <= time) {
 				Spatial aPoint;
 				if (pool.size() > 1) {
 					aPoint = pool.remove(0);
@@ -133,7 +133,7 @@ public class MusicBox extends DecayedInstrument {
 				aPoint.setLocalRotation(new Quaternion().fromAngles((float) (-PI / 2), 0, 0));
 				points.add(aPoint);
 				pointRotations.put(aPoint, 0F);
-				aPoint.setLocalTranslation(((hit.note + 3) % 12) - 5.5F, 0, 0);
+				aPoint.setLocalTranslation(((hit.getNote() + 3) % 12) - 5.5F, 0, 0);
 				iterator.remove();
 			}
 		}
@@ -153,7 +153,7 @@ public class MusicBox extends DecayedInstrument {
 			performingRecoils.add(hitsForRecoil.remove(0));
 		}
 		for (MidiNoteOnEvent performingRecoil : performingRecoils) {
-			notes[(performingRecoil.note + 3) % 12].play();
+			notes[(performingRecoil.getNote() + 3) % 12].play();
 		}
 		// Tick the hanging notes
 		for (OneMusicBoxNote note : notes) {
@@ -168,7 +168,7 @@ public class MusicBox extends DecayedInstrument {
 	 */
 	private void rotateCylinder(float delta) {
 		var tick = context.getSequencer().getTickPosition();
-		var xAngle = (float) (0.5 * PI * delta * (6E7 / context.getFile().tempoAt(tick).number) / 60.0);
+		var xAngle = (float) (0.5 * PI * delta * (6E7 / context.getFile().tempoAt(tick).getNumber()) / 60.0);
 		
 		for (Spatial point : points) {
 			point.rotate(xAngle, 0, 0);
