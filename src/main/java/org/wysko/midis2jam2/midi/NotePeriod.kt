@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.midi
 
+import org.jetbrains.annotations.Contract
+import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 
 /**
@@ -82,6 +84,51 @@ open class NotePeriod(
      */
     fun isPlayingAt(time: Double): Boolean {
         return time in startTime..endTime
+    }
+
+    companion object {
+        /**
+         * A MIDI file is a sequence of [MidiNoteOnEvent]s and [MidiNoteOffEvent]s. This method searches the
+         * files and connects corresponding events together. This is effectively calculating the "blocks" you would see in a
+         * piano roll editor.
+         *
+         * @param noteEvents the note events to calculate into [NotePeriod]s
+         */
+        @JvmStatic
+        @Contract(pure = true)
+        fun calculateNotePeriods(instrument: Instrument, noteEvents: MutableList<MidiNoteEvent>): List<NotePeriod> {
+            val notePeriods: ArrayList<NotePeriod> = ArrayList()
+            val onEvents = arrayOfNulls<MidiNoteOnEvent>(MidiNoteEvent.MIDI_MAX_NOTE + 1)
+
+            /* To calculate NotePeriods, we iterate over each MidiNoteEvent and keep track of when a NoteOnEvent occurs.
+             * When it does, we insert it into the array at the index of the note's value. Then, when a NoteOffEvent occurs,
+             * we lookup the NoteOnEvent by the NoteOffEvent's value and create a NotePeriod from that.
+             *
+             * I wrote this with the assumption that there would not be duplicate notes of the same value that overlap,
+             * so I'm not sure how it will handle in that scenario.
+             *
+             * Runs in O(n) time.
+             */
+            for (noteEvent in noteEvents) {
+                if (noteEvent is MidiNoteOnEvent) {
+                    onEvents[noteEvent.note] = noteEvent
+                } else {
+                    val noteOff = noteEvent as MidiNoteOffEvent
+                    if (onEvents[noteOff.note] != null) {
+                        val onEvent = onEvents[noteOff.note]
+                        notePeriods.add(NotePeriod(noteOff.note,
+                            instrument.context.file.eventInSeconds(onEvent!!.time),
+                            instrument.context.file.eventInSeconds(noteOff.time),
+                            onEvent,
+                            noteOff))
+                        onEvents[noteOff.note] = null
+                    }
+                }
+            }
+
+            /* Remove exact duplicates */
+            return ArrayList(notePeriods.distinct())
+        }
     }
 
     override fun toString(): String {

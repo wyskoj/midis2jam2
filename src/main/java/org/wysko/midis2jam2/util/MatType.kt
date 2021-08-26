@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-
-package org.wysko.midis2jam2.util;
+package org.wysko.midis2jam2.util
 
 /**
  * A material type.
  */
-public enum MatType {
-	/**
-	 * An unshaded material.
-	 */
-	UNSHADED,
-	
-	/**
-	 * A reflective material.
-	 */
-	REFLECTIVE
+enum class MatType {
+    /**
+     * An unshaded material.
+     */
+    UNSHADED,
+
+    /**
+     * A reflective material.
+     */
+    REFLECTIVE
 }

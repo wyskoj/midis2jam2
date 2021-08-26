@@ -14,51 +14,69 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.world
 
-package org.wysko.midis2jam2.world;
-
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
+import org.wysko.midis2jam2.util.Utils
 
 /**
  * Defines angles for cameras.
  */
-public enum Camera {
-	CAMERA_1A(-2, 92, 134, rad(18.44F), rad(180), 0),
-	CAMERA_1B(60, 92, 124, rad(18.5), rad(204.4), 0),
-	CAMERA_1C(-59.5F, 90.8F, 94.4F, rad(23.9), rad(153.6), 0),
-	CAMERA_2A(0, 71.8F, 44.5F, rad(15.7), rad(224.9), 0),
-	CAMERA_2B(-35, 76.4F, 33.6F, rad(55.8), rad(198.5), 0),
-	CAMERA_3A(-0.2F, 61.6F, 38.6F, rad(15.5), rad(180), 0),
-	CAMERA_3B(-19.6F, 78.7F, 3.8F, rad(27.7), rad(163.8), 0),
-	CAMERA_4A(0.2F, 81.1F, 32.2F, rad(21), rad(131.8), rad(-0.5)),
-	CAMERA_4B(35, 25.4F, -19, rad(-50), rad(119), rad(-2.5)),
-	CAMERA_5(5, 432, 24, rad(82.875F), rad(180), 0),
-	CAMERA_6(17, 30.5F, 42.9F, rad(-6.7), rad(144.3), 0);
-	
-	public final Vector3f location;
-	
-	public final Quaternion rotation;
-	
-	Camera(float locX, float locY, float locZ, float rotX, float rotY, float rotZ) {
-		location = new Vector3f(locX, locY, locZ);
-		rotation = new Quaternion().fromAngles(rotX, rotY, rotZ);
-	}
-	
-	/**
-	 * Checks the camera's position and ensures it stays within a certain bounding box.
-	 *
-	 * @param camera the camera
-	 */
-	@SuppressWarnings("java:S1774")
-	public static void preventCameraFromLeaving(com.jme3.renderer.Camera camera) {
-		var location = camera.getLocation();
-		camera.setLocation(new Vector3f(
-				location.x > 0 ? Math.min(location.x, 400) : Math.max(location.x, -400),
-				location.y > 0 ? Math.min(location.y, 432) : Math.max(location.y, -432),
-				location.z > 0 ? Math.min(location.z, 400) : Math.max(location.z, -400)
-		));
-	}
+enum class Camera(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY: Float, rotZ: Float) {
+    CAMERA_1A(-2f, 92f, 134f, Utils.rad(18.44f), Utils.rad(180f), 0f), CAMERA_1B(60f,
+        92f,
+        124f,
+        Utils.rad(18.5),
+        Utils.rad(204.4),
+        0f),
+    CAMERA_1C(-59.5f, 90.8f, 94.4f, Utils.rad(23.9), Utils.rad(153.6), 0f), CAMERA_2A(0f,
+        71.8f,
+        44.5f,
+        Utils.rad(15.7),
+        Utils.rad(224.9),
+        0f),
+    CAMERA_2B(-35f, 76.4f, 33.6f, Utils.rad(55.8), Utils.rad(198.5), 0f), CAMERA_3A(-0.2f,
+        61.6f,
+        38.6f,
+        Utils.rad(15.5),
+        Utils.rad(180f),
+        0f),
+    CAMERA_3B(-19.6f, 78.7f, 3.8f, Utils.rad(27.7), Utils.rad(163.8), 0f), CAMERA_4A(0.2f,
+        81.1f,
+        32.2f,
+        Utils.rad(21f),
+        Utils.rad(131.8),
+        Utils.rad(-0.5)),
+    CAMERA_4B(35f, 25.4f, -19f, Utils.rad(-50f), Utils.rad(119f), Utils.rad(-2.5)), CAMERA_5(5f,
+        432f,
+        24f,
+        Utils.rad(82.875f),
+        Utils.rad(180f),
+        0f),
+    CAMERA_6(17f, 30.5f, 42.9f, Utils.rad(-6.7), Utils.rad(144.3), 0f);
+
+    @JvmField
+    val location: Vector3f = Vector3f(locX, locY, locZ)
+
+    @JvmField
+    val rotation: Quaternion = Quaternion().fromAngles(rotX, rotY, rotZ)
+
+    companion object {
+        /**
+         * Checks the camera's position and ensures it stays within a certain bounding box.
+         *
+         * @param camera the camera
+         */
+        @JvmStatic
+        fun preventCameraFromLeaving(camera: com.jme3.renderer.Camera) {
+            val location = camera.location
+            camera.location = Vector3f(
+                if (location.x > 0) Math.min(location.x, 400f) else Math.max(location.x, -400f),
+                if (location.y > 0) Math.min(location.y, 432f) else Math.max(location.y, -432f),
+                if (location.z > 0) Math.min(location.z, 400f) else Math.max(location.z, -400f)
+            )
+        }
+    }
+
 }

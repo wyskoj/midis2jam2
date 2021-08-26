@@ -25,14 +25,16 @@ import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.gui.GuiLauncher;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.util.M2J2Settings;
+import org.wysko.midis2jam2.util.Utils;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class Liaison extends SimpleApplication {
+	
+	private static final AppSettings midis2Jam2Settings = new AppSettings(true);
 	
 	protected final Sequencer sequencer;
 	
@@ -43,8 +45,6 @@ public class Liaison extends SimpleApplication {
 	protected final M2J2Settings m2j2settings;
 	
 	protected final boolean fullscreen;
-	
-	private static final AppSettings midis2Jam2Settings = new AppSettings(true);
 	
 	static {
 		// Set settings
@@ -105,8 +105,8 @@ public class Liaison extends SimpleApplication {
 							Canvas.class, Midis2jam2.class);
 					display = constructor.newInstance(this, ctx.getCanvas(), midis2jam2);
 					display.display();
-				} catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-					e.printStackTrace();
+				} catch (ReflectiveOperationException e) {
+					Midis2jam2.getLOGGER().severe(Utils.exceptionToLines(e));
 				}
 				startCanvas();
 			});

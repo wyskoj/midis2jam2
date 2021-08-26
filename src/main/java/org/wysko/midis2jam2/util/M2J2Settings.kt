@@ -14,40 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.util
 
-package org.wysko.midis2jam2.util;
-
-public class M2J2Settings {
-	
-	private final int latencyFix;
-	
-	private final InstrumentTransition transitionSpeed;
-	
-	public M2J2Settings(int latencyFix, InstrumentTransition transitionSpeed) {
-		this.latencyFix = latencyFix;
-		this.transitionSpeed = transitionSpeed;
-	}
-	
-	public int getLatencyFix() {
-		return latencyFix;
-	}
-	
-	public InstrumentTransition getTransitionSpeed() {
-		return transitionSpeed;
-	}
-	
-	@SuppressWarnings("unused")
-	public enum InstrumentTransition {
-		NONE(0), FAST(200), NORMAL(500), SLOW(1000);
-		
-		private final double speed;
-		
-		InstrumentTransition(double speed) {
-			this.speed = speed;
-		}
-		
-		public double getSpeed() {
-			return speed;
-		}
-	}
-}
+/** Provides some configurable settings for running the program. */
+data class M2J2Settings(
+    /** The amount to shift the audio by to fix A/V sync, in milliseconds. */
+    val latencyFix: Int,
+    /** The speed to transition instruments. */
+    val transitionSpeed: InstrumentTransition,
+)

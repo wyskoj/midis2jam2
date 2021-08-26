@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiFile;
 import org.wysko.midis2jam2.starter.LegacyLiaison;
 import org.wysko.midis2jam2.starter.Liaison;
+import org.wysko.midis2jam2.util.InstrumentTransition;
 import org.wysko.midis2jam2.util.M2J2Settings;
 import org.wysko.midis2jam2.util.Utils;
 
@@ -414,13 +415,13 @@ public class GuiLauncher extends JFrame {
 			}
 			if (legacyEngineCheckbox.isSelected()) {
 				var liaison = new LegacyLiaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
-						M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
+						InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
 						fullscreenCheckbox.isSelected());
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
 			} else {
 				var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
-						M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
+						InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
 						fullscreenCheckbox.isSelected());
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				SwingUtilities.invokeLater(() -> new Thread(() -> liaison.start(Midis2jam2Display.class)).start());
@@ -460,7 +461,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void transitionSpeedNoneButtonActionPerformed(ActionEvent e) {
-		settings.setTransition(M2J2Settings.InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName()));
+		settings.setTransition(InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName()));
 		saveSettings();
 	}
 	

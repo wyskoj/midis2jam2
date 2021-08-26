@@ -21,11 +21,8 @@ import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.M2J2Settings.InstrumentTransition
+import org.wysko.midis2jam2.util.InstrumentTransition
 import kotlin.math.max
 
 /**
@@ -81,48 +78,6 @@ abstract class Instrument protected constructor(
      * @param delta the amount of time since the last call this method, expressed in seconds
      */
     abstract fun tick(time: Double, delta: Float)
-
-    /**
-     * A MIDI file is a sequence of [MidiNoteOnEvent]s and [MidiNoteOffEvent]s. This method searches the
-     * files and connects corresponding events together. This is effectively calculating the "blocks" you would see in a
-     * piano roll editor.
-     *
-     * @param noteEvents the note events to calculate into [NotePeriod]s
-     */
-    @Contract(pure = true)
-    protected fun calculateNotePeriods(noteEvents: List<MidiNoteEvent>): List<NotePeriod> {
-        val notePeriods: MutableList<NotePeriod> = ArrayList()
-        val onEvents = arrayOfNulls<MidiNoteOnEvent>(MidiNoteEvent.MIDI_MAX_NOTE + 1)
-
-        /* To calculate NotePeriods, we iterate over each MidiNoteEvent and keep track of when a NoteOnEvent occurs.
-		 * When it does, we insert it into the array at the index of the note's value. Then, when a NoteOffEvent occurs,
-		 * we lookup the NoteOnEvent by the NoteOffEvent's value and create a NotePeriod from that.
-		 *
-		 * I wrote this with the assumption that there would not be duplicate notes of the same value that overlap,
-		 * so I'm not sure how it will handle in that scenario.
-		 *
-		 * Runs in O(n) time.
-		 */
-        for (noteEvent in noteEvents) {
-            if (noteEvent is MidiNoteOnEvent) {
-                onEvents[noteEvent.note] = noteEvent
-            } else {
-                val noteOff = noteEvent as MidiNoteOffEvent
-                if (onEvents[noteOff.note] != null) {
-                    val onEvent = onEvents[noteOff.note]
-                    notePeriods.add(NotePeriod(noteOff.note,
-                        context.file.eventInSeconds(onEvent!!.time),
-                        context.file.eventInSeconds(noteOff.time),
-                        onEvent,
-                        noteOff))
-                    onEvents[noteOff.note] = null
-                }
-            }
-        }
-
-        /* Remove exact duplicates */
-        return notePeriods.distinct()
-    }
 
     /**
      * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.

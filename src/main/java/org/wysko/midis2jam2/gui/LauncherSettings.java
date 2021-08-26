@@ -17,7 +17,7 @@
 
 package org.wysko.midis2jam2.gui;
 
-import org.wysko.midis2jam2.util.M2J2Settings.InstrumentTransition;
+import org.wysko.midis2jam2.util.InstrumentTransition;
 
 import javax.swing.*;
 import java.util.ArrayList;

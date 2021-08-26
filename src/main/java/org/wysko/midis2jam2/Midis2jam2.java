@@ -68,6 +68,7 @@ import org.wysko.midis2jam2.starter.LegacyLiaison;
 import org.wysko.midis2jam2.starter.Liaison;
 import org.wysko.midis2jam2.util.M2J2Settings;
 import org.wysko.midis2jam2.util.MatType;
+import org.wysko.midis2jam2.util.Utils;
 import org.wysko.midis2jam2.world.Camera;
 import org.wysko.midis2jam2.world.ShadowController;
 import org.wysko.midis2jam2.world.StandController;
@@ -83,7 +84,6 @@ import static com.jme3.scene.Spatial.CullHint.Dynamic;
 import static org.wysko.midis2jam2.instrument.family.piano.Keyboard.KeyboardSkin.*;
 import static org.wysko.midis2jam2.util.Jme3Constants.*;
 import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
-import static org.wysko.midis2jam2.world.Camera.*;
 
 /**
  * Contains all the code relevant to operating the 3D scene.
@@ -132,7 +132,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	/**
 	 * The current camera position.
 	 */
-	private Camera currentCamera = CAMERA_1A;
+	private Camera currentCamera = Camera.CAMERA_1A;
 	
 	/**
 	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
@@ -167,6 +167,17 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 	 * The stand controller.
 	 */
 	private StandController standController;
+	
+	/**
+	 * When the MIDI sequence ends, the {@link #timeSinceStart} is recorded to this variable to know when to close the
+	 * app (three seconds after the end).
+	 */
+	private double stopTime;
+	
+	/**
+	 * True if the sequencer has reached the end of the MIDI file, false otherwise.
+	 */
+	private boolean afterEnd;
 	
 	/**
 	 * Instantiates a midis2jam2 {@link AbstractAppState}.
@@ -215,7 +226,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		this.app.getFlyByCamera().setDragToRotate(true);
 		
 		setupInputMappings();
-		setCamera(CAMERA_1A);
+		setCamera(Camera.CAMERA_1A);
 		
 		/* Load stage */
 		Spatial stage = loadModel("Stage.obj", "Stage.bmp");
@@ -322,20 +333,21 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		
 		/* If at the end of the file */
 		if (sequencer.getMicrosecondPosition() == sequencer.getMicrosecondLength()) {
-			/* Wait 3 seconds to close */
-			new Timer().schedule(new TimerTask() {
-				@Override
-				public void run() {
-					exit();
-				}
-			}, 3000);
-			sequencer.setMicrosecondPosition(0);
+			if (!afterEnd) {
+				stopTime = timeSinceStart;
+			}
+			afterEnd = true;
+		}
+		
+		/* If after the end, by three seconds */
+		if (afterEnd && timeSinceStart >= stopTime + 3.0) {
+			exit();
 		}
 		
 		shadowController.tick();
 		standController.tick();
 		
-		preventCameraFromLeaving(app.getCamera());
+		Camera.preventCameraFromLeaving(app.getCamera());
 	}
 	
 	@Override
@@ -373,20 +385,21 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			try {
 				currentCamera = switch (name) {
 					case "cam1" -> switch (currentCamera) {
-						case CAMERA_1A -> CAMERA_1B;
-						case CAMERA_1B -> CAMERA_1C;
-						default -> CAMERA_1A;
+						case CAMERA_1A -> Camera.CAMERA_1B;
+						case CAMERA_1B -> Camera.CAMERA_1C;
+						default -> Camera.CAMERA_1A;
 					};
-					case "cam2" -> currentCamera == CAMERA_2A ? CAMERA_2B : CAMERA_2A;
-					case "cam3" -> currentCamera == CAMERA_3A ? CAMERA_3B : CAMERA_3A;
-					case "cam4" -> currentCamera == CAMERA_4A ? CAMERA_4B : CAMERA_4A;
-					case "cam5" -> CAMERA_5;
-					case "cam6" -> CAMERA_6;
+					case "cam2" -> currentCamera == Camera.CAMERA_2A ? Camera.CAMERA_2B : Camera.CAMERA_2A;
+					case "cam3" -> currentCamera == Camera.CAMERA_3A ? Camera.CAMERA_3B : Camera.CAMERA_3A;
+					case "cam4" -> currentCamera == Camera.CAMERA_4A ? Camera.CAMERA_4B : Camera.CAMERA_4A;
+					case "cam5" -> Camera.CAMERA_5;
+					case "cam6" -> Camera.CAMERA_6;
 					default -> throw new IllegalStateException("Unexpected value: " + name);
 				};
 				setCamera(Camera.valueOf(currentCamera.name()));
-			} catch (IllegalArgumentException ignored) {
+			} catch (IllegalArgumentException e) {
 				LOGGER.warning("Bad camera string.");
+				LOGGER.warning(Utils.exceptionToLines(e));
 			}
 		}
 	}

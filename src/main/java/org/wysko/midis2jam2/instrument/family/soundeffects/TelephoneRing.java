@@ -95,7 +95,7 @@ public class TelephoneRing extends SustainedInstrument {
 				.filter(MidiNoteEvent.class::isInstance)
 				.map(MidiNoteEvent.class::cast)
 				.collect(Collectors.toList());
-		this.notePeriods = calculateNotePeriods(notes);
+		this.notePeriods = NotePeriod.calculateNotePeriods(this, notes);
 		
 		Spatial base = context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp");
 		

@@ -81,7 +81,7 @@ public abstract class KeyedInstrument extends Instrument {
 		this.rangeLow = rangeLow;
 		this.rangeHigh = rangeHigh;
 		this.keys = new Key[keyCount()];
-		this.notePeriods = Collections.unmodifiableList(calculateNotePeriods(this.events));
+		this.notePeriods = Collections.unmodifiableList(NotePeriod.calculateNotePeriods(this, this.events));
 	}
 	
 	/**

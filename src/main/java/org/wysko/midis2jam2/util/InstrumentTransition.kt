@@ -14,24 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.world
+package org.wysko.midis2jam2.util
 
 /**
- * Each axis in 3D space.
+ * Transition easing is configurable by the speed at which instruments transition between spots. This enum defines
+ * the different available speeds.
  */
-enum class Axis {
-    /**
-     * The X-axis.
-     */
-    X,
-
-    /**
-     * The Y-axis.
-     */
-    Y,
-
-    /**
-     * The Z-axis
-     */
-    Z
+@Suppress("unused")
+enum class InstrumentTransition(val speed: Double) {
+    NONE(0.0), FAST(200.0), NORMAL(500.0), SLOW(1000.0)
 }

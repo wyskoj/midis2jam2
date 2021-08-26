@@ -70,7 +70,8 @@ public abstract class SustainedInstrument extends Instrument {
 	protected SustainedInstrument(@NotNull Midis2jam2 context,
 	                              @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context);
-		this.notePeriods = calculateNotePeriods(scrapeMidiNoteEvents(eventList));
+		List<MidiNoteEvent> midiNoteEvents = scrapeMidiNoteEvents(eventList);
+		this.notePeriods = NotePeriod.calculateNotePeriods(this, midiNoteEvents);
 		this.unmodifiableNotePeriods = List.copyOf(notePeriods);
 	}
 	
