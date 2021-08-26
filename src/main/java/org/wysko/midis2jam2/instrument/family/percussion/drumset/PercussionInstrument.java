@@ -53,7 +53,6 @@ public abstract class PercussionInstrument extends Instrument {
 	 */
 	protected List<MidiNoteOnEvent> hits;
 	
-	
 	/**
 	 * Instantiates a new Percussion instrument.
 	 *
@@ -87,6 +86,7 @@ public abstract class PercussionInstrument extends Instrument {
 	 * @param velocity the velocity of the strike
 	 * @param delta    the amount of time since the last frame update
 	 */
+	@SuppressWarnings("java:S2301")
 	public static void recoilDrum(Spatial drum, boolean struck, int velocity, float delta) {
 		Vector3f localTranslation = drum.getLocalTranslation();
 		if (localTranslation.y < -0.0001) {

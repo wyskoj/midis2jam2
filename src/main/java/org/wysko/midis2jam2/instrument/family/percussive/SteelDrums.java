@@ -42,7 +42,7 @@ public class SteelDrums extends OneDrumOctave {
 	public SteelDrums(@NotNull Midis2jam2 context,
 	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
 		super(context, eventList);
-		Spatial drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f);
+		Spatial drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9F);
 		
 		var adjustments = new Node[12];
 		

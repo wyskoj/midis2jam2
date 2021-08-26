@@ -118,7 +118,7 @@ public final class ShadowController {
 			Spatial shadow = shadow(context, "Assets/GuitarShadow.obj", "Assets/GuitarShadow.png");
 			guitarShadows[i] = shadow;
 			context.getRootNode().attachChild(shadow);
-			shadow.setLocalTranslation(43.431F + (10 * i), 0.1F + (0.01F * i), 7.063F);
+			shadow.setLocalTranslation(43.431F + (5 * i), 0.1F + (0.01F * i), 7.063F);
 			shadow.setLocalRotation(new Quaternion().fromAngles(0, Utils.rad(-49), 0));
 		}
 		

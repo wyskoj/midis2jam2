@@ -82,6 +82,9 @@ public class Helicopter extends SustainedInstrument {
 	@NotNull
 	private final Node rotor = new Node();
 	
+	/**
+	 * Each set of lights on the helicopter. Each spatial is a plane that has the light texture for that note.
+	 */
 	@NotNull
 	private final Spatial[] lights = new Spatial[12];
 	

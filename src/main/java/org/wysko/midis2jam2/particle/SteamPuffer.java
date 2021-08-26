@@ -30,23 +30,50 @@ import java.util.Random;
 
 /**
  * The red, blue, white, and brown substances that emanate from the shaft of an instrument.
+ * <p>
+ * The SteamPuffer works by creating a pool of {@link Cloud Clouds} that are spawned and despawned. SteamPuffer only
+ * handles the generation and spawning of {@link Cloud Clouds}—animation is handled in the respective class.
  */
 public class SteamPuffer implements ParticleGenerator {
 	
+	/**
+	 * For RNG.
+	 */
 	private static final Random RANDOM = new Random();
 	
+	/**
+	 * Defines the root of the steam puffer.
+	 */
 	public final Node steamPuffNode = new Node();
 	
-	private final List<Cloud> clouds = new ArrayList<>();
+	/**
+	 * The list of currently visible clouds.
+	 */
+	private final List<Cloud> visibleClouds = new ArrayList<>();
 	
+	/**
+	 * A pool of clouds that this steam puffer can use.
+	 */
 	private final List<Cloud> cloudPool = new ArrayList<>();
 	
+	/**
+	 * Context to the main class.
+	 */
 	private final Midis2jam2 context;
 	
+	/**
+	 * The type of steam puffer.
+	 */
 	private final SteamPuffType type;
 	
+	/**
+	 * How large the clouds are.
+	 */
 	private final double scale;
 	
+	/**
+	 * The behavior of the steam puffer.
+	 */
 	private final PuffBehavior behavior;
 	
 	public SteamPuffer(Midis2jam2 context, SteamPuffType type, double scale, PuffBehavior behavior) {
@@ -56,36 +83,48 @@ public class SteamPuffer implements ParticleGenerator {
 		this.behavior = behavior;
 	}
 	
+	/**
+	 * Despawns a cloud.
+	 *
+	 * @param cloud the cloud to despawn
+	 */
 	private void despawnCloud(Cloud cloud) {
 		steamPuffNode.detachChild(cloud.cloudNode);
 	}
 	
 	@Override
+	@SuppressWarnings("java:NoSonar")
 	public void tick(float delta, boolean active) {
 		if (active) {
-			// Spawn clouds
-			double numberOfCloudsToSpawn = (delta / (1F / 60F));
-			numberOfCloudsToSpawn = Math.max(numberOfCloudsToSpawn, 1);
-			for (var i = 0; i < Math.ceil(numberOfCloudsToSpawn); i++) {
+			/* If it happens to be the case that the amount of time since the last frame was so large that it
+			warrants more than one cloud to be spawned on this frame, calculate the number of clouds to spawn. But we
+			should always spawn at least one cloud on each frame. */
+			double n = Math.ceil(Math.max((delta / (1F / 60F)), 1));
+			for (var i = 0; i < n; i++) {
 				Cloud cloud;
-				if (!cloudPool.isEmpty()) {
-					cloud = cloudPool.remove(0);
-				} else {
+				if (cloudPool.isEmpty()) {
+					/* If the pool is empty, we need to make a new cloud. */
 					cloud = new Cloud();
+				} else {
+					/* If there exists a cloud we can use, grab the first one. */
+					cloud = cloudPool.remove(0); // NOSONAR java:S5413
 				}
-				clouds.add(cloud);
+				/* Reinitialize cloud */
+				visibleClouds.add(cloud);
 				cloud.currentlyUsing = true;
 				cloud.randomInit();
 				steamPuffNode.attachChild(cloud.cloudNode);
 			}
 		}
 		
-		Iterator<Cloud> iterator = clouds.iterator();
+		Iterator<Cloud> iterator = visibleClouds.iterator();
+		/* Loop over each visible cloud */
 		while (iterator.hasNext()) {
 			var cloud = iterator.next();
 			if (cloud != null) {
 				boolean tick = cloud.tick(delta);
 				if (!tick) {
+					/* We need to despawn the cloud */
 					cloud.currentlyUsing = false;
 					cloudPool.add(cloud);
 					SteamPuffer.this.despawnCloud(cloud);
@@ -95,36 +134,89 @@ public class SteamPuffer implements ParticleGenerator {
 		}
 	}
 	
+	/**
+	 * Defines how the clouds should animate.
+	 */
 	public enum PuffBehavior {
-		OUTWARDS, UPWARDS
+		/**
+		 * The clouds move along the relative XZ plane with only some marginal variation in the Y-axis.
+		 */
+		OUTWARDS,
+		/**
+		 * The clouds move along the Y-axis with only some marginal variation on the relative XZ plane.
+		 */
+		UPWARDS
 	}
 	
-	@SuppressWarnings("unused")
+	/**
+	 * There are a few different textures for the steam puffer.
+	 */
 	public enum SteamPuffType {
+		/**
+		 * Normal steam puff type.
+		 */
 		NORMAL("SteamPuff.bmp"),
+		/**
+		 * Harmonica steam puff type.
+		 */
 		HARMONICA("SteamPuff_Harmonica.bmp"),
+		/**
+		 * Pop steam puff type.
+		 */
 		POP("SteamPuff_Pop.bmp"),
+		/**
+		 * Whistle steam puff type.
+		 */
 		WHISTLE("SteamPuff_Whistle.bmp");
 		
-		String filename;
+		/**
+		 * The filename of the cloud texture.
+		 */
+		private final String filename;
 		
 		SteamPuffType(String filename) {
 			this.filename = filename;
 		}
 	}
 	
+	/**
+	 * Defines how a cloud in the steam puffer animates.
+	 */
 	class Cloud implements Particle {
 		
+		/**
+		 * The {@link #life} value considered "end of life".
+		 */
+		public static final double END_OF_LIFE = 0.7;
+		
+		/**
+		 * Contains the geometry of the cloud (the {@link #cube}).
+		 */
 		private final Node cloudNode = new Node();
 		
+		/**
+		 * The mesh of the cloud.
+		 */
 		private final Spatial cube;
 		
-		private float randY;
+		/**
+		 * A seed for random first axis transformation.
+		 */
+		private float randA;
 		
-		private float randZ;
+		/**
+		 * A seed for random second axis transformation.
+		 */
+		private float randB;
 		
+		/**
+		 * The current duration into the life of the cloud.
+		 */
 		private double life;
 		
+		/**
+		 * True if this cloud is currently being animated, false if it is idling in the pool.
+		 */
 		private boolean currentlyUsing;
 		
 		public Cloud() {
@@ -133,10 +225,12 @@ public class SteamPuffer implements ParticleGenerator {
 			cloudNode.attachChild(cube);
 		}
 		
+		/**
+		 * Resets the life of the cloud, its transformation, and redefines random seeds.
+		 */
 		private void randomInit() {
-			
-			randY = (RANDOM.nextFloat() - 0.5F) * 1.5F;
-			randZ = (RANDOM.nextFloat() - 0.5F) * 1.5F;
+			randA = (RANDOM.nextFloat() - 0.5F) * 1.5F;
+			randB = (RANDOM.nextFloat() - 0.5F) * 1.5F;
 			cube.setLocalRotation(new Quaternion().fromAngles(new float[]{
 					RANDOM.nextFloat() * FastMath.TWO_PI,
 					RANDOM.nextFloat() * FastMath.TWO_PI,
@@ -150,17 +244,19 @@ public class SteamPuffer implements ParticleGenerator {
 		public boolean tick(float delta) {
 			if (!currentlyUsing) return false;
 			if (behavior == PuffBehavior.OUTWARDS) {
-				cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randY, locEase(life) * randZ);
+				cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randA, locEase(life) * randB);
 			} else {
-				cloudNode.setLocalTranslation(locEase(life) * 6, (float) life * 10, locEase(life) * randZ);
+				cloudNode.setLocalTranslation(locEase(life) * 6, (float) life * 10, locEase(life) * randB);
 			}
 			
 			cloudNode.setLocalScale((float) ((0.75 * life + 1.2) * scale));
 			life += delta * 1.5;
-			var endOfLife = 0.7;
-			return life <= endOfLife;
+			return life <= END_OF_LIFE;
 		}
 		
+		/**
+		 * Easing function to smoothen particle travel.
+		 */
 		@SuppressWarnings("java:S109")
 		private float locEase(double x) {
 			if (x == 1) return 1F;

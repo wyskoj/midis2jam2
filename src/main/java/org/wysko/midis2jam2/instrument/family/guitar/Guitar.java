@@ -34,24 +34,33 @@ import static org.wysko.midis2jam2.util.Utils.rad;
  */
 public class Guitar extends FrettedInstrument {
 	
-	static final Vector3f BASE_POSITION = new Vector3f(43.431f, 35.292f, 7.063f);
+	/**
+	 * The base position of the guitar.
+	 */
+	private static final Vector3f BASE_POSITION = new Vector3f(43.431F, 35.292F, 7.063F);
+	
+	/**
+	 * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
+	 * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
+	 */
+	private static final int GUITAR_VECTOR_THRESHOLD = 3;
 	
 	public Guitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, GuitarType type) {
 		super(context,
 				new StandardFrettingEngine(6, 22, new int[]{40, 45, 50, 55, 59, 64}),
 				events,
-				new FrettedInstrumentPositioning(16.6f,
-						-18.1f,
+				new FrettedInstrumentPositioning(16.6F,
+						-18.1F,
 						new Vector3f[]{
-								new Vector3f(0.8f, 1, 0.8f),
-								new Vector3f(0.75f, 1, 0.75f),
-								new Vector3f(0.7f, 1, 0.7f),
-								new Vector3f(0.77f, 1, 0.77f),
-								new Vector3f(0.75f, 1, 0.75f),
-								new Vector3f(0.7f, 1, 0.7f),
+								new Vector3f(0.8F, 1, 0.8F),
+								new Vector3f(0.75F, 1, 0.75F),
+								new Vector3f(0.7F, 1, 0.7F),
+								new Vector3f(0.77F, 1, 0.77F),
+								new Vector3f(0.75F, 1, 0.75F),
+								new Vector3f(0.7F, 1, 0.7F),
 						},
-						new float[]{-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f},
-						new float[]{-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f},
+						new float[]{-0.93F, -0.56F, -0.21F, 0.21F, 0.56F, 0.90F},
+						new float[]{-1.55F, -0.92F, -0.35F, 0.25F, 0.82F, 1.45F},
 						FretHeightByTable.fromXml(Guitar.class)),
 				6,
 				context.loadModel(type.modelFileName, type.textureFileName)
@@ -70,7 +79,7 @@ public class Guitar extends FrettedInstrument {
 		}
 		
 		// Position each string
-		var forward = 0.125f;
+		var forward = 0.125F;
 		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward);
 		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1)));
 		upperStrings[0].setLocalScale(positioning.restingStrings[0]);
@@ -98,10 +107,11 @@ public class Guitar extends FrettedInstrument {
 		// Lower strings
 		for (var i = 0; i < 6; i++) {
 			for (var j = 0; j < 5; j++) {
-				if (i < 3)
+				if (i < 3) {
 					lowerStrings[i][j] = context.loadModel("GuitarLowStringBottom" + j + ".obj", type.textureFileName);
-				else
+				} else {
 					lowerStrings[i][j] = context.loadModel("GuitarHighStringBottom" + j + ".obj", type.textureFileName);
+				}
 				instrumentNode.attachChild(lowerStrings[i][j]);
 			}
 		}
@@ -163,7 +173,15 @@ public class Guitar extends FrettedInstrument {
 	
 	@Override
 	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(new Vector3f(5, -4, 0).mult(indexForMoving(delta)));
+		float v = indexForMoving(delta);
+		/* After a certain threshold, stop moving guitars down—only along the XZ plane. */
+		if (v < GUITAR_VECTOR_THRESHOLD) {
+			offsetNode.setLocalTranslation(new Vector3f(5, -4, 0).mult(indexForMoving(delta)));
+		} else {
+			Vector3f vector = new Vector3f(5, -4, 0).mult(indexForMoving(delta));
+			vector.setY(-4F * GUITAR_VECTOR_THRESHOLD);
+			offsetNode.setLocalTranslation(vector);
+		}
 	}
 	
 	/**
@@ -185,12 +203,12 @@ public class Guitar extends FrettedInstrument {
 		/**
 		 * The Model file name.
 		 */
-		final String modelFileName;
+		private final String modelFileName;
 		
 		/**
 		 * The Texture file name.
 		 */
-		final String textureFileName;
+		private final String textureFileName;
 		
 		GuitarType(String modelFileName, String textureFileName) {
 			this.modelFileName = modelFileName;

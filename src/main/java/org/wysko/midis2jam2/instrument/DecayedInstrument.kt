@@ -44,6 +44,4 @@ abstract class DecayedInstrument protected constructor(
         setIdleVisibilityByStrikes(finalHits, time, instrumentNode)
         moveForMultiChannel(delta)
     }
-
-
 }
