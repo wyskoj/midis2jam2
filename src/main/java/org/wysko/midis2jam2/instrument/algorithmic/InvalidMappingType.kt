@@ -14,15 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.algorithmic
 
-package org.wysko.midis2jam2.instrument.algorithmic;
-
-/**
- * Denotes when a specified mapping type does not match the XML file.
- */
-public class InvalidMappingType extends Exception {
-	
-	public InvalidMappingType(String message) {
-		super(message);
-	}
-}
+/** Denotes when a specified mapping type does not match the XML file. */
+class InvalidMappingType(message: String?) : Exception(message)
