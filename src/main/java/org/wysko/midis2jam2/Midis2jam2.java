@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox;
@@ -701,7 +702,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Lead 1 (Square) */
 			case 80 -> new Keyboard(this, events, SQUARE_WAVE);
 			/* Lead 2 (Sawtooth) */
-			case 81 -> new Keyboard(this, events, SAW_WAVE);
+//			case 81 -> new Keyboard(this, events, SAW_WAVE);
+			case 81 -> new SpaceLaser(this, events);
 			/* Lead 4 (Chiff) */
 			case 83 -> new Keyboard(this, events, SYNTH);
 			/* Lead 5 (Charang) */

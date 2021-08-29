@@ -49,6 +49,7 @@ object Utils {
      * @return [CullHint.Dynamic] or [CullHint.Always]
      */
     @Contract(pure = true)
+    @JvmStatic
     fun cullHint(b: Boolean): CullHint {
         return if (b) {
             CullHint.Dynamic

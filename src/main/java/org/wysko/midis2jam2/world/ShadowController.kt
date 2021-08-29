@@ -90,7 +90,8 @@ class ShadowController(
         /* Update keyboard shadow */
         val isKeyboardVisible =
             context.instruments.stream().anyMatch { i: Instrument? -> i != null && i.isVisible && i is Keyboard }
-        keyboardShadow.cullHint = Utils.cullHint(isKeyboardVisible)
+        val cullHint = Utils.cullHint(isKeyboardVisible)
+        keyboardShadow.cullHint = cullHint
 
         /* Update rest of shadows */
         updateArrayShadows(harpShadows, Harp::class.java)
