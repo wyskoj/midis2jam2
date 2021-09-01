@@ -47,13 +47,14 @@ public class StageChoir extends WrappedOctaveSustained {
 	 * @param eventList the event list
 	 */
 	public StageChoir(@NotNull Midis2jam2 context,
-	                  @NotNull List<MidiChannelSpecificEvent> eventList) {
+	                  @NotNull List<MidiChannelSpecificEvent> eventList,
+	                  ChoirType type) {
 		super(context, eventList, true);
 		twelfths = new ChoirPeep[12];
 		var peepNodes = new Node[12];
 		for (var i = 0; i < 12; i++) {
 			peepNodes[i] = new Node();
-			twelfths[i] = new ChoirPeep();
+			twelfths[i] = new ChoirPeep(type);
 			peepNodes[i].attachChild(twelfths[i].highestLevel);
 			twelfths[i].highestLevel.setLocalTranslation(BASE_POSITION);
 			peepNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad(11.27 + i * -5.636), 0));
@@ -77,8 +78,21 @@ public class StageChoir extends WrappedOctaveSustained {
 	 */
 	public class ChoirPeep extends BouncyTwelfth {
 		
-		public ChoirPeep() {
-			animNode.attachChild(context.loadModel("StageChoir.obj", "ChoirPeep.bmp"));
+		public ChoirPeep(ChoirType type) {
+			animNode.attachChild(context.loadModel("StageChoir.obj", type.textureFile));
+		}
+	}
+	
+	public enum ChoirType {
+		VOICE_AAHS("ChoirPeep.bmp"),
+		VOICE_OOHS("ChoirPeepOoh.png"),
+		SYNTH_VOICE("ChoirPeepSynthVoice.png"),
+		VOICE_SYNTH("ChoirPeepVoiceSynth.png");
+		
+		private final String textureFile;
+		
+		ChoirType(String textureFile) {
+			this.textureFile = textureFile;
 		}
 	}
 }

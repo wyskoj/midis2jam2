@@ -109,8 +109,8 @@ class ShadowController(
      * @param clazz   the class of the instrument
      */
     private fun updateArrayShadows(shadows: MutableList<Spatial>, clazz: Class<out Instrument>) {
-        val numVisible = context.instruments.stream().filter { i: Instrument -> clazz.isInstance(i) && i.isVisible }
-            .count()
+        val numVisible = context.instruments.count { it != null && clazz.isInstance(it) && it.isVisible }
+
         for (i in shadows.indices) {
             if (i < numVisible) {
                 shadows[i].cullHint = CullHint.Dynamic

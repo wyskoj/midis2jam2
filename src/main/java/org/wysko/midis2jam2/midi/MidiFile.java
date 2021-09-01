@@ -101,6 +101,13 @@ public final class MidiFile {
 					} else if (command == ShortMessage.PROGRAM_CHANGE) {
 						file.getTracks()[j].getEvents()
 								.add(programEventFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
+					} else if (command == ShortMessage.PITCH_BEND) {
+						var val = message.getData1() + message.getData2() * 128;
+						file.getTracks()[j].getEvents()
+								.add(new MidiPitchBendEvent(midiEvent.getTick(), message.getChannel(), val));
+					} else if (command == ShortMessage.CONTROL_CHANGE) {
+						file.getTracks()[j].getEvents()
+								.add(new MidiControlEvent(midiEvent.getTick(), message.getChannel(), message.getData1(), message.getData2()));
 					} else {
 						// Ignore message
 					}

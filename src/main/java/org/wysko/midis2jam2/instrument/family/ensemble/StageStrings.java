@@ -43,12 +43,12 @@ public class StageStrings extends WrappedOctaveSustained {
 	@NotNull
 	final Node[] stringNodes = new Node[12];
 	
-	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList) {
+	public StageStrings(Midis2jam2 context, List<MidiChannelSpecificEvent> eventList, StageStringsType type) {
 		super(context, eventList, false);
 		twelfths = new StageStringNote[12];
 		for (var i = 0; i < 12; i++) {
 			stringNodes[i] = new Node();
-			twelfths[i] = new StageStringNote();
+			twelfths[i] = new StageStringNote(type);
 			stringNodes[i].attachChild(twelfths[i].highestLevel);
 			twelfths[i].highestLevel.setLocalTranslation(0, 2f * i, -151.76f);
 			stringNodes[i].setLocalRotation(new Quaternion().fromAngles(0, rad((9 / 10f) * i), 0));
@@ -60,6 +60,20 @@ public class StageStrings extends WrappedOctaveSustained {
 	@Override
 	protected void moveForMultiChannel(float delta) {
 		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(35.6 + (11.6 * indexForMoving(delta))), 0));
+	}
+	
+	public enum StageStringsType {
+		STRING_ENSEMBLE_1("FakeWood.bmp"),
+		STRING_ENSEMBLE_2("Wood.bmp"),
+		SYNTH_STRINGS_1("Laser.bmp"),
+		SYNTH_STRINGS_2("AccordionCaseFront.bmp"),
+		BOWED_SYNTH("SongFillbar.bmp");
+		
+		private final String textureFile;
+		
+		StageStringsType(String textureFile) {
+			this.textureFile = textureFile;
+		}
 	}
 	
 	/**
@@ -97,10 +111,9 @@ public class StageStrings extends WrappedOctaveSustained {
 		 */
 		final VibratingStringAnimator animator;
 		
-		public StageStringNote() {
+		public StageStringNote(StageStringsType type) {
 			// Load holder
-			animNode.attachChild(context.loadModel("StageStringHolder.obj", "FakeWood.bmp",
-					MatType.UNSHADED, 0));
+			animNode.attachChild(context.loadModel("StageStringHolder.obj", type.textureFile));
 			
 			// Load anim strings
 			for (var i = 0; i < 5; i++) {
@@ -116,7 +129,7 @@ public class StageStrings extends WrappedOctaveSustained {
 			animNode.attachChild(restingString);
 			
 			// Load bow
-			bow = context.loadModel("StageStringBow.fbx", "FakeWood.bmp");
+			bow = context.loadModel("StageStringBow.fbx", type.textureFile);
 			((Node) this.bow).getChild(1).setMaterial(((Geometry) restingString).getMaterial());
 			bowNode.attachChild(this.bow);
 			bowNode.setLocalTranslation(0, 48, 0);

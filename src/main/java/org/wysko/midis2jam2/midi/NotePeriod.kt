@@ -38,7 +38,7 @@ open class NotePeriod(
     /**
      * The end time, expressed in seconds.
      */
-    val endTime: Double,
+    var endTime: Double,
 
     /**
      * The [MidiNoteOnEvent].
@@ -138,4 +138,13 @@ open class NotePeriod(
                 ", endTime=" + endTime +
                 '}'
     }
+
+    fun copy(
+        midiNote: Int = this.midiNote,
+        startTime: Double = this.startTime,
+        endTime: Double = this.endTime,
+        noteOn: MidiNoteOnEvent = this.noteOn,
+        noteOff: MidiNoteOffEvent = this.noteOff
+    ) = NotePeriod(midiNote, startTime, endTime, noteOn, noteOff)
+
 }

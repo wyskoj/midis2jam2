@@ -38,7 +38,7 @@ abstract class DecayedInstrument protected constructor(
     /**
      * The list of unmodifiable hits.
      */
-    private val finalHits: List<MidiNoteOnEvent> = hits
+    private val finalHits: List<MidiNoteOnEvent> = ArrayList(hits)
 
     override fun tick(time: Double, delta: Float) {
         setIdleVisibilityByStrikes(finalHits, time, instrumentNode)

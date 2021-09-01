@@ -14,14 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.midi
 
-/**
- * A MIDI event that adjusts a controller.
- */
-data class MidiControlEvent(
-    override val time: Long,
-    val channel: Int,
-    val controlNum: Int,
-    val value: Int,
-) : MidiEvent(time)
+package org.wysko.midis2jam2.instrument.family.animusic
+
+/** Provides a definition for calculating the angle at which the [SpaceLaser] should rotate to given a note. */
+@FunctionalInterface
+interface SpaceLaserAngleCalculator {
+    fun angleFromNote(note: Int, pitchBendAmount: Double): Double
+}

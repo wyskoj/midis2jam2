@@ -54,7 +54,7 @@ public class JingleBells extends NonDrumSetPercussion {
 		
 		/* Load stick and materials */
 		Spatial stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp");
-		((Node) stick).getChild(0).setMaterial(context.unshadedMaterial("StickSkin.bmp"));
+		((Node) stick).getChild(0).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"));
 		
 		/* Positioning */
 		jingleBellNode.attachChild(stick);

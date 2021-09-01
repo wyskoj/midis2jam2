@@ -82,6 +82,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.jme3.scene.Spatial.CullHint.Dynamic;
+import static org.wysko.midis2jam2.instrument.family.ensemble.StageChoir.ChoirType.*;
+import static org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringsType.*;
+import static org.wysko.midis2jam2.instrument.family.organ.Accordion.AccordionType.ACCORDION;
+import static org.wysko.midis2jam2.instrument.family.organ.Accordion.AccordionType.BANDONEON;
 import static org.wysko.midis2jam2.instrument.family.piano.Keyboard.KeyboardSkin.*;
 import static org.wysko.midis2jam2.util.Jme3Constants.*;
 import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
@@ -604,10 +608,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Orchestra Hit */
 			case 15, 16, 17, 18, 19, 20, 55 -> new Keyboard(this, events, WOOD);
 			/* Accordion */
-			/* Tango Accordion */
-			case 21, 23 -> new Accordion(this, events);
+			case 21 -> new Accordion(this, events, ACCORDION);
 			/* Harmonica */
 			case 22 -> new Harmonica(this, events);
+			/* Tango Accordion */
+			case 23 -> new Accordion(this, events, BANDONEON);
 			/* Acoustic Guitar (Nylon) */
 			/* Acoustic Guitar (Steel) */
 			case 24, 25 -> new Guitar(this, events, Guitar.GuitarType.ACOUSTIC);
@@ -639,12 +644,17 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Contrabass */
 			case 43 -> new AcousticBass(this, events, AcousticBass.PlayingStyle.ARCO);
 			/* Tremolo Strings */
+			case 44 -> new StageStrings(this, events, STRING_ENSEMBLE_1);
 			/* String Ensemble 1 */
+			case 48 -> new StageStrings(this, events, STRING_ENSEMBLE_1);
 			/* String Ensemble 2 */
+			case 49 -> new StageStrings(this, events, STRING_ENSEMBLE_2);
 			/* Synth Strings 1 */
+			case 50 -> new StageStrings(this, events, SYNTH_STRINGS_1);
 			/* Synth Strings 2 */
+			case 51 -> new StageStrings(this, events, SYNTH_STRINGS_2);
 			/* Pad 5 (Bowed) */
-			case 44, 48, 49, 50, 51, 92 -> new StageStrings(this, events);
+			case 92 -> new StageStrings(this, events, BOWED_SYNTH);
 			/* Pizzicato Strings */
 			case 45 -> new PizzicatoStrings(this, events);
 			/* Orchestral Harp */
@@ -652,13 +662,17 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Timpani */
 			case 47 -> new Timpani(this, events);
 			/* Choir Aahs */
+			case 52 -> new StageChoir(this, events, VOICE_AAHS);
 			/* Voice Oohs */
+			case 53 -> new StageChoir(this, events, VOICE_OOHS);
 			/* Synth Voice */
+			case 54 -> new StageChoir(this, events, SYNTH_VOICE);
 			/* Lead 6 (Voice) */
-			/* Pad 4 (Choir) */
+			case 85 -> new StageChoir(this, events, VOICE_SYNTH);
 			/* Breath Noise */
+			case 121 -> new StageChoir(this, events, SYNTH_VOICE);
 			/* Applause */
-			case 52, 53, 54, 85, 91, 121, 126 -> new StageChoir(this, events);
+			case 126 -> new StageChoir(this, events, SYNTH_VOICE);
 			/* Trumpet */
 			case 56 -> new Trumpet(this, events, Trumpet.TrumpetType.NORMAL);
 			/* Trombone */
@@ -702,8 +716,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Lead 1 (Square) */
 			case 80 -> new Keyboard(this, events, SQUARE_WAVE);
 			/* Lead 2 (Sawtooth) */
-//			case 81 -> new Keyboard(this, events, SAW_WAVE);
 			case 81 -> new SpaceLaser(this, events);
+			/* Lead 3 (Calliope) */
+			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
 			/* Lead 4 (Chiff) */
 			case 83 -> new Keyboard(this, events, SYNTH);
 			/* Lead 5 (Charang) */
@@ -718,6 +733,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 89 -> new Keyboard(this, events, SYNTH);
 			/* Pad 3 (Polysynth) */
 			case 90 -> new Keyboard(this, events, SYNTH);
+			/* Pad 4 (Choir) */
+			case 91 -> new Keyboard(this, events, CHOIR);
 			/* Pad 6 (Metallic) */
 			case 93 -> new Keyboard(this, events, SYNTH);
 			/* Pad 7 (Halo) */
@@ -738,8 +755,6 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 102 -> new Keyboard(this, events, SYNTH);
 			/* FX 8 (Sci-fi) */
 			case 103 -> new Keyboard(this, events, SYNTH);
-			/* Lead 3 (Calliope) */
-			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
 			/* Banjo */
 			case 105 -> new Banjo(this, events);
 			// Shamisen

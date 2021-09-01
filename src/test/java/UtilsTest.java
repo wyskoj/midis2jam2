@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.wysko.midis2jam2.util.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.wysko.midis2jam2.util.Utils.rad;
 
 /**
  * Tests utility functions from {@link Utils}.
@@ -54,15 +55,15 @@ class UtilsTest {
 	
 	@Test
 	void testRadFloat() {
-		Assertions.assertEquals(0, Utils.rad(0F), 0, "0 degrees is exactly 0 radians.");
-		Assertions.assertEquals(1.5707963, Utils.rad(90F), 0.000001, "90 degrees is about 1.5707963 radians.");
-		Assertions.assertEquals(3.1415926, Utils.rad(180F), 0.000001, "180 degrees is about 3.1415926 radians.");
+		Assertions.assertEquals(0, rad(0.0), 0, "0 degrees is exactly 0 radians.");
+		Assertions.assertEquals(1.5707963, rad(90.0), 0.000001, "90 degrees is about 1.5707963 radians.");
+		Assertions.assertEquals(3.1415926, rad(180.0), 0.000001, "180 degrees is about 3.1415926 radians.");
 	}
 	
 	@Test
 	void testRadDouble() {
-		Assertions.assertEquals(0, Utils.rad(0F), 0, "0 degrees is exactly 0 radians.");
-		Assertions.assertEquals(1.5707963, Utils.rad(90D), 0.000001, "90 degrees is about 1.5707963 radians.");
-		Assertions.assertEquals(3.1415926, Utils.rad(180D), 0.000001, "180 degrees is about 3.1415926 radians.");
+		Assertions.assertEquals(0, rad(0.0), 0, "0 degrees is exactly 0 radians.");
+		Assertions.assertEquals(1.5707963, rad(90D), 0.000001, "90 degrees is about 1.5707963 radians.");
+		Assertions.assertEquals(3.1415926, rad(180D), 0.000001, "180 degrees is about 3.1415926 radians.");
 	}
 }

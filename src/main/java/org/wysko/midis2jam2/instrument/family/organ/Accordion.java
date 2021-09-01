@@ -117,14 +117,15 @@ public class Accordion extends KeyedInstrument {
 	 * @param eventList the event list
 	 */
 	public Accordion(@NotNull Midis2jam2 context,
-	                 @NotNull List<MidiChannelSpecificEvent> eventList) {
+	                 @NotNull List<MidiChannelSpecificEvent> eventList,
+	                 @NotNull AccordionType type) {
 		super(context, eventList, 0, 23);
 		
 		/* Create nodes for each section */
 		IntStream.range(0, SECTION_COUNT).forEach(i -> accordionSections[i] = new Node());
 		
 		/* Load left case */
-		Spatial leftHandCase = context.loadModel("AccordionLeftHand.fbx", "AccordionCase.bmp");
+		Spatial leftHandCase = context.loadModel("AccordionLeftHand.fbx", type.textureCaseName);
 		accordionSections[0].attachChild(leftHandCase);
 		
 		/* Load leather strap */
@@ -173,7 +174,7 @@ public class Accordion extends KeyedInstrument {
 		}
 		
 		/* Load right case */
-		accordionSections[13].attachChild(context.loadModel("AccordionRightHand.obj", "AccordionCase.bmp"));
+		accordionSections[13].attachChild(context.loadModel("AccordionRightHand.obj", type.textureCaseFrontName));
 		
 		/* Attach accordion sections to node */
 		Arrays.stream(accordionSections).forEach(instrumentNode::attachChild);
@@ -314,6 +315,20 @@ public class Accordion extends KeyedInstrument {
 					upNode.setCullHint(Spatial.CullHint.Dynamic);
 				}
 			}
+		}
+	}
+	
+	public enum AccordionType {
+		ACCORDION("AccordionCase.bmp", "AccordionCaseFront.bmp"),
+		BANDONEON("BandoneonCase.bmp", "BandoneonCaseFront.bmp");
+		
+		private final String textureCaseName;
+		
+		private final String textureCaseFrontName;
+		
+		AccordionType(String textureCaseName, String textureCaseFrontName) {
+			this.textureCaseName = textureCaseName;
+			this.textureCaseFrontName = textureCaseFrontName;
 		}
 	}
 }
