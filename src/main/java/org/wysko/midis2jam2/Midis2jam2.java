@@ -714,9 +714,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Ocarina */
 			case 79 -> new Ocarina(this, events);
 			/* Lead 1 (Square) */
-			case 80 -> new Keyboard(this, events, SQUARE_WAVE);
+			case 80 -> new SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SAW);
 			/* Lead 2 (Sawtooth) */
-			case 81 -> new SpaceLaser(this, events);
+			case 81 -> new SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SQUARE);
 			/* Lead 3 (Calliope) */
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
 			/* Lead 4 (Chiff) */

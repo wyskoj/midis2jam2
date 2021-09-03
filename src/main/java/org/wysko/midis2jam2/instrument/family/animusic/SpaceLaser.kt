@@ -33,7 +33,7 @@ import kotlin.math.exp
 import kotlin.math.sin
 
 /** The space laser, as made famous by Stick Figures from Animusic. */
-class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
     private val pitchBends: MutableList<MidiPitchBendEvent>
@@ -82,7 +82,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         private val laserNode = Node()
 
         /** The laser beam. */
-        private val laserBeam: Spatial
+        internal val laserBeam: Spatial
 
         /** Timer for how long a note has been playing to calculate wobble. */
         private var wobbleTime = 0.0
@@ -92,6 +92,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
         /** Calculates the angles for notes. */
         private val angleCalculator = SIGMOID_CALCULATOR
+
+        /** The shooter. */
+        internal val shooter: Spatial
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
@@ -130,12 +133,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         }
 
         init {
-            val shooter = context.loadModel("SpaceLaser.fbx", "ShinySilver.bmp")
-            (shooter as Node).apply {
-                getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                getChild(1).setMaterial(context.unshadedMaterial("Assets/Laser.bmp"))
-                getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
-            }
+            shooter = context.loadModel("SpaceLaser.fbx", "ShinySilver.bmp")
 
             laserBeam = context.loadModel("SpaceLaserLaser.fbx", "Laser.bmp")
             laserNode.apply {
@@ -145,6 +143,11 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
             highestLevel.attachChild(laserNode)
         }
+    }
+
+    enum class SpaceLaserType(val filename: String) {
+        SAW("Laser.bmp"),
+        SQUARE("LaserRed.png")
     }
 
     init {
@@ -173,5 +176,17 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
             .filterIsInstance(MidiControlEvent::class.java)
             .filter { e -> e.controlNum == 1 }
             .toMutableList()
+
+        for (clone in clones) {
+            clone as SpaceLaserClone
+
+            (clone.shooter as Node).apply {
+                getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                getChild(1).setMaterial(context.unshadedMaterial("Assets/" + type.filename))
+                getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
+            }
+
+            clone.laserBeam.setMaterial(context.unshadedMaterial("Assets/" + type.filename))
+        }
     }
 }
