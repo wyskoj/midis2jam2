@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox;
@@ -714,9 +713,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Ocarina */
 			case 79 -> new Ocarina(this, events);
 			/* Lead 1 (Square) */
-			case 80 -> new SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SAW);
+			case 80 -> new Keyboard(this, events, SQUARE_WAVE);
 			/* Lead 2 (Sawtooth) */
-			case 81 -> new SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SQUARE);
+			case 81 -> new Keyboard(this, events, SAW_WAVE);
 			/* Lead 3 (Calliope) */
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
 			/* Lead 4 (Chiff) */
