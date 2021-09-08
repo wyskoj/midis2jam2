@@ -18,10 +18,7 @@
 package org.wysko.midis2jam2.instrument.family.piano;
 
 import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.*;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.instrument.SustainedInstrument;
@@ -30,6 +27,9 @@ import org.wysko.midis2jam2.midi.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.BLACK;
+import static org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHITE;
 
 /**
  * Any instrument that visualizes notes by rotating piano keys.
@@ -92,9 +92,11 @@ public abstract class KeyedInstrument extends Instrument {
 	 */
 	@Contract(pure = true)
 	@NotNull
-	public static KeyColor midiValueToColor(int x) {
-		int note = x % 12;
-		return note == 1 || note == 3 || note == 6 || note == 8 || note == 10 ? KeyColor.BLACK : KeyColor.WHITE;
+	public static KeyColor midiValueToColor(@Range(from = 0, to = 127) int x) {
+		return switch (x % 12) {
+			case 1, 3, 6, 8, 10 -> BLACK;
+			default -> WHITE;
+		};
 	}
 	
 	@Override
@@ -154,7 +156,7 @@ public abstract class KeyedInstrument extends Instrument {
 	 * @return the number of keys on this instrument
 	 */
 	@Contract(pure = true)
-	public int keyCount() {
+	public final int keyCount() {
 		return (rangeHigh - rangeLow) + 1;
 	}
 	

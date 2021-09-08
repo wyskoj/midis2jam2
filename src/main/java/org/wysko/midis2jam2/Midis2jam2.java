@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.instrument.Instrument;
+import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser;
 import org.wysko.midis2jam2.instrument.family.brass.*;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets;
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox;
@@ -56,6 +57,7 @@ import org.wysko.midis2jam2.instrument.family.percussive.*;
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard;
 import org.wysko.midis2jam2.instrument.family.pipe.*;
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet;
+import org.wysko.midis2jam2.instrument.family.reed.Oboe;
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax;
@@ -239,6 +241,7 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 		initDebugText();
 		
 		/* Instrument calculation */
+		
 		try {
 			calculateInstruments();
 		} catch (ReflectiveOperationException e) {
@@ -696,6 +699,8 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			case 66 -> new TenorSax(this, events);
 			/* Baritone Sax */
 			case 67 -> new BaritoneSax(this, events);
+			/* Oboe */
+			case 68 -> new Oboe(this, events);
 			/* Clarinet */
 			case 71 -> new Clarinet(this, events);
 			/* Piccolo */
@@ -713,9 +718,9 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 			/* Ocarina */
 			case 79 -> new Ocarina(this, events);
 			/* Lead 1 (Square) */
-			case 80 -> new Keyboard(this, events, SQUARE_WAVE);
+			case 80 -> new SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SQUARE);
 			/* Lead 2 (Sawtooth) */
-			case 81 -> new Keyboard(this, events, SAW_WAVE);
+			case 81 -> new SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SAW);
 			/* Lead 3 (Calliope) */
 			case 82 -> new PanFlute(this, events, PanFlute.PipeSkin.GOLD);
 			/* Lead 4 (Chiff) */

@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.gui;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.install4j.api.launcher.SplashScreen;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -87,22 +88,27 @@ public class GuiLauncher extends JFrame {
 		settings = new LauncherSettings();
 	}
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, SplashScreen.ConnectionException {
 		// Initialize GUI
+		SplashScreen.writeMessage("Loading...");
 		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
-		
 		var guiLauncher = new GuiLauncher();
 		
+		SplashScreen.writeMessage("Loading settings...");
 		try {
-			var json = new String(Files.readAllBytes(SETTINGS_FILE.toPath()));
-			if (json.isBlank()) throw new IllegalStateException();
+			var json = Files.readString(SETTINGS_FILE.toPath());
+			if (json.isBlank()) {
+				throw new IllegalStateException();
+			}
 			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
 		} catch (Exception e) {
+			Midis2jam2.getLOGGER().info("Could not load settings. Creating new settings.");
 			guiLauncher.settings = new LauncherSettings();
 			guiLauncher.saveSettings();
 		}
 		Locale.setDefault(new Locale(guiLauncher.settings.getLocale()));
 		
+		SplashScreen.writeMessage("Initializing launcher...");
 		guiLauncher.initComponents();
 		
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -125,6 +131,8 @@ public class GuiLauncher extends JFrame {
 				}
 			}
 		});
+		
+		SplashScreen.writeMessage("Collecting MIDI devices...");
 		
 		// Load MIDI devices
 		var infoArr = MidiSystem.getMidiDeviceInfo();

@@ -26,5 +26,10 @@
       <option name="name" value="maven" />
       <option name="url" value="https://dl.bintray.com/jmonkeyengine/org.jmonkeyengine" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://maven.ej-technologies.com/repository" />
+    </remote-repository>
   </component>
 </project>
