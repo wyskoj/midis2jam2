@@ -14,145 +14,117 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.guitar
 
-package org.wysko.midis2jam2.instrument.family.guitar;
-
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.util.MatType;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
+import com.jme3.scene.Spatial.CullHint.Always
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
  * Adam Neely would be proud.
  *
  * @see FrettedInstrument
  */
-public class BassGuitar extends FrettedInstrument {
-	
-	/**
-	 * The bass skin texture file.
-	 */
-	public static final String BASS_SKIN_BMP = "BassSkin.bmp";
-	
-	/**
-	 * The base position of the bass guitar.
-	 */
-	private static final Vector3f BASE_POSITION = new Vector3f(51.5863F, 54.5902F, -16.5817F);
-	
-	/**
-	 * Instantiates a new Bass guitar.
-	 *
-	 * @param context the context
-	 * @param events  the events
-	 */
-	public BassGuitar(Midis2jam2 context, List<MidiChannelSpecificEvent> events, BassGuitarType type) {
-		super(context,
-				new StandardFrettingEngine(4, 22, new int[]{28, 33, 38, 43}),
-				events,
-				new FrettedInstrumentPositioning(19.5F, -26.57F, new Vector3f[]{
-						new Vector3f(1, 1, 1),
-						new Vector3f(1, 1, 1),
-						new Vector3f(1, 1, 1),
-						new Vector3f(1, 1, 1)
-					
-				},
-						new float[]{-0.85F, -0.31F, 0.20F, 0.70F},
-						new float[]{-1.86F, -0.85F, 0.34F, 1.37F},
-						FretHeightByTable.fromXml(BassGuitar.class)),
-				4,
-				context.loadModel(type.modelFile, type.textureFile)
-		);
-		
-		
-		for (var i = 0; i < 4; i++) {
-			Spatial string = context.loadModel("BassString.obj", BASS_SKIN_BMP);
-			upperStrings[i] = string;
-			instrumentNode.attachChild(upperStrings[i]);
+class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: BassGuitarType) :
+	FrettedInstrument(
+		context,
+		StandardFrettingEngine(4, 22, intArrayOf(28, 33, 38, 43)),
+		events,
+		FrettedInstrumentPositioning(
+			19.5f, -26.57f, arrayOf(
+				Vector3f(1f, 1f, 1f),
+				Vector3f(1f, 1f, 1f),
+				Vector3f(1f, 1f, 1f),
+				Vector3f(1f, 1f, 1f)
+			), floatArrayOf(-0.85f, -0.31f, 0.20f, 0.70f), floatArrayOf(-1.86f, -0.85f, 0.34f, 1.37f),
+			FretHeightByTable.fromXml(BassGuitar::class.java)
+		),
+		4,
+		context.loadModel(type.modelFile, type.textureFile)
+	) {
+	override fun moveForMultiChannel(delta: Float) {
+		offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(indexForMoving(delta))
+	}
+
+	/** Type of Bass Guitar */
+	enum class BassGuitarType(val modelFile: String, val textureFile: String) {
+		STANDARD("Bass.obj", BASS_SKIN_BMP), FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
+	}
+
+	companion object {
+		/**
+		 * The bass skin texture file.
+		 */
+		const val BASS_SKIN_BMP = "BassSkin.bmp"
+
+		/**
+		 * The base position of the bass guitar.
+		 */
+		private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
+	}
+
+	init {
+		for (i in 0..3) {
+			context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
+				upperStrings[i] = this
+				instrumentNode.attachChild(this)
+			}
 		}
-		
+
 		/* Position each string */
-		var forward = 0.125F;
-		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward);
-		upperStrings[0].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1.24)));
-		
-		upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward);
-		upperStrings[1].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.673)));
-		
-		upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward);
-		upperStrings[2].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.17)));
-		
-		upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward);
-		upperStrings[3].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.824)));
-		
+		val forward = 0.125f
+		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
+		upperStrings[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
+		upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward)
+		upperStrings[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
+		upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward)
+		upperStrings[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
+		upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward)
+		upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
+
 		/* Lower strings */
-		for (var i = 0; i < 4; i++) {
-			for (var j = 0; j < 5; j++) {
-				lowerStrings[i][j] = context.loadModel("BassStringBottom" + j + ".obj", BASS_SKIN_BMP,
-						MatType.UNSHADED, 0.9F);
-				instrumentNode.attachChild(lowerStrings[i][j]);
+		for (i in 0..3) {
+			for (j in 0..4) {
+				lowerStrings[i][j] = context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
+					instrumentNode.attachChild(this)
+					cullHint = Always
+				}
 			}
 		}
-		
+
 		/* Position lower strings */
-		for (var i = 0; i < 5; i++) {
-			lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward);
-			lowerStrings[0][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-1.24)));
+		for (i in 0..4) {
+			lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward)
+			lowerStrings[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
 		}
-		for (var i = 0; i < 5; i++) {
-			lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward);
-			lowerStrings[1][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-0.673)));
+		for (i in 0..4) {
+			lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward)
+			lowerStrings[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
 		}
-		for (var i = 0; i < 5; i++) {
-			lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward);
-			lowerStrings[2][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.17)));
+		for (i in 0..4) {
+			lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward)
+			lowerStrings[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
 		}
-		
-		for (var i = 0; i < 5; i++) {
-			lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward);
-			lowerStrings[3][i].setLocalRotation(new Quaternion().fromAngles(0, 0, rad(0.824)));
+		for (i in 0..4) {
+			lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward)
+			lowerStrings[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
 		}
-		
-		/* Hide all wobbly strings */
-		for (var i = 0; i < 4; i++) {
-			for (var j = 0; j < 5; j++) {
-				lowerStrings[i][j].setCullHint(Spatial.CullHint.Always);
+
+		/* Initialize note fingers */
+		for (i in 0..3) {
+			noteFingers[i] = context.loadModel("BassNoteFinger.obj", BASS_SKIN_BMP).apply {
+				instrumentNode.attachChild(this)
+				cullHint = Always
 			}
 		}
-		
-		/* Initialize note fingers */
-		for (var i = 0; i < 4; i++) {
-			noteFingers[i] = context.loadModel("BassNoteFinger.obj", BASS_SKIN_BMP);
-			instrumentNode.attachChild(noteFingers[i]);
-			noteFingers[i].setCullHint(Spatial.CullHint.Always);
-		}
-		
+
 		/* Position guitar */
-		instrumentNode.setLocalTranslation(BASE_POSITION);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1)));
-	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(new Vector3f(7, -2.43F, 0).mult(indexForMoving(delta)));
-	}
-	
-	public enum BassGuitarType {
-		STANDARD("Bass.obj", BASS_SKIN_BMP),
-		FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
-		
-		public final String modelFile;
-		
-		public final String textureFile;
-		
-		BassGuitarType(String modelFile, String textureFile) {
-			this.modelFile = modelFile;
-			this.textureFile = textureFile;
+		instrumentNode.run {
+			localTranslation = BASE_POSITION
+			localRotation = Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1))
 		}
 	}
 }

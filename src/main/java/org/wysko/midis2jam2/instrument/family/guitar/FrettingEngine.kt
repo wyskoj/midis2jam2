@@ -45,6 +45,5 @@ interface FrettingEngine {
     /**
      * Returns the current fret configuration.
      */
-    @get:Contract(pure = true)
-    val frets: List<Int>
+    val frets: IntArray
 }

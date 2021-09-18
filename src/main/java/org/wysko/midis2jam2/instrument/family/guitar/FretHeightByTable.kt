@@ -14,85 +14,77 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.guitar
 
-package org.wysko.midis2jam2.instrument.family.guitar;
-
-import org.jetbrains.annotations.Contract;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.util.Utils;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
+import org.jetbrains.annotations.Contract
+import org.w3c.dom.Element
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.util.Utils.exceptionToLines
+import org.wysko.midis2jam2.util.Utils.instantiateXmlParser
+import org.xml.sax.SAXException
+import java.io.IOException
+import javax.xml.parsers.ParserConfigurationException
 
 /**
  * Calculates fret heights using a lookup table.
  */
-public class FretHeightByTable implements FretHeightCalculator {
-	
+class FretHeightByTable(
 	/**
 	 * The lookup table. The key is the fret and the value is the scaling.
 	 */
-	private final Map<Integer, Float> lookupTable;
-	
-	/**
-	 * Instantiates a new Fret height by table.
-	 *
-	 * @param lookupTable the lookup table
-	 */
-	public FretHeightByTable(Map<Integer, Float> lookupTable) {
-		this.lookupTable = lookupTable;
-	}
-	
-	/**
-	 * Given the class of a {@link FrettedInstrument}, returns the XML data defined in {@code fret_heights.xml} for that
-	 * specific instrument.
-	 *
-	 * @param clazz the class of the instrument to get data
-	 * @return a {@link FretHeightByTable} for that instrument, containing the data in the XML
-	 */
-	public static FretHeightByTable fromXml(Class<? extends FrettedInstrument> clazz) {
-		try {
-			var xmlDoc = Utils.instantiateXmlParser("/fret_heights.xml");
-			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
-			Map<Integer, Float> lookup = new HashMap<>();
-			
-			/* For each instrument */
-			for (var i = 0; i < instrumentList.getLength(); i++) {
-				/* If the name of class equals the name of the currently indexed instrument */
-				if (instrumentList.item(i).getAttributes().getNamedItem("name").getTextContent().equals(clazz.getSimpleName())) {
-					var instrument = instrumentList.item(i);
-					var fretHeights = ((Element) instrument).getElementsByTagName("value");
-					/* For each fret height definition */
-					for (var j = 0; j < fretHeights.getLength(); j++) {
-						/* Store attributes to the lookup table */
-						var attributes = fretHeights.item(j).getAttributes();
-						lookup.put(
-								Integer.parseInt(attributes.getNamedItem("fret").getTextContent()),
-								Float.parseFloat(attributes.getNamedItem("scale").getTextContent())
-						);
-					}
-					break;
-				}
-			}
-			return new FretHeightByTable(lookup);
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			Midis2jam2.getLOGGER().severe("Failed to load fret height from XML for %s.%n%s"
-					.formatted(clazz.getName(), exceptionToLines(e)));
-			return new FretHeightByTable(new HashMap<>());
-		}
-		
-	}
-	
-	@Override
+	private val lookupTable: Map<Int, Float>
+) : FretHeightCalculator {
+
 	@Contract(pure = true)
-	public float calculateScale(int fret) {
-		return lookupTable.get(fret);
+	override fun calculateScale(fret: Int): Float {
+		return lookupTable[fret]!!
+	}
+
+	companion object {
+		/**
+		 * Given the class of a [FrettedInstrument], returns the XML data defined in `fret_heights.xml` for that
+		 * specific instrument.
+		 *
+		 * @param clazz the class of the instrument to get data
+		 * @return a [FretHeightByTable] for that instrument, containing the data in the XML
+		 */
+		@JvmStatic
+		fun fromXml(clazz: Class<out FrettedInstrument>): FretHeightByTable {
+			return try {
+				val xmlDoc = instantiateXmlParser("/fret_heights.xml")
+				val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
+				val lookup: MutableMap<Int, Float> = HashMap()
+
+				/* For each instrument */
+				for (i in 0 until instrumentList.length) {
+					/* If the name of class equals the name of the currently indexed instrument */
+					if (instrumentList.item(i).attributes.getNamedItem("name").textContent == clazz.simpleName) {
+						val instrument = instrumentList.item(i)
+						val fretHeights = (instrument as Element).getElementsByTagName("value")
+						/* For each fret height definition */
+						for (j in 0 until fretHeights.length) {
+							/* Store attributes to the lookup table */
+							val attributes = fretHeights.item(j).attributes
+							lookup[attributes.getNamedItem("fret").textContent.toInt()] =
+								attributes.getNamedItem("scale").textContent.toFloat()
+						}
+						break
+					}
+				}
+				FretHeightByTable(lookup)
+			} catch (e: ParserConfigurationException) {
+				Midis2jam2.getLOGGER()
+					.severe("Failed to load fret height from XML for ${clazz.name}.%n${exceptionToLines(e)}")
+				FretHeightByTable(HashMap())
+			} catch (e: SAXException) {
+				Midis2jam2.getLOGGER()
+					.severe("Failed to load fret height from XML for ${clazz.name}.%n${exceptionToLines(e)}")
+				FretHeightByTable(HashMap())
+			} catch (e: IOException) {
+				Midis2jam2.getLOGGER()
+					.severe("Failed to load fret height from XML for ${clazz.name}.%n${exceptionToLines(e)}")
+				FretHeightByTable(HashMap())
+			}
+		}
 	}
 }

@@ -18,7 +18,6 @@ package org.wysko.midis2jam2.midi
 
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.instrument.Instrument
-import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 
 /**
  * A note period is a tuple consisting of a [MidiNoteOnEvent] and a [MidiNoteOffEvent]. A note period is the

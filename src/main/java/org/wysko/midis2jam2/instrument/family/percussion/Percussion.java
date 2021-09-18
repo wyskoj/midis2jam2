@@ -63,6 +63,7 @@ public class Percussion extends Instrument {
 	 * @param context the context
 	 * @param events  the events
 	 */
+	@SuppressWarnings("java:S103")
 	public Percussion(Midis2jam2 context, List<MidiChannelSpecificEvent> events) {
 		super(context);
 		/* Percussion only cares about note on. */
@@ -258,6 +259,11 @@ public class Percussion extends Instrument {
 		if (noteOnEvents.stream().anyMatch(e -> e.getNote() == OPEN_SURDO || e.getNote() == MUTE_SURDO)) {
 			instruments.add(new Surdo(context,
 					noteOnEvents.stream().filter(e -> e.getNote() == OPEN_SURDO || e.getNote() == MUTE_SURDO).collect(Collectors.toList())));
+		}
+		
+		if (noteOnEvents.stream().anyMatch(e -> e.getNote() == SLAP)) {
+			instruments.add(new Slap(context,
+					noteOnEvents.stream().filter(e -> e.getNote() == SLAP).collect(Collectors.toList())));
 		}
 		
 		// Attach nodes to group node

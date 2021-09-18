@@ -14,105 +14,87 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.clone
 
-package org.wysko.midis2jam2.instrument.clone;
-
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.instrument.MonophonicInstrument;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.Arrays;
+import com.jme3.scene.Spatial
+import com.jme3.scene.Spatial.CullHint.Always
+import com.jme3.scene.Spatial.CullHint.Dynamic
+import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * Instruments that have separate geometry for up keys and down keys.
  */
-public abstract class UpAndDownKeyClone extends StretchyClone {
-	
-	/**
-	 * Geometry for keys up.
-	 */
-	@NotNull
-	protected final Spatial[] keysUp;
-	
-	/**
-	 * Geometry for keys down.
-	 */
-	@NotNull
-	protected final Spatial[] keysDown;
-	
+abstract class UpAndDownKeyClone protected constructor(
 	/**
 	 * The number of keys on this clone.
 	 */
-	protected final int keyCount;
-	
+	val keyCount: Int,
+	parent: MonophonicInstrument,
+	rotationFactor: Float,
+	stretchFactor: Float
+) : StretchyClone(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X) {
+
 	/**
-	 * Instantiates a new Up and down key clone.
-	 *
-	 * @param keyCount the key count
+	 * Geometry for keys up.
 	 */
-	protected UpAndDownKeyClone(int keyCount,
-	                            @NotNull MonophonicInstrument parent,
-	                            float rotationFactor,
-	                            float stretchFactor) {
-		
-		super(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X);
-		this.keyCount = keyCount;
-		
-		keysUp = new Spatial[keyCount];
-		keysDown = new Spatial[keyCount];
-	}
-	
+	@JvmField
+	protected val keysUp: Array<Spatial?> = arrayOfNulls(keyCount)
+
+	/**
+	 * Geometry for keys down.
+	 */
+	@JvmField
+	protected val keysDown: Array<Spatial?> = arrayOfNulls(keyCount)
+
 	/**
 	 * Given a keymap, presses or releases keys.
-	 * <p>
+	 *
 	 * If the instrument cannot play the specified MIDI note, the instrument plays will all keys up (this is technically
 	 * incorrect on saxophones, since all open keys is a standard fingering for middle C#, but whatever).
 	 *
 	 * @param midiNote the MIDI note
 	 */
-	protected void pushOrReleaseKeys(int midiNote) {
-		assert parent.manager != null;
-		Integer[] keysToGoDown = (Integer[]) parent.manager.fingering(midiNote);
-		
-		/* keysToGoDown is null if the note is outside of the instrument's range */
+	@Suppress("UNCHECKED_CAST")
+	private fun pushOrReleaseKeys(midiNote: Int) {
+		assert(parent.manager != null)
+		var keysToGoDown = parent.manager!!.fingering(midiNote) as Array<Int?>?
+
+		/* keysToGoDown is null if the note is outside the instrument's range */
 		if (keysToGoDown == null) {
-			keysToGoDown = new Integer[0];
+			keysToGoDown = arrayOfNulls(0)
 		}
-		
-		for (var i = 0; i < keyCount; i++) {
-			int finalI = i;
-			if (Arrays.stream(keysToGoDown).anyMatch(a -> a == finalI)) {
+		for (i in 0 until keyCount) {
+			if (keysToGoDown.any { it == i }) {
 				/* This is a key that needs to be pressed down */
-				keysDown[i].setCullHint(Spatial.CullHint.Dynamic);
-				keysUp[i].setCullHint(Spatial.CullHint.Always);
+				keysDown[i]!!.cullHint = Dynamic
+				keysUp[i]!!.cullHint = Always
 			} else {
 				/* This is a key that needs to be released */
-				keysDown[i].setCullHint(Spatial.CullHint.Always);
-				keysUp[i].setCullHint(Spatial.CullHint.Dynamic);
+				keysDown[i]!!.cullHint = Always
+				keysUp[i]!!.cullHint = Dynamic
 			}
 		}
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		if (isPlaying()) {
-			assert currentNotePeriod != null;
-			pushOrReleaseKeys(currentNotePeriod.getMidiNote());
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		if (isPlaying) {
+			pushOrReleaseKeys(currentNotePeriod!!.midiNote)
 		}
 	}
-	
+
 	/**
-	 * Attach all the {@link #keysUp} and {@link #keysDown} to the {@link #modelNode}, hiding all the key down models.
+	 * Attach all the [keysUp] and [keysDown] to the [modelNode], hiding all the key down models.
 	 */
-	protected void attachKeys() {
-		for (var i = 0; i < keyCount; i++) {
-			modelNode.attachChild(keysUp[i]);
-			modelNode.attachChild(keysDown[i]);
-			
+	protected fun attachKeys() {
+		for (i in 0 until keyCount) {
+			modelNode.attachChild(keysUp[i])
+			modelNode.attachChild(keysDown[i])
+
 			/* Hide the down keys on startup */
-			keysDown[i].setCullHint(Spatial.CullHint.Always);
+			keysDown[i]!!.cullHint = Always
 		}
 	}
+
 }

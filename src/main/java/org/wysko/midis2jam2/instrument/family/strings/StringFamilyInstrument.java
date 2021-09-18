@@ -23,6 +23,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument;
+import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning;
 import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine;
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
 import org.wysko.midis2jam2.util.MatType;

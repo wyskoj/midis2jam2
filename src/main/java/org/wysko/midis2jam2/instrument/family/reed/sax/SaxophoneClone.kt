@@ -14,52 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.reed.sax
 
-package org.wysko.midis2jam2.instrument.family.reed.sax;
-
-import com.jme3.math.Quaternion;
-import org.wysko.midis2jam2.instrument.clone.UpAndDownKeyClone;
-import org.wysko.midis2jam2.util.MatType;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import org.wysko.midis2jam2.instrument.clone.UpAndDownKeyClone
+import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
  * Shared code for sax clones.
  */
-public abstract class SaxophoneClone extends UpAndDownKeyClone {
-	
-	/**
-	 * The number of keys on a saxophone.
-	 */
-	private static final int NUMBER_OF_KEYS = 20;
-	
-	/**
-	 * The amount to rotate the sax by when playing.
-	 */
-	private static final float ROTATION_FACTOR = 0.1f;
-	
-	/**
-	 * Instantiates a new Saxophone clone.
-	 *
-	 * @param parent        the parent
-	 * @param stretchFactor the stretch factor
-	 */
-	protected SaxophoneClone(Saxophone parent, float stretchFactor) {
-		super(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor);
-		
-		for (var i = 0; i < keyCount; i++) {
-			keysUp[i] = parent.context.loadModel(String.format("AltoSaxKeyUp%d.obj", i),
-					"HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f);
-			
-			keysDown[i] = parent.context.loadModel(String.format("AltoSaxKeyDown%d.obj", i),
-					"HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f);
-		}
-		
-		attachKeys();
+abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) : UpAndDownKeyClone(
+	NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor
+) {
+	override fun moveForPolyphony() {
+		offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
 	}
-	
-	@Override
-	protected void moveForPolyphony() {
-		offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25f * indexForMoving()), 0));
+
+	companion object {
+		/**
+		 * The number of keys on a saxophone.
+		 */
+		private const val NUMBER_OF_KEYS = 20
+
+		/**
+		 * The amount to rotate the sax by when playing.
+		 */
+		private const val ROTATION_FACTOR = 0.1f
+	}
+
+	init {
+		for (i in 0 until keyCount) {
+			keysUp[i] = parent.context.loadModel("AltoSaxKeyUp$i.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+			keysDown[i] = parent.context.loadModel("AltoSaxKeyDown$i.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+		}
+		attachKeys()
 	}
 }

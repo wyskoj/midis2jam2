@@ -14,97 +14,113 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE;
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED;
-import static org.wysko.midis2jam2.midi.Midi.ACOUSTIC_SNARE;
-import static org.wysko.midis2jam2.midi.Midi.ELECTRIC_SNARE;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The Snare drum.
  */
-public class SnareDrum extends PercussionInstrument {
-	
+class SnareDrum(context: Midis2jam2, hits: List<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
+
 	/**
 	 * The list of hits for regular notes.
 	 */
-	private final List<MidiNoteOnEvent> regularHits;
-	
+	private val regularHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The list of hits for side sticks.
 	 */
-	private final List<MidiNoteOnEvent> sideHits;
-	
+	private val sideHits: List<MidiNoteOnEvent>
+
 	/**
 	 * Contains the side stick.
 	 */
-	private final Node sideStickNode = new Node();
-	
+	private val sideStickNode = Node()
+
 	/**
 	 * The stick used for regular hits.
 	 */
-	private final Spatial regularStick;
-	
-	/**
-	 * Instantiates a new Snare drum.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public SnareDrum(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		this.regularHits =
-				hits.stream().filter(e -> e.getNote() == ACOUSTIC_SNARE || e.getNote() == ELECTRIC_SNARE).collect(Collectors.toList());
-		this.sideHits = hits.stream().filter(e -> e.getNote() == 37).collect(Collectors.toList());
-		Spatial drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp");
-		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		Spatial sideStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		Node regularStickNode = new Node();
-		regularStickNode.attachChild(regularStick);
-		sideStickNode.attachChild(sideStick);
-		recoilNode.attachChild(drum);
-		recoilNode.attachChild(regularStickNode);
-		recoilNode.attachChild(sideStickNode);
-		highLevelNode.attachChild(recoilNode);
-		highLevelNode.move(-10.9f, 16, -72.5f);
-		highLevelNode.rotate(rad(10), 0, rad(-10));
-		regularStickNode.rotate(0, rad(80), 0);
-		regularStickNode.move(10, 0, 3);
-		sideStick.setLocalTranslation(0, 0, -2);
-		sideStick.setLocalRotation(new Quaternion().fromAngles(0, rad(-20), 0));
-		sideStickNode.setLocalTranslation(-1, 0.4f, 6);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		var regularStickStatus = Stick.handleStick(context, regularStick, time, delta, regularHits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
-		var sideStickStatus = Stick.handleStick(context, sideStickNode, time, delta, sideHits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
-		
-		var regVel = 0;
-		var sideVel = 0;
+	private val regularStick: Spatial
+	override fun tick(time: Double, delta: Float) {
+		val regularStickStatus = Stick.handleStick(
+			context,
+			regularStick,
+			time,
+			delta,
+			regularHits,
+			Stick.STRIKE_SPEED,
+			Stick.MAX_ANGLE,
+			Axis.X
+		)
+		val sideStickStatus = Stick.handleStick(
+			context,
+			sideStickNode,
+			time,
+			delta,
+			sideHits,
+			Stick.STRIKE_SPEED,
+			Stick.MAX_ANGLE,
+			Axis.X
+		)
+		var regVel = 0
+		var sideVel = 0
 		if (regularStickStatus.justStruck()) {
-			assert regularStickStatus.getStrike() != null;
-			regVel = regularStickStatus.getStrike().getVelocity();
+			assert(regularStickStatus.strike != null)
+			regVel = regularStickStatus.strike!!.velocity
 		}
 		if (sideStickStatus.justStruck()) {
-			assert sideStickStatus.getStrike() != null;
-			sideVel = (int) (sideStickStatus.getStrike().getVelocity() * 0.5);
+			assert(sideStickStatus.strike != null)
+			sideVel = (sideStickStatus.strike!!.velocity * 0.5).toInt()
 		}
-		int velocity = Math.max(regVel, sideVel);
-		PercussionInstrument.recoilDrum(recoilNode, velocity != 0, velocity, delta);
+		val velocity = regVel.coerceAtLeast(sideVel)
+		recoilDrum(recoilNode, velocity != 0, velocity, delta)
+	}
+
+	init {
+		regularHits = hits.filter { it.note == Midi.ACOUSTIC_SNARE || it.note == Midi.ELECTRIC_SNARE }
+		sideHits = hits.filter { it.note == Midi.SIDE_STICK }
+
+		context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp").apply { recoilNode.attachChild(this) }
+		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+
+		val sideStick = regularStick.clone().apply {
+			sideStickNode.attachChild(this)
+		}
+
+		val regularStickNode: Node = Node().apply {
+			attachChild(regularStick)
+		}
+
+		recoilNode.run {
+			attachChild(regularStickNode)
+			attachChild(sideStickNode)
+		}
+
+		highLevelNode.run {
+			attachChild(recoilNode)
+			move(-10.9f, 16f, -72.5f)
+			rotate(rad(10.0), 0f, rad(-10.0))
+		}
+
+		regularStickNode.run {
+			rotate(0f, rad(80.0), 0f)
+			move(10f, 0f, 3f)
+		}
+
+		sideStick.run {
+			setLocalTranslation(0f, 0f, -2f)
+			localRotation = Quaternion().fromAngles(0f, rad(-20.0), 0f)
+		}
+
+		sideStickNode.setLocalTranslation(-1f, 0.4f, 6f)
 	}
 }

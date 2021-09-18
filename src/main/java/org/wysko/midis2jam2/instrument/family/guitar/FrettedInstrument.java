@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ;
+import static org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ;
 
 /**
  * Any instrument that has strings that can be pushed down to change the pitch (e.g., guitar, bass guitar, violin,
@@ -258,7 +258,7 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		
 		/* Animate strings */
 		for (var i = 0; i < numberOfStrings; i++) {
-			animateString(i, frettingEngine.getFrets().get(i));
+			animateString(i, frettingEngine.getFrets()[i]);
 		}
 		
 		final double inc = delta / (1 / 60F);
@@ -267,113 +267,4 @@ public abstract class FrettedInstrument extends SustainedInstrument {
 		return noteStarted;
 	}
 	
-	/**
-	 * Fretted instruments in M2J2 are composed of several parts:
-	 * <ul>
-	 *     <li>Upper strings - These are the strings you see when a string is not being played.</li>
-	 *     <li>Lower strings - These are the wobbly, animated strings you see when a string is being played.</li>
-	 *     <li>Note finger - The small, yellow dot that hides the seam between upper and lower strings</li>
-	 * </ul>
-	 * <p>
-	 * When a note on a string is to be played, the upper string scales by a factor x, and the bottom string scales
-	 * by a factor 1 - x. This way, they meet at the correct spot on the fretboard. At that position, the note finger
-	 * is placed to hide the seam between the upper and lower strings.
-	 * <p>
-	 *
-	 * @see FretHeightCalculator
-	 */
-	public static class FrettedInstrumentPositioning {
-		
-		/**
-		 * The y-coordinate of the "upper strings".
-		 */
-		public final float upperY;
-		
-		/**
-		 * The y-coordinate of the "lower strings".
-		 */
-		public final float lowerY;
-		
-		/**
-		 * This provides the vertical position of the note fingers.
-		 */
-		public final Vector3f fingerVerticalOffset;
-		
-		/**
-		 * These provide the scales of each string to accommodate for higher strings being thinner.
-		 */
-		public final Vector3f[] restingStrings;
-		
-		/**
-		 * The x-coordinates of each upper string.
-		 */
-		public final float[] upperX;
-		
-		/**
-		 * The x-coordinates of each lower string.
-		 */
-		public final float[] lowerX;
-		
-		/**
-		 * The interface for scaling strings.
-		 */
-		public final FretHeightCalculator fretHeights;
-		
-		
-		/**
-		 * Instantiates a fretted instrument positioning.
-		 *
-		 * @see #upperY
-		 * @see #lowerY
-		 * @see #restingStrings
-		 * @see #upperX
-		 * @see #lowerX
-		 * @see #fretHeights
-		 */
-		public FrettedInstrumentPositioning(float upperY, float lowerY,
-		                                    Vector3f[] restingStrings, float[] upperX, float[] lowerX,
-		                                    FretHeightCalculator fretHeights) {
-			this.upperY = upperY;
-			this.lowerY = lowerY;
-			this.fingerVerticalOffset = new Vector3f(0, upperY, 0);
-			this.restingStrings = restingStrings;
-			this.upperX = upperX;
-			this.lowerX = lowerX;
-			this.fretHeights = fretHeights;
-		}
-		
-		public static class FrettedInstrumentPositioningWithZ extends FrettedInstrumentPositioning {
-			
-			/**
-			 * The z-coordinates of the top strings.
-			 */
-			private final float[] topZ;
-			
-			/**
-			 * The z-coordinates of the bottom strings.
-			 */
-			private final float[] bottomZ;
-			
-			/**
-			 * Instantiates a fretted instrument positioning.
-			 *
-			 * @see #upperY
-			 * @see #lowerY
-			 * @see #restingStrings
-			 * @see #upperX
-			 * @see #lowerX
-			 * @see #fretHeights
-			 * @see #topZ
-			 * @see #bottomZ
-			 */
-			public FrettedInstrumentPositioningWithZ(float topY, float bottomY, Vector3f[] restingStrings, float[] topX,
-			                                         float[] bottomX,
-			                                         FretHeightCalculator fretHeights, float[] topZ,
-			                                         float[] bottomZ) {
-				super(topY, bottomY, restingStrings, topX, bottomX, fretHeights);
-				this.topZ = topZ;
-				this.bottomZ = bottomZ;
-			}
-		}
-	}
 }

@@ -14,84 +14,78 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.guitar
 
-package org.wysko.midis2jam2.instrument.family.guitar;
-
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
+import com.jme3.scene.Spatial.CullHint.Always
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
- * The shamisen.
+ * The texture file for Shamisen.
  */
-public class Shamisen extends FrettedInstrument {
-	
-	/**
-	 * Instantiates a new Shamisen.
-	 *
-	 * @param context the context
-	 * @param events  the events
-	 */
-	public Shamisen(@NotNull Midis2jam2 context,
-	                @NotNull List<MidiChannelSpecificEvent> events) {
-		super(context,
-				new StandardFrettingEngine(3, 15, new int[]{50, 57, 62}),
-				events,
-				new FrettedInstrumentPositioning(38.814f,
-						-6.1f,
-						new Vector3f[]{Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ},
-						new float[]{-0.5f, 0, 0.5f},
-						new float[]{-0.5f, 0, 0.5f},
-						fret -> fret * 0.048f // 0 --> 0; 15 --> 0.72
-				),
-				3,
-				context.loadModel("Shamisen.fbx", "ShamisenSkin.png"));
-		
-		// Load strings
-		for (var i = 0; i < 3; i++) {
-			upperStrings[i] = context.loadModel("ShamisenString.fbx", "ShamisenSkin.png");
-			instrumentNode.attachChild(upperStrings[i]);
-		}
-		
-		var forward = -0.23126f;
-		for (var i = 0; i < 3; i++) {
-			upperStrings[i].setLocalTranslation(positioning.upperX[i], positioning.upperY, forward);
-		}
-		
-		for (var i = 0; i < 3; i++) {
-			for (var j = 0; j < 5; j++) {
-				lowerStrings[i][j] = context.loadModel("ShamisenStringBottom%d.fbx".formatted(j), "ShamisenSkin.png");
-				instrumentNode.attachChild(lowerStrings[i][j]);
+const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
+
+/**
+ * The Shamisen.
+ */
+class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
+	context,
+	StandardFrettingEngine(3, 15, intArrayOf(50, 57, 62)),
+	events,
+	FrettedInstrumentPositioning(38.814f,
+		-6.1f,
+		arrayOf(Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ),
+		floatArrayOf(-0.5f, 0f, 0.5f),
+		floatArrayOf(-0.5f, 0f, 0.5f),
+		object : FretHeightCalculator {
+			override fun calculateScale(fret: Int): Float {
+				return fret * 0.048f // 0 --> 0; 15 --> 0.72
 			}
 		}
-		
-		for (var i = 0; i < 3; i++) {
-			for (var j = 0; j < 5; j++) {
-				lowerStrings[i][j].setLocalTranslation(positioning.lowerX[i], positioning.lowerY, forward);
-				lowerStrings[i][j].setCullHint(Spatial.CullHint.Always);
-			}
-		}
-		
-		for (var i = 0; i < 3; i++) {
-			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", "ShamisenSkin.png");
-			instrumentNode.attachChild(noteFingers[i]);
-			noteFingers[i].setCullHint(Spatial.CullHint.Always);
-		}
-		
-		instrumentNode.setLocalTranslation(56, 43, -23);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-5), rad(-46), rad(-33)));
-		
+	),
+	3,
+	context.loadModel("Shamisen.fbx", SHAMISEN_SKIN_TEXTURE)) {
+
+	override fun moveForMultiChannel(delta: Float) {
+		offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
 	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(new Vector3f(5, -4, 0).mult(indexForMoving(delta)));
+
+	init {
+		/* Load strings */
+		val forward = -0.23126f
+		for (i in 0..2) {
+			upperStrings[i] = context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+				instrumentNode.attachChild(this)
+				localTranslation = Vector3f(positioning.upperX[i], positioning.upperY, forward)
+			}
+		}
+
+		/* Load anim strings */
+		for (i in 0..2) {
+			for (j in 0..4) {
+				lowerStrings[i][j] = context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+					instrumentNode.attachChild(this)
+					setLocalTranslation(positioning.lowerX[i], positioning.lowerY, forward)
+					cullHint = Always
+				}
+			}
+		}
+
+		/* Load note fingers */
+		for (i in 0..2) {
+			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", SHAMISEN_SKIN_TEXTURE).apply {
+				instrumentNode.attachChild(this)
+				cullHint = Always
+			}
+		}
+
+		/* Positioning */
+		instrumentNode.run {
+			localTranslation = Vector3f(56f, 43f, -23f)
+			localRotation = Quaternion().fromAngles(rad(-5.0), rad(-46.0), rad(-33.0))
+		}
 	}
 }
