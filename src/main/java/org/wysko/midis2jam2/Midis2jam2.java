@@ -544,7 +544,11 @@ public class Midis2jam2 extends AbstractAppState implements ActionListener {
 				}
 			} else {
 				/* Note off events need to be added to the program of the last MIDI note on with that same value */
-				lastProgramForNote.get(noteOnPrograms.get(((MidiNoteOffEvent) event).getNote()).getProgramNum()).add(event);
+				try {
+					lastProgramForNote.get(noteOnPrograms.get(((MidiNoteOffEvent) event).getNote()).getProgramNum()).add(event);
+				} catch (Exception e) {
+					Midis2jam2.getLOGGER().warning("Unbalanced Note On / Note Off events. Attempting to continue.\n" + exceptionToLines(e));
+				}
 			}
 		}
 		
