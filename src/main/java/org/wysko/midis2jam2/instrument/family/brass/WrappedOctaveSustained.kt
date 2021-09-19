@@ -51,6 +51,8 @@ abstract class WrappedOctaveSustained protected constructor(
             twelfths[index]!!.play(it.duration())
         }
 
+        currentNotePeriods.clear()
+
         /* Update twelfths */
         for (twelfth in twelfths) {
             twelfth!!.tick(delta)

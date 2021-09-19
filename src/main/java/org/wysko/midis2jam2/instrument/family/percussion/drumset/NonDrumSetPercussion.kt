@@ -49,6 +49,6 @@ open class NonDrumSetPercussion protected constructor(
     }
 
     init {
-        finalHits = java.util.List.copyOf(hits)
+        finalHits = ArrayList(hits)
     }
 }
