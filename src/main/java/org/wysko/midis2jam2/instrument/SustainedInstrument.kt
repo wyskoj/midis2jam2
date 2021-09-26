@@ -132,6 +132,6 @@ abstract class SustainedInstrument protected constructor(
 	init {
 		val midiNoteEvents = scrapeMidiNoteEvents(eventList)
 		notePeriods = calculateNotePeriods(this, midiNoteEvents as MutableList<MidiNoteEvent>)
-		unmodifiableNotePeriods = java.util.List.copyOf(notePeriods)
+		unmodifiableNotePeriods = ArrayList(notePeriods)
 	}
 }
