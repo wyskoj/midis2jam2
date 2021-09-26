@@ -36,7 +36,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TubaClone::class.java, FINGERING_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(0f, 40 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 40 * indexForMoving(delta), 0f)
     }
 
     /**

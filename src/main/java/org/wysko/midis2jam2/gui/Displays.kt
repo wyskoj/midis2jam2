@@ -14,38 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.gui
 
-package org.wysko.midis2jam2.gui;
+import java.awt.Cursor
+import java.awt.Point
+import java.awt.image.BufferedImage
+import javax.swing.JFrame
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
-import static java.awt.Cursor.getPredefinedCursor;
-
-public abstract class Displays extends JFrame {
-	
-	public void display() {
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		pack();
-		setLocationRelativeTo(null);
-		setVisible(true);
+abstract class Displays : JFrame() {
+	fun display() {
+		defaultCloseOperation = DISPOSE_ON_CLOSE
+		pack()
+		setLocationRelativeTo(null)
+		isVisible = true
 	}
-	
+
 	/**
 	 * Shows or hides the cursor.
 	 *
 	 * @param hide if true, hides the cursor, false shows the cursor
 	 */
-	@SuppressWarnings("java:S2301")
-	public void hideCursor(boolean hide) {
-		if (hide) {
-			this.setCursor(this.getToolkit().createCustomCursor(
-					new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-					new Point(),
-					null));
+	fun hideCursor(hide: Boolean) {
+		cursor = if (hide) {
+			this.toolkit.createCustomCursor(
+				BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
+				Point(),
+				null
+			)
 		} else {
-			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
 		}
 	}
 }

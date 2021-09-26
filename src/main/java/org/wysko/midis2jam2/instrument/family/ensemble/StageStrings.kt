@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -70,7 +69,7 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 		/**
 		 * Each frame of the anim strings.
 		 */
-		private val animStrings = arrayOfNulls<Spatial>(5)
+		private val animStrings: Array<Spatial>
 
 		/**
 		 * The resting string.
@@ -108,10 +107,10 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 				bowNode.cullHint = Dynamic
 
 				/* Slide bow across string */
-				bow.localTranslation = Vector3f(0f, (8 * (progress - 0.5)).toFloat(), 0f)
+				bow.setLocalTranslation(0f, (8 * (progress - 0.5)).toFloat(), 0f)
 
 				/* Move string and holder forwards */
-				animNode.localTranslation = Vector3f(0f, 0f, 2f)
+				animNode.setLocalTranslation(0f, 0f, 2f)
 
 				/* Hide resting string, show anim string */
 				restingString.cullHint = Always
@@ -121,7 +120,7 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 				bowNode.cullHint = Always
 
 				/* Move string and holder backwards */
-				animNode.localTranslation = Vector3f(0f, 0f, 0f)
+				animNode.setLocalTranslation(0f, 0f, 0f)
 
 				/* Show resting string, hide anim string */
 				restingString.cullHint = Dynamic
@@ -135,9 +134,9 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 			animNode.attachChild(context.loadModel("StageStringHolder.obj", type.textureFile))
 
 			/* Load anim strings */
-			for (i in 0..4) {
-				animStrings[i] = context.loadModel("StageStringBottom$i.obj", "StageStringPlaying.bmp").apply {
-					cullHint = Always
+			animStrings = Array(5) {
+				context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
+					cullHint = Always // Hide on startup
 					animStringNode.attachChild(this)
 				}
 			}

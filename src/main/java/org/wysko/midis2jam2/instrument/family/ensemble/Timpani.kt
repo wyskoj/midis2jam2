@@ -44,11 +44,11 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
 
 		for (i in 0..11) {
 			val mallet = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp").apply {
-				localTranslation = Vector3f(0f, 0f, -5f)
+				setLocalTranslation(0f, 0f, -5f)
 			}
 			malletNodes[i].run {
 				attachChild(mallet)
-				localTranslation = Vector3f(1.8f * (i - 5.5f), 31f, 15f)
+				setLocalTranslation(1.8f * (i - 5.5f), 31f, 15f)
 			}
 		}
 
@@ -59,7 +59,7 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
 
 		instrumentNode.run {
 			attachChild(animNode)
-			localTranslation = Vector3f(0f, 0f, -120f)
+			setLocalTranslation(0f, 0f, -120f)
 		}
 	}
 }

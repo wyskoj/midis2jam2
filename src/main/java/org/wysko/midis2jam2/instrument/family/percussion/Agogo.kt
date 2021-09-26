@@ -14,95 +14,74 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.lang.Math.max;
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick;
-import static org.wysko.midis2jam2.midi.Midi.HIGH_AGOGO;
-import static org.wysko.midis2jam2.midi.Midi.LOW_AGOGO;
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi.HIGH_AGOGO
+import org.wysko.midis2jam2.midi.Midi.LOW_AGOGO
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.world.Axis
+import kotlin.math.max
 
 /**
  * The agogo.
  */
-public class Agogo extends NonDrumSetPercussion {
-	
+class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * The left stick.
 	 */
-	@NotNull
-	private final Spatial leftStick;
-	
+	private val leftStick: Spatial
+
 	/**
 	 * The right stick.
 	 */
-	@NotNull
-	private final Spatial rightStick;
-	
+	private val rightStick: Spatial
+
 	/**
 	 * The hits for the high agogo.
 	 */
-	@NotNull
-	private final List<MidiNoteOnEvent> highHits;
-	
+	private val highHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The hits for the low agogo.
 	 */
-	@NotNull
-	private final List<MidiNoteOnEvent> lowHits;
-	
-	/**
-	 * Instantiates a new agogo.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Agogo(@NotNull Midis2jam2 context, @NotNull List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		highHits = hits.stream().filter(a -> a.getNote() == HIGH_AGOGO).collect(Collectors.toList());
-		lowHits = hits.stream().filter(a -> a.getNote() == LOW_AGOGO).collect(Collectors.toList());
-		
-		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		
-		recoilNode.attachChild(leftStick);
-		recoilNode.attachChild(rightStick);
-		
-		leftStick.setLocalTranslation(3, 0, 13);
-		rightStick.setLocalTranslation(10, 0, 11);
-		
-		recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp")); // sic
-		
-		instrumentNode.setLocalTranslation(-5, 50, -85);
-		instrumentNode.attachChild(recoilNode);
+	private val lowHits: List<MidiNoteOnEvent>
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val leftStatus =
+			Stick.handleStick(context, leftStick, time, delta, highHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+		val rightStatus =
+			Stick.handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+		var velocity = 0
+		if (leftStatus.strike != null) {
+			velocity = max(velocity, leftStatus.strike!!.velocity)
+		}
+		if (rightStatus.strike != null) {
+			velocity = max(velocity, rightStatus.strike!!.velocity)
+		}
+		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		var leftStatus = handleStick(context, leftStick, time, delta, highHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		var rightStatus = handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
-		var velocity = 0;
-		if (leftStatus.getStrike() != null) {
-			velocity = max(velocity, leftStatus.getStrike().getVelocity());
+
+	init {
+		highHits = hits.filter { it.note == HIGH_AGOGO }
+		lowHits = hits.filter { it.note == LOW_AGOGO }
+
+		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+			recoilNode.attachChild(this)
+			setLocalTranslation(3f, 0f, 13f)
 		}
-		if (rightStatus.getStrike() != null) {
-			velocity = max(velocity, rightStatus.getStrike().getVelocity());
+
+		rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+			recoilNode.attachChild(this)
+			setLocalTranslation(10f, 0f, 11f)
 		}
-		
-		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta);
+
+		recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp"))
+		instrumentNode.setLocalTranslation(-5f, 50f, -85f)
+		instrumentNode.attachChild(recoilNode)
 	}
 }

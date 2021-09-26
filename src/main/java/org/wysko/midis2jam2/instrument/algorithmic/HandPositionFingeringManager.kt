@@ -14,116 +14,84 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.algorithmic
 
-package org.wysko.midis2jam2.instrument.algorithmic;
-
-import org.w3c.dom.*;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.util.Utils;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.HashMap;
-
-import static org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands;
-import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
+import org.w3c.dom.Element
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands
+import org.wysko.midis2jam2.util.Utils.exceptionToLines
+import org.wysko.midis2jam2.util.Utils.instantiateXmlParser
+import org.xml.sax.SAXException
+import java.io.IOException
+import javax.xml.parsers.ParserConfigurationException
 
 /**
  * Handles fingering that uses hands.
  */
-public class HandPositionFingeringManager implements FingeringManager<Hands> {
-	
+open class HandPositionFingeringManager : FingeringManager<Hands> {
+
 	/**
 	 * The table of fingerings.
 	 */
-	private final HashMap<Integer, Hands> table = new HashMap<>();
-	
-	/**
-	 * Loads the fingering manager from XML given the class
-	 *
-	 * @param clazz the class of the instrument
-	 * @return the hand position fingering manager
-	 */
-	public static HandPositionFingeringManager from(Class<? extends Instrument> clazz) {
-		String className = clazz.getSimpleName();
-		var manager = new HandPositionFingeringManager();
-		/* XML Parsing */
-		try {
-			Document xmlDoc = Utils.instantiateXmlParser("/instrument_mapping.xml");
-			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
-			
-			/* For each instrument */
-			for (var i = 0; i < instrumentList.getLength(); i++) {
-				Node instrument = instrumentList.item(i);
-				NamedNodeMap instrumentAttributes = instrument.getAttributes();
-				/* Find instrument with matching name */
-				if (instrumentAttributes.getNamedItem("name").getTextContent().equals(className)) {
-					String mappingType = instrumentAttributes.getNamedItem("mapping-type").getTextContent();
-					if (!"hands".equals(mappingType)) {
-						Midis2jam2.getLOGGER().severe(() -> "XML has a mapping type of %s.".formatted(mappingType));
-						return manager;
-					}
-					
-					/* Get key mapping */
-					Node mapping = ((Element) instrument).getElementsByTagName("mapping").item(0);
-					NodeList maps = ((Element) mapping).getElementsByTagName("map");
-					int mapSize = maps.getLength();
-					/* For each defined note */
-					for (var j = 0; j < mapSize; j++) {
-						NamedNodeMap attributes = maps.item(j).getAttributes();
-						var note = Integer.parseInt(attributes.getNamedItem("note").getTextContent());
-						var leftHand = Integer.parseInt(attributes.getNamedItem("lh").getTextContent());
-						var rightHand = Integer.parseInt(attributes.getNamedItem("rh").getTextContent());
-						manager.table.put(note, new Hands(leftHand, rightHand));
-					}
-					break;
-				}
-			}
-		} catch (SAXException | IOException | ParserConfigurationException e) {
-			Midis2jam2.getLOGGER().severe(exceptionToLines(e));
-		}
-		return manager;
+	private val table = HashMap<Int, Hands>()
+
+	override fun fingering(midiNote: Int): Hands {
+		return table[midiNote]!!
 	}
-	
-	@Override
-	public Hands fingering(int midiNote) {
-		return table.get(midiNote);
-	}
-	
+
 	/**
 	 * Defines the indices for left and right hands.
 	 */
-	public static class Hands {
-		
+	data class Hands(val left: Int, val right: Int)
+
+	companion object {
 		/**
-		 * The index of the left hand.
-		 */
-		public final int left;
-		
-		/**
-		 * The index of the right hand.
-		 */
-		public final int right;
-		
-		/**
-		 * Instantiates a new hand configuration.
+		 * Loads the fingering manager from XML given the class
 		 *
-		 * @param left  the left hand index
-		 * @param right the right hand index
+		 * @param clazz the class of the instrument
+		 * @return the hand position fingering manager
 		 */
-		public Hands(int left, int right) {
-			this.left = left;
-			this.right = right;
-		}
-		
-		@Override
-		public String toString() {
-			return "Hands{" +
-					"left=" + left +
-					", right=" + right +
-					'}';
+		@JvmStatic
+		fun from(clazz: Class<out Instrument?>): HandPositionFingeringManager {
+			val className = clazz.simpleName
+			val manager = HandPositionFingeringManager()
+			/* XML Parsing */try {
+				val xmlDoc = instantiateXmlParser("/instrument_mapping.xml")
+				val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
+
+				/* For each instrument */for (i in 0 until instrumentList.length) {
+					val instrument = instrumentList.item(i)
+					val instrumentAttributes = instrument.attributes
+					/* Find instrument with matching name */if (instrumentAttributes.getNamedItem("name").textContent == className) {
+						val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
+						if ("hands" != mappingType) {
+							Midis2jam2.getLOGGER().severe { "XML has a mapping type of $mappingType." }
+							return manager
+						}
+
+						/* Get key mapping */
+						val mapping = (instrument as Element).getElementsByTagName("mapping").item(0)
+						val maps = (mapping as Element).getElementsByTagName("map")
+						val mapSize = maps.length
+						/* For each defined note */for (j in 0 until mapSize) {
+							val attributes = maps.item(j).attributes
+							val note = attributes.getNamedItem("note").textContent.toInt()
+							val leftHand = attributes.getNamedItem("lh").textContent.toInt()
+							val rightHand = attributes.getNamedItem("rh").textContent.toInt()
+							manager.table[note] = Hands(leftHand, rightHand)
+						}
+						break
+					}
+				}
+			} catch (e: SAXException) {
+				Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+			} catch (e: IOException) {
+				Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+			} catch (e: ParserConfigurationException) {
+				Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+			}
+			return manager
 		}
 	}
 }

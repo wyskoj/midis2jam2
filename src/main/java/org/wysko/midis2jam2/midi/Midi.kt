@@ -14,134 +14,69 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.midi
 
-package org.wysko.midis2jam2.midi;
-
-@SuppressWarnings("unused")
-public final class Midi {
-	
-	public static final int HIGH_Q = 27;
-	
-	public static final int SLAP = 28;
-	
-	public static final int SCRATCH_PUSH = 29;
-	
-	public static final int SCRATCH_PULL = 30;
-	
-	public static final int STICKS = 31;
-
-	public static final int SQUARE_CLICK = 32;
-	
-	public static final int METRONOME_CLICK = 33;
-	
-	public static final int METRONOME_BELL = 34;
-	
-	public static final int ACOUSTIC_BASS_DRUM = 35;
-	
-	public static final int ELECTRIC_BASS_DRUM = 36;
-	
-	public static final int SIDE_STICK = 37;
-	
-	public static final int ACOUSTIC_SNARE = 38;
-	
-	public static final int HAND_CLAP = 39;
-	
-	public static final int ELECTRIC_SNARE = 40;
-	
-	public static final int LOW_FLOOR_TOM = 41;
-	
-	public static final int CLOSED_HI_HAT = 42;
-	
-	public static final int HIGH_FLOOR_TOM = 43;
-	
-	public static final int PEDAL_HI_HAT = 44;
-	
-	public static final int LOW_TOM = 45;
-	
-	public static final int OPEN_HI_HAT = 46;
-	
-	public static final int LOW_MID_TOM = 47;
-	
-	public static final int HI_MID_TOM = 48;
-	
-	public static final int CRASH_CYMBAL_1 = 49;
-	
-	public static final int HIGH_TOM = 50;
-	
-	public static final int RIDE_CYMBAL_1 = 51;
-	
-	public static final int CHINESE_CYMBAL = 52;
-	
-	public static final int RIDE_BELL = 53;
-	
-	public static final int TAMBOURINE = 54;
-	
-	public static final int SPLASH_CYMBAL = 55;
-	
-	public static final int COWBELL = 56;
-	
-	public static final int CRASH_CYMBAL_2 = 57;
-	
-	public static final int VIBRA_SLAP = 58;
-	
-	public static final int RIDE_CYMBAL_2 = 59;
-	
-	public static final int HIGH_BONGO = 60;
-	
-	public static final int LOW_BONGO = 61;
-	
-	public static final int MUTE_HIGH_CONGA = 62;
-	
-	public static final int OPEN_HIGH_CONGA = 63;
-	
-	public static final int LOW_CONGA = 64;
-	
-	public static final int HIGH_TIMBALE = 65;
-	
-	public static final int LOW_TIMBALE = 66;
-	
-	public static final int HIGH_AGOGO = 67;
-	
-	public static final int LOW_AGOGO = 68;
-	
-	public static final int CABASA = 69;
-	
-	public static final int MARACAS = 70;
-	
-	public static final int SHORT_WHISTLE = 71;
-	
-	public static final int LONG_WHISTLE = 72;
-	
-	public static final int SHORT_GUIRO = 73;
-	
-	public static final int LONG_GUIRO = 74;
-	
-	public static final int CLAVES = 75;
-	
-	public static final int HIGH_WOODBLOCK = 76;
-	
-	public static final int LOW_WOODBLOCK = 77;
-	
-	public static final int MUTE_CUICA = 78;
-	
-	public static final int OPEN_CUICA = 79;
-	
-	public static final int MUTE_TRIANGLE = 80;
-	
-	public static final int OPEN_TRIANGLE = 81;
-	
-	public static final int SHAKER = 82;
-	
-	public static final int JINGLE_BELL = 83;
-	
-	public static final int BELLTREE = 84;
-	
-	public static final int CASTANETS = 85;
-	
-	public static final int MUTE_SURDO = 86;
-	
-	public static final int OPEN_SURDO = 87;
-	
-	private Midi() {
-	}
+@Suppress("unused", "SpellCheckingInspection")
+object Midi {
+	const val HIGH_Q = 27
+	const val SLAP = 28
+	const val SCRATCH_PUSH = 29
+	const val SCRATCH_PULL = 30
+	const val STICKS = 31
+	const val SQUARE_CLICK = 32
+	const val METRONOME_CLICK = 33
+	const val METRONOME_BELL = 34
+	const val ACOUSTIC_BASS_DRUM = 35
+	const val ELECTRIC_BASS_DRUM = 36
+	const val SIDE_STICK = 37
+	const val ACOUSTIC_SNARE = 38
+	const val HAND_CLAP = 39
+	const val ELECTRIC_SNARE = 40
+	const val LOW_FLOOR_TOM = 41
+	const val CLOSED_HI_HAT = 42
+	const val HIGH_FLOOR_TOM = 43
+	const val PEDAL_HI_HAT = 44
+	const val LOW_TOM = 45
+	const val OPEN_HI_HAT = 46
+	const val LOW_MID_TOM = 47
+	const val HI_MID_TOM = 48
+	const val CRASH_CYMBAL_1 = 49
+	const val HIGH_TOM = 50
+	const val RIDE_CYMBAL_1 = 51
+	const val CHINESE_CYMBAL = 52
+	const val RIDE_BELL = 53
+	const val TAMBOURINE = 54
+	const val SPLASH_CYMBAL = 55
+	const val COWBELL = 56
+	const val CRASH_CYMBAL_2 = 57
+	const val VIBRA_SLAP = 58
+	const val RIDE_CYMBAL_2 = 59
+	const val HIGH_BONGO = 60
+	const val LOW_BONGO = 61
+	const val MUTE_HIGH_CONGA = 62
+	const val OPEN_HIGH_CONGA = 63
+	const val LOW_CONGA = 64
+	const val HIGH_TIMBALE = 65
+	const val LOW_TIMBALE = 66
+	const val HIGH_AGOGO = 67
+	const val LOW_AGOGO = 68
+	const val CABASA = 69
+	const val MARACAS = 70
+	const val SHORT_WHISTLE = 71
+	const val LONG_WHISTLE = 72
+	const val SHORT_GUIRO = 73
+	const val LONG_GUIRO = 74
+	const val CLAVES = 75
+	const val HIGH_WOODBLOCK = 76
+	const val LOW_WOODBLOCK = 77
+	const val MUTE_CUICA = 78
+	const val OPEN_CUICA = 79
+	const val MUTE_TRIANGLE = 80
+	const val OPEN_TRIANGLE = 81
+	const val SHAKER = 82
+	const val JINGLE_BELL = 83
+	const val BELLTREE = 84
+	const val CASTANETS = 85
+	const val MUTE_SURDO = 86
+	const val OPEN_SURDO = 87
 }

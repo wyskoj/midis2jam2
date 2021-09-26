@@ -32,8 +32,8 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 	WrappedOctaveSustained(context, eventList, true) {
 
 	override fun moveForMultiChannel(delta: Float) {
-		for (twelfth in twelfths) {
-			(twelfth as ChoirPeep).highestLevel.localTranslation = Vector3f(BASE_POSITION).add(
+		twelfths.forEach { twelfth ->
+			(twelfth as ChoirPeep).highestLevel.localTranslation = BASE_POSITION.add(
 				Vector3f(0f, 10f, -15f).mult(indexForMoving(delta))
 			)
 		}

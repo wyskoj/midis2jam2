@@ -14,84 +14,67 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.piano
 
-package org.wysko.midis2jam2.instrument.family.piano;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 
 /**
  * Any key on a keyed instrument.
  *
  * @see KeyedInstrument
  */
-public class Key {
-	
+open class Key
+protected constructor() {
+
 	/**
 	 * The uppermost node of this key.
 	 */
-	protected final Node keyNode = new Node();
-	
+	@JvmField
+	val keyNode = Node()
+
 	/**
 	 * Contains geometry for the "up" key.
 	 */
-	protected final Node upNode = new Node();
-	
+	@JvmField
+	protected val upNode = Node()
+
 	/**
 	 * Contains geometry for the "down" key.
 	 */
-	protected final Node downNode = new Node();
-	
+	@JvmField
+	protected val downNode = Node()
+
 	/**
 	 * Is this key being pressed?
 	 */
-	protected boolean beingPressed;
-	
-	/**
-	 * Instantiates a new Key.
-	 *
-	 */
-	protected Key() {
-	}
-	
-	public boolean isBeingPressed() {
-		return beingPressed;
-	}
-	
-	public void setBeingPressed(boolean beingPressed) {
-		this.beingPressed = beingPressed;
-	}
-	
+	var isBeingPressed = false
+
 	/**
 	 * Animates the motion of the key.
 	 *
 	 * @param delta the amount of time since the last frame update
 	 */
-	public void tick(float delta) {
-		if (beingPressed) {
-			keyNode.setLocalRotation(new Quaternion().fromAngles(0.1F, 0, 0));
-			downNode.setCullHint(Spatial.CullHint.Dynamic);
-			upNode.setCullHint(Spatial.CullHint.Always);
+	open fun tick(delta: Float) {
+		if (isBeingPressed) {
+			keyNode.localRotation = Quaternion().fromAngles(0.1f, 0f, 0f)
+			downNode.cullHint = Spatial.CullHint.Dynamic
+			upNode.cullHint = Spatial.CullHint.Always
 		} else {
-			var angles = new float[3];
-			keyNode.getLocalRotation().toAngles(angles);
+			val angles = FloatArray(3)
+			keyNode.localRotation.toAngles(angles)
 			if (angles[0] > 0.0001) {
-				keyNode.setLocalRotation(new Quaternion(new float[]
-						{
-								Math.max(angles[0] - (0.02F * delta * 50), 0), 0, 0
-						}
-				));
+				keyNode.localRotation = Quaternion(
+					floatArrayOf(
+						(angles[0] - 0.02f * delta * 50).coerceAtLeast(0f), 0f, 0f
+					)
+				)
 			} else {
-				keyNode.setLocalRotation(new Quaternion(new float[]{0, 0, 0}));
-				
-				downNode.setCullHint(Spatial.CullHint.Always);
-				upNode.setCullHint(Spatial.CullHint.Dynamic);
+				keyNode.localRotation = Quaternion(floatArrayOf(0f, 0f, 0f))
+				downNode.cullHint = Spatial.CullHint.Always
+				upNode.cullHint = Spatial.CullHint.Dynamic
 			}
 		}
-	}
-	
-	public Node getKeyNode() {
-		return keyNode;
 	}
 }

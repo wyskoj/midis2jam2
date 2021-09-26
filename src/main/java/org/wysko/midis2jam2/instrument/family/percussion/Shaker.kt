@@ -14,53 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.*;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The shaker.
  */
-public class Shaker extends NonDrumSetPercussion {
-	
+class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * Contains the shaker.
 	 */
-	private final Node shakerNode = new Node();
-	
-	/**
-	 * Instantiates a new shaker.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Shaker(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		Spatial shaker = context.loadModel("Shaker.obj", "DarkWood.bmp");
-		shaker.setLocalTranslation(0, 0, -3);
-		shakerNode.attachChild(shaker);
-		
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-25)));
-		instrumentNode.setLocalTranslation(13, 45, -42);
-		instrumentNode.attachChild(shakerNode);
+	private val shakerNode = Node()
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		Stick.handleStick(context, shakerNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		handleStick(context, shakerNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
+
+	init {
+		val shaker = context.loadModel("Shaker.obj", "DarkWood.bmp")
+		shaker.setLocalTranslation(0f, 0f, -3f)
+		shakerNode.attachChild(shaker)
+		instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-25.0))
+		instrumentNode.setLocalTranslation(13f, 45f, -42f)
+		instrumentNode.attachChild(shakerNode)
 	}
 }

@@ -14,71 +14,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial.CullHint
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The sticks.
  */
-public class Sticks extends NonDrumSetPercussion {
-	
+class Sticks(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * Contains the left stick.
 	 */
-	private final Node leftStickNode = new Node();
-	
+	private val leftStickNode = Node()
+
 	/**
 	 * Contains the right stick.
 	 */
-	private final Node rightStickNode = new Node();
-	
-	/**
-	 * Instantiates sticks.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public Sticks(Midis2jam2 context,
-	              List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		this.hits = hits;
-		
-		Spatial leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		leftStick.setLocalTranslation(2.5f, 0, 0);
-		leftStick.setLocalRotation(new Quaternion().fromAngles(0, rad(20), 0));
-		leftStickNode.attachChild(leftStick);
-		
-		Spatial rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		rightStick.setLocalTranslation(-2.5f, 0, 0);
-		rightStick.setLocalRotation(new Quaternion().fromAngles(0, -rad(20), 0));
-		rightStickNode.attachChild(rightStick);
-		
-		instrumentNode.setLocalTranslation(-12, 42.3f, -48.4f);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(90), rad(90), 0));
-		instrumentNode.attachChild(leftStickNode);
-		instrumentNode.attachChild(rightStickNode);
+	private val rightStickNode = Node()
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val status = Stick.handleStick(context, leftStickNode, time, delta, hits, 2.0, 30.0, Axis.X)
+		leftStickNode.cullHint = CullHint.Dynamic
+		rightStickNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		Stick.StickStatus status = Stick.handleStick(context, leftStickNode, time, delta, hits, 2, 30, Axis.X);
-		leftStickNode.setCullHint(Dynamic);
-		rightStickNode.setLocalRotation(new Quaternion().fromAngles(-status.getRotationAngle(), 0, 0));
+
+	init {
+		val leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+		leftStick.setLocalTranslation(2.5f, 0f, 0f)
+		leftStick.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+		leftStickNode.attachChild(leftStick)
+		val rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+		rightStick.setLocalTranslation(-2.5f, 0f, 0f)
+		rightStick.localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
+		rightStickNode.attachChild(rightStick)
+		instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
+		instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
+		instrumentNode.attachChild(leftStickNode)
+		instrumentNode.attachChild(rightStickNode)
 	}
 }

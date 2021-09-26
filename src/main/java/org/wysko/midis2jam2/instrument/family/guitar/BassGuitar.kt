@@ -67,9 +67,9 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
 	}
 
 	init {
-		for (i in 0..3) {
+		/* Upper strings */
+		upperStrings = Array(4) {
 			context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
-				upperStrings[i] = this
 				instrumentNode.attachChild(this)
 			}
 		}
@@ -86,9 +86,9 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
 		upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
 
 		/* Lower strings */
-		for (i in 0..3) {
-			for (j in 0..4) {
-				lowerStrings[i][j] = context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
+		lowerStrings = Array(4) {
+			Array(5) { j ->
+				context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
 					instrumentNode.attachChild(this)
 					cullHint = Always
 				}
@@ -114,8 +114,8 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
 		}
 
 		/* Initialize note fingers */
-		for (i in 0..3) {
-			noteFingers[i] = context.loadModel("BassNoteFinger.obj", BASS_SKIN_BMP).apply {
+		noteFingers = Array(4) {
+			context.loadModel("BassNoteFinger.obj", BASS_SKIN_BMP).apply {
 				instrumentNode.attachChild(this)
 				cullHint = Always
 			}

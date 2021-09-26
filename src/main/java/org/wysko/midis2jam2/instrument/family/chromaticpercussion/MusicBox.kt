@@ -101,7 +101,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 					this.localRotation = Quaternion().fromAngles((-Math.PI / 2).toFloat(), 0f, 0f)
 					points.add(this)
 					pointRotations[this] = 0f
-					localTranslation = Vector3f((noteValue + 3) % 12 - 5.5f, 0f, 0f)
+					setLocalTranslation((noteValue + 3) % 12 - 5.5f, 0f, 0f)
 				}
 
 				/* Remove hit */
@@ -151,7 +151,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 	}
 
 	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.localTranslation = Vector3f(0f, 0f, indexForMoving(delta) * -18f)
+		offsetNode.setLocalTranslation(0f, 0f, indexForMoving(delta) * -18f)
 	}
 
 	inner class OneMusicBoxNote(i: Int) : TwelfthOfOctaveDecayed() {
@@ -205,7 +205,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 		init {
 			key = context.loadModel("MusicBoxKey.obj", "ShinySilver.bmp", REFLECTIVE, 0.9f).apply {
 				highestLevel.attachChild(this)
-				localTranslation = Vector3f(i - 5.5f, 7f, 0f)
+				setLocalTranslation(i - 5.5f, 7f, 0f)
 				localScale = Vector3f(-0.0454f * i + 1, 1f, 1f)
 			}
 		}

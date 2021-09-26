@@ -14,188 +14,160 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.particle.SteamPuffer;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.LONG;
-import static org.wysko.midis2jam2.instrument.family.percussion.Whistle.WhistleLength.SHORT;
-import static org.wysko.midis2jam2.midi.Midi.SHORT_WHISTLE;
-import static org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.UPWARDS;
-import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.NORMAL;
-import static org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE;
-import static org.wysko.midis2jam2.util.MatType.REFLECTIVE;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue.collect
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.midi.Midi.SHORT_WHISTLE
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.particle.SteamPuffer
+import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
+import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
  * The long and short percussion whistles.
  */
-public class Whistle extends NonDrumSetPercussion {
-	
+class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * The short whistle.
 	 */
-	private final PercussionWhistle shortWhistle;
-	
+	private val shortWhistle: PercussionWhistle
+
 	/**
 	 * The long whistle.
 	 */
-	private final PercussionWhistle longWhistle;
-	
-	/**
-	 * Instantiates a new non drum set percussion.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Whistle(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		shortWhistle = new PercussionWhistle(SHORT);
-		longWhistle = new PercussionWhistle(LONG);
-		
-		shortWhistle.highestLevel.setLocalTranslation(-6, 43, -83);
-		shortWhistle.highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(15), 0));
-		
-		longWhistle.highestLevel.setLocalTranslation(-2, 40, -83);
-		longWhistle.highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(15), 0));
-		
-		instrumentNode.attachChild(shortWhistle.highestLevel);
-		instrumentNode.attachChild(longWhistle.highestLevel);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		List<MidiNoteOnEvent> nextHits = NoteQueue.collect(hits, context, time);
-		
-		for (MidiNoteOnEvent nextHit : nextHits) {
-			if (nextHit != null) {
-				if (nextHit.getNote() == SHORT_WHISTLE) {
-					shortWhistle.play(0.2);
-				} else {
-					longWhistle.play(0.4);
-				}
+	private val longWhistle: PercussionWhistle
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val nextHits = collect(hits, context, time)
+		nextHits.forEach {
+			if (it.note == SHORT_WHISTLE) {
+				shortWhistle.play(0.2)
+			} else {
+				longWhistle.play(0.4)
 			}
 		}
-		
-		shortWhistle.tick(delta);
-		longWhistle.tick(delta);
-		
+		shortWhistle.tick(delta)
+		longWhistle.tick(delta)
+
 		// Override if still playing
 		if (shortWhistle.playing || longWhistle.playing) {
-			instrumentNode.setCullHint(Spatial.CullHint.Dynamic);
+			instrumentNode.cullHint = Spatial.CullHint.Dynamic
 		}
 	}
-	
+
 	/**
 	 * The enum Whistle length.
 	 */
-	enum WhistleLength {
-		
+	enum class WhistleLength {
 		/**
 		 * Short whistle length.
 		 */
 		SHORT,
-		
+
 		/**
 		 * Long whistle length.
 		 */
 		LONG
 	}
-	
+
 	/**
 	 * A single Whistle.
 	 */
-	public class PercussionWhistle {
-		
+	inner class PercussionWhistle(length: WhistleLength) {
 		/**
 		 * The Anim node.
 		 */
-		private final Node animNode = new Node();
-		
+		private val animNode = Node()
+
 		/**
 		 * The Highest level.
 		 */
-		private final Node highestLevel = new Node();
-		
+		val highestLevel = Node()
+
 		/**
 		 * The Puffer.
 		 */
-		private final SteamPuffer puffer;
-		
+		private val puffer: SteamPuffer
+
 		/**
 		 * True if this whistle is currently playing, false otherwise.
 		 */
-		private boolean playing;
-		
+		var playing = false
+
 		/**
 		 * The current amount of progress this whistle has made playing.
 		 */
-		private double progress;
-		
+		private var progress = 0.0
+
 		/**
 		 * How long this whistle should play for.
 		 */
-		private double duration;
-		
-		/**
-		 * Instantiates a new Whistle.
-		 */
-		public PercussionWhistle(WhistleLength length) {
-			
-			puffer = new SteamPuffer(context, length == LONG ? WHISTLE : NORMAL, 1, UPWARDS);
-			Spatial whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F);
-			
-			puffer.steamPuffNode.setLocalTranslation(0, 4, 0);
-			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(0, -1.57F, 0));
-			
-			animNode.attachChild(whistle);
-			animNode.attachChild(puffer.steamPuffNode);
-			
-			highestLevel.attachChild(animNode);
-		}
-		
+		private var duration = 0.0
+
 		/**
 		 * Plays a note.
 		 *
 		 * @param duration the duration
 		 */
-		public void play(double duration) {
-			playing = true;
-			progress = 0;
-			this.duration = duration;
+		fun play(duration: Double) {
+			playing = true
+			progress = 0.0
+			this.duration = duration
 		}
-		
+
 		/**
 		 * Tick.
 		 *
 		 * @param delta the amount of time since the last frame update
 		 */
-		public void tick(float delta) {
+		fun tick(delta: Float) {
 			if (progress >= 1) {
-				playing = false;
-				progress = 0;
+				playing = false
+				progress = 0.0
 			}
 			if (playing) {
-				progress += delta / duration;
-				animNode.setLocalTranslation(0, 2 - (2 * (float) (progress)), 0);
+				progress += delta / duration
+				animNode.setLocalTranslation(0f, 2 - 2 * progress.toFloat(), 0f)
 			} else {
-				animNode.setLocalTranslation(0, 0, 0);
+				animNode.setLocalTranslation(0f, 0f, 0f)
 			}
-			
-			puffer.tick(delta, playing);
+			puffer.tick(delta, playing)
 		}
+
+		/**
+		 * Instantiates a new Whistle.
+		 */
+		init {
+			puffer = SteamPuffer(
+				context,
+				if (length == WhistleLength.LONG) SteamPuffType.WHISTLE
+				else SteamPuffType.NORMAL, 1.0, PuffBehavior.UPWARDS
+			)
+			val whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f)
+			puffer.steamPuffNode.setLocalTranslation(0f, 4f, 0f)
+			puffer.steamPuffNode.localRotation = Quaternion().fromAngles(0f, -1.57f, 0f)
+			animNode.attachChild(whistle)
+			animNode.attachChild(puffer.steamPuffNode)
+			highestLevel.attachChild(animNode)
+		}
+	}
+
+	init {
+		shortWhistle = PercussionWhistle(WhistleLength.SHORT)
+		longWhistle = PercussionWhistle(WhistleLength.LONG)
+		shortWhistle.highestLevel.setLocalTranslation(-6f, 43f, -83f)
+		shortWhistle.highestLevel.localRotation = Quaternion().fromAngles(0f, rad(15.0), 0f)
+		longWhistle.highestLevel.setLocalTranslation(-2f, 40f, -83f)
+		longWhistle.highestLevel.localRotation = Quaternion().fromAngles(0f, rad(15.0), 0f)
+		instrumentNode.attachChild(shortWhistle.highestLevel)
+		instrumentNode.attachChild(longWhistle.highestLevel)
 	}
 }

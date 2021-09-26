@@ -14,129 +14,114 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.wysko.midis2jam2.midi.Midi.HIGH_WOODBLOCK;
-import static org.wysko.midis2jam2.midi.Midi.LOW_WOODBLOCK;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi.HIGH_WOODBLOCK
+import org.wysko.midis2jam2.midi.Midi.LOW_WOODBLOCK
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The woodblock. High and low.
  */
-public class Woodblock extends NonDrumSetPercussion {
-	
+class Woodblock(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * The Right hand node.
 	 */
-	private final Node rightStickNode = new Node();
-	
+	private val rightStickNode = Node()
+
 	/**
 	 * The Left hand node.
 	 */
-	private final Node leftStickNode = new Node();
-	
+	private val leftStickNode = Node()
+
 	/**
 	 * The Left woodblock anim node.
 	 */
-	private final Node leftWoodblockAnimNode = new Node();
-	
+	private val leftWoodblockAnimNode = Node()
+
 	/**
 	 * The Right woodblock anim node.
 	 */
-	private final Node rightWoodblockAnimNode = new Node();
-	
+	private val rightWoodblockAnimNode = Node()
+
 	/**
 	 * The Low woodblock hits.
 	 */
-	private final List<MidiNoteOnEvent> leftHits;
-	
+	private val leftHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The High woodblock hits.
 	 */
-	private final List<MidiNoteOnEvent> rightHits;
-	
-	/**
-	 * Instantiates new woodblocks.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public Woodblock(Midis2jam2 context,
-	                 List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		leftHits = hits.stream().filter(h -> h.getNote() == LOW_WOODBLOCK).collect(Collectors.toList());
-		rightHits = hits.stream().filter(h -> h.getNote() == HIGH_WOODBLOCK).collect(Collectors.toList());
-		
-		leftWoodblockAnimNode.attachChild(context.loadModel("WoodBlockHigh.obj", "SimpleWood.bmp"));
-		rightWoodblockAnimNode.attachChild(context.loadModel("WoodBlockLow.obj", "SimpleWood.bmp"));
-		
-		var leftWoodblockNode = new Node();
-		leftWoodblockNode.attachChild(leftWoodblockAnimNode);
-		
-		var rightWoodblockNode = new Node();
-		rightWoodblockNode.attachChild(rightWoodblockAnimNode);
-		
-		instrumentNode.attachChild(leftWoodblockNode);
-		instrumentNode.attachChild(rightWoodblockNode);
-		
-		highestLevel.setLocalTranslation(0, 40, -90);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(10), 0, 0));
-		
-		leftWoodblockNode.setLocalTranslation(-5, -0.3f, 0);
-		
-		Spatial leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		leftStick.setLocalTranslation(0, 0, -1);
-		this.leftStickNode.attachChild(leftStick);
-		this.leftStickNode.setLocalTranslation(0, 0, 13.5f);
-		
-		leftWoodblockAnimNode.attachChild(this.leftStickNode);
-		
-		Spatial rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		rightStick.setLocalTranslation(0, 0, -1);
-		rightStickNode.attachChild(rightStick);
-		rightStickNode.setLocalTranslation(0, 0, 13.5f);
-		
-		rightWoodblockNode.setLocalRotation(new Quaternion().fromAngles(0, rad(3), 0));
-		leftWoodblockNode.setLocalRotation(new Quaternion().fromAngles(0, rad(5), 0));
-		
-		rightWoodblockAnimNode.attachChild(rightStickNode);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		Stick.StickStatus statusLow = Stick.handleStick(context, rightStickNode, time, delta, leftHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		Stick.StickStatus statusHigh = Stick.handleStick(context, leftStickNode, time, delta, rightHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
+	private val rightHits: List<MidiNoteOnEvent>
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val statusLow = Stick.handleStick(
+			context,
+			rightStickNode,
+			time,
+			delta,
+			leftHits,
+			Stick.STRIKE_SPEED,
+			Stick.MAX_ANGLE,
+			Axis.X
+		)
+		val statusHigh = Stick.handleStick(
+			context,
+			leftStickNode,
+			time,
+			delta,
+			rightHits,
+			Stick.STRIKE_SPEED,
+			Stick.MAX_ANGLE,
+			Axis.X
+		)
 		if (statusLow.justStruck()) {
-			MidiNoteOnEvent strike = statusLow.getStrike();
-			assert strike != null;
-			recoilDrum(rightWoodblockAnimNode, true, strike.getVelocity(), delta);
+			val strike = statusLow.strike!!
+			recoilDrum(rightWoodblockAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(rightWoodblockAnimNode, false, 0, delta);
+			recoilDrum(rightWoodblockAnimNode, false, 0, delta)
 		}
-		
 		if (statusHigh.justStruck()) {
-			MidiNoteOnEvent strike = statusHigh.getStrike();
-			assert strike != null;
-			recoilDrum(leftWoodblockAnimNode, true, strike.getVelocity(), delta);
+			val strike = statusHigh.strike!!
+			recoilDrum(leftWoodblockAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(leftWoodblockAnimNode, false, 0, delta);
+			recoilDrum(leftWoodblockAnimNode, false, 0, delta)
 		}
+	}
+
+	init {
+		leftHits = hits.filter { it.note == LOW_WOODBLOCK }
+		rightHits = hits.filter { it.note == HIGH_WOODBLOCK }
+		leftWoodblockAnimNode.attachChild(context.loadModel("WoodBlockHigh.obj", "SimpleWood.bmp"))
+		rightWoodblockAnimNode.attachChild(context.loadModel("WoodBlockLow.obj", "SimpleWood.bmp"))
+		val leftWoodblockNode = Node()
+		leftWoodblockNode.attachChild(leftWoodblockAnimNode)
+		val rightWoodblockNode = Node()
+		rightWoodblockNode.attachChild(rightWoodblockAnimNode)
+		instrumentNode.attachChild(leftWoodblockNode)
+		instrumentNode.attachChild(rightWoodblockNode)
+		highestLevel.setLocalTranslation(0f, 40f, -90f)
+		highestLevel.localRotation = Quaternion().fromAngles(rad(10.0), 0f, 0f)
+		leftWoodblockNode.setLocalTranslation(-5f, -0.3f, 0f)
+		val leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+		leftStick.setLocalTranslation(0f, 0f, -1f)
+		leftStickNode.attachChild(leftStick)
+		leftStickNode.setLocalTranslation(0f, 0f, 13.5f)
+		leftWoodblockAnimNode.attachChild(leftStickNode)
+		val rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+		rightStick.setLocalTranslation(0f, 0f, -1f)
+		rightStickNode.attachChild(rightStick)
+		rightStickNode.setLocalTranslation(0f, 0f, 13.5f)
+		rightWoodblockNode.localRotation = Quaternion().fromAngles(0f, rad(3.0), 0f)
+		leftWoodblockNode.localRotation = Quaternion().fromAngles(0f, rad(5.0), 0f)
+		rightWoodblockAnimNode.attachChild(rightStickNode)
 	}
 }

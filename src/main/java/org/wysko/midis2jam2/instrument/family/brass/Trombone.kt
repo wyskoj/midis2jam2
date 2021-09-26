@@ -39,7 +39,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class.java, null) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(0f, 10 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 10 * indexForMoving(delta), 0f)
     }
 
     /**
@@ -95,7 +95,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
          */
         private fun getSlidePositionFromNote(period: NotePeriod): Int {
             /* If out of range, return current position */
-            val positionList = SLIDE_MANAGER.fingering(period.midiNote) ?: return currentSlidePosition.toInt()
+            val positionList = SLIDE_MANAGER.fingering(period.midiNote)
 
             /* If there is just one valid position for this note, use that. */
             if (positionList.size == 1) return positionList[0]
@@ -115,7 +115,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((30 + indexForMoving() * -3f).toDouble()), 0f)
-            offsetNode.localTranslation = Vector3f(0f, indexForMoving().toFloat(), 0f)
+            offsetNode.setLocalTranslation(0f, indexForMoving().toFloat(), 0f)
         }
 
         init {

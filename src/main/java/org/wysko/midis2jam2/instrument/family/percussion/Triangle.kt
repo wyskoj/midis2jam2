@@ -14,111 +14,93 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.instrument.family.percussion.Triangle.TriangleType.MUTED;
-import static org.wysko.midis2jam2.instrument.family.percussion.Triangle.TriangleType.OPEN;
-import static org.wysko.midis2jam2.util.MatType.REFLECTIVE;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The triangle.
  */
-public class Triangle extends NonDrumSetPercussion {
-	
+class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: TriangleType) :
+	NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * The Triangle node.
 	 */
-	private final Node triangleNode = new Node();
-	
+	private val triangleNode = Node()
+
 	/**
 	 * The Beater node.
 	 */
-	private final Node beaterNode = new Node();
-	
-	/**
-	 * Instantiates a new triangle.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Triangle(Midis2jam2 context, List<MidiNoteOnEvent> hits, TriangleType type) {
-		super(context, hits);
-		
-		/* Load triangle */
-		var triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", REFLECTIVE, 0.9F);
-		triangleNode.attachChild(triangle);
-		
-		/* Fix material if a muted triangle */
-		if (type == MUTED) {
-			var hands = context.unshadedMaterial("Assets/hands.bmp");
-			((Node) triangle).getChild(1).setMaterial(hands);
-		}
-		
-		/* Load beater */
-		beaterNode.attachChild(context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", REFLECTIVE, 0.9F));
-		beaterNode.setLocalTranslation(0, 2, 4);
-		
-		/* Attach nodes and position */
-		instrumentNode.attachChild(triangleNode);
-		instrumentNode.attachChild(beaterNode);
-		
-		triangleNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(45)));
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(-45)));
-		
-		if (type == OPEN) {
-			instrumentNode.setLocalTranslation(-5, 53, -57);
-		} else {
-			instrumentNode.setLocalTranslation(5, 53, -57);
-		}
+	private val beaterNode = Node()
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val stickStatus =
+			Stick.handleStick(context, beaterNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+		recoilDrum(
+			triangleNode,
+			stickStatus.justStruck(),
+			if (stickStatus.strike == null) 0 else stickStatus.strike!!.velocity,
+			delta
+		)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		var stickStatus = Stick.handleStick(context, beaterNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		PercussionInstrument.recoilDrum(triangleNode, stickStatus.justStruck(), stickStatus.getStrike() == null ? 0 : stickStatus.getStrike().getVelocity(), delta);
-	}
-	
+
 	/**
 	 * The type of triangle.
 	 */
-	public enum TriangleType {
-		
+	enum class TriangleType(internal val modelFile: String) {
 		/**
 		 * Open triangle type.
 		 */
 		OPEN("Triangle.obj"),
-		
+
 		/**
 		 * Muted triangle type.
 		 */
 		MUTED("MutedTriangle.fbx");
-		
-		/**
-		 * The file name of the model.
-		 */
-		private final String modelFile;
-		
-		/**
-		 * Instantiates a new triangle type.
-		 *
-		 * @param modelFile the file name of the model
-		 */
-		TriangleType(String modelFile) {
-			this.modelFile = modelFile;
+	}
+
+	init {
+
+		/* Load triangle */
+		val triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f)
+		triangleNode.attachChild(triangle)
+
+		/* Fix material if a muted triangle */
+		if (type == TriangleType.MUTED) {
+			val hands = context.unshadedMaterial("Assets/hands.bmp")
+			(triangle as Node).getChild(1).setMaterial(hands)
+		}
+
+		/* Load beater */
+		beaterNode.attachChild(
+			context.loadModel(
+				"Triangle_Stick.obj",
+				"ShinySilver.bmp",
+				MatType.REFLECTIVE,
+				0.9f
+			)
+		)
+		beaterNode.setLocalTranslation(0f, 2f, 4f)
+
+		/* Attach nodes and position */
+		instrumentNode.attachChild(triangleNode)
+		instrumentNode.attachChild(beaterNode)
+		triangleNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(45.0))
+		instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-45.0))
+		if (type == TriangleType.OPEN) {
+			instrumentNode.setLocalTranslation(-5f, 53f, -57f)
+		} else {
+			instrumentNode.setLocalTranslation(5f, 53f, -57f)
 		}
 	}
 }

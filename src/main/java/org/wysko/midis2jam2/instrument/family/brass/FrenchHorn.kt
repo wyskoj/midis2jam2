@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
@@ -36,7 +35,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     MonophonicInstrument(context, eventList, FrenchHornClone::class.java, FINGERING_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(0f, 15 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 15 * indexForMoving(delta), 0f)
     }
 
     /**
@@ -80,7 +79,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
             /* Move bell to body of horn */
             bell.run {
-                localTranslation = Vector3f(0f, -4.63f, -1.87f)
+                setLocalTranslation(0f, -4.63f, -1.87f)
                 localRotation = Quaternion().fromAngles(rad(22.0), 0f, 0f)
             }
 
@@ -92,11 +91,11 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
             }
 
             /* Move trigger key a bit over */
-            keys[0]!!.localTranslation = Vector3f(0f, 0f, 1f)
+            keys[0]!!.setLocalTranslation(0f, 0f, 1f)
 
             /* Offset from pivot and rotate horn */
             highestLevel.localRotation = Quaternion().fromAngles(rad(20.0), rad(90.0), 0f)
-            animNode.localTranslation = Vector3f(0f, 0f, 20f)
+            animNode.setLocalTranslation(0f, 0f, 20f)
         }
     }
 
@@ -109,6 +108,6 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
     init {
         /* Position French Horn */
-        groupOfPolyphony.localTranslation = Vector3f(-83.1f, 41.6f, -63.7f)
+        groupOfPolyphony.setLocalTranslation(-83.1f, 41.6f, -63.7f)
     }
 }

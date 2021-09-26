@@ -14,16 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussive
 
-package org.wysko.midis2jam2.instrument.family.percussive;
-
-import com.jme3.scene.Node;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-
-import java.util.List;
-import java.util.stream.IntStream;
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
 /**
  * Octave percussion represents instruments that have twelve notes and are hit with drum sticks.
@@ -31,24 +26,12 @@ import java.util.stream.IntStream;
  * @see Agogos
  * @see Woodblocks
  */
-public abstract class OctavePercussion extends TwelveDrumOctave {
-	
+abstract class OctavePercussion protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+	TwelveDrumOctave(context, eventList) {
+
 	/**
 	 * The nodes for each note.
 	 */
-	@NotNull
-	protected final Node[] percussionNodes = new Node[12];
-	
-	/**
-	 * Constructs an octave percussion instrument.
-	 *
-	 * @param context   context to midis2jam2
-	 * @param eventList the event list
-	 */
-	protected OctavePercussion(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
-		
-		/* Initialize percussion nodes */
-		IntStream.range(0, 12).forEach(i -> percussionNodes[i] = new Node());
-	}
+	@JvmField
+	protected val percussionNodes = Array(12) { Node() }
 }

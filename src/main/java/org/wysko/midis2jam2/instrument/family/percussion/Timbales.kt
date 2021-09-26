@@ -14,130 +14,121 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.wysko.midis2jam2.midi.Midi.HIGH_TIMBALE;
-import static org.wysko.midis2jam2.midi.Midi.LOW_TIMBALE;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi.HIGH_TIMBALE
+import org.wysko.midis2jam2.midi.Midi.LOW_TIMBALE
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The timbales.
  */
-public class Timbales extends NonDrumSetPercussion {
-	
+class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * List of hits for the low timbale.
 	 */
-	private final List<MidiNoteOnEvent> lowTimbaleHits;
-	
+	private val lowTimbaleHits: List<MidiNoteOnEvent>
+
 	/**
 	 * List of hits for the high timbale.
 	 */
-	private final List<MidiNoteOnEvent> highTimbaleHits;
-	
+	private val highTimbaleHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The Right hand node.
 	 */
-	private final Node highStickNode = new Node();
-	
+	private val highStickNode = Node()
+
 	/**
 	 * The Left hand node.
 	 */
-	private final Node lowStickNode = new Node();
-	
+	private val lowStickNode = Node()
+
 	/**
 	 * The Left timbale anim node.
 	 */
-	private final Node lowTimbaleAnimNode = new Node();
-	
+	private val lowTimbaleAnimNode = Node()
+
 	/**
 	 * The Right timbale anim node.
 	 */
-	private final Node highTimbaleAnimNode = new Node();
-	
-	/**
-	 * Instantiates timbales.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public Timbales(Midis2jam2 context,
-	                List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		/* Separate hits */
-		lowTimbaleHits = hits.stream().filter(h -> h.getNote() == LOW_TIMBALE).collect(Collectors.toList());
-		highTimbaleHits = hits.stream().filter(h -> h.getNote() == HIGH_TIMBALE).collect(Collectors.toList());
-		
-		/* Load timbales */
-		Spatial lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
-		Spatial highTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp");
-		highTimbale.setLocalScale(0.75F);
-		
-		/* Attach to nodes */
-		lowTimbaleAnimNode.attachChild(lowTimbale);
-		highTimbaleAnimNode.attachChild(highTimbale);
-		
-		var lowTimbaleNode = new Node();
-		lowTimbaleNode.attachChild(lowTimbaleAnimNode);
-		var highTimbaleNode = new Node();
-		highTimbaleNode.attachChild(highTimbaleAnimNode);
-		
-		instrumentNode.attachChild(lowTimbaleNode);
-		instrumentNode.attachChild(highTimbaleNode);
-		
-		/* Load sticks */
-		lowStickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"));
-		highStickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"));
-		
-		/* Attach & position sticks */
-		lowTimbaleAnimNode.attachChild(lowStickNode);
-		highTimbaleAnimNode.attachChild(highStickNode);
-		
-		lowTimbaleNode.setLocalTranslation(-45.9F, 50.2F, -59.1F);
-		lowTimbaleNode.setLocalRotation(new Quaternion().fromAngles(rad(32), rad(56.6), rad(-2.6)));
-		
-		highTimbaleNode.setLocalTranslation(-39, 50.1F, -69.7F);
-		highTimbaleNode.setLocalRotation(new Quaternion().fromAngles(rad(33.8), rad(59.4), rad(-1.8)));
-		
-		lowStickNode.setLocalTranslation(0, 0, 10);
-		highStickNode.setLocalTranslation(0, 0, 10);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		Stick.StickStatus statusLow = Stick.handleStick(context, lowStickNode, time, delta, lowTimbaleHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		Stick.StickStatus statusHigh = Stick.handleStick(context, highStickNode, time, delta, highTimbaleHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
+	private val highTimbaleAnimNode = Node()
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val statusLow = Stick.handleStick(
+			context,
+			lowStickNode,
+			time,
+			delta,
+			lowTimbaleHits,
+			Stick.STRIKE_SPEED,
+			Stick.MAX_ANGLE,
+			Axis.X
+		)
+		val statusHigh = Stick.handleStick(
+			context,
+			highStickNode,
+			time,
+			delta,
+			highTimbaleHits,
+			Stick.STRIKE_SPEED,
+			Stick.MAX_ANGLE,
+			Axis.X
+		)
 		if (statusLow.justStruck()) {
-			MidiNoteOnEvent strike = statusLow.getStrike();
-			assert strike != null;
-			recoilDrum(lowTimbaleAnimNode, true, strike.getVelocity(), delta);
+			val strike = statusLow.strike!!
+			recoilDrum(lowTimbaleAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(lowTimbaleAnimNode, false, 0, delta);
+			recoilDrum(lowTimbaleAnimNode, false, 0, delta)
 		}
-		
 		if (statusHigh.justStruck()) {
-			MidiNoteOnEvent strike = statusHigh.getStrike();
-			assert strike != null;
-			recoilDrum(highTimbaleAnimNode, true, strike.getVelocity(), delta);
+			val strike = statusHigh.strike!!
+			recoilDrum(highTimbaleAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(highTimbaleAnimNode, false, 0, delta);
+			recoilDrum(highTimbaleAnimNode, false, 0, delta)
 		}
+	}
+
+	init {
+		/* Separate hits */
+		lowTimbaleHits = hits.filter { it.note == LOW_TIMBALE }
+		highTimbaleHits = hits.filter { it.note == HIGH_TIMBALE }
+
+		/* Load timbales */
+		val lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp")
+		val highTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp")
+		highTimbale.setLocalScale(0.75f)
+
+		/* Attach to nodes */
+		lowTimbaleAnimNode.attachChild(lowTimbale)
+		highTimbaleAnimNode.attachChild(highTimbale)
+		val lowTimbaleNode = Node()
+		lowTimbaleNode.attachChild(lowTimbaleAnimNode)
+		val highTimbaleNode = Node()
+		highTimbaleNode.attachChild(highTimbaleAnimNode)
+		instrumentNode.attachChild(lowTimbaleNode)
+		instrumentNode.attachChild(highTimbaleNode)
+
+		/* Load sticks */
+		lowStickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
+		highStickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
+
+		/* Attach & position sticks */
+		lowTimbaleAnimNode.attachChild(lowStickNode)
+		highTimbaleAnimNode.attachChild(highStickNode)
+		lowTimbaleNode.setLocalTranslation(-45.9f, 50.2f, -59.1f)
+		lowTimbaleNode.localRotation = Quaternion().fromAngles(rad(32.0), rad(56.6), rad(-2.6))
+		highTimbaleNode.setLocalTranslation(-39f, 50.1f, -69.7f)
+		highTimbaleNode.localRotation = Quaternion().fromAngles(rad(33.8), rad(59.4), rad(-1.8))
+		lowStickNode.setLocalTranslation(0f, 0f, 10f)
+		highStickNode.setLocalTranslation(0f, 0f, 10f)
 	}
 }

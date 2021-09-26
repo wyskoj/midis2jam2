@@ -14,52 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussive
 
-package org.wysko.midis2jam2.instrument.family.percussive;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
  * The Synth drum.
  */
-public class SynthDrum extends OneDrumOctave {
-	
-	/**
-	 * @param context   the context to the main class
-	 * @param eventList the event list
-	 */
-	public SynthDrum(@NotNull Midis2jam2 context,
-	                 @NotNull List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
-		Spatial drum = context.loadModel("SynthDrum.obj", "SynthDrum.bmp");
-		
-		for (var i = 0; i < 12; i++) {
-			malletNodes[i] = new Node();
-			Spatial mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-			malletNodes[i].attachChild(mallet);
-			malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0, 15);
-			mallet.setLocalTranslation(0, 0, -5);
-			animNode.attachChild(malletNodes[i]);
-		}
-		
-		drum.setLocalRotation(new Quaternion().fromAngles(rad(45), 0, 0));
-		
-		animNode.attachChild(drum);
-		instrumentNode.attachChild(animNode);
-		instrumentNode.setLocalTranslation(3.5f, 87.1f, -130.2f);
+class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
+
+	override fun moveForMultiChannel(delta: Float) {
+		highestLevel.localRotation =
+			Quaternion().fromAngles(0f, rad((-25f + indexForMoving(delta) * -16).toDouble()), 0f)
 	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(0, rad(-25f + indexForMoving(delta) * -16), 0));
+
+	init {
+		val drum = context.loadModel("SynthDrum.obj", "SynthDrum.bmp")
+		for (i in 0..11) {
+			val mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+			malletNodes[i].attachChild(mallet)
+			malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
+			mallet.setLocalTranslation(0f, 0f, -5f)
+			animNode.attachChild(malletNodes[i])
+		}
+		drum.localRotation = Quaternion().fromAngles(rad(45.0), 0f, 0f)
+		animNode.attachChild(drum)
+		instrumentNode.attachChild(animNode)
+		instrumentNode.setLocalTranslation(3.5f, 87.1f, -130.2f)
 	}
 }

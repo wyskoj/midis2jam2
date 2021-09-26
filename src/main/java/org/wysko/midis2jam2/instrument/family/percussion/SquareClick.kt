@@ -14,56 +14,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
+class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-import java.util.List;
+	/** Contains the square click pad. */
+	private val scNode = Node()
 
-import static org.wysko.midis2jam2.util.Utils.rad;
+	/** Contains the stick. */
+	private val stickNode = Node()
 
-public class SquareClick extends NonDrumSetPercussion {
-	
-	private final Node scNode = new Node();
-	
-	private final Node stickNode = new Node();
-	
-	/**
-	 * Instantiates a new non drum set percussion.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected SquareClick(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		stickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"));
-		var child = context.loadModel("SquareShaker.obj", "Wood.bmp");
-		child.setLocalTranslation(0, -2, -2);
-		scNode.attachChild(child);
-		
-		instrumentNode.attachChild(stickNode);
-		instrumentNode.attachChild(scNode);
-		
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(-90), rad(-90), rad(-135)));
-		instrumentNode.setLocalTranslation(-42, 44, -79);
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val stickStatus =
+			Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+		stickNode.cullHint = Spatial.CullHint.Dynamic
+		scNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		stickNode.setCullHint(Spatial.CullHint.Dynamic);
-		scNode.setLocalRotation(new Quaternion().fromAngles(-stickStatus.getRotationAngle(), 0, 0));
-		
+
+	init {
+		stickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
+		val child = context.loadModel("SquareShaker.obj", "Wood.bmp")
+		child.setLocalTranslation(0f, -2f, -2f)
+		scNode.attachChild(child)
+		instrumentNode.attachChild(stickNode)
+		instrumentNode.attachChild(scNode)
+		instrumentNode.localRotation = Quaternion().fromAngles(rad(-90.0), rad(-90.0), rad(-135.0))
+		instrumentNode.setLocalTranslation(-42f, 44f, -79f)
 	}
 }

@@ -56,17 +56,17 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
 	init {
 		/* Load strings */
 		val forward = -0.23126f
-		for (i in 0..2) {
-			upperStrings[i] = context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+		upperStrings = Array(3) {
+			context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
 				instrumentNode.attachChild(this)
-				localTranslation = Vector3f(positioning.upperX[i], positioning.upperY, forward)
+				setLocalTranslation(positioning.upperX[it], positioning.upperY, forward)
 			}
 		}
 
 		/* Load anim strings */
-		for (i in 0..2) {
-			for (j in 0..4) {
-				lowerStrings[i][j] = context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+		lowerStrings = Array(3) { i: Int ->
+			Array(5) { j: Int ->
+				context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
 					instrumentNode.attachChild(this)
 					setLocalTranslation(positioning.lowerX[i], positioning.lowerY, forward)
 					cullHint = Always
@@ -75,8 +75,8 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
 		}
 
 		/* Load note fingers */
-		for (i in 0..2) {
-			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", SHAMISEN_SKIN_TEXTURE).apply {
+		noteFingers = Array(3) {
+			context.loadModel("GuitarNoteFinger.obj", SHAMISEN_SKIN_TEXTURE).apply {
 				instrumentNode.attachChild(this)
 				cullHint = Always
 			}
@@ -84,7 +84,7 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
 
 		/* Positioning */
 		instrumentNode.run {
-			localTranslation = Vector3f(56f, 43f, -23f)
+			setLocalTranslation(56f, 43f, -23f)
 			localRotation = Quaternion().fromAngles(rad(-5.0), rad(-46.0), rad(-33.0))
 		}
 	}

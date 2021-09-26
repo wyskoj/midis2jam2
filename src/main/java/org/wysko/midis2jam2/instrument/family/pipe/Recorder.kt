@@ -14,99 +14,60 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.pipe
 
-package org.wysko.midis2jam2.instrument.family.pipe;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.particle.SteamPuffer;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.particle.SteamPuffer
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
  * The recorder.
  */
-public class Recorder extends HandedInstrument {
-	
-	private static final HandPositionFingeringManager FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder.class);
-	
-	/**
-	 * Constructs a recorder.
-	 *
-	 * @param context context to midis2jam2
-	 * @param events  the events to play
-	 */
-	public Recorder(Midis2jam2 context, List<MidiChannelSpecificEvent> events) throws ReflectiveOperationException {
-		
-		super(
-				context,
-				events,
-				RecorderClone.class,
-				FINGERING_MANAGER
-		);
-		
-		// positioning
-		groupOfPolyphony.setLocalTranslation(-7, 35, -30);
+class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+	HandedInstrument(context, events, RecorderClone::class.java, FINGERING_MANAGER) {
+
+	override fun moveForMultiChannel(delta: Float) {
+		offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
 	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 10f * indexForMoving(delta), 0);
+
+	inner class RecorderClone : PuffingClone(this@Recorder, SteamPuffer.SteamPuffType.POP, 1f) {
+		override fun moveForPolyphony() {
+			offsetNode.localRotation = Quaternion().fromAngles(0f, rad((15f + indexForMoving() * 15).toDouble()), 0f)
+		}
+
+		override fun loadHands() {
+			/* Load left hands */
+			leftHands = Array(13) {
+				parent.context.loadModel("RecorderLeftHand$it.obj", "hands.bmp")
+			}
+
+			/* Load right hands */
+			rightHands = Array(13) {
+				parent.context.loadModel("RecorderRightHand$it.obj", "hands.bmp")
+			}
+
+			super.loadHands()
+		}
+
+		init {
+			val horn = context.loadModel("Recorder.obj", "Recorder.bmp")
+			loadHands()
+			puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
+			puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)
+			modelNode.attachChild(horn)
+			animNode.setLocalTranslation(0f, 0f, 23f)
+			highestLevel.localRotation = Quaternion().fromAngles(rad(45.5 - 90), 0f, 0f)
+		}
 	}
-	
-	/**
-	 * The type Flute clone.
-	 */
-	public class RecorderClone extends PuffingClone {
-		
-		/**
-		 * Instantiates a new Flute clone.
-		 */
-		public RecorderClone() {
-			super(Recorder.this, SteamPuffer.SteamPuffType.POP, 1f);
-			
-			Spatial horn = Recorder.this.context.loadModel(
-					"Recorder.obj",
-					"Recorder.bmp"
-			);
-			
-			loadHands();
-			
-			puffer.steamPuffNode.setLocalRotation(new Quaternion().fromAngles(new float[]{0, 0, rad(-90)}));
-			puffer.steamPuffNode.setLocalTranslation(0, -12.3f, 0);
-			
-			modelNode.attachChild(horn);
-			animNode.setLocalTranslation(0, 0, 23);
-			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(45.5 - 90), 0, 0));
-		}
-		
-		@Override
-		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(15f + indexForMoving() * 15), 0));
-		}
-		
-		private void loadHands() {
-			leftHands = new Spatial[13];
-			for (var i = 0; i < 13; i++) {
-				leftHands[i] = parent.context.loadModel(String.format("RecorderHandLeft%d.obj", i), "hands.bmp");
-				leftHandNode.attachChild(leftHands[i]);
-				if (i != 0) {
-					leftHands[i].setCullHint(Spatial.CullHint.Always);
-				}
-			}
-			rightHands = new Spatial[11];
-			for (var i = 0; i < 11; i++) {
-				rightHands[i] = parent.context.loadModel("RecorderHandRight" + i + ".obj", "hands.bmp");
-				rightHandNode.attachChild(rightHands[i]);
-				if (i != 0) {
-					rightHands[i].setCullHint(Spatial.CullHint.Always);
-				}
-			}
-		}
+
+	companion object {
+		private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class.java)
+	}
+
+	init {
+		groupOfPolyphony.setLocalTranslation(-7f, 35f, -30f)
 	}
 }

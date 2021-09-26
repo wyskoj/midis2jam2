@@ -102,9 +102,9 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 	}
 
 	init {
-		/* Load strings */
-		for (i in 0..5) {
-			upperStrings[i] = if (i < 3) {
+		/* Upper strings */
+		upperStrings = Array(6) {
+			if (it < 3) {
 				context.loadModel("GuitarStringLow.obj", type.textureFileName)
 			} else {
 				context.loadModel("GuitarStringHigh.obj", type.textureFileName)
@@ -135,9 +135,9 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 		upperStrings[5].localScale = positioning.restingStrings[5]
 
 		/* Load anim strings */
-		for (i in 0..5) {
-			for (j in 0..4) {
-				lowerStrings[i][j] = context.loadModel(
+		lowerStrings = Array(6) { i: Int ->
+			Array(5) { j: Int ->
+				context.loadModel(
 					if (i < 3) "GuitarLowStringBottom$j.obj" else "GuitarHighStringBottom$j.obj",
 					type.textureFileName
 				).also {
@@ -181,8 +181,8 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 
 
 		/* Initialize note fingers */
-		for (i in 0..5) {
-			noteFingers[i] = context.loadModel("GuitarNoteFinger.obj", type.textureFileName).apply {
+		noteFingers = Array(6) {
+			context.loadModel("GuitarNoteFinger.obj", type.textureFileName).apply {
 				instrumentNode.attachChild(this)
 				this.cullHint = Always
 			}

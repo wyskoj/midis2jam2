@@ -14,187 +14,171 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.Midi;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.wysko.midis2jam2.midi.Midi.*;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi.LOW_CONGA
+import org.wysko.midis2jam2.midi.Midi.MUTE_HIGH_CONGA
+import org.wysko.midis2jam2.midi.Midi.OPEN_HIGH_CONGA
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
- * Although there are three MIDI congas, there are two physical congas on stage. The left conga plays {@link
- * Midi#OPEN_HIGH_CONGA} and {@link Midi#MUTE_HIGH_CONGA}, where the right conga plays {@link Midi#LOW_CONGA}.
- * <p>
+ * Although there are three MIDI congas, there are two physical congas on stage. The left conga plays [OPEN_HIGH_CONGA]
+ * and [MUTE_HIGH_CONGA], where the right conga plays [LOW_CONGA].
+ *
  * The left conga has two left hands. The second left hand is slightly offset and near the top of the head of the conga
- * to represent a muted note. The hands are animated with {@link Stick#handleStick}.
- * <p>
+ * to represent a muted note. The hands are animated with [Stick.handleStick].
+ *
  * Because both the high and muted notes are played on the same conga, instances where both notes play at the same time
  * use the maximum velocity of the two for recoiling animation.
  */
-public class Congas extends NonDrumSetPercussion {
-	
+class Congas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * The Right hand node.
 	 */
-	private final Node rightHandNode = new Node();
-	
+	private val rightHandNode = Node()
+
 	/**
 	 * The Left hand node.
 	 */
-	private final Node leftHandNode = new Node();
-	
+	private val leftHandNode = Node()
+
 	/**
 	 * The Left conga anim node.
 	 */
-	private final Node leftCongaAnimNode = new Node();
-	
+	private val leftCongaAnimNode = Node()
+
 	/**
 	 * The Right conga anim node.
 	 */
-	private final Node rightCongaAnimNode = new Node();
-	
+	private val rightCongaAnimNode = Node()
+
 	/**
 	 * The Muted hand node.
 	 */
-	private final Node mutedHandNode = new Node();
-	
+	private val mutedHandNode = Node()
+
 	/**
 	 * The Low conga hits.
 	 */
-	private final List<MidiNoteOnEvent> lowCongaHits;
-	
+	private val lowCongaHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The High conga hits.
 	 */
-	private final List<MidiNoteOnEvent> highCongaHits;
-	
+	private val highCongaHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The Muted conga hits.
 	 */
-	private final List<MidiNoteOnEvent> mutedCongaHits;
-	
-	/**
-	 * Instantiates new congas.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public Congas(Midis2jam2 context,
-	              List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		/* Separate notes */
-		lowCongaHits = hits.stream().filter(h -> h.getNote() == LOW_CONGA).collect(Collectors.toList());
-		highCongaHits = hits.stream().filter(h -> h.getNote() == OPEN_HIGH_CONGA).collect(Collectors.toList());
-		mutedCongaHits = hits.stream().filter(h -> h.getNote() == MUTE_HIGH_CONGA).collect(Collectors.toList());
-		
-		/* Load left conga */
-		Spatial leftConga = context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp");
-		leftConga.setLocalScale(0.92F);
-		leftCongaAnimNode.attachChild(leftConga);
-		
-		/* Load right conga */
-		rightCongaAnimNode.attachChild(context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp"));
-		
-		/* Create nodes for congas and attach them */
-		var leftCongaNode = new Node();
-		leftCongaNode.attachChild(leftCongaAnimNode);
-		var rightCongaNode = new Node();
-		rightCongaNode.attachChild(rightCongaAnimNode);
-		
-		/* Attach to instrument */
-		instrumentNode.attachChild(leftCongaNode);
-		instrumentNode.attachChild(rightCongaNode);
-		
-		/* Positioning */
-		highestLevel.setLocalTranslation(-32.5F, 35.7F, -44.1F);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(4.8), rad(59.7), rad(-3.79F)));
-		
-		leftCongaNode.setLocalTranslation(0.87F, -1.15F, 2.36F);
-		leftCongaNode.setLocalRotation(new Quaternion().fromAngles(rad(4.2F), rad(18.7F), rad(5.66F)));
-		
-		rightCongaNode.setLocalTranslation(15.42F, 0.11F, -1.35F);
-		rightCongaNode.setLocalRotation(new Quaternion().fromAngles(rad(3.78F), rad(18), rad(5.18)));
-		
-		/* Load and position muted hand */
-		Spatial mutedHand = context.loadModel("hand_left.obj", "hands.bmp");
-		mutedHand.setLocalTranslation(0, 0, -1);
-		mutedHandNode.attachChild(mutedHand);
-		mutedHandNode.setLocalTranslation(-2.5F, 0, 1);
-		
-		/* Load and position left hand */
-		Spatial leftHand = context.loadModel("hand_left.obj", "hands.bmp");
-		leftHand.setLocalTranslation(0, 0, -1);
-		leftHandNode.attachChild(leftHand);
-		leftHandNode.setLocalTranslation(1.5F, 0, 6);
-		
-		/* Load and position right hand */
-		Spatial rightHand = context.loadModel("hand_right.obj", "hands.bmp");
-		rightHand.setLocalTranslation(0, 0, -1);
-		rightHandNode.attachChild(rightHand);
-		rightHandNode.setLocalTranslation(0, 0, 6);
-		
-		/* Attach hands */
-		leftCongaAnimNode.attachChild(mutedHandNode);
-		leftCongaAnimNode.attachChild(leftHandNode);
-		rightCongaAnimNode.attachChild(rightHandNode);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
+	private val mutedCongaHits: List<MidiNoteOnEvent>
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+
 		/* Animate each hand */
-		Stick.StickStatus statusLow = Stick.handleStick(context, rightHandNode, time, delta, lowCongaHits,
-				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
-		Stick.StickStatus statusHigh = Stick.handleStick(context, leftHandNode, time, delta, highCongaHits,
-				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
-		Stick.StickStatus statusMuted = Stick.handleStick(context, mutedHandNode, time, delta, mutedCongaHits,
-				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
+		val statusLow = Stick.handleStick(
+			context, rightHandNode, time, delta, lowCongaHits,
+			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+		)
+		val statusHigh = Stick.handleStick(
+			context, leftHandNode, time, delta, highCongaHits,
+			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+		)
+		val statusMuted = Stick.handleStick(
+			context, mutedHandNode, time, delta, mutedCongaHits,
+			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+		)
+
 		/* Recoil right conga */
 		if (statusLow.justStruck()) {
-			MidiNoteOnEvent strike = statusLow.getStrike();
-			assert strike != null;
-			recoilDrum(rightCongaAnimNode, true, strike.getVelocity(), delta);
+			val strike = statusLow.strike!!
+			recoilDrum(rightCongaAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(rightCongaAnimNode, false, 0, delta);
+			recoilDrum(rightCongaAnimNode, false, 0, delta)
 		}
-		
+
 		/* Recoil left conga */
 		if (statusHigh.justStruck() || statusMuted.justStruck()) {
-			
+
 			/* If a muted and a high note play at the same time, we check the velocities of both hits and use the
 			 * maximum velocity of the two for recoiling, since the animation is velocity sensitive */
-			MidiNoteOnEvent highStrike = statusHigh.getStrike();
-			MidiNoteOnEvent mutedStrike = statusMuted.getStrike();
-			var maxVelocity = 0;
-			
-			if (highStrike != null && highStrike.getVelocity() > maxVelocity) {
-				maxVelocity = highStrike.getVelocity();
+			val highStrike = statusHigh.strike
+			val mutedStrike = statusMuted.strike
+			var maxVelocity = 0
+			if (highStrike != null && highStrike.velocity > maxVelocity) {
+				maxVelocity = highStrike.velocity
 			}
-			
-			if (mutedStrike != null && mutedStrike.getVelocity() > maxVelocity) {
-				maxVelocity = mutedStrike.getVelocity();
+			if (mutedStrike != null && mutedStrike.velocity > maxVelocity) {
+				maxVelocity = mutedStrike.velocity
 			}
-			
-			recoilDrum(leftCongaAnimNode, true, maxVelocity, delta);
+			recoilDrum(leftCongaAnimNode, true, maxVelocity, delta)
 		} else {
-			recoilDrum(leftCongaAnimNode, false, 0, delta);
+			recoilDrum(leftCongaAnimNode, false, 0, delta)
 		}
+	}
+
+	init {
+
+		/* Separate notes */
+		lowCongaHits = hits.filter { it.note == LOW_CONGA }
+		highCongaHits = hits.filter { it.note == OPEN_HIGH_CONGA }
+		mutedCongaHits = hits.filter { it.note == MUTE_HIGH_CONGA }
+
+		/* Load left conga */
+		context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp").apply {
+			setLocalScale(0.92f)
+			leftCongaAnimNode.attachChild(this)
+		}
+
+		/* Load right conga */
+		rightCongaAnimNode.attachChild(context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp"))
+
+		/* Create nodes for congas and attach them */
+		val leftCongaNode = Node()
+		leftCongaNode.attachChild(leftCongaAnimNode)
+		val rightCongaNode = Node()
+		rightCongaNode.attachChild(rightCongaAnimNode)
+
+		/* Attach to instrument */
+		instrumentNode.attachChild(leftCongaNode)
+		instrumentNode.attachChild(rightCongaNode)
+
+		/* Positioning */
+		highestLevel.setLocalTranslation(-32.5f, 35.7f, -44.1f)
+		highestLevel.localRotation = Quaternion().fromAngles(rad(4.8), rad(59.7), rad(-3.79))
+		leftCongaNode.setLocalTranslation(0.87f, -1.15f, 2.36f)
+		leftCongaNode.localRotation = Quaternion().fromAngles(rad(4.2), rad(18.7), rad(5.66))
+		rightCongaNode.setLocalTranslation(15.42f, 0.11f, -1.35f)
+		rightCongaNode.localRotation = Quaternion().fromAngles(rad(3.78), rad(18.0), rad(5.18))
+
+		/* Load and position muted hand */
+		val mutedHand = context.loadModel("hand_left.obj", "hands.bmp")
+		mutedHand.setLocalTranslation(0f, 0f, -1f)
+		mutedHandNode.attachChild(mutedHand)
+		mutedHandNode.setLocalTranslation(-2.5f, 0f, 1f)
+
+		/* Load and position left hand */
+		val leftHand = context.loadModel("hand_left.obj", "hands.bmp")
+		leftHand.setLocalTranslation(0f, 0f, -1f)
+		leftHandNode.attachChild(leftHand)
+		leftHandNode.setLocalTranslation(1.5f, 0f, 6f)
+
+		/* Load and position right hand */
+		val rightHand = context.loadModel("hand_right.obj", "hands.bmp")
+		rightHand.setLocalTranslation(0f, 0f, -1f)
+		rightHandNode.attachChild(rightHand)
+		rightHandNode.setLocalTranslation(0f, 0f, 6f)
+
+		/* Attach hands */
+		leftCongaAnimNode.attachChild(mutedHandNode)
+		leftCongaAnimNode.attachChild(leftHandNode)
+		rightCongaAnimNode.attachChild(rightHandNode)
 	}
 }

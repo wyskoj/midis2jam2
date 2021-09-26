@@ -14,123 +14,102 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument
 
-package org.wysko.midis2jam2.instrument;
-
-import com.jme3.scene.Node;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager;
-import org.wysko.midis2jam2.instrument.clone.Clone;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager
+import org.wysko.midis2jam2.instrument.clone.Clone
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import java.lang.reflect.Constructor
 
 /**
  * A monophonic instrument is any instrument that can only play one note at a time (e.g., saxophones, clarinets,
  * ocarinas, etc.). Because this limitation is lifted in MIDI files, midis2jam2 needs to visualize polyphony by spawning
  * "clones" of an instrument. These clones will only appear when necessary.
- * <p>
- * It happens to be that every monophonic instrument is also a {@link SustainedInstrument}.
+ *
+ * It happens to be that every monophonic instrument is also a [SustainedInstrument].
  *
  * @see Clone
  */
-public abstract class MonophonicInstrument extends SustainedInstrument {
-	
+abstract class MonophonicInstrument protected constructor(
+	context: Midis2jam2,
+	eventList: List<MidiChannelSpecificEvent>,
+	cloneClass: Class<out Clone>,
+	val manager: FingeringManager<*>?
+) : SustainedInstrument(context, eventList) {
+
 	/**
 	 * Node contains all clones.
 	 */
-	@NotNull
-	public final Node groupOfPolyphony = new Node();
-	
+	@JvmField
+	val groupOfPolyphony = Node()
+
 	/**
 	 * The list of clones this monophonic instrument needs to effectively display all notes.
 	 */
-	@NotNull
-	public List<Clone> clones;
-	
-	@Nullable
-	public FingeringManager<?> manager;
-	
-	/**
-	 * Constructs a monophonic instrument.
-	 *
-	 * @param context   context to midis2jam2
-	 * @param eventList the event list
-	 */
-	protected MonophonicInstrument(@NotNull Midis2jam2 context,
-	                               @NotNull List<MidiChannelSpecificEvent> eventList,
-	                               @NotNull Class<? extends Clone> cloneClass,
-	                               @Nullable FingeringManager<?> manager) throws ReflectiveOperationException {
-		super(context, eventList);
-		this.clones = calculateClones(this, cloneClass);
-		
-		for (Clone clone : clones) {
-			groupOfPolyphony.attachChild(clone.offsetNode);
-		}
-		
-		this.instrumentNode.attachChild(groupOfPolyphony);
-		this.manager = manager;
-	}
-	
+	val clones: List<Clone>
+
 	/**
 	 * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
 	 * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
 	 * least number of clones.
 	 *
 	 * @param instrument the monophonic instrument that is handling the clones
-	 * @param cloneClass the class of the {@link Clone} to instantiate
-	 * @throws ReflectiveOperationException usually is thrown if an error occurs in the clone constructor
+	 * @param cloneClass the class of the [Clone] to instantiate
+	 * @throws ReflectiveOperationException is usually thrown if an error occurs in the clone constructor
 	 */
-	protected final List<Clone> calculateClones(@NotNull MonophonicInstrument instrument,
-	                                            @NotNull Class<? extends Clone> cloneClass) throws ReflectiveOperationException {
-		List<Clone> calcClones = new ArrayList<>();
-		Constructor<?> constructor = cloneClass.getDeclaredConstructor(instrument.getClass());
-		calcClones.add((Clone) constructor.newInstance(instrument));
-		for (var i = 0; i < notePeriods.size(); i++) {
-			for (var j = 0; j < notePeriods.size(); j++) {
-				if (j == i && i != notePeriods.size() - 1) continue;
-				var comp1 = notePeriods.get(i);
-				var comp2 = notePeriods.get(j);
-				if (comp1.startTick() > comp2.endTick()) continue;
+	@Throws(ReflectiveOperationException::class)
+	protected fun calculateClones(
+		instrument: MonophonicInstrument,
+		cloneClass: Class<out Clone?>
+	): List<Clone> {
+		val calcClones: MutableList<Clone> = ArrayList()
+		val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
+		calcClones.add(constructor.newInstance(instrument) as Clone)
+		for (i in notePeriods.indices) {
+			for (j in notePeriods.indices) {
+				if (j == i && i != notePeriods.size - 1) continue
+				val comp1 = notePeriods[i]
+				val comp2 = notePeriods[j]
+				if (comp1.startTick() > comp2.endTick()) continue
 				if (comp1.endTick() < comp2.startTick()) {
-					calcClones.get(0).notePeriods.add(comp1);
-					break;
+					calcClones[0].notePeriods.add(comp1)
+					break
 				}
-				/* Check if notes are overlapping */
-				if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) {
-					var added = false;
-					for (Clone clone : calcClones) {
-						if (!clone.isPlaying(comp1.startTick() + context.getFile().getDivision() / 4)) {
-							clone.notePeriods.add(comp1);
-							added = true;
-							break;
+				/* Check if notes are overlapping */if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) {
+					var added = false
+					for (clone in calcClones) {
+						if (!clone.isPlaying(comp1.startTick() + context.file.division / 4)) {
+							clone.notePeriods.add(comp1)
+							added = true
+							break
 						}
 					}
 					if (!added) {
-						Clone e = (Clone) constructor.newInstance(instrument);
-						e.notePeriods.add(comp1);
-						calcClones.add(e);
+						val e = constructor.newInstance(instrument) as Clone
+						e.notePeriods.add(comp1)
+						calcClones.add(e)
 					}
 				} else {
-					calcClones.get(0).notePeriods.add(comp1);
+					calcClones[0].notePeriods.add(comp1)
 				}
-				break;
+				break
 			}
 		}
-		return calcClones;
+		return calcClones
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+
 		/* Tick clones */
-		for (Clone clone : clones) {
-			clone.tick(time, delta);
-		}
+		clones.forEach { it.tick(time, delta) }
+	}
+
+	init {
+		clones = calculateClones(this, cloneClass)
+		clones.forEach { groupOfPolyphony.attachChild(it.offsetNode) }
+		instrumentNode.attachChild(groupOfPolyphony)
 	}
 }

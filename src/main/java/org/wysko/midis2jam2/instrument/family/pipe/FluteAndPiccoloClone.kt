@@ -14,59 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.pipe
 
-package org.wysko.midis2jam2.instrument.family.pipe;
-
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.instrument.family.pipe.Flute.FluteClone;
-import org.wysko.midis2jam2.instrument.family.pipe.Piccolo.PiccoloClone;
-import org.wysko.midis2jam2.particle.SteamPuffer;
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
 
 /**
- * Contains shared code between the {@link FluteClone} and {@link PiccoloClone}
+ * Contains shared code between the flute and piccolo.
  */
-public class FluteAndPiccoloClone extends PuffingClone {
-	
-	/**
-	 * Instantiates a new flute/piccolo clone.
-	 *
-	 * @param parent    the parent
-	 * @param puffType  the puff type
-	 * @param puffScale the puff scale
-	 */
-	public FluteAndPiccoloClone(HandedInstrument parent,
-	                            SteamPuffer.SteamPuffType puffType,
-	                            float puffScale) {
-		
-		super(parent, puffType, puffScale);
-		
-	}
-	
-	/**
-	 * Loads the left and right hands for flute and piccolo.
-	 */
-	protected final void loadHands() {
-		leftHands = new Spatial[13];
-		for (var i = 0; i < 13; i++) {
-			leftHands[i] = parent.context.loadModel(String.format("Flute_LeftHand%02d.obj", i), "hands.bmp");
-			leftHandNode.attachChild(leftHands[i]);
-			if (i != 0) {
-				leftHands[i].setCullHint(Spatial.CullHint.Always);
-			}
+open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffType, puffScale: Float) :
+	PuffingClone(parent, puffType, puffScale) {
+
+	override fun loadHands() {
+		leftHands = Array(13) {
+			parent.context.loadModel("Flute_LeftHand%02d.obj".format(it), "hands.bmp")
 		}
-		rightHands = new Spatial[12];
-		for (var i = 0; i < 12; i++) {
-			rightHands[i] = parent.context.loadModel(String.format("Flute_RightHand%02d.obj", i), "hands.bmp");
-			rightHandNode.attachChild(rightHands[i]);
-			if (i != 0) {
-				rightHands[i].setCullHint(Spatial.CullHint.Always);
-			}
+		rightHands = Array(12) {
+			parent.context.loadModel("Flute_RightHand%02d.obj".format(it), "hands.bmp")
 		}
-		
+		super.loadHands()
 	}
-	
-	@Override
-	protected void moveForPolyphony() {
-		offsetNode.setLocalTranslation(5 * indexForMoving(), 0, 5 * -indexForMoving());
+
+	override fun moveForPolyphony() {
+		offsetNode.setLocalTranslation((5 * indexForMoving()).toFloat(), 0f, (5 * -indexForMoving()).toFloat())
 	}
 }

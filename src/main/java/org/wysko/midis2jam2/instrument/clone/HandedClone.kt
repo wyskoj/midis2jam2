@@ -18,6 +18,8 @@ package org.wysko.midis2jam2.instrument.clone
 
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import com.jme3.scene.Spatial.CullHint.Always
+import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
 import org.wysko.midis2jam2.util.Utils
@@ -28,76 +30,79 @@ import org.wysko.midis2jam2.world.Axis
  * each hand in each "shape" is created, then they are seamlessly swapped out during playback to give the illusion that
  * the hands are moving.
  *
- *
- * Wouldn't it be easier to do some .bvh? Maybe, but I'm sticking with the implementation from MIDIJam and just creating
- * a different file for each position.
+ * Wouldn't it be easier to do some .bvh? Probably, but I'm sticking with the implementation from MIDIJam and just
+ * creating a different file for each position.
  */
-abstract class HandedClone protected constructor(parent: HandedInstrument, rotationFactor: Float) : Clone(
-    parent, rotationFactor, Axis.X
-) {
-    /**
-     * The Left hand node.
-     */
-    @JvmField
-    protected val leftHandNode = Node()
+abstract class HandedClone protected constructor(parent: HandedInstrument, rotationFactor: Float) :
+	Clone(parent, rotationFactor, Axis.X) {
 
-    /**
-     * The Right hand node.
-     */
-    @JvmField
-    protected val rightHandNode = Node()
+	/**
+	 * The left hand node.
+	 */
+	@JvmField
+	protected val leftHandNode = Node()
 
-    /**
-     * The Left hands.
-     */
-    @JvmField
-    var leftHands: Array<Spatial>? = null
+	/**
+	 * The right hand node.
+	 */
+	@JvmField
+	protected val rightHandNode = Node()
 
-    /**
-     * The Right hands.
-     */
-    protected lateinit var rightHands: Array<Spatial>
+	/**
+	 * The left hands.
+	 */
+	protected lateinit var leftHands: Array<Spatial>
 
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        if (isPlaying) {
-            /* Set the hands */
-            assert(currentNotePeriod != null)
-            assert(parent.manager != null)
+	/**
+	 * The right hands.
+	 */
+	protected lateinit var rightHands: Array<Spatial>
 
-            val hands = parent.manager!!.fingering(currentNotePeriod!!.midiNote) as Hands?
-            if (hands != null) {
-                if (leftHands != null) {
-                    /* May be null because ocarina does not implement left hands */
-                    setHand(leftHands!!, hands.left)
-                }
-                setHand(rightHands, hands.right)
-            }
-        }
-    }
+	/**
+	 * Overrides of this function should initialize and populate [leftHands] and [rightHands]. This method, as
+	 * defined in [HandedClone], will then attach them to the [leftHandNode] and [rightHandNode], and set all but the
+	 * first pair to be invisible.
+	 */
+	protected open fun loadHands() {
+		/* Attach hands to nodes */
+		leftHands.forEach { leftHandNode.attachChild(it) }
+		rightHands.forEach { rightHandNode.attachChild(it) }
 
-    companion object {
-        /**
-         * Sets the visibility of hands so that only the desired hand is visible.
-         *
-         * @param hands        the array of hands
-         * @param handPosition the index of the hand that should be visible
-         */
-        private fun setHand(hands: Array<Spatial>, handPosition: Int) {
-            for (i in hands.indices) {
-                hands[i].cullHint = Utils.cullHint(i == handPosition)
-            }
-        }
-    }
+		/* Set visibility */
+		leftHands.forEachIndexed {index, spatial ->
+			spatial.cullHint = if (index == 0) Dynamic else Always
+		}
+		rightHands.forEachIndexed {index, spatial ->
+			spatial.cullHint = if (index == 0) Dynamic else Always
+		}
+	}
 
-    /**
-     * Instantiates a new handed clone.
-     *
-     * @param parent         the parent
-     * @param rotationFactor the rotation factor
-     */
-    init {
-        modelNode.attachChild(leftHandNode)
-        modelNode.attachChild(rightHandNode)
-    }
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		if (isPlaying) {
+			/* Set the hands */
+			assert(currentNotePeriod != null)
+			assert(parent.manager != null)
+
+			val hands = parent.manager!!.fingering(currentNotePeriod!!.midiNote) as Hands?
+			if (hands != null) {
+				setHand(leftHands, hands.left)
+				setHand(rightHands, hands.right)
+			}
+		}
+	}
+
+	companion object {
+		/** Given an array of hands and an index, sets the hand at the index to be visible, and all else invisible. */
+		private fun setHand(hands: Array<Spatial>, handPosition: Int) {
+			hands.indices.forEach { i ->
+				hands[i].cullHint = Utils.cullHint(i == handPosition)
+			}
+		}
+	}
+
+	init {
+		modelNode.attachChild(leftHandNode)
+		modelNode.attachChild(rightHandNode)
+	}
 }

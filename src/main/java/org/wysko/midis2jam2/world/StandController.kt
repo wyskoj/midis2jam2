@@ -80,7 +80,7 @@ class StandController(
         /* Load mallet stand */
         malletStand = context.loadModel("XylophoneLegs.obj", "RubberFoot.bmp")
         context.rootNode.attachChild(malletStand)
-        malletStand.localTranslation = Vector3f(-22F, 22.2F, 23F)
+        malletStand.setLocalTranslation(-22F, 22.2F, 23F)
         malletStand.rotate(0f, Utils.rad(33.7), 0f)
         malletStand.scale(0.6666667f)
     }

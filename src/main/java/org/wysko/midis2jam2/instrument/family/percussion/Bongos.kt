@@ -14,130 +14,113 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.wysko.midis2jam2.midi.Midi.HIGH_BONGO;
-import static org.wysko.midis2jam2.midi.Midi.LOW_BONGO;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi.HIGH_BONGO
+import org.wysko.midis2jam2.midi.Midi.LOW_BONGO
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The bongos.
  */
-public class Bongos extends NonDrumSetPercussion {
-	
-	private final List<MidiNoteOnEvent> lowBongoHits;
-	
-	private final List<MidiNoteOnEvent> highBongoHits;
-	
+class Bongos(
+	context: Midis2jam2,
+	hits: MutableList<MidiNoteOnEvent>
+) : NonDrumSetPercussion(context, hits) {
+
+	private val lowBongoHits: List<MidiNoteOnEvent>
+	private val highBongoHits: List<MidiNoteOnEvent>
+
 	/**
 	 * The Right hand node.
 	 */
-	private final Node highHandNode = new Node();
-	
+	private val highHandNode = Node()
+
 	/**
 	 * The Left hand node.
 	 */
-	private final Node lowHandNode = new Node();
-	
+	private val lowHandNode = Node()
+
 	/**
 	 * The Left bongo anim node.
 	 */
-	private final Node lowBongoAnimNode = new Node();
-	
+	private val lowBongoAnimNode = Node()
+
 	/**
 	 * The Right bongo anim node.
 	 */
-	private final Node highBongoAnimNode = new Node();
-	
-	/**
-	 * Instantiates bongos.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public Bongos(Midis2jam2 context,
-	              List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		/* Separate high and low bongo hits */
-		lowBongoHits = hits.stream().filter(h -> h.getNote() == LOW_BONGO).collect(Collectors.toList());
-		highBongoHits = hits.stream().filter(h -> h.getNote() == HIGH_BONGO).collect(Collectors.toList());
-		
-		/* Load bongos */
-		Spatial lowBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
-		Spatial highBongo = context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp");
-		highBongo.setLocalScale(0.9F);
-		
-		/* Attach bongos */
-		lowBongoAnimNode.attachChild(lowBongo);
-		highBongoAnimNode.attachChild(highBongo);
-		
-		var lowBongoNode = new Node();
-		var highBongoNode = new Node();
-		lowBongoNode.attachChild(lowBongoAnimNode);
-		highBongoNode.attachChild(highBongoAnimNode);
-		
-		instrumentNode.attachChild(lowBongoNode);
-		instrumentNode.attachChild(highBongoNode);
-		
-		/* Load hands */
-		lowHandNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"));
-		highHandNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"));
-		
-		/* Attach hands */
-		lowBongoAnimNode.attachChild(lowHandNode);
-		highBongoAnimNode.attachChild(highHandNode);
-		
-		/* Positioning */
-		lowBongoNode.setLocalTranslation(-35.88F, 40.4F, -62.6F);
-		lowBongoNode.setLocalRotation(new Quaternion().fromAngles(rad(32.7), rad(61.2), rad(-3.6)));
-		
-		highBongoNode.setLocalTranslation(-38.3F, 40.2F, -54.5F);
-		highBongoNode.setLocalRotation(new Quaternion().fromAngles(rad(32.9), rad(68.1), rad(-0.86)));
-		
-		lowHandNode.setLocalTranslation(0, 0, 5);
-		highHandNode.setLocalTranslation(0, 0, 5);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
+	private val highBongoAnimNode = Node()
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+
 		/* Animate hands */
-		Stick.StickStatus statusLow = Stick.handleStick(context, lowHandNode, time, delta, lowBongoHits,
-				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		Stick.StickStatus statusHigh = Stick.handleStick(context, highHandNode, time, delta, highBongoHits,
-				Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		
-		/* Animate low bongo recoil */
-		if (statusLow.justStruck()) {
-			MidiNoteOnEvent strike = statusLow.getStrike();
-			assert strike != null;
-			recoilDrum(lowBongoAnimNode, true, strike.getVelocity(), delta);
+		val statusLow = Stick.handleStick(
+			context, lowHandNode, time, delta, lowBongoHits,
+			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+		)
+		val statusHigh = Stick.handleStick(
+			context, highHandNode, time, delta, highBongoHits,
+			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+		)
+
+		/* Animate low bongo recoil */if (statusLow.justStruck()) {
+			val strike = statusLow.strike!!
+			recoilDrum(lowBongoAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(lowBongoAnimNode, false, 0, delta);
+			recoilDrum(lowBongoAnimNode, false, 0, delta)
 		}
-		
-		/* Animate high bongo recoil */
-		if (statusHigh.justStruck()) {
-			MidiNoteOnEvent strike = statusHigh.getStrike();
-			assert strike != null;
-			recoilDrum(highBongoAnimNode, true, strike.getVelocity(), delta);
+
+		/* Animate high bongo recoil */if (statusHigh.justStruck()) {
+			val strike = statusHigh.strike!!
+			recoilDrum(highBongoAnimNode, true, strike.velocity, delta)
 		} else {
-			recoilDrum(highBongoAnimNode, false, 0, delta);
+			recoilDrum(highBongoAnimNode, false, 0, delta)
 		}
+	}
+
+	init {
+		/* Separate high and low bongo hits */
+		lowBongoHits = hits.filter { it.note == LOW_BONGO }
+		highBongoHits = hits.filter { it.note == HIGH_BONGO }
+
+		/* Load bongos */
+		context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
+			lowBongoAnimNode.attachChild(this)
+		}
+		context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
+			highBongoAnimNode.attachChild(this)
+			setLocalScale(0.9f)
+		}
+
+		/* Attach bongos */
+		val lowBongoNode = Node()
+		val highBongoNode = Node()
+		lowBongoNode.attachChild(lowBongoAnimNode)
+		highBongoNode.attachChild(highBongoAnimNode)
+		instrumentNode.attachChild(lowBongoNode)
+		instrumentNode.attachChild(highBongoNode)
+
+		/* Load hands */
+		lowHandNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"))
+		highHandNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"))
+
+		/* Attach hands */
+		lowBongoAnimNode.attachChild(lowHandNode)
+		highBongoAnimNode.attachChild(highHandNode)
+
+		/* Positioning */
+		lowBongoNode.setLocalTranslation(-35.88f, 40.4f, -62.6f)
+		lowBongoNode.localRotation = Quaternion().fromAngles(rad(32.7), rad(61.2), rad(-3.6))
+		highBongoNode.setLocalTranslation(-38.3f, 40.2f, -54.5f)
+		highBongoNode.localRotation = Quaternion().fromAngles(rad(32.9), rad(68.1), rad(-0.86))
+		lowHandNode.setLocalTranslation(0f, 0f, 5f)
+		highHandNode.setLocalTranslation(0f, 0f, 5f)
 	}
 }

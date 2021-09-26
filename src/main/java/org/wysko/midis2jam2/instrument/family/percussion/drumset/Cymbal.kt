@@ -14,188 +14,158 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset;
-
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.util.MatType;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.MatType.REFLECTIVE
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
- * Most cymbals are represented with this class, excluding the {@link HiHat}.
+ * Cymbals are represented with this class, excluding the [HiHat].
  */
-public class Cymbal extends SingleStickInstrument {
-	
+open class Cymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
+	SingleStickInstrument(context, hits) {
+
 	/**
 	 * The Cymbal node.
 	 */
-	final Node cymbalNode = new Node();
-	private final CymbalType type;
-	
+	@JvmField
+	val cymbalNode = Node()
+
 	/**
 	 * The Animator.
 	 */
-	protected CymbalAnimator animator;
-	
-	/**
-	 * Instantiates a new Cymbal.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 * @param type    the type of cymbal
-	 */
-	public Cymbal(Midis2jam2 context, List<MidiNoteOnEvent> hits, CymbalType type) {
-		super(context, hits);
-		this.type = type;
-		/* Load cymbal model */
-		final Spatial cymbal;
-		
-		if (this.type == CymbalType.CHINA)
-			cymbal = context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7F);
-		else
-			cymbal = context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7F);
-		
-		cymbalNode.attachChild(cymbal);
-		cymbalNode.setLocalScale(type.size);
-		
-		highLevelNode.setLocalTranslation(type.location);
-		highLevelNode.setLocalRotation(type.rotation);
-		highLevelNode.attachChild(cymbalNode);
-		
-		stick.setLocalTranslation(0, 0, 0);
-		stick.setLocalTranslation(0, 0, -2.6F);
-		stick.setLocalRotation(new Quaternion().fromAngles(rad(-20), 0, 0));
-		stickNode.setLocalTranslation(0, 2, 18);
-		
-		this.animator = new CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening);
+	@JvmField
+	protected var animator: CymbalAnimator
+
+	override fun tick(time: Double, delta: Float) {
+		val stickStatus = handleStick(time, delta, hits)
+		handleCymbalStrikes(delta, stickStatus.justStruck())
 	}
-	
-	
-	@Override
-	public void tick(double time, float delta) {
-		var stickStatus = handleStick(time, delta, hits);
-		handleCymbalStrikes(time, delta, stickStatus.justStruck());
-	}
-	
+
 	/**
-	 * Handle cymbal strikes.
-	 *
-	 * @param time  the time
-	 * @param delta the amount of time since the last frame update
+	 * Handles the animation of the cymbal, striking it and updating its rotation.
 	 */
-	void handleCymbalStrikes(double time, float delta, boolean struck) {
-		if (struck) {
-			animator.strike();
-		}
-		cymbalNode.setLocalRotation(new Quaternion().fromAngles(animator.rotationAmount(), 0, 0));
-		animator.tick(delta);
+	fun handleCymbalStrikes(delta: Float, struck: Boolean) {
+		/* Strike cymbal */
+		if (struck) animator.strike()
+
+		/* Update wobble */
+		cymbalNode.localRotation = Quaternion().fromAngles(animator.rotationAmount(), 0f, 0f)
+
+		/* Tick animator */
+		animator.tick(delta)
 	}
-	
+
 	/**
-	 * The type of cymbal.
+	 * Defines where on the drum set each cymbal is located, its rotation, size, and animation properties.
 	 */
-	public enum CymbalType {
-		
+	enum class CymbalType(
+		val location: Vector3f,
+		val rotation: Quaternion,
+		val size: Float,
+		val amplitude: Double,
+		val wobbleSpeed: Double
+	) {
 		/**
 		 * The Crash 1 cymbal.
 		 */
-		CRASH_1(new Vector3f(-18, 48, -90), new Quaternion().fromAngles(rad(20), rad(45), 0), 2.0F, 2.5, 4.5),
-		
+		CRASH_1(
+			Vector3f(-18f, 48f, -90f),
+			Quaternion().fromAngles(rad(20.0), rad(45.0), 0f),
+			2.0f,
+			2.5,
+			4.5
+		),
+
 		/**
 		 * The Crash 2 cymbal.
 		 */
-		CRASH_2(new Vector3f(13, 48, -90), new Quaternion().fromAngles(rad(20), rad(-45), 0), 1.5F, 2.5, 5),
-		
+		CRASH_2(
+			Vector3f(13f, 48f, -90f),
+			Quaternion().fromAngles(rad(20.0), rad(-45.0), 0f),
+			1.5f,
+			2.5,
+			5.0
+		),
+
 		/**
 		 * The Splash cymbal.
 		 */
-		SPLASH(new Vector3f(-2, 48, -90), new Quaternion().fromAngles(rad(20), 0, 0), 1.0F, 2, 5),
-		
+		SPLASH(
+			Vector3f(-2f, 48f, -90f),
+			Quaternion().fromAngles(rad(20.0), 0f, 0f),
+			1.0f,
+			2.0,
+			5.0
+		),
+
 		/**
 		 * The Ride 1 cymbal.
 		 */
-		RIDE_1(new Vector3f(22, 43, -77.8F), new Quaternion().fromAngles(rad(17), rad(291), rad(-9.45)), 2, 0.5, 3),
-		
+		RIDE_1(
+			Vector3f(22f, 43f, -77.8f),
+			Quaternion().fromAngles(rad(17.0), rad(291.0), rad(-9.45)),
+			2f,
+			0.5,
+			3.0
+		),
+
 		/**
 		 * The Ride 2 cymbal.
 		 */
-		RIDE_2(new Vector3f(-23, 40, -78.8F), new Quaternion().fromAngles(rad(20), rad(37.9), rad(-3.49)), 2, 0.5, 3),
-		
+		RIDE_2(
+			Vector3f(-23f, 40f, -78.8f),
+			Quaternion().fromAngles(rad(20.0), rad(37.9), rad(-3.49)),
+			2f,
+			0.5,
+			3.0
+		),
+
 		/**
 		 * The China cymbal.
 		 */
-		CHINA(new Vector3f(32.7F, 34.4F, -68.4F), new Quaternion().fromAngles(rad(18), rad(-89.2), rad(-10)), 2.0F, 2, 5);
-		
-		/**
-		 * The size of ths cymbal (the scale).
-		 */
-		private final float size;
-		
-		/**
-		 * The Location.
-		 */
-		private final Vector3f location;
-		
-		/**
-		 * The Rotation.
-		 */
-		private final Quaternion rotation;
-		
-		/**
-		 * The amplitude of the cymbal when struck.
-		 */
-		private final double amplitude;
-		
-		/**
-		 * The wobble speed.
-		 */
-		private final double wobbleSpeed;
-		
-		/**
-		 * The dampening.
-		 */
-		private final double dampening;
-		
-		CymbalType(Vector3f location, Quaternion rotation, float size, double amplitude, double wobbleSpeed) {
-			this.location = location;
-			this.rotation = rotation;
-			this.size = size;
-			this.amplitude = amplitude;
-			this.wobbleSpeed = wobbleSpeed;
-			this.dampening = 1.5;
+		CHINA(
+			Vector3f(32.7f, 34.4f, -68.4f),
+			Quaternion().fromAngles(rad(18.0), rad(-89.2), rad(-10.0)),
+			2.0f,
+			2.0,
+			5.0
+		);
+
+		/** How quickly the cymbal returns to rest. */
+		val dampening = 1.5
+
+	}
+
+	init {
+		/* Load cymbal model */
+		val cymbal = if (type == CymbalType.CHINA) {
+			context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", REFLECTIVE, 0.7f)
+		} else {
+			context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", REFLECTIVE, 0.7f)
 		}
-		
-		public float getSize() {
-			return size;
+
+		cymbalNode.run {
+			attachChild(cymbal)
+			setLocalScale(type.size)
 		}
-		
-		public Vector3f getLocation() {
-			return location;
+		highLevelNode.run {
+			localTranslation = type.location
+			localRotation = type.rotation
+			attachChild(cymbalNode)
 		}
-		
-		public Quaternion getRotation() {
-			return rotation;
+		stick.run {
+			setLocalTranslation(0f, 0f, 0f)
+			setLocalTranslation(0f, 0f, -2.6f)
+			localRotation = Quaternion().fromAngles(rad(-20.0), 0f, 0f)
 		}
-		
-		public double getAmplitude() {
-			return amplitude;
-		}
-		
-		public double getWobbleSpeed() {
-			return wobbleSpeed;
-		}
-		
-		public double getDampening() {
-			return dampening;
-		}
+		stickNode.setLocalTranslation(0f, 2f, 18f)
+		animator = CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening)
 	}
 }

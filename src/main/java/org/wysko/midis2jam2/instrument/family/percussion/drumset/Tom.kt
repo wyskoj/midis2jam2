@@ -14,137 +14,103 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset;
-
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
 
 /**
  * The toms.
  */
-public class Tom extends StickDrum {
-	
-	/**
-	 * Instantiates a new Tom.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 * @param pitch   the tom pitch
-	 */
-	public Tom(@NotNull Midis2jam2 context, @NotNull List<MidiNoteOnEvent> hits, @NotNull TomPitch pitch) {
-		super(context, hits);
-		/* Load the tom */
-		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp");
-		
-		/* Attach to nodes */
-		recoilNode.attachChild(drum);
-		recoilNode.attachChild(stickNode);
-		highLevelNode.attachChild(recoilNode);
-		
-		/* Set tom pitch properties */
-		drum.setLocalScale(pitch.scale);
-		highLevelNode.setLocalTranslation(pitch.location);
-		highLevelNode.setLocalRotation(pitch.rotation);
-		
-		if (pitch == TomPitch.HIGH_FLOOR || pitch == TomPitch.LOW_FLOOR) {
-			stickNode.setLocalRotation(new Quaternion().fromAngles(0, rad(80), 0));
-			stickNode.setLocalTranslation(10, 0, 0);
-		} else {
-			stickNode.setLocalTranslation(0, 0, 10);
-		}
-		
-		stick.setLocalRotation(new Quaternion().fromAngles(rad(MAX_ANGLE), 0, 0));
+class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch) : StickDrum(context, hits) {
+
+	override fun tick(time: Double, delta: Float) {
+		drumRecoil(time, delta)
+		handleStick(time, delta, hits)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		drumRecoil(time, delta);
-		handleStick(time, delta, hits);
-	}
-	
+
 	/**
 	 * The pitch of the tom.
 	 */
-	public enum TomPitch {
-		
+	enum class TomPitch(val scale: Vector3f, val location: Vector3f, val rotation: Quaternion) {
 		/**
 		 * The Low floor tom.
 		 */
 		LOW_FLOOR(
-				new Vector3f(1.5F, 1.5F, 1.5F),
-				new Vector3f(20, 20, -60),
-				new Quaternion().fromAngles(rad(-2), rad(180), rad(-10))),
-		
+			Vector3f(1.5f, 1.5f, 1.5f),
+			Vector3f(20f, 20f, -60f),
+			Quaternion().fromAngles(rad(-2.0), rad(180.0), rad(-10.0))
+		),
+
 		/**
 		 * The High floor tom.
 		 */
-		HIGH_FLOOR(new Vector3f(1.4F, 1.4F, 1.4F),
-				new Vector3f(17, 21, -75),
-				new Quaternion().fromAngles(rad(-5), rad(180), rad(-15))),
-		
+		HIGH_FLOOR(
+			Vector3f(1.4f, 1.4f, 1.4f),
+			Vector3f(17f, 21f, -75f),
+			Quaternion().fromAngles(rad(-5.0), rad(180.0), rad(-15.0))
+		),
+
 		/**
 		 * The Low tom.
 		 */
-		LOW(new Vector3f(1.2F, 1.2F, 1.2F),
-				new Vector3f(10, 29, -82),
-				new Quaternion().fromAngles(rad(60), rad(-30), 0)),
-		
+		LOW(
+			Vector3f(1.2f, 1.2f, 1.2f),
+			Vector3f(10f, 29f, -82f),
+			Quaternion().fromAngles(rad(60.0), rad(-30.0), 0f)
+		),
+
 		/**
 		 * The Low mid tom.
 		 */
-		LOW_MID(new Vector3f(1, 1, 1),
-				new Vector3f(0, 32, -85),
-				new Quaternion().fromAngles(rad(60), 0, 0)),
-		
+		LOW_MID(
+			Vector3f(1f, 1f, 1f),
+			Vector3f(0f, 32f, -85f),
+			Quaternion().fromAngles(rad(60.0), 0f, 0f)
+		),
+
 		/**
 		 * The High mid tom.
 		 */
-		HIGH_MID(new Vector3f(0.8F, 0.8F, 0.8F),
-				new Vector3f(-9, 31, -82),
-				new Quaternion().fromAngles(rad(60), rad(20), 0)),
-		
+		HIGH_MID(
+			Vector3f(0.8f, 0.8f, 0.8f),
+			Vector3f(-9f, 31f, -82f),
+			Quaternion().fromAngles(rad(60.0), rad(20.0), 0f)
+		),
+
 		/**
 		 * The High tom.
 		 */
-		HIGH(new Vector3f(0.6F, 0.6F, 0.6F),
-				new Vector3f(-15, 29, -78),
-				new Quaternion().fromAngles(rad(50), rad(40), 0));
-		
-		/**
-		 * The Scale.
-		 */
-		private final Vector3f scale;
-		
-		/**
-		 * The Location.
-		 */
-		private final Vector3f location;
-		
-		/**
-		 * The Rotation.
-		 */
-		private final Quaternion rotation;
-		
-		/**
-		 * Instantiates a new Tom pitch.
-		 *
-		 * @param scale    the scale
-		 * @param location the location
-		 * @param rotation the rotation
-		 */
-		TomPitch(Vector3f scale, Vector3f location, Quaternion rotation) {
-			this.scale = scale;
-			this.location = location;
-			this.rotation = rotation;
+		HIGH(
+			Vector3f(0.6f, 0.6f, 0.6f),
+			Vector3f(-15f, 29f, -78f),
+			Quaternion().fromAngles(rad(50.0), rad(40.0), 0f)
+		);
+	}
+
+	init {
+		/* Load the tom */
+		drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp")
+
+		/* Attach to nodes */
+		recoilNode.attachChild(drum)
+		recoilNode.attachChild(stickNode)
+		highLevelNode.attachChild(recoilNode)
+
+		/* Set tom pitch properties */
+		drum.localScale = pitch.scale
+		highLevelNode.localTranslation = pitch.location
+		highLevelNode.localRotation = pitch.rotation
+		if (pitch == TomPitch.HIGH_FLOOR || pitch == TomPitch.LOW_FLOOR) {
+			stickNode.localRotation = Quaternion().fromAngles(0f, rad(80.0), 0f)
+			stickNode.setLocalTranslation(10f, 0f, 0f)
+		} else {
+			stickNode.setLocalTranslation(0f, 0f, 10f)
 		}
+		stick.localRotation = Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f)
 	}
 }

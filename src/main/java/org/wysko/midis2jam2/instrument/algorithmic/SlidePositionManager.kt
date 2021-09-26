@@ -14,79 +14,77 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.algorithmic
 
-package org.wysko.midis2jam2.instrument.algorithmic;
+import org.w3c.dom.Element
+import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.util.Utils.instantiateXmlParser
+import org.xml.sax.SAXException
+import java.io.IOException
+import javax.xml.parsers.ParserConfigurationException
 
-import org.w3c.dom.*;
-import org.wysko.midis2jam2.instrument.Instrument;
-import org.wysko.midis2jam2.util.Utils;
-import org.xml.sax.SAXException;
+class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class SlidePositionManager implements FingeringManager<List<Integer>> {
-	
 	/**
 	 * Stores the slide table.
 	 */
-	private final HashMap<Integer, List<Integer>> slideTable = new HashMap<>();
-	
-	private SlidePositionManager() {
+	private val slideTable = HashMap<Int, List<Int>>()
+
+	override fun fingering(midiNote: Int): List<Int> {
+		return slideTable[midiNote]!!
 	}
-	
-	/**
-	 * Instantiates a new slide position manager.
-	 *
-	 * @param clazz the class who correlates the instrument in the XML file
-	 */
-	public static SlidePositionManager from(Class<? extends Instrument> clazz) {
-		String className = clazz.getSimpleName();
-		var manager = new SlidePositionManager();
-		/* XML Parsing */
-		try {
-			Document xmlDoc = Utils.instantiateXmlParser("/instrument_mapping.xml");
-			NodeList instrumentList = xmlDoc.getDocumentElement().getElementsByTagName("instrument");
-			
-			/* For each instrument */
-			for (var i = 0; i < instrumentList.getLength(); i++) {
-				Node instrument = instrumentList.item(i);
-				NamedNodeMap instrumentAttributes = instrument.getAttributes();
-				/* Find instrument with matching name */
-				if (instrumentAttributes.getNamedItem("name").getTextContent().equals(className)) {
-					String mappingType = instrumentAttributes.getNamedItem("mapping-type").getTextContent();
-					if (!mappingType.equals("slide_position")) throw new InvalidMappingType(String.format("XML has a " +
-							"mapping type of %s.", mappingType));
-					
-					/* Get key mapping */
-					Node mapping = ((Element) instrument).getElementsByTagName("mapping").item(0);
-					NodeList maps = ((Element) mapping).getElementsByTagName("map");
-					
-					for (var j = 0; j < maps.getLength(); j++) {
-						var note = maps.item(j);
-						var noteValue = Integer.parseInt(note.getAttributes().getNamedItem("note").getTextContent());
-						var validPositions = ((Element) note).getElementsByTagName("pos");
-						List<Integer> validPosList = new ArrayList<>();
-						for (var k = 0; k < validPositions.getLength(); k++) {
-							validPosList.add(Integer.parseInt(validPositions.item(k).getTextContent()));
+
+	companion object {
+		/**
+		 * Instantiates a new slide position manager.
+		 *
+		 * @param clazz the class who correlates the instrument in the XML file
+		 */
+		fun from(clazz: Class<out Instrument?>): SlidePositionManager {
+			val className = clazz.simpleName
+			val manager = SlidePositionManager()
+			/* XML Parsing */try {
+				val xmlDoc = instantiateXmlParser("/instrument_mapping.xml")
+				val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
+
+				/* For each instrument */for (i in 0 until instrumentList.length) {
+					val instrument = instrumentList.item(i)
+					val instrumentAttributes = instrument.attributes
+					/* Find instrument with matching name */if (instrumentAttributes.getNamedItem("name").textContent == className) {
+						val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
+						if (mappingType != "slide_position") throw InvalidMappingType(
+							String.format(
+								"XML has a " +
+										"mapping type of %s.", mappingType
+							)
+						)
+
+						/* Get key mapping */
+						val mapping = (instrument as Element).getElementsByTagName("mapping").item(0)
+						val maps = (mapping as Element).getElementsByTagName("map")
+						for (j in 0 until maps.length) {
+							val note = maps.item(j)
+							val noteValue = note.attributes.getNamedItem("note").textContent.toInt()
+							val validPositions = (note as Element).getElementsByTagName("pos")
+							val validPosList: MutableList<Int> = ArrayList()
+							for (k in 0 until validPositions.length) {
+								validPosList.add(validPositions.item(k).textContent.toInt())
+							}
+							manager.slideTable[noteValue] = validPosList
 						}
-						manager.slideTable.put(noteValue, validPosList);
+						break
 					}
-					
-					break;
 				}
+			} catch (e: SAXException) {
+				e.printStackTrace()
+			} catch (e: IOException) {
+				e.printStackTrace()
+			} catch (e: ParserConfigurationException) {
+				e.printStackTrace()
+			} catch (e: InvalidMappingType) {
+				e.printStackTrace()
 			}
-		} catch (SAXException | IOException | ParserConfigurationException | InvalidMappingType e) {
-			e.printStackTrace();
+			return manager
 		}
-		return manager;
-	}
-	
-	@Override
-	public List<Integer> fingering(int midiNote) {
-		return slideTable.get(midiNote);
 	}
 }

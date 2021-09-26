@@ -14,106 +14,84 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.Midi;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
-
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.Midi
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The surdo.
  */
-public class Surdo extends NonDrumSetPercussion {
-	
-	/**
-	 * The stick node.
-	 */
-	private final Node stickNode = new Node();
-	
-	private final Spatial hand;
-	
-	/**
-	 * Instantiates a new Cowbell.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public Surdo(Midis2jam2 context,
-	             List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		var drum = context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png");
-		recoilNode.attachChild(drum);
-		drum.setLocalScale(1.7f);
-		
-		Spatial stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp");
-		stick.setLocalTranslation(0, 0, -2);
-		stickNode.attachChild(stick);
-		stickNode.setLocalTranslation(0, 0, 14);
-		
-		recoilNode.attachChild(stickNode);
-		highestLevel.setLocalTranslation(25f, 25, -41);
-		highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(14.2), rad(-90), rad(0)));
-		
-		hand = context.loadModel("hand_left.obj", "hands.bmp");
-		recoilNode.attachChild(hand);
-	}
-	
-	/**
-	 * Moves the hand to a position.
-	 *
-	 * @param position the hand position
-	 */
-	private void moveHand(HandPosition position) {
+class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
+	/** The stick node. */
+	private val stickNode = Node()
+
+	/** The hand that rests or hovers above the drum. */
+	private val hand: Spatial
+
+	/** Moves the hand to a [position]. */
+	private fun moveHand(position: HandPosition) {
 		if (position == HandPosition.DOWN) {
-			hand.setLocalTranslation(0, 0, 0);
-			hand.setLocalRotation(new Quaternion().fromAngles(0, 0, 0));
+			hand.setLocalTranslation(0f, 0f, 0f)
+			hand.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
 		} else {
-			hand.setLocalTranslation(0, 2, 0);
-			hand.setLocalRotation(new Quaternion().fromAngles(rad(30), 0, 0));
+			hand.setLocalTranslation(0f, 2f, 0f)
+			hand.localRotation = Quaternion().fromAngles(rad(30.0), 0f, 0f)
 		}
-		
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		var stickStatus = Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
-		//noinspection ConstantConditions
-		PercussionInstrument.recoilDrum(recoilNode, stickStatus.justStruck(), stickStatus.justStruck() ? stickStatus.getStrike().getVelocity() : 0, delta);
-		
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val stickStatus =
+			Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+		recoilDrum(
+			recoilNode,
+			stickStatus.justStruck(),
+			if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0,
+			delta
+		)
 		if (stickStatus.justStruck()) {
-			var strike = stickStatus.getStrike();
-			assert strike != null;
-			moveHand(strike.getNote() == Midi.OPEN_SURDO ? HandPosition.UP : HandPosition.DOWN);
+			val strike = stickStatus.strike!!
+			moveHand(if (strike.note == Midi.OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
 		}
 	}
-	
+
 	/**
 	 * Defines if the hand is on the drum or raised.
 	 */
-	enum HandPosition {
+	internal enum class HandPosition {
 		/**
 		 * Up hand position.
 		 */
 		UP,
-		
+
 		/**
 		 * Down hand position.
 		 */
 		DOWN
+	}
+
+	init {
+		val drum = context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png")
+		recoilNode.attachChild(drum)
+		drum.setLocalScale(1.7f)
+		val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+		stick.setLocalTranslation(0f, 0f, -2f)
+		stickNode.attachChild(stick)
+		stickNode.setLocalTranslation(0f, 0f, 14f)
+		recoilNode.attachChild(stickNode)
+		highestLevel.setLocalTranslation(25f, 25f, -41f)
+		highestLevel.localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
+		hand = context.loadModel("hand_left.obj", "hands.bmp")
+		recoilNode.attachChild(hand)
 	}
 }

@@ -14,40 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.reed.sax
 
-package org.wysko.midis2jam2.instrument.family.reed.sax;
-
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.MonophonicInstrument;
-import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager;
-import org.wysko.midis2jam2.instrument.clone.Clone;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-
-import java.util.List;
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
 /**
  * Shared code for Saxophones.
  */
-public abstract class Saxophone extends MonophonicInstrument {
-	
-	/**
-	 * Constructs a saxophone.
-	 *
-	 * @param context    context to midis2jam2
-	 * @param eventList  the list of events for this instrument
-	 * @param cloneClass the class of the clone
-	 */
-	protected Saxophone(@NotNull Midis2jam2 context,
-	                    @NotNull List<MidiChannelSpecificEvent> eventList,
-	                    @NotNull Class<? extends Clone> cloneClass,
-	                    @NotNull PressedKeysFingeringManager fingeringManager) throws ReflectiveOperationException {
-		
-		super(context, eventList, cloneClass, fingeringManager);
-	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 40 * indexForMoving(delta), 0);
+abstract class Saxophone
+protected constructor(
+	context: Midis2jam2,
+	eventList: List<MidiChannelSpecificEvent>,
+	cloneClass: Class<out SaxophoneClone>,
+	fingeringManager: PressedKeysFingeringManager
+) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
+	override fun moveForMultiChannel(delta: Float) {
+		offsetNode.setLocalTranslation(0f, 40 * indexForMoving(delta), 0f)
 	}
 }

@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.world.Axis
 /**
  * The Snare drum.
  */
-class SnareDrum(context: Midis2jam2, hits: List<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
+class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
 
 	/**
 	 * The list of hits for regular notes.

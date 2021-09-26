@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 /**
  * A drum that is hit with a stick.
  */
-abstract class StickDrum protected constructor(context: Midis2jam2, hits: List<MidiNoteOnEvent>) :
+abstract class StickDrum protected constructor(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
 	SingleStickInstrument(context, hits) {
 
 	/**

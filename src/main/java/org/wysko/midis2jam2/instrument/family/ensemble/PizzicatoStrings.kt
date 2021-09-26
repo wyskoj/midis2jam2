@@ -76,7 +76,7 @@ class PizzicatoStrings(
 		/**
 		 * Each frame of animation.
 		 */
-		private val animStrings = arrayOfNulls<Spatial>(5)
+		private val animStrings: Array<Spatial>
 
 		/**
 		 * Is this string currently playing?
@@ -103,12 +103,12 @@ class PizzicatoStrings(
 
 			if (playing) {
 				/* Move the string forward, show anim strings, hide resting string */
-				animNode.localTranslation = Vector3f(0f, 0f, 2f)
+				animNode.setLocalTranslation(0f, 0f, 2f)
 				animStringNode.cullHint = Dynamic
 				restingString.cullHint = Always
 			} else {
 				/* Move the string backwards, hide anim strings, show resting string */
-				animNode.localTranslation = Vector3f(0f, 0f, 0f)
+				animNode.setLocalTranslation(0f, 0f, 0f)
 				animStringNode.cullHint = Always
 				restingString.cullHint = Dynamic
 			}
@@ -131,11 +131,11 @@ class PizzicatoStrings(
 			restingString = context.loadModel("StageString.obj", "StageString.bmp")
 
 			/* Load anim strings */
-			for (k in 0..4) {
-				animStrings[k] = context.loadModel("StageStringBottom$k.obj", "StageStringPlaying.bmp").apply {
+			animStrings = Array(5) {
+				context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
 					cullHint = Always // Hide on startup
+					animStringNode.attachChild(this)
 				}
-				animStringNode.attachChild(animStrings[k])
 			}
 			stringAnimator = VibratingStringAnimator(*animStrings)
 
@@ -152,12 +152,12 @@ class PizzicatoStrings(
 		for (i in 0..11) {
 			strings[i] = PizzicatoString().apply {
 				instrumentNode.attachChild(highestLevel)
-				highestLevel.localTranslation = Vector3f(i * 2f, i * 0.5f, 0f)
+				highestLevel.setLocalTranslation(i * 2f, i * 0.5f, 0f)
 				highestLevel.localScale = Vector3f(1f, 0.5f - 0.019f * i, 1f)
 			}
 		}
 
 		/* Position instrument */
-		instrumentNode.localTranslation = Vector3f(0f, 6.7f, -138f)
+		instrumentNode.setLocalTranslation(0f, 6.7f, -138f)
 	}
 }

@@ -14,51 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.scene.Node;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-
-import java.util.List;
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /**
  * The slap. It animates just like claves or hand clap.
  */
-public class Slap extends NonDrumSetPercussion {
-	
+class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * Contains the left slapper.
 	 */
-	private final Node leftSlapNode = new Node();
-	
+	private val leftSlapNode = Node()
+
 	/**
 	 * Contains the right snapper.
 	 */
-	private final Node rightSlapNode = new Node();
-	
-	/**
-	 * Instantiates a new slap.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Slap(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		leftSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"));
-		rightSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"));
-		
-		instrumentNode.attachChild(leftSlapNode);
-		instrumentNode.attachChild(rightSlapNode);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		
+	private val rightSlapNode = Node()
+
+	init {
+		leftSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
+		rightSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
+		instrumentNode.attachChild(leftSlapNode)
+		instrumentNode.attachChild(rightSlapNode)
 	}
 }

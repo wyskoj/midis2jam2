@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
  */
 open class NonDrumSetPercussion protected constructor(
     context: Midis2jam2,
-    hits: List<MidiNoteOnEvent>
+    hits: MutableList<MidiNoteOnEvent>
 ) : PercussionInstrument(context, hits) {
 
     /** The unmodifiable list of hits. */

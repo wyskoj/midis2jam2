@@ -14,59 +14,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.instrument.family.percussive.Stick;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
- * <i>Jingle bells...</i> Animates with only {@link Stick#handleStick}, nothing special.
+ * *Jingle bells...* Animates with only [Stick.handleStick], nothing special.
  */
-public class JingleBells extends NonDrumSetPercussion {
-	
+class JingleBells(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * Contains the jingle bell.
 	 */
-	@NotNull
-	private final Node jingleBellNode = new Node();
-	
-	/**
-	 * Instantiates new jingle bells.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	public JingleBells(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		this.hits = hits;
-		
-		/* Load stick and materials */
-		Spatial stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp");
-		((Node) stick).getChild(0).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"));
-		
-		/* Positioning */
-		jingleBellNode.attachChild(stick);
-		stick.setLocalTranslation(0, 0, -2);
-		instrumentNode.attachChild(jingleBellNode);
-		instrumentNode.setLocalTranslation(8.5F, 45.3F, -69.3F);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7)));
+	private val jingleBellNode = Node()
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		Stick.handleStick(context, jingleBellNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		Stick.handleStick(context, jingleBellNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X);
+
+	init {
+		/* Load stick and materials */
+		val stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp")
+		(stick as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
+
+		/* Positioning */
+		jingleBellNode.attachChild(stick)
+		stick.setLocalTranslation(0f, 0f, -2f)
+		instrumentNode.attachChild(jingleBellNode)
+		instrumentNode.setLocalTranslation(8.5f, 45.3f, -69.3f)
+		instrumentNode.localRotation = Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7))
 	}
 }

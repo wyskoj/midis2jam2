@@ -14,127 +14,91 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.reed
 
-package org.wysko.midis2jam2.instrument.family.reed;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher;
-import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager;
-import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher;
-import org.wysko.midis2jam2.instrument.clone.HandedClone;
-import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiNoteEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
+import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Companion.from
+import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
+import org.wysko.midis2jam2.instrument.clone.HandedClone
+import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * The clarinet has both hand positions and a stretchy bell.
  *
- * <a href="https://bit.ly/34Quj4e">Fingering chart</a>
+ * [Fingering chart](https://bit.ly/34Quj4e)
  */
-public class Clarinet extends HandedInstrument {
-	
-	public static final HandPositionFingeringManager FINGERING_MANAGER = HandPositionFingeringManager.from(Clarinet.class);
-	
-	/**
-	 * Constructs a clarinet.
-	 *
-	 * @param context   context to midis2jam2
-	 * @param eventList the event list
-	 */
-	public Clarinet(@NotNull Midis2jam2 context, @NotNull List<MidiChannelSpecificEvent> eventList)
-			throws ReflectiveOperationException {
-		super(context,
-				/* Strip notes outside of standard range */
-				Stream.concat(
-						eventList.stream()
-								.filter(MidiNoteEvent.class::isInstance)
-								.map(MidiNoteEvent.class::cast)
-								.filter(note -> note.getNote() >= 50 && note.getNote() <= 90),
-						eventList.stream()
-								.filter(obj -> !(obj instanceof MidiNoteEvent))
-				).collect(Collectors.toList()),
-				ClarinetClone.class,
-				FINGERING_MANAGER);
-		instrumentNode.setLocalTranslation(-25, 50, 0);
-		instrumentNode.setLocalScale(0.9F);
+class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+	HandedInstrument(
+		context,
+		/* Strip notes outside of standard range */
+		eventList.filterIsInstance<MidiNoteEvent>().filter { it.note in 50..90 }
+			.plus(eventList.filter { it !is MidiNoteEvent }),
+		ClarinetClone::class.java,
+		FINGERING_MANAGER
+	) {
+	override fun moveForMultiChannel(delta: Float) {
+		offsetNode.setLocalTranslation(0f, 20 * indexForMoving(delta), 0f)
 	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 20 * indexForMoving(delta), 0);
-	}
-	
+
 	/**
 	 * The type Clarinet clone.
 	 */
-	public class ClarinetClone extends HandedClone {
-		
+	inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
 		/**
 		 * The bell stretcher.
 		 */
-		private final BellStretcher bellStretcher;
-		
+		private val bellStretcher: BellStretcher
+		override fun moveForPolyphony() {
+			offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
+		}
+
+		override fun loadHands() {
+			leftHands = Array(19) {
+				parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
+			}
+			rightHands = Array(13) {
+				parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
+			}
+			super.loadHands()
+		}
+
+		override fun tick(time: Double, delta: Float) {
+			super.tick(time, delta)
+
+			/* Stretch bell */
+			bellStretcher.tick(currentNotePeriod, time)
+		}
+
 		/**
 		 * Instantiates a new clarinet clone.
 		 */
-		public ClarinetClone() {
-			super(Clarinet.this, 0.075F);
-			
+		init {
 			/* Load body */
-			modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"));
-			
+			modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))
+
 			/* Load bell */
-			Spatial bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png");
-			modelNode.attachChild(bell);
-			bell.setLocalTranslation(0, -20.7125F, 0);
-			
-			loadHands();
-			animNode.setLocalTranslation(0, 0, 10);
-			highestLevel.setLocalRotation(new Quaternion().fromAngles(rad(-25), rad(45), 0));
-			
-			bellStretcher = new StandardBellStretcher(0.7F, Axis.Y, bell);
+			val bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png")
+			modelNode.attachChild(bell)
+			bell.setLocalTranslation(0f, -20.7125f, 0f)
+			loadHands()
+			animNode.setLocalTranslation(0f, 0f, 10f)
+			highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(45.0), 0f)
+			bellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
 		}
-		
-		@Override
-		protected void moveForPolyphony() {
-			offsetNode.setLocalRotation(new Quaternion().fromAngles(0, rad(25 * indexForMoving()), 0));
-		}
-		
-		private void loadHands() {
-			leftHands = new Spatial[20];
-			for (var i = 0; i < 20; i++) {
-				leftHands[i] = parent.context.loadModel(String.format("ClarinetLeftHand%d.obj", i), "hands.bmp");
-				leftHandNode.attachChild(leftHands[i]);
-				if (i != 0) {
-					leftHands[i].setCullHint(Spatial.CullHint.Always);
-				}
-			}
-			rightHands = new Spatial[13];
-			for (var i = 0; i < 13; i++) {
-				rightHands[i] = parent.context.loadModel("ClarinetRightHand%d.obj".formatted(i), "hands.bmp");
-				rightHandNode.attachChild(rightHands[i]);
-				if (i != 0) {
-					rightHands[i].setCullHint(Spatial.CullHint.Always);
-				}
-			}
-		}
-		
-		@Override
-		public void tick(double time, float delta) {
-			super.tick(time, delta);
-			
-			/* Stretch bell */
-			bellStretcher.tick(currentNotePeriod, time);
-		}
+	}
+
+	companion object {
+		val FINGERING_MANAGER = from(Clarinet::class.java)
+	}
+
+	init {
+		instrumentNode.setLocalTranslation(-25f, 50f, 0f)
+		instrumentNode.setLocalScale(0.9f)
 	}
 }

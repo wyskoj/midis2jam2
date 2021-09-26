@@ -51,9 +51,8 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
 
 	init {
 		/* Load strings */
-		for (i in 0..3) {
+		upperStrings = Array(4) {
 			context.loadModel("BanjoString.fbx", "BassSkin.bmp").also {
-				upperStrings[i] = it
 				instrumentNode.attachChild(it)
 			}
 		}
@@ -70,9 +69,9 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
 		upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.92))
 
 		/* Lower strings */
-		for (i in 0..3) {
-			for (j in 0..4) {
-				lowerStrings[i][j] = context.loadModel("BanjoStringBottom$j.fbx", "BassSkin.bmp").apply {
+		lowerStrings = Array(4) {
+			Array(5) { j: Int ->
+				context.loadModel("BanjoStringBottom$j.fbx", "BassSkin.bmp").apply {
 					instrumentNode.attachChild(this)
 				}
 			}
@@ -104,8 +103,8 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
 		}
 
 		/* Initialize note fingers */
-		for (i in 0..3) {
-			noteFingers[i] = context.loadModel("BassNoteFinger.obj", "BanjoSkin.png").apply {
+		noteFingers = Array(4) {
+			context.loadModel("BassNoteFinger.obj", "BanjoSkin.png").apply {
 				instrumentNode.attachChild(this)
 				this.cullHint = Always
 			}

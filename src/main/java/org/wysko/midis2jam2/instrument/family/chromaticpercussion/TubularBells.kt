@@ -71,7 +71,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
 	}
 
 	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.localTranslation = Vector3f(-10f * indexForMoving(delta), 0f, -10f * indexForMoving(delta))
+		offsetNode.setLocalTranslation(-10f * indexForMoving(delta), 0f, -10f * indexForMoving(delta))
 	}
 
 	companion object {
@@ -173,18 +173,18 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
 			bellNode.run {
 				attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f))
 				attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.5f))
-				localTranslation = Vector3f((i - 5) * 4f, 0f, 0f)
+				setLocalTranslation((i - 5) * 4f, 0f, 0f)
 				setLocalScale((-0.04545 * i).toFloat() + 1)
 				highestLevel.attachChild(this)
 			}
 
 			malletNode = Node().apply {
-				localTranslation = Vector3f((i - 5) * 4f, -25f, 4f)
+				setLocalTranslation((i - 5) * 4f, -25f, 4f)
 				highestLevel.attachChild(this)
 				cullHint = Always
 			}
 			context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
-				localTranslation = Vector3f(0f, 5f, 0f)
+				setLocalTranslation(0f, 5f, 0f)
 				malletNode.attachChild(this)
 			}
 		}
@@ -193,7 +193,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
 	init {
 		hits.forEach { bellStrikes[(it.note + 3) % 12].add(it) }
 		instrumentNode.run {
-			localTranslation = Vector3f(-65f, 100f, -130f)
+			setLocalTranslation(-65f, 100f, -130f)
 			localRotation = Quaternion().fromAngles(0f, rad(25.0), 0f)
 		}
 	}

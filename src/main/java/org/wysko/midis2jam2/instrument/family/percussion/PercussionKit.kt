@@ -14,14 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+@file:Suppress("unused")
 
-package org.wysko.midis2jam2.instrument.family.percussion;
+package org.wysko.midis2jam2.instrument.family.percussion
 
-public enum PercussionKit {
+enum class PercussionKit(val midiNumber: Int) {
 	STANDARD(0), ROOM(8), POWER(16), ELECTRONIC(24), ANALOG(25), JAZZ(32), BRUSH(40), ORCHESTRA(48), SFX(56);
-	public final int midiNumber;
-	
-	PercussionKit(int midiNumber) {
-		this.midiNumber = midiNumber;
-	}
 }

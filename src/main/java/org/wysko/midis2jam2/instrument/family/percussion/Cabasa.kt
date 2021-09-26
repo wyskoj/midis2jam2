@@ -14,68 +14,55 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.*;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
- * The cabasa animates much like the {@link JingleBells} but also rotates depending on the current strike angle.
+ * The cabasa animates much like the [JingleBells] but also rotates depending on the current strike angle.
  *
  * @see JingleBells
  */
-public class Cabasa extends NonDrumSetPercussion {
-	
+class Cabasa(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * Contains the cabasa.
 	 */
-	@NotNull
-	private final Node cabasaNode = new Node();
-	
+	private val cabasaNode = Node()
+
 	/**
 	 * The cabasa.
 	 */
-	@NotNull
-	private final Spatial cabasaModel;
-	
-	/**
-	 * Instantiates a new cabasa.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Cabasa(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		/* Load cabasa and position */
-		cabasaModel = context.loadModel("Cabasa.obj", "Cabasa.bmp");
-		cabasaModel.setLocalTranslation(0, 0, -3);
-		cabasaNode.attachChild(cabasaModel);
-		
-		/* Positioning */
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(45)));
-		instrumentNode.setLocalTranslation(-10, 48, -50);
-		instrumentNode.attachChild(cabasaNode);
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		var stickStatus = handleStick(context, cabasaNode, time, delta, hits, STRIKE_SPEED, MAX_ANGLE, Axis.X);
-		
+	private val cabasaModel: Spatial
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val stickStatus =
+			Stick.handleStick(context, cabasaNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+
 		/* Spin the cabasa loosely based on the rotation angle of the stickStatus */
-		cabasaModel.setLocalRotation(new Quaternion().fromAngles(0, stickStatus.getRotationAngle(), 0));
+		cabasaModel.localRotation = Quaternion().fromAngles(0f, stickStatus.rotationAngle, 0f)
+	}
+
+	init {
+		/* Load cabasa and position */
+		cabasaModel = context.loadModel("Cabasa.obj", "Cabasa.bmp").apply {
+			setLocalTranslation(0f, 0f, -3f)
+			cabasaNode.attachChild(this)
+		}
+
+		/* Positioning */
+		instrumentNode.run {
+			localRotation = Quaternion().fromAngles(0f, 0f, rad(45.0))
+			setLocalTranslation(-10f, 48f, -50f)
+			attachChild(cabasaNode)
+		}
 	}
 }

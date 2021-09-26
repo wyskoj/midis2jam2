@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
@@ -41,7 +40,7 @@ class Trumpet(
 ) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(0f, 10f * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
     }
 
     /**
@@ -77,7 +76,7 @@ class Trumpet(
 
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((-10f * indexForMoving()).toDouble()), 0f)
-            offsetNode.localTranslation = Vector3f(0f, indexForMoving() * -1f, 0f)
+            offsetNode.setLocalTranslation(0f, indexForMoving() * -1f, 0f)
         }
 
         init {
@@ -124,7 +123,7 @@ class Trumpet(
 
     init {
         groupOfPolyphony.run {
-            localTranslation = Vector3f(-36.5f, 60f, 10f)
+            setLocalTranslation(-36.5f, 60f, 10f)
             localRotation = Quaternion().fromAngles(rad(-2.0), rad(90.0), 0f)
         }
     }

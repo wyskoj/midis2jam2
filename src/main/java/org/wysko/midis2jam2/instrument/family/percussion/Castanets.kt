@@ -14,76 +14,69 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussion
 
-package org.wysko.midis2jam2.instrument.family.percussion;
-
-import com.jme3.math.Quaternion;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.List;
-
-import static com.jme3.scene.Spatial.CullHint.Dynamic;
-import static org.wysko.midis2jam2.instrument.family.percussive.Stick.*;
-import static org.wysko.midis2jam2.util.Utils.rad;
+import com.jme3.math.Quaternion
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial.CullHint
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
 /**
- * The castanets animate similarly to the {@link HandClap}.
+ * The castanets animate similarly to the [HandClap].
  *
  * @see HandClap
  */
-public class Castanets extends NonDrumSetPercussion {
-	
+class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+
 	/**
 	 * Contains the top castanet.
 	 */
-	private final Node topCastanetNode = new Node();
-	
+	private val topCastanetNode = Node()
+
 	/**
 	 * Contains the bottom castanet.
 	 */
-	private final Node bottomCastanetNode = new Node();
-	
-	/**
-	 * Instantiates castanets.
-	 *
-	 * @param context the context
-	 * @param hits    the hits
-	 */
-	protected Castanets(Midis2jam2 context, List<MidiNoteOnEvent> hits) {
-		super(context, hits);
-		
-		/* Load castanets */
-		Spatial topCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp");
-		Spatial bottomCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp");
-		
-		/* Attach to nodes */
-		topCastanetNode.attachChild(topCastanet);
-		bottomCastanetNode.attachChild(bottomCastanet);
-		
-		/* Move castanets away from pivot */
-		topCastanet.setLocalTranslation(0, 0, -3);
-		bottomCastanet.setLocalTranslation(0, 0, -3);
-		
-		/* Positioning */
-		bottomCastanet.setLocalRotation(new Quaternion().fromAngles(0, 0, rad(180)));
-		
-		instrumentNode.setLocalTranslation(12, 45, -55);
-		instrumentNode.setLocalRotation(new Quaternion().fromAngles(0, rad(-45), 0));
-		instrumentNode.attachChild(topCastanetNode);
-		instrumentNode.attachChild(bottomCastanetNode);
+	private val bottomCastanetNode = Node()
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		val stickStatus = Stick.handleStick(
+			context,
+			topCastanetNode,
+			time,
+			delta,
+			hits,
+			Stick.STRIKE_SPEED / 2,
+			Stick.MAX_ANGLE / 2,
+			Axis.X
+		)
+		topCastanetNode.cullHint = CullHint.Dynamic
+		bottomCastanetNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
 	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		
-		var stickStatus = handleStick(context, topCastanetNode, time, delta, hits, STRIKE_SPEED / 2, MAX_ANGLE / 2, Axis.X);
-		topCastanetNode.setCullHint(Dynamic);
-		bottomCastanetNode.setLocalRotation(new Quaternion().fromAngles(-stickStatus.getRotationAngle(), 0, 0));
+
+	init {
+		/* Load castanets */
+		val topCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
+		val bottomCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
+
+		/* Attach to nodes */
+		topCastanetNode.attachChild(topCastanet)
+		bottomCastanetNode.attachChild(bottomCastanet)
+
+		/* Move castanets away from pivot */
+		topCastanet.setLocalTranslation(0f, 0f, -3f)
+		bottomCastanet.setLocalTranslation(0f, 0f, -3f)
+
+		/* Positioning */
+		bottomCastanet.localRotation = Quaternion().fromAngles(0f, 0f, rad(180.0))
+		instrumentNode.setLocalTranslation(12f, 45f, -55f)
+		instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-45.0), 0f)
+		instrumentNode.attachChild(topCastanetNode)
+		instrumentNode.attachChild(bottomCastanetNode)
 	}
 }

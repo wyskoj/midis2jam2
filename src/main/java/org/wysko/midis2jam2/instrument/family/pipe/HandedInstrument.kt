@@ -14,41 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.pipe
 
-package org.wysko.midis2jam2.instrument.family.pipe;
-
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.MonophonicInstrument;
-import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager;
-import org.wysko.midis2jam2.instrument.clone.Clone;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-
-import java.util.List;
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
+import org.wysko.midis2jam2.instrument.clone.Clone
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
 /**
  * Any instrument that animates using hands.
  */
-public abstract class HandedInstrument extends MonophonicInstrument {
-	
-	/**
-	 * Instantiates a new Handed instrument.
-	 *
-	 * @param context   the context
-	 * @param eventList the event list
-	 * @param clazz     the class of the clone
-	 * @param manager   the fingering manager
-	 * @throws ReflectiveOperationException if clone constructor errors
-	 */
-	protected HandedInstrument(@NotNull Midis2jam2 context,
-	                           @NotNull List<MidiChannelSpecificEvent> eventList,
-	                           @NotNull Class<? extends Clone> clazz,
-	                           @NotNull HandPositionFingeringManager manager) throws ReflectiveOperationException {
-		super(context, eventList, clazz, manager);
-	}
-	
-	@Override
-	protected void moveForMultiChannel(float delta) {
-		offsetNode.setLocalTranslation(0, 10f * indexForMoving(delta), 0);
+abstract class HandedInstrument
+protected constructor(
+	context: Midis2jam2,
+	eventList: List<MidiChannelSpecificEvent>,
+	clazz: Class<out Clone>,
+	manager: HandPositionFingeringManager
+) : MonophonicInstrument(context, eventList, clazz, manager) {
+	override fun moveForMultiChannel(delta: Float) {
+		offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
 	}
 }

@@ -76,7 +76,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
 
 	override fun moveForMultiChannel(delta: Float) {
 		val i1 = indexForMoving(delta) - 2
-		instrumentNode.localTranslation = Vector3f(-50f, 26.5f + 2 * i1, 0f)
+		instrumentNode.setLocalTranslation(-50f, 26.5f + 2 * i1, 0f)
 		highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-18.0) * i1, 0f)
 	}
 
@@ -292,13 +292,13 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
 		}
 
 		/* Position */
-		highestLevel.localTranslation = Vector3f(18f, 0f, -5f)
+		highestLevel.setLocalTranslation(18f, 0f, -5f)
 
 		/* Add shadow */
 		shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
 			setLocalScale(2 / 3f)
 			instrumentNode.attachChild(this)
-			localTranslation = Vector3f(0f, -22f, 0f)
+			setLocalTranslation(0f, -22f, 0f)
 		}
 	}
 }
