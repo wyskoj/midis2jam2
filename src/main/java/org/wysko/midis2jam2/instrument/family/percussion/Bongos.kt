@@ -35,8 +35,11 @@ class Bongos(
 	hits: MutableList<MidiNoteOnEvent>
 ) : NonDrumSetPercussion(context, hits) {
 
-	private val lowBongoHits: List<MidiNoteOnEvent>
-	private val highBongoHits: List<MidiNoteOnEvent>
+	private val lowBongoHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == LOW_BONGO } as MutableList<MidiNoteOnEvent>
+
+	private val highBongoHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == HIGH_BONGO } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The Right hand node.
@@ -87,8 +90,6 @@ class Bongos(
 
 	init {
 		/* Separate high and low bongo hits */
-		lowBongoHits = hits.filter { it.note == LOW_BONGO }
-		highBongoHits = hits.filter { it.note == HIGH_BONGO }
 
 		/* Load bongos */
 		context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {

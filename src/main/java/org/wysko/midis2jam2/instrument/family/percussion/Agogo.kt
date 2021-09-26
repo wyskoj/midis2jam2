@@ -44,12 +44,15 @@ class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
 	/**
 	 * The hits for the high agogo.
 	 */
-	private val highHits: List<MidiNoteOnEvent>
+	private val highHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == HIGH_AGOGO } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The hits for the low agogo.
 	 */
-	private val lowHits: List<MidiNoteOnEvent>
+	private val lowHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == LOW_AGOGO } as MutableList<MidiNoteOnEvent>
+
 	override fun tick(time: Double, delta: Float) {
 		super.tick(time, delta)
 		val leftStatus =
@@ -58,17 +61,15 @@ class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
 			Stick.handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 		var velocity = 0
 		if (leftStatus.strike != null) {
-			velocity = max(velocity, leftStatus.strike!!.velocity)
+			velocity = max(velocity, leftStatus.strike.velocity)
 		}
 		if (rightStatus.strike != null) {
-			velocity = max(velocity, rightStatus.strike!!.velocity)
+			velocity = max(velocity, rightStatus.strike.velocity)
 		}
 		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta)
 	}
 
 	init {
-		highHits = hits.filter { it.note == HIGH_AGOGO }
-		lowHits = hits.filter { it.note == LOW_AGOGO }
 
 		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
 			recoilNode.attachChild(this)

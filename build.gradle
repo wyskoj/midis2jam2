@@ -18,9 +18,8 @@ java {
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://maven.ej-technologies.com/repository'
-    }
+    maven { url 'https://maven.ej-technologies.com/repository' }
+    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
 }
 
 application {
@@ -55,6 +54,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.install4j/install4j-runtime
     implementation group: 'com.install4j', name: 'install4j-runtime', version: '9.0.4'
+
+    implementation "org.spongepowered:noise:2.0.0-SNAPSHOT"
 
 }
 

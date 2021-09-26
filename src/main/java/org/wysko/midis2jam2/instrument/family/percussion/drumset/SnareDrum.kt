@@ -34,12 +34,14 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percu
 	/**
 	 * The list of hits for regular notes.
 	 */
-	private val regularHits: List<MidiNoteOnEvent>
+	private val regularHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == Midi.ACOUSTIC_SNARE || it.note == Midi.ELECTRIC_SNARE } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The list of hits for side sticks.
 	 */
-	private val sideHits: List<MidiNoteOnEvent>
+	private val sideHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == Midi.SIDE_STICK } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * Contains the side stick.
@@ -86,8 +88,6 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percu
 	}
 
 	init {
-		regularHits = hits.filter { it.note == Midi.ACOUSTIC_SNARE || it.note == Midi.ELECTRIC_SNARE }
-		sideHits = hits.filter { it.note == Midi.SIDE_STICK }
 
 		context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp").apply { recoilNode.attachChild(this) }
 		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")

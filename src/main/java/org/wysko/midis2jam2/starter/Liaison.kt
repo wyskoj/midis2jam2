@@ -14,130 +14,109 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.starter
 
-package org.wysko.midis2jam2.starter;
+import com.jme3.app.SimpleApplication
+import com.jme3.system.AppSettings
+import com.jme3.system.JmeCanvasContext
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.gui.Displays
+import org.wysko.midis2jam2.gui.GuiLauncher
+import org.wysko.midis2jam2.midi.MidiFile
+import org.wysko.midis2jam2.starter.Liaison
+import org.wysko.midis2jam2.util.M2J2Settings
+import org.wysko.midis2jam2.util.Utils.exceptionToLines
+import java.awt.Canvas
+import java.awt.Dimension
+import java.awt.Toolkit
+import javax.sound.midi.Sequencer
+import javax.swing.SwingUtilities
 
-import com.jme3.app.SimpleApplication;
-import com.jme3.system.AppSettings;
-import com.jme3.system.JmeCanvasContext;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.gui.Displays;
-import org.wysko.midis2jam2.gui.GuiLauncher;
-import org.wysko.midis2jam2.midi.MidiFile;
-import org.wysko.midis2jam2.util.M2J2Settings;
-import org.wysko.midis2jam2.util.Utils;
+open class Liaison(
+	protected val guiLauncher: GuiLauncher,
+	protected val sequencer: Sequencer,
+	protected val midiFile: MidiFile,
+	protected val m2j2settings: M2J2Settings,
+	protected val fullscreen: Boolean
+) : SimpleApplication() {
+	companion object {
+		private val midis2Jam2Settings = AppSettings(true)
 
-import javax.sound.midi.Sequencer;
-import javax.swing.*;
-import java.awt.*;
-import java.lang.reflect.Constructor;
-
-public class Liaison extends SimpleApplication {
-	
-	private static final AppSettings midis2Jam2Settings = new AppSettings(true);
-	
-	protected final Sequencer sequencer;
-	
-	protected final MidiFile midiFile;
-	
-	protected final GuiLauncher guiLauncher;
-	
-	protected final M2J2Settings m2j2settings;
-	
-	protected final boolean fullscreen;
-	
-	static {
-		// Set settings
-		midis2Jam2Settings.setFrameRate(120);
-		midis2Jam2Settings.setFrequency(60);
-		midis2Jam2Settings.setVSync(true);
-		midis2Jam2Settings.setResizable(true);
-		midis2Jam2Settings.setSamples(4);
-		midis2Jam2Settings.setGammaCorrection(false);
+		init {
+			// Set settings
+			midis2Jam2Settings.frameRate = 120
+			midis2Jam2Settings.frequency = 60
+			midis2Jam2Settings.isVSync = true
+			midis2Jam2Settings.isResizable = true
+			midis2Jam2Settings.samples = 4
+			midis2Jam2Settings.isGammaCorrection = false
+		}
 	}
-	
-	private Displays display;
-	private Canvas canvas;
-	private Midis2jam2 midis2jam2;
-	
-	public Liaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings, boolean fullscreen) {
-		this.sequencer = sequencer;
-		this.midiFile = midiFile;
-		this.guiLauncher = guiLauncher;
-		this.m2j2settings = settings;
-		this.fullscreen = fullscreen;
-	}
-	
-	
-	public void start(Class<? extends Displays> displayType) {
-		setDisplayStatView(false);
-		setDisplayFps(false);
-		setPauseOnLostFocus(false);
-		setShowSettings(false);
-		var screen = Toolkit.getDefaultToolkit().getScreenSize();
-		
+
+	private var display: Displays? = null
+	private var canvas: Canvas? = null
+	private var midis2jam2: Midis2jam2? = null
+	fun start(displayType: Class<out Displays?>) {
+		setDisplayStatView(false)
+		setDisplayFps(false)
+		isPauseOnLostFocus = false
+		isShowSettings = false
+		val screen = Toolkit.getDefaultToolkit().screenSize
 		if (fullscreen) {
-			midis2Jam2Settings.setFullscreen(true);
-			midis2Jam2Settings.setResolution(screen.width, screen.height);
-			setSettings(midis2Jam2Settings);
-			super.start();
-			
+			midis2Jam2Settings.isFullscreen = true
+			midis2Jam2Settings.setResolution(screen.width, screen.height)
+			setSettings(midis2Jam2Settings)
+			super.start()
 		} else {
-			var thisLiaison = this;
-			SwingUtilities.invokeLater(() -> {
-				
-				setSettings(midis2Jam2Settings);
-				setDisplayStatView(false);
-				setDisplayFps(false);
-				setPauseOnLostFocus(false);
-				setShowSettings(false);
-				
-				createCanvas();
-				JmeCanvasContext ctx = (JmeCanvasContext) getContext();
-				ctx.setSystemListener(thisLiaison);
-				
-				var dim = new Dimension((int) (screen.width * 0.95), (int) (screen.height * 0.85));
-				canvas = ctx.getCanvas();
-				canvas.setPreferredSize(dim);
-				
+			val thisLiaison = this
+			SwingUtilities.invokeLater {
+				setSettings(midis2Jam2Settings)
+				setDisplayStatView(false)
+				setDisplayFps(false)
+				isPauseOnLostFocus = false
+				isShowSettings = false
+				createCanvas()
+				val ctx = getContext() as JmeCanvasContext
+				ctx.setSystemListener(thisLiaison)
+				val dim = Dimension((screen.width * 0.95).toInt(), (screen.height * 0.85).toInt())
+				canvas = ctx.canvas
+				canvas!!.preferredSize = dim
 				try {
-					Constructor<? extends Displays> constructor = displayType.getConstructor(Liaison.class,
-							Canvas.class, Midis2jam2.class);
-					display = constructor.newInstance(this, ctx.getCanvas(), midis2jam2);
-					display.display();
-				} catch (ReflectiveOperationException e) {
-					Midis2jam2.getLOGGER().severe(Utils.exceptionToLines(e));
+					val constructor = displayType.getConstructor(
+						Liaison::class.java,
+						Canvas::class.java, Midis2jam2::class.java
+					)
+					display = constructor.newInstance(this, ctx.canvas, midis2jam2)
+					display!!.display()
+				} catch (e: ReflectiveOperationException) {
+					Midis2jam2.getLOGGER().severe(exceptionToLines(e))
 				}
-				startCanvas();
-			});
+				startCanvas()
+			}
 		}
-		
-		guiLauncher.disableAll();
+		guiLauncher.disableAll()
 	}
-	
-	@Override
-	public void simpleInitApp() {
-		midis2jam2 = new Midis2jam2(sequencer, midiFile, m2j2settings);
-		midis2jam2.setWindow(display);
-		stateManager.attach(midis2jam2);
-		rootNode.attachChild(midis2jam2.getRootNode());
-		
+
+	override fun simpleInitApp() {
+		midis2jam2 = Midis2jam2(sequencer, midiFile, m2j2settings)
+		midis2jam2!!.setWindow(display)
+		stateManager.attach(midis2jam2)
+		rootNode.attachChild(midis2jam2!!.rootNode)
 	}
-	
-	@Override
-	public void stop() {
-		super.stop();
+
+	override fun stop() {
+		super.stop()
 		if (!fullscreen) {
-			display.setVisible(false);
-			canvas.setEnabled(false);
+			display!!.isVisible = false
+			canvas!!.isEnabled = false
 		}
-		enableLauncher();
+		enableLauncher()
 	}
-	
+
 	/**
-	 * Unlock the {@link #guiLauncher} so the user can use it.
+	 * Unlock the [.guiLauncher] so the user can use it.
 	 */
-	public void enableLauncher() {
-		guiLauncher.enableAll();
+	open fun enableLauncher() {
+		guiLauncher.enableAll()
 	}
 }

@@ -28,7 +28,7 @@ import kotlin.math.sin
 /**
  * The full, 88-key keyboard.
  */
-class Keyboard(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, private val skin: KeyboardSkin) :
+class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent>, private val skin: KeyboardSkin) :
 	KeyedInstrument(context, events, 21, 108) {
 
 	override fun moveForMultiChannel(delta: Float) {

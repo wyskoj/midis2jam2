@@ -225,10 +225,10 @@ abstract class StringFamilyInstrument protected constructor(
 		if (!showBow) {
 			bowNode.cullHint = Spatial.CullHint.Always
 		}
-		for (i in 0..3) {
-			val string = context.loadModel("ViolinString.obj", "ViolinSkin.bmp")
-			upperStrings[i] = string
-			instrumentNode.attachChild(upperStrings[i])
+		upperStrings = Array(4) {
+			context.loadModel("ViolinString.obj", "ViolinSkin.bmp").apply {
+				instrumentNode.attachChild(this)
+			}
 		}
 		positionUpperStrings()
 		loadLowerStrings()

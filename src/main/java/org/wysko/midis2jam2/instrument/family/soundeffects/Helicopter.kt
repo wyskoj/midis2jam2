@@ -16,13 +16,13 @@
  */
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
-import com.auburn.fastnoiselite.FastNoiseLite
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
+import org.spongepowered.noise.Noise
+import org.spongepowered.noise.NoiseQuality
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
@@ -45,12 +45,6 @@ import kotlin.math.cos
  */
 class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 	SustainedInstrument(context, eventList) {
-
-	/**
-	 * The simplex noise generator.
-	 */
-	private val noise = FastNoiseLite(System.currentTimeMillis().toInt())
-
 	/**
 	 * "Seed" for X-value generation.
 	 */
@@ -110,12 +104,46 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
 		/* Slight wobble */
 		animNode.localRotation = Quaternion().fromAngles(
-			force * 0.5f * rad(noise.GetNoise((time * 100 + 4000 * rotXRand).toFloat(), 0f).toDouble()),
-			force * 0.5f * rad(noise.GetNoise((time * 100 + 4000 * rotYRand).toFloat(), 0f).toDouble()),
-			force * 0.5f * rad(noise.GetNoise((time * 100 + 4000 * rotZRand).toFloat(), 0f).toDouble())
+			force * 0.5f * rad(
+				(Noise.gradientCoherentNoise3D(
+					0.0,
+					0.0,
+					time,
+					(rotXRand * 1000).toInt(),
+					NoiseQuality.STANDARD
+				) - 0.4) * 10
+			),
+			force * 0.5f * rad(
+				(Noise.gradientCoherentNoise3D(
+					0.0,
+					0.0,
+					time,
+					(rotYRand * 1000).toInt(),
+					NoiseQuality.STANDARD
+				) - 0.4) * 10
+			),
+			force * 0.5f * rad(
+				(Noise.gradientCoherentNoise3D(
+					0.0,
+					0.0,
+					time,
+					(rotZRand * 1000).toInt(),
+					NoiseQuality.STANDARD
+				) - 0.4) * 10
+			)
 		)
 		highestLevel.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
-		animNode.setLocalTranslation(0f, force * noise.GetNoise((time * 100).toFloat(), 0f), 0f)
+		animNode.setLocalTranslation(
+			0f,
+			(force * (Noise.gradientCoherentNoise3D(
+				0.0,
+				0.0,
+				time,
+				(rotZRand * 1000).toInt(),
+				NoiseQuality.STANDARD
+			) - 0.4)).toFloat() * 10,
+			0f
+		)
 		highestLevel.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)
 	}
 
@@ -158,7 +186,6 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 		animNode.attachChild(cap)
 
 		/* Initialize RNG */
-		noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2)
 		val random = Random()
 		rotXRand = random.nextFloat()
 		rotYRand = random.nextFloat()

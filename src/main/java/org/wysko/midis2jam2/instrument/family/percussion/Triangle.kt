@@ -49,7 +49,7 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: Tr
 		recoilDrum(
 			triangleNode,
 			stickStatus.justStruck(),
-			if (stickStatus.strike == null) 0 else stickStatus.strike!!.velocity,
+			if (stickStatus.strike == null) 0 else stickStatus.strike.velocity,
 			delta
 		)
 	}

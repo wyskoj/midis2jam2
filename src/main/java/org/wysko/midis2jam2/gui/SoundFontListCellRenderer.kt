@@ -14,18 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.gui
 
-package org.wysko.midis2jam2.gui;
+import java.awt.Component
+import java.io.File
+import javax.swing.DefaultListCellRenderer
+import javax.swing.JList
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-
-public class SoundFontListCellRenderer extends DefaultListCellRenderer {
-	
-	@Override
-	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-		var text = value == null ? "Default SoundFont" : new File(((String) value)).getName();
-		return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+class SoundFontListCellRenderer : DefaultListCellRenderer() {
+	override fun getListCellRendererComponent(
+		list: JList<*>,
+		value: Any,
+		index: Int,
+		isSelected: Boolean,
+		cellHasFocus: Boolean
+	): Component {
+		val text = File(value as String).name
+		return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus)
 	}
 }

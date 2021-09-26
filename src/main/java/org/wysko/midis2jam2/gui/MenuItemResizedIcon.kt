@@ -1,14 +1,12 @@
-package org.wysko.midis2jam2.gui;
+package org.wysko.midis2jam2.gui
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.Serializable;
+import java.awt.Image
+import javax.swing.Icon
+import javax.swing.ImageIcon
+import javax.swing.JMenuItem
 
-public class MenuItemResizedIcon extends JMenuItem implements Serializable {
-	
-	@Override
-	public void setIcon(Icon defaultIcon) {
-		super.setIcon(new ImageIcon(((ImageIcon) defaultIcon).getImage().getScaledInstance(20, 20,
-				Image.SCALE_SMOOTH)));
+class MenuItemResizedIcon : JMenuItem() {
+	override fun setIcon(defaultIcon: Icon) {
+		super.setIcon(ImageIcon((defaultIcon as ImageIcon).image.getScaledInstance(20, 20, Image.SCALE_SMOOTH)))
 	}
 }

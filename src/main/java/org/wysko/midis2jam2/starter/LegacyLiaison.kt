@@ -14,90 +14,84 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.starter
 
-package org.wysko.midis2jam2.starter;
+import com.jme3.system.AppSettings
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.gui.GuiLauncher
+import org.wysko.midis2jam2.midi.MidiFile
+import org.wysko.midis2jam2.util.M2J2Settings
+import java.awt.Toolkit
+import java.io.IOException
+import java.util.*
+import javax.imageio.ImageIO
+import javax.sound.midi.Sequencer
 
-import com.jme3.system.AppSettings;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.gui.GuiLauncher;
-import org.wysko.midis2jam2.midi.MidiFile;
-import org.wysko.midis2jam2.util.M2J2Settings;
+class LegacyLiaison(
+	guiLauncher: GuiLauncher,
+	sequencer: Sequencer,
+	midiFile: MidiFile,
+	settings: M2J2Settings,
+	fullscreen: Boolean
+) : Liaison(guiLauncher, sequencer, midiFile, settings, fullscreen) {
 
-import javax.sound.midi.Sequencer;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
+	companion object {
+		private val midis2Jam2Settings = AppSettings(true)
 
-import static java.util.Objects.requireNonNull;
-import static javax.imageio.ImageIO.read;
-
-public class LegacyLiaison extends Liaison {
-	
-	private static final AppSettings midis2Jam2Settings = new AppSettings(true);
-	
-	static {
-		// Set settings
-		midis2Jam2Settings.setFrameRate(120);
-		midis2Jam2Settings.setTitle("midis2jam2");
-		midis2Jam2Settings.setFrequency(60);
-		try {
-			var icons = new BufferedImage[]{
-					read(requireNonNull(Liaison.class.getResource("/ico/icon16.png"))),
-					read(requireNonNull(Liaison.class.getResource("/ico/icon32.png"))),
-					read(requireNonNull(Liaison.class.getResource("/ico/icon128.png"))),
-					read(requireNonNull(Liaison.class.getResource("/ico/icon256.png")))
-			};
-			midis2Jam2Settings.setIcons(icons);
-		} catch (IOException e) {
-			Midis2jam2.getLOGGER().warning("Failed to set window icon.");
-			e.printStackTrace();
+		init {
+			// Set settings
+			midis2Jam2Settings.frameRate = 120
+			midis2Jam2Settings.title = "midis2jam2"
+			midis2Jam2Settings.frequency = 60
+			try {
+				midis2Jam2Settings.icons = arrayOf(
+					ImageIO.read(Objects.requireNonNull(Liaison::class.java.getResource("/ico/icon16.png"))),
+					ImageIO.read(Objects.requireNonNull(Liaison::class.java.getResource("/ico/icon32.png"))),
+					ImageIO.read(Objects.requireNonNull(Liaison::class.java.getResource("/ico/icon128.png"))),
+					ImageIO.read(Objects.requireNonNull(Liaison::class.java.getResource("/ico/icon256.png")))
+				)
+			} catch (e: IOException) {
+				Midis2jam2.getLOGGER().warning("Failed to set window icon.")
+				e.printStackTrace()
+			}
+			midis2Jam2Settings.isVSync = true
+			midis2Jam2Settings.isResizable = true
+			midis2Jam2Settings.samples = 4
+			midis2Jam2Settings.isGammaCorrection = true
 		}
-		midis2Jam2Settings.setVSync(true);
-		midis2Jam2Settings.setResizable(true);
-		midis2Jam2Settings.setSamples(4);
-		midis2Jam2Settings.setGammaCorrection(true);
 	}
-	
-	public LegacyLiaison(GuiLauncher guiLauncher, Sequencer sequencer, MidiFile midiFile, M2J2Settings settings,
-	                     boolean fullscreen) {
-		super(guiLauncher, sequencer, midiFile, settings, fullscreen);
-	}
-	
-	@Override
-	public void start() {
-		var dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+	override fun start() {
+		val dim = Toolkit.getDefaultToolkit().screenSize
 		if (fullscreen) {
-			midis2Jam2Settings.setFullscreen(true);
-			midis2Jam2Settings.setResolution(dim.width, dim.height);
+			midis2Jam2Settings.isFullscreen = true
+			midis2Jam2Settings.setResolution(dim.width, dim.height)
 		} else {
-			midis2Jam2Settings.setFullscreen(false);
-			midis2Jam2Settings.setResolution((int) (dim.width * 0.95), (int) (dim.height * 0.85));
+			midis2Jam2Settings.isFullscreen = false
+			midis2Jam2Settings.setResolution((dim.width * 0.95).toInt(), (dim.height * 0.85).toInt())
 		}
-		midis2Jam2Settings.setResizable(true);
-		
-		setSettings(midis2Jam2Settings);
-		setDisplayStatView(false);
-		setDisplayFps(false);
-		setPauseOnLostFocus(false);
-		setShowSettings(false);
-		super.start();
-		guiLauncher.disableAll();
+		midis2Jam2Settings.isResizable = true
+		setSettings(midis2Jam2Settings)
+		setDisplayStatView(false)
+		setDisplayFps(false)
+		isPauseOnLostFocus = false
+		isShowSettings = false
+		super.start()
+		guiLauncher.disableAll()
 	}
-	
-	@Override
-	public void simpleInitApp() {
-		var midis2jam2 = new Midis2jam2(sequencer, midiFile, m2j2settings);
-		stateManager.attach(midis2jam2);
-		rootNode.attachChild(midis2jam2.getRootNode());
+
+	override fun simpleInitApp() {
+		val midis2jam2 = Midis2jam2(sequencer, midiFile, m2j2settings)
+		stateManager.attach(midis2jam2)
+		rootNode.attachChild(midis2jam2.rootNode)
 	}
-	
-	@Override
-	public void stop() {
-		stop(false);
-		enableLauncher();
+
+	override fun stop() {
+		stop(false)
+		enableLauncher()
 	}
-	
-	public void enableLauncher() {
-		guiLauncher.enableAll();
+
+	override fun enableLauncher() {
+		guiLauncher.enableAll()
 	}
 }

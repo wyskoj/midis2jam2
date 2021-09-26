@@ -78,12 +78,14 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
 	/**
 	 * List of hits for [METRONOME_BELL].
 	 */
-	private val bellHits: List<MidiNoteOnEvent>
+	private val bellHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == METRONOME_BELL } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * List of hits for [METRONOME_CLICK].
 	 */
-	private val clickHits: List<MidiNoteOnEvent>
+	private val clickHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == METRONOME_CLICK } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * Keeps track of which direction [clickPendulum] should swing.
@@ -147,8 +149,6 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
 	init {
 
 		/* Extract separate hits for the bell and the click */
-		bellHits = hits.filter { it.note == METRONOME_BELL }
-		clickHits = hits.filter { it.note == METRONOME_CLICK }
 
 		/* Load box */
 		instrumentNode.attachChild(context.loadModel("MetronomeBox.obj", "Wood.bmp"))

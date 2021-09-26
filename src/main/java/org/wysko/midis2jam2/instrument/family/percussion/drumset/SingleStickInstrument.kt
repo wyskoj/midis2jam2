@@ -51,7 +51,7 @@ abstract class SingleStickInstrument protected constructor(context: Midis2jam2, 
 	 * @param delta the amount of time since the last frame update
 	 * @param hits  the running list of hits
 	 */
-	open fun handleStick(time: Double, delta: Float, hits: List<MidiNoteOnEvent>): StickStatus =
+	open fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus =
 		Stick.handleStick(context, stick, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 
 

@@ -68,17 +68,21 @@ class Congas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumS
 	/**
 	 * The Low conga hits.
 	 */
-	private val lowCongaHits: List<MidiNoteOnEvent>
+	private val lowCongaHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == LOW_CONGA } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The High conga hits.
 	 */
-	private val highCongaHits: List<MidiNoteOnEvent>
+	private val highCongaHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == OPEN_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The Muted conga hits.
 	 */
-	private val mutedCongaHits: List<MidiNoteOnEvent>
+	private val mutedCongaHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == MUTE_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
+
 	override fun tick(time: Double, delta: Float) {
 		super.tick(time, delta)
 
@@ -127,9 +131,6 @@ class Congas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumS
 	init {
 
 		/* Separate notes */
-		lowCongaHits = hits.filter { it.note == LOW_CONGA }
-		highCongaHits = hits.filter { it.note == OPEN_HIGH_CONGA }
-		mutedCongaHits = hits.filter { it.note == MUTE_HIGH_CONGA }
 
 		/* Load left conga */
 		context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp").apply {

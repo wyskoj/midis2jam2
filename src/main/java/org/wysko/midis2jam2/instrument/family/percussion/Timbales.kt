@@ -35,12 +35,14 @@ class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
 	/**
 	 * List of hits for the low timbale.
 	 */
-	private val lowTimbaleHits: List<MidiNoteOnEvent>
+	private val lowTimbaleHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == LOW_TIMBALE } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * List of hits for the high timbale.
 	 */
-	private val highTimbaleHits: List<MidiNoteOnEvent>
+	private val highTimbaleHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == HIGH_TIMBALE } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The Right hand node.
@@ -99,8 +101,6 @@ class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
 
 	init {
 		/* Separate hits */
-		lowTimbaleHits = hits.filter { it.note == LOW_TIMBALE }
-		highTimbaleHits = hits.filter { it.note == HIGH_TIMBALE }
 
 		/* Load timbales */
 		val lowTimbale = context.loadModel("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp")

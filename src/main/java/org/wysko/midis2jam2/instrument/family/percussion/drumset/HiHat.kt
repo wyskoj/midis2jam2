@@ -97,7 +97,7 @@ class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleSti
 		if (animTime != -1.0) animTime += delta.toDouble()
 
 		/* Animate stick */
-		handleStick(time, delta, hitsToStrike)
+		handleStick(time, delta, hitsToStrike as MutableList<MidiNoteOnEvent>)
 
 		/* Move the hat up for recoil */
 		wholeHat.move(0f, 5 * delta, 0f)

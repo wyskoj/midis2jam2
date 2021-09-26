@@ -18,7 +18,6 @@ package org.wysko.midis2jam2.instrument.family.organ
 
 import com.jme3.material.Material
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
@@ -54,7 +53,7 @@ const val ACCORDION_KEY_WHITE_BACK_OBJ = "AccordionKeyWhiteBack.obj"
  * @see .keyByMidiNote
  * @see .dummyWhiteKey
  */
-class Accordion(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: AccordionType) :
+class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: AccordionType) :
 	KeyedInstrument(context, eventList, 0, 23) {
 
 	/**
@@ -97,7 +96,7 @@ class Accordion(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, 
 	 * @param delta the amount of time since the last frame update
 	 */
 	private fun calculateAngle(delta: Float) {
-		if (keys.any { it.isBeingPressed }) {
+		if (keys.any { it!!.isBeingPressed }) {
 			/* Squeeze at maximum speed if any key is being pressed. */
 			squeezingSpeed = MAX_SQUEEZING_SPEED.toDouble()
 		} else {
@@ -134,7 +133,7 @@ class Accordion(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, 
 	}
 
 	override fun keyByMidiNote(midiNote: Int): Key {
-		return keys[midiNote % 24]
+		return keys[midiNote % 24]!!
 	}
 
 	override fun moveForMultiChannel(delta: Float) {
@@ -268,7 +267,7 @@ class Accordion(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, 
 		}
 
 		/* Attach keys to node */
-		keys.forEach { key -> keysNode.attachChild(key.keyNode) }
+		keys.forEach { key -> keysNode.attachChild(key!!.keyNode) }
 
 		keysNode.setLocalTranslation(-4f, 22f, -0.8f)
 

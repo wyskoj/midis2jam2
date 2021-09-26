@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always

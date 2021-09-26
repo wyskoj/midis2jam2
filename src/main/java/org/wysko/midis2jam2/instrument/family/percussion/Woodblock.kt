@@ -55,12 +55,15 @@ class Woodblock(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
 	/**
 	 * The Low woodblock hits.
 	 */
-	private val leftHits: List<MidiNoteOnEvent>
+	private val leftHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == LOW_WOODBLOCK } as MutableList<MidiNoteOnEvent>
 
 	/**
 	 * The High woodblock hits.
 	 */
-	private val rightHits: List<MidiNoteOnEvent>
+	private val rightHits: MutableList<MidiNoteOnEvent> =
+		hits.filter { it.note == HIGH_WOODBLOCK } as MutableList<MidiNoteOnEvent>
+
 	override fun tick(time: Double, delta: Float) {
 		super.tick(time, delta)
 		val statusLow = Stick.handleStick(
@@ -98,8 +101,6 @@ class Woodblock(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
 	}
 
 	init {
-		leftHits = hits.filter { it.note == LOW_WOODBLOCK }
-		rightHits = hits.filter { it.note == HIGH_WOODBLOCK }
 		leftWoodblockAnimNode.attachChild(context.loadModel("WoodBlockHigh.obj", "SimpleWood.bmp"))
 		rightWoodblockAnimNode.attachChild(context.loadModel("WoodBlockLow.obj", "SimpleWood.bmp"))
 		val leftWoodblockNode = Node()

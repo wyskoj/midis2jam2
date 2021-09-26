@@ -32,7 +32,7 @@ class Woodblocks(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
 	override fun tick(time: Double, delta: Float) {
 		super.tick(time, delta)
-		twelfths.forEach { it.tick(delta) }
+		twelfths.forEach { it!!.tick(delta) }
 	}
 
 	override fun moveForMultiChannel(delta: Float) {

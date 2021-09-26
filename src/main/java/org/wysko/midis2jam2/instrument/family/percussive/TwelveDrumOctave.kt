@@ -14,110 +14,87 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.instrument.family.percussive
 
-package org.wysko.midis2jam2.instrument.family.percussive;
-
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.instrument.DecayedInstrument;
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument;
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent;
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent;
-import org.wysko.midis2jam2.world.Axis;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.jme3.scene.Node
+import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.world.Axis
 
 /**
  * Twelve drums for each note.
  */
-public abstract class TwelveDrumOctave extends DecayedInstrument {
-	
+abstract class TwelveDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+	DecayedInstrument(context, eventList) {
+
 	/**
 	 * The Mallet nodes.
 	 */
-	@NotNull
-	protected final Node[] malletNodes;
-	
+	protected val malletNodes = Array(12) { Node() }
+
 	/**
 	 * The Mallet strikes.
 	 */
-	protected final List<MidiNoteOnEvent>[] malletStrikes;
-	
+	private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
+
 	/**
 	 * Each twelfth of the octave.
 	 */
-	protected final TwelfthOfOctaveDecayed[] twelfths = new TwelfthOfOctaveDecayed[12];
-	
-	/**
-	 * @param context   the context to the main class
-	 * @param eventList the event list
-	 */
-	@SuppressWarnings("unchecked")
-	protected TwelveDrumOctave(@NotNull Midis2jam2 context,
-	                           @NotNull List<MidiChannelSpecificEvent> eventList) {
-		super(context, eventList);
-		malletNodes = new Node[12];
-		malletStrikes = new ArrayList[12];
-		for (var i = 0; i < 12; i++) {
-			malletStrikes[i] = new ArrayList<>();
-		}
-		List<MidiNoteOnEvent> collect = eventList.stream().filter(MidiNoteOnEvent.class::isInstance).map(MidiNoteOnEvent.class::cast).collect(Collectors.toList());
-		for (MidiNoteOnEvent noteOn : collect) {
-			malletStrikes[(noteOn.getNote() + 3) % 12].add(noteOn);
-		}
-	}
-	
-	@Override
-	public void tick(double time, float delta) {
-		super.tick(time, delta);
-		for (var i = 0; i < 12; i++) {
-			var stickStatus = Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5, 50, Axis.X);
+	protected val twelfths = arrayOfNulls<TwelfthOfOctaveDecayed>(12)
+
+	override fun tick(time: Double, delta: Float) {
+		super.tick(time, delta)
+		for (i in 0..11) {
+			val stickStatus =
+				Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5.0, 50.0, Axis.X)
 			if (stickStatus.justStruck()) {
-				twelfths[i].animNode.setLocalTranslation(0, -3, 0);
+				twelfths[i]!!.animNode.setLocalTranslation(0f, -3f, 0f)
 			}
-			Vector3f localTranslation = twelfths[i].animNode.getLocalTranslation();
+			val localTranslation = twelfths[i]!!.animNode.localTranslation
 			if (localTranslation.y < -0.0001) {
-				twelfths[i].animNode.setLocalTranslation(0, Math.min(0,
-						localTranslation.y + (PercussionInstrument.DRUM_RECOIL_COMEBACK * delta)), 0);
+				twelfths[i]!!.animNode.setLocalTranslation(
+					0f, Math.min(
+						0f,
+						localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta
+					), 0f
+				)
 			} else {
-				twelfths[i].animNode.setLocalTranslation(0, 0, 0);
+				twelfths[i]!!.animNode.setLocalTranslation(0f, 0f, 0f)
 			}
 		}
-		
 	}
-	
+
 	/**
 	 * The Twelfth of octave that is decayed.
 	 */
-	public abstract static class TwelfthOfOctaveDecayed {
-		
+	abstract class TwelfthOfOctaveDecayed protected constructor() {
+
 		/**
 		 * The Highest level.
 		 */
-		public final Node highestLevel = new Node();
-		
+		val highestLevel = Node()
+
 		/**
 		 * The Anim node.
 		 */
-		protected final Node animNode = new Node();
-		
-		/**
-		 * Instantiates a new Twelfth of octave decayed.
-		 */
-		protected TwelfthOfOctaveDecayed() {
-			highestLevel.attachChild(animNode);
-		}
-		
+		val animNode = Node()
+
 		/**
 		 * Update animation and note handling.
 		 *
 		 * @param delta the amount of time since the last frame update
 		 */
-		public abstract void tick(float delta);
+		abstract fun tick(delta: Float)
+
+		init {
+			highestLevel.attachChild(animNode)
+		}
 	}
-	
+
+	init {
+		eventList.filterIsInstance<MidiNoteOnEvent>().forEach { malletStrikes[(it.note + 3) % 12].add(it) }
+	}
 }

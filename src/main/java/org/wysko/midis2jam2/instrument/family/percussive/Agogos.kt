@@ -35,9 +35,7 @@ class Agogos(
 
 	override fun tick(time: Double, delta: Float) {
 		super.tick(time, delta)
-		for (woodblock in twelfths) {
-			woodblock.tick(delta)
-		}
+		twelfths.forEach { it!!.tick(delta) }
 	}
 
 	override fun moveForMultiChannel(delta: Float) {
