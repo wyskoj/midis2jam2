@@ -135,10 +135,12 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 	 * @param delta the amount of time since the last frame
 	 */
 	private fun rotateCylinder(delta: Float) {
-		val tick = context.sequencer.tickPosition
+//		val tick = context.sequencerHandler.tickPosition
+		val tick = 500_000
 
 		/* Calculate rotation angle */
-		val xAngle = (0.5 * Math.PI * delta * (6E7 / context.file.tempoAt(tick).number) / 60.0).toFloat()
+//		val xAngle = (0.5 * Math.PI * delta * (6E7 / context.file.tempoAt(tick).number) / 60.0).toFloat()
+		val xAngle = (0.5 * Math.PI * delta * (6E7 / tick) / 60.0).toFloat()
 
 		/* Rotate each point */
 		points.forEach {

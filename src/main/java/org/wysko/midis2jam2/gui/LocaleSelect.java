@@ -46,11 +46,11 @@ public class LocaleSelect extends JDialog {
 	}
 	
 	private void okButtonActionPerformed(ActionEvent e) {
-		final var bundle = ResourceBundle.getBundle("i18n.locale");
+		final ResourceBundle bundle = ResourceBundle.getBundle("i18n.locale");
 		
-		final var selectedItem = (String) localeSpinner.getSelectedItem();
-		var locale = GuiLauncher.getSupportedLocales().get(selectedItem);
-		var guiLauncher = getGuiLauncher();
+		final String selectedItem = (String) localeSpinner.getSelectedItem();
+		String locale = GuiLauncher.getSupportedLocales().get(selectedItem);
+		GuiLauncher guiLauncher = getGuiLauncher();
 		guiLauncher.getSettings().setLocale(locale);
 		guiLauncher.saveSettings();
 		
@@ -81,14 +81,14 @@ public class LocaleSelect extends JDialog {
 		//======== this ========
 		setMinimumSize(new Dimension(400, 200));
 		setTitle(bundle.getString("LocaleSelect.locale"));
-		var contentPane = getContentPane();
+		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-
+		
 		//======== dialogPane ========
 		{
 			dialogPane.setBorder(new EmptyBorder(12, 12, 12, 12));
 			dialogPane.setLayout(new BorderLayout());
-
+			
 			//======== contentPanel ========
 			{
 				contentPanel.setLayout(new BorderLayout());
@@ -111,7 +111,7 @@ public class LocaleSelect extends JDialog {
 				contentPanel.add(panel1, BorderLayout.CENTER);
 			}
 			dialogPane.add(contentPanel, BorderLayout.CENTER);
-			
+
 			//======== buttonBar ========
 			{
 				buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
@@ -140,7 +140,8 @@ public class LocaleSelect extends JDialog {
 		setLocationRelativeTo(getOwner());
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 		
-		final var spinnerListModel = new DefaultComboBoxModel<String>(new Vector<>(GuiLauncher.getSupportedLocales().keySet()));
+		final DefaultComboBoxModel spinnerListModel =
+				new DefaultComboBoxModel<String>(new Vector<>(GuiLauncher.getSupportedLocales().keySet()));
 		localeSpinner.setModel(spinnerListModel);
 		
 		final String locale = getGuiLauncher().getSettings().getLocale();
@@ -155,19 +156,12 @@ public class LocaleSelect extends JDialog {
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JPanel dialogPane;
-	
 	private JPanel contentPanel;
-	
 	private JLabel selectLocaleLabel;
-	
 	private JPanel panel1;
-	
 	private JComboBox<String> localeSpinner;
-	
 	private JPanel buttonBar;
-	
 	private JButton okButton;
-	
 	private JButton cancelButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -25,13 +25,13 @@ import org.w3c.dom.Document
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.xml.sax.SAXException
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 import java.util.stream.Collectors
-import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 
@@ -110,8 +110,6 @@ object Utils {
 	@Throws(SAXException::class, ParserConfigurationException::class, IOException::class)
 	fun instantiateXmlParser(resourceName: String): Document {
 		val df = DocumentBuilderFactory.newInstance()
-		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
-		df.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
 		return df.newDocumentBuilder().parse(PressedKeysFingeringManager::class.java.getResourceAsStream(resourceName))
 	}
 
@@ -146,4 +144,6 @@ object Utils {
 		BufferedReader(InputStreamReader(Objects.requireNonNull(Utils::class.java.getResourceAsStream(file)))).lines()
 			.collect(Collectors.joining("\n"))
 
+	@JvmStatic
+	fun fileToString(file: File) = file.readText()
 }

@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.family.organ
 
 import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
@@ -75,7 +74,6 @@ class Harmonica(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
 			}
 			pufferNodes[i].run {
 				localRotation = Quaternion().fromAngles(0f, rad(5 * (i - 5.5)), 0f)
-				attachChild(pufferNodes[i])
 			}
 		}
 

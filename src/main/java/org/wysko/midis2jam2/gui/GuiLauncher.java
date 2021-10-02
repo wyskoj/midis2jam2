@@ -45,11 +45,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.awt.Cursor.getPredefinedCursor;
 import static java.util.Objects.requireNonNull;
@@ -88,21 +87,21 @@ public class GuiLauncher extends JFrame {
 		settings = new LauncherSettings();
 	}
 	
-	public static void main(String[] args) throws IOException, SplashScreen.ConnectionException {
+	public static void main(String[] args) throws SplashScreen.ConnectionException {
 		// Initialize GUI
 		SplashScreen.writeMessage("Loading...");
-		IntelliJTheme.install(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
-		var guiLauncher = new GuiLauncher();
+		IntelliJTheme.setup(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
+		GuiLauncher guiLauncher = new GuiLauncher();
 		
 		SplashScreen.writeMessage("Loading settings...");
 		try {
-			var json = Files.readString(SETTINGS_FILE.toPath());
-			if (json.isBlank()) {
+			String json = Utils.fileToString(SETTINGS_FILE);
+			if (json.trim().equals("")) {
 				throw new IllegalStateException();
 			}
 			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
 		} catch (Exception e) {
-			Midis2jam2.getLOGGER().info("Could not load settings. Creating new settings.");
+			Midis2jam2.LOGGER.info("Could not load settings. Creating new settings.");
 			guiLauncher.settings = new LauncherSettings();
 			guiLauncher.saveSettings();
 		}
@@ -135,11 +134,15 @@ public class GuiLauncher extends JFrame {
 		SplashScreen.writeMessage("Collecting MIDI devices...");
 		
 		// Load MIDI devices
-		var infoArr = MidiSystem.getMidiDeviceInfo();
-		var aModel = new DefaultComboBoxModel<MidiDevice.Info>();
+		MidiDevice.Info[] infoArr = MidiSystem.getMidiDeviceInfo();
+		DefaultComboBoxModel aModel = new DefaultComboBoxModel<MidiDevice.Info>();
 		
 		// Populate MIDI devices (but don't add Real Time Sequencer)
-		aModel.addAll(Arrays.stream(infoArr).filter(i -> !i.getName().equals("Real Time Sequencer")).collect(Collectors.toList()));
+		for (MidiDevice.Info info : infoArr) {
+			if (!info.getName().equals("Real Time Sequencer")) {
+				aModel.addElement(info);
+			}
+		}
 		guiLauncher.midiDeviceDropDown.setModel(aModel);
 		
 		// Set tooltip values
@@ -149,11 +152,11 @@ public class GuiLauncher extends JFrame {
 		
 		// Check for updates
 		new Thread(() -> {
-			Midis2jam2.getLOGGER().info("Checking for updates.");
+			Midis2jam2.LOGGER.info("Checking for updates.");
 			try {
-				final var bundle = ResourceBundle.getBundle("i18n.updater");
-				var html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
-				var jep = new JEditorPane();
+				final ResourceBundle bundle = ResourceBundle.getBundle("i18n.updater");
+				String html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
+				JEditorPane jep = new JEditorPane();
 				jep.setContentType("text/html");
 				jep.setText(bundle.getString("warning"));
 				jep.setEditable(false);
@@ -169,12 +172,12 @@ public class GuiLauncher extends JFrame {
 				});
 				if (html.contains("Out of")) {
 					showMessageDialog(guiLauncher, jep, bundle.getString("update_available"), WARNING_MESSAGE);
-					Midis2jam2.getLOGGER().warning("Out of date!");
+					Midis2jam2.LOGGER.warning("Out of date!");
 				} else {
-					Midis2jam2.getLOGGER().info("Up to date.");
+					Midis2jam2.LOGGER.info("Up to date.");
 				}
 			} catch (IOException e) {
-				Midis2jam2.getLOGGER().warning("Failed to check for updates.");
+				Midis2jam2.LOGGER.warning("Failed to check for updates.");
 				e.printStackTrace();
 			}
 		}).start();
@@ -215,7 +218,7 @@ public class GuiLauncher extends JFrame {
 		}
 		
 		// Set MIDI device
-		for (var i = 0; i < midiDeviceDropDown.getItemCount(); i++) {
+		for (int i = 0; i < midiDeviceDropDown.getItemCount(); i++) {
 			if (midiDeviceDropDown.getItemAt(i).getName().equals(settings.getMidiDevice())) {
 				midiDeviceDropDown.setSelectedIndex(i);
 				break;
@@ -233,7 +236,7 @@ public class GuiLauncher extends JFrame {
 	 * Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}.
 	 */
 	public void saveSettings() {
-		try (var writer = new FileWriter(SETTINGS_FILE)) {
+		try (FileWriter writer = new FileWriter(SETTINGS_FILE)) {
 			writer.write(GSON.toJson(settings));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -266,7 +269,7 @@ public class GuiLauncher extends JFrame {
 	 * Prompts the user to load a MIDI file.
 	 */
 	private void loadMidiFileButtonActionPerformed(ActionEvent e) {
-		var f = new JFileChooser();
+		JFileChooser f = new JFileChooser();
 		f.setPreferredSize(new Dimension(800, 600));
 		f.setDialogTitle("Load MIDI file");
 		f.setMultiSelectionEnabled(false);
@@ -285,7 +288,7 @@ public class GuiLauncher extends JFrame {
 		f.setFileSelectionMode(FILES_ONLY);
 		f.setCurrentDirectory(new File(settings.getLastMidiDir()));
 		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
-			var selectedMidiFile = f.getSelectedFile();
+			File selectedMidiFile = f.getSelectedFile();
 			midiFilePathTextField.setText(selectedMidiFile.getAbsolutePath());
 			settings.setLastMidiDir(selectedMidiFile.getParentFile().getAbsolutePath());
 			saveSettings();
@@ -297,7 +300,7 @@ public class GuiLauncher extends JFrame {
 	 */
 	private void loadSoundFontButtonActionPerformed(ActionEvent e) {
 		
-		var dialog = new JDialog(this, "SoundFont list editor", true);
+		JDialog dialog = new JDialog(this, "SoundFont list editor", true);
 		dialog.getContentPane().add(new SoundFontList(this.settings.getSoundFontPaths(), this));
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		dialog.setLocation(dim.width / 2 - getSize().width / 2,
@@ -308,7 +311,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
-		var info = (MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem());
+		MidiDevice.Info info = (MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem());
 		if (info.getName().equals("Gervill")) {
 			soundFontLabel.setEnabled(true);
 			soundFontPathDropDown.setEnabled(true);
@@ -326,12 +329,12 @@ public class GuiLauncher extends JFrame {
 	private void startButtonPressed(ActionEvent e) {
 		// Collect MIDI file
 		this.setCursor(getPredefinedCursor(Cursor.WAIT_CURSOR));
-		if (midiFilePathTextField.getText().isBlank()) {
+		if (midiFilePathTextField.getText().trim().equals("")) {
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, "You must specify a MIDI file.", "No MIDI file selected", INFORMATION_MESSAGE);
 			return;
 		}
-		var midiFile = new File(midiFilePathTextField.getText());
+		File midiFile = new File(midiFilePathTextField.getText());
 		if (!midiFile.exists()) {
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, "The specified MIDI file does not exist.", "MIDI file does not exist", ERROR_MESSAGE);
@@ -355,7 +358,7 @@ public class GuiLauncher extends JFrame {
 		Soundbank soundfont = null;
 		final String selectedSf2Path = (String) soundFontPathDropDown.getSelectedItem();
 		if (selectedSf2Path != null) {
-			var soundFontFile = new File(selectedSf2Path);
+			File soundFontFile = new File(selectedSf2Path);
 			if (!soundFontFile.exists()) {
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				showMessageDialog(this, "The specified SoundFont does not exist.", "SoundFont file does not exist",
@@ -380,14 +383,14 @@ public class GuiLauncher extends JFrame {
 		
 		// Initialize MIDI
 		try {
-			var selectedDevice = requireNonNull((MidiDevice.Info) midiDeviceDropDown.getSelectedItem());
+			final MidiDevice.Info selectedDevice = requireNonNull((MidiDevice.Info) midiDeviceDropDown.getSelectedItem());
 			Sequencer sequencer;
 			
-			var midiDevice = MidiSystem.getMidiDevice(selectedDevice);
+			MidiDevice midiDevice = MidiSystem.getMidiDevice(selectedDevice);
 			
 			if (selectedDevice.getName().equals("Gervill")) {
 				// Internal synth
-				var synthesizer = MidiSystem.getSynthesizer();
+				Synthesizer synthesizer = MidiSystem.getSynthesizer();
 				synthesizer.open();
 				// Load soundfont
 				if (soundfont != null) {
@@ -406,14 +409,14 @@ public class GuiLauncher extends JFrame {
 			sequencer.open();
 			sequencer.setSequence(sequence);
 			
-			var value = (int) latencySpinner.getValue();
+			int value = (int) latencySpinner.getValue();
 			if (midiDevice.getDeviceInfo().getName().startsWith("VirtualMIDISynth")) {
-				var vmsConfigFile = new File("C:\\Program Files\\VirtualMIDISynth\\VirtualMIDISynth.conf");
+				File vmsConfigFile = new File("C:\\Program Files\\VirtualMIDISynth\\VirtualMIDISynth.conf");
 				if (vmsConfigFile.exists()) {
-					var vmsConfigData = Files.readString(vmsConfigFile.toPath());
-					var matcher = Pattern.compile("AdditionalBuffer=(\\d+)").matcher(vmsConfigData);
+					String vmsConfigData = Utils.fileToString(vmsConfigFile);
+					Matcher matcher = Pattern.compile("AdditionalBuffer=(\\d+)").matcher(vmsConfigData);
 					if (matcher.find()) {
-						var additionalBuffer = matcher.group(1);
+						String additionalBuffer = matcher.group(1);
 						value += Integer.parseInt(additionalBuffer);
 					} else {
 						value += 250;
@@ -422,13 +425,14 @@ public class GuiLauncher extends JFrame {
 				
 			}
 			if (legacyEngineCheckbox.isSelected()) {
-				var liaison = new LegacyLiaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
-						InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
+				LegacyLiaison liaison = new LegacyLiaison(this, sequencer, MidiFile.readMidiFile(midiFile),
+						new M2J2Settings(value,
+								InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
 						fullscreenCheckbox.isSelected());
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				SwingUtilities.invokeLater(() -> new Thread(liaison::start).start());
 			} else {
-				var liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
+				Liaison liaison = new Liaison(this, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(value,
 						InstrumentTransition.valueOf(getSelectedTransitionRadioButton().getName())),
 						fullscreenCheckbox.isSelected());
 				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -495,7 +499,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void aboutMenuItemActionPerformed(ActionEvent e) {
-		var about = new About(this, true);
+		About about = new About(this, true);
 		about.setVisible(true);
 	}
 	
@@ -505,7 +509,7 @@ public class GuiLauncher extends JFrame {
 	}
 	
 	private void localeMenuItemActionPerformed(ActionEvent e) {
-		var localeSelect = new LocaleSelect(this);
+		LocaleSelect localeSelect = new LocaleSelect(this);
 		localeSelect.setVisible(true);
 	}
 	
@@ -560,7 +564,7 @@ public class GuiLauncher extends JFrame {
 		setIconImage(new ImageIcon(getClass().getResource("/ico/icon48.png")).getImage());
 		setResizable(false);
 		setMinimumSize(new Dimension(605, 575));
-		var contentPane = getContentPane();
+		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0};
 		((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{132, 145, 77, 0, 0};
@@ -594,7 +598,7 @@ public class GuiLauncher extends JFrame {
 				fileMenu.add(exitMenuItem);
 			}
 			menuBar1.add(fileMenu);
-			
+
 			//======== menu1 ========
 			{
 				menu1.setText(bundle.getString("GuiLauncher.menu1.text"));
@@ -859,7 +863,7 @@ public class GuiLauncher extends JFrame {
 		setLocationRelativeTo(getOwner());
 		
 		//---- transitionSpeedButtonGroup ----
-		var transitionSpeedButtonGroup = new ButtonGroup();
+		ButtonGroup transitionSpeedButtonGroup = new ButtonGroup();
 		transitionSpeedButtonGroup.add(transitionSpeedNoneButton);
 		transitionSpeedButtonGroup.add(transitionSpeedSlowButton);
 		transitionSpeedButtonGroup.add(transitionSpeedNormalButton);
@@ -889,43 +893,24 @@ public class GuiLauncher extends JFrame {
 	private JComboBox<String> soundFontPathDropDown;
 	private JResizedIconButton editSoundFontsButton;
 	private JLabel soundFontHelp;
-	
 	private JPanel settingsPanel;
-	
 	private JPanel hSpacer1;
-	
 	private JLabel latencyFixLabel;
-	
 	private JSpinner latencySpinner;
-	
 	private JPanel hSpacer2;
-	
 	private JLabel latencyHelp;
-	
 	private JLabel displayLabel;
-	
 	private JCheckBox fullscreenCheckbox;
-	
 	private JLabel fullscreenHelp;
-	
 	private JCheckBox legacyEngineCheckbox;
-	
 	private JLabel legacyEngineHelp;
-	
 	private JLabel transitionSpeedLabel;
-	
 	private JPanel transitionSpeedPanel;
-	
 	private JRadioButton transitionSpeedNoneButton;
-	
 	private JRadioButton transitionSpeedSlowButton;
-	
 	private JRadioButton transitionSpeedNormalButton;
-	
 	private JRadioButton transitionSpeedFastButton;
-	
 	private JLabel transitionSpeedHelp;
-	
 	private JResizedIconButton startButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

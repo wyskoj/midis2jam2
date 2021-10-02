@@ -64,17 +64,14 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
 	 * first pair to be invisible.
 	 */
 	protected open fun loadHands() {
-		/* Attach hands to nodes */
+		if (!::leftHands.isInitialized) { // May not be initialized because of Ocarina.
+			leftHands = emptyArray()
+		}
 		leftHands.forEach { leftHandNode.attachChild(it) }
-		rightHands.forEach { rightHandNode.attachChild(it) }
+		leftHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
 
-		/* Set visibility */
-		leftHands.forEachIndexed {index, spatial ->
-			spatial.cullHint = if (index == 0) Dynamic else Always
-		}
-		rightHands.forEachIndexed {index, spatial ->
-			spatial.cullHint = if (index == 0) Dynamic else Always
-		}
+		rightHands.forEach { rightHandNode.attachChild(it) }
+		rightHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
 	}
 
 	override fun tick(time: Double, delta: Float) {
@@ -95,9 +92,7 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
 	companion object {
 		/** Given an array of hands and an index, sets the hand at the index to be visible, and all else invisible. */
 		private fun setHand(hands: Array<Spatial>, handPosition: Int) {
-			hands.indices.forEach { i ->
-				hands[i].cullHint = Utils.cullHint(i == handPosition)
-			}
+			hands.indices.forEach { hands[it].cullHint = Utils.cullHint(it == handPosition) }
 		}
 	}
 

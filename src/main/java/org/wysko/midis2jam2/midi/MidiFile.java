@@ -20,9 +20,7 @@ package org.wysko.midis2jam2.midi;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MetaMessage;
-import javax.sound.midi.ShortMessage;
+import javax.sound.midi.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -32,6 +30,13 @@ import java.util.stream.Collectors;
  * A special type of music file {@link Midis2jam2 new name}.
  */
 public final class MidiFile {
+	
+	public static final MidiFile EMPTY;
+	
+	static {
+		EMPTY = new MidiFile();
+		EMPTY.setTracks(new MidiTrack[0]);
+	}
 	
 	/**
 	 * The tracks of this MIDI file.
@@ -63,20 +68,20 @@ public final class MidiFile {
 	@SuppressWarnings({"StatementWithEmptyBody", "java:S1160"})
 	public static MidiFile readMidiFile(File midiFile) throws IOException, InvalidMidiDataException {
 		/* Init vars */
-		var sequence = new StandardMidiFileReader().getSequence(midiFile);
-		var file = new MidiFile();
+		Sequence sequence = new StandardMidiFileReader().getSequence(midiFile);
+		MidiFile file = new MidiFile();
 		
 		/* Division and track count */
 		file.setDivision((short) sequence.getResolution());
 		file.setTracks(new MidiTrack[sequence.getTracks().length + 1]);
 		
 		/* For each track */
-		for (var j = 1; j <= sequence.getTracks().length; j++) {
+		for (int j = 1; j <= sequence.getTracks().length; j++) {
 			file.getTracks()[j] = new MidiTrack();
-			var track = sequence.getTracks()[j - 1];
+			Track track = sequence.getTracks()[j - 1];
 			
-			for (var i = 0; i < track.size(); i++) {
-				var midiEvent = track.get(i);
+			for (int i = 0; i < track.size(); i++) {
+				javax.sound.midi.MidiEvent midiEvent = track.get(i);
 				if (midiEvent.getMessage() instanceof MetaMessage) {
 					MetaMessage message = (MetaMessage) midiEvent.getMessage();
 					if (message.getType() == 0x51) { // Tempo
@@ -102,7 +107,7 @@ public final class MidiFile {
 						file.getTracks()[j].getEvents()
 								.add(programEventFromData(midiEvent.getTick(), message.getData1(), message.getChannel()));
 					} else if (command == ShortMessage.PITCH_BEND) {
-						var val = message.getData1() + message.getData2() * 128;
+						int val = message.getData1() + message.getData2() * 128;
 						file.getTracks()[j].getEvents()
 								.add(new MidiPitchBendEvent(midiEvent.getTick(), message.getChannel(), val));
 					} else if (command == ShortMessage.CONTROL_CHANGE) {
@@ -164,10 +169,10 @@ public final class MidiFile {
 	 * @return the first tempo event in the file, expressed in beats per minute
 	 */
 	public double firstTempoInBpm() {
-		var event = new MidiTempoEvent(0, 500_000);
+		MidiTempoEvent event = new MidiTempoEvent(0, 500_000);
 		
 		/* For each track */
-		for (var i = 1; i < getTracks().length; i++) {
+		for (int i = 1; i < getTracks().length; i++) {
 			MidiTrack track = getTracks()[i];
 			
 			event = track.getEvents().stream()
@@ -182,7 +187,7 @@ public final class MidiFile {
 	/**
 	 * Calculates the tempo map of this MIDI file.
 	 */
-	private void calculateTempoMap() {
+	public void calculateTempoMap() {
 		List<MidiTempoEvent> tempoEvents = new ArrayList<>();
 		
 		/* For each MIDI track */
@@ -232,7 +237,7 @@ public final class MidiFile {
 			return ((double) midiTick / getDivision()) * (60 / (6E7 / temposToConsider.get(0).getNumber()));
 		}
 		double seconds = 0;
-		for (var i = 0; i < temposToConsider.size() - 1; i++) {
+		for (int i = 0; i < temposToConsider.size() - 1; i++) {
 			seconds += ((double) (temposToConsider.get(i + 1).getTime() - temposToConsider.get(i).getTime()) / getDivision())
 					* (60 / (6E7 / temposToConsider.get(i).getNumber()));
 		}
@@ -304,7 +309,7 @@ public final class MidiFile {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		var midiFile = (MidiFile) o;
+		MidiFile midiFile = (MidiFile) o;
 		return getDivision() == midiFile.getDivision()
 				&& Arrays.equals(getTracks(), midiFile.getTracks()) && Objects.equals(getTempos(), midiFile.getTempos());
 	}

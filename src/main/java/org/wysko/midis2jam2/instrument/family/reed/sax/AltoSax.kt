@@ -22,7 +22,6 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 

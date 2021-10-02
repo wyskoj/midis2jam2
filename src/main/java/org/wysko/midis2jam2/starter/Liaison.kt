@@ -19,11 +19,12 @@ package org.wysko.midis2jam2.starter
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
 import com.jme3.system.JmeCanvasContext
+import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.gui.Displays
 import org.wysko.midis2jam2.gui.GuiLauncher
+import org.wysko.midis2jam2.midi.JavaXSequencer
 import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.starter.Liaison
 import org.wysko.midis2jam2.util.M2J2Settings
 import org.wysko.midis2jam2.util.Utils.exceptionToLines
 import java.awt.Canvas
@@ -39,6 +40,9 @@ open class Liaison(
 	protected val m2j2settings: M2J2Settings,
 	protected val fullscreen: Boolean
 ) : SimpleApplication() {
+
+	val sequencerHandler = JavaXSequencer(sequencer)
+
 	companion object {
 		private val midis2Jam2Settings = AppSettings(true)
 
@@ -55,7 +59,7 @@ open class Liaison(
 
 	private var display: Displays? = null
 	private var canvas: Canvas? = null
-	private var midis2jam2: Midis2jam2? = null
+	private var midis2jam2: DesktopMidis2jam2? = null
 	fun start(displayType: Class<out Displays?>) {
 		setDisplayStatView(false)
 		setDisplayFps(false)
@@ -89,7 +93,7 @@ open class Liaison(
 					display = constructor.newInstance(this, ctx.canvas, midis2jam2)
 					display!!.display()
 				} catch (e: ReflectiveOperationException) {
-					Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+					Midis2jam2.LOGGER.severe(exceptionToLines(e))
 				}
 				startCanvas()
 			}
@@ -98,7 +102,7 @@ open class Liaison(
 	}
 
 	override fun simpleInitApp() {
-		midis2jam2 = Midis2jam2(sequencer, midiFile, m2j2settings)
+		midis2jam2 = DesktopMidis2jam2(sequencer, midiFile, m2j2settings)
 		midis2jam2!!.setWindow(display)
 		stateManager.attach(midis2jam2)
 		rootNode.attachChild(midis2jam2!!.rootNode)

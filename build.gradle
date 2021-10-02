@@ -10,10 +10,9 @@ plugins {
 
 apply plugin: 'java'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(15)
-    }
+compileJava {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 }
 
 repositories {
@@ -39,15 +38,15 @@ dependencies {
     implementation "org.jmonkeyengine:jme3-lwjgl:3.4.0-stable"
     implementation 'org.jmonkeyengine:jme3-plugins:3.4.0-stable'
 
-    implementation 'org.jetbrains:annotations:20.1.0'
+    implementation 'org.jetbrains:annotations:22.0.0'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
-    implementation 'com.formdev:flatlaf:1.1.2'
+    implementation 'com.formdev:flatlaf:1.6'
 
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.0'
 
     testImplementation(platform('org.junit:junit-bom:5.7.2'))
     testImplementation('org.junit.jupiter:junit-jupiter')
@@ -63,14 +62,6 @@ test {
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
-    }
-}
-
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "--add-exports" << "java.desktop/com.sun.media.sound=ALL-UNNAMED"
-        }
     }
 }
 

@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.starter
 
 import com.jme3.system.AppSettings
+import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.gui.GuiLauncher
 import org.wysko.midis2jam2.midi.MidiFile
@@ -51,7 +52,7 @@ class LegacyLiaison(
 					ImageIO.read(Objects.requireNonNull(Liaison::class.java.getResource("/ico/icon256.png")))
 				)
 			} catch (e: IOException) {
-				Midis2jam2.getLOGGER().warning("Failed to set window icon.")
+				Midis2jam2.LOGGER.warning("Failed to set window icon.")
 				e.printStackTrace()
 			}
 			midis2Jam2Settings.isVSync = true
@@ -81,7 +82,7 @@ class LegacyLiaison(
 	}
 
 	override fun simpleInitApp() {
-		val midis2jam2 = Midis2jam2(sequencer, midiFile, m2j2settings)
+		val midis2jam2 = DesktopMidis2jam2(sequencer, midiFile, m2j2settings)
 		stateManager.attach(midis2jam2)
 		rootNode.attachChild(midis2jam2.rootNode)
 	}

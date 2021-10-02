@@ -41,12 +41,12 @@ class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 		override fun loadHands() {
 			/* Load left hands */
 			leftHands = Array(13) {
-				parent.context.loadModel("RecorderLeftHand$it.obj", "hands.bmp")
+				parent.context.loadModel("RecorderHandLeft$it.obj", "hands.bmp")
 			}
 
 			/* Load right hands */
-			rightHands = Array(13) {
-				parent.context.loadModel("RecorderRightHand$it.obj", "hands.bmp")
+			rightHands = Array(11) {
+				parent.context.loadModel("RecorderHandRight$it.obj", "hands.bmp")
 			}
 
 			super.loadHands()

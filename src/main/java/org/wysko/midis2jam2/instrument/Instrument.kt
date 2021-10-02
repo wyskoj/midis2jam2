@@ -123,6 +123,7 @@ abstract class Instrument protected constructor(
         return if (transitionSpeed != InstrumentTransition.NONE) {
             val animationCoefficient = transitionSpeed.speed
             index += delta * TRANSITION_SPEED * (target - index) / animationCoefficient
+	        index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.count().toDouble())
             index.toFloat()
         } else {
             target.toFloat()

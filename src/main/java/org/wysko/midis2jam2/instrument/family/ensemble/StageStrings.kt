@@ -27,11 +27,17 @@ import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import kotlin.math.sin
 
 /**
  * The stage strings.
  */
-class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageStringsType) :
+class StageStrings(
+	context: Midis2jam2,
+	eventList: List<MidiChannelSpecificEvent>,
+	type: StageStringsType,
+	val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
+) :
 	WrappedOctaveSustained(context, eventList, false) {
 
 	/**
@@ -49,6 +55,10 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 		SYNTH_STRINGS_1("Laser.bmp"),
 		SYNTH_STRINGS_2("AccordionCaseFront.bmp"),
 		BOWED_SYNTH("SongFillbar.bmp");
+	}
+
+	enum class StageStringBehavior {
+		NORMAL, TREMOLO
 	}
 
 	/**
@@ -86,6 +96,9 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 		 */
 		private val animator: VibratingStringAnimator
 
+		/** We keep track of the current time for sinusoidal calculations for tremolo playing. */
+		private var time = Math.random() * 10
+
 		override fun play(duration: Double) {
 			playing = true
 			progress = 0.0
@@ -107,7 +120,19 @@ class StageStrings(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent
 				bowNode.cullHint = Dynamic
 
 				/* Slide bow across string */
-				bow.setLocalTranslation(0f, (8 * (progress - 0.5)).toFloat(), 0f)
+				if (stageStringBehavior == StageStringBehavior.NORMAL) {
+					bow.setLocalTranslation(0f, (8 * (progress - 0.5)).toFloat(), 0f)
+				} else {
+					/* Slide bow back and forth */
+					bow.setLocalTranslation(
+						0f,
+						(sin(30 * time) * 4).toFloat(),
+						0f
+					)
+
+					/* Update stopwatch */
+					time += delta
+				}
 
 				/* Move string and holder forwards */
 				animNode.setLocalTranslation(0f, 0f, 2f)

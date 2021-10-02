@@ -22,7 +22,6 @@
 package org.wysko.midis2jam2.gui;
 
 import org.wysko.midis2jam2.Midis2jam2;
-import org.wysko.midis2jam2.midi.Midi;
 import org.wysko.midis2jam2.util.Utils;
 
 import javax.swing.*;
@@ -85,20 +84,20 @@ public class About extends JDialog {
 		label5 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		oslText = new JEditorPane();
-
+		
 		//======== this ========
 		setTitle(bundle.getString("About.this.title"));
 		setResizable(false);
-		var contentPane = getContentPane();
+		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-
+		
 		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {700, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 208, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[]{700, 0};
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 208, 0};
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[]{1.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 			//---- label1 ----
 			label1.setIcon(new ImageIcon(getClass().getResource("/rounded.png")));
@@ -181,7 +180,7 @@ public class About extends JDialog {
 			}
 			panel1.add(scrollPane1, new GridBagConstraints(0, 9, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+					new Insets(0, 0, 0, 0), 0, 0));
 		}
 		contentPane.add(panel1, BorderLayout.CENTER);
 		pack();
@@ -191,7 +190,7 @@ public class About extends JDialog {
 		
 		// Set version number
 		
-		var version = Utils.resourceToString("/version.txt");
+		String version = Utils.resourceToString("/version.txt");
 		label3.setText("v" + version);
 		
 		licenseInfo.addHyperlinkListener(About::hyperlinkUpdate);

@@ -44,11 +44,7 @@ class StandardBellStretcher(
         scaleBell(((stretchiness - 1) * stretchAmount + 1).toFloat())
     }
 
-    /**
-     * Sets the scale of the bell, appropriately and automatically scaling on the correct axis.
-     *
-     * @param scale the scale of the bell
-     */
+    /** Sets the scale of the bell, appropriately and automatically scaling on the correct axis. */
     private fun scaleBell(scale: Float) {
         bell.setLocalScale(
             if (stretchAxis === Axis.X) scale else 1f,
@@ -61,8 +57,7 @@ class StandardBellStretcher(
         if (period == null) {
             scaleBell(1f)
         } else {
-            val scale = (stretchiness * (period.endTime - time) / period.duration() + 1).toFloat()
-            scaleBell(scale)
+	        scaleBell((stretchiness * (period.endTime - time) / period.duration() + 1).toFloat())
         }
     }
 }

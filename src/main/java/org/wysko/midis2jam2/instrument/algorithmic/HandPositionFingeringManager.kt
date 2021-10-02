@@ -36,8 +36,8 @@ open class HandPositionFingeringManager : FingeringManager<Hands> {
 	 */
 	private val table = HashMap<Int, Hands>()
 
-	override fun fingering(midiNote: Int): Hands {
-		return table[midiNote]!!
+	override fun fingering(midiNote: Int): Hands? {
+		return table[midiNote]
 	}
 
 	/**

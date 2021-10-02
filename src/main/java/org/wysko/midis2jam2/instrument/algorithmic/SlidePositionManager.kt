@@ -30,8 +30,8 @@ class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 	 */
 	private val slideTable = HashMap<Int, List<Int>>()
 
-	override fun fingering(midiNote: Int): List<Int> {
-		return slideTable[midiNote]!!
+	override fun fingering(midiNote: Int): List<Int>? {
+		return slideTable[midiNote]
 	}
 
 	companion object {

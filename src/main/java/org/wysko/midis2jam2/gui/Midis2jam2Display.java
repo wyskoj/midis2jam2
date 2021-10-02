@@ -54,7 +54,7 @@ public class Midis2jam2Display extends Displays {
 		//======== this ========
 		setIconImage(new ImageIcon(getClass().getResource("/ico/icon16.png")).getImage());
 		setTitle("midis2jam2");
-		var contentPane = getContentPane();
+		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 		((GridBagLayout) contentPane.getLayout()).columnWidths = new int[]{0, 0};
 		((GridBagLayout) contentPane.getLayout()).rowHeights = new int[]{0, 0};

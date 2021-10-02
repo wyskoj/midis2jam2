@@ -26,5 +26,5 @@ interface FingeringManager<E> {
      *
      * @param midiNote the MIDI note
      */
-    fun fingering(midiNote: Int): E
+    fun fingering(midiNote: Int): E?
 }

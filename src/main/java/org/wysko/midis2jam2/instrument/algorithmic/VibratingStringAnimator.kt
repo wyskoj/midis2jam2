@@ -18,7 +18,6 @@ package org.wysko.midis2jam2.instrument.algorithmic
 
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
-import org.jetbrains.annotations.Unmodifiable
 import kotlin.math.floor
 
 /**
@@ -29,7 +28,7 @@ class VibratingStringAnimator(vararg frames: Spatial) {
 	/**
 	 * Each frame of the animation.
 	 */
-	private val stringFrames: @Unmodifiable MutableList<Spatial>
+	private val stringFrames: List<Spatial>
 
 	/**
 	 * The current frame to show.
@@ -42,8 +41,7 @@ class VibratingStringAnimator(vararg frames: Spatial) {
 	 * @param delta the amount of time since the last frame update
 	 */
 	fun tick(delta: Float) {
-		val inc = (delta * 60).toDouble()
-		frame += inc
+		frame += delta * 60
 		for (i in 0 until FRAME_COUNT) {
 			frame %= FRAME_COUNT
 			if (i == floor(frame).toInt()) {
@@ -62,7 +60,6 @@ class VibratingStringAnimator(vararg frames: Spatial) {
 	}
 
 	init {
-		@Suppress("UNCHECKED_CAST")
-		stringFrames = listOf(*frames) as MutableList<Spatial>
+		stringFrames = listOf(*frames)
 	}
 }

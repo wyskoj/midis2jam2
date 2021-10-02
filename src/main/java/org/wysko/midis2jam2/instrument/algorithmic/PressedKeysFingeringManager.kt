@@ -34,8 +34,8 @@ class PressedKeysFingeringManager private constructor() : FingeringManager<Array
 	 */
 	private val fingerTable = HashMap<Int, Array<Int>>()
 
-	override fun fingering(midiNote: Int): Array<Int> {
-		return fingerTable[midiNote]!!
+	override fun fingering(midiNote: Int): Array<Int>? {
+		return fingerTable[midiNote]
 	}
 
 	companion object {

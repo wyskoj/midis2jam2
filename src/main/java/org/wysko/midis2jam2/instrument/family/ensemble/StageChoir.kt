@@ -32,10 +32,19 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 	WrappedOctaveSustained(context, eventList, true) {
 
 	override fun moveForMultiChannel(delta: Float) {
-		twelfths.forEach { twelfth ->
-			(twelfth as ChoirPeep).highestLevel.localTranslation = BASE_POSITION.add(
-				Vector3f(0f, 10f, -15f).mult(indexForMoving(delta))
-			)
+		val indexForMoving = indexForMoving(delta)
+		twelfths.forEach {
+			it as ChoirPeep
+			if (indexForMoving >= 0) {
+				it.highestLevel.localTranslation = BASE_POSITION.clone().add(
+					Vector3f(0f, 10f, -15f).mult(indexForMoving)
+				)
+			} else {
+				it.highestLevel.localTranslation = BASE_POSITION.clone().add(
+					Vector3f(0f, indexForMoving * 10f, indexForMoving * 10f)
+				)
+			}
+
 		}
 	}
 

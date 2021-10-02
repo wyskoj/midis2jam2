@@ -26,11 +26,11 @@ import javax.sound.midi.ShortMessage;
  * @author Florian Bomers
  */
 @SuppressWarnings("all")
-final class FastShortMessage extends ShortMessage {
+public final class FastShortMessage extends ShortMessage {
 	
 	private int packedMsg;
 	
-	FastShortMessage(int packedMsg) throws InvalidMidiDataException {
+	public FastShortMessage(int packedMsg) throws InvalidMidiDataException {
 		this.packedMsg = packedMsg;
 		getDataLength(packedMsg & 0xFF); // to check for validity
 	}
@@ -38,7 +38,7 @@ final class FastShortMessage extends ShortMessage {
 	/**
 	 * Creates a FastShortMessage from this ShortMessage
 	 */
-	FastShortMessage(ShortMessage msg) {
+	public FastShortMessage(ShortMessage msg) {
 		this.packedMsg = msg.getStatus()
 				| (msg.getData1() << 8)
 				| (msg.getData2() << 16);
