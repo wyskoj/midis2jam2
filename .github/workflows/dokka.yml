@@ -6,6 +6,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
+    
+    - name: Generate Dokka
+      run: ./gradlew dokkaHtml
 
     - name: Publish
       uses: netlify/actions/cli@master
