@@ -34,71 +34,71 @@ import org.wysko.midis2jam2.world.Axis
  * [Fingering chart](https://bit.ly/34Quj4e)
  */
 class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	HandedInstrument(
-		context,
-		/* Strip notes outside of standard range */
-		eventList.filterIsInstance<MidiNoteEvent>().filter { it.note in 50..90 }
-			.plus(eventList.filter { it !is MidiNoteEvent }),
-		ClarinetClone::class.java,
-		FINGERING_MANAGER
-	) {
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 20 * indexForMoving(delta), 0f)
-	}
+    HandedInstrument(
+        context,
+        /* Strip notes outside of standard range */
+        eventList.filterIsInstance<MidiNoteEvent>().filter { it.note in 50..90 }
+            .plus(eventList.filter { it !is MidiNoteEvent }),
+        ClarinetClone::class.java,
+        FINGERING_MANAGER
+    ) {
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 20 * indexForMoving(delta), 0f)
+    }
 
-	/**
-	 * The type Clarinet clone.
-	 */
-	inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
-		/**
-		 * The bell stretcher.
-		 */
-		private val bellStretcher: BellStretcher
-		override fun moveForPolyphony() {
-			offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
-		}
+    /**
+     * The type Clarinet clone.
+     */
+    inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
+        /**
+         * The bell stretcher.
+         */
+        private val bellStretcher: BellStretcher
+        override fun moveForPolyphony() {
+            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
+        }
 
-		override fun loadHands() {
-			leftHands = Array(19) {
-				parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
-			}
-			rightHands = Array(13) {
-				parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
-			}
-			super.loadHands()
-		}
+        override fun loadHands() {
+            leftHands = Array(19) {
+                parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
+            }
+            rightHands = Array(13) {
+                parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
+            }
+            super.loadHands()
+        }
 
-		override fun tick(time: Double, delta: Float) {
-			super.tick(time, delta)
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
 
-			/* Stretch bell */
-			bellStretcher.tick(currentNotePeriod, time)
-		}
+            /* Stretch bell */
+            bellStretcher.tick(currentNotePeriod, time)
+        }
 
-		/**
-		 * Instantiates a new clarinet clone.
-		 */
-		init {
-			/* Load body */
-			modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))
+        /**
+         * Instantiates a new clarinet clone.
+         */
+        init {
+            /* Load body */
+            modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))
 
-			/* Load bell */
-			val bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png")
-			modelNode.attachChild(bell)
-			bell.setLocalTranslation(0f, -20.7125f, 0f)
-			loadHands()
-			animNode.setLocalTranslation(0f, 0f, 10f)
-			highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(45.0), 0f)
-			bellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
-		}
-	}
+            /* Load bell */
+            val bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png")
+            modelNode.attachChild(bell)
+            bell.setLocalTranslation(0f, -20.7125f, 0f)
+            loadHands()
+            animNode.setLocalTranslation(0f, 0f, 10f)
+            highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(45.0), 0f)
+            bellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
+        }
+    }
 
-	companion object {
-		val FINGERING_MANAGER = from(Clarinet::class.java)
-	}
+    companion object {
+        val FINGERING_MANAGER = from(Clarinet::class.java)
+    }
 
-	init {
-		instrumentNode.setLocalTranslation(-25f, 50f, 0f)
-		instrumentNode.setLocalScale(0.9f)
-	}
+    init {
+        instrumentNode.setLocalTranslation(-25f, 50f, 0f)
+        instrumentNode.setLocalScale(0.9f)
+    }
 }

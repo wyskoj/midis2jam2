@@ -24,24 +24,23 @@ import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
  * Any clone that visualizes playing by using a [SteamPuffer].
  */
 abstract class PuffingClone protected constructor(
-	parent: HandedInstrument,
-	puffType: SteamPuffType,
-	pufferScale: Float
+    parent: HandedInstrument,
+    puffType: SteamPuffType,
+    pufferScale: Float
 ) : HandedClone(parent, 0f) {
 
-	/**
-	 * The steam puffer.
-	 */
-	@JvmField
-	val puffer: SteamPuffer
+    /**
+     * The steam puffer.
+     */
+    val puffer: SteamPuffer =
+        SteamPuffer(parent.context, puffType, pufferScale.toDouble(), SteamPuffer.PuffBehavior.OUTWARDS)
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		puffer.tick(delta, isPlaying)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        puffer.tick(delta, isPlaying)
+    }
 
-	init {
-		puffer = SteamPuffer(parent.context, puffType, pufferScale.toDouble(), SteamPuffer.PuffBehavior.OUTWARDS)
-		modelNode.attachChild(puffer.steamPuffNode)
-	}
+    init {
+        modelNode.attachChild(puffer.steamPuffNode)
+    }
 }

@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MatType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -40,27 +40,27 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /**
      * A single tuba.
      */
-    inner class TubaClone : AnimatedKeyCloneByIntegers(this@Tuba, -0.05f, 0.8f, 4, Axis.Y, Axis.Z) {
+    inner class TubaClone : AnimatedKeyCloneByIntegers(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {
 
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((50f * indexForMoving()).toDouble()), 0f)
         }
 
-        override fun animateKeys(pressed: Array<Int>?) {
+        override fun animateKeys(pressed: Array<Int>) {
             /* Tuba keys move down when pressed */
             for (i in 0..3) {
-                if (pressed!!.any { it == i }) {
-                    keys[i]!!.setLocalTranslation(0f, -0.5f, 0f)
+                if (pressed.any { it == i }) {
+                    keys[i].setLocalTranslation(0f, -0.5f, 0f)
                 } else {
-                    keys[i]!!.setLocalTranslation(0f, 0f, 0f)
+                    keys[i].setLocalTranslation(0f, 0f, 0f)
                 }
             }
         }
 
         init {
             /* Load body and bell */
-            body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f)
-            bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f))
+            body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", REFLECTIVE, 0.9f)
+            bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", REFLECTIVE, 0.9f))
 
             /* Attach body and bell */
             modelNode.run {
@@ -72,9 +72,9 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
 
             /* Load tuba keys */
-            for (i in 0..3) {
-                keys[i] = context.loadModel("TubaKey${i + 1}.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
-                modelNode.attachChild(keys[i])
+            keys = Array(4) { i ->
+                context.loadModel("TubaKey${i + 1}.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9f)
+                    .also { modelNode.attachChild(it) }
             }
 
             /* Positioning */

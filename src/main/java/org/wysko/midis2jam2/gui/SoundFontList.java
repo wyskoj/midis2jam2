@@ -252,14 +252,23 @@ public class SoundFontList extends JPanel {
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JPanel dialogPane;
+	
 	private JPanel buttonBar;
+	
 	private JButton okButton;
+	
 	private JScrollPane scrollPane1;
+	
 	private JList<String> soundFontJList;
+	
 	private JPanel panel1;
+	
 	private JResizedIconButton addButton;
+	
 	private JResizedIconButton removeButton;
+	
 	private JResizedIconButton upButton;
+	
 	private JResizedIconButton downButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

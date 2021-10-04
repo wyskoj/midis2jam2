@@ -33,36 +33,36 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Cabasa(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the cabasa.
-	 */
-	private val cabasaNode = Node()
+    /**
+     * Contains the cabasa.
+     */
+    private val cabasaNode = Node()
 
-	/**
-	 * The cabasa.
-	 */
-	private val cabasaModel: Spatial
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val stickStatus =
-			Stick.handleStick(context, cabasaNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+    /**
+     * The cabasa.
+     */
+    private val cabasaModel: Spatial
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val stickStatus =
+            Stick.handleStick(context, cabasaNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 
-		/* Spin the cabasa loosely based on the rotation angle of the stickStatus */
-		cabasaModel.localRotation = Quaternion().fromAngles(0f, stickStatus.rotationAngle, 0f)
-	}
+        /* Spin the cabasa loosely based on the rotation angle of the stickStatus */
+        cabasaModel.localRotation = Quaternion().fromAngles(0f, stickStatus.rotationAngle, 0f)
+    }
 
-	init {
-		/* Load cabasa and position */
-		cabasaModel = context.loadModel("Cabasa.obj", "Cabasa.bmp").apply {
-			setLocalTranslation(0f, 0f, -3f)
-			cabasaNode.attachChild(this)
-		}
+    init {
+        /* Load cabasa and position */
+        cabasaModel = context.loadModel("Cabasa.obj", "Cabasa.bmp").apply {
+            setLocalTranslation(0f, 0f, -3f)
+            cabasaNode.attachChild(this)
+        }
 
-		/* Positioning */
-		instrumentNode.run {
-			localRotation = Quaternion().fromAngles(0f, 0f, rad(45.0))
-			setLocalTranslation(-10f, 48f, -50f)
-			attachChild(cabasaNode)
-		}
-	}
+        /* Positioning */
+        instrumentNode.run {
+            localRotation = Quaternion().fromAngles(0f, 0f, rad(45.0))
+            setLocalTranslation(-10f, 48f, -50f)
+            attachChild(cabasaNode)
+        }
+    }
 }

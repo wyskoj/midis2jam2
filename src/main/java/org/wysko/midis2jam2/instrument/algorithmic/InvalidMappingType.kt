@@ -17,4 +17,4 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 /** Denotes when a specified mapping type does not match the XML file. */
-class InvalidMappingType(message: String?) : Exception(message)
+class InvalidMappingType(message: String) : Exception(message)

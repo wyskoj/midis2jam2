@@ -29,36 +29,36 @@ import org.wysko.midis2jam2.util.Utils.rad
  */
 class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
 
-	override fun moveForMultiChannel(delta: Float) {
-		highestLevel.localRotation =
-			Quaternion().fromAngles(0f, rad((-27 + indexForMoving(delta) * -18).toDouble()), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        highestLevel.localRotation =
+            Quaternion().fromAngles(0f, rad((-27 + indexForMoving(delta) * -18).toDouble()), 0f)
+    }
 
-	init {
+    init {
 
-		val body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f).also {
-			(it as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-		}
-		val head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp")
+        val body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f).also {
+            (it as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+        }
+        val head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp")
 
-		for (i in 0..11) {
-			val mallet = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp").apply {
-				setLocalTranslation(0f, 0f, -5f)
-			}
-			malletNodes[i].run {
-				attachChild(mallet)
-				setLocalTranslation(1.8f * (i - 5.5f), 31f, 15f)
-			}
-		}
+        for (i in 0..11) {
+            val mallet = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp").apply {
+                setLocalTranslation(0f, 0f, -5f)
+            }
+            malletNodes[i].run {
+                attachChild(mallet)
+                setLocalTranslation(1.8f * (i - 5.5f), 31f, 15f)
+            }
+        }
 
-		animNode.run {
-			attachChild(body)
-			attachChild(head)
-		}
+        animNode.run {
+            attachChild(body)
+            attachChild(head)
+        }
 
-		instrumentNode.run {
-			attachChild(animNode)
-			setLocalTranslation(0f, 0f, -120f)
-		}
-	}
+        instrumentNode.run {
+            attachChild(animNode)
+            setLocalTranslation(0f, 0f, -120f)
+        }
+    }
 }

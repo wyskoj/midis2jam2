@@ -33,50 +33,50 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the top castanet.
-	 */
-	private val topCastanetNode = Node()
+    /**
+     * Contains the top castanet.
+     */
+    private val topCastanetNode = Node()
 
-	/**
-	 * Contains the bottom castanet.
-	 */
-	private val bottomCastanetNode = Node()
+    /**
+     * Contains the bottom castanet.
+     */
+    private val bottomCastanetNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val stickStatus = Stick.handleStick(
-			context,
-			topCastanetNode,
-			time,
-			delta,
-			hits,
-			Stick.STRIKE_SPEED / 2,
-			Stick.MAX_ANGLE / 2,
-			Axis.X
-		)
-		topCastanetNode.cullHint = CullHint.Dynamic
-		bottomCastanetNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val stickStatus = Stick.handleStick(
+            context,
+            topCastanetNode,
+            time,
+            delta,
+            hits,
+            Stick.STRIKE_SPEED / 2,
+            Stick.MAX_ANGLE / 2,
+            Axis.X
+        )
+        topCastanetNode.cullHint = CullHint.Dynamic
+        bottomCastanetNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		/* Load castanets */
-		val topCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
-		val bottomCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
+    init {
+        /* Load castanets */
+        val topCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
+        val bottomCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
 
-		/* Attach to nodes */
-		topCastanetNode.attachChild(topCastanet)
-		bottomCastanetNode.attachChild(bottomCastanet)
+        /* Attach to nodes */
+        topCastanetNode.attachChild(topCastanet)
+        bottomCastanetNode.attachChild(bottomCastanet)
 
-		/* Move castanets away from pivot */
-		topCastanet.setLocalTranslation(0f, 0f, -3f)
-		bottomCastanet.setLocalTranslation(0f, 0f, -3f)
+        /* Move castanets away from pivot */
+        topCastanet.setLocalTranslation(0f, 0f, -3f)
+        bottomCastanet.setLocalTranslation(0f, 0f, -3f)
 
-		/* Positioning */
-		bottomCastanet.localRotation = Quaternion().fromAngles(0f, 0f, rad(180.0))
-		instrumentNode.setLocalTranslation(12f, 45f, -55f)
-		instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-45.0), 0f)
-		instrumentNode.attachChild(topCastanetNode)
-		instrumentNode.attachChild(bottomCastanetNode)
-	}
+        /* Positioning */
+        bottomCastanet.localRotation = Quaternion().fromAngles(0f, 0f, rad(180.0))
+        instrumentNode.setLocalTranslation(12f, 45f, -55f)
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-45.0), 0f)
+        instrumentNode.attachChild(topCastanetNode)
+        instrumentNode.attachChild(bottomCastanetNode)
+    }
 }

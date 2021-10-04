@@ -32,60 +32,60 @@ const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
  * The Shamisen.
  */
 class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
-	context,
-	StandardFrettingEngine(3, 15, intArrayOf(50, 57, 62)),
-	events,
-	FrettedInstrumentPositioning(38.814f,
-		-6.1f,
-		arrayOf(Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ),
-		floatArrayOf(-0.5f, 0f, 0.5f),
-		floatArrayOf(-0.5f, 0f, 0.5f),
-		object : FretHeightCalculator {
-			override fun calculateScale(fret: Int): Float {
-				return fret * 0.048f // 0 --> 0; 15 --> 0.72
-			}
-		}
-	),
-	3,
-	context.loadModel("Shamisen.fbx", SHAMISEN_SKIN_TEXTURE)) {
+    context,
+    StandardFrettingEngine(3, 15, intArrayOf(50, 57, 62)),
+    events,
+    FrettedInstrumentPositioning(38.814f,
+        -6.1f,
+        arrayOf(Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ),
+        floatArrayOf(-0.5f, 0f, 0.5f),
+        floatArrayOf(-0.5f, 0f, 0.5f),
+        object : FretHeightCalculator {
+            override fun calculateScale(fret: Int): Float {
+                return fret * 0.048f // 0 --> 0; 15 --> 0.72
+            }
+        }
+    ),
+    3,
+    context.loadModel("Shamisen.fbx", SHAMISEN_SKIN_TEXTURE)) {
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
+    }
 
-	init {
-		/* Load strings */
-		val forward = -0.23126f
-		upperStrings = Array(3) {
-			context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
-				instrumentNode.attachChild(this)
-				setLocalTranslation(positioning.upperX[it], positioning.upperY, forward)
-			}
-		}
+    init {
+        /* Load strings */
+        val forward = -0.23126f
+        upperStrings = Array(3) {
+            context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+                instrumentNode.attachChild(this)
+                setLocalTranslation(positioning.upperX[it], positioning.upperY, forward)
+            }
+        }
 
-		/* Load anim strings */
-		lowerStrings = Array(3) { i: Int ->
-			Array(5) { j: Int ->
-				context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
-					instrumentNode.attachChild(this)
-					setLocalTranslation(positioning.lowerX[i], positioning.lowerY, forward)
-					cullHint = Always
-				}
-			}
-		}
+        /* Load anim strings */
+        lowerStrings = Array(3) { i: Int ->
+            Array(5) { j: Int ->
+                context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+                    instrumentNode.attachChild(this)
+                    setLocalTranslation(positioning.lowerX[i], positioning.lowerY, forward)
+                    cullHint = Always
+                }
+            }
+        }
 
-		/* Load note fingers */
-		noteFingers = Array(3) {
-			context.loadModel("GuitarNoteFinger.obj", SHAMISEN_SKIN_TEXTURE).apply {
-				instrumentNode.attachChild(this)
-				cullHint = Always
-			}
-		}
+        /* Load note fingers */
+        noteFingers = Array(3) {
+            context.loadModel("GuitarNoteFinger.obj", SHAMISEN_SKIN_TEXTURE).apply {
+                instrumentNode.attachChild(this)
+                cullHint = Always
+            }
+        }
 
-		/* Positioning */
-		instrumentNode.run {
-			setLocalTranslation(56f, 43f, -23f)
-			localRotation = Quaternion().fromAngles(rad(-5.0), rad(-46.0), rad(-33.0))
-		}
-	}
+        /* Positioning */
+        instrumentNode.run {
+            setLocalTranslation(56f, 43f, -23f)
+            localRotation = Quaternion().fromAngles(rad(-5.0), rad(-46.0), rad(-33.0))
+        }
+    }
 }

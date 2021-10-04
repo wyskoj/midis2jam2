@@ -32,46 +32,36 @@ import com.jme3.math.Vector3f
  * @see FretHeightCalculator
  */
 open class FrettedInstrumentPositioning(
-	/** The y-coordinate of the "upper strings". */
-	@JvmField
-	val upperY: Float,
+    /** The y-coordinate of the "upper strings". */
+    val upperY: Float,
 
-	/** The y-coordinate of the "lower strings". */
-	@JvmField
-	val lowerY: Float,
+    /** The y-coordinate of the "lower strings". */
+    val lowerY: Float,
 
-	/** Scales of resting strings. */
-	@JvmField
-	val restingStrings: Array<Vector3f>,
+    /** Scales of resting strings. */
+    val restingStrings: Array<Vector3f>,
 
-	/** The x-coordinates of upper strings. */
-	@JvmField
-	val upperX: FloatArray,
+    /** The x-coordinates of upper strings. */
+    val upperX: FloatArray,
 
-	/** The x-coordinates of lower strings. */
-	@JvmField
-	val lowerX: FloatArray,
+    /** The x-coordinates of lower strings. */
+    val lowerX: FloatArray,
 
-	/** Calculator for fret heights. */
-	@JvmField
-	val fretHeights: FretHeightCalculator
+    /** Calculator for fret heights. */
+    val fretHeights: FretHeightCalculator
 ) {
-	/**
-	 * This provides the vertical position of the note fingers.
-	 */
-	@JvmField
-	val fingerVerticalOffset: Vector3f = Vector3f(0f, upperY, 0f)
+    /** This provides the vertical position of the note fingers. */
+    val fingerVerticalOffset: Vector3f = Vector3f(0f, upperY, 0f)
 
-	class FrettedInstrumentPositioningWithZ(
-		topY: Float,
-		bottomY: Float,
-		restingStrings: Array<Vector3f>,
-		topX: FloatArray,
-		bottomX: FloatArray,
-		fretHeights: FretHeightCalculator,
-		@JvmField
-		val topZ: FloatArray,
-		@JvmField
-		val bottomZ: FloatArray
-	) : FrettedInstrumentPositioning(topY, bottomY, restingStrings, topX, bottomX, fretHeights)
+    /** Contains positioning for strings with a Z value. */
+    class FrettedInstrumentPositioningWithZ(
+        topY: Float,
+        bottomY: Float,
+        restingStrings: Array<Vector3f>,
+        topX: FloatArray,
+        bottomX: FloatArray,
+        fretHeights: FretHeightCalculator,
+        val topZ: FloatArray,
+        val bottomZ: FloatArray
+    ) : FrettedInstrumentPositioning(topY, bottomY, restingStrings, topX, bottomX, fretHeights)
 }

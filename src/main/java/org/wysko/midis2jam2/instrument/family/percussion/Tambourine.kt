@@ -33,41 +33,41 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Tambourine(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the hand with the tambourine.
-	 */
-	private val tambourineHandNode = Node()
+    /**
+     * Contains the hand with the tambourine.
+     */
+    private val tambourineHandNode = Node()
 
-	/**
-	 * Contains the empty hand.
-	 */
-	private val emptyHandNode = Node()
+    /**
+     * Contains the empty hand.
+     */
+    private val emptyHandNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val status = Stick.handleStick(context, tambourineHandNode, time, delta, hits, 2.0, 30.0, Axis.X)
-		tambourineHandNode.cullHint = CullHint.Dynamic
-		emptyHandNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val status = Stick.handleStick(context, tambourineHandNode, time, delta, hits, 2.0, 30.0, Axis.X)
+        tambourineHandNode.cullHint = CullHint.Dynamic
+        emptyHandNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		val tambourineHand = context.loadModel("hand_tambourine.fbx", "hands.bmp")
-		/* Set tambourine materials */
-		val tambourineWoodMat = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-		tambourineWoodMat.setTexture("ColorMap", context.assetManager.loadTexture("Assets/TambourineWood.bmp"))
-		(tambourineHand as Node).getChild(2).setMaterial(tambourineWoodMat)
-		val metalTexture = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-		metalTexture.setTexture("ColorMap", context.assetManager.loadTexture("Assets/MetalTexture.bmp"))
-		tambourineHand.getChild(1).setMaterial(metalTexture)
-		tambourineHand.setLocalTranslation(0f, 0f, -2f)
-		tambourineHandNode.attachChild(tambourineHand)
-		val hand = context.loadModel("hand_right.obj", "hands.bmp")
-		hand.setLocalTranslation(0f, 0f, -2f)
-		hand.localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
-		emptyHandNode.attachChild(hand)
-		instrumentNode.setLocalTranslation(12f, 42.3f, -48.4f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(-70.0), 0f)
-		instrumentNode.attachChild(tambourineHandNode)
-		instrumentNode.attachChild(emptyHandNode)
-	}
+    init {
+        val tambourineHand = context.loadModel("hand_tambourine.fbx", "hands.bmp")
+        /* Set tambourine materials */
+        val tambourineWoodMat = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
+        tambourineWoodMat.setTexture("ColorMap", context.assetManager.loadTexture("Assets/TambourineWood.bmp"))
+        (tambourineHand as Node).getChild(2).setMaterial(tambourineWoodMat)
+        val metalTexture = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
+        metalTexture.setTexture("ColorMap", context.assetManager.loadTexture("Assets/MetalTexture.bmp"))
+        tambourineHand.getChild(1).setMaterial(metalTexture)
+        tambourineHand.setLocalTranslation(0f, 0f, -2f)
+        tambourineHandNode.attachChild(tambourineHand)
+        val hand = context.loadModel("hand_right.obj", "hands.bmp")
+        hand.setLocalTranslation(0f, 0f, -2f)
+        hand.localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
+        emptyHandNode.attachChild(hand)
+        instrumentNode.setLocalTranslation(12f, 42.3f, -48.4f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(-70.0), 0f)
+        instrumentNode.attachChild(tambourineHandNode)
+        instrumentNode.attachChild(emptyHandNode)
+    }
 }

@@ -28,27 +28,27 @@ import org.wysko.midis2jam2.util.Utils.rad
  */
 class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
 
-	override fun moveForMultiChannel(delta: Float) {
-		highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + indexForMoving(delta) * -11), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + indexForMoving(delta) * -11), 0f)
+    }
 
-	init {
-		val drum = context.loadModel("Taiko.fbx", "TaikoHead.bmp")
-		val woodTexture = context.assetManager.loadTexture("Assets/Wood.bmp")
-		val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-		material.setTexture("ColorMap", woodTexture)
-		(drum as Node).getChild(0).setMaterial(material)
-		for (i in 0..11) {
-			malletNodes[i] = Node()
-			val mallet = context.loadModel("TaikoStick.obj", "Wood.bmp")
-			malletNodes[i].attachChild(mallet)
-			malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
-			mallet.setLocalTranslation(0f, 0f, -5f)
-			animNode.attachChild(malletNodes[i])
-		}
-		drum.setLocalRotation(Quaternion().fromAngles(rad(60.0), 0f, 0f))
-		animNode.attachChild(drum)
-		instrumentNode.attachChild(animNode)
-		instrumentNode.setLocalTranslation(-6.15f, 94f, -184.9f)
-	}
+    init {
+        val drum = context.loadModel("Taiko.fbx", "TaikoHead.bmp")
+        val woodTexture = context.assetManager.loadTexture("Assets/Wood.bmp")
+        val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
+        material.setTexture("ColorMap", woodTexture)
+        (drum as Node).getChild(0).setMaterial(material)
+        for (i in 0..11) {
+            malletNodes[i] = Node()
+            val mallet = context.loadModel("TaikoStick.obj", "Wood.bmp")
+            malletNodes[i].attachChild(mallet)
+            malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
+            mallet.setLocalTranslation(0f, 0f, -5f)
+            animNode.attachChild(malletNodes[i])
+        }
+        drum.setLocalRotation(Quaternion().fromAngles(rad(60.0), 0f, 0f))
+        animNode.attachChild(drum)
+        instrumentNode.attachChild(animNode)
+        instrumentNode.setLocalTranslation(-6.15f, 94f, -184.9f)
+    }
 }

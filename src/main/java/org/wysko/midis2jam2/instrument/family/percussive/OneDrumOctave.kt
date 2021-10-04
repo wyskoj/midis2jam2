@@ -28,44 +28,42 @@ import org.wysko.midis2jam2.world.Axis
  * A drum that is hit at different spots to represent the notes in an octave.
  */
 abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	DecayedInstrument(context, eventList) {
+    DecayedInstrument(context, eventList) {
 
-	/** The Anim node. */
-	@JvmField
-	protected val animNode = Node()
+    /** The Anim node. */
+    protected val animNode: Node = Node()
 
-	/** The Mallet nodes. */
-	@JvmField
-	protected var malletNodes: Array<Node> = Array(12) { Node() }
+    /** The Mallet nodes. */
+    protected var malletNodes: Array<Node> = Array(12) { Node() }
 
-	/** The Mallet strikes. */
-	private val malletStrikes: Array<ArrayList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
+    /** The Mallet strikes. */
+    private val malletStrikes: Array<ArrayList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		var velocity = 0
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        var velocity = 0
 
-		/* Update each mallet */
-		for (i in 0..11) {
-			val stickStatus =
-				Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3.0, 50.0, Axis.X)
+        /* Update each mallet */
+        for (i in 0..11) {
+            val stickStatus =
+                Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3.0, 50.0, Axis.X)
 
-			/* If stick just struck */
-			if (stickStatus.justStruck()) {
-				velocity = velocity.coerceAtLeast(stickStatus.strike!!.velocity) // Update maximum velocity
-			}
-		}
+            /* If stick just struck */
+            if (stickStatus.justStruck()) {
+                velocity = velocity.coerceAtLeast((stickStatus.strike ?: return).velocity) // Update maximum velocity
+            }
+        }
 
-		PercussionInstrument.recoilDrum(animNode, velocity != 0, velocity, delta)
-	}
+        PercussionInstrument.recoilDrum(animNode, velocity != 0, velocity, delta)
+    }
 
-	init {
-		/* Attach mallet nodes to anim node */
-		malletNodes.forEach { animNode.attachChild(it) }
+    init {
+        /* Attach mallet nodes to anim node */
+        malletNodes.forEach { animNode.attachChild(it) }
 
-		/* Filter out note on events and assign them to correct mallets */
-		eventList.filterIsInstance<MidiNoteOnEvent>().forEach {
-			malletStrikes[(it.note + 3) % 12].add(it)
-		}
-	}
+        /* Filter out note on events and assign them to correct mallets */
+        eventList.filterIsInstance<MidiNoteOnEvent>().forEach {
+            malletStrikes[(it.note + 3) % 12].add(it)
+        }
+    }
 }

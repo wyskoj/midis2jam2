@@ -33,83 +33,81 @@ import java.lang.reflect.Constructor
  * @see Clone
  */
 abstract class MonophonicInstrument protected constructor(
-	context: Midis2jam2,
-	eventList: List<MidiChannelSpecificEvent>,
-	cloneClass: Class<out Clone>,
-	val manager: FingeringManager<*>?
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>,
+    cloneClass: Class<out Clone>,
+
+    /** The fingering manager. */
+    val manager: FingeringManager<*>?
 ) : SustainedInstrument(context, eventList) {
 
-	/**
-	 * Node contains all clones.
-	 */
-	@JvmField
-	val groupOfPolyphony = Node()
+    /** Node contains all clones. */
+    val groupOfPolyphony: Node = Node()
 
-	/**
-	 * The list of clones this monophonic instrument needs to effectively display all notes.
-	 */
-	val clones: List<Clone>
+    /** The list of clones this monophonic instrument needs to effectively display all notes. */
+    val clones: List<Clone>
 
-	/**
-	 * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
-	 * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
-	 * least number of clones.
-	 *
-	 * @param instrument the monophonic instrument that is handling the clones
-	 * @param cloneClass the class of the [Clone] to instantiate
-	 * @throws ReflectiveOperationException is usually thrown if an error occurs in the clone constructor
-	 */
-	@Throws(ReflectiveOperationException::class)
-	protected fun calculateClones(
-		instrument: MonophonicInstrument,
-		cloneClass: Class<out Clone?>
-	): List<Clone> {
-		val calcClones: MutableList<Clone> = ArrayList()
-		val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
-		calcClones.add(constructor.newInstance(instrument) as Clone)
-		for (i in notePeriods.indices) {
-			for (j in notePeriods.indices) {
-				if (j == i && i != notePeriods.size - 1) continue
-				val comp1 = notePeriods[i]
-				val comp2 = notePeriods[j]
-				if (comp1.startTick() > comp2.endTick()) continue
-				if (comp1.endTick() < comp2.startTick()) {
-					calcClones[0].notePeriods.add(comp1)
-					break
-				}
-				/* Check if notes are overlapping */if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) {
-					var added = false
-					for (clone in calcClones) {
-						if (!clone.isPlaying(comp1.startTick() + context.file.division / 4)) {
-							clone.notePeriods.add(comp1)
-							added = true
-							break
-						}
-					}
-					if (!added) {
-						val e = constructor.newInstance(instrument) as Clone
-						e.notePeriods.add(comp1)
-						calcClones.add(e)
-					}
-				} else {
-					calcClones[0].notePeriods.add(comp1)
-				}
-				break
-			}
-		}
-		return calcClones
-	}
+    /**
+     * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
+     * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
+     * least number of clones.
+     *
+     * @param instrument the monophonic instrument that is handling the clones
+     * @param cloneClass the class of the [Clone] to instantiate
+     * @throws ReflectiveOperationException is usually thrown if an error occurs in the clone constructor
+     */
+    @Throws(ReflectiveOperationException::class)
+    protected fun calculateClones(
+        instrument: MonophonicInstrument,
+        cloneClass: Class<out Clone?>
+    ): List<Clone> {
+        val calcClones: MutableList<Clone> = ArrayList()
+        val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
+        calcClones.add(constructor.newInstance(instrument) as Clone)
+        for (i in notePeriods.indices) {
+            for (j in notePeriods.indices) {
+                if (j == i && i != notePeriods.size - 1) continue
+                val comp1 = notePeriods[i]
+                val comp2 = notePeriods[j]
+                if (comp1.startTick() > comp2.endTick()) continue
+                if (comp1.endTick() < comp2.startTick()) {
+                    calcClones[0].notePeriods.add(comp1)
+                    break
+                }
+                /* Check if notes are overlapping */
+                if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) {
+                    var added = false
+                    for (clone in calcClones) {
+                        if (!clone.isPlaying(comp1.startTick() + context.file.division / 4)) {
+                            clone.notePeriods.add(comp1)
+                            added = true
+                            break
+                        }
+                    }
+                    if (!added) {
+                        val e = constructor.newInstance(instrument) as Clone
+                        e.notePeriods.add(comp1)
+                        calcClones.add(e)
+                    }
+                } else {
+                    calcClones[0].notePeriods.add(comp1)
+                }
+                break
+            }
+        }
+        return calcClones
+    }
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Tick clones */
-		clones.forEach { it.tick(time, delta) }
-	}
+        /* Tick clones */
+        clones.forEach { it.tick(time, delta) }
+    }
 
-	init {
-		clones = calculateClones(this, cloneClass)
-		clones.forEach { groupOfPolyphony.attachChild(it.offsetNode) }
-		instrumentNode.attachChild(groupOfPolyphony)
-	}
+    init {
+        clones = calculateClones(this, cloneClass)
+        clones.forEach { groupOfPolyphony.attachChild(it.offsetNode) }
+        instrumentNode.attachChild(groupOfPolyphony)
+    }
 }

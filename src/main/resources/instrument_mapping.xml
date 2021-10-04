@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!--
+<?xml version="1.0" encoding="UTF-8" ?><!--
   ~ Copyright (C) 2021 Jacob Wysko
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -42,7 +41,7 @@
             <map note="57">
                 <key>2</key>
             </map>
-            <map note="58"/>
+            <map note="58" />
             <map note="59">
                 <key>1</key>
                 <key>2</key>
@@ -66,7 +65,7 @@
             <map note="64">
                 <key>2</key>
             </map>
-            <map note="65"/>
+            <map note="65" />
             <map note="66">
                 <key>2</key>
                 <key>3</key>
@@ -81,7 +80,7 @@
             <map note="69">
                 <key>2</key>
             </map>
-            <map note="70"/>
+            <map note="70" />
             <map note="71">
                 <key>1</key>
                 <key>2</key>
@@ -92,14 +91,14 @@
             <map note="73">
                 <key>2</key>
             </map>
-            <map note="74"/>
+            <map note="74" />
             <map note="75">
                 <key>1</key>
             </map>
             <map note="76">
                 <key>2</key>
             </map>
-            <map note="77"/>
+            <map note="77" />
             <map note="78">
                 <key>2</key>
                 <key>3</key>
@@ -114,7 +113,7 @@
             <map note="81">
                 <key>2</key>
             </map>
-            <map note="82"/>
+            <map note="82" />
         </mapping>
     </instrument>
     <instrument name="FrenchHorn" mapping-type="pressed_keys">
@@ -145,7 +144,7 @@
             <map note="52">
                 <key>3</key>
             </map>
-            <map note="53"/>
+            <map note="53" />
             <map note="54">
                 <key>3</key>
                 <key>4</key>
@@ -160,7 +159,7 @@
             <map note="57">
                 <key>3</key>
             </map>
-            <map note="58"/>
+            <map note="58" />
             <map note="59">
                 <key>2</key>
                 <key>3</key>
@@ -242,7 +241,7 @@
     </instrument>
     <instrument name="Tuba" mapping-type="pressed_keys">
         <mapping>
-            <map note="22"/>
+            <map note="22" />
             <map note="23">
                 <key>2</key>
                 <key>3</key>
@@ -289,7 +288,7 @@
             <map note="33">
                 <key>2</key>
             </map>
-            <map note="34"/>
+            <map note="34" />
             <map note="35">
                 <key>2</key>
                 <key>4</key>
@@ -311,7 +310,7 @@
             <map note="40">
                 <key>2</key>
             </map>
-            <map note="41"/>
+            <map note="41" />
             <map note="42">
                 <key>2</key>
                 <key>3</key>
@@ -326,7 +325,7 @@
             <map note="45">
                 <key>2</key>
             </map>
-            <map note="46"/>
+            <map note="46" />
             <map note="47">
                 <key>1</key>
                 <key>2</key>
@@ -337,14 +336,14 @@
             <map note="49">
                 <key>2</key>
             </map>
-            <map note="50"/>
+            <map note="50" />
             <map note="51">
                 <key>1</key>
             </map>
             <map note="52">
                 <key>2</key>
             </map>
-            <map note="53"/>
+            <map note="53" />
             <map note="54">
                 <key>2</key>
                 <key>3</key>
@@ -359,7 +358,7 @@
             <map note="57">
                 <key>2</key>
             </map>
-            <map note="58"/>
+            <map note="58" />
             <map note="59">
                 <key>1</key>
                 <key>2</key>
@@ -370,14 +369,14 @@
             <map note="61">
                 <key>2</key>
             </map>
-            <map note="62"/>
+            <map note="62" />
             <map note="63">
                 <key>1</key>
             </map>
             <map note="64">
                 <key>2</key>
             </map>
-            <map note="65"/>
+            <map note="65" />
             <map note="66">
                 <key>2</key>
                 <key>3</key>
@@ -392,7 +391,7 @@
             <map note="69">
                 <key>2</key>
             </map>
-            <map note="70"/>
+            <map note="70" />
         </mapping>
     </instrument>
     <instrument name="Trombone" mapping-type="slide_position">
@@ -616,194 +615,194 @@
     </instrument>
     <instrument name="Flute" mapping-type="hands">
         <mapping>
-            <map note="60" lh="4" rh="0"/>
-            <map note="61" lh="4" rh="2"/>
-            <map note="62" lh="4" rh="3"/>
-            <map note="63" lh="4" rh="4"/>
-            <map note="64" lh="4" rh="5"/>
-            <map note="65" lh="4" rh="6"/>
-            <map note="66" lh="4" rh="7"/>
-            <map note="67" lh="4" rh="8"/>
-            <map note="68" lh="2" rh="8"/>
-            <map note="69" lh="6" rh="8"/>
-            <map note="70" lh="7" rh="6"/>
-            <map note="71" lh="7" rh="8"/>
-            <map note="72" lh="9" rh="8"/>
-            <map note="73" lh="10" rh="8"/>
-            <map note="74" lh="5" rh="3"/>
-            <map note="75" lh="5" rh="4"/>
-            <map note="76" lh="4" rh="5"/>
-            <map note="77" lh="4" rh="6"/>
-            <map note="78" lh="4" rh="7"/>
-            <map note="79" lh="4" rh="8"/>
-            <map note="80" lh="2" rh="8"/>
-            <map note="81" lh="6" rh="8"/>
-            <map note="82" lh="7" rh="6"/>
-            <map note="83" lh="7" rh="8"/>
-            <map note="84" lh="9" rh="8"/>
-            <map note="85" lh="10" rh="8"/>
-            <map note="86" lh="5" rh="8"/>
-            <map note="87" lh="2" rh="4"/>
-            <map note="88" lh="6" rh="5"/>
-            <map note="89" lh="11" rh="6"/>
-            <map note="90" lh="11" rh="7"/>
-            <map note="91" lh="0" rh="8"/>
-            <map note="92" lh="3" rh="8"/>
-            <map note="93" lh="12" rh="6"/>
-            <map note="94" lh="8" rh="9"/>
-            <map note="95" lh="11" rh="10"/>
-            <map note="96" lh="1" rh="11"/>
+            <map note="60" lh="4" rh="0" />
+            <map note="61" lh="4" rh="2" />
+            <map note="62" lh="4" rh="3" />
+            <map note="63" lh="4" rh="4" />
+            <map note="64" lh="4" rh="5" />
+            <map note="65" lh="4" rh="6" />
+            <map note="66" lh="4" rh="7" />
+            <map note="67" lh="4" rh="8" />
+            <map note="68" lh="2" rh="8" />
+            <map note="69" lh="6" rh="8" />
+            <map note="70" lh="7" rh="6" />
+            <map note="71" lh="7" rh="8" />
+            <map note="72" lh="9" rh="8" />
+            <map note="73" lh="10" rh="8" />
+            <map note="74" lh="5" rh="3" />
+            <map note="75" lh="5" rh="4" />
+            <map note="76" lh="4" rh="5" />
+            <map note="77" lh="4" rh="6" />
+            <map note="78" lh="4" rh="7" />
+            <map note="79" lh="4" rh="8" />
+            <map note="80" lh="2" rh="8" />
+            <map note="81" lh="6" rh="8" />
+            <map note="82" lh="7" rh="6" />
+            <map note="83" lh="7" rh="8" />
+            <map note="84" lh="9" rh="8" />
+            <map note="85" lh="10" rh="8" />
+            <map note="86" lh="5" rh="8" />
+            <map note="87" lh="2" rh="4" />
+            <map note="88" lh="6" rh="5" />
+            <map note="89" lh="11" rh="6" />
+            <map note="90" lh="11" rh="7" />
+            <map note="91" lh="0" rh="8" />
+            <map note="92" lh="3" rh="8" />
+            <map note="93" lh="12" rh="6" />
+            <map note="94" lh="8" rh="9" />
+            <map note="95" lh="11" rh="10" />
+            <map note="96" lh="1" rh="11" />
         </mapping>
     </instrument>
     <instrument name="Piccolo" mapping-type="hands">
         <mapping>
-            <map note="72" lh="4" rh="0"/>
-            <map note="73" lh="4" rh="2"/>
-            <map note="74" lh="4" rh="3"/>
-            <map note="75" lh="4" rh="4"/>
-            <map note="76" lh="4" rh="5"/>
-            <map note="77" lh="4" rh="6"/>
-            <map note="78" lh="4" rh="7"/>
-            <map note="79" lh="4" rh="8"/>
-            <map note="80" lh="2" rh="8"/>
-            <map note="81" lh="6" rh="8"/>
-            <map note="82" lh="7" rh="6"/>
-            <map note="83" lh="7" rh="8"/>
-            <map note="84" lh="9" rh="8"/>
-            <map note="85" lh="10" rh="8"/>
-            <map note="86" lh="5" rh="3"/>
-            <map note="87" lh="5" rh="4"/>
-            <map note="88" lh="4" rh="5"/>
-            <map note="89" lh="4" rh="6"/>
-            <map note="90" lh="4" rh="7"/>
-            <map note="91" lh="4" rh="8"/>
-            <map note="92" lh="2" rh="8"/>
-            <map note="93" lh="6" rh="8"/>
-            <map note="94" lh="7" rh="6"/>
-            <map note="95" lh="7" rh="8"/>
-            <map note="96" lh="9" rh="8"/>
-            <map note="97" lh="10" rh="8"/>
-            <map note="98" lh="5" rh="8"/>
-            <map note="99" lh="2" rh="4"/>
-            <map note="100" lh="6" rh="5"/>
-            <map note="101" lh="11" rh="6"/>
-            <map note="102" lh="11" rh="7"/>
-            <map note="103" lh="0" rh="8"/>
-            <map note="104" lh="3" rh="8"/>
-            <map note="105" lh="12" rh="6"/>
-            <map note="106" lh="8" rh="9"/>
-            <map note="107" lh="11" rh="10"/>
-            <map note="108" lh="1" rh="11"/>
+            <map note="72" lh="4" rh="0" />
+            <map note="73" lh="4" rh="2" />
+            <map note="74" lh="4" rh="3" />
+            <map note="75" lh="4" rh="4" />
+            <map note="76" lh="4" rh="5" />
+            <map note="77" lh="4" rh="6" />
+            <map note="78" lh="4" rh="7" />
+            <map note="79" lh="4" rh="8" />
+            <map note="80" lh="2" rh="8" />
+            <map note="81" lh="6" rh="8" />
+            <map note="82" lh="7" rh="6" />
+            <map note="83" lh="7" rh="8" />
+            <map note="84" lh="9" rh="8" />
+            <map note="85" lh="10" rh="8" />
+            <map note="86" lh="5" rh="3" />
+            <map note="87" lh="5" rh="4" />
+            <map note="88" lh="4" rh="5" />
+            <map note="89" lh="4" rh="6" />
+            <map note="90" lh="4" rh="7" />
+            <map note="91" lh="4" rh="8" />
+            <map note="92" lh="2" rh="8" />
+            <map note="93" lh="6" rh="8" />
+            <map note="94" lh="7" rh="6" />
+            <map note="95" lh="7" rh="8" />
+            <map note="96" lh="9" rh="8" />
+            <map note="97" lh="10" rh="8" />
+            <map note="98" lh="5" rh="8" />
+            <map note="99" lh="2" rh="4" />
+            <map note="100" lh="6" rh="5" />
+            <map note="101" lh="11" rh="6" />
+            <map note="102" lh="11" rh="7" />
+            <map note="103" lh="0" rh="8" />
+            <map note="104" lh="3" rh="8" />
+            <map note="105" lh="12" rh="6" />
+            <map note="106" lh="8" rh="9" />
+            <map note="107" lh="11" rh="10" />
+            <map note="108" lh="1" rh="11" />
         </mapping>
     </instrument>
     <instrument name="Clarinet" mapping-type="hands">
         <mapping>
-            <map note="50" lh="4" rh="7"/>
-            <map note="51" lh="4" rh="8"/>
-            <map note="52" lh="4" rh="5"/>
-            <map note="53" lh="4" rh="4"/>
-            <map note="54" lh="4" rh="6"/>
-            <map note="55" lh="4" rh="3"/>
-            <map note="56" lh="4" rh="1"/>
-            <map note="57" lh="4" rh="2"/>
-            <map note="58" lh="4" rh="0"/>
-            <map note="59" lh="6" rh="0"/>
-            <map note="60" lh="3" rh="0"/>
-            <map note="61" lh="5" rh="0"/>
-            <map note="62" lh="2" rh="0"/>
-            <map note="63" lh="1" rh="0"/>
-            <map note="64" lh="7" rh="0"/>
-            <map note="65" lh="0" rh="0"/>
-            <map note="66" lh="9" rh="0"/>
-            <map note="67" lh="8" rh="0"/>
-            <map note="68" lh="10" rh="0"/>
-            <map note="69" lh="14" rh="7"/>
-            <map note="70" lh="14" rh="8"/>
-            <map note="71" lh="14" rh="5"/>
-            <map note="72" lh="14" rh="4"/>
-            <map note="73" lh="14" rh="6"/>
-            <map note="74" lh="14" rh="3"/>
-            <map note="75" lh="14" rh="1"/>
-            <map note="76" lh="14" rh="2"/>
-            <map note="77" lh="14" rh="0"/>
-            <map note="78" lh="15" rh="0"/>
-            <map note="79" lh="13" rh="0"/>
-            <map note="80" lh="16" rh="0"/>
-            <map note="81" lh="12" rh="0"/>
-            <map note="82" lh="11" rh="0"/>
-            <map note="83" lh="17" rh="3"/>
-            <map note="84" lh="17" rh="9"/>
-            <map note="85" lh="17" rh="10"/>
-            <map note="86" lh="17" rh="11"/>
-            <map note="87" lh="18" rh="11"/>
-            <map note="88" lh="19" rh="11"/>
-            <map note="89" lh="19" rh="4"/>
-            <map note="90" lh="17" rh="12"/>
+            <map note="50" lh="4" rh="7" />
+            <map note="51" lh="4" rh="8" />
+            <map note="52" lh="4" rh="5" />
+            <map note="53" lh="4" rh="4" />
+            <map note="54" lh="4" rh="6" />
+            <map note="55" lh="4" rh="3" />
+            <map note="56" lh="4" rh="1" />
+            <map note="57" lh="4" rh="2" />
+            <map note="58" lh="4" rh="0" />
+            <map note="59" lh="6" rh="0" />
+            <map note="60" lh="3" rh="0" />
+            <map note="61" lh="5" rh="0" />
+            <map note="62" lh="2" rh="0" />
+            <map note="63" lh="1" rh="0" />
+            <map note="64" lh="7" rh="0" />
+            <map note="65" lh="0" rh="0" />
+            <map note="66" lh="9" rh="0" />
+            <map note="67" lh="8" rh="0" />
+            <map note="68" lh="10" rh="0" />
+            <map note="69" lh="14" rh="7" />
+            <map note="70" lh="14" rh="8" />
+            <map note="71" lh="14" rh="5" />
+            <map note="72" lh="14" rh="4" />
+            <map note="73" lh="14" rh="6" />
+            <map note="74" lh="14" rh="3" />
+            <map note="75" lh="14" rh="1" />
+            <map note="76" lh="14" rh="2" />
+            <map note="77" lh="14" rh="0" />
+            <map note="78" lh="15" rh="0" />
+            <map note="79" lh="13" rh="0" />
+            <map note="80" lh="16" rh="0" />
+            <map note="81" lh="12" rh="0" />
+            <map note="82" lh="11" rh="0" />
+            <map note="83" lh="17" rh="3" />
+            <map note="84" lh="17" rh="9" />
+            <map note="85" lh="17" rh="10" />
+            <map note="86" lh="17" rh="11" />
+            <map note="87" lh="18" rh="11" />
+            <map note="88" lh="19" rh="11" />
+            <map note="89" lh="19" rh="4" />
+            <map note="90" lh="17" rh="12" />
         </mapping>
     </instrument>
     <instrument name="Recorder" mapping-type="hands">
         <mapping>
-            <map note="36" lh="0" rh="0"/>
-            <map note="37" lh="0" rh="1"/>
-            <map note="38" lh="0" rh="2"/>
-            <map note="39" lh="0" rh="3"/>
-            <map note="40" lh="0" rh="4"/>
-            <map note="41" lh="0" rh="5"/>
-            <map note="42" lh="0" rh="6"/>
-            <map note="43" lh="0" rh="7"/>
-            <map note="44" lh="1" rh="3"/>
-            <map note="45" lh="1" rh="7"/>
-            <map note="46" lh="2" rh="8"/>
-            <map note="47" lh="3" rh="7"/>
-            <map note="48" lh="4" rh="7"/>
-            <map note="49" lh="5" rh="7"/>
-            <map note="50" lh="6" rh="7"/>
-            <map note="51" lh="7" rh="2"/>
-            <map note="52" lh="8" rh="4"/>
-            <map note="53" lh="8" rh="9"/>
-            <map note="54" lh="8" rh="10"/>
-            <map note="55" lh="8" rh="7"/>
-            <map note="56" lh="9" rh="8"/>
-            <map note="57" lh="9" rh="7"/>
-            <map note="58" lh="9" rh="6"/>
-            <map note="59" lh="9" rh="4"/>
-            <map note="60" lh="0" rh="0"/>
-            <map note="61" lh="0" rh="1"/>
-            <map note="62" lh="0" rh="2"/>
-            <map note="63" lh="0" rh="3"/>
-            <map note="64" lh="0" rh="4"/>
-            <map note="65" lh="0" rh="5"/>
-            <map note="66" lh="0" rh="6"/>
-            <map note="67" lh="0" rh="7"/>
-            <map note="68" lh="1" rh="3"/>
-            <map note="69" lh="1" rh="7"/>
-            <map note="70" lh="2" rh="8"/>
-            <map note="71" lh="3" rh="7"/>
-            <map note="72" lh="4" rh="7"/>
-            <map note="73" lh="5" rh="7"/>
-            <map note="74" lh="6" rh="7"/>
-            <map note="75" lh="7" rh="2"/>
-            <map note="76" lh="8" rh="4"/>
-            <map note="77" lh="8" rh="9"/>
-            <map note="78" lh="8" rh="10"/>
-            <map note="79" lh="8" rh="7"/>
-            <map note="80" lh="9" rh="8"/>
-            <map note="81" lh="9" rh="7"/>
-            <map note="82" lh="9" rh="6"/>
-            <map note="83" lh="9" rh="4"/>
-            <map note="84" lh="10" rh="4"/>
-            <map note="85" lh="11" rh="9"/>
-            <map note="86" lh="11" rh="9"/>
-            <map note="87" lh="12" rh="6"/>
-            <map note="88" lh="12" rh="6"/>
-            <map note="89" lh="9" rh="4"/>
-            <map note="90" lh="9" rh="4"/>
-            <map note="91" lh="10" rh="8"/>
-            <map note="92" lh="12" rh="6"/>
-            <map note="93" lh="12" rh="6"/>
-            <map note="94" lh="9" rh="4"/>
-            <map note="95" lh="9" rh="4"/>
-            <map note="96" lh="10" rh="8"/>
+            <map note="36" lh="0" rh="0" />
+            <map note="37" lh="0" rh="1" />
+            <map note="38" lh="0" rh="2" />
+            <map note="39" lh="0" rh="3" />
+            <map note="40" lh="0" rh="4" />
+            <map note="41" lh="0" rh="5" />
+            <map note="42" lh="0" rh="6" />
+            <map note="43" lh="0" rh="7" />
+            <map note="44" lh="1" rh="3" />
+            <map note="45" lh="1" rh="7" />
+            <map note="46" lh="2" rh="8" />
+            <map note="47" lh="3" rh="7" />
+            <map note="48" lh="4" rh="7" />
+            <map note="49" lh="5" rh="7" />
+            <map note="50" lh="6" rh="7" />
+            <map note="51" lh="7" rh="2" />
+            <map note="52" lh="8" rh="4" />
+            <map note="53" lh="8" rh="9" />
+            <map note="54" lh="8" rh="10" />
+            <map note="55" lh="8" rh="7" />
+            <map note="56" lh="9" rh="8" />
+            <map note="57" lh="9" rh="7" />
+            <map note="58" lh="9" rh="6" />
+            <map note="59" lh="9" rh="4" />
+            <map note="60" lh="0" rh="0" />
+            <map note="61" lh="0" rh="1" />
+            <map note="62" lh="0" rh="2" />
+            <map note="63" lh="0" rh="3" />
+            <map note="64" lh="0" rh="4" />
+            <map note="65" lh="0" rh="5" />
+            <map note="66" lh="0" rh="6" />
+            <map note="67" lh="0" rh="7" />
+            <map note="68" lh="1" rh="3" />
+            <map note="69" lh="1" rh="7" />
+            <map note="70" lh="2" rh="8" />
+            <map note="71" lh="3" rh="7" />
+            <map note="72" lh="4" rh="7" />
+            <map note="73" lh="5" rh="7" />
+            <map note="74" lh="6" rh="7" />
+            <map note="75" lh="7" rh="2" />
+            <map note="76" lh="8" rh="4" />
+            <map note="77" lh="8" rh="9" />
+            <map note="78" lh="8" rh="10" />
+            <map note="79" lh="8" rh="7" />
+            <map note="80" lh="9" rh="8" />
+            <map note="81" lh="9" rh="7" />
+            <map note="82" lh="9" rh="6" />
+            <map note="83" lh="9" rh="4" />
+            <map note="84" lh="10" rh="4" />
+            <map note="85" lh="11" rh="9" />
+            <map note="86" lh="11" rh="9" />
+            <map note="87" lh="12" rh="6" />
+            <map note="88" lh="12" rh="6" />
+            <map note="89" lh="9" rh="4" />
+            <map note="90" lh="9" rh="4" />
+            <map note="91" lh="10" rh="8" />
+            <map note="92" lh="12" rh="6" />
+            <map note="93" lh="12" rh="6" />
+            <map note="94" lh="9" rh="4" />
+            <map note="95" lh="9" rh="4" />
+            <map note="96" lh="10" rh="8" />
         </mapping>
     </instrument>
     <instrument name="SopranoSax" mapping-type="pressed_keys">
@@ -826,7 +825,7 @@
             <map note="84">
                 <key>2</key>
             </map>
-            <map note="83"/>
+            <map note="83" />
             <map note="82">
                 <key>5</key>
             </map>
@@ -889,7 +888,7 @@
                 <key>15</key>
                 <key>17</key>
             </map>
-            <map note="71"/>
+            <map note="71" />
             <map note="70">
                 <key>5</key>
             </map>
@@ -1013,7 +1012,7 @@
             <map note="77">
                 <key>2</key>
             </map>
-            <map note="76"/>
+            <map note="76" />
             <map note="75">
                 <key>5</key>
             </map>
@@ -1076,7 +1075,7 @@
                 <key>15</key>
                 <key>17</key>
             </map>
-            <map note="64"/>
+            <map note="64" />
             <map note="63">
                 <key>5</key>
             </map>
@@ -1200,7 +1199,7 @@
             <map note="72">
                 <key>2</key>
             </map>
-            <map note="71"/>
+            <map note="71" />
             <map note="70">
                 <key>5</key>
             </map>
@@ -1263,7 +1262,7 @@
                 <key>15</key>
                 <key>17</key>
             </map>
-            <map note="59"/>
+            <map note="59" />
             <map note="58">
                 <key>5</key>
             </map>
@@ -1387,7 +1386,7 @@
             <map note="65">
                 <key>2</key>
             </map>
-            <map note="64"/>
+            <map note="64" />
             <map note="63">
                 <key>5</key>
             </map>
@@ -1450,7 +1449,7 @@
                 <key>15</key>
                 <key>17</key>
             </map>
-            <map note="52"/>
+            <map note="52" />
             <map note="51">
                 <key>5</key>
             </map>

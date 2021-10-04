@@ -86,11 +86,11 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
             /* Attach model to node and rotate from center */
             hornNodes[i].run {
-                attachChild(twelfths[i]!!.highestLevel)
+                attachChild(twelfths[i].highestLevel)
                 localRotation = Quaternion().fromAngles(0f, rad(16 + i * 1.5), 0f)
             }
 
-            twelfths[i]!!.highestLevel.localTranslation = BASE_POSITION
+            twelfths[i].highestLevel.localTranslation = BASE_POSITION
             instrumentNode.attachChild(hornNodes[i])
         }
     }

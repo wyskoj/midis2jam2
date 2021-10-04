@@ -30,118 +30,118 @@ import kotlin.math.roundToInt
  * consistent).
  */
 class StandardFrettingEngine(
-	/** The number of strings on the instrument. */
-	private val numberOfStrings: Int,
+    /** The number of strings on the instrument. */
+    private val numberOfStrings: Int,
 
-	/** The number of frets on the instrument. */
-	private val numberOfFrets: Int,
+    /** The number of frets on the instrument. */
+    private val numberOfFrets: Int,
 
-	/* An array that contains the MIDI note value of each string as played open. */
-	private val openStringMidiNotes: IntArray
+    /* An array that contains the MIDI note value of each string as played open. */
+    private val openStringMidiNotes: IntArray
 ) : FrettingEngine {
 
-	override val frets = IntArray(numberOfStrings).apply { fill(-1) }
+    override val frets = IntArray(numberOfStrings).apply { fill(-1) }
 
-	/**
-	 * The lowest note this engine with deal with.
-	 */
-	private val rangeLow = openStringMidiNotes.first()
+    /**
+     * The lowest note this engine with deal with.
+     */
+    private val rangeLow = openStringMidiNotes.first()
 
-	/**
-	 * The highest note this engine will deal with.
-	 */
-	private val rangeHigh = openStringMidiNotes.last() + numberOfFrets
+    /**
+     * The highest note this engine will deal with.
+     */
+    private val rangeHigh = openStringMidiNotes.last() + numberOfFrets
 
-	/**
-	 * The list of fretboard positions in the running average.
-	 */
-	private val runningAverage: MutableList<FretboardPosition> = ArrayList()
+    /**
+     * The list of fretboard positions in the running average.
+     */
+    private val runningAverage: MutableList<FretboardPosition> = ArrayList()
 
-	/**
-	 * Calculates the best fretboard location for the specified MIDI note with temporal consideration. If no possible
-	 * positions exists (all the strings are occupied), returns null.
-	 *
-	 * @param midiNote the MIDI note to find the best fretboard position
-	 * @return the best fretboard position, or null if one does not exist
-	 */
-	@Contract(pure = true)
-	override fun bestFretboardPosition(midiNote: Int): FretboardPosition? {
-		val possiblePositions: MutableList<FretboardPosition> = ArrayList()
-		/* If the note is in range */
-		if (midiNote in rangeLow..rangeHigh) {
-			/* For each string */
-			for (i in 0 until numberOfStrings) {
-				/* Calculate the fret that the note would land on */
-				val fret = midiNote - openStringMidiNotes[i]
+    /**
+     * Calculates the best fretboard location for the specified MIDI note with temporal consideration. If no possible
+     * positions exists (all the strings are occupied), returns null.
+     *
+     * @param midiNote the MIDI note to find the best fretboard position
+     * @return the best fretboard position, or null if one does not exist
+     */
+    @Contract(pure = true)
+    override fun bestFretboardPosition(midiNote: Int): FretboardPosition? {
+        val possiblePositions: MutableList<FretboardPosition> = ArrayList()
+        /* If the note is in range */
+        if (midiNote in rangeLow..rangeHigh) {
+            /* For each string */
+            for (i in 0 until numberOfStrings) {
+                /* Calculate the fret that the note would land on */
+                val fret = midiNote - openStringMidiNotes[i]
 
-				/* If this is impossible to play on this string */
-				if (fret < 0 || fret > numberOfFrets || frets[i] != -1) {
-					/* Skip this string */
-					continue
-				}
+                /* If this is impossible to play on this string */
+                if (fret < 0 || fret > numberOfFrets || frets[i] != -1) {
+                    /* Skip this string */
+                    continue
+                }
 
-				/* Otherwise, add this to a list of possible positions */
-				possiblePositions.add(FretboardPosition(i, fret))
-			}
-		}
+                /* Otherwise, add this to a list of possible positions */
+                possiblePositions.add(FretboardPosition(i, fret))
+            }
+        }
 
-		/* Sort possible positions by distance to running average */
-		possiblePositions.sortWith(comparingDouble { o: FretboardPosition ->
-			o.distance(runningAveragePosition())
-		})
+        /* Sort possible positions by distance to running average */
+        possiblePositions.sortWith(comparingDouble { o: FretboardPosition ->
+            o.distance(runningAveragePosition())
+        })
 
-		/* Return the note with the least distance, or null if there are no available spots */
-		return possiblePositions.firstOrNull()
-	}
+        /* Return the note with the least distance, or null if there are no available spots */
+        return possiblePositions.firstOrNull()
+    }
 
-	/**
-	 * Applies the usage of this fretboard position, occupying the string. Adds the position to the running average.
-	 */
-	override fun applyFretboardPosition(position: FretboardPosition) {
-		/* Apply this position and add it to the running average */
-		with(position) {
-			frets[string] = fret
-			runningAverage.add(this)
-		}
+    /**
+     * Applies the usage of this fretboard position, occupying the string. Adds the position to the running average.
+     */
+    override fun applyFretboardPosition(position: FretboardPosition) {
+        /* Apply this position and add it to the running average */
+        with(position) {
+            frets[string] = fret
+            runningAverage.add(this)
+        }
 
-		/* Truncate running average if over limit */
-		if (runningAverage.size > RUNNING_AVERAGE_COUNT) {
-			runningAverage.removeAt(0)
-		}
-	}
+        /* Truncate running average if over limit */
+        if (runningAverage.size > RUNNING_AVERAGE_COUNT) {
+            runningAverage.removeAt(0)
+        }
+    }
 
-	/**
-	 * Calculates the running average position. If no frets have been previously applied, returns the position at `0,0`.
-	 */
-	@Contract(pure = true)
-	private fun runningAveragePosition(): FretboardPosition =
-		/* If there are no notes yet played, assume the average is the open note on the lowest string */
-		if (runningAverage.isEmpty()) {
-			FretboardPosition(0, 0)
-		} else {
-			/* Compute the average of the strings and frets */
-			FretboardPosition(
-				runningAverage.map { it.string }.average().roundToInt(),
-				runningAverage.map { it.fret }.average().roundToInt()
-			)
-		}
+    /**
+     * Calculates the running average position. If no frets have been previously applied, returns the position at `0,0`.
+     */
+    @Contract(pure = true)
+    private fun runningAveragePosition(): FretboardPosition =
+        /* If there are no notes yet played, assume the average is the open note on the lowest string */
+        if (runningAverage.isEmpty()) {
+            FretboardPosition(0, 0)
+        } else {
+            /* Compute the average of the strings and frets */
+            FretboardPosition(
+                runningAverage.map { it.string }.average().roundToInt(),
+                runningAverage.map { it.fret }.average().roundToInt()
+            )
+        }
 
-	/**
-	 * Releases a string, stopping the animation on it and allowing it to be used for another note.
-	 */
-	override fun releaseString(string: Int) {
-		require(string in 0 until numberOfStrings) { "Can't release a string that does not exist." }
-		frets[string] = -1
-	}
+    /**
+     * Releases a string, stopping the animation on it and allowing it to be used for another note.
+     */
+    override fun releaseString(string: Int) {
+        require(string in 0 until numberOfStrings) { "Can't release a string that does not exist." }
+        frets[string] = -1
+    }
 
 
-	companion object {
-		private const val RUNNING_AVERAGE_COUNT = 10
-	}
+    companion object {
+        private const val RUNNING_AVERAGE_COUNT = 10
+    }
 
-	init {
-		require(openStringMidiNotes.size == numberOfStrings) {
-			"The number of strings does not equal the number of data in the open string MIDI notes."
-		}
-	}
+    init {
+        require(openStringMidiNotes.size == numberOfStrings) {
+            "The number of strings does not equal the number of data in the open string MIDI notes."
+        }
+    }
 }

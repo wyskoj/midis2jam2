@@ -28,40 +28,38 @@ import org.wysko.midis2jam2.world.Axis
 /**
  * The ride cymbal.
  */
-class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) : Cymbal(
-	context, hits,
-	type
-) {
+class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
+    Cymbal(context, hits, type) {
 
-	override fun tick(time: Double, delta: Float) {
-		val stickStatus = handleStick(time, delta, hits)
-		handleCymbalStrikes(delta, stickStatus.justStruck())
-	}
+    override fun tick(time: Double, delta: Float) {
+        val stickStatus = handleStick(time, delta, hits)
+        handleCymbalStrikes(delta, stickStatus.justStruck())
+    }
 
-	override fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus {
-		val stickStatus = handleStick(
-			context, stick, time, delta,
-			hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
-		val strikingFor = stickStatus.strikingFor()
-		if (strikingFor != null) {
-			stickNode.setLocalTranslation(0f, 0f, if (strikingFor.note == 53) 15f else 20f)
-		}
-		return stickStatus
-	}
+    override fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus {
+        val stickStatus = handleStick(
+            context, stick, time, delta,
+            hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
+        val strikingFor = stickStatus.strikingFor()
+        if (strikingFor != null) {
+            stickNode.setLocalTranslation(0f, 0f, if (strikingFor.note == 53) 15f else 20f)
+        }
+        return stickStatus
+    }
 
-	init {
-		require(type === CymbalType.RIDE_1 || type === CymbalType.RIDE_2) { "Ride cymbal type is wrong." }
-		cymbalNode.run {
-			attachChild(context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f))
-			setLocalScale(type.size)
-		}
-		highLevelNode.run {
-			localTranslation = type.location
-			localRotation = type.rotation
-			attachChild(cymbalNode)
-		}
-		stickNode.setLocalTranslation(0f, 0f, 20f)
-		animator = CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening)
-	}
+    init {
+        require(type === CymbalType.RIDE_1 || type === CymbalType.RIDE_2) { "Ride cymbal type is wrong." }
+        cymbalNode.run {
+            attachChild(context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f))
+            setLocalScale(type.size)
+        }
+        highLevelNode.run {
+            localTranslation = type.location
+            localRotation = type.rotation
+            attachChild(cymbalNode)
+        }
+        stickNode.setLocalTranslation(0f, 0f, 20f)
+        animator = CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening)
+    }
 }

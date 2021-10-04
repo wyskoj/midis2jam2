@@ -26,110 +26,123 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
- * The bass drum, or kick drum.
+ * Texture file for metal texture.
+ */
+const val METAL_TEXTURE: String = "MetalTexture.bmp"
+
+/**
+ * The bass drum has three major animation components:
+ *
+ * * [beaterArm] swings up and hits the bass drum
+ * * [pedal] is pressed down
+ * * [drumNode] is recoiled
+ *
+ * The animation has no future reference. That is, when a note is played, the animation starts immediately and takes
+ * time to recoil.
  */
 class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
 
-	/**
-	 * The Bass drum beater arm.
-	 */
-	private val bassDrumBeaterArm: Spatial
+    /**
+     * The arm that swings to hit the bass drum.
+     */
+    private val beaterArm: Spatial
 
-	/**
-	 * The Bass drum pedal.
-	 */
-	private val bassDrumPedal: Spatial
+    /**
+     * The pedal is pressed when a note is played and slowly comes back to its idle position.
+     */
+    private val pedal: Spatial
 
-	/**
-	 * The Drum node.
-	 */
-	private val drumNode = Node()
+    /**
+     * The Drum node.
+     */
+    private val drumNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		val nextHit = collectOne(hits, context, time)
-		if (nextHit == null) {
-			/* Drum recoil */
-			val localTranslation = drumNode.localTranslation
-			if (localTranslation.z < -0.0001) {
-				drumNode.setLocalTranslation(
-					0f, 0f, 0f.coerceAtMost(localTranslation.z + DRUM_RECOIL_COMEBACK * delta)
-				)
-			} else {
-				drumNode.setLocalTranslation(0f, 0f, 0f)
-			}
+    override fun tick(time: Double, delta: Float) {
+        val nextHit = collectOne(hits, context, time)
+        if (nextHit == null) { // We need to recoil all animation components
 
-			/* Beater comeback */
-			val beaterAngles = bassDrumBeaterArm.localRotation.toAngles(FloatArray(3))
-			var beaterAngle = beaterAngles[0] + 8f * delta
-			beaterAngle = rad(Stick.MAX_ANGLE).coerceAtMost(beaterAngle)
-			bassDrumBeaterArm.localRotation = Quaternion().fromAngles(
-				beaterAngle, 0f, 0f
-			)
+            /* Move the drum forward if it needs to. Coerce Z to at most 0 to not overshoot the idle position. */
+            drumNode.setLocalTranslation(
+                0f,
+                0f,
+                (drumNode.localTranslation.z + DRUM_RECOIL_COMEBACK * delta).coerceAtMost(0f)
+            )
 
-			/* Pedal comeback */
-			val pedalAngles = bassDrumPedal.localRotation.toAngles(FloatArray(3))
-			var pedalAngle = (pedalAngles[0] + 8f * delta * (PEDAL_MAX_ANGLE / Stick.MAX_ANGLE)).toFloat()
-			pedalAngle = rad(PEDAL_MAX_ANGLE.toDouble()).coerceAtMost(pedalAngle)
-			bassDrumPedal.localRotation = Quaternion().fromAngles(
-				pedalAngle, 0f, 0f
-			)
-		} else {
-			/* We need to strike */
-			bassDrumBeaterArm.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
-			bassDrumPedal.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
-			drumNode.setLocalTranslation(0f, 0f, (-3 * velocityRecoilDampening(nextHit.velocity)).toFloat())
-		}
-	}
+            /* Gradually rotate the beater back to its idle position */
+            var newBeaterAngle = beaterArm.localRotation.toAngles(FloatArray(3))[0] + 8f * delta
+            newBeaterAngle = rad(Stick.MAX_ANGLE).coerceAtMost(newBeaterAngle)
+            beaterArm.localRotation = Quaternion().fromAngles(
+                newBeaterAngle,
+                0f,
+                0f
+            )
 
-	companion object {
-		/**
-		 * The maximum angle the pedal will fall back to when at rest.
-		 */
-		private const val PEDAL_MAX_ANGLE = 20
-	}
+            /* Gradually rotate the pedal back to its idle position */
+            var newPedalAngle =
+                (pedal.localRotation.toAngles(FloatArray(3))[0] + 8f * delta * (PEDAL_MAX_ANGLE / Stick.MAX_ANGLE))
+                    .toFloat()
+            newPedalAngle = rad(PEDAL_MAX_ANGLE.toDouble()).coerceAtMost(newPedalAngle)
+            pedal.localRotation = Quaternion().fromAngles(
+                newPedalAngle,
+                0f,
+                0f
+            )
 
-	init {
-		/* Load bass drum */
-		val drumModel = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp")
+        } else { // There is a note, so perform animation.
+            beaterArm.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
+            pedal.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
+            drumNode.setLocalTranslation(0f, 0f, (-3 * velocityRecoilDampening(nextHit.velocity)).toFloat())
+        }
+    }
 
-		/* Load beater arm */
-		bassDrumBeaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", "MetalTexture.bmp")
+    companion object {
+        /** The maximum angle the pedal will fall back to when at rest. */
+        private const val PEDAL_MAX_ANGLE = 20
+    }
 
-		/* Load beater holder */
-		val bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", "MetalTexture.bmp")
-		val holder = bassDrumBeaterHolder as Node
+    init {
+        /* Load bass drum */
+        val drumModel = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp")
+        drumNode.attachChild(drumModel)
 
-		/* Apply materials */
-		val arm = bassDrumBeaterArm as Node
-		val shinySilverMaterial = context.reflectiveMaterial("Assets/ShinySilver.bmp")
-		val darkMetalMaterial = context.unshadedMaterial("Assets/MetalTextureDark.bmp")
-		arm.run {
-			getChild(0).setMaterial(shinySilverMaterial)
-			getChild(1).setMaterial(darkMetalMaterial)
-		}
-		holder.getChild(0).setMaterial(darkMetalMaterial)
+        /* Load beater arm */
+        beaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", METAL_TEXTURE)
 
-		/* Load pedal */
-		bassDrumPedal = context.loadModel("DrumSet_BassDrumPedal.obj", "MetalTexture.bmp")
-		drumNode.attachChild(drumModel)
+        /* Load beater holder */
+        val bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", METAL_TEXTURE)
+        val holder = bassDrumBeaterHolder as Node
 
-		val beaterNode = Node()
-		beaterNode.run {
-			attachChild(bassDrumBeaterArm)
-			attachChild(bassDrumBeaterHolder)
-			attachChild(bassDrumPedal)
-		}
+        /* Apply materials */
+        val arm = beaterArm as Node
+        val shinySilverMaterial = context.reflectiveMaterial("Assets/ShinySilver.bmp")
+        val darkMetalMaterial = context.unshadedMaterial("Assets/MetalTextureDark.bmp")
+        arm.run {
+            getChild(0).setMaterial(shinySilverMaterial)
+            getChild(1).setMaterial(darkMetalMaterial)
+        }
+        holder.getChild(0).setMaterial(darkMetalMaterial)
 
-		highLevelNode.attachChild(drumNode)
-		highLevelNode.attachChild(beaterNode)
+        /* Load pedal */
+        pedal = context.loadModel("DrumSet_BassDrumPedal.obj", METAL_TEXTURE)
 
-		bassDrumBeaterArm.setLocalTranslation(0f, 5.5f, 1.35f)
-		bassDrumBeaterArm.setLocalRotation(Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f))
 
-		bassDrumPedal.localRotation = Quaternion().fromAngles(rad(PEDAL_MAX_ANGLE.toDouble()), 0f, 0f)
-		bassDrumPedal.setLocalTranslation(0f, 0.5f, 7.5f)
+        val beaterNode = Node()
+        beaterNode.run {
+            attachChild(beaterArm)
+            attachChild(bassDrumBeaterHolder)
+            attachChild(pedal)
+        }
 
-		beaterNode.setLocalTranslation(0f, 0f, 1.5f)
-		highLevelNode.setLocalTranslation(0f, 0f, -80f)
-	}
+        highLevelNode.attachChild(drumNode)
+        highLevelNode.attachChild(beaterNode)
+
+        beaterArm.setLocalTranslation(0f, 5.5f, 1.35f)
+        beaterArm.setLocalRotation(Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f))
+
+        pedal.localRotation = Quaternion().fromAngles(rad(PEDAL_MAX_ANGLE.toDouble()), 0f, 0f)
+        pedal.setLocalTranslation(0f, 0.5f, 7.5f)
+
+        beaterNode.setLocalTranslation(0f, 0f, 1.5f)
+        highLevelNode.setLocalTranslation(0f, 0f, -80f)
+    }
 }

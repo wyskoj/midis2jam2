@@ -28,62 +28,62 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Woodblocks consist of 12 blocks.
  */
 class Woodblocks(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	OctavePercussion(context, eventList) {
+    OctavePercussion(context, eventList) {
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		twelfths.forEach { it!!.tick(delta) }
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        twelfths.forEach { it!!.tick(delta) }
+    }
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 15 + 3.6f * indexForMoving(delta), 0f)
-		instrumentNode.localRotation =
-			Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 15 + 3.6f * indexForMoving(delta), 0f)
+        instrumentNode.localRotation =
+            Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * indexForMoving(delta), 0f)
+    }
 
-	/**
-	 * A single Woodblock.
-	 */
-	inner class Woodblock(i: Int) : TwelfthOfOctaveDecayed() {
-		override fun tick(delta: Float) {
-			val localTranslation = highestLevel.localTranslation
-			if (localTranslation.y < -0.0001) {
-				highestLevel.setLocalTranslation(
-					0f,
-					0f.coerceAtMost(localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta), 0f
-				)
-			} else {
-				highestLevel.setLocalTranslation(0f, 0f, 0f)
-			}
-		}
+    /**
+     * A single Woodblock.
+     */
+    inner class Woodblock(i: Int) : TwelfthOfOctaveDecayed() {
+        override fun tick(delta: Float) {
+            val localTranslation = highestLevel.localTranslation
+            if (localTranslation.y < -0.0001) {
+                highestLevel.setLocalTranslation(
+                    0f,
+                    0f.coerceAtMost(localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta), 0f
+                )
+            } else {
+                highestLevel.setLocalTranslation(0f, 0f, 0f)
+            }
+        }
 
-		init {
-			val mesh = context.loadModel("WoodBlockSingle.obj", "SimpleWood.bmp")
-			mesh.setLocalScale(1 - 0.036f * i)
-			animNode.attachChild(mesh)
-		}
-	}
+        init {
+            val mesh = context.loadModel("WoodBlockSingle.obj", "SimpleWood.bmp")
+            mesh.setLocalScale(1 - 0.036f * i)
+            animNode.attachChild(mesh)
+        }
+    }
 
-	init {
-		for (i in 0..11) {
-			/* Load drum stick */
-			val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-			stick.setLocalTranslation(0f, 0f, -5f)
+    init {
+        for (i in 0..11) {
+            /* Load drum stick */
+            val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+            stick.setLocalTranslation(0f, 0f, -5f)
 
-			/* Initialize node and attach stick */malletNodes[i] = Node()
-			malletNodes[i].setLocalTranslation(0f, 0f, 18f)
-			malletNodes[i].attachChild(stick)
-			val oneBlock = Node()
-			oneBlock.attachChild(malletNodes[i])
-			val woodblock = Woodblock(i)
-			twelfths[i] = woodblock
-			oneBlock.attachChild(woodblock.highestLevel)
-			percussionNodes[i].attachChild(oneBlock)
-			oneBlock.setLocalTranslation(0f, 0f, 20f)
-			percussionNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.5 * i), 0f)
-			percussionNodes[i].setLocalTranslation(0f, 0.3f * i, 0f)
-			instrumentNode.attachChild(percussionNodes[i])
-		}
-		instrumentNode.setLocalTranslation(75f, 0f, -35f)
-	}
+            /* Initialize node and attach stick */malletNodes[i] = Node()
+            malletNodes[i].setLocalTranslation(0f, 0f, 18f)
+            malletNodes[i].attachChild(stick)
+            val oneBlock = Node()
+            oneBlock.attachChild(malletNodes[i])
+            val woodblock = Woodblock(i)
+            twelfths[i] = woodblock
+            oneBlock.attachChild(woodblock.highestLevel)
+            percussionNodes[i].attachChild(oneBlock)
+            oneBlock.setLocalTranslation(0f, 0f, 20f)
+            percussionNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.5 * i), 0f)
+            percussionNodes[i].setLocalTranslation(0f, 0.3f * i, 0f)
+            instrumentNode.attachChild(percussionNodes[i])
+        }
+        instrumentNode.setLocalTranslation(75f, 0f, -35f)
+    }
 }

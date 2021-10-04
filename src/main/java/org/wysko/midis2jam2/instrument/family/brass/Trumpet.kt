@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MatType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -35,7 +35,7 @@ class Trumpet(
 ) : MonophonicInstrument(
     context,
     eventList,
-    if (type == TrumpetType.NORMAL) TrumpetClone::class.java else MutedTrumpetClone::class.java,
+    type.clazz,
     FINGERING_MANAGER
 ) {
 
@@ -46,30 +46,31 @@ class Trumpet(
     /**
      * The type of trumpet.
      */
-    enum class TrumpetType {
+    enum class TrumpetType(val clazz: Class<out TrumpetClone>) {
         /**
          * The normal, open trumpet.
          */
-        NORMAL,
+        NORMAL(TrumpetClone::class.java),
 
         /**
          * The muted trumpet.
          */
-        MUTED
+        MUTED(MutedTrumpetClone::class.java)
     }
 
     /**
      * A single instance of a trumpet.
      */
-    open inner class TrumpetClone : AnimatedKeyCloneByIntegers(this@Trumpet, 0.15f, 0.9f, 3, Axis.Z, Axis.X) {
-        override fun animateKeys(pressed: Array<Int>?) {
+    open inner class TrumpetClone : AnimatedKeyCloneByIntegers(this@Trumpet, 0.15f, 0.9f, Axis.Z, Axis.X) {
+
+        override fun animateKeys(pressed: Array<Int>) {
             for (i in 0..2) {
-                if (pressed!!.any { it == i }) {
+                if (pressed.any { it == i }) {
                     /* Press key */
-                    keys[i]!!.setLocalTranslation(0f, -0.5f, 0f)
+                    keys[i].setLocalTranslation(0f, -0.5f, 0f)
                 } else {
                     /* Release key */
-                    keys[i]!!.setLocalTranslation(0f, 0f, 0f)
+                    keys[i].setLocalTranslation(0f, 0f, 0f)
                 }
             }
         }
@@ -81,19 +82,19 @@ class Trumpet(
 
         init {
             /* Load trumpet body */
-            body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f)
+            body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", REFLECTIVE, 0.9f)
 
             /* Set horn skin grey material */
             (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
 
             /* Load bell */
-            bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f))
+            bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", REFLECTIVE, 0.9f))
             bell.setLocalTranslation(0f, 0f, 5.58f)
 
             /* Load keys */
-            for (i in 0..2) {
-                keys[i] = context.loadModel("TrumpetKey${i + 1}.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
-                modelNode.attachChild(keys[i])
+            keys = Array(3) { index ->
+                context.loadModel("TrumpetKey${index + 1}.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9f)
+                    .also { modelNode.attachChild(it) }
             }
 
             /* Attach body and bell */

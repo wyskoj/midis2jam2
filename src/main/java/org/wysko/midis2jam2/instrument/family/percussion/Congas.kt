@@ -27,6 +27,12 @@ import org.wysko.midis2jam2.midi.Midi.OPEN_HIGH_CONGA
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+import kotlin.math.max
+
+/**
+ * Texture file for hands.
+ */
+const val HANDS_TEXTURE: String = "hands.bmp"
 
 /**
  * Although there are three MIDI congas, there are two physical congas on stage. The left conga plays [OPEN_HIGH_CONGA]
@@ -40,146 +46,135 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Congas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * The Right hand node.
-	 */
-	private val rightHandNode = Node()
+    /**
+     * The Right hand node.
+     */
+    private val rightHandNode = Node()
 
-	/**
-	 * The Left hand node.
-	 */
-	private val leftHandNode = Node()
+    /**
+     * The Left hand node.
+     */
+    private val leftHandNode = Node()
 
-	/**
-	 * The Left conga anim node.
-	 */
-	private val leftCongaAnimNode = Node()
+    /**
+     * The Left conga anim node.
+     */
+    private val leftCongaAnimNode = Node()
 
-	/**
-	 * The Right conga anim node.
-	 */
-	private val rightCongaAnimNode = Node()
+    /**
+     * The Right conga anim node.
+     */
+    private val rightCongaAnimNode = Node()
 
-	/**
-	 * The Muted hand node.
-	 */
-	private val mutedHandNode = Node()
+    /**
+     * The Muted hand node.
+     */
+    private val mutedHandNode = Node()
 
-	/**
-	 * The Low conga hits.
-	 */
-	private val lowCongaHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == LOW_CONGA } as MutableList<MidiNoteOnEvent>
+    /**
+     * The Low conga hits.
+     */
+    private val lowCongaHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == LOW_CONGA } as MutableList<MidiNoteOnEvent>
 
-	/**
-	 * The High conga hits.
-	 */
-	private val highCongaHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == OPEN_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
+    /**
+     * The High conga hits.
+     */
+    private val highCongaHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == OPEN_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
 
-	/**
-	 * The Muted conga hits.
-	 */
-	private val mutedCongaHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == MUTE_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
+    /**
+     * The Muted conga hits.
+     */
+    private val mutedCongaHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == MUTE_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Animate each hand */
-		val statusLow = Stick.handleStick(
-			context, rightHandNode, time, delta, lowCongaHits,
-			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
-		val statusHigh = Stick.handleStick(
-			context, leftHandNode, time, delta, highCongaHits,
-			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
-		val statusMuted = Stick.handleStick(
-			context, mutedHandNode, time, delta, mutedCongaHits,
-			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
+        /* Animate each hand */
+        val statusLow = Stick.handleStick(
+            context, rightHandNode, time, delta, lowCongaHits,
+            Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
+        val statusHigh = Stick.handleStick(
+            context, leftHandNode, time, delta, highCongaHits,
+            Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
+        val statusMuted = Stick.handleStick(
+            context, mutedHandNode, time, delta, mutedCongaHits,
+            Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
 
-		/* Recoil right conga */
-		if (statusLow.justStruck()) {
-			val strike = statusLow.strike!!
-			recoilDrum(rightCongaAnimNode, true, strike.velocity, delta)
-		} else {
-			recoilDrum(rightCongaAnimNode, false, 0, delta)
-		}
+        /* Recoil right conga */
+        if (statusLow.justStruck()) {
+            statusLow.strike?.velocity?.let { recoilDrum(rightCongaAnimNode, true, it, delta) }
+        } else {
+            recoilDrum(rightCongaAnimNode, false, 0, delta)
+        }
 
-		/* Recoil left conga */
-		if (statusHigh.justStruck() || statusMuted.justStruck()) {
+        /* Recoil left conga */
+        if (statusHigh.justStruck() || statusMuted.justStruck()) {
+            /* If a muted and a high note play at the same time, we check the velocities of both hits and use the
+             * maximum velocity of the two for recoiling, since the animation is velocity sensitive */
+            val maxVelocity = max(statusHigh.strike?.velocity ?: 0, statusMuted.strike?.velocity ?: 0)
 
-			/* If a muted and a high note play at the same time, we check the velocities of both hits and use the
-			 * maximum velocity of the two for recoiling, since the animation is velocity sensitive */
-			val highStrike = statusHigh.strike
-			val mutedStrike = statusMuted.strike
-			var maxVelocity = 0
-			if (highStrike != null && highStrike.velocity > maxVelocity) {
-				maxVelocity = highStrike.velocity
-			}
-			if (mutedStrike != null && mutedStrike.velocity > maxVelocity) {
-				maxVelocity = mutedStrike.velocity
-			}
-			recoilDrum(leftCongaAnimNode, true, maxVelocity, delta)
-		} else {
-			recoilDrum(leftCongaAnimNode, false, 0, delta)
-		}
-	}
+            recoilDrum(leftCongaAnimNode, true, maxVelocity, delta)
+        } else {
+            recoilDrum(leftCongaAnimNode, false, 0, delta)
+        }
+    }
 
-	init {
+    init {
+        /* Load left conga */
+        context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp").apply {
+            setLocalScale(0.92f)
+            leftCongaAnimNode.attachChild(this)
+        }
 
-		/* Separate notes */
+        /* Load right conga */
+        rightCongaAnimNode.attachChild(context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp"))
 
-		/* Load left conga */
-		context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp").apply {
-			setLocalScale(0.92f)
-			leftCongaAnimNode.attachChild(this)
-		}
+        /* Create nodes for congas and attach them */
+        val leftCongaNode = Node()
+        leftCongaNode.attachChild(leftCongaAnimNode)
+        val rightCongaNode = Node()
+        rightCongaNode.attachChild(rightCongaAnimNode)
 
-		/* Load right conga */
-		rightCongaAnimNode.attachChild(context.loadModel("DrumSet_Conga.obj", "DrumShell_Conga.bmp"))
+        /* Attach to instrument */
+        instrumentNode.attachChild(leftCongaNode)
+        instrumentNode.attachChild(rightCongaNode)
 
-		/* Create nodes for congas and attach them */
-		val leftCongaNode = Node()
-		leftCongaNode.attachChild(leftCongaAnimNode)
-		val rightCongaNode = Node()
-		rightCongaNode.attachChild(rightCongaAnimNode)
+        /* Positioning */
+        highestLevel.setLocalTranslation(-32.5f, 35.7f, -44.1f)
+        highestLevel.localRotation = Quaternion().fromAngles(rad(4.8), rad(59.7), rad(-3.79))
+        leftCongaNode.setLocalTranslation(0.87f, -1.15f, 2.36f)
+        leftCongaNode.localRotation = Quaternion().fromAngles(rad(4.2), rad(18.7), rad(5.66))
+        rightCongaNode.setLocalTranslation(15.42f, 0.11f, -1.35f)
+        rightCongaNode.localRotation = Quaternion().fromAngles(rad(3.78), rad(18.0), rad(5.18))
 
-		/* Attach to instrument */
-		instrumentNode.attachChild(leftCongaNode)
-		instrumentNode.attachChild(rightCongaNode)
+        /* Load and position muted hand */
 
-		/* Positioning */
-		highestLevel.setLocalTranslation(-32.5f, 35.7f, -44.1f)
-		highestLevel.localRotation = Quaternion().fromAngles(rad(4.8), rad(59.7), rad(-3.79))
-		leftCongaNode.setLocalTranslation(0.87f, -1.15f, 2.36f)
-		leftCongaNode.localRotation = Quaternion().fromAngles(rad(4.2), rad(18.7), rad(5.66))
-		rightCongaNode.setLocalTranslation(15.42f, 0.11f, -1.35f)
-		rightCongaNode.localRotation = Quaternion().fromAngles(rad(3.78), rad(18.0), rad(5.18))
+        val mutedHand = context.loadModel("hand_left.obj", HANDS_TEXTURE)
+        mutedHand.setLocalTranslation(0f, 0f, -1f)
+        mutedHandNode.attachChild(mutedHand)
+        mutedHandNode.setLocalTranslation(-2.5f, 0f, 1f)
 
-		/* Load and position muted hand */
-		val mutedHand = context.loadModel("hand_left.obj", "hands.bmp")
-		mutedHand.setLocalTranslation(0f, 0f, -1f)
-		mutedHandNode.attachChild(mutedHand)
-		mutedHandNode.setLocalTranslation(-2.5f, 0f, 1f)
+        /* Load and position left hand */
+        val leftHand = context.loadModel("hand_left.obj", HANDS_TEXTURE)
+        leftHand.setLocalTranslation(0f, 0f, -1f)
+        leftHandNode.attachChild(leftHand)
+        leftHandNode.setLocalTranslation(1.5f, 0f, 6f)
 
-		/* Load and position left hand */
-		val leftHand = context.loadModel("hand_left.obj", "hands.bmp")
-		leftHand.setLocalTranslation(0f, 0f, -1f)
-		leftHandNode.attachChild(leftHand)
-		leftHandNode.setLocalTranslation(1.5f, 0f, 6f)
+        /* Load and position right hand */
+        val rightHand = context.loadModel("hand_right.obj", HANDS_TEXTURE)
+        rightHand.setLocalTranslation(0f, 0f, -1f)
+        rightHandNode.attachChild(rightHand)
+        rightHandNode.setLocalTranslation(0f, 0f, 6f)
 
-		/* Load and position right hand */
-		val rightHand = context.loadModel("hand_right.obj", "hands.bmp")
-		rightHand.setLocalTranslation(0f, 0f, -1f)
-		rightHandNode.attachChild(rightHand)
-		rightHandNode.setLocalTranslation(0f, 0f, 6f)
-
-		/* Attach hands */
-		leftCongaAnimNode.attachChild(mutedHandNode)
-		leftCongaAnimNode.attachChild(leftHandNode)
-		rightCongaAnimNode.attachChild(rightHandNode)
-	}
+        /* Attach hands */
+        leftCongaAnimNode.attachChild(mutedHandNode)
+        leftCongaAnimNode.attachChild(leftHandNode)
+        rightCongaAnimNode.attachChild(rightHandNode)
+    }
 }

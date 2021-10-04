@@ -34,70 +34,66 @@ import org.wysko.midis2jam2.world.Axis
  * creating a different file for each position.
  */
 abstract class HandedClone protected constructor(parent: HandedInstrument, rotationFactor: Float) :
-	Clone(parent, rotationFactor, Axis.X) {
+    Clone(parent, rotationFactor, Axis.X) {
 
-	/**
-	 * The left hand node.
-	 */
-	@JvmField
-	protected val leftHandNode = Node()
+    /**
+     * The left hand node.
+     */
+    private val leftHandNode = Node()
 
-	/**
-	 * The right hand node.
-	 */
-	@JvmField
-	protected val rightHandNode = Node()
+    /**
+     * The right hand node.
+     */
+    private val rightHandNode = Node()
 
-	/**
-	 * The left hands.
-	 */
-	protected lateinit var leftHands: Array<Spatial>
+    /**
+     * The left hands.
+     */
+    protected lateinit var leftHands: Array<Spatial>
 
-	/**
-	 * The right hands.
-	 */
-	protected lateinit var rightHands: Array<Spatial>
+    /**
+     * The right hands.
+     */
+    protected lateinit var rightHands: Array<Spatial>
 
-	/**
-	 * Overrides of this function should initialize and populate [leftHands] and [rightHands]. This method, as
-	 * defined in [HandedClone], will then attach them to the [leftHandNode] and [rightHandNode], and set all but the
-	 * first pair to be invisible.
-	 */
-	protected open fun loadHands() {
-		if (!::leftHands.isInitialized) { // May not be initialized because of Ocarina.
-			leftHands = emptyArray()
-		}
-		leftHands.forEach { leftHandNode.attachChild(it) }
-		leftHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
+    /**
+     * Overrides of this function should initialize and populate [leftHands] and [rightHands]. This method, as
+     * defined in [HandedClone], will then attach them to the [leftHandNode] and [rightHandNode], and set all but the
+     * first pair to be invisible.
+     */
+    protected open fun loadHands() {
+        if (!::leftHands.isInitialized) { // May not be initialized because of Ocarina.
+            leftHands = emptyArray()
+        }
+        leftHands.forEach { leftHandNode.attachChild(it) }
+        leftHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
 
-		rightHands.forEach { rightHandNode.attachChild(it) }
-		rightHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
-	}
+        rightHands.forEach { rightHandNode.attachChild(it) }
+        rightHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
+    }
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		if (isPlaying) {
-			/* Set the hands */
-			assert(currentNotePeriod != null)
-			assert(parent.manager != null)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        if (isPlaying) {
+            /* Set the hands */
 
-			val hands = parent.manager!!.fingering(currentNotePeriod!!.midiNote) as Hands?
-			if (hands != null) {
-				setHand(leftHands, hands.left)
-				setHand(rightHands, hands.right)
-			}
-		}
-	}
+            val hands = parent.manager!!.fingering(currentNotePeriod!!.midiNote) as Hands?
+            if (hands != null) {
+                setHand(leftHands, hands.left)
+                setHand(rightHands, hands.right)
+            }
+        }
+    }
 
-	companion object {
-		/** Given an array of hands and an index, sets the hand at the index to be visible, and all else invisible. */
-		private fun setHand(hands: Array<Spatial>, handPosition: Int) {
-			hands.indices.forEach { hands[it].cullHint = Utils.cullHint(it == handPosition) }
-		}
-	}
+    companion object {
+        /** Given an array of hands and an index, sets the hand at the index to be visible, and all else invisible. */
+        private fun setHand(hands: Array<Spatial>, handPosition: Int) {
+            hands.indices.forEach { hands[it].cullHint = Utils.cullHint(it == handPosition) }
+        }
+    }
 
-	init {
-		modelNode.attachChild(leftHandNode)
-		modelNode.attachChild(rightHandNode)
-	}
+    init {
+        modelNode.attachChild(leftHandNode)
+        modelNode.attachChild(rightHandNode)
+    }
 }

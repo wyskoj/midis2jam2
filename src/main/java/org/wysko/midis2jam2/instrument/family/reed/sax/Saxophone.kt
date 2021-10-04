@@ -26,12 +26,12 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
  */
 abstract class Saxophone
 protected constructor(
-	context: Midis2jam2,
-	eventList: List<MidiChannelSpecificEvent>,
-	cloneClass: Class<out SaxophoneClone>,
-	fingeringManager: PressedKeysFingeringManager
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>,
+    cloneClass: Class<out SaxophoneClone>,
+    fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 40 * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 40 * indexForMoving(delta), 0f)
+    }
 }

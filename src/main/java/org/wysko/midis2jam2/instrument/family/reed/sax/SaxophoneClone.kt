@@ -24,30 +24,32 @@ import org.wysko.midis2jam2.util.Utils.rad
 /**
  * Shared code for sax clones.
  */
-abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) : UpAndDownKeyClone(
-	NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor
-) {
-	override fun moveForPolyphony() {
-		offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
-	}
+abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) :
+    UpAndDownKeyClone(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor) {
 
-	companion object {
-		/**
-		 * The number of keys on a saxophone.
-		 */
-		private const val NUMBER_OF_KEYS = 20
+    override fun moveForPolyphony() {
+        offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
+    }
 
-		/**
-		 * The amount to rotate the sax by when playing.
-		 */
-		private const val ROTATION_FACTOR = 0.1f
-	}
+    companion object {
+        /**
+         * The number of keys on a saxophone.
+         */
+        private const val NUMBER_OF_KEYS = 20
 
-	init {
-		for (i in 0 until keyCount) {
-			keysUp[i] = parent.context.loadModel("AltoSaxKeyUp$i.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
-			keysDown[i] = parent.context.loadModel("AltoSaxKeyDown$i.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
-		}
-		attachKeys()
-	}
+        /**
+         * The amount to rotate the sax by when playing.
+         */
+        private const val ROTATION_FACTOR = 0.1f
+    }
+
+    init {
+        keysUp = Array(NUMBER_OF_KEYS) {
+            parent.context.loadModel("AltoSaxKeyUp$it.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+        }
+        keysDown = Array(NUMBER_OF_KEYS) {
+            parent.context.loadModel("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+        }
+        attachKeys()
+    }
 }

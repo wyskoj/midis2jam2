@@ -22,14 +22,14 @@ import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.Axis
-import java.util.stream.Collectors
 
 /**
- * [MonophonicInstruments][MonophonicInstrument] use Clones to visualize polyphony on monophonic instruments. A
- * clone is required for
- * each degree of polyphony.
+ * [MonophonicInstruments][MonophonicInstrument] use Clones to visualize polyphony. A clone is required for each
+ * degree of polyphony.
  *
  * The calculation of clones (that is, determining how many clones are needed and which clones should be responsible for
  * each note) is performed in [MonophonicInstrument].
@@ -37,161 +37,104 @@ import java.util.stream.Collectors
  * @see MonophonicInstrument
  */
 abstract class Clone protected constructor(
-    /**
-     * The [MonophonicInstrument] this clone is associated with.
-     */
-    @JvmField
+    /** The [MonophonicInstrument] this clone is associated with. */
     val parent: MonophonicInstrument,
-    /**
-     * The amount to rotate this instrument by when playing.
-     */
+
+    /** The amount to rotate this instrument by when playing. */
     private val rotationFactor: Float,
-    /**
-     * The axis on which this clone rotates when playing.
-     */
+
+    /** The axis on which this clone rotates when playing. */
     private val rotationAxis: Axis
 ) {
-    /**
-     * Used for the rotation while playing.
-     */
-    @JvmField
-    val animNode = Node()
+    /** Used for the rotation while playing. */
+    val animNode: Node = Node()
 
-    /**
-     * The model node.
-     */
-    @JvmField
-    val modelNode = Node()
+    /** The model node. */
+    val modelNode: Node = Node()
 
-    /**
-     * The note periods for which this clone should be responsible for animating.
-     *
-     * @see NotePeriod
-     */
-    @JvmField
+    /** The note periods for which this clone should be responsible for animating. */
     val notePeriods: MutableList<NotePeriod>
 
-    /**
-     * Used for moving with [.indexForMoving].
-     */
-    @JvmField
-    val offsetNode = Node()
+    /** Used for moving with [indexForMoving]. */
+    val offsetNode: Node = Node()
 
-    /**
-     * The highest level.
-     */
-    @JvmField
-    val highestLevel = Node()
+    /** The highest level. */
+    val highestLevel: Node = Node()
 
-    /**
-     * Used for positioning and rotation.
-     */
-    @JvmField
-    val idleNode = Node()
+    /** Used for positioning and rotation. */
+    val idleNode: Node = Node()
 
-    /**
-     * The current note period that is being handled.
-     */
-    @JvmField
+    /** The current note period that is being handled. */
     var currentNotePeriod: NotePeriod? = null
 
     /**
-     * Keeps track of whether or not this clone is currently visible. The 0-clone (the clone at index 0) is always
+     * Keeps track of whether this clone is currently visible. The 0-clone (the clone at index 0) is always
      * visible, that is if the instrument itself is visible.
      */
     private var isVisible = false
 
     /**
-     * Determines if this clone is playing at a certain point. Since [.notePeriods] is always losing note periods
-     * that have fully elapsed, this method is likely not reliable for checking events in the past.
-     *
-     * @param midiTick the current midi tick
-     * @return true if should be playing, false otherwise
+     * Determines if this clone is playing at a certain point. Since [notePeriods] is always losing note periods
+     * that have fully elapsed, this method cannot produce correct results for events in the past.
      */
     @Contract(pure = true)
-    fun isPlaying(midiTick: Long): Boolean {
-        return notePeriods.any { midiTick >= it.startTick() && midiTick < it.endTick() }
-    }
+    fun isPlaying(midiTick: Long): Boolean = notePeriods.any { midiTick >= it.startTick() && midiTick < it.endTick() }
 
-    /**
-     * Determines if this clone is playing at a certain point.
-     *
-     * @return true if should be playing, false otherwise
-     */
+
+    /** Determines if this clone is playing. */
     @get:Contract(pure = true)
     val isPlaying: Boolean
         get() = currentNotePeriod != null
 
-    /**
-     * Hides or shows this clone.
-     *
-     * @param indexThis the index of this clone
-     */
+    /** Hides or shows this clone, given the [index][indexThis]. */
     private fun hideOrShowOnPolyphony(indexThis: Int) {
-        if (indexThis != 0) {
+        /* If this is the 0-clone, always show. */
+        if (indexThis == 0) {
+            highestLevel.cullHint = Dynamic
+            isVisible = true
+        } else {
+            /* If we are currently positioned at 0, but normally we wouldn't be, hide. */
             if (indexForMoving() == 0) {
                 isVisible = false
                 highestLevel.cullHint = Always
             }
-            if (currentNotePeriod != null) {
-                highestLevel.cullHint = Dynamic
-                isVisible = true
-            } else {
-                highestLevel.cullHint = Always
-                isVisible = false
-            }
-        } else {
-            highestLevel.cullHint = Dynamic
-            isVisible = true
+            /* A further check if currently playing, show, hide otherwise. */
+            highestLevel.cullHint = Utils.cullHint(isPlaying)
+            isVisible = isPlaying
         }
     }
 
-    /**
-     * Similar to [org.wysko.midis2jam2.instrument.Instrument.tick].
-     *
-     *  * Calls [hideOrShowOnPolyphony]
-     *  * Rotates clone based on playing
-     *
-     * @param time  the current time
-     * @param delta the amount of time since last frame
-     */
+    /** Updates the clone on every frame. */
     open fun tick(time: Double, delta: Float) {
-        while (notePeriods.isNotEmpty() && notePeriods[0].startTime <= time) {
-            currentNotePeriod = notePeriods.removeAt(0)
-        }
-        if (currentNotePeriod != null && currentNotePeriod!!.endTime <= time) {
-            currentNotePeriod = null
+        /* Grab the newest note period */
+        NoteQueue.collectOne(notePeriods, time)?.let { currentNotePeriod = it }
+
+        /* Clear the note period if it is elapsed */
+        currentNotePeriod?.let {
+            if (it.endTime <= time) {
+                currentNotePeriod = null
+            }
         }
 
         /* Rotate clone on note play */
-        if (currentNotePeriod == null) {
-            animNode.localRotation = Quaternion()
-        } else {
-            val rotate =
-                -((currentNotePeriod!!.endTime - time) / currentNotePeriod!!.duration()).toFloat() * rotationFactor
+        currentNotePeriod?.let {
+            val rotate = -((it.endTime - time) / it.duration()).toFloat() * rotationFactor
             animNode.localRotation = Quaternion().fromAngles(
                 if (rotationAxis === Axis.X) rotate else 0f,
                 if (rotationAxis === Axis.Y) rotate else 0f,
                 if (rotationAxis === Axis.Z) rotate else 0f
             )
+        } ?: run {
+            animNode.localRotation = Quaternion()
         }
         hideOrShowOnPolyphony(parent.clones.indexOf(this))
         moveForPolyphony()
     }
 
-    /**
-     * Returns the index for moving so that clones do not overlap.
-     *
-     * @return the index for moving so that clones do not overlap
-     */
-    protected fun indexForMoving(): Int {
-        return 0.coerceAtLeast(parent.clones.stream().filter { obj: Clone -> obj.isVisible }
-            .collect(Collectors.toList()).indexOf(this))
-    }
+    /** Returns the index for moving so that clones do not overlap. */
+    protected fun indexForMoving(): Int = 0.coerceAtLeast(parent.clones.filter { it.isVisible }.indexOf(this))
 
-    /**
-     * Move as to not overlap with other clones.
-     */
+    /** Move as to not overlap with other clones. */
     protected abstract fun moveForPolyphony()
 
     init {

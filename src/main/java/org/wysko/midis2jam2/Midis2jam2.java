@@ -364,7 +364,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 			case 47:
 				return new Timpani(this, events);
 			case 52:
-				return new StageChoir(this, events, VOICE_AAHS);
+				return new StageChoir(this, events, CHOIR_AAHS);
 			case 53:
 				return new StageChoir(this, events, VOICE_OOHS);
 			case 54:
@@ -647,8 +647,8 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 * @param camera the camera to apply
 	 */
 	private void setCamera(Camera camera) {
-		this.app.getCamera().setLocation(camera.location);
-		this.app.getCamera().setRotation(camera.rotation);
+		this.app.getCamera().setLocation(camera.getLocation());
+		this.app.getCamera().setRotation(camera.getRotation());
 	}
 	
 	/**

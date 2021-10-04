@@ -26,21 +26,21 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Cello.
  */
 class Cello(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
-	context,
-	events,
-	true,
-	20.0,
-	Vector3f(0.75f, 0.75f, 0.75f),
-	intArrayOf(36, 43, 50, 57),
-	context.loadModel("Cello.obj", "CelloSkin.bmp")
+    context,
+    events,
+    true,
+    20.0,
+    Vector3f(0.75f, 0.75f, 0.75f),
+    intArrayOf(36, 43, 50, 57),
+    context.loadModel("Cello.obj", "CelloSkin.bmp")
 ) {
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(-20 * indexForMoving(delta), 0f, 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(-20 * indexForMoving(delta), 0f, 0f)
+    }
 
-	init {
-		highestLevel.setLocalTranslation(-69f, 39.5f, -49.6f)
-		instrumentNode.setLocalScale(1.86f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
-	}
+    init {
+        highestLevel.setLocalTranslation(-69f, 39.5f, -49.6f)
+        instrumentNode.setLocalScale(1.86f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
+    }
 }

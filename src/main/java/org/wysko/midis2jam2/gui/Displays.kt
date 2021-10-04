@@ -22,27 +22,27 @@ import java.awt.image.BufferedImage
 import javax.swing.JFrame
 
 abstract class Displays : JFrame() {
-	fun display() {
-		defaultCloseOperation = DISPOSE_ON_CLOSE
-		pack()
-		setLocationRelativeTo(null)
-		isVisible = true
-	}
+    fun display() {
+        defaultCloseOperation = DISPOSE_ON_CLOSE
+        pack()
+        setLocationRelativeTo(null)
+        isVisible = true
+    }
 
-	/**
-	 * Shows or hides the cursor.
-	 *
-	 * @param hide if true, hides the cursor, false shows the cursor
-	 */
-	fun hideCursor(hide: Boolean) {
-		cursor = if (hide) {
-			this.toolkit.createCustomCursor(
-				BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-				Point(),
-				null
-			)
-		} else {
-			Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-		}
-	}
+    /**
+     * Shows or hides the cursor.
+     *
+     * @param hide if true, hides the cursor, false shows the cursor
+     */
+    fun hideCursor(hide: Boolean) {
+        cursor = if (hide) {
+            this.toolkit.createCustomCursor(
+                BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
+                Point(),
+                null
+            )
+        } else {
+            Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+        }
+    }
 }

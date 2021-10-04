@@ -24,20 +24,13 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
  * A DecayedInstrument is any instrument that only depends on [MidiNoteOnEvent]s to function. The note off event
  * is discarded.
  */
-abstract class DecayedInstrument protected constructor(
-    context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
-) : Instrument(context) {
+abstract class DecayedInstrument protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+    Instrument(context) {
 
-    /**
-     * List of events this instrument should play.
-     */
-    @JvmField
-    val hits: MutableList<MidiNoteOnEvent> = eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
+    /** List of events this instrument should play. */
+    protected val hits: MutableList<MidiNoteOnEvent> = eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
 
-    /**
-     * The list of unmodifiable hits.
-     */
+    /** The list of unmodifiable hits. */
     private val finalHits: List<MidiNoteOnEvent> = ArrayList(hits)
 
     override fun tick(time: Double, delta: Float) {

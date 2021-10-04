@@ -6,7 +6,7 @@ import javax.swing.ImageIcon
 import javax.swing.JButton
 
 class JResizedIconButton : JButton() {
-	override fun setIcon(defaultIcon: Icon) {
-		super.setIcon(ImageIcon((defaultIcon as ImageIcon).image.getScaledInstance(20, 20, Image.SCALE_SMOOTH)))
-	}
+    override fun setIcon(defaultIcon: Icon) {
+        super.setIcon(ImageIcon((defaultIcon as ImageIcon).image.getScaledInstance(20, 20, Image.SCALE_SMOOTH)))
+    }
 }

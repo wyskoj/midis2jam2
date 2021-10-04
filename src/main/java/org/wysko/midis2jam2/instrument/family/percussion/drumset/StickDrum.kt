@@ -25,28 +25,28 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
  * A drum that is hit with a stick.
  */
 abstract class StickDrum protected constructor(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
-	SingleStickInstrument(context, hits) {
+    SingleStickInstrument(context, hits) {
 
-	/**
-	 * The drum model.
-	 */
-	protected lateinit var drum: Spatial
+    /**
+     * The drum model.
+     */
+    protected lateinit var drum: Spatial
 
-	/**
-	 * Handles animation and note handling for the drum recoil.
-	 *
-	 * @param time  the current time
-	 * @param delta the amount of time since the last frame update
-	 */
-	protected fun drumRecoil(time: Double, delta: Float) {
-		val recoil = collectOne(hits, context, time)
-		recoilDrum(drum, recoil != null, recoil?.velocity ?: 0, delta)
-	}
+    /**
+     * Handles animation and note handling for the drum recoil.
+     *
+     * @param time  the current time
+     * @param delta the amount of time since the last frame update
+     */
+    protected fun drumRecoil(time: Double, delta: Float) {
+        val recoil = collectOne(hits, context, time)
+        recoilDrum(drum, recoil != null, recoil?.velocity ?: 0, delta)
+    }
 
-	companion object {
-		/**
-		 * How far the drum should travel when hit.
-		 */
-		const val RECOIL_DISTANCE = -2f
-	}
+    companion object {
+        /**
+         * How far the drum should travel when hit.
+         */
+        const val RECOIL_DISTANCE = -2f
+    }
 }

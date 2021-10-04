@@ -23,6 +23,8 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.clone.Clone
+import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.Companion.SIGMOID_CALCULATOR
+import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiControlEvent
 import org.wysko.midis2jam2.midi.MidiPitchBendEvent
@@ -32,7 +34,35 @@ import org.wysko.midis2jam2.world.Axis
 import kotlin.math.exp
 import kotlin.math.sin
 
-/** The space laser, as made famous by Stick Figures from Animusic. */
+/**
+ * The space laser, as made famous by Stick Figures from Animusic.
+ *
+ * The space laser's main animation component is the [SpaceLaserClone.laserNode]. It rotates clockwise and
+ * counter-clockwise depending on the current note played. Each note has a defined rotation. Middle C has a rotation
+ * of zero (i.e., the laser is pointing straight up). Notes lower than Middle C rotate counter-clockwise of center
+ * and notes higher than Middle C rotate clockwise of center.
+ *
+ * In between notes, the laser will gradually rotate to meet the target rotation of the next note. Because a MIDI
+ * file could have its notes back-to-back (i.e., there is no silence in between notes), the laser would instantly
+ * snap to the next target rotation. To combat this, each note is slightly truncated to allow for a short amount of
+ * time for the laser to rotate.
+ *
+ * The specific angle of the laser for each note is calculated by instantiations of [SpaceLaserAngleCalculator]. This
+ * class defines an implementation of this as [SIGMOID_CALCULATOR]. Although this is used, other valid
+ * implementations should work as well.
+ *
+ * To signify that a note is playing, the shooter "shoots" out a laser beam. This is done by un-culling
+ * [SpaceLaserClone.laserBeam]. It is attached to [SpaceLaserClone.laserNode] which also contains the shooter. This
+ * way, the laser beam and the shooter are grouped together.
+ *
+ * Besides rotating based on the pitch of each note, the laser is "wobbled" slightly. The
+ * [SpaceLaserClone.wobbleIntensity] is increased during a note until a certain threshold is reached.
+ *
+ * The space laser also animated pitch bend and modulation. The intensity of the aforementioned wobble is driven by
+ * the modulation controller. Pitch bend turns the laser proportional to the intensity of the bend. For example, if
+ * the note playing is Middle C and the pitch bend dictates the sound should be pitched -100 cents, the laser should
+ * point in the same direction as B below Middle C.
+ */
 class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
@@ -50,7 +80,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
     @Suppress("unused")
     companion object {
-        /* See https://www.desmos.com/calculator/zbmdwg4vcl */
+        /** See https://www.desmos.com/calculator/zbmdwg4vcl */
         val SIGMOID_CALCULATOR: SpaceLaserAngleCalculator =
             object : SpaceLaserAngleCalculator {
                 override fun angleFromNote(note: Int, pitchBendAmount: Double): Double {
@@ -82,7 +112,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private val laserNode = Node()
 
         /** The laser beam. */
-        internal val laserBeam: Spatial
+        internal val laserBeam: Spatial = context.loadModel("SpaceLaserLaser.fbx", "Laser.bmp")
 
         /** Timer for how long a note has been playing to calculate wobble. */
         private var wobbleTime = 0.0
@@ -94,25 +124,22 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private val angleCalculator = SIGMOID_CALCULATOR
 
         /** The shooter. */
-        internal val shooter: Spatial
+        internal val shooter: Spatial = context.loadModel("SpaceLaser.fbx", "ShinySilver.bmp")
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
             if (isPlaying) {
-                val target = angleCalculator.angleFromNote(currentNotePeriod!!.midiNote, pitchBendAmount)
-
-                rotation = target
+                rotation = angleCalculator.angleFromNote((currentNotePeriod ?: return).midiNote, pitchBendAmount)
 
                 wobbleTime += delta.toDouble()
-                wobbleIntensity = ((time - currentNotePeriod!!.startTime) - 0.1).coerceIn(
-                    0.0, modulationAmount
-                        .coerceAtLeast(0.05)
+                wobbleIntensity = ((time - (currentNotePeriod ?: return).startTime) - 0.1).coerceIn(
+                    0.0, modulationAmount.coerceAtLeast(0.05)
                 )
             } else {
-                if (notePeriods.isNotEmpty()) {
-                    val startTime = notePeriods[0].startTime
+                notePeriods.firstOrNull()?.let {
+                    val startTime = it.startTime
                     if (startTime - time <= 1) {
-                        val targetPos = angleCalculator.angleFromNote(notePeriods[0].midiNote, pitchBendAmount)
+                        val targetPos = angleCalculator.angleFromNote(it.midiNote, pitchBendAmount)
                         if (startTime - time >= delta) {
                             rotation += (targetPos - rotation) / (startTime - time) * delta
                         }
@@ -133,9 +160,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
 
         init {
-            shooter = context.loadModel("SpaceLaser.fbx", "ShinySilver.bmp")
 
-            laserBeam = context.loadModel("SpaceLaserLaser.fbx", "Laser.bmp")
             laserNode.apply {
                 attachChild(shooter)
                 attachChild(laserBeam)
@@ -145,8 +170,16 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
     }
 
-    enum class SpaceLaserType(val filename: String) {
+    /** Defines a type of [SpaceLaser]. */
+    enum class SpaceLaserType(
+        /** The texture file of the laser. */
+        val filename: String
+    ) {
+
+        /** Saw laser type. */
         SAW("Laser.bmp"),
+
+        /** Square laser type. */
         SQUARE("LaserRed.png")
     }
 
@@ -169,24 +202,24 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
 
         pitchBends = eventList
-            .filterIsInstance(MidiPitchBendEvent::class.java)
+            .filterIsInstance<MidiPitchBendEvent>()
             .toMutableList()
 
         modulationEvents = eventList
-            .filterIsInstance(MidiControlEvent::class.java)
-            .filter { e -> e.controlNum == 1 }
+            .filterIsInstance<MidiControlEvent>()
+            .filter { it.controlNum == 1 } // MIDI CC#1 is modulation
             .toMutableList()
 
-        for (clone in clones) {
-            clone as SpaceLaserClone
+        clones.forEach {
+            it as SpaceLaserClone
 
-            (clone.shooter as Node).apply {
+            (it.shooter as Node).apply {
                 getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                 getChild(1).setMaterial(context.unshadedMaterial("Assets/" + type.filename))
                 getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
             }
 
-            clone.laserBeam.setMaterial(context.unshadedMaterial("Assets/" + type.filename))
+            it.laserBeam.setMaterial(context.unshadedMaterial("Assets/" + type.filename))
         }
     }
 }

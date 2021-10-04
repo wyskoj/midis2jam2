@@ -33,174 +33,174 @@ import kotlin.math.sin
  * The stage strings.
  */
 class StageStrings(
-	context: Midis2jam2,
-	eventList: List<MidiChannelSpecificEvent>,
-	type: StageStringsType,
-	val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>,
+    type: StageStringsType,
+    val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
 ) :
-	WrappedOctaveSustained(context, eventList, false) {
+    WrappedOctaveSustained(context, eventList, false) {
 
-	/**
-	 * Nodes that contain each string.
-	 */
-	private val stringNodes = Array(12) { Node() }
+    /**
+     * Nodes that contain each string.
+     */
+    private val stringNodes = Array(12) { Node() }
 
-	override fun moveForMultiChannel(delta: Float) {
-		highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * indexForMoving(delta)), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * indexForMoving(delta)), 0f)
+    }
 
-	enum class StageStringsType(val textureFile: String) {
-		STRING_ENSEMBLE_1("FakeWood.bmp"),
-		STRING_ENSEMBLE_2("Wood.bmp"),
-		SYNTH_STRINGS_1("Laser.bmp"),
-		SYNTH_STRINGS_2("AccordionCaseFront.bmp"),
-		BOWED_SYNTH("SongFillbar.bmp");
-	}
+    enum class StageStringsType(val textureFile: String) {
+        STRING_ENSEMBLE_1("FakeWood.bmp"),
+        STRING_ENSEMBLE_2("Wood.bmp"),
+        SYNTH_STRINGS_1("Laser.bmp"),
+        SYNTH_STRINGS_2("AccordionCaseFront.bmp"),
+        BOWED_SYNTH("SongFillbar.bmp");
+    }
 
-	enum class StageStringBehavior {
-		NORMAL, TREMOLO
-	}
+    enum class StageStringBehavior {
+        NORMAL, TREMOLO
+    }
 
-	/**
-	 * A single string.
-	 */
-	inner class StageStringNote(type: StageStringsType) : TwelfthOfOctave() {
+    /**
+     * A single string.
+     */
+    inner class StageStringNote(type: StageStringsType) : TwelfthOfOctave() {
 
-		/**
-		 * Contains the bow.
-		 */
-		private val bowNode = Node()
+        /**
+         * Contains the bow.
+         */
+        private val bowNode = Node()
 
-		/**
-		 * Contains the anim strings.
-		 */
-		private val animStringNode = Node()
+        /**
+         * Contains the anim strings.
+         */
+        private val animStringNode = Node()
 
-		/**
-		 * Each frame of the anim strings.
-		 */
-		private val animStrings: Array<Spatial>
+        /**
+         * Each frame of the anim strings.
+         */
+        private val animStrings: Array<Spatial>
 
-		/**
-		 * The resting string.
-		 */
-		private val restingString: Spatial
+        /**
+         * The resting string.
+         */
+        private val restingString: Spatial
 
-		/**
-		 * The bow.
-		 */
-		private val bow: Spatial
+        /**
+         * The bow.
+         */
+        private val bow: Spatial
 
-		/**
-		 * The anim string animator.
-		 */
-		private val animator: VibratingStringAnimator
+        /**
+         * The anim string animator.
+         */
+        private val animator: VibratingStringAnimator
 
-		/** We keep track of the current time for sinusoidal calculations for tremolo playing. */
-		private var time = Math.random() * 10
+        /** We keep track of the current time for sinusoidal calculations for tremolo playing. */
+        private var time = Math.random() * 10
 
-		override fun play(duration: Double) {
-			playing = true
-			progress = 0.0
-			this.duration = duration
-		}
+        override fun play(duration: Double) {
+            playing = true
+            progress = 0.0
+            this.duration = duration
+        }
 
-		override fun tick(delta: Float) {
-			/* Time elapsed */
-			if (progress >= 1) {
-				playing = false
-				progress = 0.0
-			}
+        override fun tick(delta: Float) {
+            /* Time elapsed */
+            if (progress >= 1) {
+                playing = false
+                progress = 0.0
+            }
 
-			if (playing) {
-				/* Update playing progress */
-				progress += delta / duration
+            if (playing) {
+                /* Update playing progress */
+                progress += delta / duration
 
-				/* Show bow */
-				bowNode.cullHint = Dynamic
+                /* Show bow */
+                bowNode.cullHint = Dynamic
 
-				/* Slide bow across string */
-				if (stageStringBehavior == StageStringBehavior.NORMAL) {
-					bow.setLocalTranslation(0f, (8 * (progress - 0.5)).toFloat(), 0f)
-				} else {
-					/* Slide bow back and forth */
-					bow.setLocalTranslation(
-						0f,
-						(sin(30 * time) * 4).toFloat(),
-						0f
-					)
+                /* Slide bow across string */
+                if (stageStringBehavior == StageStringBehavior.NORMAL) {
+                    bow.setLocalTranslation(0f, (8 * (progress - 0.5)).toFloat(), 0f)
+                } else {
+                    /* Slide bow back and forth */
+                    bow.setLocalTranslation(
+                        0f,
+                        (sin(30 * time) * 4).toFloat(),
+                        0f
+                    )
 
-					/* Update stopwatch */
-					time += delta
-				}
+                    /* Update stopwatch */
+                    time += delta
+                }
 
-				/* Move string and holder forwards */
-				animNode.setLocalTranslation(0f, 0f, 2f)
+                /* Move string and holder forwards */
+                animNode.setLocalTranslation(0f, 0f, 2f)
 
-				/* Hide resting string, show anim string */
-				restingString.cullHint = Always
-				animStringNode.cullHint = Dynamic
-			} else {
-				/* Hide bow */
-				bowNode.cullHint = Always
+                /* Hide resting string, show anim string */
+                restingString.cullHint = Always
+                animStringNode.cullHint = Dynamic
+            } else {
+                /* Hide bow */
+                bowNode.cullHint = Always
 
-				/* Move string and holder backwards */
-				animNode.setLocalTranslation(0f, 0f, 0f)
+                /* Move string and holder backwards */
+                animNode.setLocalTranslation(0f, 0f, 0f)
 
-				/* Show resting string, hide anim string */
-				restingString.cullHint = Dynamic
-				animStringNode.cullHint = Always
-			}
-			animator.tick(delta)
-		}
+                /* Show resting string, hide anim string */
+                restingString.cullHint = Dynamic
+                animStringNode.cullHint = Always
+            }
+            animator.tick(delta)
+        }
 
-		init {
-			/* Load holder */
-			animNode.attachChild(context.loadModel("StageStringHolder.obj", type.textureFile))
+        init {
+            /* Load holder */
+            animNode.attachChild(context.loadModel("StageStringHolder.obj", type.textureFile))
 
-			/* Load anim strings */
-			animStrings = Array(5) {
-				context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
-					cullHint = Always // Hide on startup
-					animStringNode.attachChild(this)
-				}
-			}
+            /* Load anim strings */
+            animStrings = Array(5) {
+                context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
+                    cullHint = Always // Hide on startup
+                    animStringNode.attachChild(this)
+                }
+            }
 
-			animNode.attachChild(animStringNode)
+            animNode.attachChild(animStringNode)
 
-			// Load resting string
-			restingString = context.loadModel("StageString.obj", "StageString.bmp").apply {
+            // Load resting string
+            restingString = context.loadModel("StageString.obj", "StageString.bmp").apply {
 
-			}
-			animNode.attachChild(restingString)
+            }
+            animNode.attachChild(restingString)
 
-			// Load bow
-			bow = context.loadModel("StageStringBow.fbx", type.textureFile).apply {
-				(this as Node).getChild(1).setMaterial((restingString as Geometry).material)
-			}
+            // Load bow
+            bow = context.loadModel("StageStringBow.fbx", type.textureFile).apply {
+                (this as Node).getChild(1).setMaterial((restingString as Geometry).material)
+            }
 
-			bowNode.run {
-				attachChild(bow)
-				setLocalTranslation(0f, 48f, 0f)
-				localRotation = Quaternion().fromAngles(0f, 0f, rad(-60.0))
-				cullHint = Always
-			}
+            bowNode.run {
+                attachChild(bow)
+                setLocalTranslation(0f, 48f, 0f)
+                localRotation = Quaternion().fromAngles(0f, 0f, rad(-60.0))
+                cullHint = Always
+            }
 
-			animNode.attachChild(bowNode)
-			highestLevel.attachChild(animNode)
-			animator = VibratingStringAnimator(*animStrings)
-		}
-	}
+            animNode.attachChild(bowNode)
+            highestLevel.attachChild(animNode)
+            animator = VibratingStringAnimator(*animStrings)
+        }
+    }
 
-	init {
-		twelfths = Array(12) { StageStringNote(type) }
-		for (i in 0..11) {
-			stringNodes[i].run {
-				attachChild(twelfths[i]!!.highestLevel)
-				localRotation = Quaternion().fromAngles(0f, rad((9 / 10f * i).toDouble()), 0f)
-			}
-			twelfths[i]!!.highestLevel.setLocalTranslation(0f, 2f * i, -151.76f)
-			instrumentNode.attachChild(stringNodes[i])
-		}
-	}
+    init {
+        twelfths = Array(12) { StageStringNote(type) }
+        for (i in 0..11) {
+            stringNodes[i].run {
+                attachChild(twelfths[i].highestLevel)
+                localRotation = Quaternion().fromAngles(0f, rad((9 / 10f * i).toDouble()), 0f)
+            }
+            twelfths[i].highestLevel.setLocalTranslation(0f, 2f * i, -151.76f)
+            instrumentNode.attachChild(stringNodes[i])
+        }
+    }
 }

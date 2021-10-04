@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.instrument.algorithmic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
+import org.wysko.midis2jam2.midi.NotePeriod
 
 
 object NoteQueue {
@@ -57,6 +58,16 @@ object NoteQueue {
         }
     }
 
+    fun collectOne(events: MutableList<NotePeriod>, time: Double): NotePeriod? {
+        val first = events.takeWhile { it.startTime <= time }.lastOrNull()
+        return if (first == null) {
+            null
+        } else {
+            events.remove(first)
+            first
+        }
+    }
+
     /**
      * Given a list of [MidiEvents][MidiEvent], removes the events that are needing animation. This is any event
      * that has a time equal to or less than the current time.
@@ -78,6 +89,6 @@ object NoteQueue {
                     midi.eventInSeconds(it) <= time - 0.033F)
         }
         events.removeAll(queue)
-        return queue;
+        return queue
     }
 }

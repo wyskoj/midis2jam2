@@ -30,22 +30,22 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the shaker.
-	 */
-	private val shakerNode = Node()
+    /**
+     * Contains the shaker.
+     */
+    private val shakerNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		Stick.handleStick(context, shakerNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        Stick.handleStick(context, shakerNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+    }
 
-	init {
-		val shaker = context.loadModel("Shaker.obj", "DarkWood.bmp")
-		shaker.setLocalTranslation(0f, 0f, -3f)
-		shakerNode.attachChild(shaker)
-		instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-25.0))
-		instrumentNode.setLocalTranslation(13f, 45f, -42f)
-		instrumentNode.attachChild(shakerNode)
-	}
+    init {
+        val shaker = context.loadModel("Shaker.obj", "DarkWood.bmp")
+        shaker.setLocalTranslation(0f, 0f, -3f)
+        shakerNode.attachChild(shaker)
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-25.0))
+        instrumentNode.setLocalTranslation(13f, 45f, -42f)
+        instrumentNode.attachChild(shakerNode)
+    }
 }

@@ -26,40 +26,32 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * Anything that is hit with a stick.
- */
+/** Anything that is hit with a stick. */
 abstract class SingleStickInstrument protected constructor(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
-	PercussionInstrument(context, hits) {
+    PercussionInstrument(context, hits) {
 
-	/**
-	 * The Stick.
-	 */
-	@JvmField
-	protected val stick: Spatial
+    /** The Stick. */
+    protected val stick: Spatial
 
-	/**
-	 * The Stick node.
-	 */
-	@JvmField
-	protected val stickNode = Node()
+    /** The Stick node. */
+    protected val stickNode: Node = Node()
 
-	/**
-	 * Handles the animation of the stick.
-	 *
-	 * @param time  the current time
-	 * @param delta the amount of time since the last frame update
-	 * @param hits  the running list of hits
-	 */
-	open fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus =
-		Stick.handleStick(context, stick, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+    /**
+     * Handles the animation of the stick.
+     *
+     * @param time  the current time
+     * @param delta the amount of time since the last frame update
+     * @param hits  the running list of hits
+     */
+    open fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus =
+        Stick.handleStick(context, stick, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 
 
-	init {
-		stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-			stickNode.attachChild(this)
-			localRotation = Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f)
-		}
-		highLevelNode.attachChild(stickNode)
-	}
+    init {
+        stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+            stickNode.attachChild(this)
+            localRotation = Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f)
+        }
+        highLevelNode.attachChild(stickNode)
+    }
 }

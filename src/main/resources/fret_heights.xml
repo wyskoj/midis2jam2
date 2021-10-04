@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!--
+<?xml version="1.0" encoding="UTF-8" ?><!--
   ~ Copyright (C) 2021 Jacob Wysko
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -17,73 +16,73 @@
   -->
 <instruments>
     <instrument name="BassGuitar">
-        <value fret="0" scale="0.0"/>
-        <value fret="1" scale="0.05"/>
-        <value fret="2" scale="0.1"/>
-        <value fret="3" scale="0.15"/>
-        <value fret="4" scale="0.20"/>
-        <value fret="5" scale="0.24"/>
-        <value fret="6" scale="0.285"/>
-        <value fret="7" scale="0.325"/>
-        <value fret="8" scale="0.364"/>
-        <value fret="9" scale="0.4"/>
-        <value fret="10" scale="0.43"/>
-        <value fret="11" scale="0.464"/>
-        <value fret="12" scale="0.494"/>
-        <value fret="13" scale="0.523"/>
-        <value fret="14" scale="0.55"/>
-        <value fret="15" scale="0.575"/>
-        <value fret="16" scale="0.6"/>
-        <value fret="17" scale="0.62"/>
-        <value fret="18" scale="0.643"/>
-        <value fret="19" scale="0.663"/>
-        <value fret="20" scale="0.68"/>
-        <value fret="21" scale="0.698"/>
-        <value fret="22" scale="0.716"/>
+        <value fret="0" scale="0.0" />
+        <value fret="1" scale="0.05" />
+        <value fret="2" scale="0.1" />
+        <value fret="3" scale="0.15" />
+        <value fret="4" scale="0.20" />
+        <value fret="5" scale="0.24" />
+        <value fret="6" scale="0.285" />
+        <value fret="7" scale="0.325" />
+        <value fret="8" scale="0.364" />
+        <value fret="9" scale="0.4" />
+        <value fret="10" scale="0.43" />
+        <value fret="11" scale="0.464" />
+        <value fret="12" scale="0.494" />
+        <value fret="13" scale="0.523" />
+        <value fret="14" scale="0.55" />
+        <value fret="15" scale="0.575" />
+        <value fret="16" scale="0.6" />
+        <value fret="17" scale="0.62" />
+        <value fret="18" scale="0.643" />
+        <value fret="19" scale="0.663" />
+        <value fret="20" scale="0.68" />
+        <value fret="21" scale="0.698" />
+        <value fret="22" scale="0.716" />
     </instrument>
     <instrument name="Guitar">
-        <value fret="0" scale="0"/>
-        <value fret="1" scale="0.0374"/>
-        <value fret="2" scale="0.0969"/>
-        <value fret="3" scale="0.1431"/>
-        <value fret="4" scale="0.1916"/>
-        <value fret="5" scale="0.2400"/>
-        <value fret="6" scale="0.2841"/>
-        <value fret="7" scale="0.3193"/>
-        <value fret="8" scale="0.3590"/>
-        <value fret="9" scale="0.3920"/>
-        <value fret="10" scale="0.4295"/>
-        <value fret="11" scale="0.4603"/>
-        <value fret="12" scale="0.4911"/>
-        <value fret="13" scale="0.5176"/>
-        <value fret="14" scale="0.5440"/>
-        <value fret="15" scale="0.5726"/>
-        <value fret="16" scale="0.5947"/>
-        <value fret="17" scale="0.6189"/>
-        <value fret="18" scale="0.6387"/>
-        <value fret="19" scale="0.6585"/>
-        <value fret="20" scale="0.6806"/>
-        <value fret="21" scale="0.6982"/>
-        <value fret="22" scale="0.7158"/>
+        <value fret="0" scale="0" />
+        <value fret="1" scale="0.0374" />
+        <value fret="2" scale="0.0969" />
+        <value fret="3" scale="0.1431" />
+        <value fret="4" scale="0.1916" />
+        <value fret="5" scale="0.2400" />
+        <value fret="6" scale="0.2841" />
+        <value fret="7" scale="0.3193" />
+        <value fret="8" scale="0.3590" />
+        <value fret="9" scale="0.3920" />
+        <value fret="10" scale="0.4295" />
+        <value fret="11" scale="0.4603" />
+        <value fret="12" scale="0.4911" />
+        <value fret="13" scale="0.5176" />
+        <value fret="14" scale="0.5440" />
+        <value fret="15" scale="0.5726" />
+        <value fret="16" scale="0.5947" />
+        <value fret="17" scale="0.6189" />
+        <value fret="18" scale="0.6387" />
+        <value fret="19" scale="0.6585" />
+        <value fret="20" scale="0.6806" />
+        <value fret="21" scale="0.6982" />
+        <value fret="22" scale="0.7158" />
     </instrument>
     <instrument name="Banjo">
-        <value fret="0" scale="0"/>
-        <value fret="1" scale="0.0472"/>
-        <value fret="2" scale="0.1020"/>
-        <value fret="3" scale="0.1476"/>
-        <value fret="4" scale="0.1918"/>
-        <value fret="5" scale="0.2344"/>
-        <value fret="6" scale="0.2725"/>
-        <value fret="7" scale="0.3090"/>
-        <value fret="8" scale="0.3425"/>
-        <value fret="9" scale="0.3760"/>
-        <value fret="10" scale="0.4049"/>
-        <value fret="11" scale="0.4338"/>
-        <value fret="12" scale="0.4597"/>
-        <value fret="13" scale="0.4855"/>
-        <value fret="14" scale="0.5084"/>
-        <value fret="15" scale="0.5297"/>
-        <value fret="16" scale="0.5510"/>
-        <value fret="17" scale="0.5693"/>
+        <value fret="0" scale="0" />
+        <value fret="1" scale="0.0472" />
+        <value fret="2" scale="0.1020" />
+        <value fret="3" scale="0.1476" />
+        <value fret="4" scale="0.1918" />
+        <value fret="5" scale="0.2344" />
+        <value fret="6" scale="0.2725" />
+        <value fret="7" scale="0.3090" />
+        <value fret="8" scale="0.3425" />
+        <value fret="9" scale="0.3760" />
+        <value fret="10" scale="0.4049" />
+        <value fret="11" scale="0.4338" />
+        <value fret="12" scale="0.4597" />
+        <value fret="13" scale="0.4855" />
+        <value fret="14" scale="0.5084" />
+        <value fret="15" scale="0.5297" />
+        <value fret="16" scale="0.5510" />
+        <value fret="17" scale="0.5693" />
     </instrument>
 </instruments>

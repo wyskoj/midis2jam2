@@ -31,97 +31,97 @@ import org.wysko.midis2jam2.world.Axis
  * The bongos.
  */
 class Bongos(
-	context: Midis2jam2,
-	hits: MutableList<MidiNoteOnEvent>
+    context: Midis2jam2,
+    hits: MutableList<MidiNoteOnEvent>
 ) : NonDrumSetPercussion(context, hits) {
 
-	private val lowBongoHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == LOW_BONGO } as MutableList<MidiNoteOnEvent>
+    private val lowBongoHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == LOW_BONGO } as MutableList<MidiNoteOnEvent>
 
-	private val highBongoHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == HIGH_BONGO } as MutableList<MidiNoteOnEvent>
+    private val highBongoHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == HIGH_BONGO } as MutableList<MidiNoteOnEvent>
 
-	/**
-	 * The Right hand node.
-	 */
-	private val highHandNode = Node()
+    /**
+     * The Right hand node.
+     */
+    private val highHandNode = Node()
 
-	/**
-	 * The Left hand node.
-	 */
-	private val lowHandNode = Node()
+    /**
+     * The Left hand node.
+     */
+    private val lowHandNode = Node()
 
-	/**
-	 * The Left bongo anim node.
-	 */
-	private val lowBongoAnimNode = Node()
+    /**
+     * The Left bongo anim node.
+     */
+    private val lowBongoAnimNode = Node()
 
-	/**
-	 * The Right bongo anim node.
-	 */
-	private val highBongoAnimNode = Node()
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    /**
+     * The Right bongo anim node.
+     */
+    private val highBongoAnimNode = Node()
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Animate hands */
-		val statusLow = Stick.handleStick(
-			context, lowHandNode, time, delta, lowBongoHits,
-			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
-		val statusHigh = Stick.handleStick(
-			context, highHandNode, time, delta, highBongoHits,
-			Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
+        /* Animate hands */
+        val statusLow = Stick.handleStick(
+            context, lowHandNode, time, delta, lowBongoHits,
+            Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
+        val statusHigh = Stick.handleStick(
+            context, highHandNode, time, delta, highBongoHits,
+            Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
 
-		/* Animate low bongo recoil */if (statusLow.justStruck()) {
-			val strike = statusLow.strike!!
-			recoilDrum(lowBongoAnimNode, true, strike.velocity, delta)
-		} else {
-			recoilDrum(lowBongoAnimNode, false, 0, delta)
-		}
+        /* Animate low bongo recoil */if (statusLow.justStruck()) {
+            val strike = statusLow.strike!!
+            recoilDrum(lowBongoAnimNode, true, strike.velocity, delta)
+        } else {
+            recoilDrum(lowBongoAnimNode, false, 0, delta)
+        }
 
-		/* Animate high bongo recoil */if (statusHigh.justStruck()) {
-			val strike = statusHigh.strike!!
-			recoilDrum(highBongoAnimNode, true, strike.velocity, delta)
-		} else {
-			recoilDrum(highBongoAnimNode, false, 0, delta)
-		}
-	}
+        /* Animate high bongo recoil */if (statusHigh.justStruck()) {
+            val strike = statusHigh.strike!!
+            recoilDrum(highBongoAnimNode, true, strike.velocity, delta)
+        } else {
+            recoilDrum(highBongoAnimNode, false, 0, delta)
+        }
+    }
 
-	init {
-		/* Separate high and low bongo hits */
+    init {
+        /* Separate high and low bongo hits */
 
-		/* Load bongos */
-		context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
-			lowBongoAnimNode.attachChild(this)
-		}
-		context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
-			highBongoAnimNode.attachChild(this)
-			setLocalScale(0.9f)
-		}
+        /* Load bongos */
+        context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
+            lowBongoAnimNode.attachChild(this)
+        }
+        context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
+            highBongoAnimNode.attachChild(this)
+            setLocalScale(0.9f)
+        }
 
-		/* Attach bongos */
-		val lowBongoNode = Node()
-		val highBongoNode = Node()
-		lowBongoNode.attachChild(lowBongoAnimNode)
-		highBongoNode.attachChild(highBongoAnimNode)
-		instrumentNode.attachChild(lowBongoNode)
-		instrumentNode.attachChild(highBongoNode)
+        /* Attach bongos */
+        val lowBongoNode = Node()
+        val highBongoNode = Node()
+        lowBongoNode.attachChild(lowBongoAnimNode)
+        highBongoNode.attachChild(highBongoAnimNode)
+        instrumentNode.attachChild(lowBongoNode)
+        instrumentNode.attachChild(highBongoNode)
 
-		/* Load hands */
-		lowHandNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"))
-		highHandNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"))
+        /* Load hands */
+        lowHandNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"))
+        highHandNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"))
 
-		/* Attach hands */
-		lowBongoAnimNode.attachChild(lowHandNode)
-		highBongoAnimNode.attachChild(highHandNode)
+        /* Attach hands */
+        lowBongoAnimNode.attachChild(lowHandNode)
+        highBongoAnimNode.attachChild(highHandNode)
 
-		/* Positioning */
-		lowBongoNode.setLocalTranslation(-35.88f, 40.4f, -62.6f)
-		lowBongoNode.localRotation = Quaternion().fromAngles(rad(32.7), rad(61.2), rad(-3.6))
-		highBongoNode.setLocalTranslation(-38.3f, 40.2f, -54.5f)
-		highBongoNode.localRotation = Quaternion().fromAngles(rad(32.9), rad(68.1), rad(-0.86))
-		lowHandNode.setLocalTranslation(0f, 0f, 5f)
-		highHandNode.setLocalTranslation(0f, 0f, 5f)
-	}
+        /* Positioning */
+        lowBongoNode.setLocalTranslation(-35.88f, 40.4f, -62.6f)
+        lowBongoNode.localRotation = Quaternion().fromAngles(rad(32.7), rad(61.2), rad(-3.6))
+        highBongoNode.setLocalTranslation(-38.3f, 40.2f, -54.5f)
+        highBongoNode.localRotation = Quaternion().fromAngles(rad(32.9), rad(68.1), rad(-0.86))
+        lowHandNode.setLocalTranslation(0f, 0f, 5f)
+        highHandNode.setLocalTranslation(0f, 0f, 5f)
+    }
 }

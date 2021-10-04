@@ -28,29 +28,29 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The piccolo.
  */
 class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-	HandedInstrument(context, events, PiccoloClone::class.java, FINGERING_MANAGER) {
+    HandedInstrument(context, events, PiccoloClone::class.java, FINGERING_MANAGER) {
 
-	inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.SteamPuffType.NORMAL, 1f) {
-		init {
-			val horn = context.loadModel(
-				"Piccolo.obj", "CymbalSkinSphereMap.bmp",
-				MatType.REFLECTIVE, 0.9f
-			)
-			loadHands()
-			puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
-			puffer.steamPuffNode.setLocalTranslation(0f, -8.6f, 0f)
-			highestLevel.attachChild(horn)
-		}
-	}
+    inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.SteamPuffType.NORMAL, 1f) {
+        init {
+            val horn = context.loadModel(
+                "Piccolo.obj", "CymbalSkinSphereMap.bmp",
+                MatType.REFLECTIVE, 0.9f
+            )
+            loadHands()
+            puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
+            puffer.steamPuffNode.setLocalTranslation(0f, -8.6f, 0f)
+            highestLevel.attachChild(horn)
+        }
+    }
 
-	companion object {
-		val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Piccolo::class.java)
-	}
+    companion object {
+        val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Piccolo::class.java)
+    }
 
-	init {
+    init {
 
-		// Piccolo positioning
-		groupOfPolyphony.setLocalTranslation(5f, 58f, -20f)
-		groupOfPolyphony.localRotation = Quaternion().fromAngles(rad(-80.0), rad(-53.0), rad(0.0))
-	}
+        // Piccolo positioning
+        groupOfPolyphony.setLocalTranslation(5f, 58f, -20f)
+        groupOfPolyphony.localRotation = Quaternion().fromAngles(rad(-80.0), rad(-53.0), rad(0.0))
+    }
 }

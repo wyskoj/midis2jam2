@@ -24,96 +24,96 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
-	context,
-	StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),
-	events,
-	FrettedInstrumentPositioning(
-		13.93f,
-		-19.54f, arrayOf(
-			Vector3f(1f, 1f, 1f),
-			Vector3f(1f, 1f, 1f),
-			Vector3f(1f, 1f, 1f),
-			Vector3f(1f, 1f, 1f)
-		), floatArrayOf(-0.53f, -0.13f, 0.28f, 0.68f), floatArrayOf(-1.14f, -0.40f, 0.47f, 1.21f),
-		FretHeightByTable.fromXml(Banjo::class.java)
-	),
-	4,
-	context.loadModel("Banjo.fbx", "BanjoSkin.png")
+    context,
+    StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),
+    events,
+    FrettedInstrumentPositioning(
+        13.93f,
+        -19.54f, arrayOf(
+            Vector3f(1f, 1f, 1f),
+            Vector3f(1f, 1f, 1f),
+            Vector3f(1f, 1f, 1f),
+            Vector3f(1f, 1f, 1f)
+        ), floatArrayOf(-0.53f, -0.13f, 0.28f, 0.68f), floatArrayOf(-1.14f, -0.40f, 0.47f, 1.21f),
+        FretHeightByTable.fromXml(Banjo::class.java)
+    ),
+    4,
+    context.loadModel("Banjo.fbx", "BanjoSkin.png")
 ) {
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(indexForMoving(delta))
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(indexForMoving(delta))
+    }
 
-	companion object {
-		private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
-	}
+    companion object {
+        private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
+    }
 
-	init {
-		/* Load strings */
-		upperStrings = Array(4) {
-			context.loadModel("BanjoString.fbx", "BassSkin.bmp").also {
-				instrumentNode.attachChild(it)
-			}
-		}
+    init {
+        /* Load strings */
+        upperStrings = Array(4) {
+            context.loadModel("BanjoString.fbx", "BassSkin.bmp").also {
+                instrumentNode.attachChild(it)
+            }
+        }
 
-		/* Position each string */
-		val forward = 0
-		upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward.toFloat())
-		upperStrings[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.03))
-		upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward.toFloat())
-		upperStrings[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.47))
-		upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward.toFloat())
-		upperStrings[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.33))
-		upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward.toFloat())
-		upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.92))
+        /* Position each string */
+        val forward = 0
+        upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward.toFloat())
+        upperStrings[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.03))
+        upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward.toFloat())
+        upperStrings[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.47))
+        upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward.toFloat())
+        upperStrings[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.33))
+        upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward.toFloat())
+        upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.92))
 
-		/* Lower strings */
-		lowerStrings = Array(4) {
-			Array(5) { j: Int ->
-				context.loadModel("BanjoStringBottom$j.fbx", "BassSkin.bmp").apply {
-					instrumentNode.attachChild(this)
-				}
-			}
-		}
+        /* Lower strings */
+        lowerStrings = Array(4) {
+            Array(5) { j: Int ->
+                context.loadModel("BanjoStringBottom$j.fbx", "BassSkin.bmp").apply {
+                    instrumentNode.attachChild(this)
+                }
+            }
+        }
 
-		/* Position lower strings */
-		for (i in 0..4) {
-			lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward.toFloat())
-			lowerStrings[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.04))
-		}
-		for (i in 0..4) {
-			lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward.toFloat())
-			lowerStrings[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.46))
-		}
-		for (i in 0..4) {
-			lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward.toFloat())
-			lowerStrings[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.33))
-		}
-		for (i in 0..4) {
-			lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward.toFloat())
-			lowerStrings[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.91))
-		}
+        /* Position lower strings */
+        for (i in 0..4) {
+            lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward.toFloat())
+            lowerStrings[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.04))
+        }
+        for (i in 0..4) {
+            lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward.toFloat())
+            lowerStrings[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.46))
+        }
+        for (i in 0..4) {
+            lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward.toFloat())
+            lowerStrings[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.33))
+        }
+        for (i in 0..4) {
+            lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward.toFloat())
+            lowerStrings[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.91))
+        }
 
-		/* Hide all wobbly strings */
-		for (i in 0..3) {
-			for (j in 0..4) {
-				lowerStrings[i][j].cullHint = Always
-			}
-		}
+        /* Hide all wobbly strings */
+        for (i in 0..3) {
+            for (j in 0..4) {
+                lowerStrings[i][j].cullHint = Always
+            }
+        }
 
-		/* Initialize note fingers */
-		noteFingers = Array(4) {
-			context.loadModel("BassNoteFinger.obj", "BanjoSkin.png").apply {
-				instrumentNode.attachChild(this)
-				this.cullHint = Always
-			}
-		}
+        /* Initialize note fingers */
+        noteFingers = Array(4) {
+            context.loadModel("BassNoteFinger.obj", "BanjoSkin.png").apply {
+                instrumentNode.attachChild(this)
+                this.cullHint = Always
+            }
+        }
 
-		/* Position guitar */
-		instrumentNode.apply {
-			localTranslation = BASE_POSITION
-			localRotation = Quaternion().fromAngles(rad(0.8), rad(-43.3), rad(-40.5))
-		}
-	}
+        /* Position guitar */
+        instrumentNode.apply {
+            localTranslation = BASE_POSITION
+            localRotation = Quaternion().fromAngles(rad(0.8), rad(-43.3), rad(-40.5))
+        }
+    }
 }

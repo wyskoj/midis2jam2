@@ -37,7 +37,7 @@ import kotlin.math.roundToInt
  * The trombone animates by moving a slide on the instrument.
  */
 class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    MonophonicInstrument(context, eventList, TromboneClone::class.java, null) {
+    MonophonicInstrument(context, eventList, TromboneClone::class.java, SLIDE_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 10 * indexForMoving(delta), 0f)
@@ -96,7 +96,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
          */
         private fun getSlidePositionFromNote(period: NotePeriod): Int {
             /* If out of range, return current position */
-	        val positionList = SLIDE_MANAGER.fingering(period.midiNote) ?: return currentSlidePosition.roundToInt()
+            val positionList = SLIDE_MANAGER.fingering(period.midiNote) ?: return currentSlidePosition.roundToInt()
 
             /* If there is just one valid position for this note, use that. */
             if (positionList.size == 1) return positionList[0]

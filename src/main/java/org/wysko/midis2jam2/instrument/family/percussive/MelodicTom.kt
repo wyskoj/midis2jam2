@@ -26,27 +26,27 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Melodic tom.
  */
 class MelodicTom(
-	context: Midis2jam2,
-	eventList: List<MidiChannelSpecificEvent>
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>
 ) : OneDrumOctave(context, eventList) {
 
-	override fun moveForMultiChannel(delta: Float) {
-		highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + indexForMoving(delta) * -15), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + indexForMoving(delta) * -15), 0f)
+    }
 
-	init {
-		val drum = context.loadModel("MelodicTom.obj", "DrumShell_MelodicTom.bmp")
-		for (i in 0..11) {
-			malletNodes[i] = Node()
-			val mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-			malletNodes[i].attachChild(mallet)
-			malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
-			mallet.setLocalTranslation(0f, 0f, -5f)
-			animNode.attachChild(malletNodes[i])
-		}
-		drum.localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
-		animNode.attachChild(drum)
-		instrumentNode.attachChild(animNode)
-		instrumentNode.setLocalTranslation(0f, 61.1f, -133.8f)
-	}
+    init {
+        val drum = context.loadModel("MelodicTom.obj", "DrumShell_MelodicTom.bmp")
+        for (i in 0..11) {
+            malletNodes[i] = Node()
+            val mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+            malletNodes[i].attachChild(mallet)
+            malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
+            mallet.setLocalTranslation(0f, 0f, -5f)
+            animNode.attachChild(malletNodes[i])
+        }
+        drum.localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
+        animNode.attachChild(drum)
+        instrumentNode.attachChild(animNode)
+        instrumentNode.setLocalTranslation(0f, 61.1f, -133.8f)
+    }
 }

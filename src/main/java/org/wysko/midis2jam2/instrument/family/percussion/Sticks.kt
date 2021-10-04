@@ -31,35 +31,35 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Sticks(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the left stick.
-	 */
-	private val leftStickNode = Node()
+    /**
+     * Contains the left stick.
+     */
+    private val leftStickNode = Node()
 
-	/**
-	 * Contains the right stick.
-	 */
-	private val rightStickNode = Node()
+    /**
+     * Contains the right stick.
+     */
+    private val rightStickNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val status = Stick.handleStick(context, leftStickNode, time, delta, hits, 2.0, 30.0, Axis.X)
-		leftStickNode.cullHint = CullHint.Dynamic
-		rightStickNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val status = Stick.handleStick(context, leftStickNode, time, delta, hits, 2.0, 30.0, Axis.X)
+        leftStickNode.cullHint = CullHint.Dynamic
+        rightStickNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		val leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-		leftStick.setLocalTranslation(2.5f, 0f, 0f)
-		leftStick.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
-		leftStickNode.attachChild(leftStick)
-		val rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-		rightStick.setLocalTranslation(-2.5f, 0f, 0f)
-		rightStick.localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
-		rightStickNode.attachChild(rightStick)
-		instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
-		instrumentNode.attachChild(leftStickNode)
-		instrumentNode.attachChild(rightStickNode)
-	}
+    init {
+        val leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+        leftStick.setLocalTranslation(2.5f, 0f, 0f)
+        leftStick.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        leftStickNode.attachChild(leftStick)
+        val rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+        rightStick.setLocalTranslation(-2.5f, 0f, 0f)
+        rightStick.localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
+        rightStickNode.attachChild(rightStick)
+        instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
+        instrumentNode.attachChild(leftStickNode)
+        instrumentNode.attachChild(rightStickNode)
+    }
 }

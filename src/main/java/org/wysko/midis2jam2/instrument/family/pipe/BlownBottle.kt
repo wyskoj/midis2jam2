@@ -32,89 +32,88 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Blown bottle.
  */
 class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-	WrappedOctaveSustained(context, events, true) {
+    WrappedOctaveSustained(context, events, true) {
 
-	/**
-	 * The Bottle nodes.
-	 */
-	private val bottleNodes = Array(12) { Node() }
+    /**
+     * The Bottle nodes.
+     */
+    private val bottleNodes = Array(12) { Node() }
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 20 + indexForMoving(delta) * 3.6f, 0f)
-		instrumentNode.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 20 + indexForMoving(delta) * 3.6f, 0f)
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * indexForMoving(delta), 0f)
+    }
 
-	/**
-	 * A single Bottle.
-	 */
-	inner class Bottle(i: Int) : TwelfthOfOctave() {
+    /**
+     * A single Bottle.
+     */
+    inner class Bottle(i: Int) : TwelfthOfOctave() {
 
-		/**
-		 * The puffer that blows across the top of the bottle.
-		 */
-		private val puffer: SteamPuffer = SteamPuffer(context, POP, 1.0, OUTWARDS)
+        /**
+         * The puffer that blows across the top of the bottle.
+         */
+        private val puffer: SteamPuffer = SteamPuffer(context, POP, 1.0, OUTWARDS)
 
-		override fun play(duration: Double) {
-			playing = true
-			progress = 0.0
-			this.duration = duration
-		}
+        override fun play(duration: Double) {
+            playing = true
+            progress = 0.0
+            this.duration = duration
+        }
 
-		override fun tick(delta: Float) {
-			if (progress >= 1) {
-				playing = false
-				progress = 0.0
-			}
-			if (playing) {
-				progress += delta / duration
-			}
-			puffer.tick(delta, playing)
-		}
+        override fun tick(delta: Float) {
+            if (progress >= 1) {
+                playing = false
+                progress = 0.0
+            }
+            if (playing) {
+                progress += delta / duration
+            }
+            puffer.tick(delta, playing)
+        }
 
-		init {
-			/* Load pop bottle */
-			highestLevel.attachChild(context.loadModel("PopBottle.obj", "PopBottle.bmp", MatType.REFLECTIVE, 0.9f))
+        init {
+            /* Load pop bottle */
+            highestLevel.attachChild(context.loadModel("PopBottle.obj", "PopBottle.bmp", MatType.REFLECTIVE, 0.9f))
 
-			/* Load pop bottle label */
-			context.loadModel("PopBottleLabel.obj", "PopLabel.bmp").apply {
-				localRotation = Quaternion().fromAngles(0f, FastMath.PI, 0f)
-				highestLevel.attachChild(this)
-			}
+            /* Load pop bottle label */
+            context.loadModel("PopBottleLabel.obj", "PopLabel.bmp").apply {
+                localRotation = Quaternion().fromAngles(0f, FastMath.PI, 0f)
+                highestLevel.attachChild(this)
+            }
 
-			/* Load pop */
-			val scale = 0.3f + 0.027273f * i
-			context.loadModel("PopBottlePop.obj", "Pop.bmp", MatType.REFLECTIVE, 0.8f).apply {
-				setLocalTranslation(0f, -3.25f, 0f)
-				scale(1f, scale, 1f)
-				highestLevel.attachChild(this)
-			}
+            /* Load pop */
+            val scale = 0.3f + 0.027273f * i
+            context.loadModel("PopBottlePop.obj", "Pop.bmp", MatType.REFLECTIVE, 0.8f).apply {
+                setLocalTranslation(0f, -3.25f, 0f)
+                scale(1f, scale, 1f)
+                highestLevel.attachChild(this)
+            }
 
-			/* Load middle */
-			context.loadModel("PopBottleMiddle.obj", "PopBottle.bmp", MatType.REFLECTIVE, 0.9f).apply {
-				scale(1f, 1 - scale, 1f)
-				highestLevel.attachChild(this)
-			}
+            /* Load middle */
+            context.loadModel("PopBottleMiddle.obj", "PopBottle.bmp", MatType.REFLECTIVE, 0.9f).apply {
+                scale(1f, 1 - scale, 1f)
+                highestLevel.attachChild(this)
+            }
 
-			/* Init puffer */
-			puffer.steamPuffNode.apply {
-				highestLevel.attachChild(this)
-				localRotation = Quaternion().fromAngles(0f, FastMath.PI, 0f)
-				setLocalTranslation(1f, 3.5f, 0f)
-			}
-		}
-	}
+            /* Init puffer */
+            puffer.steamPuffNode.apply {
+                highestLevel.attachChild(this)
+                localRotation = Quaternion().fromAngles(0f, FastMath.PI, 0f)
+                setLocalTranslation(1f, 3.5f, 0f)
+            }
+        }
+    }
 
-	init {
-		twelfths = Array(12) {
-			Bottle(it).apply {
-				highestLevel.setLocalTranslation(-15f, 0f, 0f)
-				bottleNodes[it].attachChild(this.highestLevel)
-				bottleNodes[it].localRotation = Quaternion().fromAngles(0f, rad(7.5 * it), 0f)
-				bottleNodes[it].setLocalTranslation(0f, 0.3f * it, 0f)
-				instrumentNode.attachChild(bottleNodes[it])
-			}
-		}
-
-		instrumentNode.setLocalTranslation(75f, 0f, -35f)
-	}
+    init {
+        twelfths = Array(12) {
+            Bottle(it).apply {
+                highestLevel.setLocalTranslation(-15f, 0f, 0f)
+                bottleNodes[it].attachChild(this.highestLevel)
+                bottleNodes[it].localRotation = Quaternion().fromAngles(0f, rad(7.5 * it), 0f)
+                bottleNodes[it].setLocalTranslation(0f, 0.3f * it, 0f)
+                instrumentNode.attachChild(bottleNodes[it])
+            }
+        }
+        instrumentNode.setLocalTranslation(75f, 0f, -35f)
+    }
 }

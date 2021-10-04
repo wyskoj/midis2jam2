@@ -25,66 +25,68 @@ import javax.xml.parsers.ParserConfigurationException
 
 class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 
-	/**
-	 * Stores the slide table.
-	 */
-	private val slideTable = HashMap<Int, List<Int>>()
+    /**
+     * Stores the slide table.
+     */
+    private val slideTable = HashMap<Int, List<Int>>()
 
-	override fun fingering(midiNote: Int): List<Int>? {
-		return slideTable[midiNote]
-	}
+    override fun fingering(midiNote: Int): List<Int>? {
+        return slideTable[midiNote]
+    }
 
-	companion object {
-		/**
-		 * Instantiates a new slide position manager.
-		 *
-		 * @param clazz the class who correlates the instrument in the XML file
-		 */
-		fun from(clazz: Class<out Instrument?>): SlidePositionManager {
-			val className = clazz.simpleName
-			val manager = SlidePositionManager()
-			/* XML Parsing */try {
-				val xmlDoc = instantiateXmlParser("/instrument_mapping.xml")
-				val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
+    companion object {
+        /**
+         * Instantiates a new slide position manager.
+         *
+         * @param clazz the class who correlates the instrument in the XML file
+         */
+        fun from(clazz: Class<out Instrument>): SlidePositionManager {
+            val className = clazz.simpleName
+            val manager = SlidePositionManager()
 
-				/* For each instrument */for (i in 0 until instrumentList.length) {
-					val instrument = instrumentList.item(i)
-					val instrumentAttributes = instrument.attributes
-					/* Find instrument with matching name */if (instrumentAttributes.getNamedItem("name").textContent == className) {
-						val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
-						if (mappingType != "slide_position") throw InvalidMappingType(
-							String.format(
-								"XML has a " +
-										"mapping type of %s.", mappingType
-							)
-						)
+            /* XML Parsing */
+            try {
+                val instrumentList = instantiateXmlParser("/instrument_mapping.xml")
+                    .documentElement.getElementsByTagName("instrument")
 
-						/* Get key mapping */
-						val mapping = (instrument as Element).getElementsByTagName("mapping").item(0)
-						val maps = (mapping as Element).getElementsByTagName("map")
-						for (j in 0 until maps.length) {
-							val note = maps.item(j)
-							val noteValue = note.attributes.getNamedItem("note").textContent.toInt()
-							val validPositions = (note as Element).getElementsByTagName("pos")
-							val validPosList: MutableList<Int> = ArrayList()
-							for (k in 0 until validPositions.length) {
-								validPosList.add(validPositions.item(k).textContent.toInt())
-							}
-							manager.slideTable[noteValue] = validPosList
-						}
-						break
-					}
-				}
-			} catch (e: SAXException) {
-				e.printStackTrace()
-			} catch (e: IOException) {
-				e.printStackTrace()
-			} catch (e: ParserConfigurationException) {
-				e.printStackTrace()
-			} catch (e: InvalidMappingType) {
-				e.printStackTrace()
-			}
-			return manager
-		}
-	}
+                /* For each instrument */
+                for (i in 0 until instrumentList.length) {
+                    val instrument = instrumentList.item(i)
+                    val instrumentAttributes = instrument.attributes
+
+                    /* Find instrument with matching name */
+                    if (instrumentAttributes.getNamedItem("name").textContent == className) {
+
+                        /* Ensure the mapping type is correct */
+                        val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
+                        if (mappingType != "slide_position")
+                            throw InvalidMappingType("XML has a mapping type of $mappingType.")
+
+                        /* Get key mapping */
+                        val mapping = (instrument as Element).getElementsByTagName("mapping").item(0)
+                        val maps = (mapping as Element).getElementsByTagName("map")
+
+                        for (j in 0 until maps.length) {
+                            val note = maps.item(j)
+                            val noteValue = note.attributes.getNamedItem("note").textContent.toInt()
+                            val validPositions = (note as Element).getElementsByTagName("pos")
+                            val validPosList: MutableList<Int> = ArrayList()
+                            (0 until validPositions.length).mapTo(validPosList) { validPositions.item(it).textContent.toInt() }
+                            manager.slideTable[noteValue] = validPosList
+                        }
+                        break
+                    }
+                }
+            } catch (e: SAXException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } catch (e: ParserConfigurationException) {
+                e.printStackTrace()
+            } catch (e: InvalidMappingType) {
+                e.printStackTrace()
+            }
+            return manager
+        }
+    }
 }

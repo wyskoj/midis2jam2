@@ -34,63 +34,63 @@ import org.wysko.midis2jam2.world.Axis
  */
 class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the laser gun.
-	 */
-	private val gunNode = Node()
+    /**
+     * Contains the laser gun.
+     */
+    private val gunNode = Node()
 
-	/**
-	 * The green beam that "shoots" out of the laser gun.
-	 */
-	private val laser: Spatial
+    /**
+     * The green beam that "shoots" out of the laser gun.
+     */
+    private val laser: Spatial
 
-	/**
-	 * Timer for keeping track of how long the laser has been visible.
-	 */
-	private var laserShowTime = 0.0
+    /**
+     * Timer for keeping track of how long the laser has been visible.
+     */
+    private var laserShowTime = 0.0
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val stickStatus =
-			Stick.handleStick(context, gunNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val stickStatus =
+            Stick.handleStick(context, gunNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 
-		/* If the laser gun just fired, show the laser and start the timer */
-		if (stickStatus.justStruck()) {
-			laser.cullHint = CullHint.Dynamic
-			laserShowTime = 0.0
-		}
+        /* If the laser gun just fired, show the laser and start the timer */
+        if (stickStatus.justStruck()) {
+            laser.cullHint = CullHint.Dynamic
+            laserShowTime = 0.0
+        }
 
-		/* Increment counter */
-		laserShowTime += delta.toDouble()
+        /* Increment counter */
+        laserShowTime += delta.toDouble()
 
-		/* If the counter has surpassed the maximum time, hide the laser */
-		if (laserShowTime > LASER_LIFE) {
-			laser.cullHint = CullHint.Always
-		}
-	}
+        /* If the counter has surpassed the maximum time, hide the laser */
+        if (laserShowTime > LASER_LIFE) {
+            laser.cullHint = CullHint.Always
+        }
+    }
 
-	companion object {
-		/**
-		 * The amount of time the laser should appear for when the laser gun shoots, expressed in seconds.
-		 */
-		const val LASER_LIFE = 0.05
-	}
+    companion object {
+        /**
+         * The amount of time the laser should appear for when the laser gun shoots, expressed in seconds.
+         */
+        const val LASER_LIFE = 0.05
+    }
 
-	init {
-		/* Load laser gun */
-		gunNode.attachChild(context.loadModel("Zapper.obj", "Zapper.bmp"))
-		instrumentNode.attachChild(gunNode)
+    init {
+        /* Load laser gun */
+        gunNode.attachChild(context.loadModel("Zapper.obj", "Zapper.bmp"))
+        instrumentNode.attachChild(gunNode)
 
-		/* Load laser */
-		laser = context.loadModel("ZapperLaser.obj", "Laser.bmp")
-		instrumentNode.attachChild(laser)
+        /* Load laser */
+        laser = context.loadModel("ZapperLaser.obj", "Laser.bmp")
+        instrumentNode.attachChild(laser)
 
-		/* Positioning */
-		laser.setLocalTranslation(0f, 0f, -14f)
-		instrumentNode.setLocalTranslation(-6f, 45f, -74f)
-		instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
+        /* Positioning */
+        laser.setLocalTranslation(0f, 0f, -14f)
+        instrumentNode.setLocalTranslation(-6f, 45f, -74f)
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
 
-		/* Hide the laser to begin with */
-		laser.cullHint = CullHint.Always
-	}
+        /* Hide the laser to begin with */
+        laser.cullHint = CullHint.Always
+    }
 }

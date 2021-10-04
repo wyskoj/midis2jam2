@@ -31,96 +31,96 @@ import org.wysko.midis2jam2.world.Axis
  */
 class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
 
-	/**
-	 * The list of hits for regular notes.
-	 */
-	private val regularHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == Midi.ACOUSTIC_SNARE || it.note == Midi.ELECTRIC_SNARE } as MutableList<MidiNoteOnEvent>
+    /**
+     * The list of hits for regular notes.
+     */
+    private val regularHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == Midi.ACOUSTIC_SNARE || it.note == Midi.ELECTRIC_SNARE } as MutableList<MidiNoteOnEvent>
 
-	/**
-	 * The list of hits for side sticks.
-	 */
-	private val sideHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == Midi.SIDE_STICK } as MutableList<MidiNoteOnEvent>
+    /**
+     * The list of hits for side sticks.
+     */
+    private val sideHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == Midi.SIDE_STICK } as MutableList<MidiNoteOnEvent>
 
-	/**
-	 * Contains the side stick.
-	 */
-	private val sideStickNode = Node()
+    /**
+     * Contains the side stick.
+     */
+    private val sideStickNode = Node()
 
-	/**
-	 * The stick used for regular hits.
-	 */
-	private val regularStick: Spatial
-	override fun tick(time: Double, delta: Float) {
-		val regularStickStatus = Stick.handleStick(
-			context,
-			regularStick,
-			time,
-			delta,
-			regularHits,
-			Stick.STRIKE_SPEED,
-			Stick.MAX_ANGLE,
-			Axis.X
-		)
-		val sideStickStatus = Stick.handleStick(
-			context,
-			sideStickNode,
-			time,
-			delta,
-			sideHits,
-			Stick.STRIKE_SPEED,
-			Stick.MAX_ANGLE,
-			Axis.X
-		)
-		var regVel = 0
-		var sideVel = 0
-		if (regularStickStatus.justStruck()) {
-			assert(regularStickStatus.strike != null)
-			regVel = regularStickStatus.strike!!.velocity
-		}
-		if (sideStickStatus.justStruck()) {
-			assert(sideStickStatus.strike != null)
-			sideVel = (sideStickStatus.strike!!.velocity * 0.5).toInt()
-		}
-		val velocity = regVel.coerceAtLeast(sideVel)
-		recoilDrum(recoilNode, velocity != 0, velocity, delta)
-	}
+    /**
+     * The stick used for regular hits.
+     */
+    private val regularStick: Spatial
+    override fun tick(time: Double, delta: Float) {
+        val regularStickStatus = Stick.handleStick(
+            context,
+            regularStick,
+            time,
+            delta,
+            regularHits,
+            Stick.STRIKE_SPEED,
+            Stick.MAX_ANGLE,
+            Axis.X
+        )
+        val sideStickStatus = Stick.handleStick(
+            context,
+            sideStickNode,
+            time,
+            delta,
+            sideHits,
+            Stick.STRIKE_SPEED,
+            Stick.MAX_ANGLE,
+            Axis.X
+        )
+        var regVel = 0
+        var sideVel = 0
+        if (regularStickStatus.justStruck()) {
+            assert(regularStickStatus.strike != null)
+            regVel = regularStickStatus.strike!!.velocity
+        }
+        if (sideStickStatus.justStruck()) {
+            assert(sideStickStatus.strike != null)
+            sideVel = (sideStickStatus.strike!!.velocity * 0.5).toInt()
+        }
+        val velocity = regVel.coerceAtLeast(sideVel)
+        recoilDrum(recoilNode, velocity != 0, velocity, delta)
+    }
 
-	init {
+    init {
 
-		context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp").apply { recoilNode.attachChild(this) }
-		regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+        context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp").apply { recoilNode.attachChild(this) }
+        regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
 
-		val sideStick = regularStick.clone().apply {
-			sideStickNode.attachChild(this)
-		}
+        val sideStick = regularStick.clone().apply {
+            sideStickNode.attachChild(this)
+        }
 
-		val regularStickNode: Node = Node().apply {
-			attachChild(regularStick)
-		}
+        val regularStickNode: Node = Node().apply {
+            attachChild(regularStick)
+        }
 
-		recoilNode.run {
-			attachChild(regularStickNode)
-			attachChild(sideStickNode)
-		}
+        recoilNode.run {
+            attachChild(regularStickNode)
+            attachChild(sideStickNode)
+        }
 
-		highLevelNode.run {
-			attachChild(recoilNode)
-			move(-10.9f, 16f, -72.5f)
-			rotate(rad(10.0), 0f, rad(-10.0))
-		}
+        highLevelNode.run {
+            attachChild(recoilNode)
+            move(-10.9f, 16f, -72.5f)
+            rotate(rad(10.0), 0f, rad(-10.0))
+        }
 
-		regularStickNode.run {
-			rotate(0f, rad(80.0), 0f)
-			move(10f, 0f, 3f)
-		}
+        regularStickNode.run {
+            rotate(0f, rad(80.0), 0f)
+            move(10f, 0f, 3f)
+        }
 
-		sideStick.run {
-			setLocalTranslation(0f, 0f, -2f)
-			localRotation = Quaternion().fromAngles(0f, rad(-20.0), 0f)
-		}
+        sideStick.run {
+            setLocalTranslation(0f, 0f, -2f)
+            localRotation = Quaternion().fromAngles(0f, rad(-20.0), 0f)
+        }
 
-		sideStickNode.setLocalTranslation(-1f, 0.4f, 6f)
-	}
+        sideStickNode.setLocalTranslation(-1f, 0.4f, 6f)
+    }
 }

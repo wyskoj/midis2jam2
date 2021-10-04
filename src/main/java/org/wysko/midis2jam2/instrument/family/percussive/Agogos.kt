@@ -29,62 +29,62 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The melodic agogos.
  */
 class Agogos(
-	context: Midis2jam2,
-	eventList: List<MidiChannelSpecificEvent>
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>
 ) : OctavePercussion(context, eventList) {
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		twelfths.forEach { it!!.tick(delta) }
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        twelfths.forEach { it!!.tick(delta) }
+    }
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 18 + 3.6f * indexForMoving(delta), 0f)
-		instrumentNode.localRotation =
-			Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 18 + 3.6f * indexForMoving(delta), 0f)
+        instrumentNode.localRotation =
+            Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * indexForMoving(delta), 0f)
+    }
 
-	/**
-	 * A single agogo.
-	 */
-	inner class Agogo(i: Int) : TwelfthOfOctaveDecayed() {
-		override fun tick(delta: Float) {
-			val localTranslation = highestLevel.localTranslation
-			if (localTranslation.y < -0.0001) {
-				highestLevel.setLocalTranslation(
-					0f,
-					0f.coerceAtMost(localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta), 0f
-				)
-			} else {
-				highestLevel.setLocalTranslation(0f, 0f, 0f)
-			}
-		}
+    /**
+     * A single agogo.
+     */
+    inner class Agogo(i: Int) : TwelfthOfOctaveDecayed() {
+        override fun tick(delta: Float) {
+            val localTranslation = highestLevel.localTranslation
+            if (localTranslation.y < -0.0001) {
+                highestLevel.setLocalTranslation(
+                    0f,
+                    0f.coerceAtMost(localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta), 0f
+                )
+            } else {
+                highestLevel.setLocalTranslation(0f, 0f, 0f)
+            }
+        }
 
-		init {
-			val mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
-			mesh.setLocalScale(1 - 0.036f * i)
-			animNode.attachChild(mesh)
-		}
-	}
+        init {
+            val mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+            mesh.setLocalScale(1 - 0.036f * i)
+            animNode.attachChild(mesh)
+        }
+    }
 
-	init {
-		for (i in 0..11) {
-			malletNodes[i] = Node()
-			val child = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-			child.setLocalTranslation(0f, 0f, -5f)
-			malletNodes[i].setLocalTranslation(0f, 0f, 18f)
-			malletNodes[i].attachChild(child)
-			val oneBlock = Node()
-			oneBlock.attachChild(malletNodes[i])
-			val agogo = Agogo(i)
-			twelfths[i] = agogo
-			oneBlock.attachChild(agogo.highestLevel)
-			percussionNodes[i].attachChild(oneBlock)
-			oneBlock.setLocalTranslation(0f, 0f, 17f)
-			percussionNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.5 * i), 0f)
-			percussionNodes[i].setLocalTranslation(0f, 0.3f * i, 0f)
-			instrumentNode.attachChild(percussionNodes[i])
-		}
-		instrumentNode.setLocalTranslation(75f, 0f, -35f)
-	}
+    init {
+        for (i in 0..11) {
+            malletNodes[i] = Node()
+            val child = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+            child.setLocalTranslation(0f, 0f, -5f)
+            malletNodes[i].setLocalTranslation(0f, 0f, 18f)
+            malletNodes[i].attachChild(child)
+            val oneBlock = Node()
+            oneBlock.attachChild(malletNodes[i])
+            val agogo = Agogo(i)
+            twelfths[i] = agogo
+            oneBlock.attachChild(agogo.highestLevel)
+            percussionNodes[i].attachChild(oneBlock)
+            oneBlock.setLocalTranslation(0f, 0f, 17f)
+            percussionNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.5 * i), 0f)
+            percussionNodes[i].setLocalTranslation(0f, 0.3f * i, 0f)
+            instrumentNode.attachChild(percussionNodes[i])
+        }
+        instrumentNode.setLocalTranslation(75f, 0f, -35f)
+    }
 }

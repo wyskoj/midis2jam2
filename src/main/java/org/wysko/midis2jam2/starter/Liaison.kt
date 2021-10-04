@@ -34,93 +34,93 @@ import javax.sound.midi.Sequencer
 import javax.swing.SwingUtilities
 
 open class Liaison(
-	protected val guiLauncher: GuiLauncher,
-	protected val sequencer: Sequencer,
-	protected val midiFile: MidiFile,
-	protected val m2j2settings: M2J2Settings,
-	protected val fullscreen: Boolean
+    protected val guiLauncher: GuiLauncher,
+    protected val sequencer: Sequencer,
+    protected val midiFile: MidiFile,
+    protected val m2j2settings: M2J2Settings,
+    protected val fullscreen: Boolean
 ) : SimpleApplication() {
 
-	val sequencerHandler = JavaXSequencer(sequencer)
+    val sequencerHandler = JavaXSequencer(sequencer)
 
-	companion object {
-		private val midis2Jam2Settings = AppSettings(true)
+    companion object {
+        private val midis2Jam2Settings = AppSettings(true)
 
-		init {
-			// Set settings
-			midis2Jam2Settings.frameRate = 120
-			midis2Jam2Settings.frequency = 60
-			midis2Jam2Settings.isVSync = true
-			midis2Jam2Settings.isResizable = true
-			midis2Jam2Settings.samples = 4
-			midis2Jam2Settings.isGammaCorrection = false
-		}
-	}
+        init {
+            // Set settings
+            midis2Jam2Settings.frameRate = 120
+            midis2Jam2Settings.frequency = 60
+            midis2Jam2Settings.isVSync = true
+            midis2Jam2Settings.isResizable = true
+            midis2Jam2Settings.samples = 4
+            midis2Jam2Settings.isGammaCorrection = false
+        }
+    }
 
-	private var display: Displays? = null
-	private var canvas: Canvas? = null
-	private var midis2jam2: DesktopMidis2jam2? = null
-	fun start(displayType: Class<out Displays?>) {
-		setDisplayStatView(false)
-		setDisplayFps(false)
-		isPauseOnLostFocus = false
-		isShowSettings = false
-		val screen = Toolkit.getDefaultToolkit().screenSize
-		if (fullscreen) {
-			midis2Jam2Settings.isFullscreen = true
-			midis2Jam2Settings.setResolution(screen.width, screen.height)
-			setSettings(midis2Jam2Settings)
-			super.start()
-		} else {
-			val thisLiaison = this
-			SwingUtilities.invokeLater {
-				setSettings(midis2Jam2Settings)
-				setDisplayStatView(false)
-				setDisplayFps(false)
-				isPauseOnLostFocus = false
-				isShowSettings = false
-				createCanvas()
-				val ctx = getContext() as JmeCanvasContext
-				ctx.setSystemListener(thisLiaison)
-				val dim = Dimension((screen.width * 0.95).toInt(), (screen.height * 0.85).toInt())
-				canvas = ctx.canvas
-				canvas!!.preferredSize = dim
-				try {
-					val constructor = displayType.getConstructor(
-						Liaison::class.java,
-						Canvas::class.java, Midis2jam2::class.java
-					)
-					display = constructor.newInstance(this, ctx.canvas, midis2jam2)
-					display!!.display()
-				} catch (e: ReflectiveOperationException) {
-					Midis2jam2.LOGGER.severe(exceptionToLines(e))
-				}
-				startCanvas()
-			}
-		}
-		guiLauncher.disableAll()
-	}
+    private var display: Displays? = null
+    private var canvas: Canvas? = null
+    private var midis2jam2: DesktopMidis2jam2? = null
+    fun start(displayType: Class<out Displays?>) {
+        setDisplayStatView(false)
+        setDisplayFps(false)
+        isPauseOnLostFocus = false
+        isShowSettings = false
+        val screen = Toolkit.getDefaultToolkit().screenSize
+        if (fullscreen) {
+            midis2Jam2Settings.isFullscreen = true
+            midis2Jam2Settings.setResolution(screen.width, screen.height)
+            setSettings(midis2Jam2Settings)
+            super.start()
+        } else {
+            val thisLiaison = this
+            SwingUtilities.invokeLater {
+                setSettings(midis2Jam2Settings)
+                setDisplayStatView(false)
+                setDisplayFps(false)
+                isPauseOnLostFocus = false
+                isShowSettings = false
+                createCanvas()
+                val ctx = getContext() as JmeCanvasContext
+                ctx.setSystemListener(thisLiaison)
+                val dim = Dimension((screen.width * 0.95).toInt(), (screen.height * 0.85).toInt())
+                canvas = ctx.canvas
+                canvas!!.preferredSize = dim
+                try {
+                    val constructor = displayType.getConstructor(
+                        Liaison::class.java,
+                        Canvas::class.java, Midis2jam2::class.java
+                    )
+                    display = constructor.newInstance(this, ctx.canvas, midis2jam2)
+                    display!!.display()
+                } catch (e: ReflectiveOperationException) {
+                    Midis2jam2.LOGGER.severe(exceptionToLines(e))
+                }
+                startCanvas()
+            }
+        }
+        guiLauncher.disableAll()
+    }
 
-	override fun simpleInitApp() {
-		midis2jam2 = DesktopMidis2jam2(sequencer, midiFile, m2j2settings)
-		midis2jam2!!.setWindow(display)
-		stateManager.attach(midis2jam2)
-		rootNode.attachChild(midis2jam2!!.rootNode)
-	}
+    override fun simpleInitApp() {
+        midis2jam2 = DesktopMidis2jam2(sequencer, midiFile, m2j2settings)
+        midis2jam2!!.setWindow(display)
+        stateManager.attach(midis2jam2)
+        rootNode.attachChild(midis2jam2!!.rootNode)
+    }
 
-	override fun stop() {
-		super.stop()
-		if (!fullscreen) {
-			display!!.isVisible = false
-			canvas!!.isEnabled = false
-		}
-		enableLauncher()
-	}
+    override fun stop() {
+        super.stop()
+        if (!fullscreen) {
+            display!!.isVisible = false
+            canvas!!.isEnabled = false
+        }
+        enableLauncher()
+    }
 
-	/**
-	 * Unlock the [.guiLauncher] so the user can use it.
-	 */
-	open fun enableLauncher() {
-		guiLauncher.enableAll()
-	}
+    /**
+     * Unlock the [.guiLauncher] so the user can use it.
+     */
+    open fun enableLauncher() {
+        guiLauncher.enableAll()
+    }
 }

@@ -27,57 +27,57 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Ocarina.
  */
 class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-	HandedInstrument(context, events, OcarinaClone::class.java, OcarinaHandGenerator()) {
+    HandedInstrument(context, events, OcarinaClone::class.java, OcarinaHandGenerator()) {
 
-	/**
-	 * The ocarina hand positions are from 0 to 11 and wrap around the octave. So this is easily calculable and doesn't
-	 * need to be stored in XML.
-	 */
-	internal class OcarinaHandGenerator : HandPositionFingeringManager() {
-		override fun fingering(midiNote: Int): Hands {
-			return Hands(0, (midiNote + 3) % 12)
-		}
-	}
+    /**
+     * The ocarina hand positions are from 0 to 11 and wrap around the octave. So this is easily calculable and doesn't
+     * need to be stored in XML.
+     */
+    internal class OcarinaHandGenerator : HandPositionFingeringManager() {
+        override fun fingering(midiNote: Int): Hands {
+            return Hands(0, (midiNote + 3) % 12)
+        }
+    }
 
-	/**
-	 * A single ocarina.
-	 */
-	inner class OcarinaClone : HandedClone(this@Ocarina, 0f) {
-		override fun loadHands() {
-			rightHands = Array(12) {
-				context.loadModel("OcarinaHand$it.obj", "hands.bmp")
-			}
-			super.loadHands()
-		}
+    /**
+     * A single ocarina.
+     */
+    inner class OcarinaClone : HandedClone(this@Ocarina, 0f) {
+        override fun loadHands() {
+            rightHands = Array(12) {
+                context.loadModel("OcarinaHand$it.obj", "hands.bmp")
+            }
+            super.loadHands()
+        }
 
-		override fun tick(time: Double, delta: Float) {
-			super.tick(time, delta)
-			/* Collect note periods to execute */
-			if (isPlaying) {
-				assert(currentNotePeriod != null)
-				animNode.setLocalTranslation(
-					0f,
-					0f,
-					3 * ((currentNotePeriod!!.endTime - time) / currentNotePeriod!!.duration()).toFloat()
-				)
-			}
-		}
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
+            /* Collect note periods to execute */
+            if (isPlaying) {
+                assert(currentNotePeriod != null)
+                animNode.setLocalTranslation(
+                    0f,
+                    0f,
+                    3 * ((currentNotePeriod!!.endTime - time) / currentNotePeriod!!.duration()).toFloat()
+                )
+            }
+        }
 
-		override fun moveForPolyphony() {
-			offsetNode.localRotation = Quaternion().fromAngles(0f, rad((17f * indexForMoving()).toDouble()), 0f)
-		}
+        override fun moveForPolyphony() {
+            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((17f * indexForMoving()).toDouble()), 0f)
+        }
 
-		init {
-			val ocarina = context.loadModel("Ocarina.obj", "Ocarina.bmp")
-			animNode.attachChild(ocarina)
-			highestLevel.attachChild(animNode)
-			loadHands()
-			highestLevel.setLocalTranslation(0f, 0f, 18f)
-		}
-	}
+        init {
+            val ocarina = context.loadModel("Ocarina.obj", "Ocarina.bmp")
+            animNode.attachChild(ocarina)
+            highestLevel.attachChild(animNode)
+            loadHands()
+            highestLevel.setLocalTranslation(0f, 0f, 18f)
+        }
+    }
 
-	init {
-		groupOfPolyphony.setLocalTranslation(32f, 47f, 30f)
-		groupOfPolyphony.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
-	}
+    init {
+        groupOfPolyphony.setLocalTranslation(32f, 47f, 30f)
+        groupOfPolyphony.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
+    }
 }

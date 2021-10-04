@@ -34,7 +34,6 @@ import javax.sound.midi.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -96,7 +95,7 @@ public class GuiLauncher extends JFrame {
 		SplashScreen.writeMessage("Loading settings...");
 		try {
 			String json = Utils.fileToString(SETTINGS_FILE);
-			if (json.trim().equals("")) {
+			if ("".equals(json.trim())) {
 				throw new IllegalStateException();
 			}
 			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
@@ -135,11 +134,11 @@ public class GuiLauncher extends JFrame {
 		
 		// Load MIDI devices
 		MidiDevice.Info[] infoArr = MidiSystem.getMidiDeviceInfo();
-		DefaultComboBoxModel aModel = new DefaultComboBoxModel<MidiDevice.Info>();
+		DefaultComboBoxModel<MidiDevice.Info> aModel = new DefaultComboBoxModel<>();
 		
 		// Populate MIDI devices (but don't add Real Time Sequencer)
 		for (MidiDevice.Info info : infoArr) {
-			if (!info.getName().equals("Real Time Sequencer")) {
+			if (!"Real Time Sequencer".equals(info.getName())) {
 				aModel.addElement(info);
 			}
 		}
@@ -149,46 +148,14 @@ public class GuiLauncher extends JFrame {
 		ToolTipManager.sharedInstance().setInitialDelay(200);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		
-		
 		// Check for updates
-		new Thread(() -> {
-			Midis2jam2.LOGGER.info("Checking for updates.");
-			try {
-				final ResourceBundle bundle = ResourceBundle.getBundle("i18n.updater");
-				String html = Utils.getHTML("https://midis2jam2.xyz/api/update?v=" + getVersion());
-				JEditorPane jep = new JEditorPane();
-				jep.setContentType("text/html");
-				jep.setText(bundle.getString("warning"));
-				jep.setEditable(false);
-				jep.setOpaque(false);
-				jep.addHyperlinkListener(hle -> {
-					if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-						try {
-							Desktop.getDesktop().browse(hle.getURL().toURI());
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						}
-					}
-				});
-				if (html.contains("Out of")) {
-					showMessageDialog(guiLauncher, jep, bundle.getString("update_available"), WARNING_MESSAGE);
-					Midis2jam2.LOGGER.warning("Out of date!");
-				} else {
-					Midis2jam2.LOGGER.info("Up to date.");
-				}
-			} catch (IOException e) {
-				Midis2jam2.LOGGER.warning("Failed to check for updates.");
-				e.printStackTrace();
-			}
-		}).start();
-		
+		UpdateChecker.checkForUpdates(guiLauncher);
 		
 		// Bring GUI to front
 		guiLauncher.bringToFront();
 		
 		// Load settings
 		guiLauncher.reloadSettings();
-		
 		
 		// Launch directly into midis2jam2 if a MIDI file is specified
 		if (args.length == 1) {
@@ -284,7 +251,7 @@ public class GuiLauncher extends JFrame {
 				return "Standard MIDI files (*.mid; *.midi)";
 			}
 		});
-		f.getActionMap().get("viewTypeDetails").actionPerformed(null); // Set default to details view
+		f.getActionMap().get("viewTypeDetails").actionPerformed(null);
 		f.setFileSelectionMode(FILES_ONLY);
 		f.setCurrentDirectory(new File(settings.getLastMidiDir()));
 		if (f.showDialog(this, "Load") == APPROVE_OPTION) {
@@ -312,7 +279,7 @@ public class GuiLauncher extends JFrame {
 	
 	private void midiDeviceDropDownActionPerformed(ActionEvent e) {
 		MidiDevice.Info info = (MidiDevice.Info) requireNonNull(midiDeviceDropDown.getSelectedItem());
-		if (info.getName().equals("Gervill")) {
+		if ("Gervill".equals(info.getName())) {
 			soundFontLabel.setEnabled(true);
 			soundFontPathDropDown.setEnabled(true);
 			editSoundFontsButton.setEnabled(true);
@@ -329,7 +296,7 @@ public class GuiLauncher extends JFrame {
 	private void startButtonPressed(ActionEvent e) {
 		// Collect MIDI file
 		this.setCursor(getPredefinedCursor(Cursor.WAIT_CURSOR));
-		if (midiFilePathTextField.getText().trim().equals("")) {
+		if ("".equals(midiFilePathTextField.getText().trim())) {
 			this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			showMessageDialog(this, "You must specify a MIDI file.", "No MIDI file selected", INFORMATION_MESSAGE);
 			return;
@@ -388,7 +355,7 @@ public class GuiLauncher extends JFrame {
 			
 			MidiDevice midiDevice = MidiSystem.getMidiDevice(selectedDevice);
 			
-			if (selectedDevice.getName().equals("Gervill")) {
+			if ("Gervill".equals(selectedDevice.getName())) {
 				// Internal synth
 				Synthesizer synthesizer = MidiSystem.getSynthesizer();
 				synthesizer.open();
@@ -583,14 +550,14 @@ public class GuiLauncher extends JFrame {
 				openMidiFileMenuItem.setIcon(new ImageIcon(getClass().getResource("/open.png")));
 				openMidiFileMenuItem.addActionListener(e -> loadMidiFileButtonActionPerformed(e));
 				fileMenu.add(openMidiFileMenuItem);
-
+				
 				//---- editSoundFontsMenuItem ----
 				editSoundFontsMenuItem.setText(bundle.getString("GuiLauncher.editSoundFontsMenuItem.text"));
 				editSoundFontsMenuItem.setIcon(new ImageIcon(getClass().getResource("/soundfont.png")));
 				editSoundFontsMenuItem.addActionListener(e -> loadSoundFontButtonActionPerformed(e));
 				fileMenu.add(editSoundFontsMenuItem);
 				fileMenu.addSeparator();
-
+				
 				//---- exitMenuItem ----
 				exitMenuItem.setText(bundle.getString("GuiLauncher.exitMenuItem.text"));
 				exitMenuItem.setIcon(new ImageIcon(getClass().getResource("/exit.png")));
@@ -598,7 +565,7 @@ public class GuiLauncher extends JFrame {
 				fileMenu.add(exitMenuItem);
 			}
 			menuBar1.add(fileMenu);
-
+			
 			//======== menu1 ========
 			{
 				menu1.setText(bundle.getString("GuiLauncher.menu1.text"));
@@ -873,44 +840,83 @@ public class GuiLauncher extends JFrame {
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JMenuBar menuBar1;
+	
 	private JMenu fileMenu;
+	
 	private MenuItemResizedIcon openMidiFileMenuItem;
+	
 	private MenuItemResizedIcon editSoundFontsMenuItem;
+	
 	private MenuItemResizedIcon exitMenuItem;
+	
 	private JMenu menu1;
+	
 	private MenuItemResizedIcon localeMenuItem;
+	
 	private JMenuItem aboutMenuItem;
+	
 	private JLabel logo;
+	
 	private JPanel configurationPanel;
+	
 	private JLabel midiFileLabel;
+	
 	private JTextField midiFilePathTextField;
+	
 	private JResizedIconButton loadMidiFileButton;
+	
 	private JLabel midiFileHelp;
+	
 	private JLabel midiDeviceLabel;
+	
 	private JComboBox<MidiDevice.Info> midiDeviceDropDown;
+	
 	private JLabel midiDeviceHelp;
+	
 	private JLabel soundFontLabel;
+	
 	private JComboBox<String> soundFontPathDropDown;
+	
 	private JResizedIconButton editSoundFontsButton;
+	
 	private JLabel soundFontHelp;
+	
 	private JPanel settingsPanel;
+	
 	private JPanel hSpacer1;
+	
 	private JLabel latencyFixLabel;
+	
 	private JSpinner latencySpinner;
+	
 	private JPanel hSpacer2;
+	
 	private JLabel latencyHelp;
+	
 	private JLabel displayLabel;
+	
 	private JCheckBox fullscreenCheckbox;
+	
 	private JLabel fullscreenHelp;
+	
 	private JCheckBox legacyEngineCheckbox;
+	
 	private JLabel legacyEngineHelp;
+	
 	private JLabel transitionSpeedLabel;
+	
 	private JPanel transitionSpeedPanel;
+	
 	private JRadioButton transitionSpeedNoneButton;
+	
 	private JRadioButton transitionSpeedSlowButton;
+	
 	private JRadioButton transitionSpeedNormalButton;
+	
 	private JRadioButton transitionSpeedFastButton;
+	
 	private JLabel transitionSpeedHelp;
+	
 	private JResizedIconButton startButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

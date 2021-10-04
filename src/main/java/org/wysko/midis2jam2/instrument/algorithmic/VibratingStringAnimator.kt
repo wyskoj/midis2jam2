@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import com.jme3.scene.Spatial
-import com.jme3.scene.Spatial.CullHint
+import org.wysko.midis2jam2.util.Utils
 import kotlin.math.floor
 
 /**
@@ -25,41 +25,23 @@ import kotlin.math.floor
  */
 class VibratingStringAnimator(vararg frames: Spatial) {
 
-	/**
-	 * Each frame of the animation.
-	 */
-	private val stringFrames: List<Spatial>
+    /**
+     * Each frame of the animation.
+     */
+    private val stringFrames: List<Spatial> = listOf(*frames)
 
-	/**
-	 * The current frame to show.
-	 */
-	private var frame = 0.0
+    /**
+     * The current frame to show.
+     */
+    private var frame = 0.0
 
-	/**
-	 * Update animation.
-	 *
-	 * @param delta the amount of time since the last frame update
-	 */
-	fun tick(delta: Float) {
-		frame += delta * 60
-		for (i in 0 until FRAME_COUNT) {
-			frame %= FRAME_COUNT
-			if (i == floor(frame).toInt()) {
-				stringFrames[i].cullHint = CullHint.Dynamic
-			} else {
-				stringFrames[i].cullHint = CullHint.Always
-			}
-		}
-	}
-
-	companion object {
-		/**
-		 * The number of frames that are used for animation.
-		 */
-		private const val FRAME_COUNT = 5
-	}
-
-	init {
-		stringFrames = listOf(*frames)
-	}
+    /**
+     * Update animation.
+     *
+     * @param delta the amount of time since the last frame update
+     */
+    fun tick(delta: Float) {
+        frame = (frame + delta * 60) % stringFrames.size
+        stringFrames.forEachIndexed { index, it -> it.cullHint = Utils.cullHint(index == floor(frame).toInt()) }
+    }
 }

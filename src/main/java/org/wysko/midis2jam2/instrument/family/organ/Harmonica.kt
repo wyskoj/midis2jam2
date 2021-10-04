@@ -30,55 +30,55 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The harmonica uses 12 [SteamPuffers][SteamPuffer] to animate each note in the octave.
  */
 class Harmonica(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	SustainedInstrument(context, eventList) {
+    SustainedInstrument(context, eventList) {
 
-	/**
-	 * Each note on the harmonica has a separate puffer.
-	 */
-	private val puffers = Array(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
+    /**
+     * Each note on the harmonica has a separate puffer.
+     */
+    private val puffers = Array(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
 
-	/**
-	 * For each note, true if it is playing, false otherwise.
-	 */
-	private val eachNotePlaying = BooleanArray(12)
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    /**
+     * For each note, true if it is playing, false otherwise.
+     */
+    private val eachNotePlaying = BooleanArray(12)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Set each element in the array to false */
-		eachNotePlaying.fill(false)
+        /* Set each element in the array to false */
+        eachNotePlaying.fill(false)
 
-		/* For each current note playing */
-		for (currentNotePeriod in currentNotePeriods) {
-			/* Determine its index position and flag it true */
-			val i = currentNotePeriod.midiNote % 12
-			eachNotePlaying[i] = true
-		}
+        /* For each current note playing */
+        for (currentNotePeriod in currentNotePeriods) {
+            /* Determine its index position and flag it true */
+            val i = currentNotePeriod.midiNote % 12
+            eachNotePlaying[i] = true
+        }
 
-		/* Update each steam puffer */
-		puffers.forEachIndexed { index, it -> it.tick(delta, eachNotePlaying[index]) }
-	}
+        /* Update each steam puffer */
+        puffers.forEachIndexed { index, it -> it.tick(delta, eachNotePlaying[index]) }
+    }
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
+    }
 
-	init {
-		instrumentNode.attachChild(context.loadModel("Harmonica.obj", "Harmonica.bmp"))
-		val pufferNodes = Array(12) { Node() }
+    init {
+        instrumentNode.attachChild(context.loadModel("Harmonica.obj", "Harmonica.bmp"))
+        val pufferNodes = Array(12) { Node() }
 
-		for (i in 0..11) {
-			puffers[i].run {
-				steamPuffNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
-				steamPuffNode.setLocalTranslation(0f, 0f, 7.2f)
-				pufferNodes[i].attachChild(this.steamPuffNode)
-			}
-			pufferNodes[i].run {
-				localRotation = Quaternion().fromAngles(0f, rad(5 * (i - 5.5)), 0f)
-			}
-		}
+        for (i in 0..11) {
+            puffers[i].run {
+                steamPuffNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
+                steamPuffNode.setLocalTranslation(0f, 0f, 7.2f)
+                pufferNodes[i].attachChild(this.steamPuffNode)
+            }
+            pufferNodes[i].run {
+                localRotation = Quaternion().fromAngles(0f, rad(5 * (i - 5.5)), 0f)
+            }
+        }
 
-		/* Position harmonica */
-		instrumentNode.setLocalTranslation(74f, 32f, -38f)
-		instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
-	}
+        /* Position harmonica */
+        instrumentNode.setLocalTranslation(74f, 32f, -38f)
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
+    }
 }

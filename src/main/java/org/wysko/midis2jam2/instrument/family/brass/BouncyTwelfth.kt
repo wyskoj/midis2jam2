@@ -30,29 +30,29 @@ import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained.Twelf
  */
 open class BouncyTwelfth : TwelfthOfOctave() {
 
-	override fun play(duration: Double) {
-		playing = true
-		progress = 0.0
-		this.duration = duration
-	}
+    override fun play(duration: Double) {
+        playing = true
+        progress = 0.0
+        this.duration = duration
+    }
 
-	override fun tick(delta: Float) {
-		/* If finished playing */
-		if (progress >= 1) {
-			playing = false
-			progress = 0.0
-		}
+    override fun tick(delta: Float) {
+        /* If finished playing */
+        if (progress >= 1) {
+            playing = false
+            progress = 0.0
+        }
 
-		/* If still playing */
-		if (playing) {
-			/* Update animation progress */
-			progress += delta / duration
-			/* Update visual position */
-			val y = (9.5 - 9.5 * progress).coerceAtLeast(0.0).toFloat()
-			animNode.setLocalTranslation(0f, y, 0f)
-		} else {
-			/* Lock to base position if not playing */
-			animNode.setLocalTranslation(0f, 0f, 0f)
-		}
-	}
+        /* If still playing */
+        if (playing) {
+            /* Update animation progress */
+            progress += delta / duration
+            /* Update visual position */
+            val y = (9.5 - 9.5 * progress).coerceAtLeast(0.0).toFloat()
+            animNode.setLocalTranslation(0f, y, 0f)
+        } else {
+            /* Lock to base position if not playing */
+            animNode.setLocalTranslation(0f, 0f, 0f)
+        }
+    }
 }

@@ -20,20 +20,20 @@ import org.wysko.midis2jam2.util.InstrumentTransition
 import javax.swing.JFileChooser
 
 class LauncherSettings {
-	var lastMidiDir: String = JFileChooser().fileSystemView.defaultDirectory.absolutePath
-	var soundFontPaths: List<String> = ArrayList()
-	var transition: InstrumentTransition = InstrumentTransition.NORMAL
-	var midiDevice: String = "Gervill"
-	var isFullscreen: Boolean = false
-	private val deviceLatencyMap: MutableMap<String, Int> = HashMap<String, Int>().also {
-		it["Gervill"] = 100
-	}
-	var isLegacyDisplay: Boolean = false
-	var locale: String = "en"
+    var lastMidiDir: String = JFileChooser().fileSystemView.defaultDirectory.absolutePath
+    var soundFontPaths: List<String> = ArrayList()
+    var transition: InstrumentTransition = InstrumentTransition.NORMAL
+    var midiDevice: String = "Gervill"
+    var isFullscreen: Boolean = false
+    private val deviceLatencyMap: MutableMap<String, Int> = HashMap<String, Int>().also {
+        it["Gervill"] = 100
+    }
+    var isLegacyDisplay: Boolean = false
+    var locale: String = "en"
 
-	fun getLatencyForDevice(deviceName: String) = deviceLatencyMap[deviceName] ?: 0
+    fun getLatencyForDevice(deviceName: String) = deviceLatencyMap[deviceName] ?: 0
 
-	fun setLatencyForDevice(deviceName: String, value: Int) {
-		deviceLatencyMap[deviceName] = value
-	}
+    fun setLatencyForDevice(deviceName: String, value: Int) {
+        deviceLatencyMap[deviceName] = value
+    }
 }

@@ -34,36 +34,24 @@ import kotlin.math.max
  * note handling for every call.
  */
 abstract class Instrument protected constructor(
-    /**
-     * Since these classes are effectively static, we need reference to the main class.
-     */
-    @JvmField
+    /** Since these classes are effectively static, we need reference to the main class. */
     val context: Midis2jam2,
 ) {
-    /**
-     * The Offset node.
-     */
-    @JvmField
-    val offsetNode = Node()
+    /** The Offset node. */
+    val offsetNode: Node = Node()
 
-    /**
-     * The Highest level.
-     */
-    @JvmField
-    val highestLevel = Node()
+    /** The Highest level. */
+    val highestLevel: Node = Node()
 
-    /**
-     * Should contain geometry and nodes for geometry.
-     */
-    @JvmField
-    val instrumentNode = Node()
+    /** Should contain geometry and nodes for geometry. */
+    val instrumentNode: Node = Node()
 
     /**
      * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
      * instruments rely on this variable (if bass guitar 1 hides after a while, bass guitar 2 should step in to fill its
      * spot).
      */
-    var isVisible = false
+    var isVisible: Boolean = false
 
     /**
      * The index of this instrument in the stack of similar instruments. Can be a decimal when instrument transition
@@ -117,13 +105,13 @@ abstract class Instrument protected constructor(
                 .filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }
                 .toList().indexOf(this))
         } else {
-            context.instruments.filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }.count() - 1
+            context.instruments.filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }.size - 1
         }
         val transitionSpeed = context.settings.transitionSpeed
         return if (transitionSpeed != InstrumentTransition.NONE) {
             val animationCoefficient = transitionSpeed.speed
             index += delta * TRANSITION_SPEED * (target - index) / animationCoefficient
-	        index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.count().toDouble())
+            index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
             index.toFloat()
         } else {
             target.toFloat()
@@ -138,19 +126,13 @@ abstract class Instrument protected constructor(
     protected abstract fun moveForMultiChannel(delta: Float)
 
     companion object {
-        /**
-         * The number of seconds an instrument should be spawn before its first note.
-         */
-        const val START_BUFFER = 1f
+        /** The number of seconds an instrument should be spawn before its first note. */
+        const val START_BUFFER: Float = 1f
 
-        /**
-         * The number of seconds an instrument should be spawn after its last note.
-         */
-        const val END_BUFFER = 5f
+        /** The number of seconds an instrument should be spawn after its last note. */
+        const val END_BUFFER: Float = 5f
 
-        /**
-         * How fast instruments move when transitioning.
-         */
+        /** How fast instruments move when transitioning. */
         private const val TRANSITION_SPEED = 2500
     }
 

@@ -26,25 +26,25 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Violin.
  */
 class Fiddle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
-	context,
-	events,
-	true, 180.0,
-	Vector3f(1f, 1f, 1f), intArrayOf(55, 62, 69, 76),
-	context.loadModel("Violin.obj", "FiddleSkin.png")
+    context,
+    events,
+    true, 180.0,
+    Vector3f(1f, 1f, 1f), intArrayOf(55, 62, 69, 76),
+    context.loadModel("Violin.obj", "FiddleSkin.png")
 ) {
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(20 * indexForMoving(delta), 0f, 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(20 * indexForMoving(delta), 0f, 0f)
+    }
 
-	/**
-	 * Instantiates a new Violin.
-	 *
-	 * @param context the context
-	 * @param events  the events
-	 */
-	init {
-		instrumentNode.setLocalTranslation(-10f, 67f, -15f)
-		instrumentNode.setLocalScale(1f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
-	}
+    /**
+     * Instantiates a new Violin.
+     *
+     * @param context the context
+     * @param events  the events
+     */
+    init {
+        instrumentNode.setLocalTranslation(-10f, 67f, -15f)
+        instrumentNode.setLocalScale(1f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
+    }
 }

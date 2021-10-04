@@ -26,19 +26,19 @@ import org.wysko.midis2jam2.midi.MidiFile
  * Android does not include this library.
  */
 interface SequencerHandler {
-	/** Returns true if the sequencer is open and ready for playback, false otherwise. */
-	fun isOpen(): Boolean
+    /** Returns true if the sequencer is open and ready for playback, false otherwise. */
+    fun isOpen(): Boolean
 
-	/** Begins playback. */
-	fun start(midiFile: MidiFile)
+    /** Begins playback. */
+    fun start(midiFile: MidiFile)
 
-	/** Stops playback. */
-	fun stop()
+    /** Stops playback. */
+    fun stop()
 
-	/** Returns the current position in the song. The unit does not matter, as long as it is the same as [duration]. */
-	fun position(): Long
+    /** Returns the current position in the song. The unit does not matter, as long as it is the same as [duration]. */
+    fun position(): Long
 
-	/** Returns the length of the song. The unit does not matter, as long as it is the same as [position]. */
-	fun duration(): Long
+    /** Returns the length of the song. The unit does not matter, as long as it is the same as [position]. */
+    fun duration(): Long
 
 }

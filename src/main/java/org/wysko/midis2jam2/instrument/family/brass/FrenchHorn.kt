@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MatType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -41,31 +41,31 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     /**
      * A single instance of a French Horn.
      */
-    inner class FrenchHornClone : AnimatedKeyCloneByIntegers(this@FrenchHorn, 0.1f, 0.9f, 4, Axis.Y, Axis.X) {
+    inner class FrenchHornClone : AnimatedKeyCloneByIntegers(this@FrenchHorn, 0.1f, 0.9f, Axis.Y, Axis.X) {
 
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((47 * indexForMoving()).toDouble()), 0f)
         }
 
-        override fun animateKeys(pressed: Array<Int>?) {
+        override fun animateKeys(pressed: Array<Int>) {
             /* For each key */
             for (i in 0..3) {
-                if (pressed!!.any { it == i }) { // If this key is pressed
+                if (pressed.any { it == i }) { // If this key is pressed
                     if (i == 0) { // If trigger key
-                        keys[i]!!.localRotation = Quaternion().fromAngles(rad(-25.0), 0f, 0f)
+                        keys[i].localRotation = Quaternion().fromAngles(rad(-25.0), 0f, 0f)
                     } else {
-                        keys[i]!!.localRotation = Quaternion().fromAngles(0f, 0f, rad(-30.0))
+                        keys[i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-30.0))
                     }
                 } else {
-                    keys[i]!!.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
+                    keys[i].localRotation = Quaternion().fromAngles(0f, 0f, 0f)
                 }
             }
         }
 
         init {
             /* Load models */
-            body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f)
-            bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f))
+            body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", REFLECTIVE, 0.9f)
+            bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", REFLECTIVE, 0.9f))
 
             /* Attach models */
             modelNode.run {
@@ -84,14 +84,15 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
             }
 
             /* Load keys */
-            for (i in 0..3) {
-                val id = if (i == 0) "Trigger" else "Key$i"
-                keys[i] = context.loadModel("FrenchHorn$id.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
-                modelNode.attachChild(keys[i])
+            keys = Array(4) { index ->
+                val id = if (index == 0) "Trigger" else "Key$index"
+                context.loadModel("FrenchHorn$id.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9f).also {
+                    modelNode.attachChild(it)
+                }
             }
 
             /* Move trigger key a bit over */
-            keys[0]!!.setLocalTranslation(0f, 0f, 1f)
+            keys.first().setLocalTranslation(0f, 0f, 1f)
 
             /* Offset from pivot and rotate horn */
             highestLevel.localRotation = Quaternion().fromAngles(rad(20.0), rad(90.0), 0f)

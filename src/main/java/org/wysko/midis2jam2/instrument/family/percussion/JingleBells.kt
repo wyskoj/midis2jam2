@@ -30,26 +30,26 @@ import org.wysko.midis2jam2.world.Axis
  */
 class JingleBells(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the jingle bell.
-	 */
-	private val jingleBellNode = Node()
+    /**
+     * Contains the jingle bell.
+     */
+    private val jingleBellNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		Stick.handleStick(context, jingleBellNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        Stick.handleStick(context, jingleBellNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+    }
 
-	init {
-		/* Load stick and materials */
-		val stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp")
-		(stick as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
+    init {
+        /* Load stick and materials */
+        val stick = context.loadModel("JingleBells.fbx", "JingleBells.bmp")
+        (stick as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
 
-		/* Positioning */
-		jingleBellNode.attachChild(stick)
-		stick.setLocalTranslation(0f, 0f, -2f)
-		instrumentNode.attachChild(jingleBellNode)
-		instrumentNode.setLocalTranslation(8.5f, 45.3f, -69.3f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7))
-	}
+        /* Positioning */
+        jingleBellNode.attachChild(stick)
+        stick.setLocalTranslation(0f, 0f, -2f)
+        instrumentNode.attachChild(jingleBellNode)
+        instrumentNode.setLocalTranslation(8.5f, 45.3f, -69.3f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7))
+    }
 }

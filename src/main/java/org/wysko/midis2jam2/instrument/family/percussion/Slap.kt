@@ -26,20 +26,20 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
  */
 class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the left slapper.
-	 */
-	private val leftSlapNode = Node()
+    /**
+     * Contains the left slapper.
+     */
+    private val leftSlapNode = Node()
 
-	/**
-	 * Contains the right snapper.
-	 */
-	private val rightSlapNode = Node()
+    /**
+     * Contains the right snapper.
+     */
+    private val rightSlapNode = Node()
 
-	init {
-		leftSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
-		rightSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
-		instrumentNode.attachChild(leftSlapNode)
-		instrumentNode.attachChild(rightSlapNode)
-	}
+    init {
+        leftSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
+        rightSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
+        instrumentNode.attachChild(leftSlapNode)
+        instrumentNode.attachChild(rightSlapNode)
+    }
 }

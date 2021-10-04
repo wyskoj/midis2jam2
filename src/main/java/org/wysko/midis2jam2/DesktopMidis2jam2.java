@@ -21,7 +21,6 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.input.controls.ActionListener;
 import org.wysko.midis2jam2.gui.Displays;
 import org.wysko.midis2jam2.instrument.Instrument;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -37,7 +36,7 @@ import java.util.TimerTask;
 /**
  * Contains all the code relevant to operating the 3D scene.
  */
-public class DesktopMidis2jam2 extends Midis2jam2 implements ActionListener {
+public class DesktopMidis2jam2 extends Midis2jam2 {
 	
 	/**
 	 * The MIDI sequencer.

@@ -19,5 +19,5 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 enum class PercussionKit(val midiNumber: Int) {
-	STANDARD(0), ROOM(8), POWER(16), ELECTRONIC(24), ANALOG(25), JAZZ(32), BRUSH(40), ORCHESTRA(48), SFX(56);
+    STANDARD(0), ROOM(8), POWER(16), ELECTRONIC(24), ANALOG(25), JAZZ(32), BRUSH(40), ORCHESTRA(48), SFX(56);
 }

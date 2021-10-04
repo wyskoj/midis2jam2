@@ -31,58 +31,58 @@ import kotlin.math.max
  */
 class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * The left stick.
-	 */
-	private val leftStick: Spatial
+    /**
+     * The left stick.
+     */
+    private val leftStick: Spatial
 
-	/**
-	 * The right stick.
-	 */
-	private val rightStick: Spatial
+    /**
+     * The right stick.
+     */
+    private val rightStick: Spatial
 
-	/**
-	 * The hits for the high agogo.
-	 */
-	private val highHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == HIGH_AGOGO } as MutableList<MidiNoteOnEvent>
+    /**
+     * The hits for the high agogo.
+     */
+    private val highHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == HIGH_AGOGO } as MutableList<MidiNoteOnEvent>
 
-	/**
-	 * The hits for the low agogo.
-	 */
-	private val lowHits: MutableList<MidiNoteOnEvent> =
-		hits.filter { it.note == LOW_AGOGO } as MutableList<MidiNoteOnEvent>
+    /**
+     * The hits for the low agogo.
+     */
+    private val lowHits: MutableList<MidiNoteOnEvent> =
+        hits.filter { it.note == LOW_AGOGO } as MutableList<MidiNoteOnEvent>
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val leftStatus =
-			Stick.handleStick(context, leftStick, time, delta, highHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-		val rightStatus =
-			Stick.handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-		var velocity = 0
-		if (leftStatus.strike != null) {
-			velocity = max(velocity, leftStatus.strike.velocity)
-		}
-		if (rightStatus.strike != null) {
-			velocity = max(velocity, rightStatus.strike.velocity)
-		}
-		recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val leftStatus =
+            Stick.handleStick(context, leftStick, time, delta, highHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        val rightStatus =
+            Stick.handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        var velocity = 0
+        if (leftStatus.strike != null) {
+            velocity = max(velocity, leftStatus.strike.velocity)
+        }
+        if (rightStatus.strike != null) {
+            velocity = max(velocity, rightStatus.strike.velocity)
+        }
+        recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta)
+    }
 
-	init {
+    init {
 
-		leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-			recoilNode.attachChild(this)
-			setLocalTranslation(3f, 0f, 13f)
-		}
+        leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+            recoilNode.attachChild(this)
+            setLocalTranslation(3f, 0f, 13f)
+        }
 
-		rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-			recoilNode.attachChild(this)
-			setLocalTranslation(10f, 0f, 11f)
-		}
+        rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+            recoilNode.attachChild(this)
+            setLocalTranslation(10f, 0f, 11f)
+        }
 
-		recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp"))
-		instrumentNode.setLocalTranslation(-5f, 50f, -85f)
-		instrumentNode.attachChild(recoilNode)
-	}
+        recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp"))
+        instrumentNode.setLocalTranslation(-5f, 50f, -85f)
+        instrumentNode.attachChild(recoilNode)
+    }
 }

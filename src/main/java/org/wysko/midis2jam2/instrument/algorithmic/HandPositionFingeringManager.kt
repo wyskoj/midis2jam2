@@ -31,67 +31,77 @@ import javax.xml.parsers.ParserConfigurationException
  */
 open class HandPositionFingeringManager : FingeringManager<Hands> {
 
-	/**
-	 * The table of fingerings.
-	 */
-	private val table = HashMap<Int, Hands>()
+    /**
+     * The table of fingerings.
+     */
+    private val table = HashMap<Int, Hands>()
 
-	override fun fingering(midiNote: Int): Hands? {
-		return table[midiNote]
-	}
+    override fun fingering(midiNote: Int): Hands? {
+        return table[midiNote]
+    }
 
-	/**
-	 * Defines the indices for left and right hands.
-	 */
-	data class Hands(val left: Int, val right: Int)
+    /**
+     * A pair of indices.
+     */
+    data class Hands(
+        /** Left hand index. */
+        val left: Int,
 
-	companion object {
-		/**
-		 * Loads the fingering manager from XML given the class
-		 *
-		 * @param clazz the class of the instrument
-		 * @return the hand position fingering manager
-		 */
-		@JvmStatic
-		fun from(clazz: Class<out Instrument?>): HandPositionFingeringManager {
-			val className = clazz.simpleName
-			val manager = HandPositionFingeringManager()
-			/* XML Parsing */try {
-				val xmlDoc = instantiateXmlParser("/instrument_mapping.xml")
-				val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
+        /** Right hand index. */
+        val right: Int
+    )
 
-				/* For each instrument */for (i in 0 until instrumentList.length) {
-					val instrument = instrumentList.item(i)
-					val instrumentAttributes = instrument.attributes
-					/* Find instrument with matching name */if (instrumentAttributes.getNamedItem("name").textContent == className) {
-						val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
-						if ("hands" != mappingType) {
-							Midis2jam2.getLOGGER().severe { "XML has a mapping type of $mappingType." }
-							return manager
-						}
+    companion object {
+        /**
+         * Loads the fingering manager from XML given the class
+         *
+         * @param clazz the class of the instrument
+         * @return the hand position fingering manager
+         */
+        @JvmStatic
+        fun from(clazz: Class<out Instrument>): HandPositionFingeringManager {
+            val className = clazz.simpleName
+            val manager = HandPositionFingeringManager()
+            /* XML Parsing */
+            try {
+                val xmlDoc = instantiateXmlParser("/instrument_mapping.xml")
+                val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
 
-						/* Get key mapping */
-						val mapping = (instrument as Element).getElementsByTagName("mapping").item(0)
-						val maps = (mapping as Element).getElementsByTagName("map")
-						val mapSize = maps.length
-						/* For each defined note */for (j in 0 until mapSize) {
-							val attributes = maps.item(j).attributes
-							val note = attributes.getNamedItem("note").textContent.toInt()
-							val leftHand = attributes.getNamedItem("lh").textContent.toInt()
-							val rightHand = attributes.getNamedItem("rh").textContent.toInt()
-							manager.table[note] = Hands(leftHand, rightHand)
-						}
-						break
-					}
-				}
-			} catch (e: SAXException) {
-				Midis2jam2.getLOGGER().severe(exceptionToLines(e))
-			} catch (e: IOException) {
-				Midis2jam2.getLOGGER().severe(exceptionToLines(e))
-			} catch (e: ParserConfigurationException) {
-				Midis2jam2.getLOGGER().severe(exceptionToLines(e))
-			}
-			return manager
-		}
-	}
+                /* For each instrument */
+                for (i in 0 until instrumentList.length) {
+                    val instrument = instrumentList.item(i)
+                    val instrumentAttributes = instrument.attributes
+                    /* Find instrument with matching name */
+                    if (instrumentAttributes.getNamedItem("name").textContent == className) {
+                        val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
+                        if ("hands" != mappingType) {
+                            Midis2jam2.getLOGGER().severe { "XML has a mapping type of $mappingType." }
+                            return manager
+                        }
+
+                        /* Get key mapping */
+                        val mapping = (instrument as Element).getElementsByTagName("mapping").item(0)
+                        val maps = (mapping as Element).getElementsByTagName("map")
+                        val mapSize = maps.length
+                        /* For each defined note */
+                        for (j in 0 until mapSize) {
+                            val attributes = maps.item(j).attributes
+                            val note = attributes.getNamedItem("note").textContent.toInt()
+                            val leftHand = attributes.getNamedItem("lh").textContent.toInt()
+                            val rightHand = attributes.getNamedItem("rh").textContent.toInt()
+                            manager.table[note] = Hands(leftHand, rightHand)
+                        }
+                        break
+                    }
+                }
+            } catch (e: SAXException) {
+                Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+            } catch (e: IOException) {
+                Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+            } catch (e: ParserConfigurationException) {
+                Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+            }
+            return manager
+        }
+    }
 }

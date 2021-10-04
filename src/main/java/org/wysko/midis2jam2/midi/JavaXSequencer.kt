@@ -23,33 +23,33 @@ import javax.sound.midi.Sequencer
 
 class JavaXSequencer(val sequencer: Sequencer) : SequencerHandler {
 
-	override fun isOpen() = sequencer.isOpen
+    override fun isOpen() = sequencer.isOpen
 
-	override fun start(midiFile: MidiFile) {
-		sequencer.tempoInBPM = midiFile.firstTempoInBpm().toFloat()
-		sequencer.start()
-		Timer(true).scheduleAtFixedRate(object : TimerTask() {
-			override fun run() {
-				/* Find the first tempo we haven't hit and need to execute */
-				val currentMidiTick = sequencer.tickPosition
-				for (tempo in midiFile.tempos) {
-					if (tempo.time == currentMidiTick) {
-						sequencer.tempoInBPM = 60000000f / tempo.number
-					}
-				}
-			}
-		}, 0, 1)
-	}
+    override fun start(midiFile: MidiFile) {
+        sequencer.tempoInBPM = midiFile.firstTempoInBpm().toFloat()
+        sequencer.start()
+        Timer(true).scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                /* Find the first tempo we haven't hit and need to execute */
+                val currentMidiTick = sequencer.tickPosition
+                for (tempo in midiFile.tempos) {
+                    if (tempo.time == currentMidiTick) {
+                        sequencer.tempoInBPM = 60000000f / tempo.number
+                    }
+                }
+            }
+        }, 0, 1)
+    }
 
-	override fun stop() {
-		if (sequencer.isRunning)
-			sequencer.stop()
+    override fun stop() {
+        if (sequencer.isRunning)
+            sequencer.stop()
 
-		if (sequencer.isOpen)
-			sequencer.close()
-	}
+        if (sequencer.isOpen)
+            sequencer.close()
+    }
 
-	override fun position() = sequencer.microsecondPosition
+    override fun position() = sequencer.microsecondPosition
 
-	override fun duration() = sequencer.microsecondLength
+    override fun duration() = sequencer.microsecondLength
 }

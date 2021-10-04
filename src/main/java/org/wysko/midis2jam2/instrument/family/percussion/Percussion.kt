@@ -34,135 +34,135 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Instrument(context) {
 
-	/** Contains all percussion instruments. */
-	val percussionNode = Node()
+    /** Contains all percussion instruments. */
+    val percussionNode = Node()
 
-	/** All note on events. */
-	val noteOnEvents: MutableList<MidiNoteOnEvent>
+    /** All note on events. */
+    val noteOnEvents: MutableList<MidiNoteOnEvent>
 
-	/** Each percussion instrument. */
-	val instruments: MutableList<PercussionInstrument> = ArrayList()
+    /** Each percussion instrument. */
+    val instruments: MutableList<PercussionInstrument> = ArrayList()
 
-	private fun eventsByNote(vararg notes: Int) = noteOnEvents.filter { notes.contains(it.note) }.toMutableList()
+    private fun eventsByNote(vararg notes: Int) = noteOnEvents.filter { notes.contains(it.note) }.toMutableList()
 
-	override fun tick(time: Double, delta: Float) {
-		setIdleVisibilityByStrikes(noteOnEvents, time, percussionNode)
-		instruments.forEach { it.tick(time, delta) }
-	}
+    override fun tick(time: Double, delta: Float) {
+        setIdleVisibilityByStrikes(noteOnEvents, time, percussionNode)
+        instruments.forEach { it.tick(time, delta) }
+    }
 
-	override fun moveForMultiChannel(delta: Float) {
-		// Do nothing!
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        // Do nothing!
+    }
 
-	init {
-		noteOnEvents = events.filterIsInstance<MidiNoteOnEvent>() as MutableList<MidiNoteOnEvent>
+    init {
+        noteOnEvents = events.filterIsInstance<MidiNoteOnEvent>() as MutableList<MidiNoteOnEvent>
 
-		val drumSetNode = Node()
+        val drumSetNode = Node()
 
-		instruments.add(SnareDrum(context, eventsByNote(Midi.ACOUSTIC_SNARE, Midi.ELECTRIC_SNARE, Midi.SIDE_STICK)))
-		instruments.add(BassDrum(context, eventsByNote(Midi.ELECTRIC_BASS_DRUM, Midi.ACOUSTIC_BASS_DRUM)))
-		instruments.add(Tom(context, eventsByNote(Midi.LOW_FLOOR_TOM), LOW_FLOOR))
-		instruments.add(Tom(context, eventsByNote(Midi.HIGH_FLOOR_TOM), HIGH_FLOOR))
-		instruments.add(Tom(context, eventsByNote(Midi.LOW_TOM), LOW))
-		instruments.add(Tom(context, eventsByNote(Midi.LOW_MID_TOM), LOW_MID))
-		instruments.add(Tom(context, eventsByNote(Midi.HI_MID_TOM), HIGH_MID))
-		instruments.add(Tom(context, eventsByNote(Midi.HIGH_TOM), HIGH))
-		instruments.add(Cymbal(context, eventsByNote(Midi.CRASH_CYMBAL_1), CRASH_1))
-		instruments.add(Cymbal(context, eventsByNote(Midi.CRASH_CYMBAL_2), CRASH_2))
-		instruments.add(Cymbal(context, eventsByNote(Midi.SPLASH_CYMBAL), SPLASH))
-		instruments.add(Cymbal(context, eventsByNote(Midi.CHINESE_CYMBAL), CHINA))
+        instruments.add(SnareDrum(context, eventsByNote(Midi.ACOUSTIC_SNARE, Midi.ELECTRIC_SNARE, Midi.SIDE_STICK)))
+        instruments.add(BassDrum(context, eventsByNote(Midi.ELECTRIC_BASS_DRUM, Midi.ACOUSTIC_BASS_DRUM)))
+        instruments.add(Tom(context, eventsByNote(Midi.LOW_FLOOR_TOM), LOW_FLOOR))
+        instruments.add(Tom(context, eventsByNote(Midi.HIGH_FLOOR_TOM), HIGH_FLOOR))
+        instruments.add(Tom(context, eventsByNote(Midi.LOW_TOM), LOW))
+        instruments.add(Tom(context, eventsByNote(Midi.LOW_MID_TOM), LOW_MID))
+        instruments.add(Tom(context, eventsByNote(Midi.HI_MID_TOM), HIGH_MID))
+        instruments.add(Tom(context, eventsByNote(Midi.HIGH_TOM), HIGH))
+        instruments.add(Cymbal(context, eventsByNote(Midi.CRASH_CYMBAL_1), CRASH_1))
+        instruments.add(Cymbal(context, eventsByNote(Midi.CRASH_CYMBAL_2), CRASH_2))
+        instruments.add(Cymbal(context, eventsByNote(Midi.SPLASH_CYMBAL), SPLASH))
+        instruments.add(Cymbal(context, eventsByNote(Midi.CHINESE_CYMBAL), CHINA))
 
-		/* Calculate ride cymbal notes */
-		val rides = eventsByNote(Midi.RIDE_BELL, Midi.RIDE_CYMBAL_1, Midi.RIDE_CYMBAL_2)
-		var currentRide = RIDE_1
-		val ride1Notes = ArrayList<MidiNoteOnEvent>()
-		val ride2Notes = ArrayList<MidiNoteOnEvent>()
-		rides.forEach {
-			when (it.note) {
-				Midi.RIDE_CYMBAL_1 -> {
-					ride1Notes.add(it)
-					currentRide = RIDE_1
-				}
-				Midi.RIDE_CYMBAL_2 -> {
-					ride2Notes.add(it)
-					currentRide = RIDE_2
-				}
-				Midi.RIDE_BELL -> {
-					if (currentRide == RIDE_1) ride1Notes.add(it)
-					else ride2Notes.add(it)
-				}
-			}
-		}
+        /* Calculate ride cymbal notes */
+        val rides = eventsByNote(Midi.RIDE_BELL, Midi.RIDE_CYMBAL_1, Midi.RIDE_CYMBAL_2)
+        var currentRide = RIDE_1
+        val ride1Notes = ArrayList<MidiNoteOnEvent>()
+        val ride2Notes = ArrayList<MidiNoteOnEvent>()
+        rides.forEach {
+            when (it.note) {
+                Midi.RIDE_CYMBAL_1 -> {
+                    ride1Notes.add(it)
+                    currentRide = RIDE_1
+                }
+                Midi.RIDE_CYMBAL_2 -> {
+                    ride2Notes.add(it)
+                    currentRide = RIDE_2
+                }
+                Midi.RIDE_BELL -> {
+                    if (currentRide == RIDE_1) ride1Notes.add(it)
+                    else ride2Notes.add(it)
+                }
+            }
+        }
 
-		instruments.add(RideCymbal(context, ride1Notes, RIDE_1))
-		instruments.add(RideCymbal(context, ride2Notes, RIDE_2))
-		instruments.add(HiHat(context, eventsByNote(Midi.PEDAL_HI_HAT, Midi.OPEN_HI_HAT, Midi.CLOSED_HI_HAT)))
+        instruments.add(RideCymbal(context, ride1Notes, RIDE_1))
+        instruments.add(RideCymbal(context, ride2Notes, RIDE_2))
+        instruments.add(HiHat(context, eventsByNote(Midi.PEDAL_HI_HAT, Midi.OPEN_HI_HAT, Midi.CLOSED_HI_HAT)))
 
-		if (noteOnEvents.any { it.note.oneOf(Midi.LOW_CONGA, Midi.OPEN_HIGH_CONGA, Midi.MUTE_HIGH_CONGA) })
-			instruments.add(Congas(context, eventsByNote(Midi.LOW_CONGA, Midi.OPEN_HIGH_CONGA, Midi.MUTE_HIGH_CONGA)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.COWBELL) })
-			instruments.add(Cowbell(context, eventsByNote(Midi.COWBELL)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.HIGH_TIMBALE, Midi.LOW_TIMBALE) })
-			instruments.add(Timbales(context, eventsByNote(Midi.HIGH_TIMBALE, Midi.LOW_TIMBALE)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.LOW_BONGO, Midi.HIGH_BONGO) })
-			instruments.add(Bongos(context, eventsByNote(Midi.LOW_BONGO, Midi.HIGH_BONGO)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.TAMBOURINE) })
-			instruments.add(Tambourine(context, eventsByNote(Midi.TAMBOURINE)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.HAND_CLAP) })
-			instruments.add(HandClap(context, eventsByNote(Midi.HAND_CLAP)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.STICKS) })
-			instruments.add(Sticks(context, eventsByNote(Midi.STICKS)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.JINGLE_BELL) })
-			instruments.add(JingleBells(context, eventsByNote(Midi.JINGLE_BELL)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.CASTANETS) })
-			instruments.add(Castanets(context, eventsByNote(Midi.CASTANETS)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.HIGH_Q) })
-			instruments.add(HighQ(context, eventsByNote(Midi.HIGH_Q)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.HIGH_WOODBLOCK, Midi.LOW_WOODBLOCK) })
-			instruments.add(Woodblock(context, eventsByNote(Midi.HIGH_WOODBLOCK, Midi.LOW_WOODBLOCK)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.LOW_AGOGO, Midi.HIGH_AGOGO) })
-			instruments.add(Agogo(context, eventsByNote(Midi.LOW_AGOGO, Midi.HIGH_AGOGO)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.SHAKER) })
-			instruments.add(Shaker(context, eventsByNote(Midi.SHAKER)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.CABASA) })
-			instruments.add(Cabasa(context, eventsByNote(Midi.CABASA)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.MARACAS) })
-			instruments.add(Maracas(context, eventsByNote(Midi.MARACAS)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.CLAVES) })
-			instruments.add(Claves(context, eventsByNote(Midi.CLAVES)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.OPEN_TRIANGLE) })
-			instruments.add(Triangle(context, eventsByNote(Midi.OPEN_TRIANGLE), OPEN))
-		if (noteOnEvents.any { it.note.oneOf(Midi.MUTE_TRIANGLE) })
-			instruments.add(Triangle(context, eventsByNote(Midi.MUTE_TRIANGLE), MUTED))
-		if (noteOnEvents.any { it.note.oneOf(Midi.SQUARE_CLICK) })
-			instruments.add(SquareClick(context, eventsByNote(Midi.SQUARE_CLICK)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.METRONOME_CLICK, Midi.METRONOME_BELL) })
-			instruments.add(Metronome(context, eventsByNote(Midi.METRONOME_CLICK, Midi.METRONOME_BELL)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.SHORT_WHISTLE, Midi.LONG_WHISTLE) })
-			instruments.add(Whistle(context, eventsByNote(Midi.SHORT_WHISTLE, Midi.LONG_WHISTLE)))
-		if (noteOnEvents.any { it.note.oneOf(Midi.MUTE_SURDO, Midi.OPEN_SURDO) })
-			instruments.add(Surdo(context, eventsByNote(Midi.MUTE_SURDO, Midi.OPEN_SURDO)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.LOW_CONGA, Midi.OPEN_HIGH_CONGA, Midi.MUTE_HIGH_CONGA) })
+            instruments.add(Congas(context, eventsByNote(Midi.LOW_CONGA, Midi.OPEN_HIGH_CONGA, Midi.MUTE_HIGH_CONGA)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.COWBELL) })
+            instruments.add(Cowbell(context, eventsByNote(Midi.COWBELL)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.HIGH_TIMBALE, Midi.LOW_TIMBALE) })
+            instruments.add(Timbales(context, eventsByNote(Midi.HIGH_TIMBALE, Midi.LOW_TIMBALE)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.LOW_BONGO, Midi.HIGH_BONGO) })
+            instruments.add(Bongos(context, eventsByNote(Midi.LOW_BONGO, Midi.HIGH_BONGO)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.TAMBOURINE) })
+            instruments.add(Tambourine(context, eventsByNote(Midi.TAMBOURINE)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.HAND_CLAP) })
+            instruments.add(HandClap(context, eventsByNote(Midi.HAND_CLAP)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.STICKS) })
+            instruments.add(Sticks(context, eventsByNote(Midi.STICKS)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.JINGLE_BELL) })
+            instruments.add(JingleBells(context, eventsByNote(Midi.JINGLE_BELL)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.CASTANETS) })
+            instruments.add(Castanets(context, eventsByNote(Midi.CASTANETS)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.HIGH_Q) })
+            instruments.add(HighQ(context, eventsByNote(Midi.HIGH_Q)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.HIGH_WOODBLOCK, Midi.LOW_WOODBLOCK) })
+            instruments.add(Woodblock(context, eventsByNote(Midi.HIGH_WOODBLOCK, Midi.LOW_WOODBLOCK)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.LOW_AGOGO, Midi.HIGH_AGOGO) })
+            instruments.add(Agogo(context, eventsByNote(Midi.LOW_AGOGO, Midi.HIGH_AGOGO)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.SHAKER) })
+            instruments.add(Shaker(context, eventsByNote(Midi.SHAKER)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.CABASA) })
+            instruments.add(Cabasa(context, eventsByNote(Midi.CABASA)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.MARACAS) })
+            instruments.add(Maracas(context, eventsByNote(Midi.MARACAS)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.CLAVES) })
+            instruments.add(Claves(context, eventsByNote(Midi.CLAVES)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.OPEN_TRIANGLE) })
+            instruments.add(Triangle(context, eventsByNote(Midi.OPEN_TRIANGLE), OPEN))
+        if (noteOnEvents.any { it.note.oneOf(Midi.MUTE_TRIANGLE) })
+            instruments.add(Triangle(context, eventsByNote(Midi.MUTE_TRIANGLE), MUTED))
+        if (noteOnEvents.any { it.note.oneOf(Midi.SQUARE_CLICK) })
+            instruments.add(SquareClick(context, eventsByNote(Midi.SQUARE_CLICK)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.METRONOME_CLICK, Midi.METRONOME_BELL) })
+            instruments.add(Metronome(context, eventsByNote(Midi.METRONOME_CLICK, Midi.METRONOME_BELL)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.SHORT_WHISTLE, Midi.LONG_WHISTLE) })
+            instruments.add(Whistle(context, eventsByNote(Midi.SHORT_WHISTLE, Midi.LONG_WHISTLE)))
+        if (noteOnEvents.any { it.note.oneOf(Midi.MUTE_SURDO, Midi.OPEN_SURDO) })
+            instruments.add(Surdo(context, eventsByNote(Midi.MUTE_SURDO, Midi.OPEN_SURDO)))
 
-		instruments.forEach {
-			when (it) {
-				is SnareDrum, is BassDrum, is Tom, is Cymbal, is HiHat -> drumSetNode.attachChild(it.highLevelNode)
-				else -> percussionNode.attachChild(it.highLevelNode)
-			}
-		}
+        instruments.forEach {
+            when (it) {
+                is SnareDrum, is BassDrum, is Tom, is Cymbal, is HiHat -> drumSetNode.attachChild(it.highLevelNode)
+                else -> percussionNode.attachChild(it.highLevelNode)
+            }
+        }
 
-		/* Add shadow */
-		val shadow = context.assetManager.loadModel("Assets/DrumShadow.obj")
-		val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-		material.setTexture("ColorMap", context.assetManager.loadTexture("Assets/DrumShadow.png"))
-		material.additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-		shadow.queueBucket = RenderQueue.Bucket.Transparent
-		shadow.setMaterial(material)
-		shadow.move(0f, 0.1f, -80f)
+        /* Add shadow */
+        val shadow = context.assetManager.loadModel("Assets/DrumShadow.obj")
+        val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
+        material.setTexture("ColorMap", context.assetManager.loadTexture("Assets/DrumShadow.png"))
+        material.additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+        shadow.queueBucket = RenderQueue.Bucket.Transparent
+        shadow.setMaterial(material)
+        shadow.move(0f, 0.1f, -80f)
 
-		percussionNode.attachChild(drumSetNode)
-		percussionNode.attachChild(shadow)
-		context.rootNode.attachChild(percussionNode)
-	}
+        percussionNode.attachChild(drumSetNode)
+        percussionNode.attachChild(shadow)
+        context.rootNode.attachChild(percussionNode)
+    }
 }
 
 fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }

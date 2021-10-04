@@ -36,215 +36,215 @@ import kotlin.math.pow
  */
 class SteamPuffer(
 
-	/**
-	 * Context to the main class.
-	 */
-	private val context: Midis2jam2,
+    /**
+     * Context to the main class.
+     */
+    private val context: Midis2jam2,
 
-	/**
-	 * The type of steam puffer.
-	 */
-	private val type: SteamPuffType,
+    /**
+     * The type of steam puffer.
+     */
+    private val type: SteamPuffType,
 
-	/**
-	 * How large the clouds are.
-	 */
-	private val scale: Double,
+    /**
+     * How large the clouds are.
+     */
+    private val scale: Double,
 
-	/**
-	 * The behavior of the steam puffer.
-	 */
-	private val behavior: PuffBehavior
+    /**
+     * The behavior of the steam puffer.
+     */
+    private val behavior: PuffBehavior
 ) : ParticleGenerator {
 
-	/**
-	 * Defines the root of the steam puffer.
-	 */
-	val steamPuffNode = Node()
+    /**
+     * Defines the root of the steam puffer.
+     */
+    val steamPuffNode = Node()
 
-	/**
-	 * The list of currently visible clouds.
-	 */
-	private val visibleClouds: MutableList<Cloud> = ArrayList()
+    /**
+     * The list of currently visible clouds.
+     */
+    private val visibleClouds: MutableList<Cloud> = ArrayList()
 
-	/**
-	 * A pool of clouds that this steam puffer can use.
-	 */
-	private val cloudPool: MutableList<Cloud> = ArrayList()
+    /**
+     * A pool of clouds that this steam puffer can use.
+     */
+    private val cloudPool: MutableList<Cloud> = ArrayList()
 
-	/**
-	 * Despawns a cloud.
-	 *
-	 * @param cloud the cloud to despawn
-	 */
-	private fun despawnCloud(cloud: Cloud) {
-		steamPuffNode.detachChild(cloud.cloudNode)
-	}
+    /**
+     * Despawns a cloud.
+     *
+     * @param cloud the cloud to despawn
+     */
+    private fun despawnCloud(cloud: Cloud) {
+        steamPuffNode.detachChild(cloud.cloudNode)
+    }
 
-	override fun tick(delta: Float, active: Boolean) {
-		if (active) {
-			/* If it happens to be the case that the amount of time since the last frame was so large that it
-			warrants more than one cloud to be spawned on this frame, calculate the number of clouds to spawn. But we
-			should always spawn at least one cloud on each frame. */
-			val n = ceil(max(delta / (1f / 60f), 1f).toDouble())
-			var i = 0
-			while (i < n) {
-				val cloud: Cloud = if (cloudPool.isEmpty()) {
-					/* If the pool is empty, we need to make a new cloud. */
-					Cloud()
-				} else {
-					/* If there exists a cloud we can use, grab the first one. */
-					cloudPool.removeAt(0) // NOSONAR java:S5413
-				}
-				/* Reinitialize cloud */visibleClouds.add(cloud)
-				cloud.currentlyUsing = true
-				cloud.randomInit()
-				steamPuffNode.attachChild(cloud.cloudNode)
-				i++
-			}
-		}
-		val iterator = visibleClouds.iterator()
-		/* Loop over each visible cloud */while (iterator.hasNext()) {
-			val cloud = iterator.next()
-			val tick = cloud.tick(delta)
-			if (!tick) {
-				/* We need to despawn the cloud */
-				cloud.currentlyUsing = false
-				cloudPool.add(cloud)
-				despawnCloud(cloud)
-				iterator.remove()
-			}
-		}
-	}
+    override fun tick(delta: Float, active: Boolean) {
+        if (active) {
+            /* If it happens to be the case that the amount of time since the last frame was so large that it
+            warrants more than one cloud to be spawned on this frame, calculate the number of clouds to spawn. But we
+            should always spawn at least one cloud on each frame. */
+            val n = ceil(max(delta / (1f / 60f), 1f).toDouble())
+            var i = 0
+            while (i < n) {
+                val cloud: Cloud = if (cloudPool.isEmpty()) {
+                    /* If the pool is empty, we need to make a new cloud. */
+                    Cloud()
+                } else {
+                    /* If there exists a cloud we can use, grab the first one. */
+                    cloudPool.removeAt(0) // NOSONAR java:S5413
+                }
+                /* Reinitialize cloud */visibleClouds.add(cloud)
+                cloud.currentlyUsing = true
+                cloud.randomInit()
+                steamPuffNode.attachChild(cloud.cloudNode)
+                i++
+            }
+        }
+        val iterator = visibleClouds.iterator()
+        /* Loop over each visible cloud */while (iterator.hasNext()) {
+            val cloud = iterator.next()
+            val tick = cloud.tick(delta)
+            if (!tick) {
+                /* We need to despawn the cloud */
+                cloud.currentlyUsing = false
+                cloudPool.add(cloud)
+                despawnCloud(cloud)
+                iterator.remove()
+            }
+        }
+    }
 
-	/**
-	 * Defines how the clouds should animate.
-	 */
-	enum class PuffBehavior {
-		/**
-		 * The clouds move along the relative XZ plane with only some marginal variation in the Y-axis.
-		 */
-		OUTWARDS,
+    /**
+     * Defines how the clouds should animate.
+     */
+    enum class PuffBehavior {
+        /**
+         * The clouds move along the relative XZ plane with only some marginal variation in the Y-axis.
+         */
+        OUTWARDS,
 
-		/**
-		 * The clouds move along the Y-axis with only some marginal variation on the relative XZ plane.
-		 */
-		UPWARDS
-	}
+        /**
+         * The clouds move along the Y-axis with only some marginal variation on the relative XZ plane.
+         */
+        UPWARDS
+    }
 
-	/**
-	 * There are a few different textures for the steam puffer.
-	 */
-	enum class SteamPuffType(
-		/**
-		 * The filename of the cloud texture.
-		 */
-		val filename: String
-	) {
-		/**
-		 * Normal steam puff type.
-		 */
-		NORMAL("SteamPuff.bmp"),
+    /**
+     * There are a few different textures for the steam puffer.
+     */
+    enum class SteamPuffType(
+        /**
+         * The filename of the cloud texture.
+         */
+        val filename: String
+    ) {
+        /**
+         * Normal steam puff type.
+         */
+        NORMAL("SteamPuff.bmp"),
 
-		/**
-		 * Harmonica steam puff type.
-		 */
-		HARMONICA("SteamPuff_Harmonica.bmp"),
+        /**
+         * Harmonica steam puff type.
+         */
+        HARMONICA("SteamPuff_Harmonica.bmp"),
 
-		/**
-		 * Pop steam puff type.
-		 */
-		POP("SteamPuff_Pop.bmp"),
+        /**
+         * Pop steam puff type.
+         */
+        POP("SteamPuff_Pop.bmp"),
 
-		/**
-		 * Whistle steam puff type.
-		 */
-		WHISTLE("SteamPuff_Whistle.bmp");
-	}
+        /**
+         * Whistle steam puff type.
+         */
+        WHISTLE("SteamPuff_Whistle.bmp");
+    }
 
-	/**
-	 * Defines how a cloud in the steam puffer animates.
-	 */
-	internal inner class Cloud : ParticleGenerator.Particle {
+    /**
+     * Defines how a cloud in the steam puffer animates.
+     */
+    internal inner class Cloud : ParticleGenerator.Particle {
 
-		/**
-		 * Contains the geometry of the cloud (the [.cube]).
-		 */
-		val cloudNode = Node()
+        /**
+         * Contains the geometry of the cloud (the [.cube]).
+         */
+        val cloudNode = Node()
 
-		/**
-		 * The mesh of the cloud.
-		 */
-		private val cube: Spatial = context.loadModel("SteamCloud.obj", type.filename)
+        /**
+         * The mesh of the cloud.
+         */
+        private val cube: Spatial = context.loadModel("SteamCloud.obj", type.filename)
 
-		/**
-		 * A seed for random first axis transformation.
-		 */
-		private var randA = 0f
+        /**
+         * A seed for random first axis transformation.
+         */
+        private var randA = 0f
 
-		/**
-		 * A seed for random second axis transformation.
-		 */
-		private var randB = 0f
+        /**
+         * A seed for random second axis transformation.
+         */
+        private var randB = 0f
 
-		/**
-		 * The current duration into the life of the cloud.
-		 */
-		private var life = 0.0
+        /**
+         * The current duration into the life of the cloud.
+         */
+        private var life = 0.0
 
-		/**
-		 * True if this cloud is currently being animated, false if it is idling in the pool.
-		 */
-		var currentlyUsing = false
+        /**
+         * True if this cloud is currently being animated, false if it is idling in the pool.
+         */
+        var currentlyUsing = false
 
-		/**
-		 * Resets the life of the cloud, its transformation, and redefines random seeds.
-		 */
-		fun randomInit() {
-			randA = (RANDOM.nextFloat() - 0.5f) * 1.5f
-			randB = (RANDOM.nextFloat() - 0.5f) * 1.5f
-			cube.localRotation = Quaternion().fromAngles(
-				floatArrayOf(
-					RANDOM.nextFloat() * FastMath.TWO_PI,
-					RANDOM.nextFloat() * FastMath.TWO_PI,
-					RANDOM.nextFloat() * FastMath.TWO_PI
-				)
-			)
-			life = (RANDOM.nextFloat() * 0.02f).toDouble()
-			cloudNode.setLocalTranslation(0f, 0f, 0f)
-		}
+        /**
+         * Resets the life of the cloud, its transformation, and redefines random seeds.
+         */
+        fun randomInit() {
+            randA = (RANDOM.nextFloat() - 0.5f) * 1.5f
+            randB = (RANDOM.nextFloat() - 0.5f) * 1.5f
+            cube.localRotation = Quaternion().fromAngles(
+                floatArrayOf(
+                    RANDOM.nextFloat() * FastMath.TWO_PI,
+                    RANDOM.nextFloat() * FastMath.TWO_PI,
+                    RANDOM.nextFloat() * FastMath.TWO_PI
+                )
+            )
+            life = (RANDOM.nextFloat() * 0.02f).toDouble()
+            cloudNode.setLocalTranslation(0f, 0f, 0f)
+        }
 
-		override fun tick(delta: Float): Boolean {
-			if (!currentlyUsing) return false
-			if (behavior == PuffBehavior.OUTWARDS) {
-				cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randA, locEase(life) * randB)
-			} else {
-				cloudNode.setLocalTranslation(locEase(life) * 6, life.toFloat() * 10, locEase(life) * randB)
-			}
-			cloudNode.setLocalScale(((0.75 * life + 1.2) * scale).toFloat())
-			life += delta * 1.5
-			return life <= END_OF_LIFE
-		}
+        override fun tick(delta: Float): Boolean {
+            if (!currentlyUsing) return false
+            if (behavior == PuffBehavior.OUTWARDS) {
+                cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randA, locEase(life) * randB)
+            } else {
+                cloudNode.setLocalTranslation(locEase(life) * 6, life.toFloat() * 10, locEase(life) * randB)
+            }
+            cloudNode.setLocalScale(((0.75 * life + 1.2) * scale).toFloat())
+            life += delta * 1.5
+            return life <= END_OF_LIFE
+        }
 
-		/**
-		 * Easing function to smoothen particle travel.
-		 */
-		private fun locEase(x: Double): Float {
-			return if (x == 1.0) 1f else (1 - 2.0.pow(-10 * x)).toFloat()
-		}
+        /**
+         * Easing function to smoothen particle travel.
+         */
+        private fun locEase(x: Double): Float {
+            return if (x == 1.0) 1f else (1 - 2.0.pow(-10 * x)).toFloat()
+        }
 
-		init {
-			randomInit()
-			cloudNode.attachChild(cube)
-		}
-	}
+        init {
+            randomInit()
+            cloudNode.attachChild(cube)
+        }
+    }
 
-	companion object {
-		/**
-		 * For RNG.
-		 */
-		private val RANDOM = Random()
+    companion object {
+        /**
+         * For RNG.
+         */
+        private val RANDOM = Random()
 
-		const val END_OF_LIFE = 0.7
-	}
+        const val END_OF_LIFE = 0.7
+    }
 }

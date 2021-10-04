@@ -44,152 +44,152 @@ import kotlin.math.cos
  * function.
  */
 class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	SustainedInstrument(context, eventList) {
-	/**
-	 * "Seed" for X-value generation.
-	 */
-	private val rotXRand: Float
+    SustainedInstrument(context, eventList) {
+    /**
+     * "Seed" for X-value generation.
+     */
+    private val rotXRand: Float
 
-	/**
-	 * "Seed" for Y-value generation.
-	 */
-	private val rotYRand: Float
+    /**
+     * "Seed" for Y-value generation.
+     */
+    private val rotYRand: Float
 
-	/**
-	 * "Seed" for Z-value generation.
-	 */
-	private val rotZRand: Float
+    /**
+     * "Seed" for Z-value generation.
+     */
+    private val rotZRand: Float
 
-	/**
-	 * Contains all geometry for animation.
-	 */
-	private val animNode = Node()
+    /**
+     * Contains all geometry for animation.
+     */
+    private val animNode = Node()
 
-	/**
-	 * The rotor which spins.
-	 */
-	private val rotor = Node()
+    /**
+     * The rotor which spins.
+     */
+    private val rotor = Node()
 
-	/**
-	 * Each set of lights on the helicopter. Each spatial is a plane that has the light texture for that note.
-	 */
-	private val lights: Array<Spatial>
+    /**
+     * Each set of lights on the helicopter. Each spatial is a plane that has the light texture for that note.
+     */
+    private val lights: Array<Spatial>
 
-	/**
-	 * The amount of height and random movement.
-	 */
-	private var force = 0f
+    /**
+     * The amount of height and random movement.
+     */
+    private var force = 0f
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Turn all lights off */
-		lights.forEach { it.cullHint = Always }
+        /* Turn all lights off */
+        lights.forEach { it.cullHint = Always }
 
-		/* Turn on active lights */
-		currentNotePeriods.forEach { lights[11 - (it.midiNote + 3) % 12].cullHint = Dynamic }
+        /* Turn on active lights */
+        currentNotePeriods.forEach { lights[11 - (it.midiNote + 3) % 12].cullHint = Dynamic }
 
-		/* If playing a note, increase the force, but cap it at 1. */
-		if (currentNotePeriods.isNotEmpty()) {
-			force += delta
-			force = force.coerceAtMost(1f)
-		} else {
-			/* Otherwise, decrease force but cup at 0. */
-			force -= delta
-			force = force.coerceAtLeast(0f)
-		}
+        /* If playing a note, increase the force, but cap it at 1. */
+        if (currentNotePeriods.isNotEmpty()) {
+            force += delta
+            force = force.coerceAtMost(1f)
+        } else {
+            /* Otherwise, decrease force but cup at 0. */
+            force -= delta
+            force = force.coerceAtLeast(0f)
+        }
 
-		/* Vroom */
-		rotor.rotate(Quaternion().fromAngles(0f, rad((3141 * delta).toDouble()), 0f))
+        /* Vroom */
+        rotor.rotate(Quaternion().fromAngles(0f, rad((3141 * delta).toDouble()), 0f))
 
-		/* Slight wobble */
-		animNode.localRotation = Quaternion().fromAngles(
-			force * 0.5f * rad(
-				(Noise.gradientCoherentNoise3D(
-					0.0,
-					0.0,
-					time,
-					(rotXRand * 1000).toInt(),
-					NoiseQuality.STANDARD
-				) - 0.4) * 10
-			),
-			force * 0.5f * rad(
-				(Noise.gradientCoherentNoise3D(
-					0.0,
-					0.0,
-					time,
-					(rotYRand * 1000).toInt(),
-					NoiseQuality.STANDARD
-				) - 0.4) * 10
-			),
-			force * 0.5f * rad(
-				(Noise.gradientCoherentNoise3D(
-					0.0,
-					0.0,
-					time,
-					(rotZRand * 1000).toInt(),
-					NoiseQuality.STANDARD
-				) - 0.4) * 10
-			)
-		)
-		highestLevel.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
-		animNode.setLocalTranslation(
-			0f,
-			(force * (Noise.gradientCoherentNoise3D(
-				0.0,
-				0.0,
-				time,
-				(rotZRand * 1000).toInt(),
-				NoiseQuality.STANDARD
-			) - 0.4)).toFloat() * 10,
-			0f
-		)
-		highestLevel.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)
-	}
+        /* Slight wobble */
+        animNode.localRotation = Quaternion().fromAngles(
+            force * 0.5f * rad(
+                (Noise.gradientCoherentNoise3D(
+                    0.0,
+                    0.0,
+                    time,
+                    (rotXRand * 1000).toInt(),
+                    NoiseQuality.STANDARD
+                ) - 0.4) * 10
+            ),
+            force * 0.5f * rad(
+                (Noise.gradientCoherentNoise3D(
+                    0.0,
+                    0.0,
+                    time,
+                    (rotYRand * 1000).toInt(),
+                    NoiseQuality.STANDARD
+                ) - 0.4) * 10
+            ),
+            force * 0.5f * rad(
+                (Noise.gradientCoherentNoise3D(
+                    0.0,
+                    0.0,
+                    time,
+                    (rotZRand * 1000).toInt(),
+                    NoiseQuality.STANDARD
+                ) - 0.4) * 10
+            )
+        )
+        highestLevel.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
+        animNode.setLocalTranslation(
+            0f,
+            (force * (Noise.gradientCoherentNoise3D(
+                0.0,
+                0.0,
+                time,
+                (rotZRand * 1000).toInt(),
+                NoiseQuality.STANDARD
+            ) - 0.4)).toFloat() * 10,
+            0f
+        )
+        highestLevel.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)
+    }
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(20 + 50 * indexForMoving(delta), 40f, -300f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(20 + 50 * indexForMoving(delta), 40f, -300f)
+    }
 
-	companion object {
-		/**
-		 * easeInOutSine, ripped from [easings.net](https://easings.net/#easeInOutSine).
-		 *
-		 * @param x in
-		 * @return out
-		 */
-		private fun easeInOutSine(x: Float): Float {
-			return (-(cos(Math.PI * x) - 1) / 2).toFloat()
-		}
-	}
+    companion object {
+        /**
+         * easeInOutSine, ripped from [easings.net](https://easings.net/#easeInOutSine).
+         *
+         * @param x in
+         * @return out
+         */
+        private fun easeInOutSine(x: Float): Float {
+            return (-(cos(Math.PI * x) - 1) / 2).toFloat()
+        }
+    }
 
-	init {
-		/* Load helicopter */
-		val copter = context.loadModel("HelicopterBody.fbx", "Helicopter.png")
-		rotor.attachChild(shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterRotor.png"))
+    init {
+        /* Load helicopter */
+        val copter = context.loadModel("HelicopterBody.fbx", "Helicopter.png")
+        rotor.attachChild(shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterRotor.png"))
 
-		/* Load lights */
-		lights = Array(12) {
-			shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterLights${it + 1}.png").apply {
-				rotor.attachChild(this)
-				this.cullHint = Always
-			}
-		}
+        /* Load lights */
+        lights = Array(12) {
+            shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterLights${it + 1}.png").apply {
+                rotor.attachChild(this)
+                this.cullHint = Always
+            }
+        }
 
-		rotor.setLocalTranslation(40f, 36f, 0f)
-		animNode.attachChild(copter)
-		animNode.attachChild(rotor)
+        rotor.setLocalTranslation(40f, 36f, 0f)
+        animNode.attachChild(copter)
+        animNode.attachChild(rotor)
 
-		/* Load rotor cap */
-		val cap = context.loadModel("HelicopterRotorCap.fbx", "Helicopter.png")
-		cap.setLocalTranslation(0f, 0f, 0.5f)
-		animNode.attachChild(cap)
+        /* Load rotor cap */
+        val cap = context.loadModel("HelicopterRotorCap.fbx", "Helicopter.png")
+        cap.setLocalTranslation(0f, 0f, 0.5f)
+        animNode.attachChild(cap)
 
-		/* Initialize RNG */
-		val random = Random()
-		rotXRand = random.nextFloat()
-		rotYRand = random.nextFloat()
-		rotZRand = random.nextFloat()
-		instrumentNode.attachChild(animNode)
-	}
+        /* Initialize RNG */
+        val random = Random()
+        rotXRand = random.nextFloat()
+        rotYRand = random.nextFloat()
+        rotZRand = random.nextFloat()
+        instrumentNode.attachChild(animNode)
+    }
 }

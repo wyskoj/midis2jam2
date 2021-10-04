@@ -29,90 +29,88 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Pan flute.
  */
 class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, skin: PipeSkin) :
-	WrappedOctaveSustained(context, eventList, false) {
+    WrappedOctaveSustained(context, eventList, false) {
 
-	/**
-	 * The Pipe nodes.
-	 */
-	private val pipeNodes = Array(12) { Node() }
+    /**
+     * The Pipe nodes.
+     */
+    private val pipeNodes = Array(12) { Node() }
 
-	override fun moveForMultiChannel(delta: Float) {
-		instrumentNode.localRotation =
-			Quaternion().fromAngles(0f, rad((80 / 11f * 12 * indexForMoving(delta)).toDouble()), 0f)
-		offsetNode.setLocalTranslation(0f, indexForMoving(delta) * 4.6f, 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        instrumentNode.localRotation =
+            Quaternion().fromAngles(0f, rad((80 / 11f * 12 * indexForMoving(delta)).toDouble()), 0f)
+        offsetNode.setLocalTranslation(0f, indexForMoving(delta) * 4.6f, 0f)
+    }
 
-	enum class PipeSkin(
-		val textureFile: String,
-		val reflective: Boolean
-	) {
-		/**
-		 * Gold pipe skin.
-		 */
-		GOLD("HornSkin.bmp", true),
+    enum class PipeSkin(val textureFile: String, val reflective: Boolean) {
+        /**
+         * Gold pipe skin.
+         */
+        GOLD("HornSkin.bmp", true),
 
-		/**
-		 * Wood pipe skin.
-		 */
-		WOOD("Wood.bmp", false);
-	}
+        /**
+         * Wood pipe skin.
+         */
+        WOOD("Wood.bmp", false);
+    }
 
-	/**
-	 * Each of the pipes in the pan flute, calliope, etc.
-	 */
-	inner class PanFlutePipe(skin: PipeSkin) : TwelfthOfOctave() {
-		/**
-		 * The geometry of this pipe.
-		 */
-		val pipe: Spatial
+    /**
+     * Each of the pipes in the pan flute, calliope, etc.
+     */
+    inner class PanFlutePipe(skin: PipeSkin) : TwelfthOfOctave() {
 
-		/**
-		 * The steam puffer for this pipe.
-		 */
-		val puffer: SteamPuffer
-		override fun play(duration: Double) {
-			playing = true
-			progress = 0.0
-			this.duration = duration
-		}
+        /**
+         * The geometry of this pipe.
+         */
+        val pipe: Spatial = context.loadModel("PanPipe.obj", skin.textureFile)
 
-		override fun tick(delta: Float) {
-			if (progress >= 1) {
-				playing = false
-				progress = 0.0
-			}
-			if (playing) {
-				progress += delta / duration
-			}
-			puffer.tick(delta, playing)
-		}
+        /**
+         * The steam puffer for this pipe.
+         */
+        val puffer: SteamPuffer
 
-		init {
-			pipe = context.loadModel("PanPipe.obj", skin.textureFile)
-			if (skin.reflective) {
-				pipe.setMaterial(context.reflectiveMaterial("/Assets/" + skin.textureFile))
-			}
-			this.highestLevel.attachChild(pipe)
-			puffer = SteamPuffer(context, SteamPuffer.SteamPuffType.NORMAL, 1.0, SteamPuffer.PuffBehavior.OUTWARDS)
-			this.highestLevel.attachChild(puffer.steamPuffNode)
-			puffer.steamPuffNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(90.0))
-		}
-	}
+        override fun play(duration: Double) {
+            playing = true
+            progress = 0.0
+            this.duration = duration
+        }
 
-	init {
-		for (i in 0..11) {
-			pipeNodes[11 - i] = Node()
-			twelfths[11 - i] = PanFlutePipe(skin)
-			instrumentNode.setLocalTranslation(75f, 22f, -35f)
-			// Set the pivot of the pipe
-			pipeNodes[11 - i].localRotation = Quaternion().fromAngles(0f, rad(7.272 * i + 75), 0f)
-			// Set the pipe offset
-			twelfths[11 - i]!!.highestLevel.setLocalTranslation(-4.248f * 0.9f, -3.5f + 0.38f * i, -11.151f * 0.9f)
-			twelfths[11 - i]!!.highestLevel.localRotation = Quaternion().fromAngles(0f, rad(180.0), 0f)
-			(twelfths[11 - i] as PanFlutePipe).pipe.setLocalScale(1f, 1 + (13 - i) * 0.05f, 1f)
-			pipeNodes[11 - i].attachChild(twelfths[11 - i]!!.highestLevel)
-			instrumentNode.attachChild(pipeNodes[11 - i])
-			(twelfths[11 - i] as PanFlutePipe).puffer.steamPuffNode.setLocalTranslation(0f, 11.75f - 0.38f * i, 0f)
-		}
-	}
+        override fun tick(delta: Float) {
+            if (progress >= 1) {
+                playing = false
+                progress = 0.0
+            }
+            if (playing) {
+                progress += delta / duration
+            }
+            puffer.tick(delta, playing)
+        }
+
+        init {
+            if (skin.reflective) {
+                pipe.setMaterial(context.reflectiveMaterial("/Assets/" + skin.textureFile))
+            }
+            this.highestLevel.attachChild(pipe)
+            puffer = SteamPuffer(context, SteamPuffer.SteamPuffType.NORMAL, 1.0, SteamPuffer.PuffBehavior.OUTWARDS)
+            this.highestLevel.attachChild(puffer.steamPuffNode)
+            puffer.steamPuffNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(90.0))
+        }
+    }
+
+    init {
+        twelfths = Array(12) { index ->
+            val i = 11 - index
+            PanFlutePipe(skin).apply {
+                highestLevel.setLocalTranslation(-4.248f * 0.9f, -3.5f + 0.38f * i, -11.151f * 0.9f)
+                highestLevel.localRotation = Quaternion().fromAngles(0f, rad(180.0), 0f)
+                pipe.setLocalScale(1f, 1 + (13 - i) * 0.05f, 1f)
+                puffer.steamPuffNode.setLocalTranslation(0f, 11.75f - 0.38f * i, 0f)
+            }.also {
+                pipeNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.272 * i + 75), 0f)
+                pipeNodes[i].attachChild(it.highestLevel)
+            }
+        }
+        pipeNodes.forEach { instrumentNode.attachChild(it) }
+        instrumentNode.setLocalTranslation(75f, 22f, -35f)
+    }
 }

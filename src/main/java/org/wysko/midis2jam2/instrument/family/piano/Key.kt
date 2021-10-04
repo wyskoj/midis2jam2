@@ -28,53 +28,42 @@ import com.jme3.scene.Spatial
 open class Key
 protected constructor() {
 
-	/**
-	 * The uppermost node of this key.
-	 */
-	@JvmField
-	val keyNode = Node()
+    /** The uppermost node of this key. */
+    val keyNode: Node = Node()
 
-	/**
-	 * Contains geometry for the "up" key.
-	 */
-	@JvmField
-	protected val upNode = Node()
+    /** Contains geometry for the "up" key. */
+    protected val upNode: Node = Node()
 
-	/**
-	 * Contains geometry for the "down" key.
-	 */
-	@JvmField
-	protected val downNode = Node()
+    /** Contains geometry for the "down" key. */
+    protected val downNode: Node = Node()
 
-	/**
-	 * Is this key being pressed?
-	 */
-	var isBeingPressed = false
+    /** Is this key being pressed? */
+    var isBeingPressed: Boolean = false
 
-	/**
-	 * Animates the motion of the key.
-	 *
-	 * @param delta the amount of time since the last frame update
-	 */
-	open fun tick(delta: Float) {
-		if (isBeingPressed) {
-			keyNode.localRotation = Quaternion().fromAngles(0.1f, 0f, 0f)
-			downNode.cullHint = Spatial.CullHint.Dynamic
-			upNode.cullHint = Spatial.CullHint.Always
-		} else {
-			val angles = FloatArray(3)
-			keyNode.localRotation.toAngles(angles)
-			if (angles[0] > 0.0001) {
-				keyNode.localRotation = Quaternion(
-					floatArrayOf(
-						(angles[0] - 0.02f * delta * 50).coerceAtLeast(0f), 0f, 0f
-					)
-				)
-			} else {
-				keyNode.localRotation = Quaternion(floatArrayOf(0f, 0f, 0f))
-				downNode.cullHint = Spatial.CullHint.Always
-				upNode.cullHint = Spatial.CullHint.Dynamic
-			}
-		}
-	}
+    /**
+     * Animates the motion of the key.
+     *
+     * @param delta the amount of time since the last frame update
+     */
+    open fun tick(delta: Float) {
+        if (isBeingPressed) {
+            keyNode.localRotation = Quaternion().fromAngles(0.1f, 0f, 0f)
+            downNode.cullHint = Spatial.CullHint.Dynamic
+            upNode.cullHint = Spatial.CullHint.Always
+        } else {
+            val angles = FloatArray(3)
+            keyNode.localRotation.toAngles(angles)
+            if (angles[0] > 0.0001) {
+                keyNode.localRotation = Quaternion(
+                    floatArrayOf(
+                        (angles[0] - 0.02f * delta * 50).coerceAtLeast(0f), 0f, 0f
+                    )
+                )
+            } else {
+                keyNode.localRotation = Quaternion(floatArrayOf(0f, 0f, 0f))
+                downNode.cullHint = Spatial.CullHint.Always
+                upNode.cullHint = Spatial.CullHint.Dynamic
+            }
+        }
+    }
 }

@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.world.Axis
 
 /**
- * Instruments that stretch when they play. More formally, the [.bell] is scaled by the inverse of the current
+ * Instruments that stretch when they play. Formally, the [bell] is scaled by the inverse of the current
  * note's elapsed duration.
  */
 abstract class StretchyClone protected constructor(
@@ -40,13 +40,12 @@ abstract class StretchyClone protected constructor(
     /**
      * The axis on which to rotate the instrument on.
      */
-    rotationAxis: Axis?
-) : Clone(parent, rotationFactor, rotationAxis!!) {
+    rotationAxis: Axis
+) : Clone(parent, rotationFactor, rotationAxis) {
 
     /**
      * The bell of the instrument. This must be a node to account for variations of the bell (e.g., Muted Trumpet).
      */
-    @JvmField
     protected val bell = Node()
 
     /**
@@ -58,6 +57,7 @@ abstract class StretchyClone protected constructor(
      * The bell stretcher.
      */
     private val bellStretcher: BellStretcher
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 

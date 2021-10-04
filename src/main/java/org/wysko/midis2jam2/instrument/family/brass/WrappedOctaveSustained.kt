@@ -33,8 +33,7 @@ abstract class WrappedOctaveSustained protected constructor(
     /**
      * Each "twelfth" or note of the octave.
      */
-    @JvmField
-    protected var twelfths = arrayOfNulls<TwelfthOfOctave>(12)
+    protected lateinit var twelfths: Array<TwelfthOfOctave>
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -48,15 +47,13 @@ abstract class WrappedOctaveSustained protected constructor(
             if (inverted) index = 11 - index
 
             /* Play! */
-            twelfths[index]!!.play(it.duration())
+            twelfths[index].play(it.duration())
         }
 
         currentNotePeriods.clear()
 
         /* Update twelfths */
-        for (twelfth in twelfths) {
-            twelfth!!.tick(delta)
-        }
+        twelfths.forEach { it.tick(delta) }
     }
 
     /**
@@ -67,31 +64,26 @@ abstract class WrappedOctaveSustained protected constructor(
         /**
          * The highest level node.
          */
-        @JvmField
         val highestLevel = Node()
 
         /**
          * The animation node.
          */
-        @JvmField
         protected val animNode = Node()
 
         /**
          * This note's current progress playing the note.
          */
-        @JvmField
         protected var progress = 0.0
 
         /**
          * Is this twelfth currently playing?
          */
-        @JvmField
         protected var playing = false
 
         /**
          * The amount of time, in seconds, this note should be playing for.
          */
-        @JvmField
         protected var duration = 0.0
 
         /** Call this method to begin playing a note for a specified duration. */

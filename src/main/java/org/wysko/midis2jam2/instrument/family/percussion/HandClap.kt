@@ -33,48 +33,48 @@ import org.wysko.midis2jam2.world.Axis
  */
 class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the left hand.
-	 */
-	private val leftHandNode = Node()
+    /**
+     * Contains the left hand.
+     */
+    private val leftHandNode = Node()
 
-	/**
-	 * Contains the right hand.
-	 */
-	private val rightHandNode = Node()
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    /**
+     * Contains the right hand.
+     */
+    private val rightHandNode = Node()
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Animate the left hand like you normally would for a stick */
-		val status = Stick.handleStick(
-			context, leftHandNode, time, delta, hits, Stick.STRIKE_SPEED * 0.8, 40.0, Axis.X
-		)
+        /* Animate the left hand like you normally would for a stick */
+        val status = Stick.handleStick(
+            context, leftHandNode, time, delta, hits, Stick.STRIKE_SPEED * 0.8, 40.0, Axis.X
+        )
 
-		/* Override handleStick making the leftHandNode cull */
-		leftHandNode.cullHint = CullHint.Dynamic
+        /* Override handleStick making the leftHandNode cull */
+        leftHandNode.cullHint = CullHint.Dynamic
 
-		/* Copy the rotation and mirror it to the right hand */
-		rightHandNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
-	}
+        /* Copy the rotation and mirror it to the right hand */
+        rightHandNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		/* Load the left hand */
-		val leftHand = context.loadModel("hand_left.obj", "hands.bmp")
-		leftHand.setLocalTranslation(0f, 0f, -1.5f)
-		leftHandNode.attachChild(leftHand)
+    init {
+        /* Load the left hand */
+        val leftHand = context.loadModel("hand_left.obj", "hands.bmp")
+        leftHand.setLocalTranslation(0f, 0f, -1.5f)
+        leftHandNode.attachChild(leftHand)
 
-		/* Load the right hand */
-		val rightHand = context.loadModel("hand_right.obj", "hands.bmp")
-		rightHand.setLocalTranslation(0f, 0f, -1.5f)
-		rightHand.localRotation = Quaternion().fromAngles(0f, rad(10.0), FastMath.PI)
-		rightHandNode.attachChild(rightHand)
+        /* Load the right hand */
+        val rightHand = context.loadModel("hand_right.obj", "hands.bmp")
+        rightHand.setLocalTranslation(0f, 0f, -1.5f)
+        rightHand.localRotation = Quaternion().fromAngles(0f, rad(10.0), FastMath.PI)
+        rightHandNode.attachChild(rightHand)
 
-		/* Positioning */
-		instrumentNode.setLocalTranslation(0f, 42.3f, -48.4f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(-70.0), 0f)
+        /* Positioning */
+        instrumentNode.setLocalTranslation(0f, 42.3f, -48.4f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(-70.0), 0f)
 
-		/* Attach hands to instrument node */
-		instrumentNode.attachChild(leftHandNode)
-		instrumentNode.attachChild(rightHandNode)
-	}
+        /* Attach hands to instrument node */
+        instrumentNode.attachChild(leftHandNode)
+        instrumentNode.attachChild(rightHandNode)
+    }
 }

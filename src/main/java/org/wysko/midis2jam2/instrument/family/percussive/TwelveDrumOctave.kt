@@ -28,73 +28,73 @@ import org.wysko.midis2jam2.world.Axis
  * Twelve drums for each note.
  */
 abstract class TwelveDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	DecayedInstrument(context, eventList) {
+    DecayedInstrument(context, eventList) {
 
-	/**
-	 * The Mallet nodes.
-	 */
-	protected val malletNodes = Array(12) { Node() }
+    /**
+     * The Mallet nodes.
+     */
+    protected val malletNodes = Array(12) { Node() }
 
-	/**
-	 * The Mallet strikes.
-	 */
-	private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
+    /**
+     * The Mallet strikes.
+     */
+    private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
 
-	/**
-	 * Each twelfth of the octave.
-	 */
-	protected val twelfths = arrayOfNulls<TwelfthOfOctaveDecayed>(12)
+    /**
+     * Each twelfth of the octave.
+     */
+    protected val twelfths = arrayOfNulls<TwelfthOfOctaveDecayed>(12)
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		for (i in 0..11) {
-			val stickStatus =
-				Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5.0, 50.0, Axis.X)
-			if (stickStatus.justStruck()) {
-				twelfths[i]!!.animNode.setLocalTranslation(0f, -3f, 0f)
-			}
-			val localTranslation = twelfths[i]!!.animNode.localTranslation
-			if (localTranslation.y < -0.0001) {
-				twelfths[i]!!.animNode.setLocalTranslation(
-					0f, Math.min(
-						0f,
-						localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta
-					), 0f
-				)
-			} else {
-				twelfths[i]!!.animNode.setLocalTranslation(0f, 0f, 0f)
-			}
-		}
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        for (i in 0..11) {
+            val stickStatus =
+                Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5.0, 50.0, Axis.X)
+            if (stickStatus.justStruck()) {
+                twelfths[i]!!.animNode.setLocalTranslation(0f, -3f, 0f)
+            }
+            val localTranslation = twelfths[i]!!.animNode.localTranslation
+            if (localTranslation.y < -0.0001) {
+                twelfths[i]!!.animNode.setLocalTranslation(
+                    0f, Math.min(
+                        0f,
+                        localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta
+                    ), 0f
+                )
+            } else {
+                twelfths[i]!!.animNode.setLocalTranslation(0f, 0f, 0f)
+            }
+        }
+    }
 
-	/**
-	 * The Twelfth of octave that is decayed.
-	 */
-	abstract class TwelfthOfOctaveDecayed protected constructor() {
+    /**
+     * The Twelfth of octave that is decayed.
+     */
+    abstract class TwelfthOfOctaveDecayed protected constructor() {
 
-		/**
-		 * The Highest level.
-		 */
-		val highestLevel = Node()
+        /**
+         * The Highest level.
+         */
+        val highestLevel = Node()
 
-		/**
-		 * The Anim node.
-		 */
-		val animNode = Node()
+        /**
+         * The Anim node.
+         */
+        val animNode = Node()
 
-		/**
-		 * Update animation and note handling.
-		 *
-		 * @param delta the amount of time since the last frame update
-		 */
-		abstract fun tick(delta: Float)
+        /**
+         * Update animation and note handling.
+         *
+         * @param delta the amount of time since the last frame update
+         */
+        abstract fun tick(delta: Float)
 
-		init {
-			highestLevel.attachChild(animNode)
-		}
-	}
+        init {
+            highestLevel.attachChild(animNode)
+        }
+    }
 
-	init {
-		eventList.filterIsInstance<MidiNoteOnEvent>().forEach { malletStrikes[(it.note + 3) % 12].add(it) }
-	}
+    init {
+        eventList.filterIsInstance<MidiNoteOnEvent>().forEach { malletStrikes[(it.note + 3) % 12].add(it) }
+    }
 }

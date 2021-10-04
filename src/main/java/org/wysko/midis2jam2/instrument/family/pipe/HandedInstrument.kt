@@ -27,12 +27,12 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
  */
 abstract class HandedInstrument
 protected constructor(
-	context: Midis2jam2,
-	eventList: List<MidiChannelSpecificEvent>,
-	clazz: Class<out Clone>,
-	manager: HandPositionFingeringManager
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>,
+    clazz: Class<out Clone>,
+    manager: HandPositionFingeringManager
 ) : MonophonicInstrument(context, eventList, clazz, manager) {
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
+    }
 }

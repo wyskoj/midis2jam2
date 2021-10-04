@@ -36,5 +36,10 @@
       <option name="name" value="maven2" />
       <option name="url" value="https://repo.spongepowered.org/repository/maven-public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://repo.spongepowered.org/repository/maven-public" />
+    </remote-repository>
   </component>
 </project>

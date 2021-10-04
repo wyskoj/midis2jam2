@@ -29,30 +29,24 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
     parent: MonophonicInstrument,
     rotationFactor: Float,
     stretchFactor: Float,
-    numberOfKeys: Int,
     stretchAxis: Axis,
     rotationAxis: Axis
 ) : StretchyClone(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis) {
+
     /**
      * The keys of the instrument.
      */
-    @JvmField
-    protected val keys: Array<Spatial?> = arrayOfNulls(numberOfKeys)
+    protected lateinit var keys: Array<Spatial>
 
-    /**
-     * Animates a key.
-     *
-     * @param pressed true if this key is pressed, false otherwise
-     */
-    protected abstract fun animateKeys(pressed: Array<Int>?)
+    /** Animates a key. */
+    protected abstract fun animateKeys(pressed: Array<Int>)
 
+    @Suppress("UNCHECKED_CAST")
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        if (currentNotePeriod != null) {
-            assert(parent.manager != null)
 
-            @Suppress("UNCHECKED_CAST") val ints =
-                parent.manager!!.fingering(currentNotePeriod!!.midiNote) as Array<Int>?
+        currentNotePeriod?.let { np ->
+            val ints = parent.manager!!.fingering(np.midiNote) as Array<Int>?
             ints?.let { animateKeys(it) }
         }
     }

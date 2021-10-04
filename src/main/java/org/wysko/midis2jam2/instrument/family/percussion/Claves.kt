@@ -33,51 +33,51 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Claves(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the left clave.
-	 */
-	private val rightClaveNode = Node()
+    /**
+     * Contains the left clave.
+     */
+    private val rightClaveNode = Node()
 
-	/**
-	 * Contains the right clave.
-	 */
-	private val leftClaveNode = Node()
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    /**
+     * Contains the right clave.
+     */
+    private val leftClaveNode = Node()
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Animate the right clave like you normally would for a stick */
-		val status = Stick.handleStick(
-			context, rightClaveNode, time, delta, hits, Stick.STRIKE_SPEED,
-			Stick.MAX_ANGLE, Axis.X
-		)
+        /* Animate the right clave like you normally would for a stick */
+        val status = Stick.handleStick(
+            context, rightClaveNode, time, delta, hits, Stick.STRIKE_SPEED,
+            Stick.MAX_ANGLE, Axis.X
+        )
 
-		/* Override handleStick making the rightClaveNode cull */
-		rightClaveNode.cullHint = CullHint.Dynamic
+        /* Override handleStick making the rightClaveNode cull */
+        rightClaveNode.cullHint = CullHint.Dynamic
 
-		/* Copy the rotation and mirror it to the left clave */
-		leftClaveNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
-	}
+        /* Copy the rotation and mirror it to the left clave */
+        leftClaveNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		/* Load right clave and position */
-		val rightClave = context.loadModel("Clave.obj", "Clave.bmp")
-		rightClave.setLocalTranslation(2.5f, 0f, 0f)
-		rightClave.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
-		rightClaveNode.attachChild(rightClave)
-		rightClaveNode.setLocalTranslation(-1f, 0f, 0f)
+    init {
+        /* Load right clave and position */
+        val rightClave = context.loadModel("Clave.obj", "Clave.bmp")
+        rightClave.setLocalTranslation(2.5f, 0f, 0f)
+        rightClave.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        rightClaveNode.attachChild(rightClave)
+        rightClaveNode.setLocalTranslation(-1f, 0f, 0f)
 
-		/* Load left clave and position */
-		val leftClave = context.loadModel("Clave.obj", "Clave.bmp")
-		leftClave.setLocalTranslation(-2.5f, 0f, 0f)
-		leftClave.localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
-		leftClaveNode.attachChild(leftClave)
+        /* Load left clave and position */
+        val leftClave = context.loadModel("Clave.obj", "Clave.bmp")
+        leftClave.setLocalTranslation(-2.5f, 0f, 0f)
+        leftClave.localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
+        leftClaveNode.attachChild(leftClave)
 
-		/* Positioning */
-		instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
+        /* Positioning */
+        instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
 
-		/* Attach claves */
-		instrumentNode.attachChild(rightClaveNode)
-		instrumentNode.attachChild(leftClaveNode)
-	}
+        /* Attach claves */
+        instrumentNode.attachChild(rightClaveNode)
+        instrumentNode.attachChild(leftClaveNode)
+    }
 }

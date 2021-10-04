@@ -233,10 +233,13 @@ final class SMFParser {
 	private static final boolean DEBUG = false;
 	
 	int tracks;                       // number of tracks
+	
 	DataInputStream stream;   // the stream to read from
 	
 	private int trackLength = 0;  // remaining length in track
+	
 	private byte[] trackData = null;
+	
 	private int pos = 0;
 	
 	SMFParser() {

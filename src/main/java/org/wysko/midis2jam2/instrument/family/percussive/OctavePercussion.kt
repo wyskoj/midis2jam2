@@ -27,11 +27,8 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
  * @see Woodblocks
  */
 abstract class OctavePercussion protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-	TwelveDrumOctave(context, eventList) {
+    TwelveDrumOctave(context, eventList) {
 
-	/**
-	 * The nodes for each note.
-	 */
-	@JvmField
-	protected val percussionNodes = Array(12) { Node() }
+    /** The nodes for each note. */
+    protected val percussionNodes: Array<Node> = Array(12) { Node() }
 }

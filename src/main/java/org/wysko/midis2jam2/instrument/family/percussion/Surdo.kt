@@ -32,66 +32,66 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/** The stick node. */
-	private val stickNode = Node()
+    /** The stick node. */
+    private val stickNode = Node()
 
-	/** The hand that rests or hovers above the drum. */
-	private val hand: Spatial
+    /** The hand that rests or hovers above the drum. */
+    private val hand: Spatial
 
-	/** Moves the hand to a [position]. */
-	private fun moveHand(position: HandPosition) {
-		if (position == HandPosition.DOWN) {
-			hand.setLocalTranslation(0f, 0f, 0f)
-			hand.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
-		} else {
-			hand.setLocalTranslation(0f, 2f, 0f)
-			hand.localRotation = Quaternion().fromAngles(rad(30.0), 0f, 0f)
-		}
-	}
+    /** Moves the hand to a [position]. */
+    private fun moveHand(position: HandPosition) {
+        if (position == HandPosition.DOWN) {
+            hand.setLocalTranslation(0f, 0f, 0f)
+            hand.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
+        } else {
+            hand.setLocalTranslation(0f, 2f, 0f)
+            hand.localRotation = Quaternion().fromAngles(rad(30.0), 0f, 0f)
+        }
+    }
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val stickStatus =
-			Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-		recoilDrum(
-			recoilNode,
-			stickStatus.justStruck(),
-			if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0,
-			delta
-		)
-		if (stickStatus.justStruck()) {
-			val strike = stickStatus.strike!!
-			moveHand(if (strike.note == Midi.OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
-		}
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val stickStatus =
+            Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        recoilDrum(
+            recoilNode,
+            stickStatus.justStruck(),
+            if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0,
+            delta
+        )
+        if (stickStatus.justStruck()) {
+            val strike = stickStatus.strike!!
+            moveHand(if (strike.note == Midi.OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
+        }
+    }
 
-	/**
-	 * Defines if the hand is on the drum or raised.
-	 */
-	internal enum class HandPosition {
-		/**
-		 * Up hand position.
-		 */
-		UP,
+    /**
+     * Defines if the hand is on the drum or raised.
+     */
+    internal enum class HandPosition {
+        /**
+         * Up hand position.
+         */
+        UP,
 
-		/**
-		 * Down hand position.
-		 */
-		DOWN
-	}
+        /**
+         * Down hand position.
+         */
+        DOWN
+    }
 
-	init {
-		val drum = context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png")
-		recoilNode.attachChild(drum)
-		drum.setLocalScale(1.7f)
-		val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-		stick.setLocalTranslation(0f, 0f, -2f)
-		stickNode.attachChild(stick)
-		stickNode.setLocalTranslation(0f, 0f, 14f)
-		recoilNode.attachChild(stickNode)
-		highestLevel.setLocalTranslation(25f, 25f, -41f)
-		highestLevel.localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
-		hand = context.loadModel("hand_left.obj", "hands.bmp")
-		recoilNode.attachChild(hand)
-	}
+    init {
+        val drum = context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png")
+        recoilNode.attachChild(drum)
+        drum.setLocalScale(1.7f)
+        val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+        stick.setLocalTranslation(0f, 0f, -2f)
+        stickNode.attachChild(stick)
+        stickNode.setLocalTranslation(0f, 0f, 14f)
+        recoilNode.attachChild(stickNode)
+        highestLevel.setLocalTranslation(25f, 25f, -41f)
+        highestLevel.localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
+        hand = context.loadModel("hand_left.obj", "hands.bmp")
+        recoilNode.attachChild(hand)
+    }
 }

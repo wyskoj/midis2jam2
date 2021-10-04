@@ -27,37 +27,37 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The upright bass.
  */
 class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, style: PlayingStyle) :
-	StringFamilyInstrument(
-		context,
-		events,
-		style == PlayingStyle.ARCO,
-		20.0,
-		Vector3f(0.75f, 0.75f, 0.75f),
-		intArrayOf(28, 33, 38, 43),
-		context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", MatType.UNSHADED, 0f)
-	) {
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(-25 * indexForMoving(delta), 0f, 0f)
-	}
+    StringFamilyInstrument(
+        context,
+        events,
+        style == PlayingStyle.ARCO,
+        20.0,
+        Vector3f(0.75f, 0.75f, 0.75f),
+        intArrayOf(28, 33, 38, 43),
+        context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", MatType.UNSHADED, 0f)
+    ) {
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(-25 * indexForMoving(delta), 0f, 0f)
+    }
 
-	/**
-	 * The acoustic bass can be played two ways in MIDI, arco (Contrabass) and pizzicato (Acoustic Bass)
-	 */
-	enum class PlayingStyle {
-		/**
-		 * Arco playing style.
-		 */
-		ARCO,
+    /**
+     * The acoustic bass can be played two ways in MIDI, arco (Contrabass) and pizzicato (Acoustic Bass)
+     */
+    enum class PlayingStyle {
+        /**
+         * Arco playing style.
+         */
+        ARCO,
 
-		/**
-		 * Pizzicato playing style.
-		 */
-		PIZZICATO
-	}
+        /**
+         * Pizzicato playing style.
+         */
+        PIZZICATO
+    }
 
-	init {
-		highestLevel.setLocalTranslation(-50f, 46f, -95f)
-		instrumentNode.setLocalScale(2.5f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
-	}
+    init {
+        highestLevel.setLocalTranslation(-50f, 46f, -95f)
+        instrumentNode.setLocalScale(2.5f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
+    }
 }

@@ -17,4 +17,4 @@
 package org.wysko.midis2jam2.midi
 
 data class MidiControlEvent(override val time: Long, override val channel: Int, val controlNum: Int, val value: Int) :
-	MidiChannelSpecificEvent(time, channel)
+    MidiChannelSpecificEvent(time, channel)

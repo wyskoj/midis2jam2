@@ -28,34 +28,34 @@ import org.wysko.midis2jam2.util.Utils.rad
  * The Flute.
  */
 class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-	HandedInstrument(context, events, FluteClone::class.java, FINGERING_MANAGER) {
+    HandedInstrument(context, events, FluteClone::class.java, FINGERING_MANAGER) {
 
-	/**
-	 * The type Flute clone.
-	 */
-	inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffType.WHISTLE, 1f) {
-		init {
-			val horn = context.loadModel(
-				"Flute.obj",
-				"ShinySilver.bmp",
-				MatType.REFLECTIVE,
-				0.9f
-			)
-			loadHands()
-			puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
-			puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)
-			highestLevel.attachChild(horn)
-		}
-	}
+    /**
+     * The type Flute clone.
+     */
+    inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffType.WHISTLE, 1f) {
+        init {
+            val horn = context.loadModel(
+                "Flute.obj",
+                "ShinySilver.bmp",
+                MatType.REFLECTIVE,
+                0.9f
+            )
+            loadHands()
+            puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
+            puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)
+            highestLevel.attachChild(horn)
+        }
+    }
 
-	companion object {
-		val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Flute::class.java)
-	}
+    companion object {
+        val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Flute::class.java)
+    }
 
-	init {
+    init {
 
-		// Flute positioning
-		groupOfPolyphony.setLocalTranslation(5f, 52f, -20f)
-		groupOfPolyphony.localRotation = Quaternion().fromAngles(rad(-80.0), rad(-53.0), rad(0.0))
-	}
+        // Flute positioning
+        groupOfPolyphony.setLocalTranslation(5f, 52f, -20f)
+        groupOfPolyphony.localRotation = Quaternion().fromAngles(rad(-80.0), rad(-53.0), rad(0.0))
+    }
 }

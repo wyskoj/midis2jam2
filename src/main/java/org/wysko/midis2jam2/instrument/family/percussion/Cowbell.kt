@@ -32,39 +32,39 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * Contains the stick.
-	 */
-	private val stickNode = Node()
+    /**
+     * Contains the stick.
+     */
+    private val stickNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Animate stick */
-		val stickStatus =
-			Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        /* Animate stick */
+        val stickStatus =
+            Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
 
-		/* Animate cowbell */
-		recoilDrum(
-			recoilNode, stickStatus.justStruck(),
-			if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0, delta
-		)
-	}
+        /* Animate cowbell */
+        recoilDrum(
+            recoilNode, stickStatus.justStruck(),
+            if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0, delta
+        )
+    }
 
-	init {
+    init {
 
-		/* Load cowbell */
-		recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", MatType.REFLECTIVE, 0.9f))
+        /* Load cowbell */
+        recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", MatType.REFLECTIVE, 0.9f))
 
-		/* Load and position stick */
-		val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-		stick.setLocalTranslation(0f, 0f, -2f)
-		stickNode.attachChild(stick)
-		stickNode.setLocalTranslation(0f, 0f, 14f)
+        /* Load and position stick */
+        val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+        stick.setLocalTranslation(0f, 0f, -2f)
+        stickNode.attachChild(stick)
+        stickNode.setLocalTranslation(0f, 0f, 14f)
 
-		/* Positioning */
-		recoilNode.attachChild(stickNode)
-		highestLevel.setLocalTranslation(-9.7f, 40f, -99f)
-		highestLevel.localRotation = Quaternion().fromAngles(rad(24.0), rad(26.7), rad(-3.81))
-	}
+        /* Positioning */
+        recoilNode.attachChild(stickNode)
+        highestLevel.setLocalTranslation(-9.7f, 40f, -99f)
+        highestLevel.localRotation = Quaternion().fromAngles(rad(24.0), rad(26.7), rad(-3.81))
+    }
 }

@@ -92,11 +92,11 @@ public class LocaleSelect extends JDialog {
 			//======== contentPanel ========
 			{
 				contentPanel.setLayout(new BorderLayout());
-
+				
 				//---- selectLocaleLabel ----
 				selectLocaleLabel.setText(bundle.getString("LocaleSelect.selectLocaleLabel.text"));
 				contentPanel.add(selectLocaleLabel, BorderLayout.NORTH);
-
+				
 				//======== panel1 ========
 				{
 					panel1.setLayout(new GridBagLayout());
@@ -111,7 +111,7 @@ public class LocaleSelect extends JDialog {
 				contentPanel.add(panel1, BorderLayout.CENTER);
 			}
 			dialogPane.add(contentPanel, BorderLayout.CENTER);
-
+			
 			//======== buttonBar ========
 			{
 				buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
@@ -156,12 +156,19 @@ public class LocaleSelect extends JDialog {
 	
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
 	private JPanel dialogPane;
+	
 	private JPanel contentPanel;
+	
 	private JLabel selectLocaleLabel;
+	
 	private JPanel panel1;
+	
 	private JComboBox<String> localeSpinner;
+	
 	private JPanel buttonBar;
+	
 	private JButton okButton;
+	
 	private JButton cancelButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -28,28 +28,28 @@ import org.wysko.midis2jam2.world.Axis
 
 class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/** Contains the square click pad. */
-	private val scNode = Node()
+    /** Contains the square click pad. */
+    private val scNode = Node()
 
-	/** Contains the stick. */
-	private val stickNode = Node()
+    /** Contains the stick. */
+    private val stickNode = Node()
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		val stickStatus =
-			Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-		stickNode.cullHint = Spatial.CullHint.Dynamic
-		scNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
-	}
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val stickStatus =
+            Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        stickNode.cullHint = Spatial.CullHint.Dynamic
+        scNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		stickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
-		val child = context.loadModel("SquareShaker.obj", "Wood.bmp")
-		child.setLocalTranslation(0f, -2f, -2f)
-		scNode.attachChild(child)
-		instrumentNode.attachChild(stickNode)
-		instrumentNode.attachChild(scNode)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(-90.0), rad(-90.0), rad(-135.0))
-		instrumentNode.setLocalTranslation(-42f, 44f, -79f)
-	}
+    init {
+        stickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
+        val child = context.loadModel("SquareShaker.obj", "Wood.bmp")
+        child.setLocalTranslation(0f, -2f, -2f)
+        scNode.attachChild(child)
+        instrumentNode.attachChild(stickNode)
+        instrumentNode.attachChild(scNode)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(-90.0), rad(-90.0), rad(-135.0))
+        instrumentNode.setLocalTranslation(-42f, 44f, -79f)
+    }
 }

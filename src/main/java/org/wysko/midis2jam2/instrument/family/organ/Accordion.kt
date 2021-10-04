@@ -54,238 +54,238 @@ const val ACCORDION_KEY_WHITE_BACK_OBJ = "AccordionKeyWhiteBack.obj"
  * @see .dummyWhiteKey
  */
 class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: AccordionType) :
-	KeyedInstrument(context, eventList, 0, 23) {
+    KeyedInstrument(context, eventList, 0, 23) {
 
-	/**
-	 * The accordion is divided into fourteen sections.
-	 */
-	private val accordionSections = Array(SECTION_COUNT) { Node() }
+    /**
+     * The accordion is divided into fourteen sections.
+     */
+    private val accordionSections = Array(SECTION_COUNT) { Node() }
 
-	/**
-	 * The current amount of squeeze.
-	 */
-	private var angle = MAX_ANGLE.toFloat()
+    /**
+     * The current amount of squeeze.
+     */
+    private var angle = MAX_ANGLE.toFloat()
 
-	/**
-	 * The current delta [angle]. That is, how much to change the angle per frame.
-	 */
-	private var squeezingSpeed = 0.0
+    /**
+     * The current delta [angle]. That is, how much to change the angle per frame.
+     */
+    private var squeezingSpeed = 0.0
 
-	/**
-	 * True if the accordion is expanding, false if it is contracting.
-	 */
-	private var expanding = false
+    /**
+     * True if the accordion is expanding, false if it is contracting.
+     */
+    private var expanding = false
 
-	/**
-	 * Returns an AccordionWhiteKey that does nothing.
-	 *
-	 * @return a dummy white key
-	 */
-	private fun dummyWhiteKey() = Node().apply {
-		attachChild(context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, ACCORDION_KEY_BMP))
-		attachChild(context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, ACCORDION_KEY_BMP))
-	}
+    /**
+     * Returns an AccordionWhiteKey that does nothing.
+     *
+     * @return a dummy white key
+     */
+    private fun dummyWhiteKey() = Node().apply {
+        attachChild(context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, ACCORDION_KEY_BMP))
+        attachChild(context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, ACCORDION_KEY_BMP))
+    }
 
-	/**
-	 * Calculates the amount of squeeze to apply to the accordion and updates the [angle].
-	 *
-	 * If the [angle] is greater than [MAX_ANGLE], switches [expanding] to false to begin
-	 * contracting. If the [angle] is less than [MIN_ANGLE], switches [expanding] to true to begin
-	 * expanding.
-	 *
-	 * @param delta the amount of time since the last frame update
-	 */
-	private fun calculateAngle(delta: Float) {
-		if (keys.any { it!!.isBeingPressed }) {
-			/* Squeeze at maximum speed if any key is being pressed. */
-			squeezingSpeed = MAX_SQUEEZING_SPEED.toDouble()
-		} else {
-			if (squeezingSpeed > 0) {
-				/* Gradually decrease squeezing speed */
-				squeezingSpeed -= (delta * 3)
-				squeezingSpeed.coerceAtLeast(0.0).also { squeezingSpeed = it }
-			}
-		}
-		/* If expanding, increase the angle, otherwise decrease the angle. */
-		if (expanding) {
-			angle += (delta * squeezingSpeed).toFloat()
-			/* Switch direction */
-			if (angle > MAX_ANGLE) {
-				expanding = false
-			}
-		} else {
-			angle -= (delta * squeezingSpeed).toFloat()
-			/* Switch direction */
-			if (angle < MIN_ANGLE) {
-				expanding = true
-			}
-		}
-	}
+    /**
+     * Calculates the amount of squeeze to apply to the accordion and updates the [angle].
+     *
+     * If the [angle] is greater than [MAX_ANGLE], switches [expanding] to false to begin
+     * contracting. If the [angle] is less than [MIN_ANGLE], switches [expanding] to true to begin
+     * expanding.
+     *
+     * @param delta the amount of time since the last frame update
+     */
+    private fun calculateAngle(delta: Float) {
+        if (keys.any { it!!.isBeingPressed }) {
+            /* Squeeze at maximum speed if any key is being pressed. */
+            squeezingSpeed = MAX_SQUEEZING_SPEED.toDouble()
+        } else {
+            if (squeezingSpeed > 0) {
+                /* Gradually decrease squeezing speed */
+                squeezingSpeed -= (delta * 3)
+                squeezingSpeed.coerceAtLeast(0.0).also { squeezingSpeed = it }
+            }
+        }
+        /* If expanding, increase the angle, otherwise decrease the angle. */
+        if (expanding) {
+            angle += (delta * squeezingSpeed).toFloat()
+            /* Switch direction */
+            if (angle > MAX_ANGLE) {
+                expanding = false
+            }
+        } else {
+            angle -= (delta * squeezingSpeed).toFloat()
+            /* Switch direction */
+            if (angle < MIN_ANGLE) {
+                expanding = true
+            }
+        }
+    }
 
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
-		calculateAngle(delta)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        calculateAngle(delta)
 
-		/* Set the rotation of each section */
-		accordionSections.indices.forEach { i ->
-			accordionSections[i].localRotation = Quaternion().fromAngles(0f, 0f, rad(angle * (i - 7.5)))
-		}
-	}
+        /* Set the rotation of each section */
+        accordionSections.indices.forEach { i ->
+            accordionSections[i].localRotation = Quaternion().fromAngles(0f, 0f, rad(angle * (i - 7.5)))
+        }
+    }
 
-	override fun keyByMidiNote(midiNote: Int): Key {
-		return keys[midiNote % 24]!!
-	}
+    override fun keyByMidiNote(midiNote: Int): Key {
+        return keys[midiNote % 24]!!
+    }
 
-	override fun moveForMultiChannel(delta: Float) {
-		offsetNode.setLocalTranslation(0f, 30 * indexForMoving(delta), 0f)
-	}
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.setLocalTranslation(0f, 30 * indexForMoving(delta), 0f)
+    }
 
-	/**
-	 * A single key on the accordion. It behaves just like any other key.
-	 */
-	private inner class AccordionKey(midiNote: Int, startPos: Int) : Key() {
-		override fun tick(delta: Float) {
-			if (isBeingPressed) {
-				keyNode.localRotation = Quaternion().fromAngles(0f, -0.1f, 0f)
-				downNode.cullHint = Dynamic
-				upNode.cullHint = Always
-			} else {
-				val angles = FloatArray(3)
-				keyNode.localRotation.toAngles(angles)
-				if (angles[1] < -0.0001) {
-					keyNode.localRotation =
-						Quaternion(floatArrayOf(0f, (angles[1] + 0.02f * delta * 50).coerceAtMost(0f), 0f))
-				} else {
-					keyNode.localRotation = Quaternion(floatArrayOf(0f, 0f, 0f))
-					downNode.cullHint = Always
-					upNode.cullHint = Dynamic
-				}
-			}
-		}
+    /**
+     * A single key on the accordion. It behaves just like any other key.
+     */
+    private inner class AccordionKey(midiNote: Int, startPos: Int) : Key() {
+        override fun tick(delta: Float) {
+            if (isBeingPressed) {
+                keyNode.localRotation = Quaternion().fromAngles(0f, -0.1f, 0f)
+                downNode.cullHint = Dynamic
+                upNode.cullHint = Always
+            } else {
+                val angles = FloatArray(3)
+                keyNode.localRotation.toAngles(angles)
+                if (angles[1] < -0.0001) {
+                    keyNode.localRotation =
+                        Quaternion(floatArrayOf(0f, (angles[1] + 0.02f * delta * 50).coerceAtMost(0f), 0f))
+                } else {
+                    keyNode.localRotation = Quaternion(floatArrayOf(0f, 0f, 0f))
+                    downNode.cullHint = Always
+                    upNode.cullHint = Dynamic
+                }
+            }
+        }
 
-		init {
-			if (midiValueToColor(midiNote) == WHITE) {
-				/* Up key */
-				val upKeyFront = context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, ACCORDION_KEY_BMP)
-				val upKeyBack = context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, ACCORDION_KEY_BMP)
-				upNode.attachChild(upKeyFront)
-				upNode.attachChild(upKeyBack)
-				/* Down key */
-				val downKeyFront = context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, "AccordionKeyDown.bmp")
-				val downKeyBack = context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, "AccordionKeyDown.bmp")
-				downNode.attachChild(downKeyFront)
-				downNode.attachChild(downKeyBack)
-				keyNode.attachChild(upNode)
-				keyNode.attachChild(downNode)
-				keyNode.move(0f, -startPos + 6f, 0f)
-			} else {
-				/* Up key */
-				val blackKey = context.loadModel("AccordionKeyBlack.obj", "AccordionKeyBlack.bmp")
-				upNode.attachChild(blackKey)
+        init {
+            if (midiValueToColor(midiNote) == WHITE) {
+                /* Up key */
+                val upKeyFront = context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, ACCORDION_KEY_BMP)
+                val upKeyBack = context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, ACCORDION_KEY_BMP)
+                upNode.attachChild(upKeyFront)
+                upNode.attachChild(upKeyBack)
+                /* Down key */
+                val downKeyFront = context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, "AccordionKeyDown.bmp")
+                val downKeyBack = context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, "AccordionKeyDown.bmp")
+                downNode.attachChild(downKeyFront)
+                downNode.attachChild(downKeyBack)
+                keyNode.attachChild(upNode)
+                keyNode.attachChild(downNode)
+                keyNode.move(0f, -startPos + 6f, 0f)
+            } else {
+                /* Up key */
+                val blackKey = context.loadModel("AccordionKeyBlack.obj", "AccordionKeyBlack.bmp")
+                upNode.attachChild(blackKey)
 
-				/* Down key */
-				val blackKeyDown = context.loadModel("AccordionKeyBlack.obj", "AccordionKeyBlackDown.bmp")
-				downNode.attachChild(blackKeyDown)
-				keyNode.attachChild(upNode)
-				keyNode.attachChild(downNode)
-				keyNode.move(0f, -midiNote * (7 / 12f) + 6.2f, 0f)
-			}
-			downNode.cullHint = Always
-		}
-	}
+                /* Down key */
+                val blackKeyDown = context.loadModel("AccordionKeyBlack.obj", "AccordionKeyBlackDown.bmp")
+                downNode.attachChild(blackKeyDown)
+                keyNode.attachChild(upNode)
+                keyNode.attachChild(downNode)
+                keyNode.move(0f, -midiNote * (7 / 12f) + 6.2f, 0f)
+            }
+            downNode.cullHint = Always
+        }
+    }
 
-	enum class AccordionType(internal val textureCaseName: String, val textureCaseFrontName: String) {
-		ACCORDION("AccordionCase.bmp", "AccordionCaseFront.bmp"),
-		BANDONEON("BandoneonCase.bmp", "BandoneonCaseFront.bmp");
-	}
+    enum class AccordionType(internal val textureCaseName: String, val textureCaseFrontName: String) {
+        ACCORDION("AccordionCase.bmp", "AccordionCaseFront.bmp"),
+        BANDONEON("BandoneonCase.bmp", "BandoneonCaseFront.bmp");
+    }
 
-	companion object {
-		/**
-		 * The maximum angle that the accordion will expand to.
-		 */
-		const val MAX_ANGLE = 4
+    companion object {
+        /**
+         * The maximum angle that the accordion will expand to.
+         */
+        const val MAX_ANGLE = 4
 
-		/**
-		 * The minimum angle that the accordion will contract to.
-		 */
-		const val MIN_ANGLE = 1
+        /**
+         * The minimum angle that the accordion will contract to.
+         */
+        const val MIN_ANGLE = 1
 
-		/**
-		 * The number of sections the accordion is divided into.
-		 */
-		const val SECTION_COUNT = 14
+        /**
+         * The number of sections the accordion is divided into.
+         */
+        const val SECTION_COUNT = 14
 
-		/**
-		 * The maximum speed at which the accordion squeezes.
-		 */
-		const val MAX_SQUEEZING_SPEED = 2
-	}
+        /**
+         * The maximum speed at which the accordion squeezes.
+         */
+        const val MAX_SQUEEZING_SPEED = 2
+    }
 
-	init {
-		/* Load left case */
-		val leftHandCase = context.loadModel("AccordionLeftHand.fbx", type.textureCaseName).also {
-			accordionSections[0].attachChild(it)
-		}
+    init {
+        /* Load left case */
+        val leftHandCase = context.loadModel("AccordionLeftHand.fbx", type.textureCaseName).also {
+            accordionSections[0].attachChild(it)
+        }
 
-		/* Load leather strap */
-		val leatherStrap = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-			setTexture("ColorMap", context.assetManager.loadTexture("Assets/LeatherStrap.bmp"))
-		}
+        /* Load leather strap */
+        val leatherStrap = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+            setTexture("ColorMap", context.assetManager.loadTexture("Assets/LeatherStrap.bmp"))
+        }
 
-		/* Load rubber foot */
-		val rubberFoot = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-			setTexture("ColorMap", context.assetManager.loadTexture("Assets/RubberFoot.bmp"))
-		}
+        /* Load rubber foot */
+        val rubberFoot = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+            setTexture("ColorMap", context.assetManager.loadTexture("Assets/RubberFoot.bmp"))
+        }
 
-		/* Set materials */
-		(leftHandCase as Node).apply {
-			getChild(1).setMaterial(leatherStrap)
-			getChild(0).setMaterial(rubberFoot)
-		}
+        /* Set materials */
+        (leftHandCase as Node).apply {
+            getChild(1).setMaterial(leatherStrap)
+            getChild(0).setMaterial(rubberFoot)
+        }
 
-		/* Add the keys */
-		val keysNode = Node()
-		accordionSections[SECTION_COUNT - 1].attachChild(keysNode)
-		var whiteCount = 0
-		for (i in 0..23) {
-			if (midiValueToColor(i) == WHITE) {
-				keys[i] = AccordionKey(i, whiteCount)
-				whiteCount++
-			} else {
-				keys[i] = AccordionKey(i, i)
-			}
-		}
+        /* Add the keys */
+        val keysNode = Node()
+        accordionSections[SECTION_COUNT - 1].attachChild(keysNode)
+        var whiteCount = 0
+        for (i in 0..23) {
+            if (midiValueToColor(i) == WHITE) {
+                keys[i] = AccordionKey(i, whiteCount)
+                whiteCount++
+            } else {
+                keys[i] = AccordionKey(i, i)
+            }
+        }
 
-		/* Add dummy keys on each end */
-		dummyWhiteKey().also {
-			keysNode.attachChild(it)
-			it.setLocalTranslation(0f, 7f, 0f)
-		}
-		dummyWhiteKey().also {
-			keysNode.attachChild(it)
-			it.setLocalTranslation(0f, -8f, 0f)
-		}
+        /* Add dummy keys on each end */
+        dummyWhiteKey().also {
+            keysNode.attachChild(it)
+            it.setLocalTranslation(0f, 7f, 0f)
+        }
+        dummyWhiteKey().also {
+            keysNode.attachChild(it)
+            it.setLocalTranslation(0f, -8f, 0f)
+        }
 
-		/* Attach keys to node */
-		keys.forEach { key -> keysNode.attachChild(key!!.keyNode) }
+        /* Attach keys to node */
+        keys.forEach { key -> keysNode.attachChild(key!!.keyNode) }
 
-		keysNode.setLocalTranslation(-4f, 22f, -0.8f)
+        keysNode.setLocalTranslation(-4f, 22f, -0.8f)
 
-		/* Load and attach accordion folds */
-		accordionSections.forEach { section ->
-			section.attachChild(context.loadModel("AccordionFold.obj", "AccordionFold.bmp"))
-		}
+        /* Load and attach accordion folds */
+        accordionSections.forEach { section ->
+            section.attachChild(context.loadModel("AccordionFold.obj", "AccordionFold.bmp"))
+        }
 
-		/* Load right case */
-		accordionSections[13].attachChild(context.loadModel("AccordionRightHand.obj", type.textureCaseFrontName))
+        /* Load right case */
+        accordionSections[13].attachChild(context.loadModel("AccordionRightHand.obj", type.textureCaseFrontName))
 
-		/* Attach accordion sections to node */
-		accordionSections.forEach { instrumentNode.attachChild(it) }
+        /* Attach accordion sections to node */
+        accordionSections.forEach { instrumentNode.attachChild(it) }
 
-		/* Positioning */
-		instrumentNode.run {
-			setLocalTranslation(-70f, 10f, -60f)
-			localRotation = Quaternion().fromAngles(rad(0.0), rad(45.0), rad(-5.0))
-		}
-	}
+        /* Positioning */
+        instrumentNode.run {
+            setLocalTranslation(-70f, 10f, -60f)
+            localRotation = Quaternion().fromAngles(rad(0.0), rad(45.0), rad(-5.0))
+        }
+    }
 }

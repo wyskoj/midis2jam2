@@ -32,52 +32,52 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Maracas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-	/**
-	 * The left maraca.
-	 */
-	private val leftMaraca: Spatial
+    /**
+     * The left maraca.
+     */
+    private val leftMaraca: Spatial
 
-	/**
-	 * The right maraca.
-	 */
-	private val rightMaraca: Spatial
-	override fun tick(time: Double, delta: Float) {
-		super.tick(time, delta)
+    /**
+     * The right maraca.
+     */
+    private val rightMaraca: Spatial
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-		/* Animate left maraca */
-		val status = Stick.handleStick(
-			context, leftMaraca, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-		)
+        /* Animate left maraca */
+        val status = Stick.handleStick(
+            context, leftMaraca, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+        )
 
-		/* Override handleStick culling the left maraca */
-		leftMaraca.cullHint = Spatial.CullHint.Dynamic
+        /* Override handleStick culling the left maraca */
+        leftMaraca.cullHint = Spatial.CullHint.Dynamic
 
-		/* Copy rotation to right maraca */
-		rightMaraca.localRotation = Quaternion().fromAngles(status.rotationAngle, 0f, 0f)
-	}
+        /* Copy rotation to right maraca */
+        rightMaraca.localRotation = Quaternion().fromAngles(status.rotationAngle, 0f, 0f)
+    }
 
-	init {
-		/* Load maracas */
-		leftMaraca = context.loadModel("Maraca.obj", "Maraca.bmp")
-		rightMaraca = context.loadModel("Maraca.obj", "Maraca.bmp")
+    init {
+        /* Load maracas */
+        leftMaraca = context.loadModel("Maraca.obj", "Maraca.bmp")
+        rightMaraca = context.loadModel("Maraca.obj", "Maraca.bmp")
 
-		/* Create nodes for maracas */
-		val leftMaracaNode = Node()
-		leftMaracaNode.attachChild(leftMaraca)
-		val rightMaracaNode = Node()
-		rightMaracaNode.attachChild(rightMaraca)
+        /* Create nodes for maracas */
+        val leftMaracaNode = Node()
+        leftMaracaNode.attachChild(leftMaraca)
+        val rightMaracaNode = Node()
+        rightMaracaNode.attachChild(rightMaraca)
 
-		/* Tilt maracas */
-		leftMaracaNode.localRotation = Quaternion().fromAngles(0f, 0f, 0.2f)
-		rightMaracaNode.localRotation = Quaternion().fromAngles(0f, 0f, -0.2f)
+        /* Tilt maracas */
+        leftMaracaNode.localRotation = Quaternion().fromAngles(0f, 0f, 0.2f)
+        rightMaracaNode.localRotation = Quaternion().fromAngles(0f, 0f, -0.2f)
 
-		/* Positioning */
-		rightMaracaNode.setLocalTranslation(5f, -1f, 0f)
-		instrumentNode.setLocalTranslation(-13f, 65f, -41f)
-		instrumentNode.localRotation = Quaternion().fromAngles(rad(-Stick.MAX_ANGLE / 2), 0f, 0f)
+        /* Positioning */
+        rightMaracaNode.setLocalTranslation(5f, -1f, 0f)
+        instrumentNode.setLocalTranslation(-13f, 65f, -41f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(-Stick.MAX_ANGLE / 2), 0f, 0f)
 
-		/* Attach maracas */
-		instrumentNode.attachChild(leftMaracaNode)
-		instrumentNode.attachChild(rightMaracaNode)
-	}
+        /* Attach maracas */
+        instrumentNode.attachChild(leftMaracaNode)
+        instrumentNode.attachChild(rightMaracaNode)
+    }
 }

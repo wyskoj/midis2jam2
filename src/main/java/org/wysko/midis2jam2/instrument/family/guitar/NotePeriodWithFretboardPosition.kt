@@ -42,8 +42,10 @@ class NotePeriodWithFretboardPosition private constructor(
          */
         @JvmStatic
         fun fromNotePeriod(notePeriod: NotePeriod): NotePeriodWithFretboardPosition {
-            return NotePeriodWithFretboardPosition(notePeriod.midiNote, notePeriod.startTime, notePeriod.endTime,
-                notePeriod.noteOn, notePeriod.noteOff)
+            return NotePeriodWithFretboardPosition(
+                notePeriod.midiNote, notePeriod.startTime, notePeriod.endTime,
+                notePeriod.noteOn, notePeriod.noteOff
+            )
         }
     }
 
