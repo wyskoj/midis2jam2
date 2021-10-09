@@ -66,12 +66,16 @@ import kotlin.math.sin
 class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
+    /** A temporally-truncated list of pitch bend events. */
     private val pitchBends: MutableList<MidiPitchBendEvent>
 
+    /** A temporally-truncated list of modulation events. */
     private val modulationEvents: MutableList<MidiControlEvent>
 
+    /** The current pitch bend amount. */
     private var pitchBendAmount = 0.0
 
+    /** The current modulation amount. */
     private var modulationAmount = 0.0
 
     override fun moveForMultiChannel(delta: Float) {
@@ -91,14 +95,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     }
 
     override fun tick(time: Double, delta: Float) {
-        val pitchBends = NoteQueue.collect(pitchBends, context, time)
-        for (midiPitchBendEvent in pitchBends) {
-            pitchBendAmount = midiPitchBendEvent.value.toDouble() - 8192
-        }
-        val mods = NoteQueue.collect(this.modulationEvents, context, time)
-        for (modEvent in mods) {
-            modulationAmount = modEvent.value.toDouble() / 127
-        }
+        NoteQueue.collect(pitchBends, context, time).forEach { pitchBendAmount = it.value.toDouble() - 8192 }
+        NoteQueue.collect(this.modulationEvents, context, time).forEach { modulationAmount = it.value.toDouble() / 127 }
+
         super.tick(time, delta)
     }
 
@@ -160,12 +159,10 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
 
         init {
-
             laserNode.apply {
                 attachChild(shooter)
                 attachChild(laserBeam)
             }
-
             highestLevel.attachChild(laserNode)
         }
     }
@@ -175,7 +172,6 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         /** The texture file of the laser. */
         val filename: String
     ) {
-
         /** Saw laser type. */
         SAW("Laser.bmp"),
 
@@ -197,28 +193,18 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
 
         /* Truncate each note period to allow some space for end-to-end notes */
-        for (i in 0 until notePeriods.size - 1) {
-            notePeriods[i].apply { if (duration() > 0.05) endTime -= 0.025 }
-        }
+        notePeriods.forEach { if (it.duration() > 0.05) it.endTime -= 0.025 }
 
-        pitchBends = eventList
-            .filterIsInstance<MidiPitchBendEvent>()
-            .toMutableList()
-
-        modulationEvents = eventList
-            .filterIsInstance<MidiControlEvent>()
-            .filter { it.controlNum == 1 } // MIDI CC#1 is modulation
-            .toMutableList()
+        pitchBends = eventList.filterIsInstance<MidiPitchBendEvent>().toMutableList()
+        modulationEvents = eventList.filterIsInstance<MidiControlEvent>().filter { it.controlNum == 1 }.toMutableList()
 
         clones.forEach {
             it as SpaceLaserClone
-
             (it.shooter as Node).apply {
                 getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                 getChild(1).setMaterial(context.unshadedMaterial("Assets/" + type.filename))
                 getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
             }
-
             it.laserBeam.setMaterial(context.unshadedMaterial("Assets/" + type.filename))
         }
     }

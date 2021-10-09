@@ -1,47 +1,15 @@
 = midis2jam2
 
-image:https://img.shields.io/github/v/release/wyskoj/midis2jam2[]
-image:https://img.shields.io/github/license/wyskoj/midis2jam2[]
-image:https://img.shields.io/appveyor/build/wyskoj/midis2jam2[]
-image:https://img.shields.io/tokei/lines/github/wyskoj/midis2jam2[]
-image:https://img.shields.io/github/issues-closed/wyskoj/midis2jam2[]
+midis2jam2 is a remaster of MIDIJam, a 3D MIDI file visualizer.
+It plays and animates any MIDI file with a 3D virtual band.
 
-*midis2jam2* is a remaster of http://www.gamesbyscott.com/midijam.htm[MIDIJam], a MIDI file visualizer made by Scott Haag, last updated in 2007.
+https://github.com/wyskoj/midis2jam2/blob/master/implementation.adoc[Not all instruments are implemented yet]; this is a work in progress.
 
-== About
+== Installation
 
-midis2jam2 provides a faithful recreation, staying true to the original look and feel as closely as possible.
-The models and textures used in midis2jam2 are the original assets from MIDIJam, designed by MIDIJam's creator Scott Haag. midis2jam2 will complete the GM-1 implementation, allowing every MIDI instrument to be visualized.
+Install midis2jam2 with the https://github.com/wyskoj/midis2jam2/releases[appropriate installer for the latest version].
 
-Future versions may add extended features, such as custom graphics, real time MIDI visualization, and others.
-
-[#_running]
-== Running
-
-=== Easy mode
-
-Simply download https://midis2jam2.xyz[the latest version] and run the file for your system.
-Follow the on-screen instructions for installing midis2jam2.
-
-=== Hard mode
-
-If you want to experience the latest midis2jam2 updates in between releases, you can download a CI build.
-Note: these builds are unstable, so I won't provide any support for them (although, you should submit issues for pertinent bugs).
-
-==== Using a prebuilt binary
-
-Download a build from the https://www.midis2jam2.xyz/builds/[builds page].
-Move `midis2jam2-xxxxxxxx.jar` to a new folder (the Xs are a placeholder here; when you download the jar, this is the beginning of the commit hash).
-Run
-
-[source,bash]
-----
-$ java -jar midis2jam2-xxxxxxxx.jar
-----
-
-==== Building from source
-
-To build and run midis2jam2, run
+== Building
 
 [source,bash]
 ----
@@ -49,34 +17,34 @@ $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2 && ./gradlew run
 ----
 
-== FAQ & Troubleshooting
+== Documentation
 
-=== The program closed, but all the notes are sustaining.
+https://midis2jam2.netlify.app[Documentation] is updated on every push.
 
-Press the MIDI panic button on your synthesizer to stop the sound.
+== Acknowledgements
 
-=== I think something is broken.
-
-Check the issues page and make sure there isn't already a relevant issue open.
-If there isn't, create an issue and use the bug report template.
-
-=== Why doesn't instrument _X_ appear?
-
-It's likely I haven't implemented it yet.
-Check link:implementation.adoc[this page] for more information.
-
-=== MidiUnavailableException: There is not enough memory available for this task...
-
-This can happen if you attempt to use ghost/phantom MIDI ports that appear visible on your machine.
-Try restarting your computer or reconnecting your MIDI devices.
+* http://www.gamesbyscott.com/midijam.htm[MIDIJam]
+* https://jmonkeyengine.org/[jMonkeyEngine]
 
 == Contributing
 
-Fork and make a pull request to directly make changes.
-Open an issue to request features and report bugs.
-Please ensure you use a template, and ensure you https://medium.com/nyc-planning-digital/writing-a-proper-github-issue-97427d62a20f[write good issues].
+Contributions are always welcome!
+See _https://github.com/wyskoj/midis2jam2/blob/master/adding-new-instruments.adoc[adding new instruments]_ for ways to get started.
+
+== Authors
+
+Main developer:
+- https://wysko.org[wyskoj]
+
+Development contributors:
+
+* https://github.com/jlachniet[jlachniet]
+* https://github.com/nikitalita[nikitalita]
+
+== Support
+
+For support, join our https://discord.gg/HD6KFQ2zkW[Discord server].
 
 == License
 
-midis2jam2 is released under the http://www.gnu.org/licenses/gpl.html[GNU General Public License 3].
-The software comes with no warranty. Assets Copyright © 2007 http://www.gamesbyscott.com/[Scott Haag] (used with permission).
+https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0]

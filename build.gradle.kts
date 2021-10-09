@@ -5,7 +5,7 @@ plugins {
     id("org.panteleyev.jpackageplugin") version "1.3.0"
     id("com.github.hierynomus.license-report") version "0.15.0"
     id("org.jetbrains.kotlin.jvm") version "1.5.21"
-    id("org.jetbrains.dokka") version "1.5.30"
+    id("org.jetbrains.dokka") version "1.4.32"
     java
     idea
     application
@@ -66,6 +66,9 @@ dependencies {
 
     // Noise library
     implementation("org.spongepowered:noise:2.0.0-SNAPSHOT")
+
+    // Dokka math
+    implementation("org.jetbrains.dokka:mathjax-plugin:1.4.32")
 }
 
 downloadLicenses {
@@ -79,6 +82,7 @@ tasks.dokkaHtml.configure {
         configureEach {
             includeNonPublic.set(true)
             reportUndocumented.set(true)
+            suppressObviousFunctions.set(true)
         }
     }
     pluginsMapConfiguration.set(

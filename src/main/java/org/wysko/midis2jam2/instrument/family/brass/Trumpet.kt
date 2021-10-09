@@ -28,28 +28,26 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
 /**
- * The trumpet has three keys, and are simply animated. It handles much like other [MonophonicInstrument]s.
+ * The Trumpet.
+ *
+ * The Trumpet has three keys animated with the use of a [PressedKeysFingeringManager]. It handles much like other
+ * [MonophonicInstrument]s.
  */
-class Trumpet(
-    context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: TrumpetType
-) : MonophonicInstrument(
-    context,
-    eventList,
-    type.clazz,
-    FINGERING_MANAGER
-) {
+class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: TrumpetType) :
+    MonophonicInstrument(context, eventList, type.clazz, FINGERING_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
     }
 
-    /**
-     * The type of trumpet.
-     */
-    enum class TrumpetType(val clazz: Class<out TrumpetClone>) {
+    /** The type of Trumpet. */
+    enum class TrumpetType(
         /**
-         * The normal, open trumpet.
+         * The class of the TrumpetClone.
          */
+        val clazz: Class<out TrumpetClone>
+    ) {
+        /** The normal, open trumpet. */
         NORMAL(TrumpetClone::class.java),
 
         /**
@@ -58,9 +56,7 @@ class Trumpet(
         MUTED(MutedTrumpetClone::class.java)
     }
 
-    /**
-     * A single instance of a trumpet.
-     */
+    /** A single Trumpet. */
     open inner class TrumpetClone : AnimatedKeyCloneByIntegers(this@Trumpet, 0.15f, 0.9f, Axis.Z, Axis.X) {
 
         override fun animateKeys(pressed: Array<Int>) {
@@ -109,9 +105,7 @@ class Trumpet(
         }
     }
 
-    /**
-     * Exact same as [TrumpetClone] but just adds the mute to the bell.
-     */
+    /** Exact same as [TrumpetClone] but just adds the mute to the bell. */
     inner class MutedTrumpetClone : TrumpetClone() {
         init {
             bell.attachChild(context.loadModel("TrumpetMute.obj", "RubberFoot.bmp"))
@@ -119,6 +113,7 @@ class Trumpet(
     }
 
     companion object {
+        /** The Trumpet fingering manager. */
         val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Trumpet::class.java)
     }
 

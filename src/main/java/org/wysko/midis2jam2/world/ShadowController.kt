@@ -155,7 +155,7 @@ class ShadowController(
             val shadow = shadow(context, "Assets/HarpShadow.obj", "Assets/HarpShadow.png")
             harpShadows.add(shadow)
             context.rootNode.attachChild(shadow)
-            shadow.setLocalTranslation(5 + 14.7f * i, 0.1f, 17 + 10.3f * i)
+            shadow.setLocalTranslation(-126f, 0.1f, -30f + (60f * i))
             shadow.localRotation = Quaternion().fromAngles(0f, Utils.rad(-35f), 0f)
         }
 

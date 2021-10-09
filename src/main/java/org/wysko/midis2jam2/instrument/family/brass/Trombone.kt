@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
 import org.wysko.midis2jam2.instrument.clone.Clone
+import org.wysko.midis2jam2.instrument.family.brass.Trombone.TromboneClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.MatType
@@ -34,7 +35,16 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * The trombone animates by moving a slide on the instrument.
+ * The Trombone.
+ *
+ * The Trombone animates by moving a slide to represent the pitch of the current note. When playing, the Trombone
+ * also slightly rotates. It uses a [SlidePositionManager] to determine the correct slide position for each note.
+ *
+ * Because each note can have a few valid positions, [TromboneClone.getSlidePositionFromNote] finds the closest valid
+ * position.
+ *
+ * When the Trombone is not playing and there is an upcoming note, the slide will gradually move to the next position
+ * when there is less than one second between now and the note start.
  */
 class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class.java, SLIDE_MANAGER) {
@@ -43,12 +53,10 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         offsetNode.setLocalTranslation(0f, 10 * indexForMoving(delta), 0f)
     }
 
-    /**
-     * A single trombone.
-     */
+    /** A single Trombone. */
     inner class TromboneClone : Clone(this@Trombone, 0.1f, Axis.X) {
 
-        /** The slide. */
+        /** The slide slides in and out to represent different pitches on the Trombone. */
         private val slide: Spatial
 
         /** Moves the slide of the trombone to a given position, from 1st to 7th position. */
@@ -56,21 +64,27 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             slide.localTranslation = slidePosition(position)
         }
 
-        /** Returns the 3D vector for a given slide position. */
+        /**
+         * Returns the 3D vector for a given slide position.
+         * TODO put equation here
+         */
         private fun slidePosition(position: Double): Vector3f {
             return Vector3f(0f, 0f, (3.333333 * position - 1).toFloat())
         }
 
-        /** Returns the current slide position. */
+        /**
+         * Returns the current slide position, calculated from the current Z-axis translation.
+         * TODO put equation here
+         */
         private val currentSlidePosition: Double
             get() = 0.3 * (slide.localTranslation.z + 1)
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
             /* If currently playing */
-            if (isPlaying && currentNotePeriod != null) {
+            if (isPlaying) {
                 /* Update slide position */
-                moveToPosition(getSlidePositionFromNote(currentNotePeriod!!).toDouble())
+                moveToPosition(getSlidePositionFromNote(currentNotePeriod ?: return).toDouble())
             }
 
             /* If not currently playing */
@@ -91,9 +105,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             }
         }
 
-        /**
-         * Gets the best slide position from a NotePeriod.
-         */
+        /** Gets the best slide position from a NotePeriod. */
         private fun getSlidePositionFromNote(period: NotePeriod): Int {
             /* If out of range, return current position */
             val positionList = SLIDE_MANAGER.fingering(period.midiNote) ?: return currentSlidePosition.roundToInt()
@@ -142,6 +154,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     companion object {
+        /** The Trombone slide manager. */
         val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trombone::class.java)
     }
 }

@@ -5,7 +5,7 @@ Check this page to see the progress of each instrument's implementation.
 *Legend*:
 
 * image:doc/plus.png[] = New instrument
-* image:doc/brush.png[] = New model/texture
+* image:doc/brush.png[] = New model/texture/behavior
 * image:doc/check.png[] = Implemented
 * image:doc/cross.png[] = Not yet implemented
 
@@ -26,22 +26,22 @@ Check this page to see the progress of each instrument's implementation.
 |===
 |*Bass*|*Strings*|*Ensemble*|*Brass*
 |_33_ Acoustic Bass image:doc/check.png[]|_41_ Violin image:doc/check.png[]|_49_ String Ensemble 1 image:doc/check.png[]|_57_ Trumpet image:doc/check.png[]
-|_34_ Electric Bass (finger) image:doc/check.png[]|_42_ Viola image:doc/check.png[]|_50_ String Ensemble 2 image:doc/check.png[]|_58_ Trombone image:doc/check.png[]
-|_35_ Electric Bass (pick) image:doc/check.png[]|_43_ Cello image:doc/check.png[]|_51_ Synth Strings 1 image:doc/check.png[]|_59_ Tuba image:doc/check.png[]
-|_36_ Fretless Bass image:doc/brush.png[]|_44_ Contrabass image:doc/check.png[]|_52_ Synth Strings 2 image:doc/check.png[]|_60_ Muted Trumpet image:doc/check.png[]
-|_37_ Slap Bass 1 image:doc/check.png[]|_45_ Tremolo Strings image:doc/check.png[]|_53_ Choir Aahs image:doc/check.png[]|_61_ French Horn image:doc/check.png[]
-|_38_ Slap Bass 2 image:doc/check.png[]|_46_ Pizzicato Strings image:doc/check.png[]|_54_ Voice Oohs image:doc/check.png[]|_62_ Brass Section image:doc/check.png[]
-|_39_ Synth Bass 1 image:doc/check.png[]|_47_ Orchestral Harp image:doc/check.png[]|_55_ Synth Voice image:doc/check.png[]|_63_ Synth Brass 1 image:doc/check.png[]
+|_34_ Electric Bass (finger) image:doc/check.png[]|_42_ Viola image:doc/check.png[]|_50_ String Ensemble 2 image:doc/brush.png[]|_58_ Trombone image:doc/check.png[]
+|_35_ Electric Bass (pick) image:doc/check.png[]|_43_ Cello image:doc/check.png[]|_51_ Synth Strings 1 image:doc/brush.png[]|_59_ Tuba image:doc/check.png[]
+|_36_ Fretless Bass image:doc/brush.png[]|_44_ Contrabass image:doc/check.png[]|_52_ Synth Strings 2 image:doc/brush.png[]|_60_ Muted Trumpet image:doc/check.png[]
+|_37_ Slap Bass 1 image:doc/check.png[]|_45_ Tremolo Strings image:doc/brush.png[]|_53_ Choir Aahs image:doc/check.png[]|_61_ French Horn image:doc/check.png[]
+|_38_ Slap Bass 2 image:doc/check.png[]|_46_ Pizzicato Strings image:doc/check.png[]|_54_ Voice Oohs image:doc/brush.png[]|_62_ Brass Section image:doc/check.png[]
+|_39_ Synth Bass 1 image:doc/check.png[]|_47_ Orchestral Harp image:doc/check.png[]|_55_ Synth Voice image:doc/brush.png[]|_63_ Synth Brass 1 image:doc/check.png[]
 |_40_ Synth Bass 2 image:doc/check.png[]|_48_ Timpani image:doc/check.png[]|_56_ Orchestra Hit image:doc/check.png[]|_64_ Synth Brass 2 image:doc/check.png[]
 |===
 
 |===
 |*Reed*|*Pipe*|*Synth Lead*|*Synth Pad*
-|_65_ Soprano Sax image:doc/check.png[]|_73_ Piccolo image:doc/check.png[]|_81_ Lead 1 (square) image:doc/check.png[]|_89_ Pad 1 (new age) image:doc/check.png[]
-|_66_ Alto Sax image:doc/check.png[]|_74_ Flute image:doc/check.png[]|_82_ Lead 2 (sawtooth) image:doc/check.png[]|_90_ Pad 2 (warm) image:doc/check.png[]
+|_65_ Soprano Sax image:doc/check.png[]|_73_ Piccolo image:doc/check.png[]|_81_ Lead 1 (square) image:doc/brush.png[]|_89_ Pad 1 (new age) image:doc/check.png[]
+|_66_ Alto Sax image:doc/check.png[]|_74_ Flute image:doc/check.png[]|_82_ Lead 2 (sawtooth) image:doc/brush.png[]|_90_ Pad 2 (warm) image:doc/check.png[]
 |_67_ Tenor Sax image:doc/check.png[]|_75_ Recorder image:doc/check.png[]|_83_ Lead 3 (calliope) image:doc/check.png[]|_91_ Pad 3 (polysynth) image:doc/check.png[]
-|_68_ Baritone Sax image:doc/check.png[]|_76_ Pan Flute image:doc/check.png[]|_84_ Lead 4 (chiff) image:doc/check.png[]|_92_ Pad 4 (choir) image:doc/check.png[]
-|_69_ Oboe image:doc/cross.png[]|_77_ Blown bottle image:doc/check.png[]|_85_ Lead 5 (charang) image:doc/check.png[]|_93_ Pad 5 (bowed) image:doc/check.png[]
+|_68_ Baritone Sax image:doc/check.png[]|_76_ Pan Flute image:doc/check.png[]|_84_ Lead 4 (chiff) image:doc/check.png[]|_92_ Pad 4 (choir) image:doc/brush.png[]
+|_69_ Oboe image:doc/plus.png[]|_77_ Blown bottle image:doc/check.png[]|_85_ Lead 5 (charang) image:doc/brush.png[]|_93_ Pad 5 (bowed) image:doc/check.png[]
 |_70_ English Horn image:doc/cross.png[]|_78_ Shakuhachi image:doc/cross.png[]|_86_ Lead 6 (voice) image:doc/check.png[]|_94_ Pad 6 (metallic) image:doc/check.png[]
 |_71_ Bassoon image:doc/cross.png[]|_79_ Whistle image:doc/check.png[]|_87_ Lead 7 (fifths) image:doc/check.png[]|_95_ Pad 7 (halo) image:doc/check.png[]
 |_72_ Clarinet image:doc/plus.png[]|_80_ Ocarina image:doc/check.png[]|_88_ Lead 8 (bass + lead) image:doc/check.png[]|_96_ Pad 8 (sweep) image:doc/check.png[]
@@ -63,7 +63,7 @@ Check this page to see the progress of each instrument's implementation.
 
 |===
 |__27__ High Q image:doc/check.png[]|__35__ Acoustic Bass Drum image:doc/check.png[]|__43__ High Floor Tom image:doc/check.png[]|__51__ Ride Cymbal 1 image:doc/check.png[]
-|__28__ Slap image:doc/cross.png[]|__36__ Electric Bass Drum image:doc/check.png[]|__44__ Pedal Hi-hat image:doc/check.png[]|_52_ Chinese Cymbal image:doc/check.png[]
+|__28__ Slap image:doc/plus.png[]|__36__ Electric Bass Drum image:doc/check.png[]|__44__ Pedal Hi-hat image:doc/check.png[]|_52_ Chinese Cymbal image:doc/check.png[]
 |_29_ Scratch Push image:doc/cross.png[]|_37_ Side Stick image:doc/check.png[]|_45_ Low Tom image:doc/check.png[]|_53_ Ride Bell image:doc/check.png[]
 |_30_ Scratch Pull image:doc/cross.png[]|_38_ Acoustic Snare image:doc/check.png[]|_46_ Open Hi-hat image:doc/check.png[]|_54_ Tambourine image:doc/check.png[]
 |_31_ Sticks image:doc/check.png[]|_39_ Hand Clap image:doc/check.png[]|_47_ Low-Mid Tom image:doc/check.png[]|_55_ Splash Cymbal image:doc/check.png[]

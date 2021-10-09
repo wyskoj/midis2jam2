@@ -92,7 +92,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(14.7f * indexForMoving(delta), 0f, 10.3f * indexForMoving(delta))
+        offsetNode.setLocalTranslation(0f, 0f, 60f * indexForMoving(delta))
     }
 
     /**
@@ -200,7 +200,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
     init {
         /* Load model */
         instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp"))
-        instrumentNode.setLocalTranslation(5f, 3.6f, 17f)
+        instrumentNode.setLocalTranslation(-126f, 3.6f, -30f)
         instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-35.0), 0f)
         highestLevel.attachChild(instrumentNode)
 

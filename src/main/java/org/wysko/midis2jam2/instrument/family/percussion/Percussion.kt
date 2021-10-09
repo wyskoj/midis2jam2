@@ -22,7 +22,8 @@ import com.jme3.material.RenderState
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.family.percussion.Triangle.TriangleType.MUTED
 import org.wysko.midis2jam2.instrument.family.percussion.Triangle.TriangleType.OPEN
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.*
@@ -31,14 +32,20 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.Tom.TomPitch.*
 import org.wysko.midis2jam2.midi.Midi
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.midi.MidiProgramEvent
 
-class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Instrument(context) {
+class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, events) {
 
     /** Contains all percussion instruments. */
-    val percussionNode = Node()
+    private val percussionNode: Node = Node()
 
     /** All note on events. */
-    val noteOnEvents: MutableList<MidiNoteOnEvent>
+    private val noteOnEvents: MutableList<MidiNoteOnEvent> = events.filterIsInstance<MidiNoteOnEvent>() as
+            MutableList<MidiNoteOnEvent>
+
+    /** All program change events. */
+    private val programEvents: MutableList<MidiProgramEvent> =
+        events.filterIsInstance<MidiProgramEvent>() as MutableList<MidiProgramEvent>
 
     /** Each percussion instrument. */
     val instruments: MutableList<PercussionInstrument> = ArrayList()
@@ -46,17 +53,46 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
     private fun eventsByNote(vararg notes: Int) = noteOnEvents.filter { notes.contains(it.note) }.toMutableList()
 
     override fun tick(time: Double, delta: Float) {
-        setIdleVisibilityByStrikes(noteOnEvents, time, percussionNode)
+        super.tick(time, delta)
         instruments.forEach { it.tick(time, delta) }
+
+        NoteQueue.collectOne(programEvents, context, time)?.let { event ->
+            when (event.programNum) {
+                PercussionKit.ROOM.midiNumber -> {
+                    retexture("DrumShell_Snare_Room.png", "DrumShell_Room.png")
+                }
+                PercussionKit.BRUSH.midiNumber -> {
+                    retexture("DrumShell_Snare_Brush.png", "DrumShell_Brush.png")
+                }
+                PercussionKit.JAZZ.midiNumber -> {
+                    retexture("DrumShell_Snare_Jazz.png", "DrumShell_Jazz.png")
+                }
+                PercussionKit.POWER.midiNumber -> {
+                    retexture("DrumShell_Snare_Power.png", "DrumShell_Power.png")
+                }
+                else -> {
+                    retexture("DrumShell_Snare.bmp", "DrumShell.bmp")
+                }
+            }
+        }
     }
+
+    /** Retextures [Retexturables][Retexturable] given textures for [RetextureTypes][RetextureType]. */
+    private fun retexture(snareTexture: String, otherTexture: String) =
+        instruments.filterIsInstance<Retexturable>().forEach {
+            if (it.retextureType() == RetextureType.SNARE) {
+                it.drum().setMaterial(context.unshadedMaterial(snareTexture))
+            } else if (it.retextureType() == RetextureType.OTHER) {
+                it.drum().setMaterial(context.unshadedMaterial(otherTexture))
+            }
+        }
+
 
     override fun moveForMultiChannel(delta: Float) {
         // Do nothing!
     }
 
     init {
-        noteOnEvents = events.filterIsInstance<MidiNoteOnEvent>() as MutableList<MidiNoteOnEvent>
-
         val drumSetNode = Node()
 
         instruments.add(SnareDrum(context, eventsByNote(Midi.ACOUSTIC_SNARE, Midi.ELECTRIC_SNARE, Midi.SIDE_STICK)))
@@ -98,6 +134,8 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
         instruments.add(RideCymbal(context, ride2Notes, RIDE_2))
         instruments.add(HiHat(context, eventsByNote(Midi.PEDAL_HI_HAT, Midi.OPEN_HI_HAT, Midi.CLOSED_HI_HAT)))
 
+        if (noteOnEvents.any { it.note.oneOf(Midi.SLAP) })
+            instruments.add(Slap(context, eventsByNote(Midi.SLAP)))
         if (noteOnEvents.any { it.note.oneOf(Midi.LOW_CONGA, Midi.OPEN_HIGH_CONGA, Midi.MUTE_HIGH_CONGA) })
             instruments.add(Congas(context, eventsByNote(Midi.LOW_CONGA, Midi.OPEN_HIGH_CONGA, Midi.MUTE_HIGH_CONGA)))
         if (noteOnEvents.any { it.note.oneOf(Midi.COWBELL) })
@@ -161,8 +199,9 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
 
         percussionNode.attachChild(drumSetNode)
         percussionNode.attachChild(shadow)
-        context.rootNode.attachChild(percussionNode)
+        instrumentNode.attachChild(percussionNode)
     }
 }
 
+/** Given a list of integers, determines if the root integer is equal to at least one of the provided integers. */
 fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }

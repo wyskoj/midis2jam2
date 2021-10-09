@@ -25,9 +25,7 @@ import org.wysko.midis2jam2.util.Utils.rad
 import kotlin.math.cos
 import kotlin.math.sin
 
-/**
- * The full, 88-key keyboard.
- */
+/** The full, 88-key keyboard. */
 class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent>, private val skin: KeyboardSkin) :
     KeyedInstrument(context, events, 21, 108) {
 
@@ -44,90 +42,59 @@ class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent
         return if (midiNote > rangeHigh || midiNote < rangeLow) null else keys[midiNote - rangeLow]
     }
 
-    /**
-     * Different types of keyboards have different skins.
-     */
+    /** Different types of keyboards have different skins. */
     @Suppress("unused")
-    enum class KeyboardSkin(val textureFile: @NonNls String) {
-        /**
-         * Harpsichord keyboard skin.
-         */
+    enum class KeyboardSkin(
+        /** The texture file of the Keyboard Skin. */
+        val textureFile: @NonNls String
+    ) {
+        /** Harpsichord keyboard skin. */
         HARPSICHORD("HarpsichordSkin.bmp"),
 
-        /**
-         * Piano keyboard skin.
-         */
+        /** Piano keyboard skin. */
         PIANO("PianoSkin.bmp"),
 
-        /**
-         * Synth keyboard skin.
-         */
+        /** Synth keyboard skin. */
         SYNTH("SynthSkin.bmp"),
 
-        /**
-         * Wood keyboard skin.
-         */
+        /** Wood keyboard skin. */
         WOOD("PianoSkin_Wood.bmp"),
 
-        /**
-         * Clavichord keyboard skin.
-         */
+        /** Clavichord keyboard skin. */
         CLAVICHORD("ClaviSkin.png"),
 
-        /**
-         * Bright keyboard skin.
-         */
+        /** Bright keyboard skin. */
         BRIGHT("BrightAcousticSkin.png"),
 
-        /**
-         * Honky tonk keyboard skin.
-         */
+        /** Honky tonk keyboard skin. */
         HONKY_TONK("HonkyTonkSkin.png"),
 
-        /**
-         * Electric grand keyboard skin.
-         */
+        /** Electric grand keyboard skin. */
         ELECTRIC_GRAND("ElectricGrandSkin.png"),
 
-        /**
-         * Electric 1 keyboard skin.
-         */
+        /** Electric 1 keyboard skin. */
         ELECTRIC_1("ElectricPiano1Skin.png"),
 
-        /**
-         * Electric 2 keyboard skin.
-         */
+        /** Electric 2 keyboard skin. */
         ELECTRIC_2("ElectricPiano2Skin.png"),
 
-        /**
-         * Celesta keyboard skin.
-         */
+        /** Celesta keyboard skin. */
         CELESTA("CelestaSkin.png"),
 
-        /**
-         * Square wave keyboard skin.
-         */
+        /** Square wave keyboard skin. */
         SQUARE_WAVE("SquareSynthSkin.png"),
 
-        /**
-         * Saw wave keyboard skin.
-         */
+        /** Saw wave keyboard skin. */
         SAW_WAVE("SawtoothWaveSynthSkin.png"),
 
-        /**
-         * Charang keyboard skin.
-         */
+        /** Charang keyboard skin. */
         CHARANG("CharangSynthSkin.png"),
 
-        /**
-         * Choir keyboard skin.
-         */
+        /** Choir keyboard skin. */
         CHOIR("ChoirSynthSkin.png");
     }
 
-    /**
-     * The type Keyboard key.
-     */
+    /** The type Keyboard key. */
     inner class KeyboardKey(midiNote: Int, startPos: Int) : Key() {
         init {
             if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key

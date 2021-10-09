@@ -21,19 +21,17 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * Contains logic for animating stick strikes.
- */
+/** Contains logic for animating sticks and other things that have a strike motion. */
 object Stick {
-    /** The standard speed at which a stick strikes. */
+
+    /** The default speed at which a stick strikes. */
     const val STRIKE_SPEED: Double = 4.0
 
-    /** The standard max angle at which a stick bends back to. */
+    /** The default maximum resting angle at which a stick rests. */
     const val MAX_ANGLE: Double = 50.0
 
     private fun proposedRotation(
@@ -43,11 +41,12 @@ object Stick {
         maxAngle: Double,
         strikeSpeed: Double
     ): Double {
-        return if (nextHit == null) maxAngle + 1
-        else -1000 * (6E7 / context.file.tempoBefore(nextHit).number / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(
+        return if (nextHit == null) maxAngle + 1 else -1000 * (6E7 / context.file.tempoBefore(nextHit).number / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(
             nextHit
         ))
     }
+
+    val stickTimeMap: MutableMap<Spatial, Long> = HashMap()
 
     /**
      * Calculates the desired rotation and visibility of a stick at any given point.
@@ -62,7 +61,6 @@ object Stick {
      * @param axis        the axis on which to rotate the stick
      * @return a [StickStatus] describing the current status of the stick
      */
-    @SuppressWarnings("kotlin:S107")
     fun handleStick(
         context: Midis2jam2,
         stickNode: Spatial,
@@ -71,47 +69,68 @@ object Stick {
         strikes: MutableList<MidiNoteOnEvent>,
         strikeSpeed: Double = STRIKE_SPEED,
         maxAngle: Double = MAX_ANGLE,
-        axis: Axis = Axis.X
+        axis: Axis = Axis.X,
+        sticky: Boolean = true
     ): StickStatus {
+        var strike = false
+
         val rotComp = when (axis) {
             Axis.X -> 0
             Axis.Y -> 1
             Axis.Z -> 2
         }
 
-        val nextHit = NoteQueue.collect(strikes, context, time).lastOrNull()
-        val strikeNow = nextHit != null && context.file.eventInSeconds(nextHit) <= time
+        var nextHit: MidiNoteOnEvent? = null
+        if (strikes.isNotEmpty()) {
+            nextHit = strikes[0]
+        }
+
+        while (strikes.isNotEmpty() && context.file.eventInSeconds(strikes[0]) <= time) {
+            nextHit = strikes.removeAt(0)
+        }
+
+        if (nextHit != null && context.file.eventInSeconds(nextHit) <= time) {
+            strike = true
+        }
+
         val proposedRotation = proposedRotation(context, time, nextHit, maxAngle, strikeSpeed)
+
+
         val floats = stickNode.localRotation.toAngles(FloatArray(3))
 
         if (proposedRotation > maxAngle) {
             // Not yet ready to strike
             if (floats[rotComp] <= maxAngle) {
                 // We have come down, need to recoil
-                val angle = rad(maxAngle).coerceAtMost(floats[rotComp] + 5f * delta)
-                when (axis) {
-                    Axis.X -> {
-                        stickNode.localRotation = Quaternion().fromAngles(angle, 0f, 0f)
+                var angle = floats[rotComp] + 5f * delta
+                angle = rad(maxAngle).coerceAtMost(angle)
+                when {
+                    axis === Axis.X -> {
+                        stickNode.localRotation = Quaternion().fromAngles(
+                            angle, 0f, 0f
+                        )
                     }
-                    Axis.Y -> {
+                    axis === Axis.Y -> {
                         stickNode.localRotation = Quaternion().fromAngles(0f, angle, 0f)
                     }
-                    Axis.Z -> {
-                        stickNode.localRotation = Quaternion().fromAngles(0f, 0f, angle)
+                    else -> {
+                        stickNode.localRotation = Quaternion().fromAngles(
+                            0f, 0f, angle
+                        )
                     }
                 }
             }
         } else {
             // Striking
             val angle = 0.0.coerceAtLeast(maxAngle.coerceAtMost(proposedRotation))
-            when (axis) {
-                Axis.X -> {
+            when {
+                axis === Axis.X -> {
                     stickNode.localRotation = Quaternion().fromAngles(rad(angle), 0f, 0f)
                 }
-                Axis.Y -> {
+                axis === Axis.Y -> {
                     stickNode.localRotation = Quaternion().fromAngles(0f, rad(angle), 0f)
                 }
-                Axis.Z -> {
+                else -> {
                     stickNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(angle))
                 }
             }
@@ -125,22 +144,33 @@ object Stick {
             // Striking or recoiling
             stickNode.cullHint = CullHint.Dynamic
         }
+
+        if (sticky) {
+            if (strike) {
+                stickTimeMap[stickNode] = nextHit!!.time
+            }
+
+            if (strikes.isNotEmpty()) {
+                if (stickTimeMap[stickNode] != null) {
+                    if (strikes.first().time - stickTimeMap[stickNode]!! <= context.file.division * 2.1) {
+                        stickNode.cullHint = CullHint.Dynamic
+                    }
+                }
+            }
+
+        }
+
+
         return StickStatus(
-            if (strikeNow) nextHit else null,
+            if (strike) nextHit else null,
             finalAngles[rotComp], if (proposedRotation > maxAngle) null else nextHit
         )
     }
 
-    /** Reports information about what has happened when [handleStick] has been called. */
     class StickStatus(
-        /** The strike that the stick just played, or null if it didn't. */
         val strike: MidiNoteOnEvent?,
-
-        /** The angle of rotation. */
         val rotationAngle: Float,
-
-        /** The note this stick is striking for. */
-        private val strikingFor: MidiNoteOnEvent?
+        val strikingFor: MidiNoteOnEvent?
     ) {
 
         /**

@@ -16,30 +16,56 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import com.jme3.math.FastMath
+import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /**
- * The slap. It animates just like claves or hand clap.
+ * The Slap.
+ *
+ * It animates very similarly to [HandClap].
  */
 class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the left slapper.
-     */
+    /** Contains the left slapper. */
     private val leftSlapNode = Node()
 
-    /**
-     * Contains the right snapper.
-     */
+    /** Contains the right snapper. */
     private val rightSlapNode = Node()
 
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val handleStick = Stick.handleStick(
+            context,
+            leftSlapNode,
+            time,
+            delta,
+            hits,
+            strikeSpeed = Stick.STRIKE_SPEED * 0.6,
+            maxAngle = 30.0
+        )
+        leftSlapNode.cullHint = Spatial.CullHint.Dynamic
+        rightSlapNode.localRotation = Quaternion().fromAngles(-handleStick.rotationAngle, 0f, 0f)
+    }
+
     init {
-        leftSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
-        rightSlapNode.attachChild(context.loadModel("Slap.fbx", "Wood.bmp"))
-        instrumentNode.attachChild(leftSlapNode)
-        instrumentNode.attachChild(rightSlapNode)
+        /* Left and right slappers */
+        leftSlapNode.attachChild(context.loadModel("SlapHalf.fbx", "Wood.bmp"))
+        rightSlapNode.attachChild(context.loadModel("SlapHalf.fbx", "Wood.bmp").apply {
+            localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
+        })
+
+        /* Position instrument */
+        instrumentNode.run {
+            attachChild(leftSlapNode)
+            attachChild(rightSlapNode)
+            setLocalTranslation(15f, 70f, -55f)
+            localRotation = Quaternion().fromAngles(0f, -FastMath.PI / 4, 0f)
+        }
     }
 }

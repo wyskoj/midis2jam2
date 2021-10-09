@@ -14,18 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-@file:Suppress("unused")
 
 package org.wysko.midis2jam2.instrument.family.percussion
 
-enum class PercussionKit(val midiNumber: Int) {
-    STANDARD(0),
-    ROOM(8),
-    POWER(16),
-    ELECTRONIC(24),
-    ANALOG(25),
-    JAZZ(32),
-    BRUSH(40),
-    ORCHESTRA(48),
-    SFX(56);
+import com.jme3.scene.Spatial
+
+/** Any percussion instrument that should change its texture when a program change occurs. */
+interface Retexturable {
+    /** Returns the drum that needs to be retextured */
+    fun drum(): Spatial
+
+    /** The type of retexture. */
+    fun retextureType(): RetextureType
+}
+
+/** Defines how a [Retexturable] should be retextured. */
+enum class RetextureType {
+    /** Retexture snare drum. */
+    SNARE,
+
+    /** Retexture other drum. */
+    OTHER
 }

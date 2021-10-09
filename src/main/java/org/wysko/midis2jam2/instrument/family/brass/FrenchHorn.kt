@@ -28,18 +28,20 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
 /**
- * The French Horn. It animates like most other [MonophonicInstrument]s. The French Horn has four keys, the first one
- * being the trigger key. It animates on a different axis than the rest.
+ * The French Horn.
+ *
+ * It animates like most other [MonophonicInstruments][MonophonicInstrument]. The French Horn has four keys, the first
+ * one being the trigger key. It animates on a different axis than the rest.
  */
 class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, FrenchHornClone::class.java, FINGERING_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 15 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 20 * indexForMoving(delta), 0f)
     }
 
     /**
-     * A single instance of a French Horn.
+     * A single French Horn.
      */
     inner class FrenchHornClone : AnimatedKeyCloneByIntegers(this@FrenchHorn, 0.1f, 0.9f, Axis.Y, Axis.X) {
 
@@ -101,9 +103,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     }
 
     companion object {
-        /**
-         * The French Horn fingering manager.
-         */
+        /** The French Horn fingering manager. */
         val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class.java)
     }
 

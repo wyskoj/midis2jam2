@@ -17,24 +17,51 @@
 package org.wysko.midis2jam2.instrument
 
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
-/**
- * A DecayedInstrument is any instrument that only depends on [MidiNoteOnEvent]s to function. The note off event
- * is discarded.
- */
+/** Any instrument that only depends on [MidiNoteOnEvent]s to function. The [MidiNoteOffEvent] is discarded. */
 abstract class DecayedInstrument protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     Instrument(context) {
 
-    /** List of events this instrument should play. */
-    protected val hits: MutableList<MidiNoteOnEvent> = eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
+    /** List of events this instrument should play. This is mutable by lower classes. */
+    protected open val hits: MutableList<MidiNoteOnEvent> =
+        eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
 
-    /** The list of unmodifiable hits. */
-    private val finalHits: List<MidiNoteOnEvent> = ArrayList(hits)
+    /** Initialized to the same vales of [hits], but used for visibility calculations. */
+    protected val hitsV: MutableList<MidiNoteOnEvent> =
+        eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
+
+    protected var lastHit: MidiNoteOnEvent? = null
+
+    override fun calcVisibility(time: Double): Boolean {
+        /* Within one second of a hit? Visible. */
+        if (hitsV.isNotEmpty() &&
+            context.file.eventInSeconds(hitsV[0]) - time <= 1
+        )
+            return true
+
+        /* If within a 7-second gap between the last hit and the next? Visible. */
+        if (lastHit != null
+            && hitsV.isNotEmpty()
+            && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit) <= 7
+        ) return true
+
+        /* If after 2 seconds of the last hit? Visible. */
+        if (lastHit != null && time - context.file.eventInSeconds(lastHit) <= 2) return true
+
+        /* Invisible. */
+        return false
+    }
 
     override fun tick(time: Double, delta: Float) {
-        setIdleVisibilityByStrikes(finalHits, time, instrumentNode)
+        setVisibility(time)
+        /* Simulate hit truncation */
+        NoteQueue.collectOne(hitsV, context, time)?.let {
+            lastHit = it
+        }
         moveForMultiChannel(delta)
     }
 }

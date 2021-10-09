@@ -19,43 +19,34 @@ package org.wysko.midis2jam2.instrument.family.piano
 
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.Instrument
-import org.wysko.midis2jam2.instrument.SustainedInstrument.Companion.calcVisibility
-import org.wysko.midis2jam2.instrument.SustainedInstrument.Companion.scrapeMidiNoteEvents
-import org.wysko.midis2jam2.midi.*
-import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
+import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteEvent
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 abstract class KeyedInstrument(
     context: Midis2jam2,
     eventList: MutableList<MidiChannelSpecificEvent>,
     val rangeLow: Int,
     val rangeHigh: Int
-) : Instrument(context) {
+) : SustainedInstrument(context, eventList) {
 
     /**
      * The events associated with this instrument.
      */
-    protected val events: MutableList<MidiNoteEvent> = scrapeMidiNoteEvents(eventList) as MutableList<MidiNoteEvent>
+    protected val events: MutableList<MidiNoteEvent> =
+        eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
 
     /**
      * The keys of this instrument.
      */
     protected val keys: Array<Key?> = arrayOfNulls(keyCount())
 
-    /**
-     * The Note periods to play.
-     */
-    private val notePeriods: List<NotePeriod> = calculateNotePeriods(this, events)
-
     /** Returns the number of keys on this instrument. */
-    fun keyCount() = rangeHigh - rangeLow + 1
+    fun keyCount(): Int = rangeHigh - rangeLow + 1
 
-    /**
-     * Returns the key associated with the MIDI note.
-     *
-     * @param midiNote the midi note
-     * @return the key
-     */
+    /** Returns the key associated with the [midiNote], or `null` if this instrument can't animate that note. */
     protected abstract fun keyByMidiNote(midiNote: Int): Key?
 
     /**
@@ -64,12 +55,13 @@ abstract class KeyedInstrument(
      * @param time the current time
      */
     protected open fun setIdleVisibilityByNoteOnAndOff(time: Double) {
-        val b = calcVisibility(time, notePeriods)
+        val b = calcVisibility(time)
         isVisible = b
         instrumentNode.cullHint = if (b) Spatial.CullHint.Dynamic else Spatial.CullHint.Always
     }
 
     override fun tick(time: Double, delta: Float) {
+        calculateCurrentNotePeriods(time)
         setIdleVisibilityByNoteOnAndOff(time)
         moveForMultiChannel(delta)
         val eventsToPerform: List<MidiNoteEvent> = getElapsedEvents(time)
@@ -95,7 +87,7 @@ abstract class KeyedInstrument(
     }
 
     /**
-     * Searches [.events] for those that should be animated now, taking special keyboard considerations into
+     * Searches [events] for those that should be animated now, taking special keyboard considerations into
      * place.
      *
      * @param time the current time, in seconds
@@ -124,7 +116,7 @@ abstract class KeyedInstrument(
          * @param x the MIDI note value
          * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
          */
-        fun midiValueToColor(x: Int) = when (x % 12) {
+        fun midiValueToColor(x: Int): KeyColor = when (x % 12) {
             1, 3, 6, 8, 10 -> KeyColor.BLACK
             else -> KeyColor.WHITE
         }

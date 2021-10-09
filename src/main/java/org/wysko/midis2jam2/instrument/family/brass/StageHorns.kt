@@ -25,10 +25,9 @@ import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
- * The stage horns are positioned back and to the left. There are 12 of them for each note in the octave. Stage horns
- * are bouncy.
+ * The Stage Horns.
  *
- * @see BouncyTwelfth
+ * Stage Horns animate no more special than any other [WrappedOctaveSustained] instrument.
  */
 class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageHornsType) :
     WrappedOctaveSustained(context, eventList, false) {
@@ -45,7 +44,9 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     }
 
     /**
-     * A single horn.
+     * A single Stage Horn.
+     *
+     * It animates no more special than any other [BouncyTwelfth].
      */
     inner class StageHornNote(type: StageHornsType) : BouncyTwelfth() {
         init {
@@ -53,27 +54,23 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
     }
 
-    enum class StageHornsType(val texture: String) {
-        /**
-         * Brass section stage horns type.
-         */
+    /** A type of Stage Horn. */
+    enum class StageHornsType(
+        /** The texture file of this Stage Horn type. */
+        val texture: String
+    ) {
+        /** Brass section stage horns type. */
         BRASS_SECTION("HornSkin.bmp"),
 
-        /**
-         * Synth brass 1 stage horns type.
-         */
+        /** Synth brass 1 stage horns type. */
         SYNTH_BRASS_1("HornSkinGrey.bmp"),
 
-        /**
-         * Synth brass 2 stage horns type.
-         */
-        SYNTH_BRASS_2("HornSkinCopper.png");
+        /** Synth brass 2 stage horns type. */
+        SYNTH_BRASS_2("HornSkinCopper.png")
     }
 
     companion object {
-        /**
-         * The base position of a horn.
-         */
+        /** The base position of a Stage Horn. */
         private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
     }
 

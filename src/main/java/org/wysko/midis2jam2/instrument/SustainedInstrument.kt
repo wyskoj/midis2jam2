@@ -16,20 +16,16 @@
  */
 package org.wysko.midis2jam2.instrument
 
-import com.jme3.scene.Spatial.CullHint.Always
-import com.jme3.scene.Spatial.CullHint.Dynamic
-import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
-import kotlin.math.abs
 
 /**
- * A sustained instrument is any instrument that also depends on knowing the [MidiNoteOffEvent] for proper
- * animation. Examples include: saxophone, piano, guitar, telephone ring.
+ * Any instrument that also depends on knowing the [MidiNoteOffEvent] for proper animation. Examples include:
+ * saxophone, piano, guitar, telephone ring.
  */
 abstract class SustainedInstrument protected constructor(
     context: Midis2jam2,
@@ -53,6 +49,9 @@ abstract class SustainedInstrument protected constructor(
      */
     protected var notePeriods: MutableList<NotePeriod>
 
+    /** The last elapsed [NotePeriod]. Used for visibility calculation. */
+    protected var lastPlayedNotePeriod: NotePeriod? = null
+
     /**
      * Determines which note periods should have starting animations at the specified time. Removes the returned
      * elements from [.notePeriods]. The method also removes elapsed note periods. All results are stored in
@@ -62,72 +61,57 @@ abstract class SustainedInstrument protected constructor(
      * @see currentNotePeriods
      */
     protected open fun calculateCurrentNotePeriods(time: Double) {
+        /* Look at the first note period in the list. If its starting time is less than or equal to the current time,
+         * it's time to start animating it. */
         while (notePeriods.isNotEmpty() && notePeriods[0].startTime <= time) {
             currentNotePeriods.add(notePeriods.removeAt(0))
         }
-        currentNotePeriods.removeIf { notePeriod: NotePeriod -> notePeriod.endTime <= time }
+
+        /* Remove all the note periods that have elapsed. */
+        val takeWhile = currentNotePeriods.takeWhile { it.endTime <= time }
+        currentNotePeriods.removeAll(takeWhile);
+
+        /* Set the last played note period for visibility calculation. */
+        takeWhile.lastOrNull()?.let {
+            lastPlayedNotePeriod = it
+        }
     }
 
     override fun tick(time: Double, delta: Float) {
         calculateCurrentNotePeriods(time)
-        setIdleVisibilityByPeriods(time)
+        setVisibility(time)
         moveForMultiChannel(delta)
     }
 
-    /**
-     * Determines whether this instrument should be visible at the time, and sets the visibility accordingly.
-     *
-     *
-     * The instrument should be visible if:
-     *
-     *  * There is at least 1 second between now and the start of any note period,
-     *  * There is at least 4 seconds between now and the end of any note period, or
-     *  * Any note period is currently playing
-     *
-     * @param time the current time
-     */
-    protected fun setIdleVisibilityByPeriods(time: Double) {
-        isVisible = calcVisibility(time, unmodifiableNotePeriods)
-        instrumentNode.cullHint = if (isVisible) Dynamic else Always
-    }
+    /** Calculates the current visibility by the current [time]. True if the instrument is visible, false otherwise. */
+    override fun calcVisibility(time: Double): Boolean {
+        /* Currently playing? Visible. */
+        if (currentNotePeriods.isNotEmpty()) return true
 
-    companion object {
-        /**
-         * Filters a list of MIDI channel specific events and returns only the [MidiNoteEvent]s.
-         *
-         * @param events the event list
-         * @return only the MidiNoteEvents
-         * @see MidiNoteEvent
-         */
-        @Contract(pure = true)
-        fun scrapeMidiNoteEvents(events: Collection<MidiChannelSpecificEvent>): List<MidiNoteEvent> =
-            events.filterIsInstance<MidiNoteEvent>()
+        /* Within one second of playing? Visible. */
+        if (notePeriods.isNotEmpty() && notePeriods[0].startTime - time <= 1) return true
 
-        /**
-         * Calculate the current visibility.
-         *
-         * @param time                    the time
-         * @param unmodifiableNotePeriods the unmodifiable note periods
-         * @return true if this instrument should be visible, false otherwise
-         */
-        fun calcVisibility(time: Double, unmodifiableNotePeriods: Iterable<NotePeriod>): Boolean {
-            var show = false
-            for (notePeriod in unmodifiableNotePeriods) {
-                // Within 1 second of a note on,
-                // within 4 seconds of a note off,
-                // or during a note, be visible
-                if (notePeriod.isPlayingAt(time) || abs(time - notePeriod.startTime) < START_BUFFER || abs(time - notePeriod.endTime) < END_BUFFER && time > notePeriod.endTime) {
-                    show = true
-                    break
-                }
-            }
-            return show
-        }
+        /* If within a 7-second gap between the last note and the next? Visible. */
+        if (lastPlayedNotePeriod != null
+            && notePeriods.isNotEmpty()
+            && notePeriods[0].startTime - lastPlayedNotePeriod!!.endTime <= 7
+        ) return true
+
+        /* If after 2 seconds of the last note period? Visible. */
+        if (lastPlayedNotePeriod != null && time - lastPlayedNotePeriod!!.endTime <= 2) return true
+
+        /* Invisible. */
+        return false
     }
 
     init {
-        val midiNoteEvents = scrapeMidiNoteEvents(eventList)
+        val midiNoteEvents = eventList.filterIsInstance<MidiNoteEvent>()
         notePeriods = calculateNotePeriods(this, midiNoteEvents as MutableList<MidiNoteEvent>)
+
+        /* In theory, the note periods should already be sorted due to the nature of how MIDI data is structured, but in
+         * case during the conversion process they become unsorted, we sort as a safe measure. */
+        notePeriods.sortBy { it.startTime }
+
         unmodifiableNotePeriods = ArrayList(notePeriods)
     }
 }

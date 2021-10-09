@@ -18,7 +18,10 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
+import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -26,11 +29,19 @@ import org.wysko.midis2jam2.util.Utils.rad
 /**
  * The toms.
  */
-class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch) : StickDrum(context, hits) {
+class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch) :
+    SingleStickInstrument(context, hits), Retexturable {
+
+    var drum: Spatial
 
     override fun tick(time: Double, delta: Float) {
-        drumRecoil(time, delta)
-        handleStick(time, delta, hits)
+        val handleStick = handleStick(time, delta, hits)
+        recoilDrum(
+            drum,
+            handleStick.justStruck(),
+            if (handleStick.justStruck()) (handleStick.strike ?: return).velocity else 0,
+            delta
+        )
     }
 
     /**
@@ -113,4 +124,7 @@ class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPit
         }
         stick.localRotation = Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f)
     }
+
+    override fun drum(): Spatial = drum
+    override fun retextureType(): RetextureType = RetextureType.OTHER
 }

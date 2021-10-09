@@ -28,7 +28,9 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
 /**
- * The tuba. Has four keys and animates just like other [MonophonicInstrument]s.
+ * The Tuba.
+ *
+ * It has four keys and animates just like other [MonophonicInstrument]s.
  */
 class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TubaClone::class.java, FINGERING_MANAGER) {
@@ -37,9 +39,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         offsetNode.setLocalTranslation(0f, 40 * indexForMoving(delta), 0f)
     }
 
-    /**
-     * A single tuba.
-     */
+    /** A single Tuba. */
     inner class TubaClone : AnimatedKeyCloneByIntegers(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {
 
         override fun moveForPolyphony() {
@@ -84,6 +84,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     companion object {
+        /** The Tuba fingering manager. */
         val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Tuba::class.java)
     }
 

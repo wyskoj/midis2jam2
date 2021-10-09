@@ -24,19 +24,25 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import java.lang.reflect.Constructor
 
 /**
- * A monophonic instrument is any instrument that can only play one note at a time (e.g., saxophones, clarinets,
- * ocarinas, etc.). Because this limitation is lifted in MIDI files, midis2jam2 needs to visualize polyphony by spawning
- * "clones" of an instrument. These clones will only appear when necessary.
+ * Any instrument that can only play one note at a time (e.g., saxophones, clarinets, ocarinas, etc.).
+ *
+ * Because this physical limitation is lifted in MIDI files by nature, midis2jam2 needs to visualize polyphony by
+ * spawning "clones" of an instrument. These clones will only appear when necessary.
+ *
+ * Classes that extend this will also need to specify a [Clone] class. Instantiations of this class are used to
+ * represent the degree of polyphony.
  *
  * It happens to be that every monophonic instrument is also a [SustainedInstrument].
  *
  * @see Clone
  */
 abstract class MonophonicInstrument protected constructor(
+    /** Context to the main class. */
     context: Midis2jam2,
+    /** The list of events this instrument should play. */
     eventList: List<MidiChannelSpecificEvent>,
+    /** The class that this instrument uses to represent polyphony. */
     cloneClass: Class<out Clone>,
-
     /** The fingering manager. */
     val manager: FingeringManager<*>?
 ) : SustainedInstrument(context, eventList) {
@@ -61,6 +67,7 @@ abstract class MonophonicInstrument protected constructor(
         instrument: MonophonicInstrument,
         cloneClass: Class<out Clone?>
     ): List<Clone> {
+        // TODO refactor to be more pretty and understandable, and not O(n^2) (!!)
         val calcClones: MutableList<Clone> = ArrayList()
         val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
         calcClones.add(constructor.newInstance(instrument) as Clone)

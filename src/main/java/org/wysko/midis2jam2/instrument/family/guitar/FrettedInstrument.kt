@@ -18,14 +18,15 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
+import com.jme3.scene.Spatial.CullHint.Always
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import kotlin.math.abs
-import kotlin.math.floor
 
 /**
  * Any instrument that has strings that can be pushed down to change the pitch (e.g., guitar, bass guitar, violin,
@@ -33,40 +34,40 @@ import kotlin.math.floor
  */
 abstract class FrettedInstrument protected constructor(
     context: Midis2jam2,
-    /**
-     * The fretting engine used for this fretted instrument.
-     */
+
+    /** The fretting engine used for this fretted instrument. */
     private val frettingEngine: FrettingEngine,
+
     events: List<MidiChannelSpecificEvent>,
-    /**
-     * The positioning parameters of this fretted instrument.
-     */
+
+    /** The positioning parameters of this fretted instrument. */
     protected val positioning: FrettedInstrumentPositioning,
-    /**
-     * The number of strings on this instrument.
-     */
+
+    /** The number of strings on this instrument. */
     private val numberOfStrings: Int,
+
+    /** The geometry of the body of the instrument. */
     instrumentBody: Spatial
 ) : SustainedInstrument(context, events) {
-    /**
-     * Each of the idle, upper strings.
-     */
+
+    /** Each of the idle, upper strings. */
     protected lateinit var upperStrings: Array<Spatial>
 
-    /**
-     * Each of the animated, lower strings, by animation frame.
-     */
+    /** Each of the animated, lower strings by animation frame. */
     protected lateinit var lowerStrings: Array<Array<Spatial>>
 
-    /**
-     * The yellow dot note fingers.
-     */
+    /** The yellow dot note fingers. */
     protected lateinit var noteFingers: Array<Spatial>
 
-    /**
-     * Which frame of animation for the animated string to use.
-     */
-    protected var frame = 0.0
+    /** Which frame of animation for the animated string to use. */
+    protected var frame: Double = 0.0
+
+    /** Handles the animation of vibrating strings. */
+    private val animators: Array<VibratingStringAnimator> by lazy {
+        Array(numberOfStrings) {
+            VibratingStringAnimator(*lowerStrings[it])
+        }
+    }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -75,44 +76,46 @@ abstract class FrettedInstrument protected constructor(
 
     /** Returns the height from the top to the bottom of the strings. */
     @Contract(pure = true)
-    private fun stringHeight(): Float {
-        return positioning.upperY - positioning.lowerY
-    }
+    private fun stringHeight(): Float = positioning.upperY - positioning.lowerY
+
 
     /** Performs a lookup and finds the vertical ratio of the [fret] position. */
     @Contract(pure = true)
-    protected fun fretToDistance(fret: Int): Float {
-        return positioning.fretHeights.calculateScale(fret)
-    }
+    protected fun fretToDistance(fret: Int): Float = positioning.fretHeights.calculateScale(fret)
 
     /**
-     * Animates a string on a given fret.
+     * Animates a [string] on a given [fret].
      *
-     * @param string the string to animate
-     * @param fret   the fret on this string to animate
+     * If [fret]` == -1`, this is equivalent to having no note play on the [string]. Otherwise, the upper and lower
+     * strings are scaled by [fretToDistance] for the accurate location of the fret. At this location, a note finger
+     * (the small, yellow dot that appears on the fret) is placed.
+     *
+     *
      */
-    private fun animateString(string: Int, fret: Int) {
+    private fun animateString(string: Int, fret: Int, delta: Float) {
+
+        /* If fret is -1, stop animating anything on this string and hide all animation components. */
         if (fret == -1) {
-            // Just hide everything
+            /* Reset scale, hide lower strings, hide note finger */
             upperStrings[string].localScale = positioning.restingStrings[string]
-            for (anim in lowerStrings[string]) {
-                anim.cullHint = Spatial.CullHint.Always
-            }
-            noteFingers[string].cullHint = Spatial.CullHint.Always
+            lowerStrings[string].forEach { it.cullHint = Always }
+            noteFingers[string].cullHint = Always
             return
         }
+
+        /* The fret distance is the ratio of the scales of the upper and lower strings. For example, if the note
+         * finger lands halfway in between the top and the bottom of the strings, this should be 0.5. */
         val fretDistance = fretToDistance(fret)
+
+        /* Scale the resting string's Y-axis by the fret distance */
         val localScale = Vector3f(positioning.restingStrings[string])
         localScale.setY(fretDistance)
         upperStrings[string].localScale = localScale
-        for (i in 0..4) {
-            frame %= 5
-            if (i.toDouble() == floor(frame)) {
-                lowerStrings[string][i].cullHint = Spatial.CullHint.Dynamic
-            } else {
-                lowerStrings[string][i].cullHint = Spatial.CullHint.Always
-            }
-            lowerStrings[string][i].localScale = Vector3f(positioning.restingStrings[string]).setY(1 - fretDistance)
+
+        animators[string].tick(delta)
+        /* Scale each frame of animation to the inverse of the fret distance */
+        lowerStrings[string].forEach {
+            it.localScale = Vector3f(positioning.restingStrings[string]).setY(1 - fretDistance)
         }
 
         // Show the fret finger on the right spot (if not an open string)
@@ -137,7 +140,7 @@ abstract class FrettedInstrument protected constructor(
             }
             noteFingers[string].localTranslation = fingerPosition
         } else {
-            noteFingers[string].cullHint = Spatial.CullHint.Always
+            noteFingers[string].cullHint = Always
         }
     }
 
@@ -150,8 +153,9 @@ abstract class FrettedInstrument protected constructor(
             val next = r.next()
             if (abs(next.endTime - time) < 0.02 || time > next.endTime) {
                 r.remove()
+                lastPlayedNotePeriod = next
                 val next1 = next as NotePeriodWithFretboardPosition
-                val string = next1.position!!.string
+                val string = (next1.position ?: return).string
                 if (string != -1) {
                     frettingEngine.releaseString(string)
                 }
@@ -197,7 +201,7 @@ abstract class FrettedInstrument protected constructor(
 
         /* Animate strings */
         for (i in 0 until numberOfStrings) {
-            animateString(i, frettingEngine.frets[i])
+            animateString(i, frettingEngine.frets[i], delta)
         }
         val inc = (delta / (1 / 60f)).toDouble()
         frame += inc

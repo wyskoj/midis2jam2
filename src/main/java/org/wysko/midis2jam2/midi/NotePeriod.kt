@@ -67,6 +67,10 @@ open class NotePeriod(
         return time in startTime..endTime
     }
 
+    override fun toString(): String {
+        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, noteOff=$noteOff, animationStarted=$animationStarted)"
+    }
+
     companion object {
         /**
          * A MIDI file is a sequence of [MidiNoteOnEvent]s and [MidiNoteOffEvent]s. This method searches the
@@ -117,5 +121,6 @@ open class NotePeriod(
             return ArrayList(notePeriods.distinct())
         }
     }
+
 
 }

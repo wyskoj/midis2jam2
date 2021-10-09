@@ -171,7 +171,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	@TestOnly
 	@SuppressWarnings("unused")
-	private static void showAll(Node rootNode) {
+	static void showAll(Node rootNode) {
 		for (Spatial child : rootNode.getChildren()) {
 			child.setCullHint(Dynamic);
 			if (child instanceof Node) {
@@ -505,11 +505,10 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 *
 	 * @param channelEvents the list of all events in this channel
 	 * @param programEvents the list of all program events in this channel
-	 * @throws ReflectiveOperationException if there was an error creating instruments
 	 */
+	@SuppressWarnings("java:NoSonar")
 	private void assignChannelEventsToInstruments(ArrayList<MidiChannelSpecificEvent> channelEvents,
-	                                              List<MidiProgramEvent> programEvents)
-			throws ReflectiveOperationException {
+	                                              List<MidiProgramEvent> programEvents) {
 		
 		/* If there is only one program event, just assign all events to that */
 		if (programEvents.size() == 1) {
@@ -557,7 +556,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		}
 		
 		/* Create instruments from each program and list */
-		for (Map.Entry<Integer, List<MidiChannelSpecificEvent>> integerListEntry : lastProgramForNote.entrySet()) {
+		for (Map.Entry<Integer, List<MidiChannelSpecificEvent>> integerListEntry : lastProgramForNote.entrySet()) { // NOSONAR
 			instruments.add(fromEvents(integerListEntry.getKey(), integerListEntry.getValue()));
 		}
 	}
@@ -619,6 +618,8 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 					case "cam6":
 						currentCamera = Camera.CAMERA_6;
 						break;
+					default:
+						// Do nothing
 				}
 				setCamera(Camera.valueOf(currentCamera.name()));
 			} catch (IllegalArgumentException e) {
@@ -637,7 +638,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		debugText = new BitmapText(bitmapFont, false);
 		getDebugText().setSize(bitmapFont.getCharSet().getRenderedSize());
 		getDebugText().setText("");
-		getDebugText().setLocalTranslation(300, getDebugText().getLineHeight(), 0);
+		getDebugText().setLocalTranslation(300, getDebugText().getLineHeight() + 500, 0);
 		this.app.getGuiNode().attachChild(getDebugText());
 	}
 	
@@ -713,7 +714,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	@SuppressWarnings("java:S5194")
 	public Spatial loadModel(String m, String t, MatType type, float brightness) {
-		Material material = type == MatType.UNSHADED ? unshadedMaterial(assetPrefix(t)) : reflectiveMaterial(assetPrefix(t), brightness);
+		Material material = type == MatType.UNSHADED ?
+				unshadedMaterial(assetPrefix(t)) :
+				reflectiveMaterial(assetPrefix(t), brightness);
 		Spatial model = getAssetManager().loadModel(assetPrefix(m));
 		model.setMaterial(material);
 		return model;
@@ -751,8 +754,14 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 * @return the reflective material
 	 */
 	public Material unshadedMaterial(String texture) {
+		String goodTexture;
+		if (!texture.startsWith("Assets/")) {
+			goodTexture = "Assets/" + texture;
+		} else {
+			goodTexture = texture;
+		}
 		Material material = new Material(getAssetManager(), UNSHADED_MAT);
-		material.setTexture(COLOR_MAP, getAssetManager().loadTexture(texture));
+		material.setTexture(COLOR_MAP, getAssetManager().loadTexture(goodTexture));
 		return material;
 	}
 	
@@ -768,6 +777,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		this.app.getFlyByCamera().setZoomSpeed(-10);
 		this.app.getFlyByCamera().setEnabled(true);
 		this.app.getFlyByCamera().setDragToRotate(true);
+		this.app.getCamera().setFov(55);
 		
 		setupInputMappings();
 		setCamera(Camera.CAMERA_1A);
@@ -792,6 +802,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 				(int) instruments.stream().filter(BassGuitar.class::isInstance).count());
 		
 		standController = new StandController(this);
+		
 	}
 	
 	@Override

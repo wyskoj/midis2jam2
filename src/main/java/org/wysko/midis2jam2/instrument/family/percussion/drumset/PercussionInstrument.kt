@@ -21,15 +21,15 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.jetbrains.annotations.Range
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /** Anything on the percussion channel. This excludes melodic agogos, woodblocks, etc. */
 abstract class PercussionInstrument protected constructor(
     context: Midis2jam2,
     /** The hits of this instrument. */
-    val hits: MutableList<MidiNoteOnEvent>
-) : Instrument(context) {
+    override val hits: MutableList<MidiNoteOnEvent>
+) : DecayedInstrument(context, hits) {
 
     /** The High level node. */
     val highLevelNode: Node = Node()
@@ -44,6 +44,11 @@ abstract class PercussionInstrument protected constructor(
     companion object {
         /** The unitless rate at which an instrument recoils. */
         const val DRUM_RECOIL_COMEBACK: Float = 22f
+
+        /**
+         * How far the drum should travel when hit.
+         */
+        private const val RECOIL_DISTANCE: Float = -2f
 
         /**
          * midis2jam2 displays velocity ramping in recoiled instruments. Different functions may be used, but a sqrt
@@ -76,7 +81,7 @@ abstract class PercussionInstrument protected constructor(
             if (struck) {
                 drum.setLocalTranslation(
                     0f,
-                    (velocityRecoilDampening(velocity) * StickDrum.RECOIL_DISTANCE).toFloat(),
+                    (velocityRecoilDampening(velocity) * RECOIL_DISTANCE).toFloat(),
                     0f
                 )
             }

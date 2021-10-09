@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained.Twelf
  *
  * BouncyTwelfths animate by keeping track of how much time has elapsed since [play] is called, which is
  * passed the number of seconds the twelfth should fall for. This does mean that the rate at which the twelfth falls is
- * not proportional to the current tempo of the MIDI file, which is something I believe MIDIJam does.
+ * not proportional to the current tempo of the MIDI file.
  *
  * If a [play] is called before it is finished falling, the animation resets.
  */

@@ -21,6 +21,8 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue.collectOne
+import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
+import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -40,7 +42,8 @@ const val METAL_TEXTURE: String = "MetalTexture.bmp"
  * The animation has no future reference. That is, when a note is played, the animation starts immediately and takes
  * time to recoil.
  */
-class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
+class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits),
+    Retexturable {
 
     /**
      * The arm that swings to hit the bass drum.
@@ -100,10 +103,11 @@ class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percus
         private const val PEDAL_MAX_ANGLE = 20
     }
 
+    private val drum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp")
+
     init {
         /* Load bass drum */
-        val drumModel = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp")
-        drumNode.attachChild(drumModel)
+        drumNode.attachChild(drum)
 
         /* Load beater arm */
         beaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", METAL_TEXTURE)
@@ -145,4 +149,7 @@ class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percus
         beaterNode.setLocalTranslation(0f, 0f, 1.5f)
         highLevelNode.setLocalTranslation(0f, 0f, -80f)
     }
+
+    override fun drum(): Spatial = drum
+    override fun retextureType(): RetextureType = RetextureType.OTHER
 }

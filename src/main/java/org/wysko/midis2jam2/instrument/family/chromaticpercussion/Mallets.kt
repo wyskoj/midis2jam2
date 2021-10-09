@@ -32,20 +32,14 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.ShadowController.Companion.shadow
 
-/**
- * Any one of vibraphone, glockenspiel, marimba, or xylophone.
- */
+/** Any one of vibraphone, glockenspiel, marimba, or xylophone. */
 class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, private val type: MalletType) :
     DecayedInstrument(context, eventList) {
 
-    /**
-     * List of lists, where each list contains the strikes corresponding to that bar's MIDI note.
-     */
+    /** List of lists, where each list contains the strikes corresponding to that bar's MIDI note. */
     private val barStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(MALLET_BAR_COUNT) { ArrayList() }
 
-    /**
-     * Each bar of the instrument. There are [MALLET_BAR_COUNT] bars.
-     */
+    /** Each bar of the instrument. There are [MALLET_BAR_COUNT] bars. */
     private var bars: Array<MalletBar>
 
     override fun tick(time: Double, delta: Float) {
@@ -60,7 +54,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
             val stickStatus = Stick.handleStick(
                 context, bar.malletNode, time, delta,
                 barStrikes[index],
-                Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+                Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X, false
             )
 
             /* Recoil if just struck */
@@ -79,75 +73,47 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-18.0) * i1, 0f)
     }
 
-    /**
-     * The type of mallets.
-     */
+    /** The type of mallets. */
     enum class MalletType(internal val textureFile: String) {
 
-        /**
-         * The vibraphone.
-         */
+        /** The vibraphone. */
         VIBES("VibesBar.bmp"),
 
-        /**
-         * The marimba.
-         */
+        /** The marimba. */
         MARIMBA("MarimbaBar.bmp"),
 
-        /**
-         * The glockenspiel.
-         */
+        /** The glockenspiel. */
         GLOCKENSPIEL("GlockenspielBar.bmp"),
 
-        /**
-         * The xylophone.
-         */
+        /** The xylophone. */
         XYLOPHONE("XylophoneBar.bmp");
     }
 
-    /**
-     * A single bar out of the 88 for the mallets.
-     */
+    /** A single bar out of the 88 for the mallets. */
     inner class MalletBar(midiNote: Int, startPos: Int) {
 
-        /**
-         * The model in the up position.
-         */
+        /** The model in the up position. */
         private var upBar: Spatial
 
-        /**
-         * The model in the down position.
-         */
+        /** The model in the down position. */
         private var downBar: Spatial
 
-        /**
-         * Contains the entire note geometry.
-         */
+        /** Contains the entire note geometry. */
         val noteNode: Node = Node()
 
-        /**
-         * Contains the mallet.
-         */
+        /** Contains the mallet. */
         val malletNode: Node = Node()
 
-        /**
-         * The small, circular shadow that appears as the mallet is striking.
-         */
+        /** The small, circular shadow that appears as the mallet is striking. */
         val shadow: Spatial
 
-        /**
-         * True if the bar is recoiling, false otherwise.
-         */
+        /** True if the bar is recoiling, false otherwise. */
         private var barIsRecoiling = false
 
-        /**
-         * True if the bar should begin recoiling.
-         */
+        /** True if the bar should begin recoiling. */
         private var recoilNow = false
 
-        /**
-         * Begins recoiling the bar.
-         */
+        /** Begins recoiling the bar. */
         fun recoilBar() {
             barIsRecoiling = true
             recoilNow = true
@@ -240,24 +206,16 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     }
 
     companion object {
-        /**
-         * The mallet case is scaled by this value to appear correct.
-         */
+        /** The mallet case is scaled by this value to appear correct. */
         const val MALLET_CASE_SCALE: Float = 0.667f
 
-        /**
-         * The number of bars on the mallets instrument.
-         */
+        /** The number of bars on the mallets instrument. */
         private const val MALLET_BAR_COUNT = 88
 
-        /**
-         * The lowest note mallets can play.
-         */
+        /** The lowest note mallets can play. */
         private const val RANGE_LOW = 21
 
-        /**
-         * The highest note mallets can play.
-         */
+        /** The highest note mallets can play. */
         private const val RANGE_HIGH = 108
     }
 

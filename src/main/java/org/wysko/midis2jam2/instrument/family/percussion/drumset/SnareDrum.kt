@@ -20,6 +20,8 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
+import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.Midi
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
@@ -29,7 +31,8 @@ import org.wysko.midis2jam2.world.Axis
 /**
  * The Snare drum.
  */
-class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits) {
+class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits),
+    Retexturable {
 
     /**
      * The list of hits for regular notes.
@@ -76,20 +79,20 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percu
         var regVel = 0
         var sideVel = 0
         if (regularStickStatus.justStruck()) {
-            assert(regularStickStatus.strike != null)
-            regVel = regularStickStatus.strike!!.velocity
+            regVel = (regularStickStatus.strike ?: return).velocity
         }
         if (sideStickStatus.justStruck()) {
-            assert(sideStickStatus.strike != null)
-            sideVel = (sideStickStatus.strike!!.velocity * 0.5).toInt()
+            sideVel = ((sideStickStatus.strike ?: return).velocity * 0.5).toInt()
         }
         val velocity = regVel.coerceAtLeast(sideVel)
         recoilDrum(recoilNode, velocity != 0, velocity, delta)
     }
 
-    init {
+    /** The geometry of the snare drum. */
+    val drum: Spatial = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp")
 
-        context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp").apply { recoilNode.attachChild(this) }
+    init {
+        drum.apply { recoilNode.attachChild(this) }
         regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
 
         val sideStick = regularStick.clone().apply {
@@ -123,4 +126,7 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percu
 
         sideStickNode.setLocalTranslation(-1f, 0.4f, 6f)
     }
+
+    override fun drum(): Spatial = drum
+    override fun retextureType(): RetextureType = RetextureType.SNARE
 }

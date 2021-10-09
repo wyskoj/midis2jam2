@@ -2,6 +2,10 @@
 
 = Adding new instruments
 
+_Note: this document was written when the program was being developed in Java.
+While the content of the document is still accurate, it does not have examples in Kotlin.
+Kotlin equivalents of the Java code presented are to be used._
+
 Here is an overview of how to add a new instrument to midis2jam2.
 
 == Overview of instruments
@@ -16,13 +20,13 @@ I've already provided an implementation of automatically setting this variable�
 
 There are three primary main subclasses of `Instrument`.
 
-* link:{sourcedir}/instrument/SustainedInstrument.java[`SustainedInstrument`]
+* link:{sourcedir}/instrument/SustainedInstrument.kt[`SustainedInstrument`]
 ** Any instrument that depends on knowing the `MidiNoteOffEvent` for each note.
 * link:{sourcedir}/instrument/DecayedInstrument.kt[`DecayedInstrument`]
 ** Any instrument that solely animates on just the `MidiNoteOnEvent`.
-* link:{sourcedir}/instrument/family/percussion/drumset/PercussionInstrument.java[`PercussionInstrument`]
+* link:{sourcedir}/instrument/family/percussion/drumset/PercussionInstrument.kt[`PercussionInstrument`]
 ** Any instrument that is on the percussion channel.
-Instruments that are not a part of the core drum set (kick drum, snare drum, hi-hat, cymbals) are of type link:{sourcedir}/instrument/family/percussion/drumset/NonDrumSetPercussion.java[`NonDrumSetPercussion`].
+Instruments that are not a part of the core drum set (kick drum, snare drum, hi-hat, cymbals) are of type link:{sourcedir}/instrument/family/percussion/drumset/NonDrumSetPercussion.kt[`NonDrumSetPercussion`].
 Note: at this time, midis2jam2 cannot differentiate between percussion kits.
 Therefore, only the standard kit instruments are recognized.
 
@@ -326,7 +330,7 @@ public void tick(double time, float delta) {
 We begin by calling super.
 This is important because the superclass(es) are handling visibility of the instrument.
 Then, we animate `leftMaraca`.
-We do this by calling `Stick.handleStick` from link:{sourcedir}/instrument/family/percussive/Stick.java[`Stick`].
+We do this by calling `Stick.handleStick` from link:{sourcedir}/instrument/family/percussive/Stick.kt[`Stick`].
 This method is your one-stop shop for animating any sort of stick striking something, or anything else that has a remotely similar animation.
 Use this method whenever possible for animating things that strike.
 
@@ -341,7 +345,7 @@ We simply set the rotation of `rightMaraca` to be the same as `leftMaraca`.
 
 ==== `AltoSax`
 
-The `AltoSax` and other `link:{sourcedir}/instrument/family/reed/sax/AltoSax.java[MonophonicInstrument]`​s require special code for handling polyphony.
+The `AltoSax` and other `link:{sourcedir}/instrument/family/reed/sax/AltoSax.kt[MonophonicInstrument]`​s require special code for handling polyphony.
 Because the instrument is inherently monophonic (you can only play one note at a time), representing the degrees of polyphony can only be done by temporarily spawning "clones" of the saxophone.
 `MonophonicInstrument` defines an algorithm for assigning notes to clones (`calculateClones`).
 Classes that extend this and call super in the constructor will have clones calculated.

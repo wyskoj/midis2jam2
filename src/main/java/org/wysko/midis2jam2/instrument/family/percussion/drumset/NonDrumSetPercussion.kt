@@ -16,8 +16,6 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
-import com.jme3.scene.Spatial.CullHint.Always
-import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
@@ -29,26 +27,23 @@ open class NonDrumSetPercussion protected constructor(
     hits: MutableList<MidiNoteOnEvent>
 ) : PercussionInstrument(context, hits) {
 
-    /** The unmodifiable list of hits. */
-    private val finalHits: List<MidiNoteOnEvent>
+    override fun calcVisibility(time: Double): Boolean {
+        /* Within 0.5 seconds of a hit? Visible. */
+        if (hitsV.isNotEmpty() &&
+            context.file.eventInSeconds(hitsV[0]) - time <= 0.5
+        )
+            return true
 
-    override fun tick(time: Double, delta: Float) {
-        instrumentNode.cullHint = if (calculateVisibility(time)) Dynamic else Always
-    }
+        /* If within a 4-second gap between the last hit and the next? Visible. */
+        if (lastHit != null
+            && hitsV.isNotEmpty()
+            && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit) <= 4
+        ) return true
 
-    /** Returns true if this instrument should be visible at the given time, false otherwise. */
-    private fun calculateVisibility(time: Double): Boolean {
-        for ((time1) in finalHits) {
-            val leftMarginTime = context.file.midiTickInSeconds(time1 - context.file.division)
-            val rightMarginTime = context.file.midiTickInSeconds(time1 + context.file.division / 2)
-            if (time in leftMarginTime..rightMarginTime) {
-                return true
-            }
-        }
+        /* If after 0.5 seconds of the last hit? Visible. */
+        if (lastHit != null && time - context.file.eventInSeconds(lastHit) <= 0.5) return true
+
+        /* Invisible. */
         return false
-    }
-
-    init {
-        finalHits = ArrayList(hits)
     }
 }
