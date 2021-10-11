@@ -33,6 +33,6 @@ protected constructor(
     manager: HandPositionFingeringManager
 ) : MonophonicInstrument(context, eventList, clazz, manager) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
     }
 }

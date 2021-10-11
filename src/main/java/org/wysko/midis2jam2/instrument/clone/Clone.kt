@@ -53,7 +53,7 @@ abstract class Clone protected constructor(
     val modelNode: Node = Node()
 
     /** The note periods for which this clone should be responsible for animating. */
-    val notePeriods: MutableList<NotePeriod>
+    val notePeriods: MutableList<NotePeriod> = ArrayList()
 
     /** Used for moving with [indexForMoving]. */
     val offsetNode: Node = Node()
@@ -66,6 +66,9 @@ abstract class Clone protected constructor(
 
     /** The current note period that is being handled. */
     var currentNotePeriod: NotePeriod? = null
+
+    /** The last played note period for visibility calculation. */
+    var lastNotePeriod: NotePeriod? = null
 
     /**
      * Keeps track of whether this clone is currently visible. The 0-clone (the clone at index 0) is always
@@ -86,6 +89,19 @@ abstract class Clone protected constructor(
     val isPlaying: Boolean
         get() = currentNotePeriod != null
 
+    private fun calcVisibility(): Boolean {
+        if (currentNotePeriod != null) return true
+
+        lastNotePeriod?.let {
+            if (notePeriods.isNotEmpty()
+                && notePeriods.first().startTick() - it.endTick() <= parent.context.file.division * 2
+            ) {
+                return true
+            }
+        }
+        return false
+    }
+
     /** Hides or shows this clone, given the [index][indexThis]. */
     private fun hideOrShowOnPolyphony(indexThis: Int) {
         /* If this is the 0-clone, always show. */
@@ -99,8 +115,8 @@ abstract class Clone protected constructor(
                 highestLevel.cullHint = Always
             }
             /* A further check if currently playing, show, hide otherwise. */
-            highestLevel.cullHint = Utils.cullHint(isPlaying)
-            isVisible = isPlaying
+            highestLevel.cullHint = Utils.cullHint(calcVisibility())
+            isVisible = calcVisibility()
         }
     }
 
@@ -112,6 +128,7 @@ abstract class Clone protected constructor(
         /* Clear the note period if it is elapsed */
         currentNotePeriod?.let {
             if (it.endTime <= time) {
+                lastNotePeriod = currentNotePeriod
                 currentNotePeriod = null
             }
         }
@@ -144,6 +161,5 @@ abstract class Clone protected constructor(
         highestLevel.attachChild(animNode)
         offsetNode.attachChild(highestLevel)
         parent.groupOfPolyphony.attachChild(offsetNode)
-        notePeriods = ArrayList()
     }
 }

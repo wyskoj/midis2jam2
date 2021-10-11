@@ -32,6 +32,6 @@ protected constructor(
     fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 40 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 40 * updateInstrumentIndex(delta), 0f)
     }
 }

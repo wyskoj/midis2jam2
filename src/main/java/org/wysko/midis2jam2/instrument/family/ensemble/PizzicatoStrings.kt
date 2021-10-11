@@ -55,7 +55,8 @@ class PizzicatoStrings(
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localRotation = Quaternion().fromAngles(0f, rad((45f + 12 * indexForMoving(delta)).toDouble()), 0f)
+        offsetNode.localRotation =
+            Quaternion().fromAngles(0f, rad((45f + 12 * updateInstrumentIndex(delta)).toDouble()), 0f)
     }
 
     /**

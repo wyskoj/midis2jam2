@@ -33,7 +33,7 @@ class Violin(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Stri
     context.loadModel("Violin.obj", "ViolinSkin.bmp")
 ) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(20f * indexForMoving(delta), 0f, 0f)
+        offsetNode.setLocalTranslation(20f * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     init {

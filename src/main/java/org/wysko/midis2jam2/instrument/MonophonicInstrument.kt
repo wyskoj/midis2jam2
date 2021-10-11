@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.NotePeriod
 import java.lang.reflect.Constructor
 
 /**
@@ -53,6 +54,7 @@ abstract class MonophonicInstrument protected constructor(
     /** The list of clones this monophonic instrument needs to effectively display all notes. */
     val clones: List<Clone>
 
+
     /**
      * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
      * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
@@ -67,41 +69,37 @@ abstract class MonophonicInstrument protected constructor(
         instrument: MonophonicInstrument,
         cloneClass: Class<out Clone?>
     ): List<Clone> {
-        // TODO refactor to be more pretty and understandable, and not O(n^2) (!!)
         val calcClones: MutableList<Clone> = ArrayList()
         val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
-        calcClones.add(constructor.newInstance(instrument) as Clone)
-        for (i in notePeriods.indices) {
-            for (j in notePeriods.indices) {
-                if (j == i && i != notePeriods.size - 1) continue
-                val comp1 = notePeriods[i]
-                val comp2 = notePeriods[j]
-                if (comp1.startTick() > comp2.endTick()) continue
-                if (comp1.endTick() < comp2.startTick()) {
-                    calcClones[0].notePeriods.add(comp1)
-                    break
-                }
-                /* Check if notes are overlapping */
-                if (comp1.startTick() >= comp2.startTick() && comp1.startTick() <= comp2.endTick()) {
-                    var added = false
-                    for (clone in calcClones) {
-                        if (!clone.isPlaying(comp1.startTick() + context.file.division / 4)) {
-                            clone.notePeriods.add(comp1)
-                            added = true
-                            break
-                        }
+        val listsOfNotes: MutableList<MutableList<NotePeriod>> = ArrayList()
+
+        notePeriods.forEach { np: NotePeriod ->
+            if (listsOfNotes.isEmpty()) {
+                /* If there are no clones initialized, create the first one and assign this NotePeriod to it. */
+                listsOfNotes.add(ArrayList<NotePeriod>().also { it.add(np) })
+            } else {
+                var added = false
+                for (list in listsOfNotes) {
+                    /* Iterate over each clone. If there is a free clone, assign it to that. */
+                    if (list.last().endTick() - (context.file.division / 8) <= np.startTick()) {
+                        list.add(np)
+                        added = true
+                        break
                     }
-                    if (!added) {
-                        val e = constructor.newInstance(instrument) as Clone
-                        e.notePeriods.add(comp1)
-                        calcClones.add(e)
-                    }
-                } else {
-                    calcClones[0].notePeriods.add(comp1)
                 }
-                break
+                if (!added) {
+                    /* If the note was not added, we need to create a new clone and assign it to that. */
+                    listsOfNotes.add(ArrayList<NotePeriod>().also { it.add(np) })
+                }
             }
         }
+
+        listsOfNotes.forEach {
+            val clone = constructor.newInstance(instrument) as Clone
+            clone.notePeriods.addAll(it)
+            calcClones.add(clone)
+        }
+
         return calcClones
     }
 

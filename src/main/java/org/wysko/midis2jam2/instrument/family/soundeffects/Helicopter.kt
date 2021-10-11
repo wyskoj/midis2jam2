@@ -148,7 +148,7 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(20 + 50 * indexForMoving(delta), 40f, -300f)
+        offsetNode.setLocalTranslation(20 + 50 * updateInstrumentIndex(delta), 40f, -300f)
     }
 
     companion object {

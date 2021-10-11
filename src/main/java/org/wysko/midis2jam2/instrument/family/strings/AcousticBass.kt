@@ -37,7 +37,7 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, 
         context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", MatType.UNSHADED, 0f)
     ) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(-25 * indexForMoving(delta), 0f, 0f)
+        offsetNode.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     /**

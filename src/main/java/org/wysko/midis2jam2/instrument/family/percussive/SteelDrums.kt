@@ -32,7 +32,7 @@ class SteelDrums(
 ) : OneDrumOctave(context, eventList) {
     override fun moveForMultiChannel(delta: Float) {
         highestLevel.localRotation =
-            Quaternion().fromAngles(0f, rad((-37f - 15 * indexForMoving(delta)).toDouble()), 0f)
+            Quaternion().fromAngles(0f, rad((-37f - 15 * updateInstrumentIndex(delta)).toDouble()), 0f)
     }
 
     init {

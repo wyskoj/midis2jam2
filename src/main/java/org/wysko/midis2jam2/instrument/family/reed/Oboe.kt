@@ -38,7 +38,7 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         FINGERING_MANAGER
     ) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 20 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
     /**

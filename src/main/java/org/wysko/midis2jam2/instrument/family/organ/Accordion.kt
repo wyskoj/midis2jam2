@@ -137,7 +137,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 30 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 30 * updateInstrumentIndex(delta), 0f)
     }
 
     /**

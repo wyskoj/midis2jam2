@@ -31,7 +31,7 @@ class MelodicTom(
 ) : OneDrumOctave(context, eventList) {
 
     override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + indexForMoving(delta) * -15), 0f)
+        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + updateInstrumentIndex(delta) * -15), 0f)
     }
 
     init {

@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.util.Utils.rad
 class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
 
     override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + indexForMoving(delta) * -11), 0f)
+        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + updateInstrumentIndex(delta) * -11), 0f)
     }
 
     init {

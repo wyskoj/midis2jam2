@@ -50,7 +50,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class.java, SLIDE_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 10 * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 10 * updateInstrumentIndex(delta), 0f)
     }
 
     /** A single Trombone. */

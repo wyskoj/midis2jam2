@@ -50,7 +50,7 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
     context.loadModel("Shamisen.fbx", SHAMISEN_SKIN_TEXTURE)) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
+        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(updateInstrumentIndex(delta))
     }
 
     init {

@@ -79,7 +79,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     private var modulationAmount = 0.0
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(-22.5f + indexForMoving(delta) * 15, 0f, 0f)
+        offsetNode.setLocalTranslation(-22.5f + updateInstrumentIndex(delta) * 15, 0f, 0f)
     }
 
     @Suppress("unused")

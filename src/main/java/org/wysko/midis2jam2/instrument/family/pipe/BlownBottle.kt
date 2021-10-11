@@ -40,8 +40,9 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     private val bottleNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 20 + indexForMoving(delta) * 3.6f, 0f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * indexForMoving(delta), 0f)
+        val index = updateInstrumentIndex(delta)
+        offsetNode.setLocalTranslation(0f, 20 + index * 3.6f, 0f)
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * index, 0f)
     }
 
     /**

@@ -1,5 +1,7 @@
 @file:Suppress("SpellCheckingInspection")
 
+project.setProperty("mainClassName", "org.wysko.midis2jam2.gui.GuiLauncher")
+
 plugins {
     id("com.github.johnrengelman.shadow") version "6.0.0"
     id("org.panteleyev.jpackageplugin") version "1.3.0"
@@ -36,7 +38,7 @@ application {
 
 tasks.shadowJar {
     doFirst {
-        File(projectDir, "src/main/resources/version.txt").writeText(archiveVersion.toString())
+        File(projectDir, "src/main/resources/version.txt").writeText(archiveVersion.get())
     }
 }
 

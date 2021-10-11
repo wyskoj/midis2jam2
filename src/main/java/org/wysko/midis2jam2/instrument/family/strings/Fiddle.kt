@@ -33,7 +33,7 @@ class Fiddle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Stri
     context.loadModel("Violin.obj", "FiddleSkin.png")
 ) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(20 * indexForMoving(delta), 0f, 0f)
+        offsetNode.setLocalTranslation(20 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     /**

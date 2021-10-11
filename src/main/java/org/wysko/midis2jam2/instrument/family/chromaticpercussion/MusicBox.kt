@@ -156,7 +156,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 0f, indexForMoving(delta) * -18f)
+        offsetNode.setLocalTranslation(0f, 0f, updateInstrumentIndex(delta) * -18f)
     }
 
     /** A single music box note. */

@@ -53,12 +53,9 @@ abstract class UpAndDownKeyClone protected constructor(
      */
     @Suppress("UNCHECKED_CAST")
     private fun pushOrReleaseKeys(midiNote: Int) {
-        var keysToGoDown = parent.manager!!.fingering(midiNote) as Array<Int>?
+        val keysToGoDown = (parent.manager ?: return).fingering(midiNote) as Array<Int>? ?: emptyArray()
 
         /* keysToGoDown is null if the note is outside the instrument's range */
-        if (keysToGoDown == null) {
-            keysToGoDown = emptyArray()
-        }
         for (i in 0 until keyCount) {
             if (keysToGoDown.any { it == i }) {
                 /* This is a key that needs to be pressed down */

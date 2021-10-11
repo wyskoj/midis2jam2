@@ -35,7 +35,7 @@ class Cello(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Strin
     context.loadModel("Cello.obj", "CelloSkin.bmp")
 ) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(-20 * indexForMoving(delta), 0f, 0f)
+        offsetNode.setLocalTranslation(-20 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     init {

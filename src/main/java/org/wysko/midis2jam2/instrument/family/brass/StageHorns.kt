@@ -39,7 +39,7 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             /* Move each horn backwards along the axis that runs
             through the center of the stage and the base position */
             horn.highestLevel.localTranslation =
-                Vector3f(BASE_POSITION).add(Vector3f(0f, 0f, -5f).mult(indexForMoving(delta)))
+                Vector3f(BASE_POSITION).add(Vector3f(0f, 0f, -5f).mult(updateInstrumentIndex(delta)))
         }
     }
 

@@ -30,7 +30,7 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     WrappedOctaveSustained(context, eventList, true) {
 
     override fun moveForMultiChannel(delta: Float) {
-        val indexForMoving = indexForMoving(delta)
+        val indexForMoving = updateInstrumentIndex(delta)
         twelfths.forEach {
             it as ChoirPeep
             if (indexForMoving >= 0) {

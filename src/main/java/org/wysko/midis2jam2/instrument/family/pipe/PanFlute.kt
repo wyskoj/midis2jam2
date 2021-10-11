@@ -37,9 +37,10 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
     private val pipeNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
+        val index = updateInstrumentIndex(delta)
         instrumentNode.localRotation =
-            Quaternion().fromAngles(0f, rad((80 / 11f * 12 * indexForMoving(delta)).toDouble()), 0f)
-        offsetNode.setLocalTranslation(0f, indexForMoving(delta) * 4.6f, 0f)
+            Quaternion().fromAngles(0f, rad((80 / 11f * 12 * index).toDouble()), 0f)
+        offsetNode.setLocalTranslation(0f, index * 4.6f, 0f)
     }
 
     enum class PipeSkin(val textureFile: String, val reflective: Boolean) {

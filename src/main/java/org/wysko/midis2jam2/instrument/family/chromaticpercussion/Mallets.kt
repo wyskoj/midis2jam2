@@ -42,8 +42,15 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     /** Each bar of the instrument. There are [MALLET_BAR_COUNT] bars. */
     private var bars: Array<MalletBar>
 
+    private var shadow: Spatial
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
+
+        /* Prevent shadow from clipping under stage */
+        val idealY = (0.5 + (checkInstrumentIndex() * 2)).coerceAtLeast(0.5)
+        val offset = idealY - shadow.worldTranslation.y
+        shadow.localTranslation.y += offset.toFloat()
 
         /* For each bar */
         for ((index, bar) in bars.withIndex()) {
@@ -68,8 +75,8 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        val i1 = indexForMoving(delta) - 2
-        instrumentNode.setLocalTranslation(-50f, 26.5f + 2 * i1, 0f)
+        val i1 = updateInstrumentIndex(delta) - 2
+        instrumentNode.setLocalTranslation(-50f, 26.5f + (2 * i1), 0f)
         highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-18.0) * i1, 0f)
     }
 
@@ -252,7 +259,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         highestLevel.setLocalTranslation(18f, 0f, -5f)
 
         /* Add shadow */
-        shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
+        shadow = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
             setLocalScale(2 / 3f)
             instrumentNode.attachChild(this)
             setLocalTranslation(0f, -22f, 0f)

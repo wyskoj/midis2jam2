@@ -40,8 +40,8 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
     private val percussionNode: Node = Node()
 
     /** All note on events. */
-    private val noteOnEvents: MutableList<MidiNoteOnEvent> = events.filterIsInstance<MidiNoteOnEvent>() as
-            MutableList<MidiNoteOnEvent>
+    private val noteOnEvents: MutableList<MidiNoteOnEvent> =
+        events.filterIsInstance<MidiNoteOnEvent>().filter { it.note in 27..87 } as MutableList<MidiNoteOnEvent>
 
     /** All program change events. */
     private val programEvents: MutableList<MidiProgramEvent> =

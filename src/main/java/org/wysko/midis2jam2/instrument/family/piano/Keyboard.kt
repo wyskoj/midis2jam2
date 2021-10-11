@@ -22,19 +22,17 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
-import kotlin.math.cos
-import kotlin.math.sin
 
 /** The full, 88-key keyboard. */
 class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent>, private val skin: KeyboardSkin) :
     KeyedInstrument(context, events, 21, 108) {
 
     override fun moveForMultiChannel(delta: Float) {
-        val i = indexForMoving(delta)
+        val i = updateInstrumentIndex(delta)
         offsetNode.setLocalTranslation(
-            (2 * -5.865f * i * cos(rad(45.0).toDouble())).toFloat(),
+            2f * -5.865f * i * 0.707f,
             3.03f * i,
-            (2 * -5.865f * i * sin(rad(45.0).toDouble())).toFloat()
+            2f * -5.865f * i * 0.707f
         )
     }
 

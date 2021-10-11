@@ -31,7 +31,7 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
 
     override fun moveForMultiChannel(delta: Float) {
         highestLevel.localRotation =
-            Quaternion().fromAngles(0f, rad((-27 + indexForMoving(delta) * -18).toDouble()), 0f)
+            Quaternion().fromAngles(0f, rad((-27 + updateInstrumentIndex(delta) * -18).toDouble()), 0f)
     }
 
     init {

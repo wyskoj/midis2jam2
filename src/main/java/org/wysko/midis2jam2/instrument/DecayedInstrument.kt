@@ -34,14 +34,12 @@ abstract class DecayedInstrument protected constructor(context: Midis2jam2, even
     protected val hitsV: MutableList<MidiNoteOnEvent> =
         eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
 
+    /** The last note that this instrument has played, used for visibility calculations. */
     protected var lastHit: MidiNoteOnEvent? = null
 
     override fun calcVisibility(time: Double): Boolean {
         /* Within one second of a hit? Visible. */
-        if (hitsV.isNotEmpty() &&
-            context.file.eventInSeconds(hitsV[0]) - time <= 1
-        )
-            return true
+        if (hitsV.isNotEmpty() && context.file.eventInSeconds(hitsV[0]) - time <= 1) return true
 
         /* If within a 7-second gap between the last hit and the next? Visible. */
         if (lastHit != null

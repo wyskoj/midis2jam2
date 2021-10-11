@@ -53,13 +53,13 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 ) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
-        val v = indexForMoving(delta)
+        val v = updateInstrumentIndex(delta)
+        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(v)
         /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
         if (v < GUITAR_VECTOR_THRESHOLD) {
-            offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
+            offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(v)
         } else {
-            val vector = Vector3f(5f, -4f, 0f).mult(indexForMoving(delta))
+            val vector = Vector3f(5f, -4f, 0f).mult(v)
             vector.setY(-4f * GUITAR_VECTOR_THRESHOLD)
             offsetNode.localTranslation = vector
         }

@@ -21,7 +21,6 @@ import com.jme3.material.RenderState
 import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Spatial
-import com.jme3.scene.Spatial.CullHint
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
@@ -63,35 +62,23 @@ class ShadowController(
     /** The number of bass guitars. */
     bassGuitarCount: Int,
 ) {
-    /**
-     * The keyboard shadow.
-     */
+    /** The keyboard shadow. */
     private val keyboardShadow: Spatial = shadow(context, "Assets/PianoShadow.obj", "Assets/KeyboardShadow.png")
 
-    /**
-     * The harp shadows.
-     */
+    /** The harp shadows. */
     private val harpShadows: MutableList<Spatial>
 
-    /**
-     * The guitar shadows.
-     */
+    /** The guitar shadows. */
     private val guitarShadows: MutableList<Spatial>
 
-    /**
-     * The bass guitar shadows.
-     */
+    /** The bass guitar shadows. */
     private val bassGuitarShadows: MutableList<Spatial>
 
-    /**
-     * Call this method on each frame to update the visibility of shadows.
-     */
+    /** Call this method on each frame to update the visibility of shadows. */
     fun tick() {
         /* Update keyboard shadow */
-        val isKeyboardVisible =
-            context.instruments.stream().anyMatch { i: Instrument? -> i != null && i.isVisible && i is Keyboard }
-        val cullHint = Utils.cullHint(isKeyboardVisible)
-        keyboardShadow.cullHint = cullHint
+        val isKeyboardVisible = context.instruments.any { it is Keyboard && it.isVisible }
+        keyboardShadow.cullHint = Utils.cullHint(isKeyboardVisible)
 
         /* Update rest of shadows */
         updateArrayShadows(harpShadows, Harp::class.java)
@@ -110,14 +97,7 @@ class ShadowController(
      */
     private fun updateArrayShadows(shadows: MutableList<Spatial>, clazz: Class<out Instrument>) {
         val numVisible = context.instruments.count { it != null && clazz.isInstance(it) && it.isVisible }
-
-        for (i in shadows.indices) {
-            if (i < numVisible) {
-                shadows[i].cullHint = CullHint.Dynamic
-            } else {
-                shadows[i].cullHint = CullHint.Always
-            }
-        }
+        shadows.forEachIndexed { index, shadow -> shadow.cullHint = Utils.cullHint(index < numVisible) }
     }
 
     companion object {

@@ -39,9 +39,9 @@ class Agogos(
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 18 + 3.6f * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 18 + 3.6f * updateInstrumentIndex(delta), 0f)
         instrumentNode.localRotation =
-            Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * indexForMoving(delta), 0f)
+            Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * updateInstrumentIndex(delta), 0f)
     }
 
     /**

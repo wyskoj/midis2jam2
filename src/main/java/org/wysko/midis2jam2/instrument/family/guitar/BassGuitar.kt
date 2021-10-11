@@ -46,7 +46,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         context.loadModel(type.modelFile, type.textureFile)
     ) {
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(indexForMoving(delta))
+        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
     }
 
     /** Type of Bass Guitar */

@@ -65,9 +65,17 @@ abstract class Instrument protected constructor(
     abstract fun tick(time: Double, delta: Float)
 
     /**
-     * Calculates if this instrument is visible at a given time.
+     * Calculates if this instrument is visible at a given time. Implementations of this method just follow this
+     * general guideline:
      *
-     * TODO criteria
+     * * If the instrument is currently playing, it should be visible.
+     * * Otherwise, if there is less than or equal to one second from the current time until the next note, it should
+     *   be visible.
+     * * Otherwise, if there is less than or equal to seven seconds from the last played note and next note to play,
+     *   it should be visible.
+     * * Otherwise, if there is less than or equal to two seconds since the last previously played note, it should be
+     *   visible.
+     * * Otherwise, it should be invisible.
      */
     abstract fun calcVisibility(time: Double): Boolean
 
@@ -76,8 +84,8 @@ abstract class Instrument protected constructor(
      *
      * @param delta the amount of time that has passed since the last frame
      */
-    @Contract(pure = true)
-    protected fun indexForMoving(delta: Float): Float {
+    @Contract(pure = false)
+    protected fun updateInstrumentIndex(delta: Float): Float {
         val target: Int = if (isVisible) {
             max(0, context.instruments
                 .filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }
@@ -95,6 +103,10 @@ abstract class Instrument protected constructor(
             target.toFloat()
         }
     }
+
+    /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */
+    @Contract(pure = true)
+    protected fun checkInstrumentIndex(): Double = index
 
     /** Calculates and moves this instrument for when multiple instances of this instrument are visible. */
     protected abstract fun moveForMultiChannel(delta: Float)

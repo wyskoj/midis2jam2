@@ -107,7 +107,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(13f * indexForMoving(delta), 0f, 0f)
+        offsetNode.setLocalTranslation(13f * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     init {

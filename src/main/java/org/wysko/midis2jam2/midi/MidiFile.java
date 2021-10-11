@@ -53,6 +53,8 @@ public final class MidiFile {
 	 */
 	private List<MidiTempoEvent> tempos = new ArrayList<>();
 	
+	private HashMap<MidiEvent, Double> eventToTime = new HashMap<>();
+	
 	public MidiFile() {
 		// Populated in implementation
 	}
@@ -122,6 +124,13 @@ public final class MidiFile {
 			}
 		}
 		file.calculateTempoMap();
+		for (MidiTrack track : file.getTracks()) {
+			if (track != null) {
+				for (MidiEvent event : track.getEvents()) {
+					file.eventToTime.put(event, file.eventInSeconds(event.getTime()));
+				}
+			}
+		}
 		return file;
 	}
 	
@@ -253,7 +262,12 @@ public final class MidiFile {
 	 * @return the event's time, expressed in seconds
 	 */
 	public double eventInSeconds(MidiEvent event) {
-		return midiTickInSeconds(event.getTime());
+		final Double time = eventToTime.get(event);
+		if (time != null) {
+			return time;
+		} else {
+			return eventInSeconds(event.getTime());
+		}
 	}
 	
 	/**

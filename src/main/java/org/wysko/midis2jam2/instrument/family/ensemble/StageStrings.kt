@@ -46,7 +46,7 @@ class StageStrings(
     private val stringNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * indexForMoving(delta)), 0f)
+        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * updateInstrumentIndex(delta)), 0f)
     }
 
     enum class StageStringsType(val textureFile: String) {

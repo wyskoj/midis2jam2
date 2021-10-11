@@ -77,7 +77,7 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
         if (isPlaying) {
             /* Set the hands */
 
-            val hands = parent.manager!!.fingering(currentNotePeriod!!.midiNote) as Hands?
+            val hands = (parent.manager ?: return).fingering((currentNotePeriod ?: return).midiNote) as Hands?
             if (hands != null) {
                 setHand(leftHands, hands.left)
                 setHand(rightHands, hands.right)

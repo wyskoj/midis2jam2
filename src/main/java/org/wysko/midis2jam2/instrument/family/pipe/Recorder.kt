@@ -30,7 +30,7 @@ class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, RecorderClone::class.java, FINGERING_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 10f * indexForMoving(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
     }
 
     inner class RecorderClone : PuffingClone(this@Recorder, SteamPuffer.SteamPuffType.POP, 1f) {

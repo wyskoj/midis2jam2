@@ -28,7 +28,7 @@ class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
 
     override fun moveForMultiChannel(delta: Float) {
         highestLevel.localRotation =
-            Quaternion().fromAngles(0f, rad((-25f + indexForMoving(delta) * -16).toDouble()), 0f)
+            Quaternion().fromAngles(0f, rad((-25f + updateInstrumentIndex(delta) * -16).toDouble()), 0f)
     }
 
     init {
