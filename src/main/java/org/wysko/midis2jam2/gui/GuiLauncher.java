@@ -212,7 +212,12 @@ public class GuiLauncher extends JFrame {
 	
 	public void updateSf2List() {
 		soundFontPathDropDown.removeAllItems();
-		settings.getSoundFontPaths().forEach(e -> soundFontPathDropDown.addItem(e));
+		List<String> soundFontPaths = settings.getSoundFontPaths();
+		if (!soundFontPaths.isEmpty()) {
+			soundFontPaths.forEach(e -> soundFontPathDropDown.addItem(e));
+		} else {
+			soundFontPathDropDown.addItem("Default SoundFont");
+		}
 		soundFontPathDropDown.revalidate();
 		settings.setSoundFontPaths(settings.getSoundFontPaths());
 		settings.setLastMidiDir(settings.getLastMidiDir());

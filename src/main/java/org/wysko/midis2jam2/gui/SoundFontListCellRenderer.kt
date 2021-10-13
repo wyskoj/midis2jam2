@@ -24,12 +24,16 @@ import javax.swing.JList
 class SoundFontListCellRenderer : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(
         list: JList<*>,
-        value: Any,
+        value: Any?,
         index: Int,
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        val text = File(value as String).name
-        return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus)
+        value?.let {
+            val text = File(value as String).name
+            return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus)
+        }
+        return super.getListCellRendererComponent(list, "", index, isSelected, cellHasFocus)
+
     }
 }
