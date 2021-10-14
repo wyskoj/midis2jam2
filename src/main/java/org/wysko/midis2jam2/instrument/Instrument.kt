@@ -57,7 +57,7 @@ abstract class Instrument protected constructor(
     private var index = 0.0
 
     /**
-     * Updates the animation and other necessary frame-dependent calculations.
+     * Updates note collection, animation, visibility, and any other calculations that need to run on each frame.
      *
      * @param time  the current time since the beginning of the MIDI file, expressed in seconds
      * @param delta the amount of time since the last call this method, expressed in seconds
@@ -65,7 +65,7 @@ abstract class Instrument protected constructor(
     abstract fun tick(time: Double, delta: Float)
 
     /**
-     * Calculates if this instrument is visible at a given time. Implementations of this method just follow this
+     * Calculates if this instrument is visible at a given time. Implementations of this method should follow this
      * general guideline:
      *
      * * If the instrument is currently playing, it should be visible.
@@ -86,21 +86,42 @@ abstract class Instrument protected constructor(
      */
     @Contract(pure = false)
     protected fun updateInstrumentIndex(delta: Float): Float {
-        val target: Int = if (isVisible) {
-            max(0, context.instruments
-                .filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }
-                .toList().indexOf(this))
+//        val target: Int = if (isVisible) {
+//            max(0, context.instruments
+//                    .filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }
+//                    .toList().indexOf(this))
+//        } else {
+//            context.instruments.filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }.size - 1
+//        }
+//        val transitionSpeed = context.settings.transitionSpeed
+//        return if (transitionSpeed != InstrumentTransition.NONE) {
+//            val animationCoefficient = transitionSpeed.speed
+//            index += delta * TRANSITION_SPEED * (target - index) / animationCoefficient
+//            index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
+//            index.toFloat()
+//        } else {
+//            target.toFloat()
+//        }
+
+        val targetIndex = if (isVisible) {
+            /* Index in the list of instruments from context */
+            max(0, context.instruments.filter { this.javaClass.isInstance(it) && it.isVisible }.indexOf(this))
         } else {
-            context.instruments.filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }.size - 1
+            /* The number of visible instruments of this type, minus one */
+            context.instruments.filter { this.javaClass.isInstance(it) && it.isVisible }.size - 1
         }
-        val transitionSpeed = context.settings.transitionSpeed
-        return if (transitionSpeed != InstrumentTransition.NONE) {
-            val animationCoefficient = transitionSpeed.speed
-            index += delta * TRANSITION_SPEED * (target - index) / animationCoefficient
-            index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
-            index.toFloat()
+
+        return if (context.settings.transitionSpeed == InstrumentTransition.NONE) {
+            /* If the transition easing is set to NONE, just return the target index. */
+            targetIndex.toFloat()
         } else {
-            target.toFloat()
+            /* Update the index gradually to the target index, given the transition speed */
+            index += delta * BASE_TRANSITION_SPEED * (targetIndex - index) / context.settings.transitionSpeed.speed
+
+            /* Never set the instrument index to anything larger than the number of instruments of this type */
+            index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
+
+            index.toFloat()
         }
     }
 
@@ -111,6 +132,10 @@ abstract class Instrument protected constructor(
     /** Calculates and moves this instrument for when multiple instances of this instrument are visible. */
     protected abstract fun moveForMultiChannel(delta: Float)
 
+    /**
+     * Given the current [time], calls [calcVisibility] to determine the current visibility, updating [isVisible] and
+     * the cull hint of [instrumentNode].
+     */
     protected fun setVisibility(time: Double) {
         isVisible = calcVisibility(time)
         instrumentNode.cullHint = Utils.cullHint(isVisible)
@@ -118,7 +143,7 @@ abstract class Instrument protected constructor(
 
     companion object {
         /** How fast instruments move when transitioning. */
-        private const val TRANSITION_SPEED = 2500
+        private const val BASE_TRANSITION_SPEED = 2500
     }
 
     init {
