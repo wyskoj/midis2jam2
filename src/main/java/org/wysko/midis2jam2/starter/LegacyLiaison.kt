@@ -52,7 +52,7 @@ class LegacyLiaison(
                     ImageIO.read(Objects.requireNonNull(Liaison::class.java.getResource("/ico/icon256.png")))
                 )
             } catch (e: IOException) {
-                Midis2jam2.LOGGER.warning("Failed to set window icon.")
+                Midis2jam2.getLOGGER().warning("Failed to set window icon.")
                 e.printStackTrace()
             }
             midis2Jam2Settings.isVSync = true

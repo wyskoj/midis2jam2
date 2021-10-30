@@ -93,7 +93,7 @@ open class Liaison(
                     display = constructor.newInstance(this, ctx.canvas, midis2jam2)
                     display!!.display()
                 } catch (e: ReflectiveOperationException) {
-                    Midis2jam2.LOGGER.severe(exceptionToLines(e))
+                    Midis2jam2.getLOGGER().severe(exceptionToLines(e))
                 }
                 startCanvas()
             }

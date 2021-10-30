@@ -34,7 +34,7 @@ object UpdateChecker {
     @JvmStatic
     fun checkForUpdates(frame: JFrame) {
         Thread {
-            Midis2jam2.LOGGER.info("Checking for updates.")
+            Midis2jam2.getLOGGER().info("Checking for updates.")
             try {
                 val bundle = ResourceBundle.getBundle("i18n.updater")
                 val html = getHTML("https://midis2jam2.xyz/api/update?v=" + GuiLauncher.getVersion())
@@ -60,12 +60,12 @@ object UpdateChecker {
                         bundle.getString("update_available"),
                         JOptionPane.WARNING_MESSAGE
                     )
-                    Midis2jam2.LOGGER.warning("Out of date!")
+                    Midis2jam2.getLOGGER().warning("Out of date!")
                 } else {
-                    Midis2jam2.LOGGER.info("Up to date.")
+                    Midis2jam2.getLOGGER().info("Up to date.")
                 }
             } catch (e: IOException) {
-                Midis2jam2.LOGGER.warning("Failed to check for updates.")
+                Midis2jam2.getLOGGER().warning("Failed to check for updates.")
                 e.printStackTrace()
             }
         }.start()

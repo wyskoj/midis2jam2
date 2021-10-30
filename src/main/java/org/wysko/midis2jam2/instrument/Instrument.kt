@@ -86,23 +86,6 @@ abstract class Instrument protected constructor(
      */
     @Contract(pure = false)
     protected fun updateInstrumentIndex(delta: Float): Float {
-//        val target: Int = if (isVisible) {
-//            max(0, context.instruments
-//                    .filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }
-//                    .toList().indexOf(this))
-//        } else {
-//            context.instruments.filter { e: Instrument -> this.javaClass.isInstance(e) && e.isVisible }.size - 1
-//        }
-//        val transitionSpeed = context.settings.transitionSpeed
-//        return if (transitionSpeed != InstrumentTransition.NONE) {
-//            val animationCoefficient = transitionSpeed.speed
-//            index += delta * TRANSITION_SPEED * (target - index) / animationCoefficient
-//            index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
-//            index.toFloat()
-//        } else {
-//            target.toFloat()
-//        }
-
         val targetIndex = if (isVisible) {
             /* Index in the list of instruments from context */
             max(0, context.instruments.filter { this.javaClass.isInstance(it) && it.isVisible }.indexOf(this))

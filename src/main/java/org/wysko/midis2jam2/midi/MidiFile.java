@@ -240,7 +240,9 @@ public final class MidiFile {
 			}
 		} else {
 			temposToConsider.add(getTempos().get(0));
-			
+		}
+		if (temposToConsider.isEmpty()) {
+			temposToConsider.add(new MidiTempoEvent(0, 500_000));
 		}
 		if (temposToConsider.size() == 1) {
 			return ((double) midiTick / getDivision()) * (60 / (6E7 / temposToConsider.get(0).getNumber()));
@@ -287,7 +289,7 @@ public final class MidiFile {
 	 * @return the effective tempo before the event
 	 */
 	@SuppressWarnings("java:S2325")
-	public MidiTempoEvent tempoBefore(MidiNoteOnEvent event) {
+	public MidiTempoEvent tempoBefore(MidiEvent event) {
 		return tempoBefore(event.getTime());
 	}
 	

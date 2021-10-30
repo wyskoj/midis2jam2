@@ -46,7 +46,7 @@ abstract class StretchyClone protected constructor(
     /**
      * The bell of the instrument. This must be a node to account for variations of the bell (e.g., Muted Trumpet).
      */
-    protected val bell = Node()
+    protected val bell: Node = Node()
 
     /**
      * The body of the instrument.

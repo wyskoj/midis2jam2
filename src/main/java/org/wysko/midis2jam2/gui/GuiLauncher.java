@@ -100,7 +100,7 @@ public class GuiLauncher extends JFrame {
 			}
 			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
 		} catch (Exception e) {
-			Midis2jam2.LOGGER.info("Could not load settings. Creating new settings.");
+			Midis2jam2.getLOGGER().info("Could not load settings. Creating new settings.");
 			guiLauncher.settings = new LauncherSettings();
 			guiLauncher.saveSettings();
 		}

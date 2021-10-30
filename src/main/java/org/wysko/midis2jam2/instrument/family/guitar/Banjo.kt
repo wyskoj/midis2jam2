@@ -23,6 +23,14 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
+/**
+ * The Banjo.
+ *
+ * @constructor Creates a Banjo.
+ *
+ * @param context context to the main class
+ * @param events the list of events for this Banjo
+ */
 class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
     context,
     StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),

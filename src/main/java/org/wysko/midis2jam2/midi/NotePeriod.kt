@@ -58,26 +58,20 @@ open class NotePeriod(
         return endTime - startTime
     }
 
-    /**
-     * Determines whether this note period would be playing at a given [time], in seconds. If it is playing, returns
-     * true, false otherwise. More specifically, it checks if the [time] is within the range of the [startTime] and
-     * the [endTime].
-     */
-    fun isPlayingAt(time: Double): Boolean {
-        return time in startTime..endTime
-    }
-
     override fun toString(): String {
-        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, noteOff=$noteOff, animationStarted=$animationStarted)"
+        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, " +
+                "noteOff=$noteOff, animationStarted=$animationStarted)"
     }
 
     companion object {
         /**
-         * A MIDI file is a sequence of [MidiNoteOnEvent]s and [MidiNoteOffEvent]s. This method searches the
-         * files and connects corresponding events together. This is effectively calculating the "blocks" you would see in a
-         * piano roll editor.
+         * A MIDI file is a sequence of [MidiNoteOnEvents][MidiNoteOnEvent] and [MidiNoteOffEvents][MidiNoteOffEvent].
+         * Each pair of a NoteOn and NoteOff event can correspond to a [NotePeriod]. This method calculates those
+         * pairs and returns them as a list of NotePeriods.
          *
-         * @param noteEvents the note events to calculate into [NotePeriod]s
+         * @param instrument the [Instrument] that the [noteEvents] pertain to
+         * @param noteEvents the note events to calculate into NotePeriods
+         * @return the note events as a list of NotePeriods
          */
         @Contract(pure = true)
         fun calculateNotePeriods(
@@ -88,27 +82,26 @@ open class NotePeriod(
             val onEvents = arrayOfNulls<MidiNoteOnEvent>(MidiNoteEvent.MIDI_MAX_NOTE + 1)
 
             /* To calculate NotePeriods, we iterate over each MidiNoteEvent and keep track of when a NoteOnEvent occurs.
-             * When it does, we insert it into the array at the index of the note's value. Then, when a NoteOffEvent occurs,
-             * we look up the NoteOnEvent by the NoteOffEvent's value and create a NotePeriod from that.
+             * When it does, we insert it into the array at the index of the note's value. Then, when a NoteOffEvent
+             * occurs, we look up the NoteOnEvent by the NoteOffEvent's value and create a NotePeriod from that.
              *
              * I wrote this with the assumption that there would not be duplicate notes of the same value that overlap,
              * so I'm not sure how it will handle in that scenario.
              *
              * Runs in O(n) time.
              */
-            for (noteEvent in noteEvents) {
+            noteEvents.forEach { noteEvent ->
                 if (noteEvent is MidiNoteOnEvent) {
                     onEvents[noteEvent.note] = noteEvent
                 } else {
                     val noteOff = noteEvent as MidiNoteOffEvent
-                    if (onEvents[noteOff.note] != null) {
-                        val onEvent = onEvents[noteOff.note]
+                    onEvents[noteOff.note]?.let {
                         notePeriods.add(
                             NotePeriod(
                                 noteOff.note,
-                                instrument.context.file.eventInSeconds(onEvent!!.time),
+                                instrument.context.file.eventInSeconds(it.time),
                                 instrument.context.file.eventInSeconds(noteOff.time),
-                                onEvent,
+                                it,
                                 noteOff
                             )
                         )
@@ -121,6 +114,4 @@ open class NotePeriod(
             return ArrayList(notePeriods.distinct())
         }
     }
-
-
 }

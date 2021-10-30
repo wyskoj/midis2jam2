@@ -120,8 +120,8 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
             context, dummyClickNode, time, delta, clickHits,
             Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z
         )
-        if (clickStatus.strikingFor() !== flipClickLastStrikeFor && clickStatus.strikingFor() != null) {
-            flipClickLastStrikeFor = clickStatus.strikingFor()
+        if (clickStatus.strikingFor !== flipClickLastStrikeFor && clickStatus.strikingFor != null) {
+            flipClickLastStrikeFor = clickStatus.strikingFor
             flipClick = !flipClick
         }
         clickPendulum.localRotation = Quaternion().fromAngles(
@@ -135,8 +135,8 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
             context, dummyBellNode, time, delta, bellHits,
             Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z
         )
-        if (bellStatus.strikingFor() !== flipBellLastStrikeFor && bellStatus.strikingFor() != null) {
-            flipBellLastStrikeFor = bellStatus.strikingFor()
+        if (bellStatus.strikingFor !== flipBellLastStrikeFor && bellStatus.strikingFor != null) {
+            flipBellLastStrikeFor = bellStatus.strikingFor
             flipBell = !flipBell
         }
         bellPendulum.localRotation = Quaternion().fromAngles(

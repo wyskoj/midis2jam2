@@ -19,19 +19,22 @@ package org.wysko.midis2jam2.world
 /**
  * Each axis in 3D space.
  */
-enum class Axis {
+enum class Axis(
+    /** The index of this axis in a 3-element array. */
+    val componentIndex: Int
+) {
     /**
      * The X-axis.
      */
-    X,
+    X(0),
 
     /**
      * The Y-axis.
      */
-    Y,
+    Y(1),
 
     /**
      * The Z-axis
      */
-    Z
+    Z(2)
 }

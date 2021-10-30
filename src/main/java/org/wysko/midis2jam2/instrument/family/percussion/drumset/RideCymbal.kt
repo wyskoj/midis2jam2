@@ -20,7 +20,6 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.StickStatus
-import org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.world.Axis
@@ -37,11 +36,11 @@ class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: 
     }
 
     override fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus {
-        val stickStatus = handleStick(
+        val stickStatus = Stick.handleStick(
             context, stick, time, delta,
             hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
         )
-        val strikingFor = stickStatus.strikingFor()
+        val strikingFor = stickStatus.strikingFor
         if (strikingFor != null) {
             stickNode.setLocalTranslation(0f, 0f, if (strikingFor.note == 53) 15f else 20f)
         }

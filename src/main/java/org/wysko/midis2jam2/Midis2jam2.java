@@ -90,7 +90,7 @@ import static org.wysko.midis2jam2.util.Utils.exceptionToLines;
 
 public abstract class Midis2jam2 extends AbstractAppState implements ActionListener {
 	
-	public static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
 	
 	/**
 	 * The {@link M2J2Settings} for this instantiation of midis2jam2.
@@ -194,10 +194,6 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		return LOGGER;
 	}
 	
-	public void setSeqHasRunOnce(boolean seqHasRunOnce) {
-		this.seqHasRunOnce = seqHasRunOnce;
-	}
-	
 	public abstract AssetManager getAssetManager();
 	
 	/**
@@ -266,7 +262,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 * yet implemented
 	 */
 	@Nullable
-	@SuppressWarnings({"java:S138", "java:S1541", "java:S1479"})
+	@SuppressWarnings({"java:S138", "java:S1541", "java:S1479", "java:S1142"})
 	private Instrument fromEvents(int programNum, List<MidiChannelSpecificEvent> events) {
 		switch (programNum) {
 			case 0:
@@ -766,6 +762,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	}
 	
 	@Override
+	@SuppressWarnings("java:S1166")
 	public void initialize(AppStateManager stateManager, Application app) {
 		super.initialize(stateManager, app);
 		this.app = (SimpleApplication) app;

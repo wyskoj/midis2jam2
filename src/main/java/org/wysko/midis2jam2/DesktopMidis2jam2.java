@@ -110,13 +110,13 @@ public class DesktopMidis2jam2 extends Midis2jam2 {
 	
 	@Override
 	public void cleanup() {
-		LOGGER.info("Cleaning up.");
+		getLOGGER().info("Cleaning up.");
 		
-		LOGGER.fine("Stopping and closing sequencer.");
+		getLOGGER().fine("Stopping and closing sequencer.");
 		sequencer.stop();
 		sequencer.close();
 		
-		LOGGER.fine("Enabling GuiLauncher.");
+		getLOGGER().fine("Enabling GuiLauncher.");
 		((Liaison) app).enableLauncher();
 	}
 	

@@ -51,7 +51,7 @@ abstract class UpAndDownKeyClone protected constructor(
      * If the instrument cannot play the specified MIDI note, the instrument plays with all keys up (this is technically
      * incorrect on saxophones, since all open keys is a standard fingering for middle C#, but whatever).
      */
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "kotlin:S1481")
     private fun pushOrReleaseKeys(midiNote: Int) {
         val keysToGoDown = (parent.manager ?: return).fingering(midiNote) as Array<Int>? ?: emptyArray()
 

@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.family.guitar
 
 import org.jetbrains.annotations.Contract
-import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -29,7 +28,7 @@ import kotlin.math.sqrt
  *
  * For example, the `FretBoardPosition` for the lowest string with an open fret is `{string=0,fret=0}`.
  */
-class FretboardPosition(
+data class FretboardPosition(
     /**
      * The string of the position.
      */
@@ -45,28 +44,5 @@ class FretboardPosition(
     @Contract(pure = true)
     fun distance(other: FretboardPosition): Double {
         return sqrt((string.toDouble() - other.string).pow(2.0) + (fret.toDouble() - other.fret).pow(2.0))
-    }
-
-    override fun toString(): String {
-        return "FretboardPosition{" +
-                "string=" + string +
-                ", fret=" + fret +
-                '}'
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hash(string, fret)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as FretboardPosition
-
-        if (string != other.string) return false
-        if (fret != other.fret) return false
-
-        return true
     }
 }
