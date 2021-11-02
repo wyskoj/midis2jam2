@@ -1,4 +1,4 @@
-= midis2jam2
+= 🎵 midis2jam2
 
 image:https://img.shields.io/github/v/release/wyskoj/midis2jam2[]
 image:https://img.shields.io/github/license/wyskoj/midis2jam2[]
@@ -11,11 +11,11 @@ It plays and animates any MIDI file with a 3D virtual band.
 
 https://github.com/wyskoj/midis2jam2/blob/master/implementation.adoc[Not all instruments are implemented yet]; this is a work in progress.
 
-== Installation
+== 🖥️ Installation
 
 Install midis2jam2 with the https://github.com/wyskoj/midis2jam2/releases[appropriate installer for the latest version].
 
-== Building
+== 💾 Building
 
 [source,bash]
 ----
@@ -23,21 +23,21 @@ $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2 && ./gradlew run
 ----
 
-== Documentation
+== 📜 Documentation
 
 https://midis2jam2.netlify.app[Documentation] is updated on every push.
 
-== Acknowledgements
+== ✴️ Acknowledgements
 
 * http://www.gamesbyscott.com/midijam.htm[MIDIJam]
 * https://jmonkeyengine.org/[jMonkeyEngine]
 
-== Contributing
+== ➕ Contributing
 
 Contributions are always welcome!
 See _https://github.com/wyskoj/midis2jam2/blob/master/adding-new-instruments.adoc[adding new instruments]_ for ways to get started.
 
-== Authors
+== ✒️ Authors
 
 Main developer:
 
@@ -48,10 +48,10 @@ Development contributors:
 * https://github.com/jlachniet[jlachniet]
 * https://github.com/nikitalita[nikitalita]
 
-== Support
+== ⁉️ Support
 
 For support, join our https://discord.gg/HD6KFQ2zkW[Discord server].
 
-== License
+== ⚖️ License
 
 https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0]
