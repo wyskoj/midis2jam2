@@ -64,6 +64,7 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax;
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax;
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter;
+import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal;
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
@@ -473,6 +474,8 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 				return new MelodicTom(this, events);
 			case 118:
 				return new SynthDrum(this, events);
+			case 119:
+				return new ReverseCymbal(this, events);
 			case 124:
 				return new TelephoneRing(this, events);
 			case 125:

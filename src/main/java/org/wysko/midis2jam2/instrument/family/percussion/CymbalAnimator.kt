@@ -49,14 +49,14 @@ class CymbalAnimator(
      */
     @Contract(pure = true)
     fun rotationAmount(): Float {
-        if (animTime >= 0) {
-            return if (animTime < 4.5) {
+        return if (animTime >= 0) {
+            if (animTime < 4.5) {
                 (amplitude * (cos(animTime * wobbleSpeed * FastMath.PI) /
                         (3 + animTime.pow(3.0) * wobbleSpeed * dampening * FastMath.PI))).toFloat()
             } else {
                 0F
             }
-        } else return 0F
+        } else 0F
     }
 
     /**
