@@ -33,13 +33,17 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     WrappedOctaveSustained(context, eventList, false) {
 
     override fun moveForMultiChannel(delta: Float) {
+        /* Get and update instrument index */
+        val index = updateInstrumentIndex(delta)
+
         /* For each individual horn */
-        for (twelfth in twelfths) {
-            val horn = twelfth as StageHornNote
-            /* Move each horn backwards along the axis that runs
-            through the center of the stage and the base position */
-            horn.highestLevel.localTranslation =
-                Vector3f(BASE_POSITION).add(Vector3f(0f, 0f, -5f).mult(updateInstrumentIndex(delta)))
+        twelfths.forEach {
+            it as StageHornNote
+            it.highestLevel.localTranslation = if (index >= 0) {
+                Vector3f(BASE_POSITION).add(Vector3f(0f, 3f, -5f).mult(index))
+            } else {
+                Vector3f(BASE_POSITION).add(Vector3f(0f, 3f, 5f).mult(index))
+            }
         }
     }
 
