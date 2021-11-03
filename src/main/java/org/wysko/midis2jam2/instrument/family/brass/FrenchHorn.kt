@@ -37,7 +37,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     MonophonicInstrument(context, eventList, FrenchHornClone::class.java, FINGERING_MANAGER) {
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
+        offsetNode.setLocalTranslation(0f, 25 * updateInstrumentIndex(delta), 0f)
     }
 
     /** A single instance of a French Horn. */
