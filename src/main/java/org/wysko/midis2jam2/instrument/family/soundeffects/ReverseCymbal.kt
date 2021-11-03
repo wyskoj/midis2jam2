@@ -23,15 +23,32 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.MatType
 import kotlin.math.cos
 import kotlin.math.pow
 
 /**
  * The Reverse Cymbal.
+ *
+ * The Reverse Cymbal animates using a custom cymbal animator class, [ReverseCymbalAnimator]. It animates the same way
+ * as the standard [CymbalAnimator] class, but is a Kotlin object and provides one static method
+ * [rotationAmount][ReverseCymbalAnimator.rotationAmount].
+ *
+ * The Reverse Cymbal discards the front end of each [NotePeriod] (the [MidiNoteOnEvent]) and instead animates solely
+ * using the [MidiNoteOffEvent]. I call these "pseudo strikes" because they are not actually a strike, but rather a
+ * point in time when the cymbal is struck and the animation is finished.
+ *
+ * For each note that the instrument plays, the cymbal is animated by [ReverseCymbalAnimator.rotationAmount]. Because
+ * the value being passed to this method is decreasing, the cymbal will rotate in reverse.
+ *
+ * At the "end" of each note, the stick does a simple strike animation. The stick is rotated around the cymbal by the
+ * type of note being played (C = 0 deg, C# = 30 deg, D = 60 deg, etc.).
  *
  * @constructor Constructs a new Reverse Cymbal.
  */
@@ -62,8 +79,10 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
+        /* Animate the stick */
         val handleStick = Stick.handleStick(context, stick, time, delta, pseudoHits)
 
+        /* Find the time of the next note end. If there is none, assume it will happen infinitely in the future. */
         val nextHitTime = pseudoHits.firstOrNull()?.let {
             context.file.eventInSeconds(it.time)
         } ?: Double.MAX_VALUE
@@ -75,11 +94,16 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
             }
         }
 
+        /* Animate the cymbal */
         cymbal.localRotation = Quaternion().fromAngles(ReverseCymbalAnimator.rotationAmount(nextHitTime - time), 0f, 0f)
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 40f, 0f)
+        offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
+    }
+
+    init {
+        instrumentNode.setLocalTranslation(75f, 40f, -35f)
     }
 }
 
