@@ -92,7 +92,11 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 0f, 60f * updateInstrumentIndex(delta))
+        if (checkInstrumentIndex() < 0) {
+            offsetNode.setLocalTranslation(0f, -60 * updateInstrumentIndex(delta), 0f)
+        } else {
+            offsetNode.setLocalTranslation(0f, 0f, 60f * updateInstrumentIndex(delta))
+        }
     }
 
     /** A single harp string. */
