@@ -55,9 +55,7 @@ import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.*;
 
-/**
- * @author Jacob Wysko
- */
+/** @author Jacob Wysko */
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class GuiLauncher extends JFrame {
 	
@@ -199,9 +197,7 @@ public class GuiLauncher extends JFrame {
 		Locale.setDefault(new Locale(settings.getLocale()));
 	}
 	
-	/**
-	 * Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}.
-	 */
+	/** Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}. */
 	public void saveSettings() {
 		try (FileWriter writer = new FileWriter(SETTINGS_FILE)) {
 			writer.write(GSON.toJson(settings));
@@ -237,9 +233,7 @@ public class GuiLauncher extends JFrame {
 		return button;
 	}
 	
-	/**
-	 * Prompts the user to load a MIDI file.
-	 */
+	/** Prompts the user to load a MIDI file. */
 	private void loadMidiFileButtonActionPerformed(ActionEvent e) {
 		JFileChooser f = new JFileChooser();
 		f.setPreferredSize(new Dimension(800, 600));
@@ -267,9 +261,7 @@ public class GuiLauncher extends JFrame {
 		}
 	}
 	
-	/**
-	 * Prompts the user to load a soundfont file.
-	 */
+	/** Prompts the user to load a soundfont file. */
 	private void loadSoundFontButtonActionPerformed(ActionEvent e) {
 		
 		JDialog dialog = new JDialog(this, "SoundFont list editor", true);

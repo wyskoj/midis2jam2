@@ -51,9 +51,7 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The pendulum for [METRONOME_CLICK].
-     */
+    /** The pendulum for [METRONOME_CLICK]. */
     private val clickPendulum: Spatial
 
     /**
@@ -70,26 +68,18 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
      */
     private val dummyBellNode = Node()
 
-    /**
-     * The pendulum for [METRONOME_BELL].
-     */
+    /** The pendulum for [METRONOME_BELL]. */
     private val bellPendulum: Spatial
 
-    /**
-     * List of hits for [METRONOME_BELL].
-     */
+    /** List of hits for [METRONOME_BELL]. */
     private val bellHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == METRONOME_BELL } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * List of hits for [METRONOME_CLICK].
-     */
+    /** List of hits for [METRONOME_CLICK]. */
     private val clickHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == METRONOME_CLICK } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * Keeps track of which direction [clickPendulum] should swing.
-     */
+    /** Keeps track of which direction [clickPendulum] should swing. */
     private var flipClick = false
 
     /**
@@ -99,9 +89,7 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
      */
     private var flipClickLastStrikeFor: MidiNoteOnEvent? = null
 
-    /**
-     * Keeps track of which direction [clickPendulum] should swing.
-     */
+    /** Keeps track of which direction [clickPendulum] should swing. */
     private var flipBell = false
 
     /**

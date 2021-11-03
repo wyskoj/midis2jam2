@@ -30,24 +30,16 @@ import java.util.*
  * least one of the instrument visible at any given time, otherwise it is hidden.
  */
 class StandController(
-    /**
-     * Context to midis2jam2.
-     */
+    /** Context to midis2jam2. */
     private val context: Midis2jam2,
 ) {
-    /**
-     * The keyboard stand.
-     */
+    /** The keyboard stand. */
     private val keyboardStand: Spatial = context.loadModel("PianoStand.obj", "RubberFoot.bmp")
 
-    /**
-     * The mallet stand.
-     */
+    /** The mallet stand. */
     private val malletStand: Spatial
 
-    /**
-     * Call this method on each frame to update the visibility of stands.
-     */
+    /** Call this method on each frame to update the visibility of stands. */
     fun tick() {
         setStandVisibility(keyboardStand, Keyboard::class.java)
         setStandVisibility(malletStand, Mallets::class.java)

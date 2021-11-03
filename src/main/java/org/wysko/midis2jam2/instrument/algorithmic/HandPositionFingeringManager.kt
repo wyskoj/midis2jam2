@@ -26,23 +26,17 @@ import org.xml.sax.SAXException
 import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 
-/**
- * Handles fingering that uses hands.
- */
+/** Handles fingering that uses hands. */
 open class HandPositionFingeringManager : FingeringManager<Hands> {
 
-    /**
-     * The table of fingerings.
-     */
+    /** The table of fingerings. */
     private val table = HashMap<Int, Hands>()
 
     override fun fingering(midiNote: Int): Hands? {
         return table[midiNote]
     }
 
-    /**
-     * A pair of indices.
-     */
+    /** A pair of indices. */
     data class Hands(
         /** Left hand index. */
         val left: Int,

@@ -16,9 +16,7 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * Any MIDI event that is specific to a certain channel.
- */
+/** Any MIDI event that is specific to a certain channel. */
 open class MidiChannelSpecificEvent(time: Long, open val channel: Int) : MidiEvent(time) {
 
     override fun equals(other: Any?): Boolean {

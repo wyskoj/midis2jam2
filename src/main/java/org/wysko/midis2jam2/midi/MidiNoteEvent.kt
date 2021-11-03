@@ -16,16 +16,12 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * A [MidiNoteOnEvent] or a [MidiNoteOffEvent].
- */
+/** A [MidiNoteOnEvent] or a [MidiNoteOffEvent]. */
 open class MidiNoteEvent protected constructor(override val time: Long, channel: Int, open val note: Int) :
     MidiChannelSpecificEvent(time, channel) {
 
     companion object {
-        /**
-         * The max value a MIDI note can have.
-         */
+        /** The max value a MIDI note can have. */
         const val MIDI_MAX_NOTE = 127
     }
 

@@ -22,9 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Melodic tom.
- */
+/** The Melodic tom. */
 class MelodicTom(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>

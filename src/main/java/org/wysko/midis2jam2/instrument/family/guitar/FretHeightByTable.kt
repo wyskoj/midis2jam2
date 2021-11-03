@@ -25,13 +25,9 @@ import org.xml.sax.SAXException
 import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 
-/**
- * Calculates fret heights using a lookup table.
- */
+/** Calculates fret heights using a lookup table. */
 class FretHeightByTable(
-    /**
-     * The lookup table. The key is the fret and the value is the scaling.
-     */
+    /** The lookup table. The key is the fret and the value is the scaling. */
     private val lookupTable: Map<Int, Float>
 ) : FretHeightCalculator {
 

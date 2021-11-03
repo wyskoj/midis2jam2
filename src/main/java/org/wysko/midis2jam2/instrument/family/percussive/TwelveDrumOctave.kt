@@ -24,25 +24,17 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * Twelve drums for each note.
- */
+/** Twelve drums for each note. */
 abstract class TwelveDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     DecayedInstrument(context, eventList) {
 
-    /**
-     * The Mallet nodes.
-     */
+    /** The Mallet nodes. */
     protected val malletNodes = Array(12) { Node() }
 
-    /**
-     * The Mallet strikes.
-     */
+    /** The Mallet strikes. */
     private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
 
-    /**
-     * Each twelfth of the octave.
-     */
+    /** Each twelfth of the octave. */
     protected val twelfths = arrayOfNulls<TwelfthOfOctaveDecayed>(12)
 
     override fun tick(time: Double, delta: Float) {
@@ -67,19 +59,13 @@ abstract class TwelveDrumOctave protected constructor(context: Midis2jam2, event
         }
     }
 
-    /**
-     * The Twelfth of octave that is decayed.
-     */
+    /** The Twelfth of octave that is decayed. */
     abstract class TwelfthOfOctaveDecayed protected constructor() {
 
-        /**
-         * The Highest level.
-         */
+        /** The Highest level. */
         val highestLevel = Node()
 
-        /**
-         * The Anim node.
-         */
+        /** The Anim node. */
         val animNode = Node()
 
         /**

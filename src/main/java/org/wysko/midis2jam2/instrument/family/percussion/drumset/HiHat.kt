@@ -27,34 +27,22 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The hi-hat.
- */
+/** The hi-hat. */
 class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleStickInstrument(context, hits) {
 
-    /**
-     * The list of NoteOn events that the stick needs to worry about (closed and open).
-     */
+    /** The list of NoteOn events that the stick needs to worry about (closed and open). */
     private val hitsToStrike: List<MidiNoteOnEvent>
 
-    /**
-     * The top cymbal.
-     */
+    /** The top cymbal. */
     private val topCymbal = Node()
 
-    /**
-     * The whole hi-hat.
-     */
+    /** The whole hi-hat. */
     private val wholeHat = Node()
 
-    /**
-     * The cymbal animator.
-     */
+    /** The cymbal animator. */
     private val animator: CymbalAnimator
 
-    /**
-     * The current animation time.
-     */
+    /** The current animation time. */
     private var animTime = 0.0
 
     /**
@@ -110,18 +98,12 @@ class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleSti
         }
     }
 
-    /**
-     * The status of the hi-hat.
-     */
+    /** The status of the hi-hat. */
     private enum class HiHatStatus {
-        /**
-         * The hat is closed, meaning the top cymbal and bottom cymbal are together.
-         */
+        /** The hat is closed, meaning the top cymbal and bottom cymbal are together. */
         CLOSED,
 
-        /**
-         * The hat is open, meaning the top cymbal is raised.
-         */
+        /** The hat is open, meaning the top cymbal is raised. */
         OPEN
     }
 

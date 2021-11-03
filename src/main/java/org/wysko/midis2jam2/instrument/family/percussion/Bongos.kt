@@ -27,9 +27,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The bongos.
- */
+/** The bongos. */
 class Bongos(
     context: Midis2jam2,
     hits: MutableList<MidiNoteOnEvent>
@@ -41,24 +39,16 @@ class Bongos(
     private val highBongoHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == HIGH_BONGO } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * The Right hand node.
-     */
+    /** The Right hand node. */
     private val highHandNode = Node()
 
-    /**
-     * The Left hand node.
-     */
+    /** The Left hand node. */
     private val lowHandNode = Node()
 
-    /**
-     * The Left bongo anim node.
-     */
+    /** The Left bongo anim node. */
     private val lowBongoAnimNode = Node()
 
-    /**
-     * The Right bongo anim node.
-     */
+    /** The Right bongo anim node. */
     private val highBongoAnimNode = Node()
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

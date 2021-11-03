@@ -29,9 +29,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * @author Jacob Wysko
- */
+/** @author Jacob Wysko */
 public class Midis2jam2Display extends Displays {
 	
 	public Midis2jam2Display(Liaison liaison, Canvas canvas, Midis2jam2 context) {

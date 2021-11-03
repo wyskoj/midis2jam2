@@ -26,20 +26,14 @@ import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The triangle.
- */
+/** The triangle. */
 class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: TriangleType) :
     NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The Triangle node.
-     */
+    /** The Triangle node. */
     private val triangleNode = Node()
 
-    /**
-     * The Beater node.
-     */
+    /** The Beater node. */
     private val beaterNode = Node()
 
     override fun tick(time: Double, delta: Float) {
@@ -54,18 +48,12 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: Tr
         )
     }
 
-    /**
-     * The type of triangle.
-     */
+    /** The type of triangle. */
     enum class TriangleType(internal val modelFile: String) {
-        /**
-         * Open triangle type.
-         */
+        /** Open triangle type. */
         OPEN("Triangle.obj"),
 
-        /**
-         * Muted triangle type.
-         */
+        /** Muted triangle type. */
         MUTED("MutedTriangle.fbx");
     }
 

@@ -26,14 +26,10 @@ import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The cowbell. Simply animates with [Stick.handleStick] and [PercussionInstrument.recoilDrum].
- */
+/** The cowbell. Simply animates with [Stick.handleStick] and [PercussionInstrument.recoilDrum]. */
 class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the stick.
-     */
+    /** Contains the stick. */
     private val stickNode = Node()
 
     override fun tick(time: Double, delta: Float) {

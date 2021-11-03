@@ -24,9 +24,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The ride cymbal.
- */
+/** The ride cymbal. */
 class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
     Cymbal(context, hits, type) {
 

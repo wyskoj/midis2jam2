@@ -38,9 +38,7 @@ abstract class KeyedInstrument(
     protected val events: MutableList<MidiNoteEvent> =
         eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
 
-    /**
-     * The keys of this instrument.
-     */
+    /** The keys of this instrument. */
     protected val keys: Array<Key?> = arrayOfNulls(keyCount())
 
     /** Returns the number of keys on this instrument. */
@@ -123,18 +121,12 @@ abstract class KeyedInstrument(
     }
 
 
-    /**
-     * Keyboards have two different colored keys: white and black.
-     */
+    /** Keyboards have two different colored keys: white and black. */
     enum class KeyColor {
-        /**
-         * White key color.
-         */
+        /** White key color. */
         WHITE,
 
-        /**
-         * Black key color.
-         */
+        /** Black key color. */
         BLACK
     }
 }

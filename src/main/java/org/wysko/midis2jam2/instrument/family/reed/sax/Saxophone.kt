@@ -21,9 +21,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
-/**
- * Shared code for Saxophones.
- */
+/** Shared code for Saxophones. */
 abstract class Saxophone
 protected constructor(
     context: Midis2jam2,

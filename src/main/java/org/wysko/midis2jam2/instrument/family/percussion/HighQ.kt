@@ -34,19 +34,13 @@ import org.wysko.midis2jam2.world.Axis
  */
 class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the laser gun.
-     */
+    /** Contains the laser gun. */
     private val gunNode = Node()
 
-    /**
-     * The green beam that "shoots" out of the laser gun.
-     */
+    /** The green beam that "shoots" out of the laser gun. */
     private val laser: Spatial
 
-    /**
-     * Timer for keeping track of how long the laser has been visible.
-     */
+    /** Timer for keeping track of how long the laser has been visible. */
     private var laserShowTime = 0.0
 
     override fun tick(time: Double, delta: Float) {
@@ -70,9 +64,7 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     }
 
     companion object {
-        /**
-         * The amount of time the laser should appear for when the laser gun shoots, expressed in seconds.
-         */
+        /** The amount of time the laser should appear for when the laser gun shoots, expressed in seconds. */
         const val LASER_LIFE = 0.05
     }
 

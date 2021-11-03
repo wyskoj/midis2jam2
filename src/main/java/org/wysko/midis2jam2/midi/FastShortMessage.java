@@ -35,9 +35,7 @@ public final class FastShortMessage extends ShortMessage {
 		getDataLength(packedMsg & 0xFF); // to check for validity
 	}
 	
-	/**
-	 * Creates a FastShortMessage from this ShortMessage
-	 */
+	/** Creates a FastShortMessage from this ShortMessage */
 	public FastShortMessage(ShortMessage msg) {
 		this.packedMsg = msg.getStatus()
 				| (msg.getData1() << 8)

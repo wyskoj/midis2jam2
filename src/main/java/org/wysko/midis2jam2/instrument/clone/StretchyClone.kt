@@ -29,33 +29,21 @@ import org.wysko.midis2jam2.world.Axis
  */
 abstract class StretchyClone protected constructor(
     parent: MonophonicInstrument, rotationFactor: Float,
-    /**
-     * The stretch factor.
-     */
+    /** The stretch factor. */
     stretchFactor: Float,
-    /**
-     * The axis on which to scale the bell on.
-     */
+    /** The axis on which to scale the bell on. */
     scaleAxis: Axis,
-    /**
-     * The axis on which to rotate the instrument on.
-     */
+    /** The axis on which to rotate the instrument on. */
     rotationAxis: Axis
 ) : Clone(parent, rotationFactor, rotationAxis) {
 
-    /**
-     * The bell of the instrument. This must be a node to account for variations of the bell (e.g., Muted Trumpet).
-     */
+    /** The bell of the instrument. This must be a node to account for variations of the bell (e.g., Muted Trumpet). */
     protected val bell: Node = Node()
 
-    /**
-     * The body of the instrument.
-     */
+    /** The body of the instrument. */
     protected lateinit var body: Spatial
 
-    /**
-     * The bell stretcher.
-     */
+    /** The bell stretcher. */
     private val bellStretcher: BellStretcher
 
     override fun tick(time: Double, delta: Float) {

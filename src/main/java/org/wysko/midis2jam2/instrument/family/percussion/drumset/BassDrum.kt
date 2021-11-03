@@ -27,9 +27,7 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * Texture file for metal texture.
- */
+/** Texture file for metal texture. */
 const val METAL_TEXTURE: String = "MetalTexture.bmp"
 
 /**
@@ -45,19 +43,13 @@ const val METAL_TEXTURE: String = "MetalTexture.bmp"
 class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits),
     Retexturable {
 
-    /**
-     * The arm that swings to hit the bass drum.
-     */
+    /** The arm that swings to hit the bass drum. */
     private val beaterArm: Spatial
 
-    /**
-     * The pedal is pressed when a note is played and slowly comes back to its idle position.
-     */
+    /** The pedal is pressed when a note is played and slowly comes back to its idle position. */
     private val pedal: Spatial
 
-    /**
-     * The Drum node.
-     */
+    /** The Drum node. */
     private val drumNode = Node()
 
     override fun tick(time: Double, delta: Float) {

@@ -28,50 +28,32 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import java.util.*
 
-/**
- * *You used to call me on my cellphone...*
- */
+/** *You used to call me on my cellphone...* */
 class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
 
-    /**
-     * The Up keys.
-     */
+    /** The Up keys. */
     private val upKeys = arrayOfNulls<Spatial>(12)
 
-    /**
-     * The Down keys.
-     */
+    /** The Down keys. */
     private val downKeys = arrayOfNulls<Spatial>(12)
 
-    /**
-     * The Up node.
-     */
+    /** The Up node. */
     private val upNode = Node()
 
-    /**
-     * The Down node.
-     */
+    /** The Down node. */
     private val downNode = Node()
 
-    /**
-     * For each key, is it playing?
-     */
+    /** For each key, is it playing? */
     val playing = BooleanArray(12)
 
-    /**
-     * The Handle.
-     */
+    /** The Handle. */
     private val handle: Spatial
 
-    /**
-     * The amount to shake the handle.
-     */
+    /** The amount to shake the handle. */
     private var force = 0f
 
-    /**
-     * Random for phone animation.
-     */
+    /** Random for phone animation. */
     private val random = Random()
 
     override fun tick(time: Double, delta: Float) {

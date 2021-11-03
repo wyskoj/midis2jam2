@@ -26,20 +26,14 @@ import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.HARMONICA
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The harmonica uses 12 [SteamPuffers][SteamPuffer] to animate each note in the octave.
- */
+/** The harmonica uses 12 [SteamPuffers][SteamPuffer] to animate each note in the octave. */
 class Harmonica(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
 
-    /**
-     * Each note on the harmonica has a separate puffer.
-     */
+    /** Each note on the harmonica has a separate puffer. */
     private val puffers = Array(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
 
-    /**
-     * For each note, true if it is playing, false otherwise.
-     */
+    /** For each note, true if it is playing, false otherwise. */
     private val eachNotePlaying = BooleanArray(12)
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

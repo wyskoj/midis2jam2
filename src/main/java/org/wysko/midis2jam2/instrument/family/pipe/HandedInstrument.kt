@@ -22,9 +22,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
-/**
- * Any instrument that animates using hands.
- */
+/** Any instrument that animates using hands. */
 abstract class HandedInstrument
 protected constructor(
     context: Midis2jam2,

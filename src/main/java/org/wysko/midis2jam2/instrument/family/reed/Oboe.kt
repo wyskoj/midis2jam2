@@ -41,14 +41,10 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
-    /**
-     * The type Oboe clone.
-     */
+    /** The type Oboe clone. */
     inner class OboeClone : HandedClone(this@Oboe, 0.075f) {
 
-        /**
-         * The bell stretcher.
-         */
+        /** The bell stretcher. */
         private val bellStretcher: BellStretcher
 
         override fun moveForPolyphony() {

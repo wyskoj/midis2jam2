@@ -16,17 +16,11 @@
  */
 package org.wysko.midis2jam2.util
 
-/**
- * A material type.
- */
+/** A material type. */
 enum class MatType {
-    /**
-     * An unshaded material.
-     */
+    /** An unshaded material. */
     UNSHADED,
 
-    /**
-     * A reflective material.
-     */
+    /** A reflective material. */
     REFLECTIVE
 }

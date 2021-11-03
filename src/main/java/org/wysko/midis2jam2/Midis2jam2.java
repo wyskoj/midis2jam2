@@ -92,34 +92,22 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	
 	private static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
 	
-	/**
-	 * The {@link M2J2Settings} for this instantiation of midis2jam2.
-	 */
+	/** The {@link M2J2Settings} for this instantiation of midis2jam2. */
 	public final M2J2Settings settings;
 	
-	/**
-	 * The list of instruments.
-	 */
+	/** The list of instruments. */
 	public final List<Instrument> instruments = new ArrayList<>();
 	
-	/**
-	 * The MIDI file.
-	 */
+	/** The MIDI file. */
 	protected final MidiFile file;
 	
-	/**
-	 * The root note of the scene.
-	 */
+	/** The root note of the scene. */
 	private final Node rootNode = new Node("root");
 	
-	/**
-	 * The application that called this.
-	 */
+	/** The application that called this. */
 	protected SimpleApplication app;
 	
-	/**
-	 * True if the sequence has begun playing, false otherwise.
-	 */
+	/** True if the sequence has begun playing, false otherwise. */
 	protected boolean seqHasRunOnce;
 	
 	/**
@@ -128,14 +116,10 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	protected double timeSinceStart = -4;
 	
-	/**
-	 * The shadow controller.
-	 */
+	/** The shadow controller. */
 	protected ShadowController shadowController;
 	
-	/**
-	 * The stand controller.
-	 */
+	/** The stand controller. */
 	protected StandController standController;
 	
 	/**
@@ -144,19 +128,13 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	protected double stopTime;
 	
-	/**
-	 * True if the sequencer has reached the end of the MIDI file, false otherwise.
-	 */
+	/** True if the sequencer has reached the end of the MIDI file, false otherwise. */
 	protected boolean afterEnd;
 	
-	/**
-	 * The current camera position.
-	 */
+	/** The current camera position. */
 	private Camera currentCamera = Camera.CAMERA_1A;
 	
-	/**
-	 * 3D text for debugging.
-	 */
+	/** 3D text for debugging. */
 	private BitmapText debugText;
 	
 	protected Midis2jam2(MidiFile file, M2J2Settings settings) {
@@ -625,9 +603,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		}
 	}
 	
-	/**
-	 * Initializes on-screen debug text.
-	 */
+	/** Initializes on-screen debug text. */
 	@TestOnly
 	private void initDebugText() {
 		BitmapFont bitmapFont = this.app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
@@ -648,9 +624,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		this.app.getCamera().setRotation(camera.getRotation());
 	}
 	
-	/**
-	 * Registers key and mouse handling.
-	 */
+	/** Registers key and mouse handling. */
 	private void setupInputMappings() {
 		this.app.getInputManager().deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
 		

@@ -25,15 +25,11 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Pan flute.
- */
+/** The Pan flute. */
 class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, skin: PipeSkin) :
     WrappedOctaveSustained(context, eventList, false) {
 
-    /**
-     * The Pipe nodes.
-     */
+    /** The Pipe nodes. */
     private val pipeNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -44,30 +40,20 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
     }
 
     enum class PipeSkin(val textureFile: String, val reflective: Boolean) {
-        /**
-         * Gold pipe skin.
-         */
+        /** Gold pipe skin. */
         GOLD("HornSkin.bmp", true),
 
-        /**
-         * Wood pipe skin.
-         */
+        /** Wood pipe skin. */
         WOOD("Wood.bmp", false);
     }
 
-    /**
-     * Each of the pipes in the pan flute, calliope, etc.
-     */
+    /** Each of the pipes in the pan flute, calliope, etc. */
     inner class PanFlutePipe(skin: PipeSkin) : TwelfthOfOctave() {
 
-        /**
-         * The geometry of this pipe.
-         */
+        /** The geometry of this pipe. */
         val pipe: Spatial = context.loadModel("PanPipe.obj", skin.textureFile)
 
-        /**
-         * The steam puffer for this pipe.
-         */
+        /** The steam puffer for this pipe. */
         val puffer: SteamPuffer
 
         override fun play(duration: Double) {

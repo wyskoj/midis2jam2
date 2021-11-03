@@ -31,9 +31,7 @@ import java.util.Vector;
 
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 
-/**
- * @author Jacob Wysko
- */
+/** @author Jacob Wysko */
 public class LocaleSelect extends JDialog {
 	
 	public LocaleSelect(Window owner) {

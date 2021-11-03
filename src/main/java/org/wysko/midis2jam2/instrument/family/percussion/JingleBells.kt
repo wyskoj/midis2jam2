@@ -25,14 +25,10 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * *Jingle bells...* Animates with only [Stick.handleStick], nothing special.
- */
+/** Animates with only [Stick.handleStick], nothing special. */
 class JingleBells(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the jingle bell.
-     */
+    /** Contains the jingle bell. */
     private val jingleBellNode = Node()
 
     override fun tick(time: Double, delta: Float) {

@@ -23,14 +23,10 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The texture file for Shamisen.
- */
+/** The texture file for Shamisen. */
 const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
 
-/**
- * The Shamisen.
- */
+/** The Shamisen. */
 class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
     context,
     StandardFrettingEngine(3, 15, intArrayOf(50, 57, 62)),

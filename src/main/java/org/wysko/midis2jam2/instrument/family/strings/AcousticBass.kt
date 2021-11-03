@@ -23,9 +23,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The upright bass.
- */
+/** The upright bass. */
 class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, style: PlayingStyle) :
     StringFamilyInstrument(
         context,
@@ -40,18 +38,12 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, 
         offsetNode.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
-    /**
-     * The acoustic bass can be played two ways in MIDI, arco (Contrabass) and pizzicato (Acoustic Bass)
-     */
+    /** The acoustic bass can be played two ways in MIDI, arco (Contrabass) and pizzicato (Acoustic Bass) */
     enum class PlayingStyle {
-        /**
-         * Arco playing style.
-         */
+        /** Arco playing style. */
         ARCO,
 
-        /**
-         * Pizzicato playing style.
-         */
+        /** Pizzicato playing style. */
         PIZZICATO
     }
 

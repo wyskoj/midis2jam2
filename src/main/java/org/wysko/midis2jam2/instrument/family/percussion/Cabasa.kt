@@ -33,14 +33,10 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Cabasa(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the cabasa.
-     */
+    /** Contains the cabasa. */
     private val cabasaNode = Node()
 
-    /**
-     * The cabasa.
-     */
+    /** The cabasa. */
     private val cabasaModel: Spatial
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

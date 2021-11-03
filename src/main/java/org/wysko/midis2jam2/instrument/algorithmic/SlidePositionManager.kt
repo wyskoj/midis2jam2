@@ -25,9 +25,7 @@ import javax.xml.parsers.ParserConfigurationException
 
 class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 
-    /**
-     * Stores the slide table.
-     */
+    /** Stores the slide table. */
     private val slideTable = HashMap<Int, List<Int>>()
 
     override fun fingering(midiNote: Int): List<Int>? {

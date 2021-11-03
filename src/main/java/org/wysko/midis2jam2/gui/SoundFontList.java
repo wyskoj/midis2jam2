@@ -34,9 +34,7 @@ import java.util.ResourceBundle;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.FILES_ONLY;
 
-/**
- * @author Jacob Wysko
- */
+/** @author Jacob Wysko */
 public class SoundFontList extends JPanel {
 	
 	public static final FileFilter DLS_FILE_FILTER = new FileFilter() {

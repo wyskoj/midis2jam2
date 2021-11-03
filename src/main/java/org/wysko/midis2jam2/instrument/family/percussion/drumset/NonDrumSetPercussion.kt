@@ -19,9 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
-/**
- * Any percussion instrument that is not attached to the drum set and should therefore only appear when playing.
- */
+/** Any percussion instrument that is not attached to the drum set and should therefore only appear when playing. */
 open class NonDrumSetPercussion protected constructor(
     context: Midis2jam2,
     hits: MutableList<MidiNoteOnEvent>

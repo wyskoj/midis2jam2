@@ -65,34 +65,22 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         }
     }
 
-    /**
-     * The type of guitar.
-     */
+    /** The type of guitar. */
     enum class GuitarType(
-        /**
-         * The Model file name.
-         */
+        /** The Model file name. */
         internal val modelFileName: String,
-        /**
-         * The Texture file name.
-         */
+        /** The Texture file name. */
         val textureFileName: String
     ) {
-        /**
-         * Acoustic guitar type.
-         */
+        /** Acoustic guitar type. */
         ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"),
 
-        /**
-         * Electric guitar type.
-         */
+        /** Electric guitar type. */
         ELECTRIC("Guitar.obj", "GuitarSkin.bmp");
     }
 
     companion object {
-        /**
-         * The base position of the guitar.
-         */
+        /** The base position of the guitar. */
         private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
 
         /**

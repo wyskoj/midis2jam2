@@ -27,40 +27,26 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The woodblock. High and low.
- */
+/** The woodblock. High and low. */
 class Woodblock(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The Right hand node.
-     */
+    /** The Right hand node. */
     private val rightStickNode = Node()
 
-    /**
-     * The Left hand node.
-     */
+    /** The Left hand node. */
     private val leftStickNode = Node()
 
-    /**
-     * The Left woodblock anim node.
-     */
+    /** The Left woodblock anim node. */
     private val leftWoodblockAnimNode = Node()
 
-    /**
-     * The Right woodblock anim node.
-     */
+    /** The Right woodblock anim node. */
     private val rightWoodblockAnimNode = Node()
 
-    /**
-     * The Low woodblock hits.
-     */
+    /** The Low woodblock hits. */
     private val leftHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == LOW_WOODBLOCK } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * The High woodblock hits.
-     */
+    /** The High woodblock hits. */
     private val rightHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == HIGH_WOODBLOCK } as MutableList<MidiNoteOnEvent>
 

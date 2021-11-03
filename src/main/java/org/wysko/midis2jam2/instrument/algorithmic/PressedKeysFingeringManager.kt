@@ -29,9 +29,7 @@ import javax.xml.parsers.ParserConfigurationException
  */
 class PressedKeysFingeringManager private constructor() : FingeringManager<Array<Int>> {
 
-    /**
-     * Stores the fingering table.
-     */
+    /** Stores the fingering table. */
     private val fingerTable = HashMap<Int, Array<Int>>()
 
     override fun fingering(midiNote: Int): Array<Int>? {

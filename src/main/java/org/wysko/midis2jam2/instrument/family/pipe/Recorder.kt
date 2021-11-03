@@ -23,9 +23,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The recorder.
- */
+/** The recorder. */
 class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, RecorderClone::class.java, FINGERING_MANAGER) {
 

@@ -33,14 +33,10 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Claves(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the left clave.
-     */
+    /** Contains the left clave. */
     private val rightClaveNode = Node()
 
-    /**
-     * Contains the right clave.
-     */
+    /** Contains the right clave. */
     private val leftClaveNode = Node()
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

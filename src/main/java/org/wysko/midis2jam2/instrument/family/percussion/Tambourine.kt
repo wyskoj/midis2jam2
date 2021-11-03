@@ -28,19 +28,13 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The tambourine.
- */
+/** The tambourine. */
 class Tambourine(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the hand with the tambourine.
-     */
+    /** Contains the hand with the tambourine. */
     private val tambourineHandNode = Node()
 
-    /**
-     * Contains the empty hand.
-     */
+    /** Contains the empty hand. */
     private val emptyHandNode = Node()
 
     override fun tick(time: Double, delta: Float) {

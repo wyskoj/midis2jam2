@@ -33,14 +33,10 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the top castanet.
-     */
+    /** Contains the top castanet. */
     private val topCastanetNode = Node()
 
-    /**
-     * Contains the bottom castanet.
-     */
+    /** Contains the bottom castanet. */
     private val bottomCastanetNode = Node()
 
     override fun tick(time: Double, delta: Float) {

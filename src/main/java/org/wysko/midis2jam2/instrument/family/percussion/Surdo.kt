@@ -27,9 +27,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The surdo.
- */
+/** The surdo. */
 class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
     /** The stick node. */
@@ -65,18 +63,12 @@ class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         }
     }
 
-    /**
-     * Defines if the hand is on the drum or raised.
-     */
+    /** Defines if the hand is on the drum or raised. */
     internal enum class HandPosition {
-        /**
-         * Up hand position.
-         */
+        /** Up hand position. */
         UP,
 
-        /**
-         * Down hand position.
-         */
+        /** Down hand position. */
         DOWN
     }
 

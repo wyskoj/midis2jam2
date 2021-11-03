@@ -27,41 +27,27 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The timbales.
- */
+/** The timbales. */
 class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * List of hits for the low timbale.
-     */
+    /** List of hits for the low timbale. */
     private val lowTimbaleHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == LOW_TIMBALE } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * List of hits for the high timbale.
-     */
+    /** List of hits for the high timbale. */
     private val highTimbaleHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == HIGH_TIMBALE } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * The Right hand node.
-     */
+    /** The Right hand node. */
     private val highStickNode = Node()
 
-    /**
-     * The Left hand node.
-     */
+    /** The Left hand node. */
     private val lowStickNode = Node()
 
-    /**
-     * The Left timbale anim node.
-     */
+    /** The Left timbale anim node. */
     private val lowTimbaleAnimNode = Node()
 
-    /**
-     * The Right timbale anim node.
-     */
+    /** The Right timbale anim node. */
     private val highTimbaleAnimNode = Node()
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

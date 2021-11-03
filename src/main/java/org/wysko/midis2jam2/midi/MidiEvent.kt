@@ -16,17 +16,11 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * MIDI files are made up of events.
- */
+/** MIDI files are made up of events. */
 open class MidiEvent
-/**
- * Instantiates a new MIDI event at a given [time].
- */
+/** Instantiates a new MIDI event at a given [time]. */
 protected constructor(
-    /**
-     * The time at which this MIDI event occurs, expressed in MIDI ticks.
-     */
+    /** The time at which this MIDI event occurs, expressed in MIDI ticks. */
     open val time: Long,
 ) {
 

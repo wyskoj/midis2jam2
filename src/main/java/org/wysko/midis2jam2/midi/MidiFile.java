@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * A special type of music file {@link Midis2jam2 new name}.
- */
+/** A special type of music file {@link Midis2jam2 new name}. */
 public final class MidiFile {
 	
 	public static final MidiFile EMPTY;
@@ -38,19 +36,13 @@ public final class MidiFile {
 		EMPTY.setTracks(new MidiTrack[0]);
 	}
 	
-	/**
-	 * The tracks of this MIDI file.
-	 */
+	/** The tracks of this MIDI file. */
 	private MidiTrack[] tracks;
 	
-	/**
-	 * The division, expressed as ticks per quarter-note.
-	 */
+	/** The division, expressed as ticks per quarter-note. */
 	private short division;
 	
-	/**
-	 * A list of tempos that occur in this MIDI file.
-	 */
+	/** A list of tempos that occur in this MIDI file. */
 	private List<MidiTempoEvent> tempos = new ArrayList<>();
 	
 	private HashMap<MidiEvent, Double> eventToTime = new HashMap<>();
@@ -174,9 +166,7 @@ public final class MidiFile {
 		return new MidiProgramEvent(tick, channel, preset);
 	}
 	
-	/**
-	 * @return the first tempo event in the file, expressed in beats per minute
-	 */
+	/** @return the first tempo event in the file, expressed in beats per minute */
 	public double firstTempoInBpm() {
 		MidiTempoEvent event = new MidiTempoEvent(0, 500_000);
 		
@@ -193,9 +183,7 @@ public final class MidiFile {
 		return 6E7 / event.getNumber();
 	}
 	
-	/**
-	 * Calculates the tempo map of this MIDI file.
-	 */
+	/** Calculates the tempo map of this MIDI file. */
 	public void calculateTempoMap() {
 		List<MidiTempoEvent> tempoEvents = new ArrayList<>();
 		

@@ -25,9 +25,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Tenor sax.
- */
+/** The Tenor sax. */
 class TenorSax(
     context: Midis2jam2,
     events: List<MidiChannelSpecificEvent>

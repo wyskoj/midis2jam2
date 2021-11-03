@@ -35,9 +35,7 @@ import java.util.stream.Collectors
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 
-/**
- * Provides various utility functions.
- */
+/** Provides various utility functions. */
 object Utils {
 
     /**
