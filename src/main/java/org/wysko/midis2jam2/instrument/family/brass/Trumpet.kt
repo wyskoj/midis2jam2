@@ -50,9 +50,7 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
         /** The normal, open trumpet. */
         NORMAL(TrumpetClone::class.java),
 
-        /**
-         * The muted trumpet.
-         */
+        /** The muted trumpet. */
         MUTED(MutedTrumpetClone::class.java)
     }
 

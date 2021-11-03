@@ -95,34 +95,22 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
         offsetNode.setLocalTranslation(0f, 0f, 60f * updateInstrumentIndex(delta))
     }
 
-    /**
-     * A single harp string.
-     */
+    /** A single harp string. */
     inner class HarpString(i: Int) {
 
-        /**
-         * The idle string.
-         */
+        /** The idle string. */
         private val string: Spatial
 
-        /**
-         * The Vibrating strings.
-         */
+        /** The Vibrating strings. */
         private val vibratingStrings: Array<Spatial>
 
-        /**
-         * The String node.
-         */
+        /** The String node. */
         internal val stringNode = Node()
 
-        /**
-         * The string animator.
-         */
+        /** The string animator. */
         private val stringAnimator: VibratingStringAnimator
 
-        /**
-         * True if this string is vibrating, false otherwise.
-         */
+        /** True if this string is vibrating, false otherwise. */
         private var vibrating = false
 
         /**
@@ -142,16 +130,12 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
             }
         }
 
-        /**
-         * Begin playing this string.
-         */
+        /** Begin playing this string. */
         fun beginPlaying() {
             vibrating = true
         }
 
-        /**
-         * End playing this string.
-         */
+        /** End playing this string. */
         fun endPlaying() {
             vibrating = false
         }

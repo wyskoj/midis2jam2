@@ -23,9 +23,7 @@ import org.wysko.midis2jam2.util.Utils;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.wysko.midis2jam2.util.Utils.rad;
 
-/**
- * Tests utility functions from {@link Utils}.
- */
+/** Tests utility functions from {@link Utils}. */
 class UtilsTest {
 	
 	@Test

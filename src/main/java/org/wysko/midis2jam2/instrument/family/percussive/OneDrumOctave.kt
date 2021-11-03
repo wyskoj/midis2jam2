@@ -24,9 +24,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * A drum that is hit at different spots to represent the notes in an octave.
- */
+/** A drum that is hit at different spots to represent the notes in an octave. */
 abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     DecayedInstrument(context, eventList) {
 

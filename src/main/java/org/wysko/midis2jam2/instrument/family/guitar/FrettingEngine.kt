@@ -32,18 +32,12 @@ interface FrettingEngine {
     @Contract(pure = true)
     fun bestFretboardPosition(midiNote: Int): FretboardPosition?
 
-    /**
-     * Applies the usage of this fretboard [position], occupying the string.
-     */
+    /** Applies the usage of this fretboard [position], occupying the string. */
     fun applyFretboardPosition(position: FretboardPosition)
 
-    /**
-     * Releases a [string], stopping the animation on it and allowing it to be used for another note.
-     */
+    /** Releases a [string], stopping the animation on it and allowing it to be used for another note. */
     fun releaseString(string: Int)
 
-    /**
-     * Returns the current fret configuration.
-     */
+    /** Returns the current fret configuration. */
     val frets: IntArray
 }

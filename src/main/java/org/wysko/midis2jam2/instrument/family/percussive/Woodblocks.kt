@@ -24,9 +24,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstr
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Woodblocks consist of 12 blocks.
- */
+/** The Woodblocks consist of 12 blocks. */
 class Woodblocks(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     OctavePercussion(context, eventList) {
 
@@ -42,9 +40,7 @@ class Woodblocks(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
             Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * index, 0f)
     }
 
-    /**
-     * A single Woodblock.
-     */
+    /** A single Woodblock. */
     inner class Woodblock(i: Int) : TwelfthOfOctaveDecayed() {
         override fun tick(delta: Float) {
             val localTranslation = highestLevel.localTranslation

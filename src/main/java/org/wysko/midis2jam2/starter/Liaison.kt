@@ -117,9 +117,7 @@ open class Liaison(
         enableLauncher()
     }
 
-    /**
-     * Unlock the [.guiLauncher] so the user can use it.
-     */
+    /** Unlock the [.guiLauncher] so the user can use it. */
     open fun enableLauncher() {
         guiLauncher.enableAll()
     }

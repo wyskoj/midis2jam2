@@ -35,14 +35,10 @@ import kotlin.math.pow
 import kotlin.math.sin
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE as StickMAX_ANGLE
 
-/**
- * The tubular bells.
- */
+/** The tubular bells. */
 class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, events) {
 
-    /**
-     * Each of the twelve bells.
-     */
+    /** Each of the twelve bells. */
     private val bells = Array(12) { i ->
         Bell(i).apply {
             instrumentNode.attachChild(highestLevel)
@@ -50,9 +46,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
         }
     }
 
-    /**
-     * Contains the list of strikes for each of the 12 bells.
-     */
+    /** Contains the list of strikes for each of the 12 bells. */
     private val bellStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
 
     override fun tick(time: Double, delta: Float) {
@@ -74,55 +68,35 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
     }
 
     companion object {
-        /**
-         * The base amplitude of the strike.
-         */
+        /** The base amplitude of the strike. */
         private const val BASE_AMPLITUDE = 0.5
 
-        /**
-         * The speed the bell will wobble at.
-         */
+        /** The speed the bell will wobble at. */
         private const val WOBBLE_SPEED = 3
 
-        /**
-         * How quickly the bell will return to rest.
-         */
+        /** How quickly the bell will return to rest. */
         private const val DAMPENING = 0.3
     }
 
-    /**
-     * A single bell.
-     */
+    /** A single bell. */
     private inner class Bell(i: Int) {
 
-        /**
-         * The highest level node.
-         */
+        /** The highest level node. */
         val highestLevel = Node()
 
-        /**
-         * Contains the tubular bell.
-         */
+        /** Contains the tubular bell. */
         val bellNode = Node()
 
-        /**
-         * Contains the mallet.
-         */
+        /** Contains the mallet. */
         val malletNode: Node
 
-        /**
-         * The current amplitude of the recoil.
-         */
+        /** The current amplitude of the recoil. */
         private var amplitude = 0.5
 
-        /**
-         * The current time of animation, or -1 if the animation has never started yet.
-         */
+        /** The current time of animation, or -1 if the animation has never started yet. */
         private var animTime = -1.0
 
-        /**
-         * True if this bell is recoiling, false if not.
-         */
+        /** True if this bell is recoiling, false if not. */
         private var bellIsRecoiling = false
 
         /**

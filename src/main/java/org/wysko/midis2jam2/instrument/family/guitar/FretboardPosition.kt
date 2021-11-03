@@ -29,18 +29,12 @@ import kotlin.math.sqrt
  * For example, the `FretBoardPosition` for the lowest string with an open fret is `{string=0,fret=0}`.
  */
 data class FretboardPosition(
-    /**
-     * The string of the position.
-     */
+    /** The string of the position. */
     val string: Int,
-    /**
-     * The fret of the position.
-     */
+    /** The fret of the position. */
     val fret: Int,
 ) {
-    /**
-     * Calculates and returns the distance from this position to [other], but ignores variable spacing. Good ol' distance formula.
-     */
+    /** Calculates and returns the distance from this position to [other], but ignores variable spacing. Good ol' distance formula. */
     @Contract(pure = true)
     fun distance(other: FretboardPosition): Double {
         return sqrt((string.toDouble() - other.string).pow(2.0) + (fret.toDouble() - other.fret).pow(2.0))

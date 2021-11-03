@@ -28,15 +28,11 @@ import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.POP
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Blown bottle.
- */
+/** The Blown bottle. */
 class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     WrappedOctaveSustained(context, events, true) {
 
-    /**
-     * The Bottle nodes.
-     */
+    /** The Bottle nodes. */
     private val bottleNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -45,14 +41,10 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         instrumentNode.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * index, 0f)
     }
 
-    /**
-     * A single Bottle.
-     */
+    /** A single Bottle. */
     inner class Bottle(i: Int) : TwelfthOfOctave() {
 
-        /**
-         * The puffer that blows across the top of the bottle.
-         */
+        /** The puffer that blows across the top of the bottle. */
         private val puffer: SteamPuffer = SteamPuffer(context, POP, 1.0, OUTWARDS)
 
         override fun play(duration: Double) {

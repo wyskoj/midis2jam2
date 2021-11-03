@@ -46,13 +46,9 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
-    /**
-     * The type Clarinet clone.
-     */
+    /** The type Clarinet clone. */
     inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
-        /**
-         * The bell stretcher.
-         */
+        /** The bell stretcher. */
         private val bellStretcher: BellStretcher
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
@@ -75,9 +71,7 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             bellStretcher.tick(currentNotePeriod, time)
         }
 
-        /**
-         * Instantiates a new clarinet clone.
-         */
+        /** Instantiates a new clarinet clone. */
         init {
             /* Load body */
             modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))

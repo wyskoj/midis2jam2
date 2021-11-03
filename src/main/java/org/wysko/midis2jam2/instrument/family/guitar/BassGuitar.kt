@@ -52,6 +52,22 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         4,
         context.loadModel(type.modelFile, type.textureFile)
     ) {
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
+    }
+
+    /** Type of Bass Guitar */
+    enum class BassGuitarType(val modelFile: String, val textureFile: String) {
+        STANDARD("Bass.obj", BASS_SKIN_BMP), FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
+    }
+
+    companion object {
+        /** The bass skin texture file. */
+        const val BASS_SKIN_BMP = "BassSkin.bmp"
+
+        /** The base position of the bass guitar. */
+        private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
+    }
 
     init {
         /* Upper strings */
@@ -113,29 +129,5 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             localTranslation = BASE_POSITION
             localRotation = Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1))
         }
-    }
-
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
-    }
-
-    /**
-     * Specifies the type of [BassGuitar].
-     *
-     * @property modelFile the model file
-     * @property textureFile the texture file
-     * @constructor Creates a type of BassGuitar.
-     */
-    enum class BassGuitarType(val modelFile: String, val textureFile: String) {
-        /** The standard BassGuitar. */
-        STANDARD("Bass.obj", BASS_SKIN_BMP),
-
-        /** The fretless BassGuitar. */
-        FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
-    }
-
-    companion object {
-        /** The base position of the bass guitar. */
-        private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
     }
 }

@@ -29,9 +29,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import kotlin.math.sin
 
-/**
- * The stage strings.
- */
+/** The stage strings. */
 class StageStrings(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>,
@@ -40,9 +38,7 @@ class StageStrings(
 ) :
     WrappedOctaveSustained(context, eventList, false) {
 
-    /**
-     * Nodes that contain each string.
-     */
+    /** Nodes that contain each string. */
     private val stringNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -61,39 +57,25 @@ class StageStrings(
         NORMAL, TREMOLO
     }
 
-    /**
-     * A single string.
-     */
+    /** A single string. */
     inner class StageStringNote(type: StageStringsType) : TwelfthOfOctave() {
 
-        /**
-         * Contains the bow.
-         */
+        /** Contains the bow. */
         private val bowNode = Node()
 
-        /**
-         * Contains the anim strings.
-         */
+        /** Contains the anim strings. */
         private val animStringNode = Node()
 
-        /**
-         * Each frame of the anim strings.
-         */
+        /** Each frame of the anim strings. */
         private val animStrings: Array<Spatial>
 
-        /**
-         * The resting string.
-         */
+        /** The resting string. */
         private val restingString: Spatial
 
-        /**
-         * The bow.
-         */
+        /** The bow. */
         private val bow: Spatial
 
-        /**
-         * The anim string animator.
-         */
+        /** The anim string animator. */
         private val animator: VibratingStringAnimator
 
         /** We keep track of the current time for sinusoidal calculations for tremolo playing. */

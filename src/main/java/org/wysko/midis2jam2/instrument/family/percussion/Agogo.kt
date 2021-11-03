@@ -26,30 +26,20 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.Axis
 import kotlin.math.max
 
-/**
- * The agogo.
- */
+/** The agogo. */
 class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The left stick.
-     */
+    /** The left stick. */
     private val leftStick: Spatial
 
-    /**
-     * The right stick.
-     */
+    /** The right stick. */
     private val rightStick: Spatial
 
-    /**
-     * The hits for the high agogo.
-     */
+    /** The hits for the high agogo. */
     private val highHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == HIGH_AGOGO } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * The hits for the low agogo.
-     */
+    /** The hits for the low agogo. */
     private val lowHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == LOW_AGOGO } as MutableList<MidiNoteOnEvent>
 

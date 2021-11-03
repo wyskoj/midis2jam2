@@ -38,39 +38,27 @@ const val SHINY_SILVER: String = "ShinySilver.bmp"
  */
 class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, eventList) {
 
-    /**
-     * Each of the hanging notes.
-     */
+    /** Each of the hanging notes. */
     private val notes = Array(12) { i ->
         OneMusicBoxNote(i).apply {
             instrumentNode.attachChild(highestLevel)
         }
     }
 
-    /**
-     * Contains the spindle.
-     */
+    /** Contains the spindle. */
     private val cylinder = Node()
 
-    /**
-     * List of hits for hanging key recoils.
-     */
+    /** List of hits for hanging key recoils. */
     private val hitsForRecoil: MutableList<MidiNoteOnEvent> =
         eventList.filterIsInstance<MidiNoteOnEvent>() as MutableList<MidiNoteOnEvent>
 
-    /**
-     * List of points that are currently active.
-     */
+    /** List of points that are currently active. */
     private val points: MutableList<Spatial> = ArrayList()
 
-    /**
-     * Keeps track of how many radians each point has rotated.
-     */
+    /** Keeps track of how many radians each point has rotated. */
     private val pointRotations = HashMap<Spatial, Float>()
 
-    /**
-     * Model of the music box point.
-     */
+    /** Model of the music box point. */
     private val pointModel: Spatial
 
     /**
@@ -162,28 +150,20 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /** A single music box note. */
     inner class OneMusicBoxNote(i: Int) : TwelfthOfOctaveDecayed() {
 
-        /**
-         * The hanging key.
-         */
+        /** The hanging key. */
         private val key: Spatial = context.loadModel("MusicBoxKey.obj", SHINY_SILVER, REFLECTIVE, 0.9f).apply {
             highestLevel.attachChild(this)
             setLocalTranslation(i - 5.5f, 7f, 0f)
             localScale = Vector3f(-0.0454f * i + 1, 1f, 1f)
         }
 
-        /**
-         * The animation progress.
-         */
+        /** The animation progress. */
         private var progress = 0.0
 
-        /**
-         * True if this note is recoiling, false otherwise.
-         */
+        /** True if this note is recoiling, false otherwise. */
         private var playing = false
 
-        /**
-         * Call to begin recoiling.
-         */
+        /** Call to begin recoiling. */
         fun play() {
             playing = true
             progress = 0.0

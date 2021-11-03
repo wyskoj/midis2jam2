@@ -33,9 +33,7 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
     rotationAxis: Axis
 ) : StretchyClone(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis) {
 
-    /**
-     * The keys of the instrument.
-     */
+    /** The keys of the instrument. */
     protected lateinit var keys: Array<Spatial>
 
     /** Animates a key. */

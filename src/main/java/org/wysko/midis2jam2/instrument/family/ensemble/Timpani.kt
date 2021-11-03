@@ -24,9 +24,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The timpani.
- */
+/** The timpani. */
 class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
 
     override fun moveForMultiChannel(delta: Float) {

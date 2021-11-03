@@ -16,8 +16,6 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * Signals that a note should stop playing.
- */
+/** Signals that a note should stop playing. */
 data class MidiNoteOffEvent(override val time: Long, override val channel: Int, override val note: Int) :
     MidiNoteEvent(time, channel, note)

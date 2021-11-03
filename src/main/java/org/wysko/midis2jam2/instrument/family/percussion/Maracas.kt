@@ -32,14 +32,10 @@ import org.wysko.midis2jam2.world.Axis
  */
 class Maracas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The left maraca.
-     */
+    /** The left maraca. */
     private val leftMaraca: Spatial
 
-    /**
-     * The right maraca.
-     */
+    /** The right maraca. */
     private val rightMaraca: Spatial
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

@@ -87,19 +87,13 @@ abstract class StringFamilyInstrument protected constructor(
     body
 ) {
 
-    /**
-     * The bow of this string instrument.
-     */
+    /** The bow of this string instrument. */
     private val bow: Spatial
 
-    /**
-     * The Bow node.
-     */
+    /** The Bow node. */
     private val bowNode = Node()
 
-    /**
-     * True if the bow is going left, false if the bow is going right.
-     */
+    /** True if the bow is going left, false if the bow is going right. */
     var bowGoesLeft = false
 
     override fun tick(time: Double, delta: Float) {
@@ -116,9 +110,7 @@ abstract class StringFamilyInstrument protected constructor(
         return b
     }
 
-    /**
-     * Position upper strings.
-     */
+    /** Position upper strings. */
     private fun positionUpperStrings() {
         val forward = -0.6f
         upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
@@ -131,9 +123,7 @@ abstract class StringFamilyInstrument protected constructor(
         upperStrings[3].localRotation = Quaternion().fromAngles(rad(-4.0), 0f, rad(1.69))
     }
 
-    /**
-     * Load lower strings.
-     */
+    /** Load lower strings. */
     private fun loadLowerStrings() {
         // Lower strings
         lowerStrings = Array(4) {
@@ -170,9 +160,7 @@ abstract class StringFamilyInstrument protected constructor(
         }
     }
 
-    /**
-     * Loads the note fingers.
-     */
+    /** Loads the note fingers. */
     private fun loadNoteFingers() {
         // Initialize note fingers
         noteFingers = Array(4) {

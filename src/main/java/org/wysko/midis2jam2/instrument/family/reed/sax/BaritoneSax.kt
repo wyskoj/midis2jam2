@@ -25,9 +25,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The baritone sax.
- */
+/** The baritone sax. */
 class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     Saxophone(context, events, BaritoneSaxClone::class.java, FINGERING_MANAGER) {
     inner class BaritoneSaxClone : SaxophoneClone(this@BaritoneSax, STRETCH_FACTOR) {
@@ -54,14 +52,10 @@ class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     }
 
     companion object {
-        /**
-         * The baritone sax fingering manager.
-         */
+        /** The baritone sax fingering manager. */
         val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(BaritoneSax::class.java)
 
-        /**
-         * The amount to stretch the baritone sax.
-         */
+        /** The amount to stretch the baritone sax. */
         private const val STRETCH_FACTOR = 0.65f
     }
 

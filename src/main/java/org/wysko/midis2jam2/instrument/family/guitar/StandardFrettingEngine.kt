@@ -42,19 +42,13 @@ class StandardFrettingEngine(
 
     override val frets = IntArray(numberOfStrings).apply { fill(-1) }
 
-    /**
-     * The lowest note this engine with deal with.
-     */
+    /** The lowest note this engine with deal with. */
     private val rangeLow = openStringMidiNotes.first()
 
-    /**
-     * The highest note this engine will deal with.
-     */
+    /** The highest note this engine will deal with. */
     private val rangeHigh = openStringMidiNotes.last() + numberOfFrets
 
-    /**
-     * The list of fretboard positions in the running average.
-     */
+    /** The list of fretboard positions in the running average. */
     private val runningAverage: MutableList<FretboardPosition> = ArrayList()
 
     /**
@@ -94,9 +88,7 @@ class StandardFrettingEngine(
         return possiblePositions.firstOrNull()
     }
 
-    /**
-     * Applies the usage of this fretboard position, occupying the string. Adds the position to the running average.
-     */
+    /** Applies the usage of this fretboard position, occupying the string. Adds the position to the running average. */
     override fun applyFretboardPosition(position: FretboardPosition) {
         /* Apply this position and add it to the running average */
         with(position) {
@@ -110,9 +102,7 @@ class StandardFrettingEngine(
         }
     }
 
-    /**
-     * Calculates the running average position. If no frets have been previously applied, returns the position at `0,0`.
-     */
+    /** Calculates the running average position. If no frets have been previously applied, returns the position at `0,0`. */
     @Contract(pure = true)
     private fun runningAveragePosition(): FretboardPosition =
         /* If there are no notes yet played, assume the average is the open note on the lowest string */
@@ -126,9 +116,7 @@ class StandardFrettingEngine(
             )
         }
 
-    /**
-     * Releases a string, stopping the animation on it and allowing it to be used for another note.
-     */
+    /** Releases a string, stopping the animation on it and allowing it to be used for another note. */
     override fun releaseString(string: Int) {
         require(string in 0 until numberOfStrings) { "Can't release a string that does not exist." }
         frets[string] = -1

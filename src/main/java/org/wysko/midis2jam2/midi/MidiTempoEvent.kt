@@ -16,9 +16,7 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * Defines how fast the MIDI file should play.
- */
+/** Defines how fast the MIDI file should play. */
 class MidiTempoEvent
 /**
  * Instantiates a new MIDI tempo event.
@@ -28,9 +26,7 @@ class MidiTempoEvent
  */
     (
     time: Long,
-    /**
-     * The tempo value, expressed in microseconds per pulse.
-     */
+    /** The tempo value, expressed in microseconds per pulse. */
     val number: Int,
 ) : MidiEvent(time) {
 

@@ -23,9 +23,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Steel drums.
- */
+/** The Steel drums. */
 class SteelDrums(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>

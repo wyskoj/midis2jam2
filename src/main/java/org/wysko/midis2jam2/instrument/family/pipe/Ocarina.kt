@@ -23,9 +23,7 @@ import org.wysko.midis2jam2.instrument.clone.HandedClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Ocarina.
- */
+/** The Ocarina. */
 class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, OcarinaClone::class.java, OcarinaHandGenerator()) {
 
@@ -39,9 +37,7 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
     }
 
-    /**
-     * A single ocarina.
-     */
+    /** A single ocarina. */
     inner class OcarinaClone : HandedClone(this@Ocarina, 0f) {
         override fun loadHands() {
             rightHands = Array(12) {

@@ -56,24 +56,16 @@ const val ACCORDION_KEY_WHITE_BACK_OBJ = "AccordionKeyWhiteBack.obj"
 class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: AccordionType) :
     KeyedInstrument(context, eventList, 0, 23) {
 
-    /**
-     * The accordion is divided into fourteen sections.
-     */
+    /** The accordion is divided into fourteen sections. */
     private val accordionSections = Array(SECTION_COUNT) { Node() }
 
-    /**
-     * The current amount of squeeze.
-     */
+    /** The current amount of squeeze. */
     private var angle = MAX_ANGLE.toFloat()
 
-    /**
-     * The current delta [angle]. That is, how much to change the angle per frame.
-     */
+    /** The current delta [angle]. That is, how much to change the angle per frame. */
     private var squeezingSpeed = 0.0
 
-    /**
-     * True if the accordion is expanding, false if it is contracting.
-     */
+    /** True if the accordion is expanding, false if it is contracting. */
     private var expanding = false
 
     /**
@@ -140,9 +132,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         offsetNode.setLocalTranslation(0f, 30 * updateInstrumentIndex(delta), 0f)
     }
 
-    /**
-     * A single key on the accordion. It behaves just like any other key.
-     */
+    /** A single key on the accordion. It behaves just like any other key. */
     private inner class AccordionKey(midiNote: Int, startPos: Int) : Key() {
         override fun tick(delta: Float) {
             if (isBeingPressed) {
@@ -200,24 +190,16 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
     }
 
     companion object {
-        /**
-         * The maximum angle that the accordion will expand to.
-         */
+        /** The maximum angle that the accordion will expand to. */
         const val MAX_ANGLE = 4
 
-        /**
-         * The minimum angle that the accordion will contract to.
-         */
+        /** The minimum angle that the accordion will contract to. */
         const val MIN_ANGLE = 1
 
-        /**
-         * The number of sections the accordion is divided into.
-         */
+        /** The number of sections the accordion is divided into. */
         const val SECTION_COUNT = 14
 
-        /**
-         * The maximum speed at which the accordion squeezes.
-         */
+        /** The maximum speed at which the accordion squeezes. */
         const val MAX_SQUEEZING_SPEED = 2
     }
 

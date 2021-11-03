@@ -25,9 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The melodic agogos.
- */
+/** The melodic agogos. */
 class Agogos(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>
@@ -44,9 +42,7 @@ class Agogos(
             Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * updateInstrumentIndex(delta), 0f)
     }
 
-    /**
-     * A single agogo.
-     */
+    /** A single agogo. */
     inner class Agogo(i: Int) : TwelfthOfOctaveDecayed() {
         override fun tick(delta: Float) {
             val localTranslation = highestLevel.localTranslation

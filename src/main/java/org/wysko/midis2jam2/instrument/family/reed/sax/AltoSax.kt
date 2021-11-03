@@ -25,9 +25,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The alto saxophone.
- */
+/** The alto saxophone. */
 class AltoSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     Saxophone(context, events, AltoSaxClone::class.java, FINGERING_MANAGER) {
 
@@ -54,14 +52,10 @@ class AltoSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     }
 
     companion object {
-        /**
-         * The Alto Sax fingering manager.
-         */
+        /** The Alto Sax fingering manager. */
         val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(AltoSax::class.java)
 
-        /**
-         * The amount to stretch the bell of this instrument by.
-         */
+        /** The amount to stretch the bell of this instrument by. */
         private const val STRETCH_FACTOR = 0.65f
     }
 

@@ -33,19 +33,13 @@ import javax.sound.midi.Sequencer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Contains all the code relevant to operating the 3D scene.
- */
+/** Contains all the code relevant to operating the 3D scene. */
 public class DesktopMidis2jam2 extends Midis2jam2 {
 	
-	/**
-	 * The MIDI sequencer.
-	 */
+	/** The MIDI sequencer. */
 	private final Sequencer sequencer;
 	
-	/**
-	 * Reference to the Swing window that is encapsulating the canvas that holds midis2jam2.
-	 */
+	/** Reference to the Swing window that is encapsulating the canvas that holds midis2jam2. */
 	private Displays window;
 	
 	/**
@@ -168,9 +162,7 @@ public class DesktopMidis2jam2 extends Midis2jam2 {
 		}
 	}
 	
-	/**
-	 * Stops the app state.
-	 */
+	/** Stops the app state. */
 	@Override
 	public void exit() {
 		if (sequencer.isOpen()) {

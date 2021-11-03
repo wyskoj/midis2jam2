@@ -24,9 +24,7 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The piccolo.
- */
+/** The piccolo. */
 class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, PiccoloClone::class.java, FINGERING_MANAGER) {
 

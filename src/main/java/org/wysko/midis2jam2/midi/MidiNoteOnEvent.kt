@@ -16,9 +16,7 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * Signals a note should begin playing.
- */
+/** Signals a note should begin playing. */
 data class MidiNoteOnEvent(
     override val time: Long,
     override val channel: Int,

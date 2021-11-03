@@ -25,14 +25,10 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The shaker.
- */
+/** The shaker. */
 class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the shaker.
-     */
+    /** Contains the shaker. */
     private val shakerNode = Node()
 
     override fun tick(time: Double, delta: Float) {

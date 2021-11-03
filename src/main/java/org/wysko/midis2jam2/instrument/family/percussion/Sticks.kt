@@ -26,19 +26,13 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * The sticks.
- */
+/** The sticks. */
 class Sticks(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the left stick.
-     */
+    /** Contains the left stick. */
     private val leftStickNode = Node()
 
-    /**
-     * Contains the right stick.
-     */
+    /** Contains the right stick. */
     private val rightStickNode = Node()
 
     override fun tick(time: Double, delta: Float) {

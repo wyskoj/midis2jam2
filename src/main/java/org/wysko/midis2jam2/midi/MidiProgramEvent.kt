@@ -16,9 +16,7 @@
  */
 package org.wysko.midis2jam2.midi
 
-/**
- * Indicates which instrument should be playing at a certain time.
- */
+/** Indicates which instrument should be playing at a certain time. */
 data class MidiProgramEvent
     (
     override val time: Long, override val channel: Int,

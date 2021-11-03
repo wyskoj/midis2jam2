@@ -22,9 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Viola.
- */
+/** The Viola. */
 class Viola(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
     context,
     events,

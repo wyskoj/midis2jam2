@@ -33,14 +33,10 @@ import org.wysko.midis2jam2.world.Axis
  */
 class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * Contains the left hand.
-     */
+    /** Contains the left hand. */
     private val leftHandNode = Node()
 
-    /**
-     * Contains the right hand.
-     */
+    /** Contains the right hand. */
     private val rightHandNode = Node()
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

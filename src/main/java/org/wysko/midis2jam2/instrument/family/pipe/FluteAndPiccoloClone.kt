@@ -18,9 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
 
-/**
- * Contains shared code between the flute and piccolo.
- */
+/** Contains shared code between the flute and piccolo. */
 open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffType, puffScale: Float) :
     PuffingClone(parent, puffType, puffScale) {
 

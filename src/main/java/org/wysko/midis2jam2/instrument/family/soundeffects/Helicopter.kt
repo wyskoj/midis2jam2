@@ -45,39 +45,25 @@ import kotlin.math.cos
  */
 class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
-    /**
-     * "Seed" for X-value generation.
-     */
+    /** "Seed" for X-value generation. */
     private val rotXRand: Float
 
-    /**
-     * "Seed" for Y-value generation.
-     */
+    /** "Seed" for Y-value generation. */
     private val rotYRand: Float
 
-    /**
-     * "Seed" for Z-value generation.
-     */
+    /** "Seed" for Z-value generation. */
     private val rotZRand: Float
 
-    /**
-     * Contains all geometry for animation.
-     */
+    /** Contains all geometry for animation. */
     private val animNode = Node()
 
-    /**
-     * The rotor which spins.
-     */
+    /** The rotor which spins. */
     private val rotor = Node()
 
-    /**
-     * Each set of lights on the helicopter. Each spatial is a plane that has the light texture for that note.
-     */
+    /** Each set of lights on the helicopter. Each spatial is a plane that has the light texture for that note. */
     private val lights: Array<Spatial>
 
-    /**
-     * The amount of height and random movement.
-     */
+    /** The amount of height and random movement. */
     private var force = 0f
 
     override fun tick(time: Double, delta: Float) {

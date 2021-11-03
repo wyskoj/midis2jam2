@@ -26,9 +26,7 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The toms.
- */
+/** The toms. */
 class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch) :
     SingleStickInstrument(context, hits), Retexturable {
 
@@ -44,58 +42,44 @@ class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPit
         )
     }
 
-    /**
-     * The pitch of the tom.
-     */
+    /** The pitch of the tom. */
     enum class TomPitch(val scale: Vector3f, val location: Vector3f, val rotation: Quaternion) {
-        /**
-         * The Low floor tom.
-         */
+        /** The Low floor tom. */
         LOW_FLOOR(
             Vector3f(1.5f, 1.5f, 1.5f),
             Vector3f(20f, 20f, -60f),
             Quaternion().fromAngles(rad(-2.0), rad(180.0), rad(-10.0))
         ),
 
-        /**
-         * The High floor tom.
-         */
+        /** The High floor tom. */
         HIGH_FLOOR(
             Vector3f(1.4f, 1.4f, 1.4f),
             Vector3f(17f, 21f, -75f),
             Quaternion().fromAngles(rad(-5.0), rad(180.0), rad(-15.0))
         ),
 
-        /**
-         * The Low tom.
-         */
+        /** The Low tom. */
         LOW(
             Vector3f(1.2f, 1.2f, 1.2f),
             Vector3f(10f, 29f, -82f),
             Quaternion().fromAngles(rad(60.0), rad(-30.0), 0f)
         ),
 
-        /**
-         * The Low mid tom.
-         */
+        /** The Low mid tom. */
         LOW_MID(
             Vector3f(1f, 1f, 1f),
             Vector3f(0f, 32f, -85f),
             Quaternion().fromAngles(rad(60.0), 0f, 0f)
         ),
 
-        /**
-         * The High mid tom.
-         */
+        /** The High mid tom. */
         HIGH_MID(
             Vector3f(0.8f, 0.8f, 0.8f),
             Vector3f(-9f, 31f, -82f),
             Quaternion().fromAngles(rad(60.0), rad(20.0), 0f)
         ),
 
-        /**
-         * The High tom.
-         */
+        /** The High tom. */
         HIGH(
             Vector3f(0.6f, 0.6f, 0.6f),
             Vector3f(-15f, 29f, -78f),

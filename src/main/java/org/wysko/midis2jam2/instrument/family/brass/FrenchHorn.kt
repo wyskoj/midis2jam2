@@ -40,9 +40,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
-    /**
-     * A single French Horn.
-     */
+    /** A single instance of a French Horn. */
     inner class FrenchHornClone : AnimatedKeyCloneByIntegers(this@FrenchHorn, 0.1f, 0.9f, Axis.Y, Axis.X) {
 
         override fun moveForPolyphony() {

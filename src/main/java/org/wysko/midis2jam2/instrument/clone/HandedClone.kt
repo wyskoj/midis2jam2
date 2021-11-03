@@ -36,24 +36,16 @@ import org.wysko.midis2jam2.world.Axis
 abstract class HandedClone protected constructor(parent: HandedInstrument, rotationFactor: Float) :
     Clone(parent, rotationFactor, Axis.X) {
 
-    /**
-     * The left hand node.
-     */
+    /** The left hand node. */
     private val leftHandNode = Node()
 
-    /**
-     * The right hand node.
-     */
+    /** The right hand node. */
     private val rightHandNode = Node()
 
-    /**
-     * The left hands.
-     */
+    /** The left hands. */
     protected lateinit var leftHands: Array<Spatial>
 
-    /**
-     * The right hands.
-     */
+    /** The right hands. */
     protected lateinit var rightHands: Array<Spatial>
 
     /**

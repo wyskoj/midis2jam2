@@ -24,15 +24,11 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The Flute.
- */
+/** The Flute. */
 class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, FluteClone::class.java, FINGERING_MANAGER) {
 
-    /**
-     * The type Flute clone.
-     */
+    /** The type Flute clone. */
     inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffType.WHISTLE, 1f) {
         init {
             val horn = context.loadModel(

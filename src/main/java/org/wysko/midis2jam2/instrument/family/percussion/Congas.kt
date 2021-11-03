@@ -29,9 +29,7 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 import kotlin.math.max
 
-/**
- * Texture file for hands.
- */
+/** Texture file for hands. */
 const val HANDS_TEXTURE: String = "hands.bmp"
 
 /**
@@ -46,46 +44,30 @@ const val HANDS_TEXTURE: String = "hands.bmp"
  */
 class Congas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The Right hand node.
-     */
+    /** The Right hand node. */
     private val rightHandNode = Node()
 
-    /**
-     * The Left hand node.
-     */
+    /** The Left hand node. */
     private val leftHandNode = Node()
 
-    /**
-     * The Left conga anim node.
-     */
+    /** The Left conga anim node. */
     private val leftCongaAnimNode = Node()
 
-    /**
-     * The Right conga anim node.
-     */
+    /** The Right conga anim node. */
     private val rightCongaAnimNode = Node()
 
-    /**
-     * The Muted hand node.
-     */
+    /** The Muted hand node. */
     private val mutedHandNode = Node()
 
-    /**
-     * The Low conga hits.
-     */
+    /** The Low conga hits. */
     private val lowCongaHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == LOW_CONGA } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * The High conga hits.
-     */
+    /** The High conga hits. */
     private val highCongaHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == OPEN_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
 
-    /**
-     * The Muted conga hits.
-     */
+    /** The Muted conga hits. */
     private val mutedCongaHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == MUTE_HIGH_CONGA } as MutableList<MidiNoteOnEvent>
 

@@ -28,15 +28,11 @@ import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The whistles.
- */
+/** The whistles. */
 class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     WrappedOctaveSustained(context, events, true) {
 
-    /**
-     * The Whistle nodes.
-     */
+    /** The Whistle nodes. */
     private val whistleNodes = Array(12) { Node() }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -45,14 +41,10 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         instrumentNode.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * index, 0f)
     }
 
-    /**
-     * A single Whistle.
-     */
+    /** A single Whistle. */
     inner class Whistle(i: Int) : TwelfthOfOctave() {
 
-        /**
-         * The Puffer.
-         */
+        /** The Puffer. */
         private val puffer: SteamPuffer = SteamPuffer(context, WHISTLE, 1.0, OUTWARDS)
 
         override fun play(duration: Double) {

@@ -21,32 +21,20 @@ import org.jetbrains.annotations.Contract
 import kotlin.math.cos
 import kotlin.math.pow
 
-/**
- * Animates the wobble on cymbals using [a sinusoidal function](https://www.desmos.com/calculator/vvbwlit9he).
- */
+/** Animates the wobble on cymbals using [a sinusoidal function](https://www.desmos.com/calculator/vvbwlit9he). */
 class CymbalAnimator(
-    /**
-     * The amplitude, or maximum angle of wobble.
-     */
+    /** The amplitude, or maximum angle of wobble. */
     private val amplitude: Double,
-    /**
-     * How fast the cymbal wobbles after being struck.
-     */
+    /** How fast the cymbal wobbles after being struck. */
     private val wobbleSpeed: Double,
-    /**
-     * The dampening, or how fast the cymbal returns to an idle state.
-     */
+    /** The dampening, or how fast the cymbal returns to an idle state. */
     private val dampening: Double
 ) {
 
-    /**
-     * The current time.
-     */
+    /** The current time. */
     private var animTime = -1.0
 
-    /**
-     * Calculates and returns the wobble angle, based on the [animTime].
-     */
+    /** Calculates and returns the wobble angle, based on the [animTime]. */
     @Contract(pure = true)
     fun rotationAmount(): Float {
         return if (animTime >= 0) {
@@ -59,9 +47,7 @@ class CymbalAnimator(
         } else 0F
     }
 
-    /**
-     * Call this method to indicate that the cymbal has just been struck.
-     */
+    /** Call this method to indicate that the cymbal has just been struck. */
     fun strike() {
         animTime = 0.0
     }

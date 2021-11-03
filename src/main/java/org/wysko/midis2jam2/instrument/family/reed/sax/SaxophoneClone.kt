@@ -21,9 +21,7 @@ import org.wysko.midis2jam2.instrument.clone.UpAndDownKeyClone
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * Shared code for sax clones.
- */
+/** Shared code for sax clones. */
 abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) :
     UpAndDownKeyClone(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor) {
 
@@ -32,14 +30,10 @@ abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFa
     }
 
     companion object {
-        /**
-         * The number of keys on a saxophone.
-         */
+        /** The number of keys on a saxophone. */
         private const val NUMBER_OF_KEYS = 20
 
-        /**
-         * The amount to rotate the sax by when playing.
-         */
+        /** The amount to rotate the sax by when playing. */
         private const val ROTATION_FACTOR = 0.1f
     }
 

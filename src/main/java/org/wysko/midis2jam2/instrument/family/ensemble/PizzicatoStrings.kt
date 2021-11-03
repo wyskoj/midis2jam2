@@ -39,9 +39,7 @@ class PizzicatoStrings(
     eventList: List<MidiChannelSpecificEvent>
 ) : DecayedInstrument(context, eventList) {
 
-    /**
-     * Each string.
-     */
+    /** Each string. */
     val strings = arrayOfNulls<PizzicatoString>(12)
 
     override fun tick(time: Double, delta: Float) {
@@ -59,39 +57,25 @@ class PizzicatoStrings(
             Quaternion().fromAngles(0f, rad((45f + 12 * updateInstrumentIndex(delta)).toDouble()), 0f)
     }
 
-    /**
-     * A single string.
-     */
+    /** A single string. */
     inner class PizzicatoString : TwelfthOfOctaveDecayed() {
 
-        /**
-         * Contains the anim strings.
-         */
+        /** Contains the anim strings. */
         private val animStringNode = Node()
 
-        /**
-         * The resting string.
-         */
+        /** The resting string. */
         private val restingString: Spatial
 
-        /**
-         * Each frame of animation.
-         */
+        /** Each frame of animation. */
         private val animStrings: Array<Spatial>
 
-        /**
-         * Is this string currently playing?
-         */
+        /** Is this string currently playing? */
         var playing = false
 
-        /**
-         * Animates the anim strings.
-         */
+        /** Animates the anim strings. */
         private val stringAnimator: VibratingStringAnimator
 
-        /**
-         * The amount of progress playing the current note.
-         */
+        /** The amount of progress playing the current note. */
         private var progress = 0.0
 
         override fun tick(delta: Float) {
@@ -118,9 +102,7 @@ class PizzicatoStrings(
             progress += (delta * 7).toDouble()
         }
 
-        /**
-         * Begin playing this string.
-         */
+        /** Begin playing this string. */
         fun play() {
             playing = true
             progress = 0.0

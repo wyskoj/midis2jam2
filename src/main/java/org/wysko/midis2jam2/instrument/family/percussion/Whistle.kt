@@ -30,19 +30,13 @@ import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/**
- * The long and short percussion whistles.
- */
+/** The long and short percussion whistles. */
 class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /**
-     * The short whistle.
-     */
+    /** The short whistle. */
     private val shortWhistle: PercussionWhistle
 
-    /**
-     * The long whistle.
-     */
+    /** The long whistle. */
     private val longWhistle: PercussionWhistle
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -63,53 +57,33 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
         }
     }
 
-    /**
-     * The enum Whistle length.
-     */
+    /** The enum Whistle length. */
     enum class WhistleLength {
-        /**
-         * Short whistle length.
-         */
+        /** Short whistle length. */
         SHORT,
 
-        /**
-         * Long whistle length.
-         */
+        /** Long whistle length. */
         LONG
     }
 
-    /**
-     * A single Whistle.
-     */
+    /** A single Whistle. */
     inner class PercussionWhistle(length: WhistleLength) {
-        /**
-         * The Anim node.
-         */
+        /** The Anim node. */
         private val animNode = Node()
 
-        /**
-         * The Highest level.
-         */
+        /** The Highest level. */
         val highestLevel = Node()
 
-        /**
-         * The Puffer.
-         */
+        /** The Puffer. */
         private val puffer: SteamPuffer
 
-        /**
-         * True if this whistle is currently playing, false otherwise.
-         */
+        /** True if this whistle is currently playing, false otherwise. */
         var playing = false
 
-        /**
-         * The current amount of progress this whistle has made playing.
-         */
+        /** The current amount of progress this whistle has made playing. */
         private var progress = 0.0
 
-        /**
-         * How long this whistle should play for.
-         */
+        /** How long this whistle should play for. */
         private var duration = 0.0
 
         /**
@@ -142,9 +116,7 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
             puffer.tick(delta, playing)
         }
 
-        /**
-         * Instantiates a new Whistle.
-         */
+        /** Instantiates a new Whistle. */
         init {
             puffer = SteamPuffer(
                 context,

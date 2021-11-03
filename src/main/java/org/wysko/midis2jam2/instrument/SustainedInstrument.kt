@@ -32,14 +32,10 @@ abstract class SustainedInstrument protected constructor(
     eventList: List<MidiChannelSpecificEvent>
 ) : Instrument(context) {
 
-    /**
-     * This list shall not be updated and shall be used for visibility calculations.
-     */
+    /** This list shall not be updated and shall be used for visibility calculations. */
     private val unmodifiableNotePeriods: List<NotePeriod>
 
-    /**
-     * The list of current note periods. Will always be updating as the MIDI file progresses.
-     */
+    /** The list of current note periods. Will always be updating as the MIDI file progresses. */
     protected val currentNotePeriods: MutableList<NotePeriod> = ArrayList()
 
     /**

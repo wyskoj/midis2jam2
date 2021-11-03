@@ -20,19 +20,13 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.util.Utils
 import kotlin.math.floor
 
-/**
- * Animates vibrating strings, as seen on the guitar, violin, etc.
- */
+/** Animates vibrating strings, as seen on the guitar, violin, etc. */
 class VibratingStringAnimator(vararg frames: Spatial) {
 
-    /**
-     * Each frame of the animation.
-     */
+    /** Each frame of the animation. */
     private val stringFrames: List<Spatial> = listOf(*frames)
 
-    /**
-     * The current frame to show.
-     */
+    /** The current frame to show. */
     private var frame = 0.0
 
     /**

@@ -22,27 +22,19 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.world.Axis
 
-/**
- * Instruments that have separate geometry for up keys and down keys.
- */
+/** Instruments that have separate geometry for up keys and down keys. */
 abstract class UpAndDownKeyClone protected constructor(
-    /**
-     * The number of keys on this clone.
-     */
+    /** The number of keys on this clone. */
     private val keyCount: Int,
     parent: MonophonicInstrument,
     rotationFactor: Float,
     stretchFactor: Float
 ) : StretchyClone(parent, rotationFactor, stretchFactor, Axis.Y, Axis.X) {
 
-    /**
-     * Geometry for keys up.
-     */
+    /** Geometry for keys up. */
     protected lateinit var keysUp: Array<Spatial>
 
-    /**
-     * Geometry for keys down.
-     */
+    /** Geometry for keys down. */
     protected lateinit var keysDown: Array<Spatial>
 
     /**
@@ -76,9 +68,7 @@ abstract class UpAndDownKeyClone protected constructor(
         }
     }
 
-    /**
-     * Attach all the [keysUp] and [keysDown] to the [modelNode], hiding all the key down models.
-     */
+    /** Attach all the [keysUp] and [keysDown] to the [modelNode], hiding all the key down models. */
     protected fun attachKeys() {
         keysUp.forEach {
             modelNode.attachChild(it)

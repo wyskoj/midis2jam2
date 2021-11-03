@@ -26,9 +26,7 @@ import org.jetbrains.annotations.Contract
  */
 @FunctionalInterface
 interface FretHeightCalculator {
-    /**
-     * Returns the scale of the strings given a [fret].
-     */
+    /** Returns the scale of the strings given a [fret]. */
     @Contract(pure = true)
     fun calculateScale(fret: Int): Float
 }
