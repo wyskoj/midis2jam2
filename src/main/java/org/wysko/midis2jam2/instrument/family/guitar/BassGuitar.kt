@@ -23,9 +23,6 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The texture file of the Bass Guitar skin. */
-const val BASS_SKIN_BMP: String = "BassSkin.bmp"
-
 /**
  * The Bass Guitar.
  *
@@ -57,16 +54,17 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     }
 
     /** Type of Bass Guitar */
-    enum class BassGuitarType(val modelFile: String, val textureFile: String) {
-        STANDARD("Bass.obj", BASS_SKIN_BMP), FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
-    }
+    enum class BassGuitarType(
+        /** The model file of the Bass Guitar type. */
+        val modelFile: String,
+        /** The texture file of the Bass Guitar type. */
+        val textureFile: String
+    ) {
+        /** The standard Bass Guitar type. */
+        STANDARD("Bass.obj", BASS_SKIN_BMP),
 
-    companion object {
-        /** The bass skin texture file. */
-        const val BASS_SKIN_BMP = "BassSkin.bmp"
-
-        /** The base position of the bass guitar. */
-        private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
+        /** The fretless Bass Guitar type. */
+        FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
     }
 
     init {
@@ -131,3 +129,9 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         }
     }
 }
+
+/** The base position of the bass guitar. */
+private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
+
+/** The bass skin texture file. */
+private const val BASS_SKIN_BMP = "BassSkin.bmp"
