@@ -61,7 +61,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
     // Theme
-    implementation("com.formdev:flatlaf:1.6")
+    implementation("com.formdev:flatlaf:1.6.1")
 
     // Installer
     implementation("com.install4j:install4j-runtime:8.0.7")
@@ -70,7 +70,7 @@ dependencies {
     implementation("org.spongepowered:noise:2.0.0-SNAPSHOT")
 
     // Dokka math
-    implementation("org.jetbrains.dokka:mathjax-plugin:1.4.32")
+    implementation("org.jetbrains.dokka:mathjax-plugin:1.5.31")
 }
 
 downloadLicenses {
