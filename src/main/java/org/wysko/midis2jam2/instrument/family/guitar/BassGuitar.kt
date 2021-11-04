@@ -21,6 +21,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
@@ -35,7 +36,10 @@ import org.wysko.midis2jam2.util.Utils.rad
 class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: BassGuitarType) :
     FrettedInstrument(
         context,
-        StandardFrettingEngine(4, 22, intArrayOf(28, 33, 38, 43)),
+        StandardFrettingEngine(
+            4, 22,
+            if (needsDropTuning(events)) BassGuitarTuning.DROP_D.values else BassGuitarTuning.STANDARD.values
+        ),
         events,
         FrettedInstrumentPositioning(
             19.5f, -26.57f, arrayOf(
@@ -47,7 +51,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             FretHeightByTable.fromXml(BassGuitar::class.java)
         ),
         4,
-        context.loadModel(type.modelFile, type.textureFile)
+        context.loadModel(if (needsDropTuning(events)) type.modelDropDFile else type.modelFile, type.textureFile)
     ) {
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
@@ -57,14 +61,16 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     enum class BassGuitarType(
         /** The model file of the Bass Guitar type. */
         val modelFile: String,
+        /** The model file of the Bass Guitar type with drop D tuning. */
+        val modelDropDFile: String,
         /** The texture file of the Bass Guitar type. */
-        val textureFile: String
+        val textureFile: String,
     ) {
         /** The standard Bass Guitar type. */
-        STANDARD("Bass.obj", BASS_SKIN_BMP),
+        STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP),
 
         /** The fretless Bass Guitar type. */
-        FRETLESS("BassFretless.fbx", "BassSkinFretless.png");
+        FRETLESS("BassFretless.fbx", "BassFretlessD.fbx", "BassSkinFretless.png");
     }
 
     init {
@@ -128,6 +134,25 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             localRotation = Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1))
         }
     }
+}
+
+/**
+ * Given a list of [events], determines if the Bass Guitar should use the drop D tuning.
+ *
+ * @return true if the Bass Guitar should use the drop D tuning, false otherwise.
+ */
+private fun needsDropTuning(events: List<MidiChannelSpecificEvent>): Boolean =
+    (events.filterIsInstance<MidiNoteOnEvent>().minByOrNull { it.note }?.note ?: 127) < 28
+
+private enum class BassGuitarTuning(
+    /** The tuning of the Bass Guitar. */
+    val values: IntArray
+) {
+    /** The standard tuning of the Bass Guitar. */
+    STANDARD(intArrayOf(28, 33, 38, 43)),
+
+    /** The drop D tuning of the Bass Guitar. */
+    DROP_D(intArrayOf(26, 33, 38, 43));
 }
 
 /** The base position of the bass guitar. */

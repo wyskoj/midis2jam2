@@ -22,6 +22,7 @@ import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.guitar.FretHeightByTable.Companion.fromXml
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
@@ -31,7 +32,10 @@ import org.wysko.midis2jam2.util.Utils.rad
  */
 class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: GuitarType) : FrettedInstrument(
     context,
-    StandardFrettingEngine(6, 22, intArrayOf(40, 45, 50, 55, 59, 64)),
+    StandardFrettingEngine(
+        6, 22,
+        if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
+    ),
     events,
     FrettedInstrumentPositioning(
         16.6f,
@@ -49,7 +53,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         fromXml(Guitar::class.java)
     ),
     6,
-    context.loadModel(type.modelFileName, type.textureFileName)
+    context.loadModel(if (needsDropTuning(events)) type.modelDFileName else type.modelFileName, type.textureFileName)
 ) {
 
     override fun moveForMultiChannel(delta: Float) {
@@ -69,14 +73,16 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     enum class GuitarType(
         /** The Model file name. */
         internal val modelFileName: String,
+        /** The Model file name for drop D tuning. */
+        internal val modelDFileName: String,
         /** The Texture file name. */
         val textureFileName: String
     ) {
         /** Acoustic guitar type. */
-        ACOUSTIC("Guitar.obj", "GuitarSkin.bmp"),
+        ACOUSTIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp"),
 
         /** Electric guitar type. */
-        ELECTRIC("Guitar.obj", "GuitarSkin.bmp");
+        ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp");
     }
 
     companion object {
@@ -181,4 +187,23 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         instrumentNode.localTranslation = BASE_POSITION
         instrumentNode.localRotation = Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3))
     }
+}
+
+/**
+ * Given a list of [events], determines if the Guitar should use the drop D tuning.
+ *
+ * @return true if the Guitar should use the drop D tuning, false otherwise.
+ */
+private fun needsDropTuning(events: List<MidiChannelSpecificEvent>): Boolean =
+    (events.filterIsInstance<MidiNoteOnEvent>().minByOrNull { it.note }?.note ?: 127) < 40
+
+private enum class GuitarTuning(
+    /** The tuning of the Guitar. */
+    val values: IntArray
+) {
+    /** The standard tuning of the Guitar. */
+    STANDARD(intArrayOf(40, 45, 50, 55, 59, 64)),
+
+    /** The drop D tuning of the Guitar. */
+    DROP_D(intArrayOf(38, 45, 50, 55, 59, 64));
 }
