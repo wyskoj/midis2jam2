@@ -58,7 +58,7 @@ import kotlin.math.sin
  * Besides rotating based on the pitch of each note, the laser is "wobbled" slightly. The
  * [SpaceLaserClone.wobbleIntensity] is increased during a note until a certain threshold is reached.
  *
- * The space laser also animated pitch bend and modulation. The intensity of the aforementioned wobble is driven by
+ * The space laser also animates pitch bend and modulation. The intensity of the aforementioned wobble is driven by
  * the modulation controller. Pitch bend turns the laser proportional to the intensity of the bend. For example, if
  * the note playing is Middle C and the pitch bend dictates the sound should be pitched -100 cents, the laser should
  * point in the same direction as B below Middle C.
@@ -101,7 +101,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         super.tick(time, delta)
     }
 
-    /** Individual space lasers. */
+    /** An individual space laser. */
     inner class SpaceLaserClone : Clone(this@SpaceLaser, 0f, Axis.X) {
 
         /** The current rotation, in degrees. */
@@ -193,7 +193,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
 
         /* Truncate each note period to allow some space for end-to-end notes */
-        notePeriods.forEach { if (it.duration() > 0.05) it.endTime -= 0.025 }
+        notePeriods.forEach {
+            if (it.duration() > 0.1) it.endTime -= 0.05 else if (it.duration() > 0.05) it.endTime -= 0.02 else it.endTime -= 0.01
+        }
 
         pitchBends = eventList.filterIsInstance<MidiPitchBendEvent>().toMutableList()
         modulationEvents = eventList.filterIsInstance<MidiControlEvent>().filter { it.controlNum == 1 }.toMutableList()
