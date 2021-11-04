@@ -28,11 +28,11 @@ import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.Axis
 
 /**
- * [MonophonicInstruments][MonophonicInstrument] use Clones to visualize polyphony. A clone is required for each
- * degree of polyphony.
+ * An instance of an instrument that is used to display degrees of polyphony on a [MonophonicInstrument].
  *
- * The calculation of clones (that is, determining how many clones are needed and which clones should be responsible for
- * each note) is performed in [MonophonicInstrument].
+ * Monophonic instruments cannot play more than one note at a time, so a duplicate of the original instrument is
+ * temporarily created to play the note. The number of clones required to play the note is determined by the degree
+ * of polyphony of the notes in the original instrument.
  *
  * @see MonophonicInstrument
  */
@@ -76,19 +76,16 @@ abstract class Clone protected constructor(
      */
     private var isVisible = false
 
-    /**
-     * Determines if this clone is playing at a certain point. Since [notePeriods] is always losing note periods
-     * that have fully elapsed, this method cannot produce correct results for events in the past.
-     */
-    @Contract(pure = true)
-    fun isPlaying(midiTick: Long): Boolean = notePeriods.any { midiTick >= it.startTick() && midiTick < it.endTick() }
-
-
     /** Determines if this clone is playing. */
     @get:Contract(pure = true)
     val isPlaying: Boolean
         get() = currentNotePeriod != null
 
+    /**
+     * Determines if this clone is visible when this method is called. This clone is visible if it is currently
+     * playing, or it is in between two notes, where the distance from the end of the last note to the start of the
+     * next note is less than or equal to 2 half-notes.
+     */
     private fun calcVisibility(): Boolean {
         if (currentNotePeriod != null) return true
 
@@ -102,10 +99,10 @@ abstract class Clone protected constructor(
         return false
     }
 
-    /** Hides or shows this clone, given the [index][indexThis]. */
-    private fun hideOrShowOnPolyphony(indexThis: Int) {
+    /** Hides or shows this clone, given the [index]. */
+    private fun hideOrShowOnPolyphony(index: Int) {
         /* If this is the 0-clone, always show. */
-        if (indexThis == 0) {
+        if (index == 0) {
             highestLevel.cullHint = Dynamic
             isVisible = true
         } else {
@@ -120,7 +117,17 @@ abstract class Clone protected constructor(
         }
     }
 
-    /** Updates the clone on every frame. */
+    /**
+     * Updates the clone on every frame.
+     *
+     * The base implementation performs the following:
+     *
+     * * Uses [NoteQueue] to determine the current note period.
+     * * Clears the [currentNotePeriod] if it has elapsed.
+     * * Rotates the clone using the [animNode].
+     * * Updates the visibility of the clone.
+     * * Updates the position of the clone.
+     */
     open fun tick(time: Double, delta: Float) {
         /* Grab the newest note period */
         NoteQueue.collectOne(notePeriods, time)?.let { currentNotePeriod = it }
@@ -148,7 +155,12 @@ abstract class Clone protected constructor(
         moveForPolyphony()
     }
 
-    /** Returns the index for moving so that clones do not overlap. */
+    /**
+     * Returns the index for moving so that clones do not overlap.
+     *
+     * This returns the index of this clone in the list of currently visible clones, where the index is never less
+     * than 0.
+     */
     protected fun indexForMoving(): Int = 0.coerceAtLeast(parent.clones.filter { it.isVisible }.indexOf(this))
 
     /** Move as to not overlap with other clones. */
