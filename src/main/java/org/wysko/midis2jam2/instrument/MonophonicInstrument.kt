@@ -72,7 +72,7 @@ abstract class MonophonicInstrument protected constructor(
         val calcClones: MutableList<Clone> = ArrayList()
         val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
         val listsOfNotes: MutableList<MutableList<NotePeriod>> = ArrayList()
-
+        notePeriods.sortWith(compareBy({ it.startTick() }, { it.midiNote }))
         notePeriods.forEach { np: NotePeriod ->
             if (listsOfNotes.isEmpty()) {
                 /* If there are no clones initialized, create the first one and assign this NotePeriod to it. */
