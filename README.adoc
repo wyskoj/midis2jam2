@@ -23,6 +23,12 @@ $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2 && ./gradlew run
 ----
 
+== ▶️ Running
+
+midis2jam2 also provides a command line interface.
+Run `midis2jam2 --help` for more information.
+You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/resources/man.txt[man page].
+
 == 📜 Documentation
 
 https://midis2jam2.netlify.app[Documentation] is updated on every push.

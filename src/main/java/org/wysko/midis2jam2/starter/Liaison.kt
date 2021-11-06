@@ -34,7 +34,7 @@ import javax.sound.midi.Sequencer
 import javax.swing.SwingUtilities
 
 open class Liaison(
-    protected val guiLauncher: GuiLauncher,
+    protected val guiLauncher: GuiLauncher?,
     protected val sequencer: Sequencer,
     protected val midiFile: MidiFile,
     protected val m2j2settings: M2J2Settings,
@@ -84,26 +84,26 @@ open class Liaison(
                 ctx.setSystemListener(thisLiaison)
                 val dim = Dimension((screen.width * 0.95).toInt(), (screen.height * 0.85).toInt())
                 canvas = ctx.canvas
-                canvas!!.preferredSize = dim
+                canvas?.preferredSize = dim
                 try {
                     val constructor = displayType.getConstructor(
                         Liaison::class.java,
                         Canvas::class.java, Midis2jam2::class.java
                     )
                     display = constructor.newInstance(this, ctx.canvas, midis2jam2)
-                    display!!.display()
+                    display?.display()
                 } catch (e: ReflectiveOperationException) {
                     Midis2jam2.getLOGGER().severe(exceptionToLines(e))
                 }
                 startCanvas()
             }
         }
-        guiLauncher.disableAll()
+        guiLauncher?.disableAll()
     }
 
     override fun simpleInitApp() {
         midis2jam2 = DesktopMidis2jam2(sequencer, midiFile, m2j2settings)
-        midis2jam2!!.setWindow(display)
+        midis2jam2?.setWindow(display)
         stateManager.attach(midis2jam2)
         rootNode.attachChild(midis2jam2!!.rootNode)
     }
@@ -111,14 +111,20 @@ open class Liaison(
     override fun stop() {
         super.stop()
         if (!fullscreen) {
-            display!!.isVisible = false
-            canvas!!.isEnabled = false
+            display?.isVisible = false
+            canvas?.isEnabled = false
         }
         enableLauncher()
+
+        /* If the GuiLauncher is null, this likely means that the program was started
+         * from the command line. In this case, we should exit the program. */
+        if (guiLauncher == null) {
+            Runtime.getRuntime().halt(0) // This is pretty harsh, but it works.
+        }
     }
 
-    /** Unlock the [.guiLauncher] so the user can use it. */
+    /** Unlock the [guiLauncher] so the user can use it. */
     open fun enableLauncher() {
-        guiLauncher.enableAll()
+        guiLauncher?.enableAll()
     }
 }

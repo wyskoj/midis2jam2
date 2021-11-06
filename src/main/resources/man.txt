@@ -1,0 +1,54 @@
+NAME
+    midis2jam2
+
+SYNOPSIS
+    midis2jam2 [options] [<input-file>]
+
+DESCRIPTION
+    midis2jam2 is a 3D MIDI file visualizer. It is a re-implementation of MIDIJam. It is written in Kotlin/JVM and uses
+    JMonkeyEngine3 for graphics. By default, it will open a GUI launcher that allows the user to select a MIDI file to
+    play, among other settings.
+
+    NOTE: when launching the program non-headless (i.e., with the GUI), unless an option is specified, the program will
+    use whatever settings are stored in the config file. So, if you launch the program non-headless and don't include
+    the -f option, but the config file has fullscreen set to true, the program will launch in fullscreen mode. The
+    config file is located in the user's home directory, in a file named midis2jam2.settings. This is why I recommend
+    you always run the program headless if specifying extra options.
+
+OPTIONS
+    -a, --headless
+        Starts the application in headless mode (no launcher). If the application is started in headless mode, the
+        default values are used for all options. If the application is started in non-headless mode, the default values
+        are overwritten by the values in the launcher.
+
+    -d, --device <device_name>
+        The device to use for MIDI playback. If this value is not specified, the default device will be used. To see the
+         available devices, use the --list-devices option.
+
+    -e, --legacy-engine
+        On some systems, the new display window does not work. Use this option to use the legacy window engine.
+
+    -f, --fullscreen
+        Starts the application in fullscreen mode.
+
+    -h, --help
+        Prints this help message and exits.
+
+    -l, --list-devices
+        Lists the available MIDI devices and exits.
+
+    -s, --soundfont <soundfont_file>
+        This option only has an effect if the --device option is either not specified or is the default device. It
+        specifies the SoundFont to use for MIDI playback by a path to a SoundFont file. If this option is not specified,
+        the default internal SoundFont will be used.
+
+    -t, --transition-speed <speed>
+        When instruments spawn, or one despawns in a stack of instruments, instruments can gradually move instead of
+        snapping. The available options are: "NONE", "SLOW", "NORMAL", "FAST".
+
+    -v, --version
+        Prints the version of this program and exits.
+
+    -y, --latency <milliseconds>
+        If this option is specified, the MIDI playback will be delayed by the specified number of milliseconds. This
+        option is useful to align the video with the audio.

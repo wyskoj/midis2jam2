@@ -29,7 +29,7 @@ import javax.imageio.ImageIO
 import javax.sound.midi.Sequencer
 
 class LegacyLiaison(
-    guiLauncher: GuiLauncher,
+    guiLauncher: GuiLauncher?,
     sequencer: Sequencer,
     midiFile: MidiFile,
     settings: M2J2Settings,
@@ -78,7 +78,7 @@ class LegacyLiaison(
         isPauseOnLostFocus = false
         isShowSettings = false
         super.start()
-        guiLauncher.disableAll()
+        guiLauncher?.disableAll()
     }
 
     override fun simpleInitApp() {
@@ -93,6 +93,6 @@ class LegacyLiaison(
     }
 
     override fun enableLauncher() {
-        guiLauncher.enableAll()
+        guiLauncher?.enableAll()
     }
 }

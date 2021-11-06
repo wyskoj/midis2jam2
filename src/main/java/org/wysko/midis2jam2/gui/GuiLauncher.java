@@ -21,6 +21,7 @@ import com.formdev.flatlaf.IntelliJTheme;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.install4j.api.launcher.SplashScreen;
+import org.apache.commons.cli.*;
 import org.jetbrains.annotations.NotNull;
 import org.wysko.midis2jam2.Midis2jam2;
 import org.wysko.midis2jam2.midi.MidiFile;
@@ -55,7 +56,9 @@ import static javax.swing.JFileChooser.APPROVE_OPTION;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.*;
 
-/** @author Jacob Wysko */
+/**
+ * @author Jacob Wysko
+ */
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class GuiLauncher extends JFrame {
 	
@@ -84,84 +87,260 @@ public class GuiLauncher extends JFrame {
 		settings = new LauncherSettings();
 	}
 	
-	public static void main(String[] args) throws SplashScreen.ConnectionException {
+	@SuppressWarnings("java:S106")
+	public static void main(String[] args) throws SplashScreen.ConnectionException, ParseException {
+		
+		// Register CLI arguments
+		Options options = new Options();
+		options.addOption("a", "headless", false, "Run in headless mode.");
+		options.addOption("d", "device", true, "The device to use for MIDI playback.");
+		options.addOption("e", "legacy-engine", false, "Use the legacy window engine.");
+		options.addOption("f", "fullscreen", false, "Starts the application in fullscreen mode.");
+		options.addOption("h", "help", false, "Prints a help message and exits.");
+		options.addOption("l", "list-devices", false, "Lists the available MIDI devices and exits.");
+		options.addOption("s", "soundfont", true, "Specifies the SoundFont to use for MIDI playback by a path to a " +
+				"SoundFont file.");
+		options.addOption("t", "transition-speed", true, "Specifies the transition speed.");
+		options.addOption("v", "version", false, "Prints the version of this program and exits.");
+		options.addOption("y", "latency", true, "Adjusts the audio for A/V sync.");
+		
 		// Initialize GUI
 		SplashScreen.writeMessage("Loading...");
 		IntelliJTheme.setup(GuiLauncher.class.getResourceAsStream("/Material Darker Contrast.theme.json"));
-		GuiLauncher guiLauncher = new GuiLauncher();
 		
-		SplashScreen.writeMessage("Loading settings...");
-		try {
-			String json = Utils.fileToString(SETTINGS_FILE);
-			if ("".equals(json.trim())) {
-				throw new IllegalStateException();
-			}
-			guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
-		} catch (Exception e) {
-			Midis2jam2.getLOGGER().info("Could not load settings. Creating new settings.");
-			guiLauncher.settings = new LauncherSettings();
-			guiLauncher.saveSettings();
+		
+		// Parse CLI arguments
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = parser.parse(options, args);
+		
+		/* Print help message and exit if the user requested it. */
+		if (cmd.hasOption("help")) {
+			System.out.println(Utils.resourceToString("/man.txt"));
+			return;
 		}
-		Locale.setDefault(new Locale(guiLauncher.settings.getLocale()));
 		
-		SplashScreen.writeMessage("Initializing launcher...");
-		guiLauncher.initComponents();
+		/* Print version and exit if the user requested it. */
+		if (cmd.hasOption("version")) {
+			System.out.println(Utils.resourceToString("/version.txt"));
+			return;
+		}
 		
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		guiLauncher.pack();
-		guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
-		guiLauncher.setVisible(true);
-		guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		// Register drag and drop
-		guiLauncher.midiFilePathTextField.setDropTarget(new DropTarget() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public synchronized void drop(DropTargetDropEvent evt) {
-				try {
-					evt.acceptDrop(DnDConstants.ACTION_COPY);
-					List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-					guiLauncher.midiFilePathTextField.setText(droppedFiles.get(0).getAbsolutePath());
-				} catch (Exception ex) {
-					ex.printStackTrace();
+		/* List MIDI devices and exit if the user requested it. */
+		if (cmd.hasOption("list-devices")) {
+			final MidiDevice.Info[] midiDeviceInfo = MidiSystem.getMidiDeviceInfo();
+			for (MidiDevice.Info info : midiDeviceInfo) {
+				if (!"Real Time Sequencer".equals(info.getName())) {
+					System.out.println(info.getName());
 				}
 			}
-		});
+			return;
+		}
 		
-		SplashScreen.writeMessage("Collecting MIDI devices...");
-		
-		// Load MIDI devices
-		MidiDevice.Info[] infoArr = MidiSystem.getMidiDeviceInfo();
-		DefaultComboBoxModel<MidiDevice.Info> aModel = new DefaultComboBoxModel<>();
-		
-		// Populate MIDI devices (but don't add Real Time Sequencer)
-		for (MidiDevice.Info info : infoArr) {
-			if (!"Real Time Sequencer".equals(info.getName())) {
-				aModel.addElement(info);
+		if (cmd.hasOption("headless")) {
+			/* Ensure that the user has specified a MIDI file. */
+			if (cmd.getArgs().length == 0) {
+				System.err.println("No MIDI file specified.");
+				return;
 			}
+			
+			/* Ensure that the file exists. */
+			File midiFile = new File(cmd.getArgs()[0]);
+			if (!midiFile.exists()) {
+				System.err.println("MIDI file does not exist.");
+				return;
+			}
+			
+			/* Ensure that the file is a valid MIDI file. */
+			Sequence sequence;
+			try {
+				sequence = MidiSystem.getSequence(midiFile);
+			} catch (InvalidMidiDataException e) {
+				System.err.println("Invalid MIDI file.");
+				System.err.println(Utils.exceptionToLines(e));
+				return;
+			} catch (IOException e) {
+				System.err.println("Could not read MIDI file.");
+				System.err.println(Utils.exceptionToLines(e));
+				return;
+			}
+			
+			/* Load the SoundFont, if specified */
+			Soundbank soundFont = null;
+			if (cmd.hasOption("soundfont")) {
+				File soundFontFile = new File(cmd.getOptionValue("soundfont"));
+				if (!soundFontFile.exists()) {
+					System.err.println("SoundFont file does not exist.");
+					return;
+				}
+				try {
+					soundFont = MidiSystem.getSoundbank(soundFontFile);
+				} catch (InvalidMidiDataException e) {
+					System.err.println("Invalid SoundFont file.");
+					System.err.println(Utils.exceptionToLines(e));
+					return;
+				} catch (IOException e) {
+					System.err.println("Could not read SoundFont file.");
+					System.err.println(Utils.exceptionToLines(e));
+					return;
+				}
+			}
+			
+			/* Load the MIDI device, if specified */
+			String deviceName = "Gervill";
+			if (cmd.hasOption("device")) {
+				deviceName = cmd.getOptionValue("device");
+			}
+			
+			String finalDeviceName = deviceName;
+			final Optional<MidiDevice.Info> first = Arrays.stream(MidiSystem.getMidiDeviceInfo()).filter(info -> info.getName().equals(finalDeviceName)).findFirst();
+			if (!first.isPresent()) {
+				System.err.println("Device not found.");
+				return;
+			}
+			
+			Sequencer sequencer;
+			try {
+				MidiDevice device = MidiSystem.getMidiDevice(first.get());
+				if (deviceName.equals("Gervill")) { // Default device
+					Synthesizer synthesizer = MidiSystem.getSynthesizer();
+					synthesizer.open();
+					if (soundFont != null) {
+						sequencer = MidiSystem.getSequencer(false);
+						sequencer.getTransmitter().setReceiver(synthesizer.getReceiver());
+						synthesizer.loadAllInstruments(soundFont);
+					} else {
+						sequencer = MidiSystem.getSequencer(true);
+					}
+				} else { // External device
+					device.open();
+					sequencer = MidiSystem.getSequencer(false);
+					sequencer.getTransmitter().setReceiver(device.getReceiver());
+				}
+				sequencer.open();
+				sequencer.setSequence(sequence);
+			} catch (MidiUnavailableException | InvalidMidiDataException e) {
+				System.err.println("Could not open MIDI device.");
+				System.err.println(Utils.exceptionToLines(e));
+				return;
+			}
+			
+			/* Set the latency, if specified */
+			int latency = 0;
+			if (cmd.hasOption("latency")) {
+				try {
+					latency = Integer.parseInt(cmd.getOptionValue("latency"));
+				} catch (NumberFormatException e) {
+					System.err.println("Invalid latency value.");
+					System.err.println(Utils.exceptionToLines(e));
+					return;
+				}
+			}
+			
+			/* Set other options */
+			boolean fullscreen = cmd.hasOption("fullscreen");
+			boolean legacyEngine = cmd.hasOption("legacy-engine");
+			String transitionSpeed = "NORMAL";
+			if (cmd.hasOption("transition-speed")) {
+				transitionSpeed = cmd.getOptionValue("transition-speed");
+				try {
+					InstrumentTransition.valueOf(transitionSpeed.toUpperCase());
+				} catch (IllegalArgumentException e) {
+					System.err.println("Invalid transition speed.");
+					System.err.println(Utils.exceptionToLines(e));
+					return;
+				}
+			}
+			
+			
+			try {
+				if (legacyEngine) {
+					LegacyLiaison liaison = new LegacyLiaison(null, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(latency,
+							InstrumentTransition.valueOf(transitionSpeed.toUpperCase())),
+							fullscreen);
+					liaison.start();
+				} else {
+					Liaison liaison = new Liaison(null, sequencer, MidiFile.readMidiFile(midiFile), new M2J2Settings(latency,
+							InstrumentTransition.valueOf(transitionSpeed.toUpperCase())),
+							fullscreen);
+					liaison.start(Midis2jam2Display.class);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InvalidMidiDataException e) {
+				e.printStackTrace();
+			}
+			
+			
+		} else {
+			GuiLauncher guiLauncher = new GuiLauncher();
+			SplashScreen.writeMessage("Loading settings...");
+			try {
+				String json = Utils.fileToString(SETTINGS_FILE);
+				if ("".equals(json.trim())) {
+					throw new IllegalStateException();
+				}
+				guiLauncher.settings = new Gson().fromJson(json, LauncherSettings.class);
+			} catch (Exception e) {
+				Midis2jam2.getLOGGER().info("Could not load settings. Creating new settings.");
+				guiLauncher.settings = new LauncherSettings();
+				guiLauncher.saveSettings();
+			}
+			Locale.setDefault(new Locale(guiLauncher.settings.getLocale()));
+			
+			SplashScreen.writeMessage("Initializing launcher...");
+			guiLauncher.initComponents();
+			
+			Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			guiLauncher.pack();
+			guiLauncher.setLocation(dim.width / 2 - guiLauncher.getSize().width / 2, dim.height / 2 - guiLauncher.getSize().height / 2);
+			guiLauncher.setVisible(true);
+			guiLauncher.setDefaultCloseOperation(EXIT_ON_CLOSE);
+			
+			// Register drag and drop
+			guiLauncher.midiFilePathTextField.setDropTarget(new DropTarget() {
+				@SuppressWarnings("unchecked")
+				@Override
+				public synchronized void drop(DropTargetDropEvent evt) {
+					try {
+						evt.acceptDrop(DnDConstants.ACTION_COPY);
+						List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+						guiLauncher.midiFilePathTextField.setText(droppedFiles.get(0).getAbsolutePath());
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			});
+			
+			SplashScreen.writeMessage("Collecting MIDI devices...");
+			
+			// Load MIDI devices
+			MidiDevice.Info[] infoArr = MidiSystem.getMidiDeviceInfo();
+			DefaultComboBoxModel<MidiDevice.Info> aModel = new DefaultComboBoxModel<>();
+			
+			// Populate MIDI devices (but don't add Real Time Sequencer)
+			for (MidiDevice.Info info : infoArr) {
+				if (!"Real Time Sequencer".equals(info.getName())) {
+					aModel.addElement(info);
+				}
+			}
+			guiLauncher.midiDeviceDropDown.setModel(aModel);
+			
+			// Set tooltip values
+			ToolTipManager.sharedInstance().setInitialDelay(200);
+			ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
+			
+			// Check for updates
+			UpdateChecker.checkForUpdates(guiLauncher);
+			
+			// Bring GUI to front
+			guiLauncher.bringToFront();
+			
+			// Load settings
+			guiLauncher.reloadSettings();
+			
+			ResourceBundle.clearCache();
 		}
-		guiLauncher.midiDeviceDropDown.setModel(aModel);
 		
-		// Set tooltip values
-		ToolTipManager.sharedInstance().setInitialDelay(200);
-		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
-		
-		// Check for updates
-		UpdateChecker.checkForUpdates(guiLauncher);
-		
-		// Bring GUI to front
-		guiLauncher.bringToFront();
-		
-		// Load settings
-		guiLauncher.reloadSettings();
-		
-		// Launch directly into midis2jam2 if a MIDI file is specified
-		if (args.length == 1) {
-			guiLauncher.midiFilePathTextField.setText(args[0]);
-			guiLauncher.startButtonPressed(null);
-		}
-		
-		ResourceBundle.clearCache();
 	}
 	
 	/**
@@ -197,7 +376,9 @@ public class GuiLauncher extends JFrame {
 		Locale.setDefault(new Locale(settings.getLocale()));
 	}
 	
-	/** Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}. */
+	/**
+	 * Saves settings, serializing with GSON then writing to the {@link #SETTINGS_FILE}.
+	 */
 	public void saveSettings() {
 		try (FileWriter writer = new FileWriter(SETTINGS_FILE)) {
 			writer.write(GSON.toJson(settings));
@@ -233,7 +414,9 @@ public class GuiLauncher extends JFrame {
 		return button;
 	}
 	
-	/** Prompts the user to load a MIDI file. */
+	/**
+	 * Prompts the user to load a MIDI file.
+	 */
 	private void loadMidiFileButtonActionPerformed(ActionEvent e) {
 		JFileChooser f = new JFileChooser();
 		f.setPreferredSize(new Dimension(800, 600));
@@ -261,7 +444,9 @@ public class GuiLauncher extends JFrame {
 		}
 	}
 	
-	/** Prompts the user to load a soundfont file. */
+	/**
+	 * Prompts the user to load a soundfont file.
+	 */
 	private void loadSoundFontButtonActionPerformed(ActionEvent e) {
 		
 		JDialog dialog = new JDialog(this, "SoundFont list editor", true);

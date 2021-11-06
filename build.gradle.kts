@@ -71,6 +71,9 @@ dependencies {
 
     // Dokka math
     implementation("org.jetbrains.dokka:mathjax-plugin:1.5.31")
+
+    // Apache Commons CLI
+    implementation("commons-cli:commons-cli:1.5.0")
 }
 
 downloadLicenses {
