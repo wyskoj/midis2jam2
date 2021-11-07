@@ -50,14 +50,14 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         ),
         floatArrayOf(-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f),
         floatArrayOf(-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f),
-        fromXml(Guitar::class.java)
+        fromXml("Guitar")
     ),
     6,
     context.loadModel(if (needsDropTuning(events)) type.modelDFileName else type.modelFileName, type.textureFileName)
 ) {
 
     override fun moveForMultiChannel(delta: Float) {
-        val v = updateInstrumentIndex(delta)
+        val v = updateInstrumentIndex(delta) * 1.5f
         offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(v)
         /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
         if (v < GUITAR_VECTOR_THRESHOLD) {
@@ -76,24 +76,15 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         /** The Model file name for drop D tuning. */
         internal val modelDFileName: String,
         /** The Texture file name. */
-        val textureFileName: String
+        val textureFileName: String,
+        /** The name used in the XML file. */
+        val xmlName: String,
     ) {
         /** Acoustic guitar type. */
-        ACOUSTIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp"),
+        ACOUSTIC("GuitarAcoustic.fbx", "GuitarD.obj", "AcousticGuitar.png", "AcousticGuitar"),
 
         /** Electric guitar type. */
-        ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp");
-    }
-
-    companion object {
-        /** The base position of the guitar. */
-        private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
-
-        /**
-         * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
-         * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
-         */
-        private const val GUITAR_VECTOR_THRESHOLD = 3
+        ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp", "Guitar");
     }
 
     init {
@@ -188,6 +179,15 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         instrumentNode.localRotation = Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3))
     }
 }
+
+/** The base position of the guitar. */
+private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
+
+/**
+ * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
+ * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
+ */
+private const val GUITAR_VECTOR_THRESHOLD = 3
 
 /**
  * Given a list of [events], determines if the Guitar should use the drop D tuning.

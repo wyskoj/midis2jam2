@@ -48,7 +48,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
                 Vector3f(1f, 1f, 1f),
                 Vector3f(1f, 1f, 1f)
             ), floatArrayOf(-0.85f, -0.31f, 0.20f, 0.70f), floatArrayOf(-1.86f, -0.85f, 0.34f, 1.37f),
-            FretHeightByTable.fromXml(BassGuitar::class.java)
+            FretHeightByTable.fromXml("BassGuitar")
         ),
         4,
         context.loadModel(if (needsDropTuning(events)) type.modelDropDFile else type.modelFile, type.textureFile)

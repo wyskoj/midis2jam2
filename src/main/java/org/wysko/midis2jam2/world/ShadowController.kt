@@ -145,7 +145,7 @@ class ShadowController(
             val shadow = shadow(context, "Assets/GuitarShadow.obj", "Assets/GuitarShadow.png")
             guitarShadows.add(shadow)
             context.rootNode.attachChild(shadow)
-            shadow.setLocalTranslation(43.431f + 5 * i, 0.1f + 0.01f * i, 7.063f)
+            shadow.setLocalTranslation(43.431f + 5 * (i * 1.5f), 0.1f + 0.01f * (i * 1.5f), 7.063f)
             shadow.localRotation = Quaternion().fromAngles(0f, Utils.rad(-49f), 0f)
         }
 

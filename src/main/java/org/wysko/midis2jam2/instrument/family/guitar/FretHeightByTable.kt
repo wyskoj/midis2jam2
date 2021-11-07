@@ -41,7 +41,7 @@ class FretHeightByTable(
          * Given the [clazz] of a [FrettedInstrument], returns the XML data defined in `fret_heights.xml` for
          * that specific instrument.
          */
-        fun fromXml(clazz: Class<out FrettedInstrument>): FretHeightByTable {
+        fun fromXml(name: String): FretHeightByTable {
             return try {
                 val xmlDoc = instantiateXmlParser("/fret_heights.xml")
                 val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
@@ -50,7 +50,7 @@ class FretHeightByTable(
                 /* For each instrument */
                 for (i in 0 until instrumentList.length) {
                     /* If the name of class doesn't equals the name of the currently indexed instrument, skip */
-                    if (instrumentList.item(i).attributes.getNamedItem("name").textContent != clazz.simpleName) continue
+                    if (instrumentList.item(i).attributes.getNamedItem("name").textContent != name) continue
 
                     val instrument = instrumentList.item(i)
                     val fretHeights = (instrument as Element).getElementsByTagName("value")
@@ -66,15 +66,15 @@ class FretHeightByTable(
                 FretHeightByTable(lookup)
             } catch (e: ParserConfigurationException) {
                 Midis2jam2.getLOGGER()
-                    .severe("Failed to load fret height from XML for ${clazz.name}.%n${exceptionToLines(e)}")
+                    .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
                 FretHeightByTable(HashMap())
             } catch (e: SAXException) {
                 Midis2jam2.getLOGGER()
-                    .severe("Failed to load fret height from XML for ${clazz.name}.%n${exceptionToLines(e)}")
+                    .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
                 FretHeightByTable(HashMap())
             } catch (e: IOException) {
                 Midis2jam2.getLOGGER()
-                    .severe("Failed to load fret height from XML for ${clazz.name}.%n${exceptionToLines(e)}")
+                    .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
                 FretHeightByTable(HashMap())
             }
         }

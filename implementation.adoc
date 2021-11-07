@@ -13,8 +13,8 @@ Check this page to see the progress of each instrument's implementation.
 
 |===
 |*Piano*|*Chromatic Percussion*|*Organ*|*Guitar*
-|_1_ Acoustic Grand Piano image:doc/check.png[]|_9_ Celesta image:doc/check.png[]|_17_ Drawbar Organ image:doc/check.png[]|_25_ Acoustic Guitar (nylon) image:doc/check.png[]
-|_2_ Bright Acoustic Piano image:doc/brush.png[]|_10_ Glockenspiel image:doc/check.png[]|_18_ Percussive Organ image:doc/check.png[]|_26_ Acoustic Guitar (steel) image:doc/check.png[]
+|_1_ Acoustic Grand Piano image:doc/check.png[]|_9_ Celesta image:doc/check.png[]|_17_ Drawbar Organ image:doc/check.png[]|_25_ Acoustic Guitar (nylon) image:doc/brush.png[]
+|_2_ Bright Acoustic Piano image:doc/brush.png[]|_10_ Glockenspiel image:doc/check.png[]|_18_ Percussive Organ image:doc/check.png[]|_26_ Acoustic Guitar (steel) image:doc/brush.png[]
 |_3_ Electric Grand Piano image:doc/brush.png[]|_11_ Music Box image:doc/check.png[]|_19_ Rock Organ image:doc/check.png[]|_27_ Electric Guitar (jazz) image:doc/check.png[]
 |_4_ Honky-tonk Piano image:doc/brush.png[]|_12_ Vibraphone image:doc/check.png[]|_20_ Church Organ image:doc/check.png[]|_28_ Electric Guitar (clean) image:doc/check.png[]
 |_5_ Electric Piano _1_ image:doc/brush.png[]|_13_ Marimba image:doc/check.png[]|_21_ Reed Organ image:doc/check.png[]|_29_ Electric Guitar (muted) image:doc/check.png[]

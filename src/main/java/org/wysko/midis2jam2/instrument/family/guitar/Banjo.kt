@@ -43,7 +43,7 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
             Vector3f(1f, 1f, 1f),
             Vector3f(1f, 1f, 1f)
         ), floatArrayOf(-0.53f, -0.13f, 0.28f, 0.68f), floatArrayOf(-1.14f, -0.40f, 0.47f, 1.21f),
-        FretHeightByTable.fromXml(Banjo::class.java)
+        FretHeightByTable.fromXml("Banjo")
     ),
     4,
     context.loadModel("Banjo.fbx", "BanjoSkin.png")
