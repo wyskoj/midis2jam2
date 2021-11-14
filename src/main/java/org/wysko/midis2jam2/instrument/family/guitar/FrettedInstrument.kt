@@ -22,11 +22,16 @@ import com.jme3.scene.Spatial.CullHint.Always
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiPitchBendEvent
 import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.util.Utils
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 
 /**
  * Any instrument that has strings that can be pushed down to change the pitch (e.g., guitar, bass guitar, violin,
@@ -69,19 +74,62 @@ abstract class FrettedInstrument protected constructor(
         }
     }
 
+    /** The current amount of pitch bend. */
+    private var pitchBendAmount: Float = 0f
+
+    /** The temporally-truncated list of pitch bend events. */
+    private val pitchBendEvents = events.filterIsInstance<MidiPitchBendEvent>() as MutableList
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
+        NoteQueue.collect(pitchBendEvents, context, time).forEach { pitchBendAmount = it.value.toFloat() - 8192 }
         handleStrings(time, delta)
     }
+
+    private val numberOfFrets
+        get() = (frettingEngine as StandardFrettingEngine).numberOfFrets
 
     /** Returns the height from the top to the bottom of the strings. */
     @Contract(pure = true)
     private fun stringHeight(): Float = positioning.upperY - positioning.lowerY
 
 
-    /** Performs a lookup and finds the vertical ratio of the [fret] position. */
+    /**
+     * Performs a lookup and finds the vertical ratio of the [fret] position.
+     *
+     * If [pitchBendAmount] is non-zero, a second calculation is performed to find the ratio of the [fret] position
+     * with the pitch bend applied. Linear interpolation is used to find the ratio.
+     */
     @Contract(pure = true)
-    protected fun fretToDistance(fret: Int): Float = positioning.fretHeights.calculateScale(fret)
+    protected fun fretToDistance(fret: Int, pitchBendAmount: Float): Float {
+        /* Find the whole number of semitones bent from the pitch bend */
+        val semitoneOffset = if (pitchBendAmount > 0) {
+            floor(pitchBendAmount / 682.0).toInt()
+        } else {
+            ceil(pitchBendAmount / 682.0).toInt()
+        }
+
+        /* Find the microtonal offset from the semitone */
+        val semitoneFraction = (pitchBendAmount / 682.0) % 1
+
+        /* Find the adjusted fret position */
+        val adjFret = (fret + semitoneOffset).coerceIn(0..numberOfFrets)
+
+        /* Linear interpolation of the semitone fraction */
+        return if (semitoneFraction > 0) {
+            Utils.lerp(
+                positioning.fretHeights.calculateScale(adjFret),
+                positioning.fretHeights.calculateScale((adjFret + 1).coerceAtMost(numberOfFrets)),
+                semitoneFraction.toFloat()
+            )
+        } else {
+            Utils.lerp(
+                positioning.fretHeights.calculateScale(adjFret),
+                positioning.fretHeights.calculateScale((adjFret - 1).coerceAtLeast(0)),
+                -semitoneFraction.toFloat()
+            )
+        }
+    }
 
     /**
      * Animates a [string] on a given [fret].
@@ -89,8 +137,6 @@ abstract class FrettedInstrument protected constructor(
      * If [fret]` == -1`, this is equivalent to having no note play on the [string]. Otherwise, the upper and lower
      * strings are scaled by [fretToDistance] for the accurate location of the fret. At this location, a note finger
      * (the small, yellow dot that appears on the fret) is placed.
-     *
-     *
      */
     private fun animateString(string: Int, fret: Int, delta: Float) {
 
@@ -105,7 +151,7 @@ abstract class FrettedInstrument protected constructor(
 
         /* The fret distance is the ratio of the scales of the upper and lower strings. For example, if the note
          * finger lands halfway in between the top and the bottom of the strings, this should be 0.5. */
-        val fretDistance = fretToDistance(fret)
+        val fretDistance = fretToDistance(fret, pitchBendAmount)
 
         /* Scale the resting string's Y-axis by the fret distance */
         val localScale = Vector3f(positioning.restingStrings[string])
@@ -119,7 +165,7 @@ abstract class FrettedInstrument protected constructor(
         }
 
         // Show the fret finger on the right spot (if not an open string)
-        if (fret != 0) {
+        if (fret != 0 || pitchBendAmount != 0f) {
             noteFingers[string].cullHint = Spatial.CullHint.Dynamic
             val fingerPosition: Vector3f = if (positioning is FrettedInstrumentPositioningWithZ) {
                 val positioningWithZ = positioning

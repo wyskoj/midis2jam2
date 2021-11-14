@@ -18,7 +18,6 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import org.jetbrains.annotations.Contract
 import java.util.Comparator.comparingDouble
-import kotlin.math.roundToInt
 
 /**
  * The fretting engine handles the calculations of determining which frets to press.
@@ -34,13 +33,13 @@ class StandardFrettingEngine(
     private val numberOfStrings: Int,
 
     /** The number of frets on the instrument. */
-    private val numberOfFrets: Int,
+    val numberOfFrets: Int,
 
     /* An array that contains the MIDI note value of each string as played open. */
     private val openStringMidiNotes: IntArray
 ) : FrettingEngine {
 
-    override val frets = IntArray(numberOfStrings).apply { fill(-1) }
+    override val frets: IntArray = IntArray(numberOfStrings).apply { fill(-1) }
 
     /** The lowest note this engine with deal with. */
     private val rangeLow = openStringMidiNotes.first()
@@ -104,15 +103,15 @@ class StandardFrettingEngine(
 
     /** Calculates the running average position. If no frets have been previously applied, returns the position at `0,0`. */
     @Contract(pure = true)
-    private fun runningAveragePosition(): FretboardPosition =
+    fun runningAveragePosition(): FretboardPosition =
         /* If there are no notes yet played, assume the average is the open note on the lowest string */
         if (runningAverage.isEmpty()) {
             FretboardPosition(0, 0)
         } else {
             /* Compute the average of the strings and frets */
             FretboardPosition(
-                runningAverage.map { it.string }.average().roundToInt(),
-                runningAverage.map { it.fret }.average().roundToInt()
+                runningAverage.minOf { it.string },
+                runningAverage.minOf { it.fret }
             )
         }
 

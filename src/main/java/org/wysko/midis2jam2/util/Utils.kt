@@ -144,4 +144,7 @@ object Utils {
 
     @JvmStatic
     fun fileToString(file: File) = file.readText()
+
+    /** Simple lerp function. */
+    fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t
 }
