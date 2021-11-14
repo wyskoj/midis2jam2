@@ -503,32 +503,6 @@ public class GuiLauncher extends JFrame {
 			return;
 		}
 		
-		// Collect sf2
-		Soundbank soundfont = null;
-		final String selectedSf2Path = (String) soundFontPathDropDown.getSelectedItem();
-		if (selectedSf2Path != null) {
-			File soundFontFile = new File(selectedSf2Path);
-			if (!soundFontFile.exists()) {
-				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				showMessageDialog(this, "The specified SoundFont does not exist.", "SoundFont file does not exist",
-						ERROR_MESSAGE);
-				return;
-			}
-			try {
-				soundfont = MidiSystem.getSoundbank(soundFontFile);
-			} catch (InvalidMidiDataException invalidMidiDataException) {
-				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				showMessageDialog(this, new ExceptionDisplay("The SoundFont file has invalid data, or is not a " +
-						"SoundFont file.", invalidMidiDataException), "Bad SoundFont file", ERROR_MESSAGE);
-				return;
-			} catch (IOException ioException) {
-				this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				showMessageDialog(this, new ExceptionDisplay("There was an error reading the SoundFont file.",
-						ioException), "I/O error", ERROR_MESSAGE);
-				return;
-			}
-		}
-		
 		
 		// Initialize MIDI
 		try {
@@ -541,7 +515,37 @@ public class GuiLauncher extends JFrame {
 				// Internal synth
 				Synthesizer synthesizer = MidiSystem.getSynthesizer();
 				synthesizer.open();
-				// Load soundfont
+				
+				// Collect sf2
+				Soundbank soundfont = null;
+				String selectedSf2Path = (String) soundFontPathDropDown.getSelectedItem();
+				if ("Default SoundFont".equals(selectedSf2Path)) {
+					selectedSf2Path = null;
+				}
+				if (selectedSf2Path != null) {
+					File soundFontFile = new File(selectedSf2Path);
+					if (!soundFontFile.exists()) {
+						this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						showMessageDialog(this, "The specified SoundFont does not exist.", "SoundFont file does not exist",
+								ERROR_MESSAGE);
+						return;
+					}
+					try {
+						soundfont = MidiSystem.getSoundbank(soundFontFile);
+					} catch (InvalidMidiDataException invalidMidiDataException) {
+						this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						showMessageDialog(this, new ExceptionDisplay("The SoundFont file has invalid data, or is not a " +
+								"SoundFont file.", invalidMidiDataException), "Bad SoundFont file", ERROR_MESSAGE);
+						return;
+					} catch (IOException ioException) {
+						this.setCursor(getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						showMessageDialog(this, new ExceptionDisplay("There was an error reading the SoundFont file.",
+								ioException), "I/O error", ERROR_MESSAGE);
+						return;
+					}
+				}
+				
+				
 				if (soundfont != null) {
 					sequencer = MidiSystem.getSequencer(false);
 					sequencer.getTransmitter().setReceiver(synthesizer.getReceiver());
