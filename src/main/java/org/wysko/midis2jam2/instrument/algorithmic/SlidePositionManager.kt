@@ -18,11 +18,15 @@ package org.wysko.midis2jam2.instrument.algorithmic
 
 import org.w3c.dom.Element
 import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.family.brass.Trombone
 import org.wysko.midis2jam2.util.Utils.instantiateXmlParser
 import org.xml.sax.SAXException
 import java.io.IOException
 import javax.xml.parsers.ParserConfigurationException
 
+/**
+ * Manages and defines the position of the [Trombone] slide for each note.
+ */
 class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 
     /** Stores the slide table. */
