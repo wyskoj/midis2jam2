@@ -65,6 +65,7 @@ class Harmonica(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
                 steamPuffNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
                 steamPuffNode.setLocalTranslation(0f, 0f, 7.2f)
                 pufferNodes[i].attachChild(this.steamPuffNode)
+                instrumentNode.attachChild(pufferNodes[i])
             }
             pufferNodes[i].run {
                 localRotation = Quaternion().fromAngles(0f, rad(5 * (i - 5.5)), 0f)
