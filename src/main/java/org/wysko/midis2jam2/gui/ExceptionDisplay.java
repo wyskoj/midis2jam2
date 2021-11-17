@@ -64,6 +64,7 @@ public class ExceptionDisplay extends JPanel {
 			
 			//---- errorStacktrace ----
 			errorStacktrace.setMaximumSize(new Dimension(100, 100));
+			errorStacktrace.setEditable(false);
 			scrollPane1.setViewportView(errorStacktrace);
 		}
 		add(scrollPane1, BorderLayout.CENTER);
