@@ -28,6 +28,8 @@ import org.wysko.midis2jam2.util.Utils.rad
 /** The baritone sax. */
 class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     Saxophone(context, events, BaritoneSaxClone::class.java, FINGERING_MANAGER) {
+
+    /** A single BaritoneSax. */
     inner class BaritoneSaxClone : SaxophoneClone(this@BaritoneSax, STRETCH_FACTOR) {
         init {
             val shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp")

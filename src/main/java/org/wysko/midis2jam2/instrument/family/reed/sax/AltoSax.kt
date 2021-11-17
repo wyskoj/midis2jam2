@@ -25,10 +25,11 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The alto saxophone. */
+/** The Alto Saxophone. */
 class AltoSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     Saxophone(context, events, AltoSaxClone::class.java, FINGERING_MANAGER) {
 
+    /** A single AltoSax. */
     inner class AltoSaxClone : SaxophoneClone(this@AltoSax, STRETCH_FACTOR) {
         init {
             val shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp")

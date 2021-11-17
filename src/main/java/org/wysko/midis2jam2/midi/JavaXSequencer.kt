@@ -21,9 +21,13 @@ import org.wysko.midis2jam2.starter.SequencerHandler
 import java.util.*
 import javax.sound.midi.Sequencer
 
-class JavaXSequencer(val sequencer: Sequencer) : SequencerHandler {
+/** An implementation of SequencerHandler that uses Java's Sequencer. */
+class JavaXSequencer(
+    /** The Sequencer to use. */
+    val sequencer: Sequencer
+) : SequencerHandler {
 
-    override fun isOpen() = sequencer.isOpen
+    override fun isOpen(): Boolean = sequencer.isOpen
 
     override fun start(midiFile: MidiFile) {
         sequencer.tempoInBPM = midiFile.firstTempoInBpm().toFloat()
@@ -49,7 +53,7 @@ class JavaXSequencer(val sequencer: Sequencer) : SequencerHandler {
             sequencer.close()
     }
 
-    override fun position() = sequencer.microsecondPosition
+    override fun position(): Long = sequencer.microsecondPosition
 
-    override fun duration() = sequencer.microsecondLength
+    override fun duration(): Long = sequencer.microsecondLength
 }

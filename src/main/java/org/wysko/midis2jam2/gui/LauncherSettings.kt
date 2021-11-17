@@ -19,20 +19,40 @@ package org.wysko.midis2jam2.gui
 import org.wysko.midis2jam2.util.InstrumentTransition
 import javax.swing.JFileChooser
 
+/**
+ * Defines the settings for the launcher.
+ */
 class LauncherSettings {
+    /** The last directory used for opening files. */
     var lastMidiDir: String = JFileChooser().fileSystemView.defaultDirectory.absolutePath
+
+    /** A list of SoundFonts to use. */
     var soundFontPaths: List<String> = ArrayList()
+
+    /** The instrument transition to use. */
     var transition: InstrumentTransition = InstrumentTransition.NORMAL
+
+    /** The MIDI device to use. */
     var midiDevice: String = "Gervill"
+
+    /** Use fullscreen? */
     var isFullscreen: Boolean = false
+
+    /** Keeps track of the latency fix for each MIDI device. */
     private val deviceLatencyMap: MutableMap<String, Int> = HashMap<String, Int>().also {
         it["Gervill"] = 100
     }
+
+    /** Use the legacy display mode? */
     var isLegacyDisplay: Boolean = false
+
+    /** The locale to use. */
     var locale: String = "en"
 
-    fun getLatencyForDevice(deviceName: String) = deviceLatencyMap[deviceName] ?: 0
+    /** Given a [deviceName], returns the latency fix for that device. */
+    fun getLatencyForDevice(deviceName: String): Int = deviceLatencyMap[deviceName] ?: 0
 
+    /** Sets the latency fix for a device. */
     fun setLatencyForDevice(deviceName: String, value: Int) {
         deviceLatencyMap[deviceName] = value
     }

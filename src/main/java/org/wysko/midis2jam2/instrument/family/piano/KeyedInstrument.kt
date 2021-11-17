@@ -25,10 +25,13 @@ import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
+/** An instrument that uses keys to play notes. */
 abstract class KeyedInstrument(
     context: Midis2jam2,
     eventList: MutableList<MidiChannelSpecificEvent>,
+    /** The lowest note that this instrument can play. */
     val rangeLow: Int,
+    /** The highest note that this instrument can play. */
     val rangeHigh: Int
 ) : SustainedInstrument(context, eventList) {
 
@@ -39,7 +42,7 @@ abstract class KeyedInstrument(
         eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
 
     /** The keys of this instrument. */
-    protected val keys: Array<Key?> = arrayOfNulls(keyCount())
+    protected lateinit var keys: Array<Key>
 
     /** Returns the number of keys on this instrument. */
     fun keyCount(): Int = rangeHigh - rangeLow + 1
@@ -68,20 +71,20 @@ abstract class KeyedInstrument(
             if (event is MidiNoteOnEvent) {
                 key?.isBeingPressed = true
             } else if (event is MidiNoteOffEvent) {
-                // If there is a note off event and a note on event in this frame for the same note, you won't see it
-                // because the key will be turned off before the frame renders. So, move the note off event back to the
-                // list of event to be rendered on the next frame.
+                /* If there is a note off event and a note on event in this frame for the same note, you won't see it
+                 * because the key will be turned off before the frame renders. So, move the note off event back to the
+                 * list of event to be rendered on the next frame. */
                 if (eventsToPerform.stream()
                         .anyMatch { e: MidiNoteEvent -> e.note == event.note && e is MidiNoteOnEvent }
                 ) {
-                    // bonk. you get to go to the next frame
+                    /* bonk. you get to go to the next frame */
                     events.add(0, event)
                 } else {
                     key?.isBeingPressed = false
                 }
             }
         }
-        keys.forEach { it!!.tick(delta) }
+        keys.forEach { it.tick(delta) }
     }
 
     /**

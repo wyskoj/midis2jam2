@@ -38,7 +38,7 @@ class FretHeightByTable(
 
     companion object {
         /**
-         * Given the [clazz] of a [FrettedInstrument], returns the XML data defined in `fret_heights.xml` for
+         * Given the [name] of a [FrettedInstrument], returns the XML data defined in `fret_heights.xml` for
          * that specific instrument.
          */
         fun fromXml(name: String): FretHeightByTable {
@@ -49,7 +49,7 @@ class FretHeightByTable(
 
                 /* For each instrument */
                 for (i in 0 until instrumentList.length) {
-                    /* If the name of class doesn't equals the name of the currently indexed instrument, skip */
+                    /* If the name of class doesn't equal the name of the currently indexed instrument, skip */
                     if (instrumentList.item(i).attributes.getNamedItem("name").textContent != name) continue
 
                     val instrument = instrumentList.item(i)

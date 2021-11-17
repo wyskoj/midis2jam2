@@ -37,8 +37,8 @@ import kotlin.math.cos
  * The first is the rotor that spins on each frame. The rotor has 12 different layers of lights that can be turned on
  * and off, representing the 12 notes in an octave.
  *
- * The second is the random wobble when it is flying. Uses [FastNoiseLite] to get some perlin-like noise for
- * smooth wobbling.
+ * The second is the random wobble when it is flying. Uses [org.spongepowered.noise.Noise] to get some perlin-like noise
+ * for smooth wobbling.
  *
  * Finally, the helicopter moves down when not playing and moves up when playing. This motion is eased with a sinusoidal
  * function.

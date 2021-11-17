@@ -24,6 +24,9 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.MatType
 import org.wysko.midis2jam2.util.Utils.rad
 
+/** The Flute fingering manager. */
+private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Flute::class.java)
+
 /** The Flute. */
 class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, FluteClone::class.java, FINGERING_MANAGER) {
@@ -42,10 +45,6 @@ class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)
             highestLevel.attachChild(horn)
         }
-    }
-
-    companion object {
-        val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Flute::class.java)
     }
 
     init {

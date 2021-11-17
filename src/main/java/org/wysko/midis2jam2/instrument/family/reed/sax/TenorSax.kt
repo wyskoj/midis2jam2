@@ -31,6 +31,7 @@ class TenorSax(
     events: List<MidiChannelSpecificEvent>
 ) : Saxophone(context, events, TenorSaxClone::class.java, FINGERING_MANAGER) {
 
+    /** A single TenorSax. */
     inner class TenorSaxClone : SaxophoneClone(this@TenorSax, STRETCH_FACTOR) {
         init {
             val shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")

@@ -30,9 +30,14 @@ import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHI
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-const val ACCORDION_KEY_BMP = "AccordionKey.bmp"
-const val ACCORDION_KEY_WHITE_FRONT_OBJ = "AccordionKeyWhiteFront.obj"
-const val ACCORDION_KEY_WHITE_BACK_OBJ = "AccordionKeyWhiteBack.obj"
+/** The accordion key texture file. */
+const val ACCORDION_KEY_BMP: String = "AccordionKey.bmp"
+
+/** The model file for the front of the white keys. */
+const val ACCORDION_KEY_WHITE_FRONT_OBJ: String = "AccordionKeyWhiteFront.obj"
+
+/** The model file for the back of the white keys. */
+const val ACCORDION_KEY_WHITE_BACK_OBJ: String = "AccordionKeyWhiteBack.obj"
 
 /**
  * The accordion is composed of 14 sections, where each section is a part of the accordion that independently rotates
@@ -88,7 +93,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
      * @param delta the amount of time since the last frame update
      */
     private fun calculateAngle(delta: Float) {
-        if (keys.any { it!!.isBeingPressed }) {
+        if (keys.any { it.isBeingPressed }) {
             /* Squeeze at maximum speed if any key is being pressed. */
             squeezingSpeed = MAX_SQUEEZING_SPEED.toDouble()
         } else {
@@ -119,13 +124,13 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         calculateAngle(delta)
 
         /* Set the rotation of each section */
-        accordionSections.indices.forEach { i ->
-            accordionSections[i].localRotation = Quaternion().fromAngles(0f, 0f, rad(angle * (i - 7.5)))
+        accordionSections.indices.forEach {
+            accordionSections[it].localRotation = Quaternion().fromAngles(0f, 0f, rad(angle * (it - 7.5)))
         }
     }
 
     override fun keyByMidiNote(midiNote: Int): Key {
-        return keys[midiNote % 24]!!
+        return keys[midiNote % 24]
     }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -184,23 +189,32 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         }
     }
 
-    enum class AccordionType(internal val textureCaseName: String, val textureCaseFrontName: String) {
+    /** Defines a type of Accordion. */
+    enum class AccordionType(
+        /** The texture file of the case. */
+        val textureCaseName: String,
+        /** The texture file of the front of the case. */
+        val textureCaseFrontName: String
+    ) {
+        /** The accordion. */
         ACCORDION("AccordionCase.bmp", "AccordionCaseFront.bmp"),
+
+        /** The bandoneon. */
         BANDONEON("BandoneonCase.bmp", "BandoneonCaseFront.bmp");
     }
 
     companion object {
         /** The maximum angle that the accordion will expand to. */
-        const val MAX_ANGLE = 4
+        const val MAX_ANGLE: Int = 4
 
         /** The minimum angle that the accordion will contract to. */
-        const val MIN_ANGLE = 1
+        const val MIN_ANGLE: Int = 1
 
         /** The number of sections the accordion is divided into. */
-        const val SECTION_COUNT = 14
+        const val SECTION_COUNT: Int = 14
 
         /** The maximum speed at which the accordion squeezes. */
-        const val MAX_SQUEEZING_SPEED = 2
+        const val MAX_SQUEEZING_SPEED: Int = 2
     }
 
     init {
@@ -228,16 +242,15 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         /* Add the keys */
         val keysNode = Node()
         accordionSections[SECTION_COUNT - 1].attachChild(keysNode)
+
         var whiteCount = 0
-        for (i in 0..23) {
-            if (midiValueToColor(i) == WHITE) {
-                keys[i] = AccordionKey(i, whiteCount)
-                whiteCount++
+        keys = Array(24) {
+            if (midiValueToColor(it) == WHITE) {
+                AccordionKey(it, whiteCount++)
             } else {
-                keys[i] = AccordionKey(i, i)
+                AccordionKey(it, it)
             }
         }
-
         /* Add dummy keys on each end */
         dummyWhiteKey().also {
             keysNode.attachChild(it)
@@ -249,7 +262,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         }
 
         /* Attach keys to node */
-        keys.forEach { key -> keysNode.attachChild(key!!.keyNode) }
+        keys.forEach { keysNode.attachChild(it.keyNode) }
 
         keysNode.setLocalTranslation(-4f, 22f, -0.8f)
 

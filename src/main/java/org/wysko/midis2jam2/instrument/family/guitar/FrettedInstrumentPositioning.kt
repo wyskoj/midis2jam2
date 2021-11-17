@@ -61,7 +61,9 @@ open class FrettedInstrumentPositioning(
         topX: FloatArray,
         bottomX: FloatArray,
         fretHeights: FretHeightCalculator,
+        /** The z-coordinate of the "upper strings". */
         val topZ: FloatArray,
+        /** The z-coordinate of the "lower strings". */
         val bottomZ: FloatArray
     ) : FrettedInstrumentPositioning(topY, bottomY, restingStrings, topX, bottomX, fretHeights)
 }

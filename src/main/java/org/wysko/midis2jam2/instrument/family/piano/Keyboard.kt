@@ -137,12 +137,11 @@ class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent
         val pianoCase = context.loadModel("PianoCase.obj", skin.textureFile)
         instrumentNode.attachChild(pianoCase)
         var whiteCount = 0
-        for (i in 0 until keyCount()) {
-            if (midiValueToColor(i + rangeLow) == KeyColor.WHITE) { // White key
-                keys[i] = KeyboardKey(i + rangeLow, whiteCount)
-                whiteCount++
+        keys = Array(keyCount()) {
+            if (midiValueToColor(it + rangeLow) == KeyColor.WHITE) { // White key
+                KeyboardKey(it + rangeLow, whiteCount++)
             } else { // Black key
-                keys[i] = KeyboardKey(i + rangeLow, i)
+                KeyboardKey(it + rangeLow, it)
             }
         }
         instrumentNode.move(-50f, 32f, -6f)

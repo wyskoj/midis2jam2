@@ -32,33 +32,17 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import kotlin.math.pow
 
+/**
+ * The Harp.
+ */
 class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
 
+    /** The strings of the harp. */
     val strings: Array<HarpString>
 
+    /** The notes this Harp should play. */
     val notes: MutableList<MidiNoteEvent> = eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
-
-    companion object {
-        /**
-         * Given a note within an octave, represented as an integer (0 = C, 2 = D, 4 = E, 5 = F, etc.), returns the harp
-         * string number to animate.
-         *
-         * @param noteNumber the note number
-         * @return the harp string number
-         * @throws IllegalArgumentException if you specify a black key
-         */
-        private fun getHarpString(noteNumber: Int): Int = when (noteNumber) {
-            0 -> 0
-            2 -> 1
-            4 -> 2
-            5 -> 3
-            7 -> 4
-            9 -> 5
-            11 -> 6
-            else -> throw IllegalAccessException("Unexpected value: $noteNumber")
-        }
-    }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -117,11 +101,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
         /** True if this string is vibrating, false otherwise. */
         private var vibrating = false
 
-        /**
-         * Update animation and notes.
-         *
-         * @param delta the amount of time since the last frame update
-         */
+        /** Update animation and notes, given the [delta]. */
         fun tick(delta: Float) {
             if (vibrating) {
                 string.cullHint = Spatial.CullHint.Always
@@ -199,4 +179,23 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
             }
         }
     }
+}
+
+/**
+ * Given a note within an octave, represented as an integer (0 = C, 2 = D, 4 = E, 5 = F, etc.), returns the harp
+ * string number to animate.
+ *
+ * @param noteNumber the note number
+ * @return the harp string number
+ * @throws IllegalArgumentException if you specify a black key
+ */
+private fun getHarpString(noteNumber: Int): Int = when (noteNumber) {
+    0 -> 0
+    2 -> 1
+    4 -> 2
+    5 -> 3
+    7 -> 4
+    9 -> 5
+    11 -> 6
+    else -> throw IllegalAccessException("Unexpected value: $noteNumber")
 }

@@ -26,10 +26,11 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The toms. */
+/** A Tom. */
 class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch) :
     SingleStickInstrument(context, hits), Retexturable {
 
+    /** The drum. */
     var drum: Spatial
 
     override fun tick(time: Double, delta: Float) {
@@ -43,7 +44,20 @@ class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPit
     }
 
     /** The pitch of the tom. */
-    enum class TomPitch(val scale: Vector3f, val location: Vector3f, val rotation: Quaternion) {
+    enum class TomPitch(
+        /**
+         * The size of the Tom.
+         */
+        val scale: Vector3f,
+        /**
+         * The location of the Tom.
+         */
+        val location: Vector3f,
+        /**
+         * The rotation of the Tom.
+         */
+        val rotation: Quaternion
+    ) {
         /** The Low floor tom. */
         LOW_FLOOR(
             Vector3f(1.5f, 1.5f, 1.5f),

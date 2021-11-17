@@ -34,12 +34,6 @@ class Fiddle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Stri
         offsetNode.setLocalTranslation(20 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
-    /**
-     * Instantiates a new Violin.
-     *
-     * @param context the context
-     * @param events  the events
-     */
     init {
         instrumentNode.setLocalTranslation(-10f, 67f, -15f)
         instrumentNode.setLocalScale(1f)

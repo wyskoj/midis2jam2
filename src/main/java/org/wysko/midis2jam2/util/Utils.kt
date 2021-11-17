@@ -142,8 +142,9 @@ object Utils {
         BufferedReader(InputStreamReader(Objects.requireNonNull(Utils::class.java.getResourceAsStream(file)))).lines()
             .collect(Collectors.joining("\n"))
 
+    /** Given a [file], returns the contents of the file as a string. */
     @JvmStatic
-    fun fileToString(file: File) = file.readText()
+    fun fileToString(file: File): String = file.readText()
 
     /** Simple lerp function. */
     fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t

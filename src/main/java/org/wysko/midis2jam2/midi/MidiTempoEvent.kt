@@ -39,15 +39,6 @@ class MidiTempoEvent
         return 6E7 / number
     }
 
-    /**
-     * Returns the number of seconds that elapse in a single beat.
-     *
-     * @return the number of seconds that elapse in a single beat
-     */
-    fun secondsPerBeat(): Double {
-        return 60 / beatsPerMinute()
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

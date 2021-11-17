@@ -21,6 +21,19 @@ package org.wysko.midis2jam2.util
  * the different available speeds.
  */
 @Suppress("unused")
-enum class InstrumentTransition(val speed: Double) {
-    NONE(0.0), FAST(200.0), NORMAL(500.0), SLOW(1000.0)
+enum class InstrumentTransition(
+    /** A coefficient used to calculate the transition speed. */
+    val speed: Double
+) {
+    /** No transition. */
+    NONE(0.0),
+
+    /** Transition at a fast speed. */
+    FAST(200.0),
+
+    /** Transition at a medium speed. */
+    NORMAL(500.0),
+
+    /** Transition at a slow speed. */
+    SLOW(1000.0)
 }

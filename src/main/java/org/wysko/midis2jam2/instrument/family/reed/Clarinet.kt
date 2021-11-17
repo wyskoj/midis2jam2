@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.reed
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
+import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Companion.from
 import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.instrument.clone.HandedClone
@@ -27,6 +28,9 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+
+/** The Clarinet fingering manager. */
+private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::class.java)
 
 /**
  * The clarinet has both hand positions and a stretchy bell.
@@ -85,10 +89,6 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(45.0), 0f)
             bellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
         }
-    }
-
-    companion object {
-        val FINGERING_MANAGER = from(Clarinet::class.java)
     }
 
     init {

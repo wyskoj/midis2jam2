@@ -5,8 +5,10 @@ import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JButton
 
+/** A button that resizes its icon to fit the button size. */
 class JResizedIconButton : JButton() {
-    override fun setIcon(defaultIcon: Icon) {
-        super.setIcon(ImageIcon((defaultIcon as ImageIcon).image.getScaledInstance(20, 20, Image.SCALE_SMOOTH)))
+    /** Sets the icon of the button to a given [icon]. */
+    override fun setIcon(icon: Icon) {
+        super.setIcon(ImageIcon((icon as ImageIcon).image.getScaledInstance(20, 20, Image.SCALE_SMOOTH)))
     }
 }
