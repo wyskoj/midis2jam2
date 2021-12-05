@@ -73,6 +73,30 @@ public class GuiLauncher extends JFrame {
 	
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
+	private static final FileFilter MIDI_FILE_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".mid") || f.getName().toLowerCase(Locale.ROOT).endsWith(".midi");
+		}
+		
+		@Override
+		public String getDescription() {
+			return "Standard MIDI files (*.mid; *.midi)";
+		}
+	};
+	
+	private static final FileFilter KARAOKE_FILE_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".kar");
+		}
+		
+		@Override
+		public String getDescription() {
+			return "Karaoke MIDI files (*.kar)";
+		}
+	};
+	
 	public static Map<String, String> getSupportedLocales() {
 		return supportedLocales;
 	}
@@ -422,17 +446,8 @@ public class GuiLauncher extends JFrame {
 		f.setPreferredSize(new Dimension(800, 600));
 		f.setDialogTitle("Load MIDI file");
 		f.setMultiSelectionEnabled(false);
-		f.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".mid") || f.getName().toLowerCase(Locale.ROOT).endsWith(".midi");
-			}
-			
-			@Override
-			public String getDescription() {
-				return "Standard MIDI files (*.mid; *.midi)";
-			}
-		});
+		f.setFileFilter(MIDI_FILE_FILTER);
+		f.addChoosableFileFilter(KARAOKE_FILE_FILTER);
 		f.getActionMap().get("viewTypeDetails").actionPerformed(null);
 		f.setFileSelectionMode(FILES_ONLY);
 		f.setCurrentDirectory(new File(settings.getLastMidiDir()));
