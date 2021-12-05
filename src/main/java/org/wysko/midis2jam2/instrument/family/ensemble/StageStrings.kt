@@ -25,18 +25,17 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import kotlin.math.sin
 
 /** The stage strings. */
 class StageStrings(
-    context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
-    type: StageStringsType,
+    context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageStringsType,
+    /** The behavior of this StageStrings. Defaults to [StageStringBehavior.NORMAL]. */
     val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
-) :
-    WrappedOctaveSustained(context, eventList, false) {
+) : WrappedOctaveSustained(context, eventList, false) {
 
     /** Nodes that contain each string. */
     private val stringNodes = Array(12) { Node() }
@@ -45,16 +44,34 @@ class StageStrings(
         highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * updateInstrumentIndex(delta)), 0f)
     }
 
-    enum class StageStringsType(val textureFile: String) {
+    /** Defines how stage strings should look, depending on the MIDI patch they play. */
+    enum class StageStringsType(
+        /** The file of the texture. */
+        val textureFile: String
+    ) {
+        /** String Ensemble 1 type. */
         STRING_ENSEMBLE_1("FakeWood.bmp"),
+
+        /** String Ensemble 2 type. */
         STRING_ENSEMBLE_2("Wood.bmp"),
+
+        /** Synth Strings 1 type. */
         SYNTH_STRINGS_1("Laser.bmp"),
+
+        /** Synth Strings 2 type. */
         SYNTH_STRINGS_2("AccordionCaseFront.bmp"),
+
+        /** Bowed Synth type. */
         BOWED_SYNTH("SongFillbar.bmp");
     }
 
+    /** Defines how stage strings should behave. */
     enum class StageStringBehavior {
-        NORMAL, TREMOLO
+        /** Normal behavior. The bow moves from left to right, taking the amount of time the note is held to traverse the string. */
+        NORMAL,
+
+        /** Tremolo behavior. The bow moves back and forth for the duration of the note. */
+        TREMOLO
     }
 
     /** A single string. */
@@ -107,9 +124,7 @@ class StageStrings(
                 } else {
                     /* Slide bow back and forth */
                     bow.setLocalTranslation(
-                        0f,
-                        (sin(30 * time) * 4).toFloat(),
-                        0f
+                        0f, (sin(30 * time) * 4).toFloat(), 0f
                     )
 
                     /* Update stopwatch */
