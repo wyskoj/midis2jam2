@@ -62,14 +62,14 @@ class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPit
         LOW_FLOOR(
             Vector3f(1.5f, 1.5f, 1.5f),
             Vector3f(20f, 20f, -60f),
-            Quaternion().fromAngles(rad(-2.0), rad(180.0), rad(-10.0))
+            Quaternion().fromAngles(rad(15f), rad(270.0), rad(0f))
         ),
 
         /** The High floor tom. */
         HIGH_FLOOR(
             Vector3f(1.4f, 1.4f, 1.4f),
             Vector3f(17f, 21f, -75f),
-            Quaternion().fromAngles(rad(-5.0), rad(180.0), rad(-15.0))
+            Quaternion().fromAngles(rad(15f), rad(270.0), rad(0f))
         ),
 
         /** The Low tom. */
@@ -114,12 +114,7 @@ class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPit
         drum.localScale = pitch.scale
         highLevelNode.localTranslation = pitch.location
         highLevelNode.localRotation = pitch.rotation
-        if (pitch == TomPitch.HIGH_FLOOR || pitch == TomPitch.LOW_FLOOR) {
-            stickNode.localRotation = Quaternion().fromAngles(0f, rad(80.0), 0f)
-            stickNode.setLocalTranslation(10f, 0f, 0f)
-        } else {
-            stickNode.setLocalTranslation(0f, 0f, 10f)
-        }
+        stickNode.setLocalTranslation(0f, 0f, 10f)
         stick.localRotation = Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f)
     }
 
