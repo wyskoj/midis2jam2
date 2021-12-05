@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.world
 import com.jme3.material.Material
 import com.jme3.material.RenderState
 import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Spatial
 import org.jetbrains.annotations.Contract
@@ -79,6 +80,13 @@ class ShadowController(
         /* Update keyboard shadow */
         val isKeyboardVisible = context.instruments.any { it is Keyboard && it.isVisible }
         keyboardShadow.cullHint = Utils.cullHint(isKeyboardVisible)
+        val keyboards = context.instruments.filterIsInstance<Keyboard>()
+
+        keyboardShadow.localScale = Vector3f(
+            1f, 1f,
+            if (keyboards.isNotEmpty()) keyboards.maxOf { it.checkInstrumentIndex() }.toFloat() + 1f
+            else 0f
+        )
 
         /* Update rest of shadows */
         updateArrayShadows(harpShadows, Harp::class.java)
