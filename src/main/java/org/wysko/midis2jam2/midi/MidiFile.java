@@ -82,6 +82,9 @@ public final class MidiFile {
 						byte[] data = message.getData();
 						int tempo = (((data[0] & 0xff) << 16) | ((data[1] & 0xff) << 8)) | (data[2] & 0xff);
 						file.getTracks()[j].getEvents().add(new MidiTempoEvent(midiEvent.getTick(), tempo));
+					} else if (message.getType() == 0x01 || message.getType() == 0x05) { // Text
+						file.getTracks()[j].getEvents().add(new MidiTextEvent(midiEvent.getTick(),
+								new String(message.getData())));
 					}
 				} else if (midiEvent.getMessage() instanceof ShortMessage) {
 					ShortMessage message = (ShortMessage) midiEvent.getMessage();

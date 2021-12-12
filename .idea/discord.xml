@@ -2,5 +2,6 @@
 <project version="4">
   <component name="DiscordProjectSettings">
     <option name="show" value="PROJECT_FILES" />
+    <option name="description" value="A remaster of MIDIJam, a 3D MIDI file visualizer." />
   </component>
 </project>

@@ -25,3 +25,4 @@ settings.json
 /src/main/resources/dependency-license.html
 .netlify
 .netlify
+/.idea/kotlinScripting.xml

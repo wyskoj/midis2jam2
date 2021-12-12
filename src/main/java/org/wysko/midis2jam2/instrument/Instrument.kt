@@ -110,7 +110,7 @@ abstract class Instrument protected constructor(
 
     /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */
     @Contract(pure = true)
-    protected fun checkInstrumentIndex(): Double = index
+    fun checkInstrumentIndex(): Double = index
 
     /** Calculates and moves this instrument for when multiple instances of this instrument are visible. */
     protected abstract fun moveForMultiChannel(delta: Float)
