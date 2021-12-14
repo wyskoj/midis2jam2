@@ -67,14 +67,15 @@ public class DesktopMidis2jam2 extends Midis2jam2 {
 		super.initialize(stateManager, app);
 		
 		/* To begin MIDI playback, I perform a check every millisecond to see if it is time to begin the playback of
-		the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
-		beginning of the file. It starts as a negative number to represent that time is to pass before the file will
-		play. Once it reaches 0, playback should begin.
-		 
-		 The Java MIDI sequencer has a bug where the first tempo of the file will not be applied, so once the
-		 sequencer is ready to play, we set the tempo. And, sometimes it will miss a tempo change in the file. To
-		 reduce the complications from this (unfortunately, it does not solve the issue; it only partially treats it)
-		 we perform a check every millisecond and apply any tempos that should be applied now. */
+		 * the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
+		 * beginning of the file. It starts as a negative number to represent that time is to pass before the file will
+		 * play. Once it reaches 0, playback should begin.
+		 *
+		 * The Java MIDI sequencer has a bug where the first tempo of the file will not be applied, so once the
+		 * sequencer is ready to play, we set the tempo. And, sometimes it will miss a tempo change in the file. To
+		 * reduce the complications from this (unfortunately, it does not solve the issue; it only partially treats it)
+		 * we perform a check every millisecond and apply any tempos that should be applied now.
+		 */
 		
 		new Timer(true).scheduleAtFixedRate(new TimerTask() {
 			@Override
