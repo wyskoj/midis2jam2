@@ -24,48 +24,72 @@ import com.jme3.math.ColorRGBA
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiTextEvent
 
-
 /**
- * The LyricController is responsible for controlling the displaying of lyrics.
+ * The LyricController is responsible for controlling the displaying of lyrics. There are two lines of lyrics, the top
+ * line displays the current lyric and the bottom line displays the next lyric.
  */
 class LyricController(
+    /** The list of lyric events */
     lyricEvents: List<MidiTextEvent>,
+
+    /** Context to midis2jam2 */
     val context: Midis2jam2
 ) {
 
+    /** Contains each lyric "line", where each syllable is an individual event. */
     private val lyricGroups = ArrayList<List<MidiTextEvent>>()
+
+    /** As the file progresses, the current lyric group is incremented and put here. */
     private var currentGroup: List<MidiTextEvent> = emptyList()
+
+    /** Font used to display lyrics. */
     private val bitmapFont = this.context.assetManager.loadFont("Interface/Fonts/Default.fnt")
 
-    val currentLine = BitmapText(bitmapFont, false).apply {
+    /** The GUI text element to display the current lyric. */
+    private val currentLine: BitmapText = BitmapText(bitmapFont, false).apply {
         size = bitmapFont.charSet.renderedSize.toFloat() * 1.5f
         context.app.guiNode.attachChild(this)
         setBox(
             Rectangle(
-                0f,
-                context.app.viewPort.camera.height * 0.9f,
-                context.app.viewPort.camera.width.toFloat(),
-                100f
+                0f, context.app.viewPort.camera.height * 0.9f, context.app.viewPort.camera.width.toFloat(), 100f
             )
         )
         color = ColorRGBA.DarkGray
         alignment = BitmapFont.Align.Center
     }
 
-    val nextLine = BitmapText(bitmapFont, false).apply {
+    /** The GUI text element to display the next lyric. */
+    private val nextLine: BitmapText = BitmapText(bitmapFont, false).apply {
         size = bitmapFont.charSet.renderedSize.toFloat()
         context.app.guiNode.attachChild(this)
         setBox(
             Rectangle(
-                0f,
-                context.app.viewPort.camera.height * 0.9f - 40f,
-                context.app.viewPort.camera.width.toFloat(),
-                100f
+                0f, context.app.viewPort.camera.height * 0.9f - 40f, context.app.viewPort.camera.width.toFloat(), 100f
             )
         )
         color = ColorRGBA.DarkGray
         alignment = BitmapFont.Align.Center
     }
+
+    /** The index of the current syllable in the current lyric group. */
+    private var currentWordIndex: Int = 0
+
+    /** The number of syllables in the current lyric group. */
+    private var lineWordCount: Int = 0
+
+    /** Time of the next lyric group start. */
+    private fun tns() = context.file.eventInSeconds(lyricGroups.first().first())
+
+    /** Time of the current lyric group end. */
+    private fun tce() = context.file.eventInSeconds(currentGroup.last())
+
+    /** The full text of the current lyric. */
+    private val currentLineText: String
+        get() = currentGroup.joinToString("") { it.text.stripped() }
+
+    /** The full text of the next lyric. */
+    private val nextLineText: String
+        get() = lyricGroups.firstOrNull()?.let { group -> group.joinToString("") { it.text.stripped() } } ?: ""
 
     init {
         val stripped = lyricEvents.filter { !it.text.startsWith("@") } as ArrayList<MidiTextEvent>
@@ -82,15 +106,11 @@ class LyricController(
         if (group.isNotEmpty()) lyricGroups.add(group) // Add the last group
     }
 
-    var currentWordIndex = 0
-    var lineWordCount = 0
-
+    /** Updates the lyric display. */
     fun tick(time: Double) {
         if (lyricGroups.isNotEmpty()) {
-
             /* If it is time to display this lyric group */
             if (shouldAdvance(time)) {
-
                 /* Remove it from the list */
                 currentGroup = lyricGroups.removeAt(0)
 
@@ -116,36 +136,26 @@ class LyricController(
             }
             /* Color the words up to the current word */
             currentLine.setColor(
-                0,
-                currentGroup.map { it.text.stripped() }.charCountUpTo(currentWordIndex),
-                ColorRGBA.White
+                0, currentGroup.map { it.text.stripped() }.charCountUpTo(currentWordIndex), ColorRGBA.White
             )
         }
 
         /* Set the text position */
         currentLine.setBox(
             Rectangle(
-                0f,
-                context.app.viewPort.camera.height * 0.9f,
-                context.app.viewPort.camera.width.toFloat(),
-                100f
+                0f, context.app.viewPort.camera.height * 0.9f, context.app.viewPort.camera.width.toFloat(), 100f
             )
         )
 
         nextLine.setBox(
             Rectangle(
-                0f,
-                context.app.viewPort.camera.height * 0.9f - 40f,
-                context.app.viewPort.camera.width.toFloat(),
-                100f
+                0f, context.app.viewPort.camera.height * 0.9f - 40f, context.app.viewPort.camera.width.toFloat(), 100f
             )
         )
         nextLine.text = nextLineText
     }
 
-    /**
-     * Determines if the current lyric group should be advanced. See [https://app.code2flow.com/Y5F13y].
-     */
+    /** Determines if the current lyric group should be advanced. See [this flowchart](https://app.code2flow.com/Y5F13y). */
     private fun shouldAdvance(time: Double): Boolean {
         return if (currentGroup.isNotEmpty()) {
             if (tns() - tce() > 2) {
@@ -157,32 +167,15 @@ class LyricController(
             tns() - time < 1
         }
     }
-
-    /**
-     * Time of the next lyric group start.
-     */
-    private fun tns() = context.file.eventInSeconds(lyricGroups.first().first())
-
-    /**
-     * Time of the current lyric group end.
-     */
-    private fun tce() = context.file.eventInSeconds(currentGroup.last())
-
-
-    val currentLineText: String
-        get() = currentGroup.joinToString("") { it.text.stripped() }
-
-    val nextLineText: String
-        get() = lyricGroups.firstOrNull()?.let { group -> group.joinToString("") { it.text.stripped() } } ?: ""
-
 }
 
+/** Given a string, removes '/' and '\' characters if it starts with one of those. */
 private fun String.stripped(): String {
     return this.removePrefix("/").removePrefix("\\")
 }
 
+/** Given a list of strings and a [max] index, returns the number of characters in the list up to the [max] index. */
 private fun List<String>.charCountUpTo(max: Int): Int {
     if (max == -1) return 0
     return (0..max).sumOf { this[it].length }
 }
-

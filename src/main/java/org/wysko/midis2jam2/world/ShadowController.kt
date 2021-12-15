@@ -36,7 +36,8 @@ import org.wysko.midis2jam2.util.Jme3Constants.UNSHADED_MAT
 import org.wysko.midis2jam2.util.Utils
 
 /**
- * Performs calculations to show and hide instrument shadows when instruments are visible or not. The `ShadowController` is responsible for the following shadows:
+ * Performs calculations to show and hide instrument shadows when instruments are visible or not. The
+ * `ShadowController` is responsible for the following shadows:
  *
  *  * Keyboard shadow
  *  * Harp shadows
@@ -56,10 +57,13 @@ import org.wysko.midis2jam2.util.Utils
 class ShadowController(
     /** Context to midis2jam2. */
     private val context: Midis2jam2,
+
     /** The number of harps. */
     harpCount: Int,
+
     /** The number of guitars. */
     guitarCount: Int,
+
     /** The number of bass guitars. */
     bassGuitarCount: Int,
 ) {
@@ -78,15 +82,13 @@ class ShadowController(
     /** Call this method on each frame to update the visibility of shadows. */
     fun tick() {
         /* Update keyboard shadow */
-        val isKeyboardVisible = context.instruments.any { it is Keyboard && it.isVisible }
-        keyboardShadow.cullHint = Utils.cullHint(isKeyboardVisible)
-        val keyboards = context.instruments.filterIsInstance<Keyboard>()
-
-        keyboardShadow.localScale = Vector3f(
-            1f, 1f,
-            if (keyboards.isNotEmpty()) keyboards.maxOf { it.checkInstrumentIndex() }.toFloat() + 1f
-            else 0f
-        )
+        keyboardShadow.cullHint = Utils.cullHint(context.instruments.any { it is Keyboard && it.isVisible })
+        context.instruments.filterIsInstance<Keyboard>().let { keyboards ->
+            keyboardShadow.localScale = Vector3f(
+                1f, 1f, if (keyboards.isNotEmpty()) keyboards.maxOf { it.checkInstrumentIndex() }.toFloat() + 1f
+                else 0f
+            )
+        }
 
         /* Update rest of shadows */
         updateArrayShadows(harpShadows, Harp::class.java)
@@ -119,16 +121,15 @@ class ShadowController(
          */
         @JvmStatic
         @Contract(pure = true)
-        fun shadow(context: Midis2jam2, model: String?, texture: String?): Spatial {
-            val shadow = context.assetManager.loadModel(model)
-            val material = Material(context.assetManager, UNSHADED_MAT)
-            material.setTexture(COLOR_MAP, context.assetManager.loadTexture(texture))
-            material.additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-            material.setFloat("AlphaDiscardThreshold", 0.01F)
-            shadow.queueBucket = RenderQueue.Bucket.Transparent
-            shadow.setMaterial(material)
-            return shadow
-        }
+        fun shadow(context: Midis2jam2, model: String?, texture: String?): Spatial =
+            context.assetManager.loadModel(model).apply {
+                setMaterial(Material(context.assetManager, UNSHADED_MAT).apply {
+                    setTexture(COLOR_MAP, context.assetManager.loadTexture(texture))
+                    additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+                    setFloat("AlphaDiscardThreshold", 0.01F)
+                })
+                queueBucket = RenderQueue.Bucket.Transparent
+            }
     }
 
     init {
