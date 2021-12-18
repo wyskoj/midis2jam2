@@ -71,10 +71,7 @@ import org.wysko.midis2jam2.midi.*;
 import org.wysko.midis2jam2.util.M2J2Settings;
 import org.wysko.midis2jam2.util.MatType;
 import org.wysko.midis2jam2.util.Utils;
-import org.wysko.midis2jam2.world.Camera;
-import org.wysko.midis2jam2.world.LyricController;
-import org.wysko.midis2jam2.world.ShadowController;
-import org.wysko.midis2jam2.world.StandController;
+import org.wysko.midis2jam2.world.*;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -140,7 +137,15 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	protected StandController standController;
 	
+	/**
+	 * The lyric controller.
+	 */
 	protected LyricController lyricController;
+	
+	/**
+	 * The autocam controller.
+	 */
+	protected AutoCamController autocamController;
 	
 	/**
 	 * When the MIDI sequence ends, the {@link #timeSinceStart} is recorded to this variable to know when to close the
@@ -158,7 +163,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	/**
 	 * The current camera position.
 	 */
-	private Camera currentCamera = Camera.CAMERA_1A;
+	public Camera currentCamera = Camera.CAMERA_1A;
 	
 	/**
 	 * 3D text for debugging.
@@ -601,6 +606,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	@SuppressWarnings({"java:S1541", "java:S1774", "java:S1821"})
 	protected void handleCameraSetting(String name, boolean isPressed) {
+		if (isPressed && name.equals("autoCam")) {
+			autocamController.trigger();
+		}
 		if (isPressed && name.startsWith("cam")) {
 			try {
 				switch (name) {
@@ -626,6 +634,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 						// Do nothing
 				}
 				setCamera(Camera.valueOf(currentCamera.name()));
+				autocamController.setEnabled(false);
 			} catch (IllegalArgumentException e) {
 				LOGGER.warning("Bad camera string.");
 				LOGGER.warning(Utils.exceptionToLines(e));
@@ -694,6 +703,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		
 		this.app.getInputManager().addMapping("freeCam", new KeyTrigger(KeyInput.KEY_GRAVE));
 		this.app.getInputManager().addListener(this, "freeCam");
+		
+		this.app.getInputManager().addMapping("autoCam", new KeyTrigger(KeyInput.KEY_0));
+		this.app.getInputManager().addListener(this, "autoCam");
 		
 		this.app.getInputManager().addMapping("exit", new KeyTrigger(KeyInput.KEY_ESCAPE));
 		this.app.getInputManager().addListener(this, "exit");
@@ -821,8 +833,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 				.filter(event -> event instanceof MidiTextEvent)
 				.forEach(event -> textEvents.add((MidiTextEvent) event));
 		
-		/* Initialize lyric controller */
+		/* Initialize controllers */
 		lyricController = new LyricController(textEvents, this);
+		autocamController = new AutoCamController(this);
 	}
 	
 	@Override
