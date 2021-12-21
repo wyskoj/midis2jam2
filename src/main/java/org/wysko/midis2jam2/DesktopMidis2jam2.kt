@@ -89,6 +89,8 @@ class DesktopMidis2jam2(
         return app.assetManager
     }
 
+    override fun songLength(): Double = sequencer.microsecondLength / 1000000.0
+
     /**
      * Cleans up the application.
      */
@@ -134,6 +136,8 @@ class DesktopMidis2jam2(
         lyricController.tick(timeSinceStart)
         autocamController.tick(timeSinceStart, tpf)
         preventCameraFromLeaving(app.camera)
+
+//        showAll(rootNode)
     }
 
     /**

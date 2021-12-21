@@ -77,7 +77,7 @@ abstract class Instrument protected constructor(
      *   visible.
      * * Otherwise, it should be invisible.
      */
-    abstract fun calcVisibility(time: Double): Boolean
+    abstract fun calcVisibility(time: Double, future: Boolean = false): Boolean
 
     /**
      * Returns the index of this instrument in the list of other instruments of this type that are visible.

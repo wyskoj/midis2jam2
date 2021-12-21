@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import kotlin.math.absoluteValue
 
 /** Any instrument that only depends on [MidiNoteOnEvent]s to function. The [MidiNoteOffEvent] is discarded. */
 abstract class DecayedInstrument protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
@@ -37,21 +38,40 @@ abstract class DecayedInstrument protected constructor(context: Midis2jam2, even
     /** The last note that this instrument has played, used for visibility calculations. */
     protected var lastHit: MidiNoteOnEvent? = null
 
-    override fun calcVisibility(time: Double): Boolean {
-        /* Within one second of a hit? Visible. */
-        if (hitsV.isNotEmpty() && context.file.eventInSeconds(hitsV[0]) - time <= 1) return true
+    override fun calcVisibility(time: Double, future: Boolean): Boolean {
+        if (future) {
+            /* Within one second of a hit? Visible. */
+            if (hitsV.any { (it.time - time).absoluteValue < 1.0 }) return true
 
-        /* If within a 7-second gap between the last hit and the next? Visible. */
-        if (lastHit != null
-            && hitsV.isNotEmpty()
-            && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit) <= 7
-        ) return true
+            /* If within a 7-second gap between any two hits? Visible. */
+            for (i in 0 until hitsV.size - 1) {
+                val gap = hitsV[i + 1].time - hitsV[i].time
+                if (gap <= 7.0) return true
+            }
 
-        /* If after 2 seconds of the last hit? Visible. */
-        if (lastHit != null && time - context.file.eventInSeconds(lastHit) <= 2) return true
+            /* If after 2 seconds of the last hit? Visible. */
+            hitsV.lastOrNull { it.time < time }?.let {
+                if (time - it.time <= 2.0) return true
+            }
 
-        /* Invisible. */
-        return false
+            return false
+        } else {
+            /* Within one second of a hit? Visible. */
+            if (hitsV.isNotEmpty() && context.file.eventInSeconds(hitsV[0]) - time <= 1) return true
+
+            /* If within a 7-second gap between the last hit and the next? Visible. */
+            if (lastHit != null
+                && hitsV.isNotEmpty()
+                && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit) <= 7
+            ) return true
+
+            /* If after 2 seconds of the last hit? Visible. */
+            if (lastHit != null && time - context.file.eventInSeconds(lastHit) <= 2) return true
+
+            /* Invisible. */
+            return false
+        }
+
     }
 
     override fun tick(time: Double, delta: Float) {

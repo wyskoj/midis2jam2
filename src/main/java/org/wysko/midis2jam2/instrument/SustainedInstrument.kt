@@ -79,25 +79,47 @@ abstract class SustainedInstrument protected constructor(
         moveForMultiChannel(delta)
     }
 
-    /** Calculates the current visibility by the current [time]. True if the instrument is visible, false otherwise. */
-    override fun calcVisibility(time: Double): Boolean {
-        /* Currently playing? Visible. */
-        if (currentNotePeriods.isNotEmpty()) return true
+    /** Calculates the current visibility by the current [time]. True if the instrument is visible, false otherwise.
+     * This method can be used for time values in the future. */
+    override fun calcVisibility(time: Double, future: Boolean): Boolean {
+        if (!future) {
+            /* Currently playing? Visible. */
+            if (currentNotePeriods.isNotEmpty()) return true
 
-        /* Within one second of playing? Visible. */
-        if (notePeriods.isNotEmpty() && notePeriods[0].startTime - time <= 1) return true
+            /* Within one second of playing? Visible. */
+            if (notePeriods.isNotEmpty() && notePeriods[0].startTime - time <= 1) return true
 
-        /* If within a 7-second gap between the last note and the next? Visible. */
-        if (lastPlayedNotePeriod != null
-            && notePeriods.isNotEmpty()
-            && notePeriods[0].startTime - lastPlayedNotePeriod!!.endTime <= 7
-        ) return true
+            /* If within a 7-second gap between the last note and the next? Visible. */
+            if (lastPlayedNotePeriod != null
+                && notePeriods.isNotEmpty()
+                && notePeriods[0].startTime - lastPlayedNotePeriod!!.endTime <= 7
+            ) return true
 
-        /* If after 2 seconds of the last note period? Visible. */
-        if (lastPlayedNotePeriod != null && time - lastPlayedNotePeriod!!.endTime <= 2) return true
+            /* If after 2 seconds of the last note period? Visible. */
+            if (lastPlayedNotePeriod != null && time - lastPlayedNotePeriod!!.endTime <= 2) return true
 
-        /* Invisible. */
-        return false
+            /* Invisible. */
+            return false
+        } else {
+            /* Currently playing? Visible. */
+            if (unmodifiableNotePeriods.any { time in it.startTime..it.endTime }) return true
+
+            /* Within one second of playing? Visible. */
+            if (unmodifiableNotePeriods.any { it.startTime > time && it.startTime - time <= 1 }) return true
+
+            /* If within a 7-second gap between two note periods? Visible. */
+            for (i in 0 until unmodifiableNotePeriods.size - 1) {
+                if (unmodifiableNotePeriods[i + 1].startTime - unmodifiableNotePeriods[i].endTime <= 7
+                    && time in unmodifiableNotePeriods[i].endTime..unmodifiableNotePeriods[i + 1].startTime
+                ) return true
+            }
+
+            /* If after 2 seconds of the last note period? Visible. */
+            if (unmodifiableNotePeriods.any { time > it.endTime && time - it.endTime <= 2 }) return true
+
+            /* Invisible. */
+            return false
+        }
     }
 
     init {

@@ -117,6 +117,11 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	public SimpleApplication app;
 	
 	/**
+	 * The current camera position.
+	 */
+	public Camera currentCamera = Camera.CAMERA_1A;
+	
+	/**
 	 * True if the sequence has begun playing, false otherwise.
 	 */
 	protected boolean seqHasRunOnce;
@@ -161,11 +166,6 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	List<MidiTextEvent> textEvents = new ArrayList<>();
 	
 	/**
-	 * The current camera position.
-	 */
-	public Camera currentCamera = Camera.CAMERA_1A;
-	
-	/**
 	 * 3D text for debugging.
 	 */
 	private BitmapText debugText;
@@ -206,6 +206,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	}
 	
 	public abstract AssetManager getAssetManager();
+	
+	
+	public abstract double songLength();
 	
 	/**
 	 * Reads the MIDI file and calculates program events, appropriately creating instances of each instrument and
@@ -712,6 +715,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		
 		this.app.getInputManager().addMapping("lmb", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 		this.app.getInputManager().addListener(this, "lmb");
+		
+		this.app.getInputManager().addMapping("locRot", new KeyTrigger(KeyInput.KEY_F1));
+		this.app.getInputManager().addListener(this, "locRot");
 	}
 	
 	/**
@@ -845,6 +851,11 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		if ("exit".equals(name)) {
 			exit();
 		}
+		if ("locRot".equals(name) && isPressed) {
+			System.out.printf("%nVector3f(%.2ff, %.2ff, %.2ff),%nQuaternion(%.2ff, %.2ff, %.2ff, %.2ff)%n",
+					app.getCamera().getLocation().x, app.getCamera().getLocation().y, app.getCamera().getLocation().z,
+					app.getCamera().getRotation().getW(), app.getCamera().getRotation().getX(), app.getCamera().getRotation().getY(), app.getCamera().getRotation().getZ());
+		}
 	}
 	
 	public Node getRootNode() {
@@ -862,7 +873,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	}
 	
 	/**
-	 * Be very careful calling this; only call if if you know what you are doing!!
+	 * Be very careful calling this; only call if you know what you are doing!!
 	 *
 	 * @param timeSinceStart
 	 */
