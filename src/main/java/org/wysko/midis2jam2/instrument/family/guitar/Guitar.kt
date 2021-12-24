@@ -73,18 +73,18 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     enum class GuitarType(
         /** The Model file name. */
         internal val modelFileName: String,
+
         /** The Model file name for drop D tuning. */
         internal val modelDFileName: String,
+
         /** The Texture file name. */
         val textureFileName: String,
-        /** The name used in the XML file. */
-        val xmlName: String,
     ) {
         /** Acoustic guitar type. */
-        ACOUSTIC("GuitarAcoustic.fbx", "GuitarD.obj", "AcousticGuitar.png", "AcousticGuitar"),
+        ACOUSTIC("GuitarAcoustic.fbx", "GuitarAcoustic.fbx", "AcousticGuitar.png"),
 
         /** Electric guitar type. */
-        ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp", "Guitar");
+        ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp");
     }
 
     init {
