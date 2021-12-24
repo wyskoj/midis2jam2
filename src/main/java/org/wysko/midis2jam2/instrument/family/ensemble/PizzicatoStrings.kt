@@ -40,16 +40,22 @@ class PizzicatoStrings(
 ) : DecayedInstrument(context, eventList) {
 
     /** Each string. */
-    val strings = arrayOfNulls<PizzicatoString>(12)
+    val strings: Array<PizzicatoString> = Array(12) {
+        PizzicatoString().apply {
+            instrumentNode.attachChild(highestLevel)
+            highestLevel.setLocalTranslation(it * 2f, it * 0.5f, 0f)
+            highestLevel.localScale = Vector3f(1f, 0.5f - 0.019f * it, 1f)
+        }
+    }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
         val eventsToDoOn = NoteQueue.collect(hits, context, time)
 
         /* Play each note that needs to be animated */
-        eventsToDoOn.forEach { strings[(it.note + 3) % 12]!!.play() }
+        eventsToDoOn.forEach { strings[(it.note + 3) % 12].play() }
 
-        strings.forEach { it!!.tick(delta) }
+        strings.forEach { it.tick(delta) }
     }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -70,7 +76,7 @@ class PizzicatoStrings(
         private val animStrings: Array<Spatial>
 
         /** Is this string currently playing? */
-        var playing = false
+        var playing: Boolean = false
 
         /** Animates the anim strings. */
         private val stringAnimator: VibratingStringAnimator
@@ -84,7 +90,6 @@ class PizzicatoStrings(
 
             /* No longer playing if we have surpassed the animation time */
             if (progress >= 1) playing = false
-
 
             if (playing) {
                 /* Move the string forward, show anim strings, hide resting string */
@@ -131,15 +136,6 @@ class PizzicatoStrings(
     }
 
     init {
-        /* Position strings */
-        for (i in 0..11) {
-            strings[i] = PizzicatoString().apply {
-                instrumentNode.attachChild(highestLevel)
-                highestLevel.setLocalTranslation(i * 2f, i * 0.5f, 0f)
-                highestLevel.localScale = Vector3f(1f, 0.5f - 0.019f * i, 1f)
-            }
-        }
-
         /* Position instrument */
         instrumentNode.setLocalTranslation(0f, 6.7f, -138f)
     }
