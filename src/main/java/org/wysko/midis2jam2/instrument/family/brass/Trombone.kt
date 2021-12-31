@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.brass.Trombone.TromboneClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 import java.util.*
@@ -133,13 +133,13 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         init {
             /* Load and attach trombone */
-            val body = context.loadModel("Trombone.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f)
+            val body = context.loadModel("Trombone.fbx", "HornSkin.bmp", MaterialType.REFLECTIVE, 0.9f)
 
             /* Set horn skin grey material */
             (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
 
             /* Load slide */
-            slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f)
+            slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", MaterialType.REFLECTIVE, 0.9f)
 
             /* Attach body, slide, and set rotation of Trombone */
             modelNode.run {

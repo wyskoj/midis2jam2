@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The long and short percussion whistles. */
@@ -123,7 +123,7 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
                 if (length == WhistleLength.LONG) SteamPuffType.WHISTLE
                 else SteamPuffType.NORMAL, 1.0, PuffBehavior.UPWARDS
             )
-            val whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f)
+            val whistle = context.loadModel("Whistle.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f)
             puffer.steamPuffNode.setLocalTranslation(0f, 4f, 0f)
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(0f, -1.57f, 0f)
             animNode.attachChild(whistle)

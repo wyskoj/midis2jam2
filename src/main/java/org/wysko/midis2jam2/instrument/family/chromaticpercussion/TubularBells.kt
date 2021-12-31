@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.cullHint
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis.X
@@ -144,8 +144,8 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
 
         init {
             bellNode.run {
-                attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f))
-                attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.5f))
+                attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f))
+                attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.5f))
                 setLocalTranslation((i - 5) * 4f, 0f, 0f)
                 setLocalScale((-0.04545 * i).toFloat() + 1)
                 highestLevel.attachChild(this)

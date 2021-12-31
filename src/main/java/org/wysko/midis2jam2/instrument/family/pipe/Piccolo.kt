@@ -21,7 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The piccolo. */
@@ -32,7 +32,7 @@ class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         init {
             val horn = context.loadModel(
                 "Piccolo.obj", "CymbalSkinSphereMap.bmp",
-                MatType.REFLECTIVE, 0.9f
+                MaterialType.REFLECTIVE, 0.9f
             )
             loadHands()
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))

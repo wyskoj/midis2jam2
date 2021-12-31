@@ -21,7 +21,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
@@ -54,7 +54,7 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
      */
     inner class StageHornNote(type: StageHornsType) : BouncyTwelfth() {
         init {
-            animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, MatType.REFLECTIVE, 0.9f))
+            animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, MaterialType.REFLECTIVE, 0.9f))
         }
     }
 

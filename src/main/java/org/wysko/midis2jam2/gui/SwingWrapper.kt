@@ -14,35 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+
 package org.wysko.midis2jam2.gui
 
-import java.awt.Cursor
-import java.awt.Point
-import java.awt.image.BufferedImage
+import java.awt.BorderLayout
+import java.awt.Canvas
 import javax.swing.JFrame
+import javax.swing.JPanel
 
-abstract class Displays : JFrame() {
-    fun display() {
-        defaultCloseOperation = DISPOSE_ON_CLOSE
-        pack()
-        setLocationRelativeTo(null)
-        isVisible = true
-    }
-
-    /**
-     * Shows or hides the cursor.
-     *
-     * @param hide if true, hides the cursor, false shows the cursor
-     */
-    fun hideCursor(hide: Boolean) {
-        cursor = if (hide) {
-            this.toolkit.createCustomCursor(
-                BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-                Point(),
-                null
-            )
-        } else {
-            Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+/**
+ * A wrapper for a [Canvas] that can be used in a Swing application.
+ * @param canvas the canvas to wrap
+ */
+class SwingWrapper(
+    canvas: Canvas,
+    title: String
+) : JFrame(title) {
+    init {
+        contentPane.layout = BorderLayout()
+        JPanel().also {
+            it.add(canvas, BorderLayout.CENTER)
         }
     }
 }

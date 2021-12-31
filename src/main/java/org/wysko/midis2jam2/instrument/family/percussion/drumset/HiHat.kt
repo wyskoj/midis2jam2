@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.midi.Midi
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The hi-hat. */
@@ -129,7 +129,7 @@ class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleSti
             context.loadModel(
                 "DrumSet_Cymbal.obj",
                 "CymbalSkinSphereMap.bmp",
-                MatType.REFLECTIVE,
+                MaterialType.REFLECTIVE,
                 0.7f
             )
         )
@@ -137,7 +137,7 @@ class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleSti
             context.loadModel(
                 "DrumSet_Cymbal.obj",
                 "CymbalSkinSphereMap.bmp",
-                MatType.REFLECTIVE,
+                MaterialType.REFLECTIVE,
                 0.7f
             ).apply {
                 localRotation = Quaternion().fromAngles(rad(180.0), 0f, 0f)

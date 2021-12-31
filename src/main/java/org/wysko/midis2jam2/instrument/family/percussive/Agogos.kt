@@ -22,7 +22,7 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The melodic agogos. */
@@ -57,7 +57,7 @@ class Agogos(
         }
 
         init {
-            val mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+            val mesh = context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", MaterialType.REFLECTIVE, 0.9f)
             mesh.setLocalScale(1 - 0.036f * i)
             animNode.attachChild(mesh)
         }

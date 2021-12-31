@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercu
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -50,7 +50,7 @@ class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
     init {
 
         /* Load cowbell */
-        recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", MatType.REFLECTIVE, 0.9f))
+        recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", MaterialType.REFLECTIVE, 0.9f))
 
         /* Load and position stick */
         val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")

@@ -20,7 +20,7 @@ import com.jme3.scene.Spatial
 import org.jetbrains.annotations.NonNls
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The full, 88-key keyboard. */
@@ -121,7 +121,7 @@ class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent
                 /* Up key */
                 val blackKeyDown = context.loadModel(
                     "PianoKeyBlackDown.obj", skin.textureFile,
-                    MatType.UNSHADED, 0.9f
+                    MaterialType.UNSHADED, 0.9f
                 )
                 downNode.attachChild(blackKeyDown)
                 keyNode.attachChild(upNode)

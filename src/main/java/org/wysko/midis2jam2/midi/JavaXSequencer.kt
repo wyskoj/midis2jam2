@@ -21,7 +21,7 @@ import org.wysko.midis2jam2.starter.SequencerHandler
 import java.util.*
 import javax.sound.midi.Sequencer
 
-/** An implementation of SequencerHandler that uses Java's Sequencer. */
+/** An implementation of [SequencerHandler] that uses JavaX's Sequencer. */
 class JavaXSequencer(
     /** The Sequencer to use. */
     val sequencer: Sequencer

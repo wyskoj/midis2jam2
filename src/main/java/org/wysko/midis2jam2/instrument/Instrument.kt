@@ -19,7 +19,6 @@ package org.wysko.midis2jam2.instrument
 import com.jme3.scene.Node
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.util.InstrumentTransition
 import org.wysko.midis2jam2.util.Utils
 import kotlin.math.max
 
@@ -94,18 +93,14 @@ abstract class Instrument protected constructor(
             context.instruments.filter { this.javaClass.isInstance(it) && it.isVisible }.size - 1
         }
 
-        return if (context.settings.transitionSpeed == InstrumentTransition.NONE) {
-            /* If the transition easing is set to NONE, just return the target index. */
-            targetIndex.toFloat()
-        } else {
-            /* Update the index gradually to the target index, given the transition speed */
-            index += delta * BASE_TRANSITION_SPEED * (targetIndex - index) / context.settings.transitionSpeed.speed
+        /* Update the index gradually to the target index, given the transition speed */
+        index += delta * BASE_TRANSITION_SPEED * (targetIndex - index) / 500.0
 
-            /* Never set the instrument index to anything larger than the number of instruments of this type */
-            index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
+        /* Never set the instrument index to anything larger than the number of instruments of this type */
+        index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
 
-            index.toFloat()
-        }
+        return index.toFloat()
+
     }
 
     /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */

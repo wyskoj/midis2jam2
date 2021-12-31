@@ -16,13 +16,12 @@
  */
 package org.wysko.midis2jam2
 
+//import org.wysko.midis2jam2.starter.Liaison
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
-import org.wysko.midis2jam2.gui.Displays
 import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.starter.Liaison
-import org.wysko.midis2jam2.util.M2J2Settings
+import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
@@ -38,13 +37,11 @@ class DesktopMidis2jam2(
     midiFile: MidiFile,
 
     /** The settings to use. */
-    settings: M2J2Settings
-) : Midis2jam2(midiFile, settings) {
+    settings: PassedSettings,
 
-    /**
-     * Reference to the Swing window that is encapsulating the canvas that holds midis2jam2.
-     */
-    private var window: Displays? = null
+    /** Callback if midis2jam2 closes unexpectedly. */
+    private val onClose: () -> Unit
+) : Midis2jam2(midiFile, settings) {
 
     /**
      * Initializes the application.
@@ -64,18 +61,15 @@ class DesktopMidis2jam2(
 		 */
         Timer(true).scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                if (timeSinceStart + settings.latencyFix / 1000.0 >= 0 && !seqHasRunOnce && sequencer.isOpen) {
+                if (timeSinceStart + settings.latencyFix / 1000.0 >= 0 && !sequencerStarted && sequencer.isOpen) {
                     sequencer.tempoInBPM = getFile().firstTempoInBpm().toFloat()
                     sequencer.start()
-                    seqHasRunOnce = true
+                    sequencerStarted = true
                     Timer(true).scheduleAtFixedRate(object : TimerTask() {
+                        val tempos = ArrayList(file.tempos)
                         override fun run() {
-                            /* Find the first tempo we haven't hit and need to execute */
-                            val currentMidiTick = sequencer.tickPosition
-                            for (tempo in getFile().tempos) {
-                                if (tempo.time == currentMidiTick) {
-                                    sequencer.tempoInBPM = 60000000f / tempo.number
-                                }
+                            while (tempos.isNotEmpty() && tempos.first().time < sequencer.tickPosition) {
+                                sequencer.tempoInBPM = 60000000f / tempos.removeAt(0).number
                             }
                         }
                     }, 0, 1)
@@ -85,22 +79,22 @@ class DesktopMidis2jam2(
     }
 
     /** Returns the [AssetManager]. */
-    override fun getAssetManager(): AssetManager {
-        return app.assetManager
-    }
+    override fun getAssetManager(): AssetManager = app.assetManager
 
+    /**
+     * The length of the song.
+     */
     override fun songLength(): Double = sequencer.microsecondLength / 1000000.0
 
     /**
      * Cleans up the application.
      */
-    override fun cleanup() {
-        getLOGGER().info("Cleaning up.")
-        getLOGGER().fine("Stopping and closing sequencer.")
-        sequencer.stop()
-        sequencer.close()
-        getLOGGER().fine("Enabling GuiLauncher.")
-        (app as Liaison).enableLauncher()
+    override fun cleanup(): Unit {
+        sequencer.run {
+            stop()
+            close()
+        }
+        onClose()
     }
 
     /**
@@ -131,24 +125,18 @@ class DesktopMidis2jam2(
         if (afterEnd && timeSinceStart >= stopTime + 3.0) {
             exit()
         }
+
         shadowController.tick()
         standController.tick()
         lyricController.tick(timeSinceStart)
         autocamController.tick(timeSinceStart, tpf)
         preventCameraFromLeaving(app.camera)
-
-//        showAll(rootNode)
     }
 
     /**
      * Called when an action occurs.
      */
-    override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
-        super.onAction(name, isPressed, tpf)
-        if ("lmb" == name && window != null) {
-            (window ?: return).hideCursor(isPressed)
-        }
-    }
+    override fun onAction(name: String, isPressed: Boolean, tpf: Float): Unit = super.onAction(name, isPressed, tpf)
 
     /**
      * Stops the app state.
@@ -159,12 +147,6 @@ class DesktopMidis2jam2(
         }
         app.stateManager.detach(this)
         app.stop()
-    }
-
-    /**
-     * Sets the window.
-     */
-    fun setWindow(window: Displays?) {
-        this.window = window
+        onClose()
     }
 }

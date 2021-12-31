@@ -16,11 +16,28 @@
  */
 package org.wysko.midis2jam2.util
 
-/** A material type. */
-enum class MatType {
-    /** An unshaded material. */
-    UNSHADED,
+import java.io.File
 
-    /** A reflective material. */
-    REFLECTIVE
-}
+/** Provides some configurable settings for running the program. */
+data class PassedSettings(
+    /** The amount to shift the audio by to fix A/V sync, in milliseconds. */
+    val latencyFix: Int,
+
+    /** Automatically start autocam. */
+    val autoAutoCam: Boolean,
+
+    /** True if midis2jam2 should be run in fullscreen mode. */
+    val fullscreen: Boolean,
+
+    /** Use legacy display mode. */
+    val legacyDisplayEngine: Boolean,
+
+    /** The MIDI file to play. */
+    val midiFile: File,
+
+    /** The MIDI device to use. */
+    val midiDevice: String,
+
+    /** The SoundFont to use. */
+    val soundFont: File?
+)

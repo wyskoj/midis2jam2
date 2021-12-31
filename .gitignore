@@ -22,6 +22,7 @@ settings.json
 .project
 /bin
 /.settings
+/src/main/resources/dependency-license.json
 /src/main/resources/dependency-license.html
 .netlify
 .netlify

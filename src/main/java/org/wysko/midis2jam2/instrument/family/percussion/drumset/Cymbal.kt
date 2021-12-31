@@ -22,7 +22,7 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MatType.REFLECTIVE
+import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** Cymbals are represented with this class, excluding the [HiHat]. */

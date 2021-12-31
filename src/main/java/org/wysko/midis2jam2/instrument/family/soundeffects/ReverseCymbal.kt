@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import kotlin.math.cos
 import kotlin.math.pow
 
@@ -57,7 +57,7 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
 
     /** The cymbal that animates backwards. */
     private val cymbal: Spatial =
-        context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MatType.REFLECTIVE, 0.7f).also {
+        context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MaterialType.REFLECTIVE, 0.7f).also {
             instrumentNode.attachChild(it)
             it.setLocalScale(2f)
         }

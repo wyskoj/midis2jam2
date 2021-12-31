@@ -68,8 +68,8 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal;
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing;
 import org.wysko.midis2jam2.instrument.family.strings.*;
 import org.wysko.midis2jam2.midi.*;
-import org.wysko.midis2jam2.util.M2J2Settings;
-import org.wysko.midis2jam2.util.MatType;
+import org.wysko.midis2jam2.util.PassedSettings;
+import org.wysko.midis2jam2.util.MaterialType;
 import org.wysko.midis2jam2.util.Utils;
 import org.wysko.midis2jam2.world.*;
 
@@ -92,9 +92,9 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	private static final Logger LOGGER = Logger.getLogger(Midis2jam2.class.getName());
 	
 	/**
-	 * The {@link M2J2Settings} for this instantiation of midis2jam2.
+	 * The {@link PassedSettings} for this instantiation of midis2jam2.
 	 */
-	public final M2J2Settings settings;
+	public final PassedSettings settings;
 	
 	/**
 	 * The list of instruments.
@@ -124,7 +124,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	/**
 	 * True if the sequence has begun playing, false otherwise.
 	 */
-	protected boolean seqHasRunOnce;
+	protected boolean sequencerStarted;
 	
 	/**
 	 * Incremental counter keeping track of how much time has elapsed (or remains until the MIDI begins playback) since
@@ -170,7 +170,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 */
 	private BitmapText debugText;
 	
-	protected Midis2jam2(MidiFile file, M2J2Settings settings) {
+	protected Midis2jam2(MidiFile file, PassedSettings settings) {
 		this.file = file;
 		this.settings = settings;
 	}
@@ -728,7 +728,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 * @return the model
 	 */
 	public Spatial loadModel(String m, String t) {
-		return loadModel(m, t, MatType.UNSHADED, 0);
+		return loadModel(m, t, MaterialType.UNSHADED, 0);
 	}
 	
 	/**
@@ -741,8 +741,8 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 	 * @return the model
 	 */
 	@SuppressWarnings("java:S5194")
-	public Spatial loadModel(String m, String t, MatType type, float brightness) {
-		Material material = type == MatType.UNSHADED ?
+	public Spatial loadModel(String m, String t, MaterialType type, float brightness) {
+		Material material = type == MaterialType.UNSHADED ?
 				unshadedMaterial(assetPrefix(t)) :
 				reflectiveMaterial(assetPrefix(t), brightness);
 		Spatial model = getAssetManager().loadModel(assetPrefix(m));

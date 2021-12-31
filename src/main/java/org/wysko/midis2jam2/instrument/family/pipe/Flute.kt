@@ -21,7 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The Flute fingering manager. */
@@ -37,7 +37,7 @@ class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             val horn = context.loadModel(
                 "Flute.obj",
                 "ShinySilver.bmp",
-                MatType.REFLECTIVE,
+                MaterialType.REFLECTIVE,
                 0.9f
             )
             loadHands()

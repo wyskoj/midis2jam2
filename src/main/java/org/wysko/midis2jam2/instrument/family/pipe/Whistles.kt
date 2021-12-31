@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The whistles. */
@@ -68,7 +68,7 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
 
         init {
-            context.loadModel("Whistle.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f).apply {
+            context.loadModel("Whistle.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f).apply {
                 val scale = 2 + -0.0909091f * i
                 animNode.attachChild(this)
                 localRotation = Quaternion().fromAngles(0f, -FastMath.HALF_PI, 0f)

@@ -14,46 +14,69 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+
 package org.wysko.midis2jam2.gui
 
-import org.wysko.midis2jam2.util.InstrumentTransition
-import javax.swing.JFileChooser
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
 
 /**
- * Defines the settings for the launcher.
+ * Defines settings that are configurable in the launcher.
  */
-class LauncherSettings {
-    /** The last directory used for opening files. */
-    var lastMidiDir: String = JFileChooser().fileSystemView.defaultDirectory.absolutePath
+@Serializable
+data class LauncherSettings(
+    /** The last directory that the user selected a MIDI file from. Defaults to the user's home directory. */
+    var lastMidiDir: String = System.getProperty("user.home"),
 
-    /** A list of SoundFonts to use. */
-    var soundFontPaths: List<String> = ArrayList()
+    /** A list of paths to SoundFonts. */
+    var soundFontPaths: MutableList<String> = mutableListOf(),
 
-    /** The instrument transition to use. */
-    var transition: InstrumentTransition = InstrumentTransition.NORMAL
+    /** The currently selected MIDI device. */
+    var midiDevice: String = "Gervill",
 
-    /** The MIDI device to use. */
-    var midiDevice: String = "Gervill"
+    /** True if midis2jam2 should run in fullscreen mode, false otherwise. */
+    var fullscreen: Boolean = false,
 
-    /** Use fullscreen? */
-    var isFullscreen: Boolean = false
+    /** Stores the amount of latency fix each MIDI device should have. */
+    var deviceLatencyMap: MutableMap<String, Int> = mutableMapOf("Gervill" to 0),
 
-    /** Keeps track of the latency fix for each MIDI device. */
-    private val deviceLatencyMap: MutableMap<String, Int> = HashMap<String, Int>().also {
-        it["Gervill"] = 100
-    }
+    /** True if the autocam should be enabled when the song starts, false otherwise. */
+    var autoAutoCam: Boolean = true,
 
-    /** Use the legacy display mode? */
-    var isLegacyDisplay: Boolean = false
+    /** True if the legacy display engine should be used, false otherwise. */
+    var isLegacyDisplay: Boolean = false,
 
-    /** The locale to use. */
+    /** The locale of the launcher. */
     var locale: String = "en"
+) {
+    /** Writes the settings to disk. */
+    fun save() {
+        launcherSettingsFile().writeText(Json.encodeToString(this))
+    }
+}
 
-    /** Given a [deviceName], returns the latency fix for that device. */
-    fun getLatencyForDevice(deviceName: String): Int = deviceLatencyMap[deviceName] ?: 0
+/** Returns the file that contains the settings for the launcher. */
+private fun launcherSettingsFile(): File = File(
+    "${System.getProperty("user.home")}${System.getProperty("file.separator")}midis2jam2.settings"
+)
 
-    /** Sets the latency fix for a device. */
-    fun setLatencyForDevice(deviceName: String, value: Int) {
-        deviceLatencyMap[deviceName] = value
+/**
+ * Loads the launcher settings, stored at [launcherSettingsFile]. When loading, it also cleans out any unavailable
+ * SoundFont files.
+ */
+internal fun loadLauncherSettingsFromFile(): LauncherSettings {
+    return if (launcherSettingsFile().exists()) {
+        try {
+            Json.decodeFromString<LauncherSettings>(launcherSettingsFile().readText()).also { settings ->
+                settings.soundFontPaths = settings.soundFontPaths.filter { File(it).exists() }.toMutableList()
+            }
+        } catch (e: Exception) {
+            LauncherSettings()
+        }
+    } else {
+        LauncherSettings()
     }
 }

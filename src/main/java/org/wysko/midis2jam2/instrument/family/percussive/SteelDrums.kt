@@ -20,7 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The Steel drums. */
@@ -34,7 +34,7 @@ class SteelDrums(
     }
 
     init {
-        val drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f)
+        val drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f)
         val adjustments = Array(12) { Node() }
         for (i in 0..11) {
             adjustments[i].attachChild(malletNodes[i])

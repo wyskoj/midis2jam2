@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.reed.sax
 
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.instrument.clone.UpAndDownKeyClone
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** Shared code for sax clones. */
@@ -39,10 +39,10 @@ abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFa
 
     init {
         keysUp = Array(NUMBER_OF_KEYS) {
-            parent.context.loadModel("AltoSaxKeyUp$it.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+            parent.context.loadModel("AltoSaxKeyUp$it.obj", "HornSkinGrey.bmp", MaterialType.REFLECTIVE, 0.9f)
         }
         keysDown = Array(NUMBER_OF_KEYS) {
-            parent.context.loadModel("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp", MatType.REFLECTIVE, 0.9f)
+            parent.context.loadModel("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp", MaterialType.REFLECTIVE, 0.9f)
         }
         attachKeys()
     }

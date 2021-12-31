@@ -14,26 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+package org.wysko.midis2jam2.util
 
-package org.wysko.midis2jam2.starter;
+/** A material type. */
+enum class MaterialType {
+    /** An unshaded material. */
+    UNSHADED,
 
-import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.midi.MidiFile;
-import org.wysko.midis2jam2.util.M2J2Settings;
-
-import javax.sound.midi.Sequencer;
-
-public class CliLiaison extends Liaison {
-	
-	public CliLiaison(@NotNull Sequencer sequencer,
-	                  @NotNull MidiFile midiFile,
-	                  @NotNull M2J2Settings m2j2settings,
-	                  boolean fullscreen) {
-		super(null, sequencer, midiFile, m2j2settings, fullscreen);
-	}
-	
-	@Override
-	public void enableLauncher() {
-		// Do nothing
-	}
+    /** A reflective material. */
+    REFLECTIVE
 }

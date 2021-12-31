@@ -21,7 +21,7 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The timpani. */
@@ -34,7 +34,7 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
 
     init {
 
-        val body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", MatType.REFLECTIVE, 0.9f).also {
+        val body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", MaterialType.REFLECTIVE, 0.9f).also {
             (it as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
         }
         val head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp")

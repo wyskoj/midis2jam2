@@ -6,11 +6,19 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.0.0"
     id("org.panteleyev.jpackageplugin") version "1.3.0"
     id("com.github.hierynomus.license-report") version "0.15.0"
-    id("org.jetbrains.kotlin.jvm") version "1.5.21"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.dokka") version "1.4.32"
+    id("org.jetbrains.compose") version "1.0.1"
+    id("org.openjfx.javafxplugin") version "0.0.10"
     java
     idea
     application
+}
+
+javafx {
+    version = "11"
+    modules = listOf("javafx.controls", "javafx.swing")
 }
 
 tasks.build {
@@ -19,9 +27,18 @@ tasks.build {
         from("build/reports/license/dependency-license.html")
         into("src/main/resources")
     }
+    copy {
+        from("build/reports/license/dependency-license.json")
+        into("src/main/resources")
+    }
 }
 
 tasks.compileJava {
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
+}
+
+tasks.compileKotlin {
     sourceCompatibility = "11"
     targetCompatibility = "11"
 }
@@ -44,10 +61,10 @@ tasks.shadowJar {
 
 dependencies {
     // JMonkeyEngine
-    implementation("org.jmonkeyengine:jme3-core:3.4.0-stable")
-    implementation("org.jmonkeyengine:jme3-desktop:3.4.0-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.4.0-stable")
-    implementation("org.jmonkeyengine:jme3-plugins:3.4.0-stable")
+    implementation("org.jmonkeyengine:jme3-core:3.4.1-stable")
+    implementation("org.jmonkeyengine:jme3-desktop:3.4.1-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.4.1-stable")
+    implementation("org.jmonkeyengine:jme3-plugins:3.4.1-stable")
 
     // JetBrains annotations
     implementation("org.jetbrains:annotations:22.0.0")
@@ -74,6 +91,12 @@ dependencies {
 
     // Apache Commons CLI
     implementation("commons-cli:commons-cli:1.5.0")
+
+    // Jetpack compose
+    implementation(compose.desktop.currentOs)
+
+    // Kotlin serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 }
 
 downloadLicenses {

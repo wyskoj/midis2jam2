@@ -67,7 +67,7 @@ object Utils {
      * @return a formatted string containing the exception and a stack trace
      */
     @JvmStatic
-    fun exceptionToLines(e: Throwable) = buildString {
+    fun exceptionToLines(e: Throwable): String = buildString {
         append("${e.javaClass.simpleName}: ${e.message}\n")
         e.stackTrace.forEach { append("$it\n") }
     }
@@ -117,7 +117,7 @@ object Utils {
      * @param deg the angle expressed in degrees
      * @return the angle expressed in radians
      */
-    fun rad(deg: Float) = deg / 180 * FastMath.PI
+    fun rad(deg: Float): Float = deg / 180 * FastMath.PI
 
 
     /**
@@ -127,7 +127,7 @@ object Utils {
      * @return the angle expressed in radians
      */
     @JvmStatic
-    fun rad(deg: Double) = (deg / 180 * FastMath.PI).toFloat()
+    fun rad(deg: Double): Float = (deg / 180 * FastMath.PI).toFloat()
 
 
     /**
@@ -148,4 +148,18 @@ object Utils {
 
     /** Simple lerp function. */
     fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t
+
+    /**
+     * Determines if a string is an integer.
+     *
+     * @return true if the string is an integer, false otherwise
+     */
+    fun String.isInt(): Boolean {
+        return try {
+            toInt()
+            true
+        } catch (e: NumberFormatException) {
+            false
+        }
+    }
 }

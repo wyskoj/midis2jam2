@@ -19,11 +19,11 @@ package org.wysko.midis2jam2.gui
 
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.Utils.getHTML
+import org.wysko.midis2jam2.util.Utils.resourceToString
 import java.awt.Desktop
 import java.io.IOException
 import java.util.*
 import javax.swing.JEditorPane
-import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.event.HyperlinkEvent
 
@@ -32,12 +32,12 @@ object UpdateChecker {
 
     /** Checks to see if the program is up-to-date. */
     @JvmStatic
-    fun checkForUpdates(frame: JFrame) {
+    fun checkForUpdates() {
         Thread {
             Midis2jam2.getLOGGER().info("Checking for updates.")
             try {
                 val bundle = ResourceBundle.getBundle("i18n.updater")
-                val html = getHTML("https://midis2jam2.xyz/api/update?v=" + GuiLauncher.getVersion())
+                val html = getHTML("https://midis2jam2.xyz/api/update?v=" + resourceToString("/version.txt"))
                 val jep = JEditorPane().apply {
                     contentType = "text/html"
                     text = bundle.getString("warning")
@@ -55,7 +55,7 @@ object UpdateChecker {
                 }
                 if (html.contains("Out of")) {
                     JOptionPane.showMessageDialog(
-                        frame,
+                        null,
                         jep,
                         bundle.getString("update_available"),
                         JOptionPane.WARNING_MESSAGE

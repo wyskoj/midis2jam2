@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MatType.REFLECTIVE
+import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 

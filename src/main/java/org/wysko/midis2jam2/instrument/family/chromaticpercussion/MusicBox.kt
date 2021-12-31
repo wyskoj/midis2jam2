@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MatType.REFLECTIVE
+import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 
 /** Texture file for shiny silver. */
 const val SHINY_SILVER: String = "ShinySilver.bmp"

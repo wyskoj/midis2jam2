@@ -22,7 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MatType
+import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -60,7 +60,7 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: Tr
     init {
 
         /* Load triangle */
-        val triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", MatType.REFLECTIVE, 0.9f)
+        val triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f)
         triangleNode.attachChild(triangle)
 
         /* Fix material if a muted triangle */
@@ -74,7 +74,7 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: Tr
             context.loadModel(
                 "Triangle_Stick.obj",
                 "ShinySilver.bmp",
-                MatType.REFLECTIVE,
+                MaterialType.REFLECTIVE,
                 0.9f
             )
         )

@@ -9,6 +9,8 @@ image:https://img.shields.io/github/issues-closed/wyskoj/midis2jam2[]
 midis2jam2 is a remaster of MIDIJam, a 3D MIDI file visualizer.
 It plays and animates any MIDI file with a 3D virtual band.
 
+It is written in Kotlin/JVM and uses jMonkeyEngine for graphics.
+
 https://github.com/wyskoj/midis2jam2/blob/master/implementation.adoc[Not all instruments are implemented yet]; this is a work in progress.
 
 == 🖥️ Installation
