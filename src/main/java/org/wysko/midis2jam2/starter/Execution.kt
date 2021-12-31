@@ -38,7 +38,7 @@ object Execution {
      *
      * @param passedSettings settings to use
      * @param onStart function to call when midis2jam2 is started
-     * @param onFinish function to call when midis2jam2 is finished\
+     * @param onFinish function to call when midis2jam2 is finished
      */
     fun start(
         passedSettings: PassedSettings,
