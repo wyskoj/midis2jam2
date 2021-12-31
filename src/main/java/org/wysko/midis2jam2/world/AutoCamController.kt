@@ -88,19 +88,19 @@ class AutoCamController(private val context: Midis2jam2) {
     /** Performs a tick of the auto-cam controller. */
     fun tick(time: Double, delta: Float) {
         if (!enabled) return
-        context.debugText.text = buildString {
-            append("enabled: $enabled\n")
-            append("moving: $moving\n")
-            append("waiting: $waiting\n")
-            append("x: $x\n")
-            append("angle: ${angles.last()}\n")
-            append("time: $time\n")
-            append("song length: ${context.file.length}\n")
-            append("valid cams: ${
-                AutoCamPosition.values()
-                    .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, instruments()) }
-            }")
-        }
+//        context.debugText.text = buildString {
+//            append("enabled: $enabled\n")
+//            append("moving: $moving\n")
+//            append("waiting: $waiting\n")
+//            append("x: $x\n")
+//            append("angle: ${angles.last()}\n")
+//            append("time: $time\n")
+//            append("song length: ${context.file.length}\n")
+//            append("valid cams: ${
+//                AutoCamPosition.values()
+//                    .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, instruments()) }
+//            }")
+//        }
 
 
         /* If the camera is not moving, and the song has started, */
@@ -138,13 +138,6 @@ class AutoCamController(private val context: Midis2jam2) {
 
         /* If we are in the process of moving to a new camera angle, */
         if (moving) {
-//            if (!angles.last().stayHere.invoke(time, instruments())) {
-//                angles.add(randomCamera(time))
-//                x = 0f
-//                startLocation = context.app.camera.location.clone()
-//                startRotation = context.app.camera.rotation.clone()
-//            }
-
             /* Increment interpolation index */
             x += delta * MOVE_SPEED
 
@@ -207,7 +200,11 @@ class AutoCamController(private val context: Midis2jam2) {
 
     /** Moves the camera to a new position, if it is not currently moving. */
     fun trigger() {
+        if (!enabled) {
+            x = 1f
+        }
         enabled = true
+
         if (!moving) {
             waiting = WAIT_TIME
         }
