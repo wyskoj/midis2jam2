@@ -23,6 +23,7 @@ import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiTextEvent
+import org.wysko.midis2jam2.util.Utils
 
 /**
  * The LyricController is responsible for controlling the displaying of lyrics. There are two lines of lyrics, the top
@@ -41,6 +42,9 @@ class LyricController(
 
     /** As the file progresses, the current lyric group is incremented and put here. */
     private var currentGroup: List<MidiTextEvent> = emptyList()
+
+    /** The previous lyric group. */
+    private var previousGroup: List<MidiTextEvent> = emptyList()
 
     /** Font used to display lyrics. */
     private val bitmapFont = this.context.assetManager.loadFont("Interface/Fonts/Default.fnt")
@@ -81,7 +85,7 @@ class LyricController(
     private fun tns() = context.file.eventInSeconds(lyricGroups.first().first())
 
     /** Time of the current lyric group end. */
-    private fun tce() = context.file.eventInSeconds(currentGroup.last())
+    private fun tce() = currentGroup.lastOrNull()?.let { context.file.eventInSeconds(it) } ?: 0.0
 
     /** The full text of the current lyric. */
     private val currentLineText: String
@@ -108,9 +112,14 @@ class LyricController(
 
     /** Updates the lyric display. */
     fun tick(time: Double) {
+        setLyricsVisibility(time)
+
         if (lyricGroups.isNotEmpty()) {
             /* If it is time to display this lyric group */
             if (shouldAdvance(time)) {
+                /* Store last group */
+                previousGroup = currentGroup
+
                 /* Remove it from the list */
                 currentGroup = lyricGroups.removeAt(0)
 
@@ -153,6 +162,32 @@ class LyricController(
             )
         )
         nextLine.text = nextLineText
+    }
+
+    private fun setLyricsVisibility(time: Double) {
+        Utils.cullHint(calculateLyricsVisibility(time)).let {
+            currentLine.cullHint = it
+            nextLine.cullHint = it
+        }
+    }
+
+    private fun calculateLyricsVisibility(time: Double): Boolean {
+        /* Within one second of the next lyric group? Visible. */
+        if (lyricGroups.isNotEmpty() && tns() - time <= 1.0) {
+            return true
+        }
+
+        /* If within a 7-second gap between lyric groups? Visible. */
+        if (lyricGroups.isNotEmpty() && tns() - tce() <= 7.0) {
+            return true
+        }
+
+        /* If after 2 seconds of the previous lyric group? Visible. */
+        if (previousGroup.isNotEmpty() && time - tce() <= 2.0) {
+            return true
+        }
+
+        return false
     }
 
     /** Determines if the current lyric group should be advanced. See [this flowchart](https://app.code2flow.com/Y5F13y). */
