@@ -1,6 +1,6 @@
 @file:Suppress("SpellCheckingInspection")
 
-project.setProperty("mainClassName", "org.wysko.midis2jam2.gui.GuiLauncher")
+project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
 
 plugins {
     id("com.github.johnrengelman.shadow") version "6.0.0"
@@ -38,9 +38,10 @@ tasks.compileJava {
     targetCompatibility = "11"
 }
 
-tasks.compileKotlin {
-    sourceCompatibility = "11"
-    targetCompatibility = "11"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 repositories {
@@ -50,7 +51,7 @@ repositories {
 }
 
 application {
-    mainClass.set("org.wysko.midis2jam2.gui.GuiLauncher")
+    mainClass.set("org.wysko.midis2jam2.MainKt")
 }
 
 tasks.shadowJar {
@@ -63,7 +64,7 @@ dependencies {
     // JMonkeyEngine
     implementation("org.jmonkeyengine:jme3-core:3.4.1-stable")
     implementation("org.jmonkeyengine:jme3-desktop:3.4.1-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.4.1-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl3:3.4.1-stable")
     implementation("org.jmonkeyengine:jme3-plugins:3.4.1-stable")
 
     // JetBrains annotations
@@ -71,14 +72,14 @@ dependencies {
 
     // Utility
     implementation("org.apache.commons:commons-lang3:3.12.0")
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("com.google.code.gson:gson:2.8.9")
 
     // Unit testing
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 
     // Theme
-    implementation("com.formdev:flatlaf:1.6.1")
+    implementation("com.formdev:flatlaf:1.6.5")
 
     // Installer
     implementation("com.install4j:install4j-runtime:8.0.7")
@@ -87,7 +88,7 @@ dependencies {
     implementation("org.spongepowered:noise:2.0.0-SNAPSHOT")
 
     // Dokka math
-    implementation("org.jetbrains.dokka:mathjax-plugin:1.5.31")
+    implementation("org.jetbrains.dokka:mathjax-plugin:1.6.0")
 
     // Apache Commons CLI
     implementation("commons-cli:commons-cli:1.5.0")
