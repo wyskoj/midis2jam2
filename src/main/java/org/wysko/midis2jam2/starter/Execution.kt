@@ -29,6 +29,7 @@ import java.awt.Toolkit
 import javax.imageio.ImageIO
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequencer
+import javax.swing.JFrame
 
 /** Starts midis2jam2 with given settings. */
 object Execution {
@@ -107,7 +108,7 @@ private val defaultSettings = AppSettings(true).apply {
     isVSync = true
     isResizable = true
     samples = 4
-    isGammaCorrection = true
+    isGammaCorrection = false
     icons = arrayOf("/ico/icon16.png", "/ico/icon32.png", "/ico/icon128.png", "/ico/icon256.png").map {
         ImageIO.read(this::class.java.getResource(it))
     }.toTypedArray()
@@ -119,6 +120,8 @@ private open class StandardExecution(
     val onFinish: () -> Unit,
     val sequencer: Sequencer,
 ) : SimpleApplication() {
+
+    private lateinit var frame: JFrame
 
     fun execute() {
         /* Set JME3 settings */
@@ -140,9 +143,7 @@ private open class StandardExecution(
             val dimensions = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
             val canvas = context.canvas
             canvas.preferredSize = dimensions
-            SwingWrapper(canvas, "midis2jam2").run {
-                isVisible = true
-            }
+            frame = SwingWrapper.wrap(canvas, "midis2jam2")
             startCanvas()
         }
     }
@@ -150,6 +151,7 @@ private open class StandardExecution(
     override fun stop() {
         stop(false)
         onFinish()
+        frame.isVisible = false
     }
 
     override fun simpleInitApp() {
@@ -207,7 +209,7 @@ private open class LegacyExecution(
 }
 
 /** Determines the width of the screen. */
-private fun screenWidth() = Toolkit.getDefaultToolkit().screenSize.width
+fun screenWidth() = Toolkit.getDefaultToolkit().screenSize.width
 
 /** Determines the height of the screen. */
-private fun screenHeight() = Toolkit.getDefaultToolkit().screenSize.height
+fun screenHeight() = Toolkit.getDefaultToolkit().screenSize.height

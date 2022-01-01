@@ -841,7 +841,7 @@ public abstract class Midis2jam2 extends AbstractAppState implements ActionListe
 		
 		/* Initialize controllers */
 		lyricController = new LyricController(textEvents, this);
-		autocamController = new AutoCamController(this);
+		autocamController = new AutoCamController(this, settings.getAutoAutoCam());
 	}
 	
 	@Override

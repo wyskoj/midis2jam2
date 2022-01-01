@@ -53,7 +53,13 @@ import org.wysko.midis2jam2.util.Utils.isInt
 import java.awt.Cursor
 import java.io.File
 import java.text.MessageFormat
+import java.util.*
 import javax.sound.midi.MidiSystem
+
+/**
+ * Locales for the GUI.
+ */
+val supportedLocales: List<Locale> = listOf(Locale.ENGLISH, Locale.FRENCH, Locale.forLanguageTag("es"))
 
 /**
  * Displays configuration options and settings for midis2jam2.
@@ -61,9 +67,13 @@ import javax.sound.midi.MidiSystem
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @Composable
+@Suppress("FunctionName")
 fun Launcher() {
     /* Try to load settings file */
     val settings = loadLauncherSettingsFromFile()
+
+    /* Load i18n strings */
+    var i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(settings.locale))
 
     /* Configuration */
     val midiDevices = MidiSystem.getMidiDeviceInfo().map { it.name }.toList().filter { it != "Real Time Sequencer" }
@@ -104,6 +114,7 @@ fun Launcher() {
     val settingsWidth = 400.dp
     var freeze by remember { mutableStateOf(false) }
     var thinking by remember { mutableStateOf(false) }
+    var locale by remember { mutableStateOf(settings.locale) }
 
     MaterialTheme(darkColors()) {
         Surface(
@@ -120,7 +131,7 @@ fun Launcher() {
                     horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(width)
                 ) {
                     Image(bitmap = useResource("logo.png", ::loadImageBitmap),
-                        contentDescription = "midis2jam2 logo",
+                        contentDescription = i18n.getString("midis2jam2"),
                         modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
                             showAbout = !showAbout
                         })
@@ -132,7 +143,7 @@ fun Launcher() {
                             modifier = Modifier.width(width).verticalScroll(screenScroll)
                         ) {
                             Text(
-                                text = "Configuration",
+                                text = i18n.getString("configuration.configuration"),
                                 style = MaterialTheme.typography.h6,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp)
                             )
@@ -141,11 +152,11 @@ fun Launcher() {
                                 onValueChange = { midiFileText = it },
                                 singleLine = true,
                                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(width),
-                                label = { Text("MIDI File") },
+                                label = { Text(i18n.getString("configuration.midi_file")) },
                                 trailingIcon = {
                                     Icon(
                                         Icons.Filled.Search,
-                                        contentDescription = "Search for MIDI file",
+                                        contentDescription = i18n.getString("configuration.search_for_midi_file"),
                                         modifier = Modifier.clickable {
                                             FileChooser().run {
                                                 initialDirectory = File(settings.lastMidiDir)
@@ -180,7 +191,7 @@ fun Launcher() {
                                     audioDelay = settings.deviceLatencyMap[midiDevices[it]].toString()
                                     settings.save()
                                 },
-                                label = { Text("MIDI Device") },
+                                label = { Text(i18n.getString("configuration.midi_device")) },
                                 modifier = Modifier.width(width).padding(0.dp, 0.dp, 0.dp, 16.dp)
                             )
                             AnimatedVisibility(
@@ -196,7 +207,7 @@ fun Launcher() {
                                         values = soundFonts,
                                         selectedIndex = selectedSoundFont,
                                         onChange = { selectedSoundFont = it },
-                                        label = { Text("SoundFont") },
+                                        label = { Text(i18n.getString("configuration.soundfont")) },
                                         modifier = Modifier.width(428.dp).padding(0.dp, 0.dp, 0.dp, 0.dp)
                                     )
                                     Button(
@@ -210,34 +221,33 @@ fun Launcher() {
                                                 JFXPanel() // This is required to initialize the JavaFX file chooser
                                                 Platform.runLater {
                                                     showOpenDialog(null).run {
-                                                        if (this != null) {
-                                                            if (!settings.soundFontPaths.contains(this.absolutePath)) {
-                                                                settings.soundFontPaths.add(this.absolutePath)
-                                                                soundFonts = settings.soundFontNames()
-                                                                selectedSoundFont =
-                                                                    soundFonts.indexOf(this.name)
-                                                                settings.save()
+                                                        if (this != null && !settings.soundFontPaths.contains(this.absolutePath)) {
+                                                            settings.soundFontPaths.add(this.absolutePath)
+                                                            soundFonts = settings.soundFontNames()
+                                                            selectedSoundFont =
+                                                                soundFonts.indexOf(this.name)
+                                                            settings.save()
 
-                                                            }
                                                         }
                                                     }
+
                                                 }
                                             }
                                         }, modifier = Modifier.height(56.dp).width(56.dp)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Filled.Search,
-                                            contentDescription = "Edit SoundFonts",
+                                            contentDescription = i18n.getString("configuration.search_for_soundfont"),
                                         )
                                     }
                                 }
                             }
 
                             Row(modifier = Modifier.clickable { showSettings = !showSettings }) {
-                                Text(text = "Settings", style = MaterialTheme.typography.h6)
+                                Text(text = i18n.getString("settings.settings"), style = MaterialTheme.typography.h6)
                                 Icon(
                                     imageVector = Icons.Filled.ArrowDropDown,
-                                    contentDescription = "Change",
+                                    contentDescription = null,
                                     modifier = Modifier.padding(top = 4.dp).rotate(settingsDropdownRotation)
                                 )
                             }
@@ -259,7 +269,7 @@ fun Launcher() {
                                                     shape = RoundedCornerShape(4.dp)
                                                 ) {
                                                     Text(
-                                                        text = "When enabled, midis2jam2 will display in fullscreen mode.",
+                                                        text = i18n.getString("settings.fullscreen_description"),
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
@@ -269,9 +279,7 @@ fun Launcher() {
                                                 anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
                                             )
                                         ) {
-                                            Text(
-                                                text = "Fullscreen"
-                                            )
+                                            Text(text = i18n.getString("settings.fullscreen"))
                                         }
                                         Switch(checked = isFullscreen, onCheckedChange = {
                                             isFullscreen = it
@@ -292,7 +300,7 @@ fun Launcher() {
                                                     shape = RoundedCornerShape(4.dp)
                                                 ) {
                                                     Text(
-                                                        text = "If midis2jam2 crashes when starting, enabling this may fix it.",
+                                                        text = i18n.getString("settings.legacy_display_engine_description"),
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
@@ -303,7 +311,7 @@ fun Launcher() {
                                             )
                                         ) {
                                             Text(
-                                                text = "Legacy display engine"
+                                                text = i18n.getString("settings.legacy_display_engine")
                                             )
                                         }
                                         Switch(checked = isLegacyDisplayEngine, onCheckedChange = {
@@ -325,7 +333,7 @@ fun Launcher() {
                                                     shape = RoundedCornerShape(4.dp)
                                                 ) {
                                                     Text(
-                                                        text = "When enabled, the autocam is enabled when the song " + "starts.",
+                                                        text = i18n.getString("settings.auto_autocam_description"),
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
@@ -336,7 +344,7 @@ fun Launcher() {
                                             )
                                         ) {
                                             Text(
-                                                text = "Autocam on song start"
+                                                text = i18n.getString("settings.auto_autocam")
                                             )
                                         }
                                         Switch(checked = isAutoAutoCam, onCheckedChange = {
@@ -358,7 +366,7 @@ fun Launcher() {
                                                     shape = RoundedCornerShape(4.dp)
                                                 ) {
                                                     Text(
-                                                        text = "If the audio and video are out of sync, adjust this number.",
+                                                        text = i18n.getString("settings.audio_delay_description"),
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
@@ -369,7 +377,7 @@ fun Launcher() {
                                             )
                                         ) {
                                             Text(
-                                                text = "Audio delay"
+                                                text = i18n.getString("settings.audio_delay")
                                             )
                                         }
                                         TextField(
@@ -387,7 +395,7 @@ fun Launcher() {
                                                 }
                                             },
                                             modifier = Modifier.width(128.dp),
-                                            label = { Text("milliseconds") },
+                                            label = { Text(i18n.getString("settings.milliseconds")) },
                                         )
                                     }
                                 }
@@ -437,8 +445,8 @@ fun Launcher() {
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
-                                    Icon(Icons.Filled.Done, contentDescription = "Start")
-                                    Text("Start")
+                                    Icon(Icons.Filled.Done, contentDescription = i18n.getString("start"))
+                                    Text(i18n.getString("start"))
                                 }
                             }
                         }
@@ -450,42 +458,58 @@ fun Launcher() {
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text = "A remaster of MIDIJam, a 3D MIDI file visualizer.",
+                                text = i18n.getString("about.description"),
                                 style = MaterialTheme.typography.h6
                             )
                             Text(
-                                text = "Copyright © MMXXII Jacob Wysko",
+                                text = i18n.getString("about.copyright"),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
                             )
                             Text(
-                                text = "This program comes with absolutely no warranty.",
+                                text = locale.uppercase(Locale.getDefault()),
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
+                                    supportedLocales.let {
+                                        locale = it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it
+                                            .size].language
+                                    }
+                                    i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
+                                    settings.locale = locale
+                                    settings.save()
+                                }
+                            )
+                            Text(
+                                text = i18n.getString("about.warranty"),
                                 style = MaterialTheme.typography.body2,
                             )
                             TextWithLink(
-                                "See the GNU General Public License for more details.",
-                                "GNU General Public License",
+                                MessageFormat.format(
+                                    i18n.getString("about.license"),
+                                    i18n.getString("about.license_name")
+                                ),
+                                i18n.getString("about.license_name"),
                                 "https://www.gnu.org/licenses/gpl-3.0.en.html",
                                 MaterialTheme.typography.body2
                             )
                             Text(
-                                text = "Some assets © 2007 Scott Haag. All rights reserved. Used with permission.",
+                                text = i18n.getString("about.scott_haag"),
                                 style = MaterialTheme.typography.h6.copy(fontSize = 12.sp),
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
                             )
                             loadAttributions().forEach { (name, author, license, url, extra) ->
                                 TextWithLink(
                                     MessageFormat.format(
-                                        "\"{0}\" by {1} licensed under {2}{3}.",
+                                        i18n.getString("about.cc_attribution"),
                                         name,
                                         author,
                                         license,
-                                        if (extra.isEmpty()) "" else ", $extra"
+                                        if (extra.isEmpty()) "" else ", ${i18n.getString("about.$extra")}"
                                     ), license, url, MaterialTheme.typography.h6.copy(fontSize = 12.sp)
                                 )
                             }
                             Text(
-                                text = "SoundFont is a registered trademark of E-mu Systems, Inc.",
+                                text = i18n.getString("about.soundfont_trademark"),
                                 style = MaterialTheme.typography.h6.copy(fontSize = 12.sp),
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp)
                             )
@@ -493,10 +517,13 @@ fun Launcher() {
                                 modifier = Modifier.clickable { showOSS = !showOSS },
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Text(text = "OSS Licenses", style = MaterialTheme.typography.body2)
+                                Text(
+                                    text = i18n.getString("about.oss_licenses"),
+                                    style = MaterialTheme.typography.body2
+                                )
                                 Icon(
                                     imageVector = Icons.Filled.ArrowDropDown,
-                                    contentDescription = "Change",
+                                    contentDescription = null,
                                     modifier = Modifier.rotate(ossRotation)
                                 )
                             }

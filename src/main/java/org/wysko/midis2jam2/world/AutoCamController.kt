@@ -60,10 +60,10 @@ private const val WAIT_TIME = 3f
  * The auto-cam controller is responsible for controlling the automatic movement of the camera. It picks camera angles
  * randomly and moves the camera to them.
  */
-class AutoCamController(private val context: Midis2jam2) {
+class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) {
 
     /** When true, the auto-cam controller is enabled. */
-    var enabled: Boolean = true
+    var enabled: Boolean = startEnabled
 
     /** The amount of time that has passed since the last camera angle change. */
     private var waiting = 0f

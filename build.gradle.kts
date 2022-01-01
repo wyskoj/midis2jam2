@@ -64,7 +64,7 @@ dependencies {
     // JMonkeyEngine
     implementation("org.jmonkeyengine:jme3-core:3.4.1-stable")
     implementation("org.jmonkeyengine:jme3-desktop:3.4.1-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl3:3.4.1-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.4.1-stable")
     implementation("org.jmonkeyengine:jme3-plugins:3.4.1-stable")
 
     // JetBrains annotations

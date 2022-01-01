@@ -17,23 +17,38 @@
 
 package org.wysko.midis2jam2.gui
 
+import org.wysko.midis2jam2.starter.screenHeight
+import org.wysko.midis2jam2.starter.screenWidth
 import java.awt.BorderLayout
 import java.awt.Canvas
+import java.awt.Dimension
+import javax.imageio.ImageIO
 import javax.swing.JFrame
-import javax.swing.JPanel
 
 /**
  * A wrapper for a [Canvas] that can be used in a Swing application.
  * @param canvas the canvas to wrap
  */
-class SwingWrapper(
-    canvas: Canvas,
-    title: String
+internal class SwingWrapper(
+    canvas: Canvas, title: String
 ) : JFrame(title) {
-    init {
-        contentPane.layout = BorderLayout()
-        JPanel().also {
-            it.add(canvas, BorderLayout.CENTER)
+
+    companion object {
+        fun wrap(canvas: Canvas, title: String): JFrame = SwingWrapper(canvas, title).also {
+            it.size = Dimension((screenWidth() * 0.95).toInt(), (screenHeight() * 0.85).toInt())
+            it.setLocationRelativeTo(null)
+            it.isVisible = true
         }
+    }
+
+    init {
+        iconImages = listOf(
+            ImageIO.read(javaClass.getResource("/ico/icon16.png")),
+            ImageIO.read(javaClass.getResource("/ico/icon32.png")),
+            ImageIO.read(javaClass.getResource("/ico/icon64.png")),
+            ImageIO.read(javaClass.getResource("/ico/icon128.png"))
+        )
+        contentPane.layout = BorderLayout()
+        contentPane.add(canvas, BorderLayout.CENTER)
     }
 }
