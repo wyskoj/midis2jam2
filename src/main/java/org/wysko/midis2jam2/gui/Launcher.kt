@@ -160,6 +160,14 @@ fun Launcher() {
                                         modifier = Modifier.clickable {
                                             FileChooser().run {
                                                 initialDirectory = File(settings.lastMidiDir)
+
+                                                /* If the directory is bad, just revert to the home directory */
+                                                if (!initialDirectory.exists()) {
+                                                    initialDirectory = File(System.getProperty("user.home"))
+                                                    settings.lastMidiDir = initialDirectory.absolutePath
+                                                    settings.save()
+                                                }
+
                                                 extensionFilters.add(
                                                     FileChooser.ExtensionFilter(
                                                         "MIDI files (*.mid, *.kar)", "*.mid", "*.kar"
