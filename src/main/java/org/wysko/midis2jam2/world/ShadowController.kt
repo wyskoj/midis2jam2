@@ -31,8 +31,6 @@ import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.strings.Harp
-import org.wysko.midis2jam2.util.Jme3Constants.COLOR_MAP
-import org.wysko.midis2jam2.util.Jme3Constants.UNSHADED_MAT
 import org.wysko.midis2jam2.util.Utils
 
 /**
@@ -85,8 +83,13 @@ class ShadowController(
         keyboardShadow.cullHint = Utils.cullHint(context.instruments.any { it is Keyboard && it.isVisible })
         context.instruments.filterIsInstance<Keyboard>().let { keyboards ->
             keyboardShadow.localScale = Vector3f(
-                1f, 1f, if (keyboards.isNotEmpty()) keyboards.maxOf { it.checkInstrumentIndex() }.toFloat() + 1f
-                else 0f
+                1f, 1f, if (keyboards.isNotEmpty()) {
+                    keyboards.filter { it.isVisible }.maxOfOrNull { it.checkInstrumentIndex() }?.let {
+                        it.toFloat() + 1f
+                    } ?: 0f
+                } else {
+                    0f
+                }
             )
         }
 
@@ -106,7 +109,7 @@ class ShadowController(
      * @param clazz   the class of the instrument
      */
     private fun updateArrayShadows(shadows: MutableList<Spatial>, clazz: Class<out Instrument>) {
-        val numVisible = context.instruments.count { it != null && clazz.isInstance(it) && it.isVisible }
+        val numVisible = context.instruments.count { clazz.isInstance(it) && it.isVisible }
         shadows.forEachIndexed { index, shadow -> shadow.cullHint = Utils.cullHint(index < numVisible) }
     }
 

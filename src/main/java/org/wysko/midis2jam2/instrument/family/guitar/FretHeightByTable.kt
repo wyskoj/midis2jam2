@@ -65,15 +65,15 @@ class FretHeightByTable(
                 }
                 FretHeightByTable(lookup)
             } catch (e: ParserConfigurationException) {
-                Midis2jam2.getLOGGER()
+                Midis2jam2.LOGGER
                     .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
                 FretHeightByTable(HashMap())
             } catch (e: SAXException) {
-                Midis2jam2.getLOGGER()
+                Midis2jam2.LOGGER
                     .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
                 FretHeightByTable(HashMap())
             } catch (e: IOException) {
-                Midis2jam2.getLOGGER()
+                Midis2jam2.LOGGER
                     .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
                 FretHeightByTable(HashMap())
             }

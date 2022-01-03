@@ -187,6 +187,14 @@ class LyricController(
             return true
         }
 
+        if (lyricGroups.isEmpty()
+            && currentGroup.isNotEmpty()
+            && time in (context.file.eventInSeconds(currentGroup.first()) - 1)
+            ..(context.file.eventInSeconds(currentGroup.last()) + 2)
+        ) {
+            return true
+        }
+
         return false
     }
 

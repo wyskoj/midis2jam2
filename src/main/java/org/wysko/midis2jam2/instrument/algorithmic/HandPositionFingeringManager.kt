@@ -69,7 +69,7 @@ open class HandPositionFingeringManager : FingeringManager<Hands> {
                     if (instrumentAttributes.getNamedItem("name").textContent == className) {
                         val mappingType = instrumentAttributes.getNamedItem("mapping-type").textContent
                         if ("hands" != mappingType) {
-                            Midis2jam2.getLOGGER().severe { "XML has a mapping type of $mappingType." }
+                            Midis2jam2.LOGGER.severe { "XML has a mapping type of $mappingType." }
                             return manager
                         }
 
@@ -89,11 +89,11 @@ open class HandPositionFingeringManager : FingeringManager<Hands> {
                     }
                 }
             } catch (e: SAXException) {
-                Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+                Midis2jam2.LOGGER.severe(exceptionToLines(e))
             } catch (e: IOException) {
-                Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+                Midis2jam2.LOGGER.severe(exceptionToLines(e))
             } catch (e: ParserConfigurationException) {
-                Midis2jam2.getLOGGER().severe(exceptionToLines(e))
+                Midis2jam2.LOGGER.severe(exceptionToLines(e))
             }
             return manager
         }

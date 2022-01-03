@@ -19,9 +19,14 @@ package org.wysko.midis2jam2
 //import org.wysko.midis2jam2.starter.Liaison
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
-import com.jme3.asset.AssetManager
+import com.jme3.input.KeyInput
+import com.jme3.input.controls.KeyTrigger
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.PassedSettings
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
@@ -44,10 +49,23 @@ class DesktopMidis2jam2(
 ) : Midis2jam2(midiFile, settings) {
 
     /**
+     * True if the sequence has begun playing, false otherwise.
+     */
+    private var sequencerStarted: Boolean = false
+
+    /**
      * Initializes the application.
      */
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
+
+        /* Register key map */
+        Json.decodeFromString<Array<KeyMap>>(Utils.resourceToString("/keymap.json")).forEach {
+            with(app.inputManager) {
+                addMapping(it.name, KeyTrigger(KeyInput::class.java.getField(it.key).getInt(KeyInput::class.java)))
+                addListener(this@DesktopMidis2jam2, it.name)
+            }
+        }
 
         /* To begin MIDI playback, I perform a check every millisecond to see if it is time to begin the playback of
 		 * the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
@@ -62,7 +80,7 @@ class DesktopMidis2jam2(
         Timer(true).scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 if (timeSinceStart + settings.latencyFix / 1000.0 >= 0 && !sequencerStarted && sequencer.isOpen) {
-                    sequencer.tempoInBPM = getFile().firstTempoInBpm().toFloat()
+                    sequencer.tempoInBPM = file.firstTempoInBpm().toFloat()
                     sequencer.start()
                     sequencerStarted = true
                     Timer(true).scheduleAtFixedRate(object : TimerTask() {
@@ -78,18 +96,10 @@ class DesktopMidis2jam2(
         }, 0, 1)
     }
 
-    /** Returns the [AssetManager]. */
-    override fun getAssetManager(): AssetManager = app.assetManager
-
-    /**
-     * The length of the song.
-     */
-    override fun songLength(): Double = sequencer.microsecondLength / 1000000.0
-
     /**
      * Cleans up the application.
      */
-    override fun cleanup(): Unit {
+    override fun cleanup() {
         sequencer.run {
             stop()
             close()
@@ -110,7 +120,7 @@ class DesktopMidis2jam2(
 
         instruments.forEach {
             /* Null if not implemented yet */
-            it?.tick(timeSinceStart, tpf)
+            it.tick(timeSinceStart, tpf)
         }
 
         /* If at the end of the file */
@@ -150,3 +160,19 @@ class DesktopMidis2jam2(
         onClose()
     }
 }
+
+/**
+ * Stores a single map between an action name and a key.
+ */
+@Serializable
+data class KeyMap(
+    /**
+     * The name of the action.
+     */
+    val name: String,
+
+    /**
+     * The name of the key, as defined in [KeyInput].
+     */
+    val key: String
+)

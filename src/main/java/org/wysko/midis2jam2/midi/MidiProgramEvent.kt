@@ -59,7 +59,8 @@ data class MidiProgramEvent
                 }
             }
 
-            /* Remove program events with same value (keep the first one) */for (i in programEvents.size - 2 downTo 0) {
+            /* Remove program events with same value (keep the first one) */
+            for (i in programEvents.size - 2 downTo 0) {
                 while (i != programEvents.size - 1 && programEvents[i].programNum == programEvents[i + 1].programNum) {
                     programEvents.removeAt(i + 1)
                 }

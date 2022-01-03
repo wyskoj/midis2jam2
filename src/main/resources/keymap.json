@@ -1,0 +1,42 @@
+[
+	{
+		"name": "cam1",
+		"key": "KEY_1"
+	},
+	{
+		"name": "cam2",
+		"key": "KEY_2"
+	},
+	{
+		"name": "cam3",
+		"key": "KEY_3"
+	},
+	{
+		"name": "cam4",
+		"key": "KEY_4"
+	},
+	{
+		"name": "cam5",
+		"key": "KEY_5"
+	},
+	{
+		"name": "cam6",
+		"key": "KEY_6"
+	},
+	{
+		"name": "slow",
+		"key": "KEY_LCONTROL"
+	},
+	{
+		"name": "fast",
+		"key": "KEY_LSHIFT"
+	},
+	{
+		"name": "autoCam",
+		"key": "KEY_0"
+	},
+	{
+		"name": "exit",
+		"key": "KEY_ESCAPE"
+	}
+]

@@ -20,16 +20,29 @@ package org.wysko.midis2jam2.starter
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
 import com.jme3.system.JmeCanvasContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Default
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.SwingWrapper
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.PassedSettings
 import java.awt.Dimension
 import java.awt.Toolkit
+import java.util.logging.Level
+import java.util.logging.Logger
 import javax.imageio.ImageIO
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequencer
 import javax.swing.JFrame
+
+/** The sequencer that is connected to the synthesizer. */
+lateinit var connectedSequencer: Sequencer
+
+/** Loads [connectedSequencer]. */
+var loadSequencerJob: Job = CoroutineScope(Default).launch {
+    connectedSequencer = MidiSystem.getSequencer(true)
+}
+
 
 /** Starts midis2jam2 with given settings. */
 object Execution {
@@ -46,58 +59,70 @@ object Execution {
         onStart: () -> Unit,
         onReady: () -> Unit,
         onFinish: () -> Unit,
-    ) {
-        onStart() // Disable launcher
+    ): Job {
+        return CoroutineScope(Default).launch {
 
-        /* Get MIDI file */
-        val sequence = MidiSystem.getSequence(passedSettings.midiFile)
+            onStart() // Disable launcher
 
-        /* Get MIDI device */
-        val midiDevice = MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo().first {
-            it.name == passedSettings
-                .midiDevice
-        })
-
-        /* Get sequencer */
-        val sequencer = if (passedSettings.midiDevice == "Gervill") {
-            /* Get internal synth */
-            val synthesizer = MidiSystem.getSynthesizer()
-            synthesizer.open()
-
-            /* Get SoundFont */
-            passedSettings.soundFont?.let { sf2 ->
-                MidiSystem.getSequencer(false).also {
-                    it.transmitter.receiver = synthesizer.receiver
-                    synthesizer.loadAllInstruments(MidiSystem.getSoundbank(sf2))
-                }
-            } ?: MidiSystem.getSequencer(true)
-        } else {
-            midiDevice.open()
-            MidiSystem.getSequencer(false).also {
-                it.transmitter.receiver = midiDevice.receiver
+            /* Get MIDI file */
+            val sequence = withContext(Dispatchers.IO) {
+                MidiSystem.getSequence(passedSettings.midiFile)
             }
-        }.also {
-            it.open()
-            it.sequence = sequence
-        }
 
-        onReady()
-        if (!passedSettings.legacyDisplayEngine) {
-            Thread({
-                StandardExecution(
-                    passedSettings,
-                    onFinish,
-                    sequencer
-                ).execute()
-            }, "midis2jam2 starter").start()
-        } else {
-            Thread({
-                LegacyExecution(
-                    passedSettings,
-                    onFinish,
-                    sequencer
-                ).execute()
-            }, "midis2jam2 starter").start()
+
+            /* Get MIDI device */
+            val midiDevice = MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo().first {
+                it.name == passedSettings
+                    .midiDevice
+            })
+
+            /* Get sequencer */
+            val sequencer = if (passedSettings.midiDevice == "Gervill") {
+                /* Get internal synth */
+                val synthesizer = MidiSystem.getSynthesizer()
+                synthesizer.open()
+
+                /* Get SoundFont */
+                passedSettings.soundFont?.let { sf2 ->
+                    MidiSystem.getSequencer(false).also {
+                        it.transmitter.receiver = synthesizer.receiver
+                        synthesizer.loadAllInstruments(MidiSystem.getSoundbank(sf2))
+                    }
+                } ?: let {
+                    loadSequencerJob.join()
+                    connectedSequencer
+                }
+            } else {
+                midiDevice.open()
+                MidiSystem.getSequencer(false).also {
+                    it.transmitter.receiver = midiDevice.receiver
+                }
+            }.also {
+                it.open()
+                it.sequence = sequence
+            }
+            /* Hush JME */
+            Logger.getLogger("com.jme3").level = Level.FINEST
+
+            onReady()
+
+            if (!passedSettings.legacyDisplayEngine) {
+                Thread({
+                    StandardExecution(
+                        passedSettings,
+                        onFinish,
+                        sequencer
+                    ).execute()
+                }, "midis2jam2 starter").start()
+            } else {
+                Thread({
+                    LegacyExecution(
+                        passedSettings,
+                        onFinish,
+                        sequencer
+                    ).execute()
+                }, "midis2jam2 starter").start()
+            }
         }
     }
 }

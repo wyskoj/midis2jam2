@@ -25,11 +25,13 @@ import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.window.*
 import com.install4j.api.launcher.SplashScreen
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.wysko.midis2jam2.gui.Launcher
 import org.wysko.midis2jam2.gui.UpdateChecker.checkForUpdates
 import org.wysko.midis2jam2.starter.Execution
+import org.wysko.midis2jam2.starter.loadSequencerJob
 import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import java.io.File
@@ -41,6 +43,9 @@ import javax.sound.midi.MidiSystem
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main(args: Array<String>) {
+    /* Get the default sequencer loaded in a coroutine now since it takes a while (about 1.5 seconds) to load. */
+    loadSequencerJob.start()
+
     /* Check for command line arguments */
     if (args.isNotEmpty()) {
         val options = Options().apply {
@@ -92,7 +97,8 @@ fun main(args: Array<String>) {
         val midiDevice = if (cmd.hasOption("device")) cmd.getOptionValue("device") else "Gervill"
 
         /* SoundFont */
-        val soundFont = if (cmd.hasOption("configuration.soundfont")) File(cmd.getOptionValue("configuration.soundfont")) else null
+        val soundFont =
+            if (cmd.hasOption("configuration.soundfont")) File(cmd.getOptionValue("configuration.soundfont")) else null
 
         /* Legacy window engine */
         val legacyWindowEngine = cmd.hasOption("legacy-engine")
@@ -106,20 +112,22 @@ fun main(args: Array<String>) {
         /* Latency */
         val latency = if (cmd.hasOption("latency")) cmd.getOptionValue("latency").toInt() else 0
 
-        Execution.start(
-            PassedSettings(
-                latency,
-                autoCam,
-                fullscreen,
-                legacyWindowEngine,
-                File(midiFile),
-                midiDevice,
-                soundFont
-            ),
-            onStart = {},
-            onReady = {},
-            onFinish = { Runtime.getRuntime().halt(0) }
-        )
+        runBlocking {
+            Execution.start(
+                PassedSettings(
+                    latency,
+                    autoCam,
+                    fullscreen,
+                    legacyWindowEngine,
+                    File(midiFile),
+                    midiDevice,
+                    soundFont
+                ),
+                onStart = {},
+                onReady = {},
+                onFinish = { Runtime.getRuntime().halt(0) }
+            ).join()
+        }
     } else {
         SplashScreen.writeMessage("Loading...")
         application {
