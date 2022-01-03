@@ -16,67 +16,36 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.jetbrains.annotations.Contract
-import org.w3c.dom.Element
-import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.util.Utils.exceptionToLines
-import org.wysko.midis2jam2.util.Utils.instantiateXmlParser
-import org.xml.sax.SAXException
-import java.io.IOException
-import javax.xml.parsers.ParserConfigurationException
+import org.wysko.midis2jam2.util.Utils.resourceToString
 
 /** Calculates fret heights using a lookup table. */
-class FretHeightByTable(
-    /** The lookup table. The key is the fret and the value is the scaling. */
-    private val lookupTable: Map<Int, Float>
+class FretHeightByTable private constructor(
+    private val instrument: Instrument
 ) : FretHeightCalculator {
 
     @Contract(pure = true)
     override fun calculateScale(fret: Int): Float {
-        return lookupTable[fret]!!
+        return instrument.frets.first { it.fret == fret }.scale.toFloat()
     }
 
     companion object {
         /**
-         * Given the [name] of a [FrettedInstrument], returns the XML data defined in `fret_heights.xml` for
-         * that specific instrument.
+         * Retrieves the fret height table by the name of the instrument.
          */
-        fun fromXml(name: String): FretHeightByTable {
-            return try {
-                val xmlDoc = instantiateXmlParser("/fret_heights.xml")
-                val instrumentList = xmlDoc.documentElement.getElementsByTagName("instrument")
-                val lookup: MutableMap<Int, Float> = HashMap()
-
-                /* For each instrument */
-                for (i in 0 until instrumentList.length) {
-                    /* If the name of class doesn't equal the name of the currently indexed instrument, skip */
-                    if (instrumentList.item(i).attributes.getNamedItem("name").textContent != name) continue
-
-                    val instrument = instrumentList.item(i)
-                    val fretHeights = (instrument as Element).getElementsByTagName("value")
-                    /* For each fret height definition */
-                    for (j in 0 until fretHeights.length) {
-                        /* Store attributes to the lookup table */
-                        val attributes = fretHeights.item(j).attributes
-                        lookup[attributes.getNamedItem("fret").textContent.toInt()] =
-                            attributes.getNamedItem("scale").textContent.toFloat()
-                    }
-                    break
-                }
-                FretHeightByTable(lookup)
-            } catch (e: ParserConfigurationException) {
-                Midis2jam2.LOGGER
-                    .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
-                FretHeightByTable(HashMap())
-            } catch (e: SAXException) {
-                Midis2jam2.LOGGER
-                    .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
-                FretHeightByTable(HashMap())
-            } catch (e: IOException) {
-                Midis2jam2.LOGGER
-                    .severe("Failed to load fret height from XML for $name.%n${exceptionToLines(e)}")
-                FretHeightByTable(HashMap())
-            }
-        }
+        fun fromJson(name: String): FretHeightByTable =
+            FretHeightByTable(
+                Json.decodeFromString<List<Instrument>>(resourceToString("/fret-heights.json"))
+                    .first { it.name == name })
     }
 }
+
+/* For parsing JSON file */
+@Serializable
+private data class Instrument(val name: String, val frets: List<Fret>)
+
+@Serializable
+private data class Fret(val fret: Int, val scale: Double)

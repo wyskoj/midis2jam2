@@ -20,7 +20,6 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.guitar.FretHeightByTable.Companion.fromXml
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -50,7 +49,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         ),
         floatArrayOf(-0.93f, -0.56f, -0.21f, 0.21f, 0.56f, 0.90f),
         floatArrayOf(-1.55f, -0.92f, -0.35f, 0.25f, 0.82f, 1.45f),
-        fromXml("Guitar")
+        FretHeightByTable.fromJson("Guitar")
     ),
     6,
     context.loadModel(if (needsDropTuning(events)) type.modelDFileName else type.modelFileName, type.textureFileName)
