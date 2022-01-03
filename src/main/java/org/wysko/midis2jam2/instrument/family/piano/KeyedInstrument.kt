@@ -68,19 +68,22 @@ abstract class KeyedInstrument(
         val eventsToPerform: List<MidiNoteEvent> = getElapsedEvents(time)
         for (event in eventsToPerform) {
             val key = keyByMidiNote(event.note)
-            if (event is MidiNoteOnEvent) {
-                key?.isBeingPressed = true
-            } else if (event is MidiNoteOffEvent) {
-                /* If there is a note off event and a note on event in this frame for the same note, you won't see it
-                 * because the key will be turned off before the frame renders. So, move the note off event back to the
-                 * list of event to be rendered on the next frame. */
-                if (eventsToPerform.stream()
-                        .anyMatch { e: MidiNoteEvent -> e.note == event.note && e is MidiNoteOnEvent }
-                ) {
-                    /* bonk. you get to go to the next frame */
-                    events.add(0, event)
-                } else {
-                    key?.isBeingPressed = false
+            when (event) {
+                is MidiNoteOnEvent -> {
+                    key?.isBeingPressed = true
+                }
+                is MidiNoteOffEvent -> {
+                    /* If there is a note off event and a note on event in this frame for the same note, you won't see it
+                         * because the key will be turned off before the frame renders. So, move the note off event back to the
+                         * list of event to be rendered on the next frame. */
+                    if (eventsToPerform.stream()
+                            .anyMatch { e: MidiNoteEvent -> e.note == event.note && e is MidiNoteOnEvent }
+                    ) {
+                        /* bonk. you get to go to the next frame */
+                        events.add(0, event)
+                    } else {
+                        key?.isBeingPressed = false
+                    }
                 }
             }
         }

@@ -30,15 +30,6 @@ class MidiTempoEvent
     val number: Int,
 ) : MidiEvent(time) {
 
-    /**
-     * Expresses this tempo event in beats per minute.
-     *
-     * @return the tempo, in beats per minute
-     */
-    private fun beatsPerMinute(): Double {
-        return 6E7 / number
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

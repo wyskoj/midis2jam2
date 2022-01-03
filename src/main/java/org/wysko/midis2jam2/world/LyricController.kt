@@ -114,25 +114,24 @@ class LyricController(
     fun tick(time: Double) {
         setLyricsVisibility(time)
 
-        if (lyricGroups.isNotEmpty()) {
-            /* If it is time to display this lyric group */
-            if (shouldAdvance(time)) {
-                /* Store last group */
-                previousGroup = currentGroup
+        /* If it is time to display this lyric group */
+        if (lyricGroups.isNotEmpty() && shouldAdvance(time)) {
+            /* Store last group */
+            previousGroup = currentGroup
 
-                /* Remove it from the list */
-                currentGroup = lyricGroups.removeAt(0)
+            /* Remove it from the list */
+            currentGroup = lyricGroups.removeAt(0)
 
-                /* Write down the number of words in this group */
-                lineWordCount = currentGroup.size
+            /* Write down the number of words in this group */
+            lineWordCount = currentGroup.size
 
-                /* Reset the word index */
-                currentWordIndex = -1
+            /* Reset the word index */
+            currentWordIndex = -1
 
-                /* Set the text of the current line */
-                currentLine.text = currentLineText
-            }
+            /* Set the text of the current line */
+            currentLine.text = currentLineText
         }
+
         /* If there are words in the current group */
         if (currentGroup.isNotEmpty()) {
             /* If it is time to display the next word */

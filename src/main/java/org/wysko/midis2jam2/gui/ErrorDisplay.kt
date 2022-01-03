@@ -18,7 +18,6 @@ package org.wysko.midis2jam2.gui
 
 import org.wysko.midis2jam2.util.Utils.exceptionToLines
 import java.awt.*
-import java.awt.event.ActionEvent
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
@@ -43,7 +42,7 @@ class ErrorDisplay(owner: Window?, e: Exception?, message: String) : JDialog(own
         textArea1.caretPosition = 0
     }
 
-    private fun ok(e: ActionEvent) {
+    private fun ok() {
         dispose()
     }
 
@@ -95,7 +94,7 @@ class ErrorDisplay(owner: Window?, e: Exception?, message: String) : JDialog(own
                 (buttonBar.layout as GridBagLayout).columnWidths = intArrayOf(0, 80)
                 (buttonBar.layout as GridBagLayout).columnWeights = doubleArrayOf(1.0, 0.0)
                 okButton.text = "OK"
-                okButton.addActionListener { e: ActionEvent -> ok(e) }
+                okButton.addActionListener { ok() }
                 buttonBar.add(
                     okButton, GridBagConstraints(
                         1, 0, 1, 1, 0.0, 0.0,

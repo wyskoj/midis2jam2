@@ -52,12 +52,12 @@ fun main(args: Array<String>) {
             addOption("a", "autocam", false, "Enables auto-cam when starting.")
             addOption("d", "device", true, "The device to use for MIDI playback.")
             addOption("e", "legacy-engine", false, "Use the legacy window engine.")
-            addOption("f", "settings.fullscreen", false, "Starts the application in fullscreen mode.")
+            addOption("f", "fullscreen", false, "Starts the application in fullscreen mode.")
             addOption("h", "help", false, "Prints a help message and exits.")
             addOption("l", "list-devices", false, "Lists the available MIDI devices and exits.")
             addOption(
                 "s",
-                "configuration.soundfont",
+                "soundfont",
                 true,
                 "Specifies the SoundFont to use for MIDI playback by a path to a SoundFont file."
             )
@@ -98,13 +98,13 @@ fun main(args: Array<String>) {
 
         /* SoundFont */
         val soundFont =
-            if (cmd.hasOption("configuration.soundfont")) File(cmd.getOptionValue("configuration.soundfont")) else null
+            if (cmd.hasOption("soundfont")) File(cmd.getOptionValue("soundfont")) else null
 
         /* Legacy window engine */
         val legacyWindowEngine = cmd.hasOption("legacy-engine")
 
         /* Fullscreen */
-        val fullscreen = cmd.hasOption("settings.fullscreen")
+        val fullscreen = cmd.hasOption("fullscreen")
 
         /* Auto-cam */
         val autoCam = cmd.hasOption("autocam")
