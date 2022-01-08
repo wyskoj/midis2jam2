@@ -36,11 +36,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,6 +121,42 @@ fun Launcher() {
     var thinking by remember { mutableStateOf(false) }
     var locale by remember { mutableStateOf(settings.locale) }
 
+    fun beginMidis2jam2() {
+        try {
+            Execution.start(
+                PassedSettings(
+                    settings.deviceLatencyMap[midiDevices[selectedMidiDevice]] ?: 0,
+                    settings.autoAutoCam,
+                    settings.fullscreen,
+                    isLegacyDisplayEngine,
+                    File(selectedMidiFile),
+                    midiDevices[selectedMidiDevice],
+                    if (settings.soundFontPaths.isNotEmpty()) {
+                        File(settings.soundFontPaths[selectedSoundFont])
+                    } else {
+                        null
+                    }
+                ),
+                onStart = {
+                    freeze = true
+                    thinking = true
+                },
+                onReady = {
+                    thinking = false
+                },
+                onFinish = {
+                    freeze = false
+                    thinking = false
+                },
+            )
+        } catch (e: Exception) {
+            freeze = false
+            thinking = false
+
+            ErrorDisplay.displayError(e, e.message ?: "")
+        }
+    }
+
     MaterialTheme(darkColors()) {
         Surface(
             Modifier.fillMaxSize().pointerHoverIcon(
@@ -151,7 +192,14 @@ fun Launcher() {
                                 value = midiFileText,
                                 onValueChange = { midiFileText = it },
                                 singleLine = true,
-                                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(width),
+                                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(width).onPreviewKeyEvent {
+                                    if (it.isShiftPressed && it.key == Key.Enter) {
+                                        beginMidis2jam2()
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                },
                                 label = { Text(i18n.getString("configuration.midi_file")) },
                                 trailingIcon = {
                                     Icon(
@@ -411,41 +459,9 @@ fun Launcher() {
                             Divider(modifier = Modifier.padding(16.dp).width(width))
                             Button(
                                 onClick = {
-                                    try {
-                                        Execution.start(
-                                            PassedSettings(
-                                                settings.deviceLatencyMap[midiDevices[selectedMidiDevice]] ?: 0,
-                                                settings.autoAutoCam,
-                                                settings.fullscreen,
-                                                isLegacyDisplayEngine,
-                                                File(selectedMidiFile),
-                                                midiDevices[selectedMidiDevice],
-                                                if (settings.soundFontPaths.isNotEmpty()) {
-                                                    File(settings.soundFontPaths[selectedSoundFont])
-                                                } else {
-                                                    null
-                                                }
-                                            ),
-                                            onStart = {
-                                                freeze = true
-                                                thinking = true
-                                            },
-                                            onReady = {
-                                                thinking = false
-                                            },
-                                            onFinish = {
-                                                freeze = false
-                                                thinking = false
-                                            },
-                                        )
-                                    } catch (e: Exception) {
-                                        freeze = false
-                                        thinking = false
-
-                                        ErrorDisplay.displayError(e, e.message ?: "")
-                                    }
+                                    beginMidis2jam2()
                                 },
-                                modifier = Modifier.width(128.dp).padding(0.dp, 0.dp, 0.dp, 16.dp),
+                                modifier = Modifier.width(150.dp).padding(0.dp, 0.dp, 0.dp, 16.dp),
                                 enabled = selectedMidiFile.isNotEmpty() && !freeze
                             ) {
                                 Row(
@@ -467,12 +483,14 @@ fun Launcher() {
                         ) {
                             Text(
                                 text = i18n.getString("about.description"),
-                                style = MaterialTheme.typography.h6
+                                style = MaterialTheme.typography.h6,
+                                textAlign = TextAlign.Center
                             )
                             Text(
                                 text = i18n.getString("about.copyright"),
                                 style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
+                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp),
+                                textAlign = TextAlign.Center
                             )
                             Text(
                                 text = locale.uppercase(Locale.getDefault()),
