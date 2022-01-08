@@ -28,15 +28,15 @@ javafx {
 }
 
 tasks.build {
-    doFirst {
-        val gitHash = System.getenv("GIT_HASH")
-        File("src/main/resources/build.txt").writeText(
-            "${
-                DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
-            }${gitHash?.let { " $it" } ?: ""}"
-        )
-    }
     dependsOn("downloadLicenses")
+
+    val gitHash = System.getenv("GIT_HASH")
+    File("src/main/resources/build.txt").writeText(
+        "${
+            DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
+        }${gitHash?.let { " $it" } ?: ""}"
+    )
+
     copy {
         from("build/reports/license/dependency-license.html")
         into("src/main/resources")
@@ -69,7 +69,6 @@ application {
 }
 
 tasks.shadowJar {
-    dependsOn("build")
     doFirst {
         File(projectDir, "src/main/resources/version.txt").writeText(archiveVersion.get())
     }
