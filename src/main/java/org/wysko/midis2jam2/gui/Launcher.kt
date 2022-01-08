@@ -254,7 +254,7 @@ fun Launcher() {
                                 visible = selectedMidiDevice == 0
                             ) {
                                 Row(
-                                    verticalAlignment = Alignment.Top,
+                                    verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     modifier = Modifier.width(width).fillMaxHeight()
                                         .padding(0.dp, 0.dp, 0.dp, 16.dp)
