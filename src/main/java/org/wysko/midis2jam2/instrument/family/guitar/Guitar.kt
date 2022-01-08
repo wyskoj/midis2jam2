@@ -165,7 +165,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         val textureFileName: String,
     ) {
         /** Acoustic guitar type. */
-        ACOUSTIC("GuitarAcoustic.fbx", "GuitarAcoustic.fbx", "AcousticGuitar.png"),
+        ACOUSTIC("GuitarAcoustic.fbx", "GuitarAcousticDropD.fbx", "AcousticGuitar.png"),
 
         /** Electric guitar type. */
         ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp");
