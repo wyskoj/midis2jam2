@@ -25,11 +25,19 @@ $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2 && ./gradlew run
 ----
 
-== ▶️ Running
-
 midis2jam2 also provides a command line interface.
 Run `midis2jam2 --help` for more information.
 You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/resources/man.txt[man page].
+
+== ⌨️️ Controls
+
+* WASDQZ &mdash; Forwards / Left / Backwards / Right / Up / Down
+** Shift &mdash; Move fast
+** Ctrl &mdash; Move slow
+* 1&ndash;6 &mdash; Cameras 1&ndash;6
+* 0 &mdash; Autocam
+* Esc &mdash; Exit
+
 
 == 📜 Documentation
 
@@ -55,6 +63,11 @@ Development contributors:
 
 * https://github.com/jlachniet[jlachniet]
 * https://github.com/nikitalita[nikitalita]
+* https://github.com/vgking1[vgking1]
+
+Internationalization:
+
+* Mr. Tremolo Measure
 
 == ⁉️ Support
 
