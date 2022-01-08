@@ -1,8 +1,12 @@
 @file:Suppress("SpellCheckingInspection")
 
-project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 plugins {
+    `java-library`
     id("com.github.johnrengelman.shadow") version "6.0.0"
     id("org.panteleyev.jpackageplugin") version "1.3.0"
     id("com.github.hierynomus.license-report") version "0.15.0"
@@ -16,12 +20,22 @@ plugins {
     application
 }
 
+project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
+
 javafx {
     version = "11"
     modules = listOf("javafx.controls", "javafx.swing")
 }
 
 tasks.build {
+    doFirst {
+        val gitHash = System.getenv("GIT_HASH")
+        File("src/main/resources/build.txt").writeText(
+            "${
+                DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
+            }${gitHash?.let { " $it" } ?: ""}"
+        )
+    }
     dependsOn("downloadLicenses")
     copy {
         from("build/reports/license/dependency-license.html")

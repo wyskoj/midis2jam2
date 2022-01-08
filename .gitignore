@@ -11,6 +11,7 @@ OpenAL64.dll
 midicsv
 midicsv.exe
 /src/main/resources/version.txt
+/src/main/resources/build.txt
 /install/
 midis2jam2.conf
 midis2jam2.ini
