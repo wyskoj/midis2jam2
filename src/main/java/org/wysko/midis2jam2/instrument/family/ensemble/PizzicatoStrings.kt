@@ -50,7 +50,7 @@ class PizzicatoStrings(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToDoOn = NoteQueue.collect(hits, context, time)
+        val eventsToDoOn = NoteQueue.collect(hits, time, context)
 
         /* Play each note that needs to be animated */
         eventsToDoOn.forEach { strings[(it.note + 3) % 12].play() }

@@ -25,6 +25,12 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
+/** The baritone sax fingering manager. */
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(BaritoneSax::class.java)
+
+/** The amount to stretch the baritone sax. */
+private const val STRETCH_FACTOR = 0.65f
+
 /** The baritone sax. */
 class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     Saxophone(context, events, BaritoneSaxClone::class.java, FINGERING_MANAGER) {
@@ -32,37 +38,33 @@ class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     /** A single BaritoneSax. */
     inner class BaritoneSaxClone : SaxophoneClone(this@BaritoneSax, STRETCH_FACTOR) {
         init {
-            val shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp")
-            val black = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-            black.setColor("Color", ColorRGBA.Black)
-            val shinyHornSkin2 = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-            body = context.assetManager.loadModel("Assets/BaritoneSaxBody.fbx")
-            bell.attachChild(context.assetManager.loadModel("Assets/BaritoneSaxHorn.obj"))
-            val bodyNode = body as Node
-            bodyNode.getChild(0).setMaterial(shinyHornSkin)
-            bodyNode.getChild(1).setMaterial(shinyHornSkin2)
-            bodyNode.getChild(2).setMaterial(black)
-            bell.setMaterial(shinyHornSkin)
-            modelNode.attachChild(body)
-            modelNode.attachChild(bell)
+            val shine = context.reflectiveMaterial("Assets/HornSkin.bmp")
 
-            /* The bell has to be moved down to attach to the body */
-            bell.move(0f, -10f, 0f)
+            with(bell) {
+                move(0f, -10f, 0f)
+                attachChild(context.assetManager.loadModel("Assets/BaritoneSaxHorn.obj"))
+                setMaterial(shine)
+            }
+
+            context.assetManager.loadModel("Assets/BaritoneSaxBody.fbx").apply {
+                this as Node
+                getChild(0).setMaterial(shine)
+                getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                getChild(2).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                    setColor("Color", ColorRGBA.Black)
+                })
+                modelNode.attachChild(this)
+            }
+
             animNode.setLocalTranslation(0f, 0f, 20f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(10.0), rad(30.0), 0f)
         }
     }
 
-    companion object {
-        /** The baritone sax fingering manager. */
-        val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(BaritoneSax::class.java)
-
-        /** The amount to stretch the baritone sax. */
-        private const val STRETCH_FACTOR = 0.65f
-    }
-
     init {
-        groupOfPolyphony.move(10f, 48.5f, -42f)
-        groupOfPolyphony.scale(1.5f)
+        groupOfPolyphony.run {
+            move(10f, 48.5f, -42f)
+            scale(1.5f)
+        }
     }
 }

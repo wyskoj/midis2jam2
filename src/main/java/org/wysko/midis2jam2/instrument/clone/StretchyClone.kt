@@ -17,9 +17,7 @@
 package org.wysko.midis2jam2.instrument.clone
 
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.world.Axis
 
@@ -28,7 +26,8 @@ import org.wysko.midis2jam2.world.Axis
  * note's elapsed duration.
  */
 abstract class StretchyClone protected constructor(
-    parent: MonophonicInstrument, rotationFactor: Float,
+    parent: MonophonicInstrument,
+    rotationFactor: Float,
     /** The stretch factor. */
     stretchFactor: Float,
     /** The axis on which to scale the bell on. */
@@ -38,13 +37,12 @@ abstract class StretchyClone protected constructor(
 ) : Clone(parent, rotationFactor, rotationAxis) {
 
     /** The bell of the instrument. This must be a node to account for variations of the bell (e.g., Muted Trumpet). */
-    protected val bell: Node = Node()
-
-    /** The body of the instrument. */
-    protected lateinit var body: Spatial
+    protected val bell: Node = Node().apply {
+        modelNode.attachChild(this)
+    }
 
     /** The bell stretcher. */
-    private val bellStretcher: BellStretcher
+    private val bellStretcher = StandardBellStretcher(stretchFactor, scaleAxis, bell)
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -53,7 +51,9 @@ abstract class StretchyClone protected constructor(
         bellStretcher.tick(currentNotePeriod, time)
     }
 
-    init {
-        bellStretcher = StandardBellStretcher(stretchFactor, scaleAxis, bell)
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("stretch", bellStretcher.scale))
+        }
     }
 }

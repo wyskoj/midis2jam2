@@ -21,8 +21,10 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
+
+/** The base position of a Stage Horn. */
+private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 
 /**
  * The Stage Horns.
@@ -31,6 +33,8 @@ import org.wysko.midis2jam2.util.Utils.rad
  */
 class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageHornsType) :
     WrappedOctaveSustained(context, eventList, false) {
+
+    override val twelfths: Array<TwelfthOfOctave> = Array(12) { StageHornNote(type) }
 
     override fun moveForMultiChannel(delta: Float) {
         /* Get and update instrument index */
@@ -54,7 +58,7 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
      */
     inner class StageHornNote(type: StageHornsType) : BouncyTwelfth() {
         init {
-            animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, MaterialType.REFLECTIVE, 0.9f))
+            animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, 0.9f))
         }
     }
 
@@ -73,13 +77,7 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         SYNTH_BRASS_2("HornSkinCopper.png")
     }
 
-    companion object {
-        /** The base position of a Stage Horn. */
-        private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
-    }
-
     init {
-        twelfths = Array(12) { StageHornNote(type) }
         val hornNodes = Array(12) { Node() }
 
         /* For each note */

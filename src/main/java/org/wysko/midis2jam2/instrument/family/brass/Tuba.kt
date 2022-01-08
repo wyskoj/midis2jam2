@@ -18,12 +18,12 @@ package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -46,7 +46,13 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((50f * indexForMoving()).toDouble()), 0f)
         }
 
+        override val keys: Array<Spatial> = Array(4) { i ->
+            context.loadModel("TubaKey${i + 1}.obj", "HornSkinGrey.bmp", 0.9f)
+                .also { modelNode.attachChild(it) }
+        }
+
         override fun animateKeys(pressed: Array<Int>) {
+            super.animateKeys(pressed)
             /* Tuba keys move down when pressed */
             for (i in 0..3) {
                 if (pressed.any { it == i }) {
@@ -59,8 +65,8 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         init {
             /* Load body and bell */
-            body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", REFLECTIVE, 0.9f)
-            bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", REFLECTIVE, 0.9f))
+            val body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", 0.9f)
+            bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", 0.9f))
 
             /* Attach body and bell */
             modelNode.run {
@@ -70,12 +76,6 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
             /* Set horn skin grey material */
             (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-
-            /* Load tuba keys */
-            keys = Array(4) { i ->
-                context.loadModel("TubaKey${i + 1}.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9f)
-                    .also { modelNode.attachChild(it) }
-            }
 
             /* Positioning */
             idleNode.localRotation = Quaternion().fromAngles(rad(-10.0), rad(90.0), 0f)

@@ -20,9 +20,9 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager
 import org.wysko.midis2jam2.instrument.clone.Clone
+import org.wysko.midis2jam2.instrument.clone.debugString
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
-import java.lang.reflect.Constructor
 
 /**
  * Any instrument that can only play one note at a time (e.g., saxophones, clarinets, ocarinas, etc.).
@@ -40,10 +40,13 @@ import java.lang.reflect.Constructor
 abstract class MonophonicInstrument protected constructor(
     /** Context to the main class. */
     context: Midis2jam2,
+
     /** The list of events this instrument should play. */
     eventList: List<MidiChannelSpecificEvent>,
+
     /** The class that this instrument uses to represent polyphony. */
     cloneClass: Class<out Clone>,
+
     /** The fingering manager. */
     val manager: FingeringManager<*>?
 ) : SustainedInstrument(context, eventList) {
@@ -54,7 +57,6 @@ abstract class MonophonicInstrument protected constructor(
     /** The list of clones this monophonic instrument needs to effectively display all notes. */
     val clones: List<Clone>
 
-
     /**
      * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
      * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
@@ -64,43 +66,24 @@ abstract class MonophonicInstrument protected constructor(
      * @param cloneClass the class of the [Clone] to instantiate
      * @throws ReflectiveOperationException is usually thrown if an error occurs in the clone constructor
      */
-    @Throws(ReflectiveOperationException::class)
-    protected fun calculateClones(
-        instrument: MonophonicInstrument,
-        cloneClass: Class<out Clone?>
+    private fun calculateClones(
+        instrument: MonophonicInstrument, cloneClass: Class<out Clone?>
     ): List<Clone> {
-        val calcClones: MutableList<Clone> = ArrayList()
-        val constructor: Constructor<*> = cloneClass.getDeclaredConstructor(instrument.javaClass)
-        val listsOfNotes: MutableList<MutableList<NotePeriod>> = ArrayList()
-        notePeriods.sortWith(compareBy({ it.startTick() }, { it.midiNote }))
-        notePeriods.forEach { np: NotePeriod ->
-            if (listsOfNotes.isEmpty()) {
-                /* If there are no clones initialized, create the first one and assign this NotePeriod to it. */
-                listsOfNotes.add(ArrayList<NotePeriod>().also { it.add(np) })
-            } else {
-                var added = false
-                for (list in listsOfNotes) {
-                    /* Iterate over each clone. If there is a free clone, assign it to that. */
-                    if (list.last().endTick() - (context.file.division / 8) <= np.startTick()) {
-                        list.add(np)
-                        added = true
-                        break
+        return cloneClass.getDeclaredConstructor(instrument.javaClass).let { constructor ->
+            notePeriods.sortedWith(compareBy({ it.startTick() }, { it.midiNote }))
+                .fold(ArrayList<ArrayList<NotePeriod>>()) { acc, np ->
+                    acc.apply {
+                        acc.firstOrNull { it.last().endTick() - (context.file.division / 8) <= np.startTick() }?.add(np)
+                            ?: run {
+                                add(ArrayList<NotePeriod>().also { it.add(np) })
+                            }
                     }
-                }
-                if (!added) {
-                    /* If the note was not added, we need to create a new clone and assign it to that. */
-                    listsOfNotes.add(ArrayList<NotePeriod>().also { it.add(np) })
-                }
-            }
+                }.map {
+                    (constructor.newInstance(instrument) as Clone).apply {
+                        notePeriods.addAll(it)
+                    }
+                }.toList()
         }
-
-        listsOfNotes.forEach {
-            val clone = constructor.newInstance(instrument) as Clone
-            clone.notePeriods.addAll(it)
-            calcClones.add(clone)
-        }
-
-        return calcClones
     }
 
     override fun tick(time: Double, delta: Float) {
@@ -114,5 +97,11 @@ abstract class MonophonicInstrument protected constructor(
         clones = calculateClones(this, cloneClass)
         clones.forEach { groupOfPolyphony.attachChild(it.offsetNode) }
         instrumentNode.attachChild(groupOfPolyphony)
+    }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(clones.debugString())
+        }
     }
 }

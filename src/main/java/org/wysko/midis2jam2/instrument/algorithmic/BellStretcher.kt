@@ -57,8 +57,14 @@ class StandardBellStretcher(
         scaleBell(((stretchiness - 1) * stretchAmount + 1).toFloat())
     }
 
+    /** The current scale of the bell. */
+    var scale: Float = 1f
+        private set
+
+
     /** Sets the scale of the bell, appropriately and automatically scaling on the correct axis. */
     private fun scaleBell(scale: Float) {
+        this.scale = scale
         bell.setLocalScale(
             if (stretchAxis === Axis.X) scale else 1f,
             if (stretchAxis === Axis.Y) scale else 1f,

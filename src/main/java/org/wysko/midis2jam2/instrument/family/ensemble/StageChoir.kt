@@ -25,9 +25,17 @@ import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
+private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
+
 /** The choir. */
 class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: ChoirType) :
     WrappedOctaveSustained(context, eventList, true) {
+
+    override val twelfths: Array<TwelfthOfOctave> = Array(12) {
+        ChoirPeep(type).apply {
+            highestLevel.localTranslation = BASE_POSITION
+        }
+    }
 
     override fun moveForMultiChannel(delta: Float) {
         val indexForMoving = updateInstrumentIndex(delta)
@@ -68,21 +76,13 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         VOICE_SYNTH("ChoirPeepVoiceSynth.png");
     }
 
-    companion object {
-        private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
-    }
-
     init {
-        twelfths = Array(12) { ChoirPeep(type) }
-        val peepNodes = Array(12) { Node() }
-
-        /* Load each peep */
-        peepNodes.forEachIndexed { index, node ->
-            node.attachChild(twelfths[index].highestLevel)
-            node.localRotation = Quaternion().fromAngles(0f, rad(11.27 + index * -5.636), 0f)
-            instrumentNode.attachChild(node)
+        Array(12) {
+            Node().apply {
+                attachChild(twelfths[it].highestLevel)
+                localRotation = Quaternion().fromAngles(0f, rad(11.27 + it * -5.636), 0f)
+                instrumentNode.attachChild(this)
+            }
         }
-
-        twelfths.forEach { it.highestLevel.localTranslation = BASE_POSITION }
     }
 }

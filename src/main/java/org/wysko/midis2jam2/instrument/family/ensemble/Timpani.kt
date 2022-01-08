@@ -21,7 +21,6 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The timpani. */
@@ -33,25 +32,18 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
     }
 
     init {
-
-        val body = context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", MaterialType.REFLECTIVE, 0.9f).also {
-            (it as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-        }
-        val head = context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp")
-
-        for (i in 0..11) {
-            val mallet = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp").apply {
+        malletNodes.forEachIndexed { index, malletNode ->
+            malletNode.attachChild(context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp").apply {
                 setLocalTranslation(0f, 0f, -5f)
-            }
-            malletNodes[i].run {
-                attachChild(mallet)
-                setLocalTranslation(1.8f * (i - 5.5f), 31f, 15f)
-            }
+            })
+            malletNode.setLocalTranslation(1.8f * (index - 5.5f), 31f, 15f)
         }
 
         animNode.run {
-            attachChild(body)
-            attachChild(head)
+            attachChild(context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", 0.9f).apply {
+                (this as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+            })
+            attachChild(context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp"))
         }
 
         instrumentNode.run {

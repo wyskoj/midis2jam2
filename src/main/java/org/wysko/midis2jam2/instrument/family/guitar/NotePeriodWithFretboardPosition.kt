@@ -22,12 +22,15 @@ import org.wysko.midis2jam2.midi.NotePeriod
 
 /** Note periods that also need to keep track of where they have been assigned to on the fretboard. */
 class NotePeriodWithFretboardPosition private constructor(
-    midiNote: Int, startTime: Double, endTime: Double,
-    noteOn: MidiNoteOnEvent, noteOff: MidiNoteOffEvent,
+    midiNote: Int,
+    startTime: Double,
+    endTime: Double,
+    noteOn: MidiNoteOnEvent,
+    noteOff: MidiNoteOffEvent,
 ) : NotePeriod(midiNote, startTime, endTime, noteOn, noteOff) {
 
     /** The fretboard position this note period was assigned to. */
-    var position: FretboardPosition? = null
+    var position: FretboardPosition = FretboardPosition(-1, -1)
 
     companion object {
         /**
@@ -36,17 +39,11 @@ class NotePeriodWithFretboardPosition private constructor(
          * @param notePeriod the note period
          * @return a note period with fretboard position
          */
-        @JvmStatic
         fun fromNotePeriod(notePeriod: NotePeriod): NotePeriodWithFretboardPosition {
             return NotePeriodWithFretboardPosition(
                 notePeriod.midiNote, notePeriod.startTime, notePeriod.endTime,
                 notePeriod.noteOn, notePeriod.noteOff
             )
         }
-    }
-
-    /** Instantiates a new NotePeriodWithFretboardPosition with default position (-1, -1). */
-    init {
-        position = FretboardPosition(-1, -1)
     }
 }

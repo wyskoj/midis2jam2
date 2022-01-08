@@ -21,18 +21,22 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The piccolo. */
+private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Piccolo::class.java)
+
+/** The Piccolo. */
 class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, PiccoloClone::class.java, FINGERING_MANAGER) {
 
+    /**
+     * A single Piccolo.
+     */
     inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.SteamPuffType.NORMAL, 1f) {
         init {
             val horn = context.loadModel(
                 "Piccolo.obj", "CymbalSkinSphereMap.bmp",
-                MaterialType.REFLECTIVE, 0.9f
+                0.9f
             )
             loadHands()
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
@@ -41,12 +45,7 @@ class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
     }
 
-    companion object {
-        val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Piccolo::class.java)
-    }
-
     init {
-
         // Piccolo positioning
         groupOfPolyphony.setLocalTranslation(5f, 58f, -20f)
         groupOfPolyphony.localRotation = Quaternion().fromAngles(rad(-80.0), rad(-53.0), rad(0.0))

@@ -26,7 +26,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 
 /** Texture file for shiny silver. */
 const val SHINY_SILVER: String = "ShinySilver.bmp"
@@ -116,7 +115,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         }
 
         /* Play each note */
-        NoteQueue.collect(hitsForRecoil, context, time).forEach { notes[(it.note + 3) % 12].play() }
+        NoteQueue.collect(hitsForRecoil, time, context).forEach { notes[(it.note + 3) % 12].play() }
 
         /* Tick the hanging notes */
         notes.forEach { it.tick(delta) }
@@ -151,7 +150,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     inner class OneMusicBoxNote(i: Int) : TwelfthOfOctaveDecayed() {
 
         /** The hanging key. */
-        private val key: Spatial = context.loadModel("MusicBoxKey.obj", SHINY_SILVER, REFLECTIVE, 0.9f).apply {
+        private val key: Spatial = context.loadModel("MusicBoxKey.obj", SHINY_SILVER, 0.9f).apply {
             highestLevel.attachChild(this)
             setLocalTranslation(i - 5.5f, 7f, 0f)
             localScale = Vector3f(-0.0454f * i + 1, 1f, 1f)
@@ -197,11 +196,11 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         instrumentNode.run {
             attachChild(context.loadModel("MusicBoxCase.obj", "Wood.bmp"))
-            attachChild(context.loadModel("MusicBoxTopBlade.obj", SHINY_SILVER, REFLECTIVE, 0.9f))
+            attachChild(context.loadModel("MusicBoxTopBlade.obj", SHINY_SILVER, 0.9f))
             attachChild(cylinder)
             setLocalTranslation(37f, 7f, -5f)
         }
-        cylinder.attachChild(context.loadModel("MusicBoxSpindle.obj", SHINY_SILVER, REFLECTIVE, 0.9f))
-        pointModel = context.loadModel("MusicBoxPoint.obj", SHINY_SILVER, REFLECTIVE, 0.9f)
+        cylinder.attachChild(context.loadModel("MusicBoxSpindle.obj", SHINY_SILVER, 0.9f))
+        pointModel = context.loadModel("MusicBoxPoint.obj", SHINY_SILVER, 0.9f)
     }
 }

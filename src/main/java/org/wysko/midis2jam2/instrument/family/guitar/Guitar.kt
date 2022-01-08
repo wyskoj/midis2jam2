@@ -18,11 +18,21 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+
+/** The base position of the guitar. */
+private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
+
+/**
+ * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
+ * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
+ */
+private const val GUITAR_VECTOR_THRESHOLD = 3
 
 /**
  * The guitar. What more do you want?
@@ -54,6 +64,81 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     6,
     context.loadModel(if (needsDropTuning(events)) type.modelDFileName else type.modelFileName, type.textureFileName)
 ) {
+    override val upperStrings: Array<Spatial> = Array(6) {
+        if (it < 3) {
+            context.loadModel("GuitarStringLow.obj", type.textureFileName)
+        } else {
+            context.loadModel("GuitarStringHigh.obj", type.textureFileName)
+        }.apply {
+            instrumentNode.attachChild(this)
+        }
+    }.apply {
+        val forward = 0.125f
+        this[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
+        this[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.0))
+        this[0].localScale = positioning.restingStrings[0]
+        this[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward)
+        this[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.62))
+        this[1].localScale = positioning.restingStrings[1]
+        this[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward)
+        this[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.22))
+        this[2].localScale = positioning.restingStrings[2]
+        this[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward)
+        this[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.08))
+        this[3].localScale = positioning.restingStrings[3]
+        this[4].setLocalTranslation(positioning.upperX[4], positioning.upperY, forward)
+        this[4].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.45))
+        this[4].localScale = positioning.restingStrings[4]
+        this[5].setLocalTranslation(positioning.upperX[5], positioning.upperY, forward)
+        this[5].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.9))
+        this[5].localScale = positioning.restingStrings[5]
+    }
+
+
+    override val lowerStrings: Array<Array<Spatial>> = Array(6) { it ->
+        Array(5) { j: Int ->
+            context.loadModel(
+                if (it < 3) "GuitarLowStringBottom$j.obj" else "GuitarHighStringBottom$j.obj",
+                type.textureFileName
+            ).also {
+                instrumentNode.attachChild(it)
+                it.cullHint = Always
+            }
+        }
+    }.apply {
+        val forward = 0.125f
+        /* Position lower strings */
+        for (i in 0..4) {
+            this[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward)
+            this[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.0))
+            this[0][i].localScale = positioning.restingStrings[0]
+        }
+        for (i in 0..4) {
+            this[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward)
+            this[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.62))
+            this[1][i].localScale = positioning.restingStrings[0]
+        }
+        for (i in 0..4) {
+            this[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward)
+            this[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.22))
+            this[2][i].localScale = positioning.restingStrings[0]
+        }
+        for (i in 0..4) {
+            this[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward)
+            this[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.08))
+            this[3][i].localScale = positioning.restingStrings[0]
+        }
+        for (i in 0..4) {
+            this[4][i].setLocalTranslation(positioning.lowerX[4], positioning.lowerY, forward)
+            this[4][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.45))
+            this[4][i].localScale = positioning.restingStrings[0]
+        }
+        for (i in 0..4) {
+            this[5][i].setLocalTranslation(positioning.lowerX[5], positioning.lowerY, forward)
+            this[5][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.9))
+            this[5][i].localScale = positioning.restingStrings[0]
+        }
+    }
 
     override fun moveForMultiChannel(delta: Float) {
         val v = updateInstrumentIndex(delta) * 1.5f
@@ -87,106 +172,11 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     }
 
     init {
-        /* Upper strings */
-        upperStrings = Array(6) {
-            if (it < 3) {
-                context.loadModel("GuitarStringLow.obj", type.textureFileName)
-            } else {
-                context.loadModel("GuitarStringHigh.obj", type.textureFileName)
-            }.apply {
-                instrumentNode.attachChild(this)
-            }
-        }
-
-        /* Position each string */
-        val forward = 0.125f
-        upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
-        upperStrings[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.0))
-        upperStrings[0].localScale = positioning.restingStrings[0]
-        upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward)
-        upperStrings[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.62))
-        upperStrings[1].localScale = positioning.restingStrings[1]
-        upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward)
-        upperStrings[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.22))
-        upperStrings[2].localScale = positioning.restingStrings[2]
-        upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward)
-        upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.08))
-        upperStrings[3].localScale = positioning.restingStrings[3]
-        upperStrings[4].setLocalTranslation(positioning.upperX[4], positioning.upperY, forward)
-        upperStrings[4].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.45))
-        upperStrings[4].localScale = positioning.restingStrings[4]
-        upperStrings[5].setLocalTranslation(positioning.upperX[5], positioning.upperY, forward)
-        upperStrings[5].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.9))
-        upperStrings[5].localScale = positioning.restingStrings[5]
-
-        /* Load anim strings */
-        lowerStrings = Array(6) { i: Int ->
-            Array(5) { j: Int ->
-                context.loadModel(
-                    if (i < 3) "GuitarLowStringBottom$j.obj" else "GuitarHighStringBottom$j.obj",
-                    type.textureFileName
-                ).also {
-                    instrumentNode.attachChild(it)
-                    it.cullHint = Always
-                }
-            }
-        }
-
-        /* Position lower strings */
-        for (i in 0..4) {
-            lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward)
-            lowerStrings[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.0))
-            lowerStrings[0][i].localScale = positioning.restingStrings[0]
-        }
-        for (i in 0..4) {
-            lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward)
-            lowerStrings[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.62))
-            lowerStrings[1][i].localScale = positioning.restingStrings[0]
-        }
-        for (i in 0..4) {
-            lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward)
-            lowerStrings[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.22))
-            lowerStrings[2][i].localScale = positioning.restingStrings[0]
-        }
-        for (i in 0..4) {
-            lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward)
-            lowerStrings[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.08))
-            lowerStrings[3][i].localScale = positioning.restingStrings[0]
-        }
-        for (i in 0..4) {
-            lowerStrings[4][i].setLocalTranslation(positioning.lowerX[4], positioning.lowerY, forward)
-            lowerStrings[4][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.45))
-            lowerStrings[4][i].localScale = positioning.restingStrings[0]
-        }
-        for (i in 0..4) {
-            lowerStrings[5][i].setLocalTranslation(positioning.lowerX[5], positioning.lowerY, forward)
-            lowerStrings[5][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.9))
-            lowerStrings[5][i].localScale = positioning.restingStrings[0]
-        }
-
-
-        /* Initialize note fingers */
-        noteFingers = Array(6) {
-            context.loadModel("GuitarNoteFinger.obj", type.textureFileName).apply {
-                instrumentNode.attachChild(this)
-                this.cullHint = Always
-            }
-        }
-
         /* Position guitar */
         instrumentNode.localTranslation = BASE_POSITION
         instrumentNode.localRotation = Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3))
     }
 }
-
-/** The base position of the guitar. */
-private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
-
-/**
- * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
- * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
- */
-private const val GUITAR_VECTOR_THRESHOLD = 3
 
 /**
  * Given a list of [events], determines if the Guitar should use the drop D tuning.

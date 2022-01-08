@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.reed
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
@@ -46,26 +47,44 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         ClarinetClone::class.java,
         FINGERING_MANAGER
     ) {
+
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
     /** The type Clarinet clone. */
     inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
-        /** The bell stretcher. */
-        private val bellStretcher: BellStretcher
-        override fun moveForPolyphony() {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
+
+        override val leftHands: Array<Spatial> = Array(19) {
+            parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
         }
 
-        override fun loadHands() {
-            leftHands = Array(19) {
-                parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
-            }
-            rightHands = Array(13) {
-                parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
-            }
-            super.loadHands()
+        override val rightHands: Array<Spatial> = Array(13) {
+            parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
+        }
+
+        init {
+            /* Load body */
+            modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))
+
+            /* Position Clarinet */
+            animNode.setLocalTranslation(0f, 0f, 10f)
+            highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(45.0), 0f)
+
+            loadHands()
+        }
+
+        /** The bell. */
+        private val bell: Spatial = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png").apply {
+            modelNode.attachChild(this)
+            setLocalTranslation(0f, -20.7125f, 0f)
+        }
+
+        /** The bell stretcher. */
+        private val bellStretcher: BellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
+
+        override fun moveForPolyphony() {
+            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -75,19 +94,10 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             bellStretcher.tick(currentNotePeriod, time)
         }
 
-        /** Instantiates a new clarinet clone. */
-        init {
-            /* Load body */
-            modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))
-
-            /* Load bell */
-            val bell = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png")
-            modelNode.attachChild(bell)
-            bell.setLocalTranslation(0f, -20.7125f, 0f)
-            loadHands()
-            animNode.setLocalTranslation(0f, 0f, 10f)
-            highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(45.0), 0f)
-            bellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
+        override fun toString(): String {
+            return super.toString() + buildString {
+                append(debugProperty("stretch", (bellStretcher as StandardBellStretcher).scale))
+            }
         }
     }
 

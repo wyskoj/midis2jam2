@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.reed
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
@@ -28,6 +29,12 @@ import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
+// The below is not a typo! Rather, a symbol of laziness.
+private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Clarinet::class.java)
+
+/**
+ * The Oboe.
+ */
 class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     HandedInstrument(
         context,
@@ -44,25 +51,25 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /** The type Oboe clone. */
     inner class OboeClone : HandedClone(this@Oboe, 0.075f) {
 
+        /** The bell. */
+        private val bell = context.loadModel("OboeHorn.fbx", "OboeSkin.png").apply {
+            modelNode.attachChild(this)
+            setLocalTranslation(0f, -20.7125f, 0f)
+        }
+
         /** The bell stretcher. */
-        private val bellStretcher: BellStretcher
+        private val bellStretcher: BellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
 
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 
-        override fun loadHands() {
-            /* Load left hands */
-            leftHands = Array(20) {
-                parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
-            }
+        override val leftHands: Array<Spatial> = Array(20) {
+            parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
+        }
 
-            /* Load right hands */
-            rightHands = Array(13) {
-                parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
-            }
-
-            super.loadHands()
+        override val rightHands: Array<Spatial> = Array(13) {
+            parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -73,24 +80,11 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         init {
             /* Load body */
             modelNode.attachChild(context.loadModel("OboeBody.fbx", "OboeSkin.png"))
-
-            /* Load bell */
-            val bell = context.loadModel("OboeHorn.fbx", "OboeSkin.png").apply {
-                modelNode.attachChild(this)
-                setLocalTranslation(0f, -20.7125f, 0f)
-            }
-
-            /* Load hands */
             loadHands()
 
             animNode.setLocalTranslation(0f, 0f, 10f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(-25.0), rad(-45.0), 0f)
-            bellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
         }
-    }
-
-    companion object {
-        val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Clarinet::class.java)
     }
 
     init {

@@ -40,6 +40,8 @@ class StageStrings(
     /** Nodes that contain each string. */
     private val stringNodes = Array(12) { Node() }
 
+    override val twelfths: Array<TwelfthOfOctave> = Array(12) { StageStringNote(type) }
+
     override fun moveForMultiChannel(delta: Float) {
         highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * updateInstrumentIndex(delta)), 0f)
     }
@@ -190,7 +192,6 @@ class StageStrings(
     }
 
     init {
-        twelfths = Array(12) { StageStringNote(type) }
         for (i in 0..11) {
             stringNodes[i].run {
                 attachChild(twelfths[i].highestLevel)

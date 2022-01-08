@@ -24,6 +24,8 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(AltoSax::class.java)
+private const val STRETCH_FACTOR = 0.65f
 
 /** The Alto Saxophone. */
 class AltoSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
@@ -32,32 +34,26 @@ class AltoSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     /** A single AltoSax. */
     inner class AltoSaxClone : SaxophoneClone(this@AltoSax, STRETCH_FACTOR) {
         init {
-            val shinyHornSkin = context.reflectiveMaterial("Assets/HornSkin.bmp")
-            val black = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                setColor("Color", Black)
-            }
-            body = context.assetManager.loadModel("Assets/AltoSaxBody.fbx")
-            bell.attachChild(context.assetManager.loadModel("Assets/AltoSaxHorn.obj"))
-            val bodyNode = body as Node
-            bodyNode.getChild(0).setMaterial(shinyHornSkin)
-            bodyNode.getChild(1).setMaterial(black)
-            bell.setMaterial(shinyHornSkin)
-            modelNode.attachChild(body)
-            modelNode.attachChild(bell)
+            val shine = context.reflectiveMaterial("Assets/HornSkin.bmp")
 
-            /* The bell has to be moved down to attach to the body */
-            bell.move(0f, -22f, 0f)
+            with(bell) {
+                move(0f, -22f, 0f)
+                attachChild(context.assetManager.loadModel("Assets/AltoSaxHorn.obj"))
+                setMaterial(shine)
+            }
+
+            context.assetManager.loadModel("Assets/AltoSaxBody.fbx").apply {
+                this as Node
+                getChild(0).setMaterial(shine)
+                getChild(1).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                    setColor("Color", Black)
+                })
+                modelNode.attachChild(this)
+            }
+
             animNode.setLocalTranslation(0f, 0f, 20f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(13.0), rad(75.0), 0f)
         }
-    }
-
-    companion object {
-        /** The Alto Sax fingering manager. */
-        val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(AltoSax::class.java)
-
-        /** The amount to stretch the bell of this instrument by. */
-        private const val STRETCH_FACTOR = 0.65f
     }
 
     init {

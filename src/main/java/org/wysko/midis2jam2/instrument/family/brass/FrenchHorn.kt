@@ -18,14 +18,16 @@ package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class.java)
 
 /**
  * The French Horn.
@@ -47,7 +49,20 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((47 * indexForMoving()).toDouble()), 0f)
         }
 
+        override val keys: Array<Spatial> = Array(4) {
+            context.loadModel(
+                "FrenchHorn${if (it == 0) "Trigger" else "Key$it"}.obj",
+                "HornSkinGrey.bmp",
+                0.9f
+            ).also { model ->
+                modelNode.attachChild(model)
+            }
+        }.also {
+            it.first().setLocalTranslation(0f, 0f, 1f)
+        }
+
         override fun animateKeys(pressed: Array<Int>) {
+            super.animateKeys(pressed)
             /* For each key */
             for (i in 0..3) {
                 if (pressed.any { it == i }) { // If this key is pressed
@@ -64,8 +79,8 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
         init {
             /* Load models */
-            body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", REFLECTIVE, 0.9f)
-            bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", REFLECTIVE, 0.9f))
+            val body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", 0.9f)
+            bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", 0.9f))
 
             /* Attach models */
             modelNode.run {
@@ -83,26 +98,10 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
                 localRotation = Quaternion().fromAngles(rad(22.0), 0f, 0f)
             }
 
-            /* Load keys */
-            keys = Array(4) { index ->
-                val id = if (index == 0) "Trigger" else "Key$index"
-                context.loadModel("FrenchHorn$id.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9f).also {
-                    modelNode.attachChild(it)
-                }
-            }
-
-            /* Move trigger key a bit over */
-            keys.first().setLocalTranslation(0f, 0f, 1f)
-
             /* Offset from pivot and rotate horn */
             highestLevel.localRotation = Quaternion().fromAngles(rad(20.0), rad(90.0), 0f)
             animNode.setLocalTranslation(0f, 0f, 20f)
         }
-    }
-
-    companion object {
-        /** The French Horn fingering manager. */
-        val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class.java)
     }
 
     init {

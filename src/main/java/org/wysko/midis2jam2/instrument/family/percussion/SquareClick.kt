@@ -24,31 +24,37 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercu
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
+/**
+ * The Square Click.
+ */
 class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
     /** Contains the square click pad. */
-    private val scNode = Node()
+    private val squareClickNode = Node().apply {
+        attachChild(context.loadModel("SquareShaker.obj", "Wood.bmp").apply {
+            setLocalTranslation(0f, -2f, -2f)
+        })
+    }.also {
+        instrumentNode.attachChild(it)
+    }
 
     /** Contains the stick. */
-    private val stickNode = Node()
+    private val stickNode = Node().apply {
+        attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
+    }.also {
+        instrumentNode.attachChild(it)
+    }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val stickStatus =
-            Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        Stick.handleStick(context, stickNode, time, delta, hits).run {
+            squareClickNode.localRotation = Quaternion().fromAngles(-this.rotationAngle, 0f, 0f)
+        }
         stickNode.cullHint = Spatial.CullHint.Dynamic
-        scNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
     }
 
     init {
-        stickNode.attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
-        val child = context.loadModel("SquareShaker.obj", "Wood.bmp")
-        child.setLocalTranslation(0f, -2f, -2f)
-        scNode.attachChild(child)
-        instrumentNode.attachChild(stickNode)
-        instrumentNode.attachChild(scNode)
         instrumentNode.localRotation = Quaternion().fromAngles(rad(-90.0), rad(-90.0), rad(-135.0))
         instrumentNode.setLocalTranslation(-42f, 44f, -79f)
     }

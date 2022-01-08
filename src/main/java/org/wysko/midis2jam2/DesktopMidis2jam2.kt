@@ -27,6 +27,7 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.debugText
 import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
@@ -52,6 +53,8 @@ class DesktopMidis2jam2(
      * True if the sequence has begun playing, false otherwise.
      */
     private var sequencerStarted: Boolean = false
+
+    private var passedTicks = 0
 
     /**
      * Initializes the application.
@@ -111,12 +114,11 @@ class DesktopMidis2jam2(
      * Performs a tick.
      */
     override fun update(tpf: Float) {
-        super.update(tpf)
-
-        if (sequencer.isOpen) {
-            /* Increment time if sequencer is ready / playing */
-            timeSinceStart += tpf.toDouble()
+        with(debugText) {
+            setLocalTranslation(0f, app.viewPort.camera.height.toFloat(), 0f)
+            text = this@DesktopMidis2jam2.debugText(tpf, timeSinceStart)
         }
+        super.update(tpf)
 
         instruments.forEach {
             /* Null if not implemented yet */
@@ -141,12 +143,16 @@ class DesktopMidis2jam2(
         lyricController.tick(timeSinceStart)
         autocamController.tick(timeSinceStart, tpf)
         preventCameraFromLeaving(app.camera)
-    }
 
-    /**
-     * Called when an action occurs.
-     */
-    override fun onAction(name: String, isPressed: Boolean, tpf: Float): Unit = super.onAction(name, isPressed, tpf)
+        if (passedTicks++ < 3) {
+            return
+        }
+
+        if (sequencer.isOpen) {
+            /* Increment time if sequencer is ready / playing */
+            timeSinceStart += tpf.toDouble()
+        }
+    }
 
     /**
      * Stops the app state.

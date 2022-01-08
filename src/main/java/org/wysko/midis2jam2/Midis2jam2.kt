@@ -22,6 +22,7 @@ import com.jme3.app.SimpleApplication
 import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
+import com.jme3.font.BitmapText
 import com.jme3.input.controls.ActionListener
 import com.jme3.material.Material
 import com.jme3.scene.Node
@@ -58,9 +59,9 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.*
 import org.wysko.midis2jam2.midi.*
-import org.wysko.midis2jam2.util.MaterialType
+import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.PassedSettings
-import org.wysko.midis2jam2.util.Utils.exceptionToLines
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.*
 import java.util.logging.Logger
 import kotlin.properties.Delegates
@@ -79,7 +80,6 @@ abstract class Midis2jam2(
 ) : AbstractAppState(), ActionListener {
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
-        super.initialize(stateManager, app)
         this.app = app as SimpleApplication
 
         this.app.renderer.defaultAnisotropicFilter = 4
@@ -150,7 +150,7 @@ abstract class Midis2jam2(
                                 } catch (npe: NullPointerException) {
                                     LOGGER.warning(
                                         "Unbalanced Note On / Note Off events. Attempting to continue." +
-                                                "\n${exceptionToLines(npe)}"
+                                                "\n${Utils.exceptionToLines(npe)}"
                                     )
                                 }
                             }
@@ -164,8 +164,6 @@ abstract class Midis2jam2(
                 }
             }
         }
-
-        println(instruments.mapIndexed { idx, it -> "$idx: ${it.javaClass.simpleName}" }.joinToString())
 
         /*** CONTROLLERS ***/
         shadowController = ShadowController(
@@ -182,6 +180,13 @@ abstract class Midis2jam2(
         autocamController = AutoCamController(this, settings.autoAutoCam)
 
         currentCamera = Camera.CAMERA_1A
+
+        debugText = BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
+            app.guiNode.attachChild(this)
+            cullHint = Spatial.CullHint.Always
+        }
+
+        super.initialize(stateManager, app)
     }
 
     /** The JME3 application that created this. */
@@ -196,7 +201,23 @@ abstract class Midis2jam2(
     val rootNode: Node = Node("root")
 
     /** The amount of time that has passed since the start of the song (or the time until the start). */
-    protected var timeSinceStart: Double = -4.0
+    protected var timeSinceStart: Double = -2.0
+
+    /** On-screen text for debugging. */
+    protected lateinit var debugText: BitmapText
+
+    /** The version of midis2jam2. */
+    val version: String = Utils.resourceToString("/version.txt")
+
+    /** The build information of midis2jam2. */
+    val build: String = Utils.resourceToString("/build.txt")
+
+    /** Determines if the debug screen should be shown. */
+    protected var showDebugScreen: Boolean = false
+        set(value) {
+            debugText.cullHint = Utils.cullHint(value)
+            field = value
+        }
 
     /**
      * The instruments.
@@ -289,7 +310,7 @@ abstract class Midis2jam2(
         }
     }
 
-    fun fromEvents(programNum: Int, events: java.util.ArrayList<MidiChannelSpecificEvent>): Instrument? {
+    private fun fromEvents(programNum: Int, events: java.util.ArrayList<MidiChannelSpecificEvent>): Instrument? {
         if (events.isEmpty()) return null
         return when (programNum) {
             0 -> Keyboard(this, events, Keyboard.KeyboardSkin.PIANO)
@@ -433,26 +454,37 @@ abstract class Midis2jam2(
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
         setCameraSpeed(name, isPressed)
         handleCameraSetting(name, isPressed)
-        if ("exit" == name) {
-            exit()
+        if (isPressed) {
+            when (name) {
+                "exit" -> {
+                    exit()
+                }
+                "debug" -> {
+                    showDebugScreen = !showDebugScreen
+                }
+            }
         }
     }
 
     /** Exits the application. */
     abstract fun exit()
 
+    /** Loads and returns an unshaded model with the specified [model] and [texture]. */
     fun loadModel(model: String, texture: String): Spatial = assetManager.loadModel(model, texture)
-    fun loadModel(model: String, texture: String, type: MaterialType, brightness: Float) =
-        assetManager.loadModel(model, texture, type, brightness)
 
+    /** Loads and returns a reflective model with the specified [model], [texture], and [brightness]. */
+    fun loadModel(model: String, texture: String, brightness: Float): Spatial =
+        assetManager.loadModel(model, texture, REFLECTIVE, brightness)
+
+    /** Loads and returns a reflective material with the specified [texture] at a default brightness. */
     fun reflectiveMaterial(texture: String): Material = assetManager.reflectiveMaterial(texture, 0.9f)
+
+    /** Loads and returns an unshaded material with the specified [texture]. */
     fun unshadedMaterial(texture: String): Material = assetManager.unshadedMaterial(texture)
 
 
     companion object {
-        /**
-         * Provides logging for midis2jam2.
-         */
+        /** Provides logging for midis2jam2. */
         val LOGGER: Logger = Logger.getLogger(Midis2jam2::class.java.name)
     }
 }

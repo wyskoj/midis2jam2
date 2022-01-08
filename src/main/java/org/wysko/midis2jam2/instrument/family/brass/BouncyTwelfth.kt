@@ -47,9 +47,9 @@ open class BouncyTwelfth : TwelfthOfOctave() {
         if (playing) {
             /* Update animation progress */
             progress += delta / duration
+
             /* Update visual position */
-            val y = (9.5 - 9.5 * progress).coerceAtLeast(0.0).toFloat()
-            animNode.setLocalTranslation(0f, y, 0f)
+            animNode.setLocalTranslation(0f, (9.5 - 9.5 * progress).coerceAtLeast(0.0).toFloat(), 0f)
         } else {
             /* Lock to base position if not playing */
             animNode.setLocalTranslation(0f, 0f, 0f)

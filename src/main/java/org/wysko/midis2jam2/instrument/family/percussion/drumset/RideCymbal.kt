@@ -21,7 +21,6 @@ import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.StickStatus
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.world.Axis
 
 /** The ride cymbal. */
@@ -48,7 +47,13 @@ class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: 
     init {
         require(type === CymbalType.RIDE_1 || type === CymbalType.RIDE_2) { "Ride cymbal type is wrong." }
         cymbalNode.run {
-            attachChild(context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", MaterialType.REFLECTIVE, 0.7f))
+            attachChild(
+                context.loadModel(
+                    "DrumSet_Cymbal.obj",
+                    "CymbalSkinSphereMap.bmp",
+                    0.7f
+                )
+            )
             setLocalScale(type.size)
         }
         highLevelNode.run {

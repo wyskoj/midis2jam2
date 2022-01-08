@@ -34,10 +34,14 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
 ) : StretchyClone(parent, rotationFactor, stretchFactor, stretchAxis, rotationAxis) {
 
     /** The keys of the instrument. */
-    protected lateinit var keys: Array<Spatial>
+    protected abstract val keys: Array<Spatial>
+
+    private var pressedKeys: Array<Int> = emptyArray()
 
     /** Animates a key. */
-    protected abstract fun animateKeys(pressed: Array<Int>)
+    protected open fun animateKeys(pressed: Array<Int>) {
+        pressedKeys = pressed
+    }
 
     @Suppress("UNCHECKED_CAST")
     override fun tick(time: Double, delta: Float) {
@@ -49,4 +53,14 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
         }
     }
 
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(
+                debugProperty(
+                    "keys",
+                    (keys.indices).map { pressedKeys.contains(it) }
+                        .joinToString(separator = "") { if (it) "X" else "_" })
+            )
+        }
+    }
 }

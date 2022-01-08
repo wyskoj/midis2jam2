@@ -18,11 +18,18 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+
+/** The base position of the bass guitar. */
+private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
+
+/** The bass skin texture file. */
+private const val BASS_SKIN_BMP = "BassSkin.bmp"
 
 /**
  * The Bass Guitar.
@@ -53,6 +60,49 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         4,
         context.loadModel(if (needsDropTuning(events)) type.modelDropDFile else type.modelFile, type.textureFile)
     ) {
+    override val upperStrings: Array<Spatial> = Array(4) {
+        context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
+            instrumentNode.attachChild(this)
+        }
+    }.apply {
+        val forward = 0.125f
+        this[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
+        this[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
+        this[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward)
+        this[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
+        this[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward)
+        this[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
+        this[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward)
+        this[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
+    }
+
+    override val lowerStrings: Array<Array<Spatial>> = Array(4) {
+        Array(5) { j ->
+            context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
+                instrumentNode.attachChild(this)
+                cullHint = Always
+            }
+        }
+    }.apply {
+        val forward = 0.125f
+        for (i in 0..4) {
+            this[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward)
+            this[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
+        }
+        for (i in 0..4) {
+            this[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward)
+            this[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
+        }
+        for (i in 0..4) {
+            this[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward)
+            this[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
+        }
+        for (i in 0..4) {
+            this[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward)
+            this[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
     }
@@ -61,8 +111,10 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     enum class BassGuitarType(
         /** The model file of the Bass Guitar type. */
         val modelFile: String,
+
         /** The model file of the Bass Guitar type with drop D tuning. */
         val modelDropDFile: String,
+
         /** The texture file of the Bass Guitar type. */
         val textureFile: String,
     ) {
@@ -74,60 +126,6 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     }
 
     init {
-        /* Upper strings */
-        upperStrings = Array(4) {
-            context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
-                instrumentNode.attachChild(this)
-            }
-        }
-
-        /* Position each string */
-        val forward = 0.125f
-        upperStrings[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
-        upperStrings[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
-        upperStrings[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward)
-        upperStrings[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
-        upperStrings[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward)
-        upperStrings[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
-        upperStrings[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward)
-        upperStrings[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
-
-        /* Lower strings */
-        lowerStrings = Array(4) {
-            Array(5) { j ->
-                context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
-                    instrumentNode.attachChild(this)
-                    cullHint = Always
-                }
-            }
-        }
-
-        /* Position lower strings */
-        for (i in 0..4) {
-            lowerStrings[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward)
-            lowerStrings[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
-        }
-        for (i in 0..4) {
-            lowerStrings[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward)
-            lowerStrings[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
-        }
-        for (i in 0..4) {
-            lowerStrings[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward)
-            lowerStrings[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
-        }
-        for (i in 0..4) {
-            lowerStrings[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward)
-            lowerStrings[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
-        }
-
-        /* Initialize note fingers */
-        noteFingers = Array(4) {
-            context.loadModel("BassNoteFinger.obj", BASS_SKIN_BMP).apply {
-                instrumentNode.attachChild(this)
-                cullHint = Always
-            }
-        }
-
         /* Position guitar */
         instrumentNode.run {
             localTranslation = BASE_POSITION
@@ -154,9 +152,3 @@ private enum class BassGuitarTuning(
     /** The drop D tuning of the Bass Guitar. */
     DROP_D(intArrayOf(26, 33, 38, 43));
 }
-
-/** The base position of the bass guitar. */
-private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
-
-/** The bass skin texture file. */
-private const val BASS_SKIN_BMP = "BassSkin.bmp"

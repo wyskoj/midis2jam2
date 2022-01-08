@@ -32,6 +32,18 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.ShadowController.Companion.shadow
 
+/** The mallet case is scaled by this value to appear correct. */
+const val MALLET_CASE_SCALE: Float = 0.667f
+
+/** The number of bars on the mallets instrument. */
+private const val MALLET_BAR_COUNT = 88
+
+/** The lowest note mallets can play. */
+private const val RANGE_LOW = 21
+
+/** The highest note mallets can play. */
+private const val RANGE_HIGH = 108
+
 /** Any one of vibraphone, glockenspiel, marimba, or xylophone. */
 class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, private val type: MalletType) :
     DecayedInstrument(context, eventList) {
@@ -40,9 +52,24 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     private val barStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(MALLET_BAR_COUNT) { ArrayList() }
 
     /** Each bar of the instrument. There are [MALLET_BAR_COUNT] bars. */
-    private var bars: Array<MalletBar>
+    private var bars: Array<MalletBar> = let {
+        val theseBars = ArrayList<MalletBar>()
+        var whiteCount = 0
+        for (i in 0 until MALLET_BAR_COUNT) {
+            if (KeyedInstrument.midiValueToColor(i + RANGE_LOW) == WHITE) {
+                theseBars.add(MalletBar(i + RANGE_LOW, whiteCount++))
+            } else {
+                theseBars.add(MalletBar(i + RANGE_LOW, i))
+            }
+        }
+        theseBars
+    }.onEach { bar -> instrumentNode.attachChild(bar.noteNode) }.toTypedArray()
 
-    private var shadow: Spatial
+    private var shadow: Spatial = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
+        instrumentNode.attachChild(this)
+        setLocalScale(2 / 3f)
+        setLocalTranslation(0f, -22f, 0f)
+    }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -212,41 +239,12 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         }
     }
 
-    companion object {
-        /** The mallet case is scaled by this value to appear correct. */
-        const val MALLET_CASE_SCALE: Float = 0.667f
-
-        /** The number of bars on the mallets instrument. */
-        private const val MALLET_BAR_COUNT = 88
-
-        /** The lowest note mallets can play. */
-        private const val RANGE_LOW = 21
-
-        /** The highest note mallets can play. */
-        private const val RANGE_HIGH = 108
-    }
-
     init {
         /* Load case */
         context.loadModel("XylophoneCase.obj", "Black.bmp").apply {
             this.setLocalScale(MALLET_CASE_SCALE)
             instrumentNode.attachChild(this)
         }
-
-        /* Initialize all bars */
-        val theseBars = ArrayList<MalletBar>()
-        var whiteCount = 0
-        for (i in 0 until MALLET_BAR_COUNT) {
-            if (KeyedInstrument.midiValueToColor(i + RANGE_LOW) == WHITE) {
-                theseBars.add(MalletBar(i + RANGE_LOW, whiteCount++))
-            } else {
-                theseBars.add(MalletBar(i + RANGE_LOW, i))
-            }
-        }
-        bars = theseBars.toTypedArray()
-
-        /* Attach all bars to the instrument */
-        bars.forEach { instrumentNode.attachChild(it.noteNode) }
 
         /* Add all applicable events */
         eventList.forEach {
@@ -257,12 +255,5 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
 
         /* Position */
         highestLevel.setLocalTranslation(18f, 0f, -5f)
-
-        /* Add shadow */
-        shadow = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
-            setLocalScale(2 / 3f)
-            instrumentNode.attachChild(this)
-            setLocalTranslation(0f, -22f, 0f)
-        }
     }
 }

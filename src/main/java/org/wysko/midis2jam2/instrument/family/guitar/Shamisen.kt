@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
@@ -25,6 +26,8 @@ import org.wysko.midis2jam2.util.Utils.rad
 
 /** The texture file for Shamisen. */
 private const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
+
+private const val FORWARD = -0.23126f
 
 /** The Shamisen. */
 class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
@@ -45,39 +48,29 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
     3,
     context.loadModel("Shamisen.fbx", SHAMISEN_SKIN_TEXTURE)) {
 
+    override val upperStrings: Array<Spatial> = Array(3) {
+        context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+            instrumentNode.attachChild(this)
+            setLocalTranslation(positioning.upperX[it], positioning.upperY, FORWARD)
+        }
+    }
+
+
+    override val lowerStrings: Array<Array<Spatial>> = Array(3) { i: Int ->
+        Array(5) { j: Int ->
+            context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+                instrumentNode.attachChild(this)
+                setLocalTranslation(positioning.lowerX[i], positioning.lowerY, FORWARD)
+                cullHint = Always
+            }
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(updateInstrumentIndex(delta))
     }
 
     init {
-        /* Load strings */
-        val forward = -0.23126f
-        upperStrings = Array(3) {
-            context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
-                instrumentNode.attachChild(this)
-                setLocalTranslation(positioning.upperX[it], positioning.upperY, forward)
-            }
-        }
-
-        /* Load anim strings */
-        lowerStrings = Array(3) { i: Int ->
-            Array(5) { j: Int ->
-                context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
-                    instrumentNode.attachChild(this)
-                    setLocalTranslation(positioning.lowerX[i], positioning.lowerY, forward)
-                    cullHint = Always
-                }
-            }
-        }
-
-        /* Load note fingers */
-        noteFingers = Array(3) {
-            context.loadModel("GuitarNoteFinger.obj", SHAMISEN_SKIN_TEXTURE).apply {
-                instrumentNode.attachChild(this)
-                cullHint = Always
-            }
-        }
-
         /* Positioning */
         instrumentNode.run {
             setLocalTranslation(56f, 43f, -23f)

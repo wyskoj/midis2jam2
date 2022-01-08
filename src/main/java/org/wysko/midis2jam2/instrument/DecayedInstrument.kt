@@ -82,7 +82,7 @@ abstract class DecayedInstrument protected constructor(context: Midis2jam2, even
     override fun tick(time: Double, delta: Float) {
         setVisibility(time)
         /* Simulate hit truncation */
-        NoteQueue.collectOne(hitsV, context, time)?.let {
+        NoteQueue.collectOne(hitsV, time, context)?.let {
             lastHit = it
         }
         moveForMultiChannel(delta)

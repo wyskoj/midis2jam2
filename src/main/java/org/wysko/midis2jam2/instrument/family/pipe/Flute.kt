@@ -21,7 +21,6 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The Flute fingering manager. */
@@ -34,21 +33,19 @@ class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     /** The type Flute clone. */
     inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffType.WHISTLE, 1f) {
         init {
-            val horn = context.loadModel(
-                "Flute.obj",
-                "ShinySilver.bmp",
-                MaterialType.REFLECTIVE,
-                0.9f
-            )
-            loadHands()
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)
-            highestLevel.attachChild(horn)
+            highestLevel.attachChild(
+                context.loadModel(
+                    "Flute.obj",
+                    "ShinySilver.bmp",
+                    0.9f
+                )
+            )
         }
     }
 
     init {
-
         // Flute positioning
         groupOfPolyphony.setLocalTranslation(5f, 52f, -20f)
         groupOfPolyphony.localRotation = Quaternion().fromAngles(rad(-80.0), rad(-53.0), rad(0.0))

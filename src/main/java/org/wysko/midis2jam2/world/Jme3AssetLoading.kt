@@ -42,9 +42,6 @@ const val ENV_MAP_AS_SPHERE_MAP: String = "EnvMapAsSphereMap"
 /** The constant ENV_MAP. */
 const val ENV_MAP: String = "EnvMap"
 
-/** The constant DIFFUSE_MAP. */
-const val DIFFUSE_MAP: String = "DiffuseMap"
-
 fun AssetManager.loadModel(model: String, texture: String): Spatial = loadModel(model, texture, UNSHADED, 0f)
 
 fun AssetManager.loadModel(model: String, texture: String, type: MaterialType, brightness: Float): Spatial =

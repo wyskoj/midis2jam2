@@ -17,13 +17,16 @@
 package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The recorder. */
+private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class.java)
+
+/** The Recorder. */
 class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, RecorderClone::class.java, FINGERING_MANAGER) {
 
@@ -31,38 +34,32 @@ class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         offsetNode.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
     }
 
+    /**
+     * A single Recorder.
+     */
     inner class RecorderClone : PuffingClone(this@Recorder, SteamPuffer.SteamPuffType.POP, 1f) {
+        override val leftHands: Array<Spatial> = Array(13) {
+            parent.context.loadModel("RecorderHandLeft$it.obj", "hands.bmp")
+        }
+        override val rightHands: Array<Spatial> = Array(11) {
+            parent.context.loadModel("RecorderHandRight$it.obj", "hands.bmp")
+        }
+
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((15f + indexForMoving() * 15).toDouble()), 0f)
         }
 
-        override fun loadHands() {
-            /* Load left hands */
-            leftHands = Array(13) {
-                parent.context.loadModel("RecorderHandLeft$it.obj", "hands.bmp")
-            }
-
-            /* Load right hands */
-            rightHands = Array(11) {
-                parent.context.loadModel("RecorderHandRight$it.obj", "hands.bmp")
-            }
-
-            super.loadHands()
-        }
-
         init {
-            val horn = context.loadModel("Recorder.obj", "Recorder.bmp")
             loadHands()
+
+            /* Align steam puffer */
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)
-            modelNode.attachChild(horn)
+
+            modelNode.attachChild(context.loadModel("Recorder.obj", "Recorder.bmp"))
             animNode.setLocalTranslation(0f, 0f, 23f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(45.5 - 90), 0f, 0f)
         }
-    }
-
-    companion object {
-        private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class.java)
     }
 
     init {

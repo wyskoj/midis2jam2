@@ -95,8 +95,8 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     }
 
     override fun tick(time: Double, delta: Float) {
-        NoteQueue.collect(pitchBends, context, time).forEach { pitchBendAmount = it.value.toDouble() - 8192 }
-        NoteQueue.collect(this.modulationEvents, context, time).forEach { modulationAmount = it.value.toDouble() / 127 }
+        NoteQueue.collect(pitchBends, time, context).forEach { pitchBendAmount = it.value.toDouble() - 8192 }
+        NoteQueue.collect(this.modulationEvents, time, context).forEach { modulationAmount = it.value.toDouble() / 127 }
 
         super.tick(time, delta)
     }
@@ -105,7 +105,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     inner class SpaceLaserClone : Clone(this@SpaceLaser, 0f, Axis.X) {
 
         /** The current rotation, in degrees. */
-        private var rotation = 0.0
+        internal var rotation = 0.0
 
         /** The node that contains the laser pointer and laser. */
         private val laserNode = Node()
@@ -117,7 +117,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private var wobbleTime = 0.0
 
         /** The current intensity of the wobble. */
-        private var wobbleIntensity = 0.0
+        internal var wobbleIntensity = 0.0
 
         /** Calculates the angles for notes. */
         private val angleCalculator = SIGMOID_CALCULATOR
@@ -165,6 +165,13 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             }
             highestLevel.attachChild(laserNode)
         }
+
+        override fun toString(): String {
+            return super.toString() + buildString {
+                append(debugProperty("rotation", rotation.toFloat()))
+                append(debugProperty("wobble", wobbleIntensity.toFloat()))
+            }
+        }
     }
 
     /** Defines a type of [SpaceLaser]. */
@@ -208,6 +215,13 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
                 getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
             }
             it.laserBeam.setMaterial(context.unshadedMaterial("Assets/" + type.filename))
+        }
+    }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("pitch-bend", pitchBendAmount.toFloat()))
+            append(debugProperty("modulation", modulationAmount.toFloat()))
         }
     }
 }

@@ -25,44 +25,52 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The Soprano saxophone. */
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class.java)
+private const val STRETCH_FACTOR = 2f
+
+/**
+ * The Soprano saxophone.
+ */
 class SopranoSax(
     context: Midis2jam2,
     events: List<MidiChannelSpecificEvent>
 ) : Saxophone(context, events, SopranoSaxClone::class.java, FINGERING_MANAGER) {
 
+    /**
+     * A single Soprano saxophone.
+     */
     inner class SopranoSaxClone : SaxophoneClone(this@SopranoSax, STRETCH_FACTOR) {
         override fun moveForPolyphony() {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((20f * indexForMoving()).toDouble()), 0f)
         }
 
         init {
-            val shinyHornSkin = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-            val black = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-            black.setColor("Color", ColorRGBA.Black)
-            body = context.assetManager.loadModel("Assets/SopranoSaxBody.fbx")
-            bell.attachChild(context.assetManager.loadModel("Assets/SopranoSaxHorn.obj"))
-            val bodyNode = body as Node
-            bodyNode.getChild(0).setMaterial(shinyHornSkin)
-            bodyNode.getChild(1).setMaterial(black)
-            bell.setMaterial(shinyHornSkin)
-            modelNode.attachChild(body)
-            modelNode.attachChild(bell)
+            val shine = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
 
-            /* Move bell down to body */
-            bell.move(0f, -22f, 0f)
+            with(bell) {
+                move(0f, -22f, 0f)
+                attachChild(context.assetManager.loadModel("Assets/SopranoSaxHorn.obj"))
+                setMaterial(shine)
+            }
+
+            context.assetManager.loadModel("Assets/SopranoSaxBody.fbx").apply {
+                this as Node
+                getChild(0).setMaterial(shine)
+                getChild(1).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                    setColor("Color", ColorRGBA.Black)
+                })
+                modelNode.attachChild(this)
+            }
+
             animNode.setLocalTranslation(0f, 0f, 20f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(54.8 - 90), rad(54.3), rad(2.4))
         }
     }
 
-    companion object {
-        val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class.java)
-        private const val STRETCH_FACTOR = 2f
-    }
-
     init {
-        groupOfPolyphony.setLocalTranslation(-7f, 22f, -51f)
-        groupOfPolyphony.setLocalScale(0.75f)
+        with(groupOfPolyphony) {
+            setLocalTranslation(-7f, 22f, -51f)
+            setLocalScale(0.75f)
+        }
     }
 }

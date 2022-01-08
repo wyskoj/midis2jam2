@@ -38,6 +38,7 @@ class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
 
     /** Contains the right hand. */
     private val rightHandNode = Node()
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 

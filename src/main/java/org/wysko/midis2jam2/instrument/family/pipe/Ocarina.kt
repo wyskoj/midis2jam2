@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.HandedClone
@@ -39,23 +40,23 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 
     /** A single ocarina. */
     inner class OcarinaClone : HandedClone(this@Ocarina, 0f) {
-        override fun loadHands() {
-            rightHands = Array(12) {
-                context.loadModel("OcarinaHand$it.obj", "hands.bmp")
-            }
-            super.loadHands()
+
+        override val leftHands: Array<Spatial> = emptyArray()
+        override val rightHands: Array<Spatial> = Array(12) {
+            context.loadModel("OcarinaHand$it.obj", "hands.bmp")
         }
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
             /* Collect note periods to execute */
             if (isPlaying) {
-                assert(currentNotePeriod != null)
-                animNode.setLocalTranslation(
-                    0f,
-                    0f,
-                    3 * ((currentNotePeriod!!.endTime - time) / currentNotePeriod!!.duration()).toFloat()
-                )
+                currentNotePeriod?.let {
+                    animNode.setLocalTranslation(
+                        0f,
+                        0f,
+                        3 * ((it.endTime - time) / it.duration()).toFloat()
+                    )
+                }
             }
         }
 
@@ -64,10 +65,9 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
 
         init {
-            val ocarina = context.loadModel("Ocarina.obj", "Ocarina.bmp")
-            animNode.attachChild(ocarina)
-            highestLevel.attachChild(animNode)
             loadHands()
+            animNode.attachChild(context.loadModel("Ocarina.obj", "Ocarina.bmp"))
+            highestLevel.attachChild(animNode)
             highestLevel.setLocalTranslation(0f, 0f, 18f)
         }
     }

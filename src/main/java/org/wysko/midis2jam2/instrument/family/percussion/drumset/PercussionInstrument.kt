@@ -24,6 +24,8 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
+private const val SQUARE_ROOT_OF_127: Float = 11.269427f
+
 /** Anything on the percussion channel. This excludes melodic agogos, woodblocks, etc. */
 abstract class PercussionInstrument protected constructor(
     context: Midis2jam2,
@@ -59,7 +61,7 @@ abstract class PercussionInstrument protected constructor(
          * @return a percentage to multiply by the target recoil
          */
         fun velocityRecoilDampening(x: @Range(from = 0, to = 127) Int): @Range(from = 0, to = 1) Double {
-            return (FastMath.sqrt(x.toFloat()) / 11.26942767f).toDouble()
+            return (FastMath.sqrt(x.toFloat()) / SQUARE_ROOT_OF_127).toDouble()
         }
 
         /**
@@ -70,7 +72,6 @@ abstract class PercussionInstrument protected constructor(
          * @param velocity the velocity of the strike
          * @param delta    the amount of time since the last frame update
          */
-        @JvmStatic
         fun recoilDrum(drum: Spatial, struck: Boolean, velocity: Int, delta: Float) {
             val localTranslation = drum.localTranslation
             if (localTranslation.y < -0.0001) {

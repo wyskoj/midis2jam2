@@ -16,71 +16,103 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.util.Utils.rad
 
-/** Twelve drums for each note. */
-abstract class TwelveDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    DecayedInstrument(context, eventList) {
+/**
+ * Some instruments animate by having twelve different "drums" for each note of the scale. The drum could be any
+ * model and each have their own stick to strike them.
+ */
+abstract class TwelveDrumOctave protected constructor(
+    /** Context to midis2jam2. */
+    context: Midis2jam2,
+    /** The list of events for this instrument. */
+    eventList: List<MidiChannelSpecificEvent>,
+    /** The distance to move the drums away from the rotational pivot point. */
+    private val pivotOffset: Float
+) : DecayedInstrument(context, eventList) {
 
-    /** The Mallet nodes. */
-    protected val malletNodes = Array(12) { Node() }
+    init {
+        instrumentNode.setLocalTranslation(75f, 0f, -35f)
+    }
 
-    /** The Mallet strikes. */
-    private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
+    /** The nodes that hold the [offsetNodes]. */
+    protected val percussionNodes: Array<Node> = Array(12) {
+        Node().apply {
+            localTranslation = Vector3f(0f, 0.3f * it, 0f)
+            localRotation = Quaternion().fromAngles(0f, rad(7.5 * it), 0f)
+            instrumentNode.attachChild(this)
+        }
+    }
+
+    /**
+     * Holds everything that is needed for a twelfth and goes into [percussionNodes]. This is needed so that they can
+     * be offset and rotated around a pivot point.
+     */
+    protected val offsetNodes: Array<Node> = Array(12) {
+        Node().apply {
+            percussionNodes[it].attachChild(this)
+            setLocalTranslation(0f, 0f, pivotOffset)
+        }
+    }
+
+    /** The nodes that hold each mallet, for each note. */
+    private val malletNodes: Array<Node> = Array(12) {
+        Node().apply {
+            attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+                setLocalTranslation(0f, 0f, -5f)
+            })
+            setLocalTranslation(0f, 0f, 18f)
+            offsetNodes[it].attachChild(this)
+        }
+    }
+
+    /** At each index, stores a list of the notes that are associated with that note, as defined by the array index. */
+    private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { arrI ->
+        eventList.filterIsInstance<MidiNoteOnEvent>()
+            .filter { arrI == (it.note + 3) % 12 } as MutableList<MidiNoteOnEvent>
+    }
 
     /** Each twelfth of the octave. */
-    protected val twelfths = arrayOfNulls<TwelfthOfOctaveDecayed>(12)
+    protected abstract val twelfths: Array<TwelfthOfOctaveDecayed>
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        for (i in 0..11) {
-            val stickStatus =
-                Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 5.0, 50.0, Axis.X)
-            if (stickStatus.justStruck()) {
-                twelfths[i]!!.animNode.setLocalTranslation(0f, -3f, 0f)
-            }
-            val localTranslation = twelfths[i]!!.animNode.localTranslation
-            if (localTranslation.y < -0.0001) {
-                twelfths[i]!!.animNode.setLocalTranslation(
-                    0f, Math.min(
-                        0f,
-                        localTranslation.y + PercussionInstrument.DRUM_RECOIL_COMEBACK * delta
-                    ), 0f
-                )
-            } else {
-                twelfths[i]!!.animNode.setLocalTranslation(0f, 0f, 0f)
+        malletStrikes.forEachIndexed { idx, list ->
+            Stick.handleStick(context, malletNodes[idx], time, delta, list).also {
+                if (it.justStruck()) {
+                    PercussionInstrument.recoilDrum(
+                        twelfths[idx].animNode,
+                        true,
+                        (it.strike ?: return@also).velocity,
+                        delta
+                    )
+                } else {
+                    PercussionInstrument.recoilDrum(twelfths[idx].animNode, false, 0, delta)
+                }
             }
         }
     }
 
-    /** The Twelfth of octave that is decayed. */
+    /** Represents a twelfth of the octave, meaning a single note value. */
     abstract class TwelfthOfOctaveDecayed protected constructor() {
 
-        /** The Highest level. */
-        val highestLevel = Node()
+        /** The node with the highest level. */
+        val highestLevel: Node = Node()
 
-        /** The Anim node. */
-        val animNode = Node()
-
-        /**
-         * Update animation and note handling.
-         *
-         * @param delta the amount of time since the last frame update
-         */
-        abstract fun tick(delta: Float)
-
-        init {
-            highestLevel.attachChild(animNode)
+        /** The animation node. */
+        val animNode: Node = Node().also {
+            highestLevel.attachChild(it)
         }
-    }
 
-    init {
-        eventList.filterIsInstance<MidiNoteOnEvent>().forEach { malletStrikes[(it.note + 3) % 12].add(it) }
+        /** Updates the animation. */
+        open fun tick(delta: Float): Unit = Unit
     }
 }

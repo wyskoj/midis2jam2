@@ -38,11 +38,13 @@ import kotlin.math.floor
  * banjo, etc.)
  */
 abstract class FrettedInstrument protected constructor(
+    /** Context to the main class. */
     context: Midis2jam2,
 
     /** The fretting engine used for this fretted instrument. */
     private val frettingEngine: FrettingEngine,
 
+    /** The events for this instrument. */
     events: List<MidiChannelSpecificEvent>,
 
     /** The positioning parameters of this fretted instrument. */
@@ -56,13 +58,18 @@ abstract class FrettedInstrument protected constructor(
 ) : SustainedInstrument(context, events) {
 
     /** Each of the idle, upper strings. */
-    protected lateinit var upperStrings: Array<Spatial>
+    protected abstract val upperStrings: Array<Spatial>
 
     /** Each of the animated, lower strings by animation frame. */
-    protected lateinit var lowerStrings: Array<Array<Spatial>>
+    protected abstract val lowerStrings: Array<Array<Spatial>>
 
     /** The yellow dot note fingers. */
-    protected lateinit var noteFingers: Array<Spatial>
+    protected val noteFingers: Array<Spatial> = Array(numberOfStrings) {
+        context.loadModel("GuitarNoteFinger.obj", "GuitarSkin.bmp").apply {
+            instrumentNode.attachChild(this)
+            this.cullHint = Always
+        }
+    }
 
     /** Which frame of animation for the animated string to use. */
     protected var frame: Double = 0.0
@@ -80,19 +87,25 @@ abstract class FrettedInstrument protected constructor(
     /** The temporally-truncated list of pitch bend events. */
     private val pitchBendEvents = events.filterIsInstance<MidiPitchBendEvent>() as MutableList
 
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        NoteQueue.collect(pitchBendEvents, context, time).forEach { pitchBendAmount = it.value.toFloat() - 8192 }
-        handleStrings(time, delta)
-    }
-
+    /** The number of frets this instrument has. */
     private val numberOfFrets
         get() = (frettingEngine as StandardFrettingEngine).numberOfFrets
+
+    init {
+        instrumentNode.attachChild(instrumentBody)
+        highestLevel.attachChild(instrumentNode)
+        notePeriods = notePeriods.map { NotePeriodWithFretboardPosition.fromNotePeriod(it) }.toMutableList()
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        NoteQueue.collect(pitchBendEvents, time, context).forEach { pitchBendAmount = it.value.toFloat() - 8192 }
+        handleStrings(time, delta)
+    }
 
     /** Returns the height from the top to the bottom of the strings. */
     @Contract(pure = true)
     private fun stringHeight(): Float = positioning.upperY - positioning.lowerY
-
 
     /**
      * Performs a lookup and finds the vertical ratio of the [fret] position.
@@ -201,7 +214,7 @@ abstract class FrettedInstrument protected constructor(
                 r.remove()
                 lastPlayedNotePeriod = next
                 val next1 = next as NotePeriodWithFretboardPosition
-                val string = (next1.position ?: return).string
+                val string = next1.position.string
                 if (string != -1) {
                     frettingEngine.releaseString(string)
                 }
@@ -220,11 +233,11 @@ abstract class FrettedInstrument protected constructor(
         var noteStarted = false
         for (i in 0 until numberOfStrings) {
             val first = currentNotePeriods.stream()
-                .filter { notePeriod: NotePeriod -> (notePeriod as NotePeriodWithFretboardPosition).position!!.string == i }
+                .filter { notePeriod: NotePeriod -> (notePeriod as NotePeriodWithFretboardPosition).position.string == i }
                 .findFirst()
             if (first.isPresent) {
                 val position = (first.get() as NotePeriodWithFretboardPosition).position
-                if (position!!.string != -1 && position.fret != -1) {
+                if (position.string != -1 && position.fret != -1) {
                     frettingEngine.applyFretboardPosition(position)
                 }
             } else {
@@ -254,9 +267,22 @@ abstract class FrettedInstrument protected constructor(
         return noteStarted
     }
 
-    init {
-        instrumentNode.attachChild(instrumentBody)
-        highestLevel.attachChild(instrumentNode)
-        notePeriods = notePeriods.map { NotePeriodWithFretboardPosition.fromNotePeriod(it) }.toMutableList()
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("frets",
+                frettingEngine.frets.joinToString(
+                    prefix = "[",
+                    postfix = "]",
+                    separator = "|"
+                ) { if (it == -1) "  " else String.format("%2d", it) }
+            ))
+            append(debugProperty("pitch-bend", pitchBendAmount))
+            append(
+                debugProperty(
+                    "average",
+                    (frettingEngine as StandardFrettingEngine).runningAveragePosition().toString()
+                )
+            )
+        }
     }
 }

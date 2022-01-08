@@ -27,8 +27,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /** An instrument that uses keys to play notes. */
 abstract class KeyedInstrument(
-    context: Midis2jam2,
-    eventList: MutableList<MidiChannelSpecificEvent>,
+    context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>,
     /** The lowest note that this instrument can play. */
     val rangeLow: Int,
     /** The highest note that this instrument can play. */
@@ -103,8 +102,9 @@ abstract class KeyedInstrument(
             if (events[0] !is MidiNoteOnEvent && events[0] !is MidiNoteOffEvent) {
                 events.removeAt(0)
             }
-            while (events.isNotEmpty() && (events[0] is MidiNoteOnEvent && context.file.eventInSeconds(events[0]) <= time ||
-                        events[0] is MidiNoteOffEvent && context.file.eventInSeconds(events[0]) - time <= 0.05)
+            while (events.isNotEmpty() && (events[0] is MidiNoteOnEvent && context.file.eventInSeconds(events[0]) <= time || events[0] is MidiNoteOffEvent && context.file.eventInSeconds(
+                    events[0]
+                ) - time <= 0.05)
             ) {
                 eventsToPerform.add(events.removeAt(0))
             }
@@ -112,6 +112,14 @@ abstract class KeyedInstrument(
         return eventsToPerform
     }
 
+    /** Keyboards have two different colored keys: white and black. */
+    enum class KeyColor {
+        /** White key color. */
+        WHITE,
+
+        /** Black key color. */
+        BLACK
+    }
 
     companion object {
         /**
@@ -126,13 +134,11 @@ abstract class KeyedInstrument(
         }
     }
 
-
-    /** Keyboards have two different colored keys: white and black. */
-    enum class KeyColor {
-        /** White key color. */
-        WHITE,
-
-        /** Black key color. */
-        BLACK
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(
+                debugProperty("keys", keys.joinToString(separator = "") { if (it.isBeingPressed) "X" else "_" })
+            )
+        }
     }
 }

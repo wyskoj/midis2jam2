@@ -27,13 +27,21 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.cullHint
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis.X
 import kotlin.math.pow
 import kotlin.math.sin
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE as StickMAX_ANGLE
+
+/** The base amplitude of the strike. */
+private const val BASE_AMPLITUDE = 0.5
+
+/** The speed the bell will wobble at. */
+private const val WOBBLE_SPEED = 3
+
+/** How quickly the bell will return to rest. */
+private const val DAMPENING = 0.3
 
 /** The tubular bells. */
 class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, events) {
@@ -65,17 +73,6 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(-10f * updateInstrumentIndex(delta), 0f, -10f * updateInstrumentIndex(delta))
-    }
-
-    companion object {
-        /** The base amplitude of the strike. */
-        private const val BASE_AMPLITUDE = 0.5
-
-        /** The speed the bell will wobble at. */
-        private const val WOBBLE_SPEED = 3
-
-        /** How quickly the bell will return to rest. */
-        private const val DAMPENING = 0.3
     }
 
     /** A single bell. */
@@ -137,15 +134,15 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
          * @param velocity the velocity of the MIDI note
          */
         fun recoilBell(velocity: Int) {
-            amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * Companion.BASE_AMPLITUDE
+            amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * BASE_AMPLITUDE
             animTime = 0.0
             bellIsRecoiling = true
         }
 
         init {
             bellNode.run {
-                attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f))
-                attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.5f))
+                attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp", 0.9f))
+                attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp", 0.5f))
                 setLocalTranslation((i - 5) * 4f, 0f, 0f)
                 setLocalScale((-0.04545 * i).toFloat() + 1)
                 highestLevel.attachChild(this)
@@ -170,5 +167,4 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
             localRotation = Quaternion().fromAngles(0f, rad(25.0), 0f)
         }
     }
-
 }

@@ -16,7 +16,6 @@
  */
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
-import com.jme3.material.Material
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -32,23 +31,44 @@ import java.util.*
 class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
 
-    /** The Up keys. */
-    private val upKeys = arrayOfNulls<Spatial>(12)
-
-    /** The Down keys. */
-    private val downKeys = arrayOfNulls<Spatial>(12)
-
     /** The Up node. */
-    private val upNode = Node()
+    private val upNode = Node().apply {
+        localRotation = Quaternion().fromAngles(rad(19.0), 0f, 0f)
+    }.also {
+        instrumentNode.attachChild(it)
+    }
 
     /** The Down node. */
-    private val downNode = Node()
+    private val downNode = Node().apply {
+        localRotation = Quaternion().fromAngles(rad(19.0), 0f, 0f)
+    }.also {
+        instrumentNode.attachChild(it)
+    }
+
+    /** The Up keys. */
+    private val upKeys = Array(12) {
+        context.loadModel("TelePhoneKey.obj", "TelePhoneKey${it.toKeyString()}Dark.bmp").apply {
+            setLocalTranslation(1.2f * (it % 3 - 1), 3.89f, -2.7f - 1.2f * -(it / 3))
+            upNode.attachChild(this)
+        }
+    }
+
+    /** The Down keys. */
+    private val downKeys = Array(12) {
+        context.loadModel("TelePhoneKey.obj", "TelePhoneKey${it.toKeyString()}.bmp").apply {
+            setLocalTranslation(1.2f * (it % 3 - 1), 3.4f, -2.7f - 1.2f * -(it / 3))
+            cullHint = Always
+            downNode.attachChild(this)
+        }
+    }
 
     /** For each key, is it playing? */
-    val playing = BooleanArray(12)
+    private val playing: BooleanArray = BooleanArray(12)
 
-    /** The Handle. */
-    private val handle: Spatial
+    /** The handle. */
+    private val handle: Spatial = context.loadModel("TelePhoneHandle.obj", "TelephoneHandle.bmp").also {
+        instrumentNode.attachChild(it)
+    }
 
     /** The amount to shake the handle. */
     private var force = 0f
@@ -56,30 +76,41 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     /** Random for phone animation. */
     private val random = Random()
 
+    init {
+        context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp").apply {
+            (this as Node).getChild(0).setMaterial(context.unshadedMaterial("RubberFoot.bmp"))
+        }.also {
+            instrumentNode.attachChild(it)
+        }
+
+        instrumentNode.setLocalTranslation(0f, 1f, -50f)
+    }
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
         /* Turn off everything */
         playing.fill(false)
-        upKeys.forEach { it!!.cullHint = Dynamic }
-        downKeys.forEach { it!!.cullHint = Always }
+        upKeys.forEach { it.cullHint = Dynamic }
+        downKeys.forEach { it.cullHint = Always }
 
         /* Turn on current note periods */
         currentNotePeriods.forEach {
-            val keyIndex = (it.midiNote + 3) % 12
-            playing[keyIndex] = true
-            upKeys[keyIndex]!!.cullHint = Always
-            downKeys[keyIndex]!!.cullHint = Dynamic
+            with((it.midiNote + 3) % 12) {
+                playing[this] = true
+                upKeys[this].cullHint = Always
+                downKeys[this].cullHint = Dynamic
+            }
         }
 
         /* Animate phone handle */
-        val isPlaying = playing.any { it }
         handle.setLocalTranslation(0f, (2 + random.nextGaussian() * 0.3).toFloat() * force, 0f)
         handle.localRotation = Quaternion().fromAngles(
             rad(random.nextGaussian() * 3) * force,
-            rad(random.nextGaussian() * 3) * force, 0f
+            rad(random.nextGaussian() * 3) * force,
+            0f
         )
-        if (isPlaying) {
+        if (playing.any { it }) {
             force += 12 * delta
             force = 1f.coerceAtMost(force)
         } else {
@@ -91,54 +122,23 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(13f * updateInstrumentIndex(delta), 0f, 0f)
     }
+}
 
-    init {
-        val base = context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp")
-
-        /* Set rubber texture */
-        (base as Node).getChild(0)
-            .setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                setTexture("ColorMap", context.assetManager.loadTexture("Assets/RubberFoot.bmp"))
-            })
-
-        handle = context.loadModel("TelePhoneHandle.obj", "TelephoneHandle.bmp")
-
-        for (i in 0..11) {
-            val key: String = when {
-                i < 9 -> {
-                    (i + 1).toString()
-                }
-                i == 9 -> {
-                    "Star"
-                }
-                i == 10 -> {
-                    "0"
-                }
-                i == 11 -> {
-                    "Pound"
-                }
-                else -> throw IllegalStateException()
-            }
-
-            upKeys[i] = context.loadModel("TelePhoneKey.obj", "TelePhoneKey${key}Dark.bmp")
-            downKeys[i] = context.loadModel("TelePhoneKey.obj", "TelePhoneKey$key.bmp")
-
-            val row = -i / 3
-            upKeys[i]!!.setLocalTranslation(1.2f * (i % 3 - 1), 3.89f, -2.7f - 1.2f * row)
-            downKeys[i]!!.setLocalTranslation(1.2f * (i % 3 - 1), 3.4f, -2.7f - 1.2f * row)
-            downKeys[i]!!.cullHint = Always
-
-            upNode.attachChild(upKeys[i])
-            downNode.attachChild(downKeys[i])
-        }
-        instrumentNode.run {
-            attachChild(base)
-            attachChild(handle)
-            attachChild(upNode)
-            attachChild(downNode)
-            setLocalTranslation(0f, 1f, -50f)
-        }
-        upNode.localRotation = Quaternion().fromAngles(rad(19.0), 0f, 0f)
-        downNode.localRotation = Quaternion().fromAngles(rad(19.0), 0f, 0f)
+/**
+ * Converts an integer to the telephone key string.
+ */
+fun Int.toKeyString(): String = when {
+    this < 9 -> {
+        (this + 1).toString()
     }
+    this == 9 -> {
+        "Star"
+    }
+    this == 10 -> {
+        "0"
+    }
+    this == 11 -> {
+        "Pound"
+    }
+    else -> throw IllegalStateException()
 }

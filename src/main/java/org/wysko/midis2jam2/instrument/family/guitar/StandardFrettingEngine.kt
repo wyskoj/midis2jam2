@@ -48,7 +48,13 @@ class StandardFrettingEngine(
     private val rangeHigh = openStringMidiNotes.last() + numberOfFrets
 
     /** The list of fretboard positions in the running average. */
-    private val runningAverage: MutableList<FretboardPosition> = ArrayList()
+    internal val runningAverage: MutableList<FretboardPosition> = ArrayList()
+
+    init {
+        require(openStringMidiNotes.size == numberOfStrings) {
+            "The number of strings does not equal the number of data in the open string MIDI notes."
+        }
+    }
 
     /**
      * Calculates the best fretboard location for the specified MIDI note with temporal consideration. If no possible
@@ -120,7 +126,6 @@ class StandardFrettingEngine(
         require(string in 0 until numberOfStrings) { "Can't release a string that does not exist." }
         frets[string] = -1
     }
-
 
     companion object {
         private const val RUNNING_AVERAGE_COUNT = 10

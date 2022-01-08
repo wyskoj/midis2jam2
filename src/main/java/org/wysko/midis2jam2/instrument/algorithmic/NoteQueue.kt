@@ -23,72 +23,79 @@ import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 
 
+/**
+ * Provides various methods for manipulating the note queue.
+ */
 object NoteQueue {
 
     /**
-     * Given a list of [MidiEvents][MidiEvent], removes the events that are needing animation. This is any event that
+     * Given a list of [MidiEvent]s, removes the events that are needing animation. This is any event that
      * has a time equal to or less than the current time. This method assumes [events] is sorted by time. It then
      * returns all the removed events.
+     *
+     * @param T the type of the events in the list, some subclass of [MidiEvent]
+     * @param events the list of events to search
+     * @param time the current time
+     * @param context the [Midis2jam2] context
+     * @return a list of events that are past the current time, or at the current time
      */
-    @JvmStatic
-    fun <T : MidiEvent> collect(events: MutableList<T>, context: Midis2jam2, time: Double): List<T> {
-        val queue = events.takeWhile { context.file.eventInSeconds(it) <= time }
-        events.removeAll(queue)
-        return queue
-    }
+    fun <T : MidiEvent> collect(events: MutableList<T>, time: Double, context: Midis2jam2): List<T> =
+        events.takeWhile { context.file.eventInSeconds(it) <= time }.also {
+            events.removeAll(it.toSet())
+        }
 
     /**
-     * Given a list of [MidiEvents][MidiEvent], removes the events that are needing animation. This is any event
-     * that has a time equal to or less than the current time.
+     * Given a list of [MidiEvent]s, removes the events that are needing animation. This is any event that
+     * has a time equal to or less than the current time. This method assumes [events] is sorted by time. It then
+     * returns the first removed event.
      *
-     * This method assumes [events] is sorted by event time.
-     *
-     * @param events the events to pull from
-     * @param time   the current time, in seconds
-     * @return the last hit to play
+     * @param T the type of the events in the list, some subclass of [MidiEvent]
+     * @param events the list of events to search
+     * @param time the current time
+     * @param context the [Midis2jam2] context
+     * @return the first event that is past the current time, or at the current time
      */
-    @JvmStatic
-    fun <T : MidiEvent> collectOne(events: MutableList<T>, context: Midis2jam2, time: Double): T? {
-        val first: T? = events.firstOrNull { context.file.eventInSeconds(it) <= time }
-        return if (first != null) {
-            events.remove(first)
-            first
-        } else {
-            null
+    fun <T : MidiEvent> collectOne(events: MutableList<T>, time: Double, context: Midis2jam2): T? =
+        events.firstOrNull { context.file.eventInSeconds(it) <= time }?.also {
+            events.remove(it)
         }
-    }
-
-    fun collectOne(events: MutableList<NotePeriod>, time: Double): NotePeriod? {
-        val first = events.takeWhile { it.startTime <= time }.lastOrNull()
-        return if (first == null) {
-            null
-        } else {
-            events.remove(first)
-            first
-        }
-    }
 
     /**
-     * Given a list of [MidiEvents][MidiEvent], removes the events that are needing animation. This is any event
-     * that has a time equal to or less than the current time.
+     * Given a list of [NotePeriod]s, removes the notes that are needing animation. This is any note that has a
+     * time equal to or less than the current time. This method assumes [notes] is sorted by time. It then returns
+     * the last removed note.
      *
-     * For events that are [MidiNoteOffEvents][MidiNoteOffEvent], they will be removed 1/30th of a second early so
-     * that repeated notes on some instruments can be differentiated.
+     * @param notes the list of notes to search
+     * @param time the current time
+     * @return the last note that is past the current time, or at the current time
+     */
+    fun collectOne(notes: MutableList<NotePeriod>, time: Double): NotePeriod? =
+        notes.takeWhile { it.startTime <= time }.lastOrNull()?.also {
+            notes.remove(it)
+        }
+
+    /**
+     * Given a list of [MidiEvent]s, removes the events that are needing animation. This is any event that has a time
+     * equal to or less than the current time.
+     *
+     * For events that are [MidiNoteOffEvent]s, they will be removed 1/30th of a second early so that repeated notes
+     * on some instruments can be visually differentiated.
      *
      * This method assumes that [events] is sorted by event time.
      *
-     * @param events the events to pull from
-     * @param time   the current time, in seconds
-     * @return a list of events that occur now or before
+     * @param T the type of the events in the list, some subclass of [MidiEvent]
+     * @param events the list of events to search
+     * @param time the current time
+     * @param context the [Midis2jam2] context
+     * @return a list of events that are past the current time, or at the current time
      */
     @JvmStatic
-    fun <T : MidiEvent> collectWithOffGap(events: MutableList<T>, context: Midis2jam2, time: Double): List<T> {
-        val midi = context.file
-        val queue = events.takeWhile {
-            midi.eventInSeconds(it) <= time || (MidiNoteOffEvent::class.isInstance(it) &&
-                    midi.eventInSeconds(it) <= time - 0.033F)
+    fun <T : MidiEvent> collectWithOffGap(events: MutableList<T>, context: Midis2jam2, time: Double): List<T> =
+        with(context.file) {
+            events.takeWhile {
+                eventInSeconds(it) <= time || it is MidiNoteOffEvent && eventInSeconds(it) <= time - 0.033F
+            }.also {
+                events.removeAll(it.toSet())
+            }
         }
-        events.removeAll(queue)
-        return queue
-    }
 }

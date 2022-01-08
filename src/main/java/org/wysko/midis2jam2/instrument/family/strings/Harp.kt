@@ -99,7 +99,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
         private val stringAnimator: VibratingStringAnimator
 
         /** True if this string is vibrating, false otherwise. */
-        private var vibrating = false
+        internal var vibrating = false
 
         /** Update animation and notes, given the [delta]. */
         fun tick(delta: Float) {
@@ -177,6 +177,12 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
             HarpString(it).apply {
                 instrumentNode.attachChild(this.stringNode)
             }
+        }
+    }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("strings", strings.joinToString(separator = "") { if (it.vibrating) "X" else "_" }))
         }
     }
 }

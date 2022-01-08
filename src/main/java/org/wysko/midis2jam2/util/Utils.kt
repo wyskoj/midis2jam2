@@ -25,7 +25,6 @@ import org.w3c.dom.Document
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.xml.sax.SAXException
 import java.io.BufferedReader
-import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -141,10 +140,6 @@ object Utils {
     fun resourceToString(file: String): String =
         BufferedReader(InputStreamReader(Objects.requireNonNull(Utils::class.java.getResourceAsStream(file)))).lines()
             .collect(Collectors.joining("\n"))
-
-    /** Given a [file], returns the contents of the file as a string. */
-    @JvmStatic
-    fun fileToString(file: File): String = file.readText()
 
     /** Simple lerp function. */
     fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t

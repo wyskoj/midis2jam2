@@ -53,7 +53,7 @@ class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percus
     private val drumNode = Node()
 
     override fun tick(time: Double, delta: Float) {
-        val nextHit = collectOne(hits, context, time)
+        val nextHit = collectOne(hits, time, context)
         if (nextHit == null) { // We need to recoil all animation components
 
             /* Move the drum forward if it needs to. Coerce Z to at most 0 to not overshoot the idle position. */

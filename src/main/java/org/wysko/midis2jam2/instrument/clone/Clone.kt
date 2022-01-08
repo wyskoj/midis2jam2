@@ -68,7 +68,7 @@ abstract class Clone protected constructor(
     var currentNotePeriod: NotePeriod? = null
 
     /** The last played note period for visibility calculation. */
-    var lastNotePeriod: NotePeriod? = null
+    private var lastNotePeriod: NotePeriod? = null
 
     /**
      * Keeps track of whether this clone is currently visible. The 0-clone (the clone at index 0) is always
@@ -174,4 +174,23 @@ abstract class Clone protected constructor(
         offsetNode.attachChild(highestLevel)
         parent.groupOfPolyphony.attachChild(offsetNode)
     }
+
+    /** Formats a property about this instrument for debugging purposes. */
+    protected fun debugProperty(name: String, value: String): String {
+        return "\t\t- $name: $value\n"
+    }
+
+    /** Formats a property about this instrument for debugging purposes. */
+    protected fun debugProperty(name: String, value: Float): String {
+        return "\t\t- $name: ${"%.3f".format(value)}\n"
+    }
+
+    override fun toString(): String {
+        return "\t- ${javaClass.simpleName}\n"
+    }
+}
+
+/** Returns a string ready for display of a list of [Clone]s. */
+fun List<Clone>.debugString(): String {
+    return joinToString(separator = "")
 }

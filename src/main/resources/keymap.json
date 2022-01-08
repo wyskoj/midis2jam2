@@ -38,5 +38,9 @@
 	{
 		"name": "exit",
 		"key": "KEY_ESCAPE"
+	},
+	{
+		"name": "debug",
+		"key": "KEY_F3"
 	}
 ]

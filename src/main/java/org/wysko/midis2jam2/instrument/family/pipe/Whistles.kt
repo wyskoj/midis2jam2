@@ -25,7 +25,6 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The whistles. */
@@ -34,6 +33,12 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 
     /** The Whistle nodes. */
     private val whistleNodes = Array(12) { Node() }
+
+    override val twelfths: Array<TwelfthOfOctave> = Array(12) {
+        Whistle(it).apply {
+            highestLevel.setLocalTranslation(-12f, 0f, 0f)
+        }
+    }
 
     override fun moveForMultiChannel(delta: Float) {
         val index = updateInstrumentIndex(delta)
@@ -68,7 +73,7 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
 
         init {
-            context.loadModel("Whistle.obj", "ShinySilver.bmp", MaterialType.REFLECTIVE, 0.9f).apply {
+            context.loadModel("Whistle.obj", "ShinySilver.bmp", 0.9f).apply {
                 val scale = 2 + -0.0909091f * i
                 animNode.attachChild(this)
                 localRotation = Quaternion().fromAngles(0f, -FastMath.HALF_PI, 0f)
@@ -84,12 +89,6 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     }
 
     init {
-        twelfths = Array(12) {
-            Whistle(it).apply {
-                highestLevel.setLocalTranslation(-12f, 0f, 0f)
-            }
-        }
-
         whistleNodes.forEachIndexed { index, node ->
             node.attachChild(twelfths[index].highestLevel)
             node.localRotation = Quaternion().fromAngles(0f, rad(7.5 * index), 0f)

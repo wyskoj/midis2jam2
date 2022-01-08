@@ -22,7 +22,6 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** Cymbals are represented with this class, excluding the [HiHat]. */
@@ -130,9 +129,9 @@ open class Cymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type:
     init {
         /* Load cymbal model */
         val cymbal = if (type == CymbalType.CHINA) {
-            context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", REFLECTIVE, 0.7f)
+            context.loadModel("DrumSet_ChinaCymbal.obj", "CymbalSkinSphereMap.bmp", 0.7f)
         } else {
-            context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", REFLECTIVE, 0.7f)
+            context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", 0.7f)
         }
 
         cymbalNode.run {

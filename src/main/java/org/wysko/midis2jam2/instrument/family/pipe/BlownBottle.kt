@@ -25,8 +25,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.POP
-import org.wysko.midis2jam2.util.MaterialType
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.Utils
 
 /** The Blown bottle. */
 class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
@@ -34,6 +33,16 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 
     /** The Bottle nodes. */
     private val bottleNodes = Array(12) { Node() }
+
+    override val twelfths: Array<TwelfthOfOctave> = Array(12) {
+        Bottle(it).apply {
+            highestLevel.setLocalTranslation(-15f, 0f, 0f)
+            bottleNodes[it].attachChild(this.highestLevel)
+            bottleNodes[it].localRotation = Quaternion().fromAngles(0f, Utils.rad(7.5 * it), 0f)
+            bottleNodes[it].setLocalTranslation(0f, 0.3f * it, 0f)
+            instrumentNode.attachChild(bottleNodes[it])
+        }
+    }
 
     override fun moveForMultiChannel(delta: Float) {
         val index = updateInstrumentIndex(delta)
@@ -66,7 +75,7 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 
         init {
             /* Load pop bottle */
-            highestLevel.attachChild(context.loadModel("PopBottle.obj", "PopBottle.bmp", MaterialType.REFLECTIVE, 0.9f))
+            highestLevel.attachChild(context.loadModel("PopBottle.obj", "PopBottle.bmp", 0.9f))
 
             /* Load pop bottle label */
             context.loadModel("PopBottleLabel.obj", "PopLabel.bmp").apply {
@@ -76,14 +85,14 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 
             /* Load pop */
             val scale = 0.3f + 0.027273f * i
-            context.loadModel("PopBottlePop.obj", "Pop.bmp", MaterialType.REFLECTIVE, 0.8f).apply {
+            context.loadModel("PopBottlePop.obj", "Pop.bmp", 0.8f).apply {
                 setLocalTranslation(0f, -3.25f, 0f)
                 scale(1f, scale, 1f)
                 highestLevel.attachChild(this)
             }
 
             /* Load middle */
-            context.loadModel("PopBottleMiddle.obj", "PopBottle.bmp", MaterialType.REFLECTIVE, 0.9f).apply {
+            context.loadModel("PopBottleMiddle.obj", "PopBottle.bmp", 0.9f).apply {
                 scale(1f, 1 - scale, 1f)
                 highestLevel.attachChild(this)
             }
@@ -98,15 +107,6 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     }
 
     init {
-        twelfths = Array(12) {
-            Bottle(it).apply {
-                highestLevel.setLocalTranslation(-15f, 0f, 0f)
-                bottleNodes[it].attachChild(this.highestLevel)
-                bottleNodes[it].localRotation = Quaternion().fromAngles(0f, rad(7.5 * it), 0f)
-                bottleNodes[it].setLocalTranslation(0f, 0.3f * it, 0f)
-                instrumentNode.attachChild(bottleNodes[it])
-            }
-        }
         instrumentNode.setLocalTranslation(75f, 0f, -35f)
     }
 }

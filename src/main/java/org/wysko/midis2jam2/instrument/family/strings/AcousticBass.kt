@@ -20,7 +20,6 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The upright bass. */
@@ -32,7 +31,7 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, 
         20.0,
         Vector3f(0.75f, 0.75f, 0.75f),
         intArrayOf(28, 33, 38, 43),
-        context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp", MaterialType.UNSHADED, 0f)
+        context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp")
     ) {
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)

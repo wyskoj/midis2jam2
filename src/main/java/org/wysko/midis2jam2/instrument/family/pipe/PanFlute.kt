@@ -32,6 +32,19 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
     /** The Pipe nodes. */
     private val pipeNodes = Array(12) { Node() }
 
+    override val twelfths: Array<TwelfthOfOctave> = Array(12) { index ->
+        val i = 11 - index
+        PanFlutePipe(skin).apply {
+            highestLevel.setLocalTranslation(-4.248f * 0.9f, -3.5f + 0.38f * i, -11.151f * 0.9f)
+            highestLevel.localRotation = Quaternion().fromAngles(0f, rad(180.0), 0f)
+            pipe.setLocalScale(1f, 1 + (13 - i) * 0.05f, 1f)
+            puffer.steamPuffNode.setLocalTranslation(0f, 11.75f - 0.38f * i, 0f)
+        }.also {
+            pipeNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.272 * i + 75), 0f)
+            pipeNodes[i].attachChild(it.highestLevel)
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
         val index = updateInstrumentIndex(delta)
         instrumentNode.localRotation =
@@ -39,7 +52,20 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
         offsetNode.setLocalTranslation(0f, index * 4.6f, 0f)
     }
 
-    enum class PipeSkin(val textureFile: String, val reflective: Boolean) {
+    /**
+     * Represents a skin the Pan Flute can have.
+     */
+    enum class PipeSkin(
+        /**
+         * The texture file name.
+         */
+        val textureFile: String,
+
+        /**
+         * True if the material is reflective, false otherwise.
+         */
+        val reflective: Boolean
+    ) {
         /** Gold pipe skin. */
         GOLD("HornSkin.bmp", true),
 
@@ -85,18 +111,6 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
     }
 
     init {
-        twelfths = Array(12) { index ->
-            val i = 11 - index
-            PanFlutePipe(skin).apply {
-                highestLevel.setLocalTranslation(-4.248f * 0.9f, -3.5f + 0.38f * i, -11.151f * 0.9f)
-                highestLevel.localRotation = Quaternion().fromAngles(0f, rad(180.0), 0f)
-                pipe.setLocalScale(1f, 1 + (13 - i) * 0.05f, 1f)
-                puffer.steamPuffNode.setLocalTranslation(0f, 11.75f - 0.38f * i, 0f)
-            }.also {
-                pipeNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.272 * i + 75), 0f)
-                pipeNodes[i].attachChild(it.highestLevel)
-            }
-        }
         pipeNodes.forEach { instrumentNode.attachChild(it) }
         instrumentNode.setLocalTranslation(75f, 22f, -35f)
     }

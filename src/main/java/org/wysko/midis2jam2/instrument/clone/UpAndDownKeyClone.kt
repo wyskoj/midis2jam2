@@ -63,8 +63,8 @@ abstract class UpAndDownKeyClone protected constructor(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        if (isPlaying) {
-            pushOrReleaseKeys(currentNotePeriod!!.midiNote)
+        currentNotePeriod?.let {
+            pushOrReleaseKeys(it.midiNote)
         }
     }
 
@@ -79,4 +79,13 @@ abstract class UpAndDownKeyClone protected constructor(
         }
     }
 
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("keys",
+                keysDown.joinToString(separator = "") {
+                    if (it.cullHint == Always) "_" else "X"
+                }
+            ))
+        }
+    }
 }

@@ -27,12 +27,13 @@ import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.brass.Trombone.TromboneClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
+
+private val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trombone::class.java)
 
 /**
  * The Trombone.
@@ -57,7 +58,8 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     inner class TromboneClone : Clone(this@Trombone, 0.1f, Axis.X) {
 
         /** The slide slides in and out to represent different pitches on the Trombone. */
-        private val slide: Spatial
+        private val slide: Spatial =
+            context.loadModel("TromboneSlide.obj", "HornSkin.bmp", 0.9f)
 
         /** Moves the slide of the trombone to a given position, from 1st to 7th position. */
         private fun moveToPosition(position: Double) {
@@ -66,7 +68,6 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         /**
          * Returns the 3D vector for a given slide position.
-         * TODO put equation here
          */
         private fun slidePosition(position: Double): Vector3f {
             return Vector3f(0f, 0f, (3.333333 * position - 1).toFloat())
@@ -74,7 +75,6 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         /**
          * Returns the current slide position, calculated from the current Z-axis translation.
-         * TODO put equation here
          */
         private val currentSlidePosition: Double
             get() = 0.3 * (slide.localTranslation.z + 1)
@@ -132,18 +132,12 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         }
 
         init {
-            /* Load and attach trombone */
-            val body = context.loadModel("Trombone.fbx", "HornSkin.bmp", MaterialType.REFLECTIVE, 0.9f)
-
-            /* Set horn skin grey material */
-            (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-
-            /* Load slide */
-            slide = context.loadModel("TromboneSlide.obj", "HornSkin.bmp", MaterialType.REFLECTIVE, 0.9f)
-
             /* Attach body, slide, and set rotation of Trombone */
             modelNode.run {
-                attachChild(body)
+                attachChild(context.loadModel("Trombone.fbx", "HornSkin.bmp", 0.9f).apply {
+                    this as Node
+                    getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                })
                 attachChild(slide)
                 localRotation = Quaternion().fromAngles(rad(-10.0), 0f, 0f)
             }
@@ -151,10 +145,11 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             /* Position Trombone */
             highestLevel.setLocalTranslation(0f, 65f, -200f)
         }
-    }
 
-    companion object {
-        /** The Trombone slide manager. */
-        val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trombone::class.java)
+        override fun toString(): String {
+            return super.toString() + buildString {
+                append(debugProperty("slide", currentSlidePosition.toFloat()))
+            }
+        }
     }
 }

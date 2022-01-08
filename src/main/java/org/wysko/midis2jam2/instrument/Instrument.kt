@@ -22,6 +22,9 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.Utils
 import kotlin.math.max
 
+/** How fast instruments move when transitioning. */
+private const val BASE_TRANSITION_SPEED = 2500
+
 /**
  * Any visual representation of a MIDI instrument. midis2jam2 displays separate instruments for
  * each channel, and also creates new instruments when the program of a channel changes (i.e., the MIDI instrument of
@@ -34,6 +37,7 @@ abstract class Instrument protected constructor(
     /** Context to the main class. */
     val context: Midis2jam2,
 ) {
+
     /** Used for moving the instrument when there are two or more consecutively visible instruments of the same type. */
     val offsetNode: Node = Node()
 
@@ -54,6 +58,13 @@ abstract class Instrument protected constructor(
      * easing is enabled.
      */
     private var index = 0.0
+
+    init {
+        /* Connect node tree */
+        highestLevel.attachChild(instrumentNode)
+        offsetNode.attachChild(highestLevel)
+        context.rootNode.attachChild(offsetNode)
+    }
 
     /**
      * Updates note collection, animation, visibility, and any other calculations that need to run on each frame.
@@ -100,7 +111,6 @@ abstract class Instrument protected constructor(
         index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
 
         return index.toFloat()
-
     }
 
     /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */
@@ -119,15 +129,19 @@ abstract class Instrument protected constructor(
         instrumentNode.cullHint = Utils.cullHint(isVisible)
     }
 
-    companion object {
-        /** How fast instruments move when transitioning. */
-        private const val BASE_TRANSITION_SPEED = 2500
+    /** Formats a property about this instrument for debugging purposes. */
+    protected fun debugProperty(name: String, value: String): String {
+        return "\t- $name: $value\n"
     }
 
-    init {
-        /* Connect node tree */
-        highestLevel.attachChild(instrumentNode)
-        offsetNode.attachChild(highestLevel)
-        context.rootNode.attachChild(offsetNode)
+    /** Formats a property about this instrument for debugging purposes. */
+    protected fun debugProperty(name: String, value: Float): String {
+        return "\t- $name: ${"%.3f".format(value)}\n"
+    }
+
+    override fun toString(): String {
+        return buildString {
+            append("* ${this@Instrument.javaClass.simpleName} / ${"%.3f".format(checkInstrumentIndex())}\n")
+        }
     }
 }

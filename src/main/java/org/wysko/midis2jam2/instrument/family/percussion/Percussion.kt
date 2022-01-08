@@ -56,7 +56,7 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
         super.tick(time, delta)
         instruments.forEach { it.tick(time, delta) }
 
-        NoteQueue.collectOne(programEvents, context, time)?.let { event ->
+        NoteQueue.collectOne(programEvents, time, context)?.let { event ->
             when (event.programNum) {
                 PercussionKit.ROOM.midiNumber -> {
                     retexture("DrumShell_Snare_Room.png", "DrumShell_Room.png")

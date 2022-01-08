@@ -25,7 +25,6 @@ import org.wysko.midis2jam2.midi.Midi.HIGH_WOODBLOCK
 import org.wysko.midis2jam2.midi.Midi.LOW_WOODBLOCK
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
 /** The woodblock. High and low. */
 class Woodblock(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
@@ -57,20 +56,14 @@ class Woodblock(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
             rightStickNode,
             time,
             delta,
-            leftHits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X
+            leftHits
         )
         val statusHigh = Stick.handleStick(
             context,
             leftStickNode,
             time,
             delta,
-            rightHits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X
+            rightHits
         )
         if (statusLow.justStruck()) {
             val strike = statusLow.strike!!

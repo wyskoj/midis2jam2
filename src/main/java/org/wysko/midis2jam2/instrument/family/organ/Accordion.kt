@@ -283,4 +283,13 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
             localRotation = Quaternion().fromAngles(rad(0.0), rad(45.0), rad(-5.0))
         }
     }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append("\n")
+            append("\t- speed: $squeezingSpeed\n")
+            append("\t- direction: ${if (expanding) "expanding" else "contracting"}\n")
+            append("\t- angle: $angle")
+        }
+    }
 }

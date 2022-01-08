@@ -18,14 +18,16 @@ package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Trumpet::class.java)
 
 /**
  * The Trumpet.
@@ -57,7 +59,13 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
     /** A single Trumpet. */
     open inner class TrumpetClone : AnimatedKeyCloneByIntegers(this@Trumpet, 0.15f, 0.9f, Axis.Z, Axis.X) {
 
+        override val keys: Array<Spatial> = Array(3) { index ->
+            context.loadModel("TrumpetKey${index + 1}.obj", "HornSkinGrey.bmp", 0.9f)
+                .also { modelNode.attachChild(it) }
+        }
+
         override fun animateKeys(pressed: Array<Int>) {
+            super.animateKeys(pressed)
             for (i in 0..2) {
                 if (pressed.any { it == i }) {
                     /* Press key */
@@ -76,20 +84,14 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
 
         init {
             /* Load trumpet body */
-            body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", REFLECTIVE, 0.9f)
+            val body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", 0.9f)
 
             /* Set horn skin grey material */
             (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
 
             /* Load bell */
-            bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", REFLECTIVE, 0.9f))
+            bell.attachChild(context.loadModel("TrumpetHorn.obj", "HornSkin.bmp", 0.9f))
             bell.setLocalTranslation(0f, 0f, 5.58f)
-
-            /* Load keys */
-            keys = Array(3) { index ->
-                context.loadModel("TrumpetKey${index + 1}.obj", "HornSkinGrey.bmp", REFLECTIVE, 0.9f)
-                    .also { modelNode.attachChild(it) }
-            }
 
             /* Attach body and bell */
             modelNode.run {
@@ -108,11 +110,6 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
         init {
             bell.attachChild(context.loadModel("TrumpetMute.obj", "RubberFoot.bmp"))
         }
-    }
-
-    companion object {
-        /** The Trumpet fingering manager. */
-        val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Trumpet::class.java)
     }
 
     init {

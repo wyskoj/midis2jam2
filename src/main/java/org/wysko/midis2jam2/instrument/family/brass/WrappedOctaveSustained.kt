@@ -35,7 +35,7 @@ abstract class WrappedOctaveSustained protected constructor(
 ) : SustainedInstrument(context, eventList) {
 
     /** Each "twelfth" or note of the octave. */
-    protected lateinit var twelfths: Array<TwelfthOfOctave>
+    protected abstract val twelfths: Array<TwelfthOfOctave>
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -72,7 +72,7 @@ abstract class WrappedOctaveSustained protected constructor(
         protected var progress: Double = 0.0
 
         /** Is this twelfth currently playing? */
-        protected var playing: Boolean = false
+        internal var playing: Boolean = false
 
         /** The amount of time, in seconds, this note should be playing for. */
         protected var duration: Double = 0.0
@@ -85,6 +85,20 @@ abstract class WrappedOctaveSustained protected constructor(
 
         init {
             highestLevel.attachChild(animNode)
+        }
+    }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(
+                debugProperty("playing",
+                    let {
+                        if (!inverted) twelfths.reversed().toTypedArray() else twelfths
+                    }.joinToString(separator = "") {
+                        if (it.playing) "X" else "_"
+                    })
+            )
+            append(debugProperty("inverted", inverted.toString()))
         }
     }
 }

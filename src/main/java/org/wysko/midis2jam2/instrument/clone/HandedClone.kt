@@ -18,8 +18,6 @@ package org.wysko.midis2jam2.instrument.clone
 
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.scene.Spatial.CullHint.Always
-import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
 import org.wysko.midis2jam2.util.Utils
@@ -43,25 +41,22 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
     private val rightHandNode = Node()
 
     /** The left hands. */
-    protected lateinit var leftHands: Array<Spatial>
+    protected abstract val leftHands: Array<Spatial>
 
     /** The right hands. */
-    protected lateinit var rightHands: Array<Spatial>
+    protected abstract val rightHands: Array<Spatial>
+
+    private var hands: Hands = Hands(0, 0)
 
     /**
-     * Overrides of this function should initialize and populate [leftHands] and [rightHands]. This method, as
-     * defined in [HandedClone], will then attach them to the [leftHandNode] and [rightHandNode], and set all but the
-     * first pair to be invisible.
+     * Once the hands are initialized, call this method to add them to the scene.
      */
-    protected open fun loadHands() {
-        if (!::leftHands.isInitialized) { // May not be initialized because of Ocarina.
-            leftHands = emptyArray()
-        }
+    protected fun loadHands() {
         leftHands.forEach { leftHandNode.attachChild(it) }
-        leftHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
+        leftHands.forEachIndexed { index, spatial -> spatial.cullHint = Utils.cullHint(index == 0) }
 
         rightHands.forEach { rightHandNode.attachChild(it) }
-        rightHands.forEachIndexed { index, spatial -> spatial.cullHint = if (index == 0) Dynamic else Always }
+        rightHands.forEachIndexed { index, spatial -> spatial.cullHint = Utils.cullHint(index == 0) }
     }
 
     override fun tick(time: Double, delta: Float) {
@@ -71,6 +66,7 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
 
             val hands = (parent.manager ?: return).fingering((currentNotePeriod ?: return).midiNote) as Hands?
             if (hands != null) {
+                this.hands = hands
                 setHand(leftHands, hands.left)
                 setHand(rightHands, hands.right)
             }
@@ -79,13 +75,18 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
 
     companion object {
         /** Given an array of hands and an index, sets the hand at the index to be visible, and all else invisible. */
-        private fun setHand(hands: Array<Spatial>, handPosition: Int) {
+        private fun setHand(hands: Array<Spatial>, handPosition: Int) =
             hands.indices.forEach { hands[it].cullHint = Utils.cullHint(it == handPosition) }
-        }
     }
 
     init {
         modelNode.attachChild(leftHandNode)
         modelNode.attachChild(rightHandNode)
+    }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("hands", hands.toString()))
+        }
     }
 }

@@ -98,7 +98,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 //            append("song length: ${context.file.length}\n")
 //            append("valid cams: ${
 //                AutoCamPosition.values()
-//                    .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, instruments()) }
+//                    .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, context.instruments) }
 //            }")
 //        }
 
@@ -109,7 +109,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
             waiting += delta
 
             /* If the instrument dictates that it should no longer be focused on, */
-            if (!angles.last().stayHere.invoke(time, instruments())) {
+            if (!angles.last().stayHere.invoke(time, context.instruments)) {
                 /* Pick a new angle */
                 trigger()
             }
@@ -176,11 +176,11 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
         } else {
             /* Collect all valid instrument camera angles */
             val validInstrumentCameras = AutoCamPosition.values()
-                .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, instruments()) }
+                .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, context.instruments) }
 
             /* Collect some the last used instrument camera angles */
             val lastUsedInstrumentCameras = angles.filter { it.type == AutoCamPositionType.INSTRUMENT }
-                .takeLast((instruments().filter { it.isVisible }.size - 2).coerceAtLeast(1))
+                .takeLast((context.instruments.filter { it.isVisible }.size - 2).coerceAtLeast(1))
 
             val notRecentlyUsedInstrumentAngles = validInstrumentCameras.minus(lastUsedInstrumentCameras.toSet())
 
@@ -190,18 +190,16 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
                 notRecentlyUsedInstrumentAngles.random()
             } else {
                 /* Otherwise, just pick the last used camera that has been the longest time since it was used */
-                angles.firstOrNull { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe(time, instruments()) }
+                angles.firstOrNull { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe(time, context.instruments) }
                     ?: AutoCamPosition.GENERAL_A
             }
         }
     }
 
-    private fun instruments() = context.instruments.filterNotNull()
-
     /** Moves the camera to a new position, if it is not currently moving. */
     fun trigger() {
         if (!enabled) {
-            x = 1f
+            x = 0f
         }
         enabled = true
 

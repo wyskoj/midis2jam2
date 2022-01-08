@@ -16,20 +16,23 @@
  */
 package org.wysko.midis2jam2.instrument.family.pipe
 
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
 
 /** Contains shared code between the flute and piccolo. */
 open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffType, puffScale: Float) :
     PuffingClone(parent, puffType, puffScale) {
 
-    override fun loadHands() {
-        leftHands = Array(13) {
-            parent.context.loadModel("Flute_LeftHand%02d.obj".format(it), "hands.bmp")
-        }
-        rightHands = Array(12) {
-            parent.context.loadModel("Flute_RightHand%02d.obj".format(it), "hands.bmp")
-        }
-        super.loadHands()
+    override val leftHands: Array<Spatial> = Array(13) {
+        parent.context.loadModel("Flute_LeftHand%02d.obj".format(it), "hands.bmp")
+    }
+
+    override val rightHands: Array<Spatial> = Array(12) {
+        parent.context.loadModel("Flute_RightHand%02d.obj".format(it), "hands.bmp")
+    }
+
+    init {
+        loadHands()
     }
 
     override fun moveForPolyphony() {

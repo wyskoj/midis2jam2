@@ -65,7 +65,7 @@ abstract class SustainedInstrument protected constructor(
 
         /* Remove all the note periods that have elapsed. */
         val takeWhile = currentNotePeriods.takeWhile { it.endTime <= time }
-        currentNotePeriods.removeAll(takeWhile)
+        currentNotePeriods.removeAll(takeWhile.toSet())
 
         /* Set the last played note period for visibility calculation. */
         takeWhile.lastOrNull()?.let {

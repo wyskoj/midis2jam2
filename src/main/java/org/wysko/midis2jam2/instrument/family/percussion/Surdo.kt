@@ -25,41 +25,48 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.Midi
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
 /** The surdo. */
 class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
     /** The stick node. */
-    private val stickNode = Node()
+    private val stickNode = Node().apply {
+        attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+            setLocalTranslation(0f, 0f, -2f)
+        })
+        setLocalTranslation(0f, 0f, 14f)
+    }.also {
+        recoilNode.attachChild(it)
+    }
 
     /** The hand that rests or hovers above the drum. */
-    private val hand: Spatial
+    private val hand: Spatial = context.loadModel("hand_left.obj", "hands.bmp").also {
+        recoilNode.attachChild(it)
+    }
 
     /** Moves the hand to a [position]. */
     private fun moveHand(position: HandPosition) {
-        if (position == HandPosition.DOWN) {
-            hand.setLocalTranslation(0f, 0f, 0f)
-            hand.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
-        } else {
-            hand.setLocalTranslation(0f, 2f, 0f)
-            hand.localRotation = Quaternion().fromAngles(rad(30.0), 0f, 0f)
+        with(hand) {
+            localRotation = if (position == HandPosition.DOWN) {
+                setLocalTranslation(0f, 0f, 0f)
+                Quaternion().fromAngles(0f, 0f, 0f)
+            } else {
+                setLocalTranslation(0f, 2f, 0f)
+                Quaternion().fromAngles(rad(30.0), 0f, 0f)
+            }
         }
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val stickStatus =
-            Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-        recoilDrum(
-            recoilNode,
-            stickStatus.justStruck(),
-            if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0,
-            delta
-        )
-        if (stickStatus.justStruck()) {
-            val strike = stickStatus.strike!!
-            moveHand(if (strike.note == Midi.OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
+        Stick.handleStick(context, stickNode, time, delta, hits).run {
+            /* Recoil drum */
+            recoilDrum(recoilNode, this.justStruck(), this.strike?.velocity ?: 0, delta)
+
+            /* Move hand */
+            if (this.justStruck()) {
+                moveHand(if (strike?.note == Midi.OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
+            }
         }
     }
 
@@ -73,17 +80,12 @@ class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     }
 
     init {
-        val drum = context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png")
-        recoilNode.attachChild(drum)
-        drum.setLocalScale(1.7f)
-        val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-        stick.setLocalTranslation(0f, 0f, -2f)
-        stickNode.attachChild(stick)
-        stickNode.setLocalTranslation(0f, 0f, 14f)
-        recoilNode.attachChild(stickNode)
-        highestLevel.setLocalTranslation(25f, 25f, -41f)
-        highestLevel.localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
-        hand = context.loadModel("hand_left.obj", "hands.bmp")
-        recoilNode.attachChild(hand)
+        recoilNode.attachChild(context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png").apply {
+            setLocalScale(1.7f)
+        })
+        with(highestLevel) {
+            setLocalTranslation(25f, 25f, -41f)
+            localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
+        }
     }
 }
