@@ -69,6 +69,7 @@ application {
 }
 
 tasks.shadowJar {
+    dependsOn("build")
     doFirst {
         File(projectDir, "src/main/resources/version.txt").writeText(archiveVersion.get())
     }
