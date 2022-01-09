@@ -38,11 +38,6 @@ You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/
 * 0 &mdash; Autocam
 * Esc &mdash; Exit
 
-
-== 📜 Documentation
-
-https://midis2jam2.netlify.app[Documentation] is updated on every push.
-
 == ✴️ Acknowledgements
 
 * http://www.gamesbyscott.com/midijam.htm[MIDIJam]
