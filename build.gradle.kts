@@ -7,51 +7,23 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     `java-library`
-    id("com.github.johnrengelman.shadow") version "6.0.0"
-    id("org.panteleyev.jpackageplugin") version "1.3.0"
-    id("com.github.hierynomus.license-report") version "0.15.0"
+    // Creating shadow JARs
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+
+    // Grabbing license dependencies
+    id("com.github.hierynomus.license-report") version "0.16.1"
+
+    // Kotlin
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     id("org.jetbrains.dokka") version "1.4.32"
     id("org.jetbrains.compose") version "1.0.1"
+
+    // JavaFX (for file choosers)
     id("org.openjfx.javafxplugin") version "0.0.10"
     java
     idea
     application
-}
-
-project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
-
-javafx {
-    version = "11"
-    modules = listOf("javafx.controls", "javafx.swing")
-}
-
-tasks.build {
-    dependsOn("downloadLicenses")
-    doFirst {
-        val gitHash = System.getenv("GIT_HASH")
-        val buildTime = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
-        File("src/main/resources/build.txt").writeText("$buildTime${gitHash?.let { " $it" } ?: ""}")
-
-        println("buildtime: $buildTime")
-
-        copy {
-            from("build/reports/license/dependency-license.json")
-            into("src/main/resources")
-        }
-    }
-}
-
-tasks.compileJava {
-    sourceCompatibility = "11"
-    targetCompatibility = "11"
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 repositories {
@@ -60,13 +32,50 @@ repositories {
     maven(url = "https://repo.spongepowered.org/repository/maven-public")
 }
 
+// Register main class
+project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
+
+// Configure JavaFX
+javafx {
+    version = "11"
+    modules = listOf("javafx.controls", "javafx.swing")
+}
+
+// Configure Java version and build
+tasks.compileJava {
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
+}
+
+// Configure Kotlin
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
 application {
     mainClass.set("org.wysko.midis2jam2.MainKt")
 }
 
-tasks.shadowJar {
+tasks.processResources {
+    dependsOn(tasks.getByName("downloadLicenses"))
     doFirst {
-        File(projectDir, "src/main/resources/version.txt").writeText(archiveVersion.get())
+        /* Write build time and hash if present */
+        val gitHash = System.getenv("GIT_HASH")
+        val buildTime = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
+        File(projectDir, "src/main/resources/build.txt").writeText("$buildTime${gitHash?.let { " $it" } ?: ""}")
+        println("buildtime: $buildTime")
+
+        /* Dependency report */
+        copy {
+            from("build/reports/license/dependency-license.json")
+            into("src/main/resources")
+        }
+
+        /* Version */
+        val midis2jam2Version: String by project
+        File(projectDir, "src/main/resources/version.txt").writeText(midis2jam2Version)
     }
 }
 
@@ -104,17 +113,50 @@ dependencies {
     implementation("commons-cli:commons-cli:1.5.0")
 
     // Jetpack compose
-    implementation(compose.desktop.currentOs)
+    if (project.hasProperty("targetplatform")) {
+        when (project.properties["targetplatform"]) {
+            "windows" -> implementation(compose.desktop.windows_x64)
+            "macos" -> implementation(compose.desktop.macos_x64)
+            "linux" -> implementation(compose.desktop.linux_x64)
+            else -> {
+                println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
+                implementation(compose.desktop.currentOs)
+            }
+        }
+        println("used platform: ${project.properties["targetplatform"]}")
+    } else {
+        implementation(compose.desktop.currentOs)
+    }
 
     // Kotlin serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 }
 
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    archiveFileName.set("midis2jam2-${
+        if (project.hasProperty("targetplatform")) {
+            when (project.properties["targetplatform"]) {
+                "windows" -> "windows"
+                "macos" -> "macos"
+                "linux" -> "linux"
+                else -> {
+                    println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
+                    "current"
+                }
+            }
+        } else {
+            "current"
+        }
+    }.jar")
+}
+
+// Configure dependency licenses
 downloadLicenses {
     includeProjectDependencies = true
     dependencyConfiguration = "compileClasspath"
 }
 
+// Configure Dokka
 tasks.dokkaHtml.configure {
     moduleName.set("midis2jam2")
     dokkaSourceSets {

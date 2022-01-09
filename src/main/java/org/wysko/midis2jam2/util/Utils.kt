@@ -29,7 +29,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
 import java.util.stream.Collectors
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
@@ -137,9 +136,10 @@ object Utils {
      * @return the contents
      */
     @JvmStatic
-    fun resourceToString(file: String): String =
-        BufferedReader(InputStreamReader(Objects.requireNonNull(Utils::class.java.getResourceAsStream(file)))).lines()
-            .collect(Collectors.joining("\n"))
+    fun resourceToString(file: String): String {
+        val resourceAsStream = Utils::class.java.getResourceAsStream(file) ?: return ""
+        return BufferedReader(InputStreamReader(resourceAsStream)).lines().collect(Collectors.joining("\n"))
+    }
 
     /** Simple lerp function. */
     fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t
