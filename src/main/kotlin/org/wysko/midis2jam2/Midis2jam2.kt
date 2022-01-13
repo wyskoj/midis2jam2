@@ -22,7 +22,6 @@ import com.jme3.app.SimpleApplication
 import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
-import com.jme3.font.BitmapText
 import com.jme3.input.controls.ActionListener
 import com.jme3.material.Material
 import com.jme3.scene.Node
@@ -452,6 +451,9 @@ abstract class Midis2jam2(
                 }
                 "debug" -> {
                     debugTextController.toggle()
+                }
+                "lyrics" ->{
+                    lyricController.toggle()
                 }
             }
         }

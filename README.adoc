@@ -34,8 +34,9 @@ You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/
 * WASDQZ &mdash; Forwards / Left / Backwards / Right / Up / Down
 ** Shift &mdash; Move fast
 ** Ctrl &mdash; Move slow
-* 1&ndash;6 &mdash; Cameras 1&ndash;6
+* 1&ndash;6 &mdash; Cameras 1&ndash;6 / Exit autocam
 * 0 &mdash; Autocam
+* L &mdash; Toggle lyric display
 * Esc &mdash; Exit
 
 == ✴️ Acknowledgements

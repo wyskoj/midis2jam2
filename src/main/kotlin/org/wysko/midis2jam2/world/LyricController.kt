@@ -23,7 +23,6 @@ import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiTextEvent
-import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.cullHint
 
 /**
@@ -37,6 +36,11 @@ class LyricController(
     /** Context to midis2jam2 */
     val context: Midis2jam2
 ) {
+
+    /**
+     * If true, the lyrics are currently being displayed, otherwise they are not.
+     */
+    var enabled: Boolean = true
 
     /** Contains each lyric "line", where each syllable is an individual event. */
     private val lyricGroups = ArrayList<List<MidiTextEvent>>()
@@ -165,9 +169,9 @@ class LyricController(
     }
 
     private fun setLyricsVisibility(time: Double) {
-        calculateLyricsVisibility(time).cullHint().let {
-            currentLine.cullHint = it
-            nextLine.cullHint = it
+        calculateLyricsVisibility(time).let {
+            currentLine.cullHint = it.and(enabled).cullHint()
+            nextLine.cullHint = it.and(enabled).cullHint()
         }
     }
 
@@ -209,6 +213,11 @@ class LyricController(
         } else {
             tns() - time < 1
         }
+    }
+
+    /** Toggles [enabled]. */
+    fun toggle() {
+        enabled = !enabled
     }
 }
 
