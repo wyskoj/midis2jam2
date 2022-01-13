@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis
 
 /**
@@ -112,7 +113,7 @@ abstract class Clone protected constructor(
                 highestLevel.cullHint = Always
             }
             /* A further check if currently playing, show, hide otherwise. */
-            highestLevel.cullHint = Utils.cullHint(calcVisibility())
+            highestLevel.cullHint = calcVisibility().cullHint()
             isVisible = calcVisibility()
         }
     }

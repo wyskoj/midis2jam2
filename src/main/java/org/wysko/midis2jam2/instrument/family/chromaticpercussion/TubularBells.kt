@@ -27,8 +27,8 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.cullHint
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis.X
 import kotlin.math.pow
 import kotlin.math.sin
@@ -105,8 +105,8 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
             animTime += delta.toDouble()
 
             bellNode.run {
-                getChild(0).cullHint = cullHint(bellIsRecoiling)
-                getChild(1).cullHint = cullHint(!bellIsRecoiling)
+                getChild(0).cullHint = bellIsRecoiling.cullHint()
+                getChild(1).cullHint = (!bellIsRecoiling).cullHint()
             }
 
             if (bellIsRecoiling) bellNode.localRotation = Quaternion().fromAngles(rotationAmount(), 0f, 0f)

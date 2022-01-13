@@ -28,8 +28,8 @@ import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClon
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiControlEvent
 import org.wysko.midis2jam2.midi.MidiPitchBendEvent
-import org.wysko.midis2jam2.util.Utils.cullHint
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis
 import kotlin.math.exp
 import kotlin.math.sin
@@ -151,7 +151,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
                 rad(rotation + sin(wobbleTime * 50) * wobbleIntensity)
             )
 
-            laserBeam.cullHint = cullHint(isPlaying)
+            laserBeam.cullHint = isPlaying.cullHint()
         }
 
         override fun moveForPolyphony() {

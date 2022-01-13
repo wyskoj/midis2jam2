@@ -32,6 +32,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.Percussion
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.strings.Harp
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
 
 /**
  * Performs calculations to show and hide instrument shadows when instruments are visible or not. The
@@ -80,7 +81,7 @@ class ShadowController(
     /** Call this method on each frame to update the visibility of shadows. */
     fun tick() {
         /* Update keyboard shadow */
-        keyboardShadow.cullHint = Utils.cullHint(context.instruments.any { it is Keyboard && it.isVisible })
+        keyboardShadow.cullHint = context.instruments.any { it is Keyboard && it.isVisible }.cullHint()
         context.instruments.filterIsInstance<Keyboard>().let { keyboards ->
             keyboardShadow.localScale = Vector3f(
                 1f, 1f, if (keyboards.isNotEmpty()) {
@@ -110,7 +111,7 @@ class ShadowController(
      */
     private fun updateArrayShadows(shadows: MutableList<Spatial>, clazz: Class<out Instrument>) {
         val numVisible = context.instruments.count { clazz.isInstance(it) && it.isVisible }
-        shadows.forEachIndexed { index, shadow -> shadow.cullHint = Utils.cullHint(index < numVisible) }
+        shadows.forEachIndexed { index, shadow -> shadow.cullHint = (index < numVisible).cullHint() }
     }
 
     companion object {

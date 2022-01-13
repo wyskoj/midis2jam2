@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.pow
 
 /**
@@ -138,7 +139,7 @@ abstract class StringFamilyInstrument protected constructor(
         localScale = bowScale
         setLocalTranslation(0f, -4f, 1f)
         localRotation = Quaternion().fromAngles(rad(180.0), rad(180.0), rad(bowRotation))
-        cullHint = Utils.cullHint(showBow)
+        cullHint = showBow.cullHint()
     }.also {
         instrumentNode.attachChild(it)
     }

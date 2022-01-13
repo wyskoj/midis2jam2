@@ -24,6 +24,7 @@ import com.jme3.math.ColorRGBA
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
 
 /**
  * The LyricController is responsible for controlling the displaying of lyrics. There are two lines of lyrics, the top
@@ -164,7 +165,7 @@ class LyricController(
     }
 
     private fun setLyricsVisibility(time: Double) {
-        Utils.cullHint(calculateLyricsVisibility(time)).let {
+        calculateLyricsVisibility(time).cullHint().let {
             currentLine.cullHint = it
             nextLine.cullHint = it
         }

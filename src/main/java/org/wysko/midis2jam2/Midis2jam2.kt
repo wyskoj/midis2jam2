@@ -181,10 +181,7 @@ abstract class Midis2jam2(
 
         currentCamera = Camera.CAMERA_1A
 
-        debugText = BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
-            app.guiNode.attachChild(this)
-            cullHint = Spatial.CullHint.Always
-        }
+        debugTextController = DebugTextController(this)
 
         super.initialize(stateManager, app)
     }
@@ -201,23 +198,17 @@ abstract class Midis2jam2(
     val rootNode: Node = Node("root")
 
     /** The amount of time that has passed since the start of the song (or the time until the start). */
-    protected var timeSinceStart: Double = -2.0
+    var timeSinceStart: Double = -2.0
+        protected set
 
     /** On-screen text for debugging. */
-    protected lateinit var debugText: BitmapText
+    protected lateinit var debugTextController: DebugTextController
 
     /** The version of midis2jam2. */
     val version: String = Utils.resourceToString("/version.txt")
 
     /** The build information of midis2jam2. */
     val build: String = Utils.resourceToString("/build.txt")
-
-    /** Determines if the debug screen should be shown. */
-    protected var showDebugScreen: Boolean = false
-        set(value) {
-            debugText.cullHint = Utils.cullHint(value)
-            field = value
-        }
 
     /**
      * The instruments.
@@ -460,10 +451,15 @@ abstract class Midis2jam2(
                     exit()
                 }
                 "debug" -> {
-                    showDebugScreen = !showDebugScreen
+                    debugTextController.toggle()
                 }
             }
         }
+    }
+
+    override fun update(tpf: Float) {
+        super.update(tpf)
+        debugTextController.tick(tpf)
     }
 
     /** Exits the application. */

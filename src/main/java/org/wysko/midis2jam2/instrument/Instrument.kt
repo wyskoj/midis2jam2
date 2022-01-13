@@ -20,6 +20,7 @@ import com.jme3.scene.Node
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.max
 
 /** How fast instruments move when transitioning. */
@@ -126,7 +127,7 @@ abstract class Instrument protected constructor(
      */
     protected fun setVisibility(time: Double) {
         isVisible = calcVisibility(time)
-        instrumentNode.cullHint = Utils.cullHint(isVisible)
+        instrumentNode.cullHint = isVisible.cullHint()
     }
 
     /** Formats a property about this instrument for debugging purposes. */

@@ -27,7 +27,6 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.debugText
 import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
@@ -114,10 +113,6 @@ class DesktopMidis2jam2(
      * Performs a tick.
      */
     override fun update(tpf: Float) {
-        with(debugText) {
-            setLocalTranslation(0f, app.viewPort.camera.height.toFloat(), 0f)
-            text = this@DesktopMidis2jam2.debugText(tpf, timeSinceStart)
-        }
         super.update(tpf)
 
         instruments.forEach {
@@ -144,6 +139,7 @@ class DesktopMidis2jam2(
         autocamController.tick(timeSinceStart, tpf)
         preventCameraFromLeaving(app.camera)
 
+        /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */
         if (passedTicks++ < 3) {
             return
         }

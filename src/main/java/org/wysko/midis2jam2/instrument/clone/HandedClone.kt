@@ -21,6 +21,7 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis
 
 /**
@@ -53,10 +54,10 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
      */
     protected fun loadHands() {
         leftHands.forEach { leftHandNode.attachChild(it) }
-        leftHands.forEachIndexed { index, spatial -> spatial.cullHint = Utils.cullHint(index == 0) }
+        leftHands.forEachIndexed { index, spatial -> spatial.cullHint = (index == 0).cullHint() }
 
         rightHands.forEach { rightHandNode.attachChild(it) }
-        rightHands.forEachIndexed { index, spatial -> spatial.cullHint = Utils.cullHint(index == 0) }
+        rightHands.forEachIndexed { index, spatial -> spatial.cullHint = (index == 0).cullHint() }
     }
 
     override fun tick(time: Double, delta: Float) {
@@ -76,7 +77,7 @@ abstract class HandedClone protected constructor(parent: HandedInstrument, rotat
     companion object {
         /** Given an array of hands and an index, sets the hand at the index to be visible, and all else invisible. */
         private fun setHand(hands: Array<Spatial>, handPosition: Int) =
-            hands.indices.forEach { hands[it].cullHint = Utils.cullHint(it == handPosition) }
+            hands.indices.forEach { hands[it].cullHint = (it == handPosition).cullHint() }
     }
 
     init {

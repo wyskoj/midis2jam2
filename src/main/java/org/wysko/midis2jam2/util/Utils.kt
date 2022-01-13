@@ -37,20 +37,6 @@ import javax.xml.parsers.ParserConfigurationException
 object Utils {
 
     /**
-     * Returns an appropriate [CullHint] for the passed boolean. Essentially, it returns the correct value assuming
-     * `true` means the object should be visible, otherwise it should not be visible.
-     *
-     * When `true` is passed, returns [CullHint.Dynamic]. Otherwise, returns [CullHint.Always]. Useful
-     * for avoiding writing `b ? Dynamic : Always`.
-     *
-     * @param b true if an object should be visible, false otherwise
-     * @return [CullHint.Dynamic] or [CullHint.Always]
-     */
-    @Contract(pure = true)
-    @JvmStatic
-    fun cullHint(b: Boolean): CullHint = if (b) Dynamic else Always
-
-    /**
      * Given an [Exception], converts it to a [String], including the exception name and stack trace. For
      * example:
      *
@@ -158,3 +144,10 @@ object Utils {
         }
     }
 }
+
+/**
+ * Converts a boolean into its appropriate [CullHint].
+ *
+ * @return [CullHint.Always] if the boolean is true, [CullHint.Never] otherwise
+ */
+fun Boolean.cullHint(): CullHint = if (this) Dynamic else Always

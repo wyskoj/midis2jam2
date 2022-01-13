@@ -15,16 +15,58 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.util
+package org.wysko.midis2jam2.world
 
+import com.jme3.font.BitmapText
+import com.jme3.scene.Spatial
 import org.lwjgl.opengl.GL11
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.util.cullHint
 import kotlin.system.measureTimeMillis
+
+/**
+ * Draws debug text on the screen.
+ *
+ * @param context Context to the main class.
+ */
+class DebugTextController(val context: Midis2jam2) {
+
+    private val text = BitmapText(context.assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
+        context.app.guiNode.attachChild(this)
+        cullHint = Spatial.CullHint.Always
+    }
+
+    /**
+     * Enables and disables the display of the debug text.
+     */
+    var enabled: Boolean = true
+        set(value) {
+            text.cullHint = enabled.cullHint()
+            field = value
+        }
+
+    /**
+     * Toggles the visibility of the debug text.
+     */
+    fun toggle(): Unit = run { enabled = !enabled }
+
+    /**
+     * Updates the debug text.
+     *
+     * @param tpf the time per frame
+     */
+    fun tick(tpf: Float) {
+        with(text) {
+            setLocalTranslation(0f, context.app.viewPort.camera.height.toFloat(), 0f)
+            text = context.debugText(tpf, context.timeSinceStart)
+        }
+    }
+}
 
 /**
  * Generates debug text.
  */
-fun Midis2jam2.debugText(tpf: Float, time: Double): String {
+private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
     return buildString {
         measureTimeMillis {
             /* midis2jam2 version and build */

@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.algorithmic
 
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.floor
 
 /** Animates vibrating strings, as seen on the guitar, violin, etc. */
@@ -36,6 +37,6 @@ class VibratingStringAnimator(vararg frames: Spatial) {
      */
     fun tick(delta: Float) {
         frame = (frame + delta * 60) % stringFrames.size
-        stringFrames.forEachIndexed { index, it -> it.cullHint = Utils.cullHint(index == floor(frame).toInt()) }
+        stringFrames.forEachIndexed { index, it -> it.cullHint = (index == floor(frame).toInt()).cullHint() }
     }
 }
