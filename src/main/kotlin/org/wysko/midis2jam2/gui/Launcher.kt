@@ -508,6 +508,7 @@ fun Launcher() {
                             Text(
                                 text = i18n.getString("about.warranty"),
                                 style = MaterialTheme.typography.body2,
+                                textAlign = TextAlign.Center
                             )
                             TextWithLink(
                                 MessageFormat.format(
@@ -521,7 +522,8 @@ fun Launcher() {
                             Text(
                                 text = i18n.getString("about.scott_haag"),
                                 style = MaterialTheme.typography.h6.copy(fontSize = 12.sp),
-                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp)
+                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp),
+                                textAlign = TextAlign.Center
                             )
                             loadAttributions().forEach { (name, author, license, url, extra) ->
                                 TextWithLink(
@@ -537,7 +539,8 @@ fun Launcher() {
                             Text(
                                 text = i18n.getString("about.soundfont_trademark"),
                                 style = MaterialTheme.typography.h6.copy(fontSize = 12.sp),
-                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp)
+                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp),
+                                textAlign = TextAlign.Center
                             )
                             Row(
                                 modifier = Modifier.clickable { showOSS = !showOSS },

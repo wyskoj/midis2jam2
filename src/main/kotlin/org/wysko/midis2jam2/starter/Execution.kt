@@ -168,7 +168,9 @@ private open class StandardExecution(
             val dimensions = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
             val canvas = context.canvas
             canvas.preferredSize = dimensions
-            frame = SwingWrapper.wrap(canvas, "midis2jam2")
+            frame = SwingWrapper.wrap(canvas, "midis2jam2") {
+                stop()
+            }
             startCanvas()
         }
     }
@@ -234,7 +236,7 @@ private open class LegacyExecution(
 }
 
 /** Determines the width of the screen. */
-fun screenWidth() = Toolkit.getDefaultToolkit().screenSize.width
+fun screenWidth(): Int = Toolkit.getDefaultToolkit().screenSize.width
 
 /** Determines the height of the screen. */
-fun screenHeight() = Toolkit.getDefaultToolkit().screenSize.height
+fun screenHeight(): Int = Toolkit.getDefaultToolkit().screenSize.height

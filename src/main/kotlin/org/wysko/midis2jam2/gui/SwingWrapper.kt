@@ -22,6 +22,8 @@ import org.wysko.midis2jam2.starter.screenWidth
 import java.awt.BorderLayout
 import java.awt.Canvas
 import java.awt.Dimension
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.imageio.ImageIO
 import javax.swing.JFrame
 
@@ -30,16 +32,8 @@ import javax.swing.JFrame
  * @param canvas the canvas to wrap
  */
 internal class SwingWrapper(
-    canvas: Canvas, title: String
+    canvas: Canvas, title: String, onClose: () -> Unit
 ) : JFrame(title) {
-
-    companion object {
-        fun wrap(canvas: Canvas, title: String): JFrame = SwingWrapper(canvas, title).also {
-            it.size = Dimension((screenWidth() * 0.95).toInt(), (screenHeight() * 0.85).toInt())
-            it.setLocationRelativeTo(null)
-            it.isVisible = true
-        }
-    }
 
     init {
         iconImages = listOf(
@@ -50,5 +44,18 @@ internal class SwingWrapper(
         )
         contentPane.layout = BorderLayout()
         contentPane.add(canvas, BorderLayout.CENTER)
+
+        addWindowListener(object : WindowAdapter() {
+            override fun windowClosing(e: WindowEvent?) = onClose()
+        })
+    }
+
+    companion object {
+        fun wrap(canvas: Canvas, title: String, onClose: () -> Unit): JFrame =
+            SwingWrapper(canvas, title, onClose).also {
+                it.size = Dimension((screenWidth() * 0.95).toInt(), (screenHeight() * 0.85).toInt())
+                it.setLocationRelativeTo(null)
+                it.isVisible = true
+            }
     }
 }
