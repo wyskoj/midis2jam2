@@ -21,12 +21,14 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.percussion.HighQ.Companion.LASER_LIFE
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+
+/** The amount of time the laser should appear for when the laser gun shoots, expressed in seconds. */
+private const val LASER_LIFE = 0.05
 
 /**
  * The High Q. Looks like a laser gun. To animate the laser gun, I just used [Stick.handleStick]. The laser that
@@ -61,11 +63,6 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         if (laserShowTime > LASER_LIFE) {
             laser.cullHint = CullHint.Always
         }
-    }
-
-    companion object {
-        /** The amount of time the laser should appear for when the laser gun shoots, expressed in seconds. */
-        const val LASER_LIFE = 0.05
     }
 
     init {

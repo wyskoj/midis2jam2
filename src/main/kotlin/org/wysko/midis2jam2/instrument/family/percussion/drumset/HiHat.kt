@@ -22,8 +22,9 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.Midi
+import org.wysko.midis2jam2.midi.CLOSED_HI_HAT
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.midi.OPEN_HI_HAT
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The hi-hat. */
@@ -65,7 +66,7 @@ class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleSti
             wholeHat.setLocalTranslation(0f, (-0.7 * velocityRecoilDampening(recoil.velocity)).toFloat(), -14f)
 
             /* Open or close hat based on note */
-            if (recoil.note == Midi.OPEN_HI_HAT) {
+            if (recoil.note == OPEN_HI_HAT) {
                 status = HiHatStatus.OPEN
                 topCymbal.setLocalTranslation(0f, 2f, 0f)
             } else {
@@ -121,7 +122,7 @@ class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleSti
         val bottomCymbal = Node()
 
         /* Filter out hits that the stick needs to worry about */
-        hitsToStrike = hits.filter { it.note == Midi.OPEN_HI_HAT || it.note == Midi.CLOSED_HI_HAT }
+        hitsToStrike = hits.filter { it.note == OPEN_HI_HAT || it.note == CLOSED_HI_HAT }
 
         /* Load the cymbals */
         topCymbal.attachChild(

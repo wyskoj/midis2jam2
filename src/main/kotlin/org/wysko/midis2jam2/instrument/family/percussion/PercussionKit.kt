@@ -18,14 +18,57 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion
 
-enum class PercussionKit(val midiNumber: Int) {
+/**
+ * Defines the percussion kits available in the MIDI standard.
+ */
+enum class PercussionKit(
+    /**
+     * The program number of this kit.
+     */
+    val midiNumber: Int
+) {
+    /**
+     * Standard kit.
+     */
     STANDARD(0),
+
+    /**
+     * Room kit.
+     */
     ROOM(8),
+
+    /**
+     * Power kit.
+     */
     POWER(16),
+
+    /**
+     * Electronic kit.
+     */
     ELECTRONIC(24),
+
+    /**
+     * Analog kit.
+     */
     ANALOG(25),
+
+    /**
+     * Jazz kit.
+     */
     JAZZ(32),
+
+    /**
+     * Brush kit.
+     */
     BRUSH(40),
+
+    /**
+     * Orchestra kit.
+     */
     ORCHESTRA(48),
-    SFX(56);
+
+    /**
+     * SFX kit.
+     */
+    SFX(56)
 }

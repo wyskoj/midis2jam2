@@ -21,8 +21,8 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
-import org.wysko.midis2jam2.midi.Midi.HIGH_BONGO
-import org.wysko.midis2jam2.midi.Midi.LOW_BONGO
+import org.wysko.midis2jam2.midi.HIGH_BONGO
+import org.wysko.midis2jam2.midi.LOW_BONGO
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis

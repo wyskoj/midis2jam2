@@ -79,7 +79,7 @@ open class NotePeriod(
             noteEvents: MutableList<MidiNoteEvent>
         ): MutableList<NotePeriod> {
             val notePeriods: ArrayList<NotePeriod> = ArrayList()
-            val onEvents = arrayOfNulls<MidiNoteOnEvent>(MidiNoteEvent.MIDI_MAX_NOTE + 1)
+            val onEvents = arrayOfNulls<MidiNoteOnEvent>(MIDI_MAX_NOTE + 1)
 
             /* To calculate NotePeriods, we iterate over each MidiNoteEvent and keep track of when a NoteOnEvent occurs.
              * When it does, we insert it into the array at the index of the note's value. Then, when a NoteOffEvent

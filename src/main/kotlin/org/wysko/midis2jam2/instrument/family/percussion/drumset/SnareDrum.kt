@@ -23,8 +23,10 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
 import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
-import org.wysko.midis2jam2.midi.Midi
+import org.wysko.midis2jam2.midi.ACOUSTIC_SNARE
+import org.wysko.midis2jam2.midi.ELECTRIC_SNARE
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.midi.SIDE_STICK
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 
@@ -34,11 +36,11 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percu
 
     /** The list of hits for regular notes. */
     private val regularHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == Midi.ACOUSTIC_SNARE || it.note == Midi.ELECTRIC_SNARE } as MutableList<MidiNoteOnEvent>
+        hits.filter { it.note == ACOUSTIC_SNARE || it.note == ELECTRIC_SNARE } as MutableList<MidiNoteOnEvent>
 
     /** The list of hits for side sticks. */
     private val sideHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == Midi.SIDE_STICK } as MutableList<MidiNoteOnEvent>
+        hits.filter { it.note == SIDE_STICK } as MutableList<MidiNoteOnEvent>
 
     /** Contains the side stick. */
     private val sideStickNode = Node()

@@ -16,5 +16,11 @@
  */
 package org.wysko.midis2jam2.midi
 
+/**
+ * Changes the value of a continuous controller.
+ *
+ * @param controlNum the controller number
+ * @param value the new value
+ */
 data class MidiControlEvent(override val time: Long, override val channel: Int, val controlNum: Int, val value: Int) :
     MidiChannelSpecificEvent(time, channel)

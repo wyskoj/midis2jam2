@@ -20,8 +20,8 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
-import org.wysko.midis2jam2.midi.Midi.HIGH_AGOGO
-import org.wysko.midis2jam2.midi.Midi.LOW_AGOGO
+import org.wysko.midis2jam2.midi.HIGH_AGOGO
+import org.wysko.midis2jam2.midi.LOW_AGOGO
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.Axis
 import kotlin.math.max

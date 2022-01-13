@@ -44,9 +44,7 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
 
     /** The type of Trumpet. */
     enum class TrumpetType(
-        /**
-         * The class of the TrumpetClone.
-         */
+        /** The class of the TrumpetClone. */
         val clazz: Class<out TrumpetClone>
     ) {
         /** The normal, open trumpet. */

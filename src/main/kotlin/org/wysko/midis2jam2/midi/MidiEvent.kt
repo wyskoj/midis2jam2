@@ -16,26 +16,8 @@
  */
 package org.wysko.midis2jam2.midi
 
-/** MIDI files are made up of events. */
-open class MidiEvent
-/** Instantiates a new MIDI event at a given [time]. */
-protected constructor(
-    /** The time at which this MIDI event occurs, expressed in MIDI ticks. */
-    open val time: Long,
-) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MidiEvent
-
-        if (time != other.time) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return time.hashCode()
-    }
-}
+/** MIDI files are made up of events.
+ *
+ * @param time the time at which this MIDI event occurs, expressed in MIDI ticks
+ */
+open class MidiEvent protected constructor(open val time: Long)

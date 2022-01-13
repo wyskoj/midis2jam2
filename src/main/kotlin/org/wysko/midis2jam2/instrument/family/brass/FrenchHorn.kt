@@ -78,22 +78,15 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         }
 
         init {
-            /* Load models */
-            val body = context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", 0.9f)
-            bell.attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", 0.9f))
-
-            /* Attach models */
-            modelNode.run {
-                attachChild(body)
-                attachChild(bell)
+            /* Load body */
+            context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", 0.9f).apply {
+                modelNode.attachChild(this)
+                (this as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
             }
 
-            /* Set grey metal material */
-            (body as Node).getChild(1)
-                .setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-
-            /* Move bell to body of horn */
-            bell.run {
+            /* Load bell */
+            bell.apply {
+                attachChild(context.loadModel("FrenchHornHorn.obj", "HornSkin.bmp", 0.9f))
                 setLocalTranslation(0f, -4.63f, -1.87f)
                 localRotation = Quaternion().fromAngles(rad(22.0), 0f, 0f)
             }

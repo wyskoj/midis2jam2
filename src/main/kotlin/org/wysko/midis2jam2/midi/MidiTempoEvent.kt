@@ -16,37 +16,10 @@
  */
 package org.wysko.midis2jam2.midi
 
-/** Defines how fast the MIDI file should play. */
-class MidiTempoEvent
 /**
- * Instantiates a new MIDI tempo event.
+ * Defines how fast the MIDI file should play.
  *
  * @param time   the time
  * @param number the tempo value, expressed in microseconds per pulse
  */
-    (
-    time: Long,
-    /** The tempo value, expressed in microseconds per pulse. */
-    val number: Int,
-) : MidiEvent(time) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        if (!super.equals(other)) return false
-
-        other as MidiTempoEvent
-
-        if (number != other.number) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + number
-        return result
-    }
-
-
-}
+class MidiTempoEvent(time: Long, val number: Int) : MidiEvent(time)

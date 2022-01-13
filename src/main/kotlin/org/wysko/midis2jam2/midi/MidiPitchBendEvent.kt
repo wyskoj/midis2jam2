@@ -16,6 +16,10 @@
  */
 package org.wysko.midis2jam2.midi
 
-/** Indicates the channel's pitch is to change. */
+/**
+ * Indicates the channel's pitch is to change.
+ *
+ * @param value the new pitch-bend value
+ */
 data class MidiPitchBendEvent(override val time: Long, override val channel: Int, val value: Int) :
     MidiChannelSpecificEvent(time, channel)

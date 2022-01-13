@@ -16,7 +16,11 @@
  */
 package org.wysko.midis2jam2.midi
 
-/** MIDI files are composed of up to 65535 tracks. Each track contains [MidiEvents][MidiEvent]. */
+/**
+ * A track of a MIDI file.
+ *
+ * @param events the events in this track
+ */
 data class MidiTrack(val events: MutableList<MidiEvent>) {
     /** Construct MidiTrack without any events. */
     constructor() : this(ArrayList<MidiEvent>())

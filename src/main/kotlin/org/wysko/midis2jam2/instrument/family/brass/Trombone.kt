@@ -69,9 +69,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         /**
          * Returns the 3D vector for a given slide position.
          */
-        private fun slidePosition(position: Double): Vector3f {
-            return Vector3f(0f, 0f, (3.333333 * position - 1).toFloat())
-        }
+        private fun slidePosition(position: Double): Vector3f = Vector3f(0f, 0f, (3.333333 * position - 1).toFloat())
 
         /**
          * Returns the current slide position, calculated from the current Z-axis translation.

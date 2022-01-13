@@ -36,6 +36,7 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
     /** The keys of the instrument. */
     protected abstract val keys: Array<Spatial>
 
+    /** An array of Ints that contains the keys that should currently be pressed. */
     private var pressedKeys: Array<Int> = emptyArray()
 
     /** Animates a key. */

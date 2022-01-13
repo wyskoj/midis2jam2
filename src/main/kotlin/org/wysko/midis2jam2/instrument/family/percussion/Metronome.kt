@@ -22,8 +22,8 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
-import org.wysko.midis2jam2.midi.Midi.METRONOME_BELL
-import org.wysko.midis2jam2.midi.Midi.METRONOME_CLICK
+import org.wysko.midis2jam2.midi.METRONOME_BELL
+import org.wysko.midis2jam2.midi.METRONOME_CLICK
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
@@ -40,13 +40,13 @@ import org.wysko.midis2jam2.world.Axis
  *
  *  1. [Stick.handleStick] is performed on a dummy node ([dummyBellNode] or [dummyClickNode]).
  * This node is invisible.
- *  1. The [Stick.handleStick] method returns the [MidiNoteOnEvent] that the strike was intended
+ *  2. The [Stick.handleStick] method returns the [MidiNoteOnEvent] that the strike was intended
  * for, or null if there was no note played. This is saved to a variable ([flipBellLastStrikeFor] or
  * [flipClickLastStrikeFor]).
- *  1. If [Stick.handleStick] reports that it just struck a note, we check to see if it equals the last
+ *  3. If [Stick.handleStick] reports that it just struck a note, we check to see if it equals the last
  * [MidiNoteOnEvent]. If it's not, we update that variable and flip a boolean indicating the direction
  * ([flipClick] or [flipBell]).
- *  1. We then set the rotation of the actual pendulum, copying the rotation of the dummy node, or effectively
+ *  4. We then set the rotation of the actual pendulum, copying the rotation of the dummy node, or effectively
  * mirroring it if the pendulum needs to swing the other direction.
  */
 class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {

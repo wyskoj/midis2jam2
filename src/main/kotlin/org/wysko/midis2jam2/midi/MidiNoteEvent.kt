@@ -16,30 +16,13 @@
  */
 package org.wysko.midis2jam2.midi
 
-/** A [MidiNoteOnEvent] or a [MidiNoteOffEvent]. */
+/** The max value a MIDI note can have. */
+const val MIDI_MAX_NOTE: Int = 127
+
+/**
+ * A [MidiNoteOnEvent] or a [MidiNoteOffEvent].
+ *
+ * @param note the note value
+ */
 open class MidiNoteEvent protected constructor(override val time: Long, channel: Int, open val note: Int) :
-    MidiChannelSpecificEvent(time, channel) {
-
-    companion object {
-        /** The max value a MIDI note can have. */
-        const val MIDI_MAX_NOTE = 127
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        if (!super.equals(other)) return false
-
-        other as MidiNoteEvent
-
-        if (note != other.note) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + note
-        return result
-    }
-}
+    MidiChannelSpecificEvent(time, channel)

@@ -17,8 +17,9 @@
 
 package org.wysko.midis2jam2.midi
 
-class MidiTextEvent(time: Long, val text: String) : MidiEvent(time) {
-    override fun toString(): String {
-        return "MidiTextEvent(time=$time, text='$text')"
-    }
-}
+/**
+ * A text event.
+ *
+ * @param text the text of the event
+ */
+data class MidiTextEvent(override val time: Long, val text: String) : MidiEvent(time)

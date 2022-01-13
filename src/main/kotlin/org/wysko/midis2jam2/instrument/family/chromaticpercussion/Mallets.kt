@@ -65,6 +65,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         theseBars
     }.onEach { bar -> instrumentNode.attachChild(bar.noteNode) }.toTypedArray()
 
+    /** The shadow. */
     private var shadow: Spatial = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
         instrumentNode.attachChild(this)
         setLocalScale(2 / 3f)
