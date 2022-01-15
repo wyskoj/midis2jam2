@@ -64,6 +64,13 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 
     /** When true, the auto-cam controller is enabled. */
     var enabled: Boolean = startEnabled
+        set(value) {
+            if (value && !field) { // If the field is being set true from a false state
+                startLocation = context.app.camera.location.clone()
+                startRotation = context.app.camera.rotation.clone()
+            }
+            field = value
+        }
 
     /** The amount of time that has passed since the last camera angle change. */
     private var waiting = 0f
@@ -88,20 +95,6 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
     /** Performs a tick of the auto-cam controller. */
     fun tick(time: Double, delta: Float) {
         if (!enabled) return
-//        context.debugText.text = buildString {
-//            append("enabled: $enabled\n")
-//            append("moving: $moving\n")
-//            append("waiting: $waiting\n")
-//            append("x: $x\n")
-//            append("angle: ${angles.last()}\n")
-//            append("time: $time\n")
-//            append("song length: ${context.file.length}\n")
-//            append("valid cams: ${
-//                AutoCamPosition.values()
-//                    .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, context.instruments) }
-//            }")
-//        }
-
 
         /* If the camera is not moving, and the song has started, */
         if (!moving && time > 0) {
