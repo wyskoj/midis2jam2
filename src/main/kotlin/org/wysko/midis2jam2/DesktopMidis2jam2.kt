@@ -55,6 +55,10 @@ class DesktopMidis2jam2(
 
     private var passedTicks = 0
 
+    private var initiatedFadeIn = false
+
+    private var removedEffect = false
+
     /**
      * Initializes the application.
      */
@@ -114,6 +118,16 @@ class DesktopMidis2jam2(
      */
     override fun update(tpf: Float) {
         super.update(tpf)
+
+        if (!initiatedFadeIn && timeSinceStart > -1.5) {
+            fade.fadeIn()
+            initiatedFadeIn = true
+        }
+
+        if (!removedEffect && timeSinceStart > -1) {
+            fpp.removeAllFilters()
+            removedEffect = true
+        }
 
         instruments.forEach {
             /* Null if not implemented yet */

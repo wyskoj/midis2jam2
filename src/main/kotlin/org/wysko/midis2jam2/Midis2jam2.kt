@@ -24,8 +24,11 @@ import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
 import com.jme3.input.controls.ActionListener
 import com.jme3.material.Material
+import com.jme3.post.FilterPostProcessor
+import com.jme3.post.filters.FadeFilter
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import com.jme3.util.SkyFactory
 import kotlinx.coroutines.runBlocking
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
@@ -88,10 +91,25 @@ abstract class Midis2jam2(
         this.app.flyByCamera.zoomSpeed = -10f
         this.app.flyByCamera.isEnabled = true
         this.app.flyByCamera.isDragToRotate = true
-        this.app.camera.fov = 55f
+        this.app.camera.fov = 50f
 
         /*** LOAD STAGE ***/
         rootNode.attachChild(loadModel("Stage.obj", "Stage.bmp"))
+
+        /*** LOAD SKYBOX ***/
+        with(assetManager.loadTexture("Assets/sky.png")) {
+            rootNode.attachChild(SkyFactory.createSky(assetManager, this, this, this, this, this, this))
+        }
+
+        /*** INIT FADE IN ***/
+        fade = FadeFilter(0.5f).apply {
+            value = 0f
+        }
+        fpp = FilterPostProcessor(assetManager).also {
+            it.addFilter(fade)
+            it.numSamples = settings.samples
+        }
+        app.viewPort.addProcessor(fpp)
 
         /*** INITIALIZE INSTRUMENTS ***/
         runBlocking {
@@ -208,6 +226,12 @@ abstract class Midis2jam2(
 
     /** The build information of midis2jam2. */
     val build: String = Utils.resourceToString("/build.txt")
+
+    /** The fade filter. */
+    protected lateinit var fade: FadeFilter
+
+    /** The filter post processor. */
+    protected lateinit var fpp: FilterPostProcessor
 
     /**
      * The instruments.
