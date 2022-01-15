@@ -135,7 +135,8 @@ fun Launcher() {
                         File(settings.soundFontPaths[selectedSoundFont])
                     } else {
                         null
-                    }
+                    },
+                    settings.samples
                 ),
                 onStart = {
                     freeze = true

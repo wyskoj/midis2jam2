@@ -53,6 +53,7 @@ fun main(args: Array<String>) {
             addOption("d", "device", true, "The device to use for MIDI playback.")
             addOption("e", "legacy-engine", false, "Use the legacy window engine.")
             addOption("f", "fullscreen", false, "Starts the application in fullscreen mode.")
+            addOption("g", "samples", true, "The number of samples for anti-aliasing. Lowest is 1, default is 4.")
             addOption("h", "help", false, "Prints a help message and exits.")
             addOption("l", "list-devices", false, "Lists the available MIDI devices and exits.")
             addOption(
@@ -112,6 +113,9 @@ fun main(args: Array<String>) {
         /* Latency */
         val latency = if (cmd.hasOption("latency")) cmd.getOptionValue("latency").toInt() else 0
 
+        /* Samples */
+        val samples = if (cmd.hasOption("samples")) cmd.getOptionValue("samples").toInt() else 4
+
         runBlocking {
             Execution.start(
                 PassedSettings(
@@ -121,7 +125,8 @@ fun main(args: Array<String>) {
                     legacyWindowEngine,
                     File(midiFile),
                     midiDevice,
-                    soundFont
+                    soundFont,
+                    samples
                 ),
                 onStart = {},
                 onReady = {},

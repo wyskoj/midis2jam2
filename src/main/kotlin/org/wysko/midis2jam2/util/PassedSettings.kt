@@ -39,5 +39,8 @@ data class PassedSettings(
     val midiDevice: String,
 
     /** The SoundFont to use. */
-    val soundFont: File?
+    val soundFont: File?,
+
+    /** Sub-pixel sampling */
+    val samples: Int = 4,
 )

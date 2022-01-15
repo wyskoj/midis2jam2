@@ -50,7 +50,10 @@ data class LauncherSettings(
     var isLegacyDisplay: Boolean = false,
 
     /** The locale of the launcher. */
-    var locale: String = "en"
+    var locale: String = "en",
+
+    /** Number of samples for sub-pixel sampling. */
+    var samples: Int = 4
 ) {
     /** Writes the settings to disk. */
     fun save() {
