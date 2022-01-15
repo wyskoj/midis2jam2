@@ -151,3 +151,6 @@ object Utils {
  * @return [CullHint.Always] if the boolean is true, [CullHint.Never] otherwise
  */
 fun Boolean.cullHint(): CullHint = if (this) Dynamic else Always
+
+/** Given a list of integers, determines if the root integer is equal to at least one of the provided integers. */
+fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }

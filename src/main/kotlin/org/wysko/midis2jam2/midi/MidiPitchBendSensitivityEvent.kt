@@ -15,10 +15,17 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.instrument.family.animusic
+package org.wysko.midis2jam2.midi
 
-/** Provides a definition for calculating the angle at which the [SpaceLaser] should rotate to given a note. */
-@FunctionalInterface
-interface SpaceLaserAngleCalculator {
-    fun angleFromNote(note: Int, pitchBendAmount: Float): Double
-}
+/**
+ * This is not a real MIDI event, but represents a moment where the pitch bend intensity is changed. Setting CC#100 and
+ * CC#101 to 0, then modifying CC#6 modifies the pitch bend sensitivity of the channel by semitones, and CC#38 modifies
+ * the pitch bend sensitivity of the channel by cents.
+ *
+ * @param value the intensity of the pitch bend, represented in semitones
+ */
+data class MidiPitchBendSensitivityEvent(
+    override val time: Long,
+    override val channel: Int,
+    val value: Float
+) : MidiChannelSpecificEvent(time, channel)

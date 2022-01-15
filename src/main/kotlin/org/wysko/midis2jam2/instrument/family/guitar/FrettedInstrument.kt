@@ -22,11 +22,12 @@ import com.jme3.scene.Spatial.CullHint.Always
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiPitchBendEvent
+import org.wysko.midis2jam2.midi.MidiPitchBendSensitivityEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils
 import kotlin.math.abs
@@ -81,11 +82,14 @@ abstract class FrettedInstrument protected constructor(
         }
     }
 
-    /** The current amount of pitch bend. */
-    private var pitchBendAmount: Float = 0f
+    /** Handles pitch band and modulation for us! */
+    private val pitchBendModulationController = PitchBendModulationController(context, events)
 
     /** The temporally-truncated list of pitch bend events. */
     private val pitchBendEvents = events.filterIsInstance<MidiPitchBendEvent>() as MutableList
+
+    /** The temporally-truncated list of pitch bend sensitivity events. */
+    private val pitchBendSensitivityEvents = events.filterIsInstance<MidiPitchBendSensitivityEvent>() as MutableList
 
     /** The number of frets this instrument has. */
     private val numberOfFrets
@@ -99,7 +103,7 @@ abstract class FrettedInstrument protected constructor(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        NoteQueue.collect(pitchBendEvents, time, context).forEach { pitchBendAmount = it.value.toFloat() - 8192 }
+
         handleStrings(time, delta)
     }
 
@@ -117,13 +121,13 @@ abstract class FrettedInstrument protected constructor(
     protected fun fretToDistance(fret: Int, pitchBendAmount: Float): Float {
         /* Find the whole number of semitones bent from the pitch bend */
         val semitoneOffset = if (pitchBendAmount > 0) {
-            floor(pitchBendAmount / 682.0).toInt()
+            floor(pitchBendAmount).toInt()
         } else {
-            ceil(pitchBendAmount / 682.0).toInt()
+            ceil(pitchBendAmount).toInt()
         }
 
         /* Find the microtonal offset from the semitone */
-        val semitoneFraction = (pitchBendAmount / 682.0) % 1
+        val semitoneFraction = pitchBendAmount % 1
 
         /* Find the adjusted fret position */
         val adjFret = (fret + semitoneOffset).coerceIn(0..numberOfFrets)
@@ -133,13 +137,13 @@ abstract class FrettedInstrument protected constructor(
             Utils.lerp(
                 positioning.fretHeights.calculateScale(adjFret),
                 positioning.fretHeights.calculateScale((adjFret + 1).coerceAtMost(numberOfFrets)),
-                semitoneFraction.toFloat()
+                semitoneFraction
             )
         } else {
             Utils.lerp(
                 positioning.fretHeights.calculateScale(adjFret),
                 positioning.fretHeights.calculateScale((adjFret - 1).coerceAtLeast(0)),
-                -semitoneFraction.toFloat()
+                -semitoneFraction
             )
         }
     }
@@ -151,7 +155,7 @@ abstract class FrettedInstrument protected constructor(
      * strings are scaled by [fretToDistance] for the accurate location of the fret. At this location, a note finger
      * (the small, yellow dot that appears on the fret) is placed.
      */
-    private fun animateString(string: Int, fret: Int, delta: Float) {
+    private fun animateString(string: Int, fret: Int, delta: Float, pitchBendAmount: Float) {
 
         /* If fret is -1, stop animating anything on this string and hide all animation components. */
         if (fret == -1) {
@@ -244,6 +248,7 @@ abstract class FrettedInstrument protected constructor(
                 frettingEngine.releaseString(i)
             }
         }
+        val pitchBendAmount = pitchBendModulationController.tick(time, delta)
         for (notePeriod in currentNotePeriods) {
             if (notePeriod.animationStarted) {
                 continue
@@ -256,11 +261,12 @@ abstract class FrettedInstrument protected constructor(
                 notePeriod1.position = guitarPosition
             }
             notePeriod1.animationStarted = true
+            pitchBendModulationController.resetModulation()
         }
 
         /* Animate strings */
         for (i in 0 until numberOfStrings) {
-            animateString(i, frettingEngine.frets[i], delta)
+            animateString(i, frettingEngine.frets[i], delta, pitchBendAmount)
         }
         val inc = (delta / (1 / 60f)).toDouble()
         frame += inc
@@ -276,7 +282,6 @@ abstract class FrettedInstrument protected constructor(
                     separator = "|"
                 ) { if (it == -1) "  " else String.format("%2d", it) }
             ))
-            append(debugProperty("pitch-bend", pitchBendAmount))
             append(
                 debugProperty(
                     "average",

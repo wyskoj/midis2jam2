@@ -22,6 +22,7 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.Companion.SIGMOID_CALCULATOR
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
@@ -66,17 +67,9 @@ import kotlin.math.sin
 class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
-    /** A temporally-truncated list of pitch bend events. */
-    private val pitchBends: MutableList<MidiPitchBendEvent>
+    private val pitchBendModulationController = PitchBendModulationController(context, eventList)
 
-    /** A temporally-truncated list of modulation events. */
-    private val modulationEvents: MutableList<MidiControlEvent>
-
-    /** The current pitch bend amount. */
-    private var pitchBendAmount = 0.0
-
-    /** The current modulation amount. */
-    private var modulationAmount = 0.0
+    private var pitchBendAmount = 0f
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(-22.5f + updateInstrumentIndex(delta) * 15, 0f, 0f)
@@ -87,18 +80,16 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         /** See https://www.desmos.com/calculator/zbmdwg4vcl */
         val SIGMOID_CALCULATOR: SpaceLaserAngleCalculator =
             object : SpaceLaserAngleCalculator {
-                override fun angleFromNote(note: Int, pitchBendAmount: Double): Double {
-                    val adjNote = note + pitchBendAmount / (8192f / 12)
-                    return -(1 / (1 + exp((-(adjNote - 64) / 16f))) * 208 - 104)
+                override fun angleFromNote(note: Int, pitchBendAmount: Float): Double {
+                    val adjNote = note + pitchBendAmount
+                    return (-(1 / (1 + exp((-(adjNote - 64) / 16f))) * 208 - 104)).toDouble()
                 }
             }
     }
 
     override fun tick(time: Double, delta: Float) {
-        NoteQueue.collect(pitchBends, time, context).forEach { pitchBendAmount = it.value.toDouble() - 8192 }
-        NoteQueue.collect(this.modulationEvents, time, context).forEach { modulationAmount = it.value.toDouble() / 127 }
-
         super.tick(time, delta)
+        pitchBendAmount = pitchBendModulationController.tick(time, delta)
     }
 
     /** An individual space laser. */
@@ -129,11 +120,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             super.tick(time, delta)
             if (isPlaying) {
                 rotation = angleCalculator.angleFromNote((currentNotePeriod ?: return).midiNote, pitchBendAmount)
-
-                wobbleTime += delta.toDouble()
-                wobbleIntensity = ((time - (currentNotePeriod ?: return).startTime) - 0.1).coerceIn(
-                    0.0, modulationAmount.coerceAtLeast(0.05)
-                )
+                if (wobbleTime == 0.0) pitchBendModulationController.resetModulation()
+                wobbleTime += delta
+                wobbleIntensity = (wobbleTime - 0.1).coerceIn(0.0..0.07)
             } else {
                 notePeriods.firstOrNull()?.let {
                     val startTime = it.startTime
@@ -144,13 +133,13 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
                         }
                     }
                 }
+                wobbleTime = 0.0
             }
-
             laserNode.localRotation = Quaternion().fromAngles(
-                0f, 0f,
-                rad(rotation + sin(wobbleTime * 50) * wobbleIntensity)
+                0f,
+                0f,
+                rad(rotation + sin(50 * wobbleTime) * wobbleIntensity)
             )
-
             laserBeam.cullHint = isPlaying.cullHint()
         }
 
@@ -201,11 +190,14 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
         /* Truncate each note period to allow some space for end-to-end notes */
         notePeriods.forEach {
-            if (it.duration() > 0.1) it.endTime -= 0.05 else if (it.duration() > 0.05) it.endTime -= 0.02 else it.endTime -= 0.01
+            when {
+                it.duration() > 0.4 -> it.endTime -= 0.1
+                it.duration() > 0.2 -> it.endTime -= 0.08
+                it.duration() > 0.1 -> it.endTime -= 0.05
+                it.duration() > 0.05 -> it.endTime -= 0.025
+                else -> it.endTime -= 0.02
+            }
         }
-
-        pitchBends = eventList.filterIsInstance<MidiPitchBendEvent>().toMutableList()
-        modulationEvents = eventList.filterIsInstance<MidiControlEvent>().filter { it.controlNum == 1 }.toMutableList()
 
         clones.forEach {
             it as SpaceLaserClone
@@ -220,8 +212,6 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
     override fun toString(): String {
         return super.toString() + buildString {
-            append(debugProperty("pitch-bend", pitchBendAmount.toFloat()))
-            append(debugProperty("modulation", modulationAmount.toFloat()))
         }
     }
 }
