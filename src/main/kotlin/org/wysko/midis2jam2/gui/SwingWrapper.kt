@@ -21,11 +21,13 @@ import org.wysko.midis2jam2.starter.screenHeight
 import org.wysko.midis2jam2.starter.screenWidth
 import java.awt.BorderLayout
 import java.awt.Canvas
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.imageio.ImageIO
 import javax.swing.JFrame
+import javax.swing.JLabel
 
 /**
  * A wrapper for a [Canvas] that can be used in a Swing application.
@@ -42,8 +44,11 @@ internal class SwingWrapper(
             ImageIO.read(javaClass.getResource("/ico/icon64.png")),
             ImageIO.read(javaClass.getResource("/ico/icon128.png"))
         )
-        contentPane.layout = BorderLayout()
-        contentPane.add(canvas, BorderLayout.CENTER)
+        with(contentPane) {
+            layout = BorderLayout()
+            add(canvas, BorderLayout.CENTER)
+            background = Color.BLACK // Your eyes are saved. You're welcome
+        }
 
         addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) = onClose()
