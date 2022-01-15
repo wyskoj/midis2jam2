@@ -219,7 +219,7 @@ abstract class Midis2jam2(
         protected set
 
     /** On-screen text for debugging. */
-    protected lateinit var debugTextController: DebugTextController
+    private lateinit var debugTextController: DebugTextController
 
     /** The version of midis2jam2. */
     val version: String = Utils.resourceToString("/version.txt")
@@ -476,7 +476,7 @@ abstract class Midis2jam2(
                 "debug" -> {
                     debugTextController.toggle()
                 }
-                "lyrics" ->{
+                "lyrics" -> {
                     lyricController.toggle()
                 }
             }
