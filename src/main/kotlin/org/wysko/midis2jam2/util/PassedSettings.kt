@@ -43,4 +43,7 @@ data class PassedSettings(
 
     /** Sub-pixel sampling */
     val samples: Int = 4,
+
+    /** Displays lyrics on-screen. */
+    val displayLyrics: Boolean = true
 )

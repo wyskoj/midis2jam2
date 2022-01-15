@@ -23,6 +23,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 
+private val json = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+}
+
 /**
  * Defines settings that are configurable in the launcher.
  */
@@ -53,11 +58,14 @@ data class LauncherSettings(
     var locale: String = "en",
 
     /** Number of samples for sub-pixel sampling. */
-    var samples: Int = 4
+    var samples: Int = 4,
+
+    /** Display MIDI lyrics on-screen. */
+    var displayLyrics: Boolean = true
 ) {
     /** Writes the settings to disk. */
     fun save() {
-        launcherSettingsFile().writeText(Json.encodeToString(this))
+        launcherSettingsFile().writeText(json.encodeToString(this))
     }
 }
 
@@ -73,7 +81,7 @@ private fun launcherSettingsFile(): File = File(
 internal fun loadLauncherSettingsFromFile(): LauncherSettings {
     return if (launcherSettingsFile().exists()) {
         try {
-            Json.decodeFromString<LauncherSettings>(launcherSettingsFile().readText()).also { settings ->
+            json.decodeFromString<LauncherSettings>(launcherSettingsFile().readText()).also { settings ->
                 settings.soundFontPaths = settings.soundFontPaths.filter { File(it).exists() }.toMutableList()
             }
         } catch (e: Exception) {

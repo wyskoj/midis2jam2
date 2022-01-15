@@ -50,6 +50,7 @@ fun main(args: Array<String>) {
     if (args.isNotEmpty()) {
         val options = Options().apply {
             addOption("a", "autocam", false, "Enables auto-cam when starting.")
+            addOption("c", "lyrics", false, "Displays lyrics if the file contains any.")
             addOption("d", "device", true, "The device to use for MIDI playback.")
             addOption("e", "legacy-engine", false, "Use the legacy window engine.")
             addOption("f", "fullscreen", false, "Starts the application in fullscreen mode.")
@@ -116,6 +117,9 @@ fun main(args: Array<String>) {
         /* Samples */
         val samples = if (cmd.hasOption("samples")) cmd.getOptionValue("samples").toInt() else 4
 
+        /* Lyrics */
+        val lyrics = cmd.hasOption("lyrics")
+
         runBlocking {
             Execution.start(
                 PassedSettings(
@@ -126,7 +130,8 @@ fun main(args: Array<String>) {
                     File(midiFile),
                     midiDevice,
                     soundFont,
-                    samples
+                    samples,
+                    lyrics
                 ),
                 onStart = {},
                 onReady = {},

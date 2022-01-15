@@ -105,6 +105,7 @@ fun Launcher() {
 
     /* Settings */
     var showSettings by remember { mutableStateOf(false) }
+    var displayLyrics by remember { mutableStateOf(settings.displayLyrics) }
     val settingsDropdownRotation by animateFloatAsState(if (!showSettings) 0f else 180f)
     var isFullscreen by remember { mutableStateOf(settings.fullscreen) }
     var isLegacyDisplayEngine by remember { mutableStateOf(settings.isLegacyDisplay) }
@@ -137,7 +138,8 @@ fun Launcher() {
                     } else {
                         null
                     },
-                    settings.samples
+                    settings.samples,
+                    settings.displayLyrics,
                 ),
                 onStart = {
                     freeze = true
@@ -408,6 +410,39 @@ fun Launcher() {
                                         Switch(checked = isAutoAutoCam, onCheckedChange = {
                                             isAutoAutoCam = it
                                             settings.autoAutoCam = it
+                                            settings.save()
+                                        })
+                                    }
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp).width(settingsWidth)
+                                    ) {
+                                        TooltipArea(
+                                            tooltip = {
+                                                Surface(
+                                                    modifier = Modifier.shadow(4.dp),
+                                                    color = Color.DarkGray,
+                                                    shape = RoundedCornerShape(4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = i18n.getString("settings.lyrics_description"),
+                                                        modifier = Modifier.padding(10.dp)
+                                                    )
+                                                }
+                                            },
+                                            delayMillis = 250,
+                                            tooltipPlacement = TooltipPlacement.ComponentRect(
+                                                anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
+                                            )
+                                        ) {
+                                            Text(
+                                                text = i18n.getString("settings.lyrics")
+                                            )
+                                        }
+                                        Switch(checked = displayLyrics, onCheckedChange = {
+                                            displayLyrics = it
+                                            settings.displayLyrics = it
                                             settings.save()
                                         })
                                     }

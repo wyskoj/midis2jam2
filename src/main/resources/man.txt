@@ -16,6 +16,9 @@ OPTIONS
     -a, --autocam
         Starts the application with the autocam feature enabled.
 
+    -c, --lyrics
+        If the MIDI file has any lyrics, they will be displayed on-screen if this option is enabled.
+
     -d, --device <device_name>
         The device to use for MIDI playback. If this value is not specified, the default device will be used. To see the
          available devices, use the --list-devices option.
@@ -25,6 +28,10 @@ OPTIONS
 
     -f, --fullscreen
         Starts the application in fullscreen mode.
+
+    -g, --samples
+        Defines the number of samples to use for sub-pixel sampling. The default value is 4. Higher values will result
+        in a smoother rendering, but will also take longer to render. The minimum value is 1.
 
     -h, --help
         Prints this help message and exits.

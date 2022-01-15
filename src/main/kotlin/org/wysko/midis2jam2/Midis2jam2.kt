@@ -194,6 +194,8 @@ abstract class Midis2jam2(
             file.tracks.filterNotNull().flatMap { it.events }.filterIsInstance<MidiTextEvent>(),
             this
         )
+        lyricController.enabled = settings.displayLyrics
+
         autocamController = AutoCamController(this, settings.autoAutoCam)
 
         currentCamera = Camera.CAMERA_1A
@@ -475,9 +477,6 @@ abstract class Midis2jam2(
                 }
                 "debug" -> {
                     debugTextController.toggle()
-                }
-                "lyrics" -> {
-                    lyricController.toggle()
                 }
             }
         }

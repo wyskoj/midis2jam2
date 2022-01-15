@@ -40,10 +40,6 @@
 		"key": "KEY_ESCAPE"
 	},
 	{
-		"name": "lyrics",
-		"key": "KEY_L"
-	},
-	{
 		"name": "debug",
 		"key": "KEY_F3"
 	}
