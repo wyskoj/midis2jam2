@@ -87,10 +87,15 @@ abstract class Midis2jam2(
         this.app.renderer.defaultAnisotropicFilter = 4
 
         /*** CONFIGURE CAMERA ***/
-        this.app.flyByCamera.moveSpeed = 100f
-        this.app.flyByCamera.zoomSpeed = -10f
-        this.app.flyByCamera.isEnabled = true
-        this.app.flyByCamera.isDragToRotate = true
+        this.app.flyByCamera.unregisterInput()
+        this.flyByCamera = FlyByCameraListenable(this.app.camera) {
+            autocamController.enabled = false
+        }
+        this.flyByCamera.registerWithInput(this.app.inputManager)
+        this.flyByCamera.moveSpeed = 100f
+        this.flyByCamera.zoomSpeed = -10f
+        this.flyByCamera.isEnabled = true
+        this.flyByCamera.isDragToRotate = true
         this.app.camera.fov = 50f
 
         /*** LOAD STAGE ***/
@@ -204,6 +209,8 @@ abstract class Midis2jam2(
 
         super.initialize(stateManager, app)
     }
+
+    lateinit var flyByCamera: FlyByCameraListenable
 
     /** The JME3 application that created this. */
     lateinit var app: SimpleApplication
