@@ -18,7 +18,6 @@
 package org.wysko.midis2jam2.midi;
 
 import org.jetbrains.annotations.NotNull;
-import org.wysko.midis2jam2.Midis2jam2;
 
 import javax.sound.midi.*;
 import java.io.File;
@@ -27,16 +26,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A special type of music file {@link Midis2jam2 new name}.
+ * A special type of music file.
  */
 public final class MidiFile {
-	
-	public static final MidiFile EMPTY;
-	
-	static {
-		EMPTY = new MidiFile();
-		EMPTY.setTracks(new MidiTrack[0]);
-	}
 	
 	/**
 	 * The tracks of this MIDI file.
