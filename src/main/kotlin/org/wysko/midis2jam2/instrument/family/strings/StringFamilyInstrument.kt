@@ -26,7 +26,6 @@ import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.pow
