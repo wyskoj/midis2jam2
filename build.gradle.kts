@@ -148,7 +148,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
         } else {
             "current"
         }
-    }.jar")
+    }-${project.properties["midis2jam2Version"]}.jar")
 }
 
 // Configure dependency licenses
