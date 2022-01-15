@@ -54,6 +54,7 @@ import javafx.embed.swing.JFXPanel
 import javafx.stage.FileChooser
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.util.PassedSettings
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.isInt
 import java.awt.Cursor
 import java.io.File
@@ -491,6 +492,12 @@ fun Launcher() {
                                 text = i18n.getString("about.copyright"),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp),
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = Utils.resourceToString("/version.txt"),
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
                             Text(
