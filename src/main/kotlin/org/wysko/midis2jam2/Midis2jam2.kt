@@ -296,9 +296,9 @@ abstract class Midis2jam2(
 
     /** Sets the speed of the camera, given a speed [name] and whether that key is [pressed]. */
     private fun setCameraSpeed(name: String, pressed: Boolean) = if (!pressed) {
-        app.flyByCamera.moveSpeed = 100f
+        flyByCamera.moveSpeed = 100f
     } else {
-        app.flyByCamera.moveSpeed = when (name) {
+        flyByCamera.moveSpeed = when (name) {
             "slow" -> 10f
             "fast" -> 200f
             else -> 100f
