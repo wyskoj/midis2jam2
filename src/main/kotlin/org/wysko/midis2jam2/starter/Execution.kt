@@ -60,6 +60,7 @@ object Execution {
         onReady: () -> Unit,
         onFinish: () -> Unit,
     ): Job {
+        System.gc()
         return CoroutineScope(Default).launch {
 
             onStart() // Disable launcher
