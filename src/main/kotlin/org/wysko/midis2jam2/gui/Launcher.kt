@@ -49,9 +49,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import javafx.application.Platform
-import javafx.embed.swing.JFXPanel
-import javafx.stage.FileChooser
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
@@ -85,7 +82,9 @@ fun Launcher() {
 
     /* Configuration */
     val midiDevices = MidiSystem.getMidiDeviceInfo().map { it.name }.toList().filter { it != "Real Time Sequencer" }
-    var selectedMidiDevice by remember { mutableStateOf(0) }
+    var selectedMidiDevice by remember {
+        mutableStateOf(midiDevices.indexOf(settings.midiDevice).let { if (it == -1) 0 else it })
+    }
     var selectedSoundFont by remember { mutableStateOf(0) }
     var midiFileText by remember { mutableStateOf("") }
     var selectedMidiFile by remember { mutableStateOf("") }
