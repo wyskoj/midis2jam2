@@ -31,13 +31,13 @@ You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/
 
 == ⌨️️ Controls
 
-* WASDQZ &mdash; Forwards / Left / Backwards / Right / Up / Down
-** Shift &mdash; Move fast
-** Ctrl &mdash; Move slow
-* 1&ndash;6 &mdash; Cameras 1&ndash;6 / Exit autocam
-* 0 &mdash; Autocam
-* L &mdash; Toggle lyric display
-* Esc &mdash; Exit
+* *WASDQZ* &mdash; Forwards / Left / Backwards / Right / Up / Down
+* *Click and drag* to rotate the camera
+** *Shift* &mdash; Move fast
+** *Ctrl* &mdash; Move slow
+* *1&ndash;6* &mdash; Cameras 1&ndash;6 / Exit autocam
+* *0* &mdash; Autocam
+* *Esc* &mdash; Exit
 
 == ✴️ Acknowledgements
 
