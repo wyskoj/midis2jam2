@@ -179,7 +179,9 @@ private open class StandardExecution(
     override fun stop() {
         stop(false)
         onFinish()
-        frame.isVisible = false
+        if (::frame.isInitialized) {
+            frame.isVisible = false
+        }
     }
 
     override fun simpleInitApp() {
