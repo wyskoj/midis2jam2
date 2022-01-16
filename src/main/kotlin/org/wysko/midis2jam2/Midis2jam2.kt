@@ -156,7 +156,7 @@ abstract class Midis2jam2(
                             if (event !is MidiNoteOffEvent) {
                                 for (i in programEvents.indices) {
                                     if (i == programEvents.size - 1
-                                        || event.time in programEvents[i].time..programEvents[i + 1].time
+                                        || event.time in programEvents[i].time until programEvents[i + 1].time
                                     ) {
                                         lastProgramPerNote[programEvents[i].programNum]?.add(event)
                                         if (event is MidiNoteOnEvent) {
