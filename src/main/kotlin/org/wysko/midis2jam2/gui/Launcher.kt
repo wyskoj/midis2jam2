@@ -225,6 +225,7 @@ fun Launcher() {
                                                     override fun accept(file: File?): Boolean {
                                                         return file?.extension?.lowercase(Locale.getDefault()) == "mid" ||
                                                                 file?.extension?.lowercase(Locale.getDefault()) == "kar"
+                                                                || file?.isDirectory == true
                                                     }
 
                                                     override fun getDescription(): String =
@@ -236,7 +237,6 @@ fun Launcher() {
                                                 isMultiSelectionEnabled = false
                                                 actionMap.get("viewTypeDetails")
                                                     .actionPerformed(null); // Set default to details view
-                                                fileSelectionMode = JFileChooser.FILES_ONLY
 
                                                 if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                                                     selectedMidiFile = this.selectedFile.absolutePath
@@ -286,6 +286,7 @@ fun Launcher() {
                                                     override fun accept(file: File?): Boolean {
                                                         return file?.extension?.lowercase(Locale.getDefault()) == "sf2" ||
                                                                 file?.extension?.lowercase(Locale.getDefault()) == "dls"
+                                                                || file?.isDirectory == true
                                                     }
 
                                                     override fun getDescription(): String =
@@ -298,7 +299,6 @@ fun Launcher() {
                                                 isMultiSelectionEnabled = false
                                                 actionMap.get("viewTypeDetails")
                                                     .actionPerformed(null); // Set default to details view
-                                                fileSelectionMode = JFileChooser.FILES_ONLY
 
                                                 if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                                                     settings.soundFontPaths.add(this.selectedFile.absolutePath)
