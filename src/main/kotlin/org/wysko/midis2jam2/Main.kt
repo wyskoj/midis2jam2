@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.window.*
+import com.formdev.flatlaf.FlatDarkLaf
 import com.install4j.api.launcher.SplashScreen
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.DefaultParser
@@ -36,6 +37,8 @@ import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import java.io.File
 import javax.sound.midi.MidiSystem
+import javax.swing.LookAndFeel
+import javax.swing.UIManager
 
 /**
  * Where it all begins.
@@ -140,6 +143,7 @@ fun main(args: Array<String>) {
         }
     } else {
         SplashScreen.writeMessage("Loading...")
+        FlatDarkLaf.setup()
         application {
             Window(
                 onCloseRequest = ::exitApplication, title = "midis2jam2 launcher", state = rememberWindowState(

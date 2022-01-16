@@ -57,10 +57,12 @@ import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.isInt
 import java.awt.Cursor
+import java.awt.Dimension
 import java.io.File
 import java.text.MessageFormat
 import java.util.*
 import javax.sound.midi.MidiSystem
+import javax.swing.JFileChooser
 
 /**
  * Locales for the GUI.
@@ -210,32 +212,40 @@ fun Launcher() {
                                         Icons.Filled.Search,
                                         contentDescription = i18n.getString("configuration.search_for_midi_file"),
                                         modifier = Modifier.clickable {
-                                            FileChooser().run {
-                                                initialDirectory = File(settings.lastMidiDir)
+                                            var initialDirectory = File(settings.lastMidiDir)
 
-                                                /* If the directory is bad, just revert to the home directory */
-                                                if (!initialDirectory.exists()) {
-                                                    initialDirectory = File(System.getProperty("user.home"))
-                                                    settings.lastMidiDir = initialDirectory.absolutePath
+                                            /* If the directory is bad, just revert to the home directory */
+                                            if (!initialDirectory.exists()) {
+                                                initialDirectory = File(System.getProperty("user.home"))
+                                                settings.lastMidiDir = initialDirectory.absolutePath
+                                                settings.save()
+                                            }
+                                            JFileChooser(initialDirectory).run {
+                                                addChoosableFileFilter(object :
+                                                    javax.swing.filechooser.FileFilter() {
+                                                    override fun accept(file: File?): Boolean {
+                                                        return file?.extension?.lowercase(Locale.getDefault()) == "mid" ||
+                                                                file?.extension?.lowercase(Locale.getDefault()) == "kar"
+                                                    }
+
+                                                    override fun getDescription(): String =
+                                                        "MIDI files (*.mid, *.kar)"
+                                                })
+
+                                                preferredSize = Dimension(800, 600)
+                                                dialogTitle = "Select MIDI file"
+                                                isMultiSelectionEnabled = false
+                                                actionMap.get("viewTypeDetails")
+                                                    .actionPerformed(null); // Set default to details view
+                                                fileSelectionMode = JFileChooser.FILES_ONLY
+
+                                                if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                                                    selectedMidiFile = this.selectedFile.absolutePath
+                                                    midiFileText = this.selectedFile.name
+                                                    settings.lastMidiDir = this.selectedFile.parent
                                                     settings.save()
                                                 }
 
-                                                extensionFilters.add(
-                                                    FileChooser.ExtensionFilter(
-                                                        "MIDI files (*.mid, *.kar)", "*.mid", "*.kar"
-                                                    )
-                                                )
-                                                JFXPanel() // This is required to initialize the JavaFX file chooser
-                                                Platform.runLater {
-                                                    showOpenDialog(null).run {
-                                                        if (this != null) {
-                                                            selectedMidiFile = absolutePath
-                                                            midiFileText = name
-                                                            settings.lastMidiDir = this.parent
-                                                            settings.save()
-                                                        }
-                                                    }
-                                                }
                                             }
                                         }.pointerHoverIcon(PointerIconDefaults.Hand, true)
                                     )
@@ -260,8 +270,7 @@ fun Launcher() {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier.width(width).fillMaxHeight()
-                                        .padding(0.dp, 0.dp, 0.dp, 16.dp)
+                                    modifier = Modifier.width(width).fillMaxHeight().padding(0.dp, 0.dp, 0.dp, 16.dp)
                                 ) {
                                     SimpleExposedDropDownMenu(
                                         values = soundFonts,
@@ -272,25 +281,30 @@ fun Launcher() {
                                     )
                                     Button(
                                         onClick = {
-                                            FileChooser().run {
-                                                extensionFilters.add(
-                                                    FileChooser.ExtensionFilter(
-                                                        "SoundFont files (*.sf2, *.dls)", "*.sf2", "*.dls"
-                                                    )
-                                                )
-                                                JFXPanel() // This is required to initialize the JavaFX file chooser
-                                                Platform.runLater {
-                                                    showOpenDialog(null).run {
-                                                        if (this != null && !settings.soundFontPaths.contains(this.absolutePath)) {
-                                                            settings.soundFontPaths.add(this.absolutePath)
-                                                            soundFonts = settings.soundFontNames()
-                                                            selectedSoundFont =
-                                                                soundFonts.indexOf(this.name)
-                                                            settings.save()
-
-                                                        }
+                                            JFileChooser().run {
+                                                addChoosableFileFilter(object :
+                                                    javax.swing.filechooser.FileFilter() {
+                                                    override fun accept(file: File?): Boolean {
+                                                        return file?.extension?.lowercase(Locale.getDefault()) == "sf2" ||
+                                                                file?.extension?.lowercase(Locale.getDefault()) == "dls"
                                                     }
 
+                                                    override fun getDescription(): String =
+                                                        "Soundbank files (*.sf2, *.dls)"
+                                                })
+
+                                                preferredSize = Dimension(800, 600)
+                                                dialogTitle = "Select soundbank file"
+                                                isMultiSelectionEnabled = false
+                                                actionMap.get("viewTypeDetails")
+                                                    .actionPerformed(null); // Set default to details view
+                                                fileSelectionMode = JFileChooser.FILES_ONLY
+
+                                                if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                                                    settings.soundFontPaths.add(this.selectedFile.absolutePath)
+                                                    soundFonts = settings.soundFontNames()
+                                                    selectedSoundFont = soundFonts.indexOf(this.selectedFile.name)
+                                                    settings.save()
                                                 }
                                             }
                                         }, modifier = Modifier.height(56.dp).width(56.dp)
@@ -333,9 +347,7 @@ fun Launcher() {
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
-                                            },
-                                            delayMillis = 250,
-                                            tooltipPlacement = TooltipPlacement.ComponentRect(
+                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
                                                 anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
                                             )
                                         ) {
@@ -364,9 +376,7 @@ fun Launcher() {
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
-                                            },
-                                            delayMillis = 250,
-                                            tooltipPlacement = TooltipPlacement.ComponentRect(
+                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
                                                 anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
                                             )
                                         ) {
@@ -397,9 +407,7 @@ fun Launcher() {
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
-                                            },
-                                            delayMillis = 250,
-                                            tooltipPlacement = TooltipPlacement.ComponentRect(
+                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
                                                 anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
                                             )
                                         ) {
@@ -430,9 +438,7 @@ fun Launcher() {
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
-                                            },
-                                            delayMillis = 250,
-                                            tooltipPlacement = TooltipPlacement.ComponentRect(
+                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
                                                 anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
                                             )
                                         ) {
@@ -463,9 +469,7 @@ fun Launcher() {
                                                         modifier = Modifier.padding(10.dp)
                                                     )
                                                 }
-                                            },
-                                            delayMillis = 250,
-                                            tooltipPlacement = TooltipPlacement.ComponentRect(
+                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
                                                 anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
                                             )
                                         ) {
@@ -478,12 +482,11 @@ fun Launcher() {
                                             onValueChange = {
                                                 if (it.isInt() || it.isEmpty()) {
                                                     audioDelay = it
-                                                    settings.deviceLatencyMap[midiDevices[selectedMidiDevice]] =
-                                                        try {
-                                                            it.toInt()
-                                                        } catch (_: Exception) {
-                                                            0
-                                                        }
+                                                    settings.deviceLatencyMap[midiDevices[selectedMidiDevice]] = try {
+                                                        it.toInt()
+                                                    } catch (_: Exception) {
+                                                        0
+                                                    }
                                                     settings.save()
                                                 }
                                             },
@@ -535,19 +538,17 @@ fun Launcher() {
                                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
-                            Text(
-                                text = locale.uppercase(Locale.getDefault()),
+                            Text(text = locale.uppercase(Locale.getDefault()),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
                                     supportedLocales.let {
-                                        locale = it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it
-                                            .size].language
+                                        locale =
+                                            it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it.size].language
                                     }
                                     i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
                                     settings.locale = locale
                                     settings.save()
-                                }
-                            )
+                                })
                             Text(
                                 text = i18n.getString("about.warranty"),
                                 style = MaterialTheme.typography.body2,
@@ -555,8 +556,7 @@ fun Launcher() {
                             )
                             TextWithLink(
                                 MessageFormat.format(
-                                    i18n.getString("about.license"),
-                                    i18n.getString("about.license_name")
+                                    i18n.getString("about.license"), i18n.getString("about.license_name")
                                 ),
                                 i18n.getString("about.license_name"),
                                 "https://www.gnu.org/licenses/gpl-3.0.en.html",
@@ -590,8 +590,7 @@ fun Launcher() {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = i18n.getString("about.oss_licenses"),
-                                    style = MaterialTheme.typography.body2
+                                    text = i18n.getString("about.oss_licenses"), style = MaterialTheme.typography.body2
                                 )
                                 Icon(
                                     imageVector = Icons.Filled.ArrowDropDown,
@@ -638,9 +637,8 @@ fun Launcher() {
 }
 
 /** Returns the list of SoundFonts as just their file names. */
-private fun LauncherSettings.soundFontNames(): List<String> =
-    if (soundFontPaths.isNotEmpty()) {
-        soundFontPaths.map { File(it).name }.toList()
-    } else {
-        mutableListOf("Default SoundFont")
-    }
+private fun LauncherSettings.soundFontNames(): List<String> = if (soundFontPaths.isNotEmpty()) {
+    soundFontPaths.map { File(it).name }.toList()
+} else {
+    mutableListOf("Default SoundFont")
+}
