@@ -220,7 +220,7 @@ fun Launcher() {
                                                 settings.save()
                                             }
                                             JFileChooser(initialDirectory).run {
-                                                addChoosableFileFilter(object :
+                                                fileFilter = object :
                                                     javax.swing.filechooser.FileFilter() {
                                                     override fun accept(file: File?): Boolean {
                                                         return file?.extension?.lowercase(Locale.getDefault()) == "mid" ||
@@ -229,7 +229,7 @@ fun Launcher() {
 
                                                     override fun getDescription(): String =
                                                         "MIDI files (*.mid, *.kar)"
-                                                })
+                                                }
 
                                                 preferredSize = Dimension(800, 600)
                                                 dialogTitle = "Select MIDI file"
@@ -281,7 +281,7 @@ fun Launcher() {
                                     Button(
                                         onClick = {
                                             JFileChooser().run {
-                                                addChoosableFileFilter(object :
+                                                fileFilter = (object :
                                                     javax.swing.filechooser.FileFilter() {
                                                     override fun accept(file: File?): Boolean {
                                                         return file?.extension?.lowercase(Locale.getDefault()) == "sf2" ||
@@ -291,6 +291,7 @@ fun Launcher() {
                                                     override fun getDescription(): String =
                                                         "Soundbank files (*.sf2, *.dls)"
                                                 })
+
 
                                                 preferredSize = Dimension(800, 600)
                                                 dialogTitle = "Select soundbank file"
