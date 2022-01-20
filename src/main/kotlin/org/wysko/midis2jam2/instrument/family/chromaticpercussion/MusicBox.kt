@@ -68,7 +68,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        rotateCylinder(delta)
+        rotateCylinder(time, delta)
 
         val hitsItr = hits.iterator()
 
@@ -126,11 +126,11 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
      *
      * @param delta the amount of time since the last frame
      */
-    private fun rotateCylinder(delta: Float) {
-        val tick = 500_000
+    private fun rotateCylinder(time: Double, delta: Float) {
+        val tempo = context.file.tempoAt(time)
 
         /* Calculate rotation angle */
-        val xAngle = (0.5 * Math.PI * delta * (6E7 / tick) / 60.0).toFloat()
+        val xAngle = (0.5 * Math.PI * delta * (6E7 / tempo) / 60.0).toFloat()
 
         /* Rotate each point */
         points.forEach {
