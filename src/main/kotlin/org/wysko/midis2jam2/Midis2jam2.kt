@@ -56,6 +56,7 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
+import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter
 import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
@@ -460,6 +461,7 @@ abstract class Midis2jam2(
             118 -> SynthDrum(this, events)
             119 -> ReverseCymbal(this, events)
             121 -> StageChoir(this, events, StageChoir.ChoirType.SYNTH_VOICE)
+            123 -> BirdTweet(this, events)
             124 -> TelephoneRing(this, events)
             125 -> Helicopter(this, events)
             126 -> StageChoir(this, events, StageChoir.ChoirType.SYNTH_VOICE)
