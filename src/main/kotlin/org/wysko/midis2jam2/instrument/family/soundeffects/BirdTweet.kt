@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
+import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
@@ -25,6 +26,7 @@ import org.wysko.midis2jam2.instrument.family.brass.BouncyTwelfth
 import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.sin
 
@@ -55,23 +57,28 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     inner class Bird() : BouncyTwelfth() {
 
         /** The open beak. */
-        private val openBeak = context.loadModel("BirdBeak_Open.fbx", "HornSkin.bmp").also {
+        private val openBeak = context.loadModel("BirdBeak_Open.fbx", "Bird.png").also {
             animNode.attachChild(it)
         }
 
         /** The closed beak. */
-        private val closedBeak = context.loadModel("BirdBeak_Closed.fbx", "HornSkin.bmp").also {
+        private val closedBeak = context.loadModel("BirdBeak_Closed.fbx", "Bird.png").also {
             animNode.attachChild(it)
         }
 
         /** The wings. */
-        private val wings = context.loadModel("BirdWings.fbx", "HornSkinGrey.bmp").also {
+        private val wings = context.loadModel("BirdWings.fbx", "Bird.png").also {
             animNode.attachChild(it)
         }
 
         init {
-            animNode.attachChild(context.loadModel("Bird.fbx", "HornSkin.bmp"))
+            animNode.attachChild(context.loadModel("Bird.fbx", "Bird.png").apply {
+                this as Node
+                getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
+            })
         }
+
+        var animationIndex = 0.0f
 
         override fun tick(delta: Float) {
             super.tick(delta)
@@ -80,8 +87,12 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             closedBeak.cullHint = (!playing).cullHint()
 
             if (playing) {
-                wings.localRotation = Quaternion().fromAngles(sin(progress * 250).toFloat() * 0.33f, 0f, 0f)
+                animationIndex += 0.3f
+            } else {
+                animationIndex = 0f
             }
+
+            wings.localRotation = Quaternion().fromAngles(sin(animationIndex) * 0.5f, 0f, 0f)
         }
     }
 
@@ -89,7 +100,7 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         Array(12) {
             Node().apply {
                 attachChild(twelfths[it].highestLevel)
-                localRotation = Quaternion().fromAngles(0f, Utils.rad(-55 + it * -3f), 0f)
+                localRotation = Quaternion().fromAngles(0f, Utils.rad(-55 + it * -2.5f), 0f)
                 instrumentNode.attachChild(this)
             }
         }
