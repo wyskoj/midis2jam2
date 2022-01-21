@@ -74,7 +74,7 @@ class HudController(val context: Midis2jam2) {
      */
     fun tick(timeSinceStart: Double, fadeValue: Float) {
         fillbar.localScale = Vector3f(
-            (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / context.file.length)).toFloat(),
+            (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / context.file.length).coerceAtMost(1.0)).toFloat(),
             VERTICAL_FILLBAR_SCALE,
             1f
         )
