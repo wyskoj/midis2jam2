@@ -151,6 +151,7 @@ class DesktopMidis2jam2(
         standController.tick()
         lyricController.tick(timeSinceStart)
         autocamController.tick(timeSinceStart, tpf)
+        hudController.tick(timeSinceStart, fade.value)
         preventCameraFromLeaving(app.camera)
 
         /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */

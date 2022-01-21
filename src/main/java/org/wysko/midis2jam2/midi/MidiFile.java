@@ -53,6 +53,8 @@ public final class MidiFile {
 	
 	public double length;
 	
+	public String name;
+	
 	/**
 	 * Reads a MIDI file and parses pertinent information.
 	 *
@@ -134,6 +136,7 @@ public final class MidiFile {
 			}
 		}
 		file.length = file.eventInSeconds(max);
+		file.name = midiFile.getName();
 		return file;
 	}
 	
