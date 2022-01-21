@@ -207,6 +207,7 @@ abstract class Midis2jam2(
         currentCamera = Camera.CAMERA_1A
 
         debugTextController = DebugTextController(this)
+        hudController = HudController(this)
 
         super.initialize(stateManager, app)
     }
@@ -283,6 +284,9 @@ abstract class Midis2jam2(
 
     /** The autocam controller. */
     lateinit var autocamController: AutoCamController
+
+    /** The HUD controller. */
+    lateinit var hudController: HudController
 
     /**
      * When the MIDI sequence ends, the [timeSinceStart] is recorded to this variable to know when to close the

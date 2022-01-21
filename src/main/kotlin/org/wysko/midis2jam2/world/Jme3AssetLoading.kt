@@ -24,6 +24,7 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.util.MaterialType
 import org.wysko.midis2jam2.util.MaterialType.UNSHADED
 
+
 /** The constant LIGHTING_MAT. */
 const val LIGHTING_MAT: String = "Common/MatDefs/Light/Lighting.j3md"
 
@@ -65,6 +66,9 @@ fun AssetManager.reflectiveMaterial(reflectiveTextureFile: String?, brightness: 
 fun AssetManager.unshadedMaterial(texture: String): Material = Material(this, UNSHADED_MAT).apply {
     setTexture(COLOR_MAP, this@unshadedMaterial.loadTexture(texture.assetPrefix()))
 }
+
+fun AssetManager.loadSprite(texture: String): Sprite = Sprite(this, texture.assetPrefix())
+
 
 /** Prepends a string with "Assets/" if it isn't already. */
 fun String.assetPrefix(): String = if (this.startsWith("Assets/")) this else "Assets/$this"

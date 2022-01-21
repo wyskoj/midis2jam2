@@ -53,6 +53,8 @@ public final class MidiFile {
 	
 	public double length;
 	
+	public String name;
+	
 	/**
 	 * Reads a MIDI file and parses pertinent information.
 	 *
@@ -134,6 +136,7 @@ public final class MidiFile {
 			}
 		}
 		file.length = file.eventInSeconds(max);
+		file.name = midiFile.getName();
 		return file;
 	}
 	
@@ -314,6 +317,24 @@ public final class MidiFile {
 			}
 		}
 		return lastTempo;
+	}
+	
+	/**
+	 * Given a time, determines the current tempo at the time.
+	 *
+	 * @param time the time
+	 * @return the tempo, expressed in MIDI format
+	 */
+	public int tempoAt(double time) {
+		if (getTempos().size() == 1) {
+			return tempos.get(0).getNumber();
+		}
+		for (int i = 1; i < getTempos().size(); i++) {
+			if (eventToTime.get(tempos.get(i)) > time) {
+				return tempos.get(i - 1).getNumber();
+			}
+		}
+		return 0;
 	}
 	
 	@Override
