@@ -83,7 +83,7 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
 
             /* fps and time */
             append("${String.format("%.0f", 1 / tpf)} fps\n")
-            append("${String.format("%.2f", time)}s\n")
+            append("${String.format("%.2f", time)}s / ${String.format("%.2f", this@debugText.file.length)}s\n")
 
             /* instruments strings */
             append("${this@debugText.instruments.joinToString("")}\n")
