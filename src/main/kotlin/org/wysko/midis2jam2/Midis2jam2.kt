@@ -100,7 +100,9 @@ abstract class Midis2jam2(
         this.app.camera.fov = 50f
 
         /*** LOAD STAGE ***/
-        rootNode.attachChild(loadModel("Stage.obj", "Stage.bmp"))
+        stage = loadModel("Stage.obj", "Stage.bmp").also {
+            rootNode.attachChild(it)
+        }
 
         /*** LOAD SKYBOX ***/
         with(assetManager.loadTexture("Assets/sky.png")) {
@@ -224,6 +226,9 @@ abstract class Midis2jam2(
 
     /** The root node of the scene. */
     val rootNode: Node = Node("root")
+
+    /** The stage of the scene. */
+    lateinit var stage: Spatial
 
     /** The amount of time that has passed since the start of the song (or the time until the start). */
     var timeSinceStart: Double = -2.0

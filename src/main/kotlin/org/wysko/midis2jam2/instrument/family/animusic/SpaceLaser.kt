@@ -16,24 +16,30 @@
  */
 package org.wysko.midis2jam2.instrument.family.animusic
 
+import com.jme3.collision.CollisionResults
+import com.jme3.material.Material
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
+import com.jme3.math.Ray
+import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import com.jme3.scene.debug.Arrow
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.Companion.SIGMOID_CALCULATOR
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiControlEvent
-import org.wysko.midis2jam2.midi.MidiPitchBendEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis
 import kotlin.math.exp
 import kotlin.math.sin
+
+private const val LASER_HEIGHT = 727.289f
 
 /**
  * The space laser, as made famous by Stick Figures from Animusic.
@@ -141,6 +147,24 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
                 rad(rotation + sin(50 * wobbleTime) * wobbleIntensity)
             )
             laserBeam.cullHint = isPlaying.cullHint()
+
+            /* Check collision with stage */
+            CollisionResults().apply {
+                context.stage.collideWith(
+                    Ray(
+                        laserBeam.worldTranslation,
+                        laserBeam.worldRotation.getRotationColumn(1)
+                    ), this
+                )
+            }.also {
+                if (it.size() > 0) {
+                    it.closestCollision.run {
+                        laserBeam.localScale = Vector3f(1f, 1f, distance / LASER_HEIGHT)
+                    }
+                } else {
+                    laserBeam.localScale = Vector3f.UNIT_XYZ
+                }
+            }
         }
 
         override fun moveForPolyphony() {
