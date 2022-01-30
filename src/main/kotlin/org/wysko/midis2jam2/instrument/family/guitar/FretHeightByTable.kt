@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.util.Utils.resourceToString
 
 /** Calculates fret heights using a lookup table. */
 class FretHeightByTable private constructor(
-    private val instrument: Instrument
+    private val instrument: Instrument,
 ) : FretHeightCalculator {
 
     @Contract(pure = true)
@@ -37,15 +37,13 @@ class FretHeightByTable private constructor(
          * Retrieves the fret height table by the name of the instrument.
          */
         fun fromJson(name: String): FretHeightByTable =
-            FretHeightByTable(
-                Json.decodeFromString<List<Instrument>>(resourceToString("/fret-heights.json"))
-                    .first { it.name == name })
+            FretHeightByTable(Json.decodeFromString(resourceToString("/instrument/$name.json")))
     }
 }
 
 /* For parsing JSON file */
 @Serializable
-private data class Instrument(val name: String, val frets: List<Fret>)
+private data class Instrument(val frets: List<Fret>)
 
 @Serializable
 private data class Fret(val fret: Int, val scale: Double)
