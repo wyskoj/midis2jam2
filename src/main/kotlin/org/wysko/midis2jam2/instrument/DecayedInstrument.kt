@@ -67,11 +67,11 @@ abstract class DecayedInstrument protected constructor(context: Midis2jam2, even
             /* If within a 7-second gap between the last hit and the next? Visible. */
             if (lastHit != null
                 && hitsV.isNotEmpty()
-                && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit) <= 7
+                && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit!!) <= 7
             ) return true
 
             /* If after 2 seconds of the last hit? Visible. */
-            if (lastHit != null && time - context.file.eventInSeconds(lastHit) <= 2) return true
+            if (lastHit != null && time - context.file.eventInSeconds(lastHit!!) <= 2) return true
 
             /* Invisible. */
             return false

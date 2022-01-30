@@ -86,7 +86,7 @@ class DesktopMidis2jam2(
         Timer(true).scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 if (timeSinceStart + settings.latencyFix / 1000.0 >= 0 && !sequencerStarted && sequencer.isOpen) {
-                    sequencer.tempoInBPM = file.firstTempoInBpm().toFloat()
+                    sequencer.tempoInBPM = file.tempos[0].bpm().toFloat()
                     sequencer.start()
                     sequencerStarted = true
                     Timer(true).scheduleAtFixedRate(object : TimerTask() {

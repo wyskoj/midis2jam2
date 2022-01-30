@@ -141,7 +141,7 @@ class LyricController(
         if (currentGroup.isNotEmpty()) {
             /* If it is time to display the next word */
             while (currentWordIndex < lineWordCount - 1 && context.file.eventInSeconds(
-                    currentGroup[currentWordIndex + 1].time
+                    currentGroup[currentWordIndex + 1]
                 ) - time < 0.0
             ) {
                 /* Increment the word index */

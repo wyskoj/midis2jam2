@@ -99,8 +99,8 @@ open class NotePeriod(
                         notePeriods.add(
                             NotePeriod(
                                 noteOff.note,
-                                instrument.context.file.eventInSeconds(it.time),
-                                instrument.context.file.eventInSeconds(noteOff.time),
+                                instrument.context.file.eventInSeconds(it),
+                                instrument.context.file.eventInSeconds(noteOff),
                                 it,
                                 noteOff
                             )

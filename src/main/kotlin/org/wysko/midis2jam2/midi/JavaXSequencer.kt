@@ -30,7 +30,7 @@ class JavaXSequencer(
     override fun isOpen(): Boolean = sequencer.isOpen
 
     override fun start(midiFile: MidiFile) {
-        sequencer.tempoInBPM = midiFile.firstTempoInBpm().toFloat()
+        sequencer.tempoInBPM = midiFile.tempos[0].bpm().toFloat()
         sequencer.start()
         Timer(true).scheduleAtFixedRate(object : TimerTask() {
             override fun run() {

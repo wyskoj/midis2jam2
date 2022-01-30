@@ -37,11 +37,11 @@ open class NonDrumSetPercussion protected constructor(
             /* If within a 4-second gap between the last hit and the next? Visible. */
             if (lastHit != null
                 && hitsV.isNotEmpty()
-                && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit) <= 4
+                && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit!!) <= 4
             ) return true
 
             /* If after 0.5 seconds of the last hit? Visible. */
-            if (lastHit != null && time - context.file.eventInSeconds(lastHit) <= 0.5) return true
+            if (lastHit != null && time - context.file.eventInSeconds(lastHit!!) <= 0.5) return true
 
             /* Invisible. */
             return false

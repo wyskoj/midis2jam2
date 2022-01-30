@@ -83,7 +83,7 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
 
         /* Find the time of the next note end. If there is none, assume it will happen infinitely in the future. */
         val nextHitTime = pseudoHits.firstOrNull()?.let {
-            context.file.eventInSeconds(it.time)
+            context.file.eventInSeconds(it)
         } ?: Double.MAX_VALUE
 
         /* Move the stick around the cymbal according to the note */

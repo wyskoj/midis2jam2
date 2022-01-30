@@ -77,7 +77,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             val (noteTime, _, noteValue, _) = hitsItr.next()
 
             /* If the note is within one quarter note */
-            if (context.file.eventInSeconds(noteTime - context.file.division) <= time) {
+            if (context.file.tickToSeconds(noteTime - context.file.division) <= time) {
 
                 /* Attempt to grab a point from the pool. If there is none, create a new one. */
                 val aPoint: Spatial = if (pool.size > 1) {
@@ -127,7 +127,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
      * @param delta the amount of time since the last frame
      */
     private fun rotateCylinder(time: Double, delta: Float) {
-        val tempo = context.file.tempoAt(time)
+        val tempo = context.file.tempoAt(time).number
 
         /* Calculate rotation angle */
         val xAngle = (0.5 * Math.PI * delta * (6E7 / tempo) / 60.0).toFloat()

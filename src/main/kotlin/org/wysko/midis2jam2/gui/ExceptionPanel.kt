@@ -14,19 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.midi
+
+package org.wysko.midis2jam2.gui
+
+import java.awt.BorderLayout
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextArea
 
 /**
- * Defines how fast the MIDI file should play.
- *
- * @param time   the time
- * @param number the tempo value, expressed in microseconds per pulse
+ * Formats an exception for display.
  */
-class MidiTempoEvent(time: Long, val number: Int) : MidiEvent(time) {
-
-    /** Returns this tempo's value as expressed in beats per minute. */
-    fun bpm(): Double = 60_000_000.0 / number
-
-    /** Returns this tempo's value as expressed in seconds per beat. */
-    fun spb(): Double = 60 / bpm()
+class ExceptionPanel(message: String, exception: Exception) : JPanel() {
+    init {
+        layout = BorderLayout()
+        add(JLabel(message), BorderLayout.NORTH)
+        add(JTextArea(exception.stackTraceToString()).apply {
+            isEditable = false
+        }, BorderLayout.CENTER)
+    }
 }
