@@ -125,14 +125,24 @@ class MidiFile(file: File) {
             .sortedBy { it.time }.asReversed().distinctBy { it.time }.asReversed()
 
     /** Maps MIDI events to their occurrence time in seconds. */
-    private val eventTime: Map<MidiEvent, Double> =
-        tracks.flatMap { it.events }.associateWith { tickToSeconds(it.time) }
+    private val eventTime: MutableMap<MidiEvent, Double> =
+        tracks.flatMap { it.events }.associateWith { tickToSeconds(it.time) } as MutableMap<MidiEvent, Double>
 
     /** The name of the MIDI file. */
     val name: String = file.name
 
     /** The length of the MIDI file, expressed in seconds. */
     val length: Double = eventTime.maxOf { it.value }
+
+    /**
+     * If you need to create "pseudo" events that are helpful for animation, register them so that they have a time
+     * associated with them.
+     */
+    fun registerEvents(events: Collection<MidiEvent>) {
+        for (event in events) {
+            eventTime[event] = tickToSeconds(event.time)
+        }
+    }
 
     /**
      * Given an [event], returns the time it occurs, in seconds.

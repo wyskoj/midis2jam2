@@ -64,7 +64,9 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     /** A list of fake "pseudo" hits that correlate to the end times. */
     private val pseudoHits: MutableList<MidiNoteOnEvent> = notePeriods.map {
         MidiNoteOnEvent(it.endTick(), it.noteOn.channel, it.midiNote, 127)
-    }.toMutableList()
+    }.toMutableList().also {
+        context.file.registerEvents(it)
+    }
 
     /** Holds the stick and is rotated to the correct position. */
     private val stickNode: Node = Node().also { instrumentNode.attachChild(it) }
