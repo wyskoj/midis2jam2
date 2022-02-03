@@ -168,7 +168,7 @@ class MidiFile(file: File) {
     /**
      * Returns the active tempo immediately before a given MIDI [tick].
      */
-    private fun tempoBefore(tick: Long): MidiTempoEvent = if (tempos.size == 1) {
+    private fun tempoBefore(tick: Long): MidiTempoEvent = if (tempos.size == 1 || tick == 0L) {
         tempos[0]
     } else {
         tempos.last() { it.time < tick }
