@@ -146,15 +146,13 @@ class MidiFile(file: File) {
         if (tempos.size == 1 || tick < 0) return tempos.first().spb() * tick.toBeats()
 
         /* Get all tempos that have started and finished before the current time. */
-        return tempos.filterIndexed { index, _ ->
-            index < tempos.size - 1 && tempos[index + 1].time < tick
-        }.foldIndexed(0.0) { idx, acc, event ->
-            acc + (event.spb() * (tempos[idx + 1].time - event.time).toBeats())
-        }.plus(
-            with(tempos.last { it.time <= tick }) {
-                (tick - time).toBeats() * spb()
-            }
-        )
+        return tempos.filter { it.time < tick }.foldIndexed(0.0) { index, acc, tempo ->
+            acc + (if (index + 1 in tempos.indices) {
+                tempos[index + 1].time.coerceAtMost(tick)
+            } else {
+                tick
+            } - tempo.time).toBeats() * tempo.spb()
+        }
     }
 
     /**
