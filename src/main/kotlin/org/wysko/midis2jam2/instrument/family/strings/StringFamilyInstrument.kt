@@ -26,8 +26,12 @@ import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.NotePeriodGroup
+import org.wysko.midis2jam2.midi.contiguousGroups
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.cullHint
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.pow
 
 /**
@@ -58,7 +62,7 @@ abstract class StringFamilyInstrument protected constructor(
     openStringMidiNotes: IntArray,
 
     /* The body of the instrument. */
-    body: Spatial
+    body: Spatial,
 ) : FrettedInstrument(
     context,
     StandardFrettingEngine(
@@ -148,54 +152,99 @@ abstract class StringFamilyInstrument protected constructor(
         bowNode.attachChild(this)
     }
 
+    /** The current intensity of the bow animation. A larger intensity means the bows will travel further. */
+    private var intensity = 3.0
+
+    private val groups: MutableList<NotePeriodGroup> = notePeriods.contiguousGroups() as MutableList<NotePeriodGroup>
+
+    private var currentGroup: NotePeriodGroup? = null
+
+    init {
+        body.setLocalTranslation(0f, 0f, -1.2f)
+    }
+
     /** True if the bow is going left, false if the bow is going right. */
     private var bowGoesLeft = false
 
     override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        animateBow(delta)
-    }
+        currentGroup?.let {
+            if (it.endTime() <= time) currentGroup = null
+        }
 
-    override fun handleStrings(time: Double, delta: Float): Boolean =
-        super.handleStrings(time, delta).also {
-            if (it) {
+        groups.takeWhile { it.startTime() <= time }.let {
+            if (it.isNotEmpty()) {
+                groups.removeAll(it)
+                currentGroup = it.last()
                 bowGoesLeft = !bowGoesLeft
             }
         }
+
+        super.tick(time, delta)
+        animateBow(time, delta)
+    }
 
     /**
      * Animates the movement of the bow.
      *
      * @param delta time since the last frame
      */
-    private fun animateBow(delta: Float) {
+    private fun animateBow(time: Double, delta: Float) {
+
         if (currentNotePeriods.isNotEmpty()) {
             bowNode.setLocalTranslation(0f, -4f, 0.5f)
+            val p = currentGroup ?: return
+            var progress = ((time - p.startTime()) / p.duration())
+            if (bowGoesLeft) progress = 1 - progress
+            progress = progress.smooth(when {
+                p.duration() < 0.5 -> 0
+                p.duration() < 1 -> 1
+                p.duration() < 2 -> 2
+                p.duration() < 3 -> 3
+                else -> 4
+            })
 
-            /* Move the bow */
-            bow.move(if (bowGoesLeft) -3 * delta else 3 * delta, 0f, 0f)
-
-            /* Prevent the bow from going too far, and reverse the direction */
-            when {
-                bow.localTranslation.x > 7 -> {
-                    bow.setLocalTranslation(7f, 0f, 0f)
-                    bowGoesLeft = true
-                }
-                bow.localTranslation.x < -7 -> {
-                    bow.setLocalTranslation(-7f, 0f, 0f)
-                    bowGoesLeft = false
-                }
+            val targetIntensity = when {
+                p.duration() < 0.2 -> 2
+                p.duration() < 0.5 -> 3
+                p.duration() < 0.75 -> 4
+                p.duration() < 1 -> 5
+                else -> 6
             }
+
+            intensity += (targetIntensity - intensity) * 0.1
+
+            bow.setLocalTranslation(((progress * intensity * 2) - intensity).toFloat(), 0f, 0f)
         } else {
-            with(bowNode.localTranslation) {
-                if (this.z < 1) {
-                    bowNode.localTranslation = this.setZ(this.z + 1 * delta)
+            if (notePeriods.isNotEmpty() && notePeriods.first().startTime - time < 1) {
+                with(bowNode.localTranslation) {
+                    if (this.z > 0.5) {
+                        bowNode.localTranslation = this.setZ((this.z - 2 * delta).coerceAtLeast(0.5f))
+                    }
+                }
+            } else {
+                with(bowNode.localTranslation) {
+                    if (this.z < 2) {
+                        bowNode.localTranslation = this.setZ((this.z + 2 * delta).coerceAtMost(2f))
+                    }
                 }
             }
         }
     }
 
-    init {
-        body.setLocalTranslation(0f, 0f, -1.2f)
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("intensity", intensity.toFloat()))
+            append(debugProperty("np", currentGroup?.let { "${it.startTime()}..${it.endTime()}" } ?: ""))
+        }
+    }
+}
+
+private fun Double.smooth(smoothness: Int): Double {
+    return when (smoothness) {
+        0 -> this // Linear
+        1 -> (this + (-(cos(PI * this) - 1) / 2)) / 2.0
+        2 -> -(cos(PI * this) - 1) / 2 // sine
+        3 -> if (this < 0.5) 2 * this.pow(2) else 1 - (-2 * this + 2).pow(2) / 2
+        else -> if (this < 0.5) 4 * this.pow(3) else 1 - (-2 * this + 2).pow(3) / 2
     }
 }

@@ -59,8 +59,7 @@ open class NotePeriod(
     }
 
     override fun toString(): String {
-        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, " +
-                "noteOff=$noteOff, animationStarted=$animationStarted)"
+        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, " + "noteOff=$noteOff, animationStarted=$animationStarted)"
     }
 
     companion object {
@@ -76,7 +75,7 @@ open class NotePeriod(
         @Contract(pure = true)
         fun calculateNotePeriods(
             instrument: Instrument,
-            noteEvents: MutableList<MidiNoteEvent>
+            noteEvents: MutableList<MidiNoteEvent>,
         ): MutableList<NotePeriod> {
             val notePeriods: ArrayList<NotePeriod> = ArrayList()
             val onEvents = arrayOfNulls<MidiNoteOnEvent>(MIDI_MAX_NOTE + 1)
@@ -96,15 +95,11 @@ open class NotePeriod(
                 } else {
                     val noteOff = noteEvent as MidiNoteOffEvent
                     onEvents[noteOff.note]?.let {
-                        notePeriods.add(
-                            NotePeriod(
-                                noteOff.note,
-                                instrument.context.file.eventInSeconds(it),
-                                instrument.context.file.eventInSeconds(noteOff),
-                                it,
-                                noteOff
-                            )
-                        )
+                        notePeriods.add(NotePeriod(noteOff.note,
+                            instrument.context.file.eventInSeconds(it),
+                            instrument.context.file.eventInSeconds(noteOff),
+                            it,
+                            noteOff))
                         onEvents[noteOff.note] = null
                     }
                 }
@@ -114,4 +109,62 @@ open class NotePeriod(
             return ArrayList(notePeriods.distinct())
         }
     }
+}
+
+/**
+ * It is useful for some instruments to identify groups of [NotePeriod]s that overlap. For example, if three notes with
+ * different note values played at the same time (their [MidiNoteOnEvent] and [MidiNoteOffEvent]s have the same tick
+ * values), this would constitute a group. However, notes with *any* amount of overlap constitute a group.
+ *
+ * This function assumes the input list is sorted by start time.
+ */
+fun List<NotePeriod>.contiguousGroups(): List<NotePeriodGroup> {
+    /* Easy gimmes */
+    if (this.isEmpty()) return emptyList()
+    if (this.size == 1) return listOf(NotePeriodGroup(listOf(first())))
+
+    val groups = mutableListOf<NotePeriodGroup>()
+    var currentGroup: MutableList<NotePeriod> = mutableListOf()
+    var furthestTime = 0L
+
+    fun NotePeriod.register(newGroup: Boolean = false) {
+        if (newGroup) {
+            groups.add(NotePeriodGroup(currentGroup))
+            currentGroup = mutableListOf(this)
+            furthestTime = this.noteOff.time
+        } else {
+            currentGroup.add(this)
+            furthestTime = this.noteOff.time.coerceAtLeast(furthestTime)
+        }
+
+    }
+
+    this.forEach { notePeriod ->
+        notePeriod.register(currentGroup.isNotEmpty() && notePeriod.noteOn.time >= furthestTime)
+    }
+
+    if (currentGroup.isNotEmpty()) {
+        groups.add(NotePeriodGroup(currentGroup))
+    }
+
+    return groups
+}
+
+/**
+ * A collection of [NotePeriod]s that have overlapping times.
+ */
+data class NotePeriodGroup(
+    /**
+     * The [NotePeriod]s that are in this group.
+     */
+    val notePeriods: List<NotePeriod>,
+) {
+    /** The time at which the first [NotePeriod] in this group begins. */
+    fun startTime(): Double = notePeriods.minOf { it.startTime }
+
+    /** The time at which the last [NotePeriod] in this group ends. */
+    fun endTime(): Double = notePeriods.maxOf { it.endTime }
+
+    /** The total amount of time this group elapses. */
+    fun duration(): Double = endTime() - startTime()
 }
