@@ -64,7 +64,7 @@ import javax.swing.JFileChooser
 /**
  * Locales for the GUI.
  */
-val supportedLocales: List<Locale> = listOf(Locale.ENGLISH, Locale.FRENCH, Locale.forLanguageTag("es"))
+val supportedLocales: List<Locale> = listOf(Locale.ENGLISH, Locale.FRENCH, Locale.forLanguageTag("es"), Locale.forLanguageTag("ru"))
 
 /**
  * Displays configuration options and settings for midis2jam2.
