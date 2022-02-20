@@ -16,8 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
+import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
@@ -29,7 +31,18 @@ protected constructor(
     cloneClass: Class<out SaxophoneClone>,
     fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
-    override fun moveForMultiChannel(delta: Float) {
+
+    private val pitchBendController = PitchBendModulationController(context, eventList)
+
+    override fun moveForMultiChannel(delta: Float): Unit =
         offsetNode.setLocalTranslation(0f, 40 * updateInstrumentIndex(delta), 0f)
+
+    private var pitchBendAmount = 0f
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val bend = pitchBendController.tick(time, delta) * 0.05f
+        pitchBendAmount += (bend - pitchBendAmount) * delta * 10
+        highestLevel.localRotation = Quaternion().fromAngles(0f, 0f, pitchBendAmount)
     }
 }
