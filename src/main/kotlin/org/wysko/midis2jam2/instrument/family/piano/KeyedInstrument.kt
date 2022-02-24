@@ -50,8 +50,7 @@ abstract class KeyedInstrument(
     protected abstract fun keyByMidiNote(midiNote: Int): Key?
 
     override fun tick(time: Double, delta: Float) {
-        calculateCurrentNotePeriods(time)
-        moveForMultiChannel(delta)
+        super.tick(time, delta)
         val eventsToPerform: List<MidiNoteEvent> = getElapsedEvents(time)
         for (event in eventsToPerform) {
             val key = keyByMidiNote(event.note)
