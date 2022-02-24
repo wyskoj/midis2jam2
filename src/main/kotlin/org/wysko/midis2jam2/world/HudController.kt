@@ -40,7 +40,7 @@ class HudController(val context: Midis2jam2) {
      * The node that contains the fillbar and text.
      */
     private val node: Node = Node().also {
-        context.app.guiNode.attachChild(it)
+        if (context.properties.getProperty("show_hud") == "true") context.app.guiNode.attachChild(it)
         it.move(10f, 10f, 0f)
     }
 

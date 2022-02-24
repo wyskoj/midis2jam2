@@ -18,6 +18,12 @@
     "default": "true"
   },
   {
+    "name": "show_hud",
+    "type": "Boolean",
+    "category": "features",
+    "default": "true"
+  },
+  {
     "name": "lyrics",
     "type": "Boolean",
     "category": "features",
