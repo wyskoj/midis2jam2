@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers.Default
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.ExceptionPanel
 import org.wysko.midis2jam2.gui.SwingWrapper
+import org.wysko.midis2jam2.gui.loadSettingsFromFile
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
@@ -86,6 +87,7 @@ object Execution {
             @Suppress("NAME_SHADOWING") val properties = Properties().apply {
                 this.putAll(DEFAULT_CONFIGURATION)
                 this.putAll(properties)
+                this.putAll(loadSettingsFromFile())
             }
             onStart() // Disable launcher
 

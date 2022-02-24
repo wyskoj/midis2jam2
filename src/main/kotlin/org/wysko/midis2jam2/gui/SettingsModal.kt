@@ -82,11 +82,6 @@ class SettingsModal(locale: String = "en") : JDialog() {
      */
     private val settingDefinitions = getSettingDefinitions()
 
-    /**
-     * A [Properties] object that contains the default values from [settingDefinitions].
-     */
-    private val defaultSettings = getDefaultSettings()
-
     init {
         /* Load setting configuration from file */
         var row = 0
@@ -135,7 +130,7 @@ class SettingsModal(locale: String = "en") : JDialog() {
         }
 
         /* Load and apply settings from file */
-        loadFromFile().entries.forEach {
+        loadSettingsFromFile().entries.forEach {
             with(components[it.key]) {
                 if (this is JCheckBox) {
                     isSelected = (it.value as String).boolean()
@@ -181,22 +176,29 @@ class SettingsModal(locale: String = "en") : JDialog() {
         setLocationRelativeTo(null)
     }
 
-    /**
-     * Loads any existing properties from the properties file. If the file does not exist, a [Properties] effectively
-     * equal to
-     */
-    private fun loadFromFile(): Properties {
-        val file = propertiesFile()
-        if (!file.exists()) {
-            file.createNewFile()
+
+}
+
+/**
+ * A [Properties] object that contains the default values from [settingDefinitions].
+ */
+private val defaultSettings = getDefaultSettings()
+
+/**
+ * Loads any existing properties from the properties file. If the file does not exist, a [Properties] effectively
+ * equal to
+ */
+fun loadSettingsFromFile(): Properties {
+    val file = propertiesFile()
+    if (!file.exists()) {
+        file.createNewFile()
+    }
+    return Properties().apply {
+        /* Apply default settings */
+        defaultSettings.stringPropertyNames().forEach {
+            put(it, defaultSettings.getProperty(it))
         }
-        return Properties().apply {
-            /* Apply default settings */
-            defaultSettings.stringPropertyNames().forEach {
-                put(it, defaultSettings.getProperty(it))
-            }
-            load(FileReader(file))
-        }
+        load(FileReader(file))
     }
 }
 
