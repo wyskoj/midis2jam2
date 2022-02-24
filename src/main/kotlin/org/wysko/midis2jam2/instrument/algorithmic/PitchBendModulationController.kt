@@ -78,7 +78,7 @@ class PitchBendModulationController(
      * Performs calculations to determine the overall pitch bend, which can be manipulated by both pitch-bend events
      * and modulation events. Returns the overall pitch bend, represented as a semitone.
      */
-    fun tick(time: Double, tpf: Float): Float {
+    fun tick(time: Double, tpf: Float, applyModulationWhenNotPlaying: Boolean = false, playing: () -> Boolean): Float {
         modulationTime += tpf
 
         /* Pitch bend */
@@ -108,8 +108,12 @@ class PitchBendModulationController(
         }
 
 
-        return (((pitchBend / 8192.0) * pitchBendSensitivity) + (sin(50 * modulationTime) * modulationRange * (modulation / 128.0)))
-            .toFloat()
+        val pitchBendPart = (pitchBend / 8192.0) * pitchBendSensitivity
+        var modulationPart = sin(50 * modulationTime) * modulationRange * (modulation / 128.0)
+        if (!playing.invoke() && !applyModulationWhenNotPlaying) {
+            modulationPart = 0.0
+        }
+        return (pitchBendPart + modulationPart).toFloat()
     }
 
     /**

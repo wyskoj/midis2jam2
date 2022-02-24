@@ -95,7 +95,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        pitchBendAmount = pitchBendModulationController.tick(time, delta)
+        pitchBendAmount = pitchBendModulationController.tick(time, delta) {
+            clones.any { it.isPlaying }
+        }
     }
 
     /** An individual space laser. */

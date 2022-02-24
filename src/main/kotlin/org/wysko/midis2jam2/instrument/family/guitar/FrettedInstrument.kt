@@ -248,7 +248,9 @@ abstract class FrettedInstrument protected constructor(
                 frettingEngine.releaseString(i)
             }
         }
-        val pitchBendAmount = pitchBendModulationController.tick(time, delta)
+        val pitchBendAmount = pitchBendModulationController.tick(time, delta) {
+            currentNotePeriods.isNotEmpty()
+        }
         for (notePeriod in currentNotePeriods) {
             if (notePeriod.animationStarted) {
                 continue

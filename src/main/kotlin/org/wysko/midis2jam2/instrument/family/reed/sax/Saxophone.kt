@@ -41,7 +41,7 @@ protected constructor(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val bend = pitchBendController.tick(time, delta) * 0.05f
+        val bend = pitchBendController.tick(time, delta) { currentNotePeriods.isNotEmpty() } * 0.05f
         pitchBendAmount += (bend - pitchBendAmount) * delta * 10
         highestLevel.localRotation = Quaternion().fromAngles(0f, 0f, pitchBendAmount)
     }
