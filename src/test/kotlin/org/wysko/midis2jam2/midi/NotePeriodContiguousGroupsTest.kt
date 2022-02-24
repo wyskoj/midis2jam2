@@ -15,19 +15,21 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
+package org.wysko.midis2jam2.midi
+
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.wysko.midis2jam2.midi.*
 
+@Suppress("RemoveRedundantBackticks")
 class NotePeriodContiguousGroupsTest {
 
     @Test
-    fun `Test empty contiguous group`() {
+    fun `Empty`() {
         assertEquals(emptyList<NotePeriodGroup>(), emptyList<NotePeriod>().contiguousGroups())
     }
 
     @Test
-    fun `Test one note contiguous group`() {
+    fun `One note`() {
         val notePeriod = NotePeriod(
             64,
             1.0,
@@ -42,7 +44,7 @@ class NotePeriodContiguousGroupsTest {
     }
 
     @Test
-    fun `Test two simultaneous notes contiguous group`() {
+    fun `Two simultaneous notes`() {
         val np = arrayOf(NotePeriod(
             64,
             1.0,
@@ -63,7 +65,7 @@ class NotePeriodContiguousGroupsTest {
     }
 
     @Test
-    fun `Test three notes with some overlap contiguous group`() {
+    fun `Three notes with some overlap`() {
         val np = arrayOf(
             NotePeriod(
                 64,
@@ -94,7 +96,7 @@ class NotePeriodContiguousGroupsTest {
     }
 
     @Test
-    fun `Test two notes with no overlap`() {
+    fun `Two notes with no overlap`() {
         val np = arrayOf(
             NotePeriod(
                 64,
@@ -118,7 +120,7 @@ class NotePeriodContiguousGroupsTest {
     }
 
     @Test
-    fun `Test four notes, where only the first and last two have overlap contiguous group`() {
+    fun `Four notes, where only the first and last two have overlap`() {
         val np = arrayOf(
             NotePeriod(
                 64,
@@ -155,7 +157,7 @@ class NotePeriodContiguousGroupsTest {
     }
 
     @Test
-    fun `Test three notes, where the second two elapse as the first one elapses contiguous group`() {
+    fun `Three notes, where the second two elapse as the first one elapses`() {
         val np = arrayOf(
             NotePeriod(
                 64,
@@ -183,7 +185,7 @@ class NotePeriodContiguousGroupsTest {
     }
 
     @Test
-    fun `Two consecutive notes contiguous groups`() {
+    fun `Two consecutive notes`() {
         val np = arrayOf(
             NotePeriod(
                 64,
