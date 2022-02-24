@@ -77,9 +77,21 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
             append("${GL11.glGetString(GL11.GL_RENDERER)}\n")
 
             /* settings */
-            append("F: ${this@debugText.settings.fullscreen} / LDE: ${this@debugText.settings.legacyDisplayEngine}\n")
-            append("D: ${this@debugText.settings.midiDevice} / SF: ${this@debugText.settings.soundFont?.name ?: "N/A"}\n")
-            append("LF: ${this@debugText.settings.latencyFix}\n")
+            append(
+                "F: ${this@debugText.properties.getProperty("fullscreen")} / LDE: ${
+                    this@debugText.properties.getProperty(
+                        "legacy_display_engine"
+                    )
+                }\n"
+            )
+            append(
+                "D: ${this@debugText.properties.getProperty("midi_device")} / SF: ${
+                    this@debugText.properties.getProperty(
+                        "soundfont"
+                    ) ?: "N/A"
+                }\n"
+            )
+            append("LF: ${this@debugText.properties.getProperty("latency_fix")}\n")
 
             /* fps and time */
             append("${String.format("%.0f", 1 / tpf)} fps\n")

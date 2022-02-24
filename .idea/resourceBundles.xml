@@ -4,11 +4,5 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/i18n/launcher.properties" />
     <file url="file://$PROJECT_DIR$/src/main/resources/i18n/launcher_es.properties" />
     <file url="file://$PROJECT_DIR$/src/main/resources/i18n/launcher_fr.properties" />
-    <custom-resource-bundle>
-      <file value="file://$PROJECT_DIR$/src/main/resources/i18n/launcher.properties" />
-      <file value="file://$PROJECT_DIR$/src/main/resources/i18n/launcher_es.properties" />
-      <file value="file://$PROJECT_DIR$/src/main/resources/i18n/launcher_fr.properties" />
-      <base-name>launcher</base-name>
-    </custom-resource-bundle>
   </component>
 </project>

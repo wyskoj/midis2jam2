@@ -25,7 +25,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
 import java.util.*
@@ -42,11 +41,11 @@ class DesktopMidis2jam2(
     midiFile: MidiFile,
 
     /** The settings to use. */
-    settings: PassedSettings,
+    properties: Properties,
 
     /** Callback if midis2jam2 closes unexpectedly. */
     private val onClose: () -> Unit
-) : Midis2jam2(midiFile, settings) {
+) : Midis2jam2(midiFile, properties) {
 
     /**
      * True if the sequence has begun playing, false otherwise.
@@ -85,7 +84,9 @@ class DesktopMidis2jam2(
 		 */
         Timer(true).scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                if (timeSinceStart + settings.latencyFix / 1000.0 >= 0 && !sequencerStarted && sequencer.isOpen) {
+                if (timeSinceStart + properties.getProperty("latency_fix").toInt() / 1000.0 >= 0
+                    && !sequencerStarted && sequencer.isOpen
+                ) {
                     sequencer.tempoInBPM = file.tempos[0].bpm().toFloat()
                     sequencer.start()
                     sequencerStarted = true

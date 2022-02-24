@@ -63,25 +63,26 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.*
 import org.wysko.midis2jam2.midi.*
 import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
-import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.*
-import java.util.logging.Logger
+import java.util.*
 import kotlin.properties.Delegates
 
 /**
  * Acts as the main animation and playback class.
  *
  * @param file the parsed MIDI file
- * @param settings the settings
+ * @param properties the settings
  * @constructor Create an instance of midis2jam2
  */
 @Suppress("LeakingThis")
 abstract class Midis2jam2(
     val file: MidiFile,
-    val settings: PassedSettings
+    val properties: Properties
 ) : AbstractAppState(), ActionListener {
 
+    @Suppress("KDocMissingDocumentation")
     override fun initialize(stateManager: AppStateManager, app: Application) {
         this.app = app as SimpleApplication
 
@@ -115,7 +116,7 @@ abstract class Midis2jam2(
         }
         fpp = FilterPostProcessor(assetManager).also {
             it.addFilter(fade)
-            it.numSamples = settings.samples
+            it.numSamples = properties.getProperty("graphics_samples").toInt()
         }
         app.viewPort.addProcessor(fpp)
 
@@ -123,7 +124,7 @@ abstract class Midis2jam2(
         runBlocking {
             instruments = Array(16) { ArrayList<MidiChannelSpecificEvent>() }.apply {
                 /* For each track, add each of its events to the corresponding channel's list */
-                file.tracks.filterNotNull().forEach { (events) ->
+                file.tracks.forEach { (events) ->
                     events.filterIsInstance<MidiChannelSpecificEvent>().forEach {
                         this[it.channel].add(it)
                     }
@@ -155,6 +156,7 @@ abstract class Midis2jam2(
                             }
                         }
                         val noteOnPrograms = HashMap<Int, MidiProgramEvent>()
+                        var warned = false
                         events.forEach { event ->
                             if (event !is MidiNoteOffEvent) {
                                 for (i in programEvents.indices) {
@@ -173,10 +175,10 @@ abstract class Midis2jam2(
                                     @Suppress("ReplaceNotNullAssertionWithElvisReturn")
                                     lastProgramPerNote[noteOnPrograms[event.note]!!.programNum]!!.add(event)
                                 } catch (npe: NullPointerException) {
-                                    LOGGER.warning(
-                                        "Unbalanced Note On / Note Off events. Attempting to continue." +
-                                                "\n${Utils.exceptionToLines(npe)}"
-                                    )
+                                    if (!warned) {
+                                        logger().warn("Unbalanced note on/off events.")
+                                        warned = true
+                                    }
                                 }
                             }
                         }
@@ -198,13 +200,10 @@ abstract class Midis2jam2(
             instruments.count { it is BassGuitar },
         )
         standController = StandController(this)
-        lyricController = LyricController(
-            file.tracks.filterNotNull().flatMap { it.events }.filterIsInstance<MidiTextEvent>(),
-            this
-        )
-        lyricController.enabled = settings.displayLyrics
+        lyricController = LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>(), this)
+        lyricController.enabled = properties.getProperty("lyrics") == "true"
 
-        autocamController = AutoCamController(this, settings.autoAutoCam)
+        autocamController = AutoCamController(this, properties.getProperty("auto_autocam") == "true")
 
         currentCamera = Camera.CAMERA_1A
 
@@ -214,6 +213,7 @@ abstract class Midis2jam2(
         super.initialize(stateManager, app)
     }
 
+    /** The fly-by camera. */
     lateinit var flyByCamera: FlyByCameraListenable
 
     /** The JME3 application that created this. */
@@ -343,7 +343,7 @@ abstract class Midis2jam2(
         }
     }
 
-    private fun fromEvents(programNum: Int, events: java.util.ArrayList<MidiChannelSpecificEvent>): Instrument? {
+    private fun fromEvents(programNum: Int, events: ArrayList<MidiChannelSpecificEvent>): Instrument? {
         if (events.isEmpty()) return null
         return when (programNum) {
             0 -> Keyboard(this, events, Keyboard.KeyboardSkin.PIANO)
@@ -500,6 +500,7 @@ abstract class Midis2jam2(
         }
     }
 
+    @Suppress("KDocMissingDocumentation")
     override fun update(tpf: Float) {
         super.update(tpf)
         debugTextController.tick(tpf)
@@ -520,10 +521,4 @@ abstract class Midis2jam2(
 
     /** Loads and returns an unshaded material with the specified [texture]. */
     fun unshadedMaterial(texture: String): Material = assetManager.unshadedMaterial(texture)
-
-
-    companion object {
-        /** Provides logging for midis2jam2. */
-        val LOGGER: Logger = Logger.getLogger(Midis2jam2::class.java.name)
-    }
 }

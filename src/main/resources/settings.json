@@ -1,0 +1,26 @@
+[
+  {
+    "name": "fullscreen",
+    "type": "Boolean",
+    "category": "display",
+    "default": "false"
+  },
+  {
+    "name": "legacy_display_engine",
+    "type": "Boolean",
+    "category": "display",
+    "default": "false"
+  },
+  {
+    "name": "auto_autocam",
+    "type": "Boolean",
+    "category": "tweaks",
+    "default": "true"
+  },
+  {
+    "name": "lyrics",
+    "type": "Boolean",
+    "category": "tweaks",
+    "default": "true"
+  }
+]

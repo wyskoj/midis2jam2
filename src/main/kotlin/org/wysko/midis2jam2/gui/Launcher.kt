@@ -23,48 +23,97 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.wysko.midis2jam2.CONFIGURATION_DIRECTORY
 import org.wysko.midis2jam2.starter.Execution
-import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.Utils.isInt
 import java.awt.Cursor
 import java.awt.Dimension
 import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 import java.text.MessageFormat
 import java.util.*
 import javax.sound.midi.MidiSystem
 import javax.swing.JFileChooser
+import kotlin.collections.ArrayList
 
 /**
  * Locales for the GUI.
  */
-val supportedLocales: List<Locale> = listOf(Locale.ENGLISH, Locale.FRENCH, Locale.forLanguageTag("es"), Locale.forLanguageTag("ru"))
+val supportedLocales: List<Locale> = listOf(
+    Locale.ENGLISH,
+    Locale.FRENCH,
+    Locale.forLanguageTag("es"),
+    Locale.forLanguageTag("ru")
+)
+
+private val DEFAULT_LAUNCHER_STATE = Properties().apply {
+    setProperty("locale", "en")
+    setProperty("midi_device", "Gervill")
+    setProperty("lastdir", System.getProperty("user.home"))
+    setProperty("soundfonts", Json.encodeToString(listOf<String>()))
+}
+
+
+private val launcherState = object : Properties(DEFAULT_LAUNCHER_STATE) {
+    override fun setProperty(key: String, value: String): Any? {
+        val old = super.setProperty(key, value)
+        store(FileWriter(launcherStateFile()), null)
+        return old
+    }
+
+    fun addSoundFont(path: String) {
+        this.setProperty(
+            "soundfonts",
+            Json.encodeToString(
+                soundfonts.apply { add(path) }
+            )
+        )
+    }
+
+    /** List of names of SoundFonts. */
+    private val soundfonts: ArrayList<String>
+        get() = Json.decodeFromString<MutableList<String>>(getProperty("soundfonts")) as ArrayList<String>
+
+}.apply {
+    load(FileReader(launcherStateFile()))
+}
+
+/**
+ * Returns the file that stores the settings.
+ */
+private fun launcherStateFile(): File {
+    val file = File(File(System.getProperty("user.home"), CONFIGURATION_DIRECTORY), "launcher.properties")
+    with(file) {
+        if (!exists()) {
+            parentFile.mkdirs()
+            createNewFile()
+        }
+    }
+    return file
+}
 
 /**
  * Displays configuration options and settings for midis2jam2.
@@ -74,74 +123,53 @@ val supportedLocales: List<Locale> = listOf(Locale.ENGLISH, Locale.FRENCH, Local
 @Composable
 @Suppress("FunctionName")
 fun Launcher() {
-    /* Try to load settings file */
-    val settings = loadLauncherSettingsFromFile()
 
     /* Load i18n strings */
-    var i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(settings.locale))
+    val locale = produceState(
+        launcherState.getProperty("locale"),
+        launcherState.getProperty("locale")
+    ) { launcherState.getProperty("locale") }
 
-    /* Configuration */
-    val midiDevices = MidiSystem.getMidiDeviceInfo().map { it.name }.toList().filter { it != "Real Time Sequencer" }
-    var selectedMidiDevice by remember {
-        mutableStateOf(midiDevices.indexOf(settings.midiDevice).let { if (it == -1) 0 else it })
-    }
-    var selectedSoundFont by remember { mutableStateOf(0) }
-    var midiFileText by remember { mutableStateOf("") }
-    var selectedMidiFile by remember { mutableStateOf("") }
-    var soundFonts by remember { mutableStateOf(settings.soundFontNames()) }
-
-    midiDevices.forEach {
-        if (settings.deviceLatencyMap.containsKey(it).not()) {
-            settings.deviceLatencyMap[it] = 0
+    val i18n by remember {
+        derivedStateOf {
+            ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale.value))
         }
     }
+
+    /* MIDI Device */
+    val midiDevices = MidiSystem.getMidiDeviceInfo().map { it.name }.toList().filter { it != "Real Time Sequencer" }
+    var selectedMidiDevice by remember { mutableStateOf(launcherState.getProperty("midi_device")) }
+
+    var midiFileText by remember { mutableStateOf("") }
+    var selectedMidiFile by remember { mutableStateOf("") }
+
+    val soundFonts by remember {
+        derivedStateOf {
+            val decodeFromString = Json.decodeFromString<List<String>>(launcherState.getProperty("soundfonts"))
+            decodeFromString.ifEmpty { listOf("Default SoundFont") }
+        }
+    }
+    var selectedSoundFont by remember { mutableStateOf(0) }
 
     /* Navigation */
     var showAbout by remember { mutableStateOf(false) }
     var showOSS by remember { mutableStateOf(false) }
-    val ossRotation by animateFloatAsState(if (!showOSS) 0f else 180f)
-
-    /* Scroll states */
+    val ossRotation by animateFloatAsState(if (showOSS) 180f else 0f)
     val screenScroll = ScrollState(0)
-
-    /* Settings */
-    var showSettings by remember { mutableStateOf(false) }
-    var displayLyrics by remember { mutableStateOf(settings.displayLyrics) }
-    val settingsDropdownRotation by animateFloatAsState(if (!showSettings) 0f else 180f)
-    var isFullscreen by remember { mutableStateOf(settings.fullscreen) }
-    var isLegacyDisplayEngine by remember { mutableStateOf(settings.isLegacyDisplay) }
-    var audioDelay by remember {
-        mutableStateOf(
-            settings.deviceLatencyMap[settings.midiDevice].toString()
-        )
-    }
-    var isAutoAutoCam by remember { mutableStateOf(settings.autoAutoCam) }
 
     /* Display */
     val width = 500.dp
-    val settingsWidth = 400.dp
     var freeze by remember { mutableStateOf(false) }
     var thinking by remember { mutableStateOf(false) }
-    var locale by remember { mutableStateOf(settings.locale) }
 
     fun beginMidis2jam2() {
         try {
             Execution.start(
-                PassedSettings(
-                    settings.deviceLatencyMap[midiDevices[selectedMidiDevice]] ?: 0,
-                    settings.autoAutoCam,
-                    settings.fullscreen,
-                    isLegacyDisplayEngine,
-                    File(selectedMidiFile),
-                    midiDevices[selectedMidiDevice],
-                    if (settings.soundFontPaths.isNotEmpty()) {
-                        File(settings.soundFontPaths[selectedSoundFont])
-                    } else {
-                        null
-                    },
-                    settings.samples,
-                    settings.displayLyrics,
-                ),
+                Properties().apply {
+                    setProperty("midi_file", selectedMidiFile)
+                    setProperty("midi_device", selectedMidiDevice)
+                    setProperty("soundfont", soundFonts[selectedSoundFont])
+                },
                 onStart = {
                     freeze = true
                     thinking = true
@@ -197,29 +225,18 @@ fun Launcher() {
                                 value = midiFileText,
                                 onValueChange = { midiFileText = it },
                                 singleLine = true,
-                                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(width).onPreviewKeyEvent {
-                                    if (it.isShiftPressed && it.key == Key.Enter) {
-                                        beginMidis2jam2()
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                },
+                                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(width),
                                 label = { Text(i18n.getString("configuration.midi_file")) },
                                 trailingIcon = {
                                     Icon(
                                         Icons.Filled.Search,
                                         contentDescription = i18n.getString("configuration.search_for_midi_file"),
                                         modifier = Modifier.clickable {
-                                            var initialDirectory = File(settings.lastMidiDir)
-
                                             /* If the directory is bad, just revert to the home directory */
-                                            if (!initialDirectory.exists()) {
-                                                initialDirectory = File(System.getProperty("user.home"))
-                                                settings.lastMidiDir = initialDirectory.absolutePath
-                                                settings.save()
+                                            if (!File(launcherState.getProperty("lastdir")).exists()) {
+                                                launcherState.setProperty("lastdir", System.getProperty("user.home"))
                                             }
-                                            JFileChooser(initialDirectory).run {
+                                            JFileChooser(File(launcherState.getProperty("lastdir"))).run {
                                                 fileFilter = object :
                                                     javax.swing.filechooser.FileFilter() {
                                                     override fun accept(file: File?): Boolean {
@@ -231,18 +248,15 @@ fun Launcher() {
                                                     override fun getDescription(): String =
                                                         "MIDI files (*.mid, *.kar)"
                                                 }
-
                                                 preferredSize = Dimension(800, 600)
                                                 dialogTitle = "Select MIDI file"
                                                 isMultiSelectionEnabled = false
-                                                actionMap.get("viewTypeDetails")
-                                                    .actionPerformed(null); // Set default to details view
+                                                actionMap.get("viewTypeDetails").actionPerformed(null)
 
                                                 if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                                                     selectedMidiFile = this.selectedFile.absolutePath
                                                     midiFileText = this.selectedFile.name
-                                                    settings.lastMidiDir = this.selectedFile.parent
-                                                    settings.save()
+                                                    launcherState.setProperty("lastdir", this.selectedFile.parent)
                                                 }
 
                                             }
@@ -253,18 +267,18 @@ fun Launcher() {
                             )
                             SimpleExposedDropDownMenu(
                                 values = midiDevices,
-                                selectedIndex = selectedMidiDevice,
+                                selectedIndex = midiDevices.indexOf(selectedMidiDevice),
                                 onChange = {
-                                    selectedMidiDevice = it
-                                    settings.midiDevice = midiDevices[it]
-                                    audioDelay = settings.deviceLatencyMap[midiDevices[it]].toString()
-                                    settings.save()
+                                    midiDevices[it].let { device ->
+                                        launcherState.setProperty("midi_device", device)
+                                        selectedMidiDevice = device
+                                    }
                                 },
                                 label = { Text(i18n.getString("configuration.midi_device")) },
                                 modifier = Modifier.width(width).padding(0.dp, 0.dp, 0.dp, 16.dp)
                             )
                             AnimatedVisibility(
-                                visible = selectedMidiDevice == 0
+                                visible = selectedMidiDevice == "Gervill"
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -283,11 +297,10 @@ fun Launcher() {
                                             JFileChooser().run {
                                                 fileFilter = (object :
                                                     javax.swing.filechooser.FileFilter() {
-                                                    override fun accept(file: File?): Boolean {
-                                                        return file?.extension?.lowercase(Locale.getDefault()) == "sf2" ||
-                                                                file?.extension?.lowercase(Locale.getDefault()) == "dls"
+                                                    override fun accept(file: File?): Boolean =
+                                                        file?.extension?.lowercase(Locale.getDefault()) == "sf2"
+                                                                || file?.extension?.lowercase(Locale.getDefault()) == "dls"
                                                                 || file?.isDirectory == true
-                                                    }
 
                                                     override fun getDescription(): String =
                                                         "Soundbank files (*.sf2, *.dls)"
@@ -297,14 +310,11 @@ fun Launcher() {
                                                 preferredSize = Dimension(800, 600)
                                                 dialogTitle = "Select soundbank file"
                                                 isMultiSelectionEnabled = false
-                                                actionMap.get("viewTypeDetails")
-                                                    .actionPerformed(null); // Set default to details view
+                                                actionMap.get("viewTypeDetails").actionPerformed(null)
 
                                                 if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                                                    settings.soundFontPaths.add(this.selectedFile.absolutePath)
-                                                    soundFonts = settings.soundFontNames()
-                                                    selectedSoundFont = soundFonts.indexOf(this.selectedFile.name)
-                                                    settings.save()
+                                                    launcherState.addSoundFont(selectedFile.absolutePath)
+                                                    selectedSoundFont = soundFonts.indexOf(selectedFile.absolutePath)
                                                 }
                                             }
                                         }, modifier = Modifier.height(56.dp).width(56.dp)
@@ -317,184 +327,17 @@ fun Launcher() {
                                 }
                             }
 
-                            Row(modifier = Modifier.clickable { showSettings = !showSettings }) {
+                            Row(modifier = Modifier.clickable {
+                                SettingsModal(locale.value).apply {
+                                    isVisible = true
+                                }
+                            }) {
                                 Text(text = i18n.getString("settings.settings"), style = MaterialTheme.typography.h6)
                                 Icon(
-                                    imageVector = Icons.Filled.ArrowDropDown,
+                                    imageVector = Icons.Filled.Settings,
                                     contentDescription = null,
-                                    modifier = Modifier.padding(top = 4.dp).rotate(settingsDropdownRotation)
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                                 )
-                            }
-
-                            AnimatedVisibility(
-                                visible = showSettings
-                            ) {
-                                Column {
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp).width(settingsWidth)
-                                    ) {
-                                        TooltipArea(
-                                            tooltip = {
-                                                Surface(
-                                                    modifier = Modifier.shadow(4.dp),
-                                                    color = Color.DarkGray,
-                                                    shape = RoundedCornerShape(4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = i18n.getString("settings.fullscreen_description"),
-                                                        modifier = Modifier.padding(10.dp)
-                                                    )
-                                                }
-                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
-                                                anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
-                                            )
-                                        ) {
-                                            Text(text = i18n.getString("settings.fullscreen"))
-                                        }
-                                        Switch(checked = isFullscreen, onCheckedChange = {
-                                            isFullscreen = it
-                                            settings.fullscreen = it
-                                            settings.save()
-                                        })
-                                    }
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp).width(settingsWidth)
-                                    ) {
-                                        TooltipArea(
-                                            tooltip = {
-                                                Surface(
-                                                    modifier = Modifier.shadow(4.dp),
-                                                    color = Color.DarkGray,
-                                                    shape = RoundedCornerShape(4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = i18n.getString("settings.legacy_display_engine_description"),
-                                                        modifier = Modifier.padding(10.dp)
-                                                    )
-                                                }
-                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
-                                                anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
-                                            )
-                                        ) {
-                                            Text(
-                                                text = i18n.getString("settings.legacy_display_engine")
-                                            )
-                                        }
-                                        Switch(checked = isLegacyDisplayEngine, onCheckedChange = {
-                                            isLegacyDisplayEngine = it
-                                            settings.isLegacyDisplay = it
-                                            settings.save()
-                                        })
-                                    }
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp).width(settingsWidth)
-                                    ) {
-                                        TooltipArea(
-                                            tooltip = {
-                                                Surface(
-                                                    modifier = Modifier.shadow(4.dp),
-                                                    color = Color.DarkGray,
-                                                    shape = RoundedCornerShape(4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = i18n.getString("settings.auto_autocam_description"),
-                                                        modifier = Modifier.padding(10.dp)
-                                                    )
-                                                }
-                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
-                                                anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
-                                            )
-                                        ) {
-                                            Text(
-                                                text = i18n.getString("settings.auto_autocam")
-                                            )
-                                        }
-                                        Switch(checked = isAutoAutoCam, onCheckedChange = {
-                                            isAutoAutoCam = it
-                                            settings.autoAutoCam = it
-                                            settings.save()
-                                        })
-                                    }
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp).width(settingsWidth)
-                                    ) {
-                                        TooltipArea(
-                                            tooltip = {
-                                                Surface(
-                                                    modifier = Modifier.shadow(4.dp),
-                                                    color = Color.DarkGray,
-                                                    shape = RoundedCornerShape(4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = i18n.getString("settings.lyrics_description"),
-                                                        modifier = Modifier.padding(10.dp)
-                                                    )
-                                                }
-                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
-                                                anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
-                                            )
-                                        ) {
-                                            Text(
-                                                text = i18n.getString("settings.lyrics")
-                                            )
-                                        }
-                                        Switch(checked = displayLyrics, onCheckedChange = {
-                                            displayLyrics = it
-                                            settings.displayLyrics = it
-                                            settings.save()
-                                        })
-                                    }
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp).width(settingsWidth)
-                                    ) {
-                                        TooltipArea(
-                                            tooltip = {
-                                                Surface(
-                                                    modifier = Modifier.shadow(4.dp),
-                                                    color = Color.DarkGray,
-                                                    shape = RoundedCornerShape(4.dp)
-                                                ) {
-                                                    Text(
-                                                        text = i18n.getString("settings.audio_delay_description"),
-                                                        modifier = Modifier.padding(10.dp)
-                                                    )
-                                                }
-                                            }, delayMillis = 250, tooltipPlacement = TooltipPlacement.ComponentRect(
-                                                anchor = Alignment.TopCenter, offset = DpOffset(0.dp, (-48).dp)
-                                            )
-                                        ) {
-                                            Text(
-                                                text = i18n.getString("settings.audio_delay")
-                                            )
-                                        }
-                                        TextField(
-                                            value = audioDelay,
-                                            onValueChange = {
-                                                if (it.isInt() || it.isEmpty()) {
-                                                    audioDelay = it
-                                                    settings.deviceLatencyMap[midiDevices[selectedMidiDevice]] = try {
-                                                        it.toInt()
-                                                    } catch (_: Exception) {
-                                                        0
-                                                    }
-                                                    settings.save()
-                                                }
-                                            },
-                                            modifier = Modifier.width(128.dp),
-                                            label = { Text(i18n.getString("settings.milliseconds")) },
-                                        )
-                                    }
-                                }
                             }
                             Divider(modifier = Modifier.padding(16.dp).width(width))
                             Button(
@@ -538,16 +381,18 @@ fun Launcher() {
                                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
-                            Text(text = locale.uppercase(Locale.getDefault()),
+                            Text(text = locale.value.uppercase(Locale.getDefault()),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
                                     supportedLocales.let {
-                                        locale =
-                                            it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it.size].language
+                                        launcherState.setProperty(
+                                            "locale",
+                                            it[(it.indexOf(it.first { l -> l.language == locale.value }) + 1) % it.size].language
+                                        )
                                     }
-                                    i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
-                                    settings.locale = locale
-                                    settings.save()
+//                                    i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
+                                    println(locale.value)
+                                    println(launcherState.getProperty("locale"))
                                 })
                             Text(
                                 text = i18n.getString("about.warranty"),
@@ -636,9 +481,3 @@ fun Launcher() {
     }
 }
 
-/** Returns the list of SoundFonts as just their file names. */
-private fun LauncherSettings.soundFontNames(): List<String> = if (soundFontPaths.isNotEmpty()) {
-    soundFontPaths.map { File(it).name }.toList()
-} else {
-    mutableListOf("Default SoundFont")
-}

@@ -17,9 +17,9 @@
 
 package org.wysko.midis2jam2.gui
 
-import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.Utils.getHTML
 import org.wysko.midis2jam2.util.Utils.resourceToString
+import org.wysko.midis2jam2.util.logger
 import java.awt.Desktop
 import java.io.IOException
 import java.util.*
@@ -31,10 +31,8 @@ import javax.swing.event.HyperlinkEvent
 object UpdateChecker {
 
     /** Checks to see if the program is up-to-date. */
-    @JvmStatic
     fun checkForUpdates() {
         Thread {
-            Midis2jam2.LOGGER.info("Checking for updates.")
             try {
                 val bundle = ResourceBundle.getBundle("i18n.updater")
                 val html = getHTML("https://midis2jam2.xyz/api/update?v=" + resourceToString("/version.txt"))
@@ -60,12 +58,12 @@ object UpdateChecker {
                         bundle.getString("update_available"),
                         JOptionPane.WARNING_MESSAGE
                     )
-                    Midis2jam2.LOGGER.warning("Out of date!")
+                    logger().warn("midis2jam2 is out of date!")
                 } else {
-                    Midis2jam2.LOGGER.info("Up to date.")
+                    logger().info("midis2jam2 is up to date.")
                 }
             } catch (e: IOException) {
-                Midis2jam2.LOGGER.warning("Failed to check for updates.")
+                logger().warn("Failed to check for updates.")
                 e.printStackTrace()
             }
         }.start()

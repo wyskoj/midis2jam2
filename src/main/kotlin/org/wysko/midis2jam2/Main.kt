@@ -31,14 +31,19 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.wysko.midis2jam2.gui.Launcher
 import org.wysko.midis2jam2.gui.UpdateChecker.checkForUpdates
+import org.wysko.midis2jam2.gui.getDefaultSettings
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.loadSequencerJob
-import org.wysko.midis2jam2.util.PassedSettings
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import java.io.File
+import java.util.logging.LogManager
 import javax.sound.midi.MidiSystem
-import javax.swing.LookAndFeel
-import javax.swing.UIManager
+
+/**
+ * The configuration directory.
+ */
+const val CONFIGURATION_DIRECTORY: String = ".midis2jam2"
+
 
 /**
  * Where it all begins.
@@ -46,8 +51,13 @@ import javax.swing.UIManager
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main(args: Array<String>) {
+    /* Hush */
+    LogManager.getLogManager().reset()
+
     /* Get the default sequencer loaded in a coroutine now since it takes a while (about 1.5 seconds) to load. */
     loadSequencerJob.start()
+
+    /* Ensure configuration folders are initialized */
 
     /* Check for command line arguments */
     if (args.isNotEmpty()) {
@@ -102,11 +112,10 @@ fun main(args: Array<String>) {
         val midiDevice = if (cmd.hasOption("device")) cmd.getOptionValue("device") else "Gervill"
 
         /* SoundFont */
-        val soundFont =
-            if (cmd.hasOption("soundfont")) File(cmd.getOptionValue("soundfont")) else null
+        val soundFont = if (cmd.hasOption("soundfont")) File(cmd.getOptionValue("soundfont")) else null
 
-        /* Legacy window engine */
-        val legacyWindowEngine = cmd.hasOption("legacy-engine")
+        /* Legacy display engine */
+        val legacyDisplayEngine = cmd.hasOption("legacy-engine")
 
         /* Fullscreen */
         val fullscreen = cmd.hasOption("fullscreen")
@@ -124,22 +133,19 @@ fun main(args: Array<String>) {
         val lyrics = cmd.hasOption("lyrics")
 
         runBlocking {
-            Execution.start(
-                PassedSettings(
-                    latency,
-                    autoCam,
-                    fullscreen,
-                    legacyWindowEngine,
-                    File(midiFile),
-                    midiDevice,
-                    soundFont,
-                    samples,
-                    lyrics
-                ),
-                onStart = {},
-                onReady = {},
-                onFinish = { Runtime.getRuntime().halt(0) }
-            ).join()
+            Execution.start(getDefaultSettings().apply {
+                setProperty("midi_file", midiFile)
+                setProperty("midi_device", midiDevice)
+                if (soundFont != null) {
+                    setProperty("soundfont", soundFont.absolutePath)
+                }
+                setProperty("legacy_display_engine", legacyDisplayEngine.toString())
+                setProperty("fullscreen", fullscreen.toString())
+                setProperty("auto_cam", autoCam.toString())
+                setProperty("latency_fix", latency.toString())
+                setProperty("graphics_samples", samples.toString())
+                setProperty("lyrics", lyrics.toString())
+            }, onStart = {}, onReady = {}, onFinish = { Runtime.getRuntime().halt(0) }).join()
         }
     } else {
         SplashScreen.writeMessage("Loading...")
