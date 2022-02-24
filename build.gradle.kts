@@ -19,8 +19,6 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.32"
     id("org.jetbrains.compose") version "1.0.1"
 
-    // JavaFX (for file choosers)
-    id("org.openjfx.javafxplugin") version "0.0.10"
     java
     idea
     application
@@ -34,12 +32,6 @@ repositories {
 
 // Register main class
 project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
-
-// Configure JavaFX
-javafx {
-    version = "11"
-    modules = listOf("javafx.controls", "javafx.swing")
-}
 
 // Configure Java version and build
 tasks.compileJava {
@@ -81,34 +73,27 @@ tasks.processResources {
 
 dependencies {
     // JMonkeyEngine
-    implementation("org.jmonkeyengine:jme3-core:3.4.1-stable")
-    implementation("org.jmonkeyengine:jme3-desktop:3.4.1-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.4.1-stable")
-    implementation("org.jmonkeyengine:jme3-plugins:3.4.1-stable")
-    implementation("org.jmonkeyengine:jme3-effects:3.4.1-stable")
+    implementation("org.jmonkeyengine:jme3-core:3.5.0-stable")
+    implementation("org.jmonkeyengine:jme3-desktop:3.5.0-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.0-stable")
+    implementation("org.jmonkeyengine:jme3-plugins:3.5.0-stable")
+    implementation("org.jmonkeyengine:jme3-effects:3.5.0-stable")
 
     // JetBrains annotations
     implementation("org.jetbrains:annotations:22.0.0")
-
-    // Utility
-    implementation("org.apache.commons:commons-lang3:3.12.0")
-    implementation("com.google.code.gson:gson:2.8.9")
 
     // Unit testing
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 
     // Theme
-    implementation("com.formdev:flatlaf:1.6.5")
+    implementation("com.formdev:flatlaf:2.0.1")
 
     // Installer
     implementation("com.install4j:install4j-runtime:8.0.7")
 
     // Noise library
     implementation("org.spongepowered:noise:2.0.0-SNAPSHOT")
-
-    // Dokka math
-    implementation("org.jetbrains.dokka:mathjax-plugin:1.6.0")
 
     // Apache Commons CLI
     implementation("commons-cli:commons-cli:1.5.0")
