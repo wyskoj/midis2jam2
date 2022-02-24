@@ -183,3 +183,6 @@ tasks.dokkaHtml.configure {
     )
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
