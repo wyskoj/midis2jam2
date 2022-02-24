@@ -49,20 +49,8 @@ abstract class KeyedInstrument(
     /** Returns the key associated with the [midiNote], or `null` if this instrument can't animate that note. */
     protected abstract fun keyByMidiNote(midiNote: Int): Key?
 
-    /**
-     * Sets idle visibility by note on and off events.
-     *
-     * @param time the current time
-     */
-    protected open fun setIdleVisibilityByNoteOnAndOff(time: Double) {
-        val b = calcVisibility(time)
-        isVisible = b
-        instrumentNode.cullHint = if (b) Spatial.CullHint.Dynamic else Spatial.CullHint.Always
-    }
-
     override fun tick(time: Double, delta: Float) {
         calculateCurrentNotePeriods(time)
-        setIdleVisibilityByNoteOnAndOff(time)
         moveForMultiChannel(delta)
         val eventsToPerform: List<MidiNoteEvent> = getElapsedEvents(time)
         for (event in eventsToPerform) {
