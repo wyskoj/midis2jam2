@@ -17,15 +17,11 @@
 package org.wysko.midis2jam2.instrument.family.animusic
 
 import com.jme3.collision.CollisionResults
-import com.jme3.material.Material
-import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Ray
 import com.jme3.math.Vector3f
-import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.scene.debug.Arrow
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
