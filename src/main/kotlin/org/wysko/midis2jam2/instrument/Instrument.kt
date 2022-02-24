@@ -53,6 +53,8 @@ abstract class Instrument protected constructor(
      * instruments rely on this variable.
      */
     var isVisible: Boolean = false
+        get() = (context.properties.getProperty("never_hidden") == "true").or(field)
+
 
     /**
      * The index of this instrument in the stack of similar instruments. Can be a decimal when instrument transition

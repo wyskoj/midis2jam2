@@ -14,13 +14,19 @@
   {
     "name": "auto_autocam",
     "type": "Boolean",
-    "category": "tweaks",
+    "category": "features",
     "default": "true"
   },
   {
     "name": "lyrics",
     "type": "Boolean",
-    "category": "tweaks",
+    "category": "features",
     "default": "true"
+  },
+  {
+    "name": "never_hidden",
+    "type": "Boolean",
+    "category": "tweaks",
+    "default": "false"
   }
 ]
