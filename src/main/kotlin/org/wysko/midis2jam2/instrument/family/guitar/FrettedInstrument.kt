@@ -83,7 +83,7 @@ abstract class FrettedInstrument protected constructor(
     }
 
     /** Handles pitch band and modulation for us! */
-    private val pitchBendModulationController = PitchBendModulationController(context, events)
+    private val pitchBendModulationController = PitchBendModulationController(context, events, smoothness = 0.0)
 
     /** The temporally-truncated list of pitch bend events. */
     private val pitchBendEvents = events.filterIsInstance<MidiPitchBendEvent>() as MutableList

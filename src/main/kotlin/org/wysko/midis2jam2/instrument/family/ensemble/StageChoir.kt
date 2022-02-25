@@ -21,7 +21,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.brass.BouncyTwelfth
-import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 

@@ -16,7 +16,7 @@
  */
 package org.wysko.midis2jam2.instrument.family.brass
 
-import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained.TwelfthOfOctave
+import org.wysko.midis2jam2.instrument.WrappedOctaveSustained.TwelfthOfOctave
 
 /**
  * A single instance of some visual that "bounces" to visualize (e.g., choir peep, stage horn). Specifically, when the

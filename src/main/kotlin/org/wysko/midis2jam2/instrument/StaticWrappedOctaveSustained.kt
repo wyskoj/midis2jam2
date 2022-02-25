@@ -14,32 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.instrument.family.reed.sax
 
-import com.jme3.math.Quaternion
+package org.wysko.midis2jam2.instrument
+
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
-/** Shared code for Saxophones. */
-abstract class Saxophone
-protected constructor(
+abstract class StaticWrappedOctaveSustained(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
-    cloneClass: Class<out SaxophoneClone>,
-    fingeringManager: PressedKeysFingeringManager
-) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
+    events: List<MidiChannelSpecificEvent>,
+    inverted: Boolean
+) : WrappedOctaveSustained(context, events, inverted) {
 
-    private val pitchBendController = PitchBendModulationController(context, eventList)
-
-    override fun moveForMultiChannel(delta: Float): Unit =
-        offsetNode.setLocalTranslation(0f, 40 * updateInstrumentIndex(delta), 0f)
+    private val pitch = PitchBendModulationController(context, events)
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val bend = pitchBendController.tick(time, delta) { currentNotePeriods.isNotEmpty() } * 0.05f
-        highestLevel.localRotation = Quaternion().fromAngles(0f, 0f, bend)
+        val tick = pitch.tick(time, delta) {
+            twelfths.any { it.playing }
+        }
+        twelfths.forEach { tw ->
+            tw.highestLevel.localTranslation.y = if (tw.playing) tick else 0f
+        }
     }
 }

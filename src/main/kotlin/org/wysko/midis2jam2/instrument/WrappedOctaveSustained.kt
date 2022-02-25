@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.instrument.family.brass
+package org.wysko.midis2jam2.instrument
 
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained.TwelfthOfOctave
+import org.wysko.midis2jam2.instrument.WrappedOctaveSustained.TwelfthOfOctave
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
 /**

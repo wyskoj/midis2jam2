@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiControlEvent
 import org.wysko.midis2jam2.midi.MidiPitchBendEvent
+import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.oneOf
 import kotlin.math.sin
 
@@ -29,7 +30,8 @@ import kotlin.math.sin
  */
 class PitchBendModulationController(
     private val context: Midis2jam2,
-    events: List<MidiChannelSpecificEvent>
+    events: List<MidiChannelSpecificEvent>,
+    smoothness: Double = 10.0
 ) {
     /**
      * The pitch-bend events.
@@ -56,7 +58,8 @@ class PitchBendModulationController(
      * Current pitch-bend sensitivity, represented in semitones. This value is initialized to 2 semitones per the MIDI
      * specification.
      */
-    private var pitchBendSensitivity = 2.0
+    var pitchBendSensitivity: Double = 2.0
+        private set
 
     /**
      * Current modulation depth, represented in internal format (0 is the minimum, 127 is the maximum).
@@ -73,6 +76,11 @@ class PitchBendModulationController(
      * When a note plays, the current phase offset of the modulation is reset to 0.
      */
     private var modulationTime: Double = 0.0
+
+    /**
+     * Number smoother.
+     */
+    private val smoother = NumberSmoother(0f, smoothness)
 
     /**
      * Performs calculations to determine the overall pitch bend, which can be manipulated by both pitch-bend events
@@ -113,7 +121,7 @@ class PitchBendModulationController(
         if (!playing.invoke() && !applyModulationWhenNotPlaying) {
             modulationPart = 0.0
         }
-        return (pitchBendPart + modulationPart).toFloat()
+        return smoother.tick(tpf) { (pitchBendPart + modulationPart).toFloat() }
     }
 
     /**

@@ -23,8 +23,9 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
-import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -35,7 +36,7 @@ class StageStrings(
     context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageStringsType,
     /** The behavior of this StageStrings. Defaults to [StageStringBehavior.NORMAL]. */
     val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
-) : WrappedOctaveSustained(context, eventList, false) {
+) : StaticWrappedOctaveSustained(context, eventList, false) {
 
     /** Nodes that contain each string. */
     private val stringNodes = Array(12) { Node() }

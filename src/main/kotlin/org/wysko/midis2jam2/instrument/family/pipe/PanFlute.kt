@@ -20,14 +20,15 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.brass.WrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The Pan flute. */
 class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, skin: PipeSkin) :
-    WrappedOctaveSustained(context, eventList, false) {
+    StaticWrappedOctaveSustained(context, eventList, false) {
 
     /** The Pipe nodes. */
     private val pipeNodes = Array(12) { Node() }
