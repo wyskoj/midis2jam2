@@ -125,14 +125,11 @@ private fun launcherStateFile(): File {
 fun Launcher() {
 
     /* Load i18n strings */
-    val locale = produceState(
-        launcherState.getProperty("locale"),
-        launcherState.getProperty("locale")
-    ) { launcherState.getProperty("locale") }
+    var locale by remember { mutableStateOf(launcherState.getProperty("locale")) }
 
     val i18n by remember {
         derivedStateOf {
-            ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale.value))
+            ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
         }
     }
 
@@ -328,7 +325,7 @@ fun Launcher() {
                             }
 
                             Row(modifier = Modifier.clickable {
-                                SettingsModal(locale.value).apply {
+                                SettingsModal(locale).apply {
                                     isVisible = true
                                 }
                             }) {
@@ -381,18 +378,19 @@ fun Launcher() {
                                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
-                            Text(text = locale.value.uppercase(Locale.getDefault()),
+                            Text(text = locale.uppercase(Locale.getDefault()),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
                                     supportedLocales.let {
+                                        val lang =
+                                            it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it.size].language
                                         launcherState.setProperty(
                                             "locale",
-                                            it[(it.indexOf(it.first { l -> l.language == locale.value }) + 1) % it.size].language
+                                            lang
                                         )
+                                        locale = lang
                                     }
-//                                    i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
-                                    println(locale.value)
-                                    println(launcherState.getProperty("locale"))
+
                                 })
                             Text(
                                 text = i18n.getString("about.warranty"),
