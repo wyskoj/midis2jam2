@@ -38,6 +38,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.logger
 import java.awt.*
 import java.awt.event.WindowEvent
 import java.awt.event.WindowListener
@@ -87,43 +88,75 @@ class SettingsModal(locale: String = "en") : JDialog() {
         var row = 0
         settingDefinitions.groupBy { it.category }.entries.forEach { (categoryName, settings) ->
             // Create category title
-            settingsPanel.add(
-                JLabel(i18n.getString("settings.category.$categoryName")).apply {
-                    font = font.deriveFont(Font.BOLD, 18f)
-                },
-                GridBagConstraints().apply {
-                    gridy = row++
-                    insets = Insets(16, 0, 8, 0)
-                }
-            )
+            settingsPanel.add(JLabel(i18n.getString("settings.category.$categoryName")).apply {
+                font = font.deriveFont(Font.BOLD, 18f)
+            }, GridBagConstraints().apply {
+                gridy = row++
+                insets = Insets(16, 0, 8, 0)
+            })
             settings.forEach { (name, type, _, _) ->
-                if (type == "Boolean") {
-                    JPanel().apply {
-                        layout = GridBagLayout()
-                        add(JLabel(i18n.getString("settings.$name")).apply {
-                            font = font.deriveFont(Font.BOLD, 16f)
-                        }, GridBagConstraints().apply {
-                            anchor = GridBagConstraints.LINE_START
-                        })
-                        add(JLabel(i18n.getString("settings.${name}_description")).apply {
-                            font = font.deriveFont(12f)
-                        }, GridBagConstraints().apply {
-                            gridy = 1
-                            anchor = GridBagConstraints.LINE_START
-                        })
-                    }.also {
-                        settingsPanel.add(it, GridBagConstraints().apply {
-                            gridy = row
-                            anchor = GridBagConstraints.LINE_START
-                            insets = Insets(0, 0, 16, 16)
-                        })
+                when (type) {
+                    "Boolean" -> {
+                        JPanel().apply {
+                            layout = GridBagLayout()
+                            add(JLabel(i18n.getString("settings.$name")).apply {
+                                font = font.deriveFont(Font.BOLD, 16f)
+                            }, GridBagConstraints().apply {
+                                anchor = GridBagConstraints.LINE_START
+                            })
+                            add(JLabel(i18n.getString("settings.${name}_description")).apply {
+                                font = font.deriveFont(12f)
+                            }, GridBagConstraints().apply {
+                                gridy = 1
+                                anchor = GridBagConstraints.LINE_START
+                            })
+                        }.also {
+                            settingsPanel.add(it, GridBagConstraints().apply {
+                                gridy = row
+                                anchor = GridBagConstraints.LINE_START
+                                insets = Insets(0, 0, 16, 16)
+                            })
+                        }
+                        JCheckBox().also {
+                            settingsPanel.add(it, GridBagConstraints().apply {
+                                gridx = 1
+                                gridy = row++
+                            })
+                            components[name] = it
+                        }
                     }
-                    JCheckBox().also {
-                        settingsPanel.add(it, GridBagConstraints().apply {
-                            gridx = 1
-                            gridy = row++
-                        })
-                        components[name] = it
+                    "Button" -> {
+                        JPanel().apply {
+                            layout = GridBagLayout()
+                            add(JLabel(i18n.getString("settings.$name")).apply {
+                                font = font.deriveFont(Font.BOLD, 16f)
+                            }, GridBagConstraints().apply {
+                                anchor = GridBagConstraints.LINE_START
+                            })
+                            add(JLabel(i18n.getString("settings.${name}_description")).apply {
+                                font = font.deriveFont(12f)
+                            }, GridBagConstraints().apply {
+                                gridy = 1
+                                anchor = GridBagConstraints.LINE_START
+                            })
+                        }.also {
+                            settingsPanel.add(it, GridBagConstraints().apply {
+                                gridy = row
+                                anchor = GridBagConstraints.LINE_START
+                                insets = Insets(0, 0, 16, 16)
+                            })
+                        }
+                        JButton("Configure").also {
+                            settingsPanel.add(it, GridBagConstraints().apply {
+                                gridx = 1
+                                gridy = row++
+                                anchor = GridBagConstraints.LINE_START
+                            })
+                            components[name] = it
+                            it.addActionListener {
+                                ExtraSettings.actions[name]?.invoke(this)
+                            }
+                        }
                     }
                 }
             }
@@ -174,6 +207,7 @@ class SettingsModal(locale: String = "en") : JDialog() {
             height += 128
         }
         setLocationRelativeTo(null)
+        logger().info("Loaded ${settingDefinitions.size} setting definitions")
     }
 
 
@@ -203,16 +237,14 @@ fun loadSettingsFromFile(): Properties {
 }
 
 /** Loads the internal settings file. */
-fun getSettingDefinitions(): List<SettingDefinition> =
-    Json.decodeFromString(Utils.resourceToString("/settings.json"))
+fun getSettingDefinitions(): List<SettingDefinition> = Json.decodeFromString(Utils.resourceToString("/settings.json"))
 
 /** Gets the default settings. */
-fun getDefaultSettings(): Properties =
-    Properties().apply {
-        getSettingDefinitions().forEach {
-            put(it.name, it.default)
-        }
+fun getDefaultSettings(): Properties = Properties().apply {
+    getSettingDefinitions().forEach {
+        put(it.name, it.default)
     }
+}
 
 /**
  * Returns a [File] that contains the program properties.
@@ -253,5 +285,5 @@ data class SettingDefinition(
     /**
      * The default value of the setting.
      */
-    val default: String,
+    val default: String = "",
 )

@@ -52,12 +52,16 @@ const val CONFIGURATION_DIRECTORY: String = ".midis2jam2"
 @ExperimentalFoundationApi
 fun main(args: Array<String>) {
     /* Hush */
-    LogManager.getLogManager().reset()
+//    LogManager.getLogManager().reset()
 
     /* Get the default sequencer loaded in a coroutine now since it takes a while (about 1.5 seconds) to load. */
     loadSequencerJob.start()
 
     /* Ensure configuration folders are initialized */
+    val configDir = File(System.getProperty("user.home"), ".midis2jam2").also {
+        it.mkdirs()
+    }
+    File(configDir, "backgrounds").mkdirs()
 
     /* Check for command line arguments */
     if (args.isNotEmpty()) {

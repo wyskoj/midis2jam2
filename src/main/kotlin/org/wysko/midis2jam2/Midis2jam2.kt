@@ -28,8 +28,8 @@ import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.FadeFilter
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.util.SkyFactory
 import kotlinx.coroutines.runBlocking
+import org.wysko.midis2jam2.gui.ConfigureBackground
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.brass.*
@@ -106,9 +106,12 @@ abstract class Midis2jam2(
         }
 
         /*** LOAD SKYBOX ***/
-        with(assetManager.loadTexture("Assets/sky.png")) {
-            rootNode.attachChild(SkyFactory.createSky(assetManager, this, this, this, this, this, this))
-        }
+        BackgroundController.configureBackground(
+            ConfigureBackground.type(),
+            ConfigureBackground.value(),
+            assetManager,
+            rootNode
+        )
 
         /*** INIT FADE IN ***/
         fade = FadeFilter(0.5f).apply {
