@@ -155,8 +155,7 @@ abstract class StringFamilyInstrument protected constructor(
     /** The current intensity of the bow animation. A larger intensity means the bows will travel further. */
     private var intensity = 3.0
 
-    private val groups: MutableList<NotePeriodGroup> = notePeriods.contiguousGroups() as MutableList<NotePeriodGroup>
-
+    private val groups: MutableList<NotePeriodGroup> = notePeriods.contiguousGroups().toMutableList()
     private var currentGroup: NotePeriodGroup? = null
 
     init {
