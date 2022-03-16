@@ -134,8 +134,12 @@ abstract class Midis2jam2(
                 channel.sortBy { it.time }
             }.foldIndexed(ArrayList()) { channelNumber, acc, events -> // pure magic
                 if (channelNumber == 9) { // Percussion channel
-                    acc.apply {
-                        add(Percussion(this@Midis2jam2, events))
+                    if (events.filterIsInstance<MidiNoteOnEvent>().isNotEmpty()) {
+                        acc.apply {
+                            add(Percussion(this@Midis2jam2, events))
+                        }
+                    } else {
+                        acc
                     }
                 } else { // Melodic channel
                     val programEvents = events.filterIsInstance<MidiProgramEvent>().let {
@@ -344,7 +348,9 @@ abstract class Midis2jam2(
     }
 
     private fun fromEvents(programNum: Int, events: ArrayList<MidiChannelSpecificEvent>): Instrument? {
-        if (events.isEmpty()) return null
+        /* If there are no NoteOn events, there's no need to actually create the instrument. */
+        if (events.filterIsInstance<MidiNoteOnEvent>().isEmpty()) return null
+
         return when (programNum) {
             0 -> Keyboard(this, events, Keyboard.KeyboardSkin.PIANO)
             1 -> Keyboard(this, events, Keyboard.KeyboardSkin.BRIGHT)
