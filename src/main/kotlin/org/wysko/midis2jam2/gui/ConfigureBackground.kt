@@ -22,10 +22,13 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.util.logger
 import java.awt.*
+import java.awt.image.BufferedImage
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
+import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.event.HyperlinkEvent
@@ -55,23 +58,21 @@ object ConfigureBackground {
 
             /* Load usable images */
             @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-            val comboBoxModel = DefaultComboBoxModel(backgroundsFolder.listFiles().filter {
-                validExtensions.contains(it.extension)
-            }.map { it.name }.toTypedArray())
 
             /* Set padding */
             (dialog.contentPane as JPanel).border = EmptyBorder(10, 10, 10, 10)
 
             /* One file combo box */
-            val oneFileComboBox = JComboBox(comboBoxModel)
+            val oneFileComboBox = JComboBox(imagesComboBoxModel())
 
             /* Six files combo boxes */
-            val westComboBox = JComboBox(comboBoxModel)
-            val northComboBox = JComboBox(comboBoxModel)
-            val eastComboBox = JComboBox(comboBoxModel)
-            val southComboBox = JComboBox(comboBoxModel)
-            val upComboBox = JComboBox(comboBoxModel)
-            val downComboBox = JComboBox(comboBoxModel)
+            val westComboBox = JComboBox(imagesComboBoxModel())
+            val northComboBox = JComboBox(imagesComboBoxModel())
+            val eastComboBox = JComboBox(imagesComboBoxModel())
+            val southComboBox = JComboBox(imagesComboBoxModel())
+            val upComboBox = JComboBox(imagesComboBoxModel())
+            val downComboBox = JComboBox(imagesComboBoxModel())
+            val comboBoxes = listOf(westComboBox, northComboBox, eastComboBox, southComboBox, upComboBox, downComboBox)
 
             /* Color */
             val colorChooser = JColorChooser()
@@ -203,18 +204,19 @@ object ConfigureBackground {
             dialog.contentPane.add(JEditorPane().also { descPane ->
                 descPane.contentType = "text/html"
                 descPane.text = """
-        <html>
-        You can configure the appearance of the background using a custom picture or color. There are several different background types:
-        <ul>
-            <li>Default &mdash; The default background (grey checkerboard) is used.</li>
-            <li>Fixed &mdash; The background picture is static and does not move (similar to MIDIJam).</li>
-            <li>Repeated cubemap &mdash; A single background picture is displayed on each of the six surrounding walls.</li>
-            <li>Unique cubemap &mdash; Six pictures are respectively displayed on each of the six surrounding walls.</li>
-            <li>Color &mdash; The background is a solid color.</li>
-        </ul>
-        To use a custom picture, you must place the image file into the <a href><tt>.midis2jam2/backgrounds</tt></a> folder in your user folder.
-        </html>
-    """.trimIndent()
+                <html>
+                You can configure the appearance of the background using a custom picture or color.
+                To use a custom picture, you must<br>place the image file into the <a href><tt>.midis2jam2/backgrounds</tt></a> folder in your user folder.<br>
+                <ul>
+                    <li>Default &mdash; The default background (grey checkerboard) is used.</li>
+                    <li>Fixed &mdash; The background picture is static and does not move (similar to MIDIJam).</li>
+                    <li>Repeated cubemap &mdash; A single background picture is displayed on each of the six surrounding walls.</li>
+                    <li>Unique cubemap &mdash; Six pictures are respectively displayed on each of the six surrounding walls.</li>
+                    <li>Color &mdash; The background is a solid color.</li>
+                </ul>
+                Note: images for use in a cubemap <b>must</b> be square.
+                </html>
+                """.trimIndent()
                 descPane.isEditable = false
                 descPane.margin = Insets(0, 0, 0, 0)
                 descPane.addHyperlinkListener {
@@ -276,14 +278,99 @@ object ConfigureBackground {
                 buttonPanel.layout = FlowLayout()
                 buttonPanel.add(JButton("OK").also { okButton ->
                     okButton.addActionListener {
-                        Properties().apply {
+                        val props = Properties().apply {
                             val selectedType = typeComboBox.selectedItem as Triple<*, *, *>
                             setProperty("type", selectedType.third as String)
                             when (selectedType.second as String) {
+                                "DEFAULT" -> {
+                                    setProperty("type", "DEFAULT")
+                                    dialog.dispose()
+                                }
                                 "ONE_FILE" -> {
+                                    /* Ensure that the user has selected a file */
+                                    if (oneFileComboBox.selectedItem == null) {
+                                        JOptionPane.showMessageDialog(
+                                            dialog,
+                                            "You must select an image.",
+                                            "Invalid configuration",
+                                            JOptionPane.ERROR_MESSAGE
+                                        )
+                                        return@addActionListener
+                                    }
+
+                                    /* Ensure the file is valid */
+                                    val read =
+                                        ImageIO.read(File(backgroundsFolder, oneFileComboBox.selectedItem as String))
+
+                                    if (read == null) {
+                                        JOptionPane.showMessageDialog(
+                                            dialog,
+                                            "The selected image could not be loaded.",
+                                            "Invalid configuration",
+                                            JOptionPane.ERROR_MESSAGE
+                                        )
+                                        return@addActionListener
+                                    }
+
+                                    if (selectedType.third as String == "REPEATED_CUBEMAP" && read.isSquare.not()) {
+                                        JOptionPane.showMessageDialog(
+                                            dialog,
+                                            "The selected image is not a square.",
+                                            "Invalid configuration",
+                                            JOptionPane.ERROR_MESSAGE
+                                        )
+                                        return@addActionListener
+                                    }
+
                                     setProperty("value", oneFileComboBox.selectedItem as String)
+                                    dialog.dispose()
+
                                 }
                                 "SIX_FILES" -> {
+                                    /* Ensure that the user has selected a file for each box */
+                                    if (comboBoxes.any { it.selectedItem == null }) {
+                                        JOptionPane.showMessageDialog(
+                                            dialog,
+                                            "You must select an image.",
+                                            "Invalid configuration.",
+                                            JOptionPane.ERROR_MESSAGE
+                                        )
+                                        return@addActionListener
+                                    }
+
+                                    val images = comboBoxes.associate {
+                                        val s = it.selectedItem as String
+                                        s to ImageIO.read(File(backgroundsFolder, s))
+                                    }
+
+                                    /* Ensure that all images are valid */
+                                    with(images.filter { it.value == null }) {
+                                        if (isNotEmpty()) {
+                                            JOptionPane.showMessageDialog(
+                                                dialog,
+                                                "The following images could not be loaded: " +
+                                                        toList().joinToString { it.first },
+                                                "Invalid configuration.",
+                                                JOptionPane.ERROR_MESSAGE
+                                            )
+                                            return@addActionListener
+                                        }
+                                    }
+
+                                    /* Ensure all images are square. */
+                                    with(images.filter { it.value.isSquare.not() }) {
+                                        if (isNotEmpty()) {
+                                            JOptionPane.showMessageDialog(
+                                                dialog,
+                                                "The following images are not square: " +
+                                                        toList().joinToString { it.first },
+                                                "Invalid configuration.",
+                                                JOptionPane.ERROR_MESSAGE
+                                            )
+                                            return@addActionListener
+                                        }
+                                    }
+
                                     setProperty(
                                         "value", Json.encodeToString(
                                             listOf(
@@ -296,13 +383,20 @@ object ConfigureBackground {
                                             )
                                         )
                                     )
+                                    dialog.dispose()
+
                                 }
                                 "COLOR" -> {
+                                    this@ConfigureBackground.logger().debug(
+                                        "RGB value: ${Arrays.toString(colorChooser.color.getRGBColorComponents(null))}"
+                                    )
                                     setProperty("value", colorChooser.color.rgb.toString())
+
+                                    dialog.dispose()
                                 }
                             }
-                        }.store(FileWriter(backgroundSettingsFile), null)
-                        dialog.dispose()
+                        }
+                        props.store(FileWriter(backgroundSettingsFile), null)
                     }
                 })
                 buttonPanel.add(JButton("Cancel").also { cancelButton ->
@@ -342,6 +436,10 @@ object ConfigureBackground {
             }
         }
 
+    private fun imagesComboBoxModel() = DefaultComboBoxModel(backgroundsFolder.listFiles().filter {
+        validExtensions.contains(it.extension)
+    }.map { it.name }.toTypedArray())
+
     /**
      * Returns the current type of background.
      */
@@ -358,6 +456,12 @@ object ConfigureBackground {
     }
 
 }
+
+/**
+ * Determines if this image is square.
+ */
+val BufferedImage.isSquare: Boolean
+    get() = width == height
 
 /** Makes some good-looking insets */
 private fun stdInsets(): Insets = Insets(0, 0, 5, 5)
@@ -377,7 +481,12 @@ private fun err(exception: Exception, message: String, title: String, onFinish: 
     onFinish.invoke()
 }
 
-
+/** Loads any background settings from the file. */
 private fun loadBackgroundSettingsFromFile(): Properties = Properties(defaultProperties).apply {
-    load(FileReader(backgroundSettingsFile))
+    try {
+        load(FileReader(backgroundSettingsFile))
+    } catch (ignored: FileNotFoundException) {
+    } catch (e: Exception) {
+        err(e, "There was an error loading the background configuration.", "Error")
+    }
 }

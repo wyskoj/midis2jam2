@@ -17,10 +17,13 @@
 
 package org.wysko.midis2jam2.world
 
-import com.jme3.asset.AssetManager
 import com.jme3.asset.plugins.FileLocator
+import com.jme3.renderer.ViewPort
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import com.jme3.ui.Picture
 import com.jme3.util.SkyFactory
+import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.gui.backgroundsFolder
 import org.wysko.midis2jam2.util.logger
 
@@ -30,8 +33,17 @@ object BackgroundController {
     /**
      * Configures the background.
      */
-    fun configureBackground(type: String, value: Any?, assetManager: AssetManager, rootNode: Node) {
+    fun configureBackground(
+        type: String,
+        value: Any?,
+        context: Midis2jam2,
+        rootNode: Node
+    ): ViewPort? {
+        val assetManager = context.assetManager
+        val renderManager = context.renderManager
+
         logger().info("Configuring $type background type.")
+        assetManager.registerLocator(backgroundsFolder.absolutePath, FileLocator::class.java)
         when (type) {
             "DEFAULT" -> {
                 with(assetManager.loadTexture("Assets/sky.png")) {
@@ -49,10 +61,34 @@ object BackgroundController {
                 }
             }
 
+            "FIXED" -> {
+                val picture = Picture("background").apply {
+                    setImage(assetManager, value as String, false)
+                    setWidth(context.app.camera.width.toFloat())
+                    setHeight(context.app.camera.height.toFloat())
+                    setPosition(0f, 0f)
+                    updateGeometricState()
+                }
+                val viewport = renderManager.createPreView("background", context.app.camera)
+                viewport.setClearFlags(true, true, true)
+                viewport.attachScene(Node().also { node ->
+                    with(picture) {
+                        node.attachChild(this)
+                        cullHint = Spatial.CullHint.Never
+                    }
+                    node.updateGeometricState()
+                    node.cullHint = Spatial.CullHint.Never
+                })
+
+                context.app.viewPort.setClearFlags(false, true, false)
+
+                return viewport
+            }
+
+
             "UNIQUE_CUBEMAP" -> {
                 val names = value as List<*>
-                logger().trace("Unique cubemap values: $names")
-                assetManager.registerLocator(backgroundsFolder.absolutePath, FileLocator::class.java)
+                logger().debug("Unique cubemap values: $names")
                 rootNode.attachChild(
                     SkyFactory.createSky(
                         assetManager,
@@ -68,7 +104,7 @@ object BackgroundController {
 
             "REPEATED_CUBEMAP" -> {
                 val name = value as String
-                logger().trace("Repeated cubemap texture: $name")
+                logger().debug("Repeated cubemap texture: $name")
                 assetManager.registerLocator(backgroundsFolder.absolutePath, FileLocator::class.java)
                 rootNode.attachChild(
                     SkyFactory.createSky(
@@ -83,5 +119,7 @@ object BackgroundController {
                 )
             }
         }
+
+        return null
     }
 }

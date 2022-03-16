@@ -333,7 +333,7 @@ fun Launcher() {
                                 Icon(
                                     imageVector = Icons.Filled.Settings,
                                     contentDescription = null,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                    modifier = Modifier.padding(horizontal = 6.dp)
                                 )
                             }
                             Divider(modifier = Modifier.padding(16.dp).width(width))

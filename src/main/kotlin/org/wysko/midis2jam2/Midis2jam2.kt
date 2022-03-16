@@ -26,6 +26,7 @@ import com.jme3.input.controls.ActionListener
 import com.jme3.material.Material
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.FadeFilter
+import com.jme3.renderer.RenderManager
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import kotlinx.coroutines.runBlocking
@@ -105,14 +106,6 @@ abstract class Midis2jam2(
             rootNode.attachChild(it)
         }
 
-        /*** LOAD SKYBOX ***/
-        BackgroundController.configureBackground(
-            ConfigureBackground.type(),
-            ConfigureBackground.value(),
-            assetManager,
-            rootNode
-        )
-
         /*** INIT FADE IN ***/
         fade = FadeFilter(0.5f).apply {
             value = 0f
@@ -121,7 +114,16 @@ abstract class Midis2jam2(
             it.addFilter(fade)
             it.numSamples = properties.getProperty("graphics_samples").toInt()
         }
+
         app.viewPort.addProcessor(fpp)
+
+        /*** LOAD SKYBOX ***/
+        BackgroundController.configureBackground(
+            ConfigureBackground.type(),
+            ConfigureBackground.value(),
+            this,
+            rootNode
+        )
 
         /*** INITIALIZE INSTRUMENTS ***/
         runBlocking {
@@ -225,6 +227,11 @@ abstract class Midis2jam2(
     /** The asset manager. */
     val assetManager: AssetManager by lazy {
         app.assetManager
+    }
+
+    /** The render manager. */
+    val renderManager: RenderManager by lazy {
+        app.renderManager
     }
 
     /** The root node of the scene. */
