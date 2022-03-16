@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.asset.plugins.FileLocator
+import com.jme3.math.ColorRGBA
 import com.jme3.renderer.ViewPort
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -26,6 +27,7 @@ import com.jme3.util.SkyFactory
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.gui.backgroundsFolder
 import org.wysko.midis2jam2.util.logger
+import java.awt.Color
 
 /** Handles configuring the background. */
 object BackgroundController {
@@ -117,6 +119,12 @@ object BackgroundController {
                         assetManager.loadTexture(name),
                     )
                 )
+            }
+
+            "COLOR" -> {
+                val color = Color(value as Int)
+                context.app.viewPort.backgroundColor =
+                    ColorRGBA(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
             }
         }
 
