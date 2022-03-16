@@ -110,6 +110,14 @@ class LyricController(
                 if (group.isNotEmpty()) lyricGroups.add(group)
                 group = ArrayList()
             }
+            if (first.text.endsWith("\n")) {
+                with(group) {
+                    add(first)
+                    lyricGroups.add(this)
+                }
+                group = ArrayList()
+                continue
+            }
             group.add(first)
         }
         if (group.isNotEmpty()) lyricGroups.add(group) // Add the last group
