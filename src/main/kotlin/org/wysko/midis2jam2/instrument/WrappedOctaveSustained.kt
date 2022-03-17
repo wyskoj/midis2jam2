@@ -65,7 +65,7 @@ abstract class WrappedOctaveSustained protected constructor(
         val highestLevel: Node = Node()
 
         /** The animation node. */
-        protected val animNode: Node = Node()
+        val animNode: Node = Node()
 
         /** This note's current progress playing the note. */
         protected var progress: Double = 0.0

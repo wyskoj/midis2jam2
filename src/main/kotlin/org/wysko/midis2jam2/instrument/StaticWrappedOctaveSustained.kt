@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument
 
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
+import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
 abstract class StaticWrappedOctaveSustained(
@@ -35,7 +36,13 @@ abstract class StaticWrappedOctaveSustained(
             twelfths.any { it.playing }
         }
         twelfths.forEach { tw ->
-            tw.highestLevel.localTranslation.y = if (tw.playing) tick else 0f
+            when (tw) {
+                is StageStrings.StageStringNote -> {
+                    tw.animNode.localTranslation.y = if (tw.playing) tick else 0f
+                }
+                else -> tw.highestLevel.localTranslation.y = if (tw.playing) tick else 0f
+            }
+
         }
     }
 }
