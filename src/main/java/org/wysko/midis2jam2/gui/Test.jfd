@@ -1,0 +1,232 @@
+JFDML JFormDesigner: "7.0.5.3.411" Java: "11.0.13" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+			"$columnSpecs": "154:1.0"
+			"$rowSpecs": "0, 0, 0, 0, center:1, 0, 0"
+			"$hGap": 5
+			"$vGap": 5
+			"$alignLeft": true
+			"$alignTop": true
+		} ) {
+			name: "this"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label1"
+				"text": "Configure Background"
+				"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 2, false )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+			add( new FormComponent( "javax.swing.JEditorPane" ) {
+				name: "editorPane1"
+				"contentType": "text/html"
+				"text": "<html>\nYou can configure the appearance of the background using a custom picture or color. There are several different background types:\n<ul>\n    <li>Default &mdash; The default background (grey checkerboard) is used.</li>\n    <li>Fixed &mdash; The background picture is static and does not move (similar to MIDIJam).</li>\n    <li>Repeated cubemap &mdash; A single background picture is displayed on each of the six surrounding walls.</li>\n    <li>Unique cubemap &mdash; Six pictures are respectively displayed on each of the six surrounding walls.</li>\n    <li>Color &mdash; The background is a solid color.</li>\n</ul>\nTo use a custom picture, you must place the image file into the <a href><tt>.midis2jam2/backgrounds</tt></a> folder in your user folder.\n</html>"
+				"editable": false
+				"margin": new java.awt.Insets( 0, 0, 0, 0 )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 1
+				"hAlign": 5
+			} )
+			add( new FormComponent( "javax.swing.JSeparator" ) {
+				name: "separator1"
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 2
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label2"
+					"text": "Select a background type:"
+				} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "comboBox1"
+					auxiliary() {
+						"JavaCodeGenerator.typeParameters": "Pair<String, String>"
+						"JavaCodeGenerator.postCreateCode": "${field}.setModel(new DefaultComboBoxModel<>(new Pair[] {\n\tnew Pair(\"Default\", \"NO_SETTINGS\"),\n\tnew Pair(\"Fixed\", \"ONE_FILE\"),\n\tnew Pair(\"Repeated cubemap\", \"ONE_FILE\"),\n\tnew Pair(\"Unique cubemap\", \"SIX_FILES\"),\n\tnew Pair(\"Color\", \"COLOR\")\n}));"
+					}
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "changeType", true ) )
+				} )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 3
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.CardLayout ) ) {
+				name: "panel2"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					name: "panel4"
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label4"
+						"text": "There are no configurable settings."
+						"horizontalAlignment": 0
+						"enabled": false
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "Center"
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "NO_SETTINGS"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "0:1.0, center:0, center:0:1.0, 0:1.0"
+					"$rowSpecs": "0:1.0, 0, 0:1.0"
+					"$hGap": 5
+					"$vGap": 5
+					"$alignLeft": true
+					"$alignTop": true
+				} ) {
+					name: "panel3"
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label3"
+						"text": "Background image:"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 1
+						"gridx": 1
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox2"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"gridy": 1
+						"hAlign": 5
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "ONE_FILE"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					name: "panel6"
+					add( new FormComponent( "javax.swing.JColorChooser" ) {
+						name: "colorChooser1"
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "Center"
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "COLOR"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "0:1.0, 0, 0, 0, 0, 0:1.0"
+					"$rowSpecs": "0:1.0, 0, 0, 0, 0, 0, 0, 0:1.0"
+					"$hGap": 5
+					"$vGap": 5
+					"$alignLeft": true
+					"$alignTop": true
+				} ) {
+					name: "six_items"
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label6"
+						"text": "Up:"
+						"horizontalAlignment": 0
+						"verticalAlignment": 3
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"gridy": 1
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox5"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"gridy": 2
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label5"
+						"text": "West:"
+						"horizontalAlignment": 0
+						"verticalAlignment": 3
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 3
+						"gridx": 1
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label7"
+						"text": "North:"
+						"horizontalAlignment": 0
+						"verticalAlignment": 3
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 3
+						"gridx": 2
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label8"
+						"text": "East:"
+						"horizontalAlignment": 0
+						"verticalAlignment": 3
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 3
+						"gridx": 3
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label9"
+						"text": "South:"
+						"horizontalAlignment": 0
+						"verticalAlignment": 3
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 3
+						"gridx": 4
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox3"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 4
+						"gridx": 1
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox4"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"gridy": 4
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox7"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 3
+						"gridy": 4
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox8"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 4
+						"gridy": 4
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label10"
+						"text": "Down:"
+						"horizontalAlignment": 0
+						"verticalAlignment": 3
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 5
+						"gridx": 2
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "comboBox6"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"gridy": 6
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "SIX_FILES"
+				} )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 4
+			} )
+			add( new FormComponent( "javax.swing.JSeparator" ) {
+				name: "separator2"
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 5
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+				name: "panel5"
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "button1"
+					"text": "OK"
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "button2"
+					"text": "Cancel"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "cancelPressed", true ) )
+				} )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+				"gridy": 6
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 660, 720 )
+		} )
+	}
+}

@@ -34,5 +34,10 @@
     "type": "Boolean",
     "category": "tweaks",
     "default": "false"
+  },
+  {
+    "name": "background",
+    "type": "Button",
+    "category": "display"
   }
 ]

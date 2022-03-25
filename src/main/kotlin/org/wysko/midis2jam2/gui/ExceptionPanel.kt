@@ -18,9 +18,12 @@
 package org.wysko.midis2jam2.gui
 
 import java.awt.BorderLayout
+import java.awt.Dimension
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JScrollPane
 import javax.swing.JTextArea
+import javax.swing.border.EmptyBorder
 
 /**
  * Formats an exception for display.
@@ -28,9 +31,14 @@ import javax.swing.JTextArea
 class ExceptionPanel(message: String, exception: Exception) : JPanel() {
     init {
         layout = BorderLayout()
-        add(JLabel(message), BorderLayout.NORTH)
-        add(JTextArea(exception.stackTraceToString()).apply {
+        add(JLabel(message).also { label ->
+            label.border = EmptyBorder(0, 0, 10, 0)
+        }, BorderLayout.NORTH)
+        add(JScrollPane(JTextArea(exception.stackTraceToString()).apply {
             isEditable = false
+        }).also { sp ->
+            sp.preferredSize = Dimension(600, 300)
         }, BorderLayout.CENTER)
+        preferredSize = Dimension(600, 300)
     }
 }
