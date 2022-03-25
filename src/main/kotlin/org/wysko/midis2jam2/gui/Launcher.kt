@@ -93,7 +93,7 @@ private val launcherState = object : Properties(DEFAULT_LAUNCHER_STATE) {
     }
 
     /** List of names of SoundFonts. */
-    private val soundfonts: ArrayList<String>
+    val soundfonts: ArrayList<String>
         get() = Json.decodeFromString<MutableList<String>>(getProperty("soundfonts")) as ArrayList<String>
 
 }.apply {
@@ -164,11 +164,10 @@ fun Launcher() {
                 Properties().apply {
                     setProperty("midi_file", selectedMidiFile)
                     setProperty("midi_device", selectedMidiDevice)
-                    soundFonts[selectedSoundFont].let {
-                        if (it != "Default SoundFont") {
-                            setProperty("soundfont", it)
-                        }
-                    }
+                    setProperty("soundfont",
+                        launcherState.soundfonts.map { File(it) }
+                            .first { it.name == soundFonts[selectedSoundFont] }.absolutePath
+                    )
                 },
                 onStart = {
                     freeze = true
