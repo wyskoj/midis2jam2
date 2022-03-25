@@ -57,7 +57,6 @@ import java.text.MessageFormat
 import java.util.*
 import javax.sound.midi.MidiSystem
 import javax.swing.JFileChooser
-import kotlin.collections.ArrayList
 
 /**
  * Locales for the GUI.
@@ -143,7 +142,7 @@ fun Launcher() {
     val soundFonts by remember {
         derivedStateOf {
             val decodeFromString = Json.decodeFromString<List<String>>(launcherState.getProperty("soundfonts"))
-            decodeFromString.ifEmpty { listOf("Default SoundFont") }
+            decodeFromString.ifEmpty { listOf("Default SoundFont") }.toMutableList()
         }
     }
     var selectedSoundFont by remember { mutableStateOf(0) }
@@ -165,7 +164,11 @@ fun Launcher() {
                 Properties().apply {
                     setProperty("midi_file", selectedMidiFile)
                     setProperty("midi_device", selectedMidiDevice)
-                    setProperty("soundfont", soundFonts[selectedSoundFont])
+                    soundFonts[selectedSoundFont].let {
+                        if (it != "Default SoundFont") {
+                            setProperty("soundfont", it)
+                        }
+                    }
                 },
                 onStart = {
                     freeze = true
@@ -311,6 +314,7 @@ fun Launcher() {
 
                                                 if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                                                     launcherState.addSoundFont(selectedFile.absolutePath)
+                                                    soundFonts.add(selectedFile.absolutePath)
                                                     selectedSoundFont = soundFonts.indexOf(selectedFile.absolutePath)
                                                 }
                                             }

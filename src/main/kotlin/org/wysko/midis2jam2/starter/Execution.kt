@@ -363,7 +363,7 @@ private open class LegacyExecution(
     override fun simpleInitApp() {
         DesktopMidis2jam2(
             sequencer = sequencer,
-            MidiFile(File(properties.getProperty("midi_device"))),
+            MidiFile(File(properties.getProperty("midi_file"))),
             properties = properties,
             onFinish
         ).also {
