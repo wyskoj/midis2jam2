@@ -164,10 +164,12 @@ fun Launcher() {
                 Properties().apply {
                     setProperty("midi_file", selectedMidiFile)
                     setProperty("midi_device", selectedMidiDevice)
-                    setProperty("soundfont",
-                        launcherState.soundfonts.map { File(it) }
-                            .first { it.name == soundFonts[selectedSoundFont] }.absolutePath
-                    )
+                    if (soundFonts[selectedSoundFont] != "Default SoundFont") {
+                        setProperty("soundfont",
+                            launcherState.soundfonts.map { File(it) }
+                                .first { it.name == soundFonts[selectedSoundFont] }.absolutePath
+                        )
+                    }
                 },
                 onStart = {
                     freeze = true
