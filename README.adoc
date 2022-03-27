@@ -63,7 +63,8 @@ Development contributors:
 
 Internationalization:
 
-* Mr. Tremolo Measure
+* ES — Mr. Tremolo Measure
+* RU — https://github.com/rxuglr[rxuglr]
 
 == ⁉️ Support
 
