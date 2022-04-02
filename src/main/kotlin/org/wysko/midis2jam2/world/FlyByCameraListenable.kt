@@ -22,15 +22,20 @@ import com.jme3.renderer.Camera
 
 /**
  * A [FlyByCamera] that calls a function whenever the camera is moved or rotated by the user.
+ *
+ * @param cam the camera that should be controlled by this
+ * @param onUserInput a callback that will run everytime an action occurs
  */
 class FlyByCameraListenable(cam: Camera, val onUserInput: (name: String) -> Unit) : FlyByCamera(cam) {
 
-    var dragging = false
+    /** Determines the state of "dragging". That is, is the mouse being held down? */
+    private var dragging: Boolean = false
         set(value) {
             if (value) onUserInput("FLYCAM_RotateDrag")
             field = value
         }
 
+    /** Called whenever an action occurs. */
     override fun onAction(name: String?, value: Boolean, tpf: Float) {
         super.onAction(name, value, tpf)
         if (name == "FLYCAM_RotateDrag") dragging = value
