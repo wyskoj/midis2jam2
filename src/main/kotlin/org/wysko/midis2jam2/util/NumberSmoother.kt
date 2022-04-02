@@ -17,15 +17,32 @@
 
 package org.wysko.midis2jam2.util
 
+import kotlin.math.abs
+
+/** Applies smoothing to a given value by slowing encroaching on that value over time. */
 class NumberSmoother(initialValue: Float, private val smoothness: Double) {
-    var value = initialValue
+
+    /**
+     * The current smoothed value.
+     */
+    var value: Float = initialValue
         private set
 
+    /**
+     * Call this on every frame to update the new smoothed value.
+     *
+     * @param delta the amount of time that has passed since the last frame
+     * @param target the target value
+     * @return [value]
+     */
     fun tick(delta: Float, target: () -> Float): Float {
-        if (smoothness == 0.0) {
-            value = target.invoke()
-        } else {
-            value += ((target.invoke() - value) * delta * smoothness).toFloat()
+        when (smoothness) {
+            0.0 -> value = target.invoke()
+            else -> with(target.invoke()) {
+                value += ((this - value) * delta * smoothness).toFloat().coerceIn(
+                    -abs(this - value)..abs(this - value) // Prevent the change from overshooting
+                )
+            }
         }
         return value
     }
