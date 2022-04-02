@@ -69,7 +69,7 @@ private const val LASER_HEIGHT = 727.289f
 class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
-    private val pitchBendModulationController = PitchBendModulationController(context, eventList)
+    private val pitchBendModulationController = PitchBendModulationController(context, eventList, smoothness = 50.0)
 
     private var pitchBendAmount = 0f
 
