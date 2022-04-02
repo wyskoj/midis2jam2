@@ -73,21 +73,21 @@ tasks.processResources {
 
 dependencies {
     // JMonkeyEngine
-    implementation("org.jmonkeyengine:jme3-core:3.5.0-stable")
-    implementation("org.jmonkeyengine:jme3-desktop:3.5.0-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.0-stable")
-    implementation("org.jmonkeyengine:jme3-plugins:3.5.0-stable")
-    implementation("org.jmonkeyengine:jme3-effects:3.5.0-stable")
+    implementation("org.jmonkeyengine:jme3-core:3.5.1-stable")
+    implementation("org.jmonkeyengine:jme3-desktop:3.5.1-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.1-stable")
+    implementation("org.jmonkeyengine:jme3-plugins:3.5.1-stable")
+    implementation("org.jmonkeyengine:jme3-effects:3.5.1-stable")
 
     // JetBrains annotations
-    implementation("org.jetbrains:annotations:22.0.0")
+    implementation("org.jetbrains:annotations:23.0.0")
 
     // Unit testing
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 
     // Theme
-    implementation("com.formdev:flatlaf:2.0.1")
+    implementation("com.formdev:flatlaf:2.1")
 
     // Installer
     implementation("com.install4j:install4j-runtime:8.0.7")
