@@ -241,11 +241,17 @@ object Execution {
 
             if (properties.getProperty("legacy_display_engine") == "true") {
                 Thread({
-                    LegacyExecution(properties, onFinish, sequencer).execute()
+                    LegacyExecution(properties, {
+                        onFinish.invoke()
+                        midiDevice?.close()
+                    }, sequencer).execute()
                 }, "midis2jam2 starter").start()
             } else {
                 Thread({
-                    StandardExecution(properties, onFinish, sequencer).execute()
+                    StandardExecution(properties, {
+                        onFinish.invoke()
+                        midiDevice?.close()
+                    }, sequencer).execute()
                 }, "midis2jam2 starter").start()
             }
         }
