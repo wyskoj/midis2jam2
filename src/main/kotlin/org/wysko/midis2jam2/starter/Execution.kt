@@ -280,6 +280,7 @@ private val defaultSettings = AppSettings(true).apply {
         ImageIO.read(this::class.java.getResource(it))
     }.toTypedArray()
     title = "midis2jam2"
+    audioRenderer = null
 }
 
 private open class StandardExecution(
