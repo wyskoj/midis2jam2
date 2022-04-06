@@ -34,7 +34,7 @@ import javax.swing.border.EmptyBorder
 import javax.swing.event.HyperlinkEvent
 
 /** List of supported image extensions. */
-val validExtensions: List<String> = listOf("jpg", "png", "gif", "bmp")
+val validExtensions: List<String> = listOf("jpg", "png", "gif", "bmp", "jpeg")
 
 /** Default properties. */
 val defaultProperties: Properties = Properties().apply {
