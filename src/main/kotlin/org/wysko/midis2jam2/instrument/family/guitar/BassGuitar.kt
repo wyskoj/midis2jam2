@@ -20,16 +20,22 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.Utils.resourceToString
 
 /** The base position of the bass guitar. */
 private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
 
 /** The bass skin texture file. */
 private const val BASS_SKIN_BMP = "BassSkin.bmp"
+
+private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
+    Json.decodeFromString(resourceToString("/instrument/alignment/BassGuitar.json"))
 
 /**
  * The Bass Guitar.
@@ -43,37 +49,38 @@ private const val BASS_SKIN_BMP = "BassSkin.bmp"
 class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: BassGuitarType) :
     FrettedInstrument(
         context,
-        StandardFrettingEngine(
-            4, 22,
+        frettingEngine = StandardFrettingEngine(
+            numberOfStrings = 4, numberOfFrets = 22,
             if (needsDropTuning(events)) BassGuitarTuning.DROP_D.values else BassGuitarTuning.STANDARD.values
         ),
         events,
-        FrettedInstrumentPositioning(
-            19.5f, -26.57f, arrayOf(
-                Vector3f(1f, 1f, 1f),
-                Vector3f(1f, 1f, 1f),
-                Vector3f(1f, 1f, 1f),
-                Vector3f(1f, 1f, 1f)
-            ), floatArrayOf(-0.85f, -0.31f, 0.20f, 0.70f), floatArrayOf(-1.86f, -0.85f, 0.34f, 1.37f),
-            FretHeightByTable.fromJson("BassGuitar")
-        ),
-        4,
-        context.loadModel(if (needsDropTuning(events)) type.modelDropDFile else type.modelFile, type.textureFile)
+        positioning = with(BASS_GUITAR_MODEL_PROPERTIES) {
+            FrettedInstrumentPositioning(
+                upperY = upperVerticalOffset,
+                lowerY = lowerVerticalOffset,
+                restingStrings = scalesVectors,
+                upperX = upperHorizontalOffsets,
+                lowerX = lowerHorizontalOffsets,
+                fretHeights = FretHeightByTable.fromJson("BassGuitar")
+            )
+        },
+        numberOfStrings = 4,
+        instrumentBody = context.loadModel(
+            if (needsDropTuning(events)) type.modelDropDFile else type.modelFile,
+            type.textureFile
+        )
     ) {
     override val upperStrings: Array<Spatial> = Array(4) {
         context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
             instrumentNode.attachChild(this)
         }
     }.apply {
-        val forward = 0.125f
-        this[0].setLocalTranslation(positioning.upperX[0], positioning.upperY, forward)
-        this[0].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
-        this[1].setLocalTranslation(positioning.upperX[1], positioning.upperY, forward)
-        this[1].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
-        this[2].setLocalTranslation(positioning.upperX[2], positioning.upperY, forward)
-        this[2].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
-        this[3].setLocalTranslation(positioning.upperX[3], positioning.upperY, forward)
-        this[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
+        forEachIndexed { index, it ->
+            with(BASS_GUITAR_MODEL_PROPERTIES) {
+                it.setLocalTranslation(upperHorizontalOffsets[index], upperVerticalOffset, FORWARD_OFFSET)
+                it.localRotation = Quaternion().fromAngles(0f, 0f, rad(rotations[index]))
+            }
+        }
     }
 
     override val lowerStrings: Array<Array<Spatial>> = Array(4) {
@@ -84,22 +91,16 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             }
         }
     }.apply {
-        val forward = 0.125f
-        for (i in 0..4) {
-            this[0][i].setLocalTranslation(positioning.lowerX[0], positioning.lowerY, forward)
-            this[0][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-1.24))
-        }
-        for (i in 0..4) {
-            this[1][i].setLocalTranslation(positioning.lowerX[1], positioning.lowerY, forward)
-            this[1][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(-0.673))
-        }
-        for (i in 0..4) {
-            this[2][i].setLocalTranslation(positioning.lowerX[2], positioning.lowerY, forward)
-            this[2][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.17))
-        }
-        for (i in 0..4) {
-            this[3][i].setLocalTranslation(positioning.lowerX[3], positioning.lowerY, forward)
-            this[3][i].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.824))
+        indices.forEach { i ->
+            (0 until 5).forEach { j ->
+                with(this[i][j]) {
+                    BASS_GUITAR_MODEL_PROPERTIES.let {
+                        localTranslation =
+                            Vector3f(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, FORWARD_OFFSET)
+                        localRotation = Quaternion().fromAngles(0f, 0f, rad(it.rotations[i]))
+                    }
+                }
+            }
         }
     }
 
