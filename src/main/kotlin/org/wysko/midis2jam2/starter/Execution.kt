@@ -241,11 +241,17 @@ object Execution {
 
             if (properties.getProperty("legacy_display_engine") == "true") {
                 Thread({
-                    LegacyExecution(properties, onFinish, sequencer).execute()
+                    LegacyExecution(properties, {
+                        onFinish.invoke()
+                        midiDevice?.close()
+                    }, sequencer).execute()
                 }, "midis2jam2 starter").start()
             } else {
                 Thread({
-                    StandardExecution(properties, onFinish, sequencer).execute()
+                    StandardExecution(properties, {
+                        onFinish.invoke()
+                        midiDevice?.close()
+                    }, sequencer).execute()
                 }, "midis2jam2 starter").start()
             }
         }
@@ -274,6 +280,7 @@ private val defaultSettings = AppSettings(true).apply {
         ImageIO.read(this::class.java.getResource(it))
     }.toTypedArray()
     title = "midis2jam2"
+    audioRenderer = null
 }
 
 private open class StandardExecution(
