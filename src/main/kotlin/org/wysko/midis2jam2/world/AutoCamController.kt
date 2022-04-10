@@ -639,6 +639,22 @@ enum class AutoCamPosition(
         { _, instruments -> instruments.filterIsInstance<SteelDrums>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
+
+    FIDDLE(
+        Vector3f(-7.67f, 79.05f, 19.95f),
+        Quaternion(-0.01f, 0.98f, -0.18f, -0.04f),
+        { time, instruments -> visibleNowAndLater(instruments, Fiddle::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments -> instruments.filterIsInstance<Fiddle>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT
+    ),
+
+    OCARINA(
+        Vector3f(36.71f, 54.71f, 33.44f),
+        Quaternion(0.04f, 0.96f, -0.18f, 0.21f),
+        { time, instruments -> visibleNowAndLater(instruments, Ocarina::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments -> instruments.filterIsInstance<Ocarina>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT
+    ),
 }
 
 /**
