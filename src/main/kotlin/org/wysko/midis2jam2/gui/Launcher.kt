@@ -141,7 +141,8 @@ fun Launcher() {
 
     val soundFonts by remember {
         derivedStateOf {
-            val decodeFromString = Json.decodeFromString<List<String>>(launcherState.getProperty("soundfonts")).map { File(it).name }
+            val decodeFromString =
+                Json.decodeFromString<List<String>>(launcherState.getProperty("soundfonts")).map { File(it).name }
             decodeFromString.ifEmpty { listOf("Default SoundFont") }.toMutableList()
         }
     }

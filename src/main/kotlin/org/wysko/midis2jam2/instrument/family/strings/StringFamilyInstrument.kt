@@ -172,7 +172,7 @@ abstract class StringFamilyInstrument protected constructor(
 
         groups.takeWhile { it.startTime() <= time }.let {
             if (it.isNotEmpty()) {
-                groups.removeAll(it)
+                groups.removeAll(it.toSet())
                 currentGroup = it.last()
                 bowGoesLeft = !bowGoesLeft
             }
@@ -194,13 +194,15 @@ abstract class StringFamilyInstrument protected constructor(
             val p = currentGroup ?: return
             var progress = ((time - p.startTime()) / p.duration())
             if (bowGoesLeft) progress = 1 - progress
-            progress = progress.smooth(when {
-                p.duration() < 0.5 -> 0
-                p.duration() < 1 -> 1
-                p.duration() < 2 -> 2
-                p.duration() < 3 -> 3
-                else -> 4
-            })
+            progress = progress.smooth(
+                when {
+                    p.duration() < 0.5 -> 0
+                    p.duration() < 1 -> 1
+                    p.duration() < 2 -> 2
+                    p.duration() < 3 -> 3
+                    else -> 4
+                }
+            )
 
             val targetIntensity = when {
                 p.duration() < 0.2 -> 2

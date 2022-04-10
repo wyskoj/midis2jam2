@@ -48,7 +48,7 @@ class StandardFrettingEngine(
     private val rangeHigh = openStringMidiNotes.last() + numberOfFrets
 
     /** The list of fretboard positions in the running average. */
-    internal val runningAverage: MutableList<FretboardPosition> = ArrayList()
+    private val runningAverage: MutableList<FretboardPosition> = ArrayList()
 
     init {
         require(openStringMidiNotes.size == numberOfStrings) {

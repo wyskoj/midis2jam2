@@ -58,8 +58,7 @@ class PitchBendModulationController(
      * Current pitch-bend sensitivity, represented in semitones. This value is initialized to 2 semitones per the MIDI
      * specification.
      */
-    var pitchBendSensitivity: Double = 2.0
-        private set
+    private var pitchBendSensitivity: Double = 2.0
 
     /**
      * Current modulation depth, represented in internal format (0 is the minimum, 127 is the maximum).

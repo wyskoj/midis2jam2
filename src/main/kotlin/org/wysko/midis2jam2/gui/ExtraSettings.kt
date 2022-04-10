@@ -18,10 +18,15 @@
 package org.wysko.midis2jam2.gui
 
 import javax.swing.JDialog
-import javax.swing.WindowConstants
 
+/**
+ * Defines actions for options in the settings window that require more than one element.
+ */
 object ExtraSettings {
-    val actions = mapOf<String, (JDialog) -> Unit>(
+    /**
+     * The list of actions.
+     */
+    val actions: Map<String, (JDialog) -> Unit> = mapOf(
         Pair("background") { parent ->
             ConfigureBackground.dialog(parent).run {
                 pack()

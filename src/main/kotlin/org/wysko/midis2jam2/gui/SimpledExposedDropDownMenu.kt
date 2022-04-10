@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 /**
  * Defines a simple dropdown menu.
  */
+@Suppress("FunctionName")
 @Composable
 fun SimpleExposedDropDownMenu(
     values: List<String>,
@@ -68,6 +69,7 @@ fun SimpleExposedDropDownMenu(
     )
 }
 
+@Suppress("FunctionName")
 @Composable
 private fun SimpleExposedDropDownMenuImpl(
     values: List<String>,

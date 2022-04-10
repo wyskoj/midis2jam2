@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.HARMONICA
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.HARMONICA
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The harmonica uses 12 [SteamPuffers][SteamPuffer] to animate each note in the octave. */

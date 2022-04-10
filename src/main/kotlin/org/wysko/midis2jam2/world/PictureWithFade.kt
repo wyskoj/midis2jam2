@@ -18,7 +18,6 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.asset.AssetManager
-import com.jme3.material.Material
 import com.jme3.material.RenderState
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.Node

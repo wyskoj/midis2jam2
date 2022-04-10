@@ -43,8 +43,20 @@ const val ENV_MAP_AS_SPHERE_MAP: String = "EnvMapAsSphereMap"
 /** The constant ENV_MAP. */
 const val ENV_MAP: String = "EnvMap"
 
+/**
+ * Loads a [model] and applies an unshaded [texture].
+ */
 fun AssetManager.loadModel(model: String, texture: String): Spatial = loadModel(model, texture, UNSHADED, 0f)
 
+/**
+ * Loads a model.
+ *
+ * @param model the name of the model
+ * @param texture the name of the texture
+ * @param type the [MaterialType]
+ * @param brightness the brightness of the reflection, if it is applicable
+ * @return the fully loaded model
+ */
 fun AssetManager.loadModel(model: String, texture: String, type: MaterialType, brightness: Float): Spatial =
     loadModel(model.assetPrefix()).apply {
         setMaterial(
@@ -56,17 +68,26 @@ fun AssetManager.loadModel(model: String, texture: String, type: MaterialType, b
         )
     }
 
-fun AssetManager.reflectiveMaterial(reflectiveTextureFile: String?, brightness: Float): Material =
+/**
+ * Loads a reflective material given its [texture] and [brightness].
+ */
+fun AssetManager.reflectiveMaterial(texture: String?, brightness: Float): Material =
     Material(this, LIGHTING_MAT).apply {
         setVector3(FRESNEL_PARAMS, Vector3f(0.1f, brightness, 0.1f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
-        setTexture(ENV_MAP, this@reflectiveMaterial.loadTexture(reflectiveTextureFile))
+        setTexture(ENV_MAP, this@reflectiveMaterial.loadTexture(texture))
     }
 
+/**
+ * Loads an unshaded material given its [texture].
+ */
 fun AssetManager.unshadedMaterial(texture: String): Material = Material(this, UNSHADED_MAT).apply {
     setTexture(COLOR_MAP, this@unshadedMaterial.loadTexture(texture.assetPrefix()))
 }
 
+/**
+ * Loads a 2D sprite for GUI, given the sprite's [texture].
+ */
 fun AssetManager.loadSprite(texture: String): Sprite = Sprite(this, texture.assetPrefix())
 
 

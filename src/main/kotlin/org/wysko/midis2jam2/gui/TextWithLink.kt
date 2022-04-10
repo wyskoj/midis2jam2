@@ -38,6 +38,7 @@ import java.net.URL
 /**
  * [Composable] that displays a text with a link. When the user clicks on the link, the link is opened in the default browser.
  */
+@Suppress("FunctionName")
 @ExperimentalComposeUiApi
 @Composable
 fun TextWithLink(

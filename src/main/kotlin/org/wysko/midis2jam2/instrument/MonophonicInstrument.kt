@@ -52,51 +52,40 @@ abstract class MonophonicInstrument protected constructor(
 ) : SustainedInstrument(context, eventList) {
 
     /** Node contains all clones. */
-    val groupOfPolyphony: Node = Node()
-
-    /** The list of clones this monophonic instrument needs to effectively display all notes. */
-    val clones: List<Clone>
+    val groupOfPolyphony: Node = Node().apply {
+        instrumentNode.attachChild(this)
+    }
 
     /**
+     * The list of clones this monophonic instrument needs to effectively display all notes.
+     *
      * Since MIDI channels that play monophonic instruments can play with polyphony, we need to calculate the number of
      * "clones" needed to visualize this and determine which note events shall be assigned to which clones, using the
      * least number of clones.
      *
-     * @param instrument the monophonic instrument that is handling the clones
-     * @param cloneClass the class of the [Clone] to instantiate
      * @throws ReflectiveOperationException is usually thrown if an error occurs in the clone constructor
      */
-    private fun calculateClones(
-        instrument: MonophonicInstrument, cloneClass: Class<out Clone?>
-    ): List<Clone> {
-        return cloneClass.getDeclaredConstructor(instrument.javaClass).let { constructor ->
-            notePeriods.sortedWith(compareBy({ it.startTick() }, { it.midiNote }))
-                .fold(ArrayList<ArrayList<NotePeriod>>()) { acc, np ->
-                    acc.apply {
-                        acc.firstOrNull { it.last().endTick() - (context.file.division / 8) <= np.startTick() }?.add(np)
-                            ?: run {
-                                add(ArrayList<NotePeriod>().also { it.add(np) })
-                            }
-                    }
-                }.map {
-                    (constructor.newInstance(instrument) as Clone).apply {
-                        notePeriods.addAll(it)
-                    }
-                }.toList()
-        }
-    }
+    val clones: List<Clone> = cloneClass.getDeclaredConstructor(this.javaClass).let { constructor ->
+        notePeriods.sortedWith(compareBy({ it.startTick() }, { it.midiNote }))
+            .fold(ArrayList<ArrayList<NotePeriod>>()) { acc, np ->
+                acc.apply {
+                    acc.firstOrNull { it.last().endTick() - (context.file.division / 8) <= np.startTick() }?.add(np)
+                        ?: run {
+                            add(ArrayList<NotePeriod>().also { it.add(np) })
+                        }
+                }
+            }.map {
+                (constructor.newInstance(this) as Clone).apply {
+                    notePeriods.addAll(it)
+                }
+            }.toList()
+    }.onEach { groupOfPolyphony.attachChild(it.offsetNode) }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
         /* Tick clones */
         clones.forEach { it.tick(time, delta) }
-    }
-
-    init {
-        clones = calculateClones(this, cloneClass)
-        clones.forEach { groupOfPolyphony.attachChild(it.offsetNode) }
-        instrumentNode.attachChild(groupOfPolyphony)
     }
 
     override fun toString(): String {

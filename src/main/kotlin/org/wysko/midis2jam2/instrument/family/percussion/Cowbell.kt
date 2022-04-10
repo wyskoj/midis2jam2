@@ -35,15 +35,18 @@ class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
-        /* Animate stick */
-        val stickStatus =
-            Stick.handleStick(context, stickNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-
-        /* Animate cowbell */
-        recoilDrum(
-            recoilNode, stickStatus.justStruck(),
-            if (stickStatus.justStruck()) stickStatus.strike!!.velocity else 0, delta
-        )
+        Stick.handleStick(
+            context,
+            stickNode,
+            time,
+            delta,
+            hits,
+            Stick.STRIKE_SPEED,
+            Stick.MAX_ANGLE,
+            Axis.X
+        ).strike?.let {
+            recoilDrum(recoilNode, true, it.velocity, delta)
+        } ?: recoilDrum(recoilNode, false, 0, delta)
     }
 
     init {

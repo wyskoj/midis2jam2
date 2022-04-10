@@ -21,7 +21,6 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
-import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
@@ -105,7 +104,7 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
                 pipe.setMaterial(context.reflectiveMaterial("/Assets/" + skin.textureFile))
             }
             this.highestLevel.attachChild(pipe)
-            puffer = SteamPuffer(context, SteamPuffer.SteamPuffType.NORMAL, 1.0, SteamPuffer.PuffBehavior.OUTWARDS)
+            puffer = SteamPuffer(context, SteamPuffer.SteamPuffTexture.NORMAL, 1.0, SteamPuffer.PuffBehavior.OUTWARDS)
             this.highestLevel.attachChild(puffer.steamPuffNode)
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(90.0))
         }

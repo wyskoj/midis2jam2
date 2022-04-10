@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(AltoSax::class.java)
 private const val STRETCH_FACTOR = 0.65f
 

@@ -25,7 +25,6 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
-import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad

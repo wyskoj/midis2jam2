@@ -57,8 +57,10 @@ class MidiFile(file: File) {
                             when (msg.type) {
 
                                 TEMPO_MSG -> {
-                                    events += MidiTempoEvent(time = tick,
-                                        number = (msg.data ?: return@with).parseTempo())
+                                    events += MidiTempoEvent(
+                                        time = tick,
+                                        number = (msg.data ?: return@with).parseTempo()
+                                    )
                                 }
                                 TEXT_MSG, LYRIC_MSG -> {
                                     events += MidiTextEvent(time = tick, text = String(msg.data))
@@ -74,10 +76,12 @@ class MidiFile(file: File) {
 
                                 NOTE_ON -> {
                                     if (msg.data2 != 0) { // Note on with 0 velocity = note off
-                                        events += MidiNoteOnEvent(time = tick,
+                                        events += MidiNoteOnEvent(
+                                            time = tick,
                                             channel = msg.channel,
                                             note = msg.data1,
-                                            velocity = msg.data2)
+                                            velocity = msg.data2
+                                        )
                                     } else {
                                         events += MidiNoteOffEvent(time = tick, channel = msg.channel, note = msg.data1)
                                     }
@@ -88,22 +92,28 @@ class MidiFile(file: File) {
                                 }
 
                                 PROGRAM_CHANGE -> {
-                                    events += MidiProgramEvent(time = tick,
+                                    events += MidiProgramEvent(
+                                        time = tick,
                                         channel = msg.channel,
-                                        programNum = msg.data1)
+                                        programNum = msg.data1
+                                    )
                                 }
 
                                 PITCH_BEND -> {
-                                    events += MidiPitchBendEvent(time = tick,
+                                    events += MidiPitchBendEvent(
+                                        time = tick,
                                         channel = msg.channel,
-                                        value = msg.data1 + msg.data2 * 128)
+                                        value = msg.data1 + msg.data2 * 128
+                                    )
                                 }
 
                                 CONTROL_CHANGE -> {
-                                    events += MidiControlEvent(time = tick,
+                                    events += MidiControlEvent(
+                                        time = tick,
                                         channel = msg.channel,
                                         controlNum = msg.data1,
-                                        value = msg.data2)
+                                        value = msg.data2
+                                    )
                                 }
 
                             }
@@ -171,7 +181,7 @@ class MidiFile(file: File) {
     private fun tempoBefore(tick: Long): MidiTempoEvent = if (tempos.size == 1 || tick == 0L) {
         tempos[0]
     } else {
-        tempos.last() { it.time < tick }
+        tempos.last { it.time < tick }
     }
 
     /**
@@ -179,15 +189,6 @@ class MidiFile(file: File) {
      */
     fun tempoBefore(event: MidiEvent): MidiTempoEvent = tempoBefore(event.time)
 
-
-    /**
-     * Returns the active tempo immediately at a given MIDI [tick].
-     */
-    fun tempoAt(tick: Long): MidiTempoEvent = if (tempos.size == 1) {
-        tempos[0]
-    } else {
-        tempos.last { it.time <= tick }
-    }
 
     /**
      * Returns the active tempo at the given [time] in seconds, expressed in MIDI format.

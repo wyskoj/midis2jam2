@@ -20,18 +20,12 @@ import com.jme3.math.FastMath
 import com.jme3.scene.Spatial.CullHint
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
-import org.jetbrains.annotations.Contract
-import org.w3c.dom.Document
-import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.xml.sax.SAXException
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.stream.Collectors
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.parsers.ParserConfigurationException
 
 /** Provides various utility functions. */
 object Utils {
@@ -50,7 +44,6 @@ object Utils {
      * @param e the exception
      * @return a formatted string containing the exception and a stack trace
      */
-    @JvmStatic
     fun exceptionToLines(e: Throwable): String = buildString {
         append("${e.javaClass.simpleName}: ${e.message}\n")
         e.stackTrace.forEach { append("$it\n") }
@@ -63,8 +56,6 @@ object Utils {
      * @return a string containing the response
      * @throws IOException if there was an error fetching data
      */
-    @JvmStatic
-    @Throws(IOException::class)
     fun getHTML(url: String): String {
         val result = StringBuilder()
         val conn = URL(url).openConnection() as HttpURLConnection
@@ -76,23 +67,6 @@ object Utils {
             }
         }
         return result.toString()
-    }
-
-    /**
-     * Given the file name of a resource file, instantiates and configures an XML parser for reading data from the
-     * specified file. Pass a resource string, for example, `"/instrument_mapping.xml"`.
-     *
-     * @param resourceName the filename of a resource file
-     * @return a [Document] ready for traversal
-     * @throws SAXException                 if there was an error parsing the XML file
-     * @throws ParserConfigurationException if there was an error instantiating the document parser
-     * @throws IOException                  if there was an IO error
-     */
-    @JvmStatic
-    @Throws(SAXException::class, ParserConfigurationException::class, IOException::class)
-    fun instantiateXmlParser(resourceName: String): Document {
-        val df = DocumentBuilderFactory.newInstance()
-        return df.newDocumentBuilder().parse(PressedKeysFingeringManager::class.java.getResourceAsStream(resourceName))
     }
 
     /**
@@ -110,7 +84,6 @@ object Utils {
      * @param deg the angle expressed in degrees
      * @return the angle expressed in radians
      */
-    @JvmStatic
     fun rad(deg: Double): Float = (deg / 180 * FastMath.PI).toFloat()
 
 
@@ -121,7 +94,6 @@ object Utils {
      * @param file the file to read
      * @return the contents
      */
-    @JvmStatic
     fun resourceToString(file: String): String {
         val resourceAsStream = Utils::class.java.getResourceAsStream(file) ?: return ""
         return BufferedReader(InputStreamReader(resourceAsStream)).lines().collect(Collectors.joining("\n"))

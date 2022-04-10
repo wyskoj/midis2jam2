@@ -36,7 +36,6 @@ import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.loadSequencerJob
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import java.io.File
-import java.util.logging.LogManager
 import javax.sound.midi.MidiSystem
 
 /**

@@ -17,7 +17,6 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.floor
 

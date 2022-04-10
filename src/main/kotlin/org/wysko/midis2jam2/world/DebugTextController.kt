@@ -18,6 +18,8 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.font.BitmapText
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.lwjgl.opengl.GL11
 import org.wysko.midis2jam2.Midis2jam2
@@ -40,9 +42,9 @@ class DebugTextController(val context: Midis2jam2) {
     /**
      * Enables and disables the display of the debug text.
      */
-    var enabled: Boolean = true
+    var enabled: Boolean = false
         set(value) {
-            text.cullHint = enabled.cullHint()
+            text.cullHint = value.cullHint()
             field = value
         }
 
@@ -99,9 +101,26 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
         append("${String.format("%.0f", 1 / tpf)} fps\n")
         append("${String.format("%.2f", time)}s / ${String.format("%.2f", this@debugText.file.length)}s\n")
 
+        /* camera position and rotation */
+        append("cam: ${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}\n")
+
         /* instruments strings */
         append("${this@debugText.instruments.joinToString("")}\n")
     }
+}
+
+private fun Quaternion.sigFigs(): String {
+    return String.format(
+        "[ w = %5.2f, x = %5.2f, y = %5.2f, z = %5.2f ]",
+        w, x, y, z
+    )
+}
+
+private fun Vector3f.sigFigs(): String {
+    return String.format(
+        "[ x = %7.2f, y = %7.2f, z = %7.2f ]",
+        x, y, z
+    )
 }
 
 private val operatingSystem = "${System.getProperty("os.name")} / ${System.getProperty("os.version")}"

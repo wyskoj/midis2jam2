@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.WHISTLE
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.WHISTLE
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The whistles. */

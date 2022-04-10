@@ -27,7 +27,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.imageio.ImageIO
 import javax.swing.JFrame
-import javax.swing.JLabel
 
 /**
  * A wrapper for a [Canvas] that can be used in a Swing application.

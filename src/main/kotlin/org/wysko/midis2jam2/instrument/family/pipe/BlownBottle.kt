@@ -21,11 +21,10 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
-import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType.POP
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.POP
 import org.wysko.midis2jam2.util.Utils
 
 /** The Blown bottle. */

@@ -19,7 +19,6 @@ package org.wysko.midis2jam2.instrument
 import com.jme3.scene.Node
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.cullHint
 import kotlin.math.max
 

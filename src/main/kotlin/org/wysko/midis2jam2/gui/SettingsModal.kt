@@ -214,7 +214,7 @@ class SettingsModal(locale: String = "en") : JDialog() {
 }
 
 /**
- * A [Properties] object that contains the default values from [settingDefinitions].
+ * A [Properties] object that contains the default values.
  */
 private val defaultSettings = getDefaultSettings()
 

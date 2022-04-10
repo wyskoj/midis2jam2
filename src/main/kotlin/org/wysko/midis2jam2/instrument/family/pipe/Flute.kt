@@ -31,7 +31,7 @@ class Flute(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, FluteClone::class.java, FINGERING_MANAGER) {
 
     /** The type Flute clone. */
-    inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffType.WHISTLE, 1f) {
+    inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffTexture.WHISTLE, 1f) {
         init {
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.steamPuffNode.setLocalTranslation(0f, -12.3f, 0f)

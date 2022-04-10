@@ -17,10 +17,10 @@
 package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
 
 /** Contains shared code between the flute and piccolo. */
-open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffType, puffScale: Float) :
+open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffTexture, puffScale: Float) :
     PuffingClone(parent, puffType, puffScale) {
 
     override val leftHands: Array<Spatial> = Array(13) {

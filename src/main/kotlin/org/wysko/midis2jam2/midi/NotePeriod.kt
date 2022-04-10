@@ -59,7 +59,7 @@ open class NotePeriod(
     }
 
     override fun toString(): String {
-        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, " + "noteOff=$noteOff, animationStarted=$animationStarted)"
+        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, noteOff=$noteOff, animationStarted=$animationStarted)"
     }
 
     companion object {
@@ -95,11 +95,15 @@ open class NotePeriod(
                 } else {
                     val noteOff = noteEvent as MidiNoteOffEvent
                     onEvents[noteOff.note]?.let {
-                        notePeriods.add(NotePeriod(noteOff.note,
-                            instrument.context.file.eventInSeconds(it),
-                            instrument.context.file.eventInSeconds(noteOff),
-                            it,
-                            noteOff))
+                        notePeriods.add(
+                            NotePeriod(
+                                midiNote = noteOff.note,
+                                startTime = instrument.context.file.eventInSeconds(it),
+                                endTime = instrument.context.file.eventInSeconds(noteOff),
+                                noteOn = it,
+                                noteOff = noteOff
+                            )
+                        )
                         onEvents[noteOff.note] = null
                     }
                 }

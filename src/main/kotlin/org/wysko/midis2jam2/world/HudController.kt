@@ -45,16 +45,6 @@ class HudController(val context: Midis2jam2) {
     }
 
     /**
-     * The name text.
-     */
-    private val text = BitmapText(context.assetManager.loadFont("Interface/Fonts/Default.fnt")).apply {
-        node.attachChild(this)
-        text = context.file.name
-        this.move(0f, 40f, 0f)
-        color = ColorRGBA(1f, 1f, 1f, 1f)
-    }
-
-    /**
      * The red fillbar.
      */
     private val fillbar = context.assetManager.loadSprite("SongFillbar.bmp").also {
@@ -66,6 +56,14 @@ class HudController(val context: Midis2jam2) {
     init {
         context.assetManager.loadSprite("SongFillbarBox.bmp").also {
             node.attachChild(it)
+        }
+
+        /* MIDI file name text */
+        BitmapText(context.assetManager.loadFont("Interface/Fonts/Default.fnt")).apply {
+            node.attachChild(this)
+            text = context.file.name
+            this.move(0f, 40f, 0f)
+            color = ColorRGBA(1f, 1f, 1f, 1f)
         }
     }
 

@@ -39,7 +39,7 @@ class SteamPuffer(
     private val context: Midis2jam2,
 
     /** The type of steam puffer. */
-    private val type: SteamPuffType,
+    private val type: SteamPuffTexture,
 
     /** How large the clouds are. */
     private val scale: Double,
@@ -110,7 +110,7 @@ class SteamPuffer(
     }
 
     /** There are a few different textures for the steam puffer. */
-    enum class SteamPuffType(
+    enum class SteamPuffTexture(
         /** The filename of the cloud texture. */
         val filename: String
     ) {

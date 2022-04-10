@@ -22,6 +22,9 @@ import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
+/**
+ * A type of [WrappedOctaveSustained] that does not bounce up and down to animate.
+ */
 abstract class StaticWrappedOctaveSustained(
     context: Midis2jam2,
     events: List<MidiChannelSpecificEvent>,

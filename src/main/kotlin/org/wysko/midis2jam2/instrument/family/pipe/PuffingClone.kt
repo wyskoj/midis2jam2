@@ -18,12 +18,12 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.midis2jam2.instrument.clone.HandedClone
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffType
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
 
 /** Any clone that visualizes playing by using a [SteamPuffer]. */
 abstract class PuffingClone protected constructor(
     parent: HandedInstrument,
-    puffType: SteamPuffType,
+    puffType: SteamPuffTexture,
     pufferScale: Float
 ) : HandedClone(parent, 0f) {
 

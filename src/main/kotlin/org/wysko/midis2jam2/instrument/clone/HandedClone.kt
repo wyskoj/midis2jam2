@@ -20,7 +20,6 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
-import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis
 

@@ -45,19 +45,21 @@ class NotePeriodContiguousGroupsTest {
 
     @Test
     fun `Two simultaneous notes`() {
-        val np = arrayOf(NotePeriod(
-            64,
-            1.0,
-            2.0,
-            MidiNoteOnEvent(96, 0, 64, 127),
-            MidiNoteOffEvent(192, 0, 64)
-        ), NotePeriod(
-            71,
-            1.0,
-            2.0,
-            MidiNoteOnEvent(96, 0, 71, 127),
-            MidiNoteOffEvent(192, 0, 71)
-        ))
+        val np = arrayOf(
+            NotePeriod(
+                64,
+                1.0,
+                2.0,
+                MidiNoteOnEvent(96, 0, 64, 127),
+                MidiNoteOffEvent(192, 0, 64)
+            ), NotePeriod(
+                71,
+                1.0,
+                2.0,
+                MidiNoteOnEvent(96, 0, 71, 127),
+                MidiNoteOffEvent(192, 0, 71)
+            )
+        )
         assertEquals(
             listOf(NotePeriodGroup(listOf(*np))),
             listOf(*np).contiguousGroups()
@@ -151,9 +153,13 @@ class NotePeriodContiguousGroupsTest {
                 MidiNoteOffEvent(7, 0, 71)
             )
         )
-        assertEquals(listOf(NotePeriodGroup(listOf(*np.copyOfRange(0, 2))),
-            NotePeriodGroup(listOf(*np.copyOfRange(2, 4)))),
-            listOf(*np).contiguousGroups())
+        assertEquals(
+            listOf(
+                NotePeriodGroup(listOf(*np.copyOfRange(0, 2))),
+                NotePeriodGroup(listOf(*np.copyOfRange(2, 4)))
+            ),
+            listOf(*np).contiguousGroups()
+        )
     }
 
     @Test
@@ -206,7 +212,9 @@ class NotePeriodContiguousGroupsTest {
         assertEquals(
             listOf(
                 NotePeriodGroup(listOf(np[0])),
-                NotePeriodGroup(listOf(np[1]))),
-            listOf(*np).contiguousGroups())
+                NotePeriodGroup(listOf(np[1]))
+            ),
+            listOf(*np).contiguousGroups()
+        )
     }
 }

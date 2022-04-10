@@ -30,6 +30,11 @@ import kotlin.math.sin
 
 private val BASE_POSITION = Vector3f(0f, 49.5f, -152.65f)
 
+private const val BIRD_TEXTURE = "Bird.png"
+
+/**
+ * The bird tweet.
+ */
 class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     WrappedOctaveSustained(context, events, true) {
 
@@ -52,31 +57,37 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     }
 
 
-    inner class Bird() : BouncyTwelfth() {
+    /**
+     * A single bird.
+     */
+    inner class Bird : BouncyTwelfth() {
 
         /** The open beak. */
-        private val openBeak = context.loadModel("BirdBeak_Open.fbx", "Bird.png").also {
+        private val openBeak = context.loadModel("BirdBeak_Open.fbx", BIRD_TEXTURE).also {
             animNode.attachChild(it)
         }
 
         /** The closed beak. */
-        private val closedBeak = context.loadModel("BirdBeak_Closed.fbx", "Bird.png").also {
+        private val closedBeak = context.loadModel("BirdBeak_Closed.fbx", BIRD_TEXTURE).also {
             animNode.attachChild(it)
         }
 
         /** The wings. */
-        private val wings = context.loadModel("BirdWings.fbx", "Bird.png").also {
+        private val wings = context.loadModel("BirdWings.fbx", BIRD_TEXTURE).also {
             animNode.attachChild(it)
         }
 
         init {
-            animNode.attachChild(context.loadModel("Bird.fbx", "Bird.png").apply {
+            animNode.attachChild(context.loadModel("Bird.fbx", BIRD_TEXTURE).apply {
                 this as Node
                 getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
             })
         }
 
-        var animationIndex = 0.0f
+        /**
+         * The current animation offset, or index.
+         */
+        private var animationIndex = 0.0f
 
         override fun tick(delta: Float) {
             super.tick(delta)

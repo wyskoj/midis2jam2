@@ -49,9 +49,10 @@ class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
 
     /** The Right timbale anim node. */
     private val highTimbaleAnimNode = Node()
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val statusLow = Stick.handleStick(
+        Stick.handleStick(
             context,
             lowStickNode,
             time,
@@ -60,8 +61,11 @@ class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
             Stick.STRIKE_SPEED,
             Stick.MAX_ANGLE,
             Axis.X
-        )
-        val statusHigh = Stick.handleStick(
+        ).strike?.let {
+            recoilDrum(lowTimbaleAnimNode, true, it.velocity, delta)
+        } ?: recoilDrum(lowTimbaleAnimNode, false, 0, delta)
+
+        Stick.handleStick(
             context,
             highStickNode,
             time,
@@ -70,19 +74,9 @@ class Timbales(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
             Stick.STRIKE_SPEED,
             Stick.MAX_ANGLE,
             Axis.X
-        )
-        if (statusLow.justStruck()) {
-            val strike = statusLow.strike!!
-            recoilDrum(lowTimbaleAnimNode, true, strike.velocity, delta)
-        } else {
-            recoilDrum(lowTimbaleAnimNode, false, 0, delta)
-        }
-        if (statusHigh.justStruck()) {
-            val strike = statusHigh.strike!!
-            recoilDrum(highTimbaleAnimNode, true, strike.velocity, delta)
-        } else {
-            recoilDrum(highTimbaleAnimNode, false, 0, delta)
-        }
+        ).strike?.let {
+            recoilDrum(highTimbaleAnimNode, true, it.velocity, delta)
+        } ?: recoilDrum(highTimbaleAnimNode, false, 0, delta)
     }
 
     init {

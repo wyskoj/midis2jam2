@@ -21,8 +21,14 @@ import java.awt.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
-
-class ErrorDisplay(owner: Window?, e: Exception?, message: String) : JDialog(owner) {
+/**
+ * Displays an error message to the screen.
+ *
+ * @param owner the owner/parent window
+ * @param e the exception
+ * @param message a message to display alongside the exception
+ */
+class ErrorDisplay private constructor(owner: Window?, e: Exception?, message: String) : JDialog(owner) {
 
     private lateinit var dialogPane: JPanel
     private lateinit var contentPanel: JPanel
@@ -36,7 +42,7 @@ class ErrorDisplay(owner: Window?, e: Exception?, message: String) : JDialog(own
         initComponents()
         setSize(800, 600)
         if (message.isNotBlank()) {
-            label1.text = "$message. Here is the stack trace:"
+            label1.text = "${message.removeSuffix(".")}. Here is the stack trace:"
         }
         textArea1.text = exceptionToLines(e!!)
         textArea1.caretPosition = 0
@@ -112,8 +118,11 @@ class ErrorDisplay(owner: Window?, e: Exception?, message: String) : JDialog(own
     }
 
     companion object {
-        fun displayError(e: Exception?, message: String) {
-            val dialog = ErrorDisplay(null, e, message)
+        /**
+         * Displays an [exception] alongside a [message].
+         */
+        fun displayError(exception: Exception?, message: String) {
+            val dialog = ErrorDisplay(null, exception, message)
             dialog.setLocationRelativeTo(null)
             dialog.isVisible = true
         }

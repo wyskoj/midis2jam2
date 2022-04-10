@@ -37,7 +37,7 @@ class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     /**
      * A single Recorder.
      */
-    inner class RecorderClone : PuffingClone(this@Recorder, SteamPuffer.SteamPuffType.POP, 1f) {
+    inner class RecorderClone : PuffingClone(this@Recorder, SteamPuffer.SteamPuffTexture.POP, 1f) {
         override val leftHands: Array<Spatial> = Array(13) {
             parent.context.loadModel("RecorderHandLeft$it.obj", "hands.bmp")
         }

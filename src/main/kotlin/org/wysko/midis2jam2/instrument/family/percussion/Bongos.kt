@@ -39,68 +39,59 @@ class Bongos(
     private val highBongoHits: MutableList<MidiNoteOnEvent> =
         hits.filter { it.note == HIGH_BONGO } as MutableList<MidiNoteOnEvent>
 
-    /** The Right hand node. */
-    private val highHandNode = Node()
+    /** The right hand node. */
+    private val highHandNode = Node().also {
+        it.attachChild(context.loadModel("hand_left.obj", "hands.bmp"))
+    }
 
-    /** The Left hand node. */
-    private val lowHandNode = Node()
+    /** The left hand node. */
+    private val lowHandNode = Node().also {
+        it.attachChild(context.loadModel("hand_right.obj", "hands.bmp"))
+    }
 
-    /** The Left bongo anim node. */
-    private val lowBongoAnimNode = Node()
+    /** The left bongo anim node. */
+    private val lowBongoAnimNode = Node().also {
+        it.attachChild(context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp"))
+    }
 
-    /** The Right bongo anim node. */
-    private val highBongoAnimNode = Node()
+    /** The right bongo anim node. */
+    private val highBongoAnimNode = Node().also {
+        it.attachChild(context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
+            setLocalScale(0.9f)
+        })
+    }
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
-        /* Animate hands */
-        val statusLow = Stick.handleStick(
+        /* Animate low bongo recoil */
+        Stick.handleStick(
             context, lowHandNode, time, delta, lowBongoHits,
             Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-        )
-        val statusHigh = Stick.handleStick(
+        ).strike?.let {
+            recoilDrum(lowBongoAnimNode, true, it.velocity, delta)
+        } ?: recoilDrum(this.lowBongoAnimNode, false, 0, delta)
+
+        /* Animate high bongo recoil */
+        Stick.handleStick(
             context, highHandNode, time, delta, highBongoHits,
             Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-        )
-
-        /* Animate low bongo recoil */if (statusLow.justStruck()) {
-            val strike = statusLow.strike!!
-            recoilDrum(lowBongoAnimNode, true, strike.velocity, delta)
-        } else {
-            recoilDrum(lowBongoAnimNode, false, 0, delta)
-        }
-
-        /* Animate high bongo recoil */if (statusHigh.justStruck()) {
-            val strike = statusHigh.strike!!
-            recoilDrum(highBongoAnimNode, true, strike.velocity, delta)
-        } else {
-            recoilDrum(highBongoAnimNode, false, 0, delta)
-        }
+        ).strike?.let {
+            recoilDrum(highBongoAnimNode, true, it.velocity, delta)
+        } ?: recoilDrum(highBongoAnimNode, false, 0, delta)
     }
 
     init {
-        /* Separate high and low bongo hits */
-
-        /* Load bongos */
-        context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
-            lowBongoAnimNode.attachChild(this)
-        }
-        context.loadModel("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
-            highBongoAnimNode.attachChild(this)
-            setLocalScale(0.9f)
-        }
-
         /* Attach bongos */
-        val lowBongoNode = Node()
+        val lowBongoNode = Node().apply {
+            instrumentNode.attachChild(this)
+            attachChild(lowBongoAnimNode)
+        }
         val highBongoNode = Node()
-        lowBongoNode.attachChild(lowBongoAnimNode)
         highBongoNode.attachChild(highBongoAnimNode)
-        instrumentNode.attachChild(lowBongoNode)
         instrumentNode.attachChild(highBongoNode)
 
         /* Load hands */
-        lowHandNode.attachChild(context.loadModel("hand_right.obj", "hands.bmp"))
-        highHandNode.attachChild(context.loadModel("hand_left.obj", "hands.bmp"))
 
         /* Attach hands */
         lowBongoAnimNode.attachChild(lowHandNode)
