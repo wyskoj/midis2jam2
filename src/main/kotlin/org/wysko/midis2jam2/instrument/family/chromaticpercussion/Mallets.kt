@@ -30,7 +30,6 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.ShadowController.Companion.shadow
 
 /** The mallet case is scaled by this value to appear correct. */
 const val MALLET_CASE_SCALE: Float = 0.667f
@@ -65,20 +64,8 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         theseBars
     }.onEach { bar -> instrumentNode.attachChild(bar.noteNode) }.toTypedArray()
 
-    /** The shadow. */
-    private var shadow: Spatial = shadow(context, "Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
-        instrumentNode.attachChild(this)
-        setLocalScale(2 / 3f)
-        setLocalTranslation(0f, -22f, 0f)
-    }
-
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-
-        /* Prevent shadow from clipping under stage */
-        val idealY = (0.5 + (checkInstrumentIndex() * 2)).coerceAtLeast(0.5)
-        val offset = idealY - shadow.worldTranslation.y
-        shadow.localTranslation.y += offset.toFloat()
 
         /* For each bar */
         for ((index, bar) in bars.withIndex()) {

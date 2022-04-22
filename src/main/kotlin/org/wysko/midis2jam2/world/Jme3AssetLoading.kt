@@ -73,17 +73,26 @@ fun AssetManager.loadModel(model: String, texture: String, type: MaterialType, b
  */
 fun AssetManager.reflectiveMaterial(texture: String?, brightness: Float): Material =
     Material(this, LIGHTING_MAT).apply {
-        setVector3(FRESNEL_PARAMS, Vector3f(0.1f, brightness, 0.1f))
+        setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
-        setTexture(ENV_MAP, this@reflectiveMaterial.loadTexture(texture))
+        val loadTexture = this@reflectiveMaterial.loadTexture(texture)
+        setTexture(ENV_MAP, loadTexture)
+        setTexture("DiffuseMap", this@reflectiveMaterial.loadTexture("Assets/Black.bmp"))
     }
 
 /**
  * Loads an unshaded material given its [texture].
  */
-fun AssetManager.unshadedMaterial(texture: String): Material = Material(this, UNSHADED_MAT).apply {
-    setTexture(COLOR_MAP, this@unshadedMaterial.loadTexture(texture.assetPrefix()))
+fun AssetManager.unshadedMaterial(texture: String): Material = Material(this, LIGHTING_MAT).apply {
+    setTexture("DiffuseMap", this@unshadedMaterial.loadTexture(texture.assetPrefix()))
 }
+
+///**
+// * Loads an unshaded material given its [texture].
+// */
+//fun AssetManager.unshadedMaterial(texture: String): Material = Material(this, UNSHADED_MAT).apply {
+//    setTexture(COLOR_MAP, this@unshadedMaterial.loadTexture(texture.assetPrefix()))
+//}
 
 /**
  * Loads a 2D sprite for GUI, given the sprite's [texture].

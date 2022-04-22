@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.animusic
 
 import com.jme3.collision.CollisionResults
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Ray
 import com.jme3.math.Vector3f
@@ -188,13 +189,15 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     /** Defines a type of [SpaceLaser]. */
     enum class SpaceLaserType(
         /** The texture file of the laser. */
-        val filename: String
+        val filename: String,
+        /** The glow color. */
+        val glowColor: ColorRGBA
     ) {
         /** Saw laser type. */
-        SAW("Laser.bmp"),
+        SAW("Laser.bmp", ColorRGBA.Green),
 
         /** Square laser type. */
-        SQUARE("LaserRed.png")
+        SQUARE("LaserRed.png", ColorRGBA.Red)
     }
 
     init {
@@ -223,12 +226,15 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
         clones.forEach {
             it as SpaceLaserClone
+            val glowMaterial = context.unshadedMaterial("Assets/" + type.filename).apply {
+                setColor("GlowColor", type.glowColor)
+            }
             (it.shooter as Node).apply {
                 getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                getChild(1).setMaterial(context.unshadedMaterial("Assets/" + type.filename))
+                getChild(1).setMaterial(glowMaterial)
                 getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
             }
-            it.laserBeam.setMaterial(context.unshadedMaterial("Assets/" + type.filename))
+            it.laserBeam.setMaterial(glowMaterial)
         }
     }
 

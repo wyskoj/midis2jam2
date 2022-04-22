@@ -23,12 +23,21 @@ import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
 import com.jme3.input.controls.ActionListener
+import com.jme3.light.AmbientLight
+import com.jme3.light.DirectionalLight
 import com.jme3.material.Material
+import com.jme3.math.ColorRGBA
+import com.jme3.math.Vector3f
 import com.jme3.post.FilterPostProcessor
+import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.FadeFilter
+import com.jme3.post.ssao.SSAOFilter
 import com.jme3.renderer.RenderManager
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import com.jme3.shadow.DirectionalLightShadowFilter
+import com.jme3.shadow.EdgeFilteringMode
 import kotlinx.coroutines.runBlocking
 import org.wysko.midis2jam2.gui.ConfigureBackground
 import org.wysko.midis2jam2.instrument.Instrument
@@ -110,12 +119,6 @@ abstract class Midis2jam2(
         fade = FadeFilter(0.5f).apply {
             value = 0f
         }
-        fpp = FilterPostProcessor(assetManager).also {
-            it.addFilter(fade)
-            it.numSamples = properties.getProperty("graphics_samples").toInt()
-        }
-
-        app.viewPort.addProcessor(fpp)
 
         /*** LOAD SKYBOX ***/
         BackgroundController.configureBackground(
@@ -200,14 +203,6 @@ abstract class Midis2jam2(
                 }
             }
         }
-
-        /*** CONTROLLERS ***/
-        shadowController = ShadowController(
-            this,
-            instruments.count { it is Harp },
-            instruments.count { it is Guitar },
-            instruments.count { it is BassGuitar },
-        )
         standController = StandController(this)
         lyricController = LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>(), this)
         lyricController.enabled = properties.getProperty("lyrics") == "true"
@@ -218,6 +213,44 @@ abstract class Midis2jam2(
 
         debugTextController = DebugTextController(this)
         hudController = HudController(this)
+
+        /*** SETUP LIGHTS ***/
+        val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
+            color = ColorRGBA.Black
+            direction = Vector3f(0.1f, -1f, -0.1f)
+            rootNode.addLight(this)
+        }
+        DirectionalLight().apply { // Main light
+            color = ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
+            direction = Vector3f(0f, -1f, -1f)
+            rootNode.addLight(this)
+        }
+        DirectionalLight().apply { // Backlight
+            color = ColorRGBA(0.1f, 0.1f, 0.3f, 1f)
+            direction = Vector3f(0f, 1f, 1f)
+            rootNode.addLight(this)
+        }
+        AmbientLight().apply { // Ambience
+            color = ColorRGBA(0.5f, 0.5f, 0.5f, 1f)
+            rootNode.addLight(this)
+        }
+        fpp = FilterPostProcessor(assetManager).apply {
+            addFilter(DirectionalLightShadowFilter(assetManager, 4096, 4).apply {
+                light = shadowsOnly
+                isEnabled = true
+                shadowIntensity = 0.16f
+                lambda = 0.65f
+                edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
+                edgesThickness = 10
+            })
+            numSamples = properties.getProperty("graphics_samples").toInt()
+            addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
+            addFilter(SSAOFilter())
+            addFilter(fade)
+            app.viewPort.addProcessor(this)
+        }
+        rootNode.shadowMode = RenderQueue.ShadowMode.CastAndReceive
+        stage.shadowMode = RenderQueue.ShadowMode.Receive
 
         super.initialize(stateManager, app)
     }

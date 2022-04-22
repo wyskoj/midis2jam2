@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.world
 import com.jme3.asset.plugins.FileLocator
 import com.jme3.math.ColorRGBA
 import com.jme3.renderer.ViewPort
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.ui.Picture
@@ -58,7 +59,9 @@ object BackgroundController {
                             this,
                             this,
                             this
-                        )
+                        ).also {
+                            it.shadowMode = RenderQueue.ShadowMode.Off
+                        }
                     )
                 }
             }
@@ -100,7 +103,9 @@ object BackgroundController {
                         assetManager.loadTexture(names[3] as String),
                         assetManager.loadTexture(names[4] as String),
                         assetManager.loadTexture(names[5] as String),
-                    )
+                    ).also {
+                        it.shadowMode = RenderQueue.ShadowMode.Off
+                    }
                 )
             }
 
@@ -117,7 +122,9 @@ object BackgroundController {
                         assetManager.loadTexture(name),
                         assetManager.loadTexture(name),
                         assetManager.loadTexture(name),
-                    )
+                    ).also {
+                        it.shadowMode = RenderQueue.ShadowMode.Off
+                    }
                 )
             }
 

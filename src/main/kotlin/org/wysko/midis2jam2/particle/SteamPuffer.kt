@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.particle
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
@@ -134,7 +135,9 @@ class SteamPuffer(
         val cloudNode = Node()
 
         /** The mesh of the cloud. */
-        private val cube: Spatial = context.loadModel("SteamCloud.obj", type.filename)
+        private val cube: Spatial = context.loadModel("SteamCloud.obj", type.filename).apply {
+            shadowMode = RenderQueue.ShadowMode.Cast
+        }
 
         /** A seed for random first axis transformation. */
         private var randA = 0f

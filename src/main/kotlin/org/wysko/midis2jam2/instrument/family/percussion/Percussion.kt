@@ -192,17 +192,7 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
             }
         }
 
-        /* Add shadow */
-        val shadow = context.assetManager.loadModel("Assets/DrumShadow.obj")
-        val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-        material.setTexture("ColorMap", context.assetManager.loadTexture("Assets/DrumShadow.png"))
-        material.additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-        shadow.queueBucket = RenderQueue.Bucket.Transparent
-        shadow.setMaterial(material)
-        shadow.move(0f, 0.1f, -80f)
-
         percussionNode.attachChild(drumSetNode)
-        percussionNode.attachChild(shadow)
         instrumentNode.attachChild(percussionNode)
     }
 }

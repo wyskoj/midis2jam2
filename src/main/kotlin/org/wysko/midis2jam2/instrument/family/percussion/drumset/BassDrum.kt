@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import com.jme3.math.Quaternion
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
@@ -95,7 +96,9 @@ class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percus
         private const val PEDAL_MAX_ANGLE = 20
     }
 
-    private val drum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp")
+    private val drum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp").apply {
+        shadowMode = RenderQueue.ShadowMode.Cast
+    }
 
     init {
         /* Load bass drum */
