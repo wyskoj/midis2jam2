@@ -56,8 +56,6 @@ class DesktopMidis2jam2(
 
     private var initiatedFadeIn = false
 
-    private var removedEffect = false
-
     /**
      * Initializes the application.
      */
@@ -125,11 +123,6 @@ class DesktopMidis2jam2(
             initiatedFadeIn = true
         }
 
-        if (!removedEffect && timeSinceStart > -1) {
-            fpp.removeAllFilters()
-            removedEffect = true
-        }
-
         instruments.forEach {
             /* Null if not implemented yet */
             it.tick(timeSinceStart, tpf)
@@ -148,7 +141,6 @@ class DesktopMidis2jam2(
             exit()
         }
 
-        shadowController.tick()
         standController.tick()
         lyricController.tick(timeSinceStart)
         autocamController.tick(timeSinceStart, tpf)
