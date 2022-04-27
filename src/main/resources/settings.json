@@ -39,5 +39,11 @@
     "name": "background",
     "type": "Button",
     "category": "display"
+  },
+  {
+    "name": "enhanced_graphics",
+    "type": "Boolean",
+    "category": "display",
+    "default": "true"
   }
 ]

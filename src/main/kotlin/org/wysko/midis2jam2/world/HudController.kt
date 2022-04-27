@@ -47,14 +47,14 @@ class HudController(val context: Midis2jam2) {
     /**
      * The red fillbar.
      */
-    private val fillbar = context.assetManager.loadSprite("SongFillbar.bmp").also {
+    private val fillbar = context.assetLoader.loadSprite("SongFillbar.bmp").also {
         node.attachChild(it)
         it.move(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 1f)
 
     }
 
     init {
-        context.assetManager.loadSprite("SongFillbarBox.bmp").also {
+        context.assetLoader.loadSprite("SongFillbarBox.bmp").also {
             node.attachChild(it)
         }
 

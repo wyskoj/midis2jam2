@@ -141,6 +141,7 @@ class DesktopMidis2jam2(
             exit()
         }
 
+        shadowController?.tick()
         standController.tick()
         lyricController.tick(timeSinceStart)
         autocamController.tick(timeSinceStart, tpf)

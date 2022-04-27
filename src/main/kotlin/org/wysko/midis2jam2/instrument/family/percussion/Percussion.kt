@@ -19,7 +19,6 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.material.Material
 import com.jme3.material.RenderState
-import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
@@ -189,6 +188,19 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
             when (it) {
                 is SnareDrum, is BassDrum, is Tom, is Cymbal, is HiHat -> drumSetNode.attachChild(it.highLevelNode)
                 else -> percussionNode.attachChild(it.highLevelNode)
+            }
+        }
+
+        /* Add shadow */
+        if (!context.enhancedGraphics) { // Display fake shadow
+            context.assetManager.loadModel("Assets/DrumShadow.obj").apply {
+                setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                    setTexture("ColorMap", context.assetManager.loadTexture("Assets/DrumShadow.png"))
+                    additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+                })
+            }.also {
+                it.move(0f, 0.1f, -80f)
+                percussionNode.attachChild(it)
             }
         }
 

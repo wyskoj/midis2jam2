@@ -27,7 +27,6 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.ShadowController.Companion.shadow
 import java.util.*
 import kotlin.math.cos
 
@@ -152,14 +151,20 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     init {
         /* Load helicopter */
         val copter = context.loadModel("HelicopterBody.fbx", "Helicopter.png")
-        rotor.attachChild(shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterRotor.png"))
+        rotor.attachChild(
+            context.assetLoader.fakeShadow(
+                "Assets/HelicopterRotorPlane.fbx",
+                "Assets/HelicopterRotor.png"
+            )
+        )
 
         /* Load lights */
         lights = Array(12) {
-            shadow(context, "Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterLights${it + 1}.png").apply {
-                rotor.attachChild(this)
-                this.cullHint = Always
-            }
+            context.assetLoader.fakeShadow("Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterLights${it + 1}.png")
+                .apply {
+                    rotor.attachChild(this)
+                    this.cullHint = Always
+                }
         }
 
         rotor.setLocalTranslation(40f, 36f, 0f)

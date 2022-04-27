@@ -101,7 +101,7 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, s
 
         init {
             if (skin.reflective) {
-                pipe.setMaterial(context.reflectiveMaterial("/Assets/" + skin.textureFile))
+                pipe.setMaterial(context.assetLoader.reflectiveMaterial(skin.textureFile))
             }
             this.highestLevel.attachChild(pipe)
             puffer = SteamPuffer(context, SteamPuffer.SteamPuffTexture.NORMAL, 1.0, SteamPuffer.PuffBehavior.OUTWARDS)

@@ -56,18 +56,10 @@ import org.wysko.midis2jam2.util.cullHint
 class ShadowController(
     /** Context to midis2jam2. */
     private val context: Midis2jam2,
-
-    /** The number of harps. */
-    harpCount: Int,
-
-    /** The number of guitars. */
-    guitarCount: Int,
-
-    /** The number of bass guitars. */
-    bassGuitarCount: Int,
 ) {
     /** The keyboard shadow. */
-    private val keyboardShadow: Spatial = shadow(context, "Assets/PianoShadow.obj", "Assets/KeyboardShadow.png")
+    private val keyboardShadow: Spatial =
+        context.assetLoader.fakeShadow("Assets/PianoShadow.obj", "Assets/KeyboardShadow.png")
 
     /** The harp shadows. */
     private val harpShadows: MutableList<Spatial>
@@ -81,7 +73,11 @@ class ShadowController(
     /** Call this method on each frame to update the visibility of shadows. */
     fun tick() {
         /* Update keyboard shadow */
+
+        // Show shadow if any keyboards are visible
         keyboardShadow.cullHint = context.instruments.any { it is Keyboard && it.isVisible }.cullHint()
+
+        // Scale the shadow by the number of visible keyboards
         context.instruments.filterIsInstance<Keyboard>().let { keyboards ->
             keyboardShadow.localScale = Vector3f(
                 1f, 1f, if (keyboards.isNotEmpty()) {
@@ -115,25 +111,6 @@ class ShadowController(
     }
 
     companion object {
-        /**
-         * Given a model and texture, returns the shadow object with correct transparency.
-         *
-         * @param context context to midis2jam2
-         * @param model   the shadow model
-         * @param texture the shadow texture
-         * @return the shadow object
-         */
-        @JvmStatic
-        @Contract(pure = true)
-        fun shadow(context: Midis2jam2, model: String?, texture: String?): Spatial =
-            context.assetManager.loadModel(model).apply {
-                setMaterial(Material(context.assetManager, UNSHADED_MAT).apply {
-                    setTexture(COLOR_MAP, context.assetManager.loadTexture(texture))
-                    additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-                    setFloat("AlphaDiscardThreshold", 0.01F)
-                })
-                queueBucket = RenderQueue.Bucket.Transparent
-            }
     }
 
     init {
@@ -144,8 +121,8 @@ class ShadowController(
 
         /* Load harp shadows */
         harpShadows = ArrayList()
-        for (i in 0 until harpCount) {
-            val shadow = shadow(context, "Assets/HarpShadow.obj", "Assets/HarpShadow.png")
+        for (i in 0 until context.instruments.count { it is Harp }) {
+            val shadow = context.assetLoader.fakeShadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png")
             harpShadows.add(shadow)
             context.rootNode.attachChild(shadow)
             shadow.setLocalTranslation(-126f, 0.1f, -30f + (60f * i))
@@ -154,8 +131,8 @@ class ShadowController(
 
         /* Add guitar shadows */
         guitarShadows = ArrayList()
-        for (i in 0 until guitarCount) {
-            val shadow = shadow(context, "Assets/GuitarShadow.obj", "Assets/GuitarShadow.png")
+        for (i in 0 until context.instruments.count { it is Guitar }) {
+            val shadow = context.assetLoader.fakeShadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png")
             guitarShadows.add(shadow)
             context.rootNode.attachChild(shadow)
             shadow.setLocalTranslation(43.431f + 5 * (i * 1.5f), 0.1f + 0.01f * (i * 1.5f), 7.063f)
@@ -164,8 +141,8 @@ class ShadowController(
 
         /* Add bass guitar shadows */
         bassGuitarShadows = ArrayList()
-        for (i in 0 until bassGuitarCount) {
-            val shadow = shadow(context, "Assets/BassShadow.obj", "Assets/BassShadow.png")
+        for (i in 0 until context.instruments.count { it is BassGuitar }) {
+            val shadow = context.assetLoader.fakeShadow("Assets/BassShadow.obj", "Assets/BassShadow.png")
             bassGuitarShadows.add(shadow)
             context.rootNode.attachChild(shadow)
             shadow.setLocalTranslation(51.5863f + 7 * i, 0.1f + 0.01f * i, -16.5817f)

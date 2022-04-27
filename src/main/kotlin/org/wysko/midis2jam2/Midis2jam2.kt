@@ -95,6 +95,7 @@ abstract class Midis2jam2(
     @Suppress("KDocMissingDocumentation")
     override fun initialize(stateManager: AppStateManager, app: Application) {
         this.app = app as SimpleApplication
+        this.assetLoader = AssetLoader(this)
 
         this.app.renderer.defaultAnisotropicFilter = 4
 
@@ -215,45 +216,51 @@ abstract class Midis2jam2(
         hudController = HudController(this)
 
         /*** SETUP LIGHTS ***/
-        val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
-            color = ColorRGBA.Black
-            direction = Vector3f(0.1f, -1f, -0.1f)
-            rootNode.addLight(this)
+        if (properties.getProperty("enhanced_graphics") == "true") {
+            val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
+                color = ColorRGBA.Black
+                direction = Vector3f(0.1f, -1f, -0.1f)
+                rootNode.addLight(this)
+            }
+            DirectionalLight().apply { // Main light
+                color = ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
+                direction = Vector3f(0f, -1f, -1f)
+                rootNode.addLight(this)
+            }
+            DirectionalLight().apply { // Backlight
+                color = ColorRGBA(0.1f, 0.1f, 0.3f, 1f)
+                direction = Vector3f(0f, 1f, 1f)
+                rootNode.addLight(this)
+            }
+            AmbientLight().apply { // Ambience
+                color = ColorRGBA(0.5f, 0.5f, 0.5f, 1f)
+                rootNode.addLight(this)
+            }
+            fpp = FilterPostProcessor(assetManager).apply {
+                addFilter(DirectionalLightShadowFilter(assetManager, 4096, 4).apply {
+                    light = shadowsOnly
+                    isEnabled = true
+                    shadowIntensity = 0.16f
+                    lambda = 0.65f
+                    edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
+                    edgesThickness = 10
+                })
+                numSamples = properties.getProperty("graphics_samples").toInt()
+                addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
+                addFilter(SSAOFilter())
+                addFilter(fade)
+                app.viewPort.addProcessor(this)
+            }
+            rootNode.shadowMode = RenderQueue.ShadowMode.CastAndReceive
+            stage.shadowMode = RenderQueue.ShadowMode.Receive
+        } else {
+            shadowController = ShadowController(this)
         }
-        DirectionalLight().apply { // Main light
-            color = ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
-            direction = Vector3f(0f, -1f, -1f)
-            rootNode.addLight(this)
-        }
-        DirectionalLight().apply { // Backlight
-            color = ColorRGBA(0.1f, 0.1f, 0.3f, 1f)
-            direction = Vector3f(0f, 1f, 1f)
-            rootNode.addLight(this)
-        }
-        AmbientLight().apply { // Ambience
-            color = ColorRGBA(0.5f, 0.5f, 0.5f, 1f)
-            rootNode.addLight(this)
-        }
-        fpp = FilterPostProcessor(assetManager).apply {
-            addFilter(DirectionalLightShadowFilter(assetManager, 4096, 4).apply {
-                light = shadowsOnly
-                isEnabled = true
-                shadowIntensity = 0.16f
-                lambda = 0.65f
-                edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
-                edgesThickness = 10
-            })
-            numSamples = properties.getProperty("graphics_samples").toInt()
-            addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
-            addFilter(SSAOFilter())
-            addFilter(fade)
-            app.viewPort.addProcessor(this)
-        }
-        rootNode.shadowMode = RenderQueue.ShadowMode.CastAndReceive
-        stage.shadowMode = RenderQueue.ShadowMode.Receive
 
         super.initialize(stateManager, app)
     }
+
+    lateinit var assetLoader: AssetLoader
 
     /** The fly-by camera. */
     lateinit var flyByCamera: FlyByCameraListenable
@@ -297,6 +304,12 @@ abstract class Midis2jam2(
     protected lateinit var fpp: FilterPostProcessor
 
     /**
+     * True if enhanced graphics should be used, false otherwise.
+     */
+    val enhancedGraphics: Boolean
+        get() = properties.getProperty("enhanced_graphics") == "true"
+
+    /**
      * The instruments.
      *
      * To form the list of the instruments, the MIDI file is read and program events are calculated, appropriately
@@ -326,7 +339,7 @@ abstract class Midis2jam2(
         }
 
     /** The shadow controller. */
-    lateinit var shadowController: ShadowController
+    var shadowController: ShadowController? = null
 
     /** The stand controller. */
     lateinit var standController: StandController
@@ -559,15 +572,15 @@ abstract class Midis2jam2(
     abstract fun exit()
 
     /** Loads and returns an unshaded model with the specified [model] and [texture]. */
-    fun loadModel(model: String, texture: String): Spatial = assetManager.loadModel(model, texture)
+    fun loadModel(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)
 
     /** Loads and returns a reflective model with the specified [model], [texture], and [brightness]. */
     fun loadModel(model: String, texture: String, brightness: Float): Spatial =
-        assetManager.loadModel(model, texture, REFLECTIVE, brightness)
+        assetLoader.loadReflectiveModel(model, texture)
 
     /** Loads and returns a reflective material with the specified [texture] at a default brightness. */
-    fun reflectiveMaterial(texture: String): Material = assetManager.reflectiveMaterial(texture, 0.9f)
+    fun reflectiveMaterial(texture: String): Material = assetLoader.reflectiveMaterial(texture)
 
     /** Loads and returns an unshaded material with the specified [texture]. */
-    fun unshadedMaterial(texture: String): Material = assetManager.unshadedMaterial(texture)
+    fun unshadedMaterial(texture: String): Material = assetLoader.diffuseMaterial(texture)
 }
