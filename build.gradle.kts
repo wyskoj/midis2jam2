@@ -16,7 +16,7 @@ plugins {
     // Kotlin
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
-    id("org.jetbrains.dokka") version "1.4.32"
+    id("org.jetbrains.dokka") version "1.6.21"
     id("org.jetbrains.compose") version "1.0.1"
 
     java
@@ -73,11 +73,11 @@ tasks.processResources {
 
 dependencies {
     // JMonkeyEngine
-    implementation("org.jmonkeyengine:jme3-core:3.5.1-stable")
-    implementation("org.jmonkeyengine:jme3-desktop:3.5.1-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.1-stable")
-    implementation("org.jmonkeyengine:jme3-plugins:3.5.1-stable")
-    implementation("org.jmonkeyengine:jme3-effects:3.5.1-stable")
+    implementation("org.jmonkeyengine:jme3-core:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-desktop:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-plugins:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-effects:3.5.2-stable")
 
     // JetBrains annotations
     implementation("org.jetbrains:annotations:23.0.0")
