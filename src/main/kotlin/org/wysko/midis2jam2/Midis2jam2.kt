@@ -255,6 +255,11 @@ abstract class Midis2jam2(
             stage.shadowMode = RenderQueue.ShadowMode.Receive
         } else {
             shadowController = ShadowController(this)
+            fpp = FilterPostProcessor(assetManager).apply {
+                numSamples = properties.getProperty("graphics_samples").toInt()
+                addFilter(fade)
+                app.viewPort.addProcessor(this)
+            }
         }
 
         super.initialize(stateManager, app)
