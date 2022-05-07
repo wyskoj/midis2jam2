@@ -19,14 +19,13 @@ package org.wysko.midis2jam2.instrument.family.piano
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /**
- * Any key on a keyed instrument.
- *
- * @see KeyedInstrument
+ * A single key on a [KeyedInstrument].
  */
-open class Key
-protected constructor() {
+open class Key protected constructor() {
 
     /** The uppermost node of this key. */
     val keyNode: Node = Node()
@@ -38,7 +37,11 @@ protected constructor() {
     protected val downNode: Node = Node()
 
     /** Is this key being pressed? */
-    var isBeingPressed: Boolean = false
+    val isBeingPressed: Boolean
+        get() = currentNote != null
+
+    /** The current note being animated. */
+    private var currentNote: MidiNoteOnEvent? = null
 
     /**
      * Animates the motion of the key.
@@ -46,11 +49,15 @@ protected constructor() {
      * @param delta the amount of time since the last frame update
      */
     open fun tick(delta: Float) {
-        if (isBeingPressed) {
-            keyNode.localRotation = Quaternion().fromAngles(0.1f, 0f, 0f)
+        currentNote?.let {
+            keyNode.localRotation = Quaternion().fromAngles(
+                (0.1f * PercussionInstrument.velocityRecoilDampening(it.velocity)).toFloat(),
+                0f,
+                0f
+            )
             downNode.cullHint = Spatial.CullHint.Dynamic
             upNode.cullHint = Spatial.CullHint.Always
-        } else {
+        } ?: run {
             val angles = FloatArray(3)
             keyNode.localRotation.toAngles(angles)
             if (angles[0] > 0.0001) {
@@ -65,5 +72,20 @@ protected constructor() {
                 upNode.cullHint = Spatial.CullHint.Dynamic
             }
         }
+    }
+
+    /**
+     * Signals that this key is being pressed. You can safely call this function more than once during the lifetime of a
+     * note.
+     */
+    fun pressKey(note: MidiNoteOnEvent) {
+        currentNote = note
+    }
+
+    /**
+     * Signals that this key is being released.
+     */
+    fun releaseKey() {
+        currentNote = null
     }
 }

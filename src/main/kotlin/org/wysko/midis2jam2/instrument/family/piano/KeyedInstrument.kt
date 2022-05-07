@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument.family.piano
 
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
@@ -46,29 +45,34 @@ abstract class KeyedInstrument(
     /** Returns the number of keys on this instrument. */
     fun keyCount(): Int = rangeHigh - rangeLow + 1
 
-    /** Returns the key associated with the [midiNote], or `null` if this instrument can't animate that note. */
+    /** Returns the [Key] associated with the [midiNote], or `null` if this instrument can't animate that note. */
     protected abstract fun keyByMidiNote(midiNote: Int): Key?
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
         val eventsToPerform: List<MidiNoteEvent> = getElapsedEvents(time)
-        for (event in eventsToPerform) {
-            val key = keyByMidiNote(event.note)
-            when (event) {
-                is MidiNoteOnEvent -> {
-                    key?.isBeingPressed = true
-                }
-                is MidiNoteOffEvent -> {
-                    /* If there is a note off event and a note on event in this frame for the same note, you won't see it
-                         * because the key will be turned off before the frame renders. So, move the note off event back to the
-                         * list of event to be rendered on the next frame. */
-                    if (eventsToPerform.stream()
-                            .anyMatch { e: MidiNoteEvent -> e.note == event.note && e is MidiNoteOnEvent }
-                    ) {
-                        /* bonk. you get to go to the next frame */
-                        events.add(0, event)
-                    } else {
-                        key?.isBeingPressed = false
+
+        /*
+         * Because there may be a NoteOn and NoteOff event in the same frame, we must delay the NoteOff event by one
+         * frame so that the key press actually animates. Note, this is only is important if the two events occur within
+         * the SAME frame.
+         */
+
+        val keysPressedThisFrame = mutableListOf<Key>()
+
+        eventsToPerform.forEach { event ->
+            keyByMidiNote(event.note)?.let {
+                when (event) {
+                    is MidiNoteOnEvent -> {
+                        it.pressKey(event)
+                        keysPressedThisFrame.add(it)
+                    }
+                    is MidiNoteOffEvent -> {
+                        if (keysPressedThisFrame.contains(it)) {
+                            events.add(0, event) // Add this event back to the queue, to be animated on next frame
+                        } else {
+                            it.releaseKey()
+                        }
                     }
                 }
             }
@@ -110,12 +114,9 @@ abstract class KeyedInstrument(
 
     companion object {
         /**
-         * Calculates if a MIDI note value is a black or white key on a standard piano.
-         *
-         * @param x the MIDI note value
-         * @return {@link KeyColor#WHITE} or {@link KeyColor#BLACK}
+         * Given a MIDI [note], determines if it is a [KeyColor.WHITE] or [KeyColor.BLACK] key on a standard keyboard.
          */
-        fun midiValueToColor(x: Int): KeyColor = when (x % 12) {
+        fun midiValueToColor(note: Int): KeyColor = when (note % 12) {
             1, 3, 6, 8, 10 -> KeyColor.BLACK
             else -> KeyColor.WHITE
         }
