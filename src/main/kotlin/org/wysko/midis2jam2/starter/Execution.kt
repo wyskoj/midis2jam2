@@ -311,7 +311,7 @@ private open class StandardExecution(
             val dimensions = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
             val canvas = context.canvas
             canvas.preferredSize = dimensions
-            frame = SwingWrapper.wrap(canvas, "midis2jam2") {
+            frame = SwingWrapper.wrap(canvas, "midis2jam2", properties.getProperty("enhanced_graphics") != "true") {
                 stop()
             }
             startCanvas()
@@ -353,7 +353,7 @@ private open class LegacyExecution(
             defaultSettings.isFullscreen = false
             defaultSettings.setResolution((screenWidth() * 0.95).toInt(), (screenHeight() * 0.85).toInt())
         }
-        defaultSettings.isResizable = true
+        defaultSettings.isResizable = properties.getProperty("enhanced_graphics") != "true"
         setSettings(defaultSettings)
         setDisplayStatView(false)
         setDisplayFps(false)

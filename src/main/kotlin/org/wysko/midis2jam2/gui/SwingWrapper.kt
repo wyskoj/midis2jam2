@@ -33,7 +33,7 @@ import javax.swing.JFrame
  * @param canvas the canvas to wrap
  */
 internal class SwingWrapper(
-    canvas: Canvas, title: String, onClose: () -> Unit
+     canvas: Canvas, title: String, resizable: Boolean, onClose: () -> Unit
 ) : JFrame(title) {
 
     init {
@@ -52,11 +52,13 @@ internal class SwingWrapper(
         addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) = onClose()
         })
+
+        this.isResizable = resizable
     }
 
     companion object {
-        fun wrap(canvas: Canvas, title: String, onClose: () -> Unit): JFrame =
-            SwingWrapper(canvas, title, onClose).also {
+        fun wrap(canvas: Canvas, title: String, resizable: Boolean, onClose: () -> Unit): JFrame =
+            SwingWrapper(canvas, title, resizable, onClose).also {
                 it.size = Dimension((screenWidth() * 0.95).toInt(), (screenHeight() * 0.85).toInt())
                 it.setLocationRelativeTo(null)
                 it.isVisible = true
