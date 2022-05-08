@@ -66,31 +66,6 @@ object BackgroundController {
                 }
             }
 
-            "FIXED" -> {
-                val picture = Picture("background").apply {
-                    setImage(assetManager, value as String, false)
-                    setWidth(context.app.camera.width.toFloat())
-                    setHeight(context.app.camera.height.toFloat())
-                    setPosition(0f, 0f)
-                    updateGeometricState()
-                }
-                val viewport = renderManager.createPreView("background", context.app.camera)
-                viewport.setClearFlags(true, true, true)
-                viewport.attachScene(Node().also { node ->
-                    with(picture) {
-                        node.attachChild(this)
-                        cullHint = Spatial.CullHint.Never
-                    }
-                    node.updateGeometricState()
-                    node.cullHint = Spatial.CullHint.Never
-                })
-
-                context.app.viewPort.setClearFlags(false, true, false)
-
-                return viewport
-            }
-
-
             "UNIQUE_CUBEMAP" -> {
                 val names = value as List<*>
                 logger().debug("Unique cubemap values: $names")

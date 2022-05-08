@@ -209,7 +209,6 @@ object ConfigureBackground {
                 To use a custom picture, you must<br>place the image file into the <a href><tt>.midis2jam2/backgrounds</tt></a> folder in your user folder.<br>
                 <ul>
                     <li>Default &mdash; The default background (grey checkerboard) is used.</li>
-                    <li>Fixed &mdash; The background picture is static and does not move (similar to MIDIJam).</li>
                     <li>Repeated cubemap &mdash; A single background picture is displayed on each of the six surrounding walls.</li>
                     <li>Unique cubemap &mdash; Six pictures are respectively displayed on each of the six surrounding walls.</li>
                     <li>Color &mdash; The background is a solid color.</li>
@@ -232,7 +231,6 @@ object ConfigureBackground {
             /* Type selection */
             val types = arrayOf(
                 Triple("Default", "DEFAULT", "DEFAULT"),
-                Triple("Fixed", "ONE_FILE", "FIXED"),
                 Triple("Repeated cubemap", "ONE_FILE", "REPEATED_CUBEMAP"),
                 Triple("Unique cubemap", "SIX_FILES", "UNIQUE_CUBEMAP"),
                 Triple("Color", "COLOR", "COLOR"),
