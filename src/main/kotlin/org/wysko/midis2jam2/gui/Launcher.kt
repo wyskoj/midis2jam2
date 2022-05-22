@@ -48,6 +48,7 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.CONFIGURATION_DIRECTORY
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.logger
 import java.awt.Cursor
 import java.awt.Dimension
 import java.io.File
@@ -57,62 +58,74 @@ import java.text.MessageFormat
 import java.util.*
 import javax.sound.midi.MidiSystem
 import javax.swing.JFileChooser
+import javax.swing.filechooser.FileFilter
 
 /**
- * Locales for the GUI.
+ * A list of locales that the launcher supports.
  */
-val supportedLocales: List<Locale> = listOf(
-    Locale.ENGLISH,
-    Locale.FRENCH,
-    Locale.forLanguageTag("es"),
-    Locale.forLanguageTag("ru")
+private val supportedLocales: List<Locale> = listOf(
+    Locale.ENGLISH, Locale.FRENCH, Locale.forLanguageTag("es"), Locale.forLanguageTag("ru")
 )
 
+/**
+ * The user's home directory.
+ */
+val USER_HOME_DIRECTORY: File = File(System.getProperty("user.home"))
+
+/**
+ * Defines the default state of the launcher's GUI components.
+ */
 private val DEFAULT_LAUNCHER_STATE = Properties().apply {
     setProperty("locale", "en")
     setProperty("midi_device", "Gervill")
-    setProperty("lastdir", System.getProperty("user.home"))
+    setProperty("lastdir", USER_HOME_DIRECTORY.absolutePath)
     setProperty("soundfonts", Json.encodeToString(listOf<String>()))
 }
 
+/**
+ * Returns the file that stores the settings. If the file or directories to it don't exist, they are created whenever
+ * this method is called.
+ */
+private val LAUNCHER_STATE_FILE: File
+    get() = File(File(USER_HOME_DIRECTORY, CONFIGURATION_DIRECTORY), "launcher.properties").also {
+        if (!it.exists()) {
+            it.parentFile.mkdirs()
+            it.createNewFile()
+        }
+    }
 
+/**
+ * The current state of the launcher properties.
+ *
+ * This anonymous object will write any changes to the properties to the [LAUNCHER_STATE_FILE] whenever the
+ * [Properties.setProperty] method is called.
+ */
 private val launcherState = object : Properties(DEFAULT_LAUNCHER_STATE) {
     override fun setProperty(key: String, value: String): Any? {
-        val old = super.setProperty(key, value)
-        store(FileWriter(launcherStateFile()), null)
-        return old
+        super.setProperty(key, value).also {
+            store(FileWriter(LAUNCHER_STATE_FILE), null)
+            return it
+        }
     }
 
+    /**
+     * Adds a SoundFont to the launcher state, given its [path].
+     */
     fun addSoundFont(path: String) {
-        this.setProperty(
-            "soundfonts",
-            Json.encodeToString(
-                soundfonts.apply { add(path) }
-            )
-        )
+        this.setProperty("soundfonts", Json.encodeToString(soundfonts.apply { add(path) }))
     }
 
-    /** List of names of SoundFonts. */
+    fun getSoundFontFile(name: String): File = File(soundfonts.first { File(it).name == name })
+
+    /** List of paths of SoundFonts. */
     val soundfonts: ArrayList<String>
         get() = Json.decodeFromString<MutableList<String>>(getProperty("soundfonts")) as ArrayList<String>
 
+
 }.apply {
-    load(FileReader(launcherStateFile()))
+    load(FileReader(LAUNCHER_STATE_FILE))
 }
 
-/**
- * Returns the file that stores the settings.
- */
-private fun launcherStateFile(): File {
-    val file = File(File(System.getProperty("user.home"), CONFIGURATION_DIRECTORY), "launcher.properties")
-    with(file) {
-        if (!exists()) {
-            parentFile.mkdirs()
-            createNewFile()
-        }
-    }
-    return file
-}
 
 /**
  * Displays configuration options and settings for midis2jam2.
@@ -123,22 +136,24 @@ private fun launcherStateFile(): File {
 @Suppress("FunctionName")
 fun Launcher() {
 
-    /* Load i18n strings */
+    /* The current locale displayed in the launcher. */
     var locale by remember { mutableStateOf(launcherState.getProperty("locale")) }
 
+    /* The resource bundle that provides strings, determined by the current [locale]. */
     val i18n by remember {
         derivedStateOf {
             ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
         }
     }
 
+    /* MIDI File */
+    var selectedMIDIFile: File? by remember { mutableStateOf(null) }
+
     /* MIDI Device */
     val midiDevices = MidiSystem.getMidiDeviceInfo().map { it.name }.toList().filter { it != "Real Time Sequencer" }
     var selectedMidiDevice by remember { mutableStateOf(launcherState.getProperty("midi_device")) }
 
-    var midiFileText by remember { mutableStateOf("") }
-    var selectedMidiFile by remember { mutableStateOf("") }
-
+    /* SoundFont */
     val soundFonts by remember {
         derivedStateOf {
             val decodeFromString =
@@ -162,13 +177,14 @@ fun Launcher() {
     fun beginMidis2jam2() {
         try {
             Execution.start(
-                Properties().apply {
-                    setProperty("midi_file", selectedMidiFile)
-                    setProperty("midi_device", selectedMidiDevice)
+                properties = Properties().apply {
+                    setProperty("midi_file", selectedMIDIFile?.absolutePath)
+                    setProperty("midi_device", selectedMidiDevice.also { println(it) })
+
                     if (soundFonts[selectedSoundFont] != "Default SoundFont") {
-                        setProperty("soundfont",
-                            launcherState.soundfonts.map { File(it) }
-                                .first { it.name == soundFonts[selectedSoundFont] }.absolutePath
+                        setProperty(
+                            "soundfont",
+                            launcherState.getSoundFontFile(soundFonts[selectedSoundFont]).absolutePath
                         )
                     }
                 },
@@ -223,50 +239,9 @@ fun Launcher() {
                                 style = MaterialTheme.typography.h6,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp)
                             )
-                            TextField(
-                                value = midiFileText,
-                                onValueChange = { midiFileText = it },
-                                singleLine = true,
-                                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(width),
-                                label = { Text(i18n.getString("configuration.midi_file")) },
-                                trailingIcon = {
-                                    Icon(
-                                        Icons.Filled.Search,
-                                        contentDescription = i18n.getString("configuration.search_for_midi_file"),
-                                        modifier = Modifier.clickable {
-                                            /* If the directory is bad, just revert to the home directory */
-                                            if (!File(launcherState.getProperty("lastdir")).exists()) {
-                                                launcherState.setProperty("lastdir", System.getProperty("user.home"))
-                                            }
-                                            JFileChooser(File(launcherState.getProperty("lastdir"))).run {
-                                                fileFilter = object :
-                                                    javax.swing.filechooser.FileFilter() {
-                                                    override fun accept(file: File?): Boolean {
-                                                        return file?.extension?.lowercase(Locale.getDefault()) == "mid" ||
-                                                                file?.extension?.lowercase(Locale.getDefault()) == "kar"
-                                                                || file?.isDirectory == true
-                                                    }
-
-                                                    override fun getDescription(): String =
-                                                        "MIDI files (*.mid, *.kar)"
-                                                }
-                                                preferredSize = Dimension(800, 600)
-                                                dialogTitle = "Select MIDI file"
-                                                isMultiSelectionEnabled = false
-                                                actionMap.get("viewTypeDetails").actionPerformed(null)
-
-                                                if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                                                    selectedMidiFile = this.selectedFile.absolutePath
-                                                    midiFileText = this.selectedFile.name
-                                                    launcherState.setProperty("lastdir", this.selectedFile.parent)
-                                                }
-
-                                            }
-                                        }.pointerHoverIcon(PointerIconDefaults.Hand, true)
-                                    )
-                                },
-                                readOnly = true
-                            )
+                            MIDIFileTextField(i18n) {
+                                selectedMIDIFile = it
+                            }
                             SimpleExposedDropDownMenu(
                                 values = midiDevices,
                                 selectedIndex = midiDevices.indexOf(selectedMidiDevice),
@@ -297,12 +272,11 @@ fun Launcher() {
                                     Button(
                                         onClick = {
                                             JFileChooser().run {
-                                                fileFilter = (object :
-                                                    javax.swing.filechooser.FileFilter() {
+                                                fileFilter = (object : FileFilter() {
                                                     override fun accept(file: File?): Boolean =
-                                                        file?.extension?.lowercase(Locale.getDefault()) == "sf2"
-                                                                || file?.extension?.lowercase(Locale.getDefault()) == "dls"
-                                                                || file?.isDirectory == true
+                                                        file?.extension?.lowercase(Locale.getDefault()) == "sf2" || file?.extension?.lowercase(
+                                                            Locale.getDefault()
+                                                        ) == "dls" || file?.isDirectory == true
 
                                                     override fun getDescription(): String =
                                                         "Soundbank files (*.sf2, *.dls)"
@@ -314,11 +288,15 @@ fun Launcher() {
                                                 isMultiSelectionEnabled = false
                                                 actionMap.get("viewTypeDetails").actionPerformed(null)
 
-                                                if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                                                    launcherState.addSoundFont(selectedFile.absolutePath)
-                                                    soundFonts.add(selectedFile.absolutePath)
-                                                    selectedSoundFont = soundFonts.indexOf(selectedFile.absolutePath)
+                                                if (showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+                                                    return@run
                                                 }
+                                                if (launcherState.soundfonts.contains(selectedFile.absolutePath)) {
+                                                    return@run
+                                                }
+                                                launcherState.addSoundFont(selectedFile.absolutePath)
+                                                soundFonts.add(selectedFile.name)
+                                                selectedSoundFont = soundFonts.indexOf(selectedFile.name)
                                             }
                                         }, modifier = Modifier.height(56.dp).width(56.dp)
                                     ) {
@@ -348,7 +326,7 @@ fun Launcher() {
                                     beginMidis2jam2()
                                 },
                                 modifier = Modifier.width(150.dp).padding(0.dp, 0.dp, 0.dp, 16.dp),
-                                enabled = selectedMidiFile.isNotEmpty() && !freeze
+                                enabled = selectedMIDIFile != null && !freeze
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -391,8 +369,7 @@ fun Launcher() {
                                         val lang =
                                             it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it.size].language
                                         launcherState.setProperty(
-                                            "locale",
-                                            lang
+                                            "locale", lang
                                         )
                                         locale = lang
                                     }
@@ -483,5 +460,59 @@ fun Launcher() {
             }
         }
     }
+}
+
+/**
+ * The text field that shows the currently selected MIDI file. The field also has a button for opening a file selector.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun MIDIFileTextField(i18n: ResourceBundle, onChange: (path: File) -> Unit) {
+    var selectedFile: File? by remember { mutableStateOf(null) }
+    TextField(
+        value = selectedFile?.name ?: "",
+        onValueChange = {},
+        singleLine = true,
+        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(500.dp),
+        label = { Text(i18n.getString("configuration.midi_file")) },
+        trailingIcon = {
+            Icon(
+                Icons.Filled.Search,
+                contentDescription = i18n.getString("configuration.search_for_midi_file"),
+                modifier = Modifier.clickable {
+                    /* If the directory is bad, just revert to the home directory */
+                    if (!File(launcherState.getProperty("lastdir")).exists()) {
+                        launcherState.setProperty("lastdir", USER_HOME_DIRECTORY.absolutePath)
+                    }
+
+                    /* Create file chooser modal */
+                    JFileChooser(File(launcherState.getProperty("lastdir"))).run {
+                        fileFilter = object : FileFilter() {
+                            override fun accept(file: File?): Boolean {
+                                return file?.extension?.lowercase(Locale.getDefault()) == "mid" || file?.extension?.lowercase(
+                                    Locale.getDefault()
+                                ) == "kar" || file?.isDirectory == true
+                            }
+
+                            override fun getDescription(): String = "MIDI files (*.mid, *.kar)"
+                        }
+                        preferredSize = Dimension(800, 600)
+                        dialogTitle = "Select MIDI file"
+                        isMultiSelectionEnabled = false
+                        actionMap.get("viewTypeDetails").actionPerformed(null) // Switch to "detail" view
+
+                        /* Update path if dialog succeeds */
+                        if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            selectedFile = this.selectedFile
+                            launcherState.setProperty("lastdir", this.selectedFile.parent)
+                            onChange(selectedFile ?: return@run) // Should be safe
+                            logger().info("Selected MIDI file ${selectedFile?.absoluteFile}")
+                        }
+                    }
+                }.pointerHoverIcon(PointerIconDefaults.Hand, true)
+            )
+        },
+        readOnly = true
+    )
 }
 
