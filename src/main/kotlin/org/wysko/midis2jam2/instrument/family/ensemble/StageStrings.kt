@@ -174,8 +174,8 @@ class StageStrings(
             animNode.attachChild(restingString)
 
             // Load bow
-            bow = context.loadModel("StageStringBow.fbx", type.textureFile).apply {
-                (this as Node).getChild(1).setMaterial((restingString as Geometry).material)
+            bow = context.loadModel("StageStringBow.obj", type.textureFile).apply {
+                (this as Node).getChild(0).setMaterial((restingString as Geometry).material)
             }
 
             bowNode.run {

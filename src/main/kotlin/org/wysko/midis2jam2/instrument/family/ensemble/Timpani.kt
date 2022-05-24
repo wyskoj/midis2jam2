@@ -40,8 +40,8 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
         }
 
         animNode.run {
-            attachChild(context.loadModel("TimpaniBody.fbx", "HornSkin.bmp", 0.9f).apply {
-                (this as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+            attachChild(context.loadModel("TimpaniBody.obj", "HornSkin.bmp", 0.9f).apply {
+                (this as Node).getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
             })
             attachChild(context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp"))
         }

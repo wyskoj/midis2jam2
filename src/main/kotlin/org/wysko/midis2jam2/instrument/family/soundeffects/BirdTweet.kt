@@ -63,24 +63,24 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     inner class Bird : BouncyTwelfth() {
 
         /** The open beak. */
-        private val openBeak = context.loadModel("BirdBeak_Open.fbx", BIRD_TEXTURE).also {
+        private val openBeak = context.loadModel("BirdBeak_Open.obj", BIRD_TEXTURE).also {
             animNode.attachChild(it)
         }
 
         /** The closed beak. */
-        private val closedBeak = context.loadModel("BirdBeak_Closed.fbx", BIRD_TEXTURE).also {
+        private val closedBeak = context.loadModel("BirdBeak_Closed.obj", BIRD_TEXTURE).also {
             animNode.attachChild(it)
         }
 
         /** The wings. */
-        private val wings = context.loadModel("BirdWings.fbx", BIRD_TEXTURE).also {
+        private val wings = context.loadModel("BirdWings.obj", BIRD_TEXTURE).also {
             animNode.attachChild(it)
         }
 
         init {
-            animNode.attachChild(context.loadModel("Bird.fbx", BIRD_TEXTURE).apply {
+            animNode.attachChild(context.loadModel("Bird.obj", BIRD_TEXTURE).apply {
                 this as Node
-                getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
+                getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
             })
         }
 

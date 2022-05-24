@@ -55,8 +55,8 @@ class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSet
 
     init {
         /* Left and right slappers */
-        leftSlapNode.attachChild(context.loadModel("SlapHalf.fbx", "Wood.bmp"))
-        rightSlapNode.attachChild(context.loadModel("SlapHalf.fbx", "Wood.bmp").apply {
+        leftSlapNode.attachChild(context.loadModel("SlapHalf.obj", "Wood.bmp"))
+        rightSlapNode.attachChild(context.loadModel("SlapHalf.obj", "Wood.bmp").apply {
             localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
         })
 

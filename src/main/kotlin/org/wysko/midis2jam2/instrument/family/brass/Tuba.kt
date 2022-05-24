@@ -65,7 +65,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         init {
             /* Load body and bell */
-            val body = context.loadModel("TubaBody.fbx", "HornSkin.bmp", 0.9f)
+            val body = context.loadModel("TubaBody.obj", "HornSkin.bmp", 0.9f)
             bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", 0.9f))
 
             /* Attach body and bell */

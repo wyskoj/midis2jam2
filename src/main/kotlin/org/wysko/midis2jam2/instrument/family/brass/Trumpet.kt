@@ -82,7 +82,7 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
 
         init {
             /* Load trumpet body */
-            val body = context.loadModel("TrumpetBody.fbx", "HornSkin.bmp", 0.9f)
+            val body = context.loadModel("TrumpetBody.obj", "HornSkin.bmp", 0.9f)
 
             /* Set horn skin grey material */
             (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))

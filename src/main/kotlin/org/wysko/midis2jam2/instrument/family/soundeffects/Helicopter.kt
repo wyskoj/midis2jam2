@@ -150,17 +150,17 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
     init {
         /* Load helicopter */
-        val copter = context.loadModel("HelicopterBody.fbx", "Helicopter.png")
+        val copter = context.loadModel("HelicopterBody.obj", "Helicopter.png")
         rotor.attachChild(
             context.assetLoader.fakeShadow(
-                "Assets/HelicopterRotorPlane.fbx",
+                "Assets/HelicopterRotorPlane.obj",
                 "Assets/HelicopterRotor.png"
             )
         )
 
         /* Load lights */
         lights = Array(12) {
-            context.assetLoader.fakeShadow("Assets/HelicopterRotorPlane.fbx", "Assets/HelicopterLights${it + 1}.png")
+            context.assetLoader.fakeShadow("Assets/HelicopterRotorPlane.obj", "Assets/HelicopterLights${it + 1}.png")
                 .apply {
                     rotor.attachChild(this)
                     this.cullHint = Always
@@ -172,7 +172,7 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         animNode.attachChild(rotor)
 
         /* Load rotor cap */
-        val cap = context.loadModel("HelicopterRotorCap.fbx", "Helicopter.png")
+        val cap = context.loadModel("HelicopterRotorCap.obj", "Helicopter.png")
         cap.setLocalTranslation(0f, 0f, 0.5f)
         animNode.attachChild(cap)
 

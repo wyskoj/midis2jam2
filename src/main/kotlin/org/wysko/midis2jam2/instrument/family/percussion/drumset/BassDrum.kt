@@ -105,10 +105,10 @@ class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percus
         drumNode.attachChild(drum)
 
         /* Load beater arm */
-        beaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.fbx", METAL_TEXTURE)
+        beaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.obj", METAL_TEXTURE)
 
         /* Load beater holder */
-        val bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.fbx", METAL_TEXTURE)
+        val bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.obj", METAL_TEXTURE)
         val holder = bassDrumBeaterHolder as Node
 
         /* Apply materials */
@@ -116,10 +116,10 @@ class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Percus
         val shinySilverMaterial = context.reflectiveMaterial("Assets/ShinySilver.bmp")
         val darkMetalMaterial = context.unshadedMaterial("Assets/MetalTextureDark.bmp")
         arm.run {
-            getChild(0).setMaterial(shinySilverMaterial)
             getChild(1).setMaterial(darkMetalMaterial)
+            getChild(0).setMaterial(shinySilverMaterial)
         }
-        holder.getChild(0).setMaterial(darkMetalMaterial)
+        holder.getChild(1).setMaterial(darkMetalMaterial)
 
         /* Load pedal */
         pedal = context.loadModel("DrumSet_BassDrumPedal.obj", METAL_TEXTURE)

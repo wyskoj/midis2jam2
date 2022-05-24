@@ -53,7 +53,7 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: Tr
         OPEN("Triangle.obj"),
 
         /** Muted triangle type. */
-        MUTED("MutedTriangle.fbx");
+        MUTED("MutedTriangle.obj");
     }
 
     init {

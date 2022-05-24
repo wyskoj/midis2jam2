@@ -49,10 +49,10 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.loadModel("Banjo.fbx", "BanjoSkin.png")
+    context.loadModel("Banjo.obj", "BanjoSkin.png")
 ) {
     override val upperStrings: Array<Spatial> = Array(4) {
-        context.loadModel("BanjoString.fbx", "BassSkin.bmp").also {
+        context.loadModel("BanjoString.obj", "BassSkin.bmp").also {
             instrumentNode.attachChild(it)
         }
     }.apply {
@@ -69,7 +69,7 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
 
     override val lowerStrings: Array<Array<Spatial>> = Array(4) {
         Array(5) { j: Int ->
-            context.loadModel("BanjoStringBottom$j.fbx", "BassSkin.bmp").apply {
+            context.loadModel("BanjoStringBottom$j.obj", "BassSkin.bmp").apply {
                 instrumentNode.attachChild(this)
             }
         }

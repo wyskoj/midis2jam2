@@ -77,7 +77,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     private val random = Random()
 
     init {
-        context.loadModel("TelePhoneBase.fbx", "TelephoneBase.bmp").apply {
+        context.loadModel("TelePhoneBase.obj", "TelephoneBase.bmp").apply {
             (this as Node).getChild(0).setMaterial(context.unshadedMaterial("RubberFoot.bmp"))
         }.also {
             instrumentNode.attachChild(it)

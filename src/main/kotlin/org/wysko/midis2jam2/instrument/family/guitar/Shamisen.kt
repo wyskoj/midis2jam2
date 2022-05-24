@@ -46,10 +46,10 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
         }
     ),
     3,
-    context.loadModel("Shamisen.fbx", SHAMISEN_SKIN_TEXTURE)) {
+    context.loadModel("Shamisen.obj", SHAMISEN_SKIN_TEXTURE)) {
 
     override val upperStrings: Array<Spatial> = Array(3) {
-        context.loadModel("ShamisenString.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+        context.loadModel("ShamisenString.obj", SHAMISEN_SKIN_TEXTURE).apply {
             instrumentNode.attachChild(this)
             setLocalTranslation(positioning.upperX[it], positioning.upperY, FORWARD)
         }
@@ -58,7 +58,7 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
 
     override val lowerStrings: Array<Array<Spatial>> = Array(3) { i: Int ->
         Array(5) { j: Int ->
-            context.loadModel("ShamisenStringBottom$j.fbx", SHAMISEN_SKIN_TEXTURE).apply {
+            context.loadModel("ShamisenStringBottom$j.obj", SHAMISEN_SKIN_TEXTURE).apply {
                 instrumentNode.attachChild(this)
                 setLocalTranslation(positioning.lowerX[i], positioning.lowerY, FORWARD)
                 cullHint = Always

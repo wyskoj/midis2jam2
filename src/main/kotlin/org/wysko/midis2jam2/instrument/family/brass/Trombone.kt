@@ -132,7 +132,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         init {
             /* Attach body, slide, and set rotation of Trombone */
             modelNode.run {
-                attachChild(context.loadModel("Trombone.fbx", "HornSkin.bmp", 0.9f).apply {
+                attachChild(context.loadModel("Trombone.obj", "HornSkin.bmp", 0.9f).apply {
                     this as Node
                     getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                 })

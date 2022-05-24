@@ -46,13 +46,13 @@ class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
                 setMaterial(shine)
             }
 
-            context.assetManager.loadModel("Assets/BaritoneSaxBody.fbx").apply {
+            context.assetManager.loadModel("Assets/BaritoneSaxBody.obj").apply {
                 this as Node
-                getChild(0).setMaterial(shine)
-                getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                getChild(2).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                getChild(1).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
                     setColor("Color", ColorRGBA.Black)
                 })
+                getChild(2).setMaterial(shine)
                 modelNode.attachChild(this)
             }
 

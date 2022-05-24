@@ -52,7 +52,7 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     inner class OboeClone : HandedClone(this@Oboe, 0.075f) {
 
         /** The bell. */
-        private val bell = context.loadModel("OboeHorn.fbx", "OboeSkin.png").apply {
+        private val bell = context.loadModel("OboeHorn.obj", "OboeSkin.png").apply {
             modelNode.attachChild(this)
             setLocalTranslation(0f, -20.7125f, 0f)
         }
@@ -79,7 +79,7 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         init {
             /* Load body */
-            modelNode.attachChild(context.loadModel("OboeBody.fbx", "OboeSkin.png"))
+            modelNode.attachChild(context.loadModel("OboeBody.obj", "OboeSkin.png"))
             loadHands()
 
             animNode.setLocalTranslation(0f, 0f, 10f)

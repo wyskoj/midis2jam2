@@ -31,7 +31,7 @@ class Tambourine(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonD
 
     /** Contains the hand with the tambourine. */
     private val tambourineHandNode = Node().apply {
-        attachChild(context.loadModel("hand_tambourine.fbx", "hands.bmp").apply {
+        attachChild(context.loadModel("hand_tambourine.obj", "hands.bmp").apply {
             (this as Node).getChild(2).setMaterial(context.unshadedMaterial("TambourineWood.bmp"))
             getChild(1).setMaterial(context.unshadedMaterial("MetalTexture.bmp"))
             setLocalTranslation(0f, 0f, -2f)

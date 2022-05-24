@@ -53,12 +53,12 @@ class SopranoSax(
                 setMaterial(shine)
             }
 
-            context.assetManager.loadModel("Assets/SopranoSaxBody.fbx").apply {
+            context.assetManager.loadModel("Assets/SopranoSaxBody.obj").apply {
                 this as Node
-                getChild(0).setMaterial(shine)
-                getChild(1).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                getChild(0).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
                     setColor("Color", ColorRGBA.Black)
                 })
+                getChild(1).setMaterial(shine)
                 modelNode.attachChild(this)
             }
 

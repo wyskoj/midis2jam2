@@ -31,7 +31,7 @@ class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
     }
 
     init {
-        val drum = context.loadModel("Taiko.fbx", "TaikoHead.bmp")
+        val drum = context.loadModel("Taiko.obj", "TaikoHead.bmp")
         val woodTexture = context.assetManager.loadTexture("Assets/Wood.bmp")
         val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
         material.setTexture("ColorMap", woodTexture)

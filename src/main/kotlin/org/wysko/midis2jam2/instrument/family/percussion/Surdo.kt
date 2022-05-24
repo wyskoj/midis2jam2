@@ -80,7 +80,7 @@ class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     }
 
     init {
-        recoilNode.attachChild(context.loadModel("DrumSet_Surdo.fbx", "DrumShell_Surdo.png").apply {
+        recoilNode.attachChild(context.loadModel("DrumSet_Surdo.obj", "DrumShell_Surdo.png").apply {
             setLocalScale(1.7f)
         })
         with(highestLevel) {

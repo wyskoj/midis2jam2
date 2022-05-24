@@ -21,6 +21,7 @@ import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Ray
 import com.jme3.math.Vector3f
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
@@ -107,7 +108,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private val laserNode = Node()
 
         /** The laser beam. */
-        internal val laserBeam: Spatial = context.loadModel("SpaceLaserLaser.fbx", "Laser.bmp")
+        internal val laserBeam: Spatial = context.loadModel("SpaceLaserLaser.obj", "Laser.bmp").apply {
+            shadowMode = RenderQueue.ShadowMode.Off
+        }
 
         /** Timer for how long a note has been playing to calculate wobble. */
         private var wobbleTime = 0.0
@@ -119,7 +122,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private val angleCalculator = SIGMOID_CALCULATOR
 
         /** The shooter. */
-        internal val shooter: Spatial = context.loadModel("SpaceLaser.fbx", "ShinySilver.bmp")
+        internal val shooter: Spatial = context.loadModel("SpaceLaser.obj", "ShinySilver.bmp")
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
@@ -202,9 +205,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
 
     init {
         /* Load base */
-        val base = context.loadModel("SpaceLaserBase.fbx", "Wood.bmp")
+        val base = context.loadModel("SpaceLaserBase.obj", "Wood.bmp")
         (base as Node).apply {
-            getChild(0).setMaterial(context.reflectiveMaterial("Assets/ShinySilver.bmp"))
+            getChild(1).setMaterial(context.reflectiveMaterial("Assets/ShinySilver.bmp"))
             getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
         }
 
@@ -231,8 +234,8 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             }
             (it.shooter as Node).apply {
                 getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                getChild(1).setMaterial(glowMaterial)
-                getChild(2).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
+                getChild(1).setMaterial(context.unshadedMaterial("Assets/RubberFoot.bmp"))
+                getChild(2).setMaterial(glowMaterial)
             }
             it.laserBeam.setMaterial(glowMaterial)
         }

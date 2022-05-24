@@ -79,7 +79,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
 
         init {
             /* Load body */
-            context.loadModel("FrenchHornBody.fbx", "HornSkin.bmp", 0.9f).apply {
+            context.loadModel("FrenchHornBody.obj", "HornSkin.bmp", 0.9f).apply {
                 modelNode.attachChild(this)
                 (this as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
             }

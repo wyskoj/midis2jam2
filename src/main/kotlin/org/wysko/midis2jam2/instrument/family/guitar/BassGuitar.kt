@@ -123,7 +123,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP),
 
         /** The fretless Bass Guitar type. */
-        FRETLESS("BassFretless.fbx", "BassFretlessD.fbx", "BassSkinFretless.png");
+        FRETLESS("BassFretless.obj", "BassFretlessD.obj", "BassSkinFretless.png");
     }
 
     init {

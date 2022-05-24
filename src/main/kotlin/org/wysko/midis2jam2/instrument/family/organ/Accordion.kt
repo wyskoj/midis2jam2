@@ -219,7 +219,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
 
     init {
         /* Load left case */
-        val leftHandCase = context.loadModel("AccordionLeftHand.fbx", type.textureCaseName).also {
+        val leftHandCase = context.loadModel("AccordionLeftHand.obj", type.textureCaseName).also {
             accordionSections[0].attachChild(it)
         }
 
@@ -236,7 +236,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         /* Set materials */
         (leftHandCase as Node).apply {
             getChild(1).setMaterial(leatherStrap)
-            getChild(0).setMaterial(rubberFoot)
+            getChild(2).setMaterial(rubberFoot)
         }
 
         /* Add the keys */
