@@ -161,7 +161,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             }.also {
                 if (it.size() > 0) {
                     it.closestCollision.run {
-                        laserBeam.localScale = Vector3f(1f, 1f, distance / LASER_HEIGHT)
+                        laserBeam.localScale = Vector3f(1f, distance / LASER_HEIGHT, 1f)
                     }
                 } else {
                     laserBeam.localScale = Vector3f.UNIT_XYZ
