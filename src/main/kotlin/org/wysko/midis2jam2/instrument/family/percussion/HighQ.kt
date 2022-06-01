@@ -16,7 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
@@ -40,7 +42,14 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     private val gunNode = Node()
 
     /** The green beam that "shoots" out of the laser gun. */
-    private val laser: Spatial
+    private val laser: Spatial = context.loadModel("ZapperLaser.obj", "Laser.bmp").apply {
+        setMaterial(context.unshadedMaterial("Laser.bmp").apply {
+            setColor("GlowColor", ColorRGBA.Green)
+        })
+        shadowMode = RenderQueue.ShadowMode.Off
+    }.also {
+        instrumentNode.attachChild(it)
+    }
 
     /** Timer for keeping track of how long the laser has been visible. */
     private var laserShowTime = 0.0
@@ -69,10 +78,6 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         /* Load laser gun */
         gunNode.attachChild(context.loadModel("Zapper.obj", "Zapper.bmp"))
         instrumentNode.attachChild(gunNode)
-
-        /* Load laser */
-        laser = context.loadModel("ZapperLaser.obj", "Laser.bmp")
-        instrumentNode.attachChild(laser)
 
         /* Positioning */
         laser.setLocalTranslation(0f, 0f, -14f)
