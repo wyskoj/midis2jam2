@@ -72,7 +72,11 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(-10f * updateInstrumentIndex(delta), 0f, -10f * updateInstrumentIndex(delta))
+        updateInstrumentIndex(delta)
+        offsetNode.setLocalTranslation(
+            (-10f * checkInstrumentIndex()).toFloat(), 0f,
+            (-10f * checkInstrumentIndex()).toFloat()
+        )
     }
 
     /** A single bell. */
