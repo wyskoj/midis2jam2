@@ -25,17 +25,38 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.util.cullHint
 
+private val badCharacter = Regex("""[^ -~\r\n]""")
+
 /**
  * The LyricController is responsible for controlling the displaying of lyrics. There are two lines of lyrics, the top
  * line displays the current lyric and the bottom line displays the next lyric.
  */
 class LyricController(
     /** The list of lyric events */
-    lyricEvents: List<MidiTextEvent>,
+    lyricEvents: MutableList<MidiTextEvent>,
 
     /** Context to midis2jam2 */
     val context: Midis2jam2
 ) {
+
+    /**
+     * Events that have been scrubbed clean.
+     */
+    private val cleanEvents: MutableList<MidiTextEvent> = lyricEvents.toMutableList().apply {
+        /* Sort events by time */
+        sortBy { it.time }
+
+        /* Text events that contain more than 100 characters are out!! */
+        removeAll { it.text.length > 100 }
+
+        /* Text events that contain bullshit ASCII are out!! */
+        removeAll { badCharacter.containsMatchIn(it.text) }
+
+        /* Text events that contain nothing (or just whitespace) are out !! */
+        removeAll { it.text.isBlank() }
+    }.also {
+        it.forEach { println(it) }
+    }
 
     /**
      * If true, the lyrics are currently being displayed, otherwise they are not.
@@ -101,16 +122,16 @@ class LyricController(
         get() = lyricGroups.firstOrNull()?.let { group -> group.joinToString("") { it.text.stripped() } } ?: ""
 
     init {
-        val stripped = lyricEvents.filter { !it.text.startsWith("@") } as ArrayList<MidiTextEvent>
+        val stripped = cleanEvents.filter { !it.text.startsWith("@") } as ArrayList<MidiTextEvent>
         /* Group lyrics events by new lines */
         var group = ArrayList<MidiTextEvent>()
         while (stripped.isNotEmpty()) {
             val first = stripped.removeFirst()
-            if (first.text.startsWith("\\") || first.text.startsWith("/")) {
+            if (first.text.startsWith("\\") || first.text.startsWith("/") || first.text == "\u0015") {
                 if (group.isNotEmpty()) lyricGroups.add(group)
                 group = ArrayList()
             }
-            if (first.text.endsWith("\n")) {
+            if (first.text.endsWith("\n") || first.text.endsWith("\r")) {
                 with(group) {
                     add(first)
                     lyricGroups.add(this)
