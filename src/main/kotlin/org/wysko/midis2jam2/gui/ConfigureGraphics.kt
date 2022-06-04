@@ -90,7 +90,7 @@ enum class ResolutionOption(
     `3840 x 2160`("graphics.3840_x_2160")
 }
 
-private val i18n = ResourceBundle.getBundle("i18n.graphics")
+private val i18n = ResourceBundle.getBundle("i18n.midis2jam2")
 
 private val resolutionI18N = object : ResourceBundle() {
 

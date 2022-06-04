@@ -56,7 +56,7 @@ class SettingsModal(locale: String = "en") : JDialog() {
     /**
      * Collects localized strings.
      */
-    private val i18n = ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
+    private val i18n = ResourceBundle.getBundle("i18n.midis2jam2", Locale.forLanguageTag(locale))
 
     init {
         title = i18n.getString("settings.settings")

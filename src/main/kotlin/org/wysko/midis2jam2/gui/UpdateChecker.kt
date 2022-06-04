@@ -34,7 +34,7 @@ object UpdateChecker {
     fun checkForUpdates() {
         Thread {
             try {
-                val bundle = ResourceBundle.getBundle("i18n.updater")
+                val bundle = ResourceBundle.getBundle("i18n.midis2jam2")
                 val html = getHTML("https://midis2jam2.xyz/api/update?v=" + resourceToString("/version.txt"))
                 val jep = JEditorPane().apply {
                     contentType = "text/html"

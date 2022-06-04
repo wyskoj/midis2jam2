@@ -142,7 +142,7 @@ fun Launcher() {
     /* The resource bundle that provides strings, determined by the current [locale]. */
     val i18n by remember {
         derivedStateOf {
-            ResourceBundle.getBundle("i18n.launcher", Locale.forLanguageTag(locale))
+            ResourceBundle.getBundle("i18n.midis2jam2", Locale.forLanguageTag(locale))
         }
     }
 
