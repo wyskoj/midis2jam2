@@ -21,6 +21,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -35,17 +36,38 @@ object Stick {
     /** The default maximum resting angle at which a stick rests. */
     const val MAX_ANGLE: Double = 50.0
 
+    /**
+     * Determines the angle at which a stick should be at to properly animate.
+     */
     private fun proposedRotation(
+        /** Context to the main class. */
         context: Midis2jam2,
+
+        /** The current time. */
         time: Double,
+
+        /** The next occurring note that will be "hit". */
         nextHit: MidiEvent?,
+
+        /** The maximum angle this stick should recoil to, in degrees. */
         maxAngle: Double,
+
+        /** The relative, unitless speed at which the stick should strike. */
         strikeSpeed: Double
     ): Double {
-        return if (nextHit == null) maxAngle + 1
-        else -1000 * (6E7 / context.file.tempoBefore(nextHit).number / (1000f / strikeSpeed)) * (time - context.file.eventInSeconds(
-            nextHit
-        ))
+        return nextHit?.let {
+            /* The rotation is essentially defined by the amount of time between NOW and the next hit. */
+            var rot = context.file.eventInSeconds(nextHit) - time
+
+            /* The rotation should be dependent on the current tempo, i.e., if the tempo is faster, the rotation should
+             * happen quicker, v.v. */
+            rot *= context.file.tempoBefore(nextHit).bpm()
+
+            /* We may wish to scale the entire rotation to hasten/delay the animation. */
+            rot *= strikeSpeed
+
+            return rot
+        } ?: (maxAngle + 1) // We have nothing to hit, so idle just above the max angle
     }
 
     /**
@@ -67,6 +89,7 @@ object Stick {
      * @param axis        the axis on which to rotate the stick
      * @return a [StickStatus] describing the current status of the stick
      */
+    @Suppress("kotlin:S107")
     fun handleStick(
         context: Midis2jam2,
         stickNode: Spatial,
@@ -78,62 +101,68 @@ object Stick {
         axis: Axis = Axis.X,
         sticky: Boolean = true
     ): StickStatus {
-        var nextHit: MidiNoteOnEvent? = null
+        /* Write down the next hit */
+        val nextHit: MidiNoteOnEvent? = strikes.firstOrNull()
 
-        if (strikes.isNotEmpty()) {
-            nextHit = strikes[0]
-        }
+        /* Update the note queue */
+        NoteQueue.collect(strikes, time, context)
 
-        while (strikes.isNotEmpty() && context.file.eventInSeconds(strikes[0]) <= time) {
-            nextHit = strikes.removeAt(0)
-        }
+        /* We are striking if next hit has passed the current time */
+        val strike = nextHit?.let {
+            context.file.eventInSeconds(nextHit) <= time
+        } ?: false
 
-        val strike = nextHit != null && context.file.eventInSeconds(nextHit) <= time
-
-
+        /* Determine the proposed rotation */
         val proposedRotation = proposedRotation(context, time, nextHit, maxAngle, strikeSpeed)
 
+        /* Write down the current rotation angles */
+        val angles = stickNode.localRotation.toAngles(FloatArray(3))
 
-        val floats = stickNode.localRotation.toAngles(FloatArray(3))
-
+        /* If the proposed angle is greater than the max angle (i.e., too soon) */
         if (proposedRotation > maxAngle) {
-            // Not yet ready to strike
-            if (floats[axis.componentIndex] <= maxAngle) {
-                // We have come down, need to recoil
-                var angle = floats[axis.componentIndex] + 5f * delta
-                angle = rad(maxAngle).coerceAtMost(angle)
-                setRotation(axis, stickNode, angle)
+            /* But the stick is currently less than the max angle */
+            if (angles[axis.componentIndex] <= maxAngle) {
+                /* Move the stick back up by a small amount for a recoil effect */
+                setRotation(axis, stickNode, (angles[axis.componentIndex] + 5f * delta).coerceAtMost(rad(maxAngle)))
             }
         } else {
-            setRotation(axis, stickNode, rad(0.0.coerceAtLeast(maxAngle.coerceAtMost(proposedRotation))))
+            /* The proposed angle is less than the max, simply set the angle */
+            setRotation(axis, stickNode, rad(proposedRotation.coerceIn(0.0..maxAngle)))
         }
 
+        /* After all the rotations have been completed, write down the new angles */
         val finalAngles = stickNode.localRotation.toAngles(FloatArray(3))
+
+        /* If the angle is greater than the max angle */
         if (finalAngles[axis.componentIndex] >= rad(maxAngle)) {
-            // Not yet ready to strike
+            // Not yet ready to strike, hide it
             stickNode.cullHint = CullHint.Always
         } else {
-            // Striking or recoiling
+            // Striking or recoiling, show it1
             stickNode.cullHint = CullHint.Dynamic
         }
 
+        /* If the stick is sticky (should appear in between hits) */
         if (sticky) {
-            if (strike) {
+            if (strike) { // Just struck, write down the time of the hit
                 stickTimeMap[stickNode] = nextHit!!.time
             }
 
+            /* If there is another strike, we have struck once, and the amount of time between the last hit and the next
+             * hit is <= 2.1 beats */
             if (strikes.isNotEmpty()
                 && stickTimeMap[stickNode] != null
                 && strikes.first().time - stickTimeMap[stickNode]!! <= context.file.division * 2.1
             ) {
-                stickNode.cullHint = CullHint.Dynamic
+                stickNode.cullHint = CullHint.Dynamic // Show it
             }
-
         }
 
+        /* Return some information back to the caller */
         return StickStatus(
-            if (strike) nextHit else null,
-            finalAngles[axis.componentIndex], if (proposedRotation > maxAngle) null else nextHit
+            strike = if (strike) nextHit else null,
+            rotationAngle = finalAngles[axis.componentIndex],
+            strikingFor = if (proposedRotation > maxAngle) null else nextHit
         )
     }
 
