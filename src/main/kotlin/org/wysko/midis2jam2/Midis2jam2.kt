@@ -40,6 +40,9 @@ import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
 import kotlinx.coroutines.runBlocking
 import org.wysko.midis2jam2.gui.ConfigureBackground
+import org.wysko.midis2jam2.gui.QualityLevel
+import org.wysko.midis2jam2.gui.antiAliasingDefinition
+import org.wysko.midis2jam2.gui.shadowDefinition
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.brass.*
@@ -72,7 +75,6 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.*
 import org.wysko.midis2jam2.midi.*
-import org.wysko.midis2jam2.util.MaterialType.REFLECTIVE
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.*
@@ -91,6 +93,8 @@ abstract class Midis2jam2(
     val file: MidiFile,
     val properties: Properties
 ) : AbstractAppState(), ActionListener {
+
+    val fakeShadows = properties.getProperty("shadows").equals("none", ignoreCase = true)
 
     @Suppress("KDocMissingDocumentation")
     override fun initialize(stateManager: AppStateManager, app: Application) {
@@ -205,7 +209,7 @@ abstract class Midis2jam2(
             }
         }
         standController = StandController(this)
-        lyricController = LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>(), this)
+        lyricController = LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>().toMutableList(), this)
         lyricController.enabled = properties.getProperty("lyrics") == "true"
 
         autocamController = AutoCamController(this, properties.getProperty("auto_autocam") == "true")
@@ -216,28 +220,42 @@ abstract class Midis2jam2(
         hudController = HudController(this)
 
         /*** SETUP LIGHTS ***/
-        if (properties.getProperty("enhanced_graphics") == "true") {
-            val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
-                color = ColorRGBA.Black
-                direction = Vector3f(0.1f, -1f, -0.1f)
-                rootNode.addLight(this)
-            }
-            DirectionalLight().apply { // Main light
-                color = ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
-                direction = Vector3f(0f, -1f, -1f)
-                rootNode.addLight(this)
-            }
-            DirectionalLight().apply { // Backlight
-                color = ColorRGBA(0.1f, 0.1f, 0.3f, 1f)
-                direction = Vector3f(0f, 1f, 1f)
-                rootNode.addLight(this)
-            }
-            AmbientLight().apply { // Ambience
-                color = ColorRGBA(0.5f, 0.5f, 0.5f, 1f)
-                rootNode.addLight(this)
-            }
+        val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
+            color = ColorRGBA.Black
+            direction = Vector3f(0.1f, -1f, -0.1f)
+            rootNode.addLight(this)
+        }
+        DirectionalLight().apply { // Main light
+            color = ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
+            direction = Vector3f(0f, -1f, -1f)
+            rootNode.addLight(this)
+        }
+        DirectionalLight().apply { // Backlight
+            color = ColorRGBA(0.1f, 0.1f, 0.3f, 1f)
+            direction = Vector3f(0f, 1f, 1f)
+            rootNode.addLight(this)
+        }
+        AmbientLight().apply { // Ambience
+            color = ColorRGBA(0.5f, 0.5f, 0.5f, 1f)
+            rootNode.addLight(this)
+        }
+
+        /*** SETUP SHADOWS ***/
+        if (fakeShadows) {
+            shadowController = ShadowController(this)
             fpp = FilterPostProcessor(assetManager).apply {
-                addFilter(DirectionalLightShadowFilter(assetManager, 4096, 4).apply {
+                numSamples =
+                    antiAliasingDefinition.getOrDefault(QualityLevel.valueOf(properties.getProperty("antialiasing")), 1)
+                addFilter(fade)
+                app.viewPort.addProcessor(this)
+            }
+        } else {
+            fpp = FilterPostProcessor(assetManager).apply {
+                val shadowDef = shadowDefinition.getOrDefault(
+                    QualityLevel.valueOf(properties.getProperty("shadows")),
+                    1 to 1024
+                )
+                addFilter(DirectionalLightShadowFilter(assetManager, shadowDef.second, shadowDef.first).apply {
                     light = shadowsOnly
                     isEnabled = true
                     shadowIntensity = 0.16f
@@ -245,7 +263,8 @@ abstract class Midis2jam2(
                     edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
                     edgesThickness = 10
                 })
-                numSamples = properties.getProperty("graphics_samples").toInt()
+                numSamples =
+                    antiAliasingDefinition.getOrDefault(QualityLevel.valueOf(properties.getProperty("antialiasing")), 1)
                 addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
                 addFilter(SSAOFilter())
                 addFilter(fade)
@@ -253,13 +272,6 @@ abstract class Midis2jam2(
             }
             rootNode.shadowMode = RenderQueue.ShadowMode.CastAndReceive
             stage.shadowMode = RenderQueue.ShadowMode.Receive
-        } else {
-            shadowController = ShadowController(this)
-            fpp = FilterPostProcessor(assetManager).apply {
-                numSamples = properties.getProperty("graphics_samples").toInt()
-                addFilter(fade)
-                app.viewPort.addProcessor(this)
-            }
         }
 
         super.initialize(stateManager, app)
@@ -311,8 +323,7 @@ abstract class Midis2jam2(
     /**
      * True if enhanced graphics should be used, false otherwise.
      */
-    val enhancedGraphics: Boolean
-        get() = properties.getProperty("enhanced_graphics") == "true"
+    val enhancedGraphics: Boolean = true
 
     /**
      * The instruments.

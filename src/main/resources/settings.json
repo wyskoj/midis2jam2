@@ -42,8 +42,7 @@
   },
   {
     "name": "enhanced_graphics",
-    "type": "Boolean",
-    "category": "display",
-    "default": "true"
+    "type": "Button",
+    "category": "display"
   }
 ]

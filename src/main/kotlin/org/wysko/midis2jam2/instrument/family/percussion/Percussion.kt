@@ -192,7 +192,7 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
         }
 
         /* Add shadow */
-        if (!context.enhancedGraphics) { // Display fake shadow
+        if (context.fakeShadows) { // Display fake shadow
             context.assetManager.loadModel("Assets/DrumShadow.obj").apply {
                 setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
                     setTexture("ColorMap", context.assetManager.loadTexture("Assets/DrumShadow.png"))

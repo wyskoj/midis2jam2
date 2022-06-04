@@ -17,30 +17,12 @@
 
 package org.wysko.midis2jam2.gui
 
-import javax.swing.JDialog
-
 /**
- * Defines actions for options in the settings window that require more than one element.
+ * Represents an [Enum] that can have its values represented in different localizations.
  */
-object ExtraSettings {
+interface InternationalizableEnum {
     /**
-     * The list of actions.
+     * The resource bundle key of this value.
      */
-    val actions: Map<String, (JDialog) -> Unit> = mapOf(
-        Pair("background") { parent ->
-            ConfigureBackground.dialog(parent).run {
-                pack()
-                setLocationRelativeTo(null)
-                isVisible = true
-            }
-        },
-        Pair("enhanced_graphics") { parent ->
-            ConfigureGraphics.dialog(parent).run {
-                pack()
-                setLocationRelativeTo(null)
-                isVisible = true
-            }
-        }
-    )
+    val i18nKey: String
 }
-

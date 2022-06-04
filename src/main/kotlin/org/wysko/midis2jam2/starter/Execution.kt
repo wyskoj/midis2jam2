@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers.Default
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.ExceptionPanel
 import org.wysko.midis2jam2.gui.SwingWrapper
+import org.wysko.midis2jam2.gui.getGraphicsSettings
 import org.wysko.midis2jam2.gui.loadSettingsFromFile
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.logger
@@ -35,6 +36,7 @@ import java.io.IOException
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
+import java.util.regex.Pattern
 import javax.imageio.ImageIO
 import javax.sound.midi.InvalidMidiDataException
 import javax.sound.midi.MidiSystem
@@ -239,6 +241,13 @@ object Execution {
 
             onReady()
 
+            /* Apply graphics configuration */
+            with(getGraphicsSettings()) {
+                stringPropertyNames().forEach {
+                    properties.setProperty(it, this.getProperty(it))
+                }
+            }
+
             if (properties.getProperty("legacy_display_engine") == "true") {
                 Thread({
                     LegacyExecution(properties, {
@@ -273,7 +282,7 @@ private val defaultSettings = AppSettings(true).apply {
     frameRate = 120
     frequency = 60
     isVSync = true
-    isResizable = true
+    isResizable = false
     samples = 4
     isGammaCorrection = false
     icons = arrayOf("/ico/icon16.png", "/ico/icon32.png", "/ico/icon128.png", "/ico/icon256.png").map {
@@ -282,6 +291,8 @@ private val defaultSettings = AppSettings(true).apply {
     title = "midis2jam2"
     audioRenderer = null
 }
+
+private val dimension = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
 
 private open class StandardExecution(
     val properties: Properties,
@@ -298,6 +309,8 @@ private open class StandardExecution(
         isPauseOnLostFocus = false
         isShowSettings = false
 
+        logger().info(properties.entries.joinToString())
+
         if (properties.getProperty("fullscreen") == "true") {
             defaultSettings.isFullscreen = true
             defaultSettings.setResolution(screenWidth(), screenHeight())
@@ -306,12 +319,14 @@ private open class StandardExecution(
         } else {
             setSettings(defaultSettings)
             createCanvas()
-            val context = getContext() as JmeCanvasContext
-            context.setSystemListener(this)
-            val dimensions = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
+            val context = (getContext() as JmeCanvasContext).also {
+                it.setSystemListener(this)
+            }
+            val dimensions = collectWindowResolution(properties)
+
             val canvas = context.canvas
             canvas.preferredSize = dimensions
-            frame = SwingWrapper.wrap(canvas, "midis2jam2", properties.getProperty("enhanced_graphics") != "true") {
+            frame = SwingWrapper.wrap(canvas, "midis2jam2", collectWindowResolution(properties)) {
                 stop()
             }
             startCanvas()
@@ -351,9 +366,10 @@ private open class LegacyExecution(
             defaultSettings.setResolution(screenWidth(), screenHeight())
         } else {
             defaultSettings.isFullscreen = false
-            defaultSettings.setResolution((screenWidth() * 0.95).toInt(), (screenHeight() * 0.85).toInt())
+            with(collectWindowResolution(properties)) {
+                defaultSettings.setResolution(width, height)
+            }
         }
-        defaultSettings.isResizable = properties.getProperty("enhanced_graphics") != "true"
         setSettings(defaultSettings)
         setDisplayStatView(false)
         setDisplayFps(false)
@@ -385,3 +401,17 @@ fun screenWidth(): Int = Toolkit.getDefaultToolkit().screenSize.width
 
 /** Determines the height of the screen. */
 fun screenHeight(): Int = Toolkit.getDefaultToolkit().screenSize.height
+
+private fun collectWindowResolution(properties: Properties): Dimension {
+    val resRegex = Pattern.compile("""(\d+)\s*x\s*(\d+)""")
+    fun defaultDimension() = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
+
+    if (properties.getProperty("resolution") == null) return defaultDimension()
+    if (properties.getProperty("resolution").equals("default", ignoreCase = true)) return defaultDimension()
+    if (!resRegex.matcher(properties.getProperty("resolution")).matches()) return defaultDimension()
+
+    return with(resRegex.matcher(properties.getProperty("resolution")).also { it.find() }) {
+        Dimension(group(1).toInt(), group(2).toInt())
+    }
+}
+
