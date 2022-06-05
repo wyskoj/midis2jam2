@@ -50,6 +50,16 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     /** List of lists, where each list contains the strikes corresponding to that bar's MIDI note. */
     private val barStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(MALLET_BAR_COUNT) { ArrayList() }
 
+    /** The fake shadow. */
+    private var fakeShadow: Spatial? =
+        if (context.fakeShadows) {
+            context.assetLoader.fakeShadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
+                instrumentNode.attachChild(this)
+                setLocalScale(2 / 3f)
+                setLocalTranslation(0f, -22f, 0f)
+            }
+        } else null
+
     /** Each bar of the instrument. There are [MALLET_BAR_COUNT] bars. */
     private var bars: Array<MalletBar> = let {
         val theseBars = ArrayList<MalletBar>()
@@ -66,6 +76,13 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
+
+        /* Prevent shadow from clipping under stage */
+        fakeShadow?.let {
+            val idealY = (0.5 + (checkInstrumentIndex() * 2)).coerceAtLeast(0.5)
+            val offset = idealY - it.worldTranslation.y
+            it.localTranslation.y += offset.toFloat()
+        }
 
         /* For each bar */
         for ((index, bar) in bars.withIndex()) {
