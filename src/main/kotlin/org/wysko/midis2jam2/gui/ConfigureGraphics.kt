@@ -74,21 +74,21 @@ enum class ResolutionOption(
     override val i18nKey: String
 ) : InternationalizableEnum {
     DEFAULT("graphics.default"),
-    `640 x 480`("graphics.640_x_480"),
-    `768 x 480`("graphics.768_x_480"),
-    `853 x 480`("graphics.853_x_480"),
-    `960 x 720`("graphics.960_x_720"),
-    `1152 x 720`("graphics.1152_x_720"),
-    `1280 x 720`("graphics.1280_x_720"),
-    `1440 x 1080`("graphics.1440_x_1080"),
-    `1728 x 1080`("graphics.1728_x_1080"),
-    `1920 x 1080`("graphics.1920_x_1080"),
-    `1920 x 1440`("graphics.1920_x_1440"),
-    `2304 x 1440`("graphics.2304_x_1440"),
-    `2560 x 1440`("graphics.2560_x_1440"),
-    `2880 x 2160`("graphics.2880_x_2160"),
-    `3456 x 2160`("graphics.3456_x_2160"),
-    `3840 x 2160`("graphics.3840_x_2160")
+    `640x480`("graphics.640_x_480"),
+    `768x480`("graphics.768_x_480"),
+    `853x480`("graphics.853_x_480"),
+    `960x720`("graphics.960_x_720"),
+    `1152x720`("graphics.1152_x_720"),
+    `1280x720`("graphics.1280_x_720"),
+    `1440x1080`("graphics.1440_x_1080"),
+    `1728x1080`("graphics.1728_x_1080"),
+    `1920x1080`("graphics.1920_x_1080"),
+    `1920x1440`("graphics.1920_x_1440"),
+    `2304x1440`("graphics.2304_x_1440"),
+    `2560x1440`("graphics.2560_x_1440"),
+    `2880x2160`("graphics.2880_x_2160"),
+    `3456x2160`("graphics.3456_x_2160"),
+    `3840x2160`("graphics.3840_x_2160")
 }
 
 private val resolutionI18N = object : ResourceBundle() {

@@ -17,129 +17,40 @@
 
 package org.wysko.midis2jam2.midi
 
-import java.io.File
-import javax.sound.midi.MetaMessage
-import javax.sound.midi.Sequence
-import javax.sound.midi.ShortMessage
-import javax.sound.midi.ShortMessage.*
-
-
-private const val TEMPO_MSG = 0x51
-private const val TEXT_MSG = 0x01
-private const val LYRIC_MSG = 0x05
 
 /**
  * Parse and stores information relating to a MIDI file.
  */
-class MidiFile(file: File) {
-
+abstract class MidiFile(
     /**
-     * The [Sequence] that makes up this MIDI file.
+     * The name of the MIDI file.
      */
-    private val sequence: Sequence = StandardMidiFileReader().getSequence(file)
+    val name: String,
 
     /**
      * Specifies the meaning of delta-times. Specifically, it is the number of MIDI ticks that make up a quarter-note.
      */
-    val division: Int = sequence.resolution
+    val division: Int,
 
     /**
      * The tracks of the MIDI file. Each [MidiTrack] in this array corresponds to a track in the MIDI file.
      */
-    val tracks: List<MidiTrack> = sequence.tracks.map {
-        MidiTrack().apply {
-            for (i in 0 until it.size()) { // For each event,
-                with(it.get(i)) {
-                    when (message) {
-
-                        is MetaMessage -> {
-                            val msg = message as MetaMessage
-                            when (msg.type) {
-
-                                TEMPO_MSG -> {
-                                    events += MidiTempoEvent(
-                                        time = tick,
-                                        number = (msg.data ?: return@with).parseTempo()
-                                    )
-                                }
-                                TEXT_MSG, LYRIC_MSG -> {
-                                    events += MidiTextEvent(time = tick, text = String(msg.data))
-                                }
-
-                                else -> {}
-                            }
-                        }
-
-                        is ShortMessage -> {
-                            val msg = message as ShortMessage
-                            when (msg.command) {
-
-                                NOTE_ON -> {
-                                    if (msg.data2 != 0) { // Note on with 0 velocity = note off
-                                        events += MidiNoteOnEvent(
-                                            time = tick,
-                                            channel = msg.channel,
-                                            note = msg.data1,
-                                            velocity = msg.data2
-                                        )
-                                    } else {
-                                        events += MidiNoteOffEvent(time = tick, channel = msg.channel, note = msg.data1)
-                                    }
-                                }
-
-                                NOTE_OFF -> {
-                                    events += MidiNoteOffEvent(time = tick, channel = msg.channel, note = msg.data1)
-                                }
-
-                                PROGRAM_CHANGE -> {
-                                    events += MidiProgramEvent(
-                                        time = tick,
-                                        channel = msg.channel,
-                                        programNum = msg.data1
-                                    )
-                                }
-
-                                PITCH_BEND -> {
-                                    events += MidiPitchBendEvent(
-                                        time = tick,
-                                        channel = msg.channel,
-                                        value = msg.data1 + msg.data2 * 128
-                                    )
-                                }
-
-                                CONTROL_CHANGE -> {
-                                    events += MidiControlEvent(
-                                        time = tick,
-                                        channel = msg.channel,
-                                        controlNum = msg.data1,
-                                        value = msg.data2
-                                    )
-                                }
-
-                            }
-                        } // ShortMessage
-
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
+    val tracks: List<MidiTrack>
+) {
 
     /**
      * Contains a list of each tempo event in the MIDI file. The events from each track are combined, sorted by their
      * tick, and duplicates have been removed (if multiple events have the same tick, the last one is kept).
      */
-    val tempos: List<MidiTempoEvent> =
+    val tempos: List<MidiTempoEvent> by lazy {
         tracks.flatMap { it.events }.filterIsInstance<MidiTempoEvent>().ifEmpty { listOf(MidiTempoEvent(0, 500_000)) }
             .sortedBy { it.time }.asReversed().distinctBy { it.time }.asReversed()
+    }
 
     /** Maps MIDI events to their occurrence time in seconds. */
-    private val eventTime: MutableMap<MidiEvent, Double> =
+    private val eventTime: MutableMap<MidiEvent, Double> by lazy {
         tracks.flatMap { it.events }.associateWith { tickToSeconds(it.time) } as MutableMap<MidiEvent, Double>
-
-    /** The name of the MIDI file. */
-    val name: String = file.name
+    }
 
     /** The length of the MIDI file, expressed in seconds. */
     val length: Double = eventTime.maxOf { it.value }
@@ -205,6 +116,6 @@ class MidiFile(file: File) {
 /**
  * Converts the byte data of a tempo event in a MIDI file to its corresponding integer.
  */
-private fun ByteArray.parseTempo(): Int = with(this.map { it.toInt() }) {
+internal fun ByteArray.parseTempo(): Int = with(this.map { it.toInt() }) {
     this[0] and 0xff shl 16 or (this[1] and 0xff shl 8) or (this[2] and 0xff)
 }

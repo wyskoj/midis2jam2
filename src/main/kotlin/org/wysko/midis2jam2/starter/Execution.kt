@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.gui.ExceptionPanel
 import org.wysko.midis2jam2.gui.SwingWrapper
 import org.wysko.midis2jam2.gui.getGraphicsSettings
 import org.wysko.midis2jam2.gui.loadSettingsFromFile
+import org.wysko.midis2jam2.midi.DesktopMidiFile
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
@@ -344,7 +345,7 @@ private open class StandardExecution(
     override fun simpleInitApp() {
         DesktopMidis2jam2(
             sequencer = sequencer,
-            MidiFile(File(properties.getProperty("midi_file"))),
+            DesktopMidiFile(File(properties.getProperty("midi_file"))),
             properties = properties,
             onFinish
         ).also {
@@ -386,7 +387,7 @@ private open class LegacyExecution(
     override fun simpleInitApp() {
         DesktopMidis2jam2(
             sequencer = sequencer,
-            MidiFile(File(properties.getProperty("midi_file"))),
+            DesktopMidiFile(File(properties.getProperty("midi_file"))),
             properties = properties,
             onFinish
         ).also {

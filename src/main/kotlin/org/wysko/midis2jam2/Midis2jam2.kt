@@ -125,14 +125,6 @@ abstract class Midis2jam2(
             value = 0f
         }
 
-        /*** LOAD SKYBOX ***/
-        BackgroundController.configureBackground(
-            ConfigureBackground.type(),
-            ConfigureBackground.value(),
-            this,
-            rootNode
-        )
-
         /*** INITIALIZE INSTRUMENTS ***/
         runBlocking {
             instruments = Array(16) { ArrayList<MidiChannelSpecificEvent>() }.apply {

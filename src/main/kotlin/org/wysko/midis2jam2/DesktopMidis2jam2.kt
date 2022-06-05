@@ -24,8 +24,10 @@ import com.jme3.input.controls.KeyTrigger
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.midis2jam2.gui.ConfigureBackground
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.world.BackgroundController
 import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
@@ -99,6 +101,14 @@ class DesktopMidis2jam2(
                 }
             }
         }, 0, 1)
+
+        /*** LOAD SKYBOX ***/
+        BackgroundController.configureBackground(
+            ConfigureBackground.type(),
+            ConfigureBackground.value(),
+            this,
+            rootNode
+        )
     }
 
     /**
