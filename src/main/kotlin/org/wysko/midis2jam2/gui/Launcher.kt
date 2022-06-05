@@ -63,9 +63,11 @@ import javax.swing.filechooser.FileFilter
 /**
  * A list of locales that the launcher supports.
  */
-private val supportedLocales: List<Locale> = listOf(
-    Locale.ENGLISH, Locale.FRENCH, Locale.forLanguageTag("es"), Locale.forLanguageTag("ru")
-)
+private val supportedLocales: List<Locale> = Utils.getResourceFolderFiles("i18n").mapNotNull { file ->
+    Regex("""midis2jam2_(.+)\.properties""").find(file.name)?.let {
+        Locale.forLanguageTag(it.groupValues[1])
+    }
+}
 
 /**
  * The user's home directory.
@@ -100,32 +102,9 @@ private val LAUNCHER_STATE_FILE: File
  * This anonymous object will write any changes to the properties to the [LAUNCHER_STATE_FILE] whenever the
  * [Properties.setProperty] method is called.
  */
-private val launcherState = object : Properties(DEFAULT_LAUNCHER_STATE) {
-    override fun setProperty(key: String, value: String): Any? {
-        super.setProperty(key, value).also {
-            store(FileWriter(LAUNCHER_STATE_FILE), null)
-            return it
-        }
-    }
-
-    /**
-     * Adds a SoundFont to the launcher state, given its [path].
-     */
-    fun addSoundFont(path: String) {
-        this.setProperty("soundfonts", Json.encodeToString(soundfonts.apply { add(path) }))
-    }
-
-    fun getSoundFontFile(name: String): File = File(soundfonts.first { File(it).name == name })
-
-    /** List of paths of SoundFonts. */
-    val soundfonts: ArrayList<String>
-        get() = Json.decodeFromString<MutableList<String>>(getProperty("soundfonts")) as ArrayList<String>
-
-
-}.apply {
+val launcherState: LauncherProperties = LauncherProperties(DEFAULT_LAUNCHER_STATE).apply {
     load(FileReader(LAUNCHER_STATE_FILE))
 }
-
 
 /**
  * Displays configuration options and settings for midis2jam2.
@@ -133,16 +112,15 @@ private val launcherState = object : Properties(DEFAULT_LAUNCHER_STATE) {
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @Composable
-@Suppress("FunctionName")
+@Suppress("FunctionName", "kotlin:S3776")
 fun Launcher() {
-
-    /* The current locale displayed in the launcher. */
-    var locale by remember { mutableStateOf(launcherState.getProperty("locale")) }
-
-    /* The resource bundle that provides strings, determined by the current [locale]. */
+    /* Internationalization */
+    var locale by remember { mutableStateOf(Internationalization.locale) }
     val i18n by remember {
         derivedStateOf {
-            ResourceBundle.getBundle("i18n.midis2jam2", Locale.forLanguageTag(locale))
+            @Suppress("UNUSED_EXPRESSION")
+            locale
+            Internationalization.i18n
         }
     }
 
@@ -309,7 +287,7 @@ fun Launcher() {
                             }
 
                             Row(modifier = Modifier.clickable {
-                                SettingsModal(locale).apply {
+                                SettingsModal().apply {
                                     isVisible = true
                                 }
                             }) {
@@ -362,16 +340,19 @@ fun Launcher() {
                                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
-                            Text(text = locale.uppercase(Locale.getDefault()),
+                            Text(text = locale.language.uppercase(Locale.getDefault()),
                                 style = MaterialTheme.typography.body1,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
                                     supportedLocales.let {
                                         val lang =
-                                            it[(it.indexOf(it.first { l -> l.language == locale }) + 1) % it.size].language
+                                            it[(it.indexOf(it.first { l -> l.language == locale.language }) + 1) % it.size].language
                                         launcherState.setProperty(
                                             "locale", lang
                                         )
-                                        locale = lang
+                                        with(Locale.forLanguageTag(lang)) {
+                                            Internationalization.locale = this
+                                            locale = this
+                                        }
                                     }
 
                                 })
@@ -516,3 +497,29 @@ fun MIDIFileTextField(i18n: ResourceBundle, onChange: (path: File) -> Unit) {
     )
 }
 
+/**
+ * [Properties] that has some extra functionality useful for the launcher.
+ */
+class LauncherProperties(existing: Properties) : Properties(existing) {
+    override fun setProperty(key: String, value: String): Any? {
+        super.setProperty(key, value).also {
+            store(FileWriter(LAUNCHER_STATE_FILE), null)
+            return it
+        }
+    }
+
+    /**
+     * Adds a SoundFont to the launcher state, given its [path].
+     */
+    fun addSoundFont(path: String) {
+        this.setProperty("soundfonts", Json.encodeToString(soundfonts.apply { add(path) }))
+    }
+
+    fun getSoundFontFile(name: String): File = File(soundfonts.first { File(it).name == name })
+
+    /** List of paths of SoundFonts. */
+    val soundfonts: ArrayList<String>
+        get() = Json.decodeFromString<MutableList<String>>(getProperty("soundfonts")) as ArrayList<String>
+
+
+}

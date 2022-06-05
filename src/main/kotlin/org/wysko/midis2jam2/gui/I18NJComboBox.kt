@@ -23,7 +23,11 @@ import javax.swing.DefaultListCellRenderer
 import javax.swing.JComboBox
 import javax.swing.JList
 
+/**
+ * A combobox that supports changing the display of the cells to their internationalized versions.
+ */
 class I18NJComboBox<InternationalizableEnum>(
+    /** The resource bundle from which the i18n strings can be pulled. */
     val resourceBundle: ResourceBundle
 ) : JComboBox<InternationalizableEnum>() {
     override fun getRenderer(): DefaultListCellRenderer = object : DefaultListCellRenderer() {

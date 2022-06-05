@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.util.logger
 import java.awt.*
 import java.io.File
 import java.io.FileWriter
+import org.wysko.midis2jam2.gui.Internationalization.i18n
 import java.util.*
 import javax.swing.*
 
@@ -90,8 +91,6 @@ enum class ResolutionOption(
     `3840 x 2160`("graphics.3840_x_2160")
 }
 
-private val i18n = ResourceBundle.getBundle("i18n.midis2jam2")
-
 private val resolutionI18N = object : ResourceBundle() {
 
     override fun handleGetObject(p0: String?): Any = if (p0 == "graphics.default") {
@@ -132,7 +131,7 @@ object ConfigureGraphics {
             /* Resolution label */
             JLabel().also {
                 it.horizontalAlignment = SwingConstants.LEFT
-                it.text = "Window resolution:"
+                it.text = i18n.getString("graphics.resolution")
                 add(it, GridBagConstraints().apply {
                     gridx = 0
                     gridy = 1
@@ -155,7 +154,7 @@ object ConfigureGraphics {
 
             /* Shadows label */
             JLabel().also {
-                it.text = "Shadows:"
+                it.text = i18n.getString("graphics.shadows")
                 add(it, GridBagConstraints().apply {
                     gridx = 0
                     gridy = 2
@@ -179,7 +178,7 @@ object ConfigureGraphics {
             /* Title label */
             JLabel().also {
                 it.font = font.deriveFont(Font.BOLD, font.size + 2f)
-                it.text = "Graphics Settings"
+                it.text = i18n.getString("graphics.title")
                 add(it, GridBagConstraints().apply {
                     gridx = 0
                     gridy = 0
@@ -190,7 +189,7 @@ object ConfigureGraphics {
 
             /* Anti-aliasing label */
             JLabel().also {
-                it.text = "Anti-aliasing:"
+                it.text = i18n.getString("graphics.antialiasing")
                 add(it, GridBagConstraints().apply {
                     gridx = 0
                     gridy = 3
@@ -222,7 +221,7 @@ object ConfigureGraphics {
 
             /* Cancel button */
             JButton().also {
-                it.text = "Cancel"
+                it.text = i18n.getString("cancel")
                 it.addActionListener { dispose() } // Exit modal
                 buttonPanel.add(it, GridBagConstraints().apply {
                     gridx = 0
@@ -234,7 +233,7 @@ object ConfigureGraphics {
 
             /* OK button */
             JButton().also {
-                it.text = "OK"
+                it.text = i18n.getString("ok")
                 it.addActionListener {
                     currentState.store(FileWriter(GRAPHICS_SETTINGS_FILE), null)
                     dispose()

@@ -21,6 +21,7 @@ import com.jme3.scene.Spatial.CullHint
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -115,6 +116,9 @@ object Utils {
             false
         }
     }
+
+    fun getResourceFolderFiles(folder: String): Array<File> =
+        File(Thread.currentThread().contextClassLoader.getResource(folder).path).listFiles()
 }
 
 /**

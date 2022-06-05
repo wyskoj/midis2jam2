@@ -38,7 +38,7 @@ object UpdateChecker {
                 val html = getHTML("https://midis2jam2.xyz/api/update?v=" + resourceToString("/version.txt"))
                 val jep = JEditorPane().apply {
                     contentType = "text/html"
-                    text = bundle.getString("warning")
+                    text = bundle.getString("update.warning")
                     isEditable = false
                     isOpaque = false
                     addHyperlinkListener { hle: HyperlinkEvent ->
@@ -55,7 +55,7 @@ object UpdateChecker {
                     JOptionPane.showMessageDialog(
                         null,
                         jep,
-                        bundle.getString("update_available"),
+                        bundle.getString("update.update_available"),
                         JOptionPane.WARNING_MESSAGE
                     )
                     logger().warn("midis2jam2 is out of date!")

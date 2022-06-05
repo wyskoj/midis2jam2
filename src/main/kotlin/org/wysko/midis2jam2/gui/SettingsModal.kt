@@ -37,6 +37,7 @@ package org.wysko.midis2jam2.gui
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.midis2jam2.gui.Internationalization.i18n
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
 import java.awt.*
@@ -51,12 +52,7 @@ import javax.swing.*
 /**
  * Dynamically generates and displays a modal for configuring various settings.
  */
-class SettingsModal(locale: String = "en") : JDialog() {
-
-    /**
-     * Collects localized strings.
-     */
-    private val i18n = ResourceBundle.getBundle("i18n.midis2jam2", Locale.forLanguageTag(locale))
+class SettingsModal() : JDialog() {
 
     init {
         title = i18n.getString("settings.settings")

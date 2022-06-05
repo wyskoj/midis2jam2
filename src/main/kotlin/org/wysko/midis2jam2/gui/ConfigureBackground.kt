@@ -32,6 +32,7 @@ import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.event.HyperlinkEvent
+import org.wysko.midis2jam2.gui.Internationalization.i18n
 
 /** List of supported image extensions. */
 val validExtensions: List<String> = listOf("jpg", "png", "gif", "bmp", "jpeg")
@@ -83,7 +84,7 @@ object ConfigureBackground {
                 /* Default card */
                 cardPanel.add(JPanel().also { defaultCard ->
                     defaultCard.layout = BorderLayout()
-                    defaultCard.add(JLabel("There are no configurable settings.").apply {
+                    defaultCard.add(JLabel(i18n.getString("background.no_settings")).apply {
                         isEnabled = false
                         horizontalAlignment = JLabel.CENTER
                     }, BorderLayout.CENTER)
@@ -95,7 +96,7 @@ object ConfigureBackground {
                         columnWidths = intArrayOf(0, 0, 0, 0)
                         columnWeights = doubleArrayOf(1.0, 0.0, 1.0, 1.0)
                     }
-                    oneFileCard.add(JLabel("Background image: "), GridBagConstraints().apply {
+                    oneFileCard.add(JLabel(i18n.getString("background.background_image")), GridBagConstraints().apply {
                         gridy = 1
                         gridx = 1
                     })
@@ -111,7 +112,7 @@ object ConfigureBackground {
                     sixFilesCard.layout = GridBagLayout()
 
                     /* WEST */
-                    sixFilesCard.add(directionLabel("West:"), GridBagConstraints().apply {
+                    sixFilesCard.add(directionLabel(i18n.getString("background.west")), GridBagConstraints().apply {
                         gridx = 1
                         gridy = 2
                         insets = stdInsets()
@@ -123,7 +124,7 @@ object ConfigureBackground {
                         insets = stdInsets()
                     })
                     /* NORTH */
-                    sixFilesCard.add(directionLabel("North:"), GridBagConstraints().apply {
+                    sixFilesCard.add(directionLabel(i18n.getString("background.north")), GridBagConstraints().apply {
                         gridx = 2
                         gridy = 2
                         insets = stdInsets()
@@ -134,7 +135,7 @@ object ConfigureBackground {
                         insets = stdInsets()
                     })
                     /* EAST */
-                    sixFilesCard.add(directionLabel("East:"), GridBagConstraints().apply {
+                    sixFilesCard.add(directionLabel(i18n.getString("background.east")), GridBagConstraints().apply {
                         gridx = 3
                         gridy = 2
                         insets = stdInsets()
@@ -145,7 +146,7 @@ object ConfigureBackground {
                         insets = stdInsets()
                     })
                     /* SOUTH */
-                    sixFilesCard.add(directionLabel("South:"), GridBagConstraints().apply {
+                    sixFilesCard.add(directionLabel(i18n.getString("background.south")), GridBagConstraints().apply {
                         gridx = 4
                         gridy = 2
                         insets = stdInsets()
@@ -156,7 +157,7 @@ object ConfigureBackground {
                         insets = stdInsets()
                     })
                     /* UP */
-                    sixFilesCard.add(directionLabel("Up:"), GridBagConstraints().apply {
+                    sixFilesCard.add(directionLabel(i18n.getString("background.up")), GridBagConstraints().apply {
                         gridx = 2
                         gridy = 0
                         insets = stdInsets()
@@ -167,7 +168,7 @@ object ConfigureBackground {
                         insets = stdInsets()
                     })
                     /* DOWN */
-                    sixFilesCard.add(directionLabel("Down:"), GridBagConstraints().apply {
+                    sixFilesCard.add(directionLabel(i18n.getString("background.down")), GridBagConstraints().apply {
                         gridx = 2
                         gridy = 4
                         insets = stdInsets()
@@ -193,7 +194,7 @@ object ConfigureBackground {
             dialog.contentPane.layout = GridBagLayout()
 
             /* Title */
-            dialog.contentPane.add(JLabel("Configure Background").apply {
+            dialog.contentPane.add(JLabel(i18n.getString("background.title")).apply {
                 font = font.deriveFont(Font.BOLD, font.size + 2f)
             }, GridBagConstraints().apply {
                 gridx = 0
@@ -203,19 +204,7 @@ object ConfigureBackground {
             /* Description */
             dialog.contentPane.add(JEditorPane().also { descPane ->
                 descPane.contentType = "text/html"
-                descPane.text = """
-                <html>
-                You can configure the appearance of the background using a custom picture or color.
-                To use a custom picture, you must<br>place the image file into the <a href><tt>.midis2jam2/backgrounds</tt></a> folder in your user folder.<br>
-                <ul>
-                    <li>Default &mdash; The default background (grey checkerboard) is used.</li>
-                    <li>Repeated cubemap &mdash; A single background picture is displayed on each of the six surrounding walls.</li>
-                    <li>Unique cubemap &mdash; Six pictures are respectively displayed on each of the six surrounding walls.</li>
-                    <li>Color &mdash; The background is a solid color.</li>
-                </ul>
-                Note: images for use in a cubemap <b>must</b> be square.
-                </html>
-                """.trimIndent()
+                descPane.text = i18n.getString("background.description")
                 descPane.isEditable = false
                 descPane.margin = Insets(0, 0, 0, 0)
                 descPane.addHyperlinkListener {
@@ -228,12 +217,17 @@ object ConfigureBackground {
 
             })
 
-            /* Type selection */
+            /* Type Selection
+             *
+             * first  = display string of type
+             * second = gui display type
+             * third  = internal type represented as string
+             */
             val types = arrayOf(
-                Triple("Default", "DEFAULT", "DEFAULT"),
-                Triple("Repeated cubemap", "ONE_FILE", "REPEATED_CUBEMAP"),
-                Triple("Unique cubemap", "SIX_FILES", "UNIQUE_CUBEMAP"),
-                Triple("Color", "COLOR", "COLOR"),
+                Triple(i18n.getString("background.default"), "DEFAULT", "DEFAULT"),
+                Triple(i18n.getString("background.repeated_cubemap"), "ONE_FILE", "REPEATED_CUBEMAP"),
+                Triple(i18n.getString("background.unique_cubemap"), "SIX_FILES", "UNIQUE_CUBEMAP"),
+                Triple(i18n.getString("background.color"), "COLOR", "COLOR"),
             )
 
             val typeComboBox = JComboBox(types).also { typeBox ->
@@ -260,7 +254,7 @@ object ConfigureBackground {
 
             dialog.contentPane.add(JPanel().also { selectionPanel ->
                 selectionPanel.layout = FlowLayout()
-                selectionPanel.add(JLabel("Select a background type:"))
+                selectionPanel.add(JLabel(i18n.getString("background.select_label")))
                 selectionPanel.add(typeComboBox)
             }, GridBagConstraints().apply {
                 gridy = 2
@@ -274,7 +268,7 @@ object ConfigureBackground {
             /* OK / Cancel buttons */
             dialog.contentPane.add(JPanel().also { buttonPanel ->
                 buttonPanel.layout = FlowLayout()
-                buttonPanel.add(JButton("OK").also { okButton ->
+                buttonPanel.add(JButton(i18n.getString("ok")).also { okButton ->
                     okButton.addActionListener {
                         val props = Properties().apply {
                             val selectedType = typeComboBox.selectedItem as Triple<*, *, *>
@@ -289,8 +283,8 @@ object ConfigureBackground {
                                     if (oneFileComboBox.selectedItem == null) {
                                         JOptionPane.showMessageDialog(
                                             dialog,
-                                            "You must select an image.",
-                                            "Invalid configuration",
+                                            i18n.getString("background.err_no_image"),
+                                            i18n.getString("background.err_title"),
                                             JOptionPane.ERROR_MESSAGE
                                         )
                                         return@addActionListener
@@ -303,8 +297,8 @@ object ConfigureBackground {
                                     if (read == null) {
                                         JOptionPane.showMessageDialog(
                                             dialog,
-                                            "The selected image could not be loaded.",
-                                            "Invalid configuration",
+                                            i18n.getString("background.err_bad_image"),
+                                            i18n.getString("background.err_title"),
                                             JOptionPane.ERROR_MESSAGE
                                         )
                                         return@addActionListener
@@ -313,8 +307,8 @@ object ConfigureBackground {
                                     if (selectedType.third as String == "REPEATED_CUBEMAP" && read.isSquare.not()) {
                                         JOptionPane.showMessageDialog(
                                             dialog,
-                                            "The selected image is not a square.",
-                                            "Invalid configuration",
+                                            i18n.getString("background.err_img_not_square"),
+                                            i18n.getString("background.err_title"),
                                             JOptionPane.ERROR_MESSAGE
                                         )
                                         return@addActionListener
@@ -329,8 +323,8 @@ object ConfigureBackground {
                                     if (comboBoxes.any { it.selectedItem == null }) {
                                         JOptionPane.showMessageDialog(
                                             dialog,
-                                            "You must select an image.",
-                                            "Invalid configuration.",
+                                            i18n.getString("background.err_no_image"),
+                                            i18n.getString("background.err_title"),
                                             JOptionPane.ERROR_MESSAGE
                                         )
                                         return@addActionListener
@@ -346,9 +340,9 @@ object ConfigureBackground {
                                         if (isNotEmpty()) {
                                             JOptionPane.showMessageDialog(
                                                 dialog,
-                                                "The following images could not be loaded: " +
+                                                i18n.getString("background.err_bad_img_list") +
                                                         toList().joinToString { it.first },
-                                                "Invalid configuration.",
+                                                i18n.getString("background.err_title"),
                                                 JOptionPane.ERROR_MESSAGE
                                             )
                                             return@addActionListener
@@ -360,9 +354,9 @@ object ConfigureBackground {
                                         if (isNotEmpty()) {
                                             JOptionPane.showMessageDialog(
                                                 dialog,
-                                                "The following images are not square: " +
+                                                i18n.getString("background.err_img_square_list") +
                                                         toList().joinToString { it.first },
-                                                "Invalid configuration.",
+                                                i18n.getString("background.err_title"),
                                                 JOptionPane.ERROR_MESSAGE
                                             )
                                             return@addActionListener
@@ -397,7 +391,7 @@ object ConfigureBackground {
                         props.store(FileWriter(backgroundSettingsFile), null)
                     }
                 })
-                buttonPanel.add(JButton("Cancel").also { cancelButton ->
+                buttonPanel.add(JButton(i18n.getString("cancel")).also { cancelButton ->
                     cancelButton.addActionListener {
                         dialog.dispose()
                     }
@@ -430,7 +424,7 @@ object ConfigureBackground {
                     typeComboBox.selectedIndex = types.indexOfFirst { it.third == properties.getProperty("type") }
                 }
             } catch (e: Exception) {
-                err(e, "There was an error loading the background configuration.", "Error")
+                err(e, i18n.getString("background.err_bag_config"), i18n.getString("error"))
             }
         }
 
@@ -484,7 +478,8 @@ private fun loadBackgroundSettingsFromFile(): Properties = Properties(defaultPro
     try {
         load(FileReader(backgroundSettingsFile))
     } catch (ignored: FileNotFoundException) {
+        // Not a problem
     } catch (e: Exception) {
-        err(e, "There was an error loading the background configuration.", "Error")
+        err(e, i18n.getString("background.err_bag_config"), i18n.getString("error"))
     }
 }
