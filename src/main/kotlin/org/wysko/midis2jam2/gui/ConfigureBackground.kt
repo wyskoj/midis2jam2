@@ -224,7 +224,7 @@ object ConfigureBackground {
              * third  = internal type represented as string
              */
             val types = arrayOf(
-                Triple(i18n.getString("background.default"), "DEFAULT", "DEFAULT"),
+                Triple(i18n.getString("graphics.default"), "DEFAULT", "DEFAULT"),
                 Triple(i18n.getString("background.repeated_cubemap"), "ONE_FILE", "REPEATED_CUBEMAP"),
                 Triple(i18n.getString("background.unique_cubemap"), "SIX_FILES", "UNIQUE_CUBEMAP"),
                 Triple(i18n.getString("background.color"), "COLOR", "COLOR"),
