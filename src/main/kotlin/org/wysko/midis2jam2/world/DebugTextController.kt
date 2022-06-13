@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.util.cullHint
 
 private val GL_RENDERER: String by lazy { GL11.glGetString(GL11.GL_RENDERER) }
 
+
 /**
  * Draws debug text on the screen.
  *
@@ -74,37 +75,32 @@ class DebugTextController(val context: Midis2jam2) {
 private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
     return buildString {
         /* midis2jam2 version and build */
-        append("midis2jam2 v${this@debugText.version} (${this@debugText.build})\n")
+        append("midis2jam2 v${this@debugText.version} (built at ${this@debugText.build})\n")
 
         /* computer operating system and renderer */
-        append("$operatingSystem\n")
-        append("$GL_RENDERER\n")
+        appendLine()
+        append("OS: $operatingSystem\n")
+        append("Graphics: $GL_RENDERER\n")
 
         /* settings */
+        appendLine()
         append(
-            "F: ${this@debugText.properties.getProperty("fullscreen")} / LDE: ${
-                this@debugText.properties.getProperty(
-                    "legacy_display_engine"
-                )
+            "Properties:\n${
+                this@debugText.properties.entries.joinToString(separator = "\n")
             }\n"
         )
-        append(
-            "D: ${this@debugText.properties.getProperty("midi_device")} / SF: ${
-                this@debugText.properties.getProperty(
-                    "soundfont"
-                ) ?: "N/A"
-            }\n"
-        )
-        append("LF: ${this@debugText.properties.getProperty("latency_fix")}\n")
 
         /* fps and time */
+        appendLine()
         append("${String.format("%.0f", 1 / tpf)} fps\n")
         append("${String.format("%.2f", time)}s / ${String.format("%.2f", this@debugText.file.length)}s\n")
 
         /* camera position and rotation */
+        appendLine()
         append("cam: ${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}\n")
 
         /* instruments strings */
+        appendLine()
         append("${this@debugText.instruments.joinToString("")}\n")
     }
 }
