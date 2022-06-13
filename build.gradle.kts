@@ -122,6 +122,11 @@ dependencies {
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
 
+    // OS analysis
+    implementation("com.github.oshi:oshi-core:6.1.6")
+
+    // Database
+    implementation("mysql:mysql-connector-java:8.0.29")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
