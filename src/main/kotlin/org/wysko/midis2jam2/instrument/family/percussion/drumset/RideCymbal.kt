@@ -27,6 +27,9 @@ import org.wysko.midis2jam2.world.Axis
 class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
     Cymbal(context, hits, type) {
 
+    private var stickPosition = 20f
+    private var stickTargetPosition = 20f
+
     override fun tick(time: Double, delta: Float) {
         val stickStatus = handleStick(time, delta, hits)
         handleCymbalStrikes(delta, stickStatus.justStruck())
@@ -37,10 +40,12 @@ class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: 
             context, stick, time, delta,
             hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
         )
-        val strikingFor = stickStatus.strikingFor
-        if (strikingFor != null) {
-            stickNode.setLocalTranslation(0f, 0f, if (strikingFor.note == 53) 15f else 20f)
+        stickStatus.strikingFor?.let {
+            stickTargetPosition = if (it.note == 53) 15f else 20f
         }
+        stickPosition += (delta * (stickTargetPosition - stickPosition) * 30)
+        stickPosition = stickPosition.coerceIn(15f..20f) // Prevent overshooting
+        stickNode.setLocalTranslation(0f, 0f, stickPosition)
         return stickStatus
     }
 
