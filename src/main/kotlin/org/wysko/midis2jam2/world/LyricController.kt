@@ -42,7 +42,7 @@ class LyricController(
     /**
      * Events that have been scrubbed clean.
      */
-    private val cleanEvents: MutableList<MidiTextEvent> = lyricEvents.toMutableList().apply {
+    private val cleanEvents: MutableList<MidiTextEvent> = lyricEvents.toMutableList().run {
         /* Sort events by time */
         sortBy { it.time }
 
@@ -52,10 +52,7 @@ class LyricController(
         /* Text events that contain bullshit ASCII are out!! */
         removeAll { badCharacter.containsMatchIn(it.text) }
 
-        /* Text events that contain nothing (or just whitespace) are out !! */
-        removeAll { it.text.isBlank() }
-    }.also {
-        it.forEach { println(it) }
+        this
     }
 
     /**
