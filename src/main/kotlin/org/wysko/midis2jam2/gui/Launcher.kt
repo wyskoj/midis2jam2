@@ -63,10 +63,8 @@ import javax.swing.filechooser.FileFilter
 /**
  * A list of locales that the launcher supports.
  */
-private val supportedLocales: List<Locale> = Utils.getResourceFolderFiles("i18n").mapNotNull { file ->
-    Regex("""midis2jam2_(.+)\.properties""").find(file.name)?.let {
-        Locale.forLanguageTag(it.groupValues[1])
-    }
+private val supportedLocales: List<Locale> = Utils.resourceToString("/supported-i18n.txt").split("\n").map {
+    Locale.forLanguageTag(it)
 }
 
 /**
