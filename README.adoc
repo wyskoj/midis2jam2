@@ -17,18 +17,6 @@ https://github.com/wyskoj/midis2jam2/blob/master/implementation.adoc[Not all ins
 
 Install midis2jam2 with the https://github.com/wyskoj/midis2jam2/releases[appropriate installer for the latest version].
 
-== 💾 Building
-
-[source,bash]
-----
-$ git clone https://github.com/wyskoj/midis2jam2
-$ cd midis2jam2 && ./gradlew run
-----
-
-midis2jam2 also provides a command line interface.
-Run `midis2jam2 --help` for more information.
-You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/resources/man.txt[man page].
-
 == ⌨️️ Controls
 
 * *WASDQZ* &mdash; Forwards / Left / Backwards / Right / Up / Down
@@ -39,15 +27,13 @@ You can also view the https://github.com/wyskoj/midis2jam2/blob/master/src/main/
 * *0* &mdash; Autocam
 * *Esc* &mdash; Exit
 
-== ✴️ Acknowledgements
+== 💾 Building
 
-* http://www.gamesbyscott.com/midijam.htm[MIDIJam]
-* https://jmonkeyengine.org/[jMonkeyEngine]
-
-== ➕ Contributing
-
-Contributions are always welcome!
-See _https://github.com/wyskoj/midis2jam2/blob/master/adding-new-instruments.adoc[adding new instruments]_ for ways to get started.
+[source,bash]
+----
+$ git clone https://github.com/wyskoj/midis2jam2
+$ cd midis2jam2 && ./gradlew run
+----
 
 == ✒️ Authors
 
@@ -63,8 +49,13 @@ Development contributors:
 
 Internationalization:
 
-* ES — Mr. Tremolo Measure
-* RU — https://github.com/rxuglr[rxuglr]
+Contributors can be found at https://poeditor.com/join/project/alZE9e86Wd[POEditor.com].
+
+== ✴️ Acknowledgements
+
+* http://www.gamesbyscott.com/midijam.htm[MIDIJam]
+* https://jmonkeyengine.org/[jMonkeyEngine]
+
 
 == ⁉️ Support
 
