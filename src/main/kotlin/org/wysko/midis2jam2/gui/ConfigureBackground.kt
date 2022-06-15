@@ -34,6 +34,9 @@ import javax.swing.border.EmptyBorder
 import javax.swing.event.HyperlinkEvent
 import org.wysko.midis2jam2.gui.Internationalization.i18n
 
+@Suppress("ObjectPropertyName", "Unused")
+private val _createBackgroundDir = File(File(System.getProperty("user.home"), ".midis2jam2"), "backgrounds").mkdirs()
+
 /** List of supported image extensions. */
 val validExtensions: List<String> = listOf("jpg", "png", "gif", "bmp", "jpeg")
 

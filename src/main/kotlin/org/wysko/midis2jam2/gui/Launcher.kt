@@ -111,7 +111,7 @@ val launcherState: LauncherProperties = LauncherProperties(DEFAULT_LAUNCHER_STAT
 @ExperimentalComposeUiApi
 @Composable
 @Suppress("FunctionName", "kotlin:S3776")
-fun Launcher() {
+fun Launcher(): (setFreeze: Boolean) -> Unit {
     /* Internationalization */
     var locale by remember { mutableStateOf(Internationalization.locale) }
     val i18n by remember {
@@ -438,6 +438,11 @@ fun Launcher() {
                 }
             }
         }
+    }
+
+    return { setFreeze: Boolean ->
+        freeze = setFreeze
+
     }
 }
 
