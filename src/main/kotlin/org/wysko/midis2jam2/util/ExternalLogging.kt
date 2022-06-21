@@ -26,30 +26,3 @@ import java.util.*
 
 private val uuid = SystemInfo().hardware.computerSystem.hardwareUUID
 
-/** Logs executions externally. */
-object ExternalLogging {
-    /** Performs a log operation. */
-    fun log(midiFile: MidiFile) {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver")
-            DriverManager.getConnection(String(Base64.getDecoder().decode(Utils.resourceToString("/db.conn")))).run {
-                val stmt = prepareStatement(String(Base64.getDecoder().decode(Utils.resourceToString("/db.stmt"))))
-
-                stmt.setString(1, uuid)
-                stmt.setString(2, midiFile.name)
-                stmt.setInt(3, midiFile.division)
-                stmt.setInt(4, midiFile.tracks.size)
-                stmt.setFloat(5, midiFile.length.toFloat())
-                stmt.setString(
-                    6,
-                    midiFile.tracks.flatMap { it.events }.filterIsInstance<MidiProgramEvent>()
-                        .distinctBy { it.programNum }.joinToString(separator = ",") { it.programNum.toString() }
-                )
-                stmt.setInt(7, midiFile.tracks.flatMap { it.events }.count { it is MidiTextEvent })
-                stmt.execute()
-            }
-        } catch (e: Exception) {
-            logger().warn("Could not perform external log.")
-        }
-    }
-}

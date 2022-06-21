@@ -28,8 +28,6 @@ import org.wysko.midis2jam2.gui.SwingWrapper
 import org.wysko.midis2jam2.gui.getGraphicsSettings
 import org.wysko.midis2jam2.gui.loadSettingsFromFile
 import org.wysko.midis2jam2.midi.DesktopMidiFile
-import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.util.ExternalLogging
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -353,10 +351,6 @@ private open class StandardExecution(
         ).also {
             stateManager.attach(it)
             rootNode.attachChild(it.rootNode)
-        }.also {
-            CoroutineScope(Default).launch {
-                ExternalLogging.log(midiFile)
-            }
         }
     }
 }
@@ -400,10 +394,6 @@ private open class LegacyExecution(
         ).also {
             stateManager.attach(it)
             rootNode.attachChild(it.rootNode)
-        }.also {
-            CoroutineScope(Default).launch {
-                ExternalLogging.log(midiFile)
-            }
         }
     }
 }
