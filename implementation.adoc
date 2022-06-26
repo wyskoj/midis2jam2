@@ -52,7 +52,7 @@ Check this page to see the progress of each instrument's implementation.
 |_97_ FX 1 (rain) image:doc/check.png[]|_105_ Sitar image:doc/cross.png[]|_113_ Tinkle Bell image:doc/check.png[]|_121_ Guitar Fret Noise image:doc/check.png[]
 |_98_ FX 2 (soundtrack) image:doc/check.png[]|_106_ Banjo image:doc/plus.png[]|_114_ Agogô image:doc/check.png[]|_122_ Breath Noise image:doc/check.png[]
 |_99_ FX 3 (crystal) image:doc/check.png[]|_107_ Shamisen image:doc/plus.png[]|_115_ Steel Drums image:doc/check.png[]|_123_ Seashore image:doc/cross.png[]
-|_100_ FX 4 (atmosphere) image:doc/check.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/cross.png[]
+|_100_ FX 4 (atmosphere) image:doc/check.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/check.png[]
 |_101_ FX 5 (brightness) image:doc/check.png[]|_109_ Kalimba image:doc/cross.png[]|_117_ Taiko Drum image:doc/check.png[]|_125_ Telephone Ring image:doc/check.png[]
 |_102_ FX 6 (goblins) image:doc/check.png[]|_110_ Bag pipe image:doc/cross.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
 |_103_ FX 7 (echoes) image:doc/check.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/check.png[]
