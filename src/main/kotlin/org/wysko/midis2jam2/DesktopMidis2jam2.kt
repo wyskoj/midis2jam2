@@ -58,6 +58,10 @@ class DesktopMidis2jam2(
 
     private var initiatedFadeIn = false
 
+    private val midiFileMicrosecondLength by lazy {
+        sequencer.microsecondLength
+    }
+
     /**
      * Initializes the application.
      */
@@ -139,7 +143,7 @@ class DesktopMidis2jam2(
         }
 
         /* If at the end of the file */
-        if (sequencer.microsecondPosition == sequencer.microsecondLength) {
+        if (sequencer.microsecondPosition == midiFileMicrosecondLength) {
             if (!afterEnd) {
                 stopTime = timeSinceStart
             }
