@@ -475,10 +475,10 @@ fun MIDIFileTextField(i18n: ResourceBundle, onChange: (path: File) -> Unit) {
                             override fun accept(file: File?): Boolean {
                                 return file?.extension?.lowercase(Locale.getDefault()) == "mid" || file?.extension?.lowercase(
                                     Locale.getDefault()
-                                ) == "kar" || file?.isDirectory == true
+                                ) == "kar" || file?.extension?.lowercase(Locale.getDefault()) == "midi" || file?.isDirectory == true
                             }
 
-                            override fun getDescription(): String = "MIDI files (*.mid, *.kar)"
+                            override fun getDescription(): String = "MIDI files (*.mid, *.midi, *.kar)"
                         }
                         preferredSize = Dimension(800, 600)
                         dialogTitle = "Select MIDI file"
