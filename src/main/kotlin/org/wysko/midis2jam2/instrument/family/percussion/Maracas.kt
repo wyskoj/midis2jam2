@@ -42,7 +42,7 @@ class Maracas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
 
         /* Animate left maraca */
         val status = Stick.handleStick(
-            context, leftMaraca, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
+            context, leftMaraca, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X, actualStick = false
         )
 
         /* Override handleStick culling the left maraca */

@@ -63,7 +63,14 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
         bells.forEachIndexed { index, it ->
             it.tick(delta)
             val handleStick = handleStick(
-                context, it.malletNode, time, delta, bellStrikes[index], STRIKE_SPEED, StickMAX_ANGLE, X
+                context,
+                it.malletNode,
+                time,
+                delta,
+                bellStrikes[index],
+                STRIKE_SPEED,
+                StickMAX_ANGLE,
+                X
             )
             if (handleStick.justStruck()) {
                 it.recoilBell((handleStick.strike ?: return@forEachIndexed).velocity)

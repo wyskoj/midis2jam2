@@ -50,7 +50,7 @@ class Sticks(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumS
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, leftStickNode, time, delta, hits, 2.0, 30.0).run {
+        Stick.handleStick(context, leftStickNode, time, delta, hits, 2.0, 30.0, actualStick = false).run {
             rightStickNode.localRotation = Quaternion().fromAngles(-this.rotationAngle, 0f, 0f)
         }
         leftStickNode.cullHint = CullHint.Dynamic

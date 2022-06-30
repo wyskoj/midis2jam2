@@ -47,7 +47,8 @@ class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSet
             delta,
             hits,
             strikeSpeed = Stick.STRIKE_SPEED * 0.6,
-            maxAngle = 30.0
+            maxAngle = 30.0,
+            actualStick = false
         )
         leftSlapNode.cullHint = Spatial.CullHint.Dynamic
         rightSlapNode.localRotation = Quaternion().fromAngles(-handleStick.rotationAngle, 0f, 0f)

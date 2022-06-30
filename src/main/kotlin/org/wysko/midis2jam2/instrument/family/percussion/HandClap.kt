@@ -44,7 +44,7 @@ class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
 
         /* Animate the left hand like you normally would for a stick */
         val status = Stick.handleStick(
-            context, leftHandNode, time, delta, hits, Stick.STRIKE_SPEED * 0.8, 40.0, Axis.X
+            context, leftHandNode, time, delta, hits, Stick.STRIKE_SPEED * 0.8, 40.0, Axis.X, actualStick = false
         )
 
         /* Override handleStick making the leftHandNode cull */

@@ -44,7 +44,7 @@ class Claves(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumS
         /* Animate the right clave like you normally would for a stick */
         val status = Stick.handleStick(
             context, rightClaveNode, time, delta, hits, Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE, Axis.X
+            Stick.MAX_ANGLE, Axis.X, actualStick = false
         )
 
         /* Override handleStick making the rightClaveNode cull */

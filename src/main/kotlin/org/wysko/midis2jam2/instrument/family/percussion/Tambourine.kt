@@ -52,7 +52,7 @@ class Tambourine(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonD
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, tambourineHandNode, time, delta, hits, 2.0, 30.0).run {
+        Stick.handleStick(context, tambourineHandNode, time, delta, hits, 2.0, 30.0, actualStick = false).run {
             emptyHandNode.localRotation = Quaternion().fromAngles(-this.rotationAngle, 0f, 0f)
         }
         tambourineHandNode.cullHint = CullHint.Dynamic

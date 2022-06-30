@@ -106,7 +106,7 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
         /* Animate click pendulum */
         val clickStatus = Stick.handleStick(
             context, dummyClickNode, time, delta, clickHits,
-            Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z
+            Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z, actualStick = false
         )
         if (clickStatus.strikingFor !== flipClickLastStrikeFor && clickStatus.strikingFor != null) {
             flipClickLastStrikeFor = clickStatus.strikingFor
@@ -121,7 +121,7 @@ class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
         /* Animate bell pendulum */
         val bellStatus = Stick.handleStick(
             context, dummyBellNode, time, delta, bellHits,
-            Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z
+            Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z, actualStick = false
         )
         if (bellStatus.strikingFor !== flipBellLastStrikeFor && bellStatus.strikingFor != null) {
             flipBellLastStrikeFor = bellStatus.strikingFor

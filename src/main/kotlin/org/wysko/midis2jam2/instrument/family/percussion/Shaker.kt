@@ -33,7 +33,17 @@ class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumS
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, shakerNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        Stick.handleStick(
+            context,
+            shakerNode,
+            time,
+            delta,
+            hits,
+            Stick.STRIKE_SPEED,
+            Stick.MAX_ANGLE,
+            Axis.X,
+            actualStick = false
+        )
     }
 
     init {

@@ -31,7 +31,10 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, 
         20.0,
         Vector3f(0.75f, 0.75f, 0.75f),
         intArrayOf(28, 33, 38, 43),
-        context.loadModel("DoubleBass.obj", "DoubleBassSkin.bmp")
+        context.loadModel(
+            "DoubleBass.obj",
+            if (style == PlayingStyle.ARCO) "DoubleBassSkin.bmp" else "DoubleBassSkinAlt.png"
+        )
     ) {
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)

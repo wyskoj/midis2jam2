@@ -18,8 +18,6 @@
 package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Geometry
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
@@ -101,7 +99,8 @@ object Stick {
         strikeSpeed: Double = STRIKE_SPEED,
         maxAngle: Double = MAX_ANGLE,
         axis: Axis = Axis.X,
-        sticky: Boolean = true
+        sticky: Boolean = true,
+        actualStick: Boolean = true
     ): StickStatus {
         /* Write down the next hit */
         val nextHit: MidiNoteOnEvent? = strikes.firstOrNull()
@@ -162,15 +161,8 @@ object Stick {
 
         /* If the file calls for the instrument to always be visible, override everything we have just done, but only if
          * the stick node contains something else than the standard stick. */
-        if (context.properties.getProperty("never_hidden") == "true") {
-            when (stickNode) {
-                is Geometry -> {
-                    if (stickNode.name != "DrumSet_Stick") stickNode.cullHint = CullHint.Dynamic
-                }
-                is Node -> {
-                    if (!stickNode.children.any { it.name == "DrumSet_Stick" }) stickNode.cullHint = CullHint.Dynamic
-                }
-            }
+        if (context.properties.getProperty("never_hidden") == "true" && !actualStick) {
+            stickNode.cullHint = CullHint.Dynamic
         }
 
         /* Return some information back to the caller */

@@ -33,7 +33,17 @@ class JingleBells(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Non
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, jingleBellNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+        Stick.handleStick(
+            context,
+            jingleBellNode,
+            time,
+            delta,
+            hits,
+            Stick.STRIKE_SPEED,
+            Stick.MAX_ANGLE,
+            Axis.X,
+            actualStick = false
+        )
     }
 
     init {

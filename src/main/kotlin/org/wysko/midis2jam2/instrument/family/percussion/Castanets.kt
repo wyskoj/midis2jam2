@@ -49,7 +49,8 @@ class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDr
             hits,
             Stick.STRIKE_SPEED / 2,
             Stick.MAX_ANGLE / 2,
-            Axis.X
+            Axis.X,
+            actualStick = false
         )
         topCastanetNode.cullHint = CullHint.Dynamic
         bottomCastanetNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)

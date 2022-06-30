@@ -48,7 +48,7 @@ class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Non
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, stickNode, time, delta, hits).run {
+        Stick.handleStick(context, stickNode, time, delta, hits, actualStick = false).run {
             squareClickNode.localRotation = Quaternion().fromAngles(-this.rotationAngle, 0f, 0f)
         }
         stickNode.cullHint = Spatial.CullHint.Dynamic

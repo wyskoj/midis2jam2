@@ -57,7 +57,17 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
         val stickStatus =
-            Stick.handleStick(context, gunNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
+            Stick.handleStick(
+                context,
+                gunNode,
+                time,
+                delta,
+                hits,
+                Stick.STRIKE_SPEED,
+                Stick.MAX_ANGLE,
+                Axis.X,
+                actualStick = false
+            )
 
         /* If the laser gun just fired, show the laser and start the timer */
         if (stickStatus.justStruck()) {
