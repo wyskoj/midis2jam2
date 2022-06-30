@@ -39,7 +39,7 @@ class JingleBells(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Non
     init {
         /* Load stick and materials */
         val stick = context.loadModel("JingleBells.obj", "JingleBells.bmp")
-        (stick as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
+        (stick as Node).getChild(1).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
 
         /* Positioning */
         jingleBellNode.attachChild(stick)
