@@ -23,6 +23,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.lwjgl.opengl.GL11
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.Percussion
 import org.wysko.midis2jam2.util.cullHint
 
 private val GL_RENDERER: String by lazy { GL11.glGetString(GL11.GL_RENDERER) }
@@ -40,12 +41,18 @@ class DebugTextController(val context: Midis2jam2) {
         cullHint = Spatial.CullHint.Always
     }
 
+    private val percussionText = BitmapText(context.assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
+        context.app.guiNode.attachChild(this)
+        cullHint = Spatial.CullHint.Always
+    }
+
     /**
      * Enables and disables the display of the debug text.
      */
     var enabled: Boolean = false
         set(value) {
             text.cullHint = value.cullHint()
+            percussionText.cullHint = value.cullHint()
             field = value
         }
 
@@ -65,7 +72,17 @@ class DebugTextController(val context: Midis2jam2) {
                 setLocalTranslation(0f, context.app.viewPort.camera.height.toFloat(), 0f)
                 text = context.debugText(tpf, context.timeSinceStart)
             }
+            with(percussionText) {
+                setLocalTranslation(1000f, context.app.viewPort.camera.height.toFloat(), 0f)
+                text = context.debugTextPercussion()
+            }
         }
+    }
+}
+
+private fun Midis2jam2.debugTextPercussion(): String {
+    return buildString {
+        append(this@debugTextPercussion.instruments.first { it is Percussion })
     }
 }
 
@@ -101,7 +118,7 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
 
         /* instruments strings */
         appendLine()
-        append("${this@debugText.instruments.joinToString("")}\n")
+        append("${this@debugText.instruments.filter { it !is Percussion }.joinToString("")}\n")
     }
 }
 

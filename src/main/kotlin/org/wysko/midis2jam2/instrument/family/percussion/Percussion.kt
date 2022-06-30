@@ -95,6 +95,12 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
         // Do nothing!
     }
 
+    override fun toString(): String {
+        return buildString {
+            appendLine(instruments.joinToString(""))
+        }
+    }
+
     init {
         val drumSetNode = Node()
 

@@ -6,10 +6,10 @@
 
 
 
-#-- object 'Converted object 0' --
+#-- object 'DrumSet_Stick' --
 # 110 vertices, 216 polygons, 648 points
 
-g Converted object 0
+g DrumSet_Stick
 
 # vertexs: 110
 v 0.256136 -0.000001 -7.192444
@@ -1642,4 +1642,4 @@ f 109/640/640 73/641/641 110/642/642
 f 110/643/643 73/644/644 62/645/645
 f 110/646/646 62/647/647 99/648/648
 
-# object end 'Converted object 0'
+# object end 'DrumSet_Stick'

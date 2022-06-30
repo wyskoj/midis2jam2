@@ -18,6 +18,8 @@
 package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Geometry
+import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
@@ -155,6 +157,19 @@ object Stick {
                 && strikes.first().time - stickTimeMap[stickNode]!! <= context.file.division * 2.1
             ) {
                 stickNode.cullHint = CullHint.Dynamic // Show it
+            }
+        }
+
+        /* If the file calls for the instrument to always be visible, override everything we have just done, but only if
+         * the stick node contains something else than the standard stick. */
+        if (context.properties.getProperty("never_hidden") == "true") {
+            when (stickNode) {
+                is Geometry -> {
+                    if (stickNode.name != "DrumSet_Stick") stickNode.cullHint = CullHint.Dynamic
+                }
+                is Node -> {
+                    if (!stickNode.children.any { it.name == "DrumSet_Stick" }) stickNode.cullHint = CullHint.Dynamic
+                }
             }
         }
 
