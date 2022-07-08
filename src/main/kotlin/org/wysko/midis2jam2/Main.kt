@@ -27,10 +27,15 @@ import androidx.compose.ui.window.*
 import com.formdev.flatlaf.FlatDarkLaf
 import com.install4j.api.launcher.SplashScreen
 import org.wysko.midis2jam2.gui.Launcher
+import org.wysko.midis2jam2.gui.LauncherController
 import org.wysko.midis2jam2.gui.UpdateChecker.checkForUpdates
 import org.wysko.midis2jam2.gui.launcherState
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.loadSequencerJob
+import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import java.util.*
 
@@ -58,13 +63,23 @@ fun main(args: Array<String>) {
     SplashScreen.writeMessage("Loading...")
     FlatDarkLaf.setup()
     application {
-        var setFreeze: ((Boolean) -> Unit)? = null
+        var launcherController: LauncherController? = null
         Window(
             onCloseRequest = ::exitApplication, title = "midis2jam2 launcher", state = rememberWindowState(
                 placement = WindowPlacement.Maximized, position = WindowPosition(Alignment.Center)
             ), icon = BitmapPainter(useResource("ico/icon32.png", ::loadImageBitmap))
         ) {
-            setFreeze = Launcher()
+            launcherController = Launcher()
+            this.window.contentPane.dropTarget = object : DropTarget() {
+                @Synchronized
+                override fun drop(dtde: DropTargetDropEvent) {
+                    dtde.let {
+                        it.acceptDrop(DnDConstants.ACTION_REFERENCE)
+                        (it.transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).firstOrNull()
+                            ?.let { file -> launcherController?.setSelectedFile?.invoke(file as File) }
+                    }
+                }
+            }
         }
         if (args.isNotEmpty()) {
             Execution.start(
@@ -73,12 +88,12 @@ fun main(args: Array<String>) {
                     setProperty("midi_device", launcherState.getProperty("midi_device"))
                 },
                 onStart = {
-                    setFreeze?.invoke(true)
+                    launcherController?.setFreeze?.invoke(true)
                 },
                 onReady = {},
                 onFinish = {
                     println("unfreezing!!")
-                    setFreeze?.invoke(false)
+                    launcherController?.setFreeze?.invoke(false)
                 }
             )
         }

@@ -111,7 +111,7 @@ val launcherState: LauncherProperties = LauncherProperties(DEFAULT_LAUNCHER_STAT
 @ExperimentalComposeUiApi
 @Composable
 @Suppress("FunctionName", "kotlin:S3776")
-fun Launcher(): (setFreeze: Boolean) -> Unit {
+fun Launcher(): LauncherController {
     /* Internationalization */
     var locale by remember { mutableStateOf(Internationalization.locale) }
     val i18n by remember {
@@ -184,6 +184,8 @@ fun Launcher(): (setFreeze: Boolean) -> Unit {
         }
     }
 
+    var midiFileTextField: ((File) -> Unit)? = null
+
     MaterialTheme(darkColors()) {
         Surface(
             Modifier.fillMaxSize().pointerHoverIcon(
@@ -215,7 +217,7 @@ fun Launcher(): (setFreeze: Boolean) -> Unit {
                                 style = MaterialTheme.typography.h6,
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp)
                             )
-                            MIDIFileTextField(i18n) {
+                            midiFileTextField = MIDIFileTextField(i18n) {
                                 selectedMIDIFile = it
                             }
                             SimpleExposedDropDownMenu(
@@ -440,18 +442,31 @@ fun Launcher(): (setFreeze: Boolean) -> Unit {
         }
     }
 
-    return { setFreeze: Boolean ->
-        freeze = setFreeze
-
-    }
+    return LauncherController(
+        { setFreeze: Boolean -> freeze = setFreeze },
+        { file: File ->
+            selectedMIDIFile = file
+            midiFileTextField?.invoke(file)
+        }
+    )
 }
+
+
+/** Provides a way for the launcher component to allow external modifications. */
+data class LauncherController(
+    internal val setFreeze: (setFreeze: Boolean) -> Unit,
+    internal val setSelectedFile: (file: File) -> Unit
+)
 
 /**
  * The text field that shows the currently selected MIDI file. The field also has a button for opening a file selector.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MIDIFileTextField(i18n: ResourceBundle, onChange: (path: File) -> Unit) {
+fun MIDIFileTextField(
+    i18n: ResourceBundle,
+    onChangeBySearchButton: (path: File) -> Unit
+): (externalFileChange: File) -> Unit {
     var selectedFile: File? by remember { mutableStateOf(null) }
     TextField(
         value = selectedFile?.name ?: "",
@@ -489,7 +504,7 @@ fun MIDIFileTextField(i18n: ResourceBundle, onChange: (path: File) -> Unit) {
                         if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                             selectedFile = this.selectedFile
                             launcherState.setProperty("lastdir", this.selectedFile.parent)
-                            onChange(selectedFile ?: return@run) // Should be safe
+                            onChangeBySearchButton(selectedFile ?: return@run) // Should be safe
                             logger().info("Selected MIDI file ${selectedFile?.absoluteFile}")
                         }
                     }
@@ -498,6 +513,9 @@ fun MIDIFileTextField(i18n: ResourceBundle, onChange: (path: File) -> Unit) {
         },
         readOnly = true
     )
+    return { externalFileChange ->
+        selectedFile = externalFileChange
+    }
 }
 
 /**
