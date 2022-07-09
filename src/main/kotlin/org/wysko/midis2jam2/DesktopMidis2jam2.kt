@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.gui.ConfigureBackground
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.BackgroundController
-import org.wysko.midis2jam2.world.Camera.Companion.preventCameraFromLeaving
+import org.wysko.midis2jam2.world.CameraAngle.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
 

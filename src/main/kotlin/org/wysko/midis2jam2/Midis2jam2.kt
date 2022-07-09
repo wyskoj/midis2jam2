@@ -39,7 +39,6 @@ import com.jme3.scene.Spatial
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
 import kotlinx.coroutines.runBlocking
-import org.wysko.midis2jam2.gui.ConfigureBackground
 import org.wysko.midis2jam2.gui.QualityLevel
 import org.wysko.midis2jam2.gui.antiAliasingDefinition
 import org.wysko.midis2jam2.gui.shadowDefinition
@@ -206,7 +205,7 @@ abstract class Midis2jam2(
 
         autocamController = AutoCamController(this, properties.getProperty("auto_autocam") == "true")
 
-        currentCamera = Camera.CAMERA_1A
+        currentCameraAngle = CameraAngle.CAMERA_1A
 
         debugTextController = DebugTextController(this)
         hudController = HudController(this)
@@ -339,7 +338,7 @@ abstract class Midis2jam2(
     lateinit var instruments: List<Instrument>
 
     /** The current camera position. */
-    private var currentCamera: Camera = Camera.CAMERA_1A
+    private var currentCameraAngle: CameraAngle = CameraAngle.CAMERA_1A
         set(value) {
             app.camera.location = value.location
             app.camera.rotation = value.rotation
@@ -394,18 +393,18 @@ abstract class Midis2jam2(
             autocamController.trigger()
         }
         if (isPressed && name.startsWith("cam")) {
-            currentCamera = when (name) {
-                "cam1" -> when (currentCamera) {
-                    Camera.CAMERA_1A -> Camera.CAMERA_1B
-                    Camera.CAMERA_1B -> Camera.CAMERA_1C
-                    else -> Camera.CAMERA_1A
+            currentCameraAngle = when (name) {
+                "cam1" -> when (currentCameraAngle) {
+                    CameraAngle.CAMERA_1A -> CameraAngle.CAMERA_1B
+                    CameraAngle.CAMERA_1B -> CameraAngle.CAMERA_1C
+                    else -> CameraAngle.CAMERA_1A
                 }
-                "cam2" -> if (currentCamera == Camera.CAMERA_2A) Camera.CAMERA_2B else Camera.CAMERA_2A
-                "cam3" -> if (currentCamera == Camera.CAMERA_3A) Camera.CAMERA_3B else Camera.CAMERA_3A
-                "cam4" -> if (currentCamera == Camera.CAMERA_4A) Camera.CAMERA_4B else Camera.CAMERA_4A
-                "cam5" -> Camera.CAMERA_5
-                "cam6" -> Camera.CAMERA_6
-                else -> Camera.CAMERA_1A // Shouldn't ever happen
+                "cam2" -> if (currentCameraAngle == CameraAngle.CAMERA_2A) CameraAngle.CAMERA_2B else CameraAngle.CAMERA_2A
+                "cam3" -> if (currentCameraAngle == CameraAngle.CAMERA_3A) CameraAngle.CAMERA_3B else CameraAngle.CAMERA_3A
+                "cam4" -> if (currentCameraAngle == CameraAngle.CAMERA_4A) CameraAngle.CAMERA_4B else CameraAngle.CAMERA_4A
+                "cam5" -> CameraAngle.CAMERA_5
+                "cam6" -> if (currentCameraAngle == CameraAngle.CAMERA_6A) CameraAngle.CAMERA_6B else CameraAngle.CAMERA_6A
+                else -> CameraAngle.CAMERA_1A // Shouldn't ever happen
             }
             autocamController.enabled = false
         }

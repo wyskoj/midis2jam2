@@ -23,7 +23,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /** Defines angles for cameras. */
-enum class Camera(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY: Float, rotZ: Float) {
+enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY: Float, rotZ: Float) {
 
     /** Camera 1A. */
     CAMERA_1A(-2f, 92f, 134f, Utils.rad(18.44f), Utils.rad(180f), 0f),
@@ -56,7 +56,10 @@ enum class Camera(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY: Floa
     CAMERA_5(5f, 432f, 24f, Utils.rad(82.875f), Utils.rad(180f), 0f),
 
     /** Camera 6. */
-    CAMERA_6(17f, 30.5f, 42.9f, Utils.rad(-6.7), Utils.rad(144.3), 0f);
+    CAMERA_6A(17f, 30.5f, 42.9f, Utils.rad(-6.7), Utils.rad(144.3), 0f),
+
+    /** Camera 6. */
+    CAMERA_6B(38.8f, 58.8f, 23.5f, 2.206f, -0.635f, 0.003f);
 
     /** The location of the camera. */
     val location: Vector3f = Vector3f(locX, locY, locZ)
