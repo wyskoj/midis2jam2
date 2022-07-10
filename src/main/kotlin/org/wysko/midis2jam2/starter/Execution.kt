@@ -279,8 +279,8 @@ fun err(exception: Exception, message: String, title: String, onFinish: () -> Un
 /* EXECUTORS */
 
 private val defaultSettings = AppSettings(true).apply {
-    frameRate = 120
-    frequency = 60
+    frameRate = 240
+    frequency = 240
     isVSync = true
     isResizable = false
     samples = 4
