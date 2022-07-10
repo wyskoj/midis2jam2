@@ -23,8 +23,6 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
-import org.wysko.midis2jam2.instrument.family.percussion.Triangle.TriangleType.MUTED
-import org.wysko.midis2jam2.instrument.family.percussion.Triangle.TriangleType.OPEN
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.Cymbal.CymbalType.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.Tom.TomPitch.*
@@ -177,10 +175,8 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
             instruments.add(Maracas(context, eventsByNote(MARACAS)))
         if (noteOnEvents.any { it.note.oneOf(CLAVES) })
             instruments.add(Claves(context, eventsByNote(CLAVES)))
-        if (noteOnEvents.any { it.note.oneOf(OPEN_TRIANGLE) })
-            instruments.add(Triangle(context, eventsByNote(OPEN_TRIANGLE), OPEN))
-        if (noteOnEvents.any { it.note.oneOf(MUTE_TRIANGLE) })
-            instruments.add(Triangle(context, eventsByNote(MUTE_TRIANGLE), MUTED))
+        if (noteOnEvents.any { it.note.oneOf(OPEN_TRIANGLE, MUTE_TRIANGLE) })
+            instruments.add(Triangle(context, eventsByNote(OPEN_TRIANGLE, MUTE_TRIANGLE)))
         if (noteOnEvents.any { it.note.oneOf(SQUARE_CLICK) })
             instruments.add(SquareClick(context, eventsByNote(SQUARE_CLICK)))
         if (noteOnEvents.any { it.note.oneOf(METRONOME_CLICK, METRONOME_BELL) })

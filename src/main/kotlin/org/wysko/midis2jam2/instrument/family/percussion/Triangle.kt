@@ -17,76 +17,51 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussive.Stick
+import org.wysko.midis2jam2.midi.MUTE_TRIANGLE
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.util.cullHint
 
-/** The triangle. */
-class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: TriangleType) :
-    NonDrumSetPercussion(context, hits) {
+/** The Triangle. */
+class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** The Triangle node. */
-    private val triangleNode = Node()
-
-    /** The Beater node. */
-    private val beaterNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        val stickStatus =
-            Stick.handleStick(context, beaterNode, time, delta, hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-        recoilDrum(
-            triangleNode,
-            stickStatus.justStruck(),
-            if (stickStatus.strike == null) 0 else stickStatus.strike.velocity,
-            delta
-        )
+    private val triangle = context.loadModel("Triangle.obj", "ShinySilver.bmp", 0.9f).also {
+        recoilNode.attachChild(it)
     }
 
-    /** The type of triangle. */
-    enum class TriangleType(internal val modelFile: String) {
-        /** Open triangle type. */
-        OPEN("Triangle.obj"),
+    private val fist = context.loadModel("MutedTriangle.obj", "hands.bmp").also {
+        recoilNode.attachChild(it)
+        it.cullHint = Spatial.CullHint.Always // Start the triangle in the unmuted position
+    }
 
-        /** Muted triangle type. */
-        MUTED("MutedTriangle.obj");
+    private val beater = context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", 0.9f).also {
+        instrumentNode.attachChild(it)
+        it.setLocalTranslation(0f, 2f, 4f)
     }
 
     init {
+        instrumentNode.setLocalTranslation(0f, 53f, -57f)
 
-        /* Load triangle */
-        val triangle = context.loadModel(type.modelFile, "ShinySilver.bmp", 0.9f)
-        triangleNode.attachChild(triangle)
+        /* By rotating the recoil node on a 45, the direction of recoil is SW, then the whole thing is rotated back
+         * so that it appears upright. */
+        recoilNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(45f))
+        instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-45f))
+    }
 
-        /* Fix material if a muted triangle */
-        if (type == TriangleType.MUTED) {
-            val hands = context.unshadedMaterial("Assets/hands.bmp")
-            (triangle as Node).getChild(1).setMaterial(hands)
-        }
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        with(Stick.handleStick(context, stickNode = beater, time, delta, hits)) {
+            strike?.let {
+                recoilDrum(recoilNode, true, it.velocity, delta)
 
-        /* Load beater */
-        beaterNode.attachChild(
-            context.loadModel(
-                "Triangle_Stick.obj",
-                "ShinySilver.bmp",
-                0.9f
-            )
-        )
-        beaterNode.setLocalTranslation(0f, 2f, 4f)
+                /* Hide/show models depending on note played */
+                fist.cullHint = (it.note == MUTE_TRIANGLE).cullHint()
 
-        /* Attach nodes and position */
-        instrumentNode.attachChild(triangleNode)
-        instrumentNode.attachChild(beaterNode)
-        triangleNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(45.0))
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-45.0))
-        if (type == TriangleType.OPEN) {
-            instrumentNode.setLocalTranslation(-5f, 53f, -57f)
-        } else {
-            instrumentNode.setLocalTranslation(5f, 53f, -57f)
+            } ?: recoilDrum(recoilNode, false, 0, delta)
         }
     }
 }
