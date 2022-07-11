@@ -19,17 +19,17 @@ package org.wysko.midis2jam2.starter
 
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
-import com.jme3.system.JmeCanvasContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Default
+import org.lwjgl.opengl.Display
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.ExceptionPanel
-import org.wysko.midis2jam2.gui.SwingWrapper
 import org.wysko.midis2jam2.gui.getGraphicsSettings
 import org.wysko.midis2jam2.gui.loadSettingsFromFile
 import org.wysko.midis2jam2.midi.DesktopMidiFile
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
+import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.io.File
 import java.io.IOException
@@ -42,7 +42,6 @@ import javax.sound.midi.InvalidMidiDataException
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.MidiUnavailableException
 import javax.sound.midi.Sequencer
-import javax.swing.JFrame
 import javax.swing.JOptionPane
 
 /** The sequencer that is connected to the synthesizer. */
@@ -248,21 +247,12 @@ object Execution {
                 }
             }
 
-            if (properties.getProperty("legacy_display_engine") == "true") {
-                Thread({
-                    LegacyExecution(properties, {
-                        onFinish.invoke()
-                        midiDevice?.close()
-                    }, sequencer).execute()
-                }, "midis2jam2 starter").start()
-            } else {
-                Thread({
-                    StandardExecution(properties, {
-                        onFinish.invoke()
-                        midiDevice?.close()
-                    }, sequencer).execute()
-                }, "midis2jam2 starter").start()
-            }
+            Thread({
+                M2J2Execution(properties, {
+                    onFinish.invoke()
+                    midiDevice?.close()
+                }, sequencer).execute()
+            }, "midis2jam2 starter").start()
         }
     }
 
@@ -279,103 +269,48 @@ fun err(exception: Exception, message: String, title: String, onFinish: () -> Un
 /* EXECUTORS */
 
 private val defaultSettings = AppSettings(true).apply {
-    frameRate = 240
-    frequency = 240
+    frameRate = -1
+    frequency = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.first().refreshRate
     isVSync = true
     isResizable = false
-    samples = 4
     isGammaCorrection = false
     icons = arrayOf("/ico/icon16.png", "/ico/icon32.png", "/ico/icon128.png", "/ico/icon256.png").map {
         ImageIO.read(this::class.java.getResource(it))
     }.toTypedArray()
     title = "midis2jam2"
     audioRenderer = null
+    centerWindow = true
 }
 
-private val dimension = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
-
-private open class StandardExecution(
-    val properties: Properties,
-    val onFinish: () -> Unit,
-    val sequencer: Sequencer,
-) : SimpleApplication() {
-
-    private lateinit var frame: JFrame
-
-    fun execute() {
-        /* Set JME3 settings */
-        setDisplayStatView(false)
-        setDisplayFps(false)
-        isPauseOnLostFocus = false
-        isShowSettings = false
-
-        logger().info(properties.entries.joinToString())
-
-        if (properties.getProperty("fullscreen") == "true") {
-            defaultSettings.isFullscreen = true
-            defaultSettings.setResolution(screenWidth(), screenHeight())
-            setSettings(defaultSettings)
-            super.start()
-        } else {
-            setSettings(defaultSettings)
-            createCanvas()
-            val context = (getContext() as JmeCanvasContext).also {
-                it.setSystemListener(this)
-            }
-            val dimensions = collectWindowResolution(properties)
-
-            val canvas = context.canvas
-            canvas.preferredSize = dimensions
-            frame = SwingWrapper.wrap(canvas, "midis2jam2", collectWindowResolution(properties)) {
-                stop()
-            }
-            startCanvas()
-        }
-    }
-
-    override fun stop() {
-        stop(false)
-        onFinish()
-        if (::frame.isInitialized) {
-            frame.isVisible = false
-        }
-    }
-
-    override fun simpleInitApp() {
-        val midiFile = DesktopMidiFile(File(properties.getProperty("midi_file")))
-        DesktopMidis2jam2(
-            sequencer = sequencer,
-            midiFile,
-            properties = properties,
-            onFinish
-        ).also {
-            stateManager.attach(it)
-            rootNode.attachChild(it.rootNode)
-        }
-    }
-}
-
-private open class LegacyExecution(
+private class M2J2Execution(
     val properties: Properties,
     val onFinish: () -> Unit,
     val sequencer: Sequencer,
 ) : SimpleApplication() {
 
     fun execute() {
-        if (properties.getProperty("fullscreen") == "true") {
+        val resolution = collectWindowResolution(properties)
+        if (properties.getProperty("fullscreen") == "true") { // Set resolution to monitor resolution
             defaultSettings.isFullscreen = true
             defaultSettings.setResolution(screenWidth(), screenHeight())
         } else {
             defaultSettings.isFullscreen = false
-            with(collectWindowResolution(properties)) {
+            with(resolution) {
                 defaultSettings.setResolution(width, height)
             }
         }
+
         setSettings(defaultSettings)
         setDisplayStatView(false)
         setDisplayFps(false)
         isPauseOnLostFocus = false
         isShowSettings = false
+        /* Calculate center */
+        Display.setLocation(
+            ((screenWidth() - resolution.width) / 2) - 7, // This -7 seems really hacky, but it makes it more centered
+            (screenHeight() - resolution.height) / 2 - 30 // Bias to move it up some
+        )
+
         start()
     }
 
@@ -404,6 +339,7 @@ fun screenWidth(): Int = Toolkit.getDefaultToolkit().screenSize.width
 /** Determines the height of the screen. */
 fun screenHeight(): Int = Toolkit.getDefaultToolkit().screenSize.height
 
+/** Obtains the preferred resolution from the config file. */
 private fun collectWindowResolution(properties: Properties): Dimension {
     val resRegex = Pattern.compile("""(\d+)\s*x\s*(\d+)""")
     fun defaultDimension() = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
