@@ -32,6 +32,8 @@ import org.wysko.midis2jam2.gui.UpdateChecker.checkForUpdates
 import org.wysko.midis2jam2.gui.launcherState
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.loadSequencerJob
+import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.logger
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
@@ -59,9 +61,18 @@ fun main(args: Array<String>) {
         it.mkdirs()
     }
 
-    /* Check for command line arguments */
     SplashScreen.writeMessage("Loading...")
-    FlatDarkLaf.setup()
+
+    /* Initialize themes */
+    try {
+        FlatDarkLaf.setup()
+    } catch (e: Exception) {
+        with(Main.logger()) {
+            warn("Failed to initialize FlatLaf theme, reverting to default.")
+            warn(Utils.exceptionToLines(e))
+        }
+    }
+
     application {
         var launcherController: LauncherController? = null
         Window(
@@ -92,7 +103,6 @@ fun main(args: Array<String>) {
                 },
                 onReady = {},
                 onFinish = {
-                    println("unfreezing!!")
                     launcherController?.setFreeze?.invoke(false)
                 }
             )
@@ -100,3 +110,8 @@ fun main(args: Array<String>) {
         checkForUpdates() // I'm checking for updates, whether you like it or not.
     }
 }
+
+/**
+ * The entrypoint class. Used for logging purposes.
+ */
+object Main
