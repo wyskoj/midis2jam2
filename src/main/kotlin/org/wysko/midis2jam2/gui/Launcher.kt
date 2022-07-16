@@ -155,7 +155,7 @@ fun Launcher(): LauncherController {
             Execution.start(
                 properties = Properties().apply {
                     setProperty("midi_file", selectedMIDIFile?.absolutePath)
-                    setProperty("midi_device", selectedMidiDevice.also { println(it) })
+                    setProperty("midi_device", selectedMidiDevice)
 
                     if (soundFonts[selectedSoundFont] != "Default SoundFont") {
                         setProperty(
