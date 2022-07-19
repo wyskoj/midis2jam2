@@ -23,8 +23,11 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The full, 88-key keyboard. */
-class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent>, private val skin: KeyboardSkin) :
-    KeyedInstrument(context, events, 21, 108) {
+open class Keyboard(
+    context: Midis2jam2,
+    events: MutableList<MidiChannelSpecificEvent>,
+    private val skin: KeyboardSkin
+) : KeyedInstrument(context, events, 21, 108) {
 
     override fun moveForMultiChannel(delta: Float) {
         val i = updateInstrumentIndex(delta)
@@ -92,7 +95,7 @@ class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent
     }
 
     /** The type Keyboard key. */
-    inner class KeyboardKey(midiNote: Int, startPos: Int) : Key() {
+    inner class KeyboardKey(val midiNote: Int, startPos: Int) : Key() {
         init {
             if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
                 /* UP KEY */
@@ -142,5 +145,11 @@ class Keyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent
         }
         instrumentNode.move(-50f, 32f, -6f)
         instrumentNode.rotate(0f, rad(45.0), 0f)
+    }
+
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("skin", skin.name))
+        }
     }
 }

@@ -16,8 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
@@ -26,9 +28,12 @@ import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.world.GlowController
 
 /** Texture file for shiny silver. */
 const val SHINY_SILVER: String = "ShinySilver.bmp"
+
+private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 0f, -18f)
 
 /**
  * The music box has several animation components. The first is the spindle/cylinder. The spindle spins at a rate of 1/4
@@ -143,7 +148,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 0f, updateInstrumentIndex(delta) * -18f)
+        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 
     /** A single music box note. */
@@ -162,6 +167,8 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         /** True if this note is recoiling, false otherwise. */
         private var playing = false
 
+        private val glowController = GlowController()
+
         /** Call to begin recoiling. */
         fun play() {
             playing = true
@@ -172,6 +179,9 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             /* Update progress */
             if (playing) {
                 progress += (delta * 4).toDouble()
+                (key as Geometry).material.setColor("GlowColor", glowController.calculate(progress))
+            } else {
+                (key as Geometry).material.setColor("GlowColor", ColorRGBA.Black)
             }
 
             /* Animation is finished */
@@ -198,7 +208,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             attachChild(context.loadModel("MusicBoxCase.obj", "Wood.bmp"))
             attachChild(context.loadModel("MusicBoxTopBlade.obj", SHINY_SILVER, 0.9f))
             attachChild(cylinder)
-            setLocalTranslation(37f, 7f, -5f)
+            setLocalTranslation(37f, 5f, -5f)
         }
         cylinder.attachChild(context.loadModel("MusicBoxSpindle.obj", SHINY_SILVER, 0.9f))
         pointModel = context.loadModel("MusicBoxPoint.obj", SHINY_SILVER, 0.9f)

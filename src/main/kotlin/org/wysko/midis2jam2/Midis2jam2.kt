@@ -60,6 +60,7 @@ import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion
 import org.wysko.midis2jam2.instrument.family.percussive.*
+import org.wysko.midis2jam2.instrument.family.piano.FifthsKeyboard
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.pipe.*
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
@@ -506,7 +507,7 @@ abstract class Midis2jam2(
             82 -> PanFlute(this, events, PanFlute.PipeSkin.GOLD)
             83 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
             84 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHARANG)
-            86 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
+            86 -> FifthsKeyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
             87 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
             88 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
             89 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)

@@ -64,20 +64,28 @@ abstract class KeyedInstrument(
             keyByMidiNote(event.note)?.let {
                 when (event) {
                     is MidiNoteOnEvent -> {
-                        it.pressKey(event)
+                        pressKey(it, event)
                         keysPressedThisFrame.add(it)
                     }
                     is MidiNoteOffEvent -> {
                         if (keysPressedThisFrame.contains(it)) {
                             events.add(0, event) // Add this event back to the queue, to be animated on next frame
                         } else {
-                            it.releaseKey()
+                            releaseKey(it)
                         }
                     }
                 }
             }
         }
         keys.forEach { it.tick(delta) }
+    }
+
+    open fun pressKey(key: Key, event: MidiNoteOnEvent) {
+        key.pressKey(event)
+    }
+
+    open fun releaseKey(key: Key) {
+        key.releaseKey()
     }
 
     /**

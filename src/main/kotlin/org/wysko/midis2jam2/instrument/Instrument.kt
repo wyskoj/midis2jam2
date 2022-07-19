@@ -98,22 +98,28 @@ abstract class Instrument protected constructor(
      */
     @Contract(pure = false)
     protected fun updateInstrumentIndex(delta: Float): Float {
+        val similarAndVisible = similarVisible()
         val targetIndex = if (isVisible) {
             /* Index in the list of instruments from context */
-            max(0, context.instruments.filter { this.javaClass.isInstance(it) && it.isVisible }.indexOf(this))
+            max(0, similarAndVisible.indexOf(this))
         } else {
             /* The number of visible instruments of this type, minus one */
-            context.instruments.filter { this.javaClass.isInstance(it) && it.isVisible }.size - 1
+            similarAndVisible.size - 1
         }
 
         /* Update the index gradually to the target index, given the transition speed */
         index += delta * BASE_TRANSITION_SPEED * (targetIndex - index) / 500.0
 
         /* Never set the instrument index to anything larger than the number of instruments of this type */
-        index = index.coerceAtMost(context.instruments.filter { this.javaClass.isInstance(it) }.size.toDouble())
+        index = index.coerceAtMost(similar().size.toDouble())
 
         return index.toFloat()
     }
+
+    /** The number of instruments that are similar to this one (they are the same class or a subclass) and are visible. */
+    protected open fun similarVisible() = similar().filter { it.isVisible }
+
+    protected open fun similar() = context.instruments.filter { this.javaClass.isInstance(it) }
 
     /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */
     @Contract(pure = true)

@@ -31,10 +31,10 @@ open class Key protected constructor() {
     val keyNode: Node = Node()
 
     /** Contains geometry for the "up" key. */
-    protected val upNode: Node = Node()
+    internal val upNode: Node = Node()
 
     /** Contains geometry for the "down" key. */
-    protected val downNode: Node = Node()
+    internal val downNode: Node = Node()
 
     /** Is this key being pressed? */
     val isBeingPressed: Boolean

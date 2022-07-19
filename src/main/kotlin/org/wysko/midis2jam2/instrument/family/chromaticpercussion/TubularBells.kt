@@ -16,9 +16,13 @@
  */
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath.PI
 import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
@@ -28,8 +32,8 @@ import org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis.X
+import org.wysko.midis2jam2.world.GlowController
 import kotlin.math.pow
 import kotlin.math.sin
 import org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE as StickMAX_ANGLE
@@ -43,6 +47,8 @@ private const val WOBBLE_SPEED = 3
 /** How quickly the bell will return to rest. */
 private const val DAMPENING = 0.3
 
+private val OFFSET_DIRECTION_VECTOR = Vector3f(-10f, 0f, -10f)
+
 /** The tubular bells. */
 class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, events) {
 
@@ -50,7 +56,6 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
     private val bells = Array(12) { i ->
         Bell(i).apply {
             instrumentNode.attachChild(highestLevel)
-            bellNode.getChild(0).cullHint = Always
         }
     }
 
@@ -79,11 +84,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
     }
 
     override fun moveForMultiChannel(delta: Float) {
-        updateInstrumentIndex(delta)
-        offsetNode.setLocalTranslation(
-            (-10f * checkInstrumentIndex()).toFloat(), 0f,
-            (-10f * checkInstrumentIndex()).toFloat()
-        )
+        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 
     /** A single bell. */
@@ -93,10 +94,27 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
         val highestLevel = Node()
 
         /** Contains the tubular bell. */
-        val bellNode = Node()
+        val bellNode = Node().apply {
+            setLocalTranslation((i - 5) * 4f, 0f, 0f)
+            setLocalScale((-0.04545 * i).toFloat() + 1)
+            highestLevel.attachChild(this)
+        }
 
         /** Contains the mallet. */
-        val malletNode: Node
+        val malletNode: Node = Node().apply {
+            setLocalTranslation((i - 5) * 4f, -25f, 4f)
+            highestLevel.attachChild(this)
+            cullHint = Always
+        }.also {
+            context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
+                setLocalTranslation(0f, 5f, 0f)
+                it.attachChild(this)
+            }
+        }
+
+        val bell: Spatial = context.loadModel("TubularBell.obj", "ShinySilver.bmp", 0.9f).also {
+            bellNode.attachChild(it)
+        }
 
         /** The current amplitude of the recoil. */
         private var amplitude = 0.5
@@ -107,6 +125,8 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
         /** True if this bell is recoiling, false if not. */
         private var bellIsRecoiling = false
 
+        private val glowController = GlowController()
+
         /**
          * Updates animation.
          *
@@ -115,12 +135,12 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
         fun tick(delta: Float) {
             animTime += delta.toDouble()
 
-            bellNode.run {
-                getChild(0).cullHint = bellIsRecoiling.cullHint()
-                getChild(1).cullHint = (!bellIsRecoiling).cullHint()
+            if (bellIsRecoiling) {
+                bellNode.localRotation = Quaternion().fromAngles(rotationAmount(), 0f, 0f)
+                (bell as Geometry).material.setColor("GlowColor", glowController.calculate(animTime))
+            } else {
+                (bell as Geometry).material.setColor("GlowColor", ColorRGBA.Black)
             }
-
-            if (bellIsRecoiling) bellNode.localRotation = Quaternion().fromAngles(rotationAmount(), 0f, 0f)
         }
 
         /**
@@ -148,26 +168,6 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
             amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * BASE_AMPLITUDE
             animTime = 0.0
             bellIsRecoiling = true
-        }
-
-        init {
-            bellNode.run {
-                attachChild(context.loadModel("TubularBell.obj", "ShinySilver.bmp", 0.9f))
-                attachChild(context.loadModel("TubularBellDark.obj", "ShinySilver.bmp", 0.5f))
-                setLocalTranslation((i - 5) * 4f, 0f, 0f)
-                setLocalScale((-0.04545 * i).toFloat() + 1)
-                highestLevel.attachChild(this)
-            }
-
-            malletNode = Node().apply {
-                setLocalTranslation((i - 5) * 4f, -25f, 4f)
-                highestLevel.attachChild(this)
-                cullHint = Always
-            }
-            context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
-                setLocalTranslation(0f, 5f, 0f)
-                malletNode.attachChild(this)
-            }
         }
     }
 
