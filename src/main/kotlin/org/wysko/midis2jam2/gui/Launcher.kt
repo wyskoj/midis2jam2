@@ -38,6 +38,8 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.loadSvgPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -340,9 +342,11 @@ fun Launcher(): LauncherController {
                                 modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
-                            Text(text = locale.language.uppercase(Locale.getDefault()),
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
+                            Spacer(Modifier.height(4.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.clickable {
                                     supportedLocales.let {
                                         val lang =
                                             it[(it.indexOf(it.first { l -> l.language == locale.language }) + 1) % it.size].language
@@ -354,8 +358,18 @@ fun Launcher(): LauncherController {
                                             locale = this
                                         }
                                     }
-
-                                })
+                                }.padding(0.dp, 0.dp, 0.dp, 0.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource("language.svg"),
+                                    contentDescription = "Select locale",
+                                    modifier = Modifier.height(32.dp).width(32.dp).padding(8.dp, 4.dp, 4.dp, 4.dp)
+                                )
+                                Text(text = locale.language.uppercase(Locale.getDefault()),
+                                    style = MaterialTheme.typography.body1,
+                                    modifier = Modifier.padding(4.dp, 4.dp, 8.dp, 4.dp))
+                            }
+                            Spacer(Modifier.height(4.dp))
                             Text(
                                 text = i18n.getString("about.warranty"),
                                 style = MaterialTheme.typography.body2,
