@@ -40,6 +40,7 @@ import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import java.util.*
+import javax.swing.UIManager
 
 /**
  * The configuration directory.
@@ -65,7 +66,7 @@ fun main(args: Array<String>) {
 
     /* Initialize themes */
     try {
-        FlatDarkLaf.setup()
+        UIManager.setLookAndFeel(FlatDarkLaf())
     } catch (e: Exception) {
         with(Main.logger()) {
             warn("Failed to initialize FlatLaf theme, reverting to default.")
