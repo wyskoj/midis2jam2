@@ -239,6 +239,7 @@ abstract class Midis2jam2(
                 numSamples =
                     antiAliasingDefinition.getOrDefault(QualityLevel.valueOf(properties.getProperty("antialiasing")), 1)
                 addFilter(fade)
+                addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
                 app.viewPort.addProcessor(this)
             }
         } else {
