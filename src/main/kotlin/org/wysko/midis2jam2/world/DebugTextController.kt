@@ -82,7 +82,7 @@ class DebugTextController(val context: Midis2jam2) {
 
 private fun Midis2jam2.debugTextPercussion(): String {
     return buildString {
-        append(this@debugTextPercussion.instruments.first { it is Percussion })
+        append(this@debugTextPercussion.instruments.firstOrNull { it is Percussion } ?: "NO PERCUSSION")
     }
 }
 
