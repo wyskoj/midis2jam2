@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.midi
 
+import kotlin.math.max
+
 /** The max value a MIDI note can have. */
 const val MIDI_MAX_NOTE: Int = 127
 
@@ -26,3 +28,16 @@ const val MIDI_MAX_NOTE: Int = 127
  */
 open class MidiNoteEvent protected constructor(override val time: Long, channel: Int, open val note: Int) :
     MidiChannelSpecificEvent(time, channel)
+
+/**
+ * Determines the maximum number of notes playing at any given time (polyphony).
+ */
+fun List<MidiNoteEvent>.maxPolyphony(): Int {
+    var currentPolyphony = 0
+    var maxPolyphony = 0
+    forEach {
+        if (it is MidiNoteOnEvent) currentPolyphony++ else currentPolyphony--
+        maxPolyphony = max(currentPolyphony, maxPolyphony)
+    }
+    return maxPolyphony
+}

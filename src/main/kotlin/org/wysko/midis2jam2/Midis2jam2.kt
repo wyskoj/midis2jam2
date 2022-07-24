@@ -413,7 +413,8 @@ abstract class Midis2jam2(
 
     private fun fromEvents(programNum: Int, events: ArrayList<MidiChannelSpecificEvent>): Instrument? {
         /* If there are no NoteOn events, there's no need to actually create the instrument. */
-        if (events.filterIsInstance<MidiNoteOnEvent>().isEmpty()) return null
+        val midiNoteEvents = events.filterIsInstance<MidiNoteEvent>()
+        if (midiNoteEvents.isEmpty()) return null
 
         return when (programNum) {
             0 -> Keyboard(this, events, Keyboard.KeyboardSkin.PIANO)
@@ -502,8 +503,20 @@ abstract class Midis2jam2(
             76 -> BlownBottle(this, events)
             78 -> Whistles(this, events)
             79 -> Ocarina(this, events)
-            80 -> SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SQUARE)
-            81 -> SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SAW)
+            80 -> {
+                if (midiNoteEvents.maxPolyphony() > 2) {
+                    Keyboard(this, events, Keyboard.KeyboardSkin.SQUARE_WAVE)
+                } else {
+                    SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SQUARE)
+                }
+            }
+            81 -> {
+                if (midiNoteEvents.maxPolyphony() > 2) {
+                    Keyboard(this, events, Keyboard.KeyboardSkin.SAW_WAVE)
+                } else {
+                    SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SAW)
+                }
+            }
             82 -> PanFlute(this, events, PanFlute.PipeSkin.GOLD)
             83 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
             84 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHARANG)
