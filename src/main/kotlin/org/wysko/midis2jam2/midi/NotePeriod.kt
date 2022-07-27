@@ -91,7 +91,10 @@ open class NotePeriod(
              */
             noteEvents.forEach { noteEvent ->
                 if (noteEvent is MidiNoteOnEvent) {
-                    onEvents[noteEvent.note] = noteEvent
+                    /* If the same note starts again while it is playing, just ignore this new NoteOn event */
+                    if (onEvents[noteEvent.note] == null) {
+                        onEvents[noteEvent.note] = noteEvent
+                    }
                 } else {
                     val noteOff = noteEvent as MidiNoteOffEvent
                     onEvents[noteOff.note]?.let {
