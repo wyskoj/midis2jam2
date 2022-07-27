@@ -39,7 +39,7 @@ import java.net.URL;
  * @author Florian Bomers
  */
 @SuppressWarnings("all")
-final class StandardMidiFileReader extends MidiFileReader {
+public final class StandardMidiFileReader extends MidiFileReader {
 	
 	private static final int MThd_MAGIC = 0x4d546864;  // 'MThd'
 	

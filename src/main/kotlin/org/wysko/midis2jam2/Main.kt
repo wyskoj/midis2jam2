@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.gui.Launcher
 import org.wysko.midis2jam2.gui.LauncherController
 import org.wysko.midis2jam2.gui.UpdateChecker.checkForUpdates
 import org.wysko.midis2jam2.gui.launcherState
+import org.wysko.midis2jam2.midi.search.MIDISearchFrame
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.loadSequencerJob
 import org.wysko.midis2jam2.util.Utils
@@ -47,7 +48,7 @@ import javax.swing.UIManager
  */
 const val CONFIGURATION_DIRECTORY: String = ".midis2jam2"
 
-
+var launcherController: LauncherController? = null
 /**
  * Where it all begins.
  */
@@ -75,7 +76,6 @@ fun main(args: Array<String>) {
     }
 
     application {
-        var launcherController: LauncherController? = null
         Window(
             onCloseRequest = ::exitApplication, title = "midis2jam2 launcher", state = rememberWindowState(
                 placement = WindowPlacement.Maximized, position = WindowPosition(Alignment.Center)
@@ -101,10 +101,12 @@ fun main(args: Array<String>) {
                 },
                 onStart = {
                     launcherController?.setFreeze?.invoke(true)
+                    MIDISearchFrame.lock()
                 },
                 onReady = {},
                 onFinish = {
                     launcherController?.setFreeze?.invoke(false)
+                    MIDISearchFrame.unlock()
                 }
             )
         }

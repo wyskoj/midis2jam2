@@ -25,10 +25,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -48,6 +45,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.CONFIGURATION_DIRECTORY
+import org.wysko.midis2jam2.midi.search.MIDISearchFrame
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
@@ -169,6 +167,7 @@ fun Launcher(): LauncherController {
                 onStart = {
                     freeze = true
                     thinking = true
+                    MIDISearchFrame.lock()
                 },
                 onReady = {
                     thinking = false
@@ -176,6 +175,7 @@ fun Launcher(): LauncherController {
                 onFinish = {
                     freeze = false
                     thinking = false
+                    MIDISearchFrame.unlock()
                 },
             )
         } catch (e: Exception) {
@@ -482,6 +482,9 @@ fun MIDIFileTextField(
     onChangeBySearchButton: (path: File) -> Unit
 ): (externalFileChange: File) -> Unit {
     var selectedFile: File? by remember { mutableStateOf(null) }
+    val externalChange: (File) -> Unit = { externalFileChange ->
+        selectedFile = externalFileChange
+    }
     TextField(
         value = selectedFile?.name ?: "",
         onValueChange = {},
@@ -489,47 +492,56 @@ fun MIDIFileTextField(
         modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp).width(500.dp),
         label = { Text(i18n.getString("configuration.midi_file")) },
         trailingIcon = {
-            Icon(
-                Icons.Filled.Search,
-                contentDescription = i18n.getString("configuration.search_for_midi_file"),
-                modifier = Modifier.clickable {
-                    /* If the directory is bad, just revert to the home directory */
-                    if (!File(launcherState.getProperty("lastdir")).exists()) {
-                        launcherState.setProperty("lastdir", USER_HOME_DIRECTORY.absolutePath)
-                    }
+            Row(modifier = Modifier.width(128.dp), horizontalArrangement = Arrangement.End) {
+                Icon(
+                    Icons.Filled.List,
+                    contentDescription = i18n.getString("configuration.midi_search"),
+                    modifier = Modifier.clickable {
+                        MIDISearchFrame.launch()
+                    }.pointerHoverIcon(PointerIconDefaults.Hand, true)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    Icons.Filled.Search,
+                    contentDescription = i18n.getString("configuration.search_for_midi_file"),
+                    modifier = Modifier.clickable {
+                        /* If the directory is bad, just revert to the home directory */
+                        if (!File(launcherState.getProperty("lastdir")).exists()) {
+                            launcherState.setProperty("lastdir", USER_HOME_DIRECTORY.absolutePath)
+                        }
 
-                    /* Create file chooser modal */
-                    JFileChooser(File(launcherState.getProperty("lastdir"))).run {
-                        fileFilter = object : FileFilter() {
-                            override fun accept(file: File?): Boolean {
-                                return file?.extension?.lowercase(Locale.getDefault()) == "mid" || file?.extension?.lowercase(
-                                    Locale.getDefault()
-                                ) == "kar" || file?.extension?.lowercase(Locale.getDefault()) == "midi" || file?.isDirectory == true
+                        /* Create file chooser modal */
+                        JFileChooser(File(launcherState.getProperty("lastdir"))).run {
+                            fileFilter = object : FileFilter() {
+                                override fun accept(file: File?): Boolean {
+                                    return file?.extension?.lowercase(Locale.getDefault()) == "mid" || file?.extension?.lowercase(
+                                        Locale.getDefault()
+                                    ) == "kar" || file?.extension?.lowercase(Locale.getDefault()) == "midi" || file?.isDirectory == true
+                                }
+
+                                override fun getDescription(): String = "MIDI files (*.mid, *.midi, *.kar)"
                             }
+                            preferredSize = Dimension(800, 600)
+                            dialogTitle = "Select MIDI file"
+                            isMultiSelectionEnabled = false
+                            actionMap.get("viewTypeDetails").actionPerformed(null) // Switch to "detail" view
 
-                            override fun getDescription(): String = "MIDI files (*.mid, *.midi, *.kar)"
+                            /* Update path if dialog succeeds */
+                            if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                                selectedFile = this.selectedFile
+                                launcherState.setProperty("lastdir", this.selectedFile.parent)
+                                onChangeBySearchButton(selectedFile ?: return@run) // Should be safe
+                                logger().info("Selected MIDI file ${selectedFile?.absoluteFile}")
+                            }
                         }
-                        preferredSize = Dimension(800, 600)
-                        dialogTitle = "Select MIDI file"
-                        isMultiSelectionEnabled = false
-                        actionMap.get("viewTypeDetails").actionPerformed(null) // Switch to "detail" view
-
-                        /* Update path if dialog succeeds */
-                        if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                            selectedFile = this.selectedFile
-                            launcherState.setProperty("lastdir", this.selectedFile.parent)
-                            onChangeBySearchButton(selectedFile ?: return@run) // Should be safe
-                            logger().info("Selected MIDI file ${selectedFile?.absoluteFile}")
-                        }
-                    }
-                }.pointerHoverIcon(PointerIconDefaults.Hand, true)
-            )
+                    }.pointerHoverIcon(PointerIconDefaults.Hand, true)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+            }
         },
         readOnly = true
     )
-    return { externalFileChange ->
-        selectedFile = externalFileChange
-    }
+    return externalChange
 }
 
 /**
