@@ -504,45 +504,45 @@ abstract class Midis2jam2(
             76 -> BlownBottle(this, events)
             78 -> Whistles(this, events)
             79 -> Ocarina(this, events)
-            80 -> {
+            80 -> { // square
                 if (midiNoteEvents.maxPolyphony() > 2) {
                     Keyboard(this, events, Keyboard.KeyboardSkin.SQUARE_WAVE)
                 } else {
                     SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SQUARE)
                 }
             }
-            81 -> {
+            81 -> { // sawtooth
                 if (midiNoteEvents.maxPolyphony() > 2) {
                     Keyboard(this, events, Keyboard.KeyboardSkin.SAW_WAVE)
                 } else {
                     SpaceLaser(this, events, SpaceLaser.SpaceLaserType.SAW)
                 }
             }
-            82 -> PanFlute(this, events, PanFlute.PipeSkin.GOLD)
-            83 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            84 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHARANG)
-            86 -> FifthsKeyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            87 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            88 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            89 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            90 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            91 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHOIR)
+            82 -> PanFlute(this, events, PanFlute.PipeSkin.GOLD) // calliope
+            83 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHIFF) // chiff
+            84 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHARANG) // charang
+            86 -> FifthsKeyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // fifths
+            87 -> Keyboard(this, events, Keyboard.KeyboardSkin.BASS_AND_LEAD) // bass + lead
+            88 -> Keyboard(this, events, Keyboard.KeyboardSkin.NEW_AGE) // new age
+            89 -> Keyboard(this, events, Keyboard.KeyboardSkin.WARM) // warm
+            90 -> Keyboard(this, events, Keyboard.KeyboardSkin.POLYSYNTH) // polysynth
+            91 -> Keyboard(this, events, Keyboard.KeyboardSkin.CHOIR) // choir
             92 -> StageStrings(
                 this,
                 events,
                 StageStrings.StageStringsType.BOWED_SYNTH,
                 StageStrings.StageStringBehavior.NORMAL
-            )
-            93 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            94 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            95 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            96 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            97 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            99 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            100 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            101 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            102 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
-            103 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH)
+            ) // bowed
+            93 -> Keyboard(this, events, Keyboard.KeyboardSkin.METALLIC) // metallic
+            94 -> StageChoir(this, events, StageChoir.ChoirType.HALO_SYNTH) // halo
+            95 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // sweep
+            96 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // rain
+            97 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // soundtrack
+            99 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // atmosphere
+            100 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // brightness
+            101 -> StageChoir(this, events, StageChoir.ChoirType.GOBLIN_SYNTH) // goblins
+            102 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // echoes
+            103 -> Keyboard(this, events, Keyboard.KeyboardSkin.SYNTH) // sci-fi
             105 -> Banjo(this, events)
             106 -> Shamisen(this, events)
             110 -> Fiddle(this, events)

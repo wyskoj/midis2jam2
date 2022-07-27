@@ -91,7 +91,25 @@ open class Keyboard(
         CHARANG("CharangSynthSkin.png"),
 
         /** Choir keyboard skin. */
-        CHOIR("ChoirSynthSkin.png");
+        CHOIR("ChoirSynthSkin.png"),
+
+        /** Chiff keyboard skin. */
+        CHIFF("ChiffSynthSkin.png"),
+
+        /** Bass and lead keyboard skin. */
+        BASS_AND_LEAD("BassLeadSynthSkin.png"),
+
+        /** Metallic keyboard skin. */
+        METALLIC("MetallicSynthSkin.png"),
+
+        /** New age keyboard skin. */
+        NEW_AGE("NewAgeSynthSkin.png"),
+
+        /** Polysynth keyboard skin. */
+        POLYSYNTH("PolysynthSynthSkin.png"),
+
+        /** Warm keyboard skin. */
+        WARM("WarmSynthSkin.png")
     }
 
     /** The type Keyboard key. */

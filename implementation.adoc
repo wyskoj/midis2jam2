@@ -37,14 +37,14 @@ Check this page to see the progress of each instrument's implementation.
 
 |===
 |*Reed*|*Pipe*|*Synth Lead*|*Synth Pad*
-|_65_ Soprano Sax image:doc/check.png[]|_73_ Piccolo image:doc/check.png[]|_81_ Lead 1 (square) image:doc/brush.png[]|_89_ Pad 1 (new age) image:doc/check.png[]
-|_66_ Alto Sax image:doc/check.png[]|_74_ Flute image:doc/check.png[]|_82_ Lead 2 (sawtooth) image:doc/brush.png[]|_90_ Pad 2 (warm) image:doc/check.png[]
-|_67_ Tenor Sax image:doc/check.png[]|_75_ Recorder image:doc/check.png[]|_83_ Lead 3 (calliope) image:doc/check.png[]|_91_ Pad 3 (polysynth) image:doc/check.png[]
-|_68_ Baritone Sax image:doc/check.png[]|_76_ Pan Flute image:doc/check.png[]|_84_ Lead 4 (chiff) image:doc/check.png[]|_92_ Pad 4 (choir) image:doc/brush.png[]
+|_65_ Soprano Sax image:doc/check.png[]|_73_ Piccolo image:doc/check.png[]|_81_ Lead 1 (square) image:doc/brush.png[]|_89_ Pad 1 (new age) image:doc/brush.png[]
+|_66_ Alto Sax image:doc/check.png[]|_74_ Flute image:doc/check.png[]|_82_ Lead 2 (sawtooth) image:doc/brush.png[]|_90_ Pad 2 (warm) image:doc/brush.png[]
+|_67_ Tenor Sax image:doc/check.png[]|_75_ Recorder image:doc/check.png[]|_83_ Lead 3 (calliope) image:doc/check.png[]|_91_ Pad 3 (polysynth) image:doc/brush.png[]
+|_68_ Baritone Sax image:doc/check.png[]|_76_ Pan Flute image:doc/check.png[]|_84_ Lead 4 (chiff) image:doc/brush.png[]|_92_ Pad 4 (choir) image:doc/brush.png[]
 |_69_ Oboe image:doc/plus.png[]|_77_ Blown bottle image:doc/check.png[]|_85_ Lead 5 (charang) image:doc/brush.png[]|_93_ Pad 5 (bowed) image:doc/check.png[]
-|_70_ English Horn image:doc/cross.png[]|_78_ Shakuhachi image:doc/cross.png[]|_86_ Lead 6 (voice) image:doc/check.png[]|_94_ Pad 6 (metallic) image:doc/check.png[]
-|_71_ Bassoon image:doc/cross.png[]|_79_ Whistle image:doc/check.png[]|_87_ Lead 7 (fifths) image:doc/check.png[]|_95_ Pad 7 (halo) image:doc/check.png[]
-|_72_ Clarinet image:doc/plus.png[]|_80_ Ocarina image:doc/check.png[]|_88_ Lead 8 (bass + lead) image:doc/check.png[]|_96_ Pad 8 (sweep) image:doc/check.png[]
+|_70_ English Horn image:doc/cross.png[]|_78_ Shakuhachi image:doc/cross.png[]|_86_ Lead 6 (voice) image:doc/check.png[]|_94_ Pad 6 (metallic) image:doc/brush.png[]
+|_71_ Bassoon image:doc/cross.png[]|_79_ Whistle image:doc/check.png[]|_87_ Lead 7 (fifths) image:doc/check.png[]|_95_ Pad 7 (halo) image:doc/brush.png[]
+|_72_ Clarinet image:doc/plus.png[]|_80_ Ocarina image:doc/check.png[]|_88_ Lead 8 (bass + lead) image:doc/brush.png[]|_96_ Pad 8 (sweep) image:doc/check.png[]
 |===
 
 |===
@@ -54,7 +54,7 @@ Check this page to see the progress of each instrument's implementation.
 |_99_ FX 3 (crystal) image:doc/check.png[]|_107_ Shamisen image:doc/plus.png[]|_115_ Steel Drums image:doc/check.png[]|_123_ Seashore image:doc/cross.png[]
 |_100_ FX 4 (atmosphere) image:doc/check.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/check.png[]
 |_101_ FX 5 (brightness) image:doc/check.png[]|_109_ Kalimba image:doc/cross.png[]|_117_ Taiko Drum image:doc/check.png[]|_125_ Telephone Ring image:doc/check.png[]
-|_102_ FX 6 (goblins) image:doc/check.png[]|_110_ Bag pipe image:doc/cross.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
+|_102_ FX 6 (goblins) image:doc/brush.png[]|_110_ Bag pipe image:doc/cross.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
 |_103_ FX 7 (echoes) image:doc/check.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/check.png[]
 |_104_ FX 8 (sci-fi) image:doc/check.png[]|_112_ Shanai image:doc/cross.png[]|_120_ Reverse Cymbal image:doc/plus.png[]|_128_ Gunshot image:doc/cross.png[]
 |===

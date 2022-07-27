@@ -16,12 +16,15 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.renderer.queue.RenderQueue
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.brass.BouncyTwelfth
 import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.family.brass.BouncyTwelfth
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
@@ -32,7 +35,11 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     WrappedOctaveSustained(context, eventList, true) {
 
     override val twelfths: Array<TwelfthOfOctave> = Array(12) {
-        ChoirPeep(type).apply {
+        if (type == ChoirType.HALO_SYNTH) {
+            ChoirPeepHalo()
+        } else {
+            ChoirPeep(type)
+        }.apply {
             highestLevel.localTranslation = BASE_POSITION
         }
     }
@@ -52,9 +59,32 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     }
 
     /** A single choir peep. */
-    inner class ChoirPeep(type: ChoirType) : BouncyTwelfth() {
-        init {
-            animNode.attachChild(context.loadModel("StageChoir.obj", type.textureFile))
+    open inner class ChoirPeep(type: ChoirType) : BouncyTwelfth() {
+        open val model = context.loadModel("StageChoir.obj", type.textureFile).also {
+            animNode.attachChild(it)
+        }
+    }
+
+    inner class ChoirPeepHalo : ChoirPeep(ChoirType.HALO_SYNTH) {
+        override val model = context.loadModel("StageChoirHalo.obj", "ChoirHalo.png").also {
+            /* Halo must be separate material for glow effect to work */
+            (it as Node).getChild(0).apply {
+                setMaterial(context.unshadedMaterial("ChoirHalo.png"))
+                shadowMode = RenderQueue.ShadowMode.Off
+            }
+            animNode.attachChild(it)
+        }
+
+        override fun tick(delta: Float) {
+            super.tick(delta)
+
+            ((model as Node).getChild(0) as Geometry).material.setColor(
+                "GlowColor", if (playing) {
+                    ColorRGBA.Yellow
+                } else {
+                    ColorRGBA.Black
+                }
+            )
         }
     }
 
@@ -73,7 +103,13 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         SYNTH_VOICE("ChoirPeepSynthVoice.png"),
 
         /** Voice synth. */
-        VOICE_SYNTH("ChoirPeepVoiceSynth.png");
+        VOICE_SYNTH("ChoirPeepVoiceSynth.png"),
+
+        /** Halo synth. */
+        HALO_SYNTH("ChoirHalo.png"),
+
+        /** Goblin synth. */
+        GOBLIN_SYNTH("ChoirPeepGoblin.png"),
     }
 
     init {
