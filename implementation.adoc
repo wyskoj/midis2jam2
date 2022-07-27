@@ -76,8 +76,8 @@ Check this page to see the progress of each instrument's implementation.
 |_59_ Ride Cymbal 2 image:doc/check.png[]|_67_ High Agogô image:doc/check.png[]|_75_ Claves image:doc/check.png[]|_83_ Jingle Bell image:doc/check.png[]
 |_60_ High Bongo image:doc/check.png[]|_68_ Low Agogô image:doc/check.png[]|_76_ High Woodblock image:doc/check.png[]|_84_ Belltree image:doc/cross.png[]
 |_61_ Low Bongo image:doc/check.png[]|_69_ Cabasa image:doc/check.png[]|_77_ Low Woodblock image:doc/check.png[]|_85_ Castanets image:doc/check.png[]
-|_62_ Mute High Conga image:doc/check.png[]|_70_ Maracas image:doc/check.png[]|_78_ Mute Cuica image:doc/cross.png[]|_86_ Mute Surdo image:doc/plus.png[]
-|_63_ Open High Conga image:doc/check.png[]|_71_ Short Whistle image:doc/check.png[]|_79_ Open Cuica image:doc/cross.png[]|_87_ Open Surdo image:doc/plus.png[]
+|_62_ Mute High Conga image:doc/check.png[]|_70_ Maracas image:doc/check.png[]|_78_ Mute Cuica image:doc/plus.png[]|_86_ Mute Surdo image:doc/plus.png[]
+|_63_ Open High Conga image:doc/check.png[]|_71_ Short Whistle image:doc/check.png[]|_79_ Open Cuica image:doc/plus.png[]|_87_ Open Surdo image:doc/plus.png[]
 |_64_ Low Conga image:doc/check.png[]|_72_ Long Whistle image:doc/check.png[]|_80_ Mute Triangle image:doc/check.png[]|
 |_65_ High Timbale image:doc/check.png[]|_73_ Short Guiro image:doc/plus.png[]|_81_ Open Triangle image:doc/check.png[]|
 |_66_ Low Timbale image:doc/check.png[]|_74_ Long Guiro image:doc/plus.png[]|_82_ Shaker image:doc/check.png[]|

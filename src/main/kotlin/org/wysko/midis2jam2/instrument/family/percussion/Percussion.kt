@@ -187,6 +187,8 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
             instruments.add(Surdo(context, eventsByNote(MUTE_SURDO, OPEN_SURDO)))
         if (noteOnEvents.any { it.note.oneOf(LONG_GUIRO, SHORT_GUIRO) })
             instruments.add(Guiro(context, eventsByNote(LONG_GUIRO, SHORT_GUIRO)))
+        if (noteOnEvents.any { it.note.oneOf(OPEN_CUICA, MUTE_CUICA) })
+            instruments.add(Cuica(context, eventsByNote(OPEN_CUICA, MUTE_CUICA)))
 
         instruments.forEach {
             when (it) {
