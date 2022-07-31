@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2
 
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
 import com.jme3.app.Application
 import com.jme3.app.SimpleApplication
 import com.jme3.app.state.AbstractAppState
@@ -432,7 +433,7 @@ abstract class Midis2jam2(
             11 -> Mallets(this, events, Mallets.MalletType.VIBES)
             12 -> Mallets(this, events, Mallets.MalletType.MARIMBA)
             13 -> Mallets(this, events, Mallets.MalletType.XYLOPHONE)
-            14, 98, 112 -> TubularBells(this, events)
+            14, 98 -> TubularBells(this, events)
             15, 16, 17, 18, 19, 20, 55 -> Keyboard(this, events, Keyboard.KeyboardSkin.WOOD)
             21 -> Accordion(this, events, Accordion.AccordionType.ACCORDION)
             22 -> Harmonica(this, events)
@@ -546,6 +547,7 @@ abstract class Midis2jam2(
             105 -> Banjo(this, events)
             106 -> Shamisen(this, events)
             110 -> Fiddle(this, events)
+            112 -> TinkleBell(this, events)
             113 -> Agogos(this, events)
             114 -> SteelDrums(this, events)
             115 -> Woodblocks(this, events)

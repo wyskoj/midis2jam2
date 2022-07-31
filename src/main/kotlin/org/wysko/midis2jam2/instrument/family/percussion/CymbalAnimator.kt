@@ -32,7 +32,8 @@ class CymbalAnimator(
 ) {
 
     /** The current time. */
-    private var animTime = -1.0
+    var animTime: Double = -1.0
+        private set
 
     /** Calculates and returns the wobble angle, based on the [animTime]. */
     @Contract(pure = true)
