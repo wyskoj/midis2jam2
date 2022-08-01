@@ -22,6 +22,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.brass.Trombone.TromboneClone
@@ -50,8 +51,19 @@ private val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trom
 class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class.java, SLIDE_MANAGER) {
 
+    private val pitchBendModulationController = PitchBendModulationController(context, eventList, smoothness = 50.0)
+    private var pitchBendAmount = 0f
+
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 10 * updateInstrumentIndex(delta), 0f)
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+
+        pitchBendAmount = pitchBendModulationController.tick(time, delta, true) {
+            clones.any { it.isPlaying }
+        }
     }
 
     /** A single Trombone. */
@@ -63,7 +75,8 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         /** Moves the slide of the trombone to a given position, from 1st to 7th position. */
         private fun moveToPosition(position: Double) {
-            slide.localTranslation = slidePosition(position)
+            slide.localTranslation =
+                slidePosition((position - pitchBendAmount).coerceIn(0.5..7.0)) // Slightly out of range still works
         }
 
         /**
