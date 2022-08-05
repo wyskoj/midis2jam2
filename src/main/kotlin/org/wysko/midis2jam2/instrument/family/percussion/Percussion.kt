@@ -90,7 +90,7 @@ class Percussion(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : 
 
 
     override fun moveForMultiChannel(delta: Float) {
-        // Do nothing!
+        percussionNode.setLocalTranslation(0f, updateInstrumentIndex(delta) * -10, 0f)
     }
 
     override fun toString(): String {
