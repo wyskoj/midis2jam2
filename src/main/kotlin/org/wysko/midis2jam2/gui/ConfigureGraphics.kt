@@ -218,19 +218,6 @@ object ConfigureGraphics {
                     gridwidth = 2
                 })
             }
-
-            /* Cancel button */
-            JButton().also {
-                it.text = i18n.getString("cancel")
-                it.addActionListener { dispose() } // Exit modal
-                buttonPanel.add(it, GridBagConstraints().apply {
-                    gridx = 0
-                    gridy = 0
-                    fill = GridBagConstraints.HORIZONTAL
-                    insets = Insets(10, 5, 10, 5)
-                })
-            }
-
             /* OK button */
             JButton().also {
                 it.text = i18n.getString("ok")
@@ -239,6 +226,18 @@ object ConfigureGraphics {
                     dispose()
                 }
                 buttonPanel.add(it, GridBagConstraints().apply {
+                    gridx = 0
+                    fill = GridBagConstraints.HORIZONTAL
+                    insets = Insets(10, 5, 10, 5)
+                })
+            }
+
+            /* Cancel button */
+            JButton().also {
+                it.text = i18n.getString("cancel")
+                it.addActionListener { dispose() } // Exit modal
+                buttonPanel.add(it, GridBagConstraints().apply {
+                    gridx = 1
                     fill = GridBagConstraints.HORIZONTAL
                     insets = Insets(10, 5, 10, 5)
                 })
