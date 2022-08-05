@@ -16,7 +16,6 @@
  */
 package org.wysko.midis2jam2
 
-//import org.wysko.midis2jam2.starter.Liaison
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.input.KeyInput
@@ -29,7 +28,9 @@ import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.BackgroundController
 import org.wysko.midis2jam2.world.CameraAngle.Companion.preventCameraFromLeaving
-import java.util.*
+import java.util.Properties
+import java.util.Timer
+import java.util.TimerTask
 import javax.sound.midi.Sequencer
 
 /**
@@ -49,18 +50,10 @@ class DesktopMidis2jam2(
     private val onClose: () -> Unit
 ) : Midis2jam2(midiFile, properties) {
 
-    /**
-     * True if the sequence has begun playing, false otherwise.
-     */
     private var sequencerStarted: Boolean = false
-
-    private var passedTicks = 0
-
+    private var skippedTicks = 0
     private var initiatedFadeIn = false
-
-    private val midiFileMicrosecondLength by lazy {
-        sequencer.microsecondLength
-    }
+    private val midiFileMicrosecondLength by lazy { sequencer.microsecondLength }
 
     /**
      * Initializes the application.
@@ -77,34 +70,42 @@ class DesktopMidis2jam2(
         }
 
         /* To begin MIDI playback, I perform a check every millisecond to see if it is time to begin the playback of
-		 * the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
-		 * beginning of the file. It starts as a negative number to represent that time is to pass before the file will
-		 * play. Once it reaches 0, playback should begin.
-		 *
-		 * The Java MIDI sequencer has a bug where the first tempo of the file will not be applied, so once the
-		 * sequencer is ready to play, we set the tempo. And, sometimes it will miss a tempo change in the file. To
-		 * reduce the complications from this (unfortunately, it does not solve the issue; it only partially treats it)
-		 * we perform a check every millisecond and apply any tempos that should be applied now.
-		 */
-        Timer(true).scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                if (timeSinceStart + properties.getProperty("latency_fix").toInt() / 1000.0 >= 0
-                    && !sequencerStarted && sequencer.isOpen
-                ) {
-                    sequencer.tempoInBPM = file.tempos[0].bpm().toFloat()
-                    sequencer.start()
-                    sequencerStarted = true
-                    Timer(true).scheduleAtFixedRate(object : TimerTask() {
-                        val tempos = ArrayList(file.tempos)
-                        override fun run() {
-                            while (tempos.isNotEmpty() && tempos.first().time < sequencer.tickPosition) {
-                                sequencer.tempoInBPM = 60000000f / tempos.removeAt(0).number
-                            }
-                        }
-                    }, 0, 1)
+         * the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
+         * beginning of the file. It starts as a negative number to represent that time is to pass before the file will
+         * play. Once it reaches 0, playback should begin.
+         *
+         * The Java MIDI sequencer has a bug where the first tempo of the file will not be applied, so once the
+         * sequencer is ready to play, we set the tempo. And, sometimes it will miss a tempo change in the file. To
+         * reduce the complications from this (unfortunately, it does not solve the issue; it only partially treats it)
+         * we perform a check every millisecond and apply any tempos that should be applied now.
+         */
+        Timer(true).scheduleAtFixedRate(
+            object : TimerTask() {
+                override fun run() {
+                    if (timeSinceStart + properties.getProperty("latency_fix").toInt() / 1000.0 >= 0 &&
+                        !sequencerStarted && sequencer.isOpen
+                    ) {
+                        sequencer.tempoInBPM = file.tempos[0].bpm().toFloat()
+                        sequencer.start()
+                        sequencerStarted = true
+                        Timer(true).scheduleAtFixedRate(
+                            object : TimerTask() {
+                                val tempos = ArrayList(file.tempos)
+                                override fun run() {
+                                    while (tempos.isNotEmpty() && tempos.first().time < sequencer.tickPosition) {
+                                        sequencer.tempoInBPM = tempos.removeAt(0).bpm().toFloat()
+                                    }
+                                }
+                            },
+                            0,
+                            1
+                        )
+                    }
                 }
-            }
-        }, 0, 1)
+            },
+            0,
+            1
+        )
 
         /*** LOAD SKYBOX ***/
         BackgroundController.configureBackground(
@@ -163,7 +164,7 @@ class DesktopMidis2jam2(
         preventCameraFromLeaving(app.camera)
 
         /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */
-        if (passedTicks++ < 3) {
+        if (skippedTicks++ < 3) {
             return
         }
 
@@ -190,7 +191,7 @@ class DesktopMidis2jam2(
  * Stores a single map between an action name and a key.
  */
 @Serializable
-data class KeyMap(
+private data class KeyMap(
     /**
      * The name of the action.
      */

@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.util.Utils.resourceToString
 
 /** midis2jam2 may make use of assets released under free licenses; we attribute them with this data structure. */
 @Serializable
-data class Attribution(
+data class AssetAttribution(
     /** The name of the asset. */
     val name: String,
 
@@ -39,10 +39,13 @@ data class Attribution(
 
     /** Any extra information about the use of the asset. */
     val extra: String
-)
-
-/** Load the attribution data from the `attributions.json` file. They are sorted by the name of the asset. */
-fun loadAttributions(): Array<Attribution> =
-    Json.decodeFromString<Array<Attribution>>(resourceToString("/attributions.json")).also { attributions ->
-        attributions.sortBy { it.name }
+) {
+    companion object {
+        /** Load the attribution data from the `attributions.json` file. They are sorted by the name of the asset. */
+        fun loadAttributions(): Array<AssetAttribution> =
+            Json.decodeFromString<Array<AssetAttribution>>(resourceToString("/attributions.json"))
+                .also { attributions ->
+                    attributions.sortBy { it.name }
+                }
     }
+}

@@ -35,7 +35,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.loadSvgPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextAlign
@@ -87,7 +86,7 @@ private val DEFAULT_LAUNCHER_STATE = Properties().apply {
  * this method is called.
  */
 private val LAUNCHER_STATE_FILE: File
-    get() = File(File(USER_HOME_DIRECTORY, CONFIGURATION_DIRECTORY), "launcher.properties").also {
+    get() = File(CONFIGURATION_DIRECTORY, "launcher.properties").also {
         if (!it.exists()) {
             it.parentFile.mkdirs()
             it.createNewFile()
@@ -365,9 +364,11 @@ fun Launcher(): LauncherController {
                                     contentDescription = "Select locale",
                                     modifier = Modifier.height(32.dp).width(32.dp).padding(8.dp, 4.dp, 4.dp, 4.dp)
                                 )
-                                Text(text = locale.language.uppercase(Locale.getDefault()),
+                                Text(
+                                    text = locale.language.uppercase(Locale.getDefault()),
                                     style = MaterialTheme.typography.body1,
-                                    modifier = Modifier.padding(4.dp, 4.dp, 8.dp, 4.dp))
+                                    modifier = Modifier.padding(4.dp, 4.dp, 8.dp, 4.dp)
+                                )
                             }
                             Spacer(Modifier.height(4.dp))
                             Text(
@@ -389,7 +390,7 @@ fun Launcher(): LauncherController {
                                 modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 0.dp),
                                 textAlign = TextAlign.Center
                             )
-                            loadAttributions().forEach { (name, author, license, url, extra) ->
+                            AssetAttribution.loadAttributions().forEach { (name, author, license, url, extra) ->
                                 TextWithLink(
                                     MessageFormat.format(
                                         i18n.getString("about.cc_attribution"),

@@ -44,12 +44,11 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
         pressedKeys = pressed
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
         currentNotePeriod?.let { np ->
-            val ints = parent.manager!!.fingering(np.midiNote) as Array<Int>?
+            @Suppress("UNCHECKED_CAST") val ints = parent.manager!!.fingering(np.midiNote) as Array<Int>?
             ints?.let { animateKeys(it) }
         }
     }

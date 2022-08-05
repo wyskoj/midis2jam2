@@ -22,11 +22,9 @@ import com.jme3.math.ColorRGBA
 import com.jme3.renderer.ViewPort
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
-import com.jme3.ui.Picture
 import com.jme3.util.SkyFactory
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.gui.backgroundsFolder
+import org.wysko.midis2jam2.gui.BACKGROUNDS_FOLDER
 import org.wysko.midis2jam2.util.logger
 import java.awt.Color
 
@@ -43,10 +41,9 @@ object BackgroundController {
         rootNode: Node
     ): ViewPort? {
         val assetManager = context.assetManager
-        val renderManager = context.renderManager
 
         logger().info("Configuring $type background type.")
-        assetManager.registerLocator(backgroundsFolder.absolutePath, FileLocator::class.java)
+        assetManager.registerLocator(BACKGROUNDS_FOLDER.absolutePath, FileLocator::class.java)
         when (type) {
             "DEFAULT" -> {
                 with(assetManager.loadTexture("Assets/sky.png")) {
@@ -77,7 +74,7 @@ object BackgroundController {
                         assetManager.loadTexture(names[2] as String),
                         assetManager.loadTexture(names[3] as String),
                         assetManager.loadTexture(names[4] as String),
-                        assetManager.loadTexture(names[5] as String),
+                        assetManager.loadTexture(names[5] as String)
                     ).also {
                         it.shadowMode = RenderQueue.ShadowMode.Off
                     }
@@ -87,7 +84,7 @@ object BackgroundController {
             "REPEATED_CUBEMAP" -> {
                 val name = value as String
                 logger().debug("Repeated cubemap texture: $name")
-                assetManager.registerLocator(backgroundsFolder.absolutePath, FileLocator::class.java)
+                assetManager.registerLocator(BACKGROUNDS_FOLDER.absolutePath, FileLocator::class.java)
                 rootNode.attachChild(
                     SkyFactory.createSky(
                         assetManager,
@@ -96,7 +93,7 @@ object BackgroundController {
                         assetManager.loadTexture(name),
                         assetManager.loadTexture(name),
                         assetManager.loadTexture(name),
-                        assetManager.loadTexture(name),
+                        assetManager.loadTexture(name)
                     ).also {
                         it.shadowMode = RenderQueue.ShadowMode.Off
                     }
