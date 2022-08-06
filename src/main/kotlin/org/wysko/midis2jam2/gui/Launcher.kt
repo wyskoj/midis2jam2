@@ -496,7 +496,7 @@ fun MIDIFileTextField(
             Row(modifier = Modifier.width(128.dp), horizontalArrangement = Arrangement.End) {
                 Icon(
                     Icons.Filled.List,
-                    contentDescription = i18n.getString("configuration.midi_search"),
+                    contentDescription = i18n.getString("midisearch.title"),
                     modifier = Modifier.clickable {
                         MIDISearchFrame.launch()
                     }.pointerHoverIcon(PointerIconDefaults.Hand, true)
