@@ -72,6 +72,7 @@ import org.wysko.midis2jam2.instrument.family.strings.Harp
 import org.wysko.midis2jam2.instrument.family.strings.Viola
 import org.wysko.midis2jam2.instrument.family.strings.Violin
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiControlEvent
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
@@ -152,7 +153,8 @@ object InstrumentAssignment {
                 buildInstrument(
                     context,
                     key,
-                    value
+                    value,
+                    channelSpecificEvents
                 )?.let { instruments += it }
             }
         }
@@ -183,7 +185,12 @@ object InstrumentAssignment {
         }
         events.removeAll(timpaniPercussion)
 
-        if (timpaniPercussion.isNotEmpty()) specialInstruments += buildInstrument(context, 47, timpaniPercussion)!!
+        if (timpaniPercussion.isNotEmpty()) specialInstruments += buildInstrument(
+            context,
+            47,
+            timpaniPercussion,
+            emptyList()
+        )!!
 
         return specialInstruments
     }
@@ -192,9 +199,20 @@ object InstrumentAssignment {
     private fun buildInstrument(
         context: Midis2jam2,
         program: Int,
-        events: MutableList<MidiChannelSpecificEvent>
+        events: MutableList<MidiChannelSpecificEvent>,
+        allChannelEvents: List<MidiChannelSpecificEvent>
     ): Instrument? {
         val midiNoteEvents = events.filterIsInstance<MidiNoteEvent>()
+
+        // We need to also get Pitch Bend RPN events because they are "sticky" meaning if the events occurred during one
+        // instrument, it should apply to the next if the channel program changes. We can do this by just collecting all
+        // the controller events.
+        @Suppress("NAME_SHADOWING")
+        val events =
+            (events + allChannelEvents.filterIsInstance<MidiControlEvent>())
+                .distinct() // Eliminates any duplicate events from adding the two together
+                .sortedBy { it.time }.toMutableList()
+
         if (midiNoteEvents.isEmpty()) return null
         return when (program) {
             0 -> Keyboard(context, events, Keyboard.KeyboardSkin.PIANO)
