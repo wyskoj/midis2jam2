@@ -19,21 +19,28 @@ package org.wysko.midis2jam2.starter
 
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.lwjgl.opengl.Display
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.ExceptionPanel
 import org.wysko.midis2jam2.gui.getGraphicsSettings
 import org.wysko.midis2jam2.gui.loadSettingsFromFile
 import org.wysko.midis2jam2.midi.DesktopMidiFile
+import org.wysko.midis2jam2.midi.StandardMidiFileReader
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.io.File
 import java.io.IOException
-import java.util.*
+import java.util.Properties
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.regex.Pattern
@@ -70,6 +77,8 @@ private val DEFAULT_CONFIGURATION = Properties().apply {
 /** Starts midis2jam2 with given settings. */
 object Execution {
 
+    private val dispatcher: CoroutineDispatcher = IO
+
     /**
      * Begins midis2jam2 with given settings.
      *
@@ -95,8 +104,8 @@ object Execution {
             /* Get MIDI file */
 
             val sequence = try {
-                withContext(Dispatchers.IO) {
-                    MidiSystem.getSequence(File(properties.getProperty("midi_file")))
+                withContext(dispatcher) {
+                    StandardMidiFileReader().getSequence(File(properties.getProperty("midi_file")))
                 }
             } catch (e: InvalidMidiDataException) {
                 err(e, "The MIDI file has bad data.", "Error reading MIDI file", onFinish)

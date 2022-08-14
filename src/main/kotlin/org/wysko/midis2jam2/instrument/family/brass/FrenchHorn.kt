@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
@@ -41,6 +42,8 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 25 * updateInstrumentIndex(delta), 0f)
     }
+
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
     /** A single instance of a French Horn. */
     inner class FrenchHornClone : AnimatedKeyCloneByIntegers(this@FrenchHorn, 0.1f, 0.9f, Axis.Y, Axis.X) {

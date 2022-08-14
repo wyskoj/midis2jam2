@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
@@ -29,6 +30,8 @@ private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::clas
 /** The Recorder. */
 class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, RecorderClone::class.java, FINGERING_MANAGER) {
+
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)

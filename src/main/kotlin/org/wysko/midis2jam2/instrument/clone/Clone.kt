@@ -64,6 +64,9 @@ abstract class Clone protected constructor(
     /** Used for positioning and rotation. */
     val idleNode: Node = Node()
 
+    /** Used for pitch bend rotation. */
+    val bendNode: Node = Node()
+
     /** The current note period that is being handled. */
     var currentNotePeriod: NotePeriod? = null
 
@@ -90,8 +93,8 @@ abstract class Clone protected constructor(
         if (currentNotePeriod != null) return true
 
         lastNotePeriod?.let {
-            if (notePeriods.isNotEmpty()
-                && notePeriods.first().startTick() - it.endTick() <= parent.context.file.division * 2
+            if (notePeriods.isNotEmpty() &&
+                notePeriods.first().startTick() - it.endTick() <= parent.context.file.division * 2
             ) {
                 return true
             }
@@ -169,7 +172,8 @@ abstract class Clone protected constructor(
     init {
         /* Connect node chain hierarchy */
         idleNode.attachChild(modelNode)
-        animNode.attachChild(idleNode)
+        bendNode.attachChild(idleNode)
+        animNode.attachChild(bendNode)
         highestLevel.attachChild(animNode)
         offsetNode.attachChild(highestLevel)
         parent.groupOfPolyphony.attachChild(offsetNode)
@@ -194,3 +198,15 @@ abstract class Clone protected constructor(
 fun List<Clone>.debugString(): String {
     return joinToString(separator = "")
 }
+
+/**
+ * Defines a configuration for applying pitch bend animation to clones.
+ */
+data class ClonePitchBendConfiguration(
+    /** The axis on which to rotate. */
+    val rotationalAxis: Axis = Axis.X,
+    /** The scale factor to apply to the bend, changing its intensity. */
+    val scaleFactor: Float = 0.05f,
+    /** Inverts the calculated bend amount, if true. */
+    val reversed: Boolean = false
+)

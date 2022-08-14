@@ -26,7 +26,6 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.Companion.SIGMOID_CALCULATOR
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
@@ -71,12 +70,16 @@ private const val LASER_HEIGHT = 727.289f
 class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
-    private val pitchBendModulationController = PitchBendModulationController(context, eventList, smoothness = 50.0)
-
     private var pitchBendAmount = 0f
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(-22.5f + updateInstrumentIndex(delta) * 15, 0f, 0f)
+    }
+
+    override fun handlePitchBend(time: Double, delta: Float) {
+        pitchBendAmount = pitchBendModulationController.tick(time, delta) {
+            clones.any { it.isPlaying }
+        }
     }
 
     @Suppress("unused")
@@ -89,13 +92,6 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
                     return (-(1 / (1 + exp((-(adjNote - 64) / 16f))) * 208 - 104)).toDouble()
                 }
             }
-    }
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        pitchBendAmount = pitchBendModulationController.tick(time, delta) {
-            clones.any { it.isPlaying }
-        }
     }
 
     /** An individual space laser. */

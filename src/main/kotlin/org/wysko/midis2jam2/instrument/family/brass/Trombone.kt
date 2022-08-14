@@ -22,7 +22,6 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.brass.Trombone.TromboneClone
@@ -30,7 +29,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
-import java.util.*
+import java.util.TreeMap
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -51,16 +50,13 @@ private val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trom
 class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class.java, SLIDE_MANAGER) {
 
-    private val pitchBendModulationController = PitchBendModulationController(context, eventList, smoothness = 50.0)
     private var pitchBendAmount = 0f
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 10 * updateInstrumentIndex(delta), 0f)
     }
 
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-
+    override fun handlePitchBend(time: Double, delta: Float) {
         pitchBendAmount = pitchBendModulationController.tick(time, delta, true) {
             clones.any { it.isPlaying }
         }
@@ -145,10 +141,12 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         init {
             /* Attach body, slide, and set rotation of Trombone */
             modelNode.run {
-                attachChild(context.loadModel("Trombone.obj", "HornSkin.bmp", 0.9f).apply {
-                    this as Node
-                    getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                })
+                attachChild(
+                    context.loadModel("Trombone.obj", "HornSkin.bmp", 0.9f).apply {
+                        this as Node
+                        getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                    }
+                )
                 attachChild(slide)
                 localRotation = Quaternion().fromAngles(rad(-10.0), 0f, 0f)
             }
