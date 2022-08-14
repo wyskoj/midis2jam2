@@ -183,7 +183,7 @@ object InstrumentAssignment {
                 }
             }
         }
-        events.removeAll(timpaniPercussion)
+        events.removeAll(timpaniPercussion.toSet())
 
         if (timpaniPercussion.isNotEmpty()) specialInstruments += buildInstrument(
             context,

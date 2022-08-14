@@ -29,11 +29,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.lwjgl.opengl.Display
 import org.wysko.midis2jam2.DesktopMidis2jam2
-import org.wysko.midis2jam2.gui.ExceptionPanel
 import org.wysko.midis2jam2.gui.getGraphicsSettings
 import org.wysko.midis2jam2.gui.loadSettingsFromFile
+import org.wysko.midis2jam2.gui.resolutionRegex
 import org.wysko.midis2jam2.midi.DesktopMidiFile
 import org.wysko.midis2jam2.midi.StandardMidiFileReader
+import org.wysko.midis2jam2.util.ThrowableDisplay.display
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
@@ -43,13 +44,11 @@ import java.io.IOException
 import java.util.Properties
 import java.util.logging.Level
 import java.util.logging.Logger
-import java.util.regex.Pattern
 import javax.imageio.ImageIO
 import javax.sound.midi.InvalidMidiDataException
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.MidiUnavailableException
 import javax.sound.midi.Sequencer
-import javax.swing.JOptionPane
 
 /** The sequencer that is connected to the synthesizer. */
 lateinit var connectedSequencer: Sequencer
@@ -73,7 +72,6 @@ private val DEFAULT_CONFIGURATION = Properties().apply {
     setProperty("latency_fix", "0")
 }
 
-
 /** Starts midis2jam2 with given settings. */
 object Execution {
 
@@ -90,11 +88,12 @@ object Execution {
         properties: Properties,
         onStart: () -> Unit,
         onReady: () -> Unit,
-        onFinish: () -> Unit,
+        onFinish: () -> Unit
     ): Job {
         System.gc()
         return CoroutineScope(Default).launch {
-            @Suppress("NAME_SHADOWING") val properties = Properties().apply {
+            @Suppress("NAME_SHADOWING")
+            val properties = Properties().apply {
                 this.putAll(DEFAULT_CONFIGURATION)
                 this.putAll(properties)
                 this.putAll(loadSettingsFromFile())
@@ -115,11 +114,11 @@ object Execution {
                 return@launch
             }
 
-
             /* Get MIDI device */
             val midiDevice = try {
                 MidiSystem.getMidiDevice(
-                    MidiSystem.getMidiDeviceInfo().first { it.name == properties.getProperty("midi_device") })
+                    MidiSystem.getMidiDeviceInfo().first { it.name == properties.getProperty("midi_device") }
+                )
             } catch (e: MidiUnavailableException) {
                 err(
                     e,
@@ -140,7 +139,6 @@ object Execution {
 
             /* Get sequencer */
             val sequencer = if (properties.getProperty("midi_device") == "Gervill") {
-
                 /* Get internal synth */
                 val synthesizer = try {
                     MidiSystem.getSynthesizer()
@@ -196,7 +194,6 @@ object Execution {
                     loadSequencerJob.join()
                     connectedSequencer
                 }
-
             } else {
                 try {
                     midiDevice.open()
@@ -224,7 +221,6 @@ object Execution {
                 try {
                     it.open()
                 } catch (e: MidiUnavailableException) {
-
                     err(
                         e,
                         "The MIDI device cannot be opened due to resource restrictions.",
@@ -270,8 +266,7 @@ object Execution {
 
 /** Handles an error. */
 fun err(exception: Exception, message: String, title: String, onFinish: () -> Unit = {}) {
-    JOptionPane.showMessageDialog(null, ExceptionPanel(message, exception), title, JOptionPane.ERROR_MESSAGE)
-    Execution.logger().error(message, exception)
+    exception.display(title, message)
     onFinish.invoke()
 }
 
@@ -294,7 +289,7 @@ private val defaultSettings = AppSettings(true).apply {
 private class M2J2Execution(
     val properties: Properties,
     val onFinish: () -> Unit,
-    val sequencer: Sequencer,
+    val sequencer: Sequencer
 ) : SimpleApplication() {
 
     fun execute() {
@@ -350,15 +345,13 @@ fun screenHeight(): Int = Toolkit.getDefaultToolkit().screenSize.height
 
 /** Obtains the preferred resolution from the config file. */
 private fun collectWindowResolution(properties: Properties): Dimension {
-    val resRegex = Pattern.compile("""(\d+)\s*x\s*(\d+)""")
     fun defaultDimension() = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
 
     if (properties.getProperty("resolution") == null) return defaultDimension()
     if (properties.getProperty("resolution").equals("default", ignoreCase = true)) return defaultDimension()
-    if (!resRegex.matcher(properties.getProperty("resolution")).matches()) return defaultDimension()
+    if (!resolutionRegex.matches(properties.getProperty("resolution"))) return defaultDimension()
 
-    return with(resRegex.matcher(properties.getProperty("resolution")).also { it.find() }) {
-        Dimension(group(1).toInt(), group(2).toInt())
-    }
+    return resolutionRegex.find(properties.getProperty("resolution"))?.let {
+        Dimension(it.groupValues[1].toInt(), it.groupValues[2].toInt())
+    } ?: defaultDimension()
 }
-

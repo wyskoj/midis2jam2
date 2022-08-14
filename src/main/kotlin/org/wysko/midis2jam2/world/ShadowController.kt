@@ -16,13 +16,9 @@
  */
 package org.wysko.midis2jam2.world
 
-import com.jme3.material.Material
-import com.jme3.material.RenderState
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
-import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Spatial
-import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets

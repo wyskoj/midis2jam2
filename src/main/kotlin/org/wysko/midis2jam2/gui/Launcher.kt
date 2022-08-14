@@ -14,19 +14,50 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+@file:Suppress("kotlin:S1128")
 
 package org.wysko.midis2jam2.gui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -46,6 +77,7 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.CONFIGURATION_DIRECTORY
 import org.wysko.midis2jam2.midi.search.MIDISearchFrame
 import org.wysko.midis2jam2.starter.Execution
+import org.wysko.midis2jam2.util.ThrowableDisplay.display
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
 import java.awt.Cursor
@@ -54,7 +86,9 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.text.MessageFormat
-import java.util.*
+import java.util.Locale
+import java.util.Properties
+import java.util.ResourceBundle
 import javax.sound.midi.MidiSystem
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileFilter
@@ -101,6 +135,13 @@ private val LAUNCHER_STATE_FILE: File
  */
 val launcherState: LauncherProperties = LauncherProperties(DEFAULT_LAUNCHER_STATE).apply {
     load(FileReader(LAUNCHER_STATE_FILE))
+}
+
+private val soundbankFileFilter = object : FileFilter() {
+    override fun accept(file: File?): Boolean =
+        file?.extension?.lowercase(Locale.getDefault()) == "sf2" || file?.extension?.lowercase(Locale.getDefault()) == "dls" || file?.isDirectory == true
+
+    override fun getDescription(): String = "Soundbank files (*.sf2, *.dls)"
 }
 
 /**
@@ -175,13 +216,12 @@ fun Launcher(): LauncherController {
                     freeze = false
                     thinking = false
                     MIDISearchFrame.unlock()
-                },
+                }
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             freeze = false
             thinking = false
-
-            ErrorDisplay.displayError(e, e.message ?: "")
+            e.display()
         }
     }
 
@@ -199,15 +239,18 @@ fun Launcher(): LauncherController {
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(width)
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(width)
                 ) {
-                    Image(bitmap = useResource("logo.png", ::loadImageBitmap),
+                    Image(
+                        bitmap = useResource("logo.png", ::loadImageBitmap),
                         contentDescription = i18n.getString("midis2jam2"),
                         modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp).clickable {
                             showAbout = !showAbout
-                        })
+                        }
+                    )
                     AnimatedVisibility(
-                        visible = !showAbout,
+                        visible = !showAbout
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -251,16 +294,7 @@ fun Launcher(): LauncherController {
                                     Button(
                                         onClick = {
                                             JFileChooser().run {
-                                                fileFilter = (object : FileFilter() {
-                                                    override fun accept(file: File?): Boolean =
-                                                        file?.extension?.lowercase(Locale.getDefault()) == "sf2" || file?.extension?.lowercase(
-                                                            Locale.getDefault()
-                                                        ) == "dls" || file?.isDirectory == true
-
-                                                    override fun getDescription(): String =
-                                                        "Soundbank files (*.sf2, *.dls)"
-                                                })
-
+                                                fileFilter = soundbankFileFilter
 
                                                 preferredSize = Dimension(800, 600)
                                                 dialogTitle = "Select soundbank file"
@@ -277,21 +311,24 @@ fun Launcher(): LauncherController {
                                                 soundFonts.add(selectedFile.name)
                                                 selectedSoundFont = soundFonts.indexOf(selectedFile.name)
                                             }
-                                        }, modifier = Modifier.height(56.dp).width(56.dp)
+                                        },
+                                        modifier = Modifier.height(56.dp).width(56.dp)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Filled.Search,
-                                            contentDescription = i18n.getString("configuration.search_for_soundfont"),
+                                            contentDescription = i18n.getString("configuration.search_for_soundfont")
                                         )
                                     }
                                 }
                             }
 
-                            Row(modifier = Modifier.clickable {
-                                SettingsModal().apply {
-                                    isVisible = true
+                            Row(
+                                modifier = Modifier.clickable {
+                                    SettingsModal().apply {
+                                        isVisible = true
+                                    }
                                 }
-                            }) {
+                            ) {
                                 Text(text = i18n.getString("settings.settings"), style = MaterialTheme.typography.h6)
                                 Icon(
                                     imageVector = Icons.Filled.Settings,
@@ -322,7 +359,7 @@ fun Launcher(): LauncherController {
                         visible = showAbout
                     ) {
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 text = i18n.getString("about.description"),
@@ -350,7 +387,8 @@ fun Launcher(): LauncherController {
                                         val lang =
                                             it[(it.indexOf(it.first { l -> l.language == locale.language }) + 1) % it.size].language
                                         launcherState.setProperty(
-                                            "locale", lang
+                                            "locale",
+                                            lang
                                         )
                                         with(Locale.forLanguageTag(lang)) {
                                             Internationalization.locale = this
@@ -378,7 +416,8 @@ fun Launcher(): LauncherController {
                             )
                             TextWithLink(
                                 MessageFormat.format(
-                                    i18n.getString("about.license"), i18n.getString("about.license_name")
+                                    i18n.getString("about.license"),
+                                    i18n.getString("about.license_name")
                                 ),
                                 i18n.getString("about.license_name"),
                                 "https://www.gnu.org/licenses/gpl-3.0.en.html",
@@ -398,7 +437,10 @@ fun Launcher(): LauncherController {
                                         author,
                                         license,
                                         if (extra.isEmpty()) "" else ", ${i18n.getString("about.$extra")}"
-                                    ), license, url, MaterialTheme.typography.h6.copy(fontSize = 12.sp)
+                                    ),
+                                    license,
+                                    url,
+                                    MaterialTheme.typography.h6.copy(fontSize = 12.sp)
                                 )
                             }
                             Text(
@@ -409,10 +451,11 @@ fun Launcher(): LauncherController {
                             )
                             Row(
                                 modifier = Modifier.clickable { showOSS = !showOSS },
-                                verticalAlignment = Alignment.CenterVertically,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = i18n.getString("about.oss_licenses"), style = MaterialTheme.typography.body2
+                                    text = i18n.getString("about.oss_licenses"),
+                                    style = MaterialTheme.typography.body2
                                 )
                                 Icon(
                                     imageVector = Icons.Filled.ArrowDropDown,
@@ -466,7 +509,6 @@ fun Launcher(): LauncherController {
     )
 }
 
-
 /** Provides a way for the launcher component to allow external modifications. */
 data class LauncherController(
     internal val setFreeze: (setFreeze: Boolean) -> Unit,
@@ -476,6 +518,7 @@ data class LauncherController(
 /**
  * The text field that shows the currently selected MIDI file. The field also has a button for opening a file selector.
  */
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MIDIFileTextField(
@@ -549,6 +592,9 @@ fun MIDIFileTextField(
  * [Properties] that has some extra functionality useful for the launcher.
  */
 class LauncherProperties(existing: Properties) : Properties(existing) {
+    /**
+     * Sets a property.
+     */
     override fun setProperty(key: String, value: String): Any? {
         super.setProperty(key, value).also {
             store(FileWriter(LAUNCHER_STATE_FILE), null)
@@ -563,11 +609,12 @@ class LauncherProperties(existing: Properties) : Properties(existing) {
         this.setProperty("soundfonts", Json.encodeToString(soundfonts.apply { add(path) }))
     }
 
+    /**
+     * Returns a [File] corresponding to the [name] of a SoundFont previously registered in this object.
+     */
     fun getSoundFontFile(name: String): File = File(soundfonts.first { File(it).name == name })
 
     /** List of paths of SoundFonts. */
     val soundfonts: ArrayList<String>
         get() = Json.decodeFromString<MutableList<String>>(getProperty("soundfonts")) as ArrayList<String>
-
-
 }

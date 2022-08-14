@@ -15,14 +15,23 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.gui
+package org.wysko.midis2jam2.util
 
-/**
- * Represents an [Enum] that can have its values represented in different localizations.
- */
-interface InternationalizableEnum {
+import org.wysko.midis2jam2.gui.ExceptionPanel
+import org.wysko.midis2jam2.starter.Execution
+import javax.swing.JOptionPane
+
+/** Defines a utility method for handling throwables. */
+object ThrowableDisplay {
     /**
-     * The resource bundle key of this value.
+     * Displays the throwable to the screen.
      */
-    val i18nKey: String
+    fun Throwable.display(
+        title: String = "Error",
+        message: String = "An error occurred.",
+        log: Boolean = true
+    ) {
+        JOptionPane.showMessageDialog(null, ExceptionPanel(message, this), title, JOptionPane.ERROR_MESSAGE)
+        if (log) Execution.logger().error(message, this)
+    }
 }

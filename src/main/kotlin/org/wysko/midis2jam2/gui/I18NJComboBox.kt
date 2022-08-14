@@ -18,7 +18,7 @@
 package org.wysko.midis2jam2.gui
 
 import java.awt.Component
-import java.util.*
+import java.util.ResourceBundle
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JComboBox
 import javax.swing.JList
@@ -30,6 +30,7 @@ class I18NJComboBox<InternationalizableEnum>(
     /** The resource bundle from which the i18n strings can be pulled. */
     val resourceBundle: ResourceBundle
 ) : JComboBox<InternationalizableEnum>() {
+    @Suppress("KDocMissingDocumentation")
     override fun getRenderer(): DefaultListCellRenderer = object : DefaultListCellRenderer() {
         override fun getListCellRendererComponent(
             list: JList<*>?,

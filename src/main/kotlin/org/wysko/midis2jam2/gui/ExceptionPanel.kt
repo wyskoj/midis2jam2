@@ -28,17 +28,25 @@ import javax.swing.border.EmptyBorder
 /**
  * Formats an exception for display.
  */
-class ExceptionPanel(message: String, exception: Exception) : JPanel() {
+class ExceptionPanel(message: String, throwable: Throwable) : JPanel() {
     init {
         layout = BorderLayout()
-        add(JLabel(message).also { label ->
-            label.border = EmptyBorder(0, 0, 10, 0)
-        }, BorderLayout.NORTH)
-        add(JScrollPane(JTextArea(exception.stackTraceToString()).apply {
-            isEditable = false
-        }).also { sp ->
-            sp.preferredSize = Dimension(600, 300)
-        }, BorderLayout.CENTER)
+        add(
+            JLabel(message).also { label ->
+                label.border = EmptyBorder(0, 0, 10, 0)
+            },
+            BorderLayout.NORTH
+        )
+        add(
+            JScrollPane(
+                JTextArea(throwable.stackTraceToString()).apply {
+                    isEditable = false
+                }
+            ).also { sp ->
+                sp.preferredSize = Dimension(600, 300)
+            },
+            BorderLayout.CENTER
+        )
         preferredSize = Dimension(600, 300)
     }
 }

@@ -22,7 +22,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.CONFIGURATION_DIRECTORY
 import org.wysko.midis2jam2.gui.Internationalization.i18n
-import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.util.ThrowableDisplay.display
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.Component
@@ -400,107 +400,11 @@ class ConfigureBackground private constructor(parent: JDialog) :
                 }
 
                 "ONE_FILE" -> {
-                    /* Ensure that the user has selected a file */
-                    if (oneFileComboBox.selectedItem == null) {
-                        JOptionPane.showMessageDialog(
-                            this@ConfigureBackground,
-                            i18n.getString("background.err_no_image"),
-                            i18n.getString(ERROR_TITLE),
-                            JOptionPane.ERROR_MESSAGE
-                        )
-                        return
-                    }
-
-                    /* Ensure the file is valid */
-                    val read =
-                        ImageIO.read(
-                            File(
-                                BACKGROUNDS_FOLDER,
-                                oneFileComboBox.selectedItem as String
-                            )
-                        )
-
-                    if (read == null) {
-                        JOptionPane.showMessageDialog(
-                            this@ConfigureBackground,
-                            i18n.getString("background.err_bad_image"),
-                            i18n.getString(ERROR_TITLE),
-                            JOptionPane.ERROR_MESSAGE
-                        )
-                        return
-                    }
-
-                    if (selectedType.third as String == "REPEATED_CUBEMAP" && read.isSquare.not()) {
-                        JOptionPane.showMessageDialog(
-                            this@ConfigureBackground,
-                            i18n.getString("background.err_img_not_square"),
-                            i18n.getString(ERROR_TITLE),
-                            JOptionPane.ERROR_MESSAGE
-                        )
-                        return
-                    }
-
-                    setProperty("value", oneFileComboBox.selectedItem as String)
-                    this@ConfigureBackground.dispose()
+                    processOneFileType(selectedType)
                 }
 
                 "SIX_FILES" -> {
-                    /* Ensure that the user has selected a file for each box */
-                    if (comboBoxes.any { it.selectedItem == null }) {
-                        JOptionPane.showMessageDialog(
-                            this@ConfigureBackground,
-                            i18n.getString("background.err_no_image"),
-                            i18n.getString(ERROR_TITLE),
-                            JOptionPane.ERROR_MESSAGE
-                        )
-                        return
-                    }
-
-                    val images = comboBoxes.associate {
-                        val s = it.selectedItem as String
-                        s to ImageIO.read(File(BACKGROUNDS_FOLDER, s))
-                    }
-
-                    /* Ensure that all images are valid */
-                    with(images.filter { it.value == null }) {
-                        if (isNotEmpty()) {
-                            JOptionPane.showMessageDialog(
-                                this@ConfigureBackground,
-                                "${i18n.getString("background.err_bad_img_list")}${toList().joinToString { it.first }}",
-                                i18n.getString(ERROR_TITLE),
-                                JOptionPane.ERROR_MESSAGE
-                            )
-                            return
-                        }
-                    }
-
-                    /* Ensure all images are square. */
-                    with(images.filter { it.value.isSquare.not() }) {
-                        if (isNotEmpty()) {
-                            JOptionPane.showMessageDialog(
-                                this@ConfigureBackground,
-                                "${i18n.getString("background.err_img_square_list")}${toList().joinToString { it.first }}",
-                                i18n.getString(ERROR_TITLE),
-                                JOptionPane.ERROR_MESSAGE
-                            )
-                            return
-                        }
-                    }
-
-                    setProperty(
-                        "value",
-                        Json.encodeToString(
-                            listOf(
-                                westComboBox.selectedItem as String,
-                                eastComboBox.selectedItem as String,
-                                northComboBox.selectedItem as String,
-                                southComboBox.selectedItem as String,
-                                upComboBox.selectedItem as String,
-                                downComboBox.selectedItem as String
-                            )
-                        )
-                    )
-                    this@ConfigureBackground.dispose()
+                    processSixFilesType()
                 }
 
                 "COLOR" -> {
@@ -510,6 +414,104 @@ class ConfigureBackground private constructor(parent: JDialog) :
             }
         }
         props.store(FileWriter(BACKGROUND_SETTINGS_FILE), null)
+    }
+
+    private fun Properties.processSixFilesType() {
+        /* Ensure that the user has selected a file for each box */
+        if (comboBoxes.any { it.selectedItem == null }) {
+            JOptionPane.showMessageDialog(
+                this@ConfigureBackground,
+                i18n.getString("background.err_no_image"),
+                i18n.getString(ERROR_TITLE),
+                JOptionPane.ERROR_MESSAGE
+            )
+            return
+        }
+
+        val images = comboBoxes.associate {
+            val s = it.selectedItem as String
+            s to ImageIO.read(File(BACKGROUNDS_FOLDER, s))
+        }
+
+        /* Ensure that all images are valid */
+        with(images.filter { it.value == null }) {
+            if (isNotEmpty()) {
+                JOptionPane.showMessageDialog(
+                    this@ConfigureBackground,
+                    "${i18n.getString("background.err_bad_img_list")}${toList().joinToString { it.first }}",
+                    i18n.getString(ERROR_TITLE),
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return
+            }
+        }
+
+        /* Ensure all images are square. */
+        with(images.filter { it.value.isSquare.not() }) {
+            if (isNotEmpty()) {
+                JOptionPane.showMessageDialog(
+                    this@ConfigureBackground,
+                    "${i18n.getString("background.err_img_square_list")}${toList().joinToString { it.first }}",
+                    i18n.getString(ERROR_TITLE),
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return
+            }
+        }
+
+        setProperty(
+            "value",
+            Json.encodeToString(
+                listOf(
+                    westComboBox.selectedItem as String,
+                    eastComboBox.selectedItem as String,
+                    northComboBox.selectedItem as String,
+                    southComboBox.selectedItem as String,
+                    upComboBox.selectedItem as String,
+                    downComboBox.selectedItem as String
+                )
+            )
+        )
+        this@ConfigureBackground.dispose()
+    }
+
+    private fun Properties.processOneFileType(selectedType: Triple<*, *, *>) {
+        /* Ensure that the user has selected a file */
+        if (oneFileComboBox.selectedItem == null) {
+            JOptionPane.showMessageDialog(
+                this@ConfigureBackground,
+                i18n.getString("background.err_no_image"),
+                i18n.getString(ERROR_TITLE),
+                JOptionPane.ERROR_MESSAGE
+            )
+            return
+        }
+
+        /* Ensure the file is valid */
+        val read = ImageIO.read(File(BACKGROUNDS_FOLDER, oneFileComboBox.selectedItem as String))
+
+        if (read == null) {
+            JOptionPane.showMessageDialog(
+                this@ConfigureBackground,
+                i18n.getString("background.err_bad_image"),
+                i18n.getString(ERROR_TITLE),
+                JOptionPane.ERROR_MESSAGE
+            )
+            return
+        }
+
+        if (selectedType.third as String == "REPEATED_CUBEMAP" && read.isSquare.not()) {
+            JOptionPane.showMessageDialog(
+                this@ConfigureBackground,
+                i18n.getString("background.err_img_not_square"),
+                i18n.getString(ERROR_TITLE),
+                JOptionPane.ERROR_MESSAGE
+            )
+            return
+        }
+
+        setProperty("value", oneFileComboBox.selectedItem as String)
+        this@ConfigureBackground.dispose()
     }
 
     init {
@@ -590,8 +592,7 @@ private fun directionLabel(direction: String): JLabel {
 
 /** Handles an error. */
 private fun err(exception: Exception, message: String, title: String, onFinish: () -> Unit = {}) {
-    JOptionPane.showMessageDialog(null, ExceptionPanel(message, exception), title, JOptionPane.ERROR_MESSAGE)
-    ConfigureBackground.logger().error(message, exception)
+    exception.display(title, message)
     onFinish.invoke()
 }
 
