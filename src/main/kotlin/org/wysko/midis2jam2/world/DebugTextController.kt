@@ -26,8 +26,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion
 import org.wysko.midis2jam2.util.cullHint
 
-private val GL_RENDERER: String by lazy { GL11.glGetString(GL11.GL_RENDERER) }
-
+private val GL_RENDERER: String by lazy { GL11.glGetString(GL11.GL_RENDERER) ?: "UNKNOWN GL_RENDERER" }
 
 /**
  * Draws debug text on the screen.
