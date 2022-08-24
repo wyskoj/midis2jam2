@@ -38,4 +38,5 @@ protected constructor(
     }
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
+    // TODO offset bend node
 }

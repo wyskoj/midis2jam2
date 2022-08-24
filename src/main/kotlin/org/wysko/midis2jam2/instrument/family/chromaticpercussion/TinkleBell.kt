@@ -106,9 +106,9 @@ class TinkleBell(
 
             ((outerBell as Node).children[0] as Geometry).material.setColor(
                 "GlowColor",
-                glowController.calculate(cymbalAnimator.animTime.let {
-                    if (it == -1.0) Double.MAX_VALUE else it
-                } * 2f)
+                glowController.calculate(
+                    cymbalAnimator.animTime.let { if (it == -1.0) Double.MAX_VALUE else it } * 2f
+                )
             )
         }
 
@@ -116,5 +116,4 @@ class TinkleBell(
             cymbalAnimator.strike()
         }
     }
-
 }

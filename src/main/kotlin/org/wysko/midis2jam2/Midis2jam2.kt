@@ -195,6 +195,7 @@ abstract class Midis2jam2(
             isDragToRotate = true
         }
         this.app.camera.fov = 50f
+        if (properties.getProperty("record_lock")?.equals("true") == true) this.flyByCamera.isEnabled = false
 
         /*** LOAD STAGE ***/
         stage = loadModel("Stage.obj", "Stage.bmp").also {
@@ -321,6 +322,7 @@ abstract class Midis2jam2(
      * @param tpf The time per frame value.
      */
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
+        if (properties.getProperty("record_lock")?.equals("true") == true) return // Input lock when recording
         setCameraSpeed(name, isPressed)
         handleCameraSetting(name, isPressed)
         if (isPressed) {

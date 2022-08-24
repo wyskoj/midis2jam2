@@ -47,3 +47,7 @@ object Internationalization {
         private set
 }
 
+/**
+ * Makes nice syntax for obtaining a string from [i18n].
+ */
+operator fun ResourceBundle.get(key: String): String = this.getString(key)

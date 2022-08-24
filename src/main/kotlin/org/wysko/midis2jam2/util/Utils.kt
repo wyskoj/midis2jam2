@@ -26,6 +26,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Properties
 import java.util.stream.Collectors
 
 /** Provides various utility functions. */
@@ -78,7 +79,6 @@ object Utils {
      */
     fun rad(deg: Float): Float = deg / 180 * FastMath.PI
 
-
     /**
      * Converts an angle expressed in degrees to radians.
      *
@@ -86,7 +86,6 @@ object Utils {
      * @return the angle expressed in radians
      */
     fun rad(deg: Double): Float = (deg / 180 * FastMath.PI).toFloat()
-
 
     /**
      * Given a string containing the path to a resource file, retrieves the contents of the file and returns it as a
@@ -130,3 +129,10 @@ fun Boolean.cullHint(): CullHint = if (this) Dynamic else Always
 
 /** Given a list of integers, determines if the root integer is equal to at least one of the provided integers. */
 fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }
+
+/**
+ * A utility function that adds many pairs to a [Properties] object.
+ */
+fun <K, V> Properties.setProperties(vararg properties: Pair<K, V>) {
+    properties.forEach { (key, value) -> this[key] = value }
+}
