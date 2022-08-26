@@ -168,8 +168,8 @@ object InstrumentAssignment {
     ): List<Instrument> {
         val specialInstruments = mutableListOf<Instrument>()
 
+        // Extract timpani events from orchestra percussion
         val timpaniPercussion = mutableListOf<MidiChannelSpecificEvent>()
-
         var currentProgram = 0
         events.forEach {
             when (it) {
@@ -184,7 +184,6 @@ object InstrumentAssignment {
             }
         }
         events.removeAll(timpaniPercussion.toSet())
-
         if (timpaniPercussion.isNotEmpty()) specialInstruments += buildInstrument(
             context,
             47,
