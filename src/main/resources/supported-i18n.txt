@@ -3,6 +3,5 @@ es
 fi
 fr
 no
-ru
 th
 tl
