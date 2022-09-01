@@ -188,6 +188,8 @@ class StageStrings(
             animNode.attachChild(bowNode)
             highestLevel.attachChild(animNode)
             animator = VibratingStringAnimator(*animStrings)
+
+            highestLevel.shadowMode = RenderQueue.ShadowMode.Receive
         }
     }
 
