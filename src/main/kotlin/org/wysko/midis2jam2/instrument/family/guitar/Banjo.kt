@@ -18,11 +18,13 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.STRING_GLOW
 
 private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
 
@@ -74,6 +76,7 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         Array(5) { j: Int ->
             context.loadModel("BanjoStringBottom$j.obj", "BassSkin.bmp").apply {
                 instrumentNode.attachChild(this)
+                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }
     }.apply {

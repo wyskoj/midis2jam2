@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
@@ -30,6 +31,7 @@ import org.wysko.midis2jam2.midi.NotePeriodGroup
 import org.wysko.midis2jam2.midi.contiguousGroups
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.world.STRING_GLOW
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.pow
@@ -119,6 +121,7 @@ abstract class StringFamilyInstrument protected constructor(
         Array(5) { j: Int ->
             context.loadModel("ViolinStringPlayed$j.obj", "DoubleBassSkin.bmp").apply {
                 instrumentNode.attachChild(this)
+                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }
     }.apply {

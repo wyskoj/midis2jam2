@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import kotlinx.serialization.Serializable
 import org.wysko.midis2jam2.Midis2jam2
@@ -30,6 +31,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.world.STRING_GLOW
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.system.measureTimeMillis
@@ -69,6 +71,7 @@ abstract class FrettedInstrument protected constructor(
         context.loadModel("GuitarNoteFinger.obj", "GuitarSkin.bmp").apply {
             instrumentNode.attachChild(this)
             this.cullHint = Spatial.CullHint.Always
+            (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
         }
     }
 

@@ -29,6 +29,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.STRING_GLOW
 import kotlin.math.sin
 
 /** The stage strings. */
@@ -167,6 +168,7 @@ class StageStrings(
                 context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
                     cullHint = Always // Hide on startup
                     animStringNode.attachChild(this)
+                    (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
                 }
             }
 

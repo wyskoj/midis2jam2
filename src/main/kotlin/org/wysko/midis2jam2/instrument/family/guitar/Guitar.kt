@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
@@ -31,6 +32,7 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.util.chunked
 import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.world.STRING_GLOW
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -241,6 +243,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
             ).also {
                 instrumentNode.attachChild(it)
                 it.cullHint = Always
+                (it as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }
     }.apply {
