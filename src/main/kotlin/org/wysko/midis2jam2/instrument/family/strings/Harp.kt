@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
@@ -30,6 +31,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.DIM_GLOW
 import kotlin.math.pow
 
 /**
@@ -151,6 +153,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
                 context.loadModel("HarpStringPlaying$it.obj", vt).apply {
                     cullHint = Spatial.CullHint.Always
                     stringNode.attachChild(this)
+                    (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
                 }
             }
 
