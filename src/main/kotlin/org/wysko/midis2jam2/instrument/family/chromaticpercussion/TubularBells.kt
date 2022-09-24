@@ -20,6 +20,7 @@ import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath.PI
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -89,6 +90,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
             strikeEvents = events,
             stickModel = context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
                 setLocalTranslation(0f, 5f, 0f)
+                shadowMode = RenderQueue.ShadowMode.Receive
             }
         ).apply {
             node.setLocalTranslation((i - 5) * 4f, -25f, 4f)
@@ -97,6 +99,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
 
         val bell: Spatial = context.loadModel("TubularBell.obj", "ShinySilver.bmp", 0.9f).also {
             bellNode.attachChild(it)
+            it.shadowMode = RenderQueue.ShadowMode.Receive
         }
 
         /** The current amplitude of the recoil. */
