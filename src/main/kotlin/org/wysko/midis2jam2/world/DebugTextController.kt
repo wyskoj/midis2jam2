@@ -102,7 +102,7 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
         appendLine()
         append(
             "Properties:\n${
-                this@debugText.properties.entries.joinToString(separator = "\n")
+            this@debugText.properties.entries.joinToString(separator = "\n")
             }\n"
         )
 
@@ -124,14 +124,19 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
 private fun Quaternion.sigFigs(): String {
     return String.format(
         "[ w = %5.2f, x = %5.2f, y = %5.2f, z = %5.2f ]",
-        w, x, y, z
+        w,
+        x,
+        y,
+        z
     )
 }
 
 private fun Vector3f.sigFigs(): String {
     return String.format(
         "[ x = %7.2f, y = %7.2f, z = %7.2f ]",
-        x, y, z
+        x,
+        y,
+        z
     )
 }
 

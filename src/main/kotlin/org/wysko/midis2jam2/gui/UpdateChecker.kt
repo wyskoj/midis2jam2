@@ -68,5 +68,4 @@ object UpdateChecker {
             }
         }.start()
     }
-
 }

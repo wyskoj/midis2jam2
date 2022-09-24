@@ -1,0 +1,38 @@
+[
+  {
+    "name": "low_floor",
+    "scale": 1.5,
+    "location": [20, 20, -60],
+    "rotation": [15, 270, 0]
+  },
+  {
+    "name": "high_floor",
+    "scale": 1.4,
+    "location": [17, 21, -75],
+    "rotation": [15, 270, 0]
+  },
+  {
+    "name": "low",
+    "scale": 1.2,
+    "location": [10, 29, -82],
+    "rotation": [60, -30, 0]
+  },
+  {
+    "name": "low_mid",
+    "scale": 1.0,
+    "location": [0, 32, -85],
+    "rotation": [60, 0, 0]
+  },
+  {
+    "name": "high_mid",
+    "scale": 0.8,
+    "location": [-9, 31, -82],
+    "rotation": [60, 20, 0]
+  },
+  {
+    "name": "high",
+    "scale": 0.6,
+    "location": [-15, 29, -78],
+    "rotation": [50, 40, 0]
+  }
+]

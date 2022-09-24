@@ -5,12 +5,12 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.GlowController
 
 /*
@@ -40,14 +40,12 @@ class TinkleBell(
     events: List<MidiChannelSpecificEvent>
 ) : DecayedInstrument(context, events) {
 
-    private val twelfths: Array<ATinkleBell> = Array(12) {
-        ATinkleBell(it).apply {
-            instrumentNode.attachChild(this.bellNode)
-        }
+    private val bellStrikes = Array(12) { idx ->
+        hits.filter { (it.note + 3) % 12 == idx }
     }
 
-    private val bellStrikes = Array(12) { idx ->
-        hits.filter { (it.note + 3) % 12 == idx }.toMutableList()
+    private val twelfths: Array<ATinkleBell> = Array(12) {
+        ATinkleBell(it, bellStrikes[it])
     }
 
     init {
@@ -62,59 +60,52 @@ class TinkleBell(
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
-        bellStrikes.forEachIndexed { index, _ ->
-            val results = Stick.handleStick(
-                context,
-                stickNode = twelfths[index].bellNode,
-                time,
-                delta,
-                strikes = bellStrikes[index]
-            )
-            if (results.justStruck()) twelfths[index].strike()
-
-            twelfths[index].bellNode.cullHint = Spatial.CullHint.Dynamic // Override stick cullHint
-        }
-
-        twelfths.forEach { it.tick(delta) }
+        twelfths.forEach { it.tick(time, delta) }
     }
 
-    private inner class ATinkleBell(index: Int) {
+    private inner class ATinkleBell(index: Int, events: List<MidiNoteOnEvent>) {
 
         val bellNode = Node().apply {
             move(index * -4f, 0f, 0f)
         }
 
-        private val outerBell =
-            context.loadModel("TinkleBell.obj", "Wood.bmp").also {
-                bellNode.attachChild(it)
-                it.move(0f, -10f, 0f)
+        private val striker = Striker(
+            context = context,
+            strikeEvents = events,
+            stickModel = bellNode,
+            actualStick = false
+        ).apply {
+            setParent(instrumentNode)
+        }
 
-                ((it as Node).children[0] as Geometry).material = context.reflectiveMaterial("HornSkin.bmp")
-            }
+        private val outerBell = context.loadModel("TinkleBell.obj", "Wood.bmp").also {
+            bellNode.attachChild(it)
+            it.move(0f, -10f, 0f)
+
+            ((it as Node).children[0] as Geometry).material = context.reflectiveMaterial("HornSkin.bmp")
+        }
 
         private val bell = context.loadModel("TinkleBellBell.obj", "HornSkinGrey.bmp", 1f).also {
             it.move(0f, -7.8f, 0f)
             bellNode.attachChild(it)
         }
 
-        private val cymbalAnimator = CymbalAnimator(1.0, 15.0, 2.0)
+        private val cymbalAnimator = CymbalAnimator(bell, 1.0, 15.0, 2.0)
         private val glowController = GlowController(glowColor = ColorRGBA.Yellow.mult(0.75f))
 
-        fun tick(delta: Float) {
+        fun tick(time: Double, delta: Float) {
             cymbalAnimator.tick(delta)
-            bell.localRotation = Quaternion().fromAngles(cymbalAnimator.rotationAmount(), 0f, 0f)
+            with(striker.tick(time, delta)) {
+                if (velocity > 0) {
+                    cymbalAnimator.strike()
+                    println("striking ${twelfths.indexOf(this@ATinkleBell)}")
+                }
+            }
 
             ((outerBell as Node).children[0] as Geometry).material.setColor(
                 "GlowColor",
-                glowController.calculate(cymbalAnimator.animTime.let {
-                    if (it == -1.0) Double.MAX_VALUE else it
-                } * 2f)
+                glowController.calculate(cymbalAnimator.animTime.let { if (it == -1.0) Double.MAX_VALUE else it } * 2f)
             )
         }
-
-        fun strike() {
-            cymbalAnimator.strike()
-        }
     }
-
 }

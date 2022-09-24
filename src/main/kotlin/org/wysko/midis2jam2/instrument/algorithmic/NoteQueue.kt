@@ -22,10 +22,10 @@ import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 
-
 /**
  * Provides various methods for manipulating the note queue.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 object NoteQueue {
 
     /**
@@ -39,6 +39,7 @@ object NoteQueue {
      * @param context the [Midis2jam2] context
      * @return a list of events that are past the current time, or at the current time
      */
+    @Deprecated("NoteQueue functions have been replaced by EventCollector.")
     fun <T : MidiEvent> collect(events: MutableList<T>, time: Double, context: Midis2jam2): List<T> =
         events.takeWhile { context.file.eventInSeconds(it) <= time }.also {
             events.removeAll(it.toSet())
@@ -55,6 +56,7 @@ object NoteQueue {
      * @param context the [Midis2jam2] context
      * @return the first event that is past the current time, or at the current time
      */
+    @Deprecated("NoteQueue functions have been replaced by EventCollector.")
     fun <T : MidiEvent> collectOne(events: MutableList<T>, time: Double, context: Midis2jam2): T? =
         events.firstOrNull { context.file.eventInSeconds(it) <= time }?.also {
             events.remove(it)
@@ -69,6 +71,7 @@ object NoteQueue {
      * @param time the current time
      * @return the last note that is past the current time, or at the current time
      */
+    @Deprecated("NoteQueue functions have been replaced by EventCollector.")
     fun collectOne(notes: MutableList<NotePeriod>, time: Double): NotePeriod? =
         notes.takeWhile { it.startTime <= time }.lastOrNull()?.also {
             notes.remove(it)
@@ -90,6 +93,7 @@ object NoteQueue {
      * @return a list of events that are past the current time, or at the current time
      */
     @JvmStatic
+    @Deprecated("NoteQueue functions have been replaced by EventCollector.")
     fun <T : MidiEvent> collectWithOffGap(events: MutableList<T>, context: Midis2jam2, time: Double): List<T> =
         with(context.file) {
             events.takeWhile {

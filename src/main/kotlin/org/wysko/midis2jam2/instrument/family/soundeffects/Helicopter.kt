@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import java.util.*
+import java.util.Random
 import kotlin.math.cos
 
 /**
@@ -90,43 +90,53 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         /* Slight wobble */
         animNode.localRotation = Quaternion().fromAngles(
             force * 0.5f * rad(
-                (Noise.gradientCoherentNoise3D(
-                    0.0,
-                    0.0,
-                    time,
-                    (rotXRand * 1000).toInt(),
-                    NoiseQuality.STANDARD
-                ) - 0.4) * 10
+                (
+                    Noise.gradientCoherentNoise3D(
+                        0.0,
+                        0.0,
+                        time,
+                        (rotXRand * 1000).toInt(),
+                        NoiseQuality.STANDARD
+                    ) - 0.4
+                    ) * 10
             ),
             force * 0.5f * rad(
-                (Noise.gradientCoherentNoise3D(
-                    0.0,
-                    0.0,
-                    time,
-                    (rotYRand * 1000).toInt(),
-                    NoiseQuality.STANDARD
-                ) - 0.4) * 10
+                (
+                    Noise.gradientCoherentNoise3D(
+                        0.0,
+                        0.0,
+                        time,
+                        (rotYRand * 1000).toInt(),
+                        NoiseQuality.STANDARD
+                    ) - 0.4
+                    ) * 10
             ),
             force * 0.5f * rad(
-                (Noise.gradientCoherentNoise3D(
-                    0.0,
-                    0.0,
-                    time,
-                    (rotZRand * 1000).toInt(),
-                    NoiseQuality.STANDARD
-                ) - 0.4) * 10
+                (
+                    Noise.gradientCoherentNoise3D(
+                        0.0,
+                        0.0,
+                        time,
+                        (rotZRand * 1000).toInt(),
+                        NoiseQuality.STANDARD
+                    ) - 0.4
+                    ) * 10
             )
         )
         highestLevel.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
         animNode.setLocalTranslation(
             0f,
-            (force * (Noise.gradientCoherentNoise3D(
-                0.0,
-                0.0,
-                time,
-                (rotZRand * 1000).toInt(),
-                NoiseQuality.STANDARD
-            ) - 0.4)).toFloat() * 10,
+            (
+                force * (
+                    Noise.gradientCoherentNoise3D(
+                        0.0,
+                        0.0,
+                        time,
+                        (rotZRand * 1000).toInt(),
+                        NoiseQuality.STANDARD
+                    ) - 0.4
+                    )
+                ).toFloat() * 10,
             0f
         )
         highestLevel.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)

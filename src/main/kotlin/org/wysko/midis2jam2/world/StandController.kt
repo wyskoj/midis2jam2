@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.util.Utils
-import java.util.*
+import java.util.Objects
 
 /**
  * Responsible for setting the visibility of the keyboard and mallet stands. The stand is simply shown if there is at
@@ -31,7 +31,7 @@ import java.util.*
  */
 class StandController(
     /** Context to midis2jam2. */
-    private val context: Midis2jam2,
+    private val context: Midis2jam2
 ) {
     /** The keyboard stand. */
     private val keyboardStand: Spatial = context.loadModel("PianoStand.obj", "RubberFoot.bmp")
@@ -56,6 +56,7 @@ class StandController(
                 .any { i: Instrument -> i.isVisible && clazz.isInstance(i) } -> {
                 stand.cullHint = CullHint.Dynamic
             }
+
             else -> {
                 stand.cullHint = CullHint.Always
             }

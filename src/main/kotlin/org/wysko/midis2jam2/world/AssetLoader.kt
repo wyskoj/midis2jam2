@@ -79,45 +79,34 @@ class AssetLoader(
 
     /** Loads a fake shadow, given the paths to its [model] and [texture]. */
     fun fakeShadow(model: String, texture: String): Spatial = assetManager.loadModel(model).apply {
-        setMaterial(Material(context.assetManager, UNSHADED_MAT).apply {
-            setTexture(COLOR_MAP, context.assetManager.loadTexture(texture))
-            additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-            setFloat("AlphaDiscardThreshold", 0.01F)
-        })
+        setMaterial(
+            Material(context.assetManager, UNSHADED_MAT).apply {
+                setTexture(COLOR_MAP, context.assetManager.loadTexture(texture))
+                additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+                setFloat("AlphaDiscardThreshold", 0.01F)
+            }
+        )
         queueBucket = RenderQueue.Bucket.Transparent
     }
 
     /**
      * Loads a diffuse material conditionally on the enhanced graphics state.
      */
-    fun diffuseMaterial(texture: String): Material = if (context.enhancedGraphics) {
+    fun diffuseMaterial(texture: String): Material =
         Material(assetManager, LIGHTING_MAT).apply {
             setTexture(DIFFUSE_MAP, assetManager.loadTexture(texture.assetPrefix()))
         }
-    } else {
-        Material(assetManager, UNSHADED_MAT).apply {
-            setTexture(COLOR_MAP, assetManager.loadTexture(texture.assetPrefix()))
-        }
-    }
 
     /**
      * Loads a reflective material conditionally on the enhanced graphics state.
      */
-    fun reflectiveMaterial(texture: String): Material = if (context.enhancedGraphics) {
+    fun reflectiveMaterial(texture: String): Material =
         Material(assetManager, LIGHTING_MAT).apply {
             setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
             setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
             setTexture(ENV_MAP, assetManager.loadTexture(texture.assetPrefix()))
             setTexture("DiffuseMap", assetManager.loadTexture("Assets/Black.bmp"))
         }
-    } else {
-        Material(assetManager, LIGHTING_MAT).apply {
-            setVector3(FRESNEL_PARAMS, Vector3f(0.1f, 0.8f, 0.1f))
-            setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
-            setTexture(ENV_MAP, assetManager.loadTexture(texture.assetPrefix()))
-        }
-    }
-
 
     /**
      * Loads a 2D sprite for GUI, given the sprite's [texture].

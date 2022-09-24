@@ -42,7 +42,10 @@ import org.wysko.midis2jam2.gui.QualityLevel
 import org.wysko.midis2jam2.gui.antiAliasingDefinition
 import org.wysko.midis2jam2.gui.shadowDefinition
 import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
+import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
+import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.util.Utils
@@ -155,6 +158,20 @@ abstract class Midis2jam2(
             field = value
         }
 
+    /** True if midis2jam2 is paused, false otherwise. */
+    protected var paused: Boolean = false
+
+    protected val eventCollectors = mutableListOf<EventCollector<out MidiEvent>>()
+    protected val notePeriodCollectors = mutableListOf<NotePeriodCollector>()
+
+    fun registerEventCollector(collector: EventCollector<out MidiEvent>) {
+        eventCollectors += collector
+    }
+
+    fun registerNotePeriodCollector(collector: NotePeriodCollector) {
+        notePeriodCollectors += collector
+    }
+
     /**
      * The instruments.
      *
@@ -207,6 +224,12 @@ abstract class Midis2jam2(
         }
 
         instruments = InstrumentAssignment.assign(this, midiFile = file)
+
+        instruments.forEach {
+            // This is a bit of a hack to prevent jittery frames when the instrument would first appear
+            rootNode.attachChild(it.offsetNode)
+            rootNode.detachChild(it.offsetNode)
+        }
 
         standController = StandController(this)
         lyricController =
@@ -328,15 +351,32 @@ abstract class Midis2jam2(
                 "exit" -> {
                     exit()
                 }
+
                 "debug" -> {
                     debugTextController.toggle()
+                }
+
+                "play/pause" -> {
+                    togglePause()
+                }
+
+                "seek" -> {
+                    seek(0.0)
                 }
             }
         }
     }
 
+    /** Seeks to a given point in time. */
+    abstract fun seek(time: Double)
+
     /** Exits the application. */
     abstract fun exit()
+
+    /** Pauses or resumes the application, depending on the current [paused] state. */
+    protected open fun togglePause() {
+        paused = !paused
+    }
 
     /** Loads and returns an unshaded model with the specified [model] and [texture]. */
     fun loadModel(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)

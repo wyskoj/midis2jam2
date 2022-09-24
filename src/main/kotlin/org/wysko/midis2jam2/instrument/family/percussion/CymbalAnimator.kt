@@ -16,13 +16,16 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
-import com.jme3.math.FastMath
-import org.jetbrains.annotations.Contract
+import com.jme3.math.FastMath.PI
+import com.jme3.math.Quaternion
+import com.jme3.scene.Spatial
 import kotlin.math.cos
 import kotlin.math.pow
 
 /** Animates the wobble on cymbals using [a sinusoidal function](https://www.desmos.com/calculator/vvbwlit9he). */
 class CymbalAnimator(
+    /** The cymbal to animate. */
+    private val cymbal: Spatial,
     /** The amplitude, or maximum angle of wobble. */
     private val amplitude: Double,
     /** How fast the cymbal wobbles after being struck. */
@@ -35,18 +38,11 @@ class CymbalAnimator(
     var animTime: Double = -1.0
         private set
 
-    /** Calculates and returns the wobble angle, based on the [animTime]. */
-    @Contract(pure = true)
-    fun rotationAmount(): Float {
-        return if (animTime >= 0) {
-            if (animTime < 4.5) {
-                (amplitude * (cos(animTime * wobbleSpeed * FastMath.PI) /
-                        (3 + animTime.pow(3.0) * wobbleSpeed * dampening * FastMath.PI))).toFloat()
-            } else {
-                0F
-            }
-        } else 0F
-    }
+    /**
+     * Calculates and returns the wobble angle, based on the [animTime].
+     */
+    private fun rotationAmount(): Float =
+        if (animTime < 0) 0f else (amplitude * (cos(animTime * wobbleSpeed * PI) / (3 + animTime.pow(3) * wobbleSpeed * dampening * PI))).toFloat()
 
     /** Call this method to indicate that the cymbal has just been struck. */
     fun strike() {
@@ -62,5 +58,13 @@ class CymbalAnimator(
         if (animTime != -1.0) {
             animTime += delta.toDouble()
         }
+        cymbal.localRotation = Quaternion().fromAngles(rotationAmount(), 0f, 0f)
+    }
+
+    /**
+     * Stops cymbal animation.
+     */
+    fun cancel() {
+        animTime = -1.0
     }
 }

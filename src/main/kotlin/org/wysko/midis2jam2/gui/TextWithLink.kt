@@ -52,21 +52,28 @@ fun TextWithLink(
     style: TextStyle = MaterialTheme.typography.body1
 ) {
     return Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = text.substringBefore(textToLink), style = style
+            text = text.substringBefore(textToLink),
+            style = style
         )
         ClickableText(
             text = buildAnnotatedString {
                 append(textToLink)
                 addStringAnnotation(
-                    tag = "URL", annotation = url, start = 0, end = textToLink.length
+                    tag = "URL",
+                    annotation = url,
+                    start = 0,
+                    end = textToLink.length
                 )
                 addStyle(
                     style = SpanStyle(
-                        color = Color(0xff64B5F6), textDecoration = TextDecoration.Underline
-                    ), start = 0, end = textToLink.length
+                        color = Color(0xff64B5F6),
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    start = 0,
+                    end = textToLink.length
                 )
             },
             onClick = { Desktop.getDesktop().browse(URL(url).toURI()) },
@@ -74,7 +81,8 @@ fun TextWithLink(
             modifier = Modifier.pointerHoverIcon(PointerIconDefaults.Hand, true)
         )
         Text(
-            text = text.substringAfter(textToLink), style = style
+            text = text.substringAfter(textToLink),
+            style = style
         )
     }
 }

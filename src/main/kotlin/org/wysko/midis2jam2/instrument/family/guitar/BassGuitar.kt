@@ -50,7 +50,8 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     FrettedInstrument(
         context,
         frettingEngine = StandardFrettingEngine(
-            numberOfStrings = 4, numberOfFrets = 22,
+            numberOfStrings = 4,
+            numberOfFrets = 22,
             if (needsDropTuning(events)) BassGuitarTuning.DROP_D.values else BassGuitarTuning.STANDARD.values
         ),
         events,
@@ -117,7 +118,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         val modelDropDFile: String,
 
         /** The texture file of the Bass Guitar type. */
-        val textureFile: String,
+        val textureFile: String
     ) {
         /** The standard Bass Guitar type. */
         STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP),

@@ -19,105 +19,92 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
 import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
+
+private val STICK_NODE_OFFSET = Vector3f(0f, 0f, 10f)
 
 /** A Tom. */
 class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch) :
-    SingleStickInstrument(context, hits), Retexturable {
+    PercussionInstrument(context, hits), Retexturable {
 
     /** The drum. */
-    var drum: Spatial
-
-    override fun tick(time: Double, delta: Float) {
-        val handleStick = handleStick(time, delta, hits)
-        recoilDrum(
-            drum,
-            handleStick.justStruck(),
-            if (handleStick.justStruck()) (handleStick.strike ?: return).velocity else 0,
-            delta
-        )
+    private val drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp").apply {
+        recoilNode.attachChild(this)
+        localScale = Vector3f.UNIT_XYZ.clone().mult(pitch.scale)
     }
 
-    /** The pitch of the tom. */
-    enum class TomPitch(
-        /**
-         * The size of the Tom.
-         */
-        val scale: Vector3f,
-        /**
-         * The location of the Tom.
-         */
-        val location: Vector3f,
-        /**
-         * The rotation of the Tom.
-         */
-        val rotation: Quaternion
-    ) {
-        /** The Low floor tom. */
-        LOW_FLOOR(
-            Vector3f(1.5f, 1.5f, 1.5f),
-            Vector3f(20f, 20f, -60f),
-            Quaternion().fromAngles(rad(15f), rad(270.0), rad(0f))
-        ),
-
-        /** The High floor tom. */
-        HIGH_FLOOR(
-            Vector3f(1.4f, 1.4f, 1.4f),
-            Vector3f(17f, 21f, -75f),
-            Quaternion().fromAngles(rad(15f), rad(270.0), rad(0f))
-        ),
-
-        /** The Low tom. */
-        LOW(
-            Vector3f(1.2f, 1.2f, 1.2f),
-            Vector3f(10f, 29f, -82f),
-            Quaternion().fromAngles(rad(60.0), rad(-30.0), 0f)
-        ),
-
-        /** The Low mid tom. */
-        LOW_MID(
-            Vector3f(1f, 1f, 1f),
-            Vector3f(0f, 32f, -85f),
-            Quaternion().fromAngles(rad(60.0), 0f, 0f)
-        ),
-
-        /** The High mid tom. */
-        HIGH_MID(
-            Vector3f(0.8f, 0.8f, 0.8f),
-            Vector3f(-9f, 31f, -82f),
-            Quaternion().fromAngles(rad(60.0), rad(20.0), 0f)
-        ),
-
-        /** The High tom. */
-        HIGH(
-            Vector3f(0.6f, 0.6f, 0.6f),
-            Vector3f(-15f, 29f, -78f),
-            Quaternion().fromAngles(rad(50.0), rad(40.0), 0f)
-        );
+    /** The stick. */
+    private val stick: Striker = Striker(context, hits, StickType.DRUMSET_STICK).apply {
+        setParent(recoilNode)
     }
 
     init {
-        /* Load the tom */
-        drum = context.loadModel("DrumSet_Tom.obj", "DrumShell.bmp")
+        // Move and rotate tom based on its pitch
+        instrumentNode.localTranslation = pitch.location()
+        instrumentNode.localRotation = pitch.rotation()
 
-        /* Attach to nodes */
-        recoilNode.attachChild(drum)
-        recoilNode.attachChild(stickNode)
-        highLevelNode.attachChild(recoilNode)
+        // Move stick so that it strikes on the drum
+        stick.node.move(STICK_NODE_OFFSET)
+    }
 
-        /* Set tom pitch properties */
-        drum.localScale = pitch.scale
-        highLevelNode.localTranslation = pitch.location
-        highLevelNode.localRotation = pitch.rotation
-        stickNode.setLocalTranslation(0f, 0f, 10f)
-        stick.localRotation = Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val result = stick.tick(time, delta)
+        recoilDrum(
+            drum = recoilNode,
+            velocity = result.strike?.velocity ?: 0,
+            delta = delta
+        )
     }
 
     override fun drum(): Spatial = drum
     override fun retextureType(): RetextureType = RetextureType.OTHER
+}
+
+/** The pitch of the tom. */
+@Suppress("kotlin:S6218", "ArrayInDataClass")
+@Serializable
+data class TomPitch(
+    /**
+     * The name of the pitch.
+     */
+    val name: String,
+    /**
+     * The scale of the pitch.
+     */
+    val scale: Float,
+    private val location: Array<Float>,
+    private val rotation: Array<Float>
+) {
+    /** Returns the location of this as a [Vector3f]. */
+    fun location(): Vector3f {
+        return Vector3f(location[0], location[1], location[2])
+    }
+
+    /** Returns the rotation of this as a [Quaternion]. */
+    fun rotation(): Quaternion {
+        return Quaternion().fromAngles(
+            rad(rotation[0]),
+            rad(rotation[1]),
+            rad(rotation[2])
+        )
+    }
+
+    companion object {
+        private val pitches =
+            Json.decodeFromString<Array<TomPitch>>(Utils.resourceToString("/instrument/alignment/Tom.json"))
+
+        /** Retrieves a [TomPitch] based on its name from the resource file. */
+        operator fun get(name: String): TomPitch = pitches.first { it.name == name }
+    }
 }

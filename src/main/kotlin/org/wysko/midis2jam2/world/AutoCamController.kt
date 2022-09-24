@@ -22,7 +22,11 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
-import org.wysko.midis2jam2.instrument.family.brass.*
+import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
+import org.wysko.midis2jam2.instrument.family.brass.StageHorns
+import org.wysko.midis2jam2.instrument.family.brass.Trombone
+import org.wysko.midis2jam2.instrument.family.brass.Trumpet
+import org.wysko.midis2jam2.instrument.family.brass.Tuba
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
@@ -37,9 +41,20 @@ import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion
-import org.wysko.midis2jam2.instrument.family.percussive.*
+import org.wysko.midis2jam2.instrument.family.percussive.Agogos
+import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
+import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
+import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
+import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
+import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.instrument.family.pipe.*
+import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
+import org.wysko.midis2jam2.instrument.family.pipe.Flute
+import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
+import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
+import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
+import org.wysko.midis2jam2.instrument.family.pipe.Recorder
+import org.wysko.midis2jam2.instrument.family.pipe.Whistles
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -47,7 +62,12 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.*
+import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
+import org.wysko.midis2jam2.instrument.family.strings.Cello
+import org.wysko.midis2jam2.instrument.family.strings.Fiddle
+import org.wysko.midis2jam2.instrument.family.strings.Harp
+import org.wysko.midis2jam2.instrument.family.strings.Viola
+import org.wysko.midis2jam2.instrument.family.strings.Violin
 import kotlin.math.pow
 
 /** The speed at which to transition from one camera angle to another. */
@@ -225,7 +245,7 @@ enum class AutoCamPosition(
     val pickMe: (time: Double, instruments: List<Instrument>) -> Boolean,
     val stayHere: (time: Double, instruments: List<Instrument>) -> Boolean,
     /** The type of camera. */
-    val type: AutoCamPositionType,
+    val type: AutoCamPositionType
 ) {
     GENERAL_A(
         Vector3f(-2.00f, 92.00f, 134.00f),
@@ -298,7 +318,6 @@ enum class AutoCamPosition(
         { _, instruments -> instruments.filterIsInstance<BaritoneSax>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
-
 
     KEYBOARDS(
         Vector3f(-32.76f, 59.79f, 38.55f),
@@ -401,7 +420,10 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.98f, -0.09f, -0.19f),
         { time, instruments ->
             instruments.filterIsInstance<StageStrings>().any { it.isVisible } && visibleNowAndLater(
-                instruments, StageStrings::class.java, time, WAIT_TIME
+                instruments,
+                StageStrings::class.java,
+                time,
+                WAIT_TIME
             )
         },
         { _, instruments -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
@@ -413,7 +435,10 @@ enum class AutoCamPosition(
         Quaternion(-0.05f, 0.92f, -0.12f, -0.38f),
         { time, instruments ->
             instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 2 && visibleNowAndLater(
-                instruments, StageStrings::class.java, time, WAIT_TIME
+                instruments,
+                StageStrings::class.java,
+                time,
+                WAIT_TIME
             )
         },
         { _, instruments -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
@@ -425,7 +450,10 @@ enum class AutoCamPosition(
         Quaternion(-0.06f, 0.86f, -0.10f, -0.49f),
         { time, instruments ->
             instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 3 && visibleNowAndLater(
-                instruments, StageStrings::class.java, time, WAIT_TIME
+                instruments,
+                StageStrings::class.java,
+                time,
+                WAIT_TIME
             )
         },
         { _, instruments -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
@@ -668,7 +696,10 @@ enum class AutoCamPosition(
  * @return true if the instrument is visible at the given time and ahead by the buffer, false otherwise
  */
 fun visibleNowAndLater(
-    instruments: List<Instrument>, instrument: Class<out Instrument>, time: Double, buffer: Number
+    instruments: List<Instrument>,
+    instrument: Class<out Instrument>,
+    time: Double,
+    buffer: Number
 ): Boolean = instruments.filterIsInstance(instrument).any {
     it.isVisible && it.calcVisibility(time + buffer.toDouble(), future = true)
 }
@@ -682,7 +713,6 @@ fun quaternionInterpolation(start: Quaternion, end: Quaternion, x: Float): Quate
     start.z + (end.z - start.z) * x,
     start.w + (end.w - start.w) * x
 ).apply { this.normalizeLocal() }
-
 
 /**
  * Applies cubic-ease-in-out interpolation to a value.

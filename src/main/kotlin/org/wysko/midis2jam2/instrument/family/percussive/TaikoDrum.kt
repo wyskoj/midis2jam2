@@ -16,37 +16,40 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
-import com.jme3.material.Material
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The Taiko drum. */
 class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
 
+    override val strikers: Array<Striker> = Array(12) { i ->
+        Striker(
+            context = context,
+            strikeEvents = eventList.modulus(i),
+            stickModel = context.loadModel("TaikoStick.obj", "Wood.bmp")
+        ).apply {
+            setParent(recoilNode)
+            offsetStick { it.move(0f, 0f, -5f) }
+            node.setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + updateInstrumentIndex(delta) * -11), 0f)
+        offsetNode.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + updateInstrumentIndex(delta) * -11), 0f)
     }
 
     init {
-        val drum = context.loadModel("Taiko.obj", "TaikoHead.bmp")
-        val woodTexture = context.assetManager.loadTexture("Assets/Wood.bmp")
-        val material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
-        material.setTexture("ColorMap", woodTexture)
-        (drum as Node).getChild(0).setMaterial(material)
-        for (i in 0..11) {
-            malletNodes[i] = Node()
-            val mallet = context.loadModel("TaikoStick.obj", "Wood.bmp")
-            malletNodes[i].attachChild(mallet)
-            malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
-            mallet.setLocalTranslation(0f, 0f, -5f)
-            animNode.attachChild(malletNodes[i])
-        }
-        drum.setLocalRotation(Quaternion().fromAngles(rad(60.0), 0f, 0f))
-        animNode.attachChild(drum)
-        instrumentNode.attachChild(animNode)
+        recoilNode.attachChild(
+            context.loadModel("Taiko.obj", "TaikoHead.bmp").apply {
+                localRotation = Quaternion().fromAngles(rad(60.0), 0f, 0f)
+                (this as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/Wood.bmp"))
+            }
+        )
+
         instrumentNode.setLocalTranslation(-6.15f, 94f, -184.9f)
     }
 }

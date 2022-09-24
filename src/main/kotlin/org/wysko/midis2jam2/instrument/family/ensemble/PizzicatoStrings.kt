@@ -24,10 +24,11 @@ import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
@@ -38,6 +39,9 @@ class PizzicatoStrings(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>
 ) : DecayedInstrument(context, eventList) {
+
+    val eventCollector: EventCollector<MidiNoteOnEvent> =
+        EventCollector(eventList.filterIsInstance<MidiNoteOnEvent>(), context)
 
     /** Each string. */
     val strings: Array<PizzicatoString> = Array(12) {
@@ -50,10 +54,12 @@ class PizzicatoStrings(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToDoOn = NoteQueue.collect(hits, time, context)
+        val eventsToDoOn = eventCollector.advanceCollectOne(time)
 
         /* Play each note that needs to be animated */
-        eventsToDoOn.forEach { strings[(it.note + 3) % 12].play() }
+        eventsToDoOn?.let {
+            strings[(it.note + 3) % 12].play()
+        }
 
         strings.forEach { it.tick(delta) }
     }

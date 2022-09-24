@@ -26,8 +26,10 @@ import org.wysko.midis2jam2.util.Utils.rad
 class Violin(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
     context,
     events,
-    true, 180.0,
-    Vector3f(1f, 1f, 1f), intArrayOf(55, 62, 69, 76),
+    true,
+    180.0,
+    Vector3f(1f, 1f, 1f),
+    intArrayOf(55, 62, 69, 76),
     context.loadModel("Violin.obj", "ViolinSkin.bmp")
 ) {
     override fun moveForMultiChannel(delta: Float) {

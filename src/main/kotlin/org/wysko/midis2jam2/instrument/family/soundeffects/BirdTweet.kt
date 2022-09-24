@@ -56,7 +56,6 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
     }
 
-
     /**
      * A single bird.
      */
@@ -78,10 +77,12 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
 
         init {
-            animNode.attachChild(context.loadModel("Bird.obj", BIRD_TEXTURE).apply {
-                this as Node
-                getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
-            })
+            animNode.attachChild(
+                context.loadModel("Bird.obj", BIRD_TEXTURE).apply {
+                    this as Node
+                    getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
+                }
+            )
         }
 
         /**

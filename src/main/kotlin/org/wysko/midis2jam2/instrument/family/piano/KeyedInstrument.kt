@@ -18,29 +18,54 @@
 package org.wysko.midis2jam2.instrument.family.piano
 
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.ToggledInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.midi.NotePeriod
 
 /** An instrument that uses keys to play notes. */
 abstract class KeyedInstrument(
-    context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>,
+    context: Midis2jam2,
+    eventList: MutableList<MidiChannelSpecificEvent>,
     /** The lowest note that this instrument can play. */
     val rangeLow: Int,
     /** The highest note that this instrument can play. */
     val rangeHigh: Int
-) : SustainedInstrument(context, eventList) {
+) : ToggledInstrument(context, eventList) {
 
-    /**
-     * The events associated with this instrument.
-     */
-    protected val events: MutableList<MidiNoteEvent> =
-        eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
+    // These note periods are only used for knowing how soon to release a key (it is dependent on the duration of the note)
+    private val notePeriods = NotePeriod.calculateNotePeriods(
+        context = context,
+        noteEvents = eventList.filterIsInstance<MidiNoteEvent>()
+    ).associateBy { it.noteOff }
+
+    override val eventCollector: EventCollector<MidiNoteEvent> = EventCollector(
+        events = eventList.filterIsInstance<MidiNoteEvent>(),
+        context = context,
+        triggerCondition = { event, time ->
+            val eventTime = context.file.eventInSeconds(event)
+            when (event) {
+                is MidiNoteOffEvent -> {
+                    val np = notePeriods[event]
+                    np?.let {
+                        when {
+                            it.duration() > 0.5 -> time >= it.endTime - 0.1
+                            it.duration() > 0.2 -> time >= it.endTime - 0.05
+                            else -> time >= it.startTime + (it.duration() * 0.5)
+                        }
+                    } ?: (time >= eventTime)
+                }
+
+                else -> time >= eventTime
+            }
+        }
+    )
 
     /** The keys of this instrument. */
-    protected lateinit var keys: Array<Key>
+    abstract val keys: Array<Key>
 
     /** Returns the number of keys on this instrument. */
     fun keyCount(): Int = rangeHigh - rangeLow + 1
@@ -50,84 +75,17 @@ abstract class KeyedInstrument(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToPerform: List<MidiNoteEvent> = getElapsedEvents(time)
-
-        /*
-         * Because there may be a NoteOn and NoteOff event in the same frame, we must delay the NoteOff event by one
-         * frame so that the key press actually animates. Note, this is only is important if the two events occur within
-         * the SAME frame.
-         */
-
-        val keysPressedThisFrame = mutableListOf<Key>()
-
-        eventsToPerform.forEach { event ->
-            keyByMidiNote(event.note)?.let {
-                when (event) {
-                    is MidiNoteOnEvent -> {
-                        pressKey(it, event)
-                        keysPressedThisFrame.add(it)
-                    }
-                    is MidiNoteOffEvent -> {
-                        if (keysPressedThisFrame.contains(it)) {
-                            events.add(0, event) // Add this event back to the queue, to be animated on next frame
-                        } else {
-                            releaseKey(it)
-                        }
-                    }
-                }
-            }
-        }
         keys.forEach { it.tick(delta) }
     }
 
-    open fun pressKey(key: Key, event: MidiNoteOnEvent) {
-        key.pressKey(event)
+    override fun noteStarted(note: MidiNoteOnEvent) {
+        super.noteStarted(note)
+        keyByMidiNote(note.note)?.pressKey(note)
     }
 
-    open fun releaseKey(key: Key) {
-        key.releaseKey()
-    }
-
-    /**
-     * Searches [events] for those that should be animated now, taking special keyboard considerations into
-     * place.
-     *
-     * @param time the current time, in seconds
-     * @return the list of events that need animation
-     */
-    private fun getElapsedEvents(time: Double): List<MidiNoteEvent> {
-        val eventsToPerform: MutableList<MidiNoteEvent> = ArrayList()
-        if (events.isNotEmpty()) {
-            if (events[0] !is MidiNoteOnEvent && events[0] !is MidiNoteOffEvent) {
-                events.removeAt(0)
-            }
-            while (events.isNotEmpty() && (events[0] is MidiNoteOnEvent && context.file.eventInSeconds(events[0]) <= time || events[0] is MidiNoteOffEvent && context.file.eventInSeconds(
-                    events[0]
-                ) - time <= 0.05)
-            ) {
-                eventsToPerform.add(events.removeAt(0))
-            }
-        }
-        return eventsToPerform
-    }
-
-    /** Keyboards have two different colored keys: white and black. */
-    enum class KeyColor {
-        /** White key color. */
-        WHITE,
-
-        /** Black key color. */
-        BLACK
-    }
-
-    companion object {
-        /**
-         * Given a MIDI [note], determines if it is a [KeyColor.WHITE] or [KeyColor.BLACK] key on a standard keyboard.
-         */
-        fun midiValueToColor(note: Int): KeyColor = when (note % 12) {
-            1, 3, 6, 8, 10 -> KeyColor.BLACK
-            else -> KeyColor.WHITE
-        }
+    override fun noteEnded(note: MidiNoteOffEvent) {
+        super.noteEnded(note)
+        keyByMidiNote(note.note)?.releaseKey()
     }
 
     override fun toString(): String {
@@ -137,4 +95,21 @@ abstract class KeyedInstrument(
             )
         }
     }
+}
+
+/** Keyboards have two different colored keys: white and black. */
+internal enum class KeyColor {
+    /** White key color. */
+    WHITE,
+
+    /** Black key color. */
+    BLACK
+}
+
+/**
+ * Given a MIDI [note], determines if it is a [KeyColor.WHITE] or [KeyColor.BLACK] key on a standard keyboard.
+ */
+internal fun noteToKeyboardKeyColor(note: Int): KeyColor = when (note % 12) {
+    1, 3, 6, 8, 10 -> KeyColor.BLACK
+    else -> KeyColor.WHITE
 }

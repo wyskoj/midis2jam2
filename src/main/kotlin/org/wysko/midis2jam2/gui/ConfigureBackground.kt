@@ -523,6 +523,7 @@ class ConfigureBackground private constructor(parent: JDialog) :
                     "REPEATED_CUBEMAP" -> {
                         oneFileComboBox.selectedItem = properties.getProperty("value")
                     }
+
                     "UNIQUE_CUBEMAP" -> {
                         val strings = Json.decodeFromString<List<String>>(properties.getProperty("value"))
                         westComboBox.selectedItem = strings[0]
@@ -532,6 +533,7 @@ class ConfigureBackground private constructor(parent: JDialog) :
                         upComboBox.selectedItem = strings[4]
                         downComboBox.selectedItem = strings[5]
                     }
+
                     "COLOR" -> {
                         colorChooser.setColor(properties.getProperty("value").toInt())
                     }

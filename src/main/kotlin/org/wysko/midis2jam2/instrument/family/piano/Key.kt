@@ -21,6 +21,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.Utils
 
 /**
  * A single key on a [KeyedInstrument].
@@ -43,34 +44,34 @@ open class Key protected constructor() {
     /** The current note being animated. */
     private var currentNote: MidiNoteOnEvent? = null
 
+    private var recoiling = false
+        set(value) {
+            if (!value) {
+                downNode.cullHint = Spatial.CullHint.Always
+                upNode.cullHint = Spatial.CullHint.Dynamic
+            }
+            field = value
+        }
+    private var recoilProgress = 0f
+    private val recoilRotationValue
+        get() = Utils.lerp(0.12f, 0f, recoilProgress)
+
     /**
      * Animates the motion of the key.
      *
      * @param delta the amount of time since the last frame update
      */
     open fun tick(delta: Float) {
-        currentNote?.let {
-            keyNode.localRotation = Quaternion().fromAngles(
-                (0.1f * PercussionInstrument.velocityRecoilDampening(it.velocity)).toFloat(),
-                0f,
-                0f
-            )
-            downNode.cullHint = Spatial.CullHint.Dynamic
-            upNode.cullHint = Spatial.CullHint.Always
-        } ?: run {
-            val angles = FloatArray(3)
-            keyNode.localRotation.toAngles(angles)
-            if (angles[0] > 0.0001) {
-                keyNode.localRotation = Quaternion(
-                    floatArrayOf(
-                        (angles[0] - 0.02f * delta * 50).coerceAtLeast(0f), 0f, 0f
-                    )
-                )
-            } else {
-                keyNode.localRotation = Quaternion(floatArrayOf(0f, 0f, 0f))
-                downNode.cullHint = Spatial.CullHint.Always
-                upNode.cullHint = Spatial.CullHint.Dynamic
+        if (currentNote == null && recoiling) {
+            recoilProgress += delta * 15
+
+            // Stop recoiling if we have reached the top
+            if (recoilProgress >= 1f) {
+                recoilProgress = 1f
+                recoiling = false
             }
+
+            keyNode.localRotation = Quaternion().fromAngles(recoilRotationValue, 0f, 0f)
         }
     }
 
@@ -80,6 +81,17 @@ open class Key protected constructor() {
      */
     fun pressKey(note: MidiNoteOnEvent) {
         currentNote = note
+        recoiling = false
+        keyNode.localRotation = Quaternion().fromAngles(
+            /* xAngle = */
+            (0.12f * PercussionInstrument.velocityRecoilDampening(note.velocity)).toFloat(),
+            /* yAngle = */
+            0f,
+            /* zAngle = */
+            0f
+        )
+        downNode.cullHint = Spatial.CullHint.Dynamic
+        upNode.cullHint = Spatial.CullHint.Always
     }
 
     /**
@@ -87,5 +99,7 @@ open class Key protected constructor() {
      */
     fun releaseKey() {
         currentNote = null
+        recoiling = true
+        recoilProgress = 0f
     }
 }

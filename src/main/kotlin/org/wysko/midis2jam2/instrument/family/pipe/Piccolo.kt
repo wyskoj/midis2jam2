@@ -38,7 +38,8 @@ class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.SteamPuffTexture.NORMAL, 1f) {
         init {
             val horn = context.loadModel(
-                "Piccolo.obj", "CymbalSkinSphereMap.bmp",
+                "Piccolo.obj",
+                "CymbalSkinSphereMap.bmp",
                 0.9f
             )
             loadHands()

@@ -54,7 +54,8 @@ class Woodblocks(
             animNode.attachChild(
                 context.loadModel("WoodBlockSingle.obj", "SimpleWood.bmp").apply {
                     setLocalScale(1 - 0.036f * i)
-                })
+                }
+            )
         }
     }
 }

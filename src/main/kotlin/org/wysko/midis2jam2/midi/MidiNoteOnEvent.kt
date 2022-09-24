@@ -25,5 +25,5 @@ data class MidiNoteOnEvent(
     override val time: Long,
     override val channel: Int,
     override val note: Int,
-    val velocity: Int,
+    val velocity: Int
 ) : MidiNoteEvent(time, channel, note)

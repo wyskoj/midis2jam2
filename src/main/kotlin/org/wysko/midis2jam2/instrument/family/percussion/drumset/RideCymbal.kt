@@ -17,56 +17,36 @@
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
-import org.wysko.midis2jam2.instrument.family.percussive.Stick.StickStatus
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.midi.RIDE_BELL
+
+private const val BELL_POSITION = 12f
+private const val EDGE_POSITION = 18f
+private const val STICK_MOVE_SPEED = 30f
 
 /** The ride cymbal. */
 class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
     Cymbal(context, hits, type) {
 
-    private var stickPosition = 20f
-    private var stickTargetPosition = 20f
+    private var targetStickPosition = EDGE_POSITION
+    private var stickPosition = EDGE_POSITION
 
     override fun tick(time: Double, delta: Float) {
-        val stickStatus = handleStick(time, delta, hits)
-        handleCymbalStrikes(delta, stickStatus.justStruck())
-    }
+        val results = stick.tick(time, delta)
+        results.strike?.let {
+            cymbalAnimator.strike()
+        }
 
-    override fun handleStick(time: Double, delta: Float, hits: MutableList<MidiNoteOnEvent>): StickStatus {
-        val stickStatus = Stick.handleStick(
-            context, stick, time, delta,
-            hits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X
-        )
-        stickStatus.strikingFor?.let {
-            stickTargetPosition = if (it.note == 53) 15f else 20f
+        // Determine if the stick should go forwards or backwards to hit the ride bell
+        results.strikingFor?.let {
+            targetStickPosition = if (it.note == RIDE_BELL) BELL_POSITION else EDGE_POSITION
         }
-        stickPosition += (delta * (stickTargetPosition - stickPosition) * 30)
-        stickPosition = stickPosition.coerceIn(15f..20f) // Prevent overshooting
-        stickNode.setLocalTranslation(0f, 0f, stickPosition)
-        return stickStatus
-    }
 
-    init {
-        require(type === CymbalType.RIDE_1 || type === CymbalType.RIDE_2) { "Ride cymbal type is wrong." }
-        cymbalNode.run {
-            attachChild(
-                context.loadModel(
-                    "DrumSet_Cymbal.obj",
-                    "CymbalSkinSphereMap.bmp",
-                    0.7f
-                )
-            )
-            setLocalScale(type.size)
-        }
-        highLevelNode.run {
-            localTranslation = type.location
-            localRotation = type.rotation
-            attachChild(cymbalNode)
-        }
-        stickNode.setLocalTranslation(0f, 0f, 20f)
-        animator = CymbalAnimator(type.amplitude, type.wobbleSpeed, type.dampening)
+        // Update influence and position
+        stickPosition += (delta * (targetStickPosition - stickPosition) * STICK_MOVE_SPEED)
+        stickPosition = stickPosition.coerceIn(BELL_POSITION..EDGE_POSITION) // Prevent overshooting
+        stick.node.setLocalTranslation(0f, 2f, stickPosition)
+
+        cymbalAnimator.tick(delta)
     }
 }

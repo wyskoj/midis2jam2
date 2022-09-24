@@ -30,7 +30,7 @@ import java.util.Comparator.comparingDouble
  */
 class StandardFrettingEngine(
     /** The number of strings on the instrument. */
-    private val numberOfStrings: Int,
+    val numberOfStrings: Int,
 
     /** The number of frets on the instrument. */
     val numberOfFrets: Int,
@@ -42,10 +42,10 @@ class StandardFrettingEngine(
     override val frets: IntArray = IntArray(numberOfStrings).apply { fill(-1) }
 
     /** The lowest note this engine with deal with. */
-    private val rangeLow = openStringMidiNotes.first()
+    val rangeLow: Int = openStringMidiNotes.first()
 
     /** The highest note this engine will deal with. */
-    private val rangeHigh = openStringMidiNotes.last() + numberOfFrets
+    val rangeHigh: Int = openStringMidiNotes.last() + numberOfFrets
 
     /** The list of fretboard positions in the running average. */
     private val runningAverage: MutableList<FretboardPosition> = ArrayList()
@@ -65,6 +65,29 @@ class StandardFrettingEngine(
      */
     @Contract(pure = true)
     override fun bestFretboardPosition(midiNote: Int): FretboardPosition? {
+        val possiblePositions: MutableList<FretboardPosition> = allPossibleFretboardPositions(midiNote)
+
+        /* Sort possible positions by distance to running average */
+        possiblePositions.sortWith(
+            comparingDouble { o: FretboardPosition ->
+                o.distance(runningAveragePosition())
+            }
+        )
+
+        /* Return the note with the least distance, or null if there are no available spots */
+        return possiblePositions.firstOrNull()
+    }
+
+    fun lowestFretboardPosition(
+        midiNote: Int,
+        occupiedStrings: List<Int>,
+        lowestByFret: Boolean = false
+    ): FretboardPosition? =
+        allPossibleFretboardPositions(midiNote)
+            .filter { !occupiedStrings.contains(it.string) }
+            .minByOrNull { if (lowestByFret) it.fret else it.string }
+
+    private fun allPossibleFretboardPositions(midiNote: Int): MutableList<FretboardPosition> {
         val possiblePositions: MutableList<FretboardPosition> = ArrayList()
         /* If the note is in range */
         if (midiNote in rangeLow..rangeHigh) {
@@ -83,14 +106,7 @@ class StandardFrettingEngine(
                 possiblePositions.add(FretboardPosition(i, fret))
             }
         }
-
-        /* Sort possible positions by distance to running average */
-        possiblePositions.sortWith(comparingDouble { o: FretboardPosition ->
-            o.distance(runningAveragePosition())
-        })
-
-        /* Return the note with the least distance, or null if there are no available spots */
-        return possiblePositions.firstOrNull()
+        return possiblePositions
     }
 
     /** Applies the usage of this fretboard position, occupying the string. Adds the position to the running average. */

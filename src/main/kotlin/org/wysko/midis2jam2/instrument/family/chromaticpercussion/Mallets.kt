@@ -17,19 +17,21 @@
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHITE
+import org.wysko.midis2jam2.instrument.algorithmic.MAX_STICK_IDLE_ANGLE
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
+import org.wysko.midis2jam2.instrument.family.piano.KeyColor
+import org.wysko.midis2jam2.instrument.family.piano.noteToKeyboardKeyColor
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.DIM_GLOW
 
 /** The mallet case is scaled by this value to appear correct. */
 const val MALLET_CASE_SCALE: Float = 0.667f
@@ -48,30 +50,34 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     DecayedInstrument(context, eventList) {
 
     /** List of lists, where each list contains the strikes corresponding to that bar's MIDI note. */
-    private val barStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(MALLET_BAR_COUNT) { ArrayList() }
+    private val barStrikes: Array<List<MidiNoteOnEvent>> = run {
+        val hits = eventList.filterIsInstance<MidiNoteOnEvent>()
+        Array(MALLET_BAR_COUNT) { idx ->
+            hits.filter { it.note == idx + RANGE_LOW }
+        }
+    }
 
-    /** The fake shadow. */
-    private var fakeShadow: Spatial? =
-        if (context.fakeShadows) {
-            context.assetLoader.fakeShadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
-                instrumentNode.attachChild(this)
-                setLocalScale(2 / 3f)
-                setLocalTranslation(0f, -22f, 0f)
-            }
-        } else null
+    /** The fake shadow that sits below the case. */
+    private var fakeShadow: Spatial? = if (context.fakeShadows) {
+        context.assetLoader.fakeShadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
+            instrumentNode.attachChild(this)
+            setLocalScale(2 / 3f)
+            setLocalTranslation(0f, -22f, 0f)
+        }
+    } else null
 
     /** Each bar of the instrument. There are [MALLET_BAR_COUNT] bars. */
     private var bars: Array<MalletBar> = let {
-        val theseBars = ArrayList<MalletBar>()
+        val bars = ArrayList<MalletBar>()
         var whiteCount = 0
         for (i in 0 until MALLET_BAR_COUNT) {
-            if (KeyedInstrument.midiValueToColor(i + RANGE_LOW) == WHITE) {
-                theseBars.add(MalletBar(i + RANGE_LOW, whiteCount++))
+            if (noteToKeyboardKeyColor(i + RANGE_LOW) == KeyColor.WHITE) {
+                bars.add(MalletBar(i + RANGE_LOW, whiteCount++, barStrikes[i]))
             } else {
-                theseBars.add(MalletBar(i + RANGE_LOW, i))
+                bars.add(MalletBar(i + RANGE_LOW, i, barStrikes[i]))
             }
         }
-        theseBars
+        bars
     }.onEach { bar -> instrumentNode.attachChild(bar.noteNode) }.toTypedArray()
 
     override fun tick(time: Double, delta: Float) {
@@ -85,25 +91,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         }
 
         /* For each bar */
-        for ((index, bar) in bars.withIndex()) {
-            /* Update the bar */
-            bar.tick(delta)
-
-            /* Animate its stick */
-            val stickStatus = Stick.handleStick(
-                context, bar.malletNode, time, delta,
-                barStrikes[index],
-                Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X, false
-            )
-
-            /* Recoil if just struck */
-            if (stickStatus.justStruck()) {
-                bar.recoilBar()
-            }
-
-            /* Update shadow animation */
-            bar.shadow.setLocalScale(((1 - Math.toDegrees(stickStatus.rotationAngle.toDouble()) / Stick.MAX_ANGLE) / 2).toFloat())
-        }
+        bars.forEach { it.tick(time, delta) }
     }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -129,7 +117,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
     }
 
     /** A single bar out of the 88 for the mallets. */
-    inner class MalletBar(midiNote: Int, startPos: Int) {
+    inner class MalletBar(midiNote: Int, startPos: Int, events: List<MidiNoteOnEvent>) {
 
         /** The model in the up position. */
         private var upBar: Spatial
@@ -140,11 +128,21 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         /** Contains the entire note geometry. */
         val noteNode: Node = Node()
 
-        /** Contains the mallet. */
-        val malletNode: Node = Node()
+        private val mallet = Striker(
+            context = context,
+            strikeEvents = events,
+            sticky = false,
+            stickModel = context.loadModel("XylophoneMalletWhite.obj", type.textureFile)
+        ).apply {
+            offsetStick { it.move(0f, 0f, -2f) }
+            node.apply {
+                move(0f, 0f, 2f)
+                scale(MALLET_CASE_SCALE)
+            }
+        }
 
         /** The small, circular shadow that appears as the mallet is striking. */
-        val shadow: Spatial
+        private val shadow: Spatial = context.loadModel("MalletHitShadow.obj", "Black.bmp")
 
         /** True if the bar is recoiling, false otherwise. */
         private var barIsRecoiling = false
@@ -153,7 +151,7 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
         private var recoilNow = false
 
         /** Begins recoiling the bar. */
-        fun recoilBar() {
+        private fun recoilBar() {
             barIsRecoiling = true
             recoilNow = true
         }
@@ -163,99 +161,81 @@ class Mallets(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, pr
          *
          * @param delta the amount of time since the last frame update
          */
-        fun tick(delta: Float) {
-            /* If the bar is recoiling */
-            if (barIsRecoiling) {
-                /* Hide the up bar, show the down bar */
+        fun tick(time: Double, delta: Float) {
+            mallet.tick(time, delta).let {
+                if (it.velocity > 0) recoilBar()
+
+                shadow.setLocalScale(((1 - Math.toDegrees(it.rotationAngle.toDouble()) / MAX_STICK_IDLE_ANGLE) / 2).toFloat())
+            }
+
+            if (barIsRecoiling) { // Hide the up bar, show the down bar
                 upBar.cullHint = Always
                 downBar.cullHint = Dynamic
 
-                if (recoilNow) {
-                    /* Move the bar all the way down */
+                if (recoilNow) { // Move the bar all the way down
                     downBar.setLocalTranslation(0f, -0.5f, 0f)
-                } else {
-                    /* Recoil the bar */
-                    if (downBar.localTranslation.y < -0.0001) {
-                        /* Move the bar slightly up */
+                } else { // Recoil the bar
+                    if (downBar.localTranslation.y < -0.0001) { // Move the bar slightly up
                         downBar.move(0f, 5 * delta, 0f)
 
                         /* Don't go any higher than resting position */
                         downBar.localTranslation.apply {
                             y = y.coerceAtMost(0f)
                         }
-                    } else {
-                        /* We've reached the top, show up bar, hide bottom bar, move down bar to 0 */
+                    } else { // We've reached the top, show up bar, hide bottom bar, move down bar to 0
                         upBar.cullHint = Dynamic
                         downBar.cullHint = Always
                         downBar.setLocalTranslation(0f, 0f, 0f)
                     }
                 }
                 recoilNow = false
-            } else {
-                /* Bar is not recoiling, show up bar, hide down bar */
+            } else { // Bar is not recoiling, show up bar, hide down bar
                 upBar.cullHint = Dynamic
                 downBar.cullHint = Always
             }
         }
 
         init {
-            /* Load mallet */
-            val mallet = context.loadModel("XylophoneMalletWhite.obj", type.textureFile).apply {
-                setLocalTranslation(0f, 0f, -2f)
-            }
-            malletNode.run {
-                attachChild(mallet)
-                setLocalScale(MALLET_CASE_SCALE)
-                localRotation = Quaternion().fromAngles(rad(50.0), 0f, 0f)
-                move(0f, 0f, 2f)
-            }
-
             /* Load mallet shadow */
-            shadow = context.loadModel("MalletHitShadow.obj", "Black.bmp")
 
             val barNode = Node()
-            if (KeyedInstrument.midiValueToColor(midiNote) == WHITE) {
+            if (noteToKeyboardKeyColor(midiNote) == KeyColor.WHITE) {
                 val scaleFactor = (RANGE_HIGH - midiNote + 20) / 50f
                 upBar = context.loadModel("XylophoneWhiteBar.obj", type.textureFile).also { barNode.attachChild(it) }
-                downBar = context.loadModel("XylophoneWhiteBarDown.obj", type.textureFile)
-                    .also { barNode.attachChild(it) }
+                downBar =
+                    context.loadModel("XylophoneWhiteBarDown.obj", type.textureFile).apply {
+                        (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
+                    }.also { barNode.attachChild(it) }
 
                 barNode.setLocalScale(0.55f, 1f, 0.5f * scaleFactor)
                 noteNode.move(1.333f * (startPos - 26), 0f, 0f)
-                malletNode.setLocalTranslation(0f, 1.35f, -midiNote / 11.5f + 19)
+                mallet.node.setLocalTranslation(0f, 1.35f, -midiNote / 11.5f + 19)
                 shadow.setLocalTranslation(0f, 0.75f, -midiNote / 11.5f + 11)
             } else {
                 val scaleFactor = (RANGE_HIGH - midiNote + 20) / 50f
                 upBar = context.loadModel("XylophoneBlackBar.obj", type.textureFile).also { barNode.attachChild(it) }
-                downBar = context.loadModel("XylophoneBlackBarDown.obj", type.textureFile)
-                    .also { barNode.attachChild(it) }
+                downBar = context.loadModel("XylophoneBlackBarDown.obj", type.textureFile).apply {
+                    (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
+                }.also { barNode.attachChild(it) }
 
                 barNode.setLocalScale(0.6f, 0.7f, 0.5f * scaleFactor)
                 noteNode.move(1.333f * (midiNote * 0.583f - 38.2f), 0f, -midiNote / 50f + 2.667f)
-                malletNode.setLocalTranslation(0f, 2.6f, midiNote / 12.5f - 2)
+                mallet.node.setLocalTranslation(0f, 2.6f, midiNote / 12.5f - 2)
                 shadow.setLocalTranslation(0f, 2f, midiNote / 12.5f - 10)
             }
             downBar.cullHint = Always
             barNode.attachChild(upBar)
             noteNode.attachChild(barNode)
-            noteNode.attachChild(malletNode)
+            noteNode.attachChild(mallet.node)
             noteNode.attachChild(shadow)
             shadow.setLocalScale(0f)
         }
     }
 
-    init {
-        /* Load case */
+    init { // Load case
         context.loadModel("XylophoneCase.obj", "Black.bmp").apply {
             this.setLocalScale(MALLET_CASE_SCALE)
             instrumentNode.attachChild(this)
-        }
-
-        /* Add all applicable events */
-        eventList.forEach {
-            if (it is MidiNoteOnEvent && it.note in RANGE_LOW..RANGE_HIGH) {
-                barStrikes[it.note - RANGE_LOW].add(it)
-            }
         }
 
         /* Position */

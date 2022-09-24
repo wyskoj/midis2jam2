@@ -23,8 +23,9 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
@@ -72,24 +73,33 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     private val stickNode: Node = Node().also { instrumentNode.attachChild(it) }
 
     /** The stick that is used to hit the cymbal. */
-    private val stick: Spatial = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").also {
-        stickNode.attachChild(it)
-        it.setLocalTranslation(0f, 0f, 15f)
+//    private val stick: Spatial = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").also {
+//        stickNode.attachChild(it)
+//        it.setLocalTranslation(0f, 0f, 15f)
+//    }
+
+    private val stick = Striker(
+        context = context,
+        strikeEvents = pseudoHits,
+        stickModel = StickType.DRUMSET_STICK
+    ).apply {
+        setParent(stickNode)
+        node.setLocalTranslation(0f, 0f, 15f)
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
         /* Animate the stick */
-        val handleStick = Stick.handleStick(context, stick, time, delta, pseudoHits)
+        val results = stick.tick(time, delta)
 
         /* Find the time of the next note end. If there is none, assume it will happen infinitely in the future. */
-        val nextHitTime = pseudoHits.firstOrNull()?.let {
+        val nextHitTime = stick.peek()?.let {
             context.file.eventInSeconds(it)
         } ?: Double.MAX_VALUE
 
         /* Move the stick around the cymbal according to the note */
-        if (handleStick.strikingFor != null && !handleStick.justStruck()) {
+        if (results.strikingFor != null && results.strike == null) {
             pseudoHits.firstOrNull()?.let {
                 stickNode.localRotation = Quaternion().fromAngles(0f, ((it.note % 12) * 30).toFloat(), 0f)
             }
@@ -127,8 +137,15 @@ object ReverseCymbalAnimator {
     fun rotationAmount(timeUntilPseudoStrike: Double): Float {
         return if (timeUntilPseudoStrike >= 0) {
             if (timeUntilPseudoStrike < 4.5) {
-                (amplitude * (cos(timeUntilPseudoStrike * wobbleSpeed * FastMath.PI) /
-                        (3 + timeUntilPseudoStrike.pow(3.0) * wobbleSpeed * dampening * FastMath.PI))).toFloat()
+                (
+                    amplitude * (
+                        cos(timeUntilPseudoStrike * wobbleSpeed * FastMath.PI) / (
+                            3 + timeUntilPseudoStrike.pow(
+                                3.0
+                            ) * wobbleSpeed * dampening * FastMath.PI
+                            )
+                        )
+                    ).toFloat()
             } else {
                 0F
             }

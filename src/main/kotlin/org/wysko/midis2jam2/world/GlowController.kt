@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.world
 import com.jme3.math.ColorRGBA
 
 val STANDARD_GLOW = ColorRGBA(0.75f, 0.75f, 0.85f, 1f)
+val DIM_GLOW = ColorRGBA(0.67f, 0.67f, 0.67f, 1f)
 
 class GlowController(
     val glowColor: ColorRGBA = STANDARD_GLOW

@@ -16,10 +16,19 @@
  */
 package org.wysko.midis2jam2.util
 
+import com.jme3.material.Material
+import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath
+import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
+import com.jme3.scene.Mesh
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
+import com.jme3.scene.debug.Arrow
+import org.wysko.midis2jam2.Midis2jam2
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -78,7 +87,6 @@ object Utils {
      */
     fun rad(deg: Float): Float = deg / 180 * FastMath.PI
 
-
     /**
      * Converts an angle expressed in degrees to radians.
      *
@@ -86,7 +94,6 @@ object Utils {
      * @return the angle expressed in radians
      */
     fun rad(deg: Double): Float = (deg / 180 * FastMath.PI).toFloat()
-
 
     /**
      * Given a string containing the path to a resource file, retrieves the contents of the file and returns it as a
@@ -130,3 +137,51 @@ fun Boolean.cullHint(): CullHint = if (this) Dynamic else Always
 
 /** Given a list of integers, determines if the root integer is equal to at least one of the provided integers. */
 fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }
+
+/** Chunks a sequence based on a predicate. */
+fun <T> Sequence<T>.chunked(predicate: (T, T) -> Boolean): Sequence<List<T>> {
+    val underlyingSequence = this
+    return sequence {
+        val buffer = mutableListOf<T>()
+        var last: T? = null
+        for (current in underlyingSequence) {
+            val shouldSplit = last?.let { predicate(it, current) } ?: false
+            if (shouldSplit) {
+                yield(buffer.toList())
+                buffer.clear()
+            }
+            buffer.add(current)
+            last = current
+        }
+        if (buffer.isNotEmpty()) {
+            yield(buffer)
+        }
+    }
+}
+
+/** Returns debug axes. */
+fun debugAxes(context: Midis2jam2): Spatial {
+    val node = Node()
+
+    fun putShape(shape: Mesh, color: ColorRGBA): Geometry {
+        val g = Geometry("coordinate axis", shape)
+        val mat = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md")
+        mat.additionalRenderState.isWireframe = true
+        mat.additionalRenderState.lineWidth = 4f
+        mat.setColor("Color", color)
+        g.material = mat
+        node.attachChild(g)
+        return g
+    }
+
+    var arrow = Arrow(Vector3f.UNIT_X.mult(10f))
+    putShape(arrow, ColorRGBA.Red)
+
+    arrow = Arrow(Vector3f.UNIT_Y.mult(10f))
+    putShape(arrow, ColorRGBA.Green)
+
+    arrow = Arrow(Vector3f.UNIT_Z.mult(10f))
+    putShape(arrow, ColorRGBA.Blue)
+
+    return node
+}

@@ -16,64 +16,56 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.util.Utils
 
 /**
- * The castanets animate similarly to the [HandClap].
- *
- * @see HandClap
+ * The Castanets.
  */
 class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the top castanet. */
-    private val topCastanetNode = Node()
+    private val castanet = Striker(
+        context = context,
+        hits,
+        stickModel = context.loadModel("Castanets.obj", "WoodBleach.bmp"),
+        strikeSpeed = 2.0,
+        maxIdleAngle = 25.0,
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+        offsetStick {
+            it.move(0f, 0f, -3f)
+        }
+    }
 
-    /** Contains the bottom castanet. */
-    private val bottomCastanetNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        val stickStatus = Stick.handleStick(
-            context,
-            topCastanetNode,
-            time,
-            delta,
-            hits,
-            Stick.STRIKE_SPEED / 2,
-            Stick.MAX_ANGLE / 2,
-            Axis.X,
-            actualStick = false
+    private val bottomCastanetNode = Node().apply {
+        attachChild(
+            context.loadModel("Castanets.obj", "WoodBleach.bmp").also {
+                it.localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
+                it.move(0f, 0f, -3f)
+            }
         )
-        topCastanetNode.cullHint = CullHint.Dynamic
-        bottomCastanetNode.localRotation = Quaternion().fromAngles(-stickStatus.rotationAngle, 0f, 0f)
+        instrumentNode.attachChild(this)
     }
 
     init {
-        /* Load castanets */
-        val topCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
-        val bottomCastanet = context.loadModel("Castanets.obj", "WoodBleach.bmp")
+        with(instrumentNode) {
+            move(12f, 45f, -55f)
+            localRotation = Quaternion().fromAngles(0f, Utils.rad(-45.0), 0f)
+        }
+    }
 
-        /* Attach to nodes */
-        topCastanetNode.attachChild(topCastanet)
-        bottomCastanetNode.attachChild(bottomCastanet)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val results = castanet.tick(time, delta)
 
-        /* Move castanets away from pivot */
-        topCastanet.setLocalTranslation(0f, 0f, -3f)
-        bottomCastanet.setLocalTranslation(0f, 0f, -3f)
-
-        /* Positioning */
-        bottomCastanet.localRotation = Quaternion().fromAngles(0f, 0f, rad(180.0))
-        instrumentNode.setLocalTranslation(12f, 45f, -55f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-45.0), 0f)
-        instrumentNode.attachChild(topCastanetNode)
-        instrumentNode.attachChild(bottomCastanetNode)
+        // Mimic the top castanet
+        bottomCastanetNode.localRotation = Quaternion().fromAngles(-results.rotationAngle, 0f, 0f)
     }
 }

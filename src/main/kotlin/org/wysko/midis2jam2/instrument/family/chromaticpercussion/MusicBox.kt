@@ -83,7 +83,6 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
             /* If the note is within one quarter note */
             if (context.file.tickToSeconds(noteTime - context.file.division) <= time) {
-
                 /* Attempt to grab a point from the pool. If there is none, create a new one. */
                 val aPoint: Spatial = if (pool.size > 1) {
                     pool.removeAt(0)
@@ -104,7 +103,6 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
                 hitsItr.remove()
             }
         }
-
 
         /* For each point, remove from the list of visible points if it has reached max angle and move it to the pool */
         val pointsItr = points.iterator()
@@ -199,7 +197,6 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             val rotation = if (progress <= 0.5) progress.toFloat() else (-progress + 1).toFloat()
             return -rotation
         }
-
     }
 
     init {

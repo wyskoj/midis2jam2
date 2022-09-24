@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import java.util.*
+import java.util.Random
 
 /** *You used to call me on my cellphone...* */
 class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
@@ -131,14 +131,18 @@ fun Int.toKeyString(): String = when {
     this < 9 -> {
         (this + 1).toString()
     }
+
     this == 9 -> {
         "Star"
     }
+
     this == 10 -> {
         "0"
     }
+
     this == 11 -> {
         "Pound"
     }
+
     else -> throw IllegalStateException()
 }

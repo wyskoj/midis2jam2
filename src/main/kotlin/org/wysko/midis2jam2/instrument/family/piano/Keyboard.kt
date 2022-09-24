@@ -16,11 +16,17 @@
  */
 package org.wysko.midis2jam2.instrument.family.piano
 
+import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
-import org.jetbrains.annotations.NonNls
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
+
+private val OFFSET_DIRECTION_VECTOR = Vector3f(-8.294f, 3.03f, -8.294f)
 
 /** The full, 88-key keyboard. */
 open class Keyboard(
@@ -29,105 +35,41 @@ open class Keyboard(
     private val skin: KeyboardSkin
 ) : KeyedInstrument(context, events, 21, 108) {
 
+    override val keys: Array<Key> = let {
+        var whiteCount = 0
+        Array(keyCount()) {
+            if (noteToKeyboardKeyColor(it + rangeLow) == KeyColor.WHITE) { // White key
+                KeyboardKey(it + rangeLow, whiteCount++)
+            } else { // Black key
+                KeyboardKey(it + rangeLow, it)
+            }
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
-        val i = updateInstrumentIndex(delta)
-        offsetNode.setLocalTranslation(
-            2f * -5.865f * i * 0.707f,
-            3.03f * i,
-            2f * -5.865f * i * 0.707f
-        )
+        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 
     override fun keyByMidiNote(midiNote: Int): Key? {
         return if (midiNote > rangeHigh || midiNote < rangeLow) null else keys[midiNote - rangeLow]
     }
 
-    /** Different types of keyboards have different skins. */
-    @Suppress("unused")
-    enum class KeyboardSkin(
-        /** The texture file of the Keyboard Skin. */
-        val textureFile: @NonNls String
-    ) {
-        /** Harpsichord keyboard skin. */
-        HARPSICHORD("HarpsichordSkin.bmp"),
-
-        /** Piano keyboard skin. */
-        PIANO("PianoSkin.bmp"),
-
-        /** Synth keyboard skin. */
-        SYNTH("SynthSkin.bmp"),
-
-        /** Wood keyboard skin. */
-        WOOD("PianoSkin_Wood.bmp"),
-
-        /** Clavichord keyboard skin. */
-        CLAVICHORD("ClaviSkin.png"),
-
-        /** Bright keyboard skin. */
-        BRIGHT("BrightAcousticSkin.png"),
-
-        /** Honky tonk keyboard skin. */
-        HONKY_TONK("HonkyTonkSkin.png"),
-
-        /** Electric grand keyboard skin. */
-        ELECTRIC_GRAND("ElectricGrandSkin.png"),
-
-        /** Electric 1 keyboard skin. */
-        ELECTRIC_1("ElectricPiano1Skin.png"),
-
-        /** Electric 2 keyboard skin. */
-        ELECTRIC_2("ElectricPiano2Skin.png"),
-
-        /** Celesta keyboard skin. */
-        CELESTA("CelestaSkin.png"),
-
-        /** Square wave keyboard skin. */
-        SQUARE_WAVE("SquareSynthSkin.png"),
-
-        /** Saw wave keyboard skin. */
-        SAW_WAVE("SawtoothWaveSynthSkin.png"),
-
-        /** Charang keyboard skin. */
-        CHARANG("CharangSynthSkin.png"),
-
-        /** Choir keyboard skin. */
-        CHOIR("ChoirSynthSkin.png"),
-
-        /** Chiff keyboard skin. */
-        CHIFF("ChiffSynthSkin.png"),
-
-        /** Bass and lead keyboard skin. */
-        BASS_AND_LEAD("BassLeadSynthSkin.png"),
-
-        /** Metallic keyboard skin. */
-        METALLIC("MetallicSynthSkin.png"),
-
-        /** New age keyboard skin. */
-        NEW_AGE("NewAgeSynthSkin.png"),
-
-        /** Polysynth keyboard skin. */
-        POLYSYNTH("PolysynthSynthSkin.png"),
-
-        /** Warm keyboard skin. */
-        WARM("WarmSynthSkin.png")
-    }
-
     /** The type Keyboard key. */
     inner class KeyboardKey(val midiNote: Int, startPos: Int) : Key() {
         init {
-            if (midiValueToColor(midiNote) == KeyColor.WHITE) { // White key
+            if (noteToKeyboardKeyColor(midiNote) == KeyColor.WHITE) { // White key
                 /* UP KEY */
                 // Front key
-                val upKeyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.textureFile)
+                val upKeyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.file)
                 // Back Key
-                val upKeyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.textureFile)
+                val upKeyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.file)
                 upNode.attachChild(upKeyFront)
                 upNode.attachChild(upKeyBack)
                 /* DOWN KEY */
                 // Front key
-                val downKeyFront = context.loadModel("PianoKeyWhiteFrontDown.obj", skin.textureFile)
+                val downKeyFront = context.loadModel("PianoKeyWhiteFrontDown.obj", skin.file)
                 // Back key
-                val downKeyBack = context.loadModel("PianoKeyWhiteBackDown.obj", skin.textureFile)
+                val downKeyBack = context.loadModel("PianoKeyWhiteBackDown.obj", skin.file)
                 downNode.attachChild(downKeyFront)
                 downNode.attachChild(downKeyBack)
                 keyNode.attachChild(upNode)
@@ -136,10 +78,10 @@ open class Keyboard(
                 keyNode.move(startPos - 26f, 0f, 0f) // 26 = count(white keys) / 2
             } else { // Black key
                 /* Up key */
-                val blackKey = context.loadModel("PianoBlackKey.obj", skin.textureFile)
+                val blackKey = context.loadModel("PianoBlackKey.obj", skin.file)
                 upNode.attachChild(blackKey)
                 /* Up key */
-                val blackKeyDown = context.loadModel("PianoKeyBlackDown.obj", skin.textureFile)
+                val blackKeyDown = context.loadModel("PianoKeyBlackDown.obj", skin.file)
                 downNode.attachChild(blackKeyDown)
                 keyNode.attachChild(upNode)
                 keyNode.attachChild(downNode)
@@ -151,23 +93,37 @@ open class Keyboard(
     }
 
     init {
-        val pianoCase = context.loadModel("PianoCase.obj", skin.textureFile)
+        val pianoCase = context.loadModel("PianoCase.obj", skin.file)
         instrumentNode.attachChild(pianoCase)
-        var whiteCount = 0
-        keys = Array(keyCount()) {
-            if (midiValueToColor(it + rangeLow) == KeyColor.WHITE) { // White key
-                KeyboardKey(it + rangeLow, whiteCount++)
-            } else { // Black key
-                KeyboardKey(it + rangeLow, it)
-            }
-        }
+
         instrumentNode.move(-50f, 32f, -6f)
         instrumentNode.rotate(0f, rad(45.0), 0f)
+
+        var children = 0
+        instrumentNode.breadthFirstTraversal { children++ }
+        println("children: $children")
     }
 
     override fun toString(): String {
         return super.toString() + buildString {
             append(debugProperty("skin", skin.name))
         }
+    }
+}
+
+/** Different types of keyboards have different skins. */
+@Serializable
+data class KeyboardSkin(
+    /** The name of the skin. */
+    val name: String,
+    /** The name of the texture file. */
+    val file: String
+) {
+    companion object {
+        private val skins =
+            Json.decodeFromString<Collection<KeyboardSkin>>(Utils.resourceToString("/instrument/textures/Keyboard.json"))
+
+        /** Returns a [KeyboardSkin] given its name. */
+        operator fun get(name: String): KeyboardSkin = skins.first { it.name == name }
     }
 }

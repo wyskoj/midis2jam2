@@ -24,8 +24,8 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor
+import org.wysko.midis2jam2.instrument.family.piano.KeyColor
+import org.wysko.midis2jam2.instrument.family.piano.noteToKeyboardKeyColor
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
@@ -52,7 +52,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
 
             /* If the note falls on a black key (if it were played on a piano) we need to "round it down" to the
              * nearest white key. */
-            if (KeyedInstrument.midiValueToColor(midiNote) == KeyColor.BLACK) {
+            if (noteToKeyboardKeyColor(midiNote) == KeyColor.BLACK) {
                 midiNote--
             }
             var harpString = -1
@@ -133,10 +133,12 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
                     t = "HarpStringRed.bmp"
                     vt = "HarpStringRedPlaying.bmp"
                 }
+
                 i % 7 == 3 -> {
                     t = "HarpStringBlue.bmp"
                     vt = "HarpStringBluePlaying.bmp"
                 }
+
                 else -> {
                     t = "HarpStringWhite.bmp"
                     vt = "HarpStringWhitePlaying.bmp"
@@ -154,7 +156,8 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
 
             stringNode.attachChild(string)
 
-            /* Funky math to polynomially scale each string */stringNode.setLocalTranslation(
+            /* Funky math to polynomially scale each string */
+            stringNode.setLocalTranslation(
                 0f,
                 2.1444f + 0.8777f * i,
                 -2.27f + 0.75651f * -i

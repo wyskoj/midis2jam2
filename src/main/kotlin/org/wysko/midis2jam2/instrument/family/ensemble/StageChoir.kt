@@ -79,7 +79,8 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             super.tick(delta)
 
             ((model as Node).getChild(0) as Geometry).material.setColor(
-                "GlowColor", if (playing) {
+                "GlowColor",
+                if (playing) {
                     ColorRGBA.Yellow
                 } else {
                     ColorRGBA.Black

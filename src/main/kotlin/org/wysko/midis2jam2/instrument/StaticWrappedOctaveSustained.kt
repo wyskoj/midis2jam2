@@ -43,9 +43,9 @@ abstract class StaticWrappedOctaveSustained(
                 is StageStrings.StageStringNote -> {
                     tw.animNode.localTranslation.y = if (tw.playing) tick else 0f
                 }
+
                 else -> tw.highestLevel.localTranslation.y = if (tw.playing) tick else 0f
             }
-
         }
     }
 }

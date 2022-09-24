@@ -16,12 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.clone
 
+import com.jme3.math.Matrix3f
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
 import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.cullHint
@@ -73,6 +75,9 @@ abstract class Clone protected constructor(
     /** The last played note period for visibility calculation. */
     private var lastNotePeriod: NotePeriod? = null
 
+    /** The note period collector. */
+    protected lateinit var notePeriodCollector: NotePeriodCollector
+
     /**
      * Keeps track of whether this clone is currently visible. The 0-clone (the clone at index 0) is always
      * visible, that is if the instrument itself is visible.
@@ -92,9 +97,11 @@ abstract class Clone protected constructor(
     private fun calcVisibility(): Boolean {
         if (currentNotePeriod != null) return true
 
-        lastNotePeriod?.let {
-            if (notePeriods.isNotEmpty() &&
-                notePeriods.first().startTick() - it.endTick() <= parent.context.file.division * 2
+        notePeriodCollector.prev()?.let {
+            if (notePeriods.isNotEmpty() && (
+                notePeriodCollector.peek()?.startTick()?.minus(it.endTick())
+                    ?: Long.MAX_VALUE
+                ) <= parent.context.file.division * 2
             ) {
                 return true
             }
@@ -132,24 +139,13 @@ abstract class Clone protected constructor(
      * * Updates the position of the clone.
      */
     open fun tick(time: Double, delta: Float) {
-        /* Grab the newest note period */
-        NoteQueue.collectOne(notePeriods, time)?.let { currentNotePeriod = it }
-
-        /* Clear the note period if it is elapsed */
-        currentNotePeriod?.let {
-            if (it.endTime <= time) {
-                lastNotePeriod = currentNotePeriod
-                currentNotePeriod = null
-            }
-        }
+        currentNotePeriod = notePeriodCollector.advance(time).firstOrNull()
 
         /* Rotate clone on note play */
         currentNotePeriod?.let {
             val rotate = -((it.endTime - time) / it.duration()).toFloat() * rotationFactor
             animNode.localRotation = Quaternion().fromAngles(
-                if (rotationAxis === Axis.X) rotate else 0f,
-                if (rotationAxis === Axis.Y) rotate else 0f,
-                if (rotationAxis === Axis.Z) rotate else 0f
+                Matrix3f.IDENTITY.getRow(rotationAxis.componentIndex).mult(rotate).toArray(null)
             )
         } ?: run {
             animNode.localRotation = Quaternion()
@@ -172,9 +168,9 @@ abstract class Clone protected constructor(
     init {
         /* Connect node chain hierarchy */
         idleNode.attachChild(modelNode)
-        bendNode.attachChild(idleNode)
-        animNode.attachChild(bendNode)
-        highestLevel.attachChild(animNode)
+        animNode.attachChild(idleNode)
+        bendNode.attachChild(animNode)
+        highestLevel.attachChild(bendNode)
         offsetNode.attachChild(highestLevel)
         parent.groupOfPolyphony.attachChild(offsetNode)
     }
@@ -191,6 +187,11 @@ abstract class Clone protected constructor(
 
     override fun toString(): String {
         return "\t- ${javaClass.simpleName}\n"
+    }
+
+    /** Initializes [notePeriodCollector]. */
+    fun createCollector() {
+        notePeriodCollector = NotePeriodCollector(notePeriods, parent.context)
     }
 }
 

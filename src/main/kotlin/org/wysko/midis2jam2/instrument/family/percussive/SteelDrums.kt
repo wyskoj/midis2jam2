@@ -17,62 +17,68 @@
 package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
+import com.jme3.math.Vector3f
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.Utils.resourceToString
+
+private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
+    Json.decodeFromString(resourceToString("/instrument/alignment/SteelDrums.json"))
 
 /** The Steel drums. */
 class SteelDrums(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>
 ) : OneDrumOctave(context, eventList) {
+
+    override val strikers: Array<Striker> = Array(12) {
+        Striker(
+            context = context,
+            strikeEvents = eventList.modulus(it),
+            stickModel = context.loadModel("SteelDrumMallet.obj", "StickSkin.bmp"),
+            sticky = false
+        ).apply {
+            setParent(recoilNode)
+            node.localTranslation = STICK_ADJUSTMENTS[it].location
+            node.localRotation = STICK_ADJUSTMENTS[it].rotation
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation =
+        offsetNode.localRotation =
             Quaternion().fromAngles(0f, rad((-37f - 15 * updateInstrumentIndex(delta)).toDouble()), 0f)
     }
 
     init {
-        val drum = context.loadModel("SteelDrum.obj", "ShinySilver.bmp", 0.9f)
-        val adjustments = Array(12) { Node() }
-        for (i in 0..11) {
-            adjustments[i].attachChild(malletNodes[i])
-            val mallet = context.loadModel("SteelDrumMallet.obj", "StickSkin.bmp")
-            malletNodes[i].attachChild(mallet)
-            instrumentNode.attachChild(adjustments[i])
+        recoilNode.attachChild(
+            context.loadModel("SteelDrum.obj", "ShinySilver.bmp", 0.9f).also {
+                it.move(0f, 2f, 0f)
+            }
+        )
+
+        with(instrumentNode) {
+            setLocalTranslation(0f, 44.55f, -98.189f)
+            localRotation = Quaternion().fromAngles(rad(29.0), 0f, 0f)
         }
-        adjustments[0].setLocalTranslation(4.31f, 4.95f, 16.29f)
-        adjustments[0].localRotation = Quaternion().fromAngles(rad(-30.0), rad(15.0), 0f)
-        adjustments[1].setLocalTranslation(7.47f, 4.95f, 14.66f)
-        adjustments[1].localRotation = Quaternion().fromAngles(rad(-30.0), rad(10.0), 0f)
-        adjustments[2].setLocalTranslation(8.57f, 4.95f, 11.25f)
-        adjustments[2].localRotation = Quaternion().fromAngles(rad(-30.0), rad(5.0), 0f)
-        adjustments[3].setLocalTranslation(7.06f, 4.95f, 6.90f)
-        adjustments[3].localRotation = Quaternion().fromAngles(rad(-30.0), rad(-5.0), 0f)
-        adjustments[4].setLocalTranslation(3.57f, 4.95f, 3.08f)
-        adjustments[4].localRotation = Quaternion().fromAngles(rad(-30.0), rad(-10.0), 0f)
-        adjustments[5].setLocalTranslation(-0.32f, 4.95f, 0.89f)
-        adjustments[5].localRotation = Quaternion().fromAngles(rad(-30.0), rad(-15.0), 0f)
+    }
+}
 
-        // Left side //
-        adjustments[6].setLocalTranslation(0.32f, 4.95f, 0.89f)
-        adjustments[6].localRotation = Quaternion().fromAngles(rad(-30.0), rad(15.0), 0f)
-        adjustments[7].setLocalTranslation(-3.56f, 4.95f, 3f)
-        adjustments[7].localRotation = Quaternion().fromAngles(rad(-30.0), rad(10.0), 0f)
-        adjustments[8].setLocalTranslation(-6.84f, 4.95f, 7f)
-        adjustments[8].localRotation = Quaternion().fromAngles(rad(-30.0), rad(5.0), 0f)
-        adjustments[9].setLocalTranslation(-8.5f, 4.95f, 11.02f)
-        adjustments[9].localRotation = Quaternion().fromAngles(rad(-30.0), rad(-5.0), 0f)
-        adjustments[10].setLocalTranslation(-7.15f, 4.95f, 14.32f)
-        adjustments[10].localRotation = Quaternion().fromAngles(rad(-30.0), rad(-10.0), 0f)
-        adjustments[11].setLocalTranslation(-4.33f, 4.95f, 16.2f)
-        adjustments[11].localRotation = Quaternion().fromAngles(rad(-30.0), rad(-15.0), 0f)
+@Serializable
+private class SteelDrumStickAdjustment(
+    val pos: List<Float>,
+    val rot: List<Float>
+) {
 
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(29.0), 0f, 0f)
-        drum.setLocalTranslation(0f, 2f, 0f)
-        animNode.attachChild(drum)
-        instrumentNode.attachChild(animNode)
-        instrumentNode.setLocalTranslation(0f, 44.55f, -98.189f)
-        highestLevel.attachChild(instrumentNode)
+    val location: Vector3f by lazy {
+        Vector3f(pos[0], pos[1], pos[2])
+    }
+
+    val rotation: Quaternion by lazy {
+        Quaternion().fromAngles(rad(rot[0]), rad(rot[1]), rad(rot[2]))
     }
 }

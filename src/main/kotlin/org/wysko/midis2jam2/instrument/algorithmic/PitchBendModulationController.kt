@@ -100,6 +100,7 @@ class PitchBendModulationController(
                 it.controlNum == 1 -> {
                     modulation = it.value
                 }
+
                 it.controlNum.oneOf(6, 38) -> {
                     when {
                         cc[101] == 0 && cc[100] == 0 -> { // Setting pitch-bend sensitivity

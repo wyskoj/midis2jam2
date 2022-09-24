@@ -168,10 +168,19 @@ class DesktopMidis2jam2(
             return
         }
 
-        if (sequencer.isOpen) {
+        if (sequencer.isOpen && !paused) {
             /* Increment time if sequencer is ready / playing */
             timeSinceStart += tpf.toDouble()
         }
+
+//        rootNode.breadthFirstTraversal { it.cullHint = Spatial.CullHint.Never }
+    }
+
+    override fun seek(time: Double) {
+        timeSinceStart = time
+        sequencer.microsecondPosition = (time * 1E6).toLong()
+        eventCollectors.forEach { it.seek(time) }
+        notePeriodCollectors.forEach { it.seek(time) }
     }
 
     /**
@@ -184,6 +193,12 @@ class DesktopMidis2jam2(
         app.stateManager.detach(this)
         app.stop()
         onClose()
+    }
+
+    override fun togglePause() {
+        super.togglePause()
+
+        if (paused) sequencer.stop() else sequencer.start()
     }
 }
 

@@ -18,12 +18,12 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.Utils
 
 /**
  * The Square Click.
@@ -32,30 +32,35 @@ class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Non
 
     /** Contains the square click pad. */
     private val squareClickNode = Node().apply {
-        attachChild(context.loadModel("SquareShaker.obj", "Wood.bmp").apply {
-            setLocalTranslation(0f, -2f, -2f)
-        })
+        attachChild(
+            context.loadModel("SquareShaker.obj", "Wood.bmp").apply {
+                setLocalTranslation(0f, -2f, -2f)
+            }
+        )
     }.also {
         instrumentNode.attachChild(it)
     }
 
     /** Contains the stick. */
-    private val stickNode = Node().apply {
-        attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp"))
-    }.also {
-        instrumentNode.attachChild(it)
+    private val stick = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = StickType.DRUMSET_STICK,
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+    }
+
+    init {
+        instrumentNode.run {
+            localRotation = Quaternion().fromAngles(Utils.rad(-90.0), Utils.rad(-90.0), Utils.rad(-135.0))
+            setLocalTranslation(-42f, 44f, -79f)
+        }
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, stickNode, time, delta, hits, actualStick = false).run {
-            squareClickNode.localRotation = Quaternion().fromAngles(-this.rotationAngle, 0f, 0f)
-        }
-        stickNode.cullHint = Spatial.CullHint.Dynamic
-    }
-
-    init {
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(-90.0), rad(-90.0), rad(-135.0))
-        instrumentNode.setLocalTranslation(-42f, 44f, -79f)
+        val results = stick.tick(time, delta)
+        squareClickNode.localRotation = Quaternion().fromAngles(-results.rotationAngle, 0f, 0f)
     }
 }

@@ -18,42 +18,47 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The sticks. */
 class Sticks(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the left stick. */
-    private val leftStickNode = Node().apply {
-        attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-            setLocalTranslation(2.5f, 0f, 0f)
-            localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
-        })
-    }.also {
-        instrumentNode.attachChild(it)
+    private val mainStick = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = StickType.DRUMSET_STICK,
+        strikeSpeed = 2.0,
+        maxIdleAngle = 30.0,
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+        offsetStick {
+            it.move(2.5f, 0f, 0f)
+            it.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        }
     }
 
     /** Contains the right stick. */
     private val rightStickNode = Node().apply {
-        attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-            setLocalTranslation(-2.5f, 0f, 0f)
-            localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
-        })
+        attachChild(
+            context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+                setLocalTranslation(-2.5f, 0f, 0f)
+                localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
+            }
+        )
     }.also {
         instrumentNode.attachChild(it)
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, leftStickNode, time, delta, hits, 2.0, 30.0, actualStick = false).run {
-            rightStickNode.localRotation = Quaternion().fromAngles(-this.rotationAngle, 0f, 0f)
-        }
-        leftStickNode.cullHint = CullHint.Dynamic
+        val results = mainStick.tick(time, delta)
+        rightStickNode.localRotation = Quaternion().fromAngles(-results.rotationAngle, 0f, 0f)
     }
 
     init {

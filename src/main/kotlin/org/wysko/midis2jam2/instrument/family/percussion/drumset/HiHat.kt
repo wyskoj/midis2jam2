@@ -16,150 +16,107 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
-import com.jme3.math.Quaternion
+import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.CLOSED_HI_HAT
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.OPEN_HI_HAT
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.midi.PEDAL_HI_HAT
+import java.lang.Integer.max
+
+private val CLOSED_POSITION = Vector3f(0f, 1.2f, 0f)
+private val OPEN_POSITION = Vector3f(0f, 2f, 0f)
+private const val AMPLITUDE = 0.25
+private const val DAMPENING = 2.0
+private const val WOBBLE_SPEED = 10.0
 
 /** The hi-hat. */
-class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : SingleStickInstrument(context, hits) {
+class HiHat(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
+    PercussionInstrument(context, hits) {
 
-    /** The list of NoteOn events that the stick needs to worry about (closed and open). */
-    private val hitsToStrike: List<MidiNoteOnEvent>
-
-    /** The top cymbal. */
-    private val topCymbal = Node()
-
-    /** The whole hi-hat. */
-    private val wholeHat = Node()
-
-    /** The cymbal animator. */
-    private val animator: CymbalAnimator
-
-    /** The current animation time. */
-    private var animTime = 0.0
-
-    /**
-     * The current status of the hi-hat.
-     *
-     * @see HiHatStatus
-     */
-    private var status = HiHatStatus.CLOSED
-
-    override fun tick(time: Double, delta: Float) {
-        animator.tick(delta)
-
-        val recoil = NoteQueue.collectOne(hits, time, context)
-
-        /* If a note is to be played */
-        if (recoil != null) {
-            /* Strike for cymbal animation */
-            animator.strike()
-
-            /* Recoil hi-hat */
-            wholeHat.setLocalTranslation(0f, (-0.7 * velocityRecoilDampening(recoil.velocity)).toFloat(), -14f)
-
-            /* Open or close hat based on note */
-            if (recoil.note == OPEN_HI_HAT) {
-                status = HiHatStatus.OPEN
-                topCymbal.setLocalTranslation(0f, 2f, 0f)
-            } else {
-                status = HiHatStatus.CLOSED
-                topCymbal.setLocalTranslation(0f, 1.2f, 0f)
-            }
-
-            /* Reset animation time */
-            animTime = 0.0
-        }
-        /* Apply wobble if the hat is open */
-        topCymbal.localRotation =
-            Quaternion().fromAngles(if (status == HiHatStatus.CLOSED) 0f else animator.rotationAmount(), 0f, 0f)
-
-        /* Increment anim time if there has already been a hat strike already */
-        if (animTime != -1.0) animTime += delta.toDouble()
-
-        /* Animate stick */
-        handleStick(time, delta, hitsToStrike as MutableList<MidiNoteOnEvent>)
-
-        /* Move the hat up for recoil */
-        wholeHat.move(0f, 5 * delta, 0f)
-
-        /* But not so far that it keeps going up */
-        if (wholeHat.localTranslation.y > 0) {
-            val localTranslation = Vector3f(wholeHat.localTranslation)
-            localTranslation.also { it.y = it.y.coerceAtMost(0f) }
-            wholeHat.localTranslation = localTranslation
-        }
+    private val cymbalsNode = Node().apply {
+        recoilNode.attachChild(this)
+        scale(1.3f)
+        move(0f, 0f, -13f)
     }
 
-    /** The status of the hi-hat. */
-    private enum class HiHatStatus {
-        /** The hat is closed, meaning the top cymbal and bottom cymbal are together. */
-        CLOSED,
-
-        /** The hat is open, meaning the top cymbal is raised. */
-        OPEN
-    }
-
-    companion object {
-        /** How fast the hi-hat wobbles. */
-        private const val WOBBLE_SPEED = 10
-
-        /** How fast the hi-hat returns to rest after being struck. */
-        private const val DAMPENING = 2.0
-
-        /** The intensity of the strike. */
-        private const val AMPLITUDE = 0.25
+    private val topCymbal: Spatial = context.loadModel(
+        model = "DrumSet_Cymbal.obj",
+        texture = "CymbalSkinSphereMap.bmp",
+        brightness = 0.7f
+    ).apply {
+        localTranslation = CLOSED_POSITION // Start in closed position
+        cymbalsNode.attachChild(this)
     }
 
     init {
-        val bottomCymbal = Node()
+        // Add bottom cymbal
+        context.loadModel(
+            model = "DrumSet_Cymbal.obj",
+            texture = "CymbalSkinSphereMap.bmp",
+            brightness = 0.7f
+        ).apply {
+            rotate(FastMath.PI, 0f, 0f) // Rotate upside down
+            cymbalsNode.attachChild(this)
+        }
+    }
 
-        /* Filter out hits that the stick needs to worry about */
-        hitsToStrike = hits.filter { it.note == OPEN_HI_HAT || it.note == CLOSED_HI_HAT }
+    private val stick: Striker = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note != PEDAL_HI_HAT },
+        stickModel = StickType.DRUMSET_STICK
+    ).apply {
+        setParent(recoilNode)
+        node.move(0f, 1f, 2f)
+    }
 
-        /* Load the cymbals */
-        topCymbal.attachChild(
-            context.loadModel(
-                "DrumSet_Cymbal.obj",
-                "CymbalSkinSphereMap.bmp",
-                0.7f
-            )
-        )
-        bottomCymbal.attachChild(
-            context.loadModel(
-                "DrumSet_Cymbal.obj",
-                "CymbalSkinSphereMap.bmp",
-                0.7f
-            ).apply {
-                localRotation = Quaternion().fromAngles(rad(180.0), 0f, 0f)
+    private val cymbalAnimator = CymbalAnimator(topCymbal, AMPLITUDE, WOBBLE_SPEED, DAMPENING)
+
+    private val pedalEventCollector = EventCollector(
+        events = hits.toList().filter { it.note == PEDAL_HI_HAT },
+        context = context
+    )
+
+    init {
+        instrumentNode.move(-6f, 22f, -72f)
+        instrumentNode.rotate(0f, 1.57f, 0f)
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+
+        val stickResults = stick.tick(time, delta)
+        stickResults.strike?.let {
+            cymbalAnimator.strike()
+            topCymbal.localTranslation = when (it.note) {
+                OPEN_HI_HAT -> OPEN_POSITION
+                else -> {
+                    cymbalAnimator.cancel()
+                    CLOSED_POSITION
+                }
             }
+        }
+
+        val pedalResults = pedalEventCollector.advanceCollectOne(time)
+        pedalResults?.let {
+            cymbalAnimator.cancel()
+            topCymbal.localTranslation = CLOSED_POSITION
+        }
+
+        recoilDrum(
+            drum = recoilNode,
+            velocity = max(stickResults.strike?.velocity ?: 0, pedalResults?.velocity ?: 0),
+            delta = delta,
+            recoilDistance = -0.7f,
+            recoilSpeed = 5f
         )
 
-        topCymbal.setLocalTranslation(0f, 1.2f, 0f)
-
-        wholeHat.run {
-            attachChild(topCymbal)
-            attachChild(bottomCymbal)
-            setLocalScale(1.3f)
-            setLocalTranslation(0f, 0f, -14f)
-        }
-
-        highLevelNode.run {
-            attachChild(wholeHat)
-            setLocalTranslation(-6f, 22f, -72f)
-            localRotation = Quaternion().fromAngles(0f, rad(90.0), 0f)
-            detachChild(stickNode)
-        }
-
-        wholeHat.attachChild(stickNode)
-        stickNode.setLocalTranslation(0f, 1f, 13f)
-        animator = CymbalAnimator(AMPLITUDE, WOBBLE_SPEED.toDouble(), DAMPENING)
+        cymbalAnimator.tick(delta)
     }
 }

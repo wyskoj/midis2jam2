@@ -34,19 +34,21 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
     context,
     StandardFrettingEngine(3, 15, intArrayOf(50, 57, 62)),
     events,
-    FrettedInstrumentPositioning(38.814f,
-        -6.1f,
-        arrayOf(Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ),
-        floatArrayOf(-0.5f, 0f, 0.5f),
-        floatArrayOf(-0.5f, 0f, 0.5f),
-        object : FretHeightCalculator {
+    FrettedInstrumentPositioning(
+        upperY = 38.814f,
+        lowerY = -6.1f,
+        restingStrings = arrayOf(Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ, Vector3f.UNIT_XYZ),
+        upperX = floatArrayOf(-0.5f, 0f, 0.5f),
+        lowerX = floatArrayOf(-0.5f, 0f, 0.5f),
+        fretHeights = object : FretHeightCalculator {
             override fun calculateScale(fret: Int): Float {
                 return fret * 0.048f // 0 --> 0; 15 --> 0.72
             }
         }
     ),
     3,
-    context.loadModel("Shamisen.obj", SHAMISEN_SKIN_TEXTURE)) {
+    context.loadModel("Shamisen.obj", SHAMISEN_SKIN_TEXTURE)
+) {
 
     override val upperStrings: Array<Spatial> = Array(3) {
         context.loadModel("ShamisenString.obj", SHAMISEN_SKIN_TEXTURE).apply {
@@ -54,7 +56,6 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
             setLocalTranslation(positioning.upperX[it], positioning.upperY, FORWARD)
         }
     }
-
 
     override val lowerStrings: Array<Array<Spatial>> = Array(3) { i: Int ->
         Array(5) { j: Int ->

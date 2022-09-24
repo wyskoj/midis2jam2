@@ -17,58 +17,42 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.util.Utils
 
 /**
- * The cabasa animates much like the [JingleBells] but also rotates depending on the current strike angle.
- *
- * @see JingleBells
+ * The Cabasa.
  */
 class Cabasa(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the cabasa. */
-    private val cabasaNode = Node()
-
-    /** The cabasa. */
-    private val cabasaModel: Spatial
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        val stickStatus =
-            Stick.handleStick(
-                context,
-                cabasaNode,
-                time,
-                delta,
-                hits,
-                Stick.STRIKE_SPEED,
-                Stick.MAX_ANGLE,
-                Axis.X,
-                actualStick = false
-            )
-
-        /* Spin the cabasa loosely based on the rotation angle of the stickStatus */
-        cabasaModel.localRotation = Quaternion().fromAngles(0f, stickStatus.rotationAngle, 0f)
+    private val cabasa = Striker(
+        context = context,
+        hits,
+        context.loadModel("Cabasa.obj", "Cabasa.bmp"),
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+        offsetStick {
+            it.move(0f, 0f, -3f)
+        }
     }
 
     init {
-        /* Load cabasa and position */
-        cabasaModel = context.loadModel("Cabasa.obj", "Cabasa.bmp").apply {
-            setLocalTranslation(0f, 0f, -3f)
-            cabasaNode.attachChild(this)
-        }
-
-        /* Positioning */
-        instrumentNode.run {
-            localRotation = Quaternion().fromAngles(0f, 0f, rad(45.0))
+        instrumentNode.apply {
+            localRotation = Quaternion().fromAngles(0f, 0f, Utils.rad(45.0))
             setLocalTranslation(-10f, 48f, -50f)
-            attachChild(cabasaNode)
+        }
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+
+        val results = cabasa.tick(time, delta)
+        cabasa.offsetStick {
+            it.localRotation = Quaternion().fromAngles(0f, results.rotationAngle, 0f)
         }
     }
 }

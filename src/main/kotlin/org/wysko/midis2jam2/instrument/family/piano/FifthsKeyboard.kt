@@ -18,38 +18,15 @@
 package org.wysko.midis2jam2.instrument.family.piano
 
 import com.jme3.math.ColorRGBA
-import com.jme3.scene.Geometry
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /**
  * A keyboard that glows the key 7 semitones below the currently playing note.
  */
 class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent>, skin: KeyboardSkin) :
     Keyboard(context, events, skin) {
-
-    override fun pressKey(key: Key, event: MidiNoteOnEvent) {
-        super.pressKey(key, event)
-        changeGlowFifthBelow(key, true)
-    }
-
-    override fun releaseKey(key: Key) {
-        super.releaseKey(key)
-        changeGlowFifthBelow(key, false)
-    }
-
-    private fun changeGlowFifthBelow(rootKey: Key, isGlowing: Boolean) {
-        rootKey as KeyboardKey
-        keyByMidiNote(rootKey.midiNote - 5)?.let { key ->
-            key.keyNode.breadthFirstTraversal {
-                if (it is Geometry) {
-                    it.material.setColor("GlowColor", glowColor(isGlowing))
-                }
-            }
-        }
-    }
 
     private fun glowColor(isGlowing: Boolean): ColorRGBA =
         if (isGlowing) ColorRGBA(0.9f, 0f, 0f, 1f) else ColorRGBA.Black

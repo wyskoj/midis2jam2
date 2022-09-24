@@ -17,10 +17,12 @@
 package org.wysko.midis2jam2.instrument
 
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.util.cullHint
-import kotlin.math.max
 
 /** How fast instruments move when transitioning. */
 private const val BASE_TRANSITION_SPEED = 2500
@@ -35,7 +37,7 @@ private const val BASE_TRANSITION_SPEED = 2500
  */
 abstract class Instrument protected constructor(
     /** Context to the main class. */
-    val context: Midis2jam2,
+    val context: Midis2jam2
 ) {
 
     /** Used for moving the instrument when there are two or more consecutively visible instruments of the same type. */
@@ -52,8 +54,28 @@ abstract class Instrument protected constructor(
      * instruments rely on this variable.
      */
     var isVisible: Boolean = false
-        get() = (context.properties.getProperty("never_hidden") == "true").or(field)
+        set(value) {
 
+            if (!value && !context.properties.getProperty("never_hidden").equals("true", ignoreCase = true)) {
+                context.rootNode.detachChild(offsetNode)
+            } else {
+                context.rootNode.attachChild(offsetNode)
+            }
+
+            if (this is PercussionInstrument && this !is NonDrumSetPercussion) {
+                field = true
+                instrumentNode.cullHint = Spatial.CullHint.Dynamic
+                return
+            }
+
+            instrumentNode.cullHint = value.cullHint()
+            field = value
+        }
+        get() {
+            return if (context.properties.getProperty("never_hidden").equals("true", ignoreCase = true)) {
+                true
+            } else field
+        }
 
     /**
      * The index of this instrument in the stack of similar instruments. Can be a decimal when instrument transition
@@ -101,7 +123,7 @@ abstract class Instrument protected constructor(
         val similarAndVisible = similarVisible()
         val targetIndex = if (isVisible) {
             /* Index in the list of instruments from context */
-            max(0, similarAndVisible.indexOf(this))
+            similarAndVisible.indexOf(this).coerceAtLeast(0)
         } else {
             /* The number of visible instruments of this type, minus one */
             similarAndVisible.size - 1
@@ -116,10 +138,14 @@ abstract class Instrument protected constructor(
         return index.toFloat()
     }
 
-    /** The number of instruments that are similar to this one (they are the same class or a subclass) and are visible. */
-    protected open fun similarVisible() = similar().filter { it.isVisible }
+    /** The number of instruments that are [similar] and are visible. */
+    protected open fun similarVisible(): List<Instrument> = similar().filter { it.isVisible }
 
-    protected open fun similar() = context.instruments.filter { this.javaClass.isInstance(it) }
+    /**
+     * Returns a list of instruments that should stack with this instrument (typically those of the same class or
+     * subclasses).
+     */
+    protected open fun similar(): List<Instrument> = context.instruments.filter { this.javaClass.isInstance(it) }
 
     /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */
     @Contract(pure = true)
@@ -134,7 +160,6 @@ abstract class Instrument protected constructor(
      */
     protected fun setVisibility(time: Double) {
         isVisible = calcVisibility(time)
-        instrumentNode.cullHint = isVisible.cullHint()
     }
 
     /** Formats a property about this instrument for debugging purposes. */

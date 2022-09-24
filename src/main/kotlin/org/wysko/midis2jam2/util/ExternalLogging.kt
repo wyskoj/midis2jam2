@@ -17,12 +17,6 @@
 
 package org.wysko.midis2jam2.util
 
-import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.midi.MidiProgramEvent
-import org.wysko.midis2jam2.midi.MidiTextEvent
 import oshi.SystemInfo
-import java.sql.DriverManager
-import java.util.*
 
 private val uuid = SystemInfo().hardware.computerSystem.hardwareUUID
-

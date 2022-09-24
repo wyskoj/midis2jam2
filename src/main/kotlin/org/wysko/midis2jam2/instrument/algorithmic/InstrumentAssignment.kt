@@ -48,6 +48,7 @@ import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
 import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
 import org.wysko.midis2jam2.instrument.family.piano.FifthsKeyboard
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.piano.KeyboardSkin
 import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
 import org.wysko.midis2jam2.instrument.family.pipe.Flute
 import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
@@ -176,6 +177,7 @@ object InstrumentAssignment {
                 is MidiProgramEvent -> {
                     currentProgram = it.programNum
                 }
+
                 is MidiNoteOnEvent -> {
                     if (currentProgram == 48 && it.note in 41..53) { // Orchestra kit, timpani percussion range
                         timpaniPercussion += it
@@ -214,22 +216,22 @@ object InstrumentAssignment {
 
         if (midiNoteEvents.isEmpty()) return null
         return when (program) {
-            0 -> Keyboard(context, events, Keyboard.KeyboardSkin.PIANO)
-            1 -> Keyboard(context, events, Keyboard.KeyboardSkin.BRIGHT)
-            2 -> Keyboard(context, events, Keyboard.KeyboardSkin.ELECTRIC_GRAND)
-            3 -> Keyboard(context, events, Keyboard.KeyboardSkin.HONKY_TONK)
-            4 -> Keyboard(context, events, Keyboard.KeyboardSkin.ELECTRIC_1)
-            5 -> Keyboard(context, events, Keyboard.KeyboardSkin.ELECTRIC_2)
-            6 -> Keyboard(context, events, Keyboard.KeyboardSkin.HARPSICHORD)
-            7 -> Keyboard(context, events, Keyboard.KeyboardSkin.CLAVICHORD)
-            8 -> Keyboard(context, events, Keyboard.KeyboardSkin.CELESTA)
+            0 -> Keyboard(context, events, KeyboardSkin["piano"])
+            1 -> Keyboard(context, events, KeyboardSkin["bright"])
+            2 -> Keyboard(context, events, KeyboardSkin["electric_grand"])
+            3 -> Keyboard(context, events, KeyboardSkin["honky_tonk"])
+            4 -> Keyboard(context, events, KeyboardSkin["electric_1"])
+            5 -> Keyboard(context, events, KeyboardSkin["electric_2"])
+            6 -> Keyboard(context, events, KeyboardSkin["harpsichord"])
+            7 -> Keyboard(context, events, KeyboardSkin["clavichord"])
+            8 -> Keyboard(context, events, KeyboardSkin["celesta"])
             9 -> Mallets(context, events, Mallets.MalletType.GLOCKENSPIEL)
             10 -> MusicBox(context, events)
             11 -> Mallets(context, events, Mallets.MalletType.VIBES)
             12 -> Mallets(context, events, Mallets.MalletType.MARIMBA)
             13 -> Mallets(context, events, Mallets.MalletType.XYLOPHONE)
             14, 98 -> TubularBells(context, events)
-            15, 16, 17, 18, 19, 20, 55 -> Keyboard(context, events, Keyboard.KeyboardSkin.WOOD)
+            15, 16, 17, 18, 19, 20, 55 -> Keyboard(context, events, KeyboardSkin["wood"])
             21 -> Accordion(context, events, Accordion.AccordionType.ACCORDION)
             22 -> Harmonica(context, events)
             23 -> Accordion(context, events, Accordion.AccordionType.BANDONEON)
@@ -248,30 +250,35 @@ object InstrumentAssignment {
                 StageStrings.StageStringsType.STRING_ENSEMBLE_1,
                 StageStrings.StageStringBehavior.TREMOLO
             )
+
             48 -> StageStrings(
                 context,
                 events,
                 StageStrings.StageStringsType.STRING_ENSEMBLE_1,
                 StageStrings.StageStringBehavior.NORMAL
             )
+
             49 -> StageStrings(
                 context,
                 events,
                 StageStrings.StageStringsType.STRING_ENSEMBLE_2,
                 StageStrings.StageStringBehavior.NORMAL
             )
+
             50 -> StageStrings(
                 context,
                 events,
                 StageStrings.StageStringsType.SYNTH_STRINGS_1,
                 StageStrings.StageStringBehavior.NORMAL
             )
+
             51 -> StageStrings(
                 context,
                 events,
                 StageStrings.StageStringsType.SYNTH_STRINGS_2,
                 StageStrings.StageStringBehavior.NORMAL
             )
+
             45 -> PizzicatoStrings(context, events)
             46 -> Harp(context, events)
             47 -> Timpani(context, events)
@@ -302,43 +309,45 @@ object InstrumentAssignment {
             79 -> Ocarina(context, events)
             80 -> { // square
                 if (midiNoteEvents.maxPolyphony() > 2) {
-                    Keyboard(context, events, Keyboard.KeyboardSkin.SQUARE_WAVE)
+                    Keyboard(context, events, KeyboardSkin["square_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaser.SpaceLaserType.SQUARE)
                 }
             }
+
             81 -> { // sawtooth
                 if (midiNoteEvents.maxPolyphony() > 2) {
-                    Keyboard(context, events, Keyboard.KeyboardSkin.SAW_WAVE)
+                    Keyboard(context, events, KeyboardSkin["saw_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaser.SpaceLaserType.SAW)
                 }
             }
+
             82 -> PanFlute(context, events, PanFlute.PipeSkin.GOLD) // calliope
-            83 -> Keyboard(context, events, Keyboard.KeyboardSkin.CHIFF) // chiff
-            84 -> Keyboard(context, events, Keyboard.KeyboardSkin.CHARANG) // charang
-            86 -> FifthsKeyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // fifths
-            87 -> Keyboard(context, events, Keyboard.KeyboardSkin.BASS_AND_LEAD) // bass + lead
-            88 -> Keyboard(context, events, Keyboard.KeyboardSkin.NEW_AGE) // new age
-            89 -> Keyboard(context, events, Keyboard.KeyboardSkin.WARM) // warm
-            90 -> Keyboard(context, events, Keyboard.KeyboardSkin.POLYSYNTH) // polysynth
-            91 -> Keyboard(context, events, Keyboard.KeyboardSkin.CHOIR) // choir
+            83 -> Keyboard(context, events, KeyboardSkin["chiff"]) // chiff
+            84 -> Keyboard(context, events, KeyboardSkin["charang"]) // charang
+            86 -> FifthsKeyboard(context, events, KeyboardSkin["synth"]) // fifths
+            87 -> Keyboard(context, events, KeyboardSkin["bass_and_lead"]) // bass + lead
+            88 -> Keyboard(context, events, KeyboardSkin["new_age"]) // new age
+            89 -> Keyboard(context, events, KeyboardSkin["warm"]) // warm
+            90 -> Keyboard(context, events, KeyboardSkin["polysynth"]) // polysynth
+            91 -> Keyboard(context, events, KeyboardSkin["choir"]) // choir
             92 -> StageStrings(
                 context,
                 events,
                 StageStrings.StageStringsType.BOWED_SYNTH,
                 StageStrings.StageStringBehavior.NORMAL
             ) // bowed
-            93 -> Keyboard(context, events, Keyboard.KeyboardSkin.METALLIC) // metallic
+            93 -> Keyboard(context, events, KeyboardSkin["metallic"]) // metallic
             94 -> StageChoir(context, events, StageChoir.ChoirType.HALO_SYNTH) // halo
-            95 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // sweep
-            96 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // rain
-            97 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // soundtrack
-            99 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // atmosphere
-            100 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // brightness
+            95 -> Keyboard(context, events, KeyboardSkin["synth"]) // sweep
+            96 -> Keyboard(context, events, KeyboardSkin["synth"]) // rain
+            97 -> Keyboard(context, events, KeyboardSkin["synth"]) // soundtrack
+            99 -> Keyboard(context, events, KeyboardSkin["synth"]) // atmosphere
+            100 -> Keyboard(context, events, KeyboardSkin["synth"]) // brightness
             101 -> StageChoir(context, events, StageChoir.ChoirType.GOBLIN_SYNTH) // goblins
-            102 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // echoes
-            103 -> Keyboard(context, events, Keyboard.KeyboardSkin.SYNTH) // sci-fi
+            102 -> Keyboard(context, events, KeyboardSkin["synth"]) // echoes
+            103 -> Keyboard(context, events, KeyboardSkin["synth"]) // sci-fi
             105 -> Banjo(context, events)
             106 -> Shamisen(context, events)
             110 -> Fiddle(context, events)

@@ -20,7 +20,7 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.OPEN_CUICA
@@ -28,14 +28,20 @@ import org.wysko.midis2jam2.util.Utils.rad
 
 private val HAND_SLIDE_RANGE = 0f..1f
 
+/** The Cuica. */
 class Cuica(
     context: Midis2jam2,
     hits: MutableList<MidiNoteOnEvent>
 ) : NonDrumSetPercussion(context, hits) {
 
-    private val drum = context.loadModel("DrumSet_Cuica.obj", "DrumShell_Cuica.png").also {
-        instrumentNode.attachChild(it)
-        (it as Node).getChild(0).setMaterial(context.unshadedMaterial("Wood.bmp"))
+    private val eventCollector = EventCollector(hits, context)
+
+    init {
+        // Load drum
+        context.loadModel("DrumSet_Cuica.obj", "DrumShell_Cuica.png").also {
+            instrumentNode.attachChild(it)
+            (it as Node).getChild(0).setMaterial(context.unshadedMaterial("Wood.bmp"))
+        }
     }
 
     private val strokeHand = context.loadModel("Hand_Cuica.obj", "hands.bmp").also {
@@ -60,7 +66,7 @@ class Cuica(
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
-        NoteQueue.collectOne(hits, time, context)?.let {
+        eventCollector.advanceCollectOne(time)?.let {
             isMoving = true
             isMovingIn = !isMovingIn
             handPosition = if (isMovingIn) 0f else 1f

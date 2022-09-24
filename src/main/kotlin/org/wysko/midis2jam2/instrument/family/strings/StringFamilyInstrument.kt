@@ -62,26 +62,33 @@ abstract class StringFamilyInstrument protected constructor(
     openStringMidiNotes: IntArray,
 
     /* The body of the instrument. */
-    body: Spatial,
+    body: Spatial
 ) : FrettedInstrument(
     context,
     StandardFrettingEngine(
-        4, 48, openStringMidiNotes
+        4,
+        48,
+        openStringMidiNotes
     ),
     events,
     FrettedInstrumentPositioningWithZ(
         8.84f,
-        -6.17f, arrayOf(
+        -6.17f,
+        arrayOf(
             Vector3f(1f, 1f, 1f),
             Vector3f(1f, 1f, 1f),
             Vector3f(1f, 1f, 1f),
             Vector3f(1f, 1f, 1f)
-        ), floatArrayOf(-0.369f, -0.122f, 0.126f, 0.364f), floatArrayOf(-0.8f, -0.3f, 0.3f, 0.8f),
+        ),
+        floatArrayOf(-0.369f, -0.122f, 0.126f, 0.364f),
+        floatArrayOf(-0.8f, -0.3f, 0.3f, 0.8f),
         object : FretHeightCalculator {
             override fun calculateScale(fret: Int): Float {
                 return 1 - (0.0003041886 * fret.toDouble().pow(2.0) + -0.0312677 * fret + 1).toFloat()
             }
-        }, floatArrayOf(-0.6f, -0.6f, -0.6f, -0.6f), floatArrayOf(
+        },
+        floatArrayOf(-0.6f, -0.6f, -0.6f, -0.6f),
+        floatArrayOf(
             0.47f,
             0.58f,
             0.58f,
@@ -188,7 +195,6 @@ abstract class StringFamilyInstrument protected constructor(
      * @param delta time since the last frame
      */
     private fun animateBow(time: Double, delta: Float) {
-
         if (currentNotePeriods.isNotEmpty()) {
             bowNode.setLocalTranslation(0f, -4f, 0.5f)
             val p = currentGroup ?: return

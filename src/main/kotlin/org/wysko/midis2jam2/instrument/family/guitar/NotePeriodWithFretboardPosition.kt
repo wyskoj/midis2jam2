@@ -26,7 +26,7 @@ class NotePeriodWithFretboardPosition private constructor(
     startTime: Double,
     endTime: Double,
     noteOn: MidiNoteOnEvent,
-    noteOff: MidiNoteOffEvent,
+    noteOff: MidiNoteOffEvent
 ) : NotePeriod(midiNote, startTime, endTime, noteOn, noteOff) {
 
     /** The fretboard position this note period was assigned to. */
@@ -41,8 +41,11 @@ class NotePeriodWithFretboardPosition private constructor(
          */
         fun fromNotePeriod(notePeriod: NotePeriod): NotePeriodWithFretboardPosition {
             return NotePeriodWithFretboardPosition(
-                notePeriod.midiNote, notePeriod.startTime, notePeriod.endTime,
-                notePeriod.noteOn, notePeriod.noteOff
+                notePeriod.midiNote,
+                notePeriod.startTime,
+                notePeriod.endTime,
+                notePeriod.noteOn,
+                notePeriod.noteOff
             )
         }
     }

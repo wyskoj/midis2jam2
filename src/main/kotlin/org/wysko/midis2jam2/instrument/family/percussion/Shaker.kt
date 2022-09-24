@@ -17,41 +17,34 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.util.Utils
 
-/** The shaker. */
+/** The Shaker. */
 class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the shaker. */
-    private val shakerNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        Stick.handleStick(
-            context,
-            shakerNode,
-            time,
-            delta,
-            hits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X,
-            actualStick = false
-        )
+    private val shaker = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = context.loadModel("Shaker.obj", "DarkWood.bmp"),
+        actualStick = false
+    ).apply {
+        offsetStick { it.move(0f, 0f, -3f) }
+        setParent(instrumentNode)
     }
 
     init {
-        val shaker = context.loadModel("Shaker.obj", "DarkWood.bmp")
-        shaker.setLocalTranslation(0f, 0f, -3f)
-        shakerNode.attachChild(shaker)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-25.0))
-        instrumentNode.setLocalTranslation(13f, 45f, -42f)
-        instrumentNode.attachChild(shakerNode)
+        instrumentNode.apply {
+            move(13f, 45f, -42f)
+            localRotation = Quaternion().fromAngles(0f, 0f, Utils.rad(-25.0))
+        }
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        shaker.tick(time, delta)
     }
 }

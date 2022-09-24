@@ -62,7 +62,7 @@ abstract class MonophonicInstrument protected constructor(
 
     /** The pitch bend modulation controller. */
     protected open val pitchBendModulationController: PitchBendModulationController =
-        PitchBendModulationController(context, eventList, smoothness = 50.0)
+        PitchBendModulationController(context, eventList, smoothness = 10.0)
 
     /** The configuration of standard pitch bend animation. */
     protected open val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration()
@@ -88,6 +88,7 @@ abstract class MonophonicInstrument protected constructor(
             }.map {
                 (constructor.newInstance(this) as Clone).apply {
                     notePeriods.addAll(it)
+                    createCollector()
                 }
             }.toList()
     }.onEach { groupOfPolyphony.attachChild(it.offsetNode) }
@@ -115,10 +116,14 @@ abstract class MonophonicInstrument protected constructor(
                 if (pitchBendConfiguration.rotationalAxis == Axis.Z) bend else 0f
             )
         }
+        this.bend = bend
     }
+
+    private var bend = 0f
 
     override fun toString(): String {
         return super.toString() + buildString {
+            append(debugProperty("bend", bend))
             append(clones.debugString())
         }
     }

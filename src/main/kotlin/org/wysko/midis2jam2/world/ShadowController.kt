@@ -51,7 +51,7 @@ import org.wysko.midis2jam2.util.cullHint
  */
 class ShadowController(
     /** Context to midis2jam2. */
-    private val context: Midis2jam2,
+    private val context: Midis2jam2
 ) {
     /** The keyboard shadow. */
     private val keyboardShadow: Spatial =
@@ -76,7 +76,9 @@ class ShadowController(
         // Scale the shadow by the number of visible keyboards
         context.instruments.filterIsInstance<Keyboard>().let { keyboards ->
             keyboardShadow.localScale = Vector3f(
-                1f, 1f, if (keyboards.isNotEmpty()) {
+                1f,
+                1f,
+                if (keyboards.isNotEmpty()) {
                     keyboards.filter { it.isVisible }.maxOfOrNull { it.checkInstrumentIndex() }?.let {
                         it.toFloat() + 1f
                     } ?: 0f
@@ -106,8 +108,7 @@ class ShadowController(
         shadows.forEachIndexed { index, shadow -> shadow.cullHint = (index < numVisible).cullHint() }
     }
 
-    companion object {
-    }
+    companion object;
 
     init {
         /* Load keyboard shadow */

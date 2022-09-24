@@ -18,62 +18,56 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
 /**
- * The claves animate similarly to the [HandClap].
- *
- * @see HandClap
+ * The Claves.
  */
 class Claves(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
     /** Contains the left clave. */
-    private val rightClaveNode = Node()
+    private val rightClave = Striker(
+        context = context,
+        hits,
+        context.loadModel("Clave.obj", "Clave.bmp"),
+        actualStick = false
+    ).apply {
+        node.move(-1f, 0f, 0f)
+        setParent(instrumentNode)
+        offsetStick {
+            it.setLocalTranslation(2.5f, 0f, 0f)
+            it.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        }
+    }
 
     /** Contains the right clave. */
-    private val leftClaveNode = Node()
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-
-        /* Animate the right clave like you normally would for a stick */
-        val status = Stick.handleStick(
-            context, rightClaveNode, time, delta, hits, Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE, Axis.X, actualStick = false
+    private val leftClaveNode = Node().apply {
+        instrumentNode.attachChild(this)
+    }.also {
+        it.attachChild(
+            context.loadModel("Clave.obj", "Clave.bmp").apply {
+                setLocalTranslation(-2.5f, 0f, 0f)
+                localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
+            }
         )
-
-        /* Override handleStick making the rightClaveNode cull */
-        rightClaveNode.cullHint = CullHint.Dynamic
-
-        /* Copy the rotation and mirror it to the left clave */
-        leftClaveNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
     }
 
     init {
-        /* Load right clave and position */
-        val rightClave = context.loadModel("Clave.obj", "Clave.bmp")
-        rightClave.setLocalTranslation(2.5f, 0f, 0f)
-        rightClave.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
-        rightClaveNode.attachChild(rightClave)
-        rightClaveNode.setLocalTranslation(-1f, 0f, 0f)
-
-        /* Load left clave and position */
-        val leftClave = context.loadModel("Clave.obj", "Clave.bmp")
-        leftClave.setLocalTranslation(-2.5f, 0f, 0f)
-        leftClave.localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
-        leftClaveNode.attachChild(leftClave)
-
-        /* Positioning */
         instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
         instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
+    }
 
-        /* Attach claves */
-        instrumentNode.attachChild(rightClaveNode)
-        instrumentNode.attachChild(leftClaveNode)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+
+        // Animate the right clave like you normally would for a stick
+        val status = rightClave.tick(time, delta)
+
+        // Copy the rotation and mirror it to the left clave
+        leftClaveNode.localRotation = Quaternion().fromAngles(-status.rotationAngle, 0f, 0f)
     }
 }

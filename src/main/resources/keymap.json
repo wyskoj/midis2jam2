@@ -42,5 +42,13 @@
 	{
 		"name": "debug",
 		"key": "KEY_F3"
+	},
+	{
+		"name": "play/pause",
+		"key": "KEY_SPACE"
+	},
+	{
+		"name": "seek",
+		"key": "KEY_K"
 	}
 ]

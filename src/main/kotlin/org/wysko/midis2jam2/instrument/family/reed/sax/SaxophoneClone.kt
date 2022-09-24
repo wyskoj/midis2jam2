@@ -42,5 +42,9 @@ abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFa
             parent.context.loadModel("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp", 0.9f)
         }
         attachKeys()
+
+        // For proper rotation when bending
+        animNode.setLocalTranslation(0f, 20f, 0f)
+        bendNode.setLocalTranslation(0f, -20f, 20f)
     }
 }

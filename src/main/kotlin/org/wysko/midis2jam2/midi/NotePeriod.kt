@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.midi
 
 import org.jetbrains.annotations.Contract
+import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 
@@ -38,7 +39,7 @@ open class NotePeriod(
     val noteOn: MidiNoteOnEvent,
 
     /** The [MidiNoteOffEvent]. */
-    val noteOff: MidiNoteOffEvent,
+    val noteOff: MidiNoteOffEvent
 ) {
     /** [FrettedInstrument] gets help from this. */
     var animationStarted: Boolean = false
@@ -59,7 +60,7 @@ open class NotePeriod(
     }
 
     override fun toString(): String {
-        return "NotePeriod(midiNote=$midiNote, startTime=$startTime, endTime=$endTime, noteOn=$noteOn, noteOff=$noteOff, animationStarted=$animationStarted)"
+        return String.format("[%d @ %.1f--%.1f]", midiNote, startTime, endTime)
     }
 
     companion object {
@@ -74,8 +75,8 @@ open class NotePeriod(
          */
         @Contract(pure = true)
         fun calculateNotePeriods(
-            instrument: Instrument,
-            noteEvents: MutableList<MidiNoteEvent>,
+            context: Midis2jam2,
+            noteEvents: List<MidiNoteEvent>
         ): MutableList<NotePeriod> {
             val notePeriods: ArrayList<NotePeriod> = ArrayList()
             val onEvents = arrayOfNulls<MidiNoteOnEvent>(MIDI_MAX_NOTE + 1)
@@ -101,8 +102,8 @@ open class NotePeriod(
                         notePeriods.add(
                             NotePeriod(
                                 midiNote = noteOff.note,
-                                startTime = instrument.context.file.eventInSeconds(it),
-                                endTime = instrument.context.file.eventInSeconds(noteOff),
+                                startTime = context.file.eventInSeconds(it),
+                                endTime = context.file.eventInSeconds(noteOff),
                                 noteOn = it,
                                 noteOff = noteOff
                             )
@@ -143,7 +144,6 @@ fun List<NotePeriod>.contiguousGroups(): List<NotePeriodGroup> {
             currentGroup.add(this)
             furthestTime = this.noteOff.time.coerceAtLeast(furthestTime)
         }
-
     }
 
     this.forEach { notePeriod ->
@@ -164,7 +164,7 @@ data class NotePeriodGroup(
     /**
      * The [NotePeriod]s that are in this group.
      */
-    val notePeriods: List<NotePeriod>,
+    val notePeriods: List<NotePeriod>
 ) {
     /** The time at which the first [NotePeriod] in this group begins. */
     fun startTime(): Double = notePeriods.minOf { it.startTime }

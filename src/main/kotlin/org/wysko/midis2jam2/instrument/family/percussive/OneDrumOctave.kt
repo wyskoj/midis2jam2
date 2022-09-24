@@ -19,49 +19,34 @@ package org.wysko.midis2jam2.instrument.family.percussive
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument.Companion.recoilDrum
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.world.Axis
 
 /** A drum that is hit at different spots to represent the notes in an octave. */
 abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    DecayedInstrument(context, eventList) {
+    DecayedInstrument(context, eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()) {
 
-    /** The Anim node. */
-    protected val animNode: Node = Node()
+    /** The strikers. */
+    protected abstract val strikers: Array<Striker>
 
-    /** The Mallet nodes. */
-    protected var malletNodes: Array<Node> = Array(12) { Node() }
-
-    /** The Mallet strikes. */
-    private val malletStrikes: Array<ArrayList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
+    /** The recoil node. */
+    protected val recoilNode: Node = Node().also {
+        instrumentNode.attachChild(it)
+    }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        var velocity = 0
 
-        /* Update each mallet */
-        for (i in 0..11) {
-            val stickStatus =
-                Stick.handleStick(context, malletNodes[i], time, delta, malletStrikes[i], 3.0, 50.0, Axis.X)
-
-            /* If stick just struck */
-            if (stickStatus.justStruck()) {
-                velocity = velocity.coerceAtLeast((stickStatus.strike ?: return).velocity) // Update maximum velocity
-            }
-        }
-
-        PercussionInstrument.recoilDrum(animNode, velocity != 0, velocity, delta)
+        val maxVelocity = strikers.maxOf { it.tick(time, delta).velocity }
+        recoilDrum(recoilNode, maxVelocity, delta)
     }
+}
 
-    init {
-        /* Attach mallet nodes to anim node */
-        malletNodes.forEach { animNode.attachChild(it) }
-
-        /* Filter out note on events and assign them to correct mallets */
-        eventList.filterIsInstance<MidiNoteOnEvent>().forEach {
-            malletStrikes[(it.note + 3) % 12].add(it)
-        }
-    }
+/**
+ * Returns the [MidiNoteOnEvent]s that would animate given the index of the note modulus 12.
+ */
+fun List<MidiChannelSpecificEvent>.modulus(int: Int): List<MidiNoteOnEvent> {
+    return filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == int }
 }

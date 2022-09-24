@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.midi
 
-
 /**
  * Parse and stores information relating to a MIDI file.
  */
@@ -78,11 +77,13 @@ abstract class MidiFile(
 
         /* Get all tempos that have started and finished before the current time. */
         return tempos.filter { it.time < tick }.foldIndexed(0.0) { index, acc, tempo ->
-            acc + (if (index + 1 in tempos.indices) {
-                tempos[index + 1].time.coerceAtMost(tick)
-            } else {
-                tick
-            } - tempo.time).toBeats() * tempo.spb()
+            acc + (
+                if (index + 1 in tempos.indices) {
+                    tempos[index + 1].time.coerceAtMost(tick)
+                } else {
+                    tick
+                } - tempo.time
+                ).toBeats() * tempo.spb()
         }
     }
 
@@ -99,7 +100,6 @@ abstract class MidiFile(
      * Returns the active tempo immediately before a given MIDI [event].
      */
     fun tempoBefore(event: MidiEvent): MidiTempoEvent = tempoBefore(event.time)
-
 
     /**
      * Returns the active tempo at the given [time] in seconds, expressed in MIDI format.
