@@ -98,10 +98,6 @@ open class Keyboard(
 
         instrumentNode.move(-50f, 32f, -6f)
         instrumentNode.rotate(0f, rad(45.0), 0f)
-
-        var children = 0
-        instrumentNode.breadthFirstTraversal { children++ }
-        println("children: $children")
     }
 
     override fun toString(): String {

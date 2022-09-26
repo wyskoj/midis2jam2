@@ -98,7 +98,6 @@ class TinkleBell(
             with(striker.tick(time, delta)) {
                 if (velocity > 0) {
                     cymbalAnimator.strike()
-                    println("striking ${twelfths.indexOf(this@ATinkleBell)}")
                 }
             }
 
