@@ -31,7 +31,6 @@ import com.jme3.math.Vector3f
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.FadeFilter
-import com.jme3.post.ssao.SSAOFilter
 import com.jme3.renderer.RenderManager
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
@@ -291,7 +290,6 @@ abstract class Midis2jam2(
                 numSamples =
                     antiAliasingDefinition.getOrDefault(QualityLevel.valueOf(properties.getProperty("antialiasing")), 1)
                 addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
-                addFilter(SSAOFilter())
                 addFilter(fade)
                 app.viewPort.addProcessor(this)
             }
