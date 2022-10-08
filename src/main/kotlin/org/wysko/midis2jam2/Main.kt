@@ -20,6 +20,7 @@ package org.wysko.midis2jam2
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
@@ -65,6 +66,7 @@ var launcherController: LauncherController? = null
 /**
  * Where it all begins.
  */
+@ExperimentalGraphicsApi
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main(args: Array<String>) {

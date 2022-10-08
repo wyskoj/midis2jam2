@@ -39,8 +39,8 @@ class FlyByCameraListenable(cam: Camera, val onUserInput: (name: String) -> Unit
     override fun onAction(name: String?, value: Boolean, tpf: Float) {
         super.onAction(name, value, tpf)
         if (name == "FLYCAM_RotateDrag") dragging = value
-        if (value && (name == "FLYCAM_Forward" || name == "FLYCAM_Backward" || name == "FLYCAM_StrafeLeft" || name == "FLYCAM_StrafeRight")) onUserInput(
-            name
-        )
+        if (value && (name == "FLYCAM_Forward" || name == "FLYCAM_Backward" || name == "FLYCAM_StrafeLeft" || name == "FLYCAM_StrafeRight")) {
+            onUserInput(name)
+        }
     }
 }

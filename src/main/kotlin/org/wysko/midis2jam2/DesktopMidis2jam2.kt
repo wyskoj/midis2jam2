@@ -144,7 +144,7 @@ class DesktopMidis2jam2(
         }
 
         /* If at the end of the file */
-        if (sequencer.microsecondPosition == midiFileMicrosecondLength) {
+        if (timeSinceStart >= file.length) {
             if (!afterEnd) {
                 stopTime = timeSinceStart
             }

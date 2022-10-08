@@ -41,5 +41,10 @@
       <option name="name" value="maven2" />
       <option name="url" value="https://repo.spongepowered.org/repository/maven-public" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://files.liferay.com/mirrors/xuggle.googlecode.com/svn/trunk/repo/share/java/" />
+    </remote-repository>
   </component>
 </project>

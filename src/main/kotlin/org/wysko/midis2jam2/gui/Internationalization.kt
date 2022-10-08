@@ -47,3 +47,8 @@ object Internationalization {
     var i18n: ResourceBundle = ResourceBundle.getBundle("i18n.midis2jam2")
         private set
 }
+
+/**
+ * Makes nice syntax for obtaining a string from [i18n].
+ */
+operator fun ResourceBundle.get(key: String): String = this.getString(key)

@@ -33,6 +33,8 @@ import org.wysko.midis2jam2.gui.loadSettingsFromFile
 import org.wysko.midis2jam2.gui.resolutionRegex
 import org.wysko.midis2jam2.midi.DesktopMidiFile
 import org.wysko.midis2jam2.midi.StandardMidiFileReader
+import org.wysko.midis2jam2.record.FixedTimer
+import org.wysko.midis2jam2.record.captureVideo
 import org.wysko.midis2jam2.util.ThrowableDisplay.display
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dimension
@@ -115,9 +117,13 @@ object Execution {
 
             /* Get MIDI device */
             val midiDevice = try {
-                MidiSystem.getMidiDevice(
-                    MidiSystem.getMidiDeviceInfo().first { it.name == properties.getProperty("midi_device") }
-                )
+                if (properties.getProperty("record")?.equals("true") == true) {
+                    null
+                } else {
+                    MidiSystem.getMidiDevice(
+                        MidiSystem.getMidiDeviceInfo().first { it.name == properties.getProperty("midi_device") }
+                    )
+                }
             } catch (e: MidiUnavailableException) {
                 err(
                     e,
@@ -195,7 +201,7 @@ object Execution {
                 }
             } else {
                 try {
-                    midiDevice.open()
+                    midiDevice?.open()
                 } catch (e: MidiUnavailableException) {
                     err(
                         e,
@@ -214,7 +220,7 @@ object Execution {
                     return@launch
                 }
                 MidiSystem.getSequencer(false).also {
-                    it.transmitter.receiver = midiDevice.receiver
+                    it.transmitter.receiver = midiDevice?.receiver
                 }
             }.also {
                 try {
@@ -251,12 +257,10 @@ object Execution {
                 }
             }
 
-            Thread({
-                M2J2Execution(properties, {
-                    onFinish.invoke()
-                    midiDevice?.close()
-                }, sequencer).execute()
-            }, "midis2jam2 starter").start()
+            M2J2Execution(properties, {
+                onFinish.invoke()
+                midiDevice?.close()
+            }, sequencer).execute()
         }
     }
 
@@ -295,7 +299,10 @@ private class M2J2Execution(
         val resolution = collectWindowResolution(properties)
         if (properties.getProperty("fullscreen") == "true") { // Set resolution to monitor resolution
             defaultSettings.isFullscreen = true
-            defaultSettings.setResolution(screenWidth(), screenHeight())
+//            defaultSettings.setResolution(screenWidth(), screenHeight())
+            with(resolution) {
+                defaultSettings.setResolution(width, height)
+            }
         } else {
             defaultSettings.isFullscreen = false
             with(resolution) {
@@ -326,6 +333,18 @@ private class M2J2Execution(
         ).also {
             stateManager.attach(it)
             rootNode.attachChild(it.rootNode)
+        }
+
+        if (properties.getProperty("record")?.equals("true", ignoreCase = true) == true) {
+            val frameRate = properties.getProperty("record_fps")?.toInt() ?: 30
+            setTimer(FixedTimer(frameRate.toLong()))
+            captureVideo(
+                app = this,
+                video = File(properties.getProperty("record_file")),
+                frameRate = frameRate,
+                resolution = settings.width to settings.height,
+                quality = properties.getProperty("record_quality").toInt()
+            )
         }
     }
 }

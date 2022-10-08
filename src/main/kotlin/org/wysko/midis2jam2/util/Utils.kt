@@ -35,6 +35,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Properties
 import java.util.stream.Collectors
 
 /** Provides various utility functions. */
@@ -137,6 +138,14 @@ fun Boolean.cullHint(): CullHint = if (this) Dynamic else Always
 
 /** Given a list of integers, determines if the root integer is equal to at least one of the provided integers. */
 fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }
+
+/**
+ * A utility function that adds many pairs to a [Properties] object.
+ */
+fun <K, V> Properties.setProperties(vararg properties: Pair<K, V>) {
+    properties.forEach { (key, value) -> this[key] = value }
+}
+
 
 /** Chunks a sequence based on a predicate. */
 fun <T> Sequence<T>.chunked(predicate: (T, T) -> Boolean): Sequence<List<T>> {

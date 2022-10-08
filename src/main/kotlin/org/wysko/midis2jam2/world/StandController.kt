@@ -17,27 +17,33 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.scene.Spatial
-import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.util.Utils
-import java.util.Objects
+import org.wysko.midis2jam2.util.cullHint
 
 /**
  * Responsible for setting the visibility of the keyboard and mallet stands. The stand is simply shown if there is at
  * least one of the instrument visible at any given time, otherwise it is hidden.
  */
-class StandController(
-    /** Context to midis2jam2. */
-    private val context: Midis2jam2
-) {
-    /** The keyboard stand. */
-    private val keyboardStand: Spatial = context.loadModel("PianoStand.obj", "RubberFoot.bmp")
+class StandController(private val context: Midis2jam2) {
 
-    /** The mallet stand. */
-    private val malletStand: Spatial
+    private val keyboardStand = context.loadModel("PianoStand.obj", "RubberFoot.bmp").apply {
+        move(-50f, 32f, -6f)
+        rotate(0f, Utils.rad(45f), 0f)
+    }.also {
+        context.rootNode.attachChild(it)
+    }
+
+    private val malletStand = context.loadModel("XylophoneLegs.obj", "RubberFoot.bmp").apply {
+        setLocalTranslation(-22F, 22.2F, 23F)
+        rotate(0f, Utils.rad(33.7), 0f)
+        scale(0.6666667f)
+    }.also {
+        context.rootNode.attachChild(it)
+    }
 
     /** Call this method on each frame to update the visibility of stands. */
     fun tick() {
@@ -50,30 +56,6 @@ class StandController(
      * currently visible.
      */
     private fun setStandVisibility(stand: Spatial, clazz: Class<out Instrument>) {
-        when {
-            context.instruments
-                .filter { obj: Instrument? -> Objects.nonNull(obj) }
-                .any { i: Instrument -> i.isVisible && clazz.isInstance(i) } -> {
-                stand.cullHint = CullHint.Dynamic
-            }
-
-            else -> {
-                stand.cullHint = CullHint.Always
-            }
-        }
-    }
-
-    init {
-        /* Load keyboard stand */
-        context.rootNode.attachChild(keyboardStand)
-        keyboardStand.move(-50f, 32f, -6f)
-        keyboardStand.rotate(0f, Utils.rad(45f), 0f)
-
-        /* Load mallet stand */
-        malletStand = context.loadModel("XylophoneLegs.obj", "RubberFoot.bmp")
-        context.rootNode.attachChild(malletStand)
-        malletStand.setLocalTranslation(-22F, 22.2F, 23F)
-        malletStand.rotate(0f, Utils.rad(33.7), 0f)
-        malletStand.scale(0.6666667f)
+        stand.cullHint = context.instruments.any { clazz.isInstance(it) && it.isVisible }.cullHint()
     }
 }

@@ -128,6 +128,9 @@ dependencies {
 
     // Database
     implementation("mysql:mysql-connector-java:8.0.29")
+
+    // Video encoding
+    implementation("io.humble:humble-video-all:0.3.0")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
