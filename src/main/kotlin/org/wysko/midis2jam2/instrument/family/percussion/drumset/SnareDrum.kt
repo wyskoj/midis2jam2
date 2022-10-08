@@ -36,7 +36,7 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
     private val regularStick = Striker(
         context = context,
         strikeEvents = hits.filter { it.note == ACOUSTIC_SNARE || it.note == ELECTRIC_SNARE },
-        stickModel = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+        stickModel = DRUMSET_STICK
     ).apply {
         setParent(recoilNode)
     }.also {

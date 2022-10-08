@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -32,7 +33,7 @@ class MelodicTom(
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
+            stickModel = StickType.DRUMSET_STICK
         ).apply {
             setParent(recoilNode)
             node.setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
