@@ -22,11 +22,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
 
 private val OFFSET_DIRECTION_VECTOR = Vector3f(-8.294f, 3.03f, -8.294f)
+private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
 
 /** The full, 88-key keyboard. */
 open class Keyboard(
@@ -34,6 +36,8 @@ open class Keyboard(
     events: MutableList<MidiChannelSpecificEvent>,
     private val skin: KeyboardSkin
 ) : KeyedInstrument(context, events, 21, 108) {
+
+    private val pitchBendController = PitchBendModulationController(context, events)
 
     override val keys: Array<Key> = let {
         var whiteCount = 0
@@ -44,6 +48,13 @@ open class Keyboard(
                 KeyboardKey(it + rangeLow, it)
             }
         }
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+
+        instrumentNode.localTranslation =
+            PITCH_BEND_DIRECTION_VECTOR.mult(pitchBendController.tick(time, delta) { true })
     }
 
     override fun moveForMultiChannel(delta: Float) {
@@ -94,10 +105,9 @@ open class Keyboard(
 
     init {
         val pianoCase = context.loadModel("PianoCase.obj", skin.file)
-        instrumentNode.attachChild(pianoCase)
-
-        instrumentNode.move(-50f, 32f, -6f)
-        instrumentNode.rotate(0f, rad(45.0), 0f)
+        highestLevel.attachChild(pianoCase)
+        highestLevel.move(-50f, 32f, -6f)
+        highestLevel.rotate(0f, rad(45.0), 0f)
     }
 
     override fun toString(): String {
