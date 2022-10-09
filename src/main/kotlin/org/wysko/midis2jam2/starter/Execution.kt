@@ -296,18 +296,13 @@ private class M2J2Execution(
 ) : SimpleApplication() {
 
     fun execute() {
-        val resolution = collectWindowResolution(properties)
-        if (properties.getProperty("fullscreen") == "true") { // Set resolution to monitor resolution
+        val prefResolution = collectWindowResolution(properties)
+        if (properties.getProperty("fullscreen") == "true") {
             defaultSettings.isFullscreen = true
-//            defaultSettings.setResolution(screenWidth(), screenHeight())
-            with(resolution) {
-                defaultSettings.setResolution(width, height)
-            }
+            defaultSettings.setResolution(screenWidth(), screenHeight()) // Set resolution to monitor resolution
         } else {
             defaultSettings.isFullscreen = false
-            with(resolution) {
-                defaultSettings.setResolution(width, height)
-            }
+            defaultSettings.setResolution(prefResolution.width, prefResolution.height)
         }
 
         setSettings(defaultSettings)
