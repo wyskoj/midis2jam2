@@ -42,8 +42,8 @@ abstract class AbstractVideoRecorder : SceneProcessor, VideoRecorder, AppState {
     private lateinit var renderManager: RenderManager
     private lateinit var byteBuffer: ByteBuffer
     private lateinit var rawFrame: BufferedImage
-    private var _isInitialized by Delegates.notNull<Boolean>()
-    private var paused by Delegates.notNull<Boolean>()
+    private var _isInitialized = false
+    private var paused = false
 
     override fun initialize(rm: RenderManager, viewPort: ViewPort) {
         val camera = viewPort.camera
