@@ -18,10 +18,19 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.asset.plugins.FileLocator
+import com.jme3.bounding.BoundingSphere
+import com.jme3.material.Material
 import com.jme3.math.ColorRGBA
+import com.jme3.math.Vector3f
 import com.jme3.renderer.ViewPort
 import com.jme3.renderer.queue.RenderQueue
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import com.jme3.scene.shape.Sphere
+import com.jme3.texture.Image
+import com.jme3.texture.Texture
+import com.jme3.texture.TextureCubeMap
 import com.jme3.util.SkyFactory
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.gui.BACKGROUNDS_FOLDER
@@ -46,21 +55,41 @@ object BackgroundController {
         assetManager.registerLocator(BACKGROUNDS_FOLDER.absolutePath, FileLocator::class.java)
         when (type) {
             "DEFAULT" -> {
-                with(assetManager.loadTexture("Assets/sky.png")) {
-                    rootNode.attachChild(
-                        SkyFactory.createSky(
-                            assetManager,
-                            this,
-                            this,
-                            this,
-                            this,
-                            this,
-                            this
-                        ).also {
-                            it.shadowMode = RenderQueue.ShadowMode.Off
+                rootNode.attachChild(
+                    Geometry("Sky", Sphere(10, 10, 10f, false, true)).apply {
+                        queueBucket = RenderQueue.Bucket.Sky
+                        cullHint = Spatial.CullHint.Never
+                        modelBound = BoundingSphere(Float.POSITIVE_INFINITY, Vector3f.ZERO)
+                        material = Material(assetManager, "Common/MatDefs/Misc/Sky.j3md").apply {
+                            setVector3("NormalScale", Vector3f.UNIT_XYZ)
+                            setTexture(
+                                "Texture",
+                                TextureCubeMap(
+                                    with(assetManager.loadTexture("Assets/sky.png")) {
+                                        Image(
+                                            image.format,
+                                            image.width,
+                                            image.height,
+                                            null,
+                                            image.colorSpace
+                                        ).apply {
+                                            repeat(6) {
+                                                addData(image.data[0])
+                                            }
+                                        }
+                                    }
+
+                                ).apply {
+                                    magFilter = Texture.MagFilter.Nearest
+                                    minFilter = Texture.MinFilter.NearestNoMipMaps
+                                    anisotropicFilter = 0
+                                    setWrap(Texture.WrapMode.EdgeClamp)
+                                }
+                            )
                         }
-                    )
-                }
+                        shadowMode = RenderQueue.ShadowMode.Off
+                    }
+                )
             }
 
             "UNIQUE_CUBEMAP" -> {
