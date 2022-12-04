@@ -32,6 +32,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
+import org.wysko.midis2jam2.util.ThrowableDisplay.display
 import java.awt.Desktop
 import java.net.URL
 
@@ -76,7 +77,13 @@ fun TextWithLink(
                     end = textToLink.length
                 )
             },
-            onClick = { Desktop.getDesktop().browse(URL(url).toURI()) },
+            onClick = {
+                try {
+                    Desktop.getDesktop().browse(URL(url).toURI())
+                } catch (e: Throwable) {
+                    e.display("Cannot open link", "There was an error opening this link.")
+                }
+            },
             style = style,
             modifier = Modifier.pointerHoverIcon(PointerIconDefaults.Hand, true)
         )
