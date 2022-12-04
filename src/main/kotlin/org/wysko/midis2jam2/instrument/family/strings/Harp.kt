@@ -23,12 +23,13 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.piano.KeyColor
 import org.wysko.midis2jam2.instrument.family.piano.noteToKeyboardKeyColor
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.DIM_GLOW
@@ -46,14 +47,21 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
     /** The notes this Harp should play. */
     val notes: MutableList<MidiNoteEvent> = eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
 
+    private val eventCollector = EventCollector(notes, context) { event, time ->
+        if (event is MidiNoteOffEvent) {
+            context.file.eventInSeconds(event) <= time - 0.033F
+        } else {
+            context.file.eventInSeconds(event) <= time
+        }
+    }
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToPerform = NoteQueue.collectWithOffGap(notes, context, time)
-        for (event in eventsToPerform) {
+        eventCollector.advanceCollectAll(time).forEach { event ->
             var midiNote = event.note
 
             /* If the note falls on a black key (if it were played on a piano) we need to "round it down" to the
-             * nearest white key. */
+                 * nearest white key. */
             if (noteToKeyboardKeyColor(midiNote) == KeyColor.BLACK) {
                 midiNote--
             }
