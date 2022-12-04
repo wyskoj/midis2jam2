@@ -100,6 +100,7 @@ class PitchBendModulationController(
                 it.controlNum == 1 -> {
                     modulation = it.value
                 }
+
                 it.controlNum.oneOf(6, 38) -> {
                     when {
                         cc[101] == 0 && cc[100] == 0 -> { // Setting pitch-bend sensitivity
@@ -114,12 +115,13 @@ class PitchBendModulationController(
             }
         }
 
-
         val pitchBendPart = (pitchBend / 8192.0) * pitchBendSensitivity
         var modulationPart = sin(50 * modulationTime) * modulationRange * (modulation / 128.0)
+
         if (!playing.invoke() && !applyModulationWhenNotPlaying) {
             modulationPart = 0.0
         }
+
         return smoother.tick(tpf) { (pitchBendPart + modulationPart).toFloat() }
     }
 
@@ -130,5 +132,4 @@ class PitchBendModulationController(
     fun resetModulation() {
         modulationTime = 0.0
     }
-
 }

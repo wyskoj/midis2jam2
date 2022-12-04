@@ -46,13 +46,13 @@ class TenorSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             context.assetManager.loadModel("Assets/TenorSaxBody.obj").apply {
                 this as Node
                 getChild(0).setMaterial(shine)
-                getChild(1).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                    setColor("Color", ColorRGBA.Black)
-                })
+                getChild(1).setMaterial(
+                    Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                        setColor("Color", ColorRGBA.Black)
+                    }
+                )
                 modelNode.attachChild(this)
             }
-
-            animNode.setLocalTranslation(0f, 0f, 20f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(10.0), rad(30.0), 0f)
         }
     }

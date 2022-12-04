@@ -19,11 +19,26 @@ package org.wysko.midis2jam2.world
 
 import com.jme3.math.ColorRGBA
 
-val STANDARD_GLOW = ColorRGBA(0.75f, 0.75f, 0.85f, 1f)
+/** Standard glow color. */
+val STANDARD_GLOW: ColorRGBA = ColorRGBA(0.75f, 0.75f, 0.85f, 1f)
 
+/** Yellow-tinted glow for vibrating strings. */
+val STRING_GLOW: ColorRGBA = ColorRGBA(0.69f, 0.72f, 0.18f, 1f)
+
+/** Similar to [STANDARD_GLOW] but slightly dimmer. */
+val DIM_GLOW: ColorRGBA = ColorRGBA(0.67f, 0.67f, 0.67f, 1f)
+
+/**
+ * Animates a decaying glow effect.
+ *
+ * @param glowColor the color of the glow
+ */
 class GlowController(
     val glowColor: ColorRGBA = STANDARD_GLOW
 ) {
+    /**
+     * Given the current [animationTime], determines the correct color for a decaying effect.
+     */
     fun calculate(animationTime: Double): ColorRGBA {
         return ColorRGBA(
             (-0.25 * animationTime + glowColor.r).toFloat(),

@@ -38,7 +38,7 @@ open class HandPositionFingeringManager : FingeringManager<Hands> {
         /** Left-hand index. */
         val left: Int,
         /** Right-hand index. */
-        val right: Int,
+        val right: Int
     )
 
     companion object {

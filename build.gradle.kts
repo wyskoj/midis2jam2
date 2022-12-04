@@ -16,7 +16,7 @@ plugins {
     // Kotlin
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
-    id("org.jetbrains.dokka") version "1.6.21"
+    id("org.jetbrains.dokka") version "1.7.10"
     id("org.jetbrains.compose") version "1.0.1"
 
     java
@@ -43,6 +43,7 @@ tasks.compileJava {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
 }
 
@@ -75,7 +76,7 @@ dependencies {
     // JMonkeyEngine
     implementation("org.jmonkeyengine:jme3-core:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-desktop:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-plugins:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-effects:3.5.2-stable")
 
@@ -84,10 +85,10 @@ dependencies {
 
     // Unit testing
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 
     // Theme
-    implementation("com.formdev:flatlaf:2.1")
+    implementation("com.formdev:flatlaf:2.4")
 
     // Installer
     implementation("com.install4j:install4j-runtime:8.0.7")
@@ -115,7 +116,7 @@ dependencies {
     }
 
     // Kotlin serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
     // Logging
 
@@ -123,10 +124,13 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
 
     // OS analysis
-    implementation("com.github.oshi:oshi-core:6.1.6")
+    implementation("com.github.oshi:oshi-core:6.2.2")
 
     // Database
     implementation("mysql:mysql-connector-java:8.0.29")
+
+    // Video encoding
+    implementation("io.humble:humble-video-all:0.3.0")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

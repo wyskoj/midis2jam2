@@ -17,6 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.math.Quaternion
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -28,11 +29,14 @@ import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.STRING_GLOW
 import kotlin.math.sin
 
 /** The stage strings. */
 class StageStrings(
-    context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageStringsType,
+    context: Midis2jam2,
+    eventList: List<MidiChannelSpecificEvent>,
+    type: StageStringsType,
     /** The behavior of this StageStrings. Defaults to [StageStringBehavior.NORMAL]. */
     val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
 ) : StaticWrappedOctaveSustained(context, eventList, false) {
@@ -126,7 +130,9 @@ class StageStrings(
                 } else {
                     /* Slide bow back and forth */
                     bow.setLocalTranslation(
-                        0f, (sin(30 * time) * 4).toFloat(), 0f
+                        0f,
+                        (sin(30 * time) * 4).toFloat(),
+                        0f
                     )
 
                     /* Update stopwatch */
@@ -162,15 +168,14 @@ class StageStrings(
                 context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
                     cullHint = Always // Hide on startup
                     animStringNode.attachChild(this)
+                    (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
                 }
             }
 
             animNode.attachChild(animStringNode)
 
             // Load resting string
-            restingString = context.loadModel("StageString.obj", "StageString.bmp").apply {
-
-            }
+            restingString = context.loadModel("StageString.obj", "StageString.bmp")
             animNode.attachChild(restingString)
 
             // Load bow
@@ -188,6 +193,8 @@ class StageStrings(
             animNode.attachChild(bowNode)
             highestLevel.attachChild(animNode)
             animator = VibratingStringAnimator(*animStrings)
+
+            highestLevel.shadowMode = RenderQueue.ShadowMode.Receive
         }
     }
 
@@ -197,7 +204,7 @@ class StageStrings(
                 attachChild(twelfths[i].highestLevel)
                 localRotation = Quaternion().fromAngles(0f, rad((9 / 10f * i).toDouble()), 0f)
             }
-            twelfths[i].highestLevel.setLocalTranslation(0f, 2f * i, -151.76f)
+            twelfths[i].highestLevel.setLocalTranslation(0f, 2f * i, -153f)
             instrumentNode.attachChild(stringNodes[i])
         }
     }

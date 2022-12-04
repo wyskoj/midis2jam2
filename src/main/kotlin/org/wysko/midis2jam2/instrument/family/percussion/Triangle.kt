@@ -19,8 +19,8 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MUTE_TRIANGLE
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -29,8 +29,10 @@ import org.wysko.midis2jam2.util.cullHint
 /** The Triangle. */
 class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    private val triangle = context.loadModel("Triangle.obj", "ShinySilver.bmp", 0.9f).also {
-        recoilNode.attachChild(it)
+    init {
+        context.loadModel("Triangle.obj", "ShinySilver.bmp", 0.9f).also {
+            recoilNode.attachChild(it)
+        }
     }
 
     private val fist = context.loadModel("MutedTriangle.obj", "hands.bmp").also {
@@ -38,9 +40,13 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
         it.cullHint = Spatial.CullHint.Always // Start the triangle in the unmuted position
     }
 
-    private val beater = context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", 0.9f).also {
-        instrumentNode.attachChild(it)
-        it.setLocalTranslation(0f, 2f, 4f)
+    private val beater = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", 0.9f)
+    ).apply {
+        setParent(instrumentNode)
+        node.move(0f, 2f, 4f)
     }
 
     init {
@@ -54,14 +60,10 @@ class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDru
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        with(Stick.handleStick(context, stickNode = beater, time, delta, hits)) {
-            strike?.let {
-                recoilDrum(recoilNode, true, it.velocity, delta)
-
-                /* Hide/show models depending on note played */
-                fist.cullHint = (it.note == MUTE_TRIANGLE).cullHint()
-
-            } ?: recoilDrum(recoilNode, false, 0, delta)
+        val results = beater.tick(time, delta)
+        recoilDrum(recoilNode, results.velocity, delta)
+        results.strike?.let {
+            fist.cullHint = (it.note == MUTE_TRIANGLE).cullHint()
         }
     }
 }

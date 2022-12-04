@@ -19,7 +19,9 @@ package org.wysko.midis2jam2.instrument.family.ensemble
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
+import org.wysko.midis2jam2.instrument.family.percussive.modulus
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
@@ -31,24 +33,28 @@ class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : 
             Quaternion().fromAngles(0f, rad((-27 + updateInstrumentIndex(delta) * -18).toDouble()), 0f)
     }
 
-    init {
-        malletNodes.forEachIndexed { index, malletNode ->
-            malletNode.attachChild(context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp").apply {
-                setLocalTranslation(0f, 0f, -5f)
-            })
-            malletNode.setLocalTranslation(1.8f * (index - 5.5f), 31f, 15f)
+    override val strikers: Array<Striker> = Array(12) { i ->
+        Striker(
+            context = context,
+            strikeEvents = eventList.modulus(i),
+            stickModel = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp")
+        ).apply {
+            setParent(recoilNode)
+            offsetStick { it.setLocalTranslation(0f, 0f, -5f) }
+            node.setLocalTranslation(1.8f * (i - 5.5f), 31f, 15f)
         }
+    }
 
-        animNode.run {
-            attachChild(context.loadModel("TimpaniBody.obj", "HornSkin.bmp", 0.9f).apply {
-                (this as Node).getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-            })
+    init {
+        recoilNode.run {
+            attachChild(
+                context.loadModel("TimpaniBody.obj", "HornSkin.bmp", 0.9f).apply {
+                    (this as Node).getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                }
+            )
             attachChild(context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp"))
         }
 
-        instrumentNode.run {
-            attachChild(animNode)
-            setLocalTranslation(0f, 0f, -120f)
-        }
+        instrumentNode.setLocalTranslation(0f, 0f, -120f)
     }
 }

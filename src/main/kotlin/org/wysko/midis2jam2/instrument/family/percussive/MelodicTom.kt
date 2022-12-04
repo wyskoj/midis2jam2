@@ -17,8 +17,9 @@
 package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
@@ -28,23 +29,28 @@ class MelodicTom(
     eventList: List<MidiChannelSpecificEvent>
 ) : OneDrumOctave(context, eventList) {
 
+    override val strikers: Array<Striker> = Array(12) { i ->
+        Striker(
+            context = context,
+            strikeEvents = eventList.modulus(i),
+            stickModel = StickType.DRUMSET_STICK
+        ).apply {
+            setParent(recoilNode)
+            node.setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
+            offsetStick { it.move(0f, 0f, -5f) }
+        }
+    }
+
     override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + updateInstrumentIndex(delta) * -15), 0f)
+        offsetNode.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + updateInstrumentIndex(delta) * -15), 0f)
     }
 
     init {
-        val drum = context.loadModel("MelodicTom.obj", "DrumShell_MelodicTom.bmp")
-        for (i in 0..11) {
-            malletNodes[i] = Node()
-            val mallet = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-            malletNodes[i].attachChild(mallet)
-            malletNodes[i].setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
-            mallet.setLocalTranslation(0f, 0f, -5f)
-            animNode.attachChild(malletNodes[i])
-        }
-        drum.localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
-        animNode.attachChild(drum)
-        instrumentNode.attachChild(animNode)
+        recoilNode.attachChild(
+            context.loadModel("MelodicTom.obj", "DrumShell_MelodicTom.bmp").apply {
+                localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
+            }
+        )
         instrumentNode.setLocalTranslation(0f, 61.1f, -133.8f)
     }
 }

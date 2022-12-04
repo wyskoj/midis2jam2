@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.util.Utils.resourceToString
 
 /** Calculates fret heights using a lookup table. */
 class FretHeightByTable private constructor(
-    private val instrument: Instrument,
+    private val instrument: Instrument
 ) : FretHeightCalculator {
 
     @Contract(pure = true)

@@ -19,10 +19,11 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 import com.jme3.math.FastMath
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import org.jetbrains.annotations.Range
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.world.Axis
+import kotlin.math.abs
 
 private const val SQUARE_ROOT_OF_127: Float = 11.269427f
 
@@ -33,9 +34,6 @@ abstract class PercussionInstrument protected constructor(
     override val hits: MutableList<MidiNoteOnEvent>
 ) : DecayedInstrument(context, hits) {
 
-    /** The High level node. */
-    val highLevelNode: Node = Node()
-
     /** The Recoil node. */
     protected val recoilNode: Node = Node()
 
@@ -45,11 +43,9 @@ abstract class PercussionInstrument protected constructor(
 
     companion object {
         /** The unitless rate at which an instrument recoils. */
-        const val DRUM_RECOIL_COMEBACK: Float = 22f
+        private const val DRUM_RECOIL_COMEBACK: Float = 22f
 
-        /**
-         * How far the drum should travel when hit.
-         */
+        /** How far the drum should travel when hit. */
         private const val RECOIL_DISTANCE: Float = -2f
 
         /**
@@ -60,9 +56,7 @@ abstract class PercussionInstrument protected constructor(
          * @param x the velocity of the note
          * @return a percentage to multiply by the target recoil
          */
-        fun velocityRecoilDampening(x: @Range(from = 0, to = 127) Int): @Range(from = 0, to = 1) Double {
-            return (FastMath.sqrt(x.toFloat()) / SQUARE_ROOT_OF_127).toDouble()
-        }
+        fun velocityRecoilDampening(x: Int): Double = (FastMath.sqrt(x.toFloat()) / SQUARE_ROOT_OF_127).toDouble()
 
         /**
          * Animates a drum recoiling. Call this method on every frame to ensure animation is handled.
@@ -72,6 +66,10 @@ abstract class PercussionInstrument protected constructor(
          * @param velocity the velocity of the strike
          * @param delta    the amount of time since the last frame update
          */
+        @Deprecated(
+            message = "Struck is now inferred from velocity.",
+            replaceWith = ReplaceWith("recoilDrum(drum, velocity, delta)")
+        )
         fun recoilDrum(drum: Spatial, struck: Boolean, velocity: Int, delta: Float) {
             val localTranslation = drum.localTranslation
             if (localTranslation.y < -0.0001) {
@@ -85,6 +83,29 @@ abstract class PercussionInstrument protected constructor(
                     (velocityRecoilDampening(velocity) * RECOIL_DISTANCE).toFloat(),
                     0f
                 )
+            }
+        }
+
+        /**
+         * Animates a drum recoiling. Call this method on every frame to ensure animation is handled.
+         *
+         * @param drum     the drum
+         * @param velocity the velocity of the strike
+         * @param delta    the amount of time since the last frame update
+         */
+        fun recoilDrum(
+            drum: Spatial,
+            velocity: Int,
+            delta: Float,
+            recoilDistance: Float = RECOIL_DISTANCE,
+            recoilSpeed: Float = DRUM_RECOIL_COMEBACK,
+            recoilAxis: Axis = Axis.Y
+        ) {
+            drum.localTranslation[recoilAxis.componentIndex] =
+                (drum.localTranslation[recoilAxis.componentIndex] + recoilSpeed * delta).coerceAtMost(0f)
+            if (velocity != 0) {
+                drum.localTranslation[recoilAxis.componentIndex] =
+                    (velocityRecoilDampening(velocity) * -abs(recoilDistance)).toFloat()
             }
         }
     }

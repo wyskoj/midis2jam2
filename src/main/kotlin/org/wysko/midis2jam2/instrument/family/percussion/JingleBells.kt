@@ -19,43 +19,37 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
-/** Animates with only [Stick.handleStick], nothing special. */
+/** The Jingle Bells. */
 class JingleBells(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the jingle bell. */
-    private val jingleBellNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        Stick.handleStick(
-            context,
-            jingleBellNode,
-            time,
-            delta,
-            hits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X,
-            actualStick = false
-        )
+    private val bells = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = context.loadModel("JingleBells.obj", "JingleBells.bmp").apply {
+            (this as Node).getChild(1).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
+        },
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+        offsetStick {
+            it.move(0f, 0f, -2f)
+        }
     }
 
     init {
-        /* Load stick and materials */
-        val stick = context.loadModel("JingleBells.obj", "JingleBells.bmp")
-        (stick as Node).getChild(1).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
+        with(instrumentNode) {
+            setLocalTranslation(8.5f, 45.3f, -69.3f)
+            localRotation = Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7))
+        }
+    }
 
-        /* Positioning */
-        jingleBellNode.attachChild(stick)
-        stick.setLocalTranslation(0f, 0f, -2f)
-        instrumentNode.attachChild(jingleBellNode)
-        instrumentNode.setLocalTranslation(8.5f, 45.3f, -69.3f)
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(19.3), rad(-21.3), rad(-12.7))
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        bells.tick(time, delta)
     }
 }

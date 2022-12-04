@@ -40,19 +40,29 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.gui.Internationalization.i18n
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Font
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Insets
 import java.awt.event.WindowEvent
 import java.awt.event.WindowListener
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
-import java.util.*
-import javax.swing.*
+import java.util.Locale
+import java.util.Properties
+import javax.swing.JButton
+import javax.swing.JCheckBox
+import javax.swing.JComponent
+import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.JPanel
 
 /**
  * Dynamically generates and displays a modal for configuring various settings.
  */
-class SettingsModal() : JDialog() {
+class SettingsModal : JDialog() {
 
     init {
         title = i18n.getString("settings.settings")
@@ -84,70 +94,98 @@ class SettingsModal() : JDialog() {
         var row = 0
         settingDefinitions.groupBy { it.category }.entries.forEach { (categoryName, settings) ->
             // Create category title
-            settingsPanel.add(JLabel(i18n.getString("settings.category.$categoryName")).apply {
-                font = font.deriveFont(Font.BOLD, 18f)
-            }, GridBagConstraints().apply {
-                gridy = row++
-                insets = Insets(16, 0, 8, 0)
-            })
+            settingsPanel.add(
+                JLabel(i18n.getString("settings.category.$categoryName")).apply {
+                    font = font.deriveFont(Font.BOLD, 18f)
+                },
+                GridBagConstraints().apply {
+                    gridy = row++
+                    insets = Insets(16, 0, 8, 0)
+                }
+            )
             settings.forEach { (name, type, _, _) ->
                 when (type) {
                     "Boolean" -> {
                         JPanel().apply {
                             layout = GridBagLayout()
-                            add(JLabel(i18n.getString("settings.$name")).apply {
-                                font = font.deriveFont(Font.BOLD, 16f)
-                            }, GridBagConstraints().apply {
-                                anchor = GridBagConstraints.LINE_START
-                            })
-                            add(JLabel(i18n.getString("settings.${name}_description")).apply {
-                                font = font.deriveFont(12f)
-                            }, GridBagConstraints().apply {
-                                gridy = 1
-                                anchor = GridBagConstraints.LINE_START
-                            })
+                            add(
+                                JLabel(i18n.getString("settings.$name")).apply {
+                                    font = font.deriveFont(Font.BOLD, 16f)
+                                },
+                                GridBagConstraints().apply {
+                                    anchor = GridBagConstraints.LINE_START
+                                }
+                            )
+                            add(
+                                JLabel(i18n.getString("settings.${name}_description")).apply {
+                                    font = font.deriveFont(12f)
+                                },
+                                GridBagConstraints().apply {
+                                    gridy = 1
+                                    anchor = GridBagConstraints.LINE_START
+                                }
+                            )
                         }.also {
-                            settingsPanel.add(it, GridBagConstraints().apply {
-                                gridy = row
-                                anchor = GridBagConstraints.LINE_START
-                                insets = Insets(0, 0, 16, 16)
-                            })
+                            settingsPanel.add(
+                                it,
+                                GridBagConstraints().apply {
+                                    gridy = row
+                                    anchor = GridBagConstraints.LINE_START
+                                    insets = Insets(0, 0, 16, 16)
+                                }
+                            )
                         }
                         JCheckBox().also {
-                            settingsPanel.add(it, GridBagConstraints().apply {
-                                gridx = 1
-                                gridy = row++
-                            })
+                            settingsPanel.add(
+                                it,
+                                GridBagConstraints().apply {
+                                    gridx = 1
+                                    gridy = row++
+                                }
+                            )
                             components[name] = it
                         }
                     }
+
                     "Button" -> {
                         JPanel().apply {
                             layout = GridBagLayout()
-                            add(JLabel(i18n.getString("settings.$name")).apply {
-                                font = font.deriveFont(Font.BOLD, 16f)
-                            }, GridBagConstraints().apply {
-                                anchor = GridBagConstraints.LINE_START
-                            })
-                            add(JLabel(i18n.getString("settings.${name}_description")).apply {
-                                font = font.deriveFont(12f)
-                            }, GridBagConstraints().apply {
-                                gridy = 1
-                                anchor = GridBagConstraints.LINE_START
-                            })
+                            add(
+                                JLabel(i18n.getString("settings.$name")).apply {
+                                    font = font.deriveFont(Font.BOLD, 16f)
+                                },
+                                GridBagConstraints().apply {
+                                    anchor = GridBagConstraints.LINE_START
+                                }
+                            )
+                            add(
+                                JLabel(i18n.getString("settings.${name}_description")).apply {
+                                    font = font.deriveFont(12f)
+                                },
+                                GridBagConstraints().apply {
+                                    gridy = 1
+                                    anchor = GridBagConstraints.LINE_START
+                                }
+                            )
                         }.also {
-                            settingsPanel.add(it, GridBagConstraints().apply {
-                                gridy = row
-                                anchor = GridBagConstraints.LINE_START
-                                insets = Insets(0, 0, 16, 16)
-                            })
+                            settingsPanel.add(
+                                it,
+                                GridBagConstraints().apply {
+                                    gridy = row
+                                    anchor = GridBagConstraints.LINE_START
+                                    insets = Insets(0, 0, 16, 16)
+                                }
+                            )
                         }
                         JButton("Configure").also {
-                            settingsPanel.add(it, GridBagConstraints().apply {
-                                gridx = 1
-                                gridy = row++
-                                anchor = GridBagConstraints.LINE_START
-                            })
+                            settingsPanel.add(
+                                it,
+                                GridBagConstraints().apply {
+                                    gridx = 1
+                                    gridy = row++
+                                    anchor = GridBagConstraints.LINE_START
+                                }
+                            )
                             components[name] = it
                             it.addActionListener {
                                 ExtraSettings.actions[name]?.invoke(this)
@@ -205,8 +243,6 @@ class SettingsModal() : JDialog() {
         setLocationRelativeTo(null)
         logger().info("Loaded ${settingDefinitions.size} setting definitions")
     }
-
-
 }
 
 /**
@@ -281,5 +317,5 @@ data class SettingDefinition(
     /**
      * The default value of the setting.
      */
-    val default: String = "",
+    val default: String = ""
 )

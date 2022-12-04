@@ -18,18 +18,21 @@
 package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.math.Quaternion
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor
+import org.wysko.midis2jam2.instrument.family.piano.KeyColor
+import org.wysko.midis2jam2.instrument.family.piano.noteToKeyboardKeyColor
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
+import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.DIM_GLOW
 import kotlin.math.pow
 
 /**
@@ -44,15 +47,22 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
     /** The notes this Harp should play. */
     val notes: MutableList<MidiNoteEvent> = eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
 
+    private val eventCollector = EventCollector(notes, context) { event, time ->
+        if (event is MidiNoteOffEvent) {
+            context.file.eventInSeconds(event) <= time - 0.033F
+        } else {
+            context.file.eventInSeconds(event) <= time
+        }
+    }
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToPerform = NoteQueue.collectWithOffGap(notes, context, time)
-        for (event in eventsToPerform) {
+        eventCollector.advanceCollectAll(time).forEach { event ->
             var midiNote = event.note
 
             /* If the note falls on a black key (if it were played on a piano) we need to "round it down" to the
-             * nearest white key. */
-            if (KeyedInstrument.midiValueToColor(midiNote) == KeyColor.BLACK) {
+                 * nearest white key. */
+            if (noteToKeyboardKeyColor(midiNote) == KeyColor.BLACK) {
                 midiNote--
             }
             var harpString = -1
@@ -133,10 +143,12 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
                     t = "HarpStringRed.bmp"
                     vt = "HarpStringRedPlaying.bmp"
                 }
+
                 i % 7 == 3 -> {
                     t = "HarpStringBlue.bmp"
                     vt = "HarpStringBluePlaying.bmp"
                 }
+
                 else -> {
                     t = "HarpStringWhite.bmp"
                     vt = "HarpStringWhitePlaying.bmp"
@@ -149,12 +161,14 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
                 context.loadModel("HarpStringPlaying$it.obj", vt).apply {
                     cullHint = Spatial.CullHint.Always
                     stringNode.attachChild(this)
+                    (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
                 }
             }
 
             stringNode.attachChild(string)
 
-            /* Funky math to polynomially scale each string */stringNode.setLocalTranslation(
+            /* Funky math to polynomially scale each string */
+            stringNode.setLocalTranslation(
                 0f,
                 2.1444f + 0.8777f * i,
                 -2.27f + 0.75651f * -i

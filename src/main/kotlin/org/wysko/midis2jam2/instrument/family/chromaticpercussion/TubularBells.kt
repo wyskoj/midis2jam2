@@ -20,23 +20,20 @@ import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath.PI
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
-import org.wysko.midis2jam2.instrument.family.percussive.Stick.STRIKE_SPEED
-import org.wysko.midis2jam2.instrument.family.percussive.Stick.handleStick
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis.X
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.GlowController
 import kotlin.math.pow
 import kotlin.math.sin
-import org.wysko.midis2jam2.instrument.family.percussive.Stick.MAX_ANGLE as StickMAX_ANGLE
 
 /** The base amplitude of the strike. */
 private const val BASE_AMPLITUDE = 0.5
@@ -53,67 +50,56 @@ private val OFFSET_DIRECTION_VECTOR = Vector3f(-10f, 0f, -10f)
 class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, events) {
 
     /** Each of the twelve bells. */
-    private val bells = Array(12) { i ->
-        Bell(i).apply {
-            instrumentNode.attachChild(highestLevel)
-        }
-    }
-
-    /** Contains the list of strikes for each of the 12 bells. */
-    private val bellStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { ArrayList() }
+    private val bells =
+        Array(12) { i -> Bell(i, events.filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == i }) }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-
-        bells.forEachIndexed { index, it ->
-            it.tick(delta)
-            val handleStick = handleStick(
-                context,
-                it.malletNode,
-                time,
-                delta,
-                bellStrikes[index],
-                STRIKE_SPEED,
-                StickMAX_ANGLE,
-                X
-            )
-            if (handleStick.justStruck()) {
-                it.recoilBell((handleStick.strike ?: return@forEachIndexed).velocity)
-            }
-        }
+        bells.forEach { it.tick(time, delta) }
     }
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 
+    init {
+        instrumentNode.run {
+            setLocalTranslation(-65f, 100f, -130f)
+            localRotation = Quaternion().fromAngles(0f, Utils.rad(25.0), 0f)
+        }
+    }
+
     /** A single bell. */
-    private inner class Bell(i: Int) {
+    private inner class Bell(i: Int, events: List<MidiNoteOnEvent>) {
 
         /** The highest level node. */
-        val highestLevel = Node()
+        val highestLevel = Node().also {
+            instrumentNode.attachChild(it)
+        }
 
         /** Contains the tubular bell. */
         val bellNode = Node().apply {
             setLocalTranslation((i - 5) * 4f, 0f, 0f)
             setLocalScale((-0.04545 * i).toFloat() + 1)
+
             highestLevel.attachChild(this)
         }
 
-        /** Contains the mallet. */
-        val malletNode: Node = Node().apply {
-            setLocalTranslation((i - 5) * 4f, -25f, 4f)
-            highestLevel.attachChild(this)
-            cullHint = Always
-        }.also {
-            context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
+        val mallet = Striker(
+            context = context,
+            strikeEvents = events,
+            stickModel = context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
                 setLocalTranslation(0f, 5f, 0f)
-                it.attachChild(this)
+                shadowMode = RenderQueue.ShadowMode.Receive
             }
+        ).apply {
+            node.setLocalTranslation((i - 5) * 4f, -25f, 4f)
+            setParent(highestLevel)
         }
 
         val bell: Spatial = context.loadModel("TubularBell.obj", "ShinySilver.bmp", 0.9f).also {
             bellNode.attachChild(it)
+            it.shadowMode = RenderQueue.ShadowMode.Receive
         }
 
         /** The current amplitude of the recoil. */
@@ -132,7 +118,11 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
          *
          * @param delta the amount of time since the last frame update
          */
-        fun tick(delta: Float) {
+        fun tick(time: Double, delta: Float) {
+            with(mallet.tick(time, delta)) {
+                if (velocity > 0) recoilBell(velocity)
+            }
+
             animTime += delta.toDouble()
 
             if (bellIsRecoiling) {
@@ -168,14 +158,6 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) 
             amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * BASE_AMPLITUDE
             animTime = 0.0
             bellIsRecoiling = true
-        }
-    }
-
-    init {
-        hits.forEach { bellStrikes[(it.note + 3) % 12].add(it) }
-        instrumentNode.run {
-            setLocalTranslation(-65f, 100f, -130f)
-            localRotation = Quaternion().fromAngles(0f, rad(25.0), 0f)
         }
     }
 }

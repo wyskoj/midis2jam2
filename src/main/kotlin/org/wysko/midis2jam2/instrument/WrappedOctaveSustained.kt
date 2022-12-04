@@ -90,12 +90,14 @@ abstract class WrappedOctaveSustained protected constructor(
     override fun toString(): String {
         return super.toString() + buildString {
             append(
-                debugProperty("playing",
+                debugProperty(
+                    "playing",
                     let {
                         if (!inverted) twelfths.reversed().toTypedArray() else twelfths
                     }.joinToString(separator = "") {
                         if (it.playing) "X" else "_"
-                    })
+                    }
+                )
             )
             append(debugProperty("inverted", inverted.toString()))
         }

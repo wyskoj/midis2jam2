@@ -18,7 +18,8 @@
 package org.wysko.midis2jam2.gui
 
 import org.wysko.midis2jam2.util.logger
-import java.util.*
+import java.util.Locale
+import java.util.ResourceBundle
 
 /**
  * Provides an easy means for delivering internationalized strings throughout the application.
@@ -47,3 +48,7 @@ object Internationalization {
         private set
 }
 
+/**
+ * Makes nice syntax for obtaining a string from [i18n].
+ */
+operator fun ResourceBundle.get(key: String): String = this.getString(key)

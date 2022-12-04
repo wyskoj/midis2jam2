@@ -78,7 +78,10 @@ class LyricController(
         context.app.guiNode.attachChild(this)
         setBox(
             Rectangle(
-                0f, context.app.viewPort.camera.height * 0.9f, context.app.viewPort.camera.width.toFloat(), 100f
+                0f,
+                context.app.viewPort.camera.height * 0.9f,
+                context.app.viewPort.camera.width.toFloat(),
+                100f
             )
         )
         color = ColorRGBA.DarkGray
@@ -91,7 +94,10 @@ class LyricController(
         context.app.guiNode.attachChild(this)
         setBox(
             Rectangle(
-                0f, context.app.viewPort.camera.height * 0.9f - 40f, context.app.viewPort.camera.width.toFloat(), 100f
+                0f,
+                context.app.viewPort.camera.height * 0.9f - 40f,
+                context.app.viewPort.camera.width.toFloat(),
+                100f
             )
         )
         color = ColorRGBA.DarkGray
@@ -175,20 +181,28 @@ class LyricController(
             }
             /* Color the words up to the current word */
             currentLine.setColor(
-                0, currentGroup.map { it.text.stripped() }.charCountUpTo(currentWordIndex), ColorRGBA.White
+                0,
+                currentGroup.map { it.text.stripped() }.charCountUpTo(currentWordIndex),
+                ColorRGBA.White
             )
         }
 
         /* Set the text position */
         currentLine.setBox(
             Rectangle(
-                0f, context.app.viewPort.camera.height * 0.9f, context.app.viewPort.camera.width.toFloat(), 100f
+                0f,
+                context.app.viewPort.camera.height * 0.9f,
+                context.app.viewPort.camera.width.toFloat(),
+                100f
             )
         )
 
         nextLine.setBox(
             Rectangle(
-                0f, context.app.viewPort.camera.height * 0.9f - 40f, context.app.viewPort.camera.width.toFloat(), 100f
+                0f,
+                context.app.viewPort.camera.height * 0.9f - 40f,
+                context.app.viewPort.camera.width.toFloat(),
+                100f
             )
         )
         nextLine.text = nextLineText
@@ -217,10 +231,9 @@ class LyricController(
             return true
         }
 
-        if (lyricGroups.isEmpty()
-            && currentGroup.isNotEmpty()
-            && time in (context.file.eventInSeconds(currentGroup.first()) - 1)
-            ..(context.file.eventInSeconds(currentGroup.last()) + 2)
+        if (lyricGroups.isEmpty() &&
+            currentGroup.isNotEmpty() &&
+            time in (context.file.eventInSeconds(currentGroup.first()) - 1)..(context.file.eventInSeconds(currentGroup.last()) + 2)
         ) {
             return true
         }

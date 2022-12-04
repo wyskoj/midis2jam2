@@ -16,12 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
-import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+
+private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
 
 /** Shared code for Saxophones. */
 abstract class Saxophone
@@ -31,15 +33,10 @@ protected constructor(
     cloneClass: Class<out SaxophoneClone>,
     fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
-
-    private val pitchBendController = PitchBendModulationController(context, eventList)
-
-    override fun moveForMultiChannel(delta: Float): Unit =
-        offsetNode.setLocalTranslation(0f, 40 * updateInstrumentIndex(delta), 0f)
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        val bend = pitchBendController.tick(time, delta) { currentNotePeriods.isNotEmpty() } * 0.05f
-        highestLevel.localRotation = Quaternion().fromAngles(0f, 0f, bend)
+    override fun moveForMultiChannel(delta: Float) {
+        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
+
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
+    // TODO offset bend node
 }

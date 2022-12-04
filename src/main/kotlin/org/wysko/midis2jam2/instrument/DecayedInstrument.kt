@@ -65,9 +65,9 @@ abstract class DecayedInstrument protected constructor(context: Midis2jam2, even
             if (hitsV.isNotEmpty() && context.file.eventInSeconds(hitsV[0]) - time <= 1) return true
 
             /* If within a 7-second gap between the last hit and the next? Visible. */
-            if (lastHit != null
-                && hitsV.isNotEmpty()
-                && context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit!!) <= 7
+            if (lastHit != null &&
+                hitsV.isNotEmpty() &&
+                context.file.eventInSeconds(hitsV[0]) - context.file.eventInSeconds(lastHit!!) <= 7
             ) return true
 
             /* If after 2 seconds of the last hit? Visible. */
@@ -76,7 +76,6 @@ abstract class DecayedInstrument protected constructor(context: Midis2jam2, even
             /* Invisible. */
             return false
         }
-
     }
 
     override fun tick(time: Double, delta: Float) {

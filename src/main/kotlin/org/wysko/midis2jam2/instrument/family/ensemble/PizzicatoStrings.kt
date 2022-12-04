@@ -18,17 +18,20 @@ package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.STRING_GLOW
 
 /**
  * Pizzicato strings have 12 separate strings that animate for each note. When a note is played, the string moves
@@ -38,6 +41,9 @@ class PizzicatoStrings(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>
 ) : DecayedInstrument(context, eventList) {
+
+    val eventCollector: EventCollector<MidiNoteOnEvent> =
+        EventCollector(eventList.filterIsInstance<MidiNoteOnEvent>(), context)
 
     /** Each string. */
     val strings: Array<PizzicatoString> = Array(12) {
@@ -50,10 +56,12 @@ class PizzicatoStrings(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToDoOn = NoteQueue.collect(hits, time, context)
+        val eventsToDoOn = eventCollector.advanceCollectAll(time)
 
         /* Play each note that needs to be animated */
-        eventsToDoOn.forEach { strings[(it.note + 3) % 12].play() }
+        eventsToDoOn.forEach {
+            strings[(it.note + 3) % 12].play()
+        }
 
         strings.forEach { it.tick(delta) }
     }
@@ -123,6 +131,7 @@ class PizzicatoStrings(
                 context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
                     cullHint = Always // Hide on startup
                     animStringNode.attachChild(this)
+                    (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
                 }
             }
             stringAnimator = VibratingStringAnimator(*animStrings)

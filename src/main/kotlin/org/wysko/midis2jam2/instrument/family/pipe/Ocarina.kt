@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.HandedClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
@@ -27,6 +28,8 @@ import org.wysko.midis2jam2.util.Utils.rad
 /** The Ocarina. */
 class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, OcarinaClone::class.java, OcarinaHandGenerator()) {
+
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(scaleFactor = 0.1f)
 
     /**
      * The ocarina hand positions are from 0 to 11 and wrap around the octave. So this is easily calculable and doesn't
@@ -66,8 +69,7 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
 
         init {
             loadHands()
-            animNode.attachChild(context.loadModel("Ocarina.obj", "Ocarina.bmp"))
-            highestLevel.attachChild(animNode)
+            modelNode.attachChild(context.loadModel("Ocarina.obj", "Ocarina.bmp"))
             highestLevel.setLocalTranslation(0f, 0f, 18f)
         }
     }

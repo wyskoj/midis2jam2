@@ -20,10 +20,15 @@ package org.wysko.midis2jam2
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import com.formdev.flatlaf.FlatDarkLaf
 import com.install4j.api.launcher.SplashScreen
 import org.wysko.midis2jam2.gui.Launcher
@@ -40,18 +45,28 @@ import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
-import java.util.*
+import java.util.Properties
 import javax.swing.UIManager
+
+/**
+ * The user's home folder.
+ */
+val USER_HOME: File = File(System.getProperty("user.home"))
 
 /**
  * The configuration directory.
  */
-const val CONFIGURATION_DIRECTORY: String = ".midis2jam2"
+val CONFIGURATION_DIRECTORY: File = File(USER_HOME, ".midis2jam2")
 
+/**
+ * When the application is launched, the launcher controller is stored here.
+ */
 var launcherController: LauncherController? = null
+
 /**
  * Where it all begins.
  */
+@ExperimentalGraphicsApi
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main(args: Array<String>) {
@@ -59,9 +74,7 @@ fun main(args: Array<String>) {
     loadSequencerJob.start()
 
     /* Ensure configuration folders are initialized */
-    File(System.getProperty("user.home"), ".midis2jam2").also {
-        it.mkdirs()
-    }
+    CONFIGURATION_DIRECTORY.mkdirs()
 
     SplashScreen.writeMessage("Loading...")
 
@@ -77,9 +90,13 @@ fun main(args: Array<String>) {
 
     application {
         Window(
-            onCloseRequest = ::exitApplication, title = "midis2jam2 launcher", state = rememberWindowState(
-                placement = WindowPlacement.Maximized, position = WindowPosition(Alignment.Center)
-            ), icon = BitmapPainter(useResource("ico/icon32.png", ::loadImageBitmap))
+            onCloseRequest = ::exitApplication,
+            title = "midis2jam2 launcher",
+            state = rememberWindowState(
+                placement = WindowPlacement.Maximized,
+                position = WindowPosition(Alignment.Center)
+            ),
+            icon = BitmapPainter(useResource("ico/icon32.png", ::loadImageBitmap))
         ) {
             launcherController = Launcher()
             this.window.contentPane.dropTarget = object : DropTarget() {

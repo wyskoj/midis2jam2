@@ -18,151 +18,89 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.METRONOME_BELL
 import org.wysko.midis2jam2.midi.METRONOME_CLICK
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
 /**
- * The metronome has two different pendulums. The first animates [METRONOME_CLICK] and the second animates
- * [METRONOME_BELL].
- *
- * Each pendulum swings to the maximum angle to represent a note on that pendulum. For every other note played on each
- * pendulum, the swing direction inverses. So, if a pendulum just swung to the right, it will swing to the left next.
- *
- * Here's generally how the animation component works (this is one of the more difficult instruments to animate). For
- * each pendulum, on each frame:
- *
- *  1. [Stick.handleStick] is performed on a dummy node ([dummyBellNode] or [dummyClickNode]).
- * This node is invisible.
- *  2. The [Stick.handleStick] method returns the [MidiNoteOnEvent] that the strike was intended
- * for, or null if there was no note played. This is saved to a variable ([flipBellLastStrikeFor] or
- * [flipClickLastStrikeFor]).
- *  3. If [Stick.handleStick] reports that it just struck a note, we check to see if it equals the last
- * [MidiNoteOnEvent]. If it's not, we update that variable and flip a boolean indicating the direction
- * ([flipClick] or [flipBell]).
- *  4. We then set the rotation of the actual pendulum, copying the rotation of the dummy node, or effectively
- * mirroring it if the pendulum needs to swing the other direction.
+ * The Metronome.
  */
 class Metronome(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** The pendulum for [METRONOME_CLICK]. */
-    private val clickPendulum: Spatial
+    private val bellStriker = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note == METRONOME_BELL },
+        strikeSpeed = 2.4,
+        maxIdleAngle = 30.0,
+        stickModel = Node() // Dummy note, rotation will be copied in [tick]
+    )
 
-    /**
-     * The dummy node for [METRONOME_CLICK].
-     *
-     * @see Metronome
-     */
-    private val dummyClickNode = Node()
+    private val clickStriker = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note == METRONOME_CLICK },
+        strikeSpeed = 2.4,
+        maxIdleAngle = 30.0,
+        stickModel = Node() // Dummy note, rotation will be copied in [tick]
+    )
 
-    /**
-     * The dummy node for [METRONOME_BELL].
-     *
-     * @see Metronome
-     */
-    private val dummyBellNode = Node()
-
-    /** The pendulum for [METRONOME_BELL]. */
-    private val bellPendulum: Spatial
-
-    /** List of hits for [METRONOME_BELL]. */
-    private val bellHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == METRONOME_BELL } as MutableList<MidiNoteOnEvent>
-
-    /** List of hits for [METRONOME_CLICK]. */
-    private val clickHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == METRONOME_CLICK } as MutableList<MidiNoteOnEvent>
-
-    /** Keeps track of which direction [clickPendulum] should swing. */
-    private var flipClick = false
-
-    /**
-     * Keeps track of the last note the [clickPendulum] hit.
-     *
-     * @see Metronome
-     */
-    private var flipClickLastStrikeFor: MidiNoteOnEvent? = null
-
-    /** Keeps track of which direction [clickPendulum] should swing. */
-    private var flipBell = false
-
-    /**
-     * Keeps track of the last note the [clickPendulum] hit.
-     *
-     * @see Metronome
-     */
-    private var flipBellLastStrikeFor: MidiNoteOnEvent? = null
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        /* See class documentation for details */
-
-        /* Animate click pendulum */
-        val clickStatus = Stick.handleStick(
-            context, dummyClickNode, time, delta, clickHits,
-            Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z, actualStick = false
-        )
-        if (clickStatus.strikingFor !== flipClickLastStrikeFor && clickStatus.strikingFor != null) {
-            flipClickLastStrikeFor = clickStatus.strikingFor
-            flipClick = !flipClick
-        }
-        clickPendulum.localRotation = Quaternion().fromAngles(
-            0f,
-            0f,
-            if (flipClick) clickStatus.rotationAngle * -1 + rad(60.0) else clickStatus.rotationAngle
-        )
-
-        /* Animate bell pendulum */
-        val bellStatus = Stick.handleStick(
-            context, dummyBellNode, time, delta, bellHits,
-            Stick.STRIKE_SPEED * (30.0 / 50), 30.0, Axis.Z, actualStick = false
-        )
-        if (bellStatus.strikingFor !== flipBellLastStrikeFor && bellStatus.strikingFor != null) {
-            flipBellLastStrikeFor = bellStatus.strikingFor
-            flipBell = !flipBell
-        }
-        bellPendulum.localRotation = Quaternion().fromAngles(
-            0f,
-            0f,
-            if (flipBell) bellStatus.rotationAngle * -1 + rad(60.0) else bellStatus.rotationAngle
-        )
+    private val bell = context.loadModel("MetronomePendjulum2.obj", "HornSkin.bmp").apply {
+        instrumentNode.attachChild(this)
+        setLocalTranslation(0f, 0f, 0.5f)
+    }
+    private val click = context.loadModel("MetronomePendjulum1.obj", "ShinySilver.bmp").apply {
+        instrumentNode.attachChild(this)
+        setLocalTranslation(0f, 0f, 1f)
     }
 
+    private var clickSwingsRight = true
+    private var bellSwingsRight = true
+
+    private var previousBellTarget: MidiNoteOnEvent? = null
+    private var previousClickTarget: MidiNoteOnEvent? = null
+
     init {
+        instrumentNode.apply {
+            attachChild(context.loadModel("MetronomeBox.obj", "Wood.bmp"))
+            setLocalTranslation(-20f, 0f, -46f)
+            localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        }
+    }
 
-        /* Extract separate hits for the bell and the click */
+    @Suppress("DuplicatedCode")
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
 
-        /* Load box */
-        instrumentNode.attachChild(context.loadModel("MetronomeBox.obj", "Wood.bmp"))
+        val bellResults = bellStriker.tick(time, delta)
+        val clickResults = clickStriker.tick(time, delta)
 
-        /* Load each pendulum */
-        clickPendulum = context.loadModel("MetronomePendjulum1.obj", "ShinySilver.bmp")
-        bellPendulum = context.loadModel("MetronomePendjulum2.obj", "HornSkin.bmp")
+        // Bell
+        bellResults.strikingFor?.let {
+            if (it != previousBellTarget) {
+                previousBellTarget = it
+                bellSwingsRight = !bellSwingsRight // Alternate if swinging for a new note
+            }
+        }
+        val bellRotation = when {
+            bellSwingsRight -> bellResults.rotationAngle - rad(30.0)
+            else -> -bellResults.rotationAngle + rad(30.0)
+        }
+        bell.localRotation = Quaternion().fromAngles(0f, 0f, bellRotation)
 
-        /* Create node for click and position */
-        val clickPendulumNode = Node()
-        clickPendulumNode.attachChild(clickPendulum)
-        clickPendulumNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-30.0))
-        clickPendulumNode.setLocalTranslation(0f, 0f, 1f)
-
-        /* Create node for bell and position */
-        val bellPendulumNode = Node()
-        bellPendulumNode.attachChild(bellPendulum)
-        bellPendulumNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-30.0))
-        bellPendulumNode.setLocalTranslation(0f, 0f, 0.5f)
-
-        /* Attach to instrument */
-        instrumentNode.attachChild(clickPendulumNode)
-        instrumentNode.attachChild(bellPendulumNode)
-
-        /* Positioning */
-        instrumentNode.setLocalTranslation(-20f, 0f, -46f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        // Click
+        clickResults.strikingFor?.let {
+            if (it != previousClickTarget) {
+                previousClickTarget = it
+                clickSwingsRight = !clickSwingsRight // Alternate if swinging for a new note
+            }
+        }
+        val clickRotation = when {
+            clickSwingsRight -> clickResults.rotationAngle - rad(30.0)
+            else -> -clickResults.rotationAngle + rad(30.0)
+        }
+        click.localRotation = Quaternion().fromAngles(0f, 0f, clickRotation)
     }
 }

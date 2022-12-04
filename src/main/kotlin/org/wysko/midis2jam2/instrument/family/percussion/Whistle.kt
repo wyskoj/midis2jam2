@@ -18,9 +18,8 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.SHORT_WHISTLE
@@ -48,9 +47,11 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
         instrumentNode.attachChild(it.highestLevel)
     }
 
+    private val eventCollector = EventCollector(hits, context)
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        NoteQueue.collect(hits, time, context).forEach {
+        eventCollector.advanceCollectAll(time).forEach {
             if (it.note == SHORT_WHISTLE) {
                 shortWhistle.play(0.2)
             } else {
@@ -59,11 +60,6 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
         }
         shortWhistle.tick(delta)
         longWhistle.tick(delta)
-
-        // Override if still playing
-        if (shortWhistle.playing || longWhistle.playing) {
-            instrumentNode.cullHint = Spatial.CullHint.Dynamic
-        }
     }
 
     /** The enum Whistle length. */

@@ -21,130 +21,102 @@ import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue.collectOne
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
 import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.Axis
 
-/** Texture file for metal texture. */
-const val METAL_TEXTURE: String = "MetalTexture.bmp"
+private const val METAL_TEXTURE = "MetalTexture.bmp"
+private const val BASS_DRUM_RECOIL_DISTANCE = -3f
 
 /**
  * The bass drum has three major animation components:
  *
  * * [beaterArm] swings up and hits the bass drum
  * * [pedal] is pressed down
- * * [drumNode] is recoiled
+ * * [drum] is recoiled
  *
  * The animation has no future reference. That is, when a note is played, the animation starts immediately and takes
  * time to recoil.
  */
-class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits),
-    Retexturable {
+class BassDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
+    PercussionInstrument(context, hits), Retexturable {
 
-    /** The arm that swings to hit the bass drum. */
-    private val beaterArm: Spatial
+    private val eventCollector = EventCollector(hits, context)
 
-    /** The pedal is pressed when a note is played and slowly comes back to its idle position. */
-    private val pedal: Spatial
-
-    /** The Drum node. */
-    private val drumNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        val nextHit = collectOne(hits, time, context)
-        if (nextHit == null) { // We need to recoil all animation components
-
-            /* Move the drum forward if it needs to. Coerce Z to at most 0 to not overshoot the idle position. */
-            drumNode.setLocalTranslation(
-                0f,
-                0f,
-                (drumNode.localTranslation.z + DRUM_RECOIL_COMEBACK * delta).coerceAtMost(0f)
-            )
-
-            /* Gradually rotate the beater back to its idle position */
-            var newBeaterAngle = beaterArm.localRotation.toAngles(FloatArray(3))[0] + 8f * delta
-            newBeaterAngle = rad(Stick.MAX_ANGLE).coerceAtMost(newBeaterAngle)
-            beaterArm.localRotation = Quaternion().fromAngles(
-                newBeaterAngle,
-                0f,
-                0f
-            )
-
-            /* Gradually rotate the pedal back to its idle position */
-            var newPedalAngle =
-                (pedal.localRotation.toAngles(FloatArray(3))[0] + 8f * delta * (PEDAL_MAX_ANGLE / Stick.MAX_ANGLE))
-                    .toFloat()
-            newPedalAngle = rad(PEDAL_MAX_ANGLE.toDouble()).coerceAtMost(newPedalAngle)
-            pedal.localRotation = Quaternion().fromAngles(
-                newPedalAngle,
-                0f,
-                0f
-            )
-
-        } else { // There is a note, so perform animation.
-            beaterArm.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
-            pedal.localRotation = Quaternion().fromAngles(0f, 0f, 0f)
-            drumNode.setLocalTranslation(0f, 0f, (-3 * velocityRecoilDampening(nextHit.velocity)).toFloat())
-        }
-    }
-
-    companion object {
-        /** The maximum angle the pedal will fall back to when at rest. */
-        private const val PEDAL_MAX_ANGLE = 20
+    private val beaterAssembly = Node().apply {
+        instrumentNode.attachChild(this)
+        move(0f, 0f, 1.5f)
     }
 
     private val drum = context.loadModel("DrumSet_BassDrum.obj", "DrumShell.bmp").apply {
         shadowMode = RenderQueue.ShadowMode.Cast
+        recoilNode.attachChild(this)
     }
 
+    private val beaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.obj", METAL_TEXTURE).apply {
+        beaterAssembly.attachChild(this)
+        move(0f, 5.5f, 1.35f)
+        (this as Node).let { // Set correct materials
+            it.children[0].setMaterial(context.reflectiveMaterial("ShinySilver.bmp"))
+            it.children[1].setMaterial(context.unshadedMaterial("MetalTextureDark.bmp"))
+        }
+    }
+
+    private val pedal = context.loadModel("DrumSet_BassDrumPedal.obj", METAL_TEXTURE).apply {
+        beaterAssembly.attachChild(this)
+        move(0f, 0.5f, 7.5f)
+    }
+
+    private var rotationFactor = 0f
+
     init {
-        /* Load bass drum */
-        drumNode.attachChild(drum)
+        beaterAssembly.attachChild(context.loadModel("DrumSet_BassDrumBeaterHolder.obj", METAL_TEXTURE))
+        instrumentNode.move(0f, 0f, -80f)
+    }
 
-        /* Load beater arm */
-        beaterArm = context.loadModel("DrumSet_BassDrumBeaterArm.obj", METAL_TEXTURE)
-
-        /* Load beater holder */
-        val bassDrumBeaterHolder = context.loadModel("DrumSet_BassDrumBeaterHolder.obj", METAL_TEXTURE)
-        val holder = bassDrumBeaterHolder as Node
-
-        /* Apply materials */
-        val arm = beaterArm as Node
-        val shinySilverMaterial = context.reflectiveMaterial("Assets/ShinySilver.bmp")
-        val darkMetalMaterial = context.unshadedMaterial("Assets/MetalTextureDark.bmp")
-        arm.run {
-            getChild(1).setMaterial(darkMetalMaterial)
-            getChild(0).setMaterial(shinySilverMaterial)
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val results = eventCollector.advanceCollectOne(time)
+        recoilDrum(
+            drum = drum,
+            velocity = results?.velocity ?: 0,
+            delta = delta,
+            recoilAxis = Axis.Z,
+            recoilDistance = BASS_DRUM_RECOIL_DISTANCE
+        )
+        results?.let {
+            rotationFactor = 1f
         }
-        holder.getChild(1).setMaterial(darkMetalMaterial)
+        beaterArm.localRotation = beaterRotation()
+        pedal.localRotation = pedalRotation()
 
-        /* Load pedal */
-        pedal = context.loadModel("DrumSet_BassDrumPedal.obj", METAL_TEXTURE)
+        rotationFactor -= delta * 8f
+        rotationFactor = rotationFactor.coerceAtLeast(0f)
+    }
 
+    private fun beaterRotation(): Quaternion {
+        return Quaternion().fromAngles(
+            -rotationFactor + 0.87f,
+            0f,
+            0f
+        )
+    }
 
-        val beaterNode = Node()
-        beaterNode.run {
-            attachChild(beaterArm)
-            attachChild(bassDrumBeaterHolder)
-            attachChild(pedal)
-        }
-
-        highLevelNode.attachChild(drumNode)
-        highLevelNode.attachChild(beaterNode)
-
-        beaterArm.setLocalTranslation(0f, 5.5f, 1.35f)
-        beaterArm.setLocalRotation(Quaternion().fromAngles(rad(Stick.MAX_ANGLE), 0f, 0f))
-
-        pedal.localRotation = Quaternion().fromAngles(rad(PEDAL_MAX_ANGLE.toDouble()), 0f, 0f)
-        pedal.setLocalTranslation(0f, 0.5f, 7.5f)
-
-        beaterNode.setLocalTranslation(0f, 0f, 1.5f)
-        highLevelNode.setLocalTranslation(0f, 0f, -80f)
+    private fun pedalRotation(): Quaternion {
+        return Quaternion().fromAngles(
+            (-rotationFactor * 0.5f) + 0.2f,
+            0f,
+            0f
+        )
     }
 
     override fun drum(): Spatial = drum
     override fun retextureType(): RetextureType = RetextureType.OTHER
+    override fun toString(): String {
+        return super.toString() + buildString {
+            append(debugProperty("rotationFactor", rotationFactor))
+        }
+    }
 }

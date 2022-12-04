@@ -16,107 +16,70 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
-import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUMSET_STICK
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.Retexturable
 import org.wysko.midis2jam2.instrument.family.percussion.RetextureType
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.ACOUSTIC_SNARE
 import org.wysko.midis2jam2.midi.ELECTRIC_SNARE
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.SIDE_STICK
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
+import java.lang.Integer.max
 
 /** The Snare drum. */
-class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : PercussionInstrument(context, hits),
-    Retexturable {
+class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) :
+    PercussionInstrument(context, hits), Retexturable {
 
-    /** The list of hits for regular notes. */
-    private val regularHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == ACOUSTIC_SNARE || it.note == ELECTRIC_SNARE } as MutableList<MidiNoteOnEvent>
-
-    /** The list of hits for side sticks. */
-    private val sideHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == SIDE_STICK } as MutableList<MidiNoteOnEvent>
-
-    /** Contains the side stick. */
-    private val sideStickNode = Node()
-
-    /** The stick used for regular hits. */
-    private val regularStick: Spatial
-    override fun tick(time: Double, delta: Float) {
-        val regularStickStatus = Stick.handleStick(
-            context,
-            regularStick,
-            time,
-            delta,
-            regularHits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X
-        )
-        val sideStickStatus = Stick.handleStick(
-            context,
-            sideStickNode,
-            time,
-            delta,
-            sideHits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X
-        )
-        var regVel = 0
-        var sideVel = 0
-        if (regularStickStatus.justStruck()) {
-            regVel = (regularStickStatus.strike ?: return).velocity
-        }
-        if (sideStickStatus.justStruck()) {
-            sideVel = ((sideStickStatus.strike ?: return).velocity * 0.5).toInt()
-        }
-        val velocity = regVel.coerceAtLeast(sideVel)
-        recoilDrum(recoilNode, velocity != 0, velocity, delta)
+    private val regularStick = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note == ACOUSTIC_SNARE || it.note == ELECTRIC_SNARE },
+        stickModel = DRUMSET_STICK
+    ).apply {
+        setParent(recoilNode)
+    }.also {
+        it.node.move(10f, 0f, 3f)
+        it.node.rotate(0f, rad(80.0), 0f)
     }
 
-    /** The geometry of the snare drum. */
-    val drum: Spatial = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp")
+    private val sideStick = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note == SIDE_STICK },
+        stickModel = DRUMSET_STICK
+    ).apply {
+        setParent(recoilNode)
+        offsetStick {
+            it.move(0f, 0f, -2f)
+            it.rotate(0f, rad(-20.0), 0f)
+        }
+    }.also {
+        it.node.apply {
+            setLocalTranslation(-1f, 0.4f, 6f)
+        }
+    }
+
+    private val drum = context.loadModel("DrumSet_SnareDrum.obj", "DrumShell_Snare.bmp").apply {
+        recoilNode.attachChild(this)
+    }
 
     init {
-        drum.apply { recoilNode.attachChild(this) }
-        regularStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-
-        val sideStick = regularStick.clone().apply {
-            sideStickNode.attachChild(this)
-        }
-
-        val regularStickNode: Node = Node().apply {
-            attachChild(regularStick)
-        }
-
-        recoilNode.run {
-            attachChild(regularStickNode)
-            attachChild(sideStickNode)
-        }
-
-        highLevelNode.run {
-            attachChild(recoilNode)
+        instrumentNode.apply {
             move(-10.9f, 16f, -72.5f)
             rotate(rad(10.0), 0f, rad(-10.0))
         }
+    }
 
-        regularStickNode.run {
-            rotate(0f, rad(80.0), 0f)
-            move(10f, 0f, 3f)
-        }
+    override fun tick(time: Double, delta: Float) {
+        val regularResults = regularStick.tick(time, delta)
+        val sideResults = sideStick.tick(time, delta)
 
-        sideStick.run {
-            setLocalTranslation(0f, 0f, -2f)
-            localRotation = Quaternion().fromAngles(0f, rad(-20.0), 0f)
-        }
-
-        sideStickNode.setLocalTranslation(-1f, 0.4f, 6f)
+        recoilDrum(
+            drum = recoilNode,
+            velocity = max(regularResults.strike?.velocity ?: 0, sideResults.strike?.velocity ?: 0),
+            delta = delta
+        )
     }
 
     override fun drum(): Spatial = drum

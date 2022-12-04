@@ -71,30 +71,32 @@ private const val LASER_HEIGHT = 727.289f
 class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class.java, null) {
 
-    private val pitchBendModulationController = PitchBendModulationController(context, eventList, smoothness = 50.0)
-
     private var pitchBendAmount = 0f
+
+    override val pitchBendModulationController: PitchBendModulationController = PitchBendModulationController(
+        context,
+        eventList,
+        smoothness = 13.0 // Make laser bend a little more snappy
+    )
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(-22.5f + updateInstrumentIndex(delta) * 15, 0f, 0f)
     }
 
+    override fun handlePitchBend(time: Double, delta: Float) {
+        pitchBendAmount = pitchBendModulationController.tick(time, delta) {
+            clones.any { it.isPlaying }
+        }
+    }
+
     @Suppress("unused")
     companion object {
         /** See https://www.desmos.com/calculator/zbmdwg4vcl */
-        val SIGMOID_CALCULATOR: SpaceLaserAngleCalculator =
-            object : SpaceLaserAngleCalculator {
-                override fun angleFromNote(note: Int, pitchBendAmount: Float): Double {
-                    val adjNote = note + pitchBendAmount
-                    return (-(1 / (1 + exp((-(adjNote - 64) / 16f))) * 208 - 104)).toDouble()
-                }
+        val SIGMOID_CALCULATOR: SpaceLaserAngleCalculator = object : SpaceLaserAngleCalculator {
+            override fun angleFromNote(note: Int, pitchBendAmount: Float): Double {
+                val adjNote = note + pitchBendAmount
+                return (-(1 / (1 + exp((-(adjNote - 64) / 16f))) * 208 - 104)).toDouble()
             }
-    }
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        pitchBendAmount = pitchBendModulationController.tick(time, delta) {
-            clones.any { it.isPlaying }
         }
     }
 
@@ -105,11 +107,14 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         internal var rotation = 0.0
 
         /** The node that contains the laser pointer and laser. */
-        private val laserNode = Node()
+        private val laserNode = Node().apply {
+            highestLevel.attachChild(this)
+        }
 
         /** The laser beam. */
         internal val laserBeam: Spatial = context.loadModel("SpaceLaserLaser.obj", "Laser.bmp").apply {
             shadowMode = RenderQueue.ShadowMode.Off
+            laserNode.attachChild(this)
         }
 
         /** Timer for how long a note has been playing to calculate wobble. */
@@ -122,21 +127,32 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private val angleCalculator = SIGMOID_CALCULATOR
 
         /** The shooter. */
-        internal val shooter: Spatial = context.loadModel("SpaceLaser.obj", "ShinySilver.bmp")
+        internal val shooter: Spatial = context.loadModel("SpaceLaser.obj", "ShinySilver.bmp").apply {
+            laserNode.attachChild(this)
+        }
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
-            if (isPlaying) {
-                rotation = angleCalculator.angleFromNote((currentNotePeriod ?: return).midiNote, pitchBendAmount)
-                if (wobbleTime == 0.0) pitchBendModulationController.resetModulation()
+            currentNotePeriod?.let {
+                // Currently playing, so set the correct rotation
+                rotation = angleCalculator.angleFromNote(it.midiNote, pitchBendAmount)
+
+                // If just starting playing, reset modulation so that we start at 0 vibrato
+                if (wobbleTime == 0.0) {
+                    pitchBendModulationController.resetModulation()
+                }
                 wobbleTime += delta
+
+                // Start wobbling 0.1 secs after starting playing
                 wobbleIntensity = (wobbleTime - 0.1).coerceIn(0.0..0.07)
-            } else {
-                notePeriods.firstOrNull()?.let {
+            } ?: run {
+                // Not yet playing. Look ahead to the next NotePeriod
+                notePeriodCollector.peek()?.let {
                     val startTime = it.startTime
-                    if (startTime - time <= 1) {
+                    if (startTime - time <= 1) { // Less than 1 second away from playing
                         val targetPos = angleCalculator.angleFromNote(it.midiNote, pitchBendAmount)
                         if (startTime - time >= delta) {
+                            // Slowly inch our way to the target rotation
                             rotation += (targetPos - rotation) / (startTime - time) * delta
                         }
                     }
@@ -144,41 +160,41 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
                 wobbleTime = 0.0
             }
             laserNode.localRotation = Quaternion().fromAngles(
+                /* xAngle = */
                 0f,
+                /* yAngle = */
                 0f,
+                /* zAngle = */
                 rad(rotation + sin(50 * wobbleTime) * wobbleIntensity)
             )
+
+            // Only show laser beam if currently playing
             laserBeam.cullHint = isPlaying.cullHint()
 
-            /* Check collision with stage */
+            // So that the laser does not penetrate through the stage when rotated to such extremes, we perform a ray
+            // cast and check for a collision. If a collision is found, we can scale the laser so that it does not
+            // appear it is clipping through the stage.
             CollisionResults().apply {
                 context.stage.collideWith(
                     Ray(
+                        /* origin = */
                         laserBeam.worldTranslation,
+                        /* direction = */
                         laserBeam.worldRotation.getRotationColumn(1)
-                    ), this
+                    ),
+                    this
                 )
-            }.also {
-                if (it.size() > 0) {
-                    it.closestCollision.run {
-                        laserBeam.localScale = Vector3f(1f, distance / LASER_HEIGHT, 1f)
-                    }
-                } else {
-                    laserBeam.localScale = Vector3f.UNIT_XYZ
-                }
+            }.also { results ->
+                laserBeam.localScale = Vector3f.UNIT_XYZ.clone().setY(
+                    results.closestCollision?.let {
+                        it.distance / LASER_HEIGHT // Ratio of distance from laser to total laser height
+                    } ?: 1f // No collision? Just use the full scale of the laser
+                )
             }
         }
 
         override fun moveForPolyphony() {
             laserNode.setLocalTranslation(0f, 0f, indexForMoving() * 5f)
-        }
-
-        init {
-            laserNode.apply {
-                attachChild(shooter)
-                attachChild(laserBeam)
-            }
-            highestLevel.attachChild(laserNode)
         }
 
         override fun toString(): String {
@@ -242,7 +258,6 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     }
 
     override fun toString(): String {
-        return super.toString() + buildString {
-        }
+        return super.toString() + buildString {}
     }
 }

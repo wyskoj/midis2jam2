@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
@@ -29,19 +30,22 @@ private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFinger
 class Piccolo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     HandedInstrument(context, events, PiccoloClone::class.java, FINGERING_MANAGER) {
 
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
+
     /**
      * A single Piccolo.
      */
     inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.SteamPuffTexture.NORMAL, 1f) {
         init {
             val horn = context.loadModel(
-                "Piccolo.obj", "CymbalSkinSphereMap.bmp",
+                "Piccolo.obj",
+                "CymbalSkinSphereMap.bmp",
                 0.9f
             )
             loadHands()
             puffer.steamPuffNode.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.steamPuffNode.setLocalTranslation(0f, -8.6f, 0f)
-            highestLevel.attachChild(horn)
+            modelNode.attachChild(horn)
         }
     }
 

@@ -21,7 +21,7 @@ import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 
-/** The melodic agogos. */
+/** The Melodic Agogos. */
 class Agogos(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>
@@ -50,7 +50,8 @@ class Agogos(
             animNode.attachChild(
                 context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", 0.9f).apply {
                     setLocalScale(1 - 0.036f * i)
-                })
+                }
+            )
         }
     }
 }

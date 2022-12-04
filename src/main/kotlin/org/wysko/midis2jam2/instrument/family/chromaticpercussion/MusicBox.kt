@@ -24,10 +24,9 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.GlowController
 
 /** Texture file for shiny silver. */
@@ -52,10 +51,6 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /** Contains the spindle. */
     private val cylinder = Node()
 
-    /** List of hits for hanging key recoils. */
-    private val hitsForRecoil: MutableList<MidiNoteOnEvent> =
-        eventList.filterIsInstance<MidiNoteOnEvent>() as MutableList<MidiNoteOnEvent>
-
     /** List of points that are currently active. */
     private val points: MutableList<Spatial> = ArrayList()
 
@@ -71,56 +66,35 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
      */
     private val pool: MutableList<Spatial> = ArrayList()
 
+    private val pointsHits = EventCollector(hits, context) { event, time ->
+        context.file.tickToSeconds(event.time - context.file.division) <= time // Quarter note early
+    }
+
+    private val notesHits = EventCollector(hits, context)
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
         rotateCylinder(time, delta)
 
-        val hitsItr = hits.iterator()
-
-        /* For each hit */
-        while (hitsItr.hasNext()) {
-            val (noteTime, _, noteValue, _) = hitsItr.next()
-
-            /* If the note is within one quarter note */
-            if (context.file.tickToSeconds(noteTime - context.file.division) <= time) {
-
-                /* Attempt to grab a point from the pool. If there is none, create a new one. */
-                val aPoint: Spatial = if (pool.size > 1) {
-                    pool.removeAt(0)
-                } else {
-                    pointModel.clone()
-                }
-
-                /* Initialize point */
-                aPoint.run {
-                    instrumentNode.attachChild(this)
-                    this.localRotation = Quaternion().fromAngles((-Math.PI / 2).toFloat(), 0f, 0f)
-                    points.add(this)
-                    pointRotations[this] = 0f
-                    setLocalTranslation((noteValue + 3) % 12 - 5.5f, 0f, 0f)
-                }
-
-                /* Remove hit */
-                hitsItr.remove()
+        pointsHits.advanceCollectAll(time).forEach {
+            // Handle points
+            with(if (pool.isNotEmpty()) pool.removeAt(0) else pointModel.clone()) {
+                instrumentNode.attachChild(this)
+                localRotation = Quaternion().fromAngles((-Math.PI / 2).toFloat(), 0f, 0f)
+                points.add(this)
+                pointRotations[this] = 0f
+                setLocalTranslation((it.note + 3) % 12 - 5.5f, 0f, 0f)
             }
         }
 
-
-        /* For each point, remove from the list of visible points if it has reached max angle and move it to the pool */
-        val pointsItr = points.iterator()
-        while (pointsItr.hasNext()) {
-            val activePoint = pointsItr.next()
-            pointRotations[activePoint]?.let {
-                if (it > 4.71) { // 3 pi / 2
-                    instrumentNode.detachChild(activePoint)
-                    pointsItr.remove()
-                    pool.add(activePoint)
-                }
-            }
+        notesHits.advanceCollectAll(time).forEach {
+            notes[(it.note + 3) % 12].play()
         }
 
-        /* Play each note */
-        NoteQueue.collect(hitsForRecoil, time, context).forEach { notes[(it.note + 3) % 12].play() }
+        points.filter { pointRotations[it]!! > 4.71 }
+            .onEach { instrumentNode.detachChild(it) } // Hide
+            .also { points.removeAll(it) } // No longer active
+            .also { pool.addAll(it) } // Put back in pool
 
         /* Tick the hanging notes */
         notes.forEach { it.tick(delta) }
@@ -138,9 +112,9 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         val xAngle = (0.5 * Math.PI * delta * (6E7 / tempo) / 60.0).toFloat()
 
         /* Rotate each point */
-        points.forEach {
-            it.rotate(xAngle, 0f, 0f)
-            pointRotations[it] = (pointRotations[it] ?: return@forEach) + xAngle
+        pointRotations.entries.forEach {
+            it.key.rotate(xAngle, 0f, 0f)
+            pointRotations[it.key] = it.value + xAngle
         }
 
         /* Rotate cylinder */
@@ -199,7 +173,6 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             val rotation = if (progress <= 0.5) progress.toFloat() else (-progress + 1).toFloat()
             return -rotation
         }
-
     }
 
     init {

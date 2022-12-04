@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Companion.from
 import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.HandedClone
 import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
@@ -47,6 +48,8 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         ClarinetClone::class.java,
         FINGERING_MANAGER
     ) {
+
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)

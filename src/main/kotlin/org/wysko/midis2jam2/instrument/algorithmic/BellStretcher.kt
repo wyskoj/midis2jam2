@@ -50,7 +50,7 @@ class StandardBellStretcher(
     private val stretchAxis: Axis,
 
     /** The bell to stretch. */
-    private val bell: Spatial,
+    private val bell: Spatial
 ) : BellStretcher {
 
     override fun tick(stretchAmount: Double) {
@@ -60,7 +60,6 @@ class StandardBellStretcher(
     /** The current scale of the bell. */
     var scale: Float = 1f
         private set
-
 
     /** Sets the scale of the bell, appropriately and automatically scaling on the correct axis. */
     private fun scaleBell(scale: Float) {

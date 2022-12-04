@@ -55,14 +55,14 @@ class SopranoSax(
 
             context.assetManager.loadModel("Assets/SopranoSaxBody.obj").apply {
                 this as Node
-                getChild(0).setMaterial(Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                    setColor("Color", ColorRGBA.Black)
-                })
+                getChild(0).setMaterial(
+                    Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                        setColor("Color", ColorRGBA.Black)
+                    }
+                )
                 getChild(1).setMaterial(shine)
                 modelNode.attachChild(this)
             }
-
-            animNode.setLocalTranslation(0f, 0f, 20f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(54.8 - 90), rad(54.3), rad(2.4))
         }
     }

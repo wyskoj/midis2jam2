@@ -69,7 +69,6 @@ enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY:
 
     companion object {
         /** Checks the camera's position and ensures it stays within a certain bounding box. */
-        @JvmStatic
         fun preventCameraFromLeaving(camera: com.jme3.renderer.Camera) {
             val location = camera.location
             camera.location = Vector3f(
@@ -78,6 +77,24 @@ enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY:
                 if (location.z > 0) min(location.z, 400f) else max(location.z, -400f)
             )
         }
-    }
 
+        /**
+         * Given the [currentCameraAngle] and the [name] of the specified camera action, determines the correct
+         * [CameraAngle] to switch to.
+         */
+        fun handleCameraAngle(currentCameraAngle: CameraAngle, name: String): CameraAngle = when (name) {
+            "cam1" -> when (currentCameraAngle) {
+                CAMERA_1A -> CAMERA_1B
+                CAMERA_1B -> CAMERA_1C
+                else -> CAMERA_1A
+            }
+
+            "cam2" -> if (currentCameraAngle == CAMERA_2A) CAMERA_2B else CAMERA_2A
+            "cam3" -> if (currentCameraAngle == CAMERA_3A) CAMERA_3B else CAMERA_3A
+            "cam4" -> if (currentCameraAngle == CAMERA_4A) CAMERA_4B else CAMERA_4A
+            "cam5" -> CAMERA_5
+            "cam6" -> if (currentCameraAngle == CAMERA_6A) CAMERA_6B else CAMERA_6A
+            else -> CAMERA_1A // Shouldn't ever happen
+        }
+    }
 }

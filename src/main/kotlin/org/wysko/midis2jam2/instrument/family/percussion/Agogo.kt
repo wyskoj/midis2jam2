@@ -16,63 +16,54 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
-import com.jme3.scene.Spatial
+import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.HIGH_AGOGO
 import org.wysko.midis2jam2.midi.LOW_AGOGO
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.world.Axis
-import kotlin.math.max
+import java.lang.Integer.max
 
-/** The agogo. */
+private val BASE_POSITION = Vector3f(-5f, 50f, -85f)
+
+/** The Agogo. */
 class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** The left stick. */
-    private val leftStick: Spatial
+    private val leftStick = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note == HIGH_AGOGO },
+        stickModel = StickType.DRUMSET_STICK
+    ).apply {
+        setParent(recoilNode)
+        node.move(3f, 0f, 13f)
+    }
 
-    /** The right stick. */
-    private val rightStick: Spatial
-
-    /** The hits for the high agogo. */
-    private val highHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == HIGH_AGOGO } as MutableList<MidiNoteOnEvent>
-
-    /** The hits for the low agogo. */
-    private val lowHits: MutableList<MidiNoteOnEvent> =
-        hits.filter { it.note == LOW_AGOGO } as MutableList<MidiNoteOnEvent>
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        val leftStatus =
-            Stick.handleStick(context, leftStick, time, delta, highHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-        val rightStatus =
-            Stick.handleStick(context, rightStick, time, delta, lowHits, Stick.STRIKE_SPEED, Stick.MAX_ANGLE, Axis.X)
-        var velocity = 0
-        if (leftStatus.strike != null) {
-            velocity = max(velocity, leftStatus.strike.velocity)
-        }
-        if (rightStatus.strike != null) {
-            velocity = max(velocity, rightStatus.strike.velocity)
-        }
-        recoilDrum(recoilNode, leftStatus.justStruck() || rightStatus.justStruck(), velocity, delta)
+    private val rightStick = Striker(
+        context = context,
+        strikeEvents = hits.filter { it.note == LOW_AGOGO },
+        stickModel = StickType.DRUMSET_STICK
+    ).apply {
+        setParent(recoilNode)
+        node.move(10f, 0f, 11f)
     }
 
     init {
-
-        leftStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-            recoilNode.attachChild(this)
-            setLocalTranslation(3f, 0f, 13f)
-        }
-
-        rightStick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-            recoilNode.attachChild(this)
-            setLocalTranslation(10f, 0f, 11f)
-        }
-
         recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp"))
-        instrumentNode.setLocalTranslation(-5f, 50f, -85f)
-        instrumentNode.attachChild(recoilNode)
+        instrumentNode.localTranslation = BASE_POSITION
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+
+        val leftResults = leftStick.tick(time, delta)
+        val rightResults = rightStick.tick(time, delta)
+
+        recoilDrum(
+            drum = recoilNode,
+            velocity = max(leftResults.strike?.velocity ?: 0, rightResults.strike?.velocity ?: 0),
+            delta = delta
+        )
     }
 }

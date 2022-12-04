@@ -25,8 +25,9 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Companion.MAX_ANGLE
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Companion.MIN_ANGLE
 import org.wysko.midis2jam2.instrument.family.piano.Key
+import org.wysko.midis2jam2.instrument.family.piano.KeyColor
 import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument
-import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument.KeyColor.WHITE
+import org.wysko.midis2jam2.instrument.family.piano.noteToKeyboardKeyColor
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
@@ -60,6 +61,17 @@ const val ACCORDION_KEY_WHITE_BACK_OBJ: String = "AccordionKeyWhiteBack.obj"
  */
 class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: AccordionType) :
     KeyedInstrument(context, eventList, 0, 23) {
+
+    override val keys: Array<Key> = let {
+        var whiteCount = 0
+        Array(24) {
+            if (noteToKeyboardKeyColor(it) == KeyColor.WHITE) {
+                AccordionKey(it, whiteCount++)
+            } else {
+                AccordionKey(it, it)
+            }
+        }
+    }
 
     /** The accordion is divided into fourteen sections. */
     private val accordionSections = Array(SECTION_COUNT) { Node() }
@@ -159,7 +171,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         }
 
         init {
-            if (midiValueToColor(midiNote) == WHITE) {
+            if (noteToKeyboardKeyColor(midiNote) == KeyColor.WHITE) {
                 /* Up key */
                 val upKeyFront = context.loadModel(ACCORDION_KEY_WHITE_FRONT_OBJ, ACCORDION_KEY_BMP)
                 val upKeyBack = context.loadModel(ACCORDION_KEY_WHITE_BACK_OBJ, ACCORDION_KEY_BMP)
@@ -243,14 +255,6 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         val keysNode = Node()
         accordionSections[SECTION_COUNT - 1].attachChild(keysNode)
 
-        var whiteCount = 0
-        keys = Array(24) {
-            if (midiValueToColor(it) == WHITE) {
-                AccordionKey(it, whiteCount++)
-            } else {
-                AccordionKey(it, it)
-            }
-        }
         /* Add dummy keys on each end */
         dummyWhiteKey().also {
             keysNode.attachChild(it)

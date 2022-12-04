@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
@@ -27,6 +28,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
+import org.wysko.midis2jam2.world.STRING_GLOW
 
 /** The base position of the bass guitar. */
 private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
@@ -50,7 +52,8 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     FrettedInstrument(
         context,
         frettingEngine = StandardFrettingEngine(
-            numberOfStrings = 4, numberOfFrets = 22,
+            numberOfStrings = 4,
+            numberOfFrets = 22,
             if (needsDropTuning(events)) BassGuitarTuning.DROP_D.values else BassGuitarTuning.STANDARD.values
         ),
         events,
@@ -88,6 +91,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
                 instrumentNode.attachChild(this)
                 cullHint = Always
+                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }
     }.apply {
@@ -117,7 +121,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         val modelDropDFile: String,
 
         /** The texture file of the Bass Guitar type. */
-        val textureFile: String,
+        val textureFile: String
     ) {
         /** The standard Bass Guitar type. */
         STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP),

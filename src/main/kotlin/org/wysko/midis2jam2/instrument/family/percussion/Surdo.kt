@@ -17,26 +17,26 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.OPEN_SURDO
 import org.wysko.midis2jam2.util.Utils.rad
 
-/** The surdo. */
+/** The Surdo. */
 class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** The stick node. */
-    private val stickNode = Node().apply {
-        attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-            setLocalTranslation(0f, 0f, -2f)
-        })
-        setLocalTranslation(0f, 0f, 14f)
-    }.also {
-        recoilNode.attachChild(it)
+    private val stick = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = StickType.DRUMSET_STICK
+    ).apply {
+        setParent(recoilNode)
+        offsetStick { it.move(0f, 0f, -2f) }
+        node.move(0f, 0f, 14f)
     }
 
     /** The hand that rests or hovers above the drum. */
@@ -57,35 +57,35 @@ class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         }
     }
 
+    init {
+        recoilNode.attachChild(
+            context.loadModel("DrumSet_Surdo.obj", "DrumShell_Surdo.png").apply {
+                setLocalScale(1.7f)
+            }
+        )
+        with(highestLevel) {
+            setLocalTranslation(25f, 25f, -41f)
+            localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
+        }
+    }
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        Stick.handleStick(context, stickNode, time, delta, hits).run {
-            /* Recoil drum */
-            recoilDrum(recoilNode, this.justStruck(), this.strike?.velocity ?: 0, delta)
 
-            /* Move hand */
-            if (this.justStruck()) {
-                moveHand(if (strike?.note == OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
-            }
+        val results = stick.tick(time, delta)
+        recoilDrum(recoilNode, results.velocity, delta)
+
+        results.strike?.let {
+            moveHand(if (it.note == OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
         }
     }
 
     /** Defines if the hand is on the drum or raised. */
-    internal enum class HandPosition {
+    private enum class HandPosition {
         /** Up hand position. */
         UP,
 
         /** Down hand position. */
         DOWN
-    }
-
-    init {
-        recoilNode.attachChild(context.loadModel("DrumSet_Surdo.obj", "DrumShell_Surdo.png").apply {
-            setLocalScale(1.7f)
-        })
-        with(highestLevel) {
-            setLocalTranslation(25f, 25f, -41f)
-            localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
-        }
     }
 }

@@ -21,13 +21,13 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.LONG
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.SHORT
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.LONG_GUIRO
-import org.wysko.midis2jam2.midi.SHORT_GUIRO
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.midi.SHORT_GUIRO
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -61,6 +61,8 @@ private const val EASING_POWER = 2
  */
 class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
+    private val eventCollector = EventCollector(hits, context)
+
     private val guiroNode = Node().apply {
         attachChild(context.loadModel("DrumSet_Guiro.obj", "GuiroSkin.png"))
     }.also {
@@ -86,7 +88,7 @@ class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
-        NoteQueue.collectOne(hits, time, context)?.let {
+        eventCollector.advanceCollectOne(time)?.let {
             isMoving = true
             movingSpeed = if (it.note == LONG_GUIRO) LONG else SHORT
             isMovingLeft = !isMovingLeft // Alternate on each stroke
@@ -117,6 +119,7 @@ class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
                     stickPosition.pow(EASING_POWER)
                 }
             }
+
             SHORT -> {
                 if (isMovingLeft) {
                     stickPosition.pow(EASING_POWER)

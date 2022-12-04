@@ -19,34 +19,43 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
 /** The amount of time the laser should appear for when the laser gun shoots, expressed in seconds. */
 private const val LASER_LIFE = 0.05
 
 /**
- * The High Q. Looks like a laser gun. To animate the laser gun, I just used [Stick.handleStick]. The laser that
- * shoots out of the gun is stationary and appears for [LASER_LIFE] seconds.
+ * The High Q.
+ *
+ * Looks like a laser gun. The laser that shoots out of the gun is stationary and appears for [LASER_LIFE] seconds.
  */
 class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the laser gun. */
-    private val gunNode = Node()
+    private val laserGun = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = context.loadModel("Zapper.obj", "Zapper.bmp"),
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+    }
 
     /** The green beam that "shoots" out of the laser gun. */
-    private val laser: Spatial = context.loadModel("ZapperLaser.obj", "Laser.bmp").apply {
-        setMaterial(context.unshadedMaterial("Laser.bmp").apply {
-            setColor("GlowColor", ColorRGBA.Green)
-        })
+    private val laserBeam: Spatial = context.loadModel("ZapperLaser.obj", "Laser.bmp").apply {
+        setMaterial(
+            context.unshadedMaterial("Laser.bmp").apply {
+                setColor("GlowColor", ColorRGBA.Green)
+            }
+        )
         shadowMode = RenderQueue.ShadowMode.Off
+        cullHint = CullHint.Always // Start hidden
+        setLocalTranslation(0f, 0f, -14f)
     }.also {
         instrumentNode.attachChild(it)
     }
@@ -54,24 +63,20 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     /** Timer for keeping track of how long the laser has been visible. */
     private var laserShowTime = 0.0
 
+    init {
+        with(instrumentNode) {
+            setLocalTranslation(-6f, 45f, -74f)
+            localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
+        }
+    }
+
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val stickStatus =
-            Stick.handleStick(
-                context,
-                gunNode,
-                time,
-                delta,
-                hits,
-                Stick.STRIKE_SPEED,
-                Stick.MAX_ANGLE,
-                Axis.X,
-                actualStick = false
-            )
+        val stickStatus = laserGun.tick(time, delta)
 
         /* If the laser gun just fired, show the laser and start the timer */
-        if (stickStatus.justStruck()) {
-            laser.cullHint = CullHint.Dynamic
+        stickStatus.strike?.let {
+            laserBeam.cullHint = CullHint.Dynamic
             laserShowTime = 0.0
         }
 
@@ -80,21 +85,7 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
 
         /* If the counter has surpassed the maximum time, hide the laser */
         if (laserShowTime > LASER_LIFE) {
-            laser.cullHint = CullHint.Always
+            laserBeam.cullHint = CullHint.Always
         }
-    }
-
-    init {
-        /* Load laser gun */
-        gunNode.attachChild(context.loadModel("Zapper.obj", "Zapper.bmp"))
-        instrumentNode.attachChild(gunNode)
-
-        /* Positioning */
-        laser.setLocalTranslation(0f, 0f, -14f)
-        instrumentNode.setLocalTranslation(-6f, 45f, -74f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
-
-        /* Hide the laser to begin with */
-        laser.cullHint = CullHint.Always
     }
 }

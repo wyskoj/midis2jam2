@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
+import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
@@ -38,6 +39,9 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     override fun moveForMultiChannel(delta: Float) {
         offsetNode.setLocalTranslation(0f, 40 * updateInstrumentIndex(delta), 0f)
     }
+
+    override val pitchBendConfiguration: ClonePitchBendConfiguration =
+        ClonePitchBendConfiguration(rotationalAxis = Axis.Z)
 
     /** A single Tuba. */
     inner class TubaClone : AnimatedKeyCloneByIntegers(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {

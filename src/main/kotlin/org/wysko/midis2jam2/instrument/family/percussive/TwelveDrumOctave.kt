@@ -21,9 +21,10 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
@@ -63,21 +64,16 @@ abstract class TwelveDrumOctave protected constructor(
         }
     }
 
-    /** The nodes that hold each mallet, for each note. */
-    private val malletNodes: Array<Node> = Array(12) {
-        Node().apply {
-            attachChild(context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").apply {
-                setLocalTranslation(0f, 0f, -5f)
-            })
-            setLocalTranslation(0f, 0f, 18f)
-            offsetNodes[it].attachChild(this)
+    private val strikers: Array<Striker> = Array(12) { i ->
+        Striker(
+            context = context,
+            strikeEvents = eventList.modulus(i),
+            stickModel = StickType.DRUMSET_STICK
+        ).apply {
+            setParent(offsetNodes[i])
+            offsetStick { it.move(0f, 0f, -5f) }
+            node.move(0f, 0f, 18f)
         }
-    }
-
-    /** At each index, stores a list of the notes that are associated with that note, as defined by the array index. */
-    private val malletStrikes: Array<MutableList<MidiNoteOnEvent>> = Array(12) { arrI ->
-        eventList.filterIsInstance<MidiNoteOnEvent>()
-            .filter { arrI == (it.note + 3) % 12 } as MutableList<MidiNoteOnEvent>
     }
 
     /** Each twelfth of the octave. */
@@ -85,19 +81,8 @@ abstract class TwelveDrumOctave protected constructor(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        malletStrikes.forEachIndexed { idx, list ->
-            Stick.handleStick(context, malletNodes[idx], time, delta, list).also {
-                if (it.justStruck()) {
-                    PercussionInstrument.recoilDrum(
-                        twelfths[idx].animNode,
-                        true,
-                        (it.strike ?: return@also).velocity,
-                        delta
-                    )
-                } else {
-                    PercussionInstrument.recoilDrum(twelfths[idx].animNode, false, 0, delta)
-                }
-            }
+        strikers.zip(twelfths).forEach {
+            PercussionInstrument.recoilDrum(it.second.animNode, it.first.tick(time, delta).velocity, delta)
         }
     }
 

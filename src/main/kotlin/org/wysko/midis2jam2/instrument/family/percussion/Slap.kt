@@ -19,10 +19,9 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /**
@@ -32,41 +31,36 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
  */
 class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the left slapper. */
-    private val leftSlapNode = Node()
+    private val leftSlap = Striker(
+        context = context,
+        strikeEvents = hits,
+        stickModel = context.loadModel("SlapHalf.obj", "Wood.bmp"),
+        strikeSpeed = 2.4,
+        maxIdleAngle = 30.0,
+        actualStick = false
+    ).apply {
+        setParent(instrumentNode)
+    }
 
-    /** Contains the right snapper. */
-    private val rightSlapNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-        val handleStick = Stick.handleStick(
-            context,
-            leftSlapNode,
-            time,
-            delta,
-            hits,
-            strikeSpeed = Stick.STRIKE_SPEED * 0.6,
-            maxAngle = 30.0,
-            actualStick = false
+    private val rightSlap = Node().also {
+        it.attachChild(
+            context.loadModel("SlapHalf.obj", "Wood.bmp").apply {
+                localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
+            }
         )
-        leftSlapNode.cullHint = Spatial.CullHint.Dynamic
-        rightSlapNode.localRotation = Quaternion().fromAngles(-handleStick.rotationAngle, 0f, 0f)
+        instrumentNode.attachChild(it)
     }
 
     init {
-        /* Left and right slappers */
-        leftSlapNode.attachChild(context.loadModel("SlapHalf.obj", "Wood.bmp"))
-        rightSlapNode.attachChild(context.loadModel("SlapHalf.obj", "Wood.bmp").apply {
-            localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
-        })
-
-        /* Position instrument */
-        instrumentNode.run {
-            attachChild(leftSlapNode)
-            attachChild(rightSlapNode)
+        instrumentNode.apply {
             setLocalTranslation(15f, 70f, -55f)
             localRotation = Quaternion().fromAngles(0f, -FastMath.PI / 4, 0f)
         }
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        val results = leftSlap.tick(time, delta)
+        rightSlap.localRotation = Quaternion().fromAngles(-results.rotationAngle, 0f, 0f)
     }
 }

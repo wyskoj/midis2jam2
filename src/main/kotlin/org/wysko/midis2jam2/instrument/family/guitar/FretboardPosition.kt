@@ -32,11 +32,15 @@ data class FretboardPosition(
     /** The string of the position. */
     val string: Int,
     /** The fret of the position. */
-    val fret: Int,
+    val fret: Int
 ) {
     /** Calculates and returns the distance from this position to [other], but ignores variable spacing. Good ol' distance formula. */
     @Contract(pure = true)
     fun distance(other: FretboardPosition): Double {
         return sqrt((string.toDouble() - other.string).pow(2.0) + (fret.toDouble() - other.fret).pow(2.0))
+    }
+
+    override fun toString(): String {
+        return "${string}S${fret}F"
     }
 }

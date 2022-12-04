@@ -51,5 +51,4 @@ class Sprite(assetManager: AssetManager, texture: String) : Node() {
             this.picture.material.setColor("Color", ColorRGBA(1f, 1f, 1f, value))
             field = value
         }
-
 }

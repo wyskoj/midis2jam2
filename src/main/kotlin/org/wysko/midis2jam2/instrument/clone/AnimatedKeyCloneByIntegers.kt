@@ -44,11 +44,11 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
         pressedKeys = pressed
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
 
         currentNotePeriod?.let { np ->
+            @Suppress("UNCHECKED_CAST")
             val ints = parent.manager!!.fingering(np.midiNote) as Array<Int>?
             ints?.let { animateKeys(it) }
         }
@@ -60,7 +60,8 @@ abstract class AnimatedKeyCloneByIntegers protected constructor(
                 debugProperty(
                     "keys",
                     (keys.indices).map { pressedKeys.contains(it) }
-                        .joinToString(separator = "") { if (it) "X" else "_" })
+                        .joinToString(separator = "") { if (it) "X" else "_" }
+                )
             )
         }
     }

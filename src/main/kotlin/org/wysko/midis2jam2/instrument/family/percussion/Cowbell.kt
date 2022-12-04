@@ -17,52 +17,31 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
-import org.wysko.midis2jam2.instrument.family.percussive.Stick
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.Axis
 
-/** The cowbell. Simply animates with [Stick.handleStick] and [PercussionInstrument.recoilDrum]. */
+/** The Cowbell. */
 class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
 
-    /** Contains the stick. */
-    private val stickNode = Node()
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-
-        Stick.handleStick(
-            context,
-            stickNode,
-            time,
-            delta,
-            hits,
-            Stick.STRIKE_SPEED,
-            Stick.MAX_ANGLE,
-            Axis.X
-        ).strike?.let {
-            recoilDrum(recoilNode, true, it.velocity, delta)
-        } ?: recoilDrum(recoilNode, false, 0, delta)
+    private val stick = Striker(context, hits, StickType.DRUMSET_STICK).apply {
+        setParent(recoilNode)
+        offsetStick { it.move(0f, 0f, -2f) }
+        node.move(0f, 0f, 14f)
     }
 
     init {
-
-        /* Load cowbell */
         recoilNode.attachChild(context.loadModel("CowBell.obj", "MetalTexture.bmp", 0.9f))
 
-        /* Load and position stick */
-        val stick = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp")
-        stick.setLocalTranslation(0f, 0f, -2f)
-        stickNode.attachChild(stick)
-        stickNode.setLocalTranslation(0f, 0f, 14f)
+        instrumentNode.setLocalTranslation(-9.7f, 40f, -99f)
+        instrumentNode.localRotation = Quaternion().fromAngles(rad(24.0), rad(26.7), rad(-3.81))
+    }
 
-        /* Positioning */
-        recoilNode.attachChild(stickNode)
-        highestLevel.setLocalTranslation(-9.7f, 40f, -99f)
-        highestLevel.localRotation = Quaternion().fromAngles(rad(24.0), rad(26.7), rad(-3.81))
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        recoilDrum(recoilNode, stick.tick(time, delta).velocity, delta)
     }
 }

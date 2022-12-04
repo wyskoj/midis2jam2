@@ -1,0 +1,86 @@
+[
+  {
+    "name": "harpsichord",
+    "file": "HarpsichordSkin.bmp"
+  },
+  {
+    "name": "piano",
+    "file": "PianoSkin.bmp"
+  },
+  {
+    "name": "synth",
+    "file": "SynthSkin.bmp"
+  },
+  {
+    "name": "wood",
+    "file": "PianoSkin_Wood.bmp"
+  },
+  {
+    "name": "clavichord",
+    "file": "ClaviSkin.png"
+  },
+  {
+    "name": "bright",
+    "file": "BrightAcousticSkin.png"
+  },
+  {
+    "name": "honky_tonk",
+    "file": "HonkyTonkSkin.png"
+  },
+  {
+    "name": "electric_grand",
+    "file": "ElectricGrandSkin.png"
+  },
+  {
+    "name": "electric_1",
+    "file": "ElectricPiano1Skin.png"
+  },
+  {
+    "name": "electric_2",
+    "file": "ElectricPiano2Skin.png"
+  },
+  {
+    "name": "celesta",
+    "file": "CelestaSkin.png"
+  },
+  {
+    "name": "square_wave",
+    "file": "SquareSynthSkin.png"
+  },
+  {
+    "name": "saw_wave",
+    "file": "SawtoothWaveSynthSkin.png"
+  },
+  {
+    "name": "charang",
+    "file": "CharangSynthSkin.png"
+  },
+  {
+    "name": "choir",
+    "file": "ChoirSynthSkin.png"
+  },
+  {
+    "name": "chiff",
+    "file": "ChiffSynthSkin.png"
+  },
+  {
+    "name": "bass_and_lead",
+    "file": "BassLeadSynthSkin.png"
+  },
+  {
+    "name": "metallic",
+    "file": "MetallicSynthSkin.png"
+  },
+  {
+    "name": "new_age",
+    "file": "NewAgeSynthSkin.png"
+  },
+  {
+    "name": "polysynth",
+    "file": "PolysynthSynthSkin.png"
+  },
+  {
+    "name": "warm",
+    "file": "WarmSynthSkin.png"
+  }
+]
