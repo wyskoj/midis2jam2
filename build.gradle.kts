@@ -76,7 +76,7 @@ dependencies {
     // JMonkeyEngine
     implementation("org.jmonkeyengine:jme3-core:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-desktop:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-plugins:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-effects:3.5.2-stable")
 
