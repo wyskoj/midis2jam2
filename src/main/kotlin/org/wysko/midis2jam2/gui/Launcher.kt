@@ -39,7 +39,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -63,7 +62,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
@@ -348,26 +346,26 @@ fun Launcher(): LauncherController {
                                 horizontalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Button(
-                                    onClick = {
-                                        VideoRecorderDialog.openDialog()
-                                    },
-                                    modifier = Modifier.width(60.dp).height(60.dp).padding(0.dp, 0.dp, 0.dp, 16.dp),
-                                    enabled = selectedMIDIFile != null && !freeze,
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.hsl(0f, 0.72f, 0.26f))
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceEvenly
-                                    ) {
-                                        Icon(
-                                            painter = painterResource("dot.svg"),
-                                            contentDescription = null,
-                                            modifier = Modifier.width(12.dp).height(12.dp)
-                                        )
-                                    }
-                                }
+//                                Button(
+//                                    onClick = {
+//                                        VideoRecorderDialog.openDialog()
+//                                    },
+//                                    modifier = Modifier.width(60.dp).height(60.dp).padding(0.dp, 0.dp, 0.dp, 16.dp),
+//                                    enabled = selectedMIDIFile != null && !freeze,
+//                                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.hsl(0f, 0.72f, 0.26f))
+//                                ) {
+//                                    Row(
+//                                        modifier = Modifier.fillMaxWidth(),
+//                                        verticalAlignment = Alignment.CenterVertically,
+//                                        horizontalArrangement = Arrangement.SpaceEvenly
+//                                    ) {
+//                                        Icon(
+//                                            painter = painterResource("dot.svg"),
+//                                            contentDescription = null,
+//                                            modifier = Modifier.width(12.dp).height(12.dp)
+//                                        )
+//                                    }
+//                                }
                                 Spacer(Modifier.width(16.dp))
                                 Button(
                                     onClick = {
