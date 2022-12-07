@@ -40,13 +40,16 @@ import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.loadSequencerJob
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
+import java.awt.Font
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
+import java.util.Enumeration
 import java.util.Properties
 import javax.swing.UIManager
+import javax.swing.plaf.FontUIResource
 
 /**
  * The user's home folder.
@@ -62,6 +65,15 @@ val CONFIGURATION_DIRECTORY: File = File(USER_HOME, ".midis2jam2")
  * When the application is launched, the launcher controller is stored here.
  */
 var launcherController: LauncherController? = null
+
+fun setUIFont(f: FontUIResource?) {
+    val keys: Enumeration<*> = UIManager.getDefaults().keys()
+    while (keys.hasMoreElements()) {
+        val key = keys.nextElement()
+        val value = UIManager.get(key)
+        if (value is FontUIResource) UIManager.put(key, f)
+    }
+}
 
 /**
  * Where it all begins.
@@ -81,6 +93,9 @@ fun main(args: Array<String>) {
     /* Initialize themes */
     try {
         UIManager.setLookAndFeel(FlatDarkLaf())
+        val createFont =
+            Font.createFont(Font.TRUETYPE_FONT, Main.javaClass.getResourceAsStream("/tahoma.ttf")).deriveFont(12f)
+        setUIFont(FontUIResource(createFont))
     } catch (e: Exception) {
         with(Main.logger()) {
             warn("Failed to initialize FlatLaf theme, reverting to default.")

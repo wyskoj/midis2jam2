@@ -21,7 +21,6 @@ import org.wysko.midis2jam2.gui.Internationalization.i18n
 import org.wysko.midis2jam2.util.logger
 import java.awt.Dialog
 import java.awt.Dimension
-import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
@@ -212,19 +211,19 @@ object ConfigureGraphics {
             }
 
             /* Title label */
-            JLabel().also {
-                it.font = font.deriveFont(Font.BOLD, font.size + 2f)
-                it.text = i18n.getString("graphics.title")
-                add(
-                    it,
-                    GridBagConstraints().apply {
-                        gridx = 0
-                        gridy = 0
-                        gridwidth = 2
-                        insets = Insets(7, 0, 7, 0)
-                    }
-                )
-            }
+//            JLabel().also {
+//                it.font = font.deriveFont(Font.BOLD, font.size + 2f)
+//                it.text = i18n.getString("graphics.title")
+//                add(
+//                    it,
+//                    GridBagConstraints().apply {
+//                        gridx = 0
+//                        gridy = 0
+//                        gridwidth = 2
+//                        insets = Insets(7, 0, 7, 0)
+//                    }
+//                )
+//            }
 
             /* Anti-aliasing label */
             JLabel().also {
