@@ -20,6 +20,15 @@ package org.wysko.midis2jam2.world
 import com.jme3.input.FlyByCamera
 import com.jme3.renderer.Camera
 
+private val listenedActions = listOf(
+    "FLYCAM_Forward",
+    "FLYCAM_Backward",
+    "FLYCAM_StrafeLeft",
+    "FLYCAM_StrafeRight",
+    "FLYCAM_Rise",
+    "FLYCAM_Lower"
+)
+
 /**
  * A [FlyByCamera] that calls a function whenever the camera is moved or rotated by the user.
  *
@@ -36,10 +45,10 @@ class FlyByCameraListenable(cam: Camera, val onUserInput: (name: String) -> Unit
         }
 
     /** Called whenever an action occurs. */
-    override fun onAction(name: String?, value: Boolean, tpf: Float) {
+    override fun onAction(name: String, value: Boolean, tpf: Float) {
         super.onAction(name, value, tpf)
         if (name == "FLYCAM_RotateDrag") dragging = value
-        if (value && (name == "FLYCAM_Forward" || name == "FLYCAM_Backward" || name == "FLYCAM_StrafeLeft" || name == "FLYCAM_StrafeRight")) {
+        if (value && listenedActions.contains(name)) {
             onUserInput(name)
         }
     }
