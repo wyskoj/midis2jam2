@@ -55,11 +55,16 @@ abstract class Instrument protected constructor(
      */
     var isVisible: Boolean = false
         set(value) {
-
-            if (!value && !context.properties.getProperty("never_hidden").equals("true", ignoreCase = true)) {
-                context.rootNode.detachChild(offsetNode)
-            } else {
+            if (context.properties.getProperty("never_hidden").equals("true", ignoreCase = true)) {
                 context.rootNode.attachChild(offsetNode)
+                field = value
+                return
+            }
+
+            if (value) {
+                context.rootNode.attachChild(offsetNode)
+            } else {
+                context.rootNode.detachChild(offsetNode)
             }
 
             if (this is PercussionInstrument && this !is NonDrumSetPercussion) {
