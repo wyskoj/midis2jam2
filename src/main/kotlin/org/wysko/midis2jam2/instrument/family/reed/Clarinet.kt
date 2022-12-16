@@ -58,7 +58,7 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /** The type Clarinet clone. */
     inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
 
-        override val leftHands: Array<Spatial> = Array(19) {
+        override val leftHands: Array<Spatial> = Array(20) {
             parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
         }
 
