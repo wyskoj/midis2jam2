@@ -100,7 +100,23 @@ enum class ResolutionOption(
     RES_2560_1440("graphics.2560_x_1440"),
     RES_2880_2160("graphics.2880_x_2160"),
     RES_3456_2160("graphics.3456_x_2160"),
-    RES_3840_2160("graphics.3840_x_2160")
+    RES_3840_2160("graphics.3840_x_2160");
+
+    companion object {
+        fun getValue(name: String): ResolutionOption? {
+            return try {
+                valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                legacyResolutionRegex.matchEntire(name)?.let {
+                    try {
+                        valueOf("RES_${it.groupValues[1]}_${it.groupValues[2]}")
+                    } catch (e: IllegalArgumentException) {
+                        null
+                    }
+                }
+            }
+        }
+    }
 }
 
 private val resolutionI18N = object : ResourceBundle() {
@@ -178,7 +194,8 @@ object ConfigureGraphics {
                         fill = GridBagConstraints.HORIZONTAL
                     }
                 )
-                it.selectedItem = ResolutionOption.valueOf(currentState.getProperty("resolution"))
+                it.selectedItem =
+                    ResolutionOption.getValue(currentState.getProperty("resolution")) ?: ResolutionOption.DEFAULT
             }
 
             /* Shadows label */
@@ -300,3 +317,5 @@ object ConfigureGraphics {
 
 /** Defines the format for which the values within [ResolutionOption] conform to. */
 val resolutionRegex: Regex = Pattern.compile("""RES_(\d+)_(\d+)""").toRegex()
+
+val legacyResolutionRegex: Regex = Pattern.compile("""(\d+)x(\d+)""").toRegex()
