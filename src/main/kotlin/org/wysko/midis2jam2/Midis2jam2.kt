@@ -355,14 +355,6 @@ abstract class Midis2jam2(
                 "debug" -> {
                     debugTextController.toggle()
                 }
-
-                "play/pause" -> {
-                    togglePause()
-                }
-
-                "seek" -> {
-                    seek(0.0)
-                }
             }
         }
     }
