@@ -536,14 +536,16 @@ fun Launcher(): LauncherController {
         { file: File ->
             selectedMIDIFile = file
             midiFileTextField?.invoke(file)
-        }
+        },
+        { freeze }
     )
 }
 
 /** Provides a way for the launcher component to allow external modifications. */
 data class LauncherController(
     internal val setFreeze: (setFreeze: Boolean) -> Unit,
-    internal val setSelectedFile: (file: File) -> Unit
+    internal val setSelectedFile: (file: File) -> Unit,
+    internal val getFreeze: () -> Boolean
 )
 
 /**
