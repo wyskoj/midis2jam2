@@ -44,6 +44,7 @@ Main developer:
 Development contributors:
 
 * https://github.com/jlachniet[jlachniet]
+* https://github.com/JonnyCrash420[JonnyCrash420]
 * https://github.com/nikitalita[nikitalita]
 * https://github.com/vgking1[vgking1]
 
