@@ -51,6 +51,7 @@ import java.util.Enumeration
 import java.util.Properties
 import javax.swing.UIManager
 import javax.swing.plaf.FontUIResource
+import kotlin.system.exitProcess
 
 /**
  * The user's home folder.
@@ -118,6 +119,7 @@ fun main(args: Array<String>) {
             onFinish = {
                 launcherController?.setFreeze?.invoke(false)
                 MIDISearchFrame.unlock()
+                exitProcess(0)
             }
         )
         SplashScreen.hide()
