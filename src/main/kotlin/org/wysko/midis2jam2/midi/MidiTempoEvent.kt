@@ -17,6 +17,11 @@
 package org.wysko.midis2jam2.midi
 
 /**
+ * The number of microseconds in a beat when the BPM is 120.
+ */
+const val ONE_HUNDRED_TWENTY_BPM: Int = 500_000
+
+/**
  * Defines how fast the MIDI file should play.
  *
  * @param time   the time
