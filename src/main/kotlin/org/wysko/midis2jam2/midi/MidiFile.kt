@@ -42,8 +42,14 @@ abstract class MidiFile(
      * tick, and duplicates have been removed (if multiple events have the same tick, the last one is kept).
      */
     val tempos: List<MidiTempoEvent> by lazy {
-        tracks.flatMap { it.events }.filterIsInstance<MidiTempoEvent>().ifEmpty { listOf(MidiTempoEvent(0, 500_000)) }
-            .sortedBy { it.time }.asReversed().distinctBy { it.time }.asReversed()
+        tracks.flatMap { it.events }.filterIsInstance<MidiTempoEvent>()
+            .ifEmpty { listOf(MidiTempoEvent(0, ONE_HUNDRED_TWENTY_BPM)) }
+            .sortedBy { it.time }.asReversed().distinctBy { it.time }.asReversed().toMutableList().also {
+                // If the first tempo event doesn't occur at the beginning of the MIDI file, assume 120 BPM.
+                if (it.first().time != 0L) {
+                    it.add(0, MidiTempoEvent(0, ONE_HUNDRED_TWENTY_BPM))
+                }
+            }.toList()
     }
 
     /** Maps MIDI events to their occurrence time in seconds. */
