@@ -23,13 +23,13 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
-import org.wysko.midis2jam2.instrument.clone.Clone
+import org.wysko.midis2jam2.instrument.clone.StretchyClone
 import org.wysko.midis2jam2.instrument.family.brass.Trombone.TromboneClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
-import java.util.TreeMap
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -57,13 +57,13 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     override fun handlePitchBend(time: Double, delta: Float) {
-        pitchBendAmount = pitchBendModulationController.tick(time, delta, true) {
+        pitchBendAmount = pitchBendModulationController.tick(time, delta, false) {
             clones.any { it.isPlaying }
         }
     }
 
     /** A single Trombone. */
-    inner class TromboneClone : Clone(this@Trombone, 0.1f, Axis.X) {
+    inner class TromboneClone : StretchyClone(this@Trombone, 0.1f, 1f, Axis.Z, Axis.X) {
 
         /** The slide slides in and out to represent different pitches on the Trombone. */
         private val slide: Spatial =
@@ -88,24 +88,40 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
-            /* If currently playing */
-            if (isPlaying) {
-                /* Update slide position */
-                moveToPosition(getSlidePositionFromNote(currentNotePeriod ?: return).toDouble())
+            if (!isPlaying) {
+                advanceSlide(time, delta)
+                return
             }
 
-            /* If not currently playing */
-            if (notePeriods.isNotEmpty() && !isPlaying) {
-                val nextNote = notePeriods[0]
+            notePeriodCollector.peek()?.let { // There is a note ahead
+                // Buffer room lets slide move at the end of a note to get to the next if we are still playing. We'll only
+                // also do this if the note is long enough (so that notes in rapid succession are animated desirably).
+                if (it.startTime - time < 0.1 && currentNotePeriod?.duration()!! >= 0.15) {
+                    advanceSlide(time, delta)
+                } else {
+                    snapSlide()
+                }
+            }
+        }
 
+        private fun snapSlide(): Boolean {
+            moveToPosition(getSlidePositionFromNote(currentNotePeriod ?: return true).toDouble())
+            return false
+        }
+
+        /**
+         * Advances the trombone slide per frame if there is less than one second until the next NotePeriod.
+         */
+        private fun advanceSlide(time: Double, delta: Float) {
+            notePeriodCollector.peek()?.let {
                 /* If within Trombone range */
-                if (nextNote.midiNote in 21..80) {
-                    val startTime = nextNote.startTime
+                if (it.midiNote in 21..80) {
+                    val startTime = it.startTime
 
                     /* Slide only if there is 1 or fewer seconds between
                     now and the beginning of the note, but at least the delta. */
                     if (startTime - time in delta..1.0F) {
-                        val targetPos = getSlidePositionFromNote(nextNote)
+                        val targetPos = getSlidePositionFromNote(it)
                         moveToPosition(currentSlidePosition + (targetPos - currentSlidePosition) / (startTime - time) * delta)
                     }
                 }
@@ -134,7 +150,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         }
 
         override fun moveForPolyphony() {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((30 + indexForMoving() * -3f).toDouble()), 0f)
+            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((-70 + indexForMoving() * 15f).toDouble()), 0f)
             offsetNode.setLocalTranslation(0f, indexForMoving().toFloat(), 0f)
         }
 
@@ -142,17 +158,26 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             /* Attach body, slide, and set rotation of Trombone */
             modelNode.run {
                 attachChild(
-                    context.loadModel("Trombone.obj", "HornSkin.bmp", 0.9f).apply {
+                    context.loadModel("TromboneBody.obj", "HornSkin.bmp", 0.9f).apply {
                         this as Node
                         getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                     }
                 )
                 attachChild(slide)
                 localRotation = Quaternion().fromAngles(rad(-10.0), 0f, 0f)
+                localScale = Vector3f(0.8f, 0.8f, 0.8f)
+            }
+
+            with(bell) {
+                attachChild(
+                    context.loadModel("TromboneHorn.obj", "HornSkin.bmp", 0.9f)
+                )
+                localTranslation = Vector3f(0.5522f, 4.291f, 1.207f)
+                localRotation = Quaternion().fromAngles(rad(-4.0), 0f, 0f)
             }
 
             /* Position Trombone */
-            highestLevel.setLocalTranslation(0f, 65f, -200f)
+            highestLevel.setLocalTranslation(0f, 65f, -55.4f)
         }
 
         override fun toString(): String {
