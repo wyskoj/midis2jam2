@@ -533,8 +533,8 @@ enum class AutoCamPosition(
     ),
 
     TROMBONE(
-        Vector3f(-104.36f, 76.19f, -113.62f),
-        Quaternion(0.00f, 1.00f, -0.07f, 0.07f),
+        Vector3f(28.212189f, 86.88116f, 41.177956f),
+        Quaternion(0.026606327f, 0.97332513f, -0.1550696f, 0.16698427f),
         { time, instruments -> visibleNowAndLater(instruments, Trombone::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Trombone>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
