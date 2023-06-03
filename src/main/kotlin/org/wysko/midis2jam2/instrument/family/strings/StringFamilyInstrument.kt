@@ -225,16 +225,18 @@ abstract class StringFamilyInstrument protected constructor(
 
             bow.setLocalTranslation(((progress * intensity * 2) - intensity).toFloat(), 0f, 0f)
         } else {
-            if (notePeriods.isNotEmpty() && notePeriods.first().startTime - time < 1) {
-                with(bowNode.localTranslation) {
-                    if (this.z > 0.5) {
-                        bowNode.localTranslation = this.setZ((this.z - 2 * delta).coerceAtLeast(0.5f))
+            notePeriodCollector.peek()?.let {
+                if (it.startTime - time < 1) {
+                    with(bowNode.localTranslation) {
+                        if (this.z > 0.5) {
+                            bowNode.localTranslation = this.setZ((this.z - 2 * delta).coerceAtLeast(0.5f))
+                        }
                     }
-                }
-            } else {
-                with(bowNode.localTranslation) {
-                    if (this.z < 2) {
-                        bowNode.localTranslation = this.setZ((this.z + 2 * delta).coerceAtMost(2f))
+                } else {
+                    with(bowNode.localTranslation) {
+                        if (this.z < 2) {
+                            bowNode.localTranslation = this.setZ((this.z + 2 * delta).coerceAtMost(2f))
+                        }
                     }
                 }
             }
