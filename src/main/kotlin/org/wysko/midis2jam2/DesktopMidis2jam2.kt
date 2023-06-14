@@ -20,6 +20,8 @@ import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.input.KeyInput
 import com.jme3.input.controls.KeyTrigger
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -28,10 +30,9 @@ import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.BackgroundController
 import org.wysko.midis2jam2.world.CameraAngle.Companion.preventCameraFromLeaving
-import java.util.Properties
-import java.util.Timer
-import java.util.TimerTask
+import java.util.*
 import javax.sound.midi.Sequencer
+
 
 /**
  * Contains all the code relevant to operating the 3D scene.
@@ -114,6 +115,9 @@ class DesktopMidis2jam2(
             this,
             rootNode
         )
+        app.camera.setLocation(Vector3f(-45.56363f, 18.749166f, -1.188012f))
+        app.camera.setRotation(Quaternion(0.037936863f, 0.9279545f, -0.09849745f, 0.3574346f))
+
     }
 
     /**

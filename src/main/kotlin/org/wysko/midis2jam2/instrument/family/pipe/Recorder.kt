@@ -48,7 +48,7 @@ class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             parent.context.loadModel("RecorderHandRight$it.obj", "hands.bmp")
         }
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((15f + indexForMoving() * 15).toDouble()), 0f)
         }
 

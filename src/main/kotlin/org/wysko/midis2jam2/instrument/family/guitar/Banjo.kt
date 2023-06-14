@@ -54,7 +54,8 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.loadModel("Banjo.obj", "BanjoSkin.png")
+    context.loadModel("Banjo.obj", "BanjoSkin.png"),
+    "BanjoSkin.png"
 ) {
     override val upperStrings: Array<Spatial> = Array(4) {
         context.loadModel("BanjoString.obj", "BassSkin.bmp").also {

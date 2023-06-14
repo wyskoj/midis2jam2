@@ -88,7 +88,8 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     instrumentBody = context.loadModel(
         if (needsDropTuning(events)) type.modelDFileName else type.modelFileName,
         type.textureFileName
-    )
+    ),
+    "GuitarSkin.bmp"
 ) {
 
     @OptIn(ExperimentalTime::class)

@@ -35,7 +35,7 @@ open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffTex
         loadHands()
     }
 
-    override fun moveForPolyphony() {
-        offsetNode.setLocalTranslation((5 * indexForMoving()).toFloat(), 0f, (5 * -indexForMoving()).toFloat())
+    override fun moveForPolyphony(delta: Float) {
+        offsetNode.setLocalTranslation((5 * indexForMoving()), 0f, (5 * -indexForMoving()))
     }
 }

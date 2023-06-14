@@ -57,7 +57,10 @@ abstract class FrettedInstrument protected constructor(
     private val numberOfStrings: Int,
 
     /** The geometry of the body of the instrument. */
-    instrumentBody: Spatial
+    instrumentBody: Spatial,
+
+    /** The texture of the body of the instrument. */
+    instrumentBodyTexture: String,
 ) : SustainedInstrument(context, events) {
 
     /** The animated lower strings. D-1 represents string, D-2 represents animation frame. */
@@ -68,7 +71,7 @@ abstract class FrettedInstrument protected constructor(
 
     /** The yellow circles that appear on strings. */
     val noteFingers: Array<Spatial> = Array(numberOfStrings) {
-        context.loadModel("GuitarNoteFinger.obj", "GuitarSkin.bmp").apply {
+        context.loadModel("GuitarNoteFinger.obj", instrumentBodyTexture).apply {
             instrumentNode.attachChild(this)
             this.cullHint = Spatial.CullHint.Always
             (this as Geometry).material.setColor("GlowColor", STRING_GLOW)

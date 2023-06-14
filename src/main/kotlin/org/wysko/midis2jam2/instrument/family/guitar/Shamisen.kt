@@ -47,7 +47,8 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
         }
     ),
     3,
-    context.loadModel("Shamisen.obj", SHAMISEN_SKIN_TEXTURE)
+    context.loadModel("Shamisen.obj", SHAMISEN_SKIN_TEXTURE),
+    SHAMISEN_SKIN_TEXTURE
 ) {
 
     override val upperStrings: Array<Spatial> = Array(3) {

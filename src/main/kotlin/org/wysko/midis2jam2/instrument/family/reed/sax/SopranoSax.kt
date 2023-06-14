@@ -40,7 +40,7 @@ class SopranoSax(
      * A single Soprano saxophone.
      */
     inner class SopranoSaxClone : SaxophoneClone(this@SopranoSax, STRETCH_FACTOR) {
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((20f * indexForMoving()).toDouble()), 0f)
         }
 

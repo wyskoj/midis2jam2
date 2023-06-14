@@ -48,7 +48,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     /** A single instance of a French Horn. */
     inner class FrenchHornClone : AnimatedKeyCloneByIntegers(this@FrenchHorn, 0.1f, 0.9f, Axis.Y, Axis.X) {
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((47 * indexForMoving()).toDouble()), 0f)
         }
 

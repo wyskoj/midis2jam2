@@ -86,7 +86,7 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         /** The bell stretcher. */
         private val bellStretcher: BellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 

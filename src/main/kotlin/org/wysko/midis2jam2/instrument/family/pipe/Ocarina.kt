@@ -63,7 +63,7 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             }
         }
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((17f * indexForMoving()).toDouble()), 0f)
         }
 

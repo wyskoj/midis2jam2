@@ -82,7 +82,7 @@ abstract class Clone protected constructor(
      * Keeps track of whether this clone is currently visible. The 0-clone (the clone at index 0) is always
      * visible, that is if the instrument itself is visible.
      */
-    private var isVisible = false
+    var isVisible = false
 
     /** Determines if this clone is playing. */
     @get:Contract(pure = true)
@@ -99,9 +99,9 @@ abstract class Clone protected constructor(
 
         notePeriodCollector.prev()?.let {
             if (notePeriods.isNotEmpty() && (
-                notePeriodCollector.peek()?.startTick()?.minus(it.endTick())
-                    ?: Long.MAX_VALUE
-                ) <= parent.context.file.division * 2
+                        notePeriodCollector.peek()?.startTick()?.minus(it.endTick())
+                            ?: Long.MAX_VALUE
+                        ) <= parent.context.file.division * 2
             ) {
                 return true
             }
@@ -117,7 +117,7 @@ abstract class Clone protected constructor(
             isVisible = true
         } else {
             /* If we are currently positioned at 0, but normally we wouldn't be, hide. */
-            if (indexForMoving() == 0) {
+            if (indexForMoving() == 0f) {
                 isVisible = false
                 highestLevel.cullHint = Always
             }
@@ -151,7 +151,7 @@ abstract class Clone protected constructor(
             animNode.localRotation = Quaternion()
         }
         hideOrShowOnPolyphony(parent.clones.indexOf(this))
-        moveForPolyphony()
+        moveForPolyphony(delta)
     }
 
     /**
@@ -160,10 +160,11 @@ abstract class Clone protected constructor(
      * This returns the index of this clone in the list of currently visible clones, where the index is never less
      * than 0.
      */
-    protected fun indexForMoving(): Int = 0.coerceAtLeast(parent.clones.filter { it.isVisible }.indexOf(this))
+    protected open fun indexForMoving(): Float =
+        0f.coerceAtLeast(parent.clones.filter { it.isVisible }.indexOf(this).toFloat())
 
     /** Move as to not overlap with other clones. */
-    protected abstract fun moveForPolyphony()
+    protected abstract fun moveForPolyphony(delta: Float)
 
     init {
         /* Connect node chain hierarchy */

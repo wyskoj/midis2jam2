@@ -78,7 +78,7 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, ty
             }
         }
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((-10f * indexForMoving()).toDouble()), 0f)
             offsetNode.setLocalTranslation(0f, indexForMoving() * -1f, 0f)
         }

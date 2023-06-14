@@ -16,6 +16,7 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -71,7 +72,12 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         instrumentBody = context.loadModel(
             if (needsDropTuning(events)) type.modelDropDFile else type.modelFile,
             type.textureFile
-        )
+        ),
+        when (type) {
+            BassGuitarType.SYNTH_1 -> "BassSkinSynth1.png"
+            BassGuitarType.SYNTH_2 -> "BassSkinSynth2.png"
+            else -> BASS_SKIN_BMP
+        }
     ) {
     override val upperStrings: Array<Spatial> = Array(4) {
         context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
@@ -91,7 +97,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
                 instrumentNode.attachChild(this)
                 cullHint = Always
-                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
+                (this as Geometry).material.setColor("GlowColor", type.glowColor)
             }
         }
     }.apply {
@@ -116,18 +122,24 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
     enum class BassGuitarType(
         /** The model file of the Bass Guitar type. */
         val modelFile: String,
-
         /** The model file of the Bass Guitar type with drop D tuning. */
         val modelDropDFile: String,
-
         /** The texture file of the Bass Guitar type. */
-        val textureFile: String
+        val textureFile: String,
+        /** The color of the glow of the Bass Guitar type. */
+        val glowColor: ColorRGBA
     ) {
         /** The standard Bass Guitar type. */
-        STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP),
+        STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP, STRING_GLOW),
 
         /** The fretless Bass Guitar type. */
-        FRETLESS("BassFretless.obj", "BassFretlessD.obj", "BassSkinFretless.png");
+        FRETLESS("BassFretless.obj", "BassFretlessD.obj", "BassSkinFretless.png", STRING_GLOW),
+
+        /** The synth 1 Bass Guitar type. */
+        SYNTH_1("Bass.obj", "BassD.obj", "BassSkinSynth1.png", ColorRGBA(0.64f, 1.1f, 0.67f, 1f)),
+
+        /** The synth 2 Bass Guitar type. */
+        SYNTH_2("Bass.obj", "BassD.obj", "BassSkinSynth2.png", ColorRGBA(0.70f, 0.93f, 1.4f, 1f));
     }
 
     init {

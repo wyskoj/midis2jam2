@@ -149,9 +149,9 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
             return positionScoreMap.firstEntry().value
         }
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((-70 + indexForMoving() * 15f).toDouble()), 0f)
-            offsetNode.setLocalTranslation(0f, indexForMoving().toFloat(), 0f)
+            offsetNode.setLocalTranslation(0f, indexForMoving(), 0f)
         }
 
         init {

@@ -30,7 +30,7 @@ private const val ROTATION_FACTOR = 0.1f
 abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) :
     UpAndDownKeyClone(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor) {
 
-    override fun moveForPolyphony() {
+    override fun moveForPolyphony(delta: Float) {
         offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
     }
 

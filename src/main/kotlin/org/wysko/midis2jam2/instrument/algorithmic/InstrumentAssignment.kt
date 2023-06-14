@@ -238,8 +238,10 @@ object InstrumentAssignment {
             24, 25 -> Guitar(context, events, Guitar.GuitarType.ACOUSTIC)
             26, 27, 28, 29, 30, 31, 120 -> Guitar(context, events, Guitar.GuitarType.ELECTRIC)
             32 -> AcousticBass(context, events, AcousticBass.PlayingStyle.PIZZICATO)
-            33, 34, 36, 37, 38, 39 -> BassGuitar(context, events, BassGuitar.BassGuitarType.STANDARD)
+            33, 34, 36, 37 -> BassGuitar(context, events, BassGuitar.BassGuitarType.STANDARD)
             35 -> BassGuitar(context, events, BassGuitar.BassGuitarType.FRETLESS)
+            38 -> BassGuitar(context, events, BassGuitar.BassGuitarType.SYNTH_1)
+            39 -> BassGuitar(context, events, BassGuitar.BassGuitarType.SYNTH_2)
             40 -> Violin(context, events)
             41 -> Viola(context, events)
             42 -> Cello(context, events)
@@ -308,7 +310,7 @@ object InstrumentAssignment {
             78 -> Whistles(context, events)
             79 -> Ocarina(context, events)
             80 -> { // square
-                if (midiNoteEvents.maxPolyphony() > 2) {
+                if (midiNoteEvents.maxPolyphony() > 4) {
                     Keyboard(context, events, KeyboardSkin["square_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaser.SpaceLaserType.SQUARE)
@@ -316,7 +318,7 @@ object InstrumentAssignment {
             }
 
             81 -> { // sawtooth
-                if (midiNoteEvents.maxPolyphony() > 2) {
+                if (midiNoteEvents.maxPolyphony() > 4) {
                     Keyboard(context, events, KeyboardSkin["saw_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaser.SpaceLaserType.SAW)

@@ -46,7 +46,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /** A single Tuba. */
     inner class TubaClone : AnimatedKeyCloneByIntegers(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {
 
-        override fun moveForPolyphony() {
+        override fun moveForPolyphony(delta: Float) {
             offsetNode.localRotation = Quaternion().fromAngles(0f, rad((50f * indexForMoving()).toDouble()), 0f)
         }
 

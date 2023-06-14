@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.Companion.SIGMOID_CALCULATOR
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.world.Axis
@@ -131,6 +132,8 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             laserNode.attachChild(this)
         }
 
+        private val index: NumberSmoother = NumberSmoother(0f, 17.0)
+
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
             currentNotePeriod?.let {
@@ -193,8 +196,14 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             }
         }
 
-        override fun moveForPolyphony() {
-            laserNode.setLocalTranslation(0f, 0f, indexForMoving() * 5f)
+        override fun indexForMoving(): Float {
+            val myIndex = parent.clones.indexOf(this)
+            val visible = parent.clones.count { it.isVisible }
+            return -0.5f * visible - 1 + myIndex
+        }
+
+        override fun moveForPolyphony(delta: Float) {
+            laserNode.setLocalTranslation(0f, 0f, index.tick(delta) { indexForMoving() * 5f } + 6)
         }
 
         override fun toString(): String {
