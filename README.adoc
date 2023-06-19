@@ -24,6 +24,7 @@ Install midis2jam2 with the https://github.com/wyskoj/midis2jam2/releases[approp
 ** *Shift* &mdash; Move fast
 ** *Ctrl* &mdash; Move slow
 * *1&ndash;6* &mdash; Cameras 1&ndash;6 / Exit autocam
+* *Grave/Tilde* &mdash; Reset camera
 * *0* &mdash; Autocam
 * *Esc* &mdash; Exit
 
