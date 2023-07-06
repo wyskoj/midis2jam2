@@ -94,6 +94,7 @@ enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY:
             "cam4" -> if (currentCameraAngle == CAMERA_4A) CAMERA_4B else CAMERA_4A
             "cam5" -> CAMERA_5
             "cam6" -> if (currentCameraAngle == CAMERA_6A) CAMERA_6B else CAMERA_6A
+            "cam_reset" -> CAMERA_1A
             else -> CAMERA_1A // Shouldn't ever happen
         }
     }

@@ -24,6 +24,10 @@
 		"key": "KEY_6"
 	},
 	{
+		"name": "cam_reset",
+		"key": "KEY_GRAVE"
+	},
+	{
 		"name": "slow",
 		"key": "KEY_LCONTROL"
 	},
