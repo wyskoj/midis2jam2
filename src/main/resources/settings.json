@@ -38,5 +38,11 @@
     "name": "enhanced_graphics",
     "type": "Button",
     "category": "display"
+  },
+  {
+    "name": "smooth_camera",
+    "type": "Boolean",
+    "category": "tweaks",
+    "default": "false"
   }
 ]

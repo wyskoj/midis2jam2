@@ -102,7 +102,7 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
         appendLine()
         append(
             "Properties:\n${
-            this@debugText.properties.entries.joinToString(separator = "\n")
+                this@debugText.properties.entries.joinToString(separator = "\n")
             }\n"
         )
 
@@ -114,6 +114,15 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
         /* camera position and rotation */
         appendLine()
         append("cam: ${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}\n")
+
+        /* camera position and rotation */
+        appendLine()
+        append(
+            "camstate: ${this@debugText.cameraState}\ncam enabled: " +
+                    "a:${this@debugText.autocamController.enabled} " +
+                    "f:${this@debugText.flyByCamera.isEnabled} " +
+                    "s:${this@debugText.slideCamController.isEnabled}\n"
+        )
 
         /* instruments strings */
         appendLine()

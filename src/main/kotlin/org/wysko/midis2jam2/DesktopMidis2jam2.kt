@@ -20,8 +20,6 @@ import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.input.KeyInput
 import com.jme3.input.controls.KeyTrigger
-import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -29,7 +27,7 @@ import org.wysko.midis2jam2.gui.ConfigureBackground
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.BackgroundController
-import org.wysko.midis2jam2.world.CameraAngle.Companion.preventCameraFromLeaving
+import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import java.util.*
 import javax.sound.midi.Sequencer
 
@@ -115,8 +113,6 @@ class DesktopMidis2jam2(
             this,
             rootNode
         )
-        app.camera.setLocation(Vector3f(-45.56363f, 18.749166f, -1.188012f))
-        app.camera.setRotation(Quaternion(0.037936863f, 0.9279545f, -0.09849745f, 0.3574346f))
 
     }
 
@@ -163,8 +159,10 @@ class DesktopMidis2jam2(
         shadowController?.tick()
         standController.tick()
         lyricController.tick(timeSinceStart)
-        autocamController.tick(timeSinceStart, tpf)
         hudController.tick(timeSinceStart, fade.value)
+        flyByCamera.tick(tpf)
+        autocamController.tick(timeSinceStart, tpf)
+        slideCamController.tick(tpf, timeSinceStart)
         preventCameraFromLeaving(app.camera)
 
         /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */

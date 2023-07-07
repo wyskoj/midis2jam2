@@ -48,16 +48,9 @@ import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.AssetLoader
-import org.wysko.midis2jam2.world.AutoCamController
-import org.wysko.midis2jam2.world.CameraAngle
-import org.wysko.midis2jam2.world.DebugTextController
-import org.wysko.midis2jam2.world.FlyByCameraListenable
-import org.wysko.midis2jam2.world.HudController
-import org.wysko.midis2jam2.world.LyricController
-import org.wysko.midis2jam2.world.ShadowController
-import org.wysko.midis2jam2.world.StandController
-import java.util.Properties
+import org.wysko.midis2jam2.world.*
+import org.wysko.midis2jam2.world.camera.*
+import java.util.*
 import kotlin.properties.Delegates
 
 /**
@@ -140,6 +133,9 @@ abstract class Midis2jam2(
     /** The autocam controller. */
     lateinit var autocamController: AutoCamController
 
+    /** The slidecam controller. */
+    lateinit var slideCamController: SlideCameraController
+
     /** The HUD controller. */
     lateinit var hudController: HudController
 
@@ -147,13 +143,14 @@ abstract class Midis2jam2(
     private lateinit var debugTextController: DebugTextController
 
     /** The fly-by camera. */
-    private lateinit var flyByCamera: FlyByCameraListenable
+    lateinit var flyByCamera: SmoothFlyByCamera
 
     /** The current camera position. */
     private var currentCameraAngle: CameraAngle = CameraAngle.CAMERA_1A
         set(value) {
-            app.camera.location = value.location
-            app.camera.rotation = value.rotation
+            // Update flyByCamera target location and rotation
+            cameraState = CameraState.FREE_CAM
+            flyByCamera.setTargetTransform(value.location, value.rotation)
             field = value
         }
 
@@ -162,6 +159,18 @@ abstract class Midis2jam2(
 
     protected val eventCollectors = mutableListOf<EventCollector<out MidiEvent>>()
     protected val notePeriodCollectors = mutableListOf<NotePeriodCollector>()
+
+    /** The current state of the camera. */
+    var cameraState: CameraState = if (isStartAutoCam()) CameraState.AUTO_CAM else CameraState.FREE_CAM
+        set(value) {
+            // Enable/disable controllers based on camera state when value is changed
+            autocamController.enabled = value == CameraState.AUTO_CAM
+            flyByCamera.isEnabled = value == CameraState.FREE_CAM
+            slideCamController.isEnabled = value == CameraState.SLIDE_CAM
+            field = value
+        }
+
+    private fun isStartAutoCam() = properties.getProperty("auto_autocam") == "true"
 
     fun registerEventCollector(collector: EventCollector<out MidiEvent>) {
         eventCollectors += collector
@@ -201,17 +210,27 @@ abstract class Midis2jam2(
 
         /*** CONFIGURE CAMERA ***/
         this.app.flyByCamera.unregisterInput()
-        this.flyByCamera = FlyByCameraListenable(this.app.camera) {
-            autocamController.enabled = false
-        }.apply {
-            registerWithInput(this@Midis2jam2.app.inputManager)
-            moveSpeed = 100f
-            zoomSpeed = -10f
-            isEnabled = true
-            isDragToRotate = true
+        this.app.flyByCamera.isEnabled = false
+        this.flyByCamera = SmoothFlyByCamera(
+            this,
+            onAction = {
+                isEnabled = true
+                cameraState = CameraState.FREE_CAM
+            },
+            actLikeNormalFlyByCamera = true
+        )
+        if (properties.getProperty("record_lock")
+                ?.equals("true") == true || isStartAutoCam()
+        ) this.flyByCamera.isEnabled = false
+
+        if (isStartAutoCam()) {
+            with(this.app.camera) {
+                CameraAngle.CAMERA_1A.let {
+                    location = it.location
+                    rotation = it.rotation
+                }
+            }
         }
-        this.app.camera.fov = 50f
-        if (properties.getProperty("record_lock")?.equals("true") == true) this.flyByCamera.isEnabled = false
 
         /*** LOAD STAGE ***/
         stage = loadModel("Stage.obj", "Stage.bmp").also {
@@ -236,10 +255,9 @@ abstract class Midis2jam2(
             LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>().toMutableList(), this)
         lyricController.enabled = properties.getProperty("lyrics") == "true"
         autocamController = AutoCamController(this, properties.getProperty("auto_autocam") == "true")
+        slideCamController = SlideCameraController(this)
         debugTextController = DebugTextController(this)
         hudController = HudController(this)
-
-        currentCameraAngle = CameraAngle.CAMERA_1A
 
         /*** SETUP LIGHTS ***/
         val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
@@ -326,12 +344,19 @@ abstract class Midis2jam2(
      */
     private fun handleCameraSetting(name: String, isPressed: Boolean) {
         if (!isPressed) return
-        if (name == "autoCam") {
-            autocamController.trigger()
+        when (name) {
+            "autoCam" -> {
+                autocamController.trigger()
+                cameraState = CameraState.AUTO_CAM
+            }
+
+            "slideCam" -> {
+                cameraState = CameraState.SLIDE_CAM
+            }
         }
         if (name.startsWith("cam")) {
             currentCameraAngle = CameraAngle.handleCameraAngle(currentCameraAngle, name)
-            autocamController.enabled = false
+            cameraState = CameraState.FREE_CAM
         }
     }
 

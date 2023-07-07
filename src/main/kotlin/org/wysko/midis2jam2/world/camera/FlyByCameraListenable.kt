@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Jacob Wysko
+ * Copyright (C) 2023 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.world
+package org.wysko.midis2jam2.world.camera
 
 import com.jme3.input.FlyByCamera
 import com.jme3.renderer.Camera

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Jacob Wysko
+ * Copyright (C) 2023 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.world
+package org.wysko.midis2jam2.world.camera
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
@@ -112,9 +112,15 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
     /** The rotation at which the camera started at in this transition. */
     private var startRotation: Quaternion = AutoCamPosition.GENERAL_A.rotation.clone()
 
+    /** The location at which the camera started at in this transition. */
+    var currentLocation: Vector3f = AutoCamPosition.GENERAL_A.location.clone()
+
+    /** The rotation at which the camera started at in this transition. */
+    var currentRotation: Quaternion = AutoCamPosition.GENERAL_A.rotation.clone()
+
     /** Performs a tick of the auto-cam controller. */
-    fun tick(time: Double, delta: Float) {
-        if (!enabled) return
+    fun tick(time: Double, delta: Float): Boolean {
+        if (!enabled) return false
 
         /* If the camera is not moving, and the song has started, */
         if (!moving && time > 0) {
@@ -155,8 +161,12 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
             x += delta * MOVE_SPEED
 
             /* Set the camera location and rotation to the interpolated values */
-            cam.location = Vector3f().interpolateLocal(startLocation, angles.last().location, x.smooth())
-            cam.rotation = quaternionInterpolation(startRotation, angles.last().rotation, x.smooth())
+            cam.location = Vector3f().interpolateLocal(startLocation, angles.last().location, x.smooth()).also {
+                currentLocation = it
+            }
+            cam.rotation = quaternionInterpolation(startRotation, angles.last().rotation, x.smooth()).also {
+                currentRotation = it
+            }
 
             /* If we have reached the end of the interpolation, */
             if (x > 1f) {
@@ -167,6 +177,8 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
                 moving = false
             }
         }
+
+        return true
     }
 
     private fun randomCamera(time: Double): AutoCamPosition {

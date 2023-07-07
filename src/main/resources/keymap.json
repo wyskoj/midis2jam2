@@ -40,6 +40,10 @@
 		"key": "KEY_0"
 	},
 	{
+		"name": "slideCam",
+		"key": "KEY_9"
+	},
+	{
 		"name": "exit",
 		"key": "KEY_ESCAPE"
 	},
