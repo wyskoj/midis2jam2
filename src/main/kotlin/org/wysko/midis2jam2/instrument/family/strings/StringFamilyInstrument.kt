@@ -99,7 +99,7 @@ abstract class StringFamilyInstrument protected constructor(
     ),
     4,
     body,
-    "ViolinSkin.bmp"
+    "GuitarSkin.bmp"
 ) {
 
     override val upperStrings: Array<Spatial> = Array(4) {
