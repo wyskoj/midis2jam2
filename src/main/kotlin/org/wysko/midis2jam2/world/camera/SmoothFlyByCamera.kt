@@ -32,9 +32,13 @@ private const val DEFAULT_MOVE_SPEED = 100f
  */
 class SmoothFlyByCamera(
     private val context: Midis2jam2,
-    private val onAction: () -> Unit,
-    private val actLikeNormalFlyByCamera: Boolean = false
+    private val onAction: () -> Unit
 ) {
+    /**
+     * Whether the camera should act like a normal [FlyByCamera].
+     */
+    var actLikeNormalFlyByCamera: Boolean = false
+
     /**
      * Whether the camera is enabled.
      */
@@ -83,12 +87,18 @@ class SmoothFlyByCamera(
         if (!isEnabled) return
 
         with(context.app.camera) {
-            location.interpolateLocal(dummyCamera.location, delta * 3.0f)
-            rotation.run {
-                slerp(dummyCamera.rotation, delta * 3.0f)
-                normalizeLocal()
+            if (actLikeNormalFlyByCamera) {
+                location = dummyCamera.location
+                rotation = dummyCamera.rotation
+                fov = dummyCamera.fov.coerceAtLeast(1f)
+            } else {
+                location.interpolateLocal(dummyCamera.location, delta * 3.0f)
+                rotation.run {
+                    slerp(dummyCamera.rotation, delta * 3.0f)
+                    normalizeLocal()
+                }
+                fov = fov.interpolate(dummyCamera.fov, delta * 3.0f).coerceAtLeast(1f)
             }
-            fov = fov.interpolate(dummyCamera.fov, delta * 3.0f)
         }
     }
 

@@ -216,9 +216,10 @@ abstract class Midis2jam2(
             onAction = {
                 isEnabled = true
                 cameraState = CameraState.FREE_CAM
-            },
-            actLikeNormalFlyByCamera = true
-        )
+            }
+        ).apply {
+            actLikeNormalFlyByCamera = properties.getProperty("smooth_camera") != "true"
+        }
         if (properties.getProperty("record_lock")
                 ?.equals("true") == true || isStartAutoCam()
         ) this.flyByCamera.isEnabled = false
