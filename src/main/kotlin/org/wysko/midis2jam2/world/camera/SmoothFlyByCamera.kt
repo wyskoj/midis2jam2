@@ -27,8 +27,15 @@ import org.wysko.midis2jam2.util.Utils
 
 private const val DEFAULT_MOVE_SPEED = 100f
 
+
 /**
+ * The SmoothFlyByCamera class is used to smoothly move and rotate the camera towards a target location and rotation.
  *
+ * @property context The Midis2jam2 instance.
+ * @property onAction Callback function to be called when an action is performed.
+ * @property actLikeNormalFlyByCamera Whether the camera should act like a normal FlyByCamera.
+ * @property isEnabled Whether the camera is enabled.
+ * @property moveSpeed The speed at which the camera moves.
  */
 class SmoothFlyByCamera(
     private val context: Midis2jam2,
@@ -117,5 +124,5 @@ class SmoothFlyByCamera(
  * @return the interpolated value
  */
 fun Float.interpolate(other: Float, speed: Float): Float {
-    return this + (other - this) * speed;
+    return this + (other - this) * speed
 }
