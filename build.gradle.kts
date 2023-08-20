@@ -14,10 +14,10 @@ plugins {
     id("com.github.hierynomus.license-report") version "0.16.1"
 
     // Kotlin
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("jvm") version "1.9.0"
+    kotlin("plugin.serialization") version "1.8.20"
     id("org.jetbrains.dokka") version "1.7.10"
-    id("org.jetbrains.compose") version "1.0.1"
+    id("org.jetbrains.compose") version "1.4.3"
 
     java
     idea
@@ -28,6 +28,8 @@ repositories {
     mavenCentral()
     maven(url = "https://maven.ej-technologies.com/repository")
     maven(url = "https://repo.spongepowered.org/repository/maven-public")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 // Register main class
@@ -35,14 +37,14 @@ project.setProperty("mainClassName", "org.wysko.midis2jam2.MainKt")
 
 // Configure Java version and build
 tasks.compileJava {
-    sourceCompatibility = "11"
-    targetCompatibility = "11"
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
 }
 
 // Configure Kotlin
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
 }
@@ -76,7 +78,7 @@ dependencies {
     // JMonkeyEngine
     implementation("org.jmonkeyengine:jme3-core:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-desktop:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-plugins:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-effects:3.5.2-stable")
 
@@ -114,9 +116,11 @@ dependencies {
     } else {
         implementation(compose.desktop.currentOs)
     }
+    implementation(compose.material3)
+    implementation("com.darkrockstudios:mpfilepicker:2.0.2")
 
     // Kotlin serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     // Logging
 

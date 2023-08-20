@@ -18,113 +18,71 @@ package org.wysko.midis2jam2
 
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
-import com.jme3.input.KeyInput
-import com.jme3.input.controls.KeyTrigger
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import org.wysko.midis2jam2.gui.ConfigureBackground
+import kotlinx.coroutines.*
 import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.getType
+import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.BackgroundController
+import org.wysko.midis2jam2.world.KeyMap
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
-import java.util.*
 import javax.sound.midi.Sequencer
-
 
 /**
  * Contains all the code relevant to operating the 3D scene.
+ *
+ * @param sequencer The MIDI sequencer.
+ * @param midiFile The MIDI file to play.
+ * @param configs The settings to use.
+ * @param onClose Callback when midis2jam2 closes.
  */
 class DesktopMidis2jam2(
-    /** The MIDI sequencer. */
-    private val sequencer: Sequencer,
+    val sequencer: Sequencer,
+    val midiFile: MidiFile,
+    val onClose: () -> Unit,
+    configs: Collection<Configuration>
+) : Midis2jam2(midiFile, configs) {
 
-    /** The MIDI file to play. */
-    midiFile: MidiFile,
+    /** Whether the sequencer has started. */
+    private var isSequencerStarted: Boolean = false
 
-    /** The settings to use. */
-    properties: Properties,
-
-    /** Callback if midis2jam2 closes unexpectedly. */
-    private val onClose: () -> Unit
-) : Midis2jam2(midiFile, properties) {
-
-    private var sequencerStarted: Boolean = false
+    /** The number of currently skipped frames at the start of the application. */
     private var skippedTicks = 0
-    private var initiatedFadeIn = false
-    private val midiFileMicrosecondLength by lazy { sequencer.microsecondLength }
 
-    /**
-     * Initializes the application.
-     */
+    /** Whether the fade-in has been initiated. */
+    private var initiatedFadeIn = false
+
+    /** Job for the tempo change coroutine. */
+    private lateinit var tempoChangeCoroutine: Job
+
+    /** Initializes the application. */
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
+        logger().debug("Initializing application...")
 
-        /* Register key map */
-        Json.decodeFromString<Array<KeyMap>>(Utils.resourceToString("/keymap.json")).forEach {
-            with(app.inputManager) {
-                addMapping(it.name, KeyTrigger(KeyInput::class.java.getField(it.key).getInt(KeyInput::class.java)))
-                addListener(this@DesktopMidis2jam2, it.name)
-            }
-        }
-
-        /* To begin MIDI playback, I perform a check every millisecond to see if it is time to begin the playback of
-         * the MIDI file. This is done by looking at timeSinceStart which contains the number of seconds since the
-         * beginning of the file. It starts as a negative number to represent that time is to pass before the file will
-         * play. Once it reaches 0, playback should begin.
-         *
-         * The Java MIDI sequencer has a bug where the first tempo of the file will not be applied, so once the
-         * sequencer is ready to play, we set the tempo. And, sometimes it will miss a tempo change in the file. To
-         * reduce the complications from this (unfortunately, it does not solve the issue; it only partially treats it)
-         * we perform a check every millisecond and apply any tempos that should be applied now.
-         */
-        Timer(true).scheduleAtFixedRate(
-            object : TimerTask() {
-                override fun run() {
-                    if (timeSinceStart + properties.getProperty("latency_fix").toInt() / 1000.0 >= 0 &&
-                        !sequencerStarted && sequencer.isOpen
-                    ) {
-                        sequencer.tempoInBPM = file.tempos[0].bpm().toFloat()
-                        sequencer.start()
-                        sequencerStarted = true
-                        Timer(true).scheduleAtFixedRate(
-                            object : TimerTask() {
-                                val tempos = ArrayList(file.tempos)
-                                override fun run() {
-                                    while (tempos.isNotEmpty() && tempos.first().time < sequencer.tickPosition) {
-                                        sequencer.tempoInBPM = tempos.removeAt(0).bpm().toFloat()
-                                    }
-                                }
-                            },
-                            0,
-                            1
-                        )
-                    }
-                }
-            },
-            0,
-            1
-        )
-
-        /*** LOAD SKYBOX ***/
+        KeyMap.registerMappings(app, this)
+        launchSequencerWithTempoChanges()
         BackgroundController.configureBackground(
-            ConfigureBackground.type(),
-            ConfigureBackground.value(),
-            this,
+            configs.getType(BackgroundConfiguration::class),
+            this@DesktopMidis2jam2,
             rootNode
         )
 
+        logger().debug("Application initialized")
     }
 
     /**
      * Cleans up the application.
      */
     override fun cleanup() {
+        logger().debug("Cleaning up...")
         sequencer.run {
             stop()
             close()
         }
         onClose()
+        logger().debug("Cleanup complete")
     }
 
     /**
@@ -174,11 +132,10 @@ class DesktopMidis2jam2(
             /* Increment time if sequencer is ready / playing */
             timeSinceStart += tpf.toDouble()
         }
-
-//        rootNode.breadthFirstTraversal { it.cullHint = Spatial.CullHint.Never }
     }
 
     override fun seek(time: Double) {
+        logger().debug("Seeking to time: $time")
         timeSinceStart = time
         sequencer.microsecondPosition = (time * 1E6).toLong()
         eventCollectors.forEach { it.seek(time) }
@@ -189,33 +146,52 @@ class DesktopMidis2jam2(
      * Stops the app state.
      */
     override fun exit() {
+        logger().debug("Exiting...")
         if (sequencer.isOpen) {
             sequencer.stop()
         }
-        app.stateManager.detach(this)
-        app.stop()
+        app.run {
+            stateManager.detach(this@DesktopMidis2jam2)
+            stop()
+        }
         onClose()
+        if (::tempoChangeCoroutine.isInitialized) {
+            tempoChangeCoroutine.cancel()
+        }
+        logger().debug("Exit complete")
     }
 
     override fun togglePause() {
         super.togglePause()
-
         if (paused) sequencer.stop() else sequencer.start()
     }
+
+    private fun launchSequencerWithTempoChanges() {
+        tempoChangeCoroutine = CoroutineScope(Dispatchers.Default).launch {
+            while (sequencer.isOpen) {
+                if (!isSequencerStarted && timeSinceStart >= 0) {
+                    startSequencer()
+                    logger().debug("Sequencer started")
+                }
+                delay(1)
+            }
+        }
+    }
+
+    private suspend fun startSequencer() {
+        sequencer.tempoInBPM = file.tempos.first().bpm().toFloat()
+        sequencer.start()
+        isSequencerStarted = true
+        startApplyingTempos()
+    }
+
+    private suspend fun startApplyingTempos() {
+        val tempos = ArrayList(file.tempos)
+        while (true) {
+            while (tempos.isNotEmpty() && tempos.first().time < sequencer.tickPosition) {
+                sequencer.tempoInBPM = tempos.removeAt(0).bpm().toFloat()
+            }
+            delay(1)
+        }
+    }
 }
-
-/**
- * Stores a single map between an action name and a key.
- */
-@Serializable
-private data class KeyMap(
-    /**
-     * The name of the action.
-     */
-    val name: String,
-
-    /**
-     * The name of the key, as defined in [KeyInput].
-     */
-    val key: String
-)

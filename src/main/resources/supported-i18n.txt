@@ -6,3 +6,4 @@ no
 ru
 th
 tl
+zh

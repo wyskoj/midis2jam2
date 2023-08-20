@@ -100,11 +100,6 @@ private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
 
         /* settings */
         appendLine()
-        append(
-            "Properties:\n${
-                this@debugText.properties.entries.joinToString(separator = "\n")
-            }\n"
-        )
 
         /* fps and time */
         appendLine()

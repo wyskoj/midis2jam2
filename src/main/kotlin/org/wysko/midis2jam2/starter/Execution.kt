@@ -19,263 +19,172 @@ package org.wysko.midis2jam2.starter
 
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.wysko.midis2jam2.DesktopMidis2jam2
-import org.wysko.midis2jam2.gui.getGraphicsSettings
-import org.wysko.midis2jam2.gui.loadSettingsFromFile
-import org.wysko.midis2jam2.gui.resolutionRegex
+import org.wysko.midis2jam2.gui.viewmodel.GERVILL
 import org.wysko.midis2jam2.midi.DesktopMidiFile
-import org.wysko.midis2jam2.midi.StandardMidiFileReader
-import org.wysko.midis2jam2.record.FixedTimer
-import org.wysko.midis2jam2.record.captureVideo
-import org.wysko.midis2jam2.util.ThrowableDisplay.display
+import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
-import java.awt.Dimension
 import java.awt.GraphicsEnvironment
-import java.awt.Toolkit
 import java.io.File
 import java.io.IOException
-import java.util.Properties
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.imageio.ImageIO
-import javax.sound.midi.InvalidMidiDataException
-import javax.sound.midi.MidiSystem
-import javax.sound.midi.MidiUnavailableException
-import javax.sound.midi.Sequencer
+import javax.sound.midi.*
 
-/** The sequencer that is connected to the synthesizer. */
-lateinit var connectedSequencer: Sequencer
-
-/** Loads [connectedSequencer]. */
-var loadSequencerJob: Job = CoroutineScope(Default).launch(start = CoroutineStart.LAZY) {
-    try {
-        connectedSequencer = MidiSystem.getSequencer(true)
-        Execution.logger().info("Loaded internal MIDI sequencer")
-    } catch (e: MidiUnavailableException) {
-        err(
-            e,
-            "The MIDI sequencer is not available due to resource restrictions, or no sequencer is installed in the system.",
-            "Error loading MIDI sequencer"
-        )
-    }
-}
-
-private val DEFAULT_CONFIGURATION = Properties().apply {
-    setProperty("graphics_samples", "4")
-    setProperty("latency_fix", "0")
-}
-
-/** Starts midis2jam2 with given settings. */
+/**
+ * This class represents the execution of a MIDI file with given configurations.
+ */
 object Execution {
-
-    private val dispatcher: CoroutineDispatcher = IO
-
     /**
-     * Begins midis2jam2 with given settings.
+     * Starts the midis2jam2 JME application.
      *
-     * @param properties settings to use
-     * @param onStart function to call when midis2jam2 is started
-     * @param onFinish function to call when midis2jam2 is finished
+     * @param midiFile The MIDI file to play.
+     * @param configurations The configurations for the application.
+     * @param onStart Callback function called when the application starts.
+     * @param onReady Callback function called when the application is ready to begin.
+     * @param onFinish Callback function called when the application is finished.
      */
     fun start(
-        properties: Properties,
+        midiFile: File,
+        configurations: Collection<Configuration>,
         onStart: () -> Unit,
         onReady: () -> Unit,
         onFinish: () -> Unit
-    ): Job {
-        System.gc()
-        return CoroutineScope(Default).launch {
-            @Suppress("NAME_SHADOWING")
-            val properties = Properties().apply {
-                this.putAll(DEFAULT_CONFIGURATION)
-                this.putAll(properties)
-                this.putAll(loadSettingsFromFile())
-            }
-            onStart() // Disable launcher
-
-            /* Get MIDI file */
+    ) {
+        CoroutineScope(Default).launch {
+            onStart()
+            val homeConfiguration = configurations.first { it is HomeConfiguration } as HomeConfiguration
 
             val sequence = try {
-                withContext(dispatcher) {
-                    StandardMidiFileReader().getSequence(File(properties.getProperty("midi_file")))
-                }
+                MidiSystem.getSequence(midiFile)
             } catch (e: InvalidMidiDataException) {
-                err(e, "The MIDI file has bad data.", "Error reading MIDI file", onFinish)
+                this@Execution.logger().errorDisp("The MIDI file is invalid.", e)
+                onFinish()
                 return@launch
             } catch (e: IOException) {
-                err(e, "The MIDI file could not be loaded.", "Error reading MIDI file", onFinish)
+                this@Execution.logger().errorDisp("There was an error reading the MIDI file.", e)
+                onFinish()
                 return@launch
             }
 
-            /* Get MIDI device */
             val midiDevice = try {
-                if (properties.getProperty("record")?.equals("true") == true) {
-                    null
-                } else {
-                    MidiSystem.getMidiDevice(
-                        MidiSystem.getMidiDeviceInfo().first { it.name == properties.getProperty("midi_device") }
-                    )
-                }
+                MidiSystem.getMidiDevice(
+                    MidiSystem.getMidiDeviceInfo().first { it.name == homeConfiguration.selectedMidiDevice })
             } catch (e: MidiUnavailableException) {
-                err(
-                    e,
-                    "The \"${properties.getProperty("midi_device")}\" MIDI device is unavailable. Are any other applications using it?",
-                    "Error opening MIDI device",
-                    onFinish
-                )
+                this@Execution.logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
+                onFinish()
                 return@launch
             } catch (e: IllegalArgumentException) {
-                err(
-                    e,
-                    "The \"${properties.getProperty("midi_device")}\" MIDI device doesn't currently exist. Did you unplug it?",
-                    "Error opening MIDI device",
-                    onFinish
-                )
+                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
+                onFinish()
+                return@launch
+            } catch (e: NoSuchElementException) {
+                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
+                onFinish()
                 return@launch
             }
 
-            /* Get sequencer */
-            val sequencer = if (properties.getProperty("midi_device") == "Gervill") {
-                /* Get internal synth */
-                val synthesizer = try {
-                    MidiSystem.getSynthesizer()
-                } catch (e: MidiUnavailableException) {
-                    err(
-                        e,
-                        "The internal synthesizer is not available due to resource restrictions, or no synthesizer is installed in the system.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                }
-
-                /* Open synthesizer */
-                try {
-                    synthesizer.open()
-                } catch (e: MidiUnavailableException) {
-                    err(
-                        e,
-                        "The MIDI device cannot be opened due to resource restrictions.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                } catch (e: SecurityException) {
-                    err(
-                        e,
-                        "The MIDI device cannot be opened due to security restrictions.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                }
-
-                /* Get SoundFont */
-                properties.getProperty("soundfont")?.let { sf2 ->
-                    getUnconnectedSequencer().also {
-                        try {
-                            it.transmitter.receiver = synthesizer.receiver
-                            synthesizer.loadAllInstruments(MidiSystem.getSoundbank(File(sf2)))
-                        } catch (e: InvalidMidiDataException) {
-                            err(e, "The SoundFont file is bad.", "Error loading SoundFont", onFinish)
-                            return@launch
-                        } catch (e: IOException) {
-                            err(e, "Could not load the SoundFont.", "Error loading SoundFont", onFinish)
-                            return@launch
-                        } catch (e: IllegalArgumentException) {
-                            err(e, "midis2jam2 does not support this soundbank.", "Error loading SoundFont", onFinish)
-                            return@launch
-                        }
-                    }
-                } ?: let {
-                    loadSequencerJob.join()
-                    connectedSequencer
-                }
-            } else {
-                try {
-                    midiDevice?.open()
-                } catch (e: MidiUnavailableException) {
-                    err(
-                        e,
-                        "The MIDI device cannot be opened due to resource restrictions.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                } catch (e: SecurityException) {
-                    err(
-                        e,
-                        "The MIDI device cannot be opened due to security restrictions.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                }
-                MidiSystem.getSequencer(false).also {
-                    it.transmitter.receiver = midiDevice?.receiver
-                }
-            }.also {
-                try {
-                    it.open()
-                } catch (e: MidiUnavailableException) {
-                    err(
-                        e,
-                        "The MIDI device cannot be opened due to resource restrictions.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                } catch (e: SecurityException) {
-                    err(
-                        e,
-                        "The MIDI device cannot be opened due to security restrictions.",
-                        "Error opening MIDI synthesizer",
-                        onFinish
-                    )
-                    return@launch
-                }
-                it.sequence = sequence
+            val sequencer = try {
+                getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
+            } catch (e: Exception) {
+                logger().errorDisp("There was an error.", e)
+                onFinish()
+                return@launch
             }
-
-            /* Hush JME */
-            Logger.getLogger("com.jme3").level = Level.FINEST
 
             onReady()
-
-            /* Apply graphics configuration */
-            with(getGraphicsSettings()) {
-                stringPropertyNames().forEach {
-                    properties.setProperty(it, this.getProperty(it))
-                }
-            }
-
-            M2J2Execution(properties, {
-                onFinish.invoke()
-                midiDevice?.close()
-            }, sequencer).execute()
+            Midis2jam2Application(midiFile, configurations, onFinish, sequencer).execute()
         }
     }
 
-    private fun getUnconnectedSequencer() = MidiSystem.getSequencer(false)
+    private fun getAndLoadSequencer(
+        homeConfiguration: HomeConfiguration, midiDevice: MidiDevice, sequence: Sequence?
+    ): Sequencer {
+        return if (homeConfiguration.selectedMidiDevice == GERVILL) {
+            val synthesizer = MidiSystem.getSynthesizer().apply {
+                open()
+                homeConfiguration.selectedSoundbank?.let {
+                    loadAllInstruments(MidiSystem.getSoundbank(File(it)))
+                }
+            }
+
+            MidiSystem.getSequencer(false).apply {
+                transmitter.receiver = synthesizer.receiver
+            }
+        } else {
+            midiDevice.open()
+            MidiSystem.getSequencer(false).apply {
+                transmitter.receiver = midiDevice.receiver
+            }
+        }.apply {
+            open()
+            this.sequence = sequence
+        }
+    }
 }
 
-/** Handles an error. */
-fun err(exception: Exception, message: String, title: String, onFinish: () -> Unit = {}) {
-    exception.display(title, message)
-    onFinish.invoke()
+private class Midis2jam2Application(
+    val midiFile: File,
+    val configurations: Collection<Configuration>,
+    val onFinish: () -> Unit,
+    val sequencer: Sequencer
+) : SimpleApplication() {
+
+    fun execute() {
+        val jmeSettings = AppSettings(false).apply { copyFrom(DEFAULT_JME_SETTINGS) }
+        val settingsConfiguration = configurations.first { it is SettingsConfiguration } as SettingsConfiguration
+        val graphicsConfiguration = configurations.first { it is GraphicsConfiguration } as GraphicsConfiguration
+
+        if (settingsConfiguration.isFullscreen) {
+            jmeSettings.isFullscreen = true
+            with(screenResolution()) {
+                jmeSettings.width = width
+                jmeSettings.height = height
+            }
+        } else {
+            jmeSettings.isFullscreen = false
+            when (graphicsConfiguration.windowResolution) {
+                is Resolution.DefaultResolution -> with(preferredResolution()) {
+                    jmeSettings.width = width
+                    jmeSettings.height = height
+                }
+
+                is Resolution.CustomResolution -> with(graphicsConfiguration.windowResolution) {
+                    jmeSettings.width = width
+                    jmeSettings.height = height
+                }
+            }
+        }
+
+        setSettings(jmeSettings)
+        setDisplayStatView(false)
+        setDisplayFps(false)
+        isPauseOnLostFocus = false
+        isShowSettings = false
+
+        start()
+    }
+
+    override fun simpleInitApp() {
+        val parsedMidiFile = DesktopMidiFile(midiFile)
+        DesktopMidis2jam2(
+            sequencer = sequencer, midiFile = parsedMidiFile, onClose = { stop() }, configs = configurations
+        ).also {
+            stateManager.attach(it)
+            rootNode.attachChild(it.rootNode)
+        }
+    }
+
+    override fun stop() {
+        onFinish()
+        super.stop()
+    }
 }
 
-/* EXECUTORS */
-
-private val defaultSettings = AppSettings(true).apply {
+private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
     frameRate = -1
     frequency = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.first().refreshRate
     isVSync = true
@@ -289,76 +198,13 @@ private val defaultSettings = AppSettings(true).apply {
     centerWindow = true
 }
 
-private class M2J2Execution(
-    val properties: Properties,
-    val onFinish: () -> Unit,
-    val sequencer: Sequencer
-) : SimpleApplication() {
-
-    fun execute() {
-        val prefResolution = collectWindowResolution(properties)
-        if (properties.getProperty("fullscreen") == "true") {
-            defaultSettings.isFullscreen = true
-            defaultSettings.setResolution(screenWidth(), screenHeight()) // Set resolution to monitor resolution
-        } else {
-            defaultSettings.isFullscreen = false
-            defaultSettings.setResolution(prefResolution.width, prefResolution.height)
-        }
-
-        setSettings(defaultSettings)
-        setDisplayStatView(false)
-        setDisplayFps(false)
-        isPauseOnLostFocus = false
-        isShowSettings = false
-        start()
-    }
-
-    override fun stop() {
-        stop(false)
-        onFinish()
-    }
-
-    override fun simpleInitApp() {
-        val midiFile = DesktopMidiFile(File(properties.getProperty("midi_file")))
-        DesktopMidis2jam2(
-            sequencer = sequencer,
-            midiFile,
-            properties = properties,
-            onFinish
-        ).also {
-            stateManager.attach(it)
-            rootNode.attachChild(it.rootNode)
-        }
-
-        if (properties.getProperty("record")?.equals("true", ignoreCase = true) == true) {
-            val frameRate = properties.getProperty("record_fps")?.toInt() ?: 30
-            setTimer(FixedTimer(frameRate.toLong()))
-            captureVideo(
-                app = this,
-                video = File(properties.getProperty("record_file")),
-                frameRate = frameRate,
-                resolution = settings.width to settings.height,
-                quality = properties.getProperty("record_quality").toInt()
-            )
-        }
-    }
+private fun screenResolution(): Resolution.CustomResolution {
+    val graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment()
+    val graphicsDevice = graphicsEnvironment.defaultScreenDevice
+    val displayMode = graphicsDevice.displayMode
+    return Resolution.CustomResolution(displayMode.width, displayMode.height)
 }
 
-/** Determines the width of the screen. */
-fun screenWidth(): Int = Toolkit.getDefaultToolkit().screenSize.width
-
-/** Determines the height of the screen. */
-fun screenHeight(): Int = Toolkit.getDefaultToolkit().screenSize.height
-
-/** Obtains the preferred resolution from the config file. */
-private fun collectWindowResolution(properties: Properties): Dimension {
-    fun defaultDimension() = Dimension(((screenWidth() * 0.95).toInt()), (screenHeight() * 0.85).toInt())
-
-    if (properties.getProperty("resolution") == null) return defaultDimension()
-    if (properties.getProperty("resolution").equals("default", ignoreCase = true)) return defaultDimension()
-    if (!resolutionRegex.matches(properties.getProperty("resolution"))) return defaultDimension()
-
-    return resolutionRegex.find(properties.getProperty("resolution"))?.let {
-        Dimension(it.groupValues[1].toInt(), it.groupValues[2].toInt())
-    } ?: defaultDimension()
+private fun preferredResolution(): Resolution.CustomResolution = with(screenResolution()) {
+    Resolution.CustomResolution((width * 0.95f).toInt(), (height * 0.85f).toInt())
 }

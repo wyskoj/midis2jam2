@@ -22,6 +22,8 @@ import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.cullHint
 
 /** How fast instruments move when transitioning. */
@@ -55,7 +57,7 @@ abstract class Instrument protected constructor(
      */
     var isVisible: Boolean = false
         set(value) {
-            if (context.properties.getProperty("never_hidden").equals("true", ignoreCase = true)) {
+            if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible) {
                 context.rootNode.attachChild(offsetNode)
                 field = value
                 return
@@ -77,7 +79,7 @@ abstract class Instrument protected constructor(
             field = value
         }
         get() {
-            return if (context.properties.getProperty("never_hidden").equals("true", ignoreCase = true)) {
+            return if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible) {
                 true
             } else field
         }

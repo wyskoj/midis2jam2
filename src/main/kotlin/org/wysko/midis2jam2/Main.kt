@@ -17,166 +17,286 @@
 
 package org.wysko.midis2jam2
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.graphics.ExperimentalGraphicsApi
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
-import com.formdev.flatlaf.FlatDarkLaf
-import com.install4j.api.launcher.SplashScreen
-import com.install4j.api.launcher.StartupNotification
-import org.wysko.midis2jam2.gui.Launcher
-import org.wysko.midis2jam2.gui.LauncherController
-import org.wysko.midis2jam2.gui.UpdateChecker.checkForUpdates
-import org.wysko.midis2jam2.gui.launcherState
-import org.wysko.midis2jam2.midi.search.MIDISearchFrame
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.wysko.midis2jam2.gui.ApplicationScreen
+import org.wysko.midis2jam2.gui.TabFactory
+import org.wysko.midis2jam2.gui.components.NavigationRail
+import org.wysko.midis2jam2.gui.material.AppTheme
+import org.wysko.midis2jam2.gui.screens.*
+import org.wysko.midis2jam2.gui.util.centerWindow
+import org.wysko.midis2jam2.gui.viewmodel.*
 import org.wysko.midis2jam2.starter.Execution
-import org.wysko.midis2jam2.starter.loadSequencerJob
-import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.logger
-import java.awt.Font
-import java.awt.datatransfer.DataFlavor
-import java.awt.dnd.DnDConstants
-import java.awt.dnd.DropTarget
-import java.awt.dnd.DropTargetDropEvent
-import java.io.File
-import java.util.Enumeration
-import java.util.Properties
-import javax.swing.UIManager
-import javax.swing.plaf.FontUIResource
-import kotlin.system.exitProcess
+import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.util.ErrorHandling
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 
-/**
- * The user's home folder.
- */
-val USER_HOME: File = File(System.getProperty("user.home"))
 
-/**
- * The configuration directory.
- */
-val CONFIGURATION_DIRECTORY: File = File(USER_HOME, ".midis2jam2")
+@OptIn(ExperimentalMaterial3Api::class)
+fun main() = application {
+    val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
 
-/**
- * When the application is launched, the launcher controller is stored here.
- */
-var launcherController: LauncherController? = null
+    val homeViewModel = HomeViewModel.create()
+    val searchViewModel = SearchViewModel()
+    val settingsViewModel = SettingsViewModel.create()
+    val backgroundConfigurationViewModel = BackgroundConfigurationViewModel.create()
+    val graphicsConfigurationViewModel = GraphicsConfigurationViewModel.create()
+    val soundbankConfigurationViewModel = SoundbankConfigurationViewModel.create()
 
-fun setUIFont(f: FontUIResource?) {
-    val keys: Enumeration<*> = UIManager.getDefaults().keys()
-    while (keys.hasMoreElements()) {
-        val key = keys.nextElement()
-        val value = UIManager.get(key)
-        if (value is FontUIResource) UIManager.put(key, f)
-    }
-}
+    var isLockPlayButton by remember { mutableStateOf(false) }
 
-/**
- * Where it all begins.
- */
-@ExperimentalGraphicsApi
-@ExperimentalComposeUiApi
-@ExperimentalFoundationApi
-fun main(args: Array<String>) {
-    /* Get the default sequencer loaded in a coroutine now since it takes a while (about 1.5 seconds) to load. */
-    loadSequencerJob.start()
+    LegacyConfigurationImporter.importLegacyConfiguration().forEach {
+        it?.let {
+            when (it) {
+                is HomeConfiguration -> homeViewModel.run {
+                    applyConfiguration(it)
+                    onConfigurationChanged(generateConfiguration())
+                }
 
-    /* Ensure configuration folders are initialized */
-    CONFIGURATION_DIRECTORY.mkdirs()
+                is SettingsConfiguration -> settingsViewModel.run {
+                    applyConfiguration(it)
+                    onConfigurationChanged(generateConfiguration())
+                }
 
-    SplashScreen.writeMessage("Loading...")
+                is BackgroundConfiguration -> backgroundConfigurationViewModel.run {
+                    applyConfiguration(it)
+                    onConfigurationChanged(generateConfiguration())
+                }
 
-    /* Initialize themes */
-    try {
-        UIManager.setLookAndFeel(FlatDarkLaf())
-        val createFont =
-            Font.createFont(Font.TRUETYPE_FONT, Main.javaClass.getResourceAsStream("/tahoma.ttf")).deriveFont(12f)
-        setUIFont(FontUIResource(createFont))
-    } catch (e: Exception) {
-        with(Main.logger()) {
-            warn("Failed to initialize FlatLaf theme, reverting to default.")
-            warn(Utils.exceptionToLines(e))
+                is GraphicsConfiguration -> graphicsConfigurationViewModel.run {
+                    applyConfiguration(it)
+                    onConfigurationChanged(generateConfiguration())
+                }
+
+                is SoundbankConfiguration -> soundbankConfigurationViewModel.run {
+                    applyConfiguration(it)
+                    onConfigurationChanged(generateConfiguration())
+                }
+            }
         }
     }
 
-    if (args.isNotEmpty()) {
-        Execution.start(
-            properties = Properties().apply {
-                setProperty("midi_file", args.first())
-                setProperty("midi_device", launcherState.getProperty("midi_device"))
-            },
-            onStart = {
-                launcherController?.setFreeze?.invoke(true)
-                MIDISearchFrame.lock()
-            },
-            onReady = {},
-            onFinish = {
-                launcherController?.setFreeze?.invoke(false)
-                MIDISearchFrame.unlock()
-                exitProcess(0)
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = I18n["midis2jam2_window_title"].value,
+        state = windowState,
+        icon = painterResource("/ico/icon512.png"),
+    ) {
+        centerWindow()
+        SetupUi(
+            homeViewModel,
+            searchViewModel,
+            settingsViewModel,
+            backgroundConfigurationViewModel,
+            graphicsConfigurationViewModel,
+            soundbankConfigurationViewModel,
+            isLockPlayButton
+        ) {
+            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+            when (backgroundConfiguration) {
+                is BackgroundConfiguration.CubemapBackground -> {
+                    if (!backgroundConfiguration.validate()) {
+                        // TODO: Show error
+                        return@SetupUi
+                    }
+                }
+
+                else -> Unit
             }
-        )
-        SplashScreen.hide()
-    } else {
-        application {
-            Window(
-                onCloseRequest = ::exitApplication,
-                title = "midis2jam2 launcher",
-                state = rememberWindowState(
-                    placement = WindowPlacement.Maximized,
-                    position = WindowPosition(Alignment.Center)
-                ),
-                icon = BitmapPainter(useResource("ico/icon32.png", ::loadImageBitmap))
+            Execution.start(midiFile = homeViewModel.midiFile.value!!, configurations = listOf(
+                homeViewModel.generateConfiguration(),
+                settingsViewModel.generateConfiguration(),
+                backgroundConfiguration,
+                graphicsConfigurationViewModel.generateConfiguration(),
+                soundbankConfigurationViewModel.generateConfiguration()
+            ), onStart = {
+                isLockPlayButton = true
+            }, onReady = {
+                // TODO: Anything?
+            }, onFinish = {
+                isLockPlayButton = false
+            })
+        }
+
+        if (ErrorHandling.isShowErrorDialog.value) {
+            Dialog(
+                onCloseRequest = { ErrorHandling.dismiss() },
+                state = rememberDialogState(position = WindowPosition(Alignment.Center), size = DpSize(600.dp, 400.dp)),
+                title = "Error"
             ) {
-                launcherController = Launcher()
-                this.window.contentPane.dropTarget = object : DropTarget() {
-                    @Synchronized
-                    override fun drop(dtde: DropTargetDropEvent) {
-                        dtde.let {
-                            it.acceptDrop(DnDConstants.ACTION_REFERENCE)
-                            (it.transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).firstOrNull()
-                                ?.let { file -> launcherController?.setSelectedFile?.invoke(file as File) }
+                val snackbarHostState = remember { SnackbarHostState() }
+                val scope = rememberCoroutineScope()
+                AppTheme(true) {
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        Scaffold(
+                            snackbarHost = {
+                                SnackbarHost(
+                                    hostState = snackbarHostState
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Snackbar(
+                                            modifier = Modifier.fillMaxWidth(0.5f)
+                                        ) {
+                                            Text(it.visuals.message)
+                                        }
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
+                                }
+                            },
+                        ) {
+                            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(painterResource("/ico/error.svg"), "Error", modifier = Modifier.size(48.dp))
+                                    Text(ErrorHandling.errorMessage.value)
+                                }
+                                OutlinedTextField(
+                                    value = ErrorHandling.errorException.value?.stackTraceToString() ?: "",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    modifier = Modifier.fillMaxWidth().weight(1f).padding(24.dp),
+                                    textStyle = TextStyle.Default.copy(
+                                        fontFamily = FontFamily.Monospace, fontSize = 12.sp
+                                    )
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    OutlinedButton(onClick = {
+                                        with(
+                                            StringSelection(
+                                                ErrorHandling.errorException.value?.stackTraceToString() ?: ""
+                                            )
+                                        ) {
+                                            Toolkit.getDefaultToolkit().systemClipboard.setContents(this, this)
+                                        }
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Copied to clipboard")
+                                        }
+                                    }) {
+                                        Text("Copy to clipboard")
+                                    }
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Button(onClick = { ErrorHandling.dismiss() }) {
+                                        Text("OK")
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-            checkForUpdates() // I'm checking for updates, whether you like it or not.
-            /* Register subsequent invocations */
-            StartupNotification.registerStartupListener {
-                if (launcherController?.getFreeze?.invoke() != true) {
-                    Execution.start(
-                        properties = Properties().apply {
-                            setProperty(
-                                "midi_file",
-                                it.run {
-                                    if (it.startsWith('"') && it.endsWith('"')) drop(1).dropLast(1) else this
-                                }
-                            )
-                            setProperty("midi_device", launcherState.getProperty("midi_device"))
-                        },
-                        onStart = {
-                            launcherController?.setFreeze?.invoke(true)
-                            MIDISearchFrame.lock()
-                        },
-                        onReady = {},
-                        onFinish = {
-                            launcherController?.setFreeze?.invoke(false)
-                            MIDISearchFrame.unlock()
-                        }
-                    )
-                }
-            }
         }
     }
 }
 
 /**
- * The entrypoint class. Used for logging purposes.
+ * Sets up the user interface for the home screen.
+ *
+ * @param homeViewModel The view model for the home screen.
+ * @param searchViewModel The view model for the search screen.
+ * @param settingsViewModel The view model for the settings screen.
+ * @param backgroundConfigurationViewModel The view model for the background configuration screen.
+ * @param graphicsConfigurationViewModel The view model for the graphics configuration screen.
+ * @param soundbankConfigurationViewModel The view model for the soundbank configuration screen.
+ * @param playMidiFile Callback function called when the user clicks the play button.
  */
-object Main
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SetupUi(
+    homeViewModel: HomeViewModel,
+    searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
+    backgroundConfigurationViewModel: BackgroundConfigurationViewModel,
+    graphicsConfigurationViewModel: GraphicsConfigurationViewModel,
+    soundbankConfigurationViewModel: SoundbankConfigurationViewModel,
+    isLockPlayButton: Boolean = false,
+    playMidiFile: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isFlicker by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    fun flicker() {
+        scope.launch {
+            isFlicker = true
+            delay(200)
+            isFlicker = false
+        }
+    }
+    AppTheme(true) {
+        Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
+            var activeScreen by remember { mutableStateOf<ApplicationScreen>(TabFactory.home) }
+            Row {
+                NavigationRail(activeScreen) {
+                    activeScreen = it
+                }
+                Crossfade(targetState = activeScreen, animationSpec = tween(200)) { selectedTab ->
+                    when (selectedTab) {
+                        TabFactory.home -> HomeScreen(
+                            homeViewModel = homeViewModel,
+                            openMidiSearch = { activeScreen = TabFactory.search },
+                            playMidiFile = playMidiFile,
+                            flicker = isFlicker,
+                            snackbarHostState = snackbarHostState,
+                            soundbankConfigurationViewModel = soundbankConfigurationViewModel,
+                            onOpenSoundbankConfig = { activeScreen = TabFactory.soundbankConfiguration },
+                            isLockPlayButton = isLockPlayButton
+                        )
+
+                        TabFactory.search -> SearchScreen(searchViewModel, snackbarHostState) {
+                            scope.launch {
+                                activeScreen = TabFactory.home
+                                delay(400)
+                                homeViewModel.selectMidiFile(it)
+                                flicker()
+                            }
+                        }
+
+                        TabFactory.settings -> SettingsScreen(settingsViewModel) {
+                            activeScreen = it
+                        }
+
+                        TabFactory.about -> AboutScreen()
+                        TabFactory.backgroundConfiguration -> BackgroundConfigurationScreen(
+                            backgroundConfigurationViewModel
+                        ) {
+                            activeScreen = TabFactory.settings
+                        }
+
+                        TabFactory.graphicsConfiguration -> GraphicsConfigurationScreen(graphicsConfigurationViewModel) {
+                            activeScreen = TabFactory.settings
+                        }
+
+                        TabFactory.soundbankConfiguration -> SoundbankConfigurationScreen(
+                            soundbankConfigurationViewModel
+                        ) {
+                            activeScreen = TabFactory.settings
+                        }
+
+                        is ApplicationScreen.ScreenWithTab -> Unit
+                        is ApplicationScreen.ScreenWithoutTab -> Unit
+                    }
+                }
+            }
+        }
+    }
+}

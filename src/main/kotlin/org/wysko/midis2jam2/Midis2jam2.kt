@@ -23,23 +23,15 @@ import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
 import com.jme3.input.controls.ActionListener
-import com.jme3.light.AmbientLight
-import com.jme3.light.DirectionalLight
 import com.jme3.material.Material
-import com.jme3.math.ColorRGBA
-import com.jme3.math.Vector3f
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.FadeFilter
-import com.jme3.renderer.RenderManager
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
-import org.wysko.midis2jam2.gui.QualityLevel
-import org.wysko.midis2jam2.gui.antiAliasingDefinition
-import org.wysko.midis2jam2.gui.shadowDefinition
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
@@ -47,37 +39,29 @@ import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
 import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.midi.MidiTextEvent
+import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.*
 import org.wysko.midis2jam2.world.camera.*
-import java.util.*
 import kotlin.properties.Delegates
 
+
 /**
- * Acts as the main animation and playback class.
+ * Controls all aspects of the program. This is the main class of the program.
  *
- * @param file the parsed MIDI file
- * @param properties the settings
- * @constructor Create an instance of midis2jam2
+ * @param file The MIDI file to be played.
+ * @param configs The configurations to be used.
  */
-@Suppress("LeakingThis")
 abstract class Midis2jam2(
     val file: MidiFile,
-    val properties: Properties
+    val configs: Collection<Configuration>,
 ) : AbstractAppState(), ActionListener {
 
     /** The JME3 application that created this. */
     lateinit var app: SimpleApplication
 
     /** The asset manager. */
-    val assetManager: AssetManager by lazy {
-        app.assetManager
-    }
-
-    /** The render manager. */
-    val renderManager: RenderManager by lazy {
-        app.renderManager
-    }
+    val assetManager: AssetManager by lazy { app.assetManager }
 
     /** The asset loader. */
     lateinit var assetLoader: AssetLoader
@@ -95,10 +79,7 @@ abstract class Midis2jam2(
     lateinit var stage: Spatial
 
     /** True if the current shadow configuration requires "fake" shadows to be used, false otherwise. */
-    val fakeShadows: Boolean = properties.getProperty("shadows").equals("none", ignoreCase = true)
-
-    /** True if enhanced graphics should be used, false otherwise. */
-    val enhancedGraphics: Boolean = true
+    val fakeShadows: Boolean = configs.getType(GraphicsConfiguration::class).shadowQuality == QualityScale.NONE
 
     /** The amount of time that has passed since the start of the song (or the time until the start). */
     var timeSinceStart: Double = -2.0
@@ -161,7 +142,8 @@ abstract class Midis2jam2(
     protected val notePeriodCollectors = mutableListOf<NotePeriodCollector>()
 
     /** The current state of the camera. */
-    var cameraState: CameraState = if (isStartAutoCam()) CameraState.AUTO_CAM else CameraState.FREE_CAM
+    var cameraState: CameraState =
+        if (configs.getType(SettingsConfiguration::class).startAutocamWithSong) CameraState.AUTO_CAM else CameraState.FREE_CAM
         set(value) {
             // Enable/disable controllers based on camera state when value is changed
             autocamController.enabled = value == CameraState.AUTO_CAM
@@ -169,8 +151,6 @@ abstract class Midis2jam2(
             slideCamController.isEnabled = value == CameraState.SLIDE_CAM
             field = value
         }
-
-    private fun isStartAutoCam() = properties.getProperty("auto_autocam") == "true"
 
     fun registerEventCollector(collector: EventCollector<out MidiEvent>) {
         eventCollectors += collector
@@ -203,6 +183,9 @@ abstract class Midis2jam2(
 
     @Suppress("KDocMissingDocumentation")
     override fun initialize(stateManager: AppStateManager, app: Application) {
+        val settingsConfig = configs.getType(SettingsConfiguration::class)
+        val graphicsConfig = configs.getType(GraphicsConfiguration::class)
+
         this.app = app as SimpleApplication
         this.assetLoader = AssetLoader(this)
 
@@ -211,20 +194,15 @@ abstract class Midis2jam2(
         /*** CONFIGURE CAMERA ***/
         this.app.flyByCamera.unregisterInput()
         this.app.flyByCamera.isEnabled = false
-        this.flyByCamera = SmoothFlyByCamera(
-            this,
-            onAction = {
-                isEnabled = true
-                cameraState = CameraState.FREE_CAM
-            }
-        ).apply {
-            actLikeNormalFlyByCamera = properties.getProperty("smooth_camera") != "true"
+        this.flyByCamera = SmoothFlyByCamera(this, onAction = {
+            isEnabled = true
+            cameraState = CameraState.FREE_CAM
+        }).apply {
+            actLikeNormalFlyByCamera = !settingsConfig.isCameraSmooth
+            isEnabled = !settingsConfig.startAutocamWithSong
         }
-        if (properties.getProperty("record_lock")
-                ?.equals("true") == true || isStartAutoCam()
-        ) this.flyByCamera.isEnabled = false
 
-        if (isStartAutoCam()) {
+        if (settingsConfig.startAutocamWithSong) {
             with(this.app.camera) {
                 CameraAngle.CAMERA_1A.let {
                     location = it.location
@@ -243,72 +221,46 @@ abstract class Midis2jam2(
             value = 0f
         }
 
-        instruments = InstrumentAssignment.assign(this, midiFile = file)
-
-        instruments.forEach {
-            // This is a bit of a hack to prevent jittery frames when the instrument would first appear
-            rootNode.attachChild(it.offsetNode)
-            rootNode.detachChild(it.offsetNode)
+        instruments = InstrumentAssignment.assign(this, midiFile = file).also {
+            it.forEach {
+                // This is a bit of a hack to prevent jittery frames when the instrument would first appear
+                rootNode.attachChild(it.offsetNode)
+                rootNode.detachChild(it.offsetNode)
+            }
         }
 
         standController = StandController(this)
         lyricController =
             LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>().toMutableList(), this)
-        lyricController.enabled = properties.getProperty("lyrics") == "true"
-        autocamController = AutoCamController(this, properties.getProperty("auto_autocam") == "true")
+        lyricController.enabled = settingsConfig.showLyrics
+        autocamController = AutoCamController(this, settingsConfig.startAutocamWithSong)
         slideCamController = SlideCameraController(this)
         debugTextController = DebugTextController(this)
         hudController = HudController(this)
 
-        /*** SETUP LIGHTS ***/
-        val shadowsOnly = DirectionalLight().apply { // No light effects (shadows only)
-            color = ColorRGBA.Black
-            direction = Vector3f(0.1f, -1f, -0.1f)
-            rootNode.addLight(this)
-        }
-        DirectionalLight().apply { // Main light
-            color = ColorRGBA(0.9f, 0.9f, 0.9f, 1f)
-            direction = Vector3f(0f, -1f, -1f)
-            rootNode.addLight(this)
-        }
-        DirectionalLight().apply { // Backlight
-            color = ColorRGBA(0.1f, 0.1f, 0.3f, 1f)
-            direction = Vector3f(0f, 1f, 1f)
-            rootNode.addLight(this)
-        }
-        AmbientLight().apply { // Ambience
-            color = ColorRGBA(0.5f, 0.5f, 0.5f, 1f)
-            rootNode.addLight(this)
-        }
+        val shadowsOnly = LightingSetup.setupLights(rootNode)
 
         /*** SETUP SHADOWS ***/
         if (fakeShadows) {
             shadowController = ShadowController(this)
             fpp = FilterPostProcessor(assetManager).apply {
-                numSamples =
-                    antiAliasingDefinition.getOrDefault(QualityLevel.valueOf(properties.getProperty("antialiasing")), 1)
+                numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
                 addFilter(fade)
                 addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
                 app.viewPort.addProcessor(this)
             }
         } else {
             fpp = FilterPostProcessor(assetManager).apply {
-                val shadowDef = shadowDefinition.getOrDefault(
-                    QualityLevel.valueOf(properties.getProperty("shadows")),
-                    1 to 1024
-                )
-                addFilter(
-                    DirectionalLightShadowFilter(assetManager, shadowDef.second, shadowDef.first).apply {
-                        light = shadowsOnly
-                        isEnabled = true
-                        shadowIntensity = 0.16f
-                        lambda = 0.65f
-                        edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
-                        edgesThickness = 10
-                    }
-                )
-                numSamples =
-                    antiAliasingDefinition.getOrDefault(QualityLevel.valueOf(properties.getProperty("antialiasing")), 1)
+                val shadowDef = GraphicsConfiguration.SHADOW_DEFINITION[graphicsConfig.shadowQuality] ?: (1 to 1024)
+                addFilter(DirectionalLightShadowFilter(assetManager, shadowDef.second, shadowDef.first).apply {
+                    light = shadowsOnly
+                    isEnabled = true
+                    shadowIntensity = 0.16f
+                    lambda = 0.65f
+                    edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
+                    edgesThickness = 10
+                })
+                numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
                 addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
                 addFilter(fade)
                 app.viewPort.addProcessor(this)
@@ -369,7 +321,6 @@ abstract class Midis2jam2(
      * @param tpf The time per frame value.
      */
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
-        if (properties.getProperty("record_lock")?.equals("true") == true) return // Input lock when recording
         setCameraSpeed(name, isPressed)
         handleCameraSetting(name, isPressed)
         if (isPressed) {

@@ -22,6 +22,8 @@ import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.getType
 
 private const val VERTICAL_FILLBAR_SCALE = 0.7f
 private const val FILLBAR_LOCATION_OFFSET = 3f
@@ -40,7 +42,7 @@ class HudController(val context: Midis2jam2) {
      * The node that contains the fillbar and text.
      */
     private val node: Node = Node().also {
-        if (context.properties.getProperty("show_hud") == "true") context.app.guiNode.attachChild(it)
+        if (context.configs.getType(SettingsConfiguration::class).showHud) context.app.guiNode.attachChild(it)
         it.move(10f, 10f, 0f)
     }
 
