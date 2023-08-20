@@ -20,15 +20,8 @@ package org.wysko.midis2jam2.instrument.algorithmic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
-import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
-import org.wysko.midis2jam2.instrument.family.brass.StageHorns
-import org.wysko.midis2jam2.instrument.family.brass.Trombone
-import org.wysko.midis2jam2.instrument.family.brass.Trumpet
-import org.wysko.midis2jam2.instrument.family.brass.Tuba
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
+import org.wysko.midis2jam2.instrument.family.brass.*
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.*
 import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings
 import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
@@ -40,22 +33,11 @@ import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion
-import org.wysko.midis2jam2.instrument.family.percussive.Agogos
-import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
-import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
-import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
-import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
-import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
+import org.wysko.midis2jam2.instrument.family.percussive.*
 import org.wysko.midis2jam2.instrument.family.piano.FifthsKeyboard
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.piano.KeyboardSkin
-import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
-import org.wysko.midis2jam2.instrument.family.pipe.Flute
-import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
-import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
-import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
-import org.wysko.midis2jam2.instrument.family.pipe.Recorder
-import org.wysko.midis2jam2.instrument.family.pipe.Whistles
+import org.wysko.midis2jam2.instrument.family.pipe.*
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -66,20 +48,8 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter
 import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
-import org.wysko.midis2jam2.instrument.family.strings.Cello
-import org.wysko.midis2jam2.instrument.family.strings.Fiddle
-import org.wysko.midis2jam2.instrument.family.strings.Harp
-import org.wysko.midis2jam2.instrument.family.strings.Viola
-import org.wysko.midis2jam2.instrument.family.strings.Violin
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiControlEvent
-import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.MidiProgramEvent
-import org.wysko.midis2jam2.midi.maxPolyphony
+import org.wysko.midis2jam2.instrument.family.strings.*
+import org.wysko.midis2jam2.midi.*
 import org.wysko.midis2jam2.util.logger
 
 /**
@@ -352,6 +322,7 @@ object InstrumentAssignment {
             103 -> Keyboard(context, events, KeyboardSkin["synth"]) // sci-fi
             105 -> Banjo(context, events)
             106 -> Shamisen(context, events)
+            108 -> Kalimba(context, events)
             110 -> Fiddle(context, events)
             112 -> TinkleBell(context, events)
             113 -> Agogos(context, events)
