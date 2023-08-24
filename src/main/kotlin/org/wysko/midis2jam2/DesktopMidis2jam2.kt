@@ -23,8 +23,10 @@ import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.getType
+import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.BackgroundController
+import org.wysko.midis2jam2.world.ImageFormatException
 import org.wysko.midis2jam2.world.KeyMap
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import javax.sound.midi.Sequencer
@@ -63,11 +65,19 @@ class DesktopMidis2jam2(
 
         KeyMap.registerMappings(app, this)
         launchSequencerWithTempoChanges()
-        BackgroundController.configureBackground(
-            configs.getType(BackgroundConfiguration::class),
-            this@DesktopMidis2jam2,
-            rootNode
-        )
+        try {
+            BackgroundController.configureBackground(
+                configs.getType(BackgroundConfiguration::class),
+                this@DesktopMidis2jam2,
+                rootNode
+            )
+        } catch (e: ImageFormatException) {
+            exit()
+            logger().errorDisp(e.message ?: "There was an error loading the images for the background.", e)
+        } catch (e: Exception) {
+            exit()
+            logger().errorDisp(e.message ?: "There was an error configuring the background.", e)
+        }
 
         logger().debug("Application initialized")
     }
@@ -152,7 +162,7 @@ class DesktopMidis2jam2(
         }
         app.run {
             stateManager.detach(this@DesktopMidis2jam2)
-            stop()
+            stop(true)
         }
         onClose()
         if (::tempoChangeCoroutine.isInitialized) {

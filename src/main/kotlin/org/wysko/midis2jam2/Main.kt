@@ -18,23 +18,26 @@
 package org.wysko.midis2jam2
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.gui.ApplicationScreen
 import org.wysko.midis2jam2.gui.TabFactory
+import org.wysko.midis2jam2.gui.components.ErrorDialog
 import org.wysko.midis2jam2.gui.components.NavigationRail
 import org.wysko.midis2jam2.gui.material.AppTheme
 import org.wysko.midis2jam2.gui.screens.*
@@ -43,11 +46,9 @@ import org.wysko.midis2jam2.gui.viewmodel.*
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalAnimationApi::class)
 fun main() = application {
     // TODO: CLI
     val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
@@ -99,111 +100,43 @@ fun main() = application {
         icon = painterResource("/ico/icon512.png"),
     ) {
         centerWindow()
-        SetupUi(
-            homeViewModel,
-            searchViewModel,
-            settingsViewModel,
-            backgroundConfigurationViewModel,
-            graphicsConfigurationViewModel,
-            soundbankConfigurationViewModel,
-            isLockPlayButton
-        ) {
-            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
-            when (backgroundConfiguration) {
-                is BackgroundConfiguration.CubemapBackground -> {
-                    if (!backgroundConfiguration.validate()) {
-                        // TODO: Show error
-                        return@SetupUi
-                    }
-                }
 
-                else -> Unit
-            }
-            Execution.start(midiFile = homeViewModel.midiFile.value!!, configurations = listOf(
-                homeViewModel.generateConfiguration(),
-                settingsViewModel.generateConfiguration(),
-                backgroundConfiguration,
-                graphicsConfigurationViewModel.generateConfiguration(),
-                soundbankConfigurationViewModel.generateConfiguration()
-            ), onStart = {
-                isLockPlayButton = true
-            }, onReady = {
-                // TODO: Anything?
-            }, onFinish = {
-                isLockPlayButton = false
-            })
-        }
-
-        if (ErrorHandling.isShowErrorDialog.value) {
-            Dialog(
-                onCloseRequest = { ErrorHandling.dismiss() },
-                state = rememberDialogState(position = WindowPosition(Alignment.Center), size = DpSize(600.dp, 400.dp)),
-                title = "Error"
-            ) {
-                val snackbarHostState = remember { SnackbarHostState() }
-                val scope = rememberCoroutineScope()
-                AppTheme(true) {
-                    Surface(modifier = Modifier.fillMaxSize()) {
-                        Scaffold(
-                            snackbarHost = {
-                                SnackbarHost(
-                                    hostState = snackbarHostState
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(16.dp)
-                                    ) {
-                                        Snackbar(
-                                            modifier = Modifier.fillMaxWidth(0.5f)
-                                        ) {
-                                            Text(it.visuals.message)
-                                        }
-                                        Spacer(modifier = Modifier.weight(1f))
-                                    }
-                                }
-                            },
-                        ) {
-                            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(painterResource("/ico/error.svg"), "Error", modifier = Modifier.size(48.dp))
-                                    Text(ErrorHandling.errorMessage.value)
-                                }
-                                OutlinedTextField(
-                                    value = ErrorHandling.errorException.value?.stackTraceToString() ?: "",
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    modifier = Modifier.fillMaxWidth().weight(1f).padding(24.dp),
-                                    textStyle = TextStyle.Default.copy(
-                                        fontFamily = FontFamily.Monospace, fontSize = 12.sp
-                                    )
-                                )
-                                Row(
-                                    horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    OutlinedButton(onClick = {
-                                        with(
-                                            StringSelection(
-                                                ErrorHandling.errorException.value?.stackTraceToString() ?: ""
-                                            )
-                                        ) {
-                                            Toolkit.getDefaultToolkit().systemClipboard.setContents(this, this)
-                                        }
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Copied to clipboard")
-                                        }
-                                    }) {
-                                        Text("Copy to clipboard")
-                                    }
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Button(onClick = { ErrorHandling.dismiss() }) {
-                                        Text("OK")
-                                    }
-                                }
+        Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
+            when (it.value) {
+                true -> ErrorDialog()
+                false -> SetupUi(
+                    homeViewModel,
+                    searchViewModel,
+                    settingsViewModel,
+                    backgroundConfigurationViewModel,
+                    graphicsConfigurationViewModel,
+                    soundbankConfigurationViewModel,
+                    isLockPlayButton
+                ) {
+                    val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                    when (backgroundConfiguration) {
+                        is BackgroundConfiguration.CubemapBackground -> {
+                            if (!backgroundConfiguration.validate()) {
+                                // TODO: Show error
+                                return@SetupUi
                             }
                         }
+
+                        else -> Unit
                     }
+                    Execution.start(midiFile = homeViewModel.midiFile.value!!, configurations = listOf(
+                        homeViewModel.generateConfiguration(),
+                        settingsViewModel.generateConfiguration(),
+                        backgroundConfiguration,
+                        graphicsConfigurationViewModel.generateConfiguration(),
+                        soundbankConfigurationViewModel.generateConfiguration()
+                    ), onStart = {
+                        isLockPlayButton = true
+                    }, onReady = {
+                        // TODO: Anything?
+                    }, onFinish = {
+                        isLockPlayButton = false
+                    })
                 }
             }
         }

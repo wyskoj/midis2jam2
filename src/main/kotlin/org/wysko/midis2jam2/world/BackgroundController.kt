@@ -99,16 +99,25 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
                 cubemap.south!!, cubemap.up!!, cubemap.down!!
             )
                 .map(::loadTexture)
-            return SkyFactory.createSky(
-                assetManager,
-                textures[0],
-                textures[1],
-                textures[2],
-                textures[3],
-                textures[4],
-                textures[5]
-            )
-                .apply { shadowMode = RenderQueue.ShadowMode.Off }
+
+            try {
+                return SkyFactory.createSky(
+                    assetManager,
+                    textures[0],
+                    textures[1],
+                    textures[2],
+                    textures[3],
+                    textures[4],
+                    textures[5]
+                )
+                    .apply { shadowMode = RenderQueue.ShadowMode.Off }
+            } catch (e: Exception) {
+                if (e.message == "Images must have same format") {
+                    throw ImageFormatException(textures.map { it.image.format })
+                } else {
+                    throw e
+                }
+            }
         }
     }
 
@@ -157,3 +166,7 @@ object BackgroundController {
         }
     }
 }
+
+class ImageFormatException(formats: List<Image.Format>) : Exception(
+    "Images must have same format. Found formats: ${formats.joinToString()}"
+)
