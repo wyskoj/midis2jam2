@@ -76,7 +76,12 @@ class DesktopMidis2jam2(
             logger().errorDisp(e.message ?: "There was an error loading the images for the background.", e)
         } catch (e: Exception) {
             exit()
-            logger().errorDisp(e.message ?: "There was an error configuring the background.", e)
+            logger().errorDisp(
+                when (e.message) {
+                    "Image width and height must be the same" -> "The background image(s) must be square."
+                    else -> e.message ?: "There was an error loading the images for the background."
+                }, e
+            )
         }
 
         logger().debug("Application initialized")
