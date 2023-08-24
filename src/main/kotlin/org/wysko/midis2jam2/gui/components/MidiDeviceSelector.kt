@@ -44,7 +44,13 @@ fun MidiDeviceSelector(
         selectedItem = selectedDevice,
         title = I18n["midi_device"].value,
         displayText = { it.name },
-        secondaryText = { MessageFormat.format(I18n["midi_device_description"].value, it.description, it.vendor) },
+        secondaryText = {
+            if (it.vendor == "Unknown vendor") {
+                it.description
+            } else {
+                MessageFormat.format(I18n["midi_device_description"].value, it.description, it.vendor)
+            }
+        },
         onItemSelected = onDeviceSelect
     )
 }
