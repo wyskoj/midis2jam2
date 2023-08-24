@@ -102,12 +102,7 @@ suspend fun main(args: Array<String>) {
             LaunchedEffect(Unit) {
                 UpdateChecker.checkForUpdates()
             }
-            // TODO: CLI
-
-
             val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
-
-
             var isLockPlayButton by remember { mutableStateOf(false) }
 
             LegacyConfigurationImporter.importLegacyConfiguration().forEach {
@@ -186,7 +181,7 @@ suspend fun main(args: Array<String>) {
                             ), onStart = {
                                 isLockPlayButton = true
                             }, onReady = {
-                                // TODO: Anything?
+                                // Nothing to do.
                             }, onFinish = {
                                 isLockPlayButton = false
                             })
