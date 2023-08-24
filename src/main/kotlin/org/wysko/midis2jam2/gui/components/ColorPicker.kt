@@ -82,18 +82,18 @@ fun ColorPicker(
         ) {
             SaturationValuePicker(overallSize, saturation, value, {
                 saturation = it
-                setColor(computedColor.toArgb())
             }, {
                 value = it
+            }, hue, circleSize) {
                 setColor(computedColor.toArgb())
-            }, hue, circleSize)
-            HuePicker(overallSize, hue) {
+            }
+            HuePicker(overallSize, hue, {
                 hue = it
+            }) {
                 setColor(computedColor.toArgb())
             }
             Column(
-                Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
+                Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
             ) {
                 OutlinedTextField(hex, { input ->
                     hex = input
@@ -114,7 +114,7 @@ fun ColorPicker(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun HuePicker(
-    size: Int, hue: Float, setHue: (Float) -> Unit
+    size: Int, hue: Float, setHue: (Float) -> Unit, onRelease: () -> Unit = {}
 ) {
     var mouseDown by remember { mutableStateOf(false) }
     Surface(
@@ -136,8 +136,8 @@ private fun HuePicker(
             PointerEventType.Release
         ) {
             mouseDown = false
-        }, color = Color.Gray,
-        shape = MaterialTheme.shapes.medium
+            onRelease()
+        }, color = Color.Gray, shape = MaterialTheme.shapes.medium
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             for (i in 0..size) {
@@ -165,7 +165,8 @@ private fun SaturationValuePicker(
     setSaturation: (Float) -> Unit,
     setValue: (Float) -> Unit,
     hue: Float,
-    circleSize: Int
+    circleSize: Int,
+    onRelease: () -> Unit = {}
 ) {
     var mouseDown by remember { mutableStateOf(false) }
     Surface(
@@ -191,8 +192,8 @@ private fun SaturationValuePicker(
             PointerEventType.Release
         ) {
             mouseDown = false
-        }, color = Color.Gray,
-        shape = MaterialTheme.shapes.medium
+            onRelease()
+        }, color = Color.Gray, shape = MaterialTheme.shapes.medium
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             for (i in 0..size) {
