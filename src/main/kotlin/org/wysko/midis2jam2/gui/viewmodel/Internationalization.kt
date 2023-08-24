@@ -34,7 +34,7 @@ object I18n {
             if (LOCALE_FILE.exists()) {
                 Locale(LOCALE_FILE.readText())
             } else {
-                Locale.getDefault()
+                Locale(Locale.getDefault().language)
             }
         } catch (e: Exception) {
             logger().error("Failed to load locale from file.", e)
