@@ -18,7 +18,6 @@
 package org.wysko.midis2jam2
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,13 +41,14 @@ import org.wysko.midis2jam2.gui.components.NavigationRail
 import org.wysko.midis2jam2.gui.material.AppTheme
 import org.wysko.midis2jam2.gui.screens.*
 import org.wysko.midis2jam2.gui.util.centerWindow
+import org.wysko.midis2jam2.gui.util.registerDragAndDrop
 import org.wysko.midis2jam2.gui.viewmodel.*
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling
 
 
-@OptIn(ExperimentalAnimationApi::class)
+@Suppress("kotlin:S1151")
 fun main() = application {
     // TODO: CLI
     val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
@@ -100,7 +100,9 @@ fun main() = application {
         icon = painterResource("/ico/icon512.png"),
     ) {
         centerWindow()
-
+        registerDragAndDrop {
+            homeViewModel.selectMidiFile(it)
+        }
         Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
             when (it.value) {
                 true -> ErrorDialog()
