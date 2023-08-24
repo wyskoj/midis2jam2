@@ -17,7 +17,8 @@
 
 package org.wysko.midis2jam2.gui
 
-import org.wysko.midis2jam2.gui.viewmodel.I18n
+import org.wysko.midis2jam2.util.Utils.getHTML
+import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.util.logger
 import java.awt.Desktop
 import java.io.IOException
@@ -34,10 +35,10 @@ object UpdateChecker {
         Thread {
             try {
                 val bundle = ResourceBundle.getBundle("i18n.midis2jam2")
-//                val html = getHTML("https://midis2jam2.xyz/api/update?v=" + resourceToString("/version.txt"))
+                val html = getHTML("https://midis2jam2.xyz/api/update?v=" + resourceToString("/version.txt"))
                 val jep = JEditorPane().apply {
                     contentType = "text/html"
-                    text = I18n["update.warning"].value
+                    text = bundle.getString("update.warning")
                     isEditable = false
                     isOpaque = false
                     addHyperlinkListener { hle: HyperlinkEvent ->
@@ -50,11 +51,11 @@ object UpdateChecker {
                         }
                     }
                 }
-                if (true) {
+                if (html.contains("Out of")) {
                     JOptionPane.showMessageDialog(
                         null,
                         jep,
-                        I18n["update.update_available"].value,
+                        bundle.getString("update.update_available"),
                         JOptionPane.WARNING_MESSAGE
                     )
                     logger().warn("midis2jam2 is out of date!")
