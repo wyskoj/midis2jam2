@@ -30,6 +30,7 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Hand
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
+import org.wysko.midis2jam2.util.logger
 import java.awt.Desktop
 import java.net.URL
 
@@ -58,8 +59,8 @@ fun TextWithLink(
             text = formattedText,
             onClick = { offset ->
                 formattedText.getStringAnnotations(tag = "link", start = offset, end = offset).firstOrNull()?.let {
-                        browseOrOpen(link)
-                    }
+                    browseOrOpen(link)
+                }
             },
             style = style.copy(color = MaterialTheme.colorScheme.onSurface),
             onTextLayout = { textLayout = it },
@@ -132,6 +133,6 @@ private fun browseOrOpen(link: Linkable) {
             is Linkable.File -> Desktop.getDesktop().open(link.file)
         }
     } catch (e: Throwable) {
-        e.printStackTrace()
+        {}.logger().error("Could not open link \"$link\"", e)
     }
 }

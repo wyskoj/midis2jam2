@@ -49,6 +49,7 @@ import java.awt.datatransfer.StringSelection
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
+    // TODO: CLI
     val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
 
     val homeViewModel = HomeViewModel.create()

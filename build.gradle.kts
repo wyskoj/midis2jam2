@@ -45,7 +45,7 @@ tasks.compileJava {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
     }
 }
 
@@ -89,9 +89,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
 
-    // Theme
-    implementation("com.formdev:flatlaf:2.4")
-
     // Installer
     implementation("com.install4j:install4j-runtime:8.0.7")
 
@@ -123,18 +120,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     // Logging
-
-    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
-
-    // OS analysis
-    implementation("com.github.oshi:oshi-core:6.2.2")
-
-    // Database
-    implementation("mysql:mysql-connector-java:8.0.29")
-
-    // Video encoding
-    implementation("io.humble:humble-video-all:0.3.0")
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
