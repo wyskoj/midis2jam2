@@ -51,7 +51,7 @@ object I18n {
     private var _strings: MutableState<ResourceBundle> = mutableStateOf(getStringsFromResourceBundle(_currentLocale))
 
     private val supportedLocales =
-        I18n::class.java.getResource("/supported-i18n.txt")!!.readText().split("\n").map { Locale(it) }
+        I18n::class.java.getResource("/supported-i18n.txt")!!.readText().split(System.lineSeparator()).map { Locale(it) }
 
     /**
      * Gets the string associated with the given key.
