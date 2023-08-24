@@ -28,6 +28,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -58,8 +60,11 @@ fun SearchScreen(
     val showProgress by searchViewModel.showProgress.collectAsState()
     val showError by searchViewModel.showError.collectAsState()
     val scope = rememberCoroutineScope()
+    var focusIndex by remember { mutableStateOf(0) }
 
-    DirectoryPickerComponent(showDirPicker, { showDirPicker = it }, searchViewModel)
+    DirectoryPickerComponent(showDirPicker, { showDirPicker = it }, searchViewModel, focusIndex) {
+        focusIndex = it
+    }
     ProgressIndicatorComponent(showProgress, indexProgress)
     ErrorSnackbarComponent(showError, snackbarHost, scope)
 
@@ -77,19 +82,25 @@ fun SearchScreen(
         searchScreenData = searchScreenData,
         searchScreenActions = searchScreenActions,
         selectedDirectory = selectedDirectory,
-        showProgress = showProgress
+        showProgress = showProgress,
+        focusIndex = focusIndex
     )
 }
 
 @Composable
 private fun DirectoryPickerComponent(
-    showDirPicker: Boolean, setShowDirPicker: (Boolean) -> Unit, searchViewModel: SearchViewModel
+    showDirPicker: Boolean,
+    setShowDirPicker: (Boolean) -> Unit,
+    searchViewModel: SearchViewModel,
+    focusIndex: Int,
+    setFocusIndex: (Int) -> Unit
 ) {
     DirectoryPicker(showDirPicker) { path ->
         setShowDirPicker(false)
         path?.let {
             searchViewModel.directorySelected(it)
         }
+        setFocusIndex(focusIndex + 1)
     }
 }
 
@@ -139,13 +150,14 @@ private fun SearchScreenContents(
     searchScreenData: SearchScreenData,
     searchScreenActions: SearchScreenActions,
     selectedDirectory: String,
-    showProgress: Boolean
+    showProgress: Boolean,
+    focusIndex: Int
 ) {
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
     ) {
         HeaderTexts(showProgress, searchScreenActions.cancelIndex)
-        DirectoryTextField(searchScreenActions.showDirPicker, selectedDirectory)
+        DirectoryTextField(searchScreenActions.showDirPicker, selectedDirectory, focusIndex)
         Spacer(modifier = Modifier.height(16.dp))
         Columns(
             searchScreenData.searchViewModel,
@@ -189,11 +201,12 @@ private fun HeaderTexts(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DirectoryTextField(showDirPicker: () -> Unit, selectedDirectory: String) {
+private fun DirectoryTextField(showDirPicker: () -> Unit, selectedDirectory: String, focusIndex: Int) {
+    val focusRequester = remember { FocusRequester() }
     Row(
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TextField(modifier = Modifier.focusable(false).fillMaxWidth(),
+        TextField(modifier = Modifier.focusable(false).fillMaxWidth().focusRequester(focusRequester),
             value = selectedDirectory,
             onValueChange = { },
             label = { Text(I18n["search_directory"].value) },
@@ -204,6 +217,13 @@ private fun DirectoryTextField(showDirPicker: () -> Unit, selectedDirectory: Str
                     Icon(Icons.Default.List, contentDescription = I18n["browse"].value)
                 }
             })
+    }
+
+    DisposableEffect(focusIndex) {
+        if (focusIndex != 0) {
+            focusRequester.requestFocus()
+        }
+        onDispose { }
     }
 }
 

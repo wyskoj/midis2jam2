@@ -71,6 +71,7 @@ fun HomeScreen(
 
     val scope = rememberCoroutineScope()
     var showFilePicker by remember { mutableStateOf(false) }
+    var focusCount by remember { mutableStateOf(0) }
 
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
@@ -81,7 +82,7 @@ fun HomeScreen(
             Midis2jam2Logo(Modifier.align(Alignment.CenterHorizontally))
             SelectMidiFileRow(midiFile, {
                 showFilePicker = true
-            }, openMidiSearch, flicker)
+            }, openMidiSearch, flicker, focusCount)
             SelectMidiDeviceRow(midiDevices, selectedMidiDevice, homeViewModel) {
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -113,20 +114,23 @@ fun HomeScreen(
         path?.let {
             homeViewModel.selectMidiFile(File(it.path))
         }
+        focusCount++
     }
 }
 
 @Composable
 private fun SelectMidiFileRow(
-    midiFile: File?, openMidiFileSelector: () -> Unit, openMidiSearch: () -> Unit, flicker: Boolean
+    midiFile: File?, openMidiFileSelector: () -> Unit, openMidiSearch: () -> Unit, flicker: Boolean, focusCount: Int
 ) {
     val flickerSize by animateFloatAsState(if (flicker) 1.05f else 1f)
     Row(
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         MidiFileSelector(
-            selectedMidiFile = midiFile?.name ?: "", modifier = Modifier.weight(1f).scale(flickerSize)
-        ) { openMidiFileSelector() }
+            selectedMidiFile = midiFile?.name ?: "", modifier = Modifier.weight(1f).scale(flickerSize), focusCount = focusCount
+        ) {
+            openMidiFileSelector()
+        }
 
         ToolTip(I18n["search"].value) {
             IconButton({ openMidiSearch() }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {

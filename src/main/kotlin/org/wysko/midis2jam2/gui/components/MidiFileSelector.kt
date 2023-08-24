@@ -25,8 +25,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
@@ -35,16 +39,15 @@ import org.wysko.midis2jam2.gui.viewmodel.I18n
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MidiFileSelector(
-    modifier: Modifier = Modifier,
-    selectedMidiFile: String,
-    openMidiFileBrowse: () -> Unit,
+    modifier: Modifier = Modifier, selectedMidiFile: String, focusCount: Int, openMidiFileBrowse: () -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
     ) {
-        TextField(modifier = Modifier.focusable(false).fillMaxWidth(),
+        TextField(modifier = Modifier.focusable(false).fillMaxWidth().focusRequester(focusRequester),
             value = selectedMidiFile,
             onValueChange = { },
             label = { Text(I18n["midi_file"].value) },
@@ -52,11 +55,20 @@ fun MidiFileSelector(
             readOnly = true,
             trailingIcon = {
                 ToolTip(I18n["browse"].value) {
-                    IconButton(openMidiFileBrowse, Modifier.pointerHoverIcon(PointerIcon.Hand)) {
+                    IconButton({
+                        openMidiFileBrowse()
+                    }, Modifier.pointerHoverIcon(PointerIcon.Hand)) {
                         Icon(Icons.Default.List, contentDescription = I18n["browse"].value)
                     }
                 }
             })
 
+    }
+
+    DisposableEffect(focusCount) {
+        if (focusCount != 0) {
+            focusRequester.requestFocus()
+        }
+        onDispose { }
     }
 }
