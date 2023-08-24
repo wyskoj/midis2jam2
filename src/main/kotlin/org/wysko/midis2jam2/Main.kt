@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.install4j.api.launcher.SplashScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.gui.ApplicationScreen
@@ -47,17 +48,16 @@ import org.wysko.midis2jam2.gui.viewmodel.*
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling
+import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
+import org.wysko.midis2jam2.util.logger
+import java.io.File
+import javax.swing.JOptionPane
+import kotlin.system.exitProcess
 
 
 @Suppress("kotlin:S1151")
-fun main() = application {
-    LaunchedEffect(Unit) {
-        UpdateChecker.checkForUpdates()
-    }
-    // TODO: CLI
-
-
-    val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
+suspend fun main(args: Array<String>) {
+    SplashScreen.writeMessage("Loading...")
 
     val homeViewModel = HomeViewModel.create()
     val searchViewModel = SearchViewModel()
@@ -66,89 +66,138 @@ fun main() = application {
     val graphicsConfigurationViewModel = GraphicsConfigurationViewModel.create()
     val soundbankConfigurationViewModel = SoundbankConfigurationViewModel.create()
 
-    var isLockPlayButton by remember { mutableStateOf(false) }
-
-    LegacyConfigurationImporter.importLegacyConfiguration().forEach {
-        it?.let {
-            when (it) {
-                is HomeConfiguration -> homeViewModel.run {
-                    applyConfiguration(it)
-                    onConfigurationChanged(generateConfiguration())
-                }
-
-                is SettingsConfiguration -> settingsViewModel.run {
-                    applyConfiguration(it)
-                    onConfigurationChanged(generateConfiguration())
-                }
-
-                is BackgroundConfiguration -> backgroundConfigurationViewModel.run {
-                    applyConfiguration(it)
-                    onConfigurationChanged(generateConfiguration())
-                }
-
-                is GraphicsConfiguration -> graphicsConfigurationViewModel.run {
-                    applyConfiguration(it)
-                    onConfigurationChanged(generateConfiguration())
-                }
-
-                is SoundbankConfiguration -> soundbankConfigurationViewModel.run {
-                    applyConfiguration(it)
-                    onConfigurationChanged(generateConfiguration())
+    if (args.isNotEmpty()) {
+        val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+        when (backgroundConfiguration) {
+            is BackgroundConfiguration.CubemapBackground -> {
+                if (!backgroundConfiguration.validate()) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "The cubemap background configuration is invalid. Please fix it in the settings.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                    return
                 }
             }
-        }
-    }
 
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = I18n["midis2jam2_window_title"].value,
-        state = windowState,
-        icon = painterResource("/ico/icon512.png"),
-    ) {
-        centerWindow()
-        registerDragAndDrop {
-            homeViewModel.selectMidiFile(it)
+            else -> Unit
         }
-        Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
-            when (it.value) {
-                true -> ErrorDialog()
-                false -> SetupUi(
-                    homeViewModel,
-                    searchViewModel,
-                    settingsViewModel,
-                    backgroundConfigurationViewModel,
-                    graphicsConfigurationViewModel,
-                    soundbankConfigurationViewModel,
-                    isLockPlayButton
-                ) {
-                    val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
-                    when (backgroundConfiguration) {
-                        is BackgroundConfiguration.CubemapBackground -> {
-                            if (!backgroundConfiguration.validate()) {
-                                // TODO: Show error
-                                return@SetupUi
-                            }
+        Execution.start(midiFile = File(args.first()), configurations = listOf(
+            homeViewModel.generateConfiguration(),
+            settingsViewModel.generateConfiguration(),
+            backgroundConfiguration,
+            graphicsConfigurationViewModel.generateConfiguration(),
+            soundbankConfigurationViewModel.generateConfiguration()
+        ), onStart = {
+
+        }, onReady = {
+            SplashScreen.hide()
+        }, onFinish = {
+            exitProcess(0)
+        })
+        delay(Long.MAX_VALUE)
+    } else {
+        application {
+            LaunchedEffect(Unit) {
+                UpdateChecker.checkForUpdates()
+            }
+            // TODO: CLI
+
+
+            val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
+
+
+            var isLockPlayButton by remember { mutableStateOf(false) }
+
+            LegacyConfigurationImporter.importLegacyConfiguration().forEach {
+                it?.let {
+                    when (it) {
+                        is HomeConfiguration -> homeViewModel.run {
+                            applyConfiguration(it)
+                            onConfigurationChanged(generateConfiguration())
                         }
 
-                        else -> Unit
+                        is SettingsConfiguration -> settingsViewModel.run {
+                            applyConfiguration(it)
+                            onConfigurationChanged(generateConfiguration())
+                        }
+
+                        is BackgroundConfiguration -> backgroundConfigurationViewModel.run {
+                            applyConfiguration(it)
+                            onConfigurationChanged(generateConfiguration())
+                        }
+
+                        is GraphicsConfiguration -> graphicsConfigurationViewModel.run {
+                            applyConfiguration(it)
+                            onConfigurationChanged(generateConfiguration())
+                        }
+
+                        is SoundbankConfiguration -> soundbankConfigurationViewModel.run {
+                            applyConfiguration(it)
+                            onConfigurationChanged(generateConfiguration())
+                        }
                     }
-                    Execution.start(midiFile = homeViewModel.midiFile.value!!, configurations = listOf(
-                        homeViewModel.generateConfiguration(),
-                        settingsViewModel.generateConfiguration(),
-                        backgroundConfiguration,
-                        graphicsConfigurationViewModel.generateConfiguration(),
-                        soundbankConfigurationViewModel.generateConfiguration()
-                    ), onStart = {
-                        isLockPlayButton = true
-                    }, onReady = {
-                        // TODO: Anything?
-                    }, onFinish = {
-                        isLockPlayButton = false
-                    })
+                }
+            }
+
+            Window(
+                onCloseRequest = ::exitApplication,
+                title = I18n["midis2jam2_window_title"].value,
+                state = windowState,
+                icon = painterResource("/ico/icon512.png"),
+            ) {
+                centerWindow()
+                registerDragAndDrop {
+                    homeViewModel.selectMidiFile(it)
+                }
+                Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
+                    when (it.value) {
+                        true -> ErrorDialog()
+                        false -> SetupUi(
+                            homeViewModel,
+                            searchViewModel,
+                            settingsViewModel,
+                            backgroundConfigurationViewModel,
+                            graphicsConfigurationViewModel,
+                            soundbankConfigurationViewModel,
+                            isLockPlayButton
+                        ) {
+                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                            when (backgroundConfiguration) {
+                                is BackgroundConfiguration.CubemapBackground -> {
+                                    if (!backgroundConfiguration.validate()) {
+                                        logger().errorDisp(
+                                            "Background configuration is invalid. Perhaps you forgot to set a texture?",
+                                            Throwable("Invalid background configuration")
+                                        )
+                                        return@SetupUi
+                                    }
+                                }
+
+                                else -> Unit
+                            }
+                            Execution.start(midiFile = homeViewModel.midiFile.value!!, configurations = listOf(
+                                homeViewModel.generateConfiguration(),
+                                settingsViewModel.generateConfiguration(),
+                                backgroundConfiguration,
+                                graphicsConfigurationViewModel.generateConfiguration(),
+                                soundbankConfigurationViewModel.generateConfiguration()
+                            ), onStart = {
+                                isLockPlayButton = true
+                            }, onReady = {
+                                // TODO: Anything?
+                            }, onFinish = {
+                                isLockPlayButton = false
+                            })
+                        }
+                    }
                 }
             }
         }
+
     }
+
 }
 
 /**
