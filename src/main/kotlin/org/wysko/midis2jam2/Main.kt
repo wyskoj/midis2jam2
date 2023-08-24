@@ -36,6 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.gui.ApplicationScreen
 import org.wysko.midis2jam2.gui.TabFactory
+import org.wysko.midis2jam2.gui.UpdateChecker
 import org.wysko.midis2jam2.gui.components.ErrorDialog
 import org.wysko.midis2jam2.gui.components.NavigationRail
 import org.wysko.midis2jam2.gui.material.AppTheme
@@ -50,7 +51,12 @@ import org.wysko.midis2jam2.util.ErrorHandling
 
 @Suppress("kotlin:S1151")
 fun main() = application {
+    LaunchedEffect(Unit) {
+        UpdateChecker.checkForUpdates()
+    }
     // TODO: CLI
+
+
     val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
 
     val homeViewModel = HomeViewModel.create()
