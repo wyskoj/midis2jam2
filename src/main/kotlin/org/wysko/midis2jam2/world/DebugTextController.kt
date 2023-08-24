@@ -18,15 +18,31 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.font.BitmapText
+import com.jme3.material.Material
+import com.jme3.material.RenderState
+import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
+import com.jme3.scene.shape.Quad
 import org.lwjgl.opengl.GL11
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.Percussion
 import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.wrap
 
+private val OPERATING_SYSTEM by lazy {
+    "${System.getProperty("os.arch")} / ${System.getProperty("os.name")} / ${
+        System.getProperty(
+            "os.version"
+        )
+    }"
+}
 private val GL_RENDERER: String by lazy { GL11.glGetString(GL11.GL_RENDERER) ?: "UNKNOWN GL_RENDERER" }
+private val JVM_INFORMATION by lazy {
+    "${System.getProperty("java.vm.name")}, ${System.getProperty("java.vm.vendor")}, ${System.getProperty("java.vm.version")}"
+}
 
 /**
  * Draws debug text on the screen.
@@ -37,10 +53,22 @@ class DebugTextController(val context: Midis2jam2) {
 
     private val text = BitmapText(context.assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
         context.app.guiNode.attachChild(this)
+        setLocalTranslation(16f, context.app.viewPort.camera.height - 16f, 0f)
         cullHint = Spatial.CullHint.Always
     }
 
     private val percussionText = BitmapText(context.assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
+        context.app.guiNode.attachChild(this)
+        setLocalTranslation(1024f, context.app.viewPort.camera.height - 16f, 0f)
+        cullHint = Spatial.CullHint.Always
+    }
+
+    private val darkBackground = Geometry("DebugDarken", Quad(10000f, 10000f)).apply {
+        material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+            setColor("Color", ColorRGBA(0f, 0f, 0f, 0.5f))
+            additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+        }
+        setLocalTranslation(0f, 0f, -1f)
         context.app.guiNode.attachChild(this)
         cullHint = Spatial.CullHint.Always
     }
@@ -52,6 +80,7 @@ class DebugTextController(val context: Midis2jam2) {
         set(value) {
             text.cullHint = value.cullHint()
             percussionText.cullHint = value.cullHint()
+            darkBackground.cullHint = value.cullHint()
             field = value
         }
 
@@ -68,11 +97,9 @@ class DebugTextController(val context: Midis2jam2) {
     fun tick(tpf: Float) {
         if (enabled) {
             with(text) {
-                setLocalTranslation(0f, context.app.viewPort.camera.height.toFloat(), 0f)
                 text = context.debugText(tpf, context.timeSinceStart)
             }
             with(percussionText) {
-                setLocalTranslation(1000f, context.app.viewPort.camera.height.toFloat(), 0f)
                 text = context.debugTextPercussion()
             }
         }
@@ -81,7 +108,12 @@ class DebugTextController(val context: Midis2jam2) {
 
 private fun Midis2jam2.debugTextPercussion(): String {
     return buildString {
-        append(this@debugTextPercussion.instruments.firstOrNull { it is Percussion } ?: "NO PERCUSSION")
+        this@debugTextPercussion.instruments.firstOrNull { it is Percussion }?.let {
+            appendLine("Percussion:")
+            appendLine(it.toString())
+        } ?: run {
+            appendLine("NO PERCUSSION")
+        }
     }
 }
 
@@ -91,57 +123,64 @@ private fun Midis2jam2.debugTextPercussion(): String {
 private fun Midis2jam2.debugText(tpf: Float, time: Double): String {
     return buildString {
         /* midis2jam2 version and build */
-        append("midis2jam2 v${this@debugText.version} (built at ${this@debugText.build})\n")
+        append(
+            "midis2jam2 v${this@debugText.version} (built at ${this@debugText.build})\n"
+        )
 
         /* computer operating system and renderer */
         appendLine()
-        append("OS: $operatingSystem\n")
-        append("Graphics: $GL_RENDERER\n")
+        appendLine("OS:  $OPERATING_SYSTEM")
+        appendLine("GPU: $GL_RENDERER")
+        appendLine("JVM: $JVM_INFORMATION")
+        appendLine(
+            "JRE: ${
+                with(Runtime.getRuntime()) {
+                    "${availableProcessors()} Cores / ${freeMemory() / 1024 / 1024}/${totalMemory() / 1024 / 1024} MB / ${maxMemory() / 1024 / 1024}MB max"
+                }
+            }"
+        )
+        appendLine("${String.format("%.0f", 1 / tpf)} FPS")
 
         /* settings */
         appendLine()
+        appendLine("Settings:")
+        appendLine(this@debugText.configs.joinToString().wrap(80))
 
-        /* fps and time */
         appendLine()
-        append("${String.format("%.0f", 1 / tpf)} fps\n")
-        append("${String.format("%.2f", time)}s / ${String.format("%.2f", this@debugText.file.length)}s\n")
+        appendLine("File:")
+        with(this@debugText.file) {
+            appendLine("$name - $division TPQN")
+            appendLine("${String.format("%.2f", time)}s / ${String.format("%.2f", length)}s")
+        }
 
         /* camera position and rotation */
         appendLine()
-        append("cam: ${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}\n")
-
-        /* camera position and rotation */
-        appendLine()
-        append(
-            "camstate: ${this@debugText.cameraState}\ncam enabled: " +
-                    "a:${this@debugText.autocamController.enabled} " +
-                    "f:${this@debugText.flyByCamera.isEnabled} " +
-                    "s:${this@debugText.slideCamController.isEnabled}\n"
-        )
+        appendLine("Camera:")
+        appendLine("${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}")
+        appendLine(this@debugText.cameraState)
 
         /* instruments strings */
         appendLine()
+        appendLine("Instruments:")
         append("${this@debugText.instruments.filter { it !is Percussion }.joinToString("")}\n")
     }
 }
 
 private fun Quaternion.sigFigs(): String {
     return String.format(
-        "[ w = %5.2f, x = %5.2f, y = %5.2f, z = %5.2f ]",
-        w,
+        "%5.2f / %5.2f / %5.2f / %5.2f",
         x,
         y,
-        z
+        z,
+        w
     )
 }
 
 private fun Vector3f.sigFigs(): String {
     return String.format(
-        "[ x = %7.2f, y = %7.2f, z = %7.2f ]",
+        "%7.2f / %7.2f / %7.2f",
         x,
         y,
         z
     )
 }
-
-private val operatingSystem = "${System.getProperty("os.name")} / ${System.getProperty("os.version")}"
