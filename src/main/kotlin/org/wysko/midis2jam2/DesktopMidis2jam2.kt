@@ -129,6 +129,11 @@ class DesktopMidis2jam2(
             exit()
         }
 
+        /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */
+        if (skippedTicks++ < 3) {
+            return
+        }
+
         shadowController?.tick()
         standController.tick()
         lyricController.tick(timeSinceStart)
@@ -138,10 +143,7 @@ class DesktopMidis2jam2(
         slideCamController.tick(tpf, timeSinceStart)
         preventCameraFromLeaving(app.camera)
 
-        /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */
-        if (skippedTicks++ < 3) {
-            return
-        }
+
 
         if (sequencer.isOpen && !paused) {
             /* Increment time if sequencer is ready / playing */

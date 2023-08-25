@@ -84,7 +84,7 @@ class SmoothFlyByCamera(
     }
 
     init {
-        setTargetTransform(Vector3f(-2f, 102f, 144f), Quaternion().fromAngles(Utils.rad(18.44f), Utils.rad(180f), 0f))
+        setTargetTransform(Vector3f(-2f, 92f, 134f), Quaternion().fromAngles(Utils.rad(18.44f), Utils.rad(180f), 0f))
     }
 
     /**
