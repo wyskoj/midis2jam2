@@ -44,7 +44,7 @@ private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
  * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
  * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
  */
-private const val GUITAR_VECTOR_THRESHOLD = 3
+private const val GUITAR_VECTOR_THRESHOLD = 8
 
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/Guitar.json"))
@@ -263,13 +263,12 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 
     override fun moveForMultiChannel(delta: Float) {
         val v = updateInstrumentIndex(delta) * 1.5f
-        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(v)
         /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
         if (v < GUITAR_VECTOR_THRESHOLD) {
-            offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(v)
+            offsetNode.localTranslation = Vector3f(5f, -2f, 0f).mult(v)
         } else {
-            val vector = Vector3f(5f, -4f, 0f).mult(v)
-            vector.setY(-4f * GUITAR_VECTOR_THRESHOLD)
+            val vector = Vector3f(5f, -2f, 0f).mult(v)
+            vector.setY(-2f * GUITAR_VECTOR_THRESHOLD)
             offsetNode.localTranslation = vector
         }
     }
