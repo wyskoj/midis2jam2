@@ -71,8 +71,8 @@ fun SoundbankConfigurationScreen(
     FilePicker(
         showFilePicker, fileExtensions = SOUNDBANK_FILE_EXTENSIONS
     ) { path ->
+        showFilePicker = false
         path?.let {
-            showFilePicker = false
             viewModel.addSoundbank(it.path)
         }
     }
