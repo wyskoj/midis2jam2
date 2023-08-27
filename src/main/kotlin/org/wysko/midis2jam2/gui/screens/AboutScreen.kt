@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.gui.components.Midis2jam2Logo
 import org.wysko.midis2jam2.gui.components.TextWithLink
 import org.wysko.midis2jam2.gui.loadDependencies
 import org.wysko.midis2jam2.gui.viewmodel.I18n
+import org.wysko.midis2jam2.util.Utils
 
 @Composable
 fun AboutScreen() {
@@ -41,7 +42,7 @@ fun AboutScreen() {
             Midis2jam2Logo()
             Text(I18n["midis2jam2_description"].value, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(16.dp))
-            Text("Copyright © MMXXIII Jacob Wysko")
+            Text("Copyright © MMXXIII Jacob Wysko • ${Utils.resourceToString("/version.txt")}")
             Text("This program comes with absolutely no warranty.")
             TextWithLink(
                 text = "See the GNU General Public License for more details.",
