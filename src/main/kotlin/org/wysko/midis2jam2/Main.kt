@@ -26,7 +26,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -43,6 +46,7 @@ import org.wysko.midis2jam2.gui.components.NavigationRail
 import org.wysko.midis2jam2.gui.material.AppTheme
 import org.wysko.midis2jam2.gui.screens.*
 import org.wysko.midis2jam2.gui.util.centerWindow
+import org.wysko.midis2jam2.gui.util.openHelp
 import org.wysko.midis2jam2.gui.util.registerDragAndDrop
 import org.wysko.midis2jam2.gui.viewmodel.*
 import org.wysko.midis2jam2.starter.Execution
@@ -55,6 +59,7 @@ import javax.swing.JOptionPane
 import kotlin.system.exitProcess
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("kotlin:S1151")
 suspend fun main(args: Array<String>) {
     SplashScreen.writeMessage("Loading...")
@@ -141,6 +146,12 @@ suspend fun main(args: Array<String>) {
                 title = I18n["midis2jam2_window_title"].value,
                 state = windowState,
                 icon = painterResource("/ico/icon512.png"),
+                onKeyEvent = {
+                    when (it.key) {
+                        Key.F1 -> openHelp()
+                        else -> false
+                    }
+                }
             ) {
                 centerWindow()
                 registerDragAndDrop {
