@@ -30,7 +30,7 @@ private const val RADIUS = 134f
 private const val Y_BASELINE = 92f
 private const val MAX_ANGLE = 0.5f
 private const val ROTATION_SPEED_FACTOR = 0.04f
-private const val DAMPENING = 0.01f
+private const val DAMPENING = 0.6f
 private const val ROTATION_DAMPENING_FACTOR = 7f
 private const val SECONDS_LEFT_UNTIL_BRAKES = 20f
 
@@ -69,11 +69,11 @@ class SlideCameraController(
                 .coerceAtMost(1f)
 
         context.app.camera.location.interpolateLocal(
-            desiredLocation(Utils.lerp(t, 0f, x)), DAMPENING
+            desiredLocation(Utils.lerp(t, 0f, x)), (DAMPENING * tpf).also { println(it) }
         )
         context.app.camera.rotation.slerp(
             lookAtRotation(context.app.camera.location.clone(), Vector3f(-2f, 47.320206f, 0f)),
-            DAMPENING * 5
+            DAMPENING * 5 * tpf
         )
         context.app.camera.rotation.normalizeLocal()
     }
