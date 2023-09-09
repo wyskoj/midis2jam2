@@ -169,7 +169,7 @@ class DesktopMidis2jam2(
         }
         app.run {
             stateManager.detach(this@DesktopMidis2jam2)
-            stop(true)
+            stop(false)
         }
         onClose()
         if (::tempoChangeCoroutine.isInitialized) {
