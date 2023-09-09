@@ -1,9 +1,0 @@
-en
-es
-fi
-fr
-no
-ru
-th
-tl
-zh
