@@ -47,7 +47,7 @@ class DesktopMidiFile(file: File) : MidiFile(
                                     )
                                 }
 
-                                TEXT_MSG, LYRIC_MSG -> {
+                                LYRIC_MSG -> {
                                     events += MidiTextEvent(time = tick, text = String(msg.data))
                                 }
 
