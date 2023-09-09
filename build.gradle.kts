@@ -78,7 +78,6 @@ dependencies {
     // JMonkeyEngine
     implementation("org.jmonkeyengine:jme3-core:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-desktop:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-plugins:3.5.2-stable")
     implementation("org.jmonkeyengine:jme3-effects:3.5.2-stable")
 
@@ -101,17 +100,31 @@ dependencies {
     // Jetpack compose
     if (project.hasProperty("targetplatform")) {
         when (project.properties["targetplatform"]) {
-            "windows" -> implementation(compose.desktop.windows_x64)
-            "macos" -> implementation(compose.desktop.macos_x64)
-            "linux" -> implementation(compose.desktop.linux_x64)
+            "windows" -> {
+                implementation(compose.desktop.windows_x64)
+                implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+            }
+
+            "macos" -> {
+                implementation(compose.desktop.macos_x64)
+                implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
+            }
+
+            "linux" -> {
+                implementation(compose.desktop.linux_x64)
+                implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+            }
+
             else -> {
                 println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
                 implementation(compose.desktop.currentOs)
+                implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
             }
         }
         println("used platform: ${project.properties["targetplatform"]}")
     } else {
         implementation(compose.desktop.currentOs)
+        implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
     }
     implementation(compose.material3)
     implementation("com.darkrockstudios:mpfilepicker:2.0.2")
@@ -124,21 +137,23 @@ dependencies {
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    archiveFileName.set("midis2jam2-${
-        if (project.hasProperty("targetplatform")) {
-            when (project.properties["targetplatform"]) {
-                "windows" -> "windows"
-                "macos" -> "macos"
-                "linux" -> "linux"
-                else -> {
-                    println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
-                    "current"
+    archiveFileName.set(
+        "midis2jam2-${
+            if (project.hasProperty("targetplatform")) {
+                when (project.properties["targetplatform"]) {
+                    "windows" -> "windows"
+                    "macos" -> "macos"
+                    "linux" -> "linux"
+                    else -> {
+                        println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
+                        "current"
+                    }
                 }
+            } else {
+                "current"
             }
-        } else {
-            "current"
-        }
-    }-${project.properties["midis2jam2Version"]}.jar")
+        }-${project.properties["midis2jam2Version"]}.jar"
+    )
 }
 
 // Configure dependency licenses
