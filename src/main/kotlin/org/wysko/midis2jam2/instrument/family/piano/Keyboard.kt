@@ -17,24 +17,25 @@
 package org.wysko.midis2jam2.instrument.family.piano
 
 import com.jme3.math.Vector3f
-import com.jme3.scene.Spatial
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
+import org.wysko.midis2jam2.instrument.family.piano.KeyColor.BLACK
+import org.wysko.midis2jam2.instrument.family.piano.KeyColor.WHITE
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.Utils.rad
 
 private val OFFSET_DIRECTION_VECTOR = Vector3f(-8.294f, 3.03f, -8.294f)
 private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
+
 
 /** The full, 88-key keyboard. */
 open class Keyboard(
     context: Midis2jam2,
     events: MutableList<MidiChannelSpecificEvent>,
-    private val skin: KeyboardSkin
+    internal val skin: KeyboardSkin
 ) : KeyedInstrument(context, events, 21, 108) {
 
     private val pitchBendController = PitchBendModulationController(context, events)
@@ -42,11 +43,18 @@ open class Keyboard(
     override val keys: Array<Key> = let {
         var whiteCount = 0
         Array(keyCount()) {
-            if (noteToKeyboardKeyColor(it + rangeLow) == KeyColor.WHITE) { // White key
-                KeyboardKey(it + rangeLow, whiteCount++)
-            } else { // Black key
-                KeyboardKey(it + rangeLow, it)
+            when (noteToKeyboardKeyColor(it + rangeLow)) {
+                WHITE -> KeyboardKey(it + rangeLow, whiteCount++)
+                BLACK -> KeyboardKey(it + rangeLow, it)
             }
+        }
+    }
+
+    init {
+        with(highestLevel) {
+            attachChild(context.loadModel("PianoCase.obj", skin.file))
+            move(-50f, 32f, -6f)
+            rotate(0f, Utils.rad(45.0), 0f)
         }
     }
 
@@ -61,59 +69,20 @@ open class Keyboard(
         offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 
-    override fun keyByMidiNote(midiNote: Int): Key? {
-        return if (midiNote > rangeHigh || midiNote < rangeLow) null else keys[midiNote - rangeLow]
-    }
-
-    /** The type Keyboard key. */
-    inner class KeyboardKey(val midiNote: Int, startPos: Int) : Key() {
-        init {
-            if (noteToKeyboardKeyColor(midiNote) == KeyColor.WHITE) { // White key
-                /* UP KEY */
-                // Front key
-                val upKeyFront = context.loadModel("PianoWhiteKeyFront.obj", skin.file)
-                // Back Key
-                val upKeyBack = context.loadModel("PianoWhiteKeyBack.obj", skin.file)
-                upNode.attachChild(upKeyFront)
-                upNode.attachChild(upKeyBack)
-                /* DOWN KEY */
-                // Front key
-                val downKeyFront = context.loadModel("PianoKeyWhiteFrontDown.obj", skin.file)
-                // Back key
-                val downKeyBack = context.loadModel("PianoKeyWhiteBackDown.obj", skin.file)
-                downNode.attachChild(downKeyFront)
-                downNode.attachChild(downKeyBack)
-                keyNode.attachChild(upNode)
-                keyNode.attachChild(downNode)
-                instrumentNode.attachChild(keyNode)
-                keyNode.move(startPos - 26f, 0f, 0f) // 26 = count(white keys) / 2
-            } else { // Black key
-                /* Up key */
-                val blackKey = context.loadModel("PianoBlackKey.obj", skin.file)
-                upNode.attachChild(blackKey)
-                /* Up key */
-                val blackKeyDown = context.loadModel("PianoKeyBlackDown.obj", skin.file)
-                downNode.attachChild(blackKeyDown)
-                keyNode.attachChild(upNode)
-                keyNode.attachChild(downNode)
-                instrumentNode.attachChild(keyNode)
-                keyNode.move(midiNote * (7 / 12f) - 38.2f, 0f, 0f) // funky math
-            }
-            downNode.cullHint = Spatial.CullHint.Always
-        }
-    }
-
-    init {
-        val pianoCase = context.loadModel("PianoCase.obj", skin.file)
-        highestLevel.attachChild(pianoCase)
-        highestLevel.move(-50f, 32f, -6f)
-        highestLevel.rotate(0f, rad(45.0), 0f)
+    override fun getKeyByMidiNote(midiNote: Int): Key? = when {
+        midiNote !in rangeLow..rangeHigh -> null
+        else -> keys[midiNote - rangeLow]
     }
 
     override fun toString(): String {
         return super.toString() + buildString {
             append(debugProperty("skin", skin.name))
         }
+    }
+
+    companion object {
+        /** The number of white keys on a keyboard. */
+        const val WHITE_KEY_COUNT: Float = 52f
     }
 }
 
@@ -122,6 +91,7 @@ open class Keyboard(
 data class KeyboardSkin(
     /** The name of the skin. */
     val name: String,
+
     /** The name of the texture file. */
     val file: String
 ) {

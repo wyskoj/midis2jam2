@@ -33,7 +33,7 @@ class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecifi
 
     override fun noteStarted(note: MidiNoteOnEvent) {
         super.noteStarted(note)
-        keyByMidiNote(note.note - 5)?.let { key ->
+        getKeyByMidiNote(note.note - 5)?.let { key ->
             key.keyNode.breadthFirstTraversal {
                 if (it is Geometry) {
                     it.material.setColor("GlowColor", glowColor(true))
@@ -44,7 +44,7 @@ class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecifi
 
     override fun noteEnded(note: MidiNoteOffEvent) {
         super.noteEnded(note)
-        keyByMidiNote(note.note - 5)?.let {
+        getKeyByMidiNote(note.note - 5)?.let {
             it.keyNode.breadthFirstTraversal { key ->
                 if (key is Geometry) {
                     key.material.setColor("GlowColor", glowColor(false))

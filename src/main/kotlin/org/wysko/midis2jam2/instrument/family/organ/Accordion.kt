@@ -141,7 +141,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         }
     }
 
-    override fun keyByMidiNote(midiNote: Int): Key {
+    override fun getKeyByMidiNote(midiNote: Int): Key {
         return keys[midiNote % 24]
     }
 

@@ -20,26 +20,23 @@ package org.wysko.midis2jam2.instrument.family.piano
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.ToggledInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.midi.*
 
-/** An instrument that uses keys to play notes. */
+/**
+ * An instrument that uses keys to play notes.
+ *
+ * @param rangeLow The lowest note that this instrument can play.
+ * @param rangeHigh The highest note that this instrument can play.
+ */
 abstract class KeyedInstrument(
-    context: Midis2jam2,
-    eventList: MutableList<MidiChannelSpecificEvent>,
-    /** The lowest note that this instrument can play. */
-    val rangeLow: Int,
-    /** The highest note that this instrument can play. */
-    val rangeHigh: Int
+    context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, val rangeLow: Int, val rangeHigh: Int
 ) : ToggledInstrument(context, eventList) {
 
-    // These note periods are only used for knowing how soon to release a key (it is dependent on the duration of the note)
+    /** The keys of this instrument. */
+    abstract val keys: Array<Key>
+
     private val notePeriods = NotePeriod.calculateNotePeriods(
-        context = context,
-        noteEvents = eventList.filterIsInstance<MidiNoteEvent>()
+        context = context, noteEvents = eventList.filterIsInstance<MidiNoteEvent>()
     ).associateBy { it.noteOff }
 
     override val eventCollector: EventCollector<MidiNoteEvent> = EventCollector(
@@ -50,28 +47,18 @@ abstract class KeyedInstrument(
             when (event) {
                 is MidiNoteOffEvent -> {
                     val np = notePeriods[event]
-                    np?.let {
-                        when {
-                            it.duration() > 0.5 -> time >= it.endTime - 0.1
-                            it.duration() > 0.2 -> time >= it.endTime - 0.05
-                            else -> time >= it.startTime + (it.duration() * 0.5)
-                        }
-                    } ?: (time >= eventTime)
+                    np?.let { processEventDuration(it, time) } ?: (time >= eventTime)
                 }
 
                 else -> time >= eventTime
             }
-        }
-    )
-
-    /** The keys of this instrument. */
-    abstract val keys: Array<Key>
+        })
 
     /** Returns the number of keys on this instrument. */
     fun keyCount(): Int = rangeHigh - rangeLow + 1
 
-    /** Returns the [Key] associated with the [midiNote], or `null` if this instrument can't animate that note. */
-    protected abstract fun keyByMidiNote(midiNote: Int): Key?
+    /** Returns the [Key] associated with the [midiNote], or `null` if this instrument can't animate the note. */
+    protected abstract fun getKeyByMidiNote(midiNote: Int): Key?
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
@@ -80,12 +67,20 @@ abstract class KeyedInstrument(
 
     override fun noteStarted(note: MidiNoteOnEvent) {
         super.noteStarted(note)
-        keyByMidiNote(note.note)?.pressKey(note)
+        getKeyByMidiNote(note.note)?.pressKey(note)
     }
 
     override fun noteEnded(note: MidiNoteOffEvent) {
         super.noteEnded(note)
-        keyByMidiNote(note.note)?.releaseKey()
+        getKeyByMidiNote(note.note)?.releaseKey()
+    }
+
+    private fun processEventDuration(it: NotePeriod, time: Double): Boolean {
+        return when {
+            it.duration() > 0.5 -> time >= it.endTime - 0.1
+            it.duration() > 0.2 -> time >= it.endTime - 0.05
+            else -> time >= it.startTime + (it.duration() * 0.5)
+        }
     }
 
     override fun toString(): String {
@@ -97,7 +92,7 @@ abstract class KeyedInstrument(
     }
 }
 
-/** Keyboards have two different colored keys: white and black. */
+/** The different colors of keys on a keyboard. */
 internal enum class KeyColor {
     /** White key color. */
     WHITE,
