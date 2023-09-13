@@ -16,45 +16,63 @@
  */
 package org.wysko.midis2jam2.instrument.family.piano
 
-import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.toQuat
+import org.wysko.midis2jam2.util.toSign
+
+private const val KEY_PRESS_ANGLE = 0.1f
+private const val KEY_RECOIL_SPEED = 20f
 
 /**
  * A single key on a [KeyedInstrument].
  */
-open class Key protected constructor() {
+abstract class Key protected constructor(
+    private val rotationAxis: Vector3f,
+    private val keyedInstrument: KeyedInstrument,
+    private val inverseRotation: Boolean = false,
+    keyboardConfiguration: KeyboardConfiguration,
+    moveValue: Float,
+    midiNote: Int,
+) {
 
     /** The uppermost node of this key. */
     val keyNode: Node = Node()
 
     /** Contains geometry for the "up" key. */
-    internal val upNode: Node = Node()
+    private val upNode: Node = Node()
 
     /** Contains geometry for the "down" key. */
-    internal val downNode: Node = Node()
+    private val downNode: Node = Node()
 
     /** Is this key being pressed? */
-    val isBeingPressed: Boolean
+    val isPressed: Boolean
         get() = currentNote != null
 
     /** The current note being animated. */
     private var currentNote: MidiNoteOnEvent? = null
 
-    private var recoiling = false
-        set(value) {
-            if (!value) {
-                downNode.cullHint = Spatial.CullHint.Always
-                upNode.cullHint = Spatial.CullHint.Dynamic
-            }
-            field = value
+    private var rotationFactor = 0f
+
+    init {
+        when (noteToKeyboardKeyColor(midiNote)) {
+            KeyColor.WHITE -> configureKeyParts(
+                configuration = keyboardConfiguration.whiteKeyConfiguration,
+                moveValue = moveValue
+            )
+
+            KeyColor.BLACK -> configureKeyParts(
+                configuration = keyboardConfiguration.blackKeyConfiguration, moveValue = moveValue
+            )
         }
-    private var recoilProgress = 0f
-    private val recoilRotationValue
-        get() = Utils.lerp(0.12f, 0f, recoilProgress)
+        attachKeysToNodes()
+        keyedInstrument.instrumentNode.attachChild(keyNode)
+        downNode.cullHint = Spatial.CullHint.Always
+    }
 
     /**
      * Animates the motion of the key.
@@ -62,17 +80,22 @@ open class Key protected constructor() {
      * @param delta the amount of time since the last frame update
      */
     open fun tick(delta: Float) {
-        if (currentNote == null && recoiling) {
-            recoilProgress += delta * 15
-
-            // Stop recoiling if we have reached the top
-            if (recoilProgress >= 1f) {
-                recoilProgress = 1f
-                recoiling = false
+        if (isPressed) {
+            rotationFactor = PercussionInstrument.velocityRecoilDampening((currentNote ?: return).velocity).toFloat()
+        } else {
+            if (rotationFactor > 0f) {
+                rotationFactor -= delta * KEY_RECOIL_SPEED
             }
-
-            keyNode.localRotation = Quaternion().fromAngles(recoilRotationValue, 0f, 0f)
         }
+        // Prevent over-rotation
+        rotationFactor = rotationFactor.coerceIn(0f..1f)
+
+        (rotationFactor == 0f).let {
+            upNode.cullHint = it.cullHint()
+            downNode.cullHint = (!it).cullHint()
+        }
+
+        keyNode.localRotation = rotationAxis.mult(rotationFactor * KEY_PRESS_ANGLE * -inverseRotation.toSign()).toQuat()
     }
 
     /**
@@ -81,17 +104,6 @@ open class Key protected constructor() {
      */
     fun pressKey(note: MidiNoteOnEvent) {
         currentNote = note
-        recoiling = false
-        keyNode.localRotation = Quaternion().fromAngles(
-            /* xAngle = */
-            (0.12f * PercussionInstrument.velocityRecoilDampening(note.velocity)).toFloat(),
-            /* yAngle = */
-            0f,
-            /* zAngle = */
-            0f
-        )
-        downNode.cullHint = Spatial.CullHint.Dynamic
-        upNode.cullHint = Spatial.CullHint.Always
     }
 
     /**
@@ -99,7 +111,42 @@ open class Key protected constructor() {
      */
     fun releaseKey() {
         currentNote = null
-        recoiling = true
-        recoilProgress = 0f
+    }
+
+    /** Attaches the up and down key nodes to the main key node. */
+    private fun attachKeysToNodes() {
+        keyNode.apply {
+            attachChild(upNode)
+            attachChild(downNode)
+        }
+    }
+
+    /** Loads the key model and attaches it to the given node. */
+    private fun loadKeyModel(frontKeyFile: String, backKeyFile: String? = null, texture: String, node: Node) {
+        node.attachChild(keyedInstrument.context.loadModel(frontKeyFile, texture))
+        backKeyFile?.let { backKey ->
+            node.attachChild(keyedInstrument.context.loadModel(backKey, texture).also { it.move(0f, -0.01f, 0f) })
+        }
+    }
+
+    /** Sets up the key parts. */
+    private fun configureKeyParts(
+        configuration: KeyConfiguration, moveValue: Float
+    ) {
+        with(configuration) {
+            when (this) {
+                is KeyConfiguration.SeparateModels -> {
+                    loadKeyModel(frontKeyFile, backKeyFile, texture, upNode)
+                    loadKeyModel(frontKeyFileDown, backKeyFileDown, texture, downNode)
+                }
+
+                is KeyConfiguration.SeparateTextures -> {
+                    loadKeyModel(frontKeyFile, backKeyFile, upTexture, upNode)
+                    loadKeyModel(frontKeyFile, backKeyFile, downTexture, downNode)
+                }
+            }
+        }
+
+        keyNode.move(rotationAxis.mult(moveValue))
     }
 }

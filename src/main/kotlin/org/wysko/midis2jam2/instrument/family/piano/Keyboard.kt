@@ -44,8 +44,8 @@ open class Keyboard(
         var whiteCount = 0
         Array(keyCount()) {
             when (noteToKeyboardKeyColor(it + rangeLow)) {
-                WHITE -> KeyboardKey(it + rangeLow, whiteCount++)
-                BLACK -> KeyboardKey(it + rangeLow, it)
+                WHITE -> KeyboardKey(this, it + rangeLow, whiteCount++)
+                BLACK -> KeyboardKey(this, it + rangeLow, it)
             }
         }
     }

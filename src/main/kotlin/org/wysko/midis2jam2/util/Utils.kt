@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.util
 import com.jme3.material.Material
 import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath
+import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Mesh
@@ -35,7 +36,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.Properties
+import java.util.*
 import java.util.stream.Collectors
 
 /** Provides various utility functions. */
@@ -194,3 +195,9 @@ fun debugAxes(context: Midis2jam2): Spatial {
 
     return node
 }
+
+fun Vector3f.toQuat(): Quaternion {
+    return Quaternion().fromAngles(this.x, this.y, this.z)
+}
+
+fun Boolean.toSign(): Float = if (this) 1f else -1f

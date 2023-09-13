@@ -16,25 +16,28 @@
  */
 package org.wysko.midis2jam2.world
 
+import com.jme3.math.Vector3f
+
 /**
  * Each axis in 3D space.
  */
 enum class Axis(
     /** The index of this axis in a 3-element array. */
-    val componentIndex: Int
+    val componentIndex: Int,
+    val identity: Vector3f,
 ) {
     /**
      * The X-axis.
      */
-    X(0),
+    X(0, Vector3f(1f, 0f, 0f)),
 
     /**
      * The Y-axis.
      */
-    Y(1),
+    Y(1, Vector3f(0f, 1f, 0f)),
 
     /**
      * The Z-axis
      */
-    Z(2)
+    Z(2, Vector3f(0f, 0f, 1f));
 }

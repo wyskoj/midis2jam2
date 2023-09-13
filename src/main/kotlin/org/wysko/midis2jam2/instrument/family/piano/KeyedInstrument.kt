@@ -86,14 +86,14 @@ abstract class KeyedInstrument(
     override fun toString(): String {
         return super.toString() + buildString {
             append(
-                debugProperty("keys", keys.joinToString(separator = "") { if (it.isBeingPressed) "X" else "_" })
+                debugProperty("keys", keys.joinToString(separator = "") { if (it.isPressed) "X" else "_" })
             )
         }
     }
 }
 
 /** The different colors of keys on a keyboard. */
-internal enum class KeyColor {
+enum class KeyColor {
     /** White key color. */
     WHITE,
 
