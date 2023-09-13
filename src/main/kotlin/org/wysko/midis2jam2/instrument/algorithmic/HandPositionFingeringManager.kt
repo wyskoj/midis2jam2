@@ -32,18 +32,18 @@ open class HandPositionFingeringManager : FingeringManager<Hands> {
 
     override fun fingering(midiNote: Int): Hands? = table[midiNote]
 
-    /** A pair of indices. */
+    /** A pair of indexes. */
     @Serializable
     data class Hands(
-        /** Left-hand index. */
+        /** The left hand index. */
         val left: Int,
-        /** Right-hand index. */
+        /** The right hand index. */
         val right: Int
     )
 
     companion object {
         /** Loads the hand position manager from a file based on the class name. */
-        fun from(`class`: Class<out Instrument>): HandPositionFingeringManager =
-            Json.decodeFromString(Utils.resourceToString("/instrument/${`class`.simpleName}.json"))
+        fun from(klass: Class<out Instrument>): HandPositionFingeringManager =
+            Json.decodeFromString(Utils.resourceToString("/instrument/${klass.simpleName}.json"))
     }
 }

@@ -21,28 +21,27 @@ import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.world.Axis
 
 /**
- * Animates the stretch of the bell of an instrument. This is seen on some woodwinds like the saxophones, clarinets,
- * etc. Classes that implement this interface are responsible for appropriately stretching the bell.
+ * Animates the stretch of an instrument's bell.
+ * Classes that implement this interface are responsible for appropriately stretching the bell.
  */
 interface BellStretcher {
     /**
-     * Sets the amount of bell stretch by the given amount. You should call this method on every frame.
+     * Sets the amount of bell stretch by the given amount. Call this method on every frame.
      *
-     * @param stretchAmount the amount to stretch the bell, from 0.0 (resting) to 1.0 (fully stretched)
+     * @param stretchAmount the amount to stretch the bell, from `0.0` (resting) to `1.0` (fully stretched)
      */
     fun tick(stretchAmount: Double)
 
     /**
-     * Sets the amount of bell stretch from the current [NotePeriod]. You should call this method on every frame.
+     * Sets the amount of bell stretch from the current [NotePeriod]. Call this method on every frame.
      *
-     * @param period the note period from which to calculate the amount to stretch the bell by
+     * @param period NotePeriod from which to calculate the amount to stretch the bell by.
      */
     fun tick(period: NotePeriod?, time: Double)
 }
 
 /** Standard implementation of [BellStretcher]. */
 class StandardBellStretcher(
-
     /** The maximum stretch amount applied to the bell. */
     private val stretchiness: Float,
 
@@ -53,22 +52,12 @@ class StandardBellStretcher(
     private val bell: Spatial
 ) : BellStretcher {
 
-    override fun tick(stretchAmount: Double) {
-        scaleBell(((stretchiness - 1) * stretchAmount + 1).toFloat())
-    }
-
     /** The current scale of the bell. */
     var scale: Float = 1f
         private set
 
-    /** Sets the scale of the bell, appropriately and automatically scaling on the correct axis. */
-    private fun scaleBell(scale: Float) {
-        this.scale = scale
-        bell.setLocalScale(
-            if (stretchAxis === Axis.X) scale else 1f,
-            if (stretchAxis === Axis.Y) scale else 1f,
-            if (stretchAxis === Axis.Z) scale else 1f
-        )
+    override fun tick(stretchAmount: Double) {
+        scaleBell(((stretchiness - 1) * stretchAmount + 1).toFloat())
     }
 
     override fun tick(period: NotePeriod?, time: Double) {
@@ -77,5 +66,15 @@ class StandardBellStretcher(
         } else {
             scaleBell((stretchiness * (period.endTime - time) / period.duration() + 1).toFloat())
         }
+    }
+
+    /** Sets the scale of the bell—appropriately and automatically scaling on the correct axis. */
+    private fun scaleBell(scale: Float) {
+        this.scale = scale
+        bell.setLocalScale(
+            if (stretchAxis === Axis.X) scale else 1f,
+            if (stretchAxis === Axis.Y) scale else 1f,
+            if (stretchAxis === Axis.Z) scale else 1f
+        )
     }
 }

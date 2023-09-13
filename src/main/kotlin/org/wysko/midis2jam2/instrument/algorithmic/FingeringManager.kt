@@ -16,13 +16,15 @@
  */
 package org.wysko.midis2jam2.instrument.algorithmic
 
-/** Handles the lookup of fingerings for MIDI notes. */
-interface FingeringManager<E> {
+/**
+ * Handles the lookup of fingerings for MIDI notes.
+ */
+fun interface FingeringManager<E> {
     /**
      * Given a MIDI note, returns the fingering associated with that note, or null if the note is outside the
      * instrument's defined range.
      *
-     * @param midiNote the MIDI note
+     * @param midiNote MIDI note
      */
     fun fingering(midiNote: Int): E?
 }

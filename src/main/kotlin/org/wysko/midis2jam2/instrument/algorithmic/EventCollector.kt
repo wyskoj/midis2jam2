@@ -20,9 +20,14 @@ package org.wysko.midis2jam2.instrument.algorithmic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiEvent
 
-/** Periodically collects elapsed events from a pool of [MidiEvent]. */
+/**
+ * Periodically collects elapsed events from a pool of [MidiEvent].
+ *
+ * @param events The list of events, sorted.
+ * @param context Context to the main class.
+ * @param triggerCondition This condition must be true to collect an event from the pool.
+ */
 class EventCollector<T : MidiEvent>(
-    /** The list of events. This list is expected to be sorted. */
     private val events: List<T>,
     private val context: Midis2jam2,
     private val triggerCondition: ((MidiEvent, Double) -> Boolean) = { event, time ->
@@ -42,37 +47,41 @@ class EventCollector<T : MidiEvent>(
     fun advanceCollectAll(time: Double): List<T> {
         val startingIndex = currentIndex
 
-        // Keep advancing the play head while we have not reached the end of the list, and we are not looking at an
+        // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
         // event in the future.
-        while (currentIndex < events.size && triggerCondition(events[currentIndex], time)) {
+        val atEndOfList = currentIndex == events.size
+        while (!atEndOfList && triggerCondition(events[currentIndex], time)) {
             currentIndex++
         }
 
-        // Return just the events we iterated over
+        // Return the events we iterated over
         return events.subList(startingIndex, currentIndex)
     }
 
     /**
      * Advances the play head and returns a list of [MidiEvents][MidiEvent] that have elapsed since the last invocation
-     * of this function or the [seek] function. If no events were collected during the time elapsed since the last
-     * invocation, the return is `null`.
+     * of this function or the [seek] function.
+     *
+     * If we collected no events during the time elapsed since the last invocation, the return is `null`.
      */
     fun advanceCollectOne(time: Double): T? {
-        // Keep advancing the play head while we have not reached the end of the list, and we are not looking at an
+        // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
         // event in the future.
         var advanced = false
-        while (currentIndex < events.size && triggerCondition(events[currentIndex], time)) {
+        val atEndOfList = currentIndex == events.size
+        while (!atEndOfList && triggerCondition(events[currentIndex], time)) {
             currentIndex++
             advanced = true
         }
 
-        // Return just the last event we iterated over
+        // Return the last event we iterated over
         return if (advanced) events[currentIndex - 1] else null
     }
 
     /**
-     * Moves the play head forward or backward in time to "seek" to a new position in the song. Do not use this method
-     * for each frame. Rather, use this when making large jumps in time.
+     * Moves the play head forward or backward in time to "seek" to a new position in the song.
+     * Don't use this method for each frame.
+     * Rather, use this when making large jumps in time.
      */
     fun seek(time: Double) {
         currentIndex = events.indexOfFirst { context.file.eventInSeconds(it) >= time }
