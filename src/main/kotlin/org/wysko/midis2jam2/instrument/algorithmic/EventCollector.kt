@@ -49,8 +49,7 @@ class EventCollector<T : MidiEvent>(
 
         // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
         // event in the future.
-        val atEndOfList = currentIndex >= events.size
-        while (!atEndOfList && triggerCondition(events[currentIndex], time)) {
+        while (currentIndex < events.size && triggerCondition(events[currentIndex], time)) {
             currentIndex++
         }
 
@@ -68,8 +67,7 @@ class EventCollector<T : MidiEvent>(
         // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
         // event in the future.
         var advanced = false
-        val atEndOfList = currentIndex >= events.size
-        while (!atEndOfList && triggerCondition(events[currentIndex], time)) {
+        while (currentIndex < events.size && triggerCondition(events[currentIndex], time)) {
             currentIndex++
             advanced = true
         }
