@@ -31,7 +31,7 @@ val Int.hsv: Triple<Float, Float, Float>
 
         val (max, min, delta) = calculateMaxMinDelta(r, g, b)
 
-        val h = calculateHue(r, g, b, max, delta)
+        val h = calculateHue(r, g, b, max, delta).wrapToRange(0..360)
         val s = calculateSaturation(max, delta)
         val v = max.toFloat() / 255
 
@@ -67,4 +67,9 @@ private fun calculateHue(r: Int, g: Int, b: Int, max: Int, delta: Int): Float {
 
 private fun calculateSaturation(max: Int, delta: Int): Float {
     return if (max == 0) 0f else delta.toFloat() / max
+}
+
+private fun Float.wrapToRange(intRange: IntRange): Float {
+    val rangeSize = intRange.run { last - first }
+    return ((this - intRange.first) % rangeSize + rangeSize) % rangeSize + intRange.first
 }
