@@ -29,7 +29,7 @@ val Int.hsv: Triple<Float, Float, Float>
         val g = this shr 8 and 0xFF
         val b = this and 0xFF
 
-        val (max, min, delta) = calculateMaxMinDelta(r, g, b)
+        val (max, _, delta) = calculateMaxMinDelta(r, g, b)
 
         val h = calculateHue(r, g, b, max, delta).wrapToRange(0..360)
         val s = calculateSaturation(max, delta)
@@ -38,10 +38,14 @@ val Int.hsv: Triple<Float, Float, Float>
         return Triple(h, s, v)
     }
 
+/**
+ * Converts a hexadecimal color string to an ARGB integer value.
+ *
+ * @param hexColor The hexadecimal color string to convert. Must be in the format "#RRGGBB".
+ * @return The ARGB integer value corresponding to the given hexadecimal color string, or null if the input is invalid.
+ */
 fun hexStringToIntArgb(hexColor: String?): Int? {
-    val regex = Regex("^#[A-Fa-f0-9]{6}$") // matches six character hexadecimal numbers only
-
-    return if (hexColor != null && regex.matches(hexColor)) {
+    return if (hexColor != null && Regex("^#[A-Fa-f0-9]{6}$").matches(hexColor)) {
         // Parse the RGB components and add the alpha component manually as 0xFF
         Integer.parseUnsignedInt(hexColor.drop(1), 16) or (0xFF shl 24)
     } else {
@@ -56,18 +60,14 @@ private fun calculateMaxMinDelta(r: Int, g: Int, b: Int): Triple<Int, Int, Int> 
     return Triple(max, min, delta)
 }
 
-private fun calculateHue(r: Int, g: Int, b: Int, max: Int, delta: Int): Float {
-    return when {
-        delta == 0 -> 0f
-        max == r -> 60f * ((g - b).toFloat() / delta.toFloat() % 6)
-        max == g -> 60f * ((b - r).toFloat() / delta.toFloat() + 2)
-        else -> 60f * ((r - g).toFloat() / delta.toFloat() + 4)
-    }
+private fun calculateHue(r: Int, g: Int, b: Int, max: Int, delta: Int): Float = when {
+    delta == 0 -> 0f
+    max == r -> 60f * ((g - b).toFloat() / delta.toFloat() % 6)
+    max == g -> 60f * ((b - r).toFloat() / delta.toFloat() + 2)
+    else -> 60f * ((r - g).toFloat() / delta.toFloat() + 4)
 }
 
-private fun calculateSaturation(max: Int, delta: Int): Float {
-    return if (max == 0) 0f else delta.toFloat() / max
-}
+private fun calculateSaturation(max: Int, delta: Int): Float = if (max == 0) 0f else delta.toFloat() / max
 
 private fun Float.wrapToRange(intRange: IntRange): Float {
     val rangeSize = intRange.run { last - first }
