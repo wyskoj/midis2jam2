@@ -41,6 +41,7 @@ import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.gui.viewmodel.SoundbankConfigurationViewModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import java.io.File
+import java.nio.file.FileSystems
 import javax.sound.midi.MidiDevice
 
 /**
@@ -108,7 +109,7 @@ fun HomeScreen(
     FilePicker(
         showFilePicker,
         fileExtensions = MIDI_FILE_EXTENSIONS,
-        initialDirectory = "$lastMidiFileSelectedDirectory${System.getProperty("file.separator")}"
+        initialDirectory = "$lastMidiFileSelectedDirectory${FileSystems.getDefault().separator}"
     ) { path ->
         showFilePicker = false
         path?.let {

@@ -69,7 +69,7 @@ class SlideCameraController(
                 .coerceAtMost(1f)
 
         context.app.camera.location.interpolateLocal(
-            desiredLocation(Utils.lerp(t, 0f, x)), (DAMPENING * tpf).also { println(it) }
+            desiredLocation(Utils.lerp(t, 0f, x)), (DAMPENING * tpf)
         )
         context.app.camera.rotation.slerp(
             lookAtRotation(context.app.camera.location.clone(), Vector3f(-2f, 47.320206f, 0f)),

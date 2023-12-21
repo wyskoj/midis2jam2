@@ -17,7 +17,7 @@ plugins {
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.serialization") version "1.8.20"
     id("org.jetbrains.dokka") version "1.7.10"
-    id("org.jetbrains.compose") version "1.4.3"
+    id("org.jetbrains.compose") version "1.5.11"
 
     java
     idea
@@ -76,10 +76,12 @@ tasks.processResources {
 
 dependencies {
     // JMonkeyEngine
-    implementation("org.jmonkeyengine:jme3-core:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-desktop:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-plugins:3.5.2-stable")
-    implementation("org.jmonkeyengine:jme3-effects:3.5.2-stable")
+    val jmeVersion = "3.6.1-stable"
+
+    implementation("org.jmonkeyengine:jme3-core:$jmeVersion")
+    implementation("org.jmonkeyengine:jme3-desktop:$jmeVersion")
+    implementation("org.jmonkeyengine:jme3-plugins:$jmeVersion")
+    implementation("org.jmonkeyengine:jme3-effects:$jmeVersion")
 
     // JetBrains annotations
     implementation("org.jetbrains:annotations:23.0.0")
@@ -102,29 +104,29 @@ dependencies {
         when (project.properties["targetplatform"]) {
             "windows" -> {
                 implementation(compose.desktop.windows_x64)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
             }
 
             "macos" -> {
                 implementation(compose.desktop.macos_x64)
-                implementation("org.jmonkeyengine:jme3-lwjgl:3.5.2-stable")
+                implementation("org.jmonkeyengine:jme3-lwjgl:$jmeVersion")
             }
 
             "linux" -> {
                 implementation(compose.desktop.linux_x64)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
             }
 
             else -> {
                 println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
                 implementation(compose.desktop.currentOs)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
             }
         }
         println("used platform: ${project.properties["targetplatform"]}")
     } else {
         implementation(compose.desktop.currentOs)
-        implementation("org.jmonkeyengine:jme3-lwjgl3:3.5.2-stable")
+        implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
     }
     implementation(compose.material3)
     implementation("com.darkrockstudios:mpfilepicker:2.0.2")

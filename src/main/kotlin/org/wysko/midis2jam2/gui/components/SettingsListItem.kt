@@ -20,7 +20,6 @@ package org.wysko.midis2jam2.gui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
@@ -40,7 +39,6 @@ import androidx.compose.ui.unit.dp
  * Must be a function that takes a Boolean parameter.
  * @param onOpenOptions The function to be called when options are opened. Optional and can be null. Must be a function with no parameters.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsListItem(
     headlineText: @Composable () -> Unit,
@@ -51,8 +49,8 @@ fun SettingsListItem(
 ) {
     val baseModifier = Modifier.height(72.dp)
     ListItem(
-        headlineText = headlineText,
-        supportingText = supportingText,
+        headlineContent = headlineText,
+        supportingContent = supportingText,
         trailingContent = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
