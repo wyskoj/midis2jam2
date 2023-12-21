@@ -24,7 +24,10 @@ import java.io.File
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.MidiSystem
 
-const val GERVILL = "Gervill"
+/**
+ * The name of the Gervill MIDI device.
+ */
+const val GERVILL: String = "Gervill"
 
 /**
  * Represents the ViewModel for the home screen of the application.
@@ -116,7 +119,8 @@ class HomeViewModel(
 
     override fun applyConfiguration(configuration: HomeConfiguration) {
         _lastMidiFileSelectedDirectory.value = configuration.lastMidiFileSelectedDirectory
-        _selectedMidiDevice.value = _midiDevices.value.first { it.name == configuration.selectedMidiDevice }
+        _selectedMidiDevice.value =
+            _midiDevices.value.firstOrNull { it.name == configuration.selectedMidiDevice } ?: getMidiDevices().first()
         _selectedSoundbank.value = configuration.selectedSoundbank?.let { File(it) }
     }
 
