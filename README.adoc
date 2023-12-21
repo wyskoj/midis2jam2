@@ -38,7 +38,7 @@ $ cd midis2jam2 && ./gradlew run
 
 == ✒️ Authors
 
-Main developer:
+Executive developer:
 
 * https://wysko.org[wyskoj]
 
@@ -49,9 +49,7 @@ Development contributors:
 * https://github.com/nikitalita[nikitalita]
 * https://github.com/vgking1[vgking1]
 
-Internationalization:
-
-Contributors can be found at https://poeditor.com/join/project/alZE9e86Wd[POEditor.com].
+Internationalization contributors can be found on the _About_ screen of the application.
 
 == ✴️ Acknowledgements
 
@@ -61,8 +59,14 @@ Contributors can be found at https://poeditor.com/join/project/alZE9e86Wd[POEdit
 
 == ⁉️ Support
 
-For support, join our https://discord.gg/HD6KFQ2zkW[Discord server].
+Find guides and answers to common questions on the https://wyskoj.github.io/midis2jam2-docs/[documentation site]. For support, join our https://discord.gg/HD6KFQ2zkW[Discord server].
 
 == ⚖️ License
 
-https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0]
+midis2jam2 © MMXXI–MMXXIV Jacob Wysko. The software is licensed under the https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0] and comes with absolutely no warranty.
+
+Some assets Copyright © 2007 Scott Haag  (used with permission).
+
+View the _About_ screen in the application for contribution attributions.
+
+SoundFont is a registered trademark of E-mu Systems, Inc.

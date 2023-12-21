@@ -29,6 +29,21 @@ private val LOCALE_FILE = File(APPLICATION_CONFIG_HOME, "locale.txt")
  * Provides internationalization support for the application.
  */
 object I18n {
+
+    private val supportedLocales = arrayOf(
+        "en",
+        "es",
+        "fi",
+        "fr",
+        "it",
+        "no",
+        "ru",
+        "th",
+        "tl",
+        "uk",
+        "zh",
+    ).map { Locale(it) }
+
     private var _currentLocale by mutableStateOf(
         try {
             if (LOCALE_FILE.exists()) {
@@ -38,7 +53,11 @@ object I18n {
             }
         } catch (e: Exception) {
             logger().error("Failed to load locale from file.", e)
-            Locale.getDefault()
+            if (supportedLocales.contains(Locale.getDefault())) {
+                Locale.getDefault()
+            } else {
+                Locale.ENGLISH
+            }
         }
     )
 
@@ -49,18 +68,6 @@ object I18n {
         get() = _currentLocale
 
     private var _strings: MutableState<ResourceBundle> = mutableStateOf(getStringsFromResourceBundle(_currentLocale))
-
-    private val supportedLocales = arrayOf(
-        "en",
-        "es",
-        "fi",
-        "fr",
-        "no",
-        "ru",
-        "th",
-        "tl",
-        "zh",
-    ).map { Locale(it) }
 
     /**
      * Gets the string associated with the given key.

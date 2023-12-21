@@ -53,7 +53,7 @@ fun AboutScreen() {
                 Midis2jam2Logo()
                 Text(I18n["midis2jam2_description"].value, style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(16.dp))
-                Text("Copyright © MMXXIII Jacob Wysko • ${Utils.resourceToString("/version.txt")}")
+                Text("Copyright © MMXXI–MMXXIV Jacob Wysko • ${Utils.resourceToString("/version.txt")}")
                 Text("This program comes with absolutely no warranty.")
                 TextWithLink(
                     text = "See the GNU General Public License for more details.",
@@ -79,14 +79,16 @@ fun AboutScreen() {
                     Text("Tinkle Bell model by TheCococQuartz.")
                     Spacer(Modifier.height(16.dp))
                     Text("Internationalization contributions:", fontStyle = FontStyle.Italic)
-                    Text("中文: otomad")
+                    Text("Español: Mr. Tremolo Measure")
                     Text("Suomi: Dermoker")
                     Text("Français: Jacob Wysko")
+                    Text("Italiano: SamuDrummer")
                     Text("Norsk: Trygve Larsen")
                     Text("Pусский: Rxuglr")
-                    Text("Español: Mr. Tremolo Measure")
-                    Text("Tagalog: GlovePerson")
                     Text("ไทย: Hariwong Lonarai")
+                    Text("Tagalog: GlovePerson")
+                    Text("Українська мова: PicoUA")
+                    Text("中文: otomad")
                     Spacer(Modifier.height(16.dp))
                     Text("Open-source software licenses:", fontStyle = FontStyle.Italic)
                     loadDependencies().forEach { (dependencyName, _, licenses) ->
