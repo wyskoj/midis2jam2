@@ -45,21 +45,49 @@ object I18n {
     ).map { Locale(it) }
 
     private var _currentLocale by mutableStateOf(
-        try {
-            if (LOCALE_FILE.exists()) {
-                Locale(LOCALE_FILE.readText())
-            } else {
-                Locale(Locale.getDefault().language)
+        run {
+            // First, try to load the locale from the file, if it exists.
+            var locale = getLocaleFromFile()
+
+            // If the locale is null, try to load the locale from the system.
+            // But we can only do this if the locale is supported.
+            if (locale == null) {
+                val systemLocale = Locale(Locale.getDefault().language)
+                if (supportedLocales.contains(systemLocale)) {
+                    logger().info("System locale is $systemLocale, supported, using it")
+                    locale = systemLocale
+                } else {
+                    logger().info("System locale is $systemLocale, not supported, not using it")
+                }
             }
-        } catch (e: Exception) {
-            logger().error("Failed to load locale from file.", e)
-            if (supportedLocales.contains(Locale.getDefault())) {
-                Locale.getDefault()
-            } else {
-                Locale.ENGLISH
+
+            // If the locale is still null, just use English.
+            locale ?: Locale.ENGLISH.also {
+                logger().info("Resorting to English locale")
             }
         }
     )
+
+    private fun getLocaleFromFile(): Locale? {
+        if (!LOCALE_FILE.exists()) {
+            logger().info("Locale file does not exist")
+            return null
+        }
+        val localeString = try {
+            LOCALE_FILE.readText().also {
+                logger().info("Read locale file")
+            }
+        } catch (e: Exception) {
+            logger().error("Failed to read locale file", e)
+            null
+        }
+        return try {
+            localeString?.let { Locale(it) }
+        } catch (e: Exception) {
+            logger().error("Failed to parse locale string $localeString", e)
+            null
+        }
+    }
 
     /**
      * The current [locale][Locale]. All strings currently displayed in the application are in this locale.
@@ -67,7 +95,8 @@ object I18n {
     val currentLocale: Locale
         get() = _currentLocale
 
-    private var _strings: MutableState<ResourceBundle> = mutableStateOf(getStringsFromResourceBundle(_currentLocale))
+    private var _strings: MutableState<ResourceBundle> =
+        mutableStateOf(getStringsFromResourceBundle(_currentLocale))
 
     /**
      * Gets the string associated with the given key.
