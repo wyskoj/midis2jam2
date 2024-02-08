@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.world.modelR
 
 /** The Melodic Agogos. */
 class Agogos(
@@ -36,10 +37,10 @@ class Agogos(
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Float) {
         with(updateInstrumentIndex(delta)) {
-            offsetNode.setLocalTranslation(0f, 18 + 3.6f * this, 0f)
-            instrumentNode.localRotation =
+            root.setLocalTranslation(0f, 18 + 3.6f * this, 0f)
+            geometry.localRotation =
                 Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * this, 0f)
         }
     }
@@ -48,7 +49,7 @@ class Agogos(
     inner class Agogo(i: Int) : TwelfthOfOctaveDecayed() {
         init {
             animNode.attachChild(
-                context.loadModel("AgogoSingle.obj", "HornSkinGrey.bmp", 0.9f).apply {
+                context.modelR("AgogoSingle.obj", "HornSkinGrey.bmp").apply {
                     setLocalScale(1 - 0.036f * i)
                 }
             )

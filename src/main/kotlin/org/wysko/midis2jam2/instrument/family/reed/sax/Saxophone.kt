@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import kotlin.reflect.KClass
 
 private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
 
@@ -30,11 +31,11 @@ abstract class Saxophone
 protected constructor(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>,
-    cloneClass: Class<out SaxophoneClone>,
+    cloneClass: KClass<out SaxophoneClone>,
     fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)

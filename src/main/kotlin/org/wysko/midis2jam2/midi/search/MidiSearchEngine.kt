@@ -1,5 +1,5 @@
-package org.wysko.midis2jam2.midi.search/*
- * Copyright (C) 2023 Jacob Wysko
+/*
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@ package org.wysko.midis2jam2.midi.search/*
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+
+package org.wysko.midis2jam2.midi.search
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -127,7 +129,8 @@ class MidiSearchEngine(
      * Returns an empty map if no sequences were extracted.
      */
     private fun extractSequencesFromMidiFiles(
-        midiFiles: List<File>, onProgress: (IndexingProgress) -> Unit
+        midiFiles: List<File>,
+        onProgress: (IndexingProgress) -> Unit
     ): Map<File, Sequence> = midiFiles.mapIndexedNotNull { index, file ->
         runCatching { midiFileReader.getSequence(file) }.getOrNull()?.let { file to it }
             .also {

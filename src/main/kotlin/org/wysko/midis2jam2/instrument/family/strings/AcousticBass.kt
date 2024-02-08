@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The upright bass. */
 class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, style: PlayingStyle) :
@@ -31,13 +32,13 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, 
         20.0,
         Vector3f(0.75f, 0.75f, 0.75f),
         intArrayOf(28, 33, 38, 43),
-        context.loadModel(
+        context.modelD(
             "DoubleBass.obj",
             if (style == PlayingStyle.ARCO) "DoubleBassSkin.bmp" else "DoubleBassSkinAlt.png"
         )
     ) {
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     /** The acoustic bass can be played two ways in MIDI, arco (Contrabass) and pizzicato (Acoustic Bass) */
@@ -50,8 +51,8 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, 
     }
 
     init {
-        highestLevel.setLocalTranslation(-50f, 46f, -95f)
-        instrumentNode.setLocalScale(2.5f)
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
+        placement.setLocalTranslation(-50f, 46f, -95f)
+        geometry.setLocalScale(2.5f)
+        geometry.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
     }
 }

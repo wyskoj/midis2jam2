@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,29 +37,30 @@ private const val MAXIMUM_FILLBAR_SCALE = (FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION
  * @param context context to the main class
  */
 class HudController(val context: Midis2jam2) {
-
     /**
      * The node that contains the fillbar and text.
      */
-    private val node: Node = Node().also {
-        if (context.configs.getType(SettingsConfiguration::class).showHud) context.app.guiNode.attachChild(it)
-        it.move(10f, 10f, 0f)
-    }
+    private val node: Node =
+        Node().also {
+            if (context.configs.getType(SettingsConfiguration::class).showHud) context.app.guiNode.attachChild(it)
+            it.move(10f, 10f, 0f)
+        }
 
     /**
      * The red fillbar.
      */
-    private val fillbar = context.assetLoader.loadSprite("SongFillbar.bmp").also {
-        node.attachChild(it)
-        it.move(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 1f)
-    }
+    private val fillbar =
+        context.assetLoader.loadSprite("SongFillbar.bmp").also {
+            node.attachChild(it)
+            it.move(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 1f)
+        }
 
     init {
         context.assetLoader.loadSprite("SongFillbarBox.bmp").also {
             node.attachChild(it)
         }
 
-        /* MIDI file name text */
+        // MIDI file name text
         BitmapText(context.assetManager.loadFont("Interface/Fonts/Default.fnt")).apply {
             node.attachChild(this)
             text = context.file.name
@@ -71,12 +72,16 @@ class HudController(val context: Midis2jam2) {
     /**
      * Updates animation.
      */
-    fun tick(timeSinceStart: Double, fadeValue: Float) {
-        fillbar.localScale = Vector3f(
-            (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / context.file.length).coerceAtMost(1.0)).toFloat(),
-            VERTICAL_FILLBAR_SCALE,
-            1f
-        )
+    fun tick(
+        timeSinceStart: Double,
+        fadeValue: Float,
+    ) {
+        fillbar.localScale =
+            Vector3f(
+                (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / context.file.length).coerceAtMost(1.0)).toFloat(),
+                VERTICAL_FILLBAR_SCALE,
+                1f,
+            )
         node.children.forEach {
             when (it) {
                 is Sprite -> {

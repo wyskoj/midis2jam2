@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,14 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+
 package org.wysko.midis2jam2
 
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
@@ -43,9 +46,8 @@ class DesktopMidis2jam2(
     val sequencer: Sequencer,
     val midiFile: MidiFile,
     val onClose: () -> Unit,
-    configs: Collection<Configuration>
+    configs: Collection<Configuration>,
 ) : Midis2jam2(midiFile, configs) {
-
     /** Whether the sequencer has started. */
     private var isSequencerStarted: Boolean = false
 
@@ -59,17 +61,19 @@ class DesktopMidis2jam2(
     private lateinit var tempoChangeCoroutine: Job
 
     /** Initializes the application. */
-    override fun initialize(stateManager: AppStateManager, app: Application) {
+    override fun initialize(
+        stateManager: AppStateManager,
+        app: Application,
+    ) {
         super.initialize(stateManager, app)
         logger().debug("Initializing application...")
 
         KeyMap.registerMappings(app, this)
-        launchSequencerWithTempoChanges()
         try {
             BackgroundController.configureBackground(
                 configs.getType(BackgroundConfiguration::class),
                 this@DesktopMidis2jam2,
-                rootNode
+                rootNode,
             )
         } catch (e: ImageFormatException) {
             exit()
@@ -80,7 +84,8 @@ class DesktopMidis2jam2(
                 when (e.message) {
                     "Image width and height must be the same" -> "The background image(s) must be square."
                     else -> e.message ?: "There was an error loading the images for the background."
-                }, e
+                },
+                e,
             )
         }
 
@@ -106,57 +111,78 @@ class DesktopMidis2jam2(
     override fun update(tpf: Float) {
         super.update(tpf)
 
-        if (!initiatedFadeIn && timeSinceStart > -1.5) {
-            fade.fadeIn()
+        // Start sequencer if not started
+        if (!isSequencerStarted && time > 0.0) {
+            with(sequencer) {
+                start()
+            }
+            isSequencerStarted = true
+        }
+
+        // Initiate fade-in
+        if (!initiatedFadeIn && time > -1.5) {
+            fadeFilter.fadeIn()
             initiatedFadeIn = true
         }
 
+        // Tick instruments
         instruments.forEach {
-            /* Null if not implemented yet */
-            it.tick(timeSinceStart, tpf)
+            it.tick(time, tpf)
         }
 
-        /* If at the end of the file */
-        if (timeSinceStart >= file.length) {
-            if (!afterEnd) {
-                stopTime = timeSinceStart
+        // If at the end of the file
+        if (time >= file.length) {
+            if (!isSongFinished) {
+                endTime = time
             }
-            afterEnd = true
+            isSongFinished = true
         }
 
-        /* If after the end, by three seconds */
-        if (afterEnd && timeSinceStart >= stopTime + 3.0) {
-            exit()
+        // If after the end, by three seconds
+        if (isSongFinished && time >= endTime + 3.0) {
+            if (configs.getType(HomeConfiguration::class).isLooping) {
+                loop()
+            } else {
+                exit()
+            }
         }
 
-        /* This is a hack to prevent the first few frames from updating the timeSinceStart variable. */
+        // This is a hack to prevent the first few frames from updating the timeSinceStart variable.
         if (skippedTicks++ < 3) {
             return
         }
 
         shadowController?.tick()
         standController.tick()
-        lyricController.tick(timeSinceStart)
-        hudController.tick(timeSinceStart, fade.value)
+        lyricController.tick(time)
+        hudController.tick(time, fadeFilter.value)
         flyByCamera.tick(tpf)
-        autocamController.tick(timeSinceStart, tpf)
-        slideCamController.tick(tpf, timeSinceStart)
+        autocamController.tick(time, tpf)
+        slideCamController.tick(tpf, time)
         preventCameraFromLeaving(app.camera)
-
-
+        drumSetVisibilityManager.tick(time)
 
         if (sequencer.isOpen && !paused) {
-            /* Increment time if sequencer is ready / playing */
-            timeSinceStart += tpf.toDouble()
+            // Increment time if sequencer is ready / playing
+            time += tpf.toDouble()
         }
+    }
+
+    private fun loop() {
+        isSequencerStarted = false
+        sequencer.stop()
+        seek(-2.0)
+        slideCamController.onLoop()
+        (sequencer as JwRealTimeSequencer).resetDevice()
     }
 
     override fun seek(time: Double) {
         logger().debug("Seeking to time: $time")
-        timeSinceStart = time
-        sequencer.microsecondPosition = (time * 1E6).toLong()
+        this.time = time
+        sequencer.microsecondPosition = (time * 1E6).coerceAtLeast(0.0).toLong()
         eventCollectors.forEach { it.seek(time) }
         notePeriodCollectors.forEach { it.seek(time) }
+        notePeriodGroupCollectors.forEach { it.seek(time) }
     }
 
     /**
@@ -180,35 +206,10 @@ class DesktopMidis2jam2(
 
     override fun togglePause() {
         super.togglePause()
-        if (paused) sequencer.stop() else sequencer.start()
-    }
-
-    private fun launchSequencerWithTempoChanges() {
-        tempoChangeCoroutine = CoroutineScope(Dispatchers.Default).launch {
-            while (sequencer.isOpen) {
-                if (!isSequencerStarted && timeSinceStart >= 0) {
-                    startSequencer()
-                    logger().debug("Sequencer started")
-                }
-                delay(1)
-            }
-        }
-    }
-
-    private suspend fun startSequencer() {
-        sequencer.tempoInBPM = file.tempos.first().bpm().toFloat()
-        sequencer.start()
-        isSequencerStarted = true
-        startApplyingTempos()
-    }
-
-    private suspend fun startApplyingTempos() {
-        val tempos = ArrayList(file.tempos)
-        while (true) {
-            while (tempos.isNotEmpty() && tempos.first().time < sequencer.tickPosition) {
-                sequencer.tempoInBPM = tempos.removeAt(0).bpm().toFloat()
-            }
-            delay(1)
+        if (paused) {
+            sequencer.stop()
+        } else {
+            sequencer.start()
         }
     }
 }

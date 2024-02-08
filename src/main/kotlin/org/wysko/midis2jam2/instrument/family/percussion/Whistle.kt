@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,43 +20,50 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.SHORT_WHISTLE
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelR
 
 /** The long and short percussion whistles. */
-class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
-
+class Whistle(
+    context: Midis2jam2,
+    shortHits: MutableList<MidiNoteOnEvent>,
+    longHits: MutableList<MidiNoteOnEvent>,
+) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.time }.toMutableList()) {
     /** The short whistle. */
-    private val shortWhistle: PercussionWhistle = PercussionWhistle(WhistleLength.SHORT).apply {
-        highestLevel.setLocalTranslation(-6f, 43f, -83f)
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(15.0), 0f)
-    }.also {
-        instrumentNode.attachChild(it.highestLevel)
-    }
+    private val shortWhistle: PercussionWhistle =
+        PercussionWhistle(WhistleLength.SHORT).apply {
+            highestLevel.setLocalTranslation(-6f, 43f, -83f)
+            highestLevel.localRotation = Quaternion().fromAngles(0f, rad(15.0), 0f)
+        }.also {
+            geometry.attachChild(it.highestLevel)
+        }
 
     /** The long whistle. */
-    private val longWhistle: PercussionWhistle = PercussionWhistle(WhistleLength.LONG).apply {
-        highestLevel.setLocalTranslation(-2f, 40f, -83f)
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(15.0), 0f)
-    }.also {
-        instrumentNode.attachChild(it.highestLevel)
-    }
+    private val longWhistle: PercussionWhistle =
+        PercussionWhistle(WhistleLength.LONG).apply {
+            highestLevel.setLocalTranslation(-2f, 40f, -83f)
+            highestLevel.localRotation = Quaternion().fromAngles(0f, rad(15.0), 0f)
+        }.also {
+            geometry.attachChild(it.highestLevel)
+        }
 
-    private val eventCollector = EventCollector(hits, context)
+    private val shortEventCollector = EventCollector(shortHits, context)
+    private val longEventCollector = EventCollector(longHits, context)
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
-        eventCollector.advanceCollectAll(time).forEach {
-            if (it.note == SHORT_WHISTLE) {
-                shortWhistle.play(0.2)
-            } else {
-                longWhistle.play(0.4)
-            }
+        shortEventCollector.advanceCollectOne(time)?.let {
+            shortWhistle.play(0.2)
+        }
+        longEventCollector.advanceCollectOne(time)?.let {
+            longWhistle.play(0.4)
         }
         shortWhistle.tick(delta)
         longWhistle.tick(delta)
@@ -68,7 +75,7 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
         SHORT,
 
         /** Long whistle length. */
-        LONG
+        LONG,
     }
 
     /** A single Whistle. */
@@ -77,24 +84,26 @@ class Whistle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrum
         val highestLevel: Node = Node()
 
         /** The Anim node. */
-        private val animNode = Node().apply {
-            highestLevel.attachChild(this)
-        }.also {
-            it.attachChild(context.loadModel("Whistle.obj", "ShinySilver.bmp", 0.9f))
-        }
+        private val animNode =
+            Node().apply {
+                highestLevel.attachChild(this)
+            }.also {
+                it.attachChild(context.modelR("Whistle.obj", "ShinySilver.bmp"))
+            }
 
         /** The Puffer. */
-        private val puffer: SteamPuffer = SteamPuffer(
-            context,
-            type = if (length == WhistleLength.LONG) SteamPuffTexture.WHISTLE else SteamPuffTexture.NORMAL,
-            scale = 1.0,
-            behavior = PuffBehavior.UPWARDS
-        ).apply {
-            steamPuffNode.setLocalTranslation(0f, 4f, 0f)
-            steamPuffNode.localRotation = Quaternion().fromAngles(0f, -1.57f, 0f)
-        }.also {
-            animNode.attachChild(it.steamPuffNode)
-        }
+        private val puffer: SteamPuffer =
+            SteamPuffer(
+                context,
+                type = if (length == WhistleLength.LONG) SteamPuffTexture.WHISTLE else SteamPuffTexture.NORMAL,
+                scale = 1.0,
+                behavior = PuffBehavior.UPWARDS,
+            ).apply {
+                root.setLocalTranslation(0f, 4f, 0f)
+                root.localRotation = Quaternion().fromAngles(0f, -1.57f, 0f)
+            }.also {
+                animNode.attachChild(it.root)
+            }
 
         /** True if this whistle is currently playing, false otherwise. */
         var playing: Boolean = false

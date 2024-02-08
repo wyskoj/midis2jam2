@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.starter.configuration
 
 import kotlinx.serialization.Serializable
+import org.wysko.midis2jam2.Midis2jam2
 import java.io.File
 
 private val CONFIG_FILE = File(APPLICATION_CONFIG_HOME, "graphics.json")
@@ -39,18 +40,49 @@ data class GraphicsConfiguration(
     val antiAliasingQuality: QualityScale = QualityScale.LOW,
 ) : Configuration {
     companion object {
-        val preserver by lazy { ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE) }
-        val ANTI_ALIASING_DEFINITION = mapOf(
+        /**
+         * The preserver for the graphics configuration.
+         */
+        val preserver: ConfigurationPreserver<GraphicsConfiguration> by lazy {
+            ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE)
+        }
+
+        /**
+         * The definition of the antialiasing quality scale.
+         *
+         * This variable is a map that defines the correlation between each `QualityScale` and an integer value.
+         * The integer value represents the level of antialiasing quality for that particular `QualityScale`.
+         *
+         * @see QualityScale
+         */
+        val ANTI_ALIASING_DEFINITION: Map<QualityScale, Int> = mapOf(
             QualityScale.NONE to 1,
             QualityScale.LOW to 2,
             QualityScale.MEDIUM to 3,
             QualityScale.HIGH to 4,
         )
-        val SHADOW_DEFINITION = mapOf(
+
+        /**
+         * The definition of the shadow quality scale.
+         *
+         * This variable is a map that defines the correlation between each `QualityScale` and a pair of integers.
+         * The pair of integers represents the level of shadow quality for that particular `QualityScale`.
+         * The first integer represents the level of shadow quality,
+         * and the second integer represents the resolution of the shadow.
+         *
+         * @see QualityScale
+         */
+        val SHADOW_DEFINITION: Map<QualityScale, Pair<Int, Int>> = mapOf(
             QualityScale.LOW to (1 to 1024),
             QualityScale.MEDIUM to (2 to 2048),
             QualityScale.HIGH to (4 to 4096),
         )
+
+        /**
+         * Convenience method to determine if fake shadows should be used.
+         */
+        val Midis2jam2.isFakeShadows: Boolean
+            get() = configs.getType(GraphicsConfiguration::class).shadowQuality == QualityScale.NONE
     }
 }
 
@@ -65,19 +97,25 @@ sealed class Resolution {
      */
     @Serializable
     object DefaultResolution : Resolution() {
-        override fun toString() = "Default"
+        override fun toString(): String = "Default"
     }
 
     /**
      * Represents a custom resolution for the application.
+     *
+     * @property width The width of the resolution.
+     * @property height The height of the resolution.
      */
     @Serializable
     data class CustomResolution(val width: Int, val height: Int) : Resolution() {
-        override fun toString() = "${width}x$height"
+        override fun toString(): String = "${width}x$height"
     }
 
     companion object {
-        val OPTIONS by lazy {
+        /**
+         * The available resolution options.
+         */
+        val OPTIONS: List<Resolution> by lazy {
             listOf(
                 DefaultResolution,
                 CustomResolution(640, 480),
@@ -110,14 +148,26 @@ sealed class Resolution {
 
 /**
  * Represents the quality scale of a certain item.
- *
- * The available quality scales are:
- * - [QualityScale.NONE]: Indicates that the item has no quality.
- * - [QualityScale.LOW]: Indicates that the item has low quality.
- * - [QualityScale.MEDIUM]: Indicates that the item has medium quality.
- * - [QualityScale.HIGH]: Indicates that the item has high quality.
  */
 @Serializable
 enum class QualityScale {
-    NONE, LOW, MEDIUM, HIGH
+    /**
+     * Represents the lowest quality.
+     */
+    NONE,
+
+    /**
+     * Represents low quality.
+     */
+    LOW,
+
+    /**
+     * Represents medium quality.
+     */
+    MEDIUM,
+
+    /**
+     * Represents high quality.
+     */
+    HIGH
 }

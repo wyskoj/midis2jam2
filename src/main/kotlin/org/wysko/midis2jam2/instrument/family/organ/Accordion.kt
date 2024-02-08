@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Companion.SQUEEZE_RANGE
 import org.wysko.midis2jam2.instrument.family.piano.*
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.*
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 private const val WHITE_KEY_FRONT = "AccordionKeyWhiteFront.obj"
 private const val WHITE_KEY_BACK = "AccordionKeyWhiteBack.obj"
@@ -48,18 +51,18 @@ private const val BLACK_KEY_DOWN_TEXTURE = "AccordionKeyBlackDown.bmp"
  *
  * Because the accordion only has twenty-four playable keys, notes are modulus 24.
  */
-class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: AccordionType) :
+class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: Type) :
     KeyedInstrument(context, eventList, 0, 23) {
-
-    override val keys: Array<Key> = let {
-        var whiteCount = 0
-        Array(24) {
-            when (noteToKeyboardKeyColor(it)) {
-                KeyColor.WHITE -> AccordionKey(it, whiteCount++, this)
-                KeyColor.BLACK -> AccordionKey(it, it, this)
+    override val keys: Array<Key> =
+        let {
+            var whiteCount = 0
+            Array(24) {
+                when (Color.fromNote(it)) {
+                    White -> AccordionKey(it, whiteCount++, this)
+                    Black -> AccordionKey(it, it, this)
+                }
             }
         }
-    }
 
     /** The accordion sections. */
     private val accordionSections = Array(SECTION_COUNT) { Node() }
@@ -78,10 +81,11 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
      *
      * @return a dummy white key
      */
-    private fun dummyWhiteKey() = Node().apply {
-        attachChild(context.loadModel(WHITE_KEY_FRONT, WHITE_KEY_TEXTURE))
-        attachChild(context.loadModel(WHITE_KEY_BACK, WHITE_KEY_TEXTURE))
-    }
+    private fun dummyWhiteKey() =
+        Node().apply {
+            attachChild(context.modelD(WHITE_KEY_FRONT, WHITE_KEY_TEXTURE))
+            attachChild(context.modelD(WHITE_KEY_BACK, WHITE_KEY_TEXTURE))
+        }
 
     /**
      * Calculates the amount of squeeze to apply to the accordion and updates the [angle].
@@ -93,32 +97,38 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
      * @param delta the amount of time since the last frame update
      */
     private fun calculateAngle(delta: Float) {
-        if (keys.any { it.isPressed }) {/* Squeeze at maximum speed if any key is being pressed. */
+        // Squeeze at maximum speed if any key is being pressed.
+        if (collector.currentNotePeriods.isNotEmpty()) {
             squeezingSpeed = MAX_SQUEEZING_SPEED.toDouble()
         } else {
-            if (squeezingSpeed > 0) {/* Gradually decrease squeezing speed */
+            if (squeezingSpeed > 0) { // Gradually decrease squeezing speed
                 squeezingSpeed -= (delta * 3)
                 squeezingSpeed.coerceAtLeast(0.0).also { squeezingSpeed = it }
             }
-        }/* If expanding, increase the angle, otherwise decrease the angle. */
+        }
+
+        // If expanding, increase the angle, otherwise decrease the angle.
         if (expanding) {
-            angle += (delta * squeezingSpeed).toFloat()/* Switch direction */
+            angle += (delta * squeezingSpeed).toFloat() // Switch direction
             if (angle > SQUEEZE_RANGE.endInclusive) {
                 expanding = false
             }
         } else {
-            angle -= (delta * squeezingSpeed).toFloat()/* Switch direction */
+            angle -= (delta * squeezingSpeed).toFloat() // Switch direction
             if (angle < SQUEEZE_RANGE.start) {
                 expanding = true
             }
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
         calculateAngle(delta)
 
-        /* Set the rotation of each section */
+        // Set the rotation of each section
         accordionSections.indices.forEach {
             accordionSections[it].localRotation = Quaternion().fromAngles(0f, 0f, rad(angle * (it - 7.5)))
         }
@@ -128,26 +138,27 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         return keys[midiNote % 24]
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 30 * updateInstrumentIndex(delta), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(0f, 30 * updateInstrumentIndex(delta), 0f)
     }
 
     /** Defines a type of Accordion. */
-    enum class AccordionType(
+    enum class Type(
         /** The texture file of the case. */
         val textureCaseName: String,
         /** The texture file of the front of the case. */
-        val textureCaseFrontName: String
+        val textureCaseFrontName: String,
     ) {
         /** The accordion. */
         ACCORDION("AccordionCase.bmp", "AccordionCaseFront.bmp"),
 
         /** The bandoneon. */
-        BANDONEON("BandoneonCase.bmp", "BandoneonCaseFront.bmp");
+        BANDONEON("BandoneonCase.bmp", "BandoneonCaseFront.bmp"),
     }
 
     companion object {
-        val SQUEEZE_RANGE = 1f..4f
+        /** The range of the accordion's squeeze. */
+        val SQUEEZE_RANGE: ClosedFloatingPointRange<Float> = 1f..4f
 
         /** The number of sections the accordion is divided into. */
         const val SECTION_COUNT: Int = 14
@@ -159,37 +170,48 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         const val WHITE_KEY_COUNT: Float = 12f
 
         /** The keyboard configuration. */
-        val KEY_CONFIGURATION: KeyboardConfiguration = KeyboardConfiguration(
-            whiteKeyConfiguration = KeyConfiguration.SeparateTextures(
-                frontKeyFile = WHITE_KEY_FRONT,
-                backKeyFile = WHITE_KEY_BACK,
-                upTexture = WHITE_KEY_TEXTURE,
-                downTexture = WHITE_KEY_DOWN_TEXTURE
-            ), blackKeyConfiguration = KeyConfiguration.SeparateTextures(
-                frontKeyFile = BLACK_KEY,
-                backKeyFile = null,
-                upTexture = BLACK_KEY_TEXTURE,
-                downTexture = BLACK_KEY_DOWN_TEXTURE
+        val KEY_CONFIGURATION: KeyboardConfiguration =
+            KeyboardConfiguration(
+                whiteKeyConfiguration =
+                    KeyConfiguration.SeparateTextures(
+                        frontKeyFile = WHITE_KEY_FRONT,
+                        backKeyFile = WHITE_KEY_BACK,
+                        upTexture = WHITE_KEY_TEXTURE,
+                        downTexture = WHITE_KEY_DOWN_TEXTURE,
+                    ),
+                blackKeyConfiguration =
+                    KeyConfiguration.SeparateTextures(
+                        frontKeyFile = BLACK_KEY,
+                        backKeyFile = null,
+                        upTexture = BLACK_KEY_TEXTURE,
+                        downTexture = BLACK_KEY_DOWN_TEXTURE,
+                    ),
             )
-        )
     }
 
-    init {/* Load left case */
-        val leftHandCase = context.loadModel("AccordionLeftHand.obj", type.textureCaseName).also {
-            accordionSections[0].attachChild(it)
-        }
+    override fun keyStatus(midiNote: Int): Key.State {
+        collector.currentNotePeriods.firstOrNull { it.midiNote % 24 == midiNote % 24 }?.let {
+            return Key.State.Down(it.noteOn.velocity)
+        } ?: return Key.State.Up
+    }
 
-        /* Set materials */
+    init { // Load left case
+        val leftHandCase =
+            context.modelD("AccordionLeftHand.obj", type.textureCaseName).also {
+                accordionSections[0].attachChild(it)
+            }
+
+        // Set materials
         (leftHandCase as Node).apply {
             getChild(1).setMaterial(context.unshadedMaterial("LeatherStrap.bmp"))
             getChild(2).setMaterial(context.unshadedMaterial("RubberFoot.bmp"))
         }
 
-        /* Add the keys */
+        // Add the keys
         val keysNode = Node()
         accordionSections[SECTION_COUNT - 1].attachChild(keysNode)
 
-        /* Add dummy keys on each end */
+        // Add dummy keys on each end
         dummyWhiteKey().also {
             keysNode.attachChild(it)
             it.setLocalTranslation(0f, 7f, 0f)
@@ -199,32 +221,28 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
             it.setLocalTranslation(0f, -8f, 0f)
         }
 
-        /* Attach keys to node */
-        keys.forEach { keysNode.attachChild(it.keyNode) }
+        // Attach keys to node
+        keys.forEach { keysNode.attachChild(it.root) }
 
         keysNode.setLocalTranslation(-4f, 22f, -0.8f)
 
-        /* Load and attach accordion folds */
+        // Load and attach accordion folds
         accordionSections.forEach { section ->
-            section.attachChild(context.loadModel("AccordionFold.obj", "AccordionFold.bmp"))
+            section.attachChild(context.modelD("AccordionFold.obj", "AccordionFold.bmp"))
         }
 
-        /* Load right case */
-        accordionSections[13].attachChild(context.loadModel("AccordionRightHand.obj", type.textureCaseFrontName))
+        // Load right case
+        accordionSections[13].attachChild(context.modelD("AccordionRightHand.obj", type.textureCaseFrontName))
 
-        /* Attach accordion sections to node */
-        accordionSections.forEach { instrumentNode.attachChild(it) }
+        // Attach accordion sections to node
+        accordionSections.forEach { geometry.attachChild(it) }
 
-        /* Positioning */
-        instrumentNode.run {
+        // Positioning
+        geometry.run {
             setLocalTranslation(-70f, 10f, -60f)
             localRotation = Quaternion().fromAngles(rad(0.0), rad(45.0), rad(-5.0))
         }
     }
 
-    override fun toString(): String {
-        return super.toString() + buildString {
-            append(debugProperty("angle", angle))
-        }
-    }
+    override fun toString(): String = super.toString() + debugProperty("angle", angle)
 }

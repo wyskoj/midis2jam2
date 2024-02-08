@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,15 @@ import org.wysko.midis2jam2.midi.MidiEvent
 
 /**
  * Periodically collects elapsed events from a pool of [MidiEvent].
- *
- * @param events The list of events, sorted.
- * @param context Context to the main class.
- * @param triggerCondition This condition must be true to collect an event from the pool.
  */
 class EventCollector<T : MidiEvent>(
     private val events: List<T>,
     private val context: Midis2jam2,
-    private val triggerCondition: ((MidiEvent, Double) -> Boolean) = { event, time ->
-        context.file.eventInSeconds(event) <= time
-    }
-) {
+    private val triggerCondition: ((MidiEvent, Double) -> Boolean) =
+        { event, time -> context.file.eventInSeconds(event) <= time },
+    private val onSeek: (EventCollector<T>) -> Unit = {},
+) : Collector<T> {
+
     init {
         context.registerEventCollector(this)
     }
@@ -81,18 +78,19 @@ class EventCollector<T : MidiEvent>(
      * Don't use this method for each frame.
      * Rather, use this when making large jumps in time.
      */
-    fun seek(time: Double) {
+    override fun seek(time: Double) {
         currentIndex = events.indexOfFirst { context.file.eventInSeconds(it) >= time }
-        if (currentIndex == -1) currentIndex = 0
+        if (currentIndex == -1) currentIndex = events.size
+        onSeek(this)
     }
 
     /**
      * Returns the immediate next event in the future. If there are no more events, the return is `null`.
      */
-    fun peek(): T? = if (currentIndex < events.size) events[currentIndex] else null
+    override fun peek(): T? = events.getOrNull(currentIndex)
 
     /**
      * Returns the last elapsed event. If no events have yet elapsed, the return is `null`.
      */
-    fun prev(): T? = if (currentIndex > 0) events[currentIndex - 1] else null
+    override fun prev(): T? = events.getOrNull(currentIndex - 1)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,60 +20,62 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.HARMONICA
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The harmonica uses 12 [SteamPuffers][SteamPuffer] to animate each note in the octave. */
 class Harmonica(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
-
     /** Each note on the harmonica has a separate puffer. */
     private val puffers = Array(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
 
-    /** For each note, true if it is playing, false otherwise. */
-    private val eachNotePlaying = BooleanArray(12)
-    override fun tick(time: Double, delta: Float) {
+    private val bend = PitchBendModulationController(context, eventList)
+
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
-        /* Set each element in the array to false */
-        eachNotePlaying.fill(false)
-
-        /* For each current note playing */
-        for (currentNotePeriod in currentNotePeriods) {
-            /* Determine its index position and flag it true */
-            val i = currentNotePeriod.midiNote % 12
-            eachNotePlaying[i] = true
+        // Update each steam puffer
+        puffers.forEachIndexed { index, it ->
+            it.tick(
+                delta,
+                collector.currentNotePeriods.any { it.midiNote % 12 == index },
+            )
         }
 
-        /* Update each steam puffer */
-        puffers.forEachIndexed { index, it -> it.tick(delta, eachNotePlaying[index]) }
+        // Pitch bend
+        geometry.localRotation = Quaternion().fromAngles(-bend.tick(time, delta) * 0.25f, rad(-90.0), 0f)
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
     }
 
     init {
-        instrumentNode.attachChild(context.loadModel("Harmonica.obj", "Harmonica.bmp"))
+        geometry.attachChild(context.modelD("Harmonica.obj", "Harmonica.bmp"))
         val pufferNodes = Array(12) { Node() }
 
         for (i in 0..11) {
             puffers[i].run {
-                steamPuffNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
-                steamPuffNode.setLocalTranslation(0f, 0f, 7.2f)
-                pufferNodes[i].attachChild(this.steamPuffNode)
-                instrumentNode.attachChild(pufferNodes[i])
+                root.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
+                root.setLocalTranslation(0f, 0f, 7.2f)
+                pufferNodes[i].attachChild(this.root)
+                geometry.attachChild(pufferNodes[i])
             }
             pufferNodes[i].run {
                 localRotation = Quaternion().fromAngles(0f, rad(5 * (i - 5.5)), 0f)
             }
         }
 
-        /* Position harmonica */
-        instrumentNode.setLocalTranslation(74f, 32f, -38f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
+        // Position harmonica
+        geometry.setLocalTranslation(74f, 32f, -38f)
+        geometry.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,20 @@ import org.wysko.midis2jam2.midi.NotePeriod
 
 /** Periodically updates a set of [NotePeriods][NotePeriod] that are "elapsing" at the given time. */
 class NotePeriodCollector(
-    private var notePeriods: List<NotePeriod>,
     context: Midis2jam2,
-    /** Releases notes early by this much. */
-    private val releaseCondition: ((time: Double, np: NotePeriod) -> Boolean) = { time: Double, notePeriod: NotePeriod ->
-        time >= notePeriod.endTime
-    }
-) {
+    private var notePeriods: List<NotePeriod>,
+    private val releaseCondition: (time: Double, np: NotePeriod) -> Boolean =
+        { time: Double, notePeriod: NotePeriod -> time >= notePeriod.endTime },
+) : Collector<NotePeriod> {
     init {
         context.registerNotePeriodCollector(this)
         notePeriods = notePeriods.sortedBy { it.startTime }
     }
 
-    private val currentNotePeriods = HashSet<NotePeriod>()
+    /**
+     * The current set of [NotePeriods][NotePeriod].
+     */
+    val currentNotePeriods: HashSet<NotePeriod> = HashSet()
     private val heap = HeapAPQ<Double, NotePeriod> { p0, p1 -> p0.compareTo(p1) }
     private var currentIndex = 0
     private var lastRemoved: NotePeriod? = null
@@ -45,8 +46,8 @@ class NotePeriodCollector(
         // Collect NotePeriods that need to be added to the heap
         while (currentIndex < notePeriods.size && notePeriods[currentIndex].startTime <= time) {
             val np = notePeriods[currentIndex]
-            heap.insert(np.endTime, np) // Add to heap, sorting by endTime
-            currentNotePeriods.add(np) // Add to set of current NotePeriods
+            heap.insert(np.endTime, np)
+            currentNotePeriods.add(np)
             currentIndex++
         }
 
@@ -65,20 +66,17 @@ class NotePeriodCollector(
      * Moves the play head forward or backward in time to "seek" to a new position in the song. Do not use this method
      * for each frame. Rather, use this when making large jumps in time.
      */
-    fun seek(time: Double): Set<NotePeriod> {
-        // Clear fields
+    override fun seek(time: Double) {
         currentNotePeriods.clear()
         heap.clear()
         currentIndex = 0
         lastRemoved = null
-
-        // Advance forward to desired time
-        return advance(time)
+        advance(time)
     }
 
     /** Returns the next [NotePeriod] that has not yet started. */
-    fun peek(): NotePeriod? = notePeriods.getOrNull(currentIndex)
+    override fun peek(): NotePeriod? = notePeriods.getOrNull(currentIndex)
 
     /** Returns the last fully elapsed [NotePeriod]. */
-    fun prev(): NotePeriod? = lastRemoved
+    override fun prev(): NotePeriod? = lastRemoved
 }

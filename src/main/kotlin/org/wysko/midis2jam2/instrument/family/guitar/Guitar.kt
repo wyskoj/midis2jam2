@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.util.chunked
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.STRING_GLOW
+import org.wysko.midis2jam2.world.modelD
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -85,7 +86,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         )
     },
     numberOfStrings = 6,
-    instrumentBody = context.loadModel(
+    instrumentBody = context.modelD(
         if (needsDropTuning(events)) type.modelDFileName else type.modelFileName,
         type.textureFileName
     ),
@@ -220,11 +221,11 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 
     override val upperStrings: Array<Spatial> = Array(6) {
         if (it < 3) {
-            context.loadModel("GuitarStringLow.obj", type.textureFileName)
+            context.modelD("GuitarStringLow.obj", type.textureFileName)
         } else {
-            context.loadModel("GuitarStringHigh.obj", type.textureFileName)
+            context.modelD("GuitarStringHigh.obj", type.textureFileName)
         }.apply {
-            instrumentNode.attachChild(this)
+            geometry.attachChild(this)
         }
     }.apply {
         forEachIndexed { index, it ->
@@ -236,13 +237,13 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         }
     }
 
-    override val lowerStrings: Array<Array<Spatial>> = Array(6) { it ->
-        Array(5) { j: Int ->
-            context.loadModel(
+    override val lowerStrings: List<List<Spatial>> = List(6) { it ->
+        List(5) { j: Int ->
+            context.modelD(
                 if (it < 3) "GuitarLowStringBottom$j.obj" else "GuitarHighStringBottom$j.obj",
                 type.textureFileName
             ).also {
-                instrumentNode.attachChild(it)
+                geometry.attachChild(it)
                 it.cullHint = Always
                 (it as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
@@ -261,15 +262,15 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Float) {
         val v = updateInstrumentIndex(delta) * 1.5f
         /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
         if (v < GUITAR_VECTOR_THRESHOLD) {
-            offsetNode.localTranslation = Vector3f(5f, -2f, 0f).mult(v)
+            root.localTranslation = Vector3f(5f, -2f, 0f).mult(v)
         } else {
             val vector = Vector3f(5f, -2f, 0f).mult(v)
             vector.setY(-2f * GUITAR_VECTOR_THRESHOLD)
-            offsetNode.localTranslation = vector
+            root.localTranslation = vector
         }
     }
 
@@ -293,8 +294,8 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 
     init {
         /* Position guitar */
-        instrumentNode.localTranslation = BASE_POSITION
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3))
+        geometry.localTranslation = BASE_POSITION
+        geometry.localRotation = Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3))
     }
 }
 

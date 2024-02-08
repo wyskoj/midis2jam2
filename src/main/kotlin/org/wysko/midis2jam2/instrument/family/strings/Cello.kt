@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Cello. */
 class Cello(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
@@ -30,15 +31,15 @@ class Cello(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Strin
     20.0,
     Vector3f(0.75f, 0.75f, 0.75f),
     intArrayOf(36, 43, 50, 57),
-    context.loadModel("Cello.obj", "CelloSkin.bmp")
+    context.modelD("Cello.obj", "CelloSkin.bmp")
 ) {
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(-20 * updateInstrumentIndex(delta), 0f, 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(-20 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     init {
-        highestLevel.setLocalTranslation(-69f, 39.5f, -49.6f)
-        instrumentNode.setLocalScale(1.86f)
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
+        placement.setLocalTranslation(-69f, 39.5f, -49.6f)
+        geometry.setLocalScale(1.86f)
+        geometry.localRotation = Quaternion().fromAngles(rad(-15.0), rad(45.0), 0f)
     }
 }

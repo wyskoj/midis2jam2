@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,21 +25,19 @@ import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 
 /**
- * Registers drag and drop functionality to the [FrameWindowScope].
+ * Registers a drag and drop listener on the window's content pane.
  *
- * @param setMidiFile The callback function to be called when a [file][File] is dropped.
+ * @param onFileDrop The function to call when a file is dropped.
  */
-fun FrameWindowScope.registerDragAndDrop(
-    setMidiFile: (File) -> Unit,
-) {
-    this.window.contentPane.dropTarget = object : DropTarget() {
-        @Synchronized
-        override fun drop(dtde: DropTargetDropEvent) {
-            dtde.let { dropTargetDropEvent ->
-                dropTargetDropEvent.acceptDrop(DnDConstants.ACTION_REFERENCE)
-                (dropTargetDropEvent.transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).firstOrNull()
-                    ?.let { setMidiFile(it as File) }
+fun FrameWindowScope.registerDragAndDrop(onFileDrop: (File) -> Unit) {
+    this.window.contentPane.dropTarget =
+        object : DropTarget() {
+            @Synchronized
+            override fun drop(event: DropTargetDropEvent) {
+                event.acceptDrop(DnDConstants.ACTION_REFERENCE)
+                val transferData = event.transferable.getTransferData(DataFlavor.javaFileListFlavor) as? List<*>
+                val file = transferData?.firstOrNull() as? File ?: return
+                onFileDrop(file)
             }
         }
-    }
 }

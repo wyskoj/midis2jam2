@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,8 @@ const val GERVILL: String = "Gervill"
  */
 class HomeViewModel(
     initialConfiguration: HomeConfiguration?,
-    override val onConfigurationChanged: (HomeConfiguration) -> Unit
+    override val onConfigurationChanged: (HomeConfiguration) -> Unit,
 ) : ConfigurationViewModel<HomeConfiguration> {
-
     private val _midiFile = MutableStateFlow<File?>(null)
     val midiFile: StateFlow<File?>
         get() = _midiFile
@@ -62,6 +61,10 @@ class HomeViewModel(
     private val _lastMidiFileSelectedDirectory = MutableStateFlow<String?>(null)
     val lastMidiFileSelectedDirectory: StateFlow<String?>
         get() = _lastMidiFileSelectedDirectory
+
+    private val _isLooping = MutableStateFlow(false)
+    val isLooping: StateFlow<Boolean>
+        get() = _isLooping
 
     /**
      * Specifies if the soundbank selector should be shown
@@ -107,21 +110,35 @@ class HomeViewModel(
         _midiDevices.value = getMidiDevices()
     }
 
-    private fun getMidiDevices() = runCatching {
-        MidiSystem.getMidiDeviceInfo().filter { it.name != "Real Time Sequencer" }
-    }.getOrDefault(emptyList())
+    /**
+     * Sets the looping state.
+     *
+     * @param isLooping The looping state.
+     */
+    fun setLooping(isLooping: Boolean) {
+        _isLooping.value = isLooping
+        onConfigurationChanged(generateConfiguration())
+    }
 
-    override fun generateConfiguration(): HomeConfiguration = HomeConfiguration(
-        lastMidiFileSelectedDirectory = _lastMidiFileSelectedDirectory.value,
-        selectedMidiDevice = _selectedMidiDevice.value.name,
-        selectedSoundbank = _selectedSoundbank.value?.absolutePath
-    )
+    private fun getMidiDevices() =
+        runCatching {
+            MidiSystem.getMidiDeviceInfo().filter { it.name != "Real Time Sequencer" }
+        }.getOrDefault(emptyList())
+
+    override fun generateConfiguration(): HomeConfiguration =
+        HomeConfiguration(
+            lastMidiFileSelectedDirectory = _lastMidiFileSelectedDirectory.value,
+            selectedMidiDevice = _selectedMidiDevice.value.name,
+            selectedSoundbank = _selectedSoundbank.value?.absolutePath,
+            isLooping = _isLooping.value,
+        )
 
     override fun applyConfiguration(configuration: HomeConfiguration) {
         _lastMidiFileSelectedDirectory.value = configuration.lastMidiFileSelectedDirectory
         _selectedMidiDevice.value =
             _midiDevices.value.firstOrNull { it.name == configuration.selectedMidiDevice } ?: getMidiDevices().first()
         _selectedSoundbank.value = configuration.selectedSoundbank?.let { File(it) }
+        _isLooping.value = configuration.isLooping
     }
 
     init {
@@ -135,9 +152,10 @@ class HomeViewModel(
         fun create(
             onConfigurationChanged: (HomeConfiguration) -> Unit = {
                 HomeConfiguration.preserver.saveConfiguration(it)
+            },
+        ): HomeViewModel =
+            HomeViewModel(HomeConfiguration.preserver.getConfiguration()) {
+                onConfigurationChanged(it)
             }
-        ): HomeViewModel = HomeViewModel(HomeConfiguration.preserver.getConfiguration()) {
-            onConfigurationChanged(it)
-        }
     }
 }

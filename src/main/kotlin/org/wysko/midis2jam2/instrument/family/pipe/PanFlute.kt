@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,102 +16,105 @@
  */
 package org.wysko.midis2jam2.instrument.family.pipe
 
-import com.jme3.math.Quaternion
-import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
+import org.wysko.midis2jam2.instrument.PitchClassAnimator
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
+import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.NORMAL
+import org.wysko.midis2jam2.util.NumberSmoother
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.material
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.scale
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelD
 
-/** The Pan flute. */
+/**
+ * The Pan Flute.
+ */
 class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, skin: PipeSkin) :
-    StaticWrappedOctaveSustained(context, eventList, false) {
+    DivisiveSustainedInstrument(context, eventList, false) {
 
-    /** The Pipe nodes. */
-    private val pipeNodes = Array(12) { Node() }
-
-    override val twelfths: Array<TwelfthOfOctave> = Array(12) { index ->
+    override val animators: Array<PitchClassAnimator> = Array(12) { index ->
         val i = 11 - index
-        PanFlutePipe(skin).apply {
-            highestLevel.setLocalTranslation(-4.248f * 0.9f, -3.5f + 0.38f * i, -11.151f * 0.9f)
-            highestLevel.localRotation = Quaternion().fromAngles(0f, rad(180.0), 0f)
-            pipe.setLocalScale(1f, 1 + (13 - i) * 0.05f, 1f)
-            puffer.steamPuffNode.setLocalTranslation(0f, 11.75f - 0.38f * i, 0f)
+        PanFlutePipe(skin, eventList.notePeriodsModulus(context, i)).apply {
+            root.loc = v3(-4.248 * 0.9, -3.5 + 0.38 * i, -11.151 * 0.9)
+            root.rot = v3(0, 180, 0)
+            geometry.scale = v3(1, 1 + (13 - i) * 0.05, 1)
+            puffer.root.loc = v3(0, 11.75 - 0.38 * i, 0)
         }.also {
-            pipeNodes[i].localRotation = Quaternion().fromAngles(0f, rad(7.272 * i + 75), 0f)
-            pipeNodes[i].attachChild(it.highestLevel)
+            node {
+                +it.root
+                rot = v3(0, 7.272 * i + 75, 0)
+            }.also { geometry += it }
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        val index = updateInstrumentIndex(delta)
-        instrumentNode.localRotation =
-            Quaternion().fromAngles(0f, rad((80 / 11f * 12 * index).toDouble()), 0f)
-        offsetNode.setLocalTranslation(0f, index * 4.6f, 0f)
+    private val pitchBendModulationController = PitchBendModulationController(context, eventList)
+    private var bend = 0f
+
+    init {
+        placement.loc = v3(75f, 22f, -35f)
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        bend = pitchBendModulationController.tick(time, delta)
+    }
+
+    override fun adjustForMultipleInstances(delta: Float) {
+        geometry.rot = v3(0, 80 / 11.0 * 12 * updateInstrumentIndex(delta), 0)
+        root.loc = v3(0, index * 4.6, 0)
     }
 
     /**
      * Represents a skin the Pan Flute can have.
      */
     enum class PipeSkin(
-        /**
-         * The texture file name.
-         */
-        val textureFile: String,
-
-        /**
-         * True if the material is reflective, false otherwise.
-         */
-        val reflective: Boolean
+        internal val textureFile: String,
+        internal val reflective: Boolean,
     ) {
         /** Gold pipe skin. */
         GOLD("HornSkin.bmp", true),
 
         /** Wood pipe skin. */
-        WOOD("Wood.bmp", false);
+        WOOD("Wood.bmp", false),
     }
 
     /** Each of the pipes in the pan flute, calliope, etc. */
-    inner class PanFlutePipe(skin: PipeSkin) : TwelfthOfOctave() {
+    private inner class PanFlutePipe(skin: PipeSkin, notePeriodsModulus: List<NotePeriod>) :
+        PitchClassAnimator(context, notePeriodsModulus) {
 
-        /** The geometry of this pipe. */
-        val pipe: Spatial = context.loadModel("PanPipe.obj", skin.textureFile)
-
-        /** The steam puffer for this pipe. */
-        val puffer: SteamPuffer
-
-        override fun play(duration: Double) {
-            playing = true
-            progress = 0.0
-            this.duration = duration
-        }
-
-        override fun tick(delta: Float) {
-            if (progress >= 1) {
-                playing = false
-                progress = 0.0
-            }
-            if (playing) {
-                progress += delta / duration
-            }
-            puffer.tick(delta, playing)
-        }
+        val puffer = SteamPuffer(context, NORMAL, 1.0, OUTWARDS)
+        val bendCtrl = NumberSmoother(0f, 10.0)
 
         init {
-            if (skin.reflective) {
-                pipe.setMaterial(context.assetLoader.reflectiveMaterial(skin.textureFile))
+            with(geometry) {
+                +context.modelD("PanPipe.obj", skin.textureFile).apply {
+                    if (skin.reflective) {
+                        material = context.assetLoader.reflectiveMaterial(skin.textureFile)
+                    }
+                }
             }
-            this.highestLevel.attachChild(pipe)
-            puffer = SteamPuffer(context, SteamPuffer.SteamPuffTexture.NORMAL, 1.0, SteamPuffer.PuffBehavior.OUTWARDS)
-            this.highestLevel.attachChild(puffer.steamPuffNode)
-            puffer.steamPuffNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(90.0))
+            with(animation) {
+                +puffer.root.also {
+                    it.rot = v3(0, 0, 90)
+                }
+            }
         }
-    }
 
-    init {
-        pipeNodes.forEach { instrumentNode.attachChild(it) }
-        instrumentNode.setLocalTranslation(75f, 22f, -35f)
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
+            puffer.tick(delta, playing)
+            animation.loc = v3(0, bendCtrl.tick(delta) { if (playing) bend else 0f }, 0)
+        }
     }
 }

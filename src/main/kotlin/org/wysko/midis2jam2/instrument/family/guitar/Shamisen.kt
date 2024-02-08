@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The texture file for Shamisen. */
 private const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
@@ -47,34 +48,34 @@ class Shamisen(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Fr
         }
     ),
     3,
-    context.loadModel("Shamisen.obj", SHAMISEN_SKIN_TEXTURE),
+    context.modelD("Shamisen.obj", SHAMISEN_SKIN_TEXTURE),
     SHAMISEN_SKIN_TEXTURE
 ) {
 
     override val upperStrings: Array<Spatial> = Array(3) {
-        context.loadModel("ShamisenString.obj", SHAMISEN_SKIN_TEXTURE).apply {
-            instrumentNode.attachChild(this)
+        context.modelD("ShamisenString.obj", SHAMISEN_SKIN_TEXTURE).apply {
+            geometry.attachChild(this)
             setLocalTranslation(positioning.upperX[it], positioning.upperY, FORWARD)
         }
     }
 
-    override val lowerStrings: Array<Array<Spatial>> = Array(3) { i: Int ->
-        Array(5) { j: Int ->
-            context.loadModel("ShamisenStringBottom$j.obj", SHAMISEN_SKIN_TEXTURE).apply {
-                instrumentNode.attachChild(this)
+    override val lowerStrings: List<List<Spatial>> = List(3) { i: Int ->
+        List(5) { j: Int ->
+            context.modelD("ShamisenStringBottom$j.obj", SHAMISEN_SKIN_TEXTURE).apply {
+                geometry.attachChild(this)
                 setLocalTranslation(positioning.lowerX[i], positioning.lowerY, FORWARD)
                 cullHint = Always
             }
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(5f, -4f, 0f).mult(updateInstrumentIndex(delta))
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localTranslation = Vector3f(5f, -4f, 0f).mult(updateInstrumentIndex(delta))
     }
 
     init {
         /* Positioning */
-        instrumentNode.run {
+        geometry.run {
             setLocalTranslation(56f, 43f, -23f)
             localRotation = Quaternion().fromAngles(rad(-5.0), rad(-46.0), rad(-33.0))
         }

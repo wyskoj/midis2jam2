@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.LONG
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.SHORT
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.LONG_GUIRO
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.SHORT_GUIRO
+import org.wysko.midis2jam2.world.modelD
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -59,21 +59,27 @@ private const val EASING_POWER = 2
  *
  * The gourd is slightly lowered during the motion of the stick. This vertical offset is defined by [verticalTransform].
  */
-class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class Guiro(
+    context: Midis2jam2,
+    shortHits: MutableList<MidiNoteOnEvent>,
+    longHits: MutableList<MidiNoteOnEvent>,
+) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.time }.toMutableList()) {
+    private val shortCollector = EventCollector(shortHits, context)
+    private val longCollector = EventCollector(longHits, context)
 
-    private val eventCollector = EventCollector(hits, context)
+    private val guiroNode =
+        Node().apply {
+            attachChild(context.modelD("DrumSet_Guiro.obj", "GuiroSkin.png"))
+        }.also {
+            geometry.attachChild(it)
+        }
 
-    private val guiroNode = Node().apply {
-        attachChild(context.loadModel("DrumSet_Guiro.obj", "GuiroSkin.png"))
-    }.also {
-        instrumentNode.attachChild(it)
-    }
-
-    private val stickNode = Node().apply {
-        attachChild(context.loadModel("DrumSet_GuiroStick.obj", "Wood.bmp"))
-    }.also {
-        instrumentNode.attachChild(it)
-    }
+    private val stickNode =
+        Node().apply {
+            attachChild(context.modelD("DrumSet_GuiroStick.obj", "Wood.bmp"))
+        }.also {
+            geometry.attachChild(it)
+        }
 
     private var isMoving = false
     private var isMovingLeft = true
@@ -81,16 +87,26 @@ class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
     private var stickPosition = 0f
 
     init {
-        instrumentNode.localTranslation = BASE_POSITION
-        instrumentNode.localRotation = BASE_ROTATION
+        geometry.localTranslation = BASE_POSITION
+        geometry.localRotation = BASE_ROTATION
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
-        eventCollector.advanceCollectOne(time)?.let {
+        shortCollector.advanceCollectOne(time)?.let {
             isMoving = true
-            movingSpeed = if (it.note == LONG_GUIRO) LONG else SHORT
+            movingSpeed = SHORT
+            isMovingLeft = !isMovingLeft // Alternate on each stroke
+            if (isMovingLeft) stickPosition = 1f else 0f // Reset position to start of motion
+        }
+
+        longCollector.advanceCollectOne(time)?.let {
+            isMoving = true
+            movingSpeed = LONG
             isMovingLeft = !isMovingLeft // Alternate on each stroke
             if (isMovingLeft) stickPosition = 1f else 0f // Reset position to start of motion
         }
@@ -102,7 +118,7 @@ class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
             stickPosition = stickPosition.coerceIn(GUIRO_SLIDE_RANGE) // Don't ever show the stick outside the range
         }
 
-        stickNode.run {
+        with(stickNode) {
             localTranslation =
                 STICK_BASE_POSITION.add(easedStickPosition() * STICK_MOTION_SCALE, verticalTransform(), 0f)
             localRotation = Quaternion().fromAngles(verticalTransform() / 4, 0f, 0f)
@@ -110,8 +126,8 @@ class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         guiroNode.setLocalTranslation(0f, verticalTransform() / 4, 0f)
     }
 
-    private fun easedStickPosition(): Float {
-        return when (movingSpeed) {
+    private fun easedStickPosition(): Float =
+        when (movingSpeed) {
             LONG -> {
                 if (isMovingLeft) {
                     1 - (1 - stickPosition).pow(EASING_POWER)
@@ -128,24 +144,20 @@ class Guiro(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
                 }
             }
         }
-    }
 
     private fun verticalTransform(): Float = abs((2 * stickPosition - 1).pow(5)) // "U" shape in 0..1
 
     override fun toString(): String {
-        return super.toString() + buildString {
-            appendLine(debugProperty("stickPosition", stickPosition))
-            appendLine(debugProperty("isMovingLeft", isMovingLeft.toString()))
-            appendLine(debugProperty("isMoving", isMoving.toString()))
-        }
+        return super.toString() +
+            buildString {
+                appendLine(debugProperty("stickPosition", stickPosition))
+                appendLine(debugProperty("isMovingLeft", isMovingLeft.toString()))
+                appendLine(debugProperty("isMoving", isMoving.toString()))
+            }
     }
 }
 
-/** The current moving speed of the guiro stick. */
 private enum class GuiroStickSpeed {
-    /** Short stroke, fast speed. */
     SHORT,
-
-    /** Long stroke, slow speed. */
-    LONG
+    LONG,
 }

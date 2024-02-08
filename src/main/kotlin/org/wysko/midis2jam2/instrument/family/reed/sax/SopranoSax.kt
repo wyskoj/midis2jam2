@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class.java)
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class)
 private const val STRETCH_FACTOR = 2f
 
 /**
@@ -34,14 +34,14 @@ private const val STRETCH_FACTOR = 2f
 class SopranoSax(
     context: Midis2jam2,
     events: List<MidiChannelSpecificEvent>
-) : Saxophone(context, events, SopranoSaxClone::class.java, FINGERING_MANAGER) {
+) : Saxophone(context, events, SopranoSaxClone::class, FINGERING_MANAGER) {
 
     /**
      * A single Soprano saxophone.
      */
     inner class SopranoSaxClone : SaxophoneClone(this@SopranoSax, STRETCH_FACTOR) {
-        override fun moveForPolyphony(delta: Float) {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((20f * indexForMoving()).toDouble()), 0f)
+        override fun adjustForPolyphony(delta: Float) {
+            root.localRotation = Quaternion().fromAngles(0f, rad((20f * indexForMoving()).toDouble()), 0f)
         }
 
         init {
@@ -61,14 +61,14 @@ class SopranoSax(
                     }
                 )
                 getChild(1).setMaterial(shine)
-                modelNode.attachChild(this)
+                geometry.attachChild(this)
             }
             highestLevel.localRotation = Quaternion().fromAngles(rad(54.8 - 90), rad(54.3), rad(2.4))
         }
     }
 
     init {
-        with(groupOfPolyphony) {
+        with(geometry) {
             setLocalTranslation(-7f, 22f, -51f)
             setLocalScale(0.75f)
         }

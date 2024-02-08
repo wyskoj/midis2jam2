@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,12 @@ package org.wysko.midis2jam2.instrument.algorithmic
  */
 fun interface FingeringManager<E> {
     /**
-     * Given a MIDI note, returns the fingering associated with that note, or null if the note is outside the
+     * Given a MIDI note, returns the fingering associated with that note, or `null` if the note is outside the
      * instrument's defined range.
      *
-     * @param midiNote MIDI note
+     * @param midiNote The MIDI note to find the fingering for.
+     * @return The fingering associated with the given MIDI note, or `null` if the note is outside the instrument's
+     * defined range.
      */
     fun fingering(midiNote: Int): E?
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,84 +16,73 @@
  */
 package org.wysko.midis2jam2.instrument.family.brass
 
-import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.wysko.midis2jam2.instrument.clone.AnimatedKeyCloneByIntegers
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
+import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.get
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.material
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.times
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.modelR
+
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Tuba::class)
 
 /**
  * The Tuba.
- *
- * It has four keys and animates just like other [MonophonicInstrument]s.
  */
 class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    MonophonicInstrument(context, eventList, TubaClone::class.java, FINGERING_MANAGER) {
+    MonophonicInstrument(context, eventList, TubaClone::class, FINGERING_MANAGER), MultipleInstancesLinearAdjustment {
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 40 * updateInstrumentIndex(delta), 0f)
+    override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(Axis.Z)
+    override val multipleInstancesDirection: Vector3f = v3(0, 40, 0)
+
+    init {
+        placement.loc = v3(-110f, 25f, -30f)
     }
 
-    override val pitchBendConfiguration: ClonePitchBendConfiguration =
-        ClonePitchBendConfiguration(rotationalAxis = Axis.Z)
-
-    /** A single Tuba. */
-    inner class TubaClone : AnimatedKeyCloneByIntegers(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {
-
-        override fun moveForPolyphony(delta: Float) {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((50f * indexForMoving()).toDouble()), 0f)
-        }
+    /**
+     * A single Tuba.
+     */
+    inner class TubaClone : CloneWithKeyPositions(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {
 
         override val keys: Array<Spatial> = Array(4) { i ->
-            context.loadModel("TubaKey${i + 1}.obj", "HornSkinGrey.bmp", 0.9f)
-                .also { modelNode.attachChild(it) }
+            with(geometry) {
+                +context.modelR("TubaKey${i + 1}.obj", "HornSkinGrey.bmp")
+            }
         }
 
-        override fun animateKeys(pressed: Array<Int>) {
+        override fun adjustForPolyphony(delta: Float) {
+            root.rot = v3(0, 50, 0) * indexForMoving()
+        }
+
+        override fun animateKeys(pressed: List<Int>) {
             super.animateKeys(pressed)
-            /* Tuba keys move down when pressed */
-            for (i in 0..3) {
-                if (pressed.any { it == i }) {
-                    keys[i].setLocalTranslation(0f, -0.5f, 0f)
-                } else {
-                    keys[i].setLocalTranslation(0f, 0f, 0f)
-                }
-            }
+            keys.forEachIndexed { i, key -> key.loc = v3(0f, if (i in pressed) -0.5 else 0, 0f) }
         }
 
         init {
-            /* Load body and bell */
-            val body = context.loadModel("TubaBody.obj", "HornSkin.bmp", 0.9f)
-            bell.attachChild(context.loadModel("TubaHorn.obj", "HornSkin.bmp", 0.9f))
-
-            /* Attach body and bell */
-            modelNode.run {
-                attachChild(body)
-                attachChild(bell)
+            with(geometry) {
+                +context.modelR("TubaBody.obj", "HornSkin.bmp").apply {
+                    (this as Node)[1].material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
+                }
+            }
+            with(bell) {
+                +context.modelR("TubaHorn.obj", "HornSkin.bmp")
             }
 
-            /* Set horn skin grey material */
-            (body as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-
-            /* Positioning */
-            idleNode.localRotation = Quaternion().fromAngles(rad(-10.0), rad(90.0), 0f)
-            highestLevel.setLocalTranslation(10f, 0f, 0f)
+            highestLevel.loc = v3(10, 0, 0)
+            highestLevel.rot = v3(-10.0, 90.0, 0)
         }
-    }
-
-    companion object {
-        /** The Tuba fingering manager. */
-        val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Tuba::class.java)
-    }
-
-    init {
-        /* Tuba positioning */
-        groupOfPolyphony.setLocalTranslation(-110f, 25f, -30f)
     }
 }

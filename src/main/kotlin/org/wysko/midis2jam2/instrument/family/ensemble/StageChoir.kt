@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,109 +17,144 @@
 package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.math.ColorRGBA
-import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
-import com.jme3.renderer.queue.RenderQueue
-import com.jme3.scene.Geometry
-import com.jme3.scene.Node
+import com.jme3.renderer.queue.RenderQueue.ShadowMode.Off
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
-import org.wysko.midis2jam2.instrument.family.brass.BouncyTwelfth
+import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
+import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.PitchClassAnimator
+import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.midi.notePeriodsModulus
+import org.wysko.midis2jam2.util.material
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelD
+import kotlin.math.exp
+import kotlin.math.pow
 
 private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 
-/** The choir. */
+/**
+ * The Stage Choir.
+ *
+ * @param context The context to the main class.
+ * @param eventList The list of all events that this instrument should be aware of.
+ * @param type The type of choir peep.
+ */
 class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: ChoirType) :
-    WrappedOctaveSustained(context, eventList, true) {
+    DivisiveSustainedInstrument(context, eventList, true) {
 
-    override val twelfths: Array<TwelfthOfOctave> = Array(12) {
-        if (type == ChoirType.HALO_SYNTH) {
-            ChoirPeepHalo()
-        } else {
-            ChoirPeep(type)
-        }.apply {
-            highestLevel.localTranslation = BASE_POSITION
+    private val pitchBendModulationController = PitchBendModulationController(context, eventList)
+    private var bend = 0f
+
+    override val animators: Array<PitchClassAnimator> =
+        Array(12) {
+            val notePeriods = eventList.notePeriodsModulus(context, it)
+            if (type == ChoirType.HaloSynth) {
+                ChoirPeepHalo(notePeriods)
+            } else {
+                ChoirPeep(type, notePeriods)
+            }.apply {
+                root.localTranslation = BASE_POSITION
+            }
+        }
+
+    init {
+        repeat(12) {
+            with(geometry) {
+                +node {
+                    +animators[it].root
+                    rot = v3(0, 11.27 + it * -5.636, 0)
+                }
+            }
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        bend = pitchBendModulationController.tick(time, delta)
+    }
+
+    override fun adjustForMultipleInstances(delta: Float) {
         val indexForMoving = updateInstrumentIndex(delta)
-        twelfths.forEach {
+        animators.forEach {
             it as ChoirPeep
             if (indexForMoving >= 0) {
-                it.highestLevel.localTranslation =
+                it.root.localTranslation =
                     BASE_POSITION.clone().add(Vector3f(0f, 10f, -15f).mult(indexForMoving))
             } else {
-                it.highestLevel.localTranslation =
+                it.root.localTranslation =
                     BASE_POSITION.clone().add(Vector3f(0f, indexForMoving * 10f, indexForMoving * 10f))
             }
         }
     }
 
+    override fun similar(): List<Instrument> =
+        context.instruments.filterIsInstance<StageChoir>() + context.instruments.filterIsInstance<ApplauseChoir>()
+
     /** A single choir peep. */
-    open inner class ChoirPeep(type: ChoirType) : BouncyTwelfth() {
-        open val model = context.loadModel("StageChoir.obj", type.textureFile).also {
-            animNode.attachChild(it)
+    open inner class ChoirPeep(type: ChoirType, notePeriods: List<NotePeriod>) :
+        RisingPitchClassAnimator(context, notePeriods) {
+        private val head = with(geometry) {
+            +context.modelD("StageChoirHead.obj", type.textureFile).also { it.move(v3(0, 24.652, 0)) }
         }
-    }
 
-    inner class ChoirPeepHalo : ChoirPeep(ChoirType.HALO_SYNTH) {
-        override val model = context.loadModel("StageChoirHalo.obj", "ChoirHalo.png").also {
-            /* Halo must be separate material for glow effect to work */
-            (it as Node).getChild(0).apply {
-                setMaterial(context.unshadedMaterial("ChoirHalo.png"))
-                shadowMode = RenderQueue.ShadowMode.Off
+        init {
+            with(geometry) {
+                +context.modelD("StageChoirBody.obj", type.textureFile)
             }
-            animNode.attachChild(it)
         }
 
-        override fun tick(delta: Float) {
-            super.tick(delta)
-
-            ((model as Node).getChild(0) as Geometry).material.setColor(
-                "GlowColor",
-                if (playing) {
-                    ColorRGBA.Yellow
-                } else {
-                    ColorRGBA.Black
-                }
-            )
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
+            head.rot = v3(if (playing) (1.0 / (1 + exp(bend / 4))) * 180 - 90 else 0, 0, 0)
         }
     }
 
-    /** The type of choir peep. */
-    enum class ChoirType(
-        /** The texture file of the choir type. */
-        val textureFile: String
-    ) {
+    /** A single choir peep with a halo. */
+    inner class ChoirPeepHalo(notePeriods: List<NotePeriod>) : ChoirPeep(ChoirType.HaloSynth, notePeriods) {
+        private val halo = with(geometry) {
+            +context.modelD("StageChoirHalo.obj", "ChoirHalo.png").also {
+                it.material = context.unshadedMaterial("ChoirHalo.png")
+                it.shadowMode = Off
+            }
+        }
+
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
+            val progress = collector.currentNotePeriods.firstOrNull()?.progress(time) ?: 1.0
+            val glowIntensity = (-progress.pow(64) + 1).toFloat()
+            halo.material.setColor("GlowColor", ColorRGBA(glowIntensity, glowIntensity, 0f, 1f))
+        }
+    }
+
+    /**
+     * The type of choir peep.
+     *
+     * @property textureFile The texture file for the choir peep.
+     */
+    enum class ChoirType(val textureFile: String) {
         /** Voice aahs. */
-        CHOIR_AAHS("ChoirPeep.bmp"),
+        ChoirAahs("ChoirPeep.bmp"),
 
         /** Voice oohs. */
-        VOICE_OOHS("ChoirPeepOoh.png"),
+        VoiceOohs("ChoirPeepOoh.png"),
 
         /** Synth voice. */
-        SYNTH_VOICE("ChoirPeepSynthVoice.png"),
+        SynthVoice("ChoirPeepSynthVoice.png"),
 
         /** Voice synth. */
-        VOICE_SYNTH("ChoirPeepVoiceSynth.png"),
+        VoiceSynth("ChoirPeepVoiceSynth.png"),
 
         /** Halo synth. */
-        HALO_SYNTH("ChoirHalo.png"),
+        HaloSynth("ChoirHalo.png"),
 
         /** Goblin synth. */
-        GOBLIN_SYNTH("ChoirPeepGoblin.png"),
-    }
-
-    init {
-        Array(12) {
-            Node().apply {
-                attachChild(twelfths[it].highestLevel)
-                localRotation = Quaternion().fromAngles(0f, rad(11.27 + it * -5.636), 0f)
-                instrumentNode.attachChild(this)
-            }
-        }
+        GoblinSynth("ChoirPeepGoblin.png"),
     }
 }

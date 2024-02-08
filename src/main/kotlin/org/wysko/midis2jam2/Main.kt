@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ import java.io.File
 import javax.swing.JOptionPane
 import kotlin.system.exitProcess
 
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Suppress("kotlin:S1151")
 suspend fun main(args: Array<String>) {
@@ -80,7 +79,7 @@ suspend fun main(args: Array<String>) {
                         null,
                         "The cubemap background configuration is invalid. Please fix it in the settings.",
                         "Error",
-                        JOptionPane.ERROR_MESSAGE
+                        JOptionPane.ERROR_MESSAGE,
                     )
                     return
                 }
@@ -88,19 +87,25 @@ suspend fun main(args: Array<String>) {
 
             else -> Unit
         }
-        Execution.start(midiFile = File(args.first()), configurations = listOf(
-            homeViewModel.generateConfiguration(),
-            settingsViewModel.generateConfiguration(),
-            backgroundConfiguration,
-            graphicsConfigurationViewModel.generateConfiguration(),
-            soundbankConfigurationViewModel.generateConfiguration()
-        ), onStart = {
-
-        }, onReady = {
-            SplashScreen.hide()
-        }, onFinish = {
-            exitProcess(0)
-        })
+        Execution.start(
+            midiFile = File(args.first()),
+            configurations =
+                listOf(
+                    homeViewModel.generateConfiguration(),
+                    settingsViewModel.generateConfiguration(),
+                    backgroundConfiguration,
+                    graphicsConfigurationViewModel.generateConfiguration(),
+                    soundbankConfigurationViewModel.generateConfiguration(),
+                ),
+            onStart = {
+            },
+            onReady = {
+                SplashScreen.hide()
+            },
+            onFinish = {
+                exitProcess(0)
+            },
+        )
         delay(Long.MAX_VALUE)
     } else {
         application {
@@ -113,30 +118,35 @@ suspend fun main(args: Array<String>) {
             LegacyConfigurationImporter.importLegacyConfiguration().forEach {
                 it?.let {
                     when (it) {
-                        is HomeConfiguration -> homeViewModel.run {
-                            applyConfiguration(it)
-                            onConfigurationChanged(generateConfiguration())
-                        }
+                        is HomeConfiguration ->
+                            homeViewModel.run {
+                                applyConfiguration(it)
+                                onConfigurationChanged(generateConfiguration())
+                            }
 
-                        is SettingsConfiguration -> settingsViewModel.run {
-                            applyConfiguration(it)
-                            onConfigurationChanged(generateConfiguration())
-                        }
+                        is SettingsConfiguration ->
+                            settingsViewModel.run {
+                                applyConfiguration(it)
+                                onConfigurationChanged(generateConfiguration())
+                            }
 
-                        is BackgroundConfiguration -> backgroundConfigurationViewModel.run {
-                            applyConfiguration(it)
-                            onConfigurationChanged(generateConfiguration())
-                        }
+                        is BackgroundConfiguration ->
+                            backgroundConfigurationViewModel.run {
+                                applyConfiguration(it)
+                                onConfigurationChanged(generateConfiguration())
+                            }
 
-                        is GraphicsConfiguration -> graphicsConfigurationViewModel.run {
-                            applyConfiguration(it)
-                            onConfigurationChanged(generateConfiguration())
-                        }
+                        is GraphicsConfiguration ->
+                            graphicsConfigurationViewModel.run {
+                                applyConfiguration(it)
+                                onConfigurationChanged(generateConfiguration())
+                            }
 
-                        is SoundbankConfiguration -> soundbankConfigurationViewModel.run {
-                            applyConfiguration(it)
-                            onConfigurationChanged(generateConfiguration())
-                        }
+                        is SoundbankConfiguration ->
+                            soundbankConfigurationViewModel.run {
+                                applyConfiguration(it)
+                                onConfigurationChanged(generateConfiguration())
+                            }
                     }
                 }
             }
@@ -148,10 +158,14 @@ suspend fun main(args: Array<String>) {
                 icon = painterResource("/ico/icon512.png"),
                 onKeyEvent = {
                     when (it.key) {
-                        Key.F1 -> openHelp()
+                        Key.F1 -> {
+                            openHelp()
+                            true
+                        }
+
                         else -> false
                     }
-                }
+                },
             ) {
                 centerWindow()
                 registerDragAndDrop {
@@ -160,50 +174,56 @@ suspend fun main(args: Array<String>) {
                 Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
                     when (it.value) {
                         true -> ErrorDialog()
-                        false -> SetupUi(
-                            homeViewModel,
-                            searchViewModel,
-                            settingsViewModel,
-                            backgroundConfigurationViewModel,
-                            graphicsConfigurationViewModel,
-                            soundbankConfigurationViewModel,
-                            isLockPlayButton
-                        ) {
-                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
-                            when (backgroundConfiguration) {
-                                is BackgroundConfiguration.CubemapBackground -> {
-                                    if (!backgroundConfiguration.validate()) {
-                                        logger().errorDisp(
-                                            "Background configuration is invalid. Perhaps you forgot to set a texture?",
-                                            Throwable("Invalid background configuration")
-                                        )
-                                        return@SetupUi
+                        false ->
+                            SetupUi(
+                                homeViewModel,
+                                searchViewModel,
+                                settingsViewModel,
+                                backgroundConfigurationViewModel,
+                                graphicsConfigurationViewModel,
+                                soundbankConfigurationViewModel,
+                                isLockPlayButton,
+                            ) {
+                                val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                                when (backgroundConfiguration) {
+                                    is BackgroundConfiguration.CubemapBackground -> {
+                                        if (!backgroundConfiguration.validate()) {
+                                            logger().errorDisp(
+                                                "Background configuration is invalid. Perhaps you forgot to set a texture?",
+                                                Throwable("Invalid background configuration"),
+                                            )
+                                            return@SetupUi
+                                        }
                                     }
-                                }
 
-                                else -> Unit
+                                    else -> Unit
+                                }
+                                Execution.start(
+                                    midiFile = homeViewModel.midiFile.value!!,
+                                    configurations =
+                                        listOf(
+                                            homeViewModel.generateConfiguration(),
+                                            settingsViewModel.generateConfiguration(),
+                                            backgroundConfiguration,
+                                            graphicsConfigurationViewModel.generateConfiguration(),
+                                            soundbankConfigurationViewModel.generateConfiguration(),
+                                        ),
+                                    onStart = {
+                                        isLockPlayButton = true
+                                    },
+                                    onReady = {
+                                        // Nothing to do.
+                                    },
+                                    onFinish = {
+                                        isLockPlayButton = false
+                                    },
+                                )
                             }
-                            Execution.start(midiFile = homeViewModel.midiFile.value!!, configurations = listOf(
-                                homeViewModel.generateConfiguration(),
-                                settingsViewModel.generateConfiguration(),
-                                backgroundConfiguration,
-                                graphicsConfigurationViewModel.generateConfiguration(),
-                                soundbankConfigurationViewModel.generateConfiguration()
-                            ), onStart = {
-                                isLockPlayButton = true
-                            }, onReady = {
-                                // Nothing to do.
-                            }, onFinish = {
-                                isLockPlayButton = false
-                            })
-                        }
                     }
                 }
             }
         }
-
     }
-
 }
 
 /**
@@ -227,11 +247,12 @@ private fun SetupUi(
     graphicsConfigurationViewModel: GraphicsConfigurationViewModel,
     soundbankConfigurationViewModel: SoundbankConfigurationViewModel,
     isLockPlayButton: Boolean = false,
-    playMidiFile: () -> Unit
+    playMidiFile: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var isFlicker by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+
     fun flicker() {
         scope.launch {
             isFlicker = true
@@ -248,46 +269,52 @@ private fun SetupUi(
                 }
                 Crossfade(targetState = activeScreen, animationSpec = tween(200)) { selectedTab ->
                     when (selectedTab) {
-                        TabFactory.home -> HomeScreen(
-                            homeViewModel = homeViewModel,
-                            openMidiSearch = { activeScreen = TabFactory.search },
-                            playMidiFile = playMidiFile,
-                            flicker = isFlicker,
-                            snackbarHostState = snackbarHostState,
-                            soundbankConfigurationViewModel = soundbankConfigurationViewModel,
-                            onOpenSoundbankConfig = { activeScreen = TabFactory.soundbankConfiguration },
-                            isLockPlayButton = isLockPlayButton
-                        )
+                        TabFactory.home ->
+                            HomeScreen(
+                                homeViewModel = homeViewModel,
+                                openMidiSearch = { activeScreen = TabFactory.search },
+                                playMidiFile = playMidiFile,
+                                flicker = isFlicker,
+                                snackbarHostState = snackbarHostState,
+                                soundbankConfigurationViewModel = soundbankConfigurationViewModel,
+                                onOpenSoundbankConfig = { activeScreen = TabFactory.soundbankConfiguration },
+                                isLockPlayButton = isLockPlayButton,
+                            )
 
-                        TabFactory.search -> SearchScreen(searchViewModel, snackbarHostState) {
-                            scope.launch {
-                                activeScreen = TabFactory.home
-                                delay(400)
-                                homeViewModel.selectMidiFile(it)
-                                flicker()
+                        TabFactory.search ->
+                            SearchScreen(searchViewModel, snackbarHostState) {
+                                scope.launch {
+                                    activeScreen = TabFactory.home
+                                    delay(400)
+                                    homeViewModel.selectMidiFile(it)
+                                    flicker()
+                                }
                             }
-                        }
 
-                        TabFactory.settings -> SettingsScreen(settingsViewModel) {
-                            activeScreen = it
-                        }
+                        TabFactory.settings ->
+                            SettingsScreen(settingsViewModel) {
+                                activeScreen = it
+                            }
 
                         TabFactory.about -> AboutScreen()
-                        TabFactory.backgroundConfiguration -> BackgroundConfigurationScreen(
-                            backgroundConfigurationViewModel
-                        ) {
-                            activeScreen = TabFactory.settings
-                        }
+                        TabFactory.backgroundConfiguration ->
+                            BackgroundConfigurationScreen(
+                                backgroundConfigurationViewModel,
+                            ) {
+                                activeScreen = TabFactory.settings
+                            }
 
-                        TabFactory.graphicsConfiguration -> GraphicsConfigurationScreen(graphicsConfigurationViewModel) {
-                            activeScreen = TabFactory.settings
-                        }
+                        TabFactory.graphicsConfiguration ->
+                            GraphicsConfigurationScreen(graphicsConfigurationViewModel) {
+                                activeScreen = TabFactory.settings
+                            }
 
-                        TabFactory.soundbankConfiguration -> SoundbankConfigurationScreen(
-                            soundbankConfigurationViewModel
-                        ) {
-                            activeScreen = TabFactory.settings
-                        }
+                        TabFactory.soundbankConfiguration ->
+                            SoundbankConfigurationScreen(
+                                soundbankConfigurationViewModel,
+                            ) {
+                                activeScreen = TabFactory.settings
+                            }
 
                         is ApplicationScreen.ScreenWithTab -> Unit
                         is ApplicationScreen.ScreenWithoutTab -> Unit

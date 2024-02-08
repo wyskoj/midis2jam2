@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,27 @@
 package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
+import org.wysko.midis2jam2.world.modelD
 
 /** Contains shared code between the flute and piccolo. */
-open class FluteAndPiccoloClone(parent: HandedInstrument, puffType: SteamPuffTexture, puffScale: Float) :
-    PuffingClone(parent, puffType, puffScale) {
+open class FluteAndPiccoloClone(parent: InstrumentWithHands, puffType: SteamPuffTexture, puffScale: Float) :
+    CloneWithPuffer(parent, puffType, puffScale) {
 
-    override val leftHands: Array<Spatial> = Array(13) {
-        parent.context.loadModel("Flute_LeftHand%02d.obj".format(it), "hands.bmp")
+    override val leftHands: List<Spatial> = List(13) {
+        parent.context.modelD("Flute_LeftHand%02d.obj".format(it), "hands.bmp")
     }
 
-    override val rightHands: Array<Spatial> = Array(12) {
-        parent.context.loadModel("Flute_RightHand%02d.obj".format(it), "hands.bmp")
+    override val rightHands: List<Spatial> = List(12) {
+        parent.context.modelD("Flute_RightHand%02d.obj".format(it), "hands.bmp")
     }
 
     init {
         loadHands()
     }
 
-    override fun moveForPolyphony(delta: Float) {
-        offsetNode.setLocalTranslation((5 * indexForMoving()), 0f, (5 * -indexForMoving()))
+    override fun adjustForPolyphony(delta: Float) {
+        root.setLocalTranslation((5 * indexForMoving()), 0f, (5 * -indexForMoving()))
     }
 }

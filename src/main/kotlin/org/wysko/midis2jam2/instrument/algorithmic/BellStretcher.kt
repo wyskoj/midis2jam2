@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ interface BellStretcher {
      * Sets the amount of bell stretch from the current [NotePeriod]. Call this method on every frame.
      *
      * @param period NotePeriod from which to calculate the amount to stretch the bell by.
+     * @param time The current time since the beginning of the song, in seconds.
      */
     fun tick(period: NotePeriod?, time: Double)
 }

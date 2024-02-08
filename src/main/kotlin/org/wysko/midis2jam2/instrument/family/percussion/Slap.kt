@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,44 +21,48 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The Slap.
  *
  * It animates very similarly to [HandClap].
  */
-class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class Slap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+    private val leftSlap =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = context.modelD("SlapHalf.obj", "Wood.bmp"),
+            strikeSpeed = 2.4,
+            maxIdleAngle = 30.0,
+            actualStick = false,
+        ).apply {
+            setParent(geometry)
+        }
 
-    private val leftSlap = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = context.loadModel("SlapHalf.obj", "Wood.bmp"),
-        strikeSpeed = 2.4,
-        maxIdleAngle = 30.0,
-        actualStick = false
-    ).apply {
-        setParent(instrumentNode)
-    }
-
-    private val rightSlap = Node().also {
-        it.attachChild(
-            context.loadModel("SlapHalf.obj", "Wood.bmp").apply {
-                localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
-            }
-        )
-        instrumentNode.attachChild(it)
-    }
+    private val rightSlap =
+        Node().also {
+            it.attachChild(
+                context.modelD("SlapHalf.obj", "Wood.bmp").apply {
+                    localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
+                },
+            )
+            geometry.attachChild(it)
+        }
 
     init {
-        instrumentNode.apply {
+        geometry.apply {
             setLocalTranslation(15f, 70f, -55f)
             localRotation = Quaternion().fromAngles(0f, -FastMath.PI / 4, 0f)
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
         val results = leftSlap.tick(time, delta)
         rightSlap.localRotation = Quaternion().fromAngles(-results.rotationAngle, 0f, 0f)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,18 +28,14 @@ import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 open class NotePeriod(
     /** The MIDI pitch of this note period. */
     val midiNote: Int,
-
     /** The start time, expressed in seconds. */
     val startTime: Double,
-
     /** The end time, expressed in seconds. */
     var endTime: Double,
-
     /** The [MidiNoteOnEvent]. */
     val noteOn: MidiNoteOnEvent,
-
     /** The [MidiNoteOffEvent]. */
-    val noteOff: MidiNoteOffEvent
+    val noteOff: MidiNoteOffEvent,
 ) {
     /** [FrettedInstrument] gets help from this. */
     var animationStarted: Boolean = false
@@ -59,6 +55,9 @@ open class NotePeriod(
         return endTime - startTime
     }
 
+    /** The current progress of this elapsing, represented in the range `0.0..1.0` */
+    fun progress(time: Double): Double = (1.0 - (endTime - time) / duration()).coerceIn(0.0..1.0)
+
     override fun toString(): String {
         return String.format("[%d @ %.1f--%.1f]", midiNote, startTime, endTime)
     }
@@ -75,8 +74,8 @@ open class NotePeriod(
          */
         @Contract(pure = true)
         fun calculateNotePeriods(
-            context: Midis2jam2,
-            noteEvents: List<MidiNoteEvent>
+            midiFile: MidiFile,
+            noteEvents: List<MidiNoteEvent>,
         ): MutableList<NotePeriod> {
             val notePeriods: ArrayList<NotePeriod> = ArrayList()
             val onEvents = arrayOfNulls<MidiNoteOnEvent>(MIDI_MAX_NOTE + 1)
@@ -92,7 +91,7 @@ open class NotePeriod(
              */
             noteEvents.forEach { noteEvent ->
                 if (noteEvent is MidiNoteOnEvent) {
-                    /* If the same note starts again while it is playing, just ignore this new NoteOn event */
+                    // If the same note starts again while it is playing, just ignore this new NoteOn event
                     if (onEvents[noteEvent.note] == null) {
                         onEvents[noteEvent.note] = noteEvent
                     }
@@ -102,22 +101,28 @@ open class NotePeriod(
                         notePeriods.add(
                             NotePeriod(
                                 midiNote = noteOff.note,
-                                startTime = context.file.eventInSeconds(it),
-                                endTime = context.file.eventInSeconds(noteOff),
+                                startTime = midiFile.eventInSeconds(it),
+                                endTime = midiFile.eventInSeconds(noteOff),
                                 noteOn = it,
-                                noteOff = noteOff
-                            )
+                                noteOff = noteOff,
+                            ),
                         )
                         onEvents[noteOff.note] = null
                     }
                 }
             }
 
-            /* Remove exact duplicates */
+            // Remove exact duplicates
             return ArrayList(notePeriods.distinct())
         }
     }
 }
+
+fun List<MidiEvent>.notePeriodsModulus(
+    context: Midis2jam2,
+    modulus: Int,
+): List<NotePeriod> =
+    NotePeriod.calculateNotePeriods(context.file, filterIsInstance<MidiNoteEvent>().filter { it.note % 12 == modulus })
 
 /**
  * It is useful for some instruments to identify groups of [NotePeriod]s that overlap. For example, if three notes with
@@ -127,7 +132,7 @@ open class NotePeriod(
  * This function assumes the input list is sorted by start time.
  */
 fun List<NotePeriod>.contiguousGroups(): List<NotePeriodGroup> {
-    /* Easy gimmes */
+    // Easy gimmes
     if (this.isEmpty()) return emptyList()
     if (this.size == 1) return listOf(NotePeriodGroup(listOf(first())))
 
@@ -159,13 +164,10 @@ fun List<NotePeriod>.contiguousGroups(): List<NotePeriodGroup> {
 
 /**
  * A collection of [NotePeriod]s that have overlapping times.
+ *
+ * @property notePeriods The [NotePeriod]s that are in this group.
  */
-data class NotePeriodGroup(
-    /**
-     * The [NotePeriod]s that are in this group.
-     */
-    val notePeriods: List<NotePeriod>
-) {
+data class NotePeriodGroup(val notePeriods: List<NotePeriod>) {
     /** The time at which the first [NotePeriod] in this group begins. */
     fun startTime(): Double = notePeriods.minOf { it.startTime }
 
@@ -174,4 +176,11 @@ data class NotePeriodGroup(
 
     /** The total amount of time this group elapses. */
     fun duration(): Double = endTime() - startTime()
+
+    /**
+     * The progress of this group's elapsing, given the current [time], represented in the range `0.0..1.0`.
+     *
+     * @param time The current time, expressed in seconds.
+     */
+    fun progress(time: Double): Double = (1.0 - (endTime() - time) / duration()).coerceIn(0.0..1.0)
 }

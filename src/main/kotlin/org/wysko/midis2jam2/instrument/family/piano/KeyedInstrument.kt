@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 package org.wysko.midis2jam2.instrument.family.piano
 
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.ToggledInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
+import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
 import org.wysko.midis2jam2.midi.*
 
 /**
@@ -29,30 +29,22 @@ import org.wysko.midis2jam2.midi.*
  * @param rangeHigh The highest note that this instrument can play.
  */
 abstract class KeyedInstrument(
-    context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, val rangeLow: Int, val rangeHigh: Int
-) : ToggledInstrument(context, eventList) {
-
+    context: Midis2jam2,
+    eventList: MutableList<MidiChannelSpecificEvent>,
+    val rangeLow: Int,
+    val rangeHigh: Int,
+) : SustainedInstrument(context, eventList) {
     /** The keys of this instrument. */
     abstract val keys: Array<Key>
 
-    private val notePeriods = NotePeriod.calculateNotePeriods(
-        context = context, noteEvents = eventList.filterIsInstance<MidiNoteEvent>()
-    ).associateBy { it.noteOff }
-
-    override val eventCollector: EventCollector<MidiNoteEvent> = EventCollector(
-        events = eventList.filterIsInstance<MidiNoteEvent>(),
-        context = context,
-        triggerCondition = { event, time ->
-            val eventTime = context.file.eventInSeconds(event)
-            when (event) {
-                is MidiNoteOffEvent -> {
-                    val np = notePeriods[event]
-                    np?.let { processEventDuration(it, time) } ?: (time >= eventTime)
-                }
-
-                else -> time >= eventTime
-            }
-        })
+    override val collector: NotePeriodCollector =
+        NotePeriodCollector(
+            context = context,
+            notePeriods = notePeriods,
+            releaseCondition = { time: Double, notePeriod: NotePeriod ->
+                processEventDuration(notePeriod, time)
+            },
+        )
 
     /** Returns the number of keys on this instrument. */
     fun keyCount(): Int = rangeHigh - rangeLow + 1
@@ -60,22 +52,19 @@ abstract class KeyedInstrument(
     /** Returns the [Key] associated with the [midiNote], or `null` if this instrument can't animate the note. */
     protected abstract fun getKeyByMidiNote(midiNote: Int): Key?
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
+        collector.advance(time)
         keys.forEach { it.tick(delta) }
     }
 
-    override fun noteStarted(note: MidiNoteOnEvent) {
-        super.noteStarted(note)
-        getKeyByMidiNote(note.note)?.pressKey(note)
-    }
-
-    override fun noteEnded(note: MidiNoteOffEvent) {
-        super.noteEnded(note)
-        getKeyByMidiNote(note.note)?.releaseKey()
-    }
-
-    private fun processEventDuration(it: NotePeriod, time: Double): Boolean {
+    private fun processEventDuration(
+        it: NotePeriod,
+        time: Double,
+    ): Boolean {
         return when {
             it.duration() > 0.5 -> time >= it.endTime - 0.1
             it.duration() > 0.2 -> time >= it.endTime - 0.05
@@ -84,27 +73,19 @@ abstract class KeyedInstrument(
     }
 
     override fun toString(): String {
-        return super.toString() + buildString {
-            append(
-                debugProperty("keys", keys.joinToString(separator = "") { if (it.isPressed) "X" else "_" })
-            )
-        }
+        return super.toString() +
+            buildString {
+                append(
+                    debugProperty(
+                        "keys",
+                        keys.joinToString(separator = "") { if (it.currentState is Key.State.Down) "X" else "_" },
+                    ),
+                )
+            }
     }
-}
 
-/** The different colors of keys on a keyboard. */
-enum class KeyColor {
-    /** White key color. */
-    WHITE,
-
-    /** Black key color. */
-    BLACK
-}
-
-/**
- * Given a MIDI [note], determines if it is a [KeyColor.WHITE] or [KeyColor.BLACK] key on a standard keyboard.
- */
-internal fun noteToKeyboardKeyColor(note: Int): KeyColor = when (note % 12) {
-    1, 3, 6, 8, 10 -> KeyColor.BLACK
-    else -> KeyColor.WHITE
+    open fun keyStatus(midiNote: Int): Key.State =
+        collector.currentNotePeriods.firstOrNull { it.midiNote == midiNote }?.let {
+            Key.State.Down(it.noteOn.velocity)
+        } ?: Key.State.Up
 }

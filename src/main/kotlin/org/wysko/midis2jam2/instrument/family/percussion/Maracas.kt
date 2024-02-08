@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,39 +20,43 @@ import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.MAX_STICK_IDLE_ANGLE
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The Maracas.
  */
-class Maracas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class Maracas(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+    private val leftMaraca =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = context.modelD("Maraca.obj", "Maraca.bmp"),
+            actualStick = false,
+        ).apply {
+            setParent(geometry)
+            node.localRotation = Quaternion().fromAngles(0f, 0f, 0.2f)
+        }
 
-    private val leftMaraca = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = context.loadModel("Maraca.obj", "Maraca.bmp"),
-        actualStick = false
-    ).apply {
-        setParent(instrumentNode)
-        node.localRotation = Quaternion().fromAngles(0f, 0f, 0.2f)
-    }
-
-    private val rightMaraca = context.loadModel("Maraca.obj", "Maraca.bmp").apply {
-        instrumentNode.attachChild(this)
-        move(5f, -1f, 0f)
-        localRotation = Quaternion().fromAngles(0f, 0f, -0.2f)
-    }
+    private val rightMaraca =
+        context.modelD("Maraca.obj", "Maraca.bmp").apply {
+            geometry.attachChild(this)
+            move(5f, -1f, 0f)
+            localRotation = Quaternion().fromAngles(0f, 0f, -0.2f)
+        }
 
     init {
-        instrumentNode.apply {
+        geometry.apply {
             setLocalTranslation(-13f, 65f, -41f)
             localRotation = Quaternion().fromAngles(Utils.rad(-MAX_STICK_IDLE_ANGLE / 2), 0f, 0f)
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
         val results = leftMaraca.tick(time, delta)

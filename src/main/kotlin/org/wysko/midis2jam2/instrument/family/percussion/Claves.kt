@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,48 +20,52 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The Claves.
  */
-class Claves(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
-
+class Claves(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
     /** Contains the left clave. */
-    private val rightClave = Striker(
-        context = context,
-        hits,
-        context.loadModel("Clave.obj", "Clave.bmp"),
-        actualStick = false
-    ).apply {
-        node.move(-1f, 0f, 0f)
-        setParent(instrumentNode)
-        offsetStick {
-            it.setLocalTranslation(2.5f, 0f, 0f)
-            it.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+    private val rightClave =
+        Striker(
+            context = context,
+            hits,
+            context.modelD("Clave.obj", "Clave.bmp"),
+            actualStick = false,
+        ).apply {
+            node.move(-1f, 0f, 0f)
+            setParent(geometry)
+            offsetStick {
+                it.setLocalTranslation(2.5f, 0f, 0f)
+                it.localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+            }
         }
-    }
 
     /** Contains the right clave. */
-    private val leftClaveNode = Node().apply {
-        instrumentNode.attachChild(this)
-    }.also {
-        it.attachChild(
-            context.loadModel("Clave.obj", "Clave.bmp").apply {
-                setLocalTranslation(-2.5f, 0f, 0f)
-                localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
-            }
-        )
-    }
+    private val leftClaveNode =
+        Node().apply {
+            geometry.attachChild(this)
+        }.also {
+            it.attachChild(
+                context.modelD("Clave.obj", "Clave.bmp").apply {
+                    setLocalTranslation(-2.5f, 0f, 0f)
+                    localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
+                },
+            )
+        }
 
     init {
-        instrumentNode.setLocalTranslation(-12f, 42.3f, -48.4f)
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
+        geometry.setLocalTranslation(-12f, 42.3f, -48.4f)
+        geometry.localRotation = Quaternion().fromAngles(rad(90.0), rad(90.0), 0f)
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
         // Animate the right clave like you normally would for a stick

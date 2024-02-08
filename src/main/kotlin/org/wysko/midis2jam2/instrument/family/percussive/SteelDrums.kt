@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
+import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.modelR
 
 private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
     Json.decodeFromString(resourceToString("/instrument/alignment/SteelDrums.json"))
@@ -40,7 +42,7 @@ class SteelDrums(
         Striker(
             context = context,
             strikeEvents = eventList.modulus(it),
-            stickModel = context.loadModel("SteelDrumMallet.obj", "StickSkin.bmp"),
+            stickModel = context.modelD("SteelDrumMallet.obj", "StickSkin.bmp"),
             sticky = false
         ).apply {
             setParent(recoilNode)
@@ -49,19 +51,19 @@ class SteelDrums(
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localRotation =
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localRotation =
             Quaternion().fromAngles(0f, rad((-37f - 15 * updateInstrumentIndex(delta)).toDouble()), 0f)
     }
 
     init {
         recoilNode.attachChild(
-            context.loadModel("SteelDrum.obj", "ShinySilver.bmp", 0.9f).also {
+            context.modelR("SteelDrum.obj", "ShinySilver.bmp").also {
                 it.move(0f, 2f, 0f)
             }
         )
 
-        with(instrumentNode) {
+        with(geometry) {
             setLocalTranslation(0f, 44.55f, -98.189f)
             localRotation = Quaternion().fromAngles(rad(29.0), 0f, 0f)
         }

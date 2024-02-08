@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Violin. */
 class Fiddle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
@@ -30,15 +31,15 @@ class Fiddle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Stri
     180.0,
     Vector3f(1f, 1f, 1f),
     intArrayOf(55, 62, 69, 76),
-    context.loadModel("Violin.obj", "FiddleSkin.png")
+    context.modelD("Violin.obj", "FiddleSkin.png")
 ) {
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(20 * updateInstrumentIndex(delta), 0f, 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(20 * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     init {
-        instrumentNode.setLocalTranslation(-10f, 67f, -15f)
-        instrumentNode.setLocalScale(1f)
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
+        geometry.setLocalTranslation(-10f, 67f, -15f)
+        geometry.setLocalScale(1f)
+        geometry.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
     }
 }

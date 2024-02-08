@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
+import org.wysko.midis2jam2.world.modelD
 
 private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
 
@@ -54,12 +55,12 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.loadModel("Banjo.obj", "BanjoSkin.png"),
+    context.modelD("Banjo.obj", "BanjoSkin.png"),
     "BanjoSkin.png"
 ) {
     override val upperStrings: Array<Spatial> = Array(4) {
-        context.loadModel("BanjoString.obj", "BassSkin.bmp").also {
-            instrumentNode.attachChild(it)
+        context.modelD("BanjoString.obj", "BassSkin.bmp").also {
+            geometry.attachChild(it)
         }
     }.apply {
         val forward = 0
@@ -73,10 +74,10 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         this[3].localRotation = Quaternion().fromAngles(0f, 0f, rad(0.92))
     }
 
-    override val lowerStrings: Array<Array<Spatial>> = Array(4) {
-        Array(5) { j: Int ->
-            context.loadModel("BanjoStringBottom$j.obj", "BassSkin.bmp").apply {
-                instrumentNode.attachChild(this)
+    override val lowerStrings: List<List<Spatial>> = List(4) {
+        List(5) { j: Int ->
+            context.modelD("BanjoStringBottom$j.obj", "BassSkin.bmp").apply {
+                geometry.attachChild(this)
                 (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }
@@ -101,13 +102,13 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         flatMap { it.asIterable() }.forEach { it.cullHint = Always }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
     }
 
     init {
         /* Position guitar */
-        instrumentNode.apply {
+        geometry.apply {
             localTranslation = BASE_POSITION
             localRotation = Quaternion().fromAngles(rad(0.8), rad(-43.3), rad(-40.5))
         }

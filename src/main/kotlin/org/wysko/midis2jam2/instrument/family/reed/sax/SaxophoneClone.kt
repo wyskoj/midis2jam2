@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
 import com.jme3.math.Quaternion
-import org.wysko.midis2jam2.instrument.clone.UpAndDownKeyClone
+import org.wysko.midis2jam2.instrument.clone.CloneWithKeyStates
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelR
 
 /** The number of keys on a saxophone. */
 private const val NUMBER_OF_KEYS = 20
@@ -28,18 +29,18 @@ private const val ROTATION_FACTOR = 0.1f
 
 /** Shared code for sax clones. */
 abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) :
-    UpAndDownKeyClone(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor) {
+    CloneWithKeyStates(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor) {
 
-    override fun moveForPolyphony(delta: Float) {
-        offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
+    override fun adjustForPolyphony(delta: Float) {
+        root.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
     }
 
     init {
-        keysUp = Array(NUMBER_OF_KEYS) {
-            parent.context.loadModel("AltoSaxKeyUp$it.obj", "HornSkinGrey.bmp", 0.9f)
+        keysUp = List(NUMBER_OF_KEYS) {
+            parent.context.modelR("AltoSaxKeyUp$it.obj", "HornSkinGrey.bmp")
         }
-        keysDown = Array(NUMBER_OF_KEYS) {
-            parent.context.loadModel("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp", 0.9f)
+        keysDown = List(NUMBER_OF_KEYS) {
+            parent.context.modelR("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp")
         }
         attachKeys()
 

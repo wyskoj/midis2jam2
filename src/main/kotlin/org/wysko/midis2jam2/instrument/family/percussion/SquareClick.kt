@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,44 +21,48 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The Square Click.
  */
-class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
-
+class SquareClick(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
     /** Contains the square click pad. */
-    private val squareClickNode = Node().apply {
-        attachChild(
-            context.loadModel("SquareShaker.obj", "Wood.bmp").apply {
-                setLocalTranslation(0f, -2f, -2f)
-            }
-        )
-    }.also {
-        instrumentNode.attachChild(it)
-    }
+    private val squareClickNode =
+        Node().apply {
+            attachChild(
+                context.modelD("SquareShaker.obj", "Wood.bmp").apply {
+                    setLocalTranslation(0f, -2f, -2f)
+                },
+            )
+        }.also {
+            geometry.attachChild(it)
+        }
 
     /** Contains the stick. */
-    private val stick = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = StickType.DRUMSET_STICK,
-        actualStick = false
-    ).apply {
-        setParent(instrumentNode)
-    }
+    private val stick =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = StickType.DRUM_SET_STICK,
+            actualStick = false,
+        ).apply {
+            setParent(geometry)
+        }
 
     init {
-        instrumentNode.run {
+        geometry.run {
             localRotation = Quaternion().fromAngles(Utils.rad(-90.0), Utils.rad(-90.0), Utils.rad(-135.0))
             setLocalTranslation(-42f, 44f, -79f)
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
         val results = stick.tick(time, delta)
         squareClickNode.localRotation = Quaternion().fromAngles(-results.rotationAngle, 0f, 0f)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ class CymbalAnimator(
     /** How fast the cymbal wobbles after being struck. */
     private val wobbleSpeed: Double,
     /** The dampening, or how fast the cymbal returns to an idle state. */
-    private val dampening: Double
+    private val dampening: Double,
+    private val phaseOffset: Float = 0.0f
 ) {
 
     /** The current time. */
@@ -42,7 +43,10 @@ class CymbalAnimator(
      * Calculates and returns the wobble angle, based on the [animTime].
      */
     private fun rotationAmount(): Float =
-        if (animTime < 0) 0f else (amplitude * (cos(animTime * wobbleSpeed * PI) / (3 + animTime.pow(3) * wobbleSpeed * dampening * PI))).toFloat()
+        when {
+            animTime < 0 -> 0f
+            else -> (amplitude * (cos(animTime * wobbleSpeed * PI + phaseOffset) / (3 + animTime.pow(3) * wobbleSpeed * dampening * PI))).toFloat()
+        }
 
     /** Call this method to indicate that the cymbal has just been struck. */
     fun strike() {

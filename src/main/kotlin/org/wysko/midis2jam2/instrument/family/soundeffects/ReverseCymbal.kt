@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.world.modelR
 import kotlin.math.cos
 import kotlin.math.pow
 
@@ -54,67 +55,67 @@ import kotlin.math.pow
  */
 class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
-
     /** The cymbal that animates backwards. */
     private val cymbal: Spatial =
-        context.loadModel("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp", 0.7f).also {
-            instrumentNode.attachChild(it)
+        context.modelR("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp").also {
+            geometry.attachChild(it)
             it.setLocalScale(2f)
         }
 
     /** A list of fake "pseudo" hits that correlate to the end times. */
-    private val pseudoHits: MutableList<MidiNoteOnEvent> = notePeriods.map {
-        MidiNoteOnEvent(it.endTick(), it.noteOn.channel, it.midiNote, 127)
-    }.toMutableList().also {
-        context.file.registerEvents(it)
-    }
+    private val pseudoHits: MutableList<MidiNoteOnEvent> =
+        notePeriods.map {
+            MidiNoteOnEvent(it.endTick(), it.noteOn.channel, it.midiNote, 127)
+        }.toMutableList().also {
+            context.file.registerEvents(it)
+        }
 
     /** Holds the stick and is rotated to the correct position. */
-    private val stickNode: Node = Node().also { instrumentNode.attachChild(it) }
+    private val stickNode: Node = Node().also { geometry.attachChild(it) }
 
     /** The stick that is used to hit the cymbal. */
-//    private val stick: Spatial = context.loadModel("DrumSet_Stick.obj", "StickSkin.bmp").also {
-//        stickNode.attachChild(it)
-//        it.setLocalTranslation(0f, 0f, 15f)
-//    }
+    private val stick =
+        Striker(
+            context = context,
+            strikeEvents = pseudoHits,
+            stickModel = StickType.DRUM_SET_STICK,
+        ).apply {
+            setParent(stickNode)
+            node.setLocalTranslation(0f, 0f, 15f)
+        }
 
-    private val stick = Striker(
-        context = context,
-        strikeEvents = pseudoHits,
-        stickModel = StickType.DRUMSET_STICK
-    ).apply {
-        setParent(stickNode)
-        node.setLocalTranslation(0f, 0f, 15f)
-    }
-
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
-        /* Animate the stick */
+        // Animate the stick
         val results = stick.tick(time, delta)
 
-        /* Find the time of the next note end. If there is none, assume it will happen infinitely in the future. */
-        val nextHitTime = stick.peek()?.let {
-            context.file.eventInSeconds(it)
-        } ?: Double.MAX_VALUE
+        // Find the time of the next note end. If there is none, assume it will happen infinitely in the future.
+        val nextHitTime =
+            stick.peek()?.let {
+                context.file.eventInSeconds(it)
+            } ?: Double.MAX_VALUE
 
-        /* Move the stick around the cymbal according to the note */
+        // Move the stick around the cymbal according to the note
         if (results.strikingFor != null && results.strike == null) {
             pseudoHits.firstOrNull()?.let {
                 stickNode.localRotation = Quaternion().fromAngles(0f, ((it.note % 12) * 30).toFloat(), 0f)
             }
         }
 
-        /* Animate the cymbal */
+        // Animate the cymbal
         cymbal.localRotation = Quaternion().fromAngles(ReverseCymbalAnimator.rotationAmount(nextHitTime - time), 0f, 0f)
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
     init {
-        instrumentNode.setLocalTranslation(75f, 40f, -35f)
+        geometry.setLocalTranslation(75f, 40f, -35f)
     }
 }
 
@@ -141,14 +142,16 @@ object ReverseCymbalAnimator {
                     amplitude * (
                         cos(timeUntilPseudoStrike * wobbleSpeed * FastMath.PI) / (
                             3 + timeUntilPseudoStrike.pow(
-                                3.0
+                                3.0,
                             ) * wobbleSpeed * dampening * FastMath.PI
-                            )
                         )
-                    ).toFloat()
+                    )
+                ).toFloat()
             } else {
                 0F
             }
-        } else 0F
+        } else {
+            0F
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +21,22 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.util.Utils.resourceToString
+import kotlin.reflect.KClass
 
 /**
- * Handles fingering for instruments that play by defining which arrangement of keys are pressed (e.g., saxophone,
- * trumpet, tuba)
+ * Handles fingering for instruments that play by defining which arrangement of keys is pressed (e.g., saxophone,
+ * trumpet, tuba).
  */
 @Serializable
-class PressedKeysFingeringManager private constructor() : FingeringManager<Array<Int>> {
+class PressedKeysFingeringManager private constructor() : FingeringManager<List<Int>> {
 
-    /** Stores the fingering table. */
-    private val fingerTable = HashMap<Int, Array<Int>>()
+    private val fingerTable = HashMap<Int, List<Int>>()
 
-    override fun fingering(midiNote: Int): Array<Int>? = fingerTable[midiNote]
+    override fun fingering(midiNote: Int): List<Int>? = fingerTable[midiNote]
 
     companion object {
         /** Loads the fingering manager from a file based on the class name. */
-        fun from(`class`: Class<out Instrument>): PressedKeysFingeringManager =
-            Json.decodeFromString(resourceToString("/instrument/${`class`.simpleName}.json"))
+        fun from(klass: KClass<out Instrument>): PressedKeysFingeringManager =
+            Json.decodeFromString(resourceToString("/instrument/${klass.simpleName}.json"))
     }
 }

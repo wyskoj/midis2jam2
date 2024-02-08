@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,29 +20,35 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument.Companion.recoilDrum
+import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument.Companion.recoilDrum
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /** A drum that is hit at different spots to represent the notes in an octave. */
 abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    DecayedInstrument(context, eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()) {
+    DecayedInstrument(
+        context,
+        eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList(),
+    ) {
+        /** The strikers. */
+        protected abstract val strikers: Array<Striker>
 
-    /** The strikers. */
-    protected abstract val strikers: Array<Striker>
+        /** The recoil node. */
+        protected val recoilNode: Node =
+            Node().also {
+                geometry.attachChild(it)
+            }
 
-    /** The recoil node. */
-    protected val recoilNode: Node = Node().also {
-        instrumentNode.attachChild(it)
+        override fun tick(
+            time: Double,
+            delta: Float,
+        ) {
+            super.tick(time, delta)
+
+            val maxVelocity = strikers.maxOf { it.tick(time, delta).velocity }
+            recoilDrum(recoilNode, maxVelocity, delta)
+        }
     }
-
-    override fun tick(time: Double, delta: Float) {
-        super.tick(time, delta)
-
-        val maxVelocity = strikers.maxOf { it.tick(time, delta).velocity }
-        recoilDrum(recoilNode, maxVelocity, delta)
-    }
-}
 
 /**
  * Returns the [MidiNoteOnEvent]s that would animate given the index of the note modulus 12.

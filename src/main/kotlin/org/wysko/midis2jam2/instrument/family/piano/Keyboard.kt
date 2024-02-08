@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,64 +21,58 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.instrument.family.piano.KeyColor.BLACK
-import org.wysko.midis2jam2.instrument.family.piano.KeyColor.WHITE
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelD
 
-private val OFFSET_DIRECTION_VECTOR = Vector3f(-8.294f, 3.03f, -8.294f)
 private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
-
 
 /** The full, 88-key keyboard. */
 open class Keyboard(
     context: Midis2jam2,
     events: MutableList<MidiChannelSpecificEvent>,
-    internal val skin: KeyboardSkin
-) : KeyedInstrument(context, events, 21, 108) {
-
+    internal val skin: KeyboardSkin,
+) : KeyedInstrument(context, events, 21, 108), MultipleInstancesLinearAdjustment {
     private val pitchBendController = PitchBendModulationController(context, events)
 
-    override val keys: Array<Key> = let {
-        var whiteCount = 0
-        Array(keyCount()) {
-            when (noteToKeyboardKeyColor(it + rangeLow)) {
-                WHITE -> KeyboardKey(this, it + rangeLow, whiteCount++)
-                BLACK -> KeyboardKey(this, it + rangeLow, it)
+    override val keys: Array<Key> =
+        let {
+            var whiteCount = 0
+            Array(keyCount()) {
+                when (Color.fromNote(it + rangeLow)) {
+                    White -> KeyboardKey(this, it + rangeLow, whiteCount++)
+                    Black -> KeyboardKey(this, it + rangeLow, it)
+                }
             }
         }
-    }
+
+    override val multipleInstancesDirection: Vector3f = v3(-8.294, 3.03, -8.294)
 
     init {
-        with(highestLevel) {
-            attachChild(context.loadModel("PianoCase.obj", skin.file))
-            move(-50f, 32f, -6f)
-            rotate(0f, Utils.rad(45.0), 0f)
+        with(placement) {
+            +context.modelD("PianoCase.obj", skin.file)
+            loc = v3(-50, 32, -6)
+            rot = v3(0, 45, 0)
         }
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-
-        instrumentNode.localTranslation =
-            PITCH_BEND_DIRECTION_VECTOR.mult(pitchBendController.tick(time, delta) { true })
+        geometry.localTranslation = PITCH_BEND_DIRECTION_VECTOR.mult(pitchBendController.tick(time, delta) { true })
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
-    }
+    override fun getKeyByMidiNote(midiNote: Int): Key? = keys.getOrNull(midiNote - rangeLow)
 
-    override fun getKeyByMidiNote(midiNote: Int): Key? = when {
-        midiNote !in rangeLow..rangeHigh -> null
-        else -> keys[midiNote - rangeLow]
-    }
-
-    override fun toString(): String {
-        return super.toString() + buildString {
-            append(debugProperty("skin", skin.name))
-        }
-    }
+    override fun toString(): String = super.toString() + debugProperty("skin", skin.name)
 
     companion object {
         /** The number of white keys on a keyboard. */
@@ -91,9 +85,8 @@ open class Keyboard(
 data class KeyboardSkin(
     /** The name of the skin. */
     val name: String,
-
     /** The name of the texture file. */
-    val file: String
+    val file: String,
 ) {
     companion object {
         private val skins =

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,31 +19,34 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.world.modelD
 
 /** The Shaker. */
-class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
-
-    private val shaker = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = context.loadModel("Shaker.obj", "DarkWood.bmp"),
-        actualStick = false
-    ).apply {
-        offsetStick { it.move(0f, 0f, -3f) }
-        setParent(instrumentNode)
-    }
+class Shaker(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+    private val shaker =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = context.modelD("Shaker.obj", "DarkWood.bmp"),
+            actualStick = false,
+        ).apply {
+            offsetStick { it.move(0f, 0f, -3f) }
+            setParent(geometry)
+        }
 
     init {
-        instrumentNode.apply {
+        geometry.apply {
             move(13f, 45f, -42f)
             localRotation = Quaternion().fromAngles(0f, 0f, Utils.rad(-25.0))
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
         shaker.tick(time, delta)
     }

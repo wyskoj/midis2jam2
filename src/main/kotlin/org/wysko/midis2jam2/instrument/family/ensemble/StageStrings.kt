@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,195 +17,167 @@
 package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.math.Quaternion
-import com.jme3.renderer.queue.RenderQueue
+import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
-import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.StaticWrappedOctaveSustained
-import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
-import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
+import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
+import org.wysko.midis2jam2.instrument.PitchClassAnimator
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
+import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.notePeriodsModulus
+import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
+import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 
-/** The stage strings. */
+/**
+ * The Stage Strings.
+ */
 class StageStrings(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
+    private val eventList: List<MidiChannelSpecificEvent>,
     type: StageStringsType,
-    /** The behavior of this StageStrings. Defaults to [StageStringBehavior.NORMAL]. */
-    val stageStringBehavior: StageStringBehavior = StageStringBehavior.NORMAL
-) : StaticWrappedOctaveSustained(context, eventList, false) {
+    private val stageStringBehavior: StageStringBehavior = StageStringBehavior.Normal,
+) : DivisiveSustainedInstrument(context, eventList, false) {
 
-    /** Nodes that contain each string. */
     private val stringNodes = Array(12) { Node() }
+    private val pitchBendModulationController = PitchBendModulationController(context, eventList, 0.0)
+    private var pitchBend = 0f
 
-    override val twelfths: Array<TwelfthOfOctave> = Array(12) { StageStringNote(type) }
+    override val animators: Array<PitchClassAnimator> = Array(12) { StageStringNote(type, it) }
 
-    override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation = Quaternion().fromAngles(0f, rad(35.6 + 11.6 * updateInstrumentIndex(delta)), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        placement.rot = v3(0, 35.6 + 11.6 * updateInstrumentIndex(delta), 0)
     }
 
-    /** Defines how stage strings should look, depending on the MIDI patch they play. */
-    enum class StageStringsType(
-        /** The file of the texture. */
-        val textureFile: String
-    ) {
-        /** String Ensemble 1 type. */
-        STRING_ENSEMBLE_1("FakeWood.bmp"),
-
-        /** String Ensemble 2 type. */
-        STRING_ENSEMBLE_2("Wood.bmp"),
-
-        /** Synth Strings 1 type. */
-        SYNTH_STRINGS_1("Laser.bmp"),
-
-        /** Synth Strings 2 type. */
-        SYNTH_STRINGS_2("AccordionCaseFront.bmp"),
-
-        /** Bowed Synth type. */
-        BOWED_SYNTH("SongFillbar.bmp");
-    }
-
-    /** Defines how stage strings should behave. */
-    enum class StageStringBehavior {
-        /** Normal behavior. The bow moves from left to right, taking the amount of time the note is held to traverse the string. */
-        NORMAL,
-
-        /** Tremolo behavior. The bow moves back and forth for the duration of the note. */
-        TREMOLO
-    }
-
-    /** A single string. */
-    inner class StageStringNote(type: StageStringsType) : TwelfthOfOctave() {
-
-        /** Contains the bow. */
-        private val bowNode = Node()
-
-        /** Contains the anim strings. */
-        private val animStringNode = Node()
-
-        /** Each frame of the anim strings. */
-        private val animStrings: Array<Spatial>
-
-        /** The resting string. */
-        private val restingString: Spatial
-
-        /** The bow. */
-        private val bow: Spatial
-
-        /** The anim string animator. */
-        private val animator: VibratingStringAnimator
-
-        /** We keep track of the current time for sinusoidal calculations for tremolo playing. */
-        private var time = Math.random() * 10
-
-        override fun play(duration: Double) {
-            playing = true
-            progress = 0.0
-            this.duration = duration
-        }
-
-        override fun tick(delta: Float) {
-            /* Time elapsed */
-            if (progress >= 1) {
-                playing = false
-                progress = 0.0
-            }
-
-            if (playing) {
-                /* Update playing progress */
-                progress += delta / duration
-
-                /* Show bow */
-                bowNode.cullHint = Dynamic
-
-                /* Slide bow across string */
-                if (stageStringBehavior == StageStringBehavior.NORMAL) {
-                    bow.setLocalTranslation(0f, (8 * (progress - 0.5)).toFloat(), 0f)
-                } else {
-                    /* Slide bow back and forth */
-                    bow.setLocalTranslation(
-                        0f,
-                        (sin(30 * time) * 4).toFloat(),
-                        0f
-                    )
-
-                    /* Update stopwatch */
-                    time += delta
-                }
-
-                /* Move string and holder forwards */
-                animNode.setLocalTranslation(0f, 0f, 2f)
-
-                /* Hide resting string, show anim string */
-                restingString.cullHint = Always
-                animStringNode.cullHint = Dynamic
-            } else {
-                /* Hide bow */
-                bowNode.cullHint = Always
-
-                /* Move string and holder backwards */
-                animNode.setLocalTranslation(0f, 0f, 0f)
-
-                /* Show resting string, hide anim string */
-                restingString.cullHint = Dynamic
-                animStringNode.cullHint = Always
-            }
-            animator.tick(delta)
-        }
-
-        init {
-            /* Load holder */
-            animNode.attachChild(context.loadModel("StageStringHolder.obj", type.textureFile))
-
-            /* Load anim strings */
-            animStrings = Array(5) {
-                context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
-                    cullHint = Always // Hide on startup
-                    animStringNode.attachChild(this)
-                    (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
-                }
-            }
-
-            animNode.attachChild(animStringNode)
-
-            // Load resting string
-            restingString = context.loadModel("StageString.obj", "StageString.bmp")
-            animNode.attachChild(restingString)
-
-            // Load bow
-            bow = context.loadModel("StageStringBow.obj", type.textureFile).apply {
-                (this as Node).getChild(0).setMaterial((restingString as Geometry).material)
-            }
-
-            bowNode.run {
-                attachChild(bow)
-                setLocalTranslation(0f, 48f, 0f)
-                localRotation = Quaternion().fromAngles(0f, 0f, rad(-60.0))
-                cullHint = Always
-            }
-
-            animNode.attachChild(bowNode)
-            highestLevel.attachChild(animNode)
-            animator = VibratingStringAnimator(*animStrings)
-
-            highestLevel.shadowMode = RenderQueue.ShadowMode.Receive
-        }
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        pitchBend = pitchBendModulationController.tick(time, delta)
     }
 
     init {
-        for (i in 0..11) {
+        repeat(12) { i ->
             stringNodes[i].run {
-                attachChild(twelfths[i].highestLevel)
+                attachChild(animators[i].root)
                 localRotation = Quaternion().fromAngles(0f, rad((9 / 10f * i).toDouble()), 0f)
             }
-            twelfths[i].highestLevel.setLocalTranslation(0f, 2f * i, -153f)
-            instrumentNode.attachChild(stringNodes[i])
+            animators[i].root.setLocalTranslation(0f, 2f * i, -153f)
+            geometry.attachChild(stringNodes[i])
         }
+    }
+
+    /**
+     * A single string.
+     */
+    inner class StageStringNote(type: StageStringsType, index: Int) :
+        PitchClassAnimator(context, eventList.notePeriodsModulus(context, index)) {
+        private val bowNode = Node()
+        private val animStringNode = Node()
+        private val animStrings: List<Spatial> = List(5) {
+            context.modelD("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
+                cullHint = Always // Hide on startup
+                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
+            }
+        }.onEach { animStringNode += it }
+        private val restingString = context.modelD("StageString.obj", "StageString.bmp")
+        private val bow: Spatial =
+            context.modelD("StageStringBow.obj", type.textureFile).apply {
+                (this as Node).getChild(0).setMaterial((restingString as Geometry).material)
+            }
+        private val animator: StringVibrationController = StringVibrationController(animStrings)
+        private val nudgeCtrl = NumberSmoother(-1f, if (type == StageStringsType.StringEnsemble2) 20.0 else 30.0)
+        private val bendCtrl = NumberSmoother(0f, 10.0)
+
+        init {
+            with(geometry) {
+                +context.modelD("StageStringHolder.obj", type.textureFile)
+                +animStringNode
+                +restingString
+                +bowNode
+            }
+            with(bowNode) {
+                +bow
+                loc = v3(0, 48, 0)
+                rot = v3(0, 0, -60)
+                cullHint = false.ch
+            }
+            with(root) {
+                shadowMode = Receive
+                +geometry
+            }
+        }
+
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
+            bowNode.cullHint = playing.ch
+            animStringNode.cullHint = playing.ch
+            restingString.cullHint = (!playing).ch
+
+            geometry.loc = v3(
+                0,
+                bendCtrl.tick(delta) { if (playing) pitchBend else 0f },
+                nudgeCtrl.tick(delta) { if (playing) 2f else -0.5f }
+            )
+
+            if (playing) {
+                val progress = collector.currentNotePeriods.first().progress(time)
+                bow.loc = when (stageStringBehavior) {
+                    StageStringBehavior.Normal -> v3(0, 8 * (progress - 0.5), 0)
+                    StageStringBehavior.Tremolo -> v3(0, sin(30 * time) * 4, 0)
+                }
+            }
+
+            animator.tick(delta)
+        }
+    }
+
+    /**
+     * Defines how stage strings should behave.
+     */
+    enum class StageStringBehavior {
+        /**
+         * Normal behavior.
+         *
+         * The bow moves from left to right, taking the amount of time the note is held to traverse the string.
+         */
+        Normal,
+
+        /**
+         * Tremolo behavior.
+         *
+         * The bow moves back and forth for the duration of the note.
+         */
+        Tremolo,
+    }
+
+    /**
+     * Defines how stage strings should look, depending on the MIDI patch they play.
+     */
+    enum class StageStringsType(internal val textureFile: String) {
+        /** String Ensemble 1 type. */
+        StringEnsemble1("FakeWood.bmp"),
+
+        /** String Ensemble 2 type. */
+        StringEnsemble2("Wood.bmp"),
+
+        /** Synth Strings 1 type. */
+        SynthStrings1("Laser.bmp"),
+
+        /** Synth Strings 2 type. */
+        SynthStrings2("AccordionCaseFront.bmp"),
+
+        /** Bowed Synth type. */
+        BowedSynth("SongFillbar.bmp"),
     }
 }

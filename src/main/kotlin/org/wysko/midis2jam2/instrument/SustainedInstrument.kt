@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,73 +18,42 @@ package org.wysko.midis2jam2.instrument
 
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
+import org.wysko.midis2jam2.instrument.algorithmic.Visibility
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
 
 /**
- * Any instrument that also depends on knowing the [MidiNoteOffEvent] for proper animation. Examples include:
- * saxophone, piano, guitar, telephone ring.
+ * An instrument that uses both NoteOn and NoteOff events to play notes.
+ *
+ * @param context The context to the main class.
+ * @param eventList The list of all events that this instrument should be aware of.
  */
-abstract class SustainedInstrument protected constructor(
-    context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>
-) : Instrument(context) {
-
-    /** The list of note periods. */
-    protected val notePeriods: MutableList<NotePeriod> = calculateNotePeriods(
-        context = context,
-        noteEvents = eventList.filterIsInstance<MidiNoteEvent>()
-    )
-
-    /** The list of current note periods. Will always be updating as the MIDI file progresses. */
-    protected var currentNotePeriods: Set<NotePeriod> = setOf()
-
-    /** The note period collector. */
-    protected open val notePeriodCollector: NotePeriodCollector = NotePeriodCollector(
-        notePeriods = notePeriods,
-        context = context
-    )
+abstract class SustainedInstrument(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+    Instrument(context) {
 
     /**
-     * Determines the current note periods.
+     * The list of all note periods that this instrument should play.
      */
-    protected open fun calculateCurrentNotePeriods(time: Double) {
-        currentNotePeriods = notePeriodCollector.advance(time)
-    }
+    protected val notePeriods: MutableList<NotePeriod> =
+        calculateNotePeriods(midiFile = context.file, noteEvents = eventList.filterIsInstance<MidiNoteEvent>())
+
+    /**
+     * The collector that manages the note periods.
+     */
+    protected open val collector: NotePeriodCollector =
+        NotePeriodCollector(context = context, notePeriods = notePeriods)
 
     override fun tick(time: Double, delta: Float) {
-        calculateCurrentNotePeriods(time)
-        setVisibility(time)
-        moveForMultiChannel(delta)
+        collector.advance(time)
+        isVisible = calculateVisibility(time)
+        adjustForMultipleInstances(delta)
     }
 
-    /** Calculates the current visibility by the current [time]. True if the instrument is visible, false otherwise.
-     * This method can be used for time values in the future. */
-    override fun calcVisibility(time: Double, future: Boolean): Boolean {
-        // Visible if currently playing
-        if (currentNotePeriods.isNotEmpty()) return true
-
-        // Visible if within one second of playing
-        notePeriodCollector.peek()?.let {
-            if (it.startTime - time <= 1.0) return true
+    override fun calculateVisibility(time: Double, future: Boolean): Boolean =
+        Visibility.standardRules(collector, time).also {
+            if (!isVisible && it) onEntry()
+            if (isVisible && !it) onExit()
         }
-
-        // Visible if within a 7-second gap of two notes
-        notePeriodCollector.prev()?.let { prev ->
-            notePeriodCollector.peek()?.let { peek ->
-                if (peek.startTime - prev.endTime <= 7.0) return true
-            }
-        }
-
-        // Visible if 2 seconds after the last note period
-        notePeriodCollector.prev()?.let {
-            if (time - it.endTime <= 2.0) return true
-        }
-
-        // Invisible
-        return false
-    }
 }

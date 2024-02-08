@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,27 @@
 
 package org.wysko.midis2jam2.instrument.family.strings
 
-import com.jme3.math.Quaternion
 import com.jme3.scene.Geometry
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
-import org.wysko.midis2jam2.instrument.family.piano.KeyColor
-import org.wysko.midis2jam2.instrument.family.piano.noteToKeyboardKeyColor
+import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
+import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
+import org.wysko.midis2jam2.instrument.family.piano.Key
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.scale
+import org.wysko.midis2jam2.util.times
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.DIM_GLOW
+import org.wysko.midis2jam2.world.modelD
 import kotlin.math.pow
 
 /**
@@ -40,175 +45,89 @@ import kotlin.math.pow
  */
 class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>) :
     SustainedInstrument(context, eventList) {
-
-    /** The strings of the harp. */
-    val strings: Array<HarpString>
-
-    /** The notes this Harp should play. */
-    val notes: MutableList<MidiNoteEvent> = eventList.filterIsInstance<MidiNoteEvent>() as MutableList<MidiNoteEvent>
-
-    private val eventCollector = EventCollector(notes, context) { event, time ->
-        if (event is MidiNoteOffEvent) {
-            context.file.eventInSeconds(event) <= time - 0.033F
-        } else {
-            context.file.eventInSeconds(event) <= time
+    override val collector: NotePeriodCollector =
+        NotePeriodCollector(context, notePeriods) { time: Double, notePeriod: NotePeriod ->
+            time - 0.033f >= notePeriod.endTime
         }
-    }
+
+    private val strings: List<HarpString> = List(47) { HarpString(it) }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        eventCollector.advanceCollectAll(time).forEach { event ->
-            var midiNote = event.note
-
-            /* If the note falls on a black key (if it were played on a piano) we need to "round it down" to the
-                 * nearest white key. */
-            if (noteToKeyboardKeyColor(midiNote) == KeyColor.BLACK) {
-                midiNote--
-            }
-            var harpString = -1
-
-            /* Only consider notes within the range of the instrument */
-            if (midiNote in 24..103) {
-                harpString = getHarpString(midiNote % 12)
-                harpString += (midiNote - 24) / 12 * 7
-            }
-            if (event is MidiNoteOnEvent) {
-                if (harpString != -1) {
-                    strings[harpString].beginPlaying()
-                }
-            } else {
-                if (harpString != -1) {
-                    strings[harpString].endPlaying()
-                }
-            }
-        }
         strings.forEach { it.tick(delta) }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        if (checkInstrumentIndex() < 0) {
-            offsetNode.setLocalTranslation(0f, -60 * updateInstrumentIndex(delta), 0f)
-        } else {
-            offsetNode.setLocalTranslation(0f, 0f, 60f * updateInstrumentIndex(delta))
-        }
-    }
-
-    /** A single harp string. */
-    inner class HarpString(i: Int) {
-
-        /** The idle string. */
-        private val string: Spatial
-
-        /** The Vibrating strings. */
-        private val vibratingStrings: Array<Spatial>
-
-        /** The String node. */
-        internal val stringNode = Node()
-
-        /** The string animator. */
-        private val stringAnimator: VibratingStringAnimator
-
-        /** True if this string is vibrating, false otherwise. */
-        internal var vibrating = false
-
-        /** Update animation and notes, given the [delta]. */
-        fun tick(delta: Float) {
-            if (vibrating) {
-                string.cullHint = Spatial.CullHint.Always
-                stringAnimator.tick(delta)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.loc = with(updateInstrumentIndex(delta)) {
+            if (index < 0) {
+                v3(0, -60, 0) * this
             } else {
-                string.cullHint = Spatial.CullHint.Dynamic
-                for (vibratingString in vibratingStrings) {
-                    vibratingString.cullHint = Spatial.CullHint.Always
-                }
+                v3(0, 0, 60) * this
             }
-        }
-
-        /** Begin playing this string. */
-        fun beginPlaying() {
-            vibrating = true
-        }
-
-        /** End playing this string. */
-        fun endPlaying() {
-            vibrating = false
-        }
-
-        init {
-            /* Select correct texture from note */
-            val t: String
-            val vt: String
-            when {
-                i % 7 == 0 -> {
-                    t = "HarpStringRed.bmp"
-                    vt = "HarpStringRedPlaying.bmp"
-                }
-
-                i % 7 == 3 -> {
-                    t = "HarpStringBlue.bmp"
-                    vt = "HarpStringBluePlaying.bmp"
-                }
-
-                else -> {
-                    t = "HarpStringWhite.bmp"
-                    vt = "HarpStringWhitePlaying.bmp"
-                }
-            }
-            string = this@Harp.context.loadModel("HarpString.obj", t)
-
-            /* Load vibrating strings */
-            vibratingStrings = Array(5) {
-                context.loadModel("HarpStringPlaying$it.obj", vt).apply {
-                    cullHint = Spatial.CullHint.Always
-                    stringNode.attachChild(this)
-                    (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
-                }
-            }
-
-            stringNode.attachChild(string)
-
-            /* Funky math to polynomially scale each string */
-            stringNode.setLocalTranslation(
-                0f,
-                2.1444f + 0.8777f * i,
-                -2.27f + 0.75651f * -i
-            )
-            val scale = (2.44816E-4 * i.toDouble().pow(2.0) + -0.02866 * i + 0.97509).toFloat()
-            stringNode.setLocalScale(1f, scale, 1f)
-            stringAnimator = VibratingStringAnimator(*vibratingStrings)
         }
     }
 
     init {
-        /* Load model */
-        instrumentNode.attachChild(context.loadModel("Harp.obj", "HarpSkin.bmp"))
-        instrumentNode.setLocalTranslation(-126f, 3.6f, -30f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, rad(-35.0), 0f)
-        highestLevel.attachChild(instrumentNode)
-
-        /* Create harp strings */
-        strings = Array(47) {
-            HarpString(it).apply {
-                instrumentNode.attachChild(this.stringNode)
-            }
+        with(geometry) {
+            +context.modelD("Harp.obj", "HarpSkin.bmp")
+        }
+        with(placement) {
+            loc = v3(-126, 3.6, -30)
+            rot = v3(0, -35, 0)
         }
     }
 
-    override fun toString(): String {
-        return super.toString() + buildString {
-            append(debugProperty("strings", strings.joinToString(separator = "") { if (it.vibrating) "X" else "_" }))
+    private inner class HarpString(i: Int) {
+        private val midiNotes = (24..103).filter {
+            var note = it
+            if (Key.Color.fromNote(note) == Black) {
+                note--
+            }
+            getHarpString(note % 12) + (note - 24) / 12 * 7 == i
+        }
+
+        private val textures = when {
+            i % 7 == 0 -> HarpTextures.Red
+            i % 7 == 3 -> HarpTextures.Blue
+            else -> HarpTextures.White
+        }
+
+        private val stringNode = node {
+            loc = v3(0f, 2.1444f + 0.8777f * i, -2.27f + 0.75651f * -i)
+            scale = v3(1f, (2.44816E-4 * i.toDouble().pow(2.0) + -0.02866 * i + 0.97509), 1f)
+        }.also { geometry += it }
+
+        private val idleString: Spatial = with(stringNode) {
+            +context.modelD("HarpString.obj", textures.idle)
+        }
+
+        private val vibratingStringNode = with(stringNode) { +node() }
+
+        private val vibratingStrings: List<Spatial> = List(5) {
+            context.modelD("HarpStringPlaying$it.obj", textures.playing).apply {
+                cullHint = false.ch
+                (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
+            }
+        }.onEach { vibratingStringNode += it }
+
+        private val stringAnimator = StringVibrationController(vibratingStrings)
+
+        fun tick(delta: Float) {
+            with(collector.currentNotePeriods.any { it.midiNote in midiNotes }) {
+                idleString.cullHint = (!this).ch
+                vibratingStringNode.cullHint = this.ch
+            }
+            stringAnimator.tick(delta)
         }
     }
 }
 
-/**
- * Given a note within an octave, represented as an integer (0 = C, 2 = D, 4 = E, 5 = F, etc.), returns the harp
- * string number to animate.
- *
- * @param noteNumber the note number
- * @return the harp string number
- * @throws IllegalArgumentException if you specify a black key
- */
+private sealed class HarpTextures(val idle: String, val playing: String) {
+    data object Red : HarpTextures("HarpStringRed.bmp", "HarpStringRedPlaying.bmp")
+    data object Blue : HarpTextures("HarpStringBlue.bmp", "HarpStringBluePlaying.bmp")
+    data object White : HarpTextures("HarpStringWhite.bmp", "HarpStringWhitePlaying.bmp")
+}
+
 private fun getHarpString(noteNumber: Int): Int = when (noteNumber) {
     0 -> 0
     2 -> 1
@@ -217,5 +136,5 @@ private fun getHarpString(noteNumber: Int): Int = when (noteNumber) {
     7 -> 4
     9 -> 5
     11 -> 6
-    else -> throw IllegalAccessException("Unexpected value: $noteNumber")
+    else -> error("Unexpected value: $noteNumber")
 }

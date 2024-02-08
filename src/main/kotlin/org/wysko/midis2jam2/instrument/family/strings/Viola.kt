@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Viola. */
 class Viola(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : StringFamilyInstrument(
@@ -30,16 +31,16 @@ class Viola(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Strin
     180.0,
     Vector3f(1f, 1f, 1f),
     intArrayOf(48, 55, 62, 69),
-    context.loadModel("Violin.obj", "ViolaSkin.bmp")
+    context.modelD("Violin.obj", "ViolaSkin.bmp")
 ) {
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(20f * updateInstrumentIndex(delta), 0f, 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(20f * updateInstrumentIndex(delta), 0f, 0f)
     }
 
     init {
-        highestLevel.setLocalTranslation(-2f, 27f, -15f)
-        highestLevel.attachChild(instrumentNode)
-        instrumentNode.setLocalScale(1f)
-        instrumentNode.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
+        placement.setLocalTranslation(-2f, 27f, -15f)
+        placement.attachChild(geometry)
+        geometry.setLocalScale(1f)
+        geometry.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
     }
 }

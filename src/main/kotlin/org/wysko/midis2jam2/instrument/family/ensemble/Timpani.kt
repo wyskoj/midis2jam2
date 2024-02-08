@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,45 +16,49 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
-import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
 import org.wysko.midis2jam2.instrument.family.percussive.modulus
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.get
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.material
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.modelR
 
-/** The timpani. */
+/**
+ * The Timpani.
+ */
 class Timpani(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
 
-    override fun moveForMultiChannel(delta: Float) {
-        highestLevel.localRotation =
-            Quaternion().fromAngles(0f, rad((-27 + updateInstrumentIndex(delta) * -18).toDouble()), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.rot = v3(0f, -27 + updateInstrumentIndex(delta) * -18, 0f)
     }
 
     override val strikers: Array<Striker> = Array(12) { i ->
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = context.loadModel("XylophoneMalletWhite.obj", "XylophoneBar.bmp")
+            stickModel = context.modelD("XylophoneMalletWhite.obj", "XylophoneBar.bmp")
         ).apply {
             setParent(recoilNode)
-            offsetStick { it.setLocalTranslation(0f, 0f, -5f) }
-            node.setLocalTranslation(1.8f * (i - 5.5f), 31f, 15f)
+            offsetStick { it.loc = v3(0, 0, -5) }
+            node.loc = v3(1.8 * (i - 5.5), 31, 15)
         }
     }
 
     init {
-        recoilNode.run {
-            attachChild(
-                context.loadModel("TimpaniBody.obj", "HornSkin.bmp", 0.9f).apply {
-                    (this as Node).getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                }
-            )
-            attachChild(context.loadModel("TimpaniHead.obj", "TimpaniSkin.bmp"))
+        with(recoilNode) {
+            +context.modelR("TimpaniBody.obj", "HornSkin.bmp").apply {
+                (this as Node)[0].material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
+            }
+            +context.modelD("TimpaniHead.obj", "TimpaniSkin.bmp")
         }
-
-        instrumentNode.setLocalTranslation(0f, 0f, -120f)
+        placement.loc = v3(0, 0, -120)
     }
 }

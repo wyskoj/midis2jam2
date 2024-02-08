@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ data class HomeConfiguration(
     val lastMidiFileSelectedDirectory: String? = null,
     val selectedMidiDevice: String = "Gervill",
     val selectedSoundbank: String? = null,
+    val isLooping: Boolean = false,
 ) : Configuration {
     companion object {
         val preserver by lazy { ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE) }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,7 +135,12 @@ object Utils {
  *
  * @return [CullHint.Always] if the boolean is true, [CullHint.Never] otherwise
  */
+@Deprecated("Use Boolean.ch instead", ReplaceWith("this.ch"))
 fun Boolean.cullHint(): CullHint = if (this) Dynamic else Always
+
+/** Converts a boolean into its appropriate [CullHint]. */
+val Boolean.ch: CullHint
+    get() = if (this) Dynamic else Always
 
 /** Given a list of integers, determines if the root integer is equal to at least one of the provided integers. */
 fun Int.oneOf(vararg options: Int): Boolean = options.any { it == this }

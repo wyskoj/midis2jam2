@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Synth drum. */
 class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
@@ -30,7 +31,7 @@ class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = StickType.DRUMSET_STICK
+            stickModel = StickType.DRUM_SET_STICK
         ).apply {
             setParent(recoilNode)
             node.setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
@@ -38,17 +39,17 @@ class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localRotation =
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localRotation =
             Quaternion().fromAngles(0f, rad((-25f + updateInstrumentIndex(delta) * -16).toDouble()), 0f)
     }
 
     init {
         recoilNode.attachChild(
-            context.loadModel("SynthDrum.obj", "SynthDrum.bmp").apply {
+            context.modelD("SynthDrum.obj", "SynthDrum.bmp").apply {
                 localRotation = Quaternion().fromAngles(rad(45.0), 0f, 0f)
             }
         )
-        instrumentNode.setLocalTranslation(3.5f, 87.1f, -130.2f)
+        geometry.setLocalTranslation(3.5f, 87.1f, -130.2f)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,104 +25,96 @@ import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.oneOf
 import kotlin.math.sin
 
+private const val MODULATION_DEPTH_CONSTANT = 100 / 12800.0
+private const val PITCH_BEND_CENTER = 0x2000
+
+// Control change parameters
+private const val CC_MODULATION_WHEEL = 1
+private const val CC_DATA_ENTRY = 6
+private const val CC_LSB_DATA = 38
+private const val CC_LSB_RPN = 0x64
+private const val CC_MSB_RPN = 0x65
+
+// Registered parameter numbers
+private const val RPN_PITCH_BEND_RANGE = 0x0
+private const val RPN_MODULATION_DEPTH_RANGE = 0x5
+
 /**
  * Handles the calculation of pitch-bend and modulation.
  */
 class PitchBendModulationController(
     private val context: Midis2jam2,
     events: List<MidiChannelSpecificEvent>,
-    smoothness: Double = 10.0
+    smoothness: Double = 10.0,
 ) {
-    /**
-     * The pitch-bend events.
-     */
-    private val pitchBendEvents = events.filterIsInstance<MidiPitchBendEvent>().toMutableList()
+    // Relevant events
+    private val pitchBendEvents =
+        EventCollector(events.filterIsInstance<MidiPitchBendEvent>(), context) { collector ->
+            pitchBend = collector.prev()?.let { it.value - PITCH_BEND_CENTER } ?: 0
+        }
 
-    /**
-     * Any control change events, used for both modulation and pitch-bend configuration.
-     */
-    private val controlChangeEvents = events.filterIsInstance<MidiControlEvent>().toMutableList()
+    private val controlChangeEvents =
+        listOf(CC_MODULATION_WHEEL, CC_DATA_ENTRY, CC_LSB_DATA, CC_LSB_RPN, CC_MSB_RPN).associateWith { controlNum ->
+            EventCollector(
+                events.filterIsInstance<MidiControlEvent>().filter { it.controlNum == controlNum },
+                context,
+            ) { collector ->
+                cc[controlNum] = (collector.prev()?.value ?: 0).also { processRPNs(controlNum, it) }
+            }
+        }
 
-    /**
-     * Current control change values for pitch bend RPN and modulation. Do NOT use non-relevant CC values as they are
-     * not being updated in this class (the relevant ones are CC#1, CC#6, CC#38, CC#100, and CC#101)!!
-     */
-    private val cc = Array(128) { 0 }
+    // Relevant continuous controllers
+    private val cc = IntArray(128)
 
-    /**
-     * Current pitch bend amount, represented in internal format (-8192 is the minimum, 8191 is the maximum).
-     */
+    // Current states
     private var pitchBend = 0
-
-    /**
-     * Current pitch-bend sensitivity, represented in semitones. This value is initialized to 2 semitones per the MIDI
-     * specification.
-     */
-    private var pitchBendSensitivity: Double = 2.0
-
-    /**
-     * Current modulation depth, represented in internal format (0 is the minimum, 127 is the maximum).
-     */
+    private var pitchBendSensitivity = 2.0
     private var modulation = 0
-
-    /**
-     * Current modulation depth range, represented in semitones. This value is initialized to 0.5 semitones per the MIDI
-     * specification.
-     */
     private var modulationRange = 0.5
+    private var modulationTime = 0.0
 
-    /**
-     * When a note plays, the current phase offset of the modulation is reset to 0.
-     */
-    private var modulationTime: Double = 0.0
-
-    /**
-     * Number smoother.
-     */
+    // Number smoother
     private val smoother = NumberSmoother(0f, smoothness)
 
     /**
      * Performs calculations to determine the overall pitch bend, which can be manipulated by both pitch-bend events
      * and modulation events. Returns the overall pitch bend, represented as a semitone.
+     *
+     * @param time The current time, in seconds.
+     * @param tpf Delta time.
+     * @param applyModulationWhenIdling Should the modulation effect be applied when the instrument is idling?
+     * @param playing Returns `true` when the instrument is playing, `false` otherwise.
      */
-    fun tick(time: Double, tpf: Float, applyModulationWhenNotPlaying: Boolean = false, playing: () -> Boolean): Float {
+    fun tick(
+        time: Double,
+        tpf: Float,
+        applyModulationWhenIdling: Boolean = false,
+        playing: () -> Boolean = { true },
+    ): Float {
         modulationTime += tpf
 
-        /* Pitch bend */
-        NoteQueue.collect(pitchBendEvents, time, context).forEach {
-            pitchBend = it.value - 8192
+        // Collect pitch bend events
+        pitchBendEvents.advanceCollectAll(time).forEach {
+            pitchBend = it.value - PITCH_BEND_CENTER // Values are centered around 8192
         }
 
-        /* Control changes */
-        NoteQueue.collect(controlChangeEvents, time, context).forEach {
-            cc[it.controlNum] = it.value
-            when {
-                it.controlNum == 1 -> {
-                    modulation = it.value
-                }
-
-                it.controlNum.oneOf(6, 38) -> {
-                    when {
-                        cc[101] == 0 && cc[100] == 0 -> { // Setting pitch-bend sensitivity
-                            pitchBendSensitivity = cc[6] + (cc[38] / 100.0)
-                        }
-
-                        cc[101] == 0 && cc[100] == 5 -> { // Setting modulation depth range
-                            modulationRange = cc[6] + (cc[38] * (0.0078125)) // 0.78125 = 100/12800
-                        }
-                    }
-                }
+        // Collect control change events
+        controlChangeEvents.entries.forEach { (controlNum, collector) ->
+            collector.advanceCollectAll(time).forEach {
+                cc[controlNum] = it.value
+                processRPNs(controlNum, it.value)
             }
         }
 
-        val pitchBendPart = (pitchBend / 8192.0) * pitchBendSensitivity
-        var modulationPart = sin(50 * modulationTime) * modulationRange * (modulation / 128.0)
-
-        if (!playing.invoke() && !applyModulationWhenNotPlaying) {
-            modulationPart = 0.0
+        return if (!playing() && !applyModulationWhenIdling) {
+            smoother.tick(tpf) {
+                pitchBendSemitones().toFloat()
+            }
+        } else {
+            smoother.tick(tpf) {
+                (pitchBendSemitones() + modulationSemitones()).toFloat()
+            }
         }
-
-        return smoother.tick(tpf) { (pitchBendPart + modulationPart).toFloat() }
     }
 
     /**
@@ -132,4 +124,35 @@ class PitchBendModulationController(
     fun resetModulation() {
         modulationTime = 0.0
     }
+
+    /** Processes registered parameter numbers. */
+    private fun processRPNs(
+        controlNum: Int,
+        value: Int,
+    ) {
+        when {
+            controlNum == CC_MODULATION_WHEEL -> modulation = value
+
+            controlNum.oneOf(CC_DATA_ENTRY, CC_LSB_DATA) -> {
+                if (isRpnChangePitchBendSensitivity()) {
+                    pitchBendSensitivity = cc[CC_DATA_ENTRY] + (cc[CC_LSB_DATA] / 100.0)
+                }
+                if (isRpnChangeModulationDepthRange()) {
+                    modulationRange = cc[CC_DATA_ENTRY] + (cc[CC_LSB_DATA] * MODULATION_DEPTH_CONSTANT)
+                }
+            }
+        }
+    }
+
+    /** The current pitch bend amount, in semitones. */
+    private fun modulationSemitones() = sin(50 * modulationTime) * modulationRange * (modulation / 128.0)
+
+    /** The current modulation amount, in semitones. */
+    private fun pitchBendSemitones() = (pitchBend / PITCH_BEND_CENTER.toDouble()) * pitchBendSensitivity
+
+    /** Are the RPNs set to change the pitch bend sensitivity? */
+    private fun isRpnChangePitchBendSensitivity() = cc[CC_MSB_RPN] == 0 && cc[CC_LSB_RPN] == RPN_PITCH_BEND_RANGE
+
+    /** Are the RPNs set to change the modulation range? */
+    private fun isRpnChangeModulationDepthRange() = cc[CC_MSB_RPN] == 0 && cc[CC_LSB_RPN] == RPN_MODULATION_DEPTH_RANGE
 }

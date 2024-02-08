@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.midi
 
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.identifySpecification
+
 /**
  * Parse and stores information relating to a MIDI file.
  */
@@ -25,18 +27,15 @@ abstract class MidiFile(
      * The name of the MIDI file.
      */
     val name: String,
-
     /**
      * Specifies the meaning of delta-times. Specifically, it is the number of MIDI ticks that make up a quarter-note.
      */
     val division: Int,
-
     /**
      * The tracks of the MIDI file. Each [MidiTrack] in this array corresponds to a track in the MIDI file.
      */
-    val tracks: List<MidiTrack>
+    val tracks: List<MidiTrack>,
 ) {
-
     /**
      * Contains a list of each tempo event in the MIDI file. The events from each track are combined, sorted by their
      * tick, and duplicates have been removed (if multiple events have the same tick, the last one is kept).
@@ -60,6 +59,8 @@ abstract class MidiFile(
     /** The length of the MIDI file, expressed in seconds. */
     val length: Double = eventTime.maxOf { it.value }
 
+    val specification = identifySpecification()
+
     /**
      * If you need to create "pseudo" events that are helpful for animation, register them so that they have a time
      * associated with them.
@@ -81,26 +82,27 @@ abstract class MidiFile(
     fun tickToSeconds(tick: Long): Double {
         if (tempos.size == 1 || tick < 0) return tempos.first().spb() * tick.toBeats()
 
-        /* Get all tempos that have started and finished before the current time. */
+        // Get all tempos that have started and finished before the current time.
         return tempos.filter { it.time < tick }.foldIndexed(0.0) { index, acc, tempo ->
             acc + (
-                if (index + 1 in tempos.indices) {
-                    tempos[index + 1].time.coerceAtMost(tick)
-                } else {
-                    tick
-                } - tempo.time
-                ).toBeats() * tempo.spb()
+                    if (index + 1 in tempos.indices) {
+                        tempos[index + 1].time.coerceAtMost(tick)
+                    } else {
+                        tick
+                    } - tempo.time
+                    ).toBeats() * tempo.spb()
         }
     }
 
     /**
      * Returns the active tempo immediately before a given MIDI [tick].
      */
-    private fun tempoBefore(tick: Long): MidiTempoEvent = if (tempos.size == 1 || tick == 0L) {
-        tempos[0]
-    } else {
-        tempos.last { it.time < tick }
-    }
+    private fun tempoBefore(tick: Long): MidiTempoEvent =
+        if (tempos.size == 1 || tick == 0L) {
+            tempos[0]
+        } else {
+            tempos.last { it.time < tick }
+        }
 
     /**
      * Returns the active tempo immediately before a given MIDI [event].
@@ -110,10 +112,15 @@ abstract class MidiFile(
     /**
      * Returns the active tempo at the given [time] in seconds, expressed in MIDI format.
      */
-    fun tempoAt(time: Double): MidiTempoEvent = when {
-        tempos.size == 1 || time < 0 -> tempos.first()
-        else -> tempos.last { eventTime[it]!! <= time }
-    }
+    fun tempoAt(time: Double): MidiTempoEvent =
+        when {
+            tempos.size == 1 || time < 0 -> tempos.first()
+            else -> tempos.last { eventTime[it]!! <= time }
+        }
+
+    fun timeOfFirstNoteOn(): Double = tracks.flatMap {
+        it.events
+    }.filterIsInstance<MidiNoteOnEvent>().minOf { eventInSeconds(it) }
 
     /** Converts a value expressed in MIDI ticks to its beat number. */
     private fun Long.toBeats(): Double = this / division.toDouble()
@@ -122,6 +129,7 @@ abstract class MidiFile(
 /**
  * Converts the byte data of a tempo event in a MIDI file to its corresponding integer.
  */
-internal fun ByteArray.parseTempo(): Int = with(this.map { it.toInt() }) {
-    this[0] and 0xff shl 16 or (this[1] and 0xff shl 8) or (this[2] and 0xff)
-}
+internal fun ByteArray.parseTempo(): Int =
+    with(this.map { it.toInt() }) {
+        this[0] and 0xff shl 16 or (this[1] and 0xff shl 8) or (this[2] and 0xff)
+    }

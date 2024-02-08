@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.world.STRING_GLOW
+import org.wysko.midis2jam2.world.modelD
 
 /** The base position of the bass guitar. */
 private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
@@ -69,7 +70,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
             )
         },
         numberOfStrings = 4,
-        instrumentBody = context.loadModel(
+        instrumentBody = context.modelD(
             if (needsDropTuning(events)) type.modelDropDFile else type.modelFile,
             type.textureFile
         ),
@@ -80,8 +81,8 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         }
     ) {
     override val upperStrings: Array<Spatial> = Array(4) {
-        context.loadModel("BassString.obj", BASS_SKIN_BMP).apply {
-            instrumentNode.attachChild(this)
+        context.modelD("BassString.obj", BASS_SKIN_BMP).apply {
+            geometry.attachChild(this)
         }
     }.apply {
         forEachIndexed { index, it ->
@@ -92,10 +93,10 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         }
     }
 
-    override val lowerStrings: Array<Array<Spatial>> = Array(4) {
-        Array(5) { j ->
-            context.loadModel("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
-                instrumentNode.attachChild(this)
+    override val lowerStrings: List<List<Spatial>> = List(4) {
+        List(5) { j ->
+            context.modelD("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
+                geometry.attachChild(this)
                 cullHint = Always
                 (this as Geometry).material.setColor("GlowColor", type.glowColor)
             }
@@ -114,8 +115,8 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
     }
 
     /** Type of Bass Guitar */
@@ -144,7 +145,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
 
     init {
         /* Position guitar */
-        instrumentNode.run {
+        geometry.run {
             localTranslation = BASE_POSITION
             localRotation = Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1))
         }

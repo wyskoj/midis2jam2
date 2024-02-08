@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,5 +25,5 @@ data class MidiNoteOnEvent(
     override val time: Long,
     override val channel: Int,
     override val note: Int,
-    val velocity: Int
+    val velocity: Int,
 ) : MidiNoteEvent(time, channel, note)

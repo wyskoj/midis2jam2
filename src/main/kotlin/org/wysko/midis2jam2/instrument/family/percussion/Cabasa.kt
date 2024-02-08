@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,35 +19,38 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The Cabasa.
  */
-class Cabasa(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
-
-    private val cabasa = Striker(
-        context = context,
-        hits,
-        context.loadModel("Cabasa.obj", "Cabasa.bmp"),
-        actualStick = false
-    ).apply {
-        setParent(instrumentNode)
-        offsetStick {
-            it.move(0f, 0f, -3f)
+class Cabasa(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+    private val cabasa =
+        Striker(
+            context = context,
+            hits,
+            context.modelD("Cabasa.obj", "Cabasa.bmp"),
+            actualStick = false,
+        ).apply {
+            setParent(geometry)
+            offsetStick {
+                it.move(0f, 0f, -3f)
+            }
         }
-    }
 
     init {
-        instrumentNode.apply {
+        geometry.apply {
             localRotation = Quaternion().fromAngles(0f, 0f, Utils.rad(45.0))
             setLocalTranslation(-10f, 48f, -50f)
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
         val results = cabasa.tick(time, delta)

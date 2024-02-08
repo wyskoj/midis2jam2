@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,41 +20,47 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.midi.HIGH_AGOGO
-import org.wysko.midis2jam2.midi.LOW_AGOGO
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.world.modelD
 import java.lang.Integer.max
 
 private val BASE_POSITION = Vector3f(-5f, 50f, -85f)
 
 /** The Agogo. */
-class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class Agogo(
+    context: Midis2jam2,
+    highHits: MutableList<MidiNoteOnEvent>,
+    lowHits: MutableList<MidiNoteOnEvent>,
+) : AuxiliaryPercussion(context, (highHits + lowHits).sortedBy { it.time }.toMutableList()) {
+    private val leftStick =
+        Striker(
+            context = context,
+            strikeEvents = highHits,
+            stickModel = StickType.DRUM_SET_STICK,
+        ).apply {
+            setParent(recoilNode)
+            node.move(3f, 0f, 13f)
+        }
 
-    private val leftStick = Striker(
-        context = context,
-        strikeEvents = hits.filter { it.note == HIGH_AGOGO },
-        stickModel = StickType.DRUMSET_STICK
-    ).apply {
-        setParent(recoilNode)
-        node.move(3f, 0f, 13f)
-    }
-
-    private val rightStick = Striker(
-        context = context,
-        strikeEvents = hits.filter { it.note == LOW_AGOGO },
-        stickModel = StickType.DRUMSET_STICK
-    ).apply {
-        setParent(recoilNode)
-        node.move(10f, 0f, 11f)
-    }
+    private val rightStick =
+        Striker(
+            context = context,
+            strikeEvents = lowHits,
+            stickModel = StickType.DRUM_SET_STICK,
+        ).apply {
+            setParent(recoilNode)
+            node.move(10f, 0f, 11f)
+        }
 
     init {
-        recoilNode.attachChild(context.loadModel("Agogo.obj", "HornSkinGrey.bmp"))
-        instrumentNode.localTranslation = BASE_POSITION
+        recoilNode.attachChild(context.modelD("Agogo.obj", "HornSkinGrey.bmp"))
+        geometry.localTranslation = BASE_POSITION
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
         val leftResults = leftStick.tick(time, delta)
@@ -63,7 +69,7 @@ class Agogo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         recoilDrum(
             drum = recoilNode,
             velocity = max(leftResults.strike?.velocity ?: 0, rightResults.strike?.velocity ?: 0),
-            delta = delta
+            delta = delta,
         )
     }
 }

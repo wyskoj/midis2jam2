@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,41 +20,26 @@ package org.wysko.midis2jam2.world
 import com.jme3.material.Material
 import com.jme3.material.RenderState
 import com.jme3.math.Vector3f
-import com.jme3.renderer.queue.RenderQueue
+import com.jme3.renderer.queue.RenderQueue.Bucket.Transparent
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 
-/** The constant LIGHTING_MAT. */
 private const val LIGHTING_MAT: String = "Common/MatDefs/Light/Lighting.j3md"
-
-/** The constant UNSHADED_MAT. */
 private const val UNSHADED_MAT: String = "Common/MatDefs/Misc/Unshaded.j3md"
-
-/** The constant COLOR_MAP. */
 private const val COLOR_MAP: String = "ColorMap"
-
-/** The constant DIFFUSE_MAP. */
 private const val DIFFUSE_MAP: String = "DiffuseMap"
-
-/** The constant FRESNEL_PARAMS. */
 private const val FRESNEL_PARAMS: String = "FresnelParams"
-
-/** The constant ENV_MAP_AS_SPHERE_MAP. */
 private const val ENV_MAP_AS_SPHERE_MAP: String = "EnvMapAsSphereMap"
-
-/** The constant ENV_MAP. */
 private const val ENV_MAP: String = "EnvMap"
 
-/** Prepends a string with "Assets/" if it isn't already. */
 private fun String.assetPrefix(): String = if (this.startsWith("Assets/")) this else "Assets/$this"
 
 /**
  * Provides utility functions for loading assets from files.
+ *
+ * @property context The context to the main class.
  */
-class AssetLoader(
-    /** Context to the main class. */
-    val context: Midis2jam2
-) {
+class AssetLoader(val context: Midis2jam2) {
 
     private val assetManager
         get() = context.assetManager
@@ -62,20 +47,17 @@ class AssetLoader(
     /**
      * Loads a [model] and applies a regular [texture].
      */
-    fun loadDiffuseModel(model: String, texture: String): Spatial {
-        return assetManager.loadModel(model.assetPrefix()).apply {
-            setMaterial(diffuseMaterial(texture))
-        }
+    fun loadDiffuseModel(model: String, texture: String): Spatial = assetManager.loadModel(model.assetPrefix()).apply {
+        setMaterial(diffuseMaterial(texture))
     }
 
     /**
      * Loads a [model] and applies a regular [texture].
      */
-    fun loadReflectiveModel(model: String, texture: String): Spatial {
-        return assetManager.loadModel(model.assetPrefix()).apply {
+    fun loadReflectiveModel(model: String, texture: String): Spatial =
+        assetManager.loadModel(model.assetPrefix()).apply {
             setMaterial(reflectiveMaterial(texture))
         }
-    }
 
     /** Loads a fake shadow, given the paths to its [model] and [texture]. */
     fun fakeShadow(model: String, texture: String): Spatial = assetManager.loadModel(model).apply {
@@ -86,7 +68,7 @@ class AssetLoader(
                 setFloat("AlphaDiscardThreshold", 0.01F)
             }
         )
-        queueBucket = RenderQueue.Bucket.Transparent
+        queueBucket = Transparent
     }
 
     /**
@@ -113,3 +95,13 @@ class AssetLoader(
      */
     fun loadSprite(texture: String): Sprite = Sprite(assetManager, texture.assetPrefix())
 }
+
+/**
+ * Convenience function for loading a [model] with a diffuse [texture].
+ */
+fun Midis2jam2.modelD(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)
+
+/**
+ * Convenience function for loading a [model] with a reflective [texture].
+ */
+fun Midis2jam2.modelR(model: String, texture: String): Spatial = assetLoader.loadReflectiveModel(model, texture)

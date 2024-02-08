@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,17 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.modelD
 
+/**
+ * The maximum angle, in degrees, at which the stick will rest and recoil to.
+ */
 const val MAX_STICK_IDLE_ANGLE: Double = 50.0
+
+private const val DEFAULT_STRIKE_SPEED = 3.0
 
 /**
  * Provides common logic and functionality for objects that animate with a "strike" motion, such as drum sticks or
@@ -47,54 +55,54 @@ class Striker(
     private val context: Midis2jam2,
     private val strikeEvents: List<MidiNoteOnEvent>,
     private val stickModel: Spatial,
-    private val strikeSpeed: Double = 4.0,
+    private val strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
     private val maxIdleAngle: Double = MAX_STICK_IDLE_ANGLE,
     private val rotationAxis: Axis = Axis.X,
     private val sticky: Boolean = true,
-    private val actualStick: Boolean = true
+    private val actualStick: Boolean = true,
 ) {
-
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
         context: Midis2jam2,
         strikeEvents: List<MidiNoteOnEvent>,
         stickModel: StickType,
-        strikeSpeed: Double = 4.0,
+        strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
         maxIdleAngle: Double = MAX_STICK_IDLE_ANGLE,
         rotationAxis: Axis = Axis.X,
         sticky: Boolean = true,
-        actualStick: Boolean = true
+        actualStick: Boolean = true,
     ) : this(
         context,
         strikeEvents,
         stickModel.let {
-            val model = context.loadModel(it.modelName, it.textureName)
-            it.extras(model)
-            model
+            context.modelD(it.modelName, it.textureName)
         },
         strikeSpeed,
         maxIdleAngle,
         rotationAxis,
         sticky,
-        actualStick
+        actualStick,
     )
 
     /**
      * The global node for this object. Feel free to translate, rotate, and scale this freely.
      */
-    val node: Node = Node()
-
-    private val rotationNode = Node().also {
-        node.attachChild(it) // Attach this to global node
-        it.attachChild(stickModel)
-    }
+    val node: Node = node()
 
     private val eventCollector = EventCollector(strikeEvents, context)
+    private val rotationNode = with(node) {
+        +node {
+            +stickModel
+        }
+    }
 
     /**
      * Updates animation, given the current [time] and the amount of time since the last frame ([delta]).
      */
-    fun tick(time: Double, delta: Float): StickStatus {
+    fun tick(
+        time: Double,
+        delta: Float,
+    ): StickStatus {
         // Collect an event if a strike is occurring now
         val strike = eventCollector.advanceCollectOne(time)
 
@@ -110,18 +118,18 @@ class Striker(
                 // Recoil the stick by slightly raising it
                 setRotation(
                     axis = rotationAxis,
-                    angle = (currentAngles[rotationAxis.componentIndex] + 5f * delta).coerceAtMost(rad(maxIdleAngle))
+                    angle = (currentAngles[rotationAxis.componentIndex] + 5f * delta).coerceAtMost(rad(maxIdleAngle)),
                 )
             }
         } else {
             // The proposed angle is simply less than the maximum, so we just set the angle to be that
             setRotation(
                 axis = rotationAxis,
-                angle = rad(proposedRotation.coerceIn(0.0..maxIdleAngle))
+                angle = rad(proposedRotation.coerceIn(0.0..maxIdleAngle)),
             )
         }
 
-        /* After all the rotations have been completed, write down the new angles */
+        // After all the rotations have been completed, write down the new angles
         val finalAngles = rotationNode.localRotation.toAngles(null)
 
         // Determine visibility based on current rotation
@@ -133,7 +141,7 @@ class Striker(
             node.cullHint = Spatial.CullHint.Dynamic
         }
 
-        /* If the stick is sticky (should appear in between hits) */
+        // If the stick is sticky (should appear in between hits)
         if (sticky) {
             val peek = eventCollector.peek()
             val prev = eventCollector.prev()
@@ -149,11 +157,11 @@ class Striker(
             node.cullHint = Spatial.CullHint.Dynamic
         }
 
-        /* Return some information back to the caller */
+        // Return some information back to the caller
         return StickStatus(
             strike = strike,
             rotationAngle = finalAngles[rotationAxis.componentIndex],
-            strikingFor = if (proposedRotation > maxIdleAngle) null else eventCollector.peek()
+            strikingFor = if (proposedRotation > maxIdleAngle) null else eventCollector.peek(),
         )
     }
 
@@ -175,36 +183,64 @@ class Striker(
 
     private fun proposedRotation(time: Double): Double {
         return eventCollector.peek()?.let {
-            /* The rotation is essentially defined by the amount of time between NOW and the next hit. */
+            // The rotation is essentially defined by the amount of time between NOW and the next hit.
             var rot = context.file.eventInSeconds(it) - time
 
             /* The rotation should be dependent on the current tempo, i.e., if the tempo is faster, the rotation should
              * happen quicker, v.v. */
             rot *= context.file.tempoBefore(it).bpm()
 
-            /* We may wish to scale the entire rotation to hasten/delay the animation. */
+            // We may wish to scale the entire rotation to hasten/delay the animation.
             rot *= strikeSpeed
 
             return rot
         } ?: (maxIdleAngle + 1) // We have nothing to hit, so idle just above the max angle
     }
 
-    private fun setRotation(axis: Axis, angle: Float) {
+    private fun setRotation(
+        axis: Axis,
+        angle: Float,
+    ) {
         rotationNode.localRotation =
             Quaternion().fromAngles(Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(angle).toArray(null))
     }
 }
 
-/** Returns data describing what the status of the stick is. */
+/**
+ * Defines properties for a [Striker].
+ *
+ * @property stickModel The model used for the stick.
+ * @property strikeSpeed The speed at which the stick will animate downwards to strike.
+ * @property maxIdleAngle The maximum angle, in degrees, at which the stick will rest and recoil to.
+ * @property rotationAxis The axis on which the stick will rotate.
+ * @property sticky `true` if the stick should remain visible between strikes up to a certain tolerance, `false`
+ * otherwise.
+ * @property actualStick `true` if the spatial used in this object is actually a stick, and not something that does
+ * not appear as a stick but uses the same motion, `false` otherwise.
+ * When `false`, this object will always remain visible when the "never_hidden"
+ * midis2jam2 property is enabled.
+ */
+data class StickProperties(
+    val stickModel: Spatial,
+    val strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
+    val maxIdleAngle: Double = MAX_STICK_IDLE_ANGLE,
+    val rotationAxis: Axis = Axis.X,
+    val sticky: Boolean = true,
+    val actualStick: Boolean = true,
+)
+
+/**
+ * Returns data describing what the status of the stick is.
+ *
+ * @property strike If the stick just struck, this is the strike it struck for. `null` otherwise.
+ * @property rotationAngle The current rotation angle of the stick.
+ * @property strikingFor If the stick is rotating to strike a note, this is the note it's striking for. `null`
+ * otherwise.
+ */
 data class StickStatus(
-    /** If the stick just struck, this is the strike it struck for. Null otherwise. */
     val strike: MidiNoteOnEvent?,
-
-    /** The current rotation angle of the stick. */
     val rotationAngle: Float,
-
-    /** If the stick is rotating to strike a note, this is the note it's striking for. Null otherwise. */
-    val strikingFor: MidiNoteOnEvent?
+    val strikingFor: MidiNoteOnEvent?,
 ) {
     /** The velocity at which the striker struck at, or `0` if it did not strike this frame. */
     val velocity: Int
@@ -217,23 +253,22 @@ data class StickStatus(
 enum class StickType(
     internal val modelName: String,
     internal val textureName: String,
-    internal val extras: (stick: Spatial) -> Unit = {}
 ) {
-    /** The drumset stick. */
-    DRUMSET_STICK(
+    /** The drum set stick. */
+    DRUM_SET_STICK(
         modelName = "DrumSet_Stick.obj",
-        textureName = "StickSkin.bmp"
+        textureName = "StickSkin.bmp",
     ),
 
     /** The left hand. */
     HAND_LEFT(
         modelName = "hand_left.obj",
-        textureName = "hands.bmp"
+        textureName = "hands.bmp",
     ),
 
     /** The right hand. */
     HAND_RIGHT(
         modelName = "hand_right.obj",
-        textureName = "hands.bmp"
+        textureName = "hands.bmp",
     ),
 }

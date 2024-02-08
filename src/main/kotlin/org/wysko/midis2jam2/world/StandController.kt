@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,14 +30,14 @@ import org.wysko.midis2jam2.util.cullHint
  */
 class StandController(private val context: Midis2jam2) {
 
-    private val keyboardStand = context.loadModel("PianoStand.obj", "RubberFoot.bmp").apply {
+    private val keyboardStand = context.modelD("PianoStand.obj", "RubberFoot.bmp").apply {
         move(-50f, 32f, -6f)
         rotate(0f, Utils.rad(45f), 0f)
     }.also {
         context.rootNode.attachChild(it)
     }
 
-    private val malletStand = context.loadModel("XylophoneLegs.obj", "RubberFoot.bmp").apply {
+    private val malletStand = context.modelD("XylophoneLegs.obj", "RubberFoot.bmp").apply {
         setLocalTranslation(-22F, 22.2F, 23F)
         rotate(0f, Utils.rad(33.7), 0f)
         scale(0.6666667f)

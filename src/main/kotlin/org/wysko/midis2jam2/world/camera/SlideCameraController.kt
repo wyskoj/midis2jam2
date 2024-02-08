@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class SlideCameraController(
 ) {
     /** True if the camera is currently sliding. */
     var isEnabled: Boolean = false
-    
+
     private var goingRight = true
     private var t = 0f
     private var brakesApplied = false
@@ -50,7 +50,6 @@ class SlideCameraController(
     fun tick(tpf: Float, time: Double) {
         if (!isEnabled) return
 
-
         if (goingRight) {
             t += tpf * ROTATION_SPEED_FACTOR
         } else {
@@ -59,23 +58,42 @@ class SlideCameraController(
 
         if (t > MAX_ANGLE) goingRight = false else if (t < -MAX_ANGLE) goingRight = true
 
-        if (context.file.length - time < SECONDS_LEFT_UNTIL_BRAKES) {
-            brakesApplied = true
-            angleWhenBrakesApplied = t
+        brakesApplied = if (context.file.length - time < SECONDS_LEFT_UNTIL_BRAKES) {
+            if (!brakesApplied) {
+                angleWhenBrakesApplied = t
+            }
+            true
+        } else {
+            false
         }
 
-        val x =
-            (if (brakesApplied) 1f - ((context.file.length - 2) - time) / SECONDS_LEFT_UNTIL_BRAKES else 0f).toFloat()
-                .coerceAtMost(1f)
+        val brakesFactor = (
+                if (brakesApplied) {
+                    1f - ((context.file.length - 2) - time) / SECONDS_LEFT_UNTIL_BRAKES
+                } else {
+                    0f
+                }
+                )
+            .toFloat()
+            .coerceAtMost(1f)
 
         context.app.camera.location.interpolateLocal(
-            desiredLocation(Utils.lerp(t, 0f, x)), (DAMPENING * tpf)
+            desiredLocation(Utils.lerp(t, 0f, brakesFactor)),
+            (DAMPENING * tpf)
         )
         context.app.camera.rotation.slerp(
             lookAtRotation(context.app.camera.location.clone(), Vector3f(-2f, 47.320206f, 0f)),
             DAMPENING * 5 * tpf
         )
         context.app.camera.rotation.normalizeLocal()
+    }
+
+    /**
+     * Call when the file loops.
+     */
+    fun onLoop() {
+        t = 0f
+        brakesApplied = false
     }
 
     private fun desiredLocation(t: Float): Vector3f {

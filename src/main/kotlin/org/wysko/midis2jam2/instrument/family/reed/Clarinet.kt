@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,15 @@ import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Companion.from
 import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
-import org.wysko.midis2jam2.instrument.clone.HandedClone
-import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
+import org.wysko.midis2jam2.instrument.clone.CloneWithHands
+import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.modelD
 
-/** The Clarinet fingering manager. */
-private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::class.java)
+private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::class)
 
 /**
  * The clarinet has both hand positions and a stretchy bell.
@@ -40,35 +40,35 @@ private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::cla
  * [Fingering chart](https://bit.ly/34Quj4e)
  */
 class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    HandedInstrument(
+    InstrumentWithHands(
         context,
         /* Strip notes outside of standard range */
         eventList.filterIsInstance<MidiNoteEvent>().filter { it.note in 50..90 }
             .plus(eventList.filter { it !is MidiNoteEvent }),
-        ClarinetClone::class.java,
+        ClarinetClone::class,
         FINGERING_MANAGER
     ) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
     /** The type Clarinet clone. */
-    inner class ClarinetClone : HandedClone(this@Clarinet, 0.075f) {
+    inner class ClarinetClone : CloneWithHands(this@Clarinet, 0.075f) {
 
-        override val leftHands: Array<Spatial> = Array(20) {
-            parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
+        override val leftHands: List<Spatial> = List(20) {
+            parent.context.modelD("ClarinetLeftHand$it.obj", "hands.bmp")
         }
 
-        override val rightHands: Array<Spatial> = Array(13) {
-            parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
+        override val rightHands: List<Spatial> = List(13) {
+            parent.context.modelD("ClarinetRightHand$it.obj", "hands.bmp")
         }
 
         init {
             /* Load body */
-            modelNode.attachChild(context.loadModel("ClarinetBody.obj", "ClarinetSkin.png"))
+            geometry.attachChild(context.modelD("ClarinetBody.obj", "ClarinetSkin.png"))
 
             /* Position Clarinet */
             animNode.setLocalTranslation(0f, 0f, 10f)
@@ -78,16 +78,16 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         }
 
         /** The bell. */
-        private val bell: Spatial = context.loadModel("ClarinetHorn.obj", "ClarinetSkin.png").apply {
-            modelNode.attachChild(this)
+        private val bell: Spatial = context.modelD("ClarinetHorn.obj", "ClarinetSkin.png").apply {
+            geometry.attachChild(this)
             setLocalTranslation(0f, -20.7125f, 0f)
         }
 
         /** The bell stretcher. */
         private val bellStretcher: BellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
 
-        override fun moveForPolyphony(delta: Float) {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
+        override fun adjustForPolyphony(delta: Float) {
+            root.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -105,7 +105,7 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     init {
-        instrumentNode.setLocalTranslation(-25f, 50f, 0f)
-        instrumentNode.setLocalScale(0.9f)
+        geometry.setLocalTranslation(-25f, 50f, 0f)
+        geometry.setLocalScale(0.9f)
     }
 }

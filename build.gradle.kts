@@ -1,5 +1,7 @@
 @file:Suppress("SpellCheckingInspection")
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -14,10 +16,10 @@ plugins {
     id("com.github.hierynomus.license-report") version "0.16.1"
 
     // Kotlin
-    kotlin("jvm") version "1.9.0"
-    kotlin("plugin.serialization") version "1.8.20"
-    id("org.jetbrains.dokka") version "1.7.10"
+    kotlin("jvm") version "1.9.21"
+    kotlin("plugin.serialization") version "1.9.21"
     id("org.jetbrains.compose") version "1.5.11"
+    id("io.gitlab.arturbosch.detekt") version("1.23.3")
 
     java
     idea
@@ -42,7 +44,7 @@ tasks.compileJava {
 }
 
 // Configure Kotlin
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "17"
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xcontext-receivers")
@@ -56,19 +58,19 @@ application {
 tasks.processResources {
     dependsOn(tasks.getByName("downloadLicenses"))
     doFirst {
-        /* Write build time and hash if present */
+        // Write build time and hash if present
         val gitHash = System.getenv("GIT_HASH")
         val buildTime = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
         File(projectDir, "src/main/resources/build.txt").writeText("$buildTime${gitHash?.let { " $it" } ?: ""}")
         println("buildtime: $buildTime")
 
-        /* Dependency report */
+        // Dependency report
         copy {
             from("build/reports/license/dependency-license.json")
             into("src/main/resources")
         }
 
-        /* Version */
+        // Version
         val midis2jam2Version: String by project
         File(projectDir, "src/main/resources/version.txt").writeText(midis2jam2Version)
     }
@@ -133,12 +135,15 @@ dependencies {
 
     // Kotlin serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
+
+    implementation(files("libs/Gervill-0.2.31.jar"))
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+tasks.withType<ShadowJar> {
     archiveFileName.set(
         "midis2jam2-${
             if (project.hasProperty("targetplatform")) {
@@ -154,7 +159,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
             } else {
                 "current"
             }
-        }-${project.properties["midis2jam2Version"]}.jar"
+        }-${project.properties["midis2jam2Version"]}.jar",
     )
 }
 
@@ -164,32 +169,10 @@ downloadLicenses {
     dependencyConfiguration = "compileClasspath"
 }
 
-// Configure Dokka
-tasks.dokkaHtml.configure {
-    moduleName.set("midis2jam2")
-    dokkaSourceSets {
-        configureEach {
-            includeNonPublic.set(true)
-            reportUndocumented.set(true)
-            suppressObviousFunctions.set(true)
-        }
-    }
-    pluginsMapConfiguration.set(
-        mapOf(
-            "org.jetbrains.dokka.base.DokkaBase" to """
-          {
-            "customStyleSheets": [
-              "${rootDir.toString().replace('\\', '/')}/doc/logo-styles.css"
-            ],
-            "customAssets" : [
-              "${rootDir.toString().replace('\\', '/')}/doc/midis2jam2.svg"
-            ]
-          }
-          """.trimIndent()
-        )
-    )
-}
-
 tasks.test {
     useJUnitPlatform()
+}
+
+detekt {
+    config.setFrom(files("detekt-config.yml"))
 }

@@ -1,0 +1,13 @@
+comments:
+  CommentOverPrivateProperty:
+    active: true
+  EndOfSentenceFormat:
+    active: true
+  OutdatedDocumentation:
+    active: true
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    excludeGuardClauses: true

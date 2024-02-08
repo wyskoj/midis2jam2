@@ -56,7 +56,11 @@
 		"key": "KEY_SPACE"
 	},
 	{
-		"name": "seek",
-		"key": "KEY_K"
+		"name": "seek_forward",
+		"key": "KEY_RIGHT"
+	},
+	{
+		"name": "seek_backward",
+		"key": "KEY_LEFT"
 	}
 ]

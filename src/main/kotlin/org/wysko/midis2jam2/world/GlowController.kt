@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,14 +33,13 @@ val DIM_GLOW: ColorRGBA = ColorRGBA(0.67f, 0.67f, 0.67f, 1f)
  *
  * @param glowColor the color of the glow
  */
-class GlowController(
-    val glowColor: ColorRGBA = STANDARD_GLOW
-) {
+class GlowController(val glowColor: ColorRGBA = STANDARD_GLOW) {
     /**
      * Given the current [animationTime], determines the correct color for a decaying effect.
      */
-    fun calculate(animationTime: Double): ColorRGBA {
-        return ColorRGBA(
+    fun calculate(animationTime: Double): ColorRGBA = when {
+        animationTime < 0 -> ColorRGBA.Black
+        else -> ColorRGBA(
             (-0.25 * animationTime + glowColor.r).toFloat(),
             (-0.25 * animationTime + glowColor.g).toFloat(),
             (-0.25 * animationTime + glowColor.b).toFloat(),

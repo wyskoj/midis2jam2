@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,171 +17,156 @@
 package org.wysko.midis2jam2.instrument
 
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
-import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.Visibility
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
-import org.wysko.midis2jam2.util.cullHint
-
-/** How fast instruments move when transitioning. */
-private const val BASE_TRANSITION_SPEED = 2500
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.minusAssign
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.times
 
 /**
- * Any visual representation of a MIDI instrument. midis2jam2 displays separate instruments for
- * each channel, and also creates new instruments when the program of a channel changes (i.e., the MIDI instrument of
- * the channel changes).
+ * Represents an instrument.
  *
- * Classes that implement Instrument are responsible for handling [tick], which updates the current animation and
- * note handling for every call.
+ * All instruments should extend this class.
+ * It is responsible for managing the visibility of the instrument,
+ * general positioning, and the instrument's node hierarchy.
+ *
+ * @property context The context to the main class.
  */
-abstract class Instrument protected constructor(
-    /** Context to the main class. */
-    val context: Midis2jam2
-) {
-
-    /** Used for moving the instrument when there are two or more consecutively visible instruments of the same type. */
-    val offsetNode: Node = Node()
-
-    /** Used for general positioning and rotation of the instrument. */
-    val highestLevel: Node = Node()
-
-    /** Contains instrument geometry, ideally through further sub-nodes. */
-    val instrumentNode: Node = Node()
+abstract class Instrument(val context: Midis2jam2) {
 
     /**
-     * When true, this instrument should be displayed on the screen. Otherwise, it should not. The positions of
-     * instruments rely on this variable.
+     * This node is translated when multiple instances of the same instrument are on the stage.
+     * It is at the top of the node hierarchy.
      */
-    var isVisible: Boolean = false
+    val root: Node = node()
+
+    /**
+     * This node is translated for general positioning of the instrument.
+     * It is at the second level of the node hierarchy.
+     */
+    val placement: Node = node()
+
+    /**
+     * This node contains the instrument's geometry.
+     * It is at the third level of the node hierarchy—the lowest in the [Instrument] class.
+     */
+    val geometry: Node = node()
+
+    /**
+     * The index of the instrument.
+     * This is used for positioning the instrument when multiple instances of the same
+     * instrument are on the stage.
+     * As instruments move on stage, they do not "snap" to their target position.
+     * Instead, they gradually move to their target position, which is calculated by
+     * [updateInstrumentIndex].
+     *
+     */
+    var index: Double = 0.0
+
+    /**
+     * Whether the instrument is visible.
+     * The calculation for visibility is handled by [Visibility].
+     *
+     * If the context has the `instrumentAlwaysVisible` setting enabled, this will always be true.
+     *
+     * The [root] is attached and detached from the [context]'s root node when this is set.
+     *
+     * @see Visibility
+     */
+    open var isVisible: Boolean = true
+        get() = context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible || field
         set(value) {
-            if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible) {
-                context.rootNode.attachChild(offsetNode)
-                field = value
-                return
-            }
-
-            if (value) {
-                context.rootNode.attachChild(offsetNode)
-            } else {
-                context.rootNode.detachChild(offsetNode)
-            }
-
-            if (this is PercussionInstrument && this !is NonDrumSetPercussion) {
-                field = true
-                instrumentNode.cullHint = Spatial.CullHint.Dynamic
-                return
-            }
-
-            instrumentNode.cullHint = value.cullHint()
             field = value
+            with(context.rootNode) {
+                if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible || field) {
+                    this += root
+                } else {
+                    this -= root
+                }
+            }
         }
-        get() {
-            return if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible) {
-                true
-            } else field
-        }
-
-    /**
-     * The index of this instrument in the stack of similar instruments. Can be a decimal when instrument transition
-     * easing is enabled.
-     */
-    private var index = 0.0
 
     init {
-        /* Connect node tree */
-        highestLevel.attachChild(instrumentNode)
-        offsetNode.attachChild(highestLevel)
-        context.rootNode.attachChild(offsetNode)
+        placement += geometry
+        root += placement
+        context.rootNode += root
     }
 
     /**
-     * Updates note collection, animation, visibility, and any other calculations that need to run on each frame.
+     * Called every frame. All logic for the instrument should be handled here.
      *
-     * @param time  the current time since the beginning of the MIDI file, expressed in seconds
-     * @param delta the amount of time since the last call this method, expressed in seconds
+     * @param time The current time since the beginning of the song, in seconds.
+     * @param delta The amount of time that elapsed since the last frame, in seconds.
      */
     abstract fun tick(time: Double, delta: Float)
 
     /**
-     * Calculates if this instrument is visible at a given time. Implementations of this method should follow this
-     * general guideline:
+     * Calculates the visibility of the instrument.
      *
-     * * If the instrument is currently playing, it should be visible.
-     * * Otherwise, if there is less than or equal to one second from the current time until the next note, it should
-     *   be visible.
-     * * Otherwise, if there is less than or equal to seven seconds from the last played note and next note to play,
-     *   it should be visible.
-     * * Otherwise, if there is less than or equal to two seconds since the last previously played note, it should be
-     *   visible.
-     * * Otherwise, it should be invisible.
+     * @param time The current time since the beginning of the song, in seconds.
+     * @param future Whether to calculate the visibility for the future.
      */
-    abstract fun calcVisibility(time: Double, future: Boolean = false): Boolean
+    abstract fun calculateVisibility(time: Double, future: Boolean = false): Boolean
 
     /**
-     * Returns the index of this instrument in the list of other instruments of this type that are visible.
-     *
-     * @param delta the amount of time that has passed since the last frame
+     * Called when the instrument's [visibility][isVisible] changes from `false` to `true`.
      */
-    @Contract(pure = false)
-    protected fun updateInstrumentIndex(delta: Float): Float {
-        val similarAndVisible = similarVisible()
-        val targetIndex = if (isVisible) {
-            /* Index in the list of instruments from context */
-            similarAndVisible.indexOf(this).coerceAtLeast(0)
-        } else {
-            /* The number of visible instruments of this type, minus one */
-            similarAndVisible.size - 1
+    protected open fun onEntry(): Unit = Unit
+
+    /**
+     * Called when the instrument's [visibility][isVisible] changes from `true` to `false`.
+     */
+    protected open fun onExit(): Unit = Unit
+
+    /**
+     * Adjusts the [root] to account for multiple instances of the same instrument.
+     *
+     * @param delta The amount of time that elapsed since the last frame, in seconds.
+     */
+    protected open fun adjustForMultipleInstances(delta: Float) {
+        if (this is MultipleInstancesLinearAdjustment) {
+            root.loc = this.multipleInstancesDirection * updateInstrumentIndex(delta)
         }
+    }
 
-        /* Update the index gradually to the target index, given the transition speed */
-        index += delta * BASE_TRANSITION_SPEED * (targetIndex - index) / 500.0
-
-        /* Never set the instrument index to anything larger than the number of instruments of this type */
+    /**
+     * Updates the [index] of the instrument.
+     *
+     * @param delta The amount of time that elapsed since the last frame, in seconds.
+     * @return The new index.
+     * @see index
+     */
+    protected fun updateInstrumentIndex(delta: Float): Float {
+        val targetIndex = if (isVisible) similarVisible().indexOf(this).coerceAtLeast(0) else similarVisible().size - 1
+        index += delta * 2500 * (targetIndex - index) / 500.0
         index = index.coerceAtMost(similar().size.toDouble())
-
         return index.toFloat()
     }
 
-    /** The number of instruments that are [similar] and are visible. */
+    /**
+     * Returns a list of instruments that are of the same type as this instrument.
+     */
+    protected open fun similar(): List<Instrument> = context.instruments.filter { this::class.isInstance(it) }
+
+    /**
+     * Returns a list of instruments that are of the same type as this instrument and are visible.
+     */
     protected open fun similarVisible(): List<Instrument> = similar().filter { it.isVisible }
 
     /**
-     * Returns a list of instruments that should stack with this instrument (typically those of the same class or
-     * subclasses).
+     * Formats a property about this instrument for debugging purposes.
+     *
+     * @param name The name of the property.
+     * @param value The value of the property.
      */
-    protected open fun similar(): List<Instrument> = context.instruments.filter { this.javaClass.isInstance(it) }
-
-    /** Does the same thing as [updateInstrumentIndex] but is pure and does not modify any variables. */
-    @Contract(pure = true)
-    fun checkInstrumentIndex(): Double = index
-
-    /** Calculates and moves this instrument for when multiple instances of this instrument are visible. */
-    protected abstract fun moveForMultiChannel(delta: Float)
-
-    /**
-     * Given the current [time], calls [calcVisibility] to determine the current visibility, updating [isVisible] and
-     * the cull hint of [instrumentNode].
-     */
-    protected fun setVisibility(time: Double) {
-        isVisible = calcVisibility(time)
+    protected fun debugProperty(name: String, value: Any): String = when (value) {
+        is Float -> "\t- $name: ${"%.3f".format(value)}\n"
+        else -> "\t- $name: $value\n"
     }
 
-    /** Formats a property about this instrument for debugging purposes. */
-    protected fun debugProperty(name: String, value: String): String {
-        return "\t- $name: $value\n"
-    }
-
-    /** Formats a property about this instrument for debugging purposes. */
-    protected fun debugProperty(name: String, value: Float): String {
-        return "\t- $name: ${"%.3f".format(value)}\n"
-    }
-
-    override fun toString(): String {
-        return buildString {
-            append("* ${this@Instrument.javaClass.simpleName} / ${"%.3f".format(checkInstrumentIndex())}\n")
-        }
-    }
+    override fun toString(): String = "* ${this@Instrument.javaClass.simpleName} / ${"%.3f".format(index)}\n"
 }

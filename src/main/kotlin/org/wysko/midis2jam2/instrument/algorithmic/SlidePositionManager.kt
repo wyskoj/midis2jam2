@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.brass.Trombone
 import org.wysko.midis2jam2.util.Utils
+import kotlin.reflect.KClass
 
 /**
  * Manages and defines the position of the [Trombone] slide for each note.
@@ -29,14 +30,13 @@ import org.wysko.midis2jam2.util.Utils
 @Serializable
 class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 
-    /** Stores the slide table. */
     private val slideTable = HashMap<Int, List<Int>>()
 
     override fun fingering(midiNote: Int): List<Int>? = slideTable[midiNote]
 
     companion object {
         /** Loads the slide position manager from a file based on the class name. */
-        fun from(`class`: Class<out Instrument>): SlidePositionManager =
-            Json.decodeFromString(Utils.resourceToString("/instrument/${`class`.simpleName}.json"))
+        fun from(klass: KClass<out Instrument>): SlidePositionManager =
+            Json.decodeFromString(Utils.resourceToString("/instrument/${klass.simpleName}.json"))
     }
 }

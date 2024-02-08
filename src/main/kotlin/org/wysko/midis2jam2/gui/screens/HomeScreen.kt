@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ fun HomeScreen(
     flicker: Boolean,
     snackbarHostState: SnackbarHostState,
     onOpenSoundbankConfig: () -> Unit,
-    isLockPlayButton: Boolean
+    isLockPlayButton: Boolean,
 ) {
     val midiFile by homeViewModel.midiFile.collectAsState()
     val midiDevices by homeViewModel.midiDevices.collectAsState()
@@ -69,16 +69,19 @@ fun HomeScreen(
     val soundbanks by soundbankConfigurationViewModel.soundbanks.collectAsState()
     val selectedSoundbank by homeViewModel.selectedSoundbank.collectAsState()
     val lastMidiFileSelectedDirectory by homeViewModel.lastMidiFileSelectedDirectory.collectAsState()
+    val isLooping by homeViewModel.isLooping.collectAsState()
 
     val scope = rememberCoroutineScope()
     var showFilePicker by remember { mutableStateOf(false) }
     var focusCount by remember { mutableStateOf(0) }
 
     Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            Modifier.padding(64.dp).requiredWidth(512.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+            Modifier.padding(64.dp).requiredWidth(512.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Midis2jam2Logo(Modifier.align(Alignment.CenterHorizontally))
             SelectMidiFileRow(midiFile, {
@@ -88,28 +91,37 @@ fun HomeScreen(
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         I18n["refreshed_midi_devices"].value,
-                        duration = SnackbarDuration.Short
+                        duration = SnackbarDuration.Short,
                     )
                 }
             }
             AnimatedVisibility(homeViewModel.shouldShowSoundbankSelector) {
                 SelectSoundbankRow(selectedSoundbank, soundbanks.toList(), homeViewModel, onOpenSoundbankConfig)
             }
-            ElevatedButton(
-                onClick = playMidiFile,
-                modifier = Modifier.width(160.dp).align(Alignment.CenterHorizontally).height(48.dp),
-                enabled = !isLockPlayButton && midiFile != null
-            ) {
-                Icon(Icons.Default.PlayArrow, I18n["play"].value)
-                Spacer(Modifier.width(8.dp))
-                Text(I18n["play"].value)
+            Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                ElevatedButton(
+                    onClick = playMidiFile,
+                    modifier = Modifier.width(160.dp).height(48.dp),
+                    enabled = !isLockPlayButton && midiFile != null,
+                ) {
+                    Icon(Icons.Default.PlayArrow, I18n["play"].value)
+                    Spacer(Modifier.width(8.dp))
+                    Text(I18n["play"].value)
+                }
+                ToolTip(I18n["repeat"].value) {
+                    IconToggleButton(isLooping, {
+                        homeViewModel.setLooping(it)
+                    }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
+                        Icon(painterResource("/ico/repeat.svg"), I18n["repeat"].value)
+                    }
+                }
             }
         }
     }
     FilePicker(
         showFilePicker,
         fileExtensions = MIDI_FILE_EXTENSIONS,
-        initialDirectory = "$lastMidiFileSelectedDirectory${FileSystems.getDefault().separator}"
+        initialDirectory = "$lastMidiFileSelectedDirectory${FileSystems.getDefault().separator}",
     ) { path ->
         showFilePicker = false
         path?.let {
@@ -121,14 +133,21 @@ fun HomeScreen(
 
 @Composable
 private fun SelectMidiFileRow(
-    midiFile: File?, openMidiFileSelector: () -> Unit, openMidiSearch: () -> Unit, flicker: Boolean, focusCount: Int
+    midiFile: File?,
+    openMidiFileSelector: () -> Unit,
+    openMidiSearch: () -> Unit,
+    flicker: Boolean,
+    focusCount: Int,
 ) {
     val flickerSize by animateFloatAsState(if (flicker) 1.05f else 1f)
     Row(
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MidiFileSelector(
-            selectedMidiFile = midiFile?.name ?: "", modifier = Modifier.weight(1f).scale(flickerSize), focusCount = focusCount
+            selectedMidiFile = midiFile?.name ?: "",
+            modifier = Modifier.weight(1f).scale(flickerSize),
+            focusCount = focusCount,
         ) {
             openMidiFileSelector()
         }
@@ -146,13 +165,16 @@ private fun SelectMidiDeviceRow(
     midiDevices: List<MidiDevice.Info>,
     selectedMidiDevice: MidiDevice.Info,
     viewModel: HomeViewModel,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MidiDeviceSelector(
-            devices = midiDevices, selectedDevice = selectedMidiDevice, modifier = Modifier.weight(1f)
+            devices = midiDevices,
+            selectedDevice = selectedMidiDevice,
+            modifier = Modifier.weight(1f),
         ) { info ->
             viewModel.selectMidiDevice(info)
         }
@@ -172,13 +194,16 @@ private fun SelectSoundbankRow(
     selectedSoundbank: File?,
     soundbanks: List<File>,
     viewModel: HomeViewModel,
-    onOpenSoundbankConfig: () -> Unit
+    onOpenSoundbankConfig: () -> Unit,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         SoundbankSelector(
-            modifier = Modifier.weight(1f), selectedSoundbank = selectedSoundbank, soundbanks = soundbanks
+            modifier = Modifier.weight(1f),
+            selectedSoundbank = selectedSoundbank,
+            soundbanks = soundbanks,
         ) { soundbank ->
             viewModel.selectSoundbank(soundbank)
         }

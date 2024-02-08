@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,56 +16,60 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
-import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
+import org.wysko.midis2jam2.instrument.family.percussion.Surdo.HandPosition.Down
+import org.wysko.midis2jam2.instrument.family.percussion.Surdo.HandPosition.Up
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.OPEN_SURDO
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.Vector3fSmoother
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelD
 
 /** The Surdo. */
-class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class Surdo(
+    context: Midis2jam2,
+    muteHits: MutableList<MidiNoteOnEvent>,
+    openHits: MutableList<MidiNoteOnEvent>,
+) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
+    private val muteCollector = EventCollector(muteHits, context)
+    private val openCollector = EventCollector(openHits, context)
 
-    private val stick = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = StickType.DRUMSET_STICK
-    ).apply {
-        setParent(recoilNode)
-        offsetStick { it.move(0f, 0f, -2f) }
-        node.move(0f, 0f, 14f)
-    }
+    private val stick =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = StickType.DRUM_SET_STICK,
+        ).apply {
+            setParent(recoilNode)
+            offsetStick { it.move(0f, 0f, -2f) }
+            node.move(0f, 0f, 14f)
+        }
 
     /** The hand that rests or hovers above the drum. */
-    private val hand: Spatial = context.loadModel("hand_left.obj", "hands.bmp").also {
-        recoilNode.attachChild(it)
-    }
-
-    /** Moves the hand to a [position]. */
-    private fun moveHand(position: HandPosition) {
-        with(hand) {
-            localRotation = if (position == HandPosition.DOWN) {
-                setLocalTranslation(0f, 0f, 0f)
-                Quaternion().fromAngles(0f, 0f, 0f)
-            } else {
-                setLocalTranslation(0f, 2f, 0f)
-                Quaternion().fromAngles(rad(30.0), 0f, 0f)
-            }
+    private val hand: Spatial =
+        context.modelD("hand_left.obj", "hands.bmp").also {
+            recoilNode.attachChild(it)
         }
-    }
+
+    private var handPosition: HandPosition = Up
+    private val handLocCtrl = Vector3fSmoother(Up.translation, 20.0)
+    private val handRotCtrl = Vector3fSmoother(Up.rotation, 20.0)
 
     init {
         recoilNode.attachChild(
-            context.loadModel("DrumSet_Surdo.obj", "DrumShell_Surdo.png").apply {
+            context.modelD("DrumSet_Surdo.obj", "DrumShell_Surdo.png").apply {
                 setLocalScale(1.7f)
-            }
+            },
         )
-        with(highestLevel) {
-            setLocalTranslation(25f, 25f, -41f)
-            localRotation = Quaternion().fromAngles(rad(14.2), rad(-90.0), rad(0.0))
+        with(placement) {
+            loc = v3(25, 25, -41)
+            rot = v3(14.2, -90, 0)
         }
     }
 
@@ -75,17 +79,31 @@ class Surdo(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSe
         val results = stick.tick(time, delta)
         recoilDrum(recoilNode, results.velocity, delta)
 
-        results.strike?.let {
-            moveHand(if (it.note == OPEN_SURDO) HandPosition.UP else HandPosition.DOWN)
-        }
+        muteCollector.advanceCollectOne(time)?.let { handPosition = Down }
+        openCollector.advanceCollectOne(time)?.let { handPosition = Up }
+
+        hand.loc = handLocCtrl.tick(delta) { handPosition.translation }
+        hand.rot = handRotCtrl.tick(delta) { handPosition.rotation }
     }
 
-    /** Defines if the hand is on the drum or raised. */
-    private enum class HandPosition {
-        /** Up hand position. */
-        UP,
+    override fun onEntry() {
+        val nextMute = muteCollector.peek()
+        val nextOpen = openCollector.peek()
 
-        /** Down hand position. */
-        DOWN
+        val handPosition = when {
+            nextMute == null && nextOpen != null -> Up
+            nextMute != null && nextOpen == null -> Down
+            nextMute != null && nextOpen != null -> if (nextMute.time < nextOpen.time) Down else Up
+            else -> error("All cases covered.")
+        }
+
+        this.handPosition = handPosition
+        handLocCtrl.value = handPosition.translation.clone()
+        handRotCtrl.value = handPosition.rotation.clone()
+    }
+
+    private sealed class HandPosition(val translation: Vector3f, val rotation: Vector3f) {
+        data object Up : HandPosition(v3(0, 2, 0), v3(30, 0, 0))
+        data object Down : HandPosition(v3(0, 0, 0), v3(0, 0, 0))
     }
 }

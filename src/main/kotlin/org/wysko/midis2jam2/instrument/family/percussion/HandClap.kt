@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,48 +22,52 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The Hand Clap.
  *
  * The hand clap consists of two hands that come together and recoil, just like a regular hand clap.
  */
-class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+    private val leftHand =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = StickType.HAND_LEFT,
+            strikeSpeed = 3.2,
+            maxIdleAngle = 40.0,
+            actualStick = false,
+        ).apply {
+            setParent(geometry)
+            offsetStick { it.move(0f, 0f, -1.5f) }
+        }
 
-    private val leftHand = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = StickType.HAND_LEFT,
-        strikeSpeed = 3.2,
-        maxIdleAngle = 40.0,
-        actualStick = false
-    ).apply {
-        setParent(instrumentNode)
-        offsetStick { it.move(0f, 0f, -1.5f) }
-    }
-
-    private val rightHandNode = Node().apply {
-        instrumentNode.attachChild(this)
-    }.also {
-        it.attachChild(
-            context.loadModel("hand_right.obj", "hands.bmp").apply {
-                move(0f, 0f, -1.5f)
-                localRotation = Quaternion().fromAngles(0f, rad(10.0), FastMath.PI)
-            }
-        )
-    }
+    private val rightHandNode =
+        Node().apply {
+            geometry.attachChild(this)
+        }.also {
+            it.attachChild(
+                context.modelD("hand_right.obj", "hands.bmp").apply {
+                    move(0f, 0f, -1.5f)
+                    localRotation = Quaternion().fromAngles(0f, rad(10.0), FastMath.PI)
+                },
+            )
+        }
 
     init {
-        with(instrumentNode) {
+        with(geometry) {
             setLocalTranslation(0f, 42.3f, -48.4f)
             localRotation = Quaternion().fromAngles(rad(90.0), rad(-70.0), 0f)
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
         val status = leftHand.tick(time, delta)

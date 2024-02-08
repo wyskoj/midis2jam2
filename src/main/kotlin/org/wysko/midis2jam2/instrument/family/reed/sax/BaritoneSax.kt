@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The baritone sax fingering manager. */
-private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(BaritoneSax::class.java)
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(BaritoneSax::class)
 
 /** The amount to stretch the baritone sax. */
 private const val STRETCH_FACTOR = 0.65f
 
 /** The baritone sax. */
 class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-    Saxophone(context, events, BaritoneSaxClone::class.java, FINGERING_MANAGER) {
+    Saxophone(context, events, BaritoneSaxClone::class, FINGERING_MANAGER) {
 
     /** A single BaritoneSax. */
     inner class BaritoneSaxClone : SaxophoneClone(this@BaritoneSax, STRETCH_FACTOR) {
@@ -55,14 +55,14 @@ class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
                     }
                 )
                 getChild(2).setMaterial(shine)
-                modelNode.attachChild(this)
+                geometry.attachChild(this)
             }
             highestLevel.localRotation = Quaternion().fromAngles(rad(10.0), rad(30.0), 0f)
         }
     }
 
     init {
-        groupOfPolyphony.run {
+        geometry.run {
             move(10f, 48.5f, -42f)
             scale(1.5f)
         }

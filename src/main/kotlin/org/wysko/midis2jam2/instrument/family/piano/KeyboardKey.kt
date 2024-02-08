@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.piano
 
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
 import org.wysko.midis2jam2.world.Axis
 
 private const val WHITE_KEY_FRONT = "PianoWhiteKeyFront.obj"
@@ -29,25 +31,30 @@ private const val BLACK_KEY_DOWN = "PianoKeyBlackDown.obj"
 /** A single key on the keyboard. */
 class KeyboardKey(keyboard: Keyboard, midiNote: Int, whiteKeyIndex: Int) : Key(
     rotationAxis = Axis.X.identity,
-    keyboardConfiguration = KeyboardConfiguration(
-        whiteKeyConfiguration = KeyConfiguration.SeparateModels(
+    keyboardConfiguration =
+    KeyboardConfiguration(
+        whiteKeyConfiguration =
+        KeyConfiguration.SeparateModels(
             frontKeyFile = WHITE_KEY_FRONT,
             backKeyFile = WHITE_KEY_BACK,
             frontKeyFileDown = WHITE_KEY_FRONT_DOWN,
             backKeyFileDown = WHITE_KEY_BACK_DOWN,
-            texture = keyboard.skin.file
-        ), blackKeyConfiguration = KeyConfiguration.SeparateModels(
+            texture = keyboard.skin.file,
+        ),
+        blackKeyConfiguration =
+        KeyConfiguration.SeparateModels(
             frontKeyFile = BLACK_KEY,
             backKeyFile = null,
             frontKeyFileDown = BLACK_KEY_DOWN,
             backKeyFileDown = null,
-            texture = keyboard.skin.file
-        )
+            texture = keyboard.skin.file,
+        ),
     ),
-    moveValue = when (noteToKeyboardKeyColor(midiNote)) {
-        KeyColor.WHITE -> whiteKeyIndex - (Keyboard.WHITE_KEY_COUNT / 2)
-        KeyColor.BLACK -> midiNote * (7f / 12f) - 38.2f
+    moveValue =
+    when (Color.fromNote(midiNote)) {
+        White -> whiteKeyIndex - (Keyboard.WHITE_KEY_COUNT / 2)
+        Black -> midiNote * (7f / 12f) - 38.2f
     },
     midiNote = midiNote,
-    keyedInstrument = keyboard
+    keyedInstrument = keyboard,
 )

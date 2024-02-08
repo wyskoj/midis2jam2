@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +18,24 @@
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
 import com.jme3.math.ColorRGBA
-import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.GlowController
+import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.modelR
 
 /*
  * Copyright (C) 2022 Jacob Wysko
@@ -47,68 +54,59 @@ import org.wysko.midis2jam2.world.GlowController
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 20f, 0f)
-
 /**
  * The Tinkle Bell.
+ *
+ * @param context The context to the main class.
+ * @param events The list of all events that this instrument should be aware of.
  */
 class TinkleBell(
     context: Midis2jam2,
     events: List<MidiChannelSpecificEvent>
-) : DecayedInstrument(context, events) {
+) : DecayedInstrument(context, events), MultipleInstancesLinearAdjustment {
 
-    private val bellStrikes = Array(12) { idx ->
-        hits.filter { (it.note + 3) % 12 == idx }
-    }
-
-    private val twelfths: Array<ATinkleBell> = Array(12) {
-        ATinkleBell(it, bellStrikes[it])
-    }
+    override val multipleInstancesDirection: Vector3f = v3(0, 20, 0)
+    private val hitsByNote = List(12) { idx -> hits.filter { (it.note + 3) % 12 == idx } }
+    private val bells: List<Bell> = List(12) { Bell(it, hitsByNote[it]) }
 
     init {
-        instrumentNode.setLocalTranslation(20f, 30f, 10f)
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, 2.7f, 0f)
-    }
-
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
+        with(geometry) {
+            loc = v3(20, 30, 10)
+            rot = v3(0, 155, 0)
+        }
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-
-        twelfths.forEach { it.tick(time, delta) }
+        bells.forEach { it.tick(time, delta) }
     }
 
-    private inner class ATinkleBell(index: Int, events: List<MidiNoteOnEvent>) {
-
-        val bellNode = Node().apply {
-            move(index * -4f, 0f, 0f)
+    private inner class Bell(index: Int, events: List<MidiNoteOnEvent>) {
+        val root = node {
+            loc = v3(index * -4, 0, 0)
+            scale(1 - (index * 0.02f))
         }
+        private val tinkleBell = with(root) {
+            +context.modelR("TinkleBellBell.obj", "HornSkinGrey.bmp").apply { loc = v3(0f, -7.8f, 0f) }
+        }
+        private val cymbalAnimator = CymbalAnimator(tinkleBell, 1.0, 15.0, 2.0)
+        private val glowController = GlowController(glowColor = ColorRGBA.Yellow.mult(0.75f))
 
         private val striker = Striker(
             context = context,
             strikeEvents = events,
-            stickModel = bellNode,
+            stickModel = root,
             actualStick = false
         ).apply {
-            setParent(instrumentNode)
+            setParent(geometry)
         }
 
-        private val outerBell = context.loadModel("TinkleBell.obj", "Wood.bmp").also {
-            bellNode.attachChild(it)
-            it.move(0f, -10f, 0f)
-
-            ((it as Node).children[0] as Geometry).material = context.reflectiveMaterial("HornSkin.bmp")
+        private val outerBell = with(root) {
+            +context.modelD("TinkleBell.obj", "Wood.bmp").apply {
+                loc = v3(0, -10, 0)
+                ((this as Node).children[0] as Geometry).material = context.reflectiveMaterial("HornSkin.bmp")
+            }
         }
-
-        private val bell = context.loadModel("TinkleBellBell.obj", "HornSkinGrey.bmp", 1f).also {
-            it.move(0f, -7.8f, 0f)
-            bellNode.attachChild(it)
-        }
-
-        private val cymbalAnimator = CymbalAnimator(bell, 1.0, 15.0, 2.0)
-        private val glowController = GlowController(glowColor = ColorRGBA.Yellow.mult(0.75f))
 
         fun tick(time: Double, delta: Float) {
             cymbalAnimator.tick(delta)

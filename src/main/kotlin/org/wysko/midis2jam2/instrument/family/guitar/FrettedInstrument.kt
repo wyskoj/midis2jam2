@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
+import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
@@ -32,6 +32,7 @@ import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.STRING_GLOW
+import org.wysko.midis2jam2.world.modelD
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.system.measureTimeMillis
@@ -43,45 +44,39 @@ import kotlin.system.measureTimeMillis
 abstract class FrettedInstrument protected constructor(
     /** Context to the main class. */
     context: Midis2jam2,
-
     /** The fretting engine used for this fretted instrument. */
     protected val frettingEngine: FrettingEngine,
-
     /** The events for this instrument. */
     events: List<MidiChannelSpecificEvent>,
-
     /** The positioning parameters of this fretted instrument. */
     protected val positioning: FrettedInstrumentPositioning,
-
     /** The number of strings on this instrument. */
     private val numberOfStrings: Int,
-
     /** The geometry of the body of the instrument. */
     instrumentBody: Spatial,
-
     /** The texture of the body of the instrument. */
     instrumentBodyTexture: String,
 ) : SustainedInstrument(context, events) {
-
     /** The animated lower strings. D-1 represents string, D-2 represents animation frame. */
-    open val lowerStrings: Array<Array<Spatial>> = arrayOf()
+    open val lowerStrings: List<List<Spatial>> = listOf()
 
     /** The idle upper strings. */
     open val upperStrings: Array<Spatial> = arrayOf()
 
     /** The yellow circles that appear on strings. */
-    val noteFingers: Array<Spatial> = Array(numberOfStrings) {
-        context.loadModel("GuitarNoteFinger.obj", instrumentBodyTexture).apply {
-            instrumentNode.attachChild(this)
-            this.cullHint = Spatial.CullHint.Always
-            (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
+    val noteFingers: Array<Spatial> =
+        Array(numberOfStrings) {
+            context.modelD("GuitarNoteFinger.obj", instrumentBodyTexture).apply {
+                geometry.attachChild(this)
+                this.cullHint = Spatial.CullHint.Always
+                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
+            }
         }
-    }
 
     /** Handles the animation of vibrating strings. */
-    private val animators: Array<VibratingStringAnimator> by lazy {
-        Array(numberOfStrings) {
-            VibratingStringAnimator(*lowerStrings[it])
+    private val animators: List<StringVibrationController> by lazy {
+        List(numberOfStrings) {
+            StringVibrationController(lowerStrings[it])
         }
     }
 
@@ -90,46 +85,51 @@ abstract class FrettedInstrument protected constructor(
 
     /** Maps each note period to a valid fretboard position. */
     @Suppress("kotlin:S1481")
-    open val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> = run {
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
-        measureTimeMillis {
-            val eventToPeriod = buildMap {
-                notePeriods.forEach {
-                    put(it.noteOff, it)
-                    put(it.noteOn, it)
-                }
-            }
-            val occupiedStrings = mutableSetOf<Int>()
-            val noteOccupyingString = mutableMapOf<Int, Int>()
-            events.filterIsInstance<MidiNoteEvent>().forEach { noteEvent ->
-                when (noteEvent) {
-                    is MidiNoteOnEvent -> {
-                        frettingEngine.bestFretboardPosition(midiNote = noteEvent.note)?.let {
-                            occupiedStrings += it.string
-                            map[eventToPeriod[noteEvent] ?: return@let] = it
-                            noteOccupyingString[noteEvent.note] = it.string
-                            frettingEngine.applyFretboardPosition(it)
+    open val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> =
+        run {
+            val map = mutableMapOf<NotePeriod, FretboardPosition>()
+            measureTimeMillis {
+                val eventToPeriod =
+                    buildMap {
+                        notePeriods.forEach {
+                            put(it.noteOff, it)
+                            put(it.noteOn, it)
                         }
                     }
+                val occupiedStrings = mutableSetOf<Int>()
+                val noteOccupyingString = mutableMapOf<Int, Int>()
+                events.filterIsInstance<MidiNoteEvent>().forEach { noteEvent ->
+                    when (noteEvent) {
+                        is MidiNoteOnEvent -> {
+                            frettingEngine.bestFretboardPosition(midiNote = noteEvent.note)?.let {
+                                occupiedStrings += it.string
+                                map[eventToPeriod[noteEvent] ?: return@let] = it
+                                noteOccupyingString[noteEvent.note] = it.string
+                                frettingEngine.applyFretboardPosition(it)
+                            }
+                        }
 
-                    is MidiNoteOffEvent -> {
-                        noteOccupyingString.remove(noteEvent.note)?.let { frettingEngine.releaseString(it) }
+                        is MidiNoteOffEvent -> {
+                            noteOccupyingString.remove(noteEvent.note)?.let { frettingEngine.releaseString(it) }
+                        }
                     }
                 }
-            }
-        }.also { logger().info("Generic fretboard calculations took ${it / 1000.0} secs for ${notePeriods.size} NotePeriods.") }
+            }.also { logger().info("Generic fretboard calculations took ${it / 1000.0} secs for ${notePeriods.size} NotePeriods.") }
 
-        map
-    }
+            map
+        }
 
     private val stringHeight: Float
         get() = positioning.upperY - positioning.lowerY
 
     init {
-        instrumentNode.attachChild(instrumentBody)
+        geometry.attachChild(instrumentBody)
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
         for (i in 0 until numberOfStrings) {
@@ -137,17 +137,18 @@ abstract class FrettedInstrument protected constructor(
                 string = i,
                 fret = currentFret(i) ?: -1,
                 delta = delta,
-                pitchBendAmount = pitchBendModulationController.tick(
-                    time,
-                    delta,
-                    playing = currentNotePeriods::isNotEmpty
-                )
+                pitchBendAmount =
+                    pitchBendModulationController.tick(
+                        time,
+                        delta,
+                        playing = collector.currentNotePeriods::isNotEmpty,
+                    ),
             )
         }
     }
 
     private fun currentFret(string: Int): Int? {
-        val np = currentNotePeriods.firstOrNull { notePeriodFretboardPosition[it]?.string == string }
+        val np = collector.currentNotePeriods.firstOrNull { notePeriodFretboardPosition[it]?.string == string }
         return np?.let {
             return if (!it.animationStarted) {
                 it.animationStarted = true
@@ -158,38 +159,47 @@ abstract class FrettedInstrument protected constructor(
         }
     }
 
-    private fun fretToDistance(fret: Int, pitchBendAmount: Float): Float {
+    private fun fretToDistance(
+        fret: Int,
+        pitchBendAmount: Float,
+    ): Float {
         frettingEngine as StandardFrettingEngine
-        /* Find the whole number of semitones bent from the pitch bend */
-        val semitoneOffset = if (pitchBendAmount > 0) {
-            floor(pitchBendAmount).toInt()
-        } else {
-            ceil(pitchBendAmount).toInt()
-        }
+        // Find the whole number of semitones bent from the pitch bend
+        val semitoneOffset =
+            if (pitchBendAmount > 0) {
+                floor(pitchBendAmount).toInt()
+            } else {
+                ceil(pitchBendAmount).toInt()
+            }
 
-        /* Find the microtonal offset from the semitone */
+        // Find the microtonal offset from the semitone
         val semitoneFraction = pitchBendAmount % 1
 
-        /* Find the adjusted fret position */
+        // Find the adjusted fret position
         val adjFret = (fret + semitoneOffset).coerceIn(0..frettingEngine.numberOfFrets)
 
-        /* Linear interpolation of the semitone fraction */
+        // Linear interpolation of the semitone fraction
         return if (semitoneFraction > 0) {
             Utils.lerp(
                 a = positioning.fretHeights.calculateScale(adjFret),
                 b = positioning.fretHeights.calculateScale((adjFret + 1).coerceAtMost(frettingEngine.numberOfFrets)),
-                t = semitoneFraction
+                t = semitoneFraction,
             )
         } else {
             Utils.lerp(
                 a = positioning.fretHeights.calculateScale(adjFret),
                 b = positioning.fretHeights.calculateScale((adjFret - 1).coerceAtLeast(0)),
-                t = -semitoneFraction
+                t = -semitoneFraction,
             )
         }
     }
 
-    private fun animateString(string: Int, fret: Int, delta: Float, pitchBendAmount: Float) {
+    private fun animateString(
+        string: Int,
+        fret: Int,
+        delta: Float,
+        pitchBendAmount: Float,
+    ) {
         // If fret is -1, stop animating anything on this string and hide all animation components.
         if (fret == -1) {
             // Reset scale, hide lower strings, hide note finger
@@ -215,18 +225,19 @@ abstract class FrettedInstrument protected constructor(
         noteFingers[string].let {
             if (fret != 0 || pitchBendAmount != 0f) {
                 it.cullHint = Spatial.CullHint.Dynamic // Show note finger
-                it.localTranslation = Vector3f(
-                    /* x = */
-                    (positioning.lowerX[string] - positioning.upperX[string]) * fretDistance + positioning.upperX[string],
-                    /* y = */
-                    positioning.fingerVerticalOffset.y - stringHeight * fretDistance,
-                    /* z = */
-                    if (positioning is FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ) {
-                        ((positioning.topZ[string] - positioning.bottomZ[string]) * fretDistance + positioning.topZ[string]) * -1.3f - 2
-                    } else {
-                        0f
-                    }
-                )
+                it.localTranslation =
+                    Vector3f(
+                        // x =
+                        (positioning.lowerX[string] - positioning.upperX[string]) * fretDistance + positioning.upperX[string],
+                        // y =
+                        positioning.fingerVerticalOffset.y - stringHeight * fretDistance,
+                        // z =
+                        if (positioning is FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ) {
+                            ((positioning.topZ[string] - positioning.bottomZ[string]) * fretDistance + positioning.topZ[string]) * -1.3f - 2
+                        } else {
+                            0f
+                        },
+                    )
             } else {
                 it.cullHint = Spatial.CullHint.Always // Hide finger
             }
@@ -234,23 +245,24 @@ abstract class FrettedInstrument protected constructor(
     }
 
     override fun toString(): String {
-        return super.toString() + buildString {
-            append(
-                debugProperty(
-                    "FRETBOARD",
-                    currentNotePeriods.joinToString {
-                        """${it.midiNote} <-> ${notePeriodFretboardPosition[it]}"""
-                    }
+        return super.toString() +
+            buildString {
+                append(
+                    debugProperty(
+                        "FRETBOARD",
+                        collector.currentNotePeriods.joinToString {
+                            """${it.midiNote} <-> ${notePeriodFretboardPosition[it]}"""
+                        },
+                    ),
                 )
-            )
-        }
+            }
     }
 }
 
 @Serializable
 internal data class ChordDefinition(
     val notes: List<Int>,
-    val frets: List<Int>
+    val frets: List<Int>,
 ) {
     fun definedNotes() = notes.filter { it != -1 }.toSet()
 
@@ -258,7 +270,7 @@ internal data class ChordDefinition(
         val string = notes.indexOf(note)
         return FretboardPosition(
             string = string,
-            fret = frets[string]
+            fret = frets[string],
         )
     }
 }

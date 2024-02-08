@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Taiko drum. */
 class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
@@ -30,7 +31,7 @@ class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = context.loadModel("TaikoStick.obj", "Wood.bmp")
+            stickModel = context.modelD("TaikoStick.obj", "Wood.bmp")
         ).apply {
             setParent(recoilNode)
             offsetStick { it.move(0f, 0f, -5f) }
@@ -38,18 +39,18 @@ class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + updateInstrumentIndex(delta) * -11), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + updateInstrumentIndex(delta) * -11), 0f)
     }
 
     init {
         recoilNode.attachChild(
-            context.loadModel("Taiko.obj", "TaikoHead.bmp").apply {
+            context.modelD("Taiko.obj", "TaikoHead.bmp").apply {
                 localRotation = Quaternion().fromAngles(rad(60.0), 0f, 0f)
                 (this as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/Wood.bmp"))
             }
         )
 
-        instrumentNode.setLocalTranslation(-6.15f, 94f, -184.9f)
+        geometry.setLocalTranslation(-6.15f, 94f, -184.9f)
     }
 }

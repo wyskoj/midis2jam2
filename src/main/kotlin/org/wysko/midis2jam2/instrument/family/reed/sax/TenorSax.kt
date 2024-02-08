@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@ import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
-private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(TenorSax::class.java)
+private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(TenorSax::class)
 private const val STRETCH_FACTOR = 0.65f
 
 /** The Tenor sax. */
 class TenorSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-    Saxophone(context, events, TenorSaxClone::class.java, FINGERING_MANAGER) {
+    Saxophone(context, events, TenorSaxClone::class, FINGERING_MANAGER) {
 
     /** A single TenorSax. */
     inner class TenorSaxClone : SaxophoneClone(this@TenorSax, STRETCH_FACTOR) {
@@ -51,14 +51,14 @@ class TenorSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
                         setColor("Color", ColorRGBA.Black)
                     }
                 )
-                modelNode.attachChild(this)
+                geometry.attachChild(this)
             }
             highestLevel.localRotation = Quaternion().fromAngles(rad(10.0), rad(30.0), 0f)
         }
     }
 
     init {
-        with(groupOfPolyphony) {
+        with(geometry) {
             setLocalTranslation(-11f, 34.5f, -22f)
             setLocalScale(1.15f)
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,136 +16,109 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
-import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
-import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.instrument.algorithmic.VibratingStringAnimator
+import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.NumberSmoother
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.scale
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * Pizzicato strings have 12 separate strings that animate for each note. When a note is played, the string moves
  * forwards and vibrates for about 0.14 seconds.
+ *
+ * @param context The context to the main class.
+ * @param eventList The list of all events that this instrument should be aware of.
  */
 class PizzicatoStrings(
     context: Midis2jam2,
     eventList: List<MidiChannelSpecificEvent>
 ) : DecayedInstrument(context, eventList) {
 
-    val eventCollector: EventCollector<MidiNoteOnEvent> =
+    private val eventCollector: EventCollector<MidiNoteOnEvent> =
         EventCollector(eventList.filterIsInstance<MidiNoteOnEvent>(), context)
 
-    /** Each string. */
-    val strings: Array<PizzicatoString> = Array(12) {
+    private val strings: Array<PizzicatoString> = Array(12) {
         PizzicatoString().apply {
-            instrumentNode.attachChild(highestLevel)
-            highestLevel.setLocalTranslation(it * 2f, it * 0.5f, 0f)
-            highestLevel.localScale = Vector3f(1f, 0.5f - 0.019f * it, 1f)
+            with(highestLevel) {
+                geometry += this
+                loc = v3(2 * it, 0.5 * it, 0)
+                scale = v3(1, 0.5 - 0.019 * it, 1)
+            }
         }
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        val eventsToDoOn = eventCollector.advanceCollectAll(time)
-
-        /* Play each note that needs to be animated */
-        eventsToDoOn.forEach {
-            strings[(it.note + 3) % 12].play()
-        }
-
+        eventCollector.advanceCollectAll(time).forEach { strings[(it.note + 3) % 12].play() }
         strings.forEach { it.tick(delta) }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localRotation =
-            Quaternion().fromAngles(0f, rad((45f + 12 * updateInstrumentIndex(delta)).toDouble()), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.rot = v3(0, 45 + 12 * updateInstrumentIndex(delta), 0)
     }
 
-    /** A single string. */
-    inner class PizzicatoString : TwelfthOfOctaveDecayed() {
+    init {
+        placement.loc = v3(0, 6.7, -138)
+    }
 
-        /** Contains the anim strings. */
-        private val animStringNode = Node()
+    /**
+     * Contains a single string.
+     */
+    private inner class PizzicatoString : TwelfthOfOctaveDecayed() {
 
-        /** The resting string. */
-        private val restingString: Spatial
-
-        /** Each frame of animation. */
-        private val animStrings: Array<Spatial>
-
-        /** Is this string currently playing? */
-        var playing: Boolean = false
-
-        /** Animates the anim strings. */
-        private val stringAnimator: VibratingStringAnimator
-
-        /** The amount of progress playing the current note. */
+        private val animatedStringNode = node()
+        private val restingString: Spatial = context.modelD("StageString.obj", "StageString.bmp")
+        private val animatedStringFrames: List<Spatial> = List(5) {
+            context.modelD("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
+                cullHint = Always // Hide on startup
+                animatedStringNode += this
+                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
+            }
+        }
+        private var playing: Boolean = false
+        private val stringAnimator: StringVibrationController = StringVibrationController(animatedStringFrames)
         private var progress = 0.0
+        private val nudgeCtrl = NumberSmoother(0f, 40.0)
+
+        init {
+            with(animNode) {
+                +context.modelD("PizzicatoStringHolder.obj", "Wood.bmp")
+                +restingString
+                +animatedStringNode
+            }
+        }
 
         override fun tick(delta: Float) {
-            /* Tick string animation */
             stringAnimator.tick(delta)
-
-            /* No longer playing if we have surpassed the animation time */
             if (progress >= 1) playing = false
 
-            if (playing) {
-                /* Move the string forward, show anim strings, hide resting string */
-                animNode.setLocalTranslation(0f, 0f, 2f)
-                animStringNode.cullHint = Dynamic
-                restingString.cullHint = Always
-            } else {
-                /* Move the string backwards, hide anim strings, show resting string */
-                animNode.setLocalTranslation(0f, 0f, 0f)
-                animStringNode.cullHint = Always
-                restingString.cullHint = Dynamic
-            }
+            // Move string and update visibility
+            animatedStringNode.cullHint = playing.ch
+            restingString.cullHint = (!playing).ch
+            animNode.loc = v3(0, 0, nudgeCtrl.tick(delta) { if (playing) 2f else 0f })
 
-            /* Update progress */
             progress += (delta * 7).toDouble()
         }
 
-        /** Begin playing this string. */
         fun play() {
             playing = true
             progress = 0.0
         }
-
-        init {
-            /* Load string holder and resting string */
-            animNode.attachChild(context.loadModel("PizzicatoStringHolder.obj", "Wood.bmp"))
-            restingString = context.loadModel("StageString.obj", "StageString.bmp")
-
-            /* Load anim strings */
-            animStrings = Array(5) {
-                context.loadModel("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
-                    cullHint = Always // Hide on startup
-                    animStringNode.attachChild(this)
-                    (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
-                }
-            }
-            stringAnimator = VibratingStringAnimator(*animStrings)
-
-            /* Attach */
-            animNode.run {
-                attachChild(animStringNode)
-                attachChild(restingString)
-            }
-        }
-    }
-
-    init {
-        /* Position instrument */
-        instrumentNode.setLocalTranslation(0f, 6.7f, -138f)
     }
 }

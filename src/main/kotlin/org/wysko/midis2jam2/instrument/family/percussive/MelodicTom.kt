@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Melodic tom. */
 class MelodicTom(
@@ -33,7 +34,7 @@ class MelodicTom(
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = StickType.DRUMSET_STICK
+            stickModel = StickType.DRUM_SET_STICK
         ).apply {
             setParent(recoilNode)
             node.setLocalTranslation(1.8f * (i - 5.5f), 0f, 15f)
@@ -41,16 +42,16 @@ class MelodicTom(
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + updateInstrumentIndex(delta) * -15), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + updateInstrumentIndex(delta) * -15), 0f)
     }
 
     init {
         recoilNode.attachChild(
-            context.loadModel("MelodicTom.obj", "DrumShell_MelodicTom.bmp").apply {
+            context.modelD("MelodicTom.obj", "DrumShell_MelodicTom.bmp").apply {
                 localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
             }
         )
-        instrumentNode.setLocalTranslation(0f, 61.1f, -133.8f)
+        geometry.setLocalTranslation(0f, 61.1f, -133.8f)
     }
 }

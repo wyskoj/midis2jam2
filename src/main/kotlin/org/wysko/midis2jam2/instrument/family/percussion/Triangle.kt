@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,54 +16,90 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
-import com.jme3.math.Quaternion
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.NonDrumSetPercussion
-import org.wysko.midis2jam2.midi.MUTE_TRIANGLE
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.modelR
 
 /** The Triangle. */
-class Triangle(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : NonDrumSetPercussion(context, hits) {
+class Triangle(
+    context: Midis2jam2,
+    muteHits: MutableList<MidiNoteOnEvent>,
+    openHits: MutableList<MidiNoteOnEvent>,
+) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
+    private val muteCollector = EventCollector(muteHits, context)
+    private val openCollector = EventCollector(openHits, context)
 
-    init {
-        context.loadModel("Triangle.obj", "ShinySilver.bmp", 0.9f).also {
-            recoilNode.attachChild(it)
+    private val fist = with(recoilNode) {
+        +context.modelD("MutedTriangle.obj", "hands.bmp").apply {
+            cullHint = false.ch
         }
     }
 
-    private val fist = context.loadModel("MutedTriangle.obj", "hands.bmp").also {
-        recoilNode.attachChild(it)
-        it.cullHint = Spatial.CullHint.Always // Start the triangle in the unmuted position
-    }
+    private val beater =
+        Striker(
+            context = context,
+            strikeEvents = hits,
+            stickModel = context.modelR("Triangle_Stick.obj", "ShinySilver.bmp"),
+        ).apply {
+            setParent(geometry)
+            node.move(0f, 2f, 4f)
+        }
 
-    private val beater = Striker(
-        context = context,
-        strikeEvents = hits,
-        stickModel = context.loadModel("Triangle_Stick.obj", "ShinySilver.bmp", 0.9f)
-    ).apply {
-        setParent(instrumentNode)
-        node.move(0f, 2f, 4f)
-    }
 
     init {
-        instrumentNode.setLocalTranslation(0f, 53f, -57f)
+        with(recoilNode) {
+            +context.modelR("Triangle.obj", "ShinySilver.bmp")
+            rot = v3(0, 0, 45)
+        }
+
+        geometry.setLocalTranslation(0f, 53f, -57f)
 
         /* By rotating the recoil node on a 45, the direction of recoil is SW, then the whole thing is rotated back
          * so that it appears upright. */
-        recoilNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(45f))
-        instrumentNode.localRotation = Quaternion().fromAngles(0f, 0f, rad(-45f))
+        geometry.rot = v3(0f, 0f, -45f)
     }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
+
+        // Beater
         val results = beater.tick(time, delta)
         recoilDrum(recoilNode, results.velocity, delta)
-        results.strike?.let {
-            fist.cullHint = (it.note == MUTE_TRIANGLE).cullHint()
+
+        // Fist
+        muteCollector.advanceCollectOne(time)?.let {
+            fist.cullHint = true.ch
         }
+        openCollector.advanceCollectOne(time)?.let {
+            fist.cullHint = false.ch
+        }
+    }
+
+    override fun onEntry() {
+        val nextMute = muteCollector.peek()
+        val nextOpen = openCollector.peek()
+
+        fist.cullHint = when {
+            nextMute == null && nextOpen != null -> {
+                false
+            }
+
+            nextMute != null && nextOpen == null -> {
+                true
+            }
+
+            nextMute != null && nextOpen != null -> {
+                nextMute.time < nextOpen.time
+            }
+
+            else -> error("All cases covered.")
+        }.ch
     }
 }

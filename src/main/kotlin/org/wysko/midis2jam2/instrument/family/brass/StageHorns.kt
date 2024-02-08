@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,82 +16,81 @@
  */
 package org.wysko.midis2jam2.instrument.family.brass
 
-import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.WrappedOctaveSustained
+import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
+import org.wysko.midis2jam2.instrument.PitchClassAnimator
+import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.midi.notePeriodsModulus
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plus
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.times
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.modelR
 
-/** The base position of a Stage Horn. */
 private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 
 /**
- * The Stage Horns.
+ * The stage horns are a set of twelve horns that are arranged in an arc at the back of the stage.
  *
- * Stage Horns animate no more special than any other [WrappedOctaveSustained] instrument.
+ * @param context The context to the main class.
+ * @param eventList The list of all events that this instrument should be aware of.
+ * @param type The type of stage horns to use.
  */
 class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageHornsType) :
-    WrappedOctaveSustained(context, eventList, false) {
+    DivisiveSustainedInstrument(context, eventList, false) {
 
-    override val twelfths: Array<TwelfthOfOctave> = Array(12) { StageHornNote(type) }
-
-    override fun moveForMultiChannel(delta: Float) {
-        /* Get and update instrument index */
-        val index = updateInstrumentIndex(delta)
-
-        /* For each individual horn */
-        twelfths.forEach {
-            it as StageHornNote
-            it.highestLevel.localTranslation = if (index >= 0) {
-                Vector3f(BASE_POSITION).add(Vector3f(0f, 3f, -5f).mult(index))
-            } else {
-                Vector3f(BASE_POSITION).add(Vector3f(0f, 3f, 5f).mult(index))
+    override val animators: Array<PitchClassAnimator> =
+        Array(12) {
+            RisingPitchClassAnimator(context, eventList.notePeriodsModulus(context, it)).apply {
+                geometry += context.modelR("StageHorn.obj", type.texture)
             }
+        }
+
+    init {
+        val hornNodes = Array(12) {
+            with(geometry) {
+                +node {
+                    +animators[it].root
+                }
+            }
+        }
+
+        hornNodes.forEachIndexed { i, node ->
+            animators[i].root.loc = BASE_POSITION
+            node.rot = v3(0f, 16 + i * 1.5, 0f)
+        }
+    }
+
+    override fun adjustForMultipleInstances(delta: Float) {
+        val index = updateInstrumentIndex(delta)
+        animators.forEach {
+            it.root.loc = BASE_POSITION + v3(0f, 3f, if (index >= 0) -5f else 5f) * index
         }
     }
 
     /**
-     * A single Stage Horn.
-     *
-     * It animates no more special than any other [BouncyTwelfth].
+     * A type of stage horns.
      */
-    inner class StageHornNote(type: StageHornsType) : BouncyTwelfth() {
-        init {
-            animNode.attachChild(context.loadModel("StageHorn.obj", type.texture, 0.9f))
-        }
-    }
+    enum class StageHornsType(internal val texture: String) {
+        /**
+         * The default stage horns.
+         */
+        BrassSection("HornSkin.bmp"),
 
-    /** A type of Stage Horn. */
-    enum class StageHornsType(
-        /** The texture file of this Stage Horn type. */
-        val texture: String
-    ) {
-        /** Brass section stage horns type. */
-        BRASS_SECTION("HornSkin.bmp"),
+        /**
+         * The stage horns used for "Synth Brass 1".
+         */
+        SynthBrass1("HornSkinGrey.bmp"),
 
-        /** Synth brass 1 stage horns type. */
-        SYNTH_BRASS_1("HornSkinGrey.bmp"),
-
-        /** Synth brass 2 stage horns type. */
-        SYNTH_BRASS_2("HornSkinCopper.png")
-    }
-
-    init {
-        val hornNodes = Array(12) { Node() }
-
-        /* For each note */
-        for (i in 0..11) {
-
-            /* Attach model to node and rotate from center */
-            hornNodes[i].run {
-                attachChild(twelfths[i].highestLevel)
-                localRotation = Quaternion().fromAngles(0f, rad(16 + i * 1.5), 0f)
-            }
-
-            twelfths[i].highestLevel.localTranslation = BASE_POSITION
-            instrumentNode.attachChild(hornNodes[i])
-        }
+        /**
+         * The stage horns used for "Synth Brass 2".
+         */
+        SynthBrass2("HornSkinCopper.png"),
     }
 }

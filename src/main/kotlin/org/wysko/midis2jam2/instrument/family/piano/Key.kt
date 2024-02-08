@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@ package org.wysko.midis2jam2.instrument.family.piano
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
 import org.wysko.midis2jam2.util.cullHint
 import org.wysko.midis2jam2.util.toQuat
 import org.wysko.midis2jam2.util.toSign
+import org.wysko.midis2jam2.world.modelD
 
 private const val KEY_PRESS_ANGLE = 0.1f
 private const val KEY_RECOIL_SPEED = 20f
@@ -37,11 +37,15 @@ abstract class Key protected constructor(
     private val inverseRotation: Boolean = false,
     keyboardConfiguration: KeyboardConfiguration,
     moveValue: Float,
-    midiNote: Int,
+    val midiNote: Int,
 ) {
+    /** Whether this key is pressed. */
+    @Deprecated("")
+    val isPressed: Boolean
+        get() = currentState is State.Down
 
     /** The uppermost node of this key. */
-    val keyNode: Node = Node()
+    val root: Node = Node()
 
     /** Contains geometry for the "up" key. */
     private val upNode: Node = Node()
@@ -49,28 +53,27 @@ abstract class Key protected constructor(
     /** Contains geometry for the "down" key. */
     private val downNode: Node = Node()
 
-    /** Is this key being pressed? */
-    val isPressed: Boolean
-        get() = currentNote != null
-
     /** The current note being animated. */
-    private var currentNote: MidiNoteOnEvent? = null
+    var currentState: State = State.Up
 
     private var rotationFactor = 0f
 
     init {
-        when (noteToKeyboardKeyColor(midiNote)) {
-            KeyColor.WHITE -> configureKeyParts(
-                configuration = keyboardConfiguration.whiteKeyConfiguration,
-                moveValue = moveValue
-            )
+        when (Color.fromNote(midiNote)) {
+            Color.White ->
+                configureKeyParts(
+                    configuration = keyboardConfiguration.whiteKeyConfiguration,
+                    moveValue = moveValue,
+                )
 
-            KeyColor.BLACK -> configureKeyParts(
-                configuration = keyboardConfiguration.blackKeyConfiguration, moveValue = moveValue
-            )
+            Color.Black ->
+                configureKeyParts(
+                    configuration = keyboardConfiguration.blackKeyConfiguration,
+                    moveValue = moveValue,
+                )
         }
         attachKeysToNodes()
-        keyedInstrument.instrumentNode.attachChild(keyNode)
+        keyedInstrument.geometry.attachChild(root)
         downNode.cullHint = Spatial.CullHint.Always
     }
 
@@ -80,8 +83,10 @@ abstract class Key protected constructor(
      * @param delta the amount of time since the last frame update
      */
     open fun tick(delta: Float) {
-        if (isPressed) {
-            rotationFactor = PercussionInstrument.velocityRecoilDampening((currentNote ?: return).velocity).toFloat()
+        currentState = keyedInstrument.keyStatus(midiNote)
+        if (currentState is State.Down) {
+            rotationFactor =
+                PercussionInstrument.velocityRecoilDampening((currentState as State.Down).velocity).toFloat()
         } else {
             if (rotationFactor > 0f) {
                 rotationFactor -= delta * KEY_RECOIL_SPEED
@@ -95,43 +100,34 @@ abstract class Key protected constructor(
             downNode.cullHint = (!it).cullHint()
         }
 
-        keyNode.localRotation = rotationAxis.mult(rotationFactor * KEY_PRESS_ANGLE * -inverseRotation.toSign()).toQuat()
-    }
-
-    /**
-     * Signals that this key is being pressed. You can safely call this function more than once during the lifetime of a
-     * note.
-     */
-    fun pressKey(note: MidiNoteOnEvent) {
-        currentNote = note
-    }
-
-    /**
-     * Signals that this key is being released.
-     */
-    fun releaseKey() {
-        currentNote = null
+        root.localRotation = rotationAxis.mult(rotationFactor * KEY_PRESS_ANGLE * -inverseRotation.toSign()).toQuat()
     }
 
     /** Attaches the up and down key nodes to the main key node. */
     private fun attachKeysToNodes() {
-        keyNode.apply {
+        root.apply {
             attachChild(upNode)
             attachChild(downNode)
         }
     }
 
     /** Loads the key model and attaches it to the given node. */
-    private fun loadKeyModel(frontKeyFile: String, backKeyFile: String? = null, texture: String, node: Node) {
-        node.attachChild(keyedInstrument.context.loadModel(frontKeyFile, texture))
+    private fun loadKeyModel(
+        frontKeyFile: String,
+        backKeyFile: String? = null,
+        texture: String,
+        node: Node,
+    ) {
+        node.attachChild(keyedInstrument.context.modelD(frontKeyFile, texture))
         backKeyFile?.let { backKey ->
-            node.attachChild(keyedInstrument.context.loadModel(backKey, texture).also { it.move(0f, -0.01f, 0f) })
+            node.attachChild(keyedInstrument.context.modelD(backKey, texture).also { it.move(0f, -0.01f, 0f) })
         }
     }
 
     /** Sets up the key parts. */
     private fun configureKeyParts(
-        configuration: KeyConfiguration, moveValue: Float
+        configuration: KeyConfiguration,
+        moveValue: Float,
     ) {
         with(configuration) {
             when (this) {
@@ -147,6 +143,39 @@ abstract class Key protected constructor(
             }
         }
 
-        keyNode.move(rotationAxis.mult(moveValue))
+        root.move(rotationAxis.mult(moveValue))
+    }
+
+    /** The different states of a key. */
+    sealed class State {
+        /** The key is up. */
+        data object Up : State()
+
+        /**
+         * The key is down.
+         *
+         * @property velocity The velocity of the key press.
+         */
+        data class Down(val velocity: Int) : State()
+    }
+
+    /** The different colors of keys on a keyboard. */
+    enum class Color {
+        /** White key color. */
+        White,
+
+        /** Black key color. */
+        Black;
+
+        companion object {
+            /**
+             * Given a MIDI [note], determines if it is a [Color.White] or [Color.Black] key on a standard keyboard.
+             */
+            fun fromNote(note: Int): Color =
+                when (note % 12) {
+                    1, 3, 6, 8, 10 -> Black
+                    else -> White
+                }
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.particle.SteamPuffer.Cloud
+import org.wysko.midis2jam2.world.modelD
 import java.util.Random
 import kotlin.math.ceil
 import kotlin.math.max
@@ -50,7 +51,7 @@ class SteamPuffer(
 ) : ParticleGenerator {
 
     /** Defines the root of the steam puffer. */
-    val steamPuffNode: Node = Node()
+    val root: Node = Node()
 
     /** The list of currently visible clouds. */
     private val visibleClouds: MutableList<Cloud> = ArrayList()
@@ -60,7 +61,7 @@ class SteamPuffer(
 
     /** Despawns a [cloud]. */
     private fun despawnCloud(cloud: Cloud) {
-        steamPuffNode.detachChild(cloud.cloudNode)
+        root.detachChild(cloud.cloudNode)
     }
 
     override fun tick(delta: Float, active: Boolean) {
@@ -82,7 +83,7 @@ class SteamPuffer(
                 visibleClouds.add(cloud)
                 cloud.currentlyUsing = true
                 cloud.randomInit()
-                steamPuffNode.attachChild(cloud.cloudNode)
+                root.attachChild(cloud.cloudNode)
                 i++
             }
         }
@@ -135,7 +136,7 @@ class SteamPuffer(
         val cloudNode = Node()
 
         /** The mesh of the cloud. */
-        private val cube: Spatial = context.loadModel("SteamCloud.obj", type.filename).apply {
+        private val cube: Spatial = context.modelD("SteamCloud.obj", type.filename).apply {
             shadowMode = RenderQueue.ShadowMode.Cast
         }
 

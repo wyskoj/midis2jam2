@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,3 +41,11 @@ fun List<MidiNoteEvent>.maxPolyphony(): Int {
     }
     return maxPolyphony
 }
+
+/**
+ * Filters the list of [MidiNoteEvent]s by the specified notes.
+ *
+ * @param notes the notes to filter by
+ * @return a new mutable list containing the filtered [MidiNoteEvent]s
+ */
+fun <T : MidiNoteEvent> List<T>.byNote(vararg notes: Int): List<T> = filter { notes.contains(it.note) }.toMutableList()

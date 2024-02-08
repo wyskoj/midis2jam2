@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
-import java.util.Random
+import org.wysko.midis2jam2.world.modelD
+import java.util.*
 import kotlin.math.cos
 
 /**
@@ -65,65 +66,72 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     /** The amount of height and random movement. */
     private var force = 0f
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(
+        time: Double,
+        delta: Float,
+    ) {
         super.tick(time, delta)
 
-        /* Turn all lights off */
+        // Turn all lights off
         lights.forEach { it.cullHint = Always }
 
-        /* Turn on active lights */
-        currentNotePeriods.forEach { lights[11 - (it.midiNote + 3) % 12].cullHint = Dynamic }
+        // Turn on active lights
+        collector.currentNotePeriods.forEach { lights[11 - (it.midiNote + 3) % 12].cullHint = Dynamic }
 
-        /* If playing a note, increase the force, but cap it at 1. */
-        if (currentNotePeriods.isNotEmpty()) {
+        // If playing a note, increase the force, but cap it at 1.
+        if (collector.currentNotePeriods.isNotEmpty()) {
             force += delta
             force = force.coerceAtMost(1f)
         } else {
-            /* Otherwise, decrease force but cup at 0. */
+            // Otherwise, decrease force but cup at 0.
             force -= delta
             force = force.coerceAtLeast(0f)
         }
 
-        /* Vroom */
+        // Vroom
         rotor.rotate(Quaternion().fromAngles(0f, rad((3141 * delta).toDouble()), 0f))
 
-        /* Slight wobble */
-        animNode.localRotation = Quaternion().fromAngles(
-            force * 0.5f * rad(
-                (
-                    Noise.gradientCoherentNoise3D(
-                        0.0,
-                        0.0,
-                        time,
-                        (rotXRand * 1000).toInt(),
-                        NoiseQuality.STANDARD
-                    ) - 0.4
-                    ) * 10
-            ),
-            force * 0.5f * rad(
-                (
-                    Noise.gradientCoherentNoise3D(
-                        0.0,
-                        0.0,
-                        time,
-                        (rotYRand * 1000).toInt(),
-                        NoiseQuality.STANDARD
-                    ) - 0.4
-                    ) * 10
-            ),
-            force * 0.5f * rad(
-                (
-                    Noise.gradientCoherentNoise3D(
-                        0.0,
-                        0.0,
-                        time,
-                        (rotZRand * 1000).toInt(),
-                        NoiseQuality.STANDARD
-                    ) - 0.4
-                    ) * 10
+        // Slight wobble
+        animNode.localRotation =
+            Quaternion().fromAngles(
+                force * 0.5f *
+                    rad(
+                        (
+                            Noise.gradientCoherentNoise3D(
+                                0.0,
+                                0.0,
+                                time,
+                                (rotXRand * 1000).toInt(),
+                                NoiseQuality.STANDARD,
+                            ) - 0.4
+                        ) * 10,
+                    ),
+                force * 0.5f *
+                    rad(
+                        (
+                            Noise.gradientCoherentNoise3D(
+                                0.0,
+                                0.0,
+                                time,
+                                (rotYRand * 1000).toInt(),
+                                NoiseQuality.STANDARD,
+                            ) - 0.4
+                        ) * 10,
+                    ),
+                force * 0.5f *
+                    rad(
+                        (
+                            Noise.gradientCoherentNoise3D(
+                                0.0,
+                                0.0,
+                                time,
+                                (rotZRand * 1000).toInt(),
+                                NoiseQuality.STANDARD,
+                            ) - 0.4
+                        ) * 10,
+                    ),
             )
-        )
-        highestLevel.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
+        placement.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
         animNode.setLocalTranslation(
             0f,
             (
@@ -133,17 +141,17 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
                         0.0,
                         time,
                         (rotZRand * 1000).toInt(),
-                        NoiseQuality.STANDARD
+                        NoiseQuality.STANDARD,
                     ) - 0.4
-                    )
-                ).toFloat() * 10,
-            0f
+                )
+            ).toFloat() * 10,
+            0f,
         )
-        highestLevel.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)
+        placement.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(20 + 50 * updateInstrumentIndex(delta), 40f, -300f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(20 + 50 * updateInstrumentIndex(delta), 40f, -300f)
     }
 
     companion object {
@@ -159,38 +167,42 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
     }
 
     init {
-        /* Load helicopter */
-        val copter = context.loadModel("HelicopterBody.obj", "Helicopter.png")
+        // Load helicopter
+        val copter = context.modelD("HelicopterBody.obj", "Helicopter.png")
         rotor.attachChild(
             context.assetLoader.fakeShadow(
                 "Assets/HelicopterRotorPlane.obj",
-                "Assets/HelicopterRotor.png"
-            )
+                "Assets/HelicopterRotor.png",
+            ),
         )
 
-        /* Load lights */
-        lights = Array(12) {
-            context.assetLoader.fakeShadow("Assets/HelicopterRotorPlane.obj", "Assets/HelicopterLights${it + 1}.png")
-                .apply {
-                    rotor.attachChild(this)
-                    this.cullHint = Always
-                }
-        }
+        // Load lights
+        lights =
+            Array(12) {
+                context.assetLoader.fakeShadow(
+                    "Assets/HelicopterRotorPlane.obj",
+                    "Assets/HelicopterLights${it + 1}.png"
+                )
+                    .apply {
+                        rotor.attachChild(this)
+                        this.cullHint = Always
+                    }
+            }
 
         rotor.setLocalTranslation(40f, 36f, 0f)
         animNode.attachChild(copter)
         animNode.attachChild(rotor)
 
-        /* Load rotor cap */
-        val cap = context.loadModel("HelicopterRotorCap.obj", "Helicopter.png")
+        // Load rotor cap
+        val cap = context.modelD("HelicopterRotorCap.obj", "Helicopter.png")
         cap.setLocalTranslation(0f, 0f, 0.5f)
         animNode.attachChild(cap)
 
-        /* Initialize RNG */
+        // Initialize RNG
         val random = Random()
         rotXRand = random.nextFloat()
         rotYRand = random.nextFloat()
         rotZRand = random.nextFloat()
-        instrumentNode.attachChild(animNode)
+        geometry.attachChild(animNode)
     }
 }

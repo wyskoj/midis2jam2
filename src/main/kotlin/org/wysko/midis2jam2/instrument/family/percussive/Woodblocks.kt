@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.world.modelD
 
 /**
  * The melodic woodblocks.
@@ -38,10 +39,10 @@ class Woodblocks(
         }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Float) {
         with(updateInstrumentIndex(delta)) {
-            offsetNode.setLocalTranslation(0f, 15 + 3.6f * this, 0f)
-            instrumentNode.localRotation =
+            root.setLocalTranslation(0f, 15 + 3.6f * this, 0f)
+            geometry.localRotation =
                 Quaternion().fromAngles(0f, -FastMath.HALF_PI + FastMath.HALF_PI * this, 0f)
         }
     }
@@ -52,7 +53,7 @@ class Woodblocks(
     inner class Woodblock(i: Int) : TwelfthOfOctaveDecayed() {
         init {
             animNode.attachChild(
-                context.loadModel("WoodBlockSingle.obj", "SimpleWood.bmp").apply {
+                context.modelD("WoodBlockSingle.obj", "SimpleWood.bmp").apply {
                     setLocalScale(1 - 0.036f * i)
                 }
             )

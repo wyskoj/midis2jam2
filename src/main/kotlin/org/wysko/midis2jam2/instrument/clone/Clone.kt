@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,11 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
-import org.jetbrains.annotations.Contract
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
-import org.wysko.midis2jam2.instrument.algorithmic.NoteQueue
 import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.Axis
 
 /**
@@ -34,37 +33,37 @@ import org.wysko.midis2jam2.world.Axis
  *
  * Monophonic instruments cannot play more than one note at a time, so a duplicate of the original instrument is
  * temporarily created to play the note. The number of clones required to play the note is determined by the degree
- * of polyphony of the notes in the original instrument.
+ * of polyphony in the original instrument.
  *
+ * @property parent The [MonophonicInstrument] this clone is associated with.
  * @see MonophonicInstrument
  */
 abstract class Clone protected constructor(
-    /** The [MonophonicInstrument] this clone is associated with. */
     val parent: MonophonicInstrument,
-
-    /** The amount to rotate this instrument by when playing. */
     private val rotationFactor: Float,
-
-    /** The axis on which this clone rotates when playing. */
     private val rotationAxis: Axis
 ) {
-    /** Used for the rotation while playing. */
-    val animNode: Node = Node()
-
-    /** The model node. */
-    val modelNode: Node = Node()
-
     /** The note periods for which this clone should be responsible for animating. */
     val notePeriods: MutableList<NotePeriod> = ArrayList()
 
+    /**
+     * Keeps track of whether this clone is currently visible.
+     * The 0-clone (the clone at index 0) is always
+     * visible, that is if the instrument itself is visible.
+     */
+    var isVisible: Boolean = false
+
     /** Used for moving with [indexForMoving]. */
-    val offsetNode: Node = Node()
+    val root: Node = Node()
+
+    /** The model node. */
+    val geometry: Node = Node()
+
+    /** Used for the rotation while playing. */
+    val animNode: Node = Node()
 
     /** The highest level. */
     val highestLevel: Node = Node()
-
-    /** Used for positioning and rotation. */
-    val idleNode: Node = Node()
 
     /** Used for pitch bend rotation. */
     val bendNode: Node = Node()
@@ -72,59 +71,19 @@ abstract class Clone protected constructor(
     /** The current note period that is being handled. */
     var currentNotePeriod: NotePeriod? = null
 
-    /** The last played note period for visibility calculation. */
-    private var lastNotePeriod: NotePeriod? = null
-
     /** The note period collector. */
     protected lateinit var notePeriodCollector: NotePeriodCollector
 
-    /**
-     * Keeps track of whether this clone is currently visible. The 0-clone (the clone at index 0) is always
-     * visible, that is if the instrument itself is visible.
-     */
-    var isVisible = false
-
     /** Determines if this clone is playing. */
-    @get:Contract(pure = true)
     val isPlaying: Boolean
         get() = currentNotePeriod != null
 
-    /**
-     * Determines if this clone is visible when this method is called. This clone is visible if it is currently
-     * playing, or it is in between two notes, where the distance from the end of the last note to the start of the
-     * next note is less than or equal to 2 half-notes.
-     */
-    private fun calcVisibility(): Boolean {
-        if (currentNotePeriod != null) return true
-
-        notePeriodCollector.prev()?.let {
-            if (notePeriods.isNotEmpty() && (
-                        notePeriodCollector.peek()?.startTick()?.minus(it.endTick())
-                            ?: Long.MAX_VALUE
-                        ) <= parent.context.file.division * 2
-            ) {
-                return true
-            }
-        }
-        return false
-    }
-
-    /** Hides or shows this clone, given the [index]. */
-    private fun hideOrShowOnPolyphony(index: Int) {
-        /* If this is the 0-clone, always show. */
-        if (index == 0) {
-            highestLevel.cullHint = Dynamic
-            isVisible = true
-        } else {
-            /* If we are currently positioned at 0, but normally we wouldn't be, hide. */
-            if (indexForMoving() == 0f) {
-                isVisible = false
-                highestLevel.cullHint = Always
-            }
-            /* A further check if currently playing, show, hide otherwise. */
-            highestLevel.cullHint = calcVisibility().cullHint()
-            isVisible = calcVisibility()
-        }
+    init {
+        parent.geometry += root
+        root += highestLevel
+        highestLevel += bendNode
+        bendNode += animNode
+        animNode += geometry
     }
 
     /**
@@ -132,7 +91,7 @@ abstract class Clone protected constructor(
      *
      * The base implementation performs the following:
      *
-     * * Uses [NoteQueue] to determine the current note period.
+     * * Uses [NotePeriodCollector] to determine the [currentNotePeriod].
      * * Clears the [currentNotePeriod] if it has elapsed.
      * * Rotates the clone using the [animNode].
      * * Updates the visibility of the clone.
@@ -151,7 +110,12 @@ abstract class Clone protected constructor(
             animNode.localRotation = Quaternion()
         }
         hideOrShowOnPolyphony(parent.clones.indexOf(this))
-        moveForPolyphony(delta)
+        adjustForPolyphony(delta)
+    }
+
+    /** Initializes [notePeriodCollector]. */
+    fun createCollector() {
+        notePeriodCollector = NotePeriodCollector(parent.context, notePeriods)
     }
 
     /**
@@ -164,35 +128,52 @@ abstract class Clone protected constructor(
         0f.coerceAtLeast(parent.clones.filter { it.isVisible }.indexOf(this).toFloat())
 
     /** Move as to not overlap with other clones. */
-    protected abstract fun moveForPolyphony(delta: Float)
+    protected abstract fun adjustForPolyphony(delta: Float)
 
-    init {
-        /* Connect node chain hierarchy */
-        idleNode.attachChild(modelNode)
-        animNode.attachChild(idleNode)
-        bendNode.attachChild(animNode)
-        highestLevel.attachChild(bendNode)
-        offsetNode.attachChild(highestLevel)
-        parent.groupOfPolyphony.attachChild(offsetNode)
+    /**
+     * Determines if this clone is visible when this method is called.
+     */
+    private fun calcVisibility(): Boolean {
+        if (currentNotePeriod != null) return true
+
+        notePeriodCollector.prev()?.let { prev ->
+            val timeGap = notePeriodCollector.peek()?.startTick()?.minus(prev.endTick()) ?: Long.MAX_VALUE
+            if (timeGap <= parent.context.file.division * 2) {
+                return true
+            }
+        }
+        return false
     }
 
-    /** Formats a property about this instrument for debugging purposes. */
-    protected fun debugProperty(name: String, value: String): String {
-        return "\t\t- $name: $value\n"
+    /** Hides or shows this clone, given the [index]. */
+    private fun hideOrShowOnPolyphony(index: Int) {
+        if (index == 0) {
+            // The 0-clone is always visible
+            highestLevel.cullHint = Dynamic
+            isVisible = true
+        } else {
+            // If we are currently positioned at 0, but normally we wouldn't be, hide.
+            if (indexForMoving() == 0f) {
+                isVisible = false
+                highestLevel.cullHint = Always
+            }
+            // A further check: if currently playing, show, hide otherwise.
+            highestLevel.cullHint = calcVisibility().ch
+            isVisible = calcVisibility()
+        }
     }
 
-    /** Formats a property about this instrument for debugging purposes. */
-    protected fun debugProperty(name: String, value: Float): String {
-        return "\t\t- $name: ${"%.3f".format(value)}\n"
-    }
+    /**
+     * Formats a property about this instrument for debugging purposes.
+     *
+     * @param name The name of the property.
+     * @param value The value of the property.
+     */
+    protected fun debugProperty(name: String, value: Any): String =
+        if (value is Float) "\t\t- $name: ${"%.3f".format(value)}\n" else "\t\t- $name: $value\n"
 
     override fun toString(): String {
         return "\t- ${javaClass.simpleName}\n"
-    }
-
-    /** Initializes [notePeriodCollector]. */
-    fun createCollector() {
-        notePeriodCollector = NotePeriodCollector(notePeriods, parent.context)
     }
 }
 
@@ -203,12 +184,13 @@ fun List<Clone>.debugString(): String {
 
 /**
  * Defines a configuration for applying pitch bend animation to clones.
+ *
+ * @property rotationalAxis The axis on which to rotate.
+ * @property scaleFactor The scale factor to apply to the bend, changing its intensity.
+ * @property reversed Inverts the calculated bend amount, if true.
  */
 data class ClonePitchBendConfiguration(
-    /** The axis on which to rotate. */
     val rotationalAxis: Axis = Axis.X,
-    /** The scale factor to apply to the bend, changing its intensity. */
     val scaleFactor: Float = 0.05f,
-    /** Inverts the calculated bend amount, if true. */
     val reversed: Boolean = false
 )

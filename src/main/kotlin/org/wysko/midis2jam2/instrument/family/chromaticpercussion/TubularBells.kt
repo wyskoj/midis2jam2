@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,148 +16,99 @@
  */
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
-import com.jme3.math.ColorRGBA
 import com.jme3.math.FastMath.PI
-import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
-import com.jme3.renderer.queue.RenderQueue
+import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
 import com.jme3.scene.Geometry
-import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.PercussionInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.GlowController
-import kotlin.math.pow
-import kotlin.math.sin
+import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.modelR
 
-/** The base amplitude of the strike. */
-private const val BASE_AMPLITUDE = 0.5
+/**
+ * The Tubular Bells.
+ *
+ * @param context The context to the main class.
+ * @param events The list of all events that this instrument should be aware of.
+ */
+class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+    DecayedInstrument(context, events),
+    MultipleInstancesLinearAdjustment {
 
-/** The speed the bell will wobble at. */
-private const val WOBBLE_SPEED = 3
-
-/** How quickly the bell will return to rest. */
-private const val DAMPENING = 0.3
-
-private val OFFSET_DIRECTION_VECTOR = Vector3f(-10f, 0f, -10f)
-
-/** The tubular bells. */
-class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : DecayedInstrument(context, events) {
-
-    /** Each of the twelve bells. */
+    override val multipleInstancesDirection: Vector3f = v3(-10, 0, -10)
     private val bells =
-        Array(12) { i -> Bell(i, events.filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == i }) }
+        List(12) { i -> Bell(i, events.filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == i }) }
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
         bells.forEach { it.tick(time, delta) }
     }
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
-    }
-
     init {
-        instrumentNode.run {
-            setLocalTranslation(-65f, 100f, -130f)
-            localRotation = Quaternion().fromAngles(0f, Utils.rad(25.0), 0f)
+        with(placement) {
+            loc = v3(-65, 100, -130)
+            rot = v3(0, 25, 0)
         }
     }
 
-    /** A single bell. */
+    /**
+     * Contains a single bell.
+     */
     private inner class Bell(i: Int, events: List<MidiNoteOnEvent>) {
-
-        /** The highest level node. */
-        val highestLevel = Node().also {
-            instrumentNode.attachChild(it)
-        }
-
-        /** Contains the tubular bell. */
-        val bellNode = Node().apply {
-            setLocalTranslation((i - 5) * 4f, 0f, 0f)
-            setLocalScale((-0.04545 * i).toFloat() + 1)
-
-            highestLevel.attachChild(this)
-        }
-
-        val mallet = Striker(
-            context = context,
-            strikeEvents = events,
-            stickModel = context.loadModel("TubularBellMallet.obj", "Wood.bmp").apply {
-                setLocalTranslation(0f, 5f, 0f)
-                shadowMode = RenderQueue.ShadowMode.Receive
+        val root = with(geometry) {
+            +node {
+                loc = v3((i - 5) * 4, 0, 0)
+                setLocalScale((-0.04545 * i).toFloat() + 1)
             }
-        ).apply {
-            node.setLocalTranslation((i - 5) * 4f, -25f, 4f)
-            setParent(highestLevel)
         }
 
-        val bell: Spatial = context.loadModel("TubularBell.obj", "ShinySilver.bmp", 0.9f).also {
-            bellNode.attachChild(it)
-            it.shadowMode = RenderQueue.ShadowMode.Receive
-        }
+        val mallet =
+            Striker(
+                context = context,
+                strikeEvents = events,
+                stickModel =
+                context.modelD("TubularBellMallet.obj", "Wood.bmp").apply {
+                    loc = v3(0, 5, 0)
+                    shadowMode = Receive // The shadows it casts look weird, so only receive them
+                },
+            ).apply {
+                node.loc = v3(0, -25, 4)
+                setParent(root)
+            }
 
-        /** The current amplitude of the recoil. */
-        private var amplitude = 0.5
-
-        /** The current time of animation, or -1 if the animation has never started yet. */
-        private var animTime = -1.0
-
-        /** True if this bell is recoiling, false if not. */
-        private var bellIsRecoiling = false
+        val bellModel: Geometry = with(root) {
+            +context.modelR("TubularBell.obj", "ShinySilver.bmp").apply {
+                shadowMode = Receive
+            }
+        } as Geometry
 
         private val glowController = GlowController()
+        private val animator = CymbalAnimator(bellModel, -0.5, 3.0, 0.3, PI / 2)
 
         /**
          * Updates animation.
          *
-         * @param delta the amount of time since the last frame update
+         * @param time The current time since the beginning of the song, in seconds.
+         * @param delta The amount of time that elapsed since the last frame, in seconds.
          */
         fun tick(time: Double, delta: Float) {
-            with(mallet.tick(time, delta)) {
-                if (velocity > 0) recoilBell(velocity)
-            }
+            with(mallet.tick(time, delta)) { if (velocity > 0) animator.strike() }
+            animator.tick(delta)
 
-            animTime += delta.toDouble()
+            val animationTime = if (animator.animTime < 0) Double.MAX_VALUE else animator.animTime
 
-            if (bellIsRecoiling) {
-                bellNode.localRotation = Quaternion().fromAngles(rotationAmount(), 0f, 0f)
-                (bell as Geometry).material.setColor("GlowColor", glowController.calculate(animTime))
-            } else {
-                (bell as Geometry).material.setColor("GlowColor", ColorRGBA.Black)
-            }
-        }
-
-        /**
-         * Calculates the rotation during the recoil.
-         *
-         * @return the rotation amount
-         */
-        fun rotationAmount(): Float {
-            if (animTime < 0) return 0f
-
-            return if (animTime in 0.0..2.0) {
-                (amplitude * (sin(animTime * WOBBLE_SPEED * PI) / (3 + animTime.pow(3.0) * WOBBLE_SPEED * DAMPENING * PI))).toFloat()
-            } else {
-                bellIsRecoiling = false
-                0f
-            }
-        }
-
-        /**
-         * Recoils the bell.
-         *
-         * @param velocity the velocity of the MIDI note
-         */
-        fun recoilBell(velocity: Int) {
-            amplitude = PercussionInstrument.velocityRecoilDampening(velocity) * BASE_AMPLITUDE
-            animTime = 0.0
-            bellIsRecoiling = true
+            bellModel.material.setColor("GlowColor", glowController.calculate(animationTime))
         }
     }
 }

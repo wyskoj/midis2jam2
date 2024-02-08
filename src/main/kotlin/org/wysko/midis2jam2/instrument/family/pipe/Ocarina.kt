@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,14 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
-import org.wysko.midis2jam2.instrument.clone.HandedClone
+import org.wysko.midis2jam2.instrument.clone.CloneWithHands
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.modelD
 
 /** The Ocarina. */
 class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-    HandedInstrument(context, events, OcarinaClone::class.java, OcarinaHandGenerator()) {
+    InstrumentWithHands(context, events, OcarinaClone::class, OcarinaHandGenerator()) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(scaleFactor = 0.1f)
 
@@ -42,11 +43,11 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
     }
 
     /** A single ocarina. */
-    inner class OcarinaClone : HandedClone(this@Ocarina, 0f) {
+    inner class OcarinaClone : CloneWithHands(this@Ocarina, 0f) {
 
-        override val leftHands: Array<Spatial> = emptyArray()
-        override val rightHands: Array<Spatial> = Array(12) {
-            context.loadModel("OcarinaHand$it.obj", "hands.bmp")
+        override val leftHands: List<Spatial> = listOf()
+        override val rightHands: List<Spatial> = List(12) {
+            context.modelD("OcarinaHand$it.obj", "hands.bmp")
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -63,19 +64,19 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
             }
         }
 
-        override fun moveForPolyphony(delta: Float) {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((17f * indexForMoving()).toDouble()), 0f)
+        override fun adjustForPolyphony(delta: Float) {
+            root.localRotation = Quaternion().fromAngles(0f, rad((17f * indexForMoving()).toDouble()), 0f)
         }
 
         init {
             loadHands()
-            modelNode.attachChild(context.loadModel("Ocarina.obj", "Ocarina.bmp"))
+            geometry.attachChild(context.modelD("Ocarina.obj", "Ocarina.bmp"))
             highestLevel.setLocalTranslation(0f, 0f, 18f)
         }
     }
 
     init {
-        groupOfPolyphony.setLocalTranslation(32f, 47f, 30f)
-        groupOfPolyphony.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
+        geometry.setLocalTranslation(32f, 47f, 30f)
+        geometry.localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
     }
 }

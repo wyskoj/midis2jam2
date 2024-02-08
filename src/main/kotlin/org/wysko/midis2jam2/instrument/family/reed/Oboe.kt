@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,57 +23,58 @@ import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
-import org.wysko.midis2jam2.instrument.clone.HandedClone
-import org.wysko.midis2jam2.instrument.family.pipe.HandedInstrument
+import org.wysko.midis2jam2.instrument.clone.CloneWithHands
+import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.modelD
 
 // The below is not a typo! Rather, a symbol of laziness.
-private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Clarinet::class.java)
+private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Clarinet::class)
 
 /**
  * The Oboe.
  */
 class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    HandedInstrument(
+    InstrumentWithHands(
         context,
-        /* Strip notes outside of standard range */
+        /* Strip notes outside standard range */
         eventList.filterIsInstance<MidiNoteEvent>().filter { it.note in 58..90 }
             .plus(eventList.filter { it !is MidiNoteEvent }),
-        OboeClone::class.java,
+        OboeClone::class,
         FINGERING_MANAGER
     ) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
-    override fun moveForMultiChannel(delta: Float) {
-        offsetNode.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
+    override fun adjustForMultipleInstances(delta: Float) {
+        root.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
     /** The type Oboe clone. */
-    inner class OboeClone : HandedClone(this@Oboe, 0.075f) {
+    inner class OboeClone : CloneWithHands(this@Oboe, 0.075f) {
 
         /** The bell. */
-        private val bell = context.loadModel("OboeHorn.obj", "OboeSkin.png").apply {
-            modelNode.attachChild(this)
+        private val bell = context.modelD("OboeHorn.obj", "OboeSkin.png").apply {
+            geometry.attachChild(this)
             setLocalTranslation(0f, -20.7125f, 0f)
         }
 
         /** The bell stretcher. */
         private val bellStretcher: BellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
 
-        override fun moveForPolyphony(delta: Float) {
-            offsetNode.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
+        override fun adjustForPolyphony(delta: Float) {
+            root.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 
-        override val leftHands: Array<Spatial> = Array(20) {
-            parent.context.loadModel("ClarinetLeftHand$it.obj", "hands.bmp")
+        override val leftHands: List<Spatial> = List(20) {
+            parent.context.modelD("ClarinetLeftHand$it.obj", "hands.bmp")
         }
 
-        override val rightHands: Array<Spatial> = Array(13) {
-            parent.context.loadModel("ClarinetRightHand$it.obj", "hands.bmp")
+        override val rightHands: List<Spatial> = List(13) {
+            parent.context.modelD("ClarinetRightHand$it.obj", "hands.bmp")
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -83,7 +84,7 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         init {
             /* Load body */
-            modelNode.attachChild(context.loadModel("OboeBody.obj", "OboeSkin.png"))
+            geometry.attachChild(context.modelD("OboeBody.obj", "OboeSkin.png"))
             loadHands()
 
             animNode.setLocalTranslation(0f, 0f, 10f)
@@ -92,7 +93,7 @@ class Oboe(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     }
 
     init {
-        instrumentNode.run {
+        geometry.run {
             setLocalTranslation(25f, 50f, 0f)
             setLocalScale(0.9f)
         }

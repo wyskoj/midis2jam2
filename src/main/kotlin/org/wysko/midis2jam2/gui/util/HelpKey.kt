@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,12 @@
 
 package org.wysko.midis2jam2.gui.util
 
-
 import java.awt.Desktop
+import java.net.URI
 
-fun openHelp(): Boolean {
-    Desktop.getDesktop().browse(java.net.URI("https://wyskoj.github.io/midis2jam2-docs/"))
-    return true
-}
+private const val HELP_URL = "https://wyskoj.github.io/midis2jam2-docs/"
+
+/**
+ * Opens the help page in the user's default browser.
+ */
+fun openHelp(): Unit = Desktop.getDesktop().browse(URI(HELP_URL))

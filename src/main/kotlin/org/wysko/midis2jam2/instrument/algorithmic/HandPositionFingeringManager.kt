@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,28 +22,31 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Hands
 import org.wysko.midis2jam2.util.Utils
+import kotlin.reflect.KClass
 
 /** Handles fingering that uses hands. */
 @Serializable
 open class HandPositionFingeringManager : FingeringManager<Hands> {
 
-    /** The table of fingerings. */
     private val table = HashMap<Int, Hands>()
 
     override fun fingering(midiNote: Int): Hands? = table[midiNote]
 
-    /** A pair of indexes. */
+    /**
+     * A pair of indexes.
+     *
+     * @property left The left-hand index.
+     * @property right The right-hand index.
+     */
     @Serializable
     data class Hands(
-        /** The left hand index. */
         val left: Int,
-        /** The right hand index. */
         val right: Int
     )
 
     companion object {
         /** Loads the hand position manager from a file based on the class name. */
-        fun from(klass: Class<out Instrument>): HandPositionFingeringManager =
+        fun from(klass: KClass<out Instrument>): HandPositionFingeringManager =
             Json.decodeFromString(Utils.resourceToString("/instrument/${klass.simpleName}.json"))
     }
 }
