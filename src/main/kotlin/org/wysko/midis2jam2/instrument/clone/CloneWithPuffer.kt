@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Jacob Wysko
+ * Copyright (C) 2024 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.instrument.family.pipe
+package org.wysko.midis2jam2.instrument.clone
 
-import org.wysko.midis2jam2.instrument.clone.HandedClone
+import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
 
 /** Any clone that visualizes playing by using a [SteamPuffer]. */
-abstract class PuffingClone protected constructor(
-    parent: HandedInstrument,
+abstract class CloneWithPuffer protected constructor(
+    parent: InstrumentWithHands,
     puffType: SteamPuffTexture,
     pufferScale: Float
-) : HandedClone(parent, 0f) {
+) : CloneWithHands(parent, 0f) {
 
     /** The steam puffer. */
     val puffer: SteamPuffer =
@@ -37,6 +37,6 @@ abstract class PuffingClone protected constructor(
     }
 
     init {
-        modelNode.attachChild(puffer.steamPuffNode)
+        geometry.attachChild(puffer.root)
     }
 }
