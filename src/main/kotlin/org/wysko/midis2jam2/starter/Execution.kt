@@ -22,6 +22,7 @@ import com.jme3.system.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.launch
+import org.wysko.gervill.RealTimeSequencerProvider
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
 import org.wysko.midis2jam2.midi.DesktopMidiFile
@@ -67,46 +68,43 @@ object Execution {
             onStart()
             val homeConfiguration = configurations.first { it is HomeConfiguration } as HomeConfiguration
 
-            val sequence =
-                try {
-                    MidiSystem.getSequence(midiFile)
-                } catch (e: InvalidMidiDataException) {
-                    this@Execution.logger().errorDisp("The MIDI file is invalid.", e)
-                    onFinish()
-                    return@launch
-                } catch (e: IOException) {
-                    this@Execution.logger().errorDisp("There was an error reading the MIDI file.", e)
-                    onFinish()
-                    return@launch
-                }
+            val sequence = try {
+                MidiSystem.getSequence(midiFile)
+            } catch (e: InvalidMidiDataException) {
+                this@Execution.logger().errorDisp("The MIDI file is invalid.", e)
+                onFinish()
+                return@launch
+            } catch (e: IOException) {
+                this@Execution.logger().errorDisp("There was an error reading the MIDI file.", e)
+                onFinish()
+                return@launch
+            }
 
-            val midiDevice =
-                try {
-                    MidiSystem.getMidiDevice(
-                        MidiSystem.getMidiDeviceInfo().first { it.name == homeConfiguration.selectedMidiDevice },
-                    )
-                } catch (e: MidiUnavailableException) {
-                    this@Execution.logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
-                    onFinish()
-                    return@launch
-                } catch (e: IllegalArgumentException) {
-                    this@Execution.logger().errorDisp("The MIDI device is not found.", e)
-                    onFinish()
-                    return@launch
-                } catch (e: NoSuchElementException) {
-                    this@Execution.logger().errorDisp("The MIDI device is not found.", e)
-                    onFinish()
-                    return@launch
-                }
+            val midiDevice = try {
+                MidiSystem.getMidiDevice(
+                    MidiSystem.getMidiDeviceInfo().first { it.name == homeConfiguration.selectedMidiDevice },
+                )
+            } catch (e: MidiUnavailableException) {
+                this@Execution.logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
+                onFinish()
+                return@launch
+            } catch (e: IllegalArgumentException) {
+                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
+                onFinish()
+                return@launch
+            } catch (e: NoSuchElementException) {
+                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
+                onFinish()
+                return@launch
+            }
 
-            val sequencer =
-                try {
-                    getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
-                } catch (e: Exception) {
-                    logger().errorDisp("There was an error.", e)
-                    onFinish()
-                    return@launch
-                }
+            val sequencer = try {
+                getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
+            } catch (e: Exception) {
+                logger().errorDisp("There was an error.", e)
+                onFinish()
+                return@launch
+            }
 
             onReady()
             Midis2jam2Application(midiFile, configurations, onFinish, sequencer).execute()
@@ -118,28 +116,26 @@ object Execution {
         midiDevice: MidiDevice,
         sequence: Sequence?,
     ): Sequencer {
-        return if (homeConfiguration.selectedMidiDevice == GERVILL) {
-            val synthesizer =
-                MidiSystem.getSynthesizer().apply {
+        val provider = RealTimeSequencerProvider()
+        return when (homeConfiguration.selectedMidiDevice) {
+            GERVILL -> {
+                val synthesizer = MidiSystem.getSynthesizer().apply {
                     open()
-                    homeConfiguration.selectedSoundbank?.let {
-                        loadAllInstruments(MidiSystem.getSoundbank(File(it)))
-                    }
+                    homeConfiguration.selectedSoundbank?.let { loadAllInstruments(MidiSystem.getSoundbank(File(it))) }
                 }
 
-            val provider = org.wysko.gervill.RealTimeSequencerProvider()
-            provider.getDevice(provider.deviceInfo[0]).apply {
-                transmitter.receiver = synthesizer.receiver
-            } as Sequencer
-        } else {
-            midiDevice.open()
-            val provider = org.wysko.gervill.RealTimeSequencerProvider()
-            provider.getDevice(provider.deviceInfo[0]).apply {
-                transmitter.receiver = midiDevice.receiver
-            } as Sequencer
-        }.apply {
-            open()
-            this.sequence = sequence
+                provider.getDevice(provider.deviceInfo[0])
+                    .apply { transmitter.receiver = synthesizer.receiver } as Sequencer
+            }
+
+            else -> {
+                midiDevice.open()
+                provider.getDevice(provider.deviceInfo[0])
+                    .apply { transmitter.receiver = midiDevice.receiver } as Sequencer
+            }
+        }.also {
+            it.open()
+            it.sequence = sequence
         }
     }
 }
@@ -223,14 +219,12 @@ private val DEFAULT_JME_SETTINGS =
         centerWindow = true
     }
 
-private fun screenResolution(): Resolution.CustomResolution {
-    val graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment()
-    val graphicsDevice = graphicsEnvironment.defaultScreenDevice
-    val displayMode = graphicsDevice.displayMode
-    return Resolution.CustomResolution(displayMode.width, displayMode.height)
-}
+private fun screenResolution(): Resolution.CustomResolution =
+    with(GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayMode) {
+        Resolution.CustomResolution(width, height)
+    }
 
 private fun preferredResolution(): Resolution.CustomResolution =
     with(screenResolution()) {
-        Resolution.CustomResolution((width * 0.95f).toInt(), (height * 0.85f).toInt())
+        Resolution.CustomResolution((width * 0.95).toInt(), (height * 0.85).toInt())
     }
