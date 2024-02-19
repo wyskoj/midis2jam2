@@ -17,8 +17,14 @@
 package org.wysko.midis2jam2.midi
 
 /**
- * Signals that a note should stop playing. Note that midis2jam2 converts [MidiNoteOnEvent]s that have a velocity of 0
- * to events of this type.
+ * Indicates the end of a note.
+ *
+ * @property time The time this event occurs, in MIDI ticks.
+ * @property channel The channel this event occurs on.
+ * @property note The note that is stopped.
  */
-data class MidiNoteOffEvent(override val time: Long, override val channel: Int, override val note: Int) :
-    MidiNoteEvent(time, channel, note)
+data class MidiNoteOffEvent(
+    override val time: Long,
+    override val channel: Int,
+    override val note: Int
+) : MidiNoteEvent(time, channel, note)

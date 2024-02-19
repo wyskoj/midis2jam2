@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.times
@@ -43,7 +43,7 @@ private const val TRIGGER_KEY_INDEX = 0
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
  */
-class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     MonophonicInstrument(context, eventList, FrenchHornClone::class, FINGERING_MANAGER),
     MultipleInstancesLinearAdjustment {
 

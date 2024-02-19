@@ -16,8 +16,9 @@
  */
 package org.wysko.midis2jam2.midi
 
-/** MIDI files are made up of events.
+/**
+ * MIDI files are made up of a series of events. This is the base class for all MIDI events.
  *
- * @param time the time at which this MIDI event occurs, expressed in MIDI ticks
+ * @property time The time of the event in MIDI ticks.
  */
 open class MidiEvent protected constructor(open val time: Long)

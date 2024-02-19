@@ -32,7 +32,7 @@ class JingleBell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxi
             strikeEvents = hits,
             stickModel =
             context.modelD("JingleBells.obj", "JingleBells.bmp").apply {
-                (this as Node).getChild(1).setMaterial(context.unshadedMaterial("Assets/StickSkin.bmp"))
+                (this as Node).getChild(1).setMaterial(context.diffuseMaterial("Assets/StickSkin.bmp"))
             },
             actualStick = false,
         ).apply {

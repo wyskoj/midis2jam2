@@ -14,13 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.midi
+
+package org.wysko.midis2jam2.instrument.family.brass
 
 /**
- * Changes the value of a continuous controller.
- *
- * @param controlNum the controller number
- * @param value the new value
+ * A type of stage horns.
  */
-data class MidiControlEvent(override val time: Long, override val channel: Int, val controlNum: Int, val value: Int) :
-    MidiChannelSpecificEvent(time, channel)
+sealed class StageHornsType(internal val texture: String) {
+    /**
+     * The default stage horns.
+     */
+    data object BrassSection : StageHornsType("HornSkin.bmp")
+
+    /**
+     * The stage horns used for "Synth Brass 1".
+     */
+    data object SynthBrass1 : StageHornsType("HornSkinGrey.bmp")
+
+    /**
+     * The stage horns used for "Synth Brass 2".
+     */
+    data object SynthBrass2 : StageHornsType("HornSkinCopper.png")
+}

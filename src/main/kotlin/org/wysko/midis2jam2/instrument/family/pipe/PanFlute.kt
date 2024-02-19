@@ -20,7 +20,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
@@ -40,10 +40,10 @@ import org.wysko.midis2jam2.world.modelD
 /**
  * The Pan Flute.
  */
-class PanFlute(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, skin: PipeSkin) :
-    DivisiveSustainedInstrument(context, eventList, false) {
+class PanFlute(context: Midis2jam2, eventList: List<MidiChannelEvent>, skin: PipeSkin) :
+    DivisiveSustainedInstrument(context, eventList) {
 
-    override val animators: Array<PitchClassAnimator> = Array(12) { index ->
+    override val animators: List<PitchClassAnimator> = List(12) { index ->
         val i = 11 - index
         PanFlutePipe(skin, eventList.notePeriodsModulus(context, i)).apply {
             root.loc = v3(-4.248 * 0.9, -3.5 + 0.38 * i, -11.151 * 0.9)

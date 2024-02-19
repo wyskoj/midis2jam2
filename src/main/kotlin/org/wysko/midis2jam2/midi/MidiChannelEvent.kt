@@ -14,25 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-
-package org.wysko.midis2jam2.util
+package org.wysko.midis2jam2.midi
 
 /**
- * Wraps a string to a certain length.
+ * A [MidiEvent] that is specific to a certain channel.
  *
- * @param length The length to wrap the string to.
- * @return The wrapped string.
+ * @property time The time of the event in MIDI ticks.
+ * @property channel The channel on which the event should occur.
  */
-fun String.wrap(length: Int): String {
-    var count = 0
-    return buildString {
-        this@wrap.forEach { char ->
-            if (count == length) {
-                appendLine()
-                count = 0
-            }
-            append(char)
-            count++
-        }
-    }
-}
+open class MidiChannelEvent(
+    override val time: Long,
+    open val channel: Int
+) : MidiEvent(time)

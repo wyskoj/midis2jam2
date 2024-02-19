@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.get
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.material
@@ -41,7 +41,7 @@ private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingerin
 /**
  * The Tuba.
  */
-class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class Tuba(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     MonophonicInstrument(context, eventList, TubaClone::class, FINGERING_MANAGER), MultipleInstancesLinearAdjustment {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(Axis.Z)
@@ -54,7 +54,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     /**
      * A single Tuba.
      */
-    inner class TubaClone : CloneWithKeyPositions(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.Z) {
+    inner class TubaClone : CloneWithKeyPositions(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.X) {
 
         override val keys: Array<Spatial> = Array(4) { i ->
             with(geometry) {

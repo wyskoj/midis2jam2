@@ -22,12 +22,11 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
@@ -39,28 +38,23 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 /**
  * A modified version of the stage choir that animates applause.
  */
-class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannelSpecificEvent>) :
-    DivisiveSustainedInstrument(context, eventList, true) {
+class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannelEvent>) :
+    DivisiveSustainedInstrument(context, eventList) {
 
-    override val animators: Array<PitchClassAnimator> =
-        Array(12) {
-            ApplauseChoirPeep().apply {
-                root.loc = BASE_POSITION
-            }
-        }
+    override val animators: List<PitchClassAnimator> = List(12) { ApplauseChoirPeep() }
 
     init {
         repeat(12) {
             with(geometry) {
                 +node {
-                    this += animators[it].root
+                    +animators[it].root
                     rot = v3(0, 11.2 + it * -5.636, 0)
                 }
             }
         }
     }
 
-    override fun similar(): List<Instrument> =
+    override fun findSimilar(): List<Instrument> =
         // Order matters here to preserve index
         context.instruments.filterIsInstance<StageChoir>() + context.instruments.filterIsInstance<ApplauseChoir>()
 
@@ -88,6 +82,7 @@ class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannel
             with(geometry) {
                 +context.modelD("StageChoirNoBook.obj", "ChoirPeepOoh.png")
             }
+            root.loc = BASE_POSITION
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -98,7 +93,7 @@ class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannel
             animInfluence = animInfluence.coerceIn(0f..1f)
 
             // Set bounce
-            geometry.loc = v3(0, animation(time) * animInfluence, 0)
+            animation.loc = v3(0, animation(time) * animInfluence, 0)
         }
 
         private fun animation(time: Double) = ((-(((time * bounceSpeed) % 1) - 0.5).pow(2) + 0.25) * 38).toFloat()

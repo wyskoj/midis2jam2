@@ -35,13 +35,13 @@ import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import org.wysko.midis2jam2.starter.configuration.SOUNDBANK_FILE_EXTENSIONS
 import org.wysko.midis2jam2.gui.viewmodel.I18n
-import org.wysko.midis2jam2.gui.viewmodel.SoundbankConfigurationViewModel
+import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun SoundbankConfigurationScreen(
-    viewModel: SoundbankConfigurationViewModel,
+    viewModel: SoundBankConfigurationViewModel,
     onGoBack: () -> Unit,
 ) {
     val soundbanks by viewModel.soundbanks.collectAsState()

@@ -16,83 +16,89 @@
  */
 package org.wysko.midis2jam2.instrument.family.pipe
 
-import com.jme3.math.FastMath
-import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.WHISTLE
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.scale
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelR
 
-/** The whistles. */
-class Whistles(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-    DivisiveSustainedInstrument(context, events, true) {
-    /** The Whistle nodes. */
-    private val whistleNodes = Array(12) { Node() }
+/**
+ * The whistles.
+ *
+ * @param context The context to the main class.
+ * @param events The list of all events that this instrument should be aware of.
+ **/
+class Whistles(context: Midis2jam2, events: List<MidiChannelEvent>) :
+    DivisiveSustainedInstrument(context, events) {
 
-    override val animators: Array<PitchClassAnimator> =
-        Array(12) {
-            Whistle(it, events.notePeriodsModulus(context, it)).apply {
-                root.setLocalTranslation(-12f, 0f, 0f)
-            }
-        }
+    override val animators: List<PitchClassAnimator> = List(12) { Whistle(it, events.notePeriodsModulus(context, it)) }
 
-    override fun adjustForMultipleInstances(delta: Float) {
-        val index = updateInstrumentIndex(delta)
-        root.setLocalTranslation(0f, 22.5f + index * 6.8f, 0f)
-        geometry.localRotation = Quaternion().fromAngles(0f, FastMath.HALF_PI * index, 0f)
-    }
-
-    /** A single Whistle. */
-    inner class Whistle(i: Int, notePeriodsModulus: List<NotePeriod>) : PitchClassAnimator(context, notePeriodsModulus) {
-        /** The Puffer. */
-        private val puffer: SteamPuffer = SteamPuffer(context, WHISTLE, 1.0, OUTWARDS)
-
-        override fun tick(
-            time: Double,
-            delta: Float,
-        ) {
-            super.tick(time, delta)
-            if (playing) {
-                val progress = collector.currentNotePeriods.first().progress(time)
-                geometry.setLocalTranslation(0f, 2 - 2 * progress.toFloat(), 0f)
-            } else {
-                geometry.setLocalTranslation(0f, 0f, 0f)
-            }
-            puffer.tick(delta, playing)
-        }
-
-        init {
-            context.modelR("Whistle.obj", "ShinySilver.bmp").apply {
-                val scale = 2 + -0.0909091f * i
-                geometry.attachChild(this)
-                localRotation = Quaternion().fromAngles(0f, -FastMath.HALF_PI, 0f)
-                setLocalScale(1f, scale, 1f)
-                setLocalTranslation(0f, 5 + -5 * scale, 0f)
-            }
-            geometry.attachChild(puffer.root)
-            puffer.root.run {
-                localRotation = Quaternion().fromAngles(0f, FastMath.PI, 0f)
-                setLocalTranslation(-1f, 3f + i * 0.1f, 0f)
-            }
-        }
+    override fun adjustForMultipleInstances(delta: Float): Unit = updateInstrumentIndex(delta).run {
+        root.loc = v3(0, 22.5 + this * 6.8, 0)
+        geometry.rot = v3(0, 90 * this, 0)
     }
 
     init {
-        whistleNodes.forEachIndexed { index, node ->
-            node.attachChild(animators[index].root)
-            node.localRotation = Quaternion().fromAngles(0f, rad(7.5 * index), 0f)
-            node.setLocalTranslation(0f, 0.1f * index, 0f)
-            geometry.attachChild(node)
+        with(geometry) {
+            loc = v3(75, 0, -35)
+            repeat(12) {
+                +node {
+                    +animators[it].root
+                    loc = v3(0, 0.1 * it, 0)
+                    rot = v3(0, 7.5 * it, 0)
+                }
+            }
+        }
+    }
+
+    /**
+     * A single whistle.
+     *
+     * @param i The index of the whistle.
+     * @param notePeriodsModulus The list of note periods.
+     */
+    inner class Whistle(i: Int, notePeriodsModulus: List<NotePeriod>) :
+        PitchClassAnimator(context, notePeriodsModulus) {
+
+        private val puffer: SteamPuffer = SteamPuffer(context, WHISTLE, 1.0, OUTWARDS)
+
+        init {
+            with(geometry) {
+                +context.modelR("Whistle.obj", "ShinySilver.bmp").apply {
+                    val scaleFactor = 2 + -0.0909091 * i
+                    loc = v3(0, 5 + -5 * scaleFactor, 0)
+                    rot = v3(0, -90, 0)
+                    scale = v3(1, scaleFactor, 1)
+                }
+                +puffer.root.apply {
+                    loc = v3(-1, 3 + i * 0.1, 0)
+                    rot = v3(0, 180, 0)
+                }
+            }
+            root.loc = v3(-12, 0, 0)
         }
 
-        geometry.setLocalTranslation(75f, 0f, -35f)
+        override fun tick(time: Double, delta: Float) {
+            super.tick(time, delta)
+            puffer.tick(delta, playing)
+
+            geometry.loc = if (playing) {
+                val progress = collector.currentNotePeriods.first().calculateProgress(time)
+                v3(0, 2 - 2 * progress.toFloat(), 0)
+            } else {
+                v3(0, 0, 0)
+            }
+        }
     }
 }

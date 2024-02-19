@@ -79,17 +79,17 @@ object Visibility {
         if (collector.currentNotePeriods.isNotEmpty()) return true
 
         collector.peek()?.let {
-            if (it.startTime - time <= parameters.showBefore) return true
+            if (it.start - time <= parameters.showBefore) return true
         }
 
         collector.prev()?.let { prev ->
             collector.peek()?.let { peek ->
-                if (peek.startTime - prev.endTime <= parameters.showBetween) return true
+                if (peek.start - prev.end <= parameters.showBetween) return true
             }
         }
 
         collector.prev()?.let {
-            if (time - it.endTime <= parameters.showAfter) return true
+            if (time - it.end <= parameters.showAfter) return true
         }
 
         return false

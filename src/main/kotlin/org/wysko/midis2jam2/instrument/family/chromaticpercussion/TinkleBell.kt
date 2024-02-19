@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node
@@ -34,7 +34,6 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.GlowController
-import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
 
 /*
@@ -62,7 +61,7 @@ import org.wysko.midis2jam2.world.modelR
  */
 class TinkleBell(
     context: Midis2jam2,
-    events: List<MidiChannelSpecificEvent>
+    events: List<MidiChannelEvent>
 ) : DecayedInstrument(context, events), MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 20, 0)
@@ -102,9 +101,9 @@ class TinkleBell(
         }
 
         private val outerBell = with(root) {
-            +context.modelD("TinkleBell.obj", "Wood.bmp").apply {
+            +context.modelR("TinkleBell.obj", "HornSkin.bmp").apply {
                 loc = v3(0, -10, 0)
-                ((this as Node).children[0] as Geometry).material = context.reflectiveMaterial("HornSkin.bmp")
+                ((this as Node).children[0] as Geometry).material = context.diffuseMaterial("Wood.bmp")
             }
         }
 
@@ -116,7 +115,7 @@ class TinkleBell(
                 }
             }
 
-            ((outerBell as Node).children[0] as Geometry).material.setColor(
+            ((outerBell as Node).children[1] as Geometry).material.setColor(
                 "GlowColor",
                 glowController.calculate(cymbalAnimator.animTime.let { if (it == -1.0) Double.MAX_VALUE else it } * 2f)
             )

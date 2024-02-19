@@ -22,7 +22,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class)
@@ -33,7 +33,7 @@ private const val STRETCH_FACTOR = 2f
  */
 class SopranoSax(
     context: Midis2jam2,
-    events: List<MidiChannelSpecificEvent>
+    events: List<MidiChannelEvent>
 ) : Saxophone(context, events, SopranoSaxClone::class, FINGERING_MANAGER) {
 
     /**

@@ -58,7 +58,7 @@ abstract class CloneWithKeyPositions protected constructor(
         super.tick(time, delta)
 
         currentNotePeriod?.let { np ->
-            val ints = parent.manager!!.fingering(np.midiNote) as List<Int>?
+            val ints = parent.manager!!.fingering(np.note) as List<Int>?
             ints?.let { animateKeys(it) }
         }
     }

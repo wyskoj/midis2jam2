@@ -19,44 +19,38 @@ package org.wysko.midis2jam2.instrument
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /**
  * An instrument that only uses NoteOn events to play notes. The NoteOff events are ignored.
  *
  * @param context The context to the main class.
- * @param eventList The list of all events that this instrument should be aware of.
+ * @param events The list of all events that this instrument should be aware of.
  */
 abstract class DecayedInstrument protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
+    private val events: List<MidiChannelEvent>
 ) : Instrument(context) {
 
     /**
-     * A filter of `eventList` that only contains [MidiNoteOnEvent]s.
+     * A filter of [events] that only contains [MidiNoteOnEvent]s.
      */
-    val hits: MutableList<MidiNoteOnEvent> = eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList()
+    val hits: MutableList<MidiNoteOnEvent> = events.filterIsInstance<MidiNoteOnEvent>().toMutableList()
 
     /**
      * An [EventCollector] used to collect events for visibility calculations.
      */
     open val collectorForVisibility: EventCollector<MidiNoteOnEvent> =
-        EventCollector(eventList.filterIsInstance<MidiNoteOnEvent>(), context)
+        EventCollector(context, events.filterIsInstance<MidiNoteOnEvent>())
 
-    override fun calculateVisibility(time: Double, future: Boolean): Boolean =
-        with(collectorForVisibility) {
-            advanceCollectOne(time)
-
-            Visibility.standardRules(context, this, time).also {
-                if (!isVisible && it) {
-                    onEntry()
-                }
-                if (isVisible && !it) {
-                    onExit()
-                }
-            }
+    override fun calculateVisibility(time: Double, future: Boolean): Boolean = with(collectorForVisibility) {
+        advanceCollectOne(time)
+        Visibility.standardRules(context, this, time).also {
+            if (!isVisible && it) onEntry()
+            if (isVisible && !it) onExit()
         }
+    }
 
     override fun tick(time: Double, delta: Float) {
         isVisible = calculateVisibility(time, false)

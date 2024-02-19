@@ -21,7 +21,8 @@ package org.wysko.midis2jam2.midi
  * A MIDI system exclusive event, or sysex event, is a MIDI message that carries system exclusive data.
  * This data can be used to control various parameters of a synthesizer or effects unit.
  *
- * @param data The data to be sent.
+ * @property time The time of the event in MIDI ticks.
+ * @property data The data to be sent.
  */
 data class MidiSysexEvent(
     override val time: Long,

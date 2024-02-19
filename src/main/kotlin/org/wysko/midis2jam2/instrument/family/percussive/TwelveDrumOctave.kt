@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /**
@@ -35,7 +35,7 @@ abstract class TwelveDrumOctave protected constructor(
     /** Context to midis2jam2. */
     context: Midis2jam2,
     /** The list of events for this instrument. */
-    eventList: List<MidiChannelSpecificEvent>,
+    eventList: List<MidiChannelEvent>,
     /** The distance to move the drums away from the rotational pivot point. */
     private val pivotOffset: Float,
 ) : DecayedInstrument(context, eventList) {

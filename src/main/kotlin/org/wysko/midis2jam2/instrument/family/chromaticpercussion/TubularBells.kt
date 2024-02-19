@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node
@@ -42,7 +42,7 @@ import org.wysko.midis2jam2.world.modelR
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class TubularBells(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+class TubularBells(context: Midis2jam2, events: List<MidiChannelEvent>) :
     DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 

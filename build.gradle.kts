@@ -19,7 +19,7 @@ plugins {
     kotlin("jvm") version "1.9.21"
     kotlin("plugin.serialization") version "1.9.21"
     id("org.jetbrains.compose") version "1.5.11"
-    id("io.gitlab.arturbosch.detekt") version("1.23.3")
+    id("io.gitlab.arturbosch.detekt") version ("1.23.3")
 
     java
     idea
@@ -138,9 +138,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
 
-    implementation(files("libs/Gervill-0.2.31.jar"))
+    implementation(files("libs/Gervill-0.2.31.jar", "libs/jme-ttf-2.2.2.jar"))
+    implementation("org.nutz:nutz-plugins-sfntly:1.r.60.r3")
 }
 
 tasks.withType<ShadowJar> {
@@ -152,7 +153,9 @@ tasks.withType<ShadowJar> {
                     "macos" -> "macos"
                     "linux" -> "linux"
                     else -> {
-                        println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
+                        println(
+                            "Unknown target platform: ${project.properties["targetplatform"]}, reverting to default"
+                        )
                         "current"
                     }
                 }

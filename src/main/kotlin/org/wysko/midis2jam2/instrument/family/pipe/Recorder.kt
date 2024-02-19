@@ -22,7 +22,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.modelD
 private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class)
 
 /** The Recorder. */
-class Recorder(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+class Recorder(context: Midis2jam2, events: List<MidiChannelEvent>) :
     InstrumentWithHands(context, events, RecorderClone::class, FINGERING_MANAGER) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)

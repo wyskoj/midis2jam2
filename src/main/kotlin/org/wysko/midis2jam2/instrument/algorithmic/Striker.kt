@@ -89,7 +89,7 @@ class Striker(
      */
     val node: Node = node()
 
-    private val eventCollector = EventCollector(strikeEvents, context)
+    private val eventCollector = EventCollector(context, strikeEvents)
     private val rotationNode = with(node) {
         +node {
             +stickModel
@@ -188,7 +188,7 @@ class Striker(
 
             /* The rotation should be dependent on the current tempo, i.e., if the tempo is faster, the rotation should
              * happen quicker, v.v. */
-            rot *= context.file.tempoBefore(it).bpm()
+            rot *= context.file.tempoBefore(it).bpm
 
             // We may wish to scale the entire rotation to hasten/delay the animation.
             rot *= strikeSpeed

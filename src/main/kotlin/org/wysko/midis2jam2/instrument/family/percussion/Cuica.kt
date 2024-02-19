@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.Vector3fSmoother
+import org.wysko.midis2jam2.util.VectorSmoother
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
@@ -36,14 +36,14 @@ class Cuica(
     muteHits: MutableList<MidiNoteOnEvent>,
     openHits: MutableList<MidiNoteOnEvent>,
 ) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
-    private val muteCollector = EventCollector(muteHits, context)
-    private val openCollector = EventCollector(openHits, context)
+    private val muteCollector = EventCollector(context, muteHits)
+    private val openCollector = EventCollector(context, openHits)
 
     init {
         // Load drum
         context.modelD("DrumSet_Cuica.obj", "DrumShell_Cuica.png").also {
             geometry.attachChild(it)
-            (it as Node).getChild(0).setMaterial(context.unshadedMaterial("Wood.bmp"))
+            (it as Node).getChild(0).setMaterial(context.diffuseMaterial("Wood.bmp"))
         }
     }
 
@@ -60,8 +60,8 @@ class Cuica(
     private var isMovingIn = false
     private var strokeHandCtrl = NumberSmoother(0f, 10.0)
     private var handState: HandState = HandState.Resting
-    private var restingHandLocCtrl = Vector3fSmoother(HandState.Resting.translation, 30.0)
-    private var restingHandRotCtrl = Vector3fSmoother(HandState.Resting.rotation, 30.0)
+    private var restingHandLocCtrl = VectorSmoother(HandState.Resting.translation, 30.0)
+    private var restingHandRotCtrl = VectorSmoother(HandState.Resting.rotation, 30.0)
 
     init {
         with(geometry) {

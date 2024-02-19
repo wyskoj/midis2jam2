@@ -17,7 +17,10 @@
 
 package org.wysko.midis2jam2.util
 
-import org.slf4j.LoggerFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory.getLogger
 
-/** Provides an easy function for obtaining the logger. */
-fun <T : Any> T.logger(): org.slf4j.Logger = LoggerFactory.getLogger(javaClass)
+/**
+ * Convenience function to obtain the logger.
+ */
+fun <T : Any> T.logger(): Logger = getLogger(javaClass)

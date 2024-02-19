@@ -21,7 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node
@@ -42,15 +42,14 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of stage horns to use.
  */
-class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: StageHornsType) :
-    DivisiveSustainedInstrument(context, eventList, false) {
+class StageHorns(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: StageHornsType) :
+    DivisiveSustainedInstrument(context, eventList) {
 
-    override val animators: Array<PitchClassAnimator> =
-        Array(12) {
-            RisingPitchClassAnimator(context, eventList.notePeriodsModulus(context, it)).apply {
-                geometry += context.modelR("StageHorn.obj", type.texture)
-            }
+    override val animators: List<PitchClassAnimator> = List(12) {
+        RisingPitchClassAnimator(context, eventList.notePeriodsModulus(context, 11 - it)).apply {
+            geometry += context.modelR("StageHorn.obj", type.texture)
         }
+    }
 
     init {
         val hornNodes = Array(12) {
@@ -72,25 +71,5 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         animators.forEach {
             it.root.loc = BASE_POSITION + v3(0f, 3f, if (index >= 0) -5f else 5f) * index
         }
-    }
-
-    /**
-     * A type of stage horns.
-     */
-    enum class StageHornsType(internal val texture: String) {
-        /**
-         * The default stage horns.
-         */
-        BrassSection("HornSkin.bmp"),
-
-        /**
-         * The stage horns used for "Synth Brass 1".
-         */
-        SynthBrass1("HornSkinGrey.bmp"),
-
-        /**
-         * The stage horns used for "Synth Brass 2".
-         */
-        SynthBrass2("HornSkinCopper.png"),
     }
 }

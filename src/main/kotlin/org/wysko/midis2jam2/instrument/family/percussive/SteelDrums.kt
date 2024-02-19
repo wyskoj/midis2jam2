@@ -23,7 +23,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.world.modelD
@@ -35,7 +35,7 @@ private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
 /** The Steel drums. */
 class SteelDrums(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>
+    eventList: List<MidiChannelEvent>
 ) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) {

@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
@@ -28,16 +28,15 @@ import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
  * An instrument that uses both NoteOn and NoteOff events to play notes.
  *
  * @param context The context to the main class.
- * @param eventList The list of all events that this instrument should be aware of.
+ * @param events The list of all events that this instrument should be aware of.
  */
-abstract class SustainedInstrument(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    Instrument(context) {
+abstract class SustainedInstrument(context: Midis2jam2, events: List<MidiChannelEvent>) : Instrument(context) {
 
     /**
      * The list of all note periods that this instrument should play.
      */
     protected val notePeriods: MutableList<NotePeriod> =
-        calculateNotePeriods(midiFile = context.file, noteEvents = eventList.filterIsInstance<MidiNoteEvent>())
+        calculateNotePeriods(context.file, events.filterIsInstance<MidiNoteEvent>())
 
     /**
      * The collector that manages the note periods.

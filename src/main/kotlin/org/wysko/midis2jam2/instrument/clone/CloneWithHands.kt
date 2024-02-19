@@ -65,7 +65,7 @@ abstract class CloneWithHands protected constructor(parent: InstrumentWithHands,
         if (isPlaying) {
             if (parent.manager == null) return
 
-            val hands = currentNotePeriod?.let { parent.manager.fingering(it.midiNote) } as Hands?
+            val hands = currentNotePeriod?.let { parent.manager.fingering(it.note) } as Hands?
             hands?.let {
                 this.hands = it
                 updateHandVisibility(it)

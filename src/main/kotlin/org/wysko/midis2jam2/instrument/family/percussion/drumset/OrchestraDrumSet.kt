@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.RideCymbal
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.SnareDrum
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.byNote
+import org.wysko.midis2jam2.midi.filterByNotes
 
 /**
  * A [DrumSet] that uses standard models and can be skinned with [TypicalDrumSetSkin].
@@ -44,21 +44,21 @@ class OrchestraDrumSet(
 ) : DrumSet(context, events) {
     override val collectorForVisibility: EventCollector<MidiNoteOnEvent> =
         EventCollector(
+            context,
             events.filter {
                 it.note in 27..30 || it.note in 35..40 || (it.note in 55..59 && it.note % 2 == 1)
             },
-            context,
         )
     private val instruments =
         buildList {
             // TODO: Bass and snare drum should have new models
-            this += BassDrum(context, events.byNote(35, 36).toMutableList(), ShellStyle.TypicalDrumShell.Standard)
-            this += SnareDrum(context, events.byNote(37, 38, 40).toMutableList(), ShellStyle.TypicalDrumShell.Standard)
-            this += HiHat(context, events.byNote(27, 28, 29).toMutableList(), HiHatNoteMapping.Orchestra)
-            this += Cymbal(context, events.byNote(59).toMutableList(), CymbalType["crash_1"])
-            this += Cymbal(context, events.byNote(57).toMutableList(), CymbalType["crash_2"])
-            this += Cymbal(context, events.byNote(55).toMutableList(), CymbalType["splash"])
-            this += RideCymbal(context, events.byNote(30).toMutableList(), CymbalType["ride_1"])
+            this += BassDrum(context, events.filterByNotes(35, 36).toMutableList(), ShellStyle.TypicalDrumShell.Standard)
+            this += SnareDrum(context, events.filterByNotes(37, 38, 40).toMutableList(), ShellStyle.TypicalDrumShell.Standard)
+            this += HiHat(context, events.filterByNotes(27, 28, 29).toMutableList(), HiHatNoteMapping.Orchestra)
+            this += Cymbal(context, events.filterByNotes(59).toMutableList(), CymbalType["crash_1"])
+            this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"])
+            this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"])
+            this += RideCymbal(context, events.filterByNotes(30).toMutableList(), CymbalType["ride_1"])
         }.onEach {
             geometry.attachChild(it.placement)
         }

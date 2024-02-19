@@ -24,36 +24,26 @@ import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
 import com.jme3.input.controls.ActionListener
 import com.jme3.material.Material
-import com.jme3.post.FilterPostProcessor
-import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.FadeFilter
-import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.shadow.DirectionalLightShadowFilter
-import com.jme3.shadow.EdgeFilteringMode
 import org.wysko.midis2jam2.instrument.Instrument
-import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
+import org.wysko.midis2jam2.instrument.algorithmic.Collector
 import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodGroupCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetVisibilityManager
-import org.wysko.midis2jam2.midi.MidiEvent
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
-import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration.Companion.isFakeShadows
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.minusAssign
+import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.AssetLoader
 import org.wysko.midis2jam2.world.DebugTextController
 import org.wysko.midis2jam2.world.HudController
-import org.wysko.midis2jam2.world.LightingSetup
-import org.wysko.midis2jam2.world.LyricController
 import org.wysko.midis2jam2.world.ShadowController
 import org.wysko.midis2jam2.world.StandController
 import org.wysko.midis2jam2.world.camera.AutoCamController
@@ -61,6 +51,7 @@ import org.wysko.midis2jam2.world.camera.CameraAngle
 import org.wysko.midis2jam2.world.camera.CameraState
 import org.wysko.midis2jam2.world.camera.SlideCameraController
 import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
+import org.wysko.midis2jam2.world.lyric.LyricController
 import org.wysko.midis2jam2.world.modelD
 import kotlin.properties.Delegates
 
@@ -76,14 +67,14 @@ abstract class Midis2jam2(
 ) : AbstractAppState(), ActionListener {
 
     /**
+     * The root node of the scene.
+     */
+    val root: Node = Node()
+
+    /**
      * The AssetManager, as provided by the [app].
      */
     val assetManager: AssetManager by lazy { app.assetManager }
-
-    /**
-     * The root node of the scene.
-     */
-    val rootNode: Node = Node()
 
     /**
      * The version of midis2jam2.
@@ -138,19 +129,9 @@ abstract class Midis2jam2(
     lateinit var drumSetVisibilityManager: DrumSetVisibilityManager
 
     /**
-     * The list of event collectors.
+     * The list of collectors.
      */
-    protected val eventCollectors: MutableList<EventCollector<out MidiEvent>> = mutableListOf()
-
-    /**
-     * The list of note period collectors.
-     */
-    protected val notePeriodCollectors: MutableList<NotePeriodCollector> = mutableListOf()
-
-    /**
-     * The list of note period group collectors.
-     */
-    protected val notePeriodGroupCollectors: MutableList<NotePeriodGroupCollector> = mutableListOf()
+    protected val collectors: MutableList<Collector<*>> = mutableListOf()
 
     /**
      * `true` if the sequencer has reached the end of the MIDI file, `false` otherwise.
@@ -223,19 +204,15 @@ abstract class Midis2jam2(
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         val settingsConfig = configs.getType(SettingsConfiguration::class)
-        val graphicsConfig = configs.getType(GraphicsConfiguration::class)
-
-        // Set up the application
-        this.app = (app as SimpleApplication).also {
-            it.renderer.defaultAnisotropicFilter = 4
+        this.app = (app as SimpleApplication)
+        this.app.run {
+            renderer.defaultAnisotropicFilter = 4
+            flyByCamera.run {
+                unregisterInput()
+                isEnabled = false
+            }
         }
-        assetLoader = AssetLoader(this)
-
-        // Set up camera
-        this.app.flyByCamera.run {
-            unregisterInput()
-            isEnabled = false
-        }
+        this.assetLoader = AssetLoader(this)
         this.flyByCamera = SmoothFlyByCamera(this) {
             isEnabled = true
             cameraState = CameraState.FREE_CAM
@@ -243,66 +220,30 @@ abstract class Midis2jam2(
             actLikeNormalFlyByCamera = !settingsConfig.isCameraSmooth
             isEnabled = !settingsConfig.startAutocamWithSong
         }
+        this.stage = with(root) { +modelD("Stage.obj", "Stage.bmp") }
+        this.fadeFilter = FadeFilter(0.5f).apply { value = 0f }
+        this.instruments = InstrumentAssignment.assign(this, midiFile = file).onEach {
+            // This is a bit of a hack to prevent stuttering when the instrument would first appear
+            root += it.root
+            root -= it.root
+        }
+        this.drumSetVisibilityManager = DrumSetVisibilityManager(this, instruments.filterIsInstance<DrumSet>())
+        this.standController = StandController()
+        this.lyricController =
+            LyricController(this, file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>())
+        this.lyricController.isEnabled = settingsConfig.showLyrics
+        this.autocamController = AutoCamController(this, settingsConfig.startAutocamWithSong)
+        this.slideCamController = SlideCameraController()
+        this.debugTextController = DebugTextController(this)
+        this.hudController = HudController()
+        ShadowController.configureShadows(fadeFilter)
         if (settingsConfig.startAutocamWithSong) {
             with(this.app.camera) {
-                CameraAngle.CAMERA_1A.let {
+                let {
                     location = it.location
                     rotation = it.rotation
                 }
             }
-        }
-        stage = with(rootNode) { +modelD("Stage.obj", "Stage.bmp") }
-
-        /*** INIT FADE IN ***/
-        fadeFilter = FadeFilter(0.5f).apply { value = 0f }
-
-        instruments = InstrumentAssignment.assign(this, midiFile = file).onEach {
-            // This is a bit of a hack to prevent stuttering when the instrument would first appear
-            rootNode.attachChild(it.root)
-            rootNode.detachChild(it.root)
-        }
-        drumSetVisibilityManager = DrumSetVisibilityManager(this, instruments.filterIsInstance<DrumSet>())
-
-        standController = StandController(this)
-        lyricController =
-            LyricController(file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>().toMutableList(), this)
-        lyricController.enabled = settingsConfig.showLyrics
-        autocamController = AutoCamController(this, settingsConfig.startAutocamWithSong)
-        slideCamController = SlideCameraController(this)
-        debugTextController = DebugTextController(this)
-        hudController = HudController(this)
-
-        val shadowsOnly = LightingSetup.setupLights(rootNode)
-
-        /*** SETUP SHADOWS ***/
-        if (isFakeShadows) {
-            shadowController = ShadowController(this)
-            FilterPostProcessor(assetManager).apply {
-                numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
-                addFilter(fadeFilter)
-                addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
-                app.viewPort.addProcessor(this)
-            }
-        } else {
-            FilterPostProcessor(assetManager).apply {
-                val shadowDef = GraphicsConfiguration.SHADOW_DEFINITION[graphicsConfig.shadowQuality] ?: (1 to 1024)
-                addFilter(
-                    DirectionalLightShadowFilter(assetManager, shadowDef.second, shadowDef.first).apply {
-                        light = shadowsOnly
-                        isEnabled = true
-                        shadowIntensity = 0.16f
-                        lambda = 0.65f
-                        edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
-                        edgesThickness = 10
-                    },
-                )
-                numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
-                addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
-                addFilter(fadeFilter)
-                app.viewPort.addProcessor(this)
-            }
-            rootNode.shadowMode = RenderQueue.ShadowMode.CastAndReceive
-            stage.shadowMode = RenderQueue.ShadowMode.Receive
         }
 
         super.initialize(stateManager, app)
@@ -385,17 +326,14 @@ abstract class Midis2jam2(
     fun reflectiveMaterial(texture: String): Material = assetLoader.reflectiveMaterial(texture)
 
     /** Loads and returns an unshaded material with the specified [texture]. */
-    fun unshadedMaterial(texture: String): Material = assetLoader.diffuseMaterial(texture)
+    fun diffuseMaterial(texture: String): Material = assetLoader.diffuseMaterial(texture)
 
-    fun registerEventCollector(collector: EventCollector<out MidiEvent>) {
-        eventCollectors += collector
-    }
-
-    fun registerNotePeriodCollector(collector: NotePeriodCollector) {
-        notePeriodCollectors += collector
-    }
-
-    fun registerNotePeriodGroupCollector(collector: NotePeriodGroupCollector) {
-        notePeriodGroupCollectors += collector
+    /**
+     * Registers a [collector] to be updated when the time is advanced.
+     *
+     * @param collector The collector to be registered.
+     */
+    fun registerCollector(collector: Collector<*>) {
+        collectors += collector
     }
 }

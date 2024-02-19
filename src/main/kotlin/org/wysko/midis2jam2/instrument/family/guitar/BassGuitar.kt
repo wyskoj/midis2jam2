@@ -25,19 +25,21 @@ import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
+import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.DROP_D
+import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.STANDARD
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 
-/** The base position of the bass guitar. */
 private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
-
-/** The bass skin texture file. */
 private const val BASS_SKIN_BMP = "BassSkin.bmp"
-
 private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/BassGuitar.json"))
 
@@ -50,15 +52,15 @@ private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
  * @param events the list of events for this BassGuitar
  * @param type specifies the type of BassGuitar
  */
-class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: BassGuitarType) :
+class BassGuitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: BassGuitarType) :
     FrettedInstrument(
         context,
-        frettingEngine = StandardFrettingEngine(
-            numberOfStrings = 4,
-            numberOfFrets = 22,
-            if (needsDropTuning(events)) BassGuitarTuning.DROP_D.values else BassGuitarTuning.STANDARD.values
-        ),
         events,
+        StandardFrettingEngine(
+            4,
+            22,
+            if (needsDropTuning(events)) DROP_D.values else STANDARD.values
+        ),
         positioning = with(BASS_GUITAR_MODEL_PROPERTIES) {
             FrettedInstrumentPositioning(
                 upperY = upperVerticalOffset,
@@ -73,22 +75,24 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         instrumentBody = context.modelD(
             if (needsDropTuning(events)) type.modelDropDFile else type.modelFile,
             type.textureFile
-        ),
-        when (type) {
-            BassGuitarType.SYNTH_1 -> "BassSkinSynth1.png"
-            BassGuitarType.SYNTH_2 -> "BassSkinSynth2.png"
+        ) to when (type) {
+            BassGuitarType.Synth1 -> "BassSkinSynth1.png"
+            BassGuitarType.Synth2 -> "BassSkinSynth2.png"
             else -> BASS_SKIN_BMP
         }
-    ) {
+    ),
+    MultipleInstancesLinearAdjustment {
+
+
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BassString.obj", BASS_SKIN_BMP).apply {
             geometry.attachChild(this)
         }
     }.apply {
-        forEachIndexed { index, it ->
+        forEachIndexed { index, string ->
             with(BASS_GUITAR_MODEL_PROPERTIES) {
-                it.setLocalTranslation(upperHorizontalOffsets[index], upperVerticalOffset, FORWARD_OFFSET)
-                it.localRotation = Quaternion().fromAngles(0f, 0f, rad(rotations[index]))
+                string.loc = v3(upperHorizontalOffsets[index], upperVerticalOffset, FORWARD_OFFSET)
+                string.rot = v3(0, 0, rotations[index])
             }
         }
     }
@@ -103,70 +107,74 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, ty
         }
     }.apply {
         indices.forEach { i ->
-            (0 until 5).forEach { j ->
+            for (j in 0..<5) {
                 with(this[i][j]) {
                     BASS_GUITAR_MODEL_PROPERTIES.let {
-                        localTranslation =
-                            Vector3f(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, FORWARD_OFFSET)
-                        localRotation = Quaternion().fromAngles(0f, 0f, rad(it.rotations[i]))
+                        loc = v3(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, FORWARD_OFFSET)
+                        rot = v3(0, 0, it.rotations[i])
                     }
                 }
             }
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
-        root.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
-    }
-
-    /** Type of Bass Guitar */
-    enum class BassGuitarType(
-        /** The model file of the Bass Guitar type. */
-        val modelFile: String,
-        /** The model file of the Bass Guitar type with drop D tuning. */
-        val modelDropDFile: String,
-        /** The texture file of the Bass Guitar type. */
-        val textureFile: String,
-        /** The color of the glow of the Bass Guitar type. */
-        val glowColor: ColorRGBA
-    ) {
-        /** The standard Bass Guitar type. */
-        STANDARD("Bass.obj", "BassD.obj", BASS_SKIN_BMP, STRING_GLOW),
-
-        /** The fretless Bass Guitar type. */
-        FRETLESS("BassFretless.obj", "BassFretlessD.obj", "BassSkinFretless.png", STRING_GLOW),
-
-        /** The synth 1 Bass Guitar type. */
-        SYNTH_1("Bass.obj", "BassD.obj", "BassSkinSynth1.png", ColorRGBA(0.64f, 1.1f, 0.67f, 1f)),
-
-        /** The synth 2 Bass Guitar type. */
-        SYNTH_2("Bass.obj", "BassD.obj", "BassSkinSynth2.png", ColorRGBA(0.70f, 0.93f, 1.4f, 1f));
-    }
+    override val multipleInstancesDirection: Vector3f = v3(7, -2.43, 0)
 
     init {
-        /* Position guitar */
         geometry.run {
             localTranslation = BASE_POSITION
             localRotation = Quaternion().fromAngles(rad(-3.21), rad(-43.5), rad(-29.1))
         }
     }
+
+    /**
+     * Type of Bass Guitar.
+     */
+    sealed class BassGuitarType(
+        internal val modelFile: String,
+        internal val modelDropDFile: String,
+        internal val textureFile: String,
+        internal val glowColor: ColorRGBA
+    ) {
+
+        /** The standard Bass Guitar type. */
+        data object Standard : BassGuitarType(
+            modelFile = "Bass.obj",
+            modelDropDFile = "BassD.obj",
+            textureFile = BASS_SKIN_BMP,
+            glowColor = STRING_GLOW
+        )
+
+        /** The fretless Bass Guitar type. */
+        data object Fretless : BassGuitarType(
+            modelFile = "BassFretless.obj",
+            modelDropDFile = "BassFretlessD.obj",
+            textureFile = "BassSkinFretless.png",
+            glowColor = STRING_GLOW
+        )
+
+        /** The synth 1 Bass Guitar type. */
+        data object Synth1 : BassGuitarType(
+            modelFile = "Bass.obj",
+            modelDropDFile = "BassD.obj",
+            textureFile = "BassSkinSynth1.png",
+            glowColor = ColorRGBA(0.64f, 1.1f, 0.67f, 1f)
+        )
+
+        /** The synth 2 Bass Guitar type. */
+        data object Synth2 : BassGuitarType(
+            modelFile = "Bass.obj",
+            modelDropDFile = "BassD.obj",
+            textureFile = "BassSkinSynth2.png",
+            glowColor = ColorRGBA(0.70f, 0.93f, 1.4f, 1f)
+        )
+    }
 }
 
-/**
- * Given a list of [events], determines if the Bass Guitar should use the drop D tuning.
- *
- * @return true if the Bass Guitar should use the drop D tuning, false otherwise.
- */
-private fun needsDropTuning(events: List<MidiChannelSpecificEvent>): Boolean =
+private fun needsDropTuning(events: List<MidiChannelEvent>): Boolean =
     (events.filterIsInstance<MidiNoteOnEvent>().minByOrNull { it.note }?.note ?: 127) < 28
 
-private enum class BassGuitarTuning(
-    /** The tuning of the Bass Guitar. */
-    val values: IntArray
-) {
-    /** The standard tuning of the Bass Guitar. */
+private enum class BassGuitarTuning(val values: IntArray) {
     STANDARD(intArrayOf(28, 33, 38, 43)),
-
-    /** The drop D tuning of the Bass Guitar. */
-    DROP_D(intArrayOf(26, 33, 38, 43));
+    DROP_D(intArrayOf(26, 33, 38, 43))
 }

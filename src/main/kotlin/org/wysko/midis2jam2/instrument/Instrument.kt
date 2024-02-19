@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.minusAssign
 import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.times
 
 /**
@@ -71,7 +72,7 @@ abstract class Instrument(val context: Midis2jam2) {
      * Whether the instrument is visible.
      * The calculation for visibility is handled by [Visibility].
      *
-     * If the context has the `instrumentAlwaysVisible` setting enabled, this will always be true.
+     * If the [context] has the `instrumentAlwaysVisible` setting enabled, this will always be true.
      *
      * The [root] is attached and detached from the [context]'s root node when this is set.
      *
@@ -81,7 +82,7 @@ abstract class Instrument(val context: Midis2jam2) {
         get() = context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible || field
         set(value) {
             field = value
-            with(context.rootNode) {
+            with(context.root) {
                 if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible || field) {
                     this += root
                 } else {
@@ -93,7 +94,7 @@ abstract class Instrument(val context: Midis2jam2) {
     init {
         placement += geometry
         root += placement
-        context.rootNode += root
+        context.root += root
     }
 
     /**
@@ -128,8 +129,17 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param delta The amount of time that elapsed since the last frame, in seconds.
      */
     protected open fun adjustForMultipleInstances(delta: Float) {
-        if (this is MultipleInstancesLinearAdjustment) {
-            root.loc = this.multipleInstancesDirection * updateInstrumentIndex(delta)
+        when (this) {
+            is MultipleInstancesLinearAdjustment -> {
+                root.loc = this.multipleInstancesDirection * updateInstrumentIndex(delta)
+            }
+
+            is MultipleInstancesRadialAdjustment -> {
+                root.rot = rotationAxis
+                    .identity
+                    .clone()
+                    .mult(baseAngle + rotationAngle * updateInstrumentIndex(delta))
+            }
         }
     }
 
@@ -141,21 +151,25 @@ abstract class Instrument(val context: Midis2jam2) {
      * @see index
      */
     protected fun updateInstrumentIndex(delta: Float): Float {
-        val targetIndex = if (isVisible) similarVisible().indexOf(this).coerceAtLeast(0) else similarVisible().size - 1
+        val targetIndex = if (isVisible) {
+            findSimilarAndVisible().indexOf(this).coerceAtLeast(0)
+        } else {
+            findSimilarAndVisible().size - 1
+        }
         index += delta * 2500 * (targetIndex - index) / 500.0
-        index = index.coerceAtMost(similar().size.toDouble())
+        index = index.coerceAtMost(findSimilar().size.toDouble())
         return index.toFloat()
     }
 
     /**
      * Returns a list of instruments that are of the same type as this instrument.
      */
-    protected open fun similar(): List<Instrument> = context.instruments.filter { this::class.isInstance(it) }
+    protected open fun findSimilar(): List<Instrument> = context.instruments.filter { this::class.isInstance(it) }
 
     /**
      * Returns a list of instruments that are of the same type as this instrument and are visible.
      */
-    protected open fun similarVisible(): List<Instrument> = similar().filter { it.isVisible }
+    protected open fun findSimilarAndVisible(): List<Instrument> = findSimilar().filter { it.isVisible }
 
     /**
      * Formats a property about this instrument for debugging purposes.
@@ -163,7 +177,7 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param name The name of the property.
      * @param value The value of the property.
      */
-    protected fun debugProperty(name: String, value: Any): String = when (value) {
+    protected fun formatProperty(name: String, value: Any): String = when (value) {
         is Float -> "\t- $name: ${"%.3f".format(value)}\n"
         else -> "\t- $name: $value\n"
     }

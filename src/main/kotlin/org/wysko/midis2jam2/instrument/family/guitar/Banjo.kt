@@ -22,7 +22,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
@@ -37,10 +37,10 @@ private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
  * @param context context to the main class
  * @param events the list of events for this Banjo
  */
-class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : FrettedInstrument(
+class Banjo(context: Midis2jam2, events: List<MidiChannelEvent>) : FrettedInstrument(
     context,
-    StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),
     events,
+    StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),
     FrettedInstrumentPositioning(
         13.93f,
         -19.54f,
@@ -55,7 +55,7 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) : Frett
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.modelD("Banjo.obj", "BanjoSkin.png"),
+    context.modelD("Banjo.obj", "BanjoSkin.png") to
     "BanjoSkin.png"
 ) {
     override val upperStrings: Array<Spatial> = Array(4) {

@@ -20,7 +20,8 @@ package org.wysko.midis2jam2.instrument.family.piano
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
-import org.wysko.midis2jam2.midi.*
+import org.wysko.midis2jam2.midi.MidiChannelEvent
+import org.wysko.midis2jam2.midi.NotePeriod
 
 /**
  * An instrument that uses keys to play notes.
@@ -30,7 +31,7 @@ import org.wysko.midis2jam2.midi.*
  */
 abstract class KeyedInstrument(
     context: Midis2jam2,
-    eventList: MutableList<MidiChannelSpecificEvent>,
+    eventList: MutableList<MidiChannelEvent>,
     val rangeLow: Int,
     val rangeHigh: Int,
 ) : SustainedInstrument(context, eventList) {
@@ -66,9 +67,9 @@ abstract class KeyedInstrument(
         time: Double,
     ): Boolean {
         return when {
-            it.duration() > 0.5 -> time >= it.endTime - 0.1
-            it.duration() > 0.2 -> time >= it.endTime - 0.05
-            else -> time >= it.startTime + (it.duration() * 0.5)
+            it.duration > 0.5 -> time >= it.end - 0.1
+            it.duration > 0.2 -> time >= it.end - 0.05
+            else -> time >= it.start + (it.duration * 0.5)
         }
     }
 
@@ -76,7 +77,7 @@ abstract class KeyedInstrument(
         return super.toString() +
             buildString {
                 append(
-                    debugProperty(
+                    formatProperty(
                         "keys",
                         keys.joinToString(separator = "") { if (it.currentState is Key.State.Down) "X" else "_" },
                     ),
@@ -85,7 +86,7 @@ abstract class KeyedInstrument(
     }
 
     open fun keyStatus(midiNote: Int): Key.State =
-        collector.currentNotePeriods.firstOrNull { it.midiNote == midiNote }?.let {
+        collector.currentNotePeriods.firstOrNull { it.note == midiNote }?.let {
             Key.State.Down(it.noteOn.velocity)
         } ?: Key.State.Up
 }

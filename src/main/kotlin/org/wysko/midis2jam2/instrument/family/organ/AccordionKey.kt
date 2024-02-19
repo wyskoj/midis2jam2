@@ -27,14 +27,13 @@ class AccordionKey(
     whiteKeyIndex: Int,
     accordion: Accordion,
 ) : Key(
-        rotationAxis = Axis.Y.identity,
-        inverseRotation = true,
-        keyboardConfiguration = Accordion.KEY_CONFIGURATION,
-        moveValue =
-            when (Color.fromNote(midiNote)) {
-                Color.White -> -whiteKeyIndex + (Accordion.WHITE_KEY_COUNT / 2)
-                Color.Black -> -midiNote * (7f / 12f) + 6.2f
-            },
-        midiNote = midiNote,
-        keyedInstrument = accordion,
-    )
+    rotationAxis = Axis.Y.identity,
+    inverseRotation = true,
+    keyboardConfiguration = Accordion.KEY_CONFIGURATION,
+    moveValue = when (Color.fromNote(midiNote)) {
+        Color.White -> -whiteKeyIndex + (Accordion.WHITE_KEY_COUNT / 2)
+        Color.Black -> -midiNote * (7f / 12f) + 6.2f
+    },
+    midiNote = midiNote,
+    keyedInstrument = accordion,
+)

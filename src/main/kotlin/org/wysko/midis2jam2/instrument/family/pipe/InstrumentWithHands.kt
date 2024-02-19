@@ -20,14 +20,14 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.Clone
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import kotlin.reflect.KClass
 
 /** Any instrument that animates using hands. */
 abstract class InstrumentWithHands
 protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
+    eventList: List<MidiChannelEvent>,
     clazz: KClass<out Clone>,
     manager: HandPositionFingeringManager
 ) : MonophonicInstrument(context, eventList, clazz, manager) {

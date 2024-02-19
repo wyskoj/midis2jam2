@@ -123,10 +123,10 @@ object LegacyConfigurationImporter {
 
                 configs += when (type) {
                     "DEFAULT" -> BackgroundConfiguration.DefaultBackground
-                    "REPEATED_CUBEMAP" -> BackgroundConfiguration.RepeatedCubemapBackground(texture = value!!)
+                    "REPEATED_CUBEMAP" -> BackgroundConfiguration.RepeatedCubeMapBackground(texture = value!!)
                     "UNIQUE_CUBEMAP" -> {
                         val textures = Json.decodeFromString<List<String>>(value!!)
-                        BackgroundConfiguration.UniqueCubemapBackground(
+                        BackgroundConfiguration.UniqueCubeMapBackground(
                             CubemapTexture(
                                 west = textures[0],
                                 east = textures[1],

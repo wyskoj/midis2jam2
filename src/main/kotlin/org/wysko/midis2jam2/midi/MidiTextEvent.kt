@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.midi
 /**
  * A text event.
  *
- * @param text the text of the event
+ * @property time The time of the event in MIDI ticks.
+ * @property text The text of the event.
  */
 data class MidiTextEvent(override val time: Long, val text: String) : MidiEvent(time)

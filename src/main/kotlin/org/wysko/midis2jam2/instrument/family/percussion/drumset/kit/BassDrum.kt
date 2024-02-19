@@ -45,7 +45,7 @@ class BassDrum(
     style: ShellStyle,
 ) :
     DrumSetInstrument(context, hits) {
-    private val eventCollector = EventCollector(hits, context)
+    private val eventCollector = EventCollector(context, hits)
 
     private val beaterAssembly =
         Node().apply {
@@ -65,7 +65,7 @@ class BassDrum(
             move(0f, 5.5f, 1.35f)
             (this as Node).let { // Set correct materials
                 it.children[0].setMaterial(context.reflectiveMaterial("ShinySilver.bmp"))
-                it.children[1].setMaterial(context.unshadedMaterial("MetalTextureDark.bmp"))
+                it.children[1].setMaterial(context.diffuseMaterial("MetalTextureDark.bmp"))
             }
         }
 

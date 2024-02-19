@@ -25,14 +25,23 @@ import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
 import org.wysko.midis2jam2.midi.DesktopMidiFile
-import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
+import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.Resolution
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import java.awt.GraphicsEnvironment
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
-import javax.sound.midi.*
+import javax.sound.midi.InvalidMidiDataException
+import javax.sound.midi.MidiDevice
+import javax.sound.midi.MidiSystem
+import javax.sound.midi.MidiUnavailableException
+import javax.sound.midi.Sequence
+import javax.sound.midi.Sequencer
 
 /**
  * This class represents the execution of a MIDI file with given configurations.
@@ -187,7 +196,7 @@ private class Midis2jam2Application(
             configs = configurations,
         ).also {
             stateManager.attach(it)
-            rootNode.attachChild(it.rootNode)
+            rootNode.attachChild(it.root)
         }
     }
 
@@ -200,7 +209,8 @@ private class Midis2jam2Application(
 private val DEFAULT_JME_SETTINGS =
     AppSettings(true).apply {
         frameRate = -1
-        frequency = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.first().refreshRate
+        frequency =
+            GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.first().refreshRate
         isVSync = true
         isResizable = false
         isGammaCorrection = false

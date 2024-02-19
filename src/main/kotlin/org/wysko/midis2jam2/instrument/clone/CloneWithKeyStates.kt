@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.world.Axis
 /**
  * Instruments that have separate geometry for up keys and down keys.
  *
- * @property keyCount The number of keys on the instrument.
+ * @param keyCount The number of keys on the instrument.
  * @param parent The parent instrument.
  * @param rotationFactor A scale factor for the rotation of the instrument.
  * @param stretchFactor A scale factor for the stretching of the instrument.
@@ -46,13 +46,13 @@ abstract class CloneWithKeyStates protected constructor(
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-        currentNotePeriod?.let { this.setAllKeyStates(it.midiNote) }
+        currentNotePeriod?.let { this.setAllKeyStates(it.note) }
     }
 
     /**
      * Given a [midiNote], presses or releases keys.
      *
-     * If the instrument cannot play the specified MIDI note, the instrument plays with all keys up (this is technically
+     * If the instrument can't play the specified MIDI note, the instrument plays with all keys up (this is technically
      * incorrect on saxophones, since all open keys is a standard fingering for middle C#, but whatever).
      */
     private fun setAllKeyStates(midiNote: Int) {

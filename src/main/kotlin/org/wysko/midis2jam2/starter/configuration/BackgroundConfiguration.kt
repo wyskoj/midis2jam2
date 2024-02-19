@@ -36,15 +36,15 @@ private val CONFIG_FILE = File(APPLICATION_CONFIG_HOME, "background.json")
  *
  * This class is sealed and provides four subclasses to represent different types of backgrounds:
  *   - [DefaultBackground]: Represents the default background configuration.
- *   - [RepeatedCubemapBackground]: Represents a background configuration with a repeated cubemap texture.
- *   - [UniqueCubemapBackground]: Represents a background configuration with a unique cubemap texture.
+ *   - [RepeatedCubeMapBackground]: Represents a background configuration with a repeated cubemap texture.
+ *   - [UniqueCubeMapBackground]: Represents a background configuration with a unique cubemap texture.
  *   - [ColorBackground]: Represents a background configuration with a solid color.
  *
  * This class implements the [Configuration] interface and is serializable.
  *
  * @see DefaultBackground
- * @see RepeatedCubemapBackground
- * @see UniqueCubemapBackground
+ * @see RepeatedCubeMapBackground
+ * @see UniqueCubeMapBackground
  * @see ColorBackground
  *
  * @constructor Creates an instance of [BackgroundConfiguration].
@@ -72,7 +72,7 @@ sealed class BackgroundConfiguration : Configuration {
      */
     @Serializable
     @SerialName("repeated")
-    data class RepeatedCubemapBackground(val texture: String) : CubemapBackground() {
+    data class RepeatedCubeMapBackground(val texture: String) : CubemapBackground() {
         override fun validate(): Boolean = texture.isNotBlank()
     }
 
@@ -84,7 +84,7 @@ sealed class BackgroundConfiguration : Configuration {
      */
     @Serializable
     @SerialName("unique")
-    data class UniqueCubemapBackground(val cubemap: CubemapTexture) : CubemapBackground() {
+    data class UniqueCubeMapBackground(val cubemap: CubemapTexture) : CubemapBackground() {
         override fun validate(): Boolean {
             val directions = listOf(
                 cubemap.north,

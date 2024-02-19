@@ -22,7 +22,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.debugString
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.times
@@ -43,7 +43,7 @@ import kotlin.reflect.full.primaryConstructor
  */
 abstract class MonophonicInstrument protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
+    eventList: List<MidiChannelEvent>,
     cloneClass: KClass<out Clone>,
     val manager: FingeringManager<*>?,
 ) : SustainedInstrument(context, eventList) {
@@ -63,12 +63,12 @@ abstract class MonophonicInstrument protected constructor(
      * [notePeriods] assigned to [Clone]s.
      */
     val clones: List<Clone> = run {
-        val sortedNotePeriods = notePeriods.sortedWith(compareBy({ it.startTick() }, { it.midiNote }))
+        val sortedNotePeriods = notePeriods.sortedWith(compareBy({ it.startTick }, { it.note }))
 
         val bins = sortedNotePeriods.fold(mutableListOf<MutableList<NotePeriod>>()) { list, notePeriod ->
             // Search for a clone that isn't playing (or is just about to finish playing, helps with small overlaps)
             val firstAvailableClone =
-                list.firstOrNull { it.last().endTick() - (context.file.division / 8) <= notePeriod.startTick() }
+                list.firstOrNull { it.last().endTick - (context.file.division / 8) <= notePeriod.startTick }
 
             if (firstAvailableClone == null) {
                 list += mutableListOf(notePeriod)

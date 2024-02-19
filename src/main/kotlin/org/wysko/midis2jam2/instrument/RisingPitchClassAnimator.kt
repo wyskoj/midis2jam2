@@ -52,8 +52,8 @@ open class RisingPitchClassAnimator(context: Midis2jam2, notePeriods: List<NoteP
             0,
             (
                 RISE_HEIGHT - RISE_HEIGHT * blendedProgress(
-                    notePeriod.progress(time),
-                    notePeriod.duration()
+                    notePeriod.calculateProgress(time),
+                    notePeriod.duration
                 )
                 ).coerceAtLeast(0.0),
             0

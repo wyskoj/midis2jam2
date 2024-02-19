@@ -26,11 +26,11 @@ class NotePeriodCollector(
     context: Midis2jam2,
     private var notePeriods: List<NotePeriod>,
     private val releaseCondition: (time: Double, np: NotePeriod) -> Boolean =
-        { time: Double, notePeriod: NotePeriod -> time >= notePeriod.endTime },
+        { time: Double, notePeriod: NotePeriod -> time >= notePeriod.end },
 ) : Collector<NotePeriod> {
     init {
-        context.registerNotePeriodCollector(this)
-        notePeriods = notePeriods.sortedBy { it.startTime }
+        context.registerCollector(this)
+        notePeriods = notePeriods.sortedBy { it.start }
     }
 
     /**
@@ -44,9 +44,9 @@ class NotePeriodCollector(
     /** Advances the play head forwards to update the set of current note periods, given the current [time]. */
     fun advance(time: Double): Set<NotePeriod> {
         // Collect NotePeriods that need to be added to the heap
-        while (currentIndex < notePeriods.size && notePeriods[currentIndex].startTime <= time) {
+        while (currentIndex < notePeriods.size && notePeriods[currentIndex].start <= time) {
             val np = notePeriods[currentIndex]
-            heap.insert(np.endTime, np)
+            heap.insert(np.end, np)
             currentNotePeriods.add(np)
             currentIndex++
         }

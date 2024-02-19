@@ -22,30 +22,43 @@ import kotlin.math.max
 const val MIDI_MAX_NOTE: Int = 127
 
 /**
- * A [MidiNoteOnEvent] or a [MidiNoteOffEvent].
+ * Indicates the start or end of a note.
  *
- * @param note the note value
+ * @property time The time this event occurs in MIDI ticks.
+ * @property channel The channel on which the note should be played.
+ * @property note The note number of the note to be played.
  */
-open class MidiNoteEvent protected constructor(override val time: Long, channel: Int, open val note: Int) :
-    MidiChannelSpecificEvent(time, channel)
+sealed class MidiNoteEvent(
+    override val time: Long,
+    override val channel: Int,
+    open val note: Int
+) : MidiChannelEvent(time, channel) {
+    companion object {
+        /**
+         * Returns the maximum polyphony of the MIDI note events in the given list.
+         *
+         * Polyphony refers to the maximum number of simultaneous notes that are played.
+         *
+         * @receiver The list of MIDI note events.
+         * @return The maximum polyphony.
+         */
+        val List<MidiNoteEvent>.maximumPolyphony: Int
+            get() = fold((0 to 0)) { (current, max), event ->
+                when (event) {
+                    is MidiNoteOnEvent -> current + 1 to max(current + 1, max)
+                    is MidiNoteOffEvent -> current - 1 to max
+                }
+            }.second
 
-/**
- * Determines the maximum number of notes playing at any given time (polyphony).
- */
-fun List<MidiNoteEvent>.maxPolyphony(): Int {
-    var currentPolyphony = 0
-    var maxPolyphony = 0
-    forEach {
-        if (it is MidiNoteOnEvent) currentPolyphony++ else currentPolyphony--
-        maxPolyphony = max(currentPolyphony, maxPolyphony)
     }
-    return maxPolyphony
 }
 
 /**
  * Filters the list of [MidiNoteEvent]s by the specified notes.
  *
- * @param notes the notes to filter by
- * @return a new mutable list containing the filtered [MidiNoteEvent]s
+ * @param T The type of [MidiNoteEvent] to filter.
+ * @param notes The values of the notes to filter by.
+ * @return A new mutable list containing the filtered [MidiNoteEvent]s.
  */
-fun <T : MidiNoteEvent> List<T>.byNote(vararg notes: Int): List<T> = filter { notes.contains(it.note) }.toMutableList()
+fun <T : MidiNoteEvent> List<T>.filterByNotes(vararg notes: Int): List<T> =
+    filter { notes.contains(it.note) }.toMutableList()

@@ -33,8 +33,8 @@ class Tambourine(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxi
             strikeEvents = hits,
             stickModel =
             context.modelD("hand_tambourine.obj", "hands.bmp").apply {
-                (this as Node).getChild(2).setMaterial(context.unshadedMaterial("TambourineWood.bmp"))
-                getChild(1).setMaterial(context.unshadedMaterial("MetalTexture.bmp"))
+                (this as Node).getChild(2).setMaterial(context.diffuseMaterial("TambourineWood.bmp"))
+                getChild(1).setMaterial(context.diffuseMaterial("MetalTexture.bmp"))
             },
             strikeSpeed = 2.0,
             maxIdleAngle = 30.0,

@@ -19,9 +19,9 @@ package org.wysko.midis2jam2.midi
 /**
  * A track of a MIDI file.
  *
- * @param events the events in this track
+ * @property events The events in this track.
  */
 data class MidiTrack(val events: MutableList<MidiEvent>) {
-    /** Construct MidiTrack without any events. */
-    constructor() : this(ArrayList<MidiEvent>())
+    /** Construct without any events. */
+    constructor() : this(mutableListOf())
 }

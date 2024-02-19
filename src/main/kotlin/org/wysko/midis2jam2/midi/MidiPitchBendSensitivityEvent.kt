@@ -22,10 +22,42 @@ package org.wysko.midis2jam2.midi
  * CC#101 to 0, then modifying CC#6 modifies the pitch bend sensitivity of the channel by semitones, and CC#38 modifies
  * the pitch bend sensitivity of the channel by cents.
  *
- * @param value the intensity of the pitch bend, represented in semitones
+ * @property time The time this event occurs, in MIDI ticks.
+ * @property channel The channel this event occurs on.
+ * @property value The new pitch bend sensitivity, in semitones.
  */
 data class MidiPitchBendSensitivityEvent(
     override val time: Long,
     override val channel: Int,
-    val value: Float
-) : MidiChannelSpecificEvent(time, channel)
+    val value: Double
+) : MidiChannelEvent(time, channel) {
+    companion object {
+        /**
+         * Parses a list of [MidiRegisteredParameterNumberChangeEvent] and
+         * returns a list of [MidiPitchBendSensitivityEvent].
+         * The first event in the list is always a default event with a value of 2.0.
+         *
+         * @param events The list of [MidiRegisteredParameterNumberChangeEvent] to process.
+         * @param defaultChannel The default channel to use if the channel is not specified.
+         */
+        fun fromRpnChanges(
+            events: List<MidiRegisteredParameterNumberChangeEvent>,
+            defaultChannel: Int
+        ): List<MidiPitchBendSensitivityEvent> {
+            val list = mutableListOf(MidiPitchBendSensitivityEvent(0L, defaultChannel, 2.0))
+            if (events.isEmpty()) return list
+
+            require(events.all { it.registeredParameterNumber == RegisteredParameterNumber.PitchBendSensitivity }) {
+                "The list of events must only contain pitch bend sensitivity events."
+            }
+
+            return list + events.map {
+                MidiPitchBendSensitivityEvent(
+                    it.time, it.channel, it.dataEntry.msb + it.dataEntry.lsb.centsToSemitones()
+                )
+            }
+        }
+    }
+}
+
+private fun Int.centsToSemitones() = this / 100.0

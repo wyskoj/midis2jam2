@@ -34,18 +34,16 @@ object FileAsStringSerializer : KSerializer<File> {
     /**
      * Serialize a [File] into a string.
      *
-     * @param   encoder [Encoder] to aid the serialization.
-     * @param   value [File] object to serialize.
+     * @param encoder [Encoder] to aid the serialization.
+     * @param value [File] object to serialize.
      */
-    override fun serialize(encoder: Encoder, value: File): Unit =
-        encoder.encodeString(value.absolutePath)
+    override fun serialize(encoder: Encoder, value: File): Unit = encoder.encodeString(value.absolutePath)
 
     /**
      * Deserialize a string into a [File].
      *
-     * @param   decoder [Decoder] to aid the deserialization.
-     * @return  Returns [File] object deserialized from the string.
+     * @param decoder [Decoder] to aid the deserialization.
+     * @return Returns [File] object deserialized from the string.
      */
-    override fun deserialize(decoder: Decoder): File =
-        File(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): File = File(decoder.decodeString())
 }

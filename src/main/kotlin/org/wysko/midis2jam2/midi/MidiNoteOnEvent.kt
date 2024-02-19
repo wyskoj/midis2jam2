@@ -17,9 +17,12 @@
 package org.wysko.midis2jam2.midi
 
 /**
- * Signals a note should begin playing.
+ * Indicates the start of a note.
  *
- * @param velocity the non-zero velocity of the note
+ * @property time The time this event occurs, in MIDI ticks.
+ * @property channel The channel this event occurs on.
+ * @property note The note that is being played.
+ * @property velocity The non-zero velocity of the note.
  */
 data class MidiNoteOnEvent(
     override val time: Long,

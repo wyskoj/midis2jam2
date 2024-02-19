@@ -24,15 +24,15 @@ import org.wysko.midis2jam2.midi.MidiEvent
  * Periodically collects elapsed events from a pool of [MidiEvent].
  */
 class EventCollector<T : MidiEvent>(
-    private val events: List<T>,
     private val context: Midis2jam2,
-    private val triggerCondition: ((MidiEvent, Double) -> Boolean) =
+    private val events: List<T>,
+    private val triggerCondition: (MidiEvent, Double) -> Boolean =
         { event, time -> context.file.eventInSeconds(event) <= time },
     private val onSeek: (EventCollector<T>) -> Unit = {},
 ) : Collector<T> {
 
     init {
-        context.registerEventCollector(this)
+        context.registerCollector(this)
     }
 
     private var currentIndex = 0

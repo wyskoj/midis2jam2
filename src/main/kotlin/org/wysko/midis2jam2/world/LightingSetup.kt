@@ -38,23 +38,19 @@ object LightingSetup {
         createDirectionalLight(rootNode, ColorRGBA(0.9f, 0.9f, 0.9f, 1f), Vector3f(0f, -1f, -1f)) // Main light
         createDirectionalLight(rootNode, ColorRGBA(0.1f, 0.1f, 0.3f, 1f), Vector3f(0f, 1f, 1f)) // Backlight
         createAmbientLight(rootNode, ColorRGBA(0.5f, 0.5f, 0.5f, 1f)) // Ambience
-
         return shadowsOnly
     }
 
-    private fun createDirectionalLight(rootNode: Node, colorRGBA: ColorRGBA, direction: Vector3f): DirectionalLight {
-        return DirectionalLight().apply {
+    private fun createDirectionalLight(rootNode: Node, colorRGBA: ColorRGBA, direction: Vector3f) =
+        DirectionalLight().apply {
             color = colorRGBA
             this.direction = direction
             rootNode.addLight(this)
         }
-    }
 
-    private fun createAmbientLight(rootNode: Node, colorRGBA: ColorRGBA): AmbientLight {
-        return AmbientLight().apply {
-            color = colorRGBA
-            rootNode.addLight(this)
-        }
+    private fun createAmbientLight(rootNode: Node, colorRGBA: ColorRGBA): AmbientLight = AmbientLight().apply {
+        color = colorRGBA
+        rootNode.addLight(this)
     }
 }
 

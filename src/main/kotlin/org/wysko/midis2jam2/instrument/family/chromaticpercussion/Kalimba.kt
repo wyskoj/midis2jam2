@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
@@ -43,14 +43,14 @@ private val PRONG_SCALES = listOf(1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f, 1.9f, 1.7f
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class Kalimba(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+class Kalimba(context: Midis2jam2, events: List<MidiChannelEvent>) :
     DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 10, 0)
 
     private val eventCollector: EventCollector<MidiNoteOnEvent> =
-        EventCollector(events.filterIsInstance<MidiNoteOnEvent>(), context)
+        EventCollector(context, events.filterIsInstance<MidiNoteOnEvent>())
 
     private val tines = List(12) { i ->
         Tine(i % 2 == 0).also {

@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithHands
 import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
@@ -39,7 +39,7 @@ private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::cla
  *
  * [Fingering chart](https://bit.ly/34Quj4e)
  */
-class Clarinet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class Clarinet(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     InstrumentWithHands(
         context,
         /* Strip notes outside of standard range */

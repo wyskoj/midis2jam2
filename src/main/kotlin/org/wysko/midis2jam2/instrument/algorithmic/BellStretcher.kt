@@ -65,7 +65,7 @@ class StandardBellStretcher(
         if (period == null) {
             scaleBell(1f)
         } else {
-            scaleBell((stretchiness * (period.endTime - time) / period.duration() + 1).toFloat())
+            scaleBell((stretchiness * (period.end - time) / period.duration + 1).toFloat())
         }
     }
 

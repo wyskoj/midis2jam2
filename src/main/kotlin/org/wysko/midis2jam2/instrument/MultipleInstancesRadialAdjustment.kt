@@ -14,13 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.util
 
-/** A material type. */
-enum class MaterialType {
-    /** An unshaded material. */
-    UNSHADED,
+package org.wysko.midis2jam2.instrument
 
-    /** A reflective material. */
-    REFLECTIVE
+import org.wysko.midis2jam2.world.Axis
+
+/**
+ * An interface for instruments that adjust their position by rotation when there are multiple instances of them.
+ */
+interface MultipleInstancesRadialAdjustment {
+    /**
+     * The axis to rotate the instrument around.
+     */
+    val rotationAxis: Axis
+
+    /**
+     * The angle to rotate the instrument by, in degrees.
+     */
+    val rotationAngle: Float
+
+    /**
+     * The base angle, when there is only one instance of the instrument, in degrees.
+     */
+    val baseAngle: Float
 }

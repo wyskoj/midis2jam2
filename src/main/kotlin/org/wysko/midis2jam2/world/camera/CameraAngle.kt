@@ -81,6 +81,9 @@ enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY:
         /**
          * Given the [currentCameraAngle] and the [name] of the specified camera action, determines the correct
          * [CameraAngle] to switch to.
+         *
+         * @param currentCameraAngle The current camera angle.
+         * @param name The name of the camera action.
          */
         fun handleCameraAngle(currentCameraAngle: CameraAngle, name: String): CameraAngle = when (name) {
             "cam1" -> when (currentCameraAngle) {

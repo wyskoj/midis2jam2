@@ -73,8 +73,8 @@ fun BackgroundConfigurationScreen(
             AnimatedContent(backgroundClass) {
                 when (it) {
                     BackgroundConfiguration.DefaultBackground::class -> Unit
-                    BackgroundConfiguration.RepeatedCubemapBackground::class -> RepeatedCubemapBackground(viewModel)
-                    BackgroundConfiguration.UniqueCubemapBackground::class -> UniqueCubemapBackground(viewModel)
+                    BackgroundConfiguration.RepeatedCubeMapBackground::class -> RepeatedCubemapBackground(viewModel)
+                    BackgroundConfiguration.UniqueCubeMapBackground::class -> UniqueCubemapBackground(viewModel)
                     BackgroundConfiguration.ColorBackground::class -> ColorBackground(viewModel)
                 }
             }
@@ -105,13 +105,13 @@ private fun BackgroundOptions(
             }, text = I18n["background_type_default"].value
         )
         RadioButtonWithText(
-            backgroundClass == BackgroundConfiguration.RepeatedCubemapBackground::class, onSelected = {
-                viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.RepeatedCubemapBackground::class)
+            backgroundClass == BackgroundConfiguration.RepeatedCubeMapBackground::class, onSelected = {
+                viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.RepeatedCubeMapBackground::class)
             }, text = I18n["background_type_repeated_cubemap"].value
         )
         RadioButtonWithText(
-            backgroundClass == BackgroundConfiguration.UniqueCubemapBackground::class, onSelected = {
-                viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.UniqueCubemapBackground::class)
+            backgroundClass == BackgroundConfiguration.UniqueCubeMapBackground::class, onSelected = {
+                viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.UniqueCubeMapBackground::class)
             }, text = I18n["background_type_unique_cubemap"].value
         )
         RadioButtonWithText(
@@ -128,7 +128,7 @@ private fun RepeatedCubemapBackground(
     viewModel: BackgroundConfigurationViewModel
 ) {
     val images by viewModel.availableImages.collectAsState()
-    val config by viewModel.repeatedCubemapBackgroundConfiguration.collectAsState()
+    val config by viewModel.repeatedCubeMapBackgroundConfiguration.collectAsState()
 
     Column(
         Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -153,7 +153,7 @@ private fun UniqueCubemapBackground(
     viewModel: BackgroundConfigurationViewModel
 ) {
     val images by viewModel.availableImages.collectAsState()
-    val config by viewModel.uniqueCubemapBackgroundConfiguration.collectAsState()
+    val config by viewModel.uniqueCubeMapBackgroundConfiguration.collectAsState()
 
     Column(
         modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)

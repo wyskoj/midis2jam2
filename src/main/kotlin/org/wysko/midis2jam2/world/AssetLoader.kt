@@ -93,7 +93,7 @@ class AssetLoader(val context: Midis2jam2) {
     /**
      * Loads a 2D sprite for GUI, given the sprite's [texture].
      */
-    fun loadSprite(texture: String): Sprite = Sprite(assetManager, texture.assetPrefix())
+    fun loadSprite(texture: String): PictureWithFade = PictureWithFade(assetManager, texture.assetPrefix())
 }
 
 /**

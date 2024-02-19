@@ -21,8 +21,11 @@ import com.jme3.math.Vector3f
 
 /**
  * Applies smoothing to a given vector by slowly moving to that vector over time.
+ *
+ * @param initialValue The initial value of the vector.
+ * @param smoothness The smoothness of the vector.
  */
-class Vector3fSmoother(initialValue: Vector3f, private val smoothness: Double) {
+class VectorSmoother(initialValue: Vector3f, private val smoothness: Double) {
 
     /**
      * The current smoothed vector.

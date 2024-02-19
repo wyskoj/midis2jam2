@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.BarState.DOWN
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.BarState.UP
 import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration.Companion.isFakeShadows
 import org.wysko.midis2jam2.util.ch
@@ -50,7 +50,7 @@ private val RANGE = 21..108
  */
 class Mallets(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
+    eventList: List<MidiChannelEvent>,
     private val type: MalletType
 ) : DecayedInstrument(context, eventList) {
 

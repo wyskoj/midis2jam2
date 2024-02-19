@@ -25,9 +25,10 @@ import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
+import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.material
 import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.rot
@@ -46,23 +47,19 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of choir peep.
  */
-class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: ChoirType) :
-    DivisiveSustainedInstrument(context, eventList, true) {
+class StageChoir(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: ChoirType) :
+    DivisiveSustainedInstrument(context, eventList) {
 
     private val pitchBendModulationController = PitchBendModulationController(context, eventList)
     private var bend = 0f
 
-    override val animators: Array<PitchClassAnimator> =
-        Array(12) {
-            val notePeriods = eventList.notePeriodsModulus(context, it)
-            if (type == ChoirType.HaloSynth) {
-                ChoirPeepHalo(notePeriods)
-            } else {
-                ChoirPeep(type, notePeriods)
-            }.apply {
-                root.localTranslation = BASE_POSITION
-            }
+    override val animators: List<PitchClassAnimator> = List(12) {
+        val notePeriods = eventList.notePeriodsModulus(context, it)
+        when (type) {
+            ChoirType.HaloSynth -> ChoirPeepHalo(notePeriods)
+            else -> ChoirPeep(type, notePeriods)
         }
+    }
 
     init {
         repeat(12) {
@@ -94,7 +91,7 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         }
     }
 
-    override fun similar(): List<Instrument> =
+    override fun findSimilar(): List<Instrument> =
         context.instruments.filterIsInstance<StageChoir>() + context.instruments.filterIsInstance<ApplauseChoir>()
 
     /** A single choir peep. */
@@ -108,6 +105,7 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             with(geometry) {
                 +context.modelD("StageChoirBody.obj", type.textureFile)
             }
+            root.loc = BASE_POSITION
         }
 
         override fun tick(time: Double, delta: Float) {
@@ -120,14 +118,14 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
     inner class ChoirPeepHalo(notePeriods: List<NotePeriod>) : ChoirPeep(ChoirType.HaloSynth, notePeriods) {
         private val halo = with(geometry) {
             +context.modelD("StageChoirHalo.obj", "ChoirHalo.png").also {
-                it.material = context.unshadedMaterial("ChoirHalo.png")
+                it.material = context.diffuseMaterial("ChoirHalo.png")
                 it.shadowMode = Off
             }
         }
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
-            val progress = collector.currentNotePeriods.firstOrNull()?.progress(time) ?: 1.0
+            val progress = collector.currentNotePeriods.firstOrNull()?.calculateProgress(time) ?: 1.0
             val glowIntensity = (-progress.pow(64) + 1).toFloat()
             halo.material.setColor("GlowColor", ColorRGBA(glowIntensity, glowIntensity, 0f, 1f))
         }

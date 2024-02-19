@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
@@ -39,7 +39,7 @@ private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
 /** The full, 88-key keyboard. */
 open class Keyboard(
     context: Midis2jam2,
-    events: MutableList<MidiChannelSpecificEvent>,
+    events: MutableList<MidiChannelEvent>,
     internal val skin: KeyboardSkin,
 ) : KeyedInstrument(context, events, 21, 108), MultipleInstancesLinearAdjustment {
     private val pitchBendController = PitchBendModulationController(context, events)
@@ -72,7 +72,7 @@ open class Keyboard(
 
     override fun getKeyByMidiNote(midiNote: Int): Key? = keys.getOrNull(midiNote - rangeLow)
 
-    override fun toString(): String = super.toString() + debugProperty("skin", skin.name)
+    override fun toString(): String = super.toString() + formatProperty("skin", skin.name)
 
     companion object {
         /** The number of white keys on a keyboard. */

@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.loc
@@ -43,11 +43,11 @@ import kotlin.math.pow
 /**
  * The Harp.
  */
-class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>) :
+class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>) :
     SustainedInstrument(context, eventList) {
     override val collector: NotePeriodCollector =
         NotePeriodCollector(context, notePeriods) { time: Double, notePeriod: NotePeriod ->
-            time - 0.033f >= notePeriod.endTime
+            time - 0.033f >= notePeriod.end
         }
 
     private val strings: List<HarpString> = List(47) { HarpString(it) }
@@ -113,7 +113,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>
         private val stringAnimator = StringVibrationController(vibratingStrings)
 
         fun tick(delta: Float) {
-            with(collector.currentNotePeriods.any { it.midiNote in midiNotes }) {
+            with(collector.currentNotePeriods.any { it.note in midiNotes }) {
                 idleString.cullHint = (!this).ch
                 vibratingStringNode.cullHint = this.ch
             }

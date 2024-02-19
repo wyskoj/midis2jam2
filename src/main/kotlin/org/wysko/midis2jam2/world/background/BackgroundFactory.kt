@@ -15,17 +15,14 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.world
+package org.wysko.midis2jam2.world.background
 
 import com.jme3.asset.AssetManager
-import com.jme3.asset.plugins.FileLocator
 import com.jme3.bounding.BoundingSphere
 import com.jme3.material.Material
-import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Geometry
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.shape.Sphere
 import com.jme3.texture.Image
@@ -35,24 +32,34 @@ import com.jme3.texture.TextureCubeMap
 import com.jme3.texture.plugins.AWTLoader
 import com.jme3.util.SkyFactory
 import jme3tools.converters.ImageToAwt
-import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 
-/** Background factory for different background types. */
+/**
+ * Background factory for different background types.
+ *
+ * @property assetManager The asset manager to use.
+ */
 sealed class BackgroundFactory(internal val assetManager: AssetManager) {
+
     /**
-     * Creates a background. The background is not attached to the scene graph—this must be done by the caller.
+     * Creates a background.
+     *
+     * The background is not attached to the scene graph.
+     * The caller must do this.
      */
     abstract fun create(): Spatial
 
+    /**
+     * Loads a texture from the given [assetPath] and rotates it 180 degrees, such that it is right-side up.
+     */
     internal fun loadTexture(assetPath: String) = rotateTexture(assetManager.loadTexture(assetPath))
 
     /**
      * Loads the default checkerboard background.
      *
+     * @param assetManager The asset manager to use.
      * @see BackgroundConfiguration.DefaultBackground
      */
     class Default(assetManager: AssetManager) : BackgroundFactory(assetManager) {
@@ -61,30 +68,22 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
                 queueBucket = RenderQueue.Bucket.Sky
                 cullHint = Spatial.CullHint.Never
                 modelBound = BoundingSphere(Float.POSITIVE_INFINITY, Vector3f.ZERO)
-                material =
-                    Material(assetManager, "Common/MatDefs/Misc/Sky.j3md").apply {
-                        setVector3("NormalScale", Vector3f.UNIT_XYZ)
-                        setTexture("Texture", loadSkyTexture())
-                    }
+                material = Material(assetManager, "Common/MatDefs/Misc/Sky.j3md").apply {
+                    setVector3("NormalScale", Vector3f.UNIT_XYZ)
+                    setTexture("Texture", loadSkyTexture())
+                }
                 shadowMode = RenderQueue.ShadowMode.Off
             }
 
         private fun loadSkyTexture(): TextureCubeMap =
             loadTexture("Assets/sky.png").let { texture ->
                 Image(
-                    // format =
                     texture.image.format,
-                    // width =
                     texture.image.width,
-                    // height =
                     texture.image.height,
-                    // data =
                     null,
-                    // colorSpace =
                     texture.image.colorSpace,
-                ).apply {
-                    repeat(6) { addData(texture.image.data[0]) }
-                }
+                ).apply { repeat(6) { addData(texture.image.data[0]) } }
             }.let { image ->
                 TextureCubeMap(image).apply {
                     magFilter = Texture.MagFilter.Nearest
@@ -96,13 +95,15 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
     }
 
     /**
-     * Loads a unique cubemap background.
+     * Loads a unique cube map background.
      *
-     * @see BackgroundConfiguration.UniqueCubemapBackground
+     * @param assetManager The asset manager to use.
+     * @param config The configuration to use.
+     * @see BackgroundConfiguration.UniqueCubeMapBackground
      */
-    class UniqueCubemap(
+    class UniqueCubeMap(
         assetManager: AssetManager,
-        private val config: BackgroundConfiguration.UniqueCubemapBackground,
+        private val config: BackgroundConfiguration.UniqueCubeMapBackground,
     ) : BackgroundFactory(assetManager) {
         override fun create(): Spatial {
             val cubemap = config.cubemap
@@ -114,8 +115,7 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
                     cubemap.south!!,
                     cubemap.up!!,
                     cubemap.down!!,
-                )
-                    .map(::loadTexture)
+                ).map(::loadTexture)
 
             try {
                 return SkyFactory.createSky(
@@ -126,11 +126,10 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
                     textures[3],
                     textures[4],
                     textures[5],
-                )
-                    .apply { shadowMode = RenderQueue.ShadowMode.Off }
+                ).apply { shadowMode = RenderQueue.ShadowMode.Off }
             } catch (e: Exception) {
                 if (e.message == "Images must have same format") {
-                    throw ImageFormatException(textures.map { it.image.format })
+                    throw BackgroundImageFormatException(textures.map { it.image.format })
                 } else {
                     throw e
                 }
@@ -139,64 +138,26 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
     }
 
     /**
-     * Loads a repeated cubemap background.
+     * Loads a repeated cube map background.
      *
-     * @see BackgroundConfiguration.RepeatedCubemapBackground
+     * @see BackgroundConfiguration.RepeatedCubeMapBackground
      */
-    class RepeatedCubemap(
+    class RepeatedCubeMap(
         assetManager: AssetManager,
-        private val config: BackgroundConfiguration.RepeatedCubemapBackground,
+        private val config: BackgroundConfiguration.RepeatedCubeMapBackground,
     ) : BackgroundFactory(assetManager) {
-        override fun create(): Spatial {
-            val texture = loadTexture(config.texture)
-            return SkyFactory.createSky(assetManager, texture, texture, texture, texture, texture, texture)
+        override fun create(): Spatial = with(loadTexture(config.texture)) {
+            SkyFactory.createSky(assetManager, this, this, this, this, this, this)
                 .apply { shadowMode = RenderQueue.ShadowMode.Off }
         }
     }
 
     private fun rotateTexture(texture: Texture): Texture2D {
         val image = ImageToAwt.convert(texture.image, false, true, 0)
-        val tx =
-            AffineTransform.getScaleInstance(-1.0, -1.0).apply {
-                translate(-image.width.toDouble(), -image.height.toDouble())
-            }
+        val tx = AffineTransform.getScaleInstance(-1.0, -1.0).apply {
+            translate(-image.width.toDouble(), -image.height.toDouble())
+        }
         val rotatedImage = AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(image, null)
         return Texture2D(AWTLoader().load(rotatedImage, true))
     }
 }
-
-/** Handles configuring the background. */
-object BackgroundController {
-    /**
-     * Configures the background based on the given [configuration][config].
-     *
-     * @param config the configuration to use
-     * @param context the application context
-     * @param rootNode the root node of the scene graph
-     */
-    fun configureBackground(
-        config: BackgroundConfiguration,
-        context: Midis2jam2,
-        rootNode: Node,
-    ) {
-        val assetManager = context.assetManager
-        assetManager.registerLocator(BACKGROUND_IMAGES_FOLDER.absolutePath, FileLocator::class.java)
-        when (config) {
-            is BackgroundConfiguration.DefaultBackground ->
-                rootNode.attachChild(BackgroundFactory.Default(assetManager).create())
-
-            is BackgroundConfiguration.UniqueCubemapBackground ->
-                rootNode.attachChild(BackgroundFactory.UniqueCubemap(assetManager, config).create())
-
-            is BackgroundConfiguration.RepeatedCubemapBackground ->
-                rootNode.attachChild(BackgroundFactory.RepeatedCubemap(assetManager, config).create())
-
-            is BackgroundConfiguration.ColorBackground ->
-                context.app.viewPort.backgroundColor = ColorRGBA().fromIntARGB(config.color)
-        }
-    }
-}
-
-class ImageFormatException(formats: List<Image.Format>) : Exception(
-    "Images must have same format. Found formats: ${formats.joinToString()}",
-)

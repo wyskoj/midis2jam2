@@ -51,8 +51,8 @@ class Whistle(
             geometry.attachChild(it.highestLevel)
         }
 
-    private val shortEventCollector = EventCollector(shortHits, context)
-    private val longEventCollector = EventCollector(longHits, context)
+    private val shortEventCollector = EventCollector(context, shortHits)
+    private val longEventCollector = EventCollector(context, longHits)
 
     override fun tick(
         time: Double,

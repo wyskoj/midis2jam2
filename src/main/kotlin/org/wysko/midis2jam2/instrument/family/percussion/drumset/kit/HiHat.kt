@@ -83,8 +83,8 @@ class HiHat(
 
     private val pedalEventCollector =
         EventCollector(
-            events = hits.toList().filter { it.note == noteMapping.pedal },
             context = context,
+            events = hits.toList().filter { it.note == noteMapping.pedal },
         )
 
     init {

@@ -21,11 +21,11 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument.Companion.recoilDrum
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 
 /** A drum that is hit at different spots to represent the notes in an octave. */
-abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     DecayedInstrument(
         context,
         eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList(),
@@ -53,6 +53,6 @@ abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventLis
 /**
  * Returns the [MidiNoteOnEvent]s that would animate given the index of the note modulus 12.
  */
-fun List<MidiChannelSpecificEvent>.modulus(int: Int): List<MidiNoteOnEvent> {
+fun List<MidiChannelEvent>.modulus(int: Int): List<MidiNoteOnEvent> {
     return filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == int }
 }

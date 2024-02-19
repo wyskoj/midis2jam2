@@ -31,7 +31,7 @@ import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.wrap
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -45,9 +45,11 @@ private val OPERATING_SYSTEM by lazy {
 }
 private val GL_RENDERER: String by lazy { GL11.glGetString(GL11.GL_RENDERER) ?: "UNKNOWN GL_RENDERER" }
 private val JVM_INFORMATION by lazy {
-    "${System.getProperty(
-        "java.vm.name"
-    )}, ${System.getProperty("java.vm.vendor")}, ${System.getProperty("java.vm.version")}"
+    "${
+        System.getProperty(
+            "java.vm.name"
+        )
+    }, ${System.getProperty("java.vm.vendor")}, ${System.getProperty("java.vm.version")}"
 }
 
 /**
@@ -93,15 +95,12 @@ class DebugTextController(val context: Midis2jam2) {
             cullHint = Spatial.CullHint.Always
         }
 
-    /**
-     * Enables and disables the display of the debug text.
-     */
-    var enabled: Boolean = false
+    private var enabled: Boolean = false
         set(value) {
-            text.cullHint = value.cullHint()
-            percussionText.cullHint = value.cullHint()
-            darkBackground.cullHint = value.cullHint()
-            syncIndicator.cullHint = value.cullHint()
+            text.cullHint = value.ch
+            percussionText.cullHint = value.ch
+            darkBackground.cullHint = value.ch
+            syncIndicator.cullHint = value.ch
             field = value
         }
 
@@ -119,7 +118,8 @@ class DebugTextController(val context: Midis2jam2) {
         if (enabled) {
             with(text) { text = context.debugText(tpf, context.time) }
             with(percussionText) { text = "" }
-            val drift = (((context as DesktopMidis2jam2).sequencer as JwRealTimeSequencer).time - context.time).absoluteValue
+            val drift =
+                (((context as DesktopMidis2jam2).sequencer as JwRealTimeSequencer).time - context.time).absoluteValue
             syncIndicator.setLocalScale((drift * 5f).toFloat(), 1f, 1f)
             syncIndicator.material.setColor(
                 "Color",
@@ -154,7 +154,7 @@ private fun Midis2jam2.debugText(
                 }
             }",
         )
-        appendLine("${String.format("%.0f", 1 / tpf)} FPS")
+        appendLine("${"%.0f".format(1 / tpf)} FPS")
 
         // settings
         appendLine()
@@ -165,7 +165,7 @@ private fun Midis2jam2.debugText(
         appendLine("File:")
         with(this@debugText.file) {
             appendLine("$name - $division TPQN")
-            appendLine("${String.format("%.2f", time)}s / ${String.format("%.2f", length)}s")
+            appendLine("${"%.2f".format(time)}s / ${"%.2f".format(length)}s")
             appendLine("$specification")
         }
 
@@ -192,10 +192,13 @@ private fun Midis2jam2.debugText(
         appendLine(
             "currentlyVisible: ${
                 this@debugText.drumSetVisibilityManager.currentlyVisibleDrumSet?.let {
-                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.typicalDrumSetSkin else ""}"
+                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.typicalDrumSetSkin.toString() else ""}"
                 } ?: "null"
             }"
         )
+        appendLine()
+        appendLine("Lyrics")
+        appendLine(this@debugText.lyricController.debugInfo(this@debugText.time))
 
         // instruments strings
         appendLine()
@@ -204,5 +207,5 @@ private fun Midis2jam2.debugText(
     }
 }
 
-private fun Quaternion.sigFigs(): String = String.format("%5.2f / %5.2f / %5.2f / %5.2f", x, y, z, w)
-private fun Vector3f.sigFigs(): String = String.format("%7.2f / %7.2f / %7.2f", x, y, z)
+private fun Quaternion.sigFigs(): String = "%5.2f / %5.2f / %5.2f / %5.2f".format(x, y, z, w)
+private fun Vector3f.sigFigs(): String = "%7.2f / %7.2f / %7.2f".format(x, y, z)

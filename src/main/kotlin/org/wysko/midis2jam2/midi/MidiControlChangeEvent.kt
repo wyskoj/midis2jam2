@@ -17,8 +17,16 @@
 package org.wysko.midis2jam2.midi
 
 /**
- * Any MIDI event that is specific to a certain [channel].
+ * Indicates a change in the value of a MIDI controller.
  *
- * @param channel the channel this event is specific to
+ * @property time The time this event occurs in MIDI ticks.
+ * @property channel The channel on which the controller change should occur.
+ * @property controller The controller number that is changing.
+ * @property value The new value of the controller.
  */
-open class MidiChannelSpecificEvent(time: Long, open val channel: Int) : MidiEvent(time)
+data class MidiControlChangeEvent(
+    override val time: Long,
+    override val channel: Int,
+    val controller: Int,
+    val value: Int
+) : MidiChannelEvent(time, channel)

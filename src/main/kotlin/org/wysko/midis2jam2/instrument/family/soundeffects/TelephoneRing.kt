@@ -23,13 +23,13 @@ import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 import java.util.Random
 
 /** *You used to call me on my cellphone...* */
-class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     SustainedInstrument(context, eventList) {
     /** The Up node. */
     private val upNode =
@@ -83,7 +83,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
 
     init {
         context.modelD("TelePhoneBase.obj", "TelephoneBase.bmp").apply {
-            (this as Node).getChild(0).setMaterial(context.unshadedMaterial("RubberFoot.bmp"))
+            (this as Node).getChild(0).setMaterial(context.diffuseMaterial("RubberFoot.bmp"))
         }.also {
             geometry.attachChild(it)
         }
@@ -104,7 +104,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
 
         // Turn on current note periods
         collector.currentNotePeriods.forEach {
-            with((it.midiNote + 3) % 12) {
+            with((it.note + 3) % 12) {
                 playing[this] = true
                 upKeys[this].cullHint = Always
                 downKeys[this].cullHint = Dynamic

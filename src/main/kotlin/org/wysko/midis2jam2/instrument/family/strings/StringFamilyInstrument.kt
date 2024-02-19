@@ -27,14 +27,14 @@ import org.wysko.midis2jam2.instrument.family.guitar.FretHeightCalculator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.contiguousGroups
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.sign
 import org.wysko.midis2jam2.util.times
-import org.wysko.midis2jam2.util.toSign
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
@@ -51,7 +51,7 @@ import kotlin.math.pow
 abstract class StringFamilyInstrument protected constructor(
     /** Context to midis2jam2. */
     context: Midis2jam2,
-    events: List<MidiChannelSpecificEvent>,
+    events: List<MidiChannelEvent>,
     showBow: Boolean,
     bowRotation: Double,
     bowScale: Vector3f,
@@ -59,12 +59,8 @@ abstract class StringFamilyInstrument protected constructor(
     body: Spatial,
 ) : FrettedInstrument(
     context,
-    StandardFrettingEngine(
-        4,
-        48,
-        openStringMidiNotes,
-    ),
     events,
+    StandardFrettingEngine(4, 48, openStringMidiNotes),
     FrettedInstrumentPositioningWithZ(
         8.84f,
         -6.17f,
@@ -90,7 +86,7 @@ abstract class StringFamilyInstrument protected constructor(
         ),
     ),
     4,
-    body,
+    body to
     "GuitarSkin.bmp",
 ) {
     override val upperStrings: Array<Spatial> =
@@ -147,7 +143,7 @@ abstract class StringFamilyInstrument protected constructor(
             localScale = bowScale
             setLocalTranslation(0f, -4f, 1f)
             localRotation = Quaternion().fromAngles(rad(180.0), rad(180.0), rad(bowRotation))
-            cullHint = showBow.cullHint()
+            cullHint = showBow.ch
         }.also {
             geometry.attachChild(it)
         }
@@ -179,17 +175,17 @@ abstract class StringFamilyInstrument protected constructor(
     private val dragIntensity = NumberSmoother(1f, 10.0)
 
     private fun animateBow(time: Double, delta: Float) {
-        val progress = groupCollector.currentNotePeriodGroup?.progress(time) ?: (1.0)
+        val progress = groupCollector.currentNotePeriodGroup?.calculateProgress(time) ?: (1.0)
 
-        bow.loc = v3(MAX_BOW_TRANSLATION, 0, 0) * bowGoesLeft.toSign() * (progress - 0.5) * dragIntensity.value
+        bow.loc = v3(MAX_BOW_TRANSLATION, 0, 0) * bowGoesLeft.sign * (progress - 0.5) * dragIntensity.value
 
         dragIntensity.tick(delta) {
             if (groupCollector.currentNotePeriodGroup == null) {
                 groupCollector.peek()?.let {
-                    if (it.startTime() - time < 1.0) durationToIntensity(it.duration()) else null
+                    if (it.startTime - time < 1.0) durationToIntensity(it.duration) else null
                 } ?: dragIntensity.value
             } else {
-                durationToIntensity(groupCollector.currentNotePeriodGroup!!.duration())
+                durationToIntensity(groupCollector.currentNotePeriodGroup!!.duration)
             }
         }
 
@@ -200,10 +196,10 @@ abstract class StringFamilyInstrument protected constructor(
                 groupCollector.currentNotePeriodGroup != null -> true
 
                 // Not playing, but about to play
-                !isBowDown && it.startTime - time <= 0.5 -> true
+                !isBowDown && it.start - time <= 0.5 -> true
 
                 // Just played, about to play again soon
-                isBowDown && it.startTime - time < 5 -> true
+                isBowDown && it.start - time < 5 -> true
 
                 // Not playing
                 else -> false
@@ -219,10 +215,10 @@ abstract class StringFamilyInstrument protected constructor(
 
     override fun toString(): String =
         super.toString() +
-            debugProperty("intensity", dragIntensity.value) +
-            debugProperty("bowGoesLeft", bowGoesLeft) +
-            debugProperty("group", groupCollector.currentNotePeriodGroup.toString()) +
-            debugProperty("isBowDown", isBowDown)
+                formatProperty("intensity", dragIntensity.value) +
+                formatProperty("bowGoesLeft", bowGoesLeft) +
+                formatProperty("group", groupCollector.currentNotePeriodGroup.toString()) +
+                formatProperty("isBowDown", isBowDown)
 }
 
 private fun durationToIntensity(duration: Double): Float = when {

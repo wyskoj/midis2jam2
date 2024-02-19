@@ -32,7 +32,7 @@ import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.RIDE_BELL
 import org.wysko.midis2jam2.midi.RIDE_CYMBAL_1
 import org.wysko.midis2jam2.midi.RIDE_CYMBAL_2
-import org.wysko.midis2jam2.midi.byNote
+import org.wysko.midis2jam2.midi.filterByNotes
 
 /**
  * A [DrumSet] that uses standard models and can be skinned with [TypicalDrumSetSkin].
@@ -48,53 +48,53 @@ class BrushDrumSet(
 ) : DrumSet(context, events) {
     override val collectorForVisibility: EventCollector<MidiNoteOnEvent> =
         EventCollector(
+            context,
             events.filter {
                 it.note in 35..53 || it.note % 2 == 1 && it.note in 55..59
             },
-            context,
         )
 
     private val instruments =
         buildList {
-            this += BassDrum(context, events.byNote(35, 36).toMutableList(), ShellStyle.TypicalDrumShell.Brush)
-            this += SnareDrum(context, events.byNote(37, 38, 40).toMutableList(), ShellStyle.TypicalDrumShell.Brush)
-            this += HiHat(context, events.byNote(42, 44, 46).toMutableList())
+            this += BassDrum(context, events.filterByNotes(35, 36).toMutableList(), ShellStyle.TypicalDrumShell.Brush)
+            this += SnareDrum(context, events.filterByNotes(37, 38, 40).toMutableList(), ShellStyle.TypicalDrumShell.Brush)
+            this += HiHat(context, events.filterByNotes(42, 44, 46).toMutableList())
             this +=
                 Tom(
                     context,
-                    events.byNote(41).toMutableList(),
+                    events.filterByNotes(41).toMutableList(),
                     TomPitch["low_floor"],
                     ShellStyle.TypicalDrumShell.Brush,
                 )
             this +=
                 Tom(
                     context,
-                    events.byNote(43).toMutableList(),
+                    events.filterByNotes(43).toMutableList(),
                     TomPitch["high_floor"],
                     ShellStyle.TypicalDrumShell.Brush,
                 )
-            this += Tom(context, events.byNote(45).toMutableList(), TomPitch["low"], ShellStyle.TypicalDrumShell.Brush)
+            this += Tom(context, events.filterByNotes(45).toMutableList(), TomPitch["low"], ShellStyle.TypicalDrumShell.Brush)
             this +=
                 Tom(
                     context,
-                    events.byNote(47).toMutableList(),
+                    events.filterByNotes(47).toMutableList(),
                     TomPitch["low_mid"],
                     ShellStyle.TypicalDrumShell.Brush,
                 )
             this +=
                 Tom(
                     context,
-                    events.byNote(48).toMutableList(),
+                    events.filterByNotes(48).toMutableList(),
                     TomPitch["high_mid"],
                     ShellStyle.TypicalDrumShell.Brush,
                 )
-            this += Tom(context, events.byNote(50).toMutableList(), TomPitch["high"], ShellStyle.TypicalDrumShell.Brush)
-            this += Cymbal(context, events.byNote(49).toMutableList(), CymbalType["crash_1"])
-            this += Cymbal(context, events.byNote(57).toMutableList(), CymbalType["crash_2"])
-            this += Cymbal(context, events.byNote(55).toMutableList(), CymbalType["splash"])
-            this += Cymbal(context, events.byNote(52).toMutableList(), CymbalType["china"])
+            this += Tom(context, events.filterByNotes(50).toMutableList(), TomPitch["high"], ShellStyle.TypicalDrumShell.Brush)
+            this += Cymbal(context, events.filterByNotes(49).toMutableList(), CymbalType["crash_1"])
+            this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"])
+            this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"])
+            this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"])
 
-            val rides = events.byNote(RIDE_BELL, RIDE_CYMBAL_1, RIDE_CYMBAL_2)
+            val rides = events.filterByNotes(RIDE_BELL, RIDE_CYMBAL_1, RIDE_CYMBAL_2)
             var currentRide = 1
             val ride1Notes = ArrayList<MidiNoteOnEvent>()
             val ride2Notes = ArrayList<MidiNoteOnEvent>()

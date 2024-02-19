@@ -22,12 +22,12 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithHands
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 
 /** The Ocarina. */
-class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+class Ocarina(context: Midis2jam2, events: List<MidiChannelEvent>) :
     InstrumentWithHands(context, events, OcarinaClone::class, OcarinaHandGenerator()) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(scaleFactor = 0.1f)
@@ -58,7 +58,7 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
                     animNode.setLocalTranslation(
                         0f,
                         0f,
-                        3 * ((it.endTime - time) / it.duration()).toFloat()
+                        3 * ((it.end - time) / it.duration).toFloat()
                     )
                 }
             }

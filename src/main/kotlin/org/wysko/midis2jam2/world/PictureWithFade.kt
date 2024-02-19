@@ -18,17 +18,20 @@
 package org.wysko.midis2jam2.world
 
 import com.jme3.asset.AssetManager
-import com.jme3.material.RenderState
+import com.jme3.material.RenderState.BlendMode.Alpha
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.Node
 import com.jme3.texture.Texture2D
 import com.jme3.ui.Picture
 
 /**
- * A type of [Picture] that allows for an easy to modify opacity setting. It is also wrapped within a [Node] so it is
- * scalable.
+ * A type of [Picture] that allows for an easy-to-modify opacity setting.
+ * It is also wrapped within a [Node] so it is scalable.
+ *
+ * @param assetManager The asset manager.
+ * @param texture The texture to use.
  */
-class Sprite(assetManager: AssetManager, texture: String) : Node() {
+class PictureWithFade(assetManager: AssetManager, texture: String) : Node() {
 
     private val picture: Picture = Picture(texture).apply {
         (assetManager.loadTexture(texture) as Texture2D).also {
@@ -37,7 +40,7 @@ class Sprite(assetManager: AssetManager, texture: String) : Node() {
             setHeight(it.image.height.toFloat())
         }
         material = this.material.clone().apply {
-            additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+            additionalRenderState.blendMode = Alpha
         }
     }.also {
         this.attachChild(it)

@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
 import org.wysko.midis2jam2.instrument.clone.CloneWithBell
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
@@ -40,7 +40,7 @@ private val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trom
 /**
  * The Trombone.
  */
-class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class, SLIDE_MANAGER) {
 
     private var bend = 0f
@@ -112,7 +112,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
                  * We'll only also do this if the note is long enough
                  * (so that notes in rapid succession are animated desirably).
                  */
-                if (it.startTime - time < 0.1 && currentNotePeriod?.duration()!! >= 0.15) {
+                if (it.start - time < 0.1 && currentNotePeriod?.duration!! >= 0.15) {
                     advanceSlide(time, delta)
                 } else {
                     snapSlide()
@@ -127,11 +127,11 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
 
         private fun advanceSlide(time: Double, delta: Float) {
             notePeriodCollector.peek()?.let {
-                if (it.midiNote !in 21..80) {
+                if (it.note !in 21..80) {
                     return
                 }
 
-                val startTime = it.startTime
+                val startTime = it.start
                 if (startTime - time in delta..1.0F) {
                     val target = getSlidePositionFromNote(it)
                     moveToPosition(slidePosition + (target - slidePosition) / (startTime - time) * delta)
@@ -140,7 +140,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
         }
 
         private fun getSlidePositionFromNote(period: NotePeriod): Int {
-            val positionList = SLIDE_MANAGER.fingering(period.midiNote) ?: return slidePosition.roundToInt()
+            val positionList = SLIDE_MANAGER.fingering(period.note) ?: return slidePosition.roundToInt()
             if (positionList.size == 1) return positionList[0]
 
             // Check all positions and find the closest

@@ -20,12 +20,11 @@ import com.jme3.math.Vector3f
 
 /**
  * Each axis in 3D space.
+ *
+ * @property componentIndex The index of the component in a vector.
+ * @property identity The identity vector for this axis.
  */
-enum class Axis(
-    /** The index of this axis in a 3-element array. */
-    val componentIndex: Int,
-    val identity: Vector3f,
-) {
+enum class Axis(val componentIndex: Int, val identity: Vector3f) {
     /**
      * The X-axis.
      */
@@ -37,7 +36,7 @@ enum class Axis(
     Y(1, Vector3f(0f, 1f, 0f)),
 
     /**
-     * The Z-axis
+     * The Z-axis.
      */
-    Z(2, Vector3f(0f, 0f, 1f));
+    Z(2, Vector3f(0f, 0f, 1f))
 }

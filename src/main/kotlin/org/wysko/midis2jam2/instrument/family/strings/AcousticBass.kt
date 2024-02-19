@@ -19,12 +19,12 @@ package org.wysko.midis2jam2.instrument.family.strings
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 
 /** The upright bass. */
-class AcousticBass(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, style: PlayingStyle) :
+class AcousticBass(context: Midis2jam2, events: List<MidiChannelEvent>, style: PlayingStyle) :
     StringFamilyInstrument(
         context,
         events,

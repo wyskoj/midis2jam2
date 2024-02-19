@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.get
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.material
@@ -47,7 +47,7 @@ private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingerin
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of trumpet.
  */
-class Trumpet(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: TrumpetType) :
+class Trumpet(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: TrumpetType) :
     MonophonicInstrument(context, eventList, type.clazz, FINGERING_MANAGER), MultipleInstancesLinearAdjustment {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)

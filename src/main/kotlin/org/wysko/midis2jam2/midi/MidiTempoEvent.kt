@@ -17,21 +17,26 @@
 package org.wysko.midis2jam2.midi
 
 /**
- * The number of microseconds in a beat when the BPM is 120.
- */
-const val ONE_HUNDRED_TWENTY_BPM: Int = 500_000
-
-/**
  * Defines how fast the MIDI file should play.
  *
- * @param time   the time
- * @param number the tempo value, expressed in microseconds per pulse
+ * @property time The time of the event in MIDI ticks.
+ * @property number The tempo value, expressed in microseconds per pulse.
  */
-class MidiTempoEvent(time: Long, val number: Int) : MidiEvent(time) {
+data class MidiTempoEvent(override val time: Long, val number: Int) : MidiEvent(time) {
+    /**
+     * The tempo value, as expressed in beats per minute.
+     */
+    val bpm: Double = 60_000_000.0 / number
 
-    /** Returns this tempo's value as expressed in beats per minute. */
-    fun bpm(): Double = 60_000_000.0 / number
+    /**
+     * The tempo value, as expressed in seconds per beat.
+     */
+    val spb: Double = 60 / bpm
 
-    /** Returns this tempo's value as expressed in seconds per beat. */
-    fun spb(): Double = 60 / bpm()
+    companion object {
+        /**
+         * The default tempo event, which is 120 BPM at the beginning of the MIDI file.
+         */
+        val DEFAULT: MidiTempoEvent = MidiTempoEvent(0, 500_000)
+    }
 }

@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.gui.components.*
 import org.wysko.midis2jam2.gui.viewmodel.HomeViewModel
 import org.wysko.midis2jam2.gui.viewmodel.I18n
-import org.wysko.midis2jam2.gui.viewmodel.SoundbankConfigurationViewModel
+import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import java.io.File
 import java.nio.file.FileSystems
@@ -55,7 +55,7 @@ import javax.sound.midi.MidiDevice
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
-    soundbankConfigurationViewModel: SoundbankConfigurationViewModel,
+    soundbankConfigurationViewModel: SoundBankConfigurationViewModel,
     openMidiSearch: () -> Unit,
     playMidiFile: () -> Unit,
     flicker: Boolean,

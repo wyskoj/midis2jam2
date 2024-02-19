@@ -20,12 +20,12 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 
 /** The Taiko drum. */
-class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
+class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelEvent>) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) { i ->
         Striker(
@@ -47,7 +47,7 @@ class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) 
         recoilNode.attachChild(
             context.modelD("Taiko.obj", "TaikoHead.bmp").apply {
                 localRotation = Quaternion().fromAngles(rad(60.0), 0f, 0f)
-                (this as Node).getChild(0).setMaterial(context.unshadedMaterial("Assets/Wood.bmp"))
+                (this as Node).getChild(0).setMaterial(context.diffuseMaterial("Assets/Wood.bmp"))
             }
         )
 

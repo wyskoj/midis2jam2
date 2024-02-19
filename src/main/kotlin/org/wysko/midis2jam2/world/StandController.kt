@@ -21,41 +21,43 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import kotlin.reflect.KClass
 
 /**
  * Responsible for setting the visibility of the keyboard and mallet stands. The stand is simply shown if there is at
- * least one of the instrument visible at any given time, otherwise it is hidden.
+ * least one of the instruments visible at any given time, otherwise it is hidden.
  */
-class StandController(private val context: Midis2jam2) {
-
-    private val keyboardStand = context.modelD("PianoStand.obj", "RubberFoot.bmp").apply {
-        move(-50f, 32f, -6f)
-        rotate(0f, Utils.rad(45f), 0f)
-    }.also {
-        context.rootNode.attachChild(it)
+context(Midis2jam2)
+class StandController {
+    private val keyboardStand = with(root) {
+        +modelD("PianoStand.obj", "RubberFoot.bmp").apply {
+            loc = v3(-50, 32, -6)
+            rot = v3(0, 45, 0)
+        }
     }
 
-    private val malletStand = context.modelD("XylophoneLegs.obj", "RubberFoot.bmp").apply {
-        setLocalTranslation(-22F, 22.2F, 23F)
-        rotate(0f, Utils.rad(33.7), 0f)
-        scale(0.6666667f)
-    }.also {
-        context.rootNode.attachChild(it)
-    }
-
-    /** Call this method on each frame to update the visibility of stands. */
-    fun tick() {
-        setStandVisibility(keyboardStand, Keyboard::class.java)
-        setStandVisibility(malletStand, Mallets::class.java)
+    private val malletStand = with(root) {
+        +modelD("XylophoneLegs.obj", "RubberFoot.bmp").apply {
+            loc = v3(-22F, 22.2F, 23F)
+            rot = v3(0f, 33.7, 0f)
+            scale(2 / 3F)
+        }
     }
 
     /**
-     * Shows/hides a [stand] (that the piano/mallets) rest on depending on if any instrument of that type ([clazz]) is
-     * currently visible.
+     * Ticks the stand controller. This should be called every frame.
      */
-    private fun setStandVisibility(stand: Spatial, clazz: Class<out Instrument>) {
-        stand.cullHint = context.instruments.any { clazz.isInstance(it) && it.isVisible }.cullHint()
+    fun tick() {
+        setStandVisibility(keyboardStand, Keyboard::class)
+        setStandVisibility(malletStand, Mallets::class)
+    }
+
+    private fun setStandVisibility(stand: Spatial, klass: KClass<out Instrument>) {
+        stand.cullHint = instruments.any { klass.isInstance(it) && it.isVisible }.ch
     }
 }

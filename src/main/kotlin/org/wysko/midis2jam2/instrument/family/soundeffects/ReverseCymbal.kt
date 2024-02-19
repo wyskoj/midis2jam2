@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.NotePeriod
@@ -53,7 +53,7 @@ import kotlin.math.pow
  *
  * @constructor Constructs a new Reverse Cymbal.
  */
-class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     SustainedInstrument(context, eventList) {
     /** The cymbal that animates backwards. */
     private val cymbal: Spatial =
@@ -65,7 +65,7 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelSpecificEven
     /** A list of fake "pseudo" hits that correlate to the end times. */
     private val pseudoHits: MutableList<MidiNoteOnEvent> =
         notePeriods.map {
-            MidiNoteOnEvent(it.endTick(), it.noteOn.channel, it.midiNote, 127)
+            MidiNoteOnEvent(it.endTick, it.noteOn.channel, it.note, 127)
         }.toMutableList().also {
             context.file.registerEvents(it)
         }

@@ -42,11 +42,11 @@ abstract class MidiFile(
      */
     val tempos: List<MidiTempoEvent> by lazy {
         tracks.flatMap { it.events }.filterIsInstance<MidiTempoEvent>()
-            .ifEmpty { listOf(MidiTempoEvent(0, ONE_HUNDRED_TWENTY_BPM)) }
+            .ifEmpty { listOf(MidiTempoEvent.DEFAULT) }
             .sortedBy { it.time }.asReversed().distinctBy { it.time }.asReversed().toMutableList().also {
                 // If the first tempo event doesn't occur at the beginning of the MIDI file, assume 120 BPM.
                 if (it.first().time != 0L) {
-                    it.add(0, MidiTempoEvent(0, ONE_HUNDRED_TWENTY_BPM))
+                    it.add(0, MidiTempoEvent.DEFAULT)
                 }
             }.toList()
     }
@@ -80,7 +80,7 @@ abstract class MidiFile(
      * Given a MIDI [tick], returns the time it occurs, in seconds.
      */
     fun tickToSeconds(tick: Long): Double {
-        if (tempos.size == 1 || tick < 0) return tempos.first().spb() * tick.toBeats()
+        if (tempos.size == 1 || tick < 0) return tempos.first().spb * tick.toBeats()
 
         // Get all tempos that have started and finished before the current time.
         return tempos.filter { it.time < tick }.foldIndexed(0.0) { index, acc, tempo ->
@@ -90,7 +90,7 @@ abstract class MidiFile(
                     } else {
                         tick
                     } - tempo.time
-                    ).toBeats() * tempo.spb()
+                    ).toBeats() * tempo.spb
         }
     }
 

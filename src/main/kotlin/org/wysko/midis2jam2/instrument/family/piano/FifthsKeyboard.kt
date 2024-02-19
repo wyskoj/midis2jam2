@@ -21,12 +21,12 @@ import com.jme3.math.ColorRGBA
 import com.jme3.scene.Geometry
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 
 /**
  * A keyboard that glows the key 7 semitones below the currently playing note.
  */
-class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecificEvent>, skin: KeyboardSkin) :
+class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelEvent>, skin: KeyboardSkin) :
     Keyboard(context, events, skin) {
 
     override fun tick(time: Double, delta: Float) {
@@ -34,7 +34,7 @@ class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecifi
         keys.forEach { key ->
             key.root.breadthFirstTraversal {
                 if (it is Geometry) {
-                    it.material.setColor("GlowColor", glowColor(collector.currentNotePeriods.any { it.midiNote == key.midiNote + 5 }))
+                    it.material.setColor("GlowColor", glowColor(collector.currentNotePeriods.any { it.note == key.midiNote + 5 }))
                 }
             }
         }
@@ -43,6 +43,6 @@ class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelSpecifi
     private fun glowColor(isGlowing: Boolean): ColorRGBA =
         if (isGlowing) ColorRGBA(0.9f, 0f, 0f, 1f) else ColorRGBA.Black
 
-    override fun similar(): List<Instrument> =
+    override fun findSimilar(): List<Instrument> =
         context.instruments.filterIsInstance<Keyboard>() // We need to include regular Keyboards as similar instruments
 }

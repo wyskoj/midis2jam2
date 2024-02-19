@@ -58,9 +58,9 @@ abstract class PitchClassAnimator protected constructor(context: Midis2jam2, not
     }
 
     /**
-     * `true` if the twelfth is playing, `false` otherwise.
+     * `true` if the animator is playing, `false` otherwise.
      *
-     * This is a convenience property for checking if [NotePeriodCollector.currentNotePeriods] is empty.
+     * *This is a convenience property for checking if [NotePeriodCollector.currentNotePeriods] is empty.*
      */
     val playing: Boolean
         get() = collector.currentNotePeriods.isNotEmpty()

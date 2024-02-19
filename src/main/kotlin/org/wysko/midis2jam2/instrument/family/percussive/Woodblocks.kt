@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussive
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.world.modelD
 
 /**
@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.world.modelD
  */
 class Woodblocks(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>
+    eventList: List<MidiChannelEvent>
 ) : TwelveDrumOctave(context, eventList, 20f) {
 
     override val twelfths: Array<TwelfthOfOctaveDecayed> = Array(12) {

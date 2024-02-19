@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.minusAssign
 import org.wysko.midis2jam2.util.node
@@ -45,7 +45,7 @@ private const val SHINY_SILVER: String = "ShinySilver.bmp"
  * turn per beat = π/2 rad. To calculate this, the spindle is rotated by `0.5 * PI * delta * (6E7 / bpm) / 60` on
  * each frame.
  */
-class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class MusicBox(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     DecayedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 0, -18)
@@ -56,10 +56,10 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
     private val pinRotations: MutableMap<Spatial, Float> = mutableMapOf()
     private val pinModel: Spatial = context.modelR("MusicBoxPoint.obj", SHINY_SILVER)
     private val pinPool: MutableList<Spatial> = ArrayList()
-    private val collectorForPins = EventCollector(hits, context, { event, time ->
+    private val collectorForPins = EventCollector(context, hits, { event, time ->
         context.file.tickToSeconds(event.time - context.file.division) <= time // Quarter note early
     })
-    private val collectorForLamellae = EventCollector(hits, context)
+    private val collectorForLamellae = EventCollector(context, hits)
 
     init {
         with(geometry) {

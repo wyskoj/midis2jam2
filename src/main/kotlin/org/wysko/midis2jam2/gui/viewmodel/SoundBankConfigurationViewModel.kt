@@ -25,7 +25,7 @@ import java.io.File
 /**
  * ViewModel class for managing soundbank configuration.
  */
-class SoundbankConfigurationViewModel(
+class SoundBankConfigurationViewModel(
     initialConfiguration: SoundbankConfiguration? = null,
     override val onConfigurationChanged: (SoundbankConfiguration) -> Unit
 ) : ConfigurationViewModel<SoundbankConfiguration> {
@@ -74,12 +74,12 @@ class SoundbankConfigurationViewModel(
     }
 
     companion object {
-        /** Factory for creating [SoundbankConfigurationViewModel] instances, loading pre-existing configurations if they exist. */
+        /** Factory for creating [SoundBankConfigurationViewModel] instances, loading pre-existing configurations if they exist. */
         fun create(
             onConfigurationChanged: (SoundbankConfiguration) -> Unit = {
                 SoundbankConfiguration.preserver.saveConfiguration(it)
             }
-        ): SoundbankConfigurationViewModel = SoundbankConfigurationViewModel(SoundbankConfiguration.preserver.getConfiguration()) {
+        ): SoundBankConfigurationViewModel = SoundBankConfigurationViewModel(SoundbankConfiguration.preserver.getConfiguration()) {
             onConfigurationChanged(it)
         }
     }

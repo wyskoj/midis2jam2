@@ -41,15 +41,15 @@ class BackgroundConfigurationViewModel(
     val colorBackgroundConfiguration: StateFlow<BackgroundConfiguration.ColorBackground>
         get() = _colorBackgroundConfiguration
 
-    private val _repeatedCubemapBackgroundConfiguration =
-        MutableStateFlow(BackgroundConfiguration.RepeatedCubemapBackground(""))
-    val repeatedCubemapBackgroundConfiguration: StateFlow<BackgroundConfiguration.RepeatedCubemapBackground>
-        get() = _repeatedCubemapBackgroundConfiguration
+    private val _repeatedCubeMapBackgroundConfiguration =
+        MutableStateFlow(BackgroundConfiguration.RepeatedCubeMapBackground(""))
+    val repeatedCubeMapBackgroundConfiguration: StateFlow<BackgroundConfiguration.RepeatedCubeMapBackground>
+        get() = _repeatedCubeMapBackgroundConfiguration
 
-    private val _uniqueCubemapBackgroundConfiguration =
-        MutableStateFlow(BackgroundConfiguration.UniqueCubemapBackground(CubemapTexture("", "", "", "", "", "")))
-    val uniqueCubemapBackgroundConfiguration: StateFlow<BackgroundConfiguration.UniqueCubemapBackground>
-        get() = _uniqueCubemapBackgroundConfiguration
+    private val _uniqueCubeMapBackgroundConfiguration =
+        MutableStateFlow(BackgroundConfiguration.UniqueCubeMapBackground(CubemapTexture("", "", "", "", "", "")))
+    val uniqueCubeMapBackgroundConfiguration: StateFlow<BackgroundConfiguration.UniqueCubeMapBackground>
+        get() = _uniqueCubeMapBackgroundConfiguration
 
     private val _selectedBackgroundConfigurationClass =
         MutableStateFlow<KClass<out BackgroundConfiguration>>(BackgroundConfiguration.DefaultBackground::class)
@@ -71,14 +71,14 @@ class BackgroundConfigurationViewModel(
     }
 
     fun setRepeatedCubemapTexture(texture: String) {
-        _repeatedCubemapBackgroundConfiguration.value =
-            _repeatedCubemapBackgroundConfiguration.value.copy(texture = texture)
+        _repeatedCubeMapBackgroundConfiguration.value =
+            _repeatedCubeMapBackgroundConfiguration.value.copy(texture = texture)
         onConfigurationChanged(generateConfiguration())
     }
 
     fun setUniqueCubemapTexture(newTextures: CubemapTexture) {
-        val currentTextures = _uniqueCubemapBackgroundConfiguration.value
-        _uniqueCubemapBackgroundConfiguration.value = _uniqueCubemapBackgroundConfiguration.value.copy(
+        val currentTextures = _uniqueCubeMapBackgroundConfiguration.value
+        _uniqueCubeMapBackgroundConfiguration.value = _uniqueCubeMapBackgroundConfiguration.value.copy(
             cubemap = CubemapTexture(
                 north = newTextures.north ?: currentTextures.cubemap.north,
                 south = newTextures.south ?: currentTextures.cubemap.south,
@@ -103,8 +103,8 @@ class BackgroundConfigurationViewModel(
     override fun generateConfiguration(): BackgroundConfiguration = when (selectedBackgroundConfigurationClass.value) {
         BackgroundConfiguration.DefaultBackground::class -> _defaultBackgroundConfiguration.value
         BackgroundConfiguration.ColorBackground::class -> _colorBackgroundConfiguration.value
-        BackgroundConfiguration.RepeatedCubemapBackground::class -> _repeatedCubemapBackgroundConfiguration.value
-        BackgroundConfiguration.UniqueCubemapBackground::class -> _uniqueCubemapBackgroundConfiguration.value
+        BackgroundConfiguration.RepeatedCubeMapBackground::class -> _repeatedCubeMapBackgroundConfiguration.value
+        BackgroundConfiguration.UniqueCubeMapBackground::class -> _uniqueCubeMapBackgroundConfiguration.value
         else -> error("Unknown background configuration class")
     }
 
@@ -120,14 +120,14 @@ class BackgroundConfigurationViewModel(
                 _selectedBackgroundConfigurationClass.value = BackgroundConfiguration.ColorBackground::class
             }
 
-            is BackgroundConfiguration.RepeatedCubemapBackground -> {
-                _repeatedCubemapBackgroundConfiguration.value = configuration
-                _selectedBackgroundConfigurationClass.value = BackgroundConfiguration.RepeatedCubemapBackground::class
+            is BackgroundConfiguration.RepeatedCubeMapBackground -> {
+                _repeatedCubeMapBackgroundConfiguration.value = configuration
+                _selectedBackgroundConfigurationClass.value = BackgroundConfiguration.RepeatedCubeMapBackground::class
             }
 
-            is BackgroundConfiguration.UniqueCubemapBackground -> {
-                _uniqueCubemapBackgroundConfiguration.value = configuration
-                _selectedBackgroundConfigurationClass.value = BackgroundConfiguration.UniqueCubemapBackground::class
+            is BackgroundConfiguration.UniqueCubeMapBackground -> {
+                _uniqueCubeMapBackgroundConfiguration.value = configuration
+                _selectedBackgroundConfigurationClass.value = BackgroundConfiguration.UniqueCubeMapBackground::class
             }
         }
     }

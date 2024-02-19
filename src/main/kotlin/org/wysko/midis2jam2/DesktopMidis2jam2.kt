@@ -19,7 +19,6 @@ package org.wysko.midis2jam2
 
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
-import kotlinx.coroutines.Job
 import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
@@ -28,19 +27,19 @@ import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
-import org.wysko.midis2jam2.world.BackgroundController
-import org.wysko.midis2jam2.world.ImageFormatException
 import org.wysko.midis2jam2.world.KeyMap
+import org.wysko.midis2jam2.world.background.BackgroundController
+import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import javax.sound.midi.Sequencer
 
 /**
- * Contains all the code relevant to operating the 3D scene.
+ * Implementation of [Midis2jam2] for desktop. This is so that we can access `javax` classes.
  *
- * @param sequencer The MIDI sequencer.
- * @param midiFile The MIDI file to play.
- * @param configs The settings to use.
- * @param onClose Callback when midis2jam2 closes.
+ * @property sequencer The sequencer responsible for playing the MIDI file.
+ * @property midiFile The MIDI file that this instance is playing.
+ * @property onClose A function to call when the application is closed.
+ * @param configs A collection of the application's configurations.
  */
 class DesktopMidis2jam2(
     val sequencer: Sequencer,
@@ -48,53 +47,38 @@ class DesktopMidis2jam2(
     val onClose: () -> Unit,
     configs: Collection<Configuration>,
 ) : Midis2jam2(midiFile, configs) {
-    /** Whether the sequencer has started. */
+
     private var isSequencerStarted: Boolean = false
+    private var skippedFrames = 0
+    private var isFadeStarted = false
 
-    /** The number of currently skipped frames at the start of the application. */
-    private var skippedTicks = 0
-
-    /** Whether the fade-in has been initiated. */
-    private var initiatedFadeIn = false
-
-    /** Job for the tempo change coroutine. */
-    private lateinit var tempoChangeCoroutine: Job
-
-    /** Initializes the application. */
-    override fun initialize(
-        stateManager: AppStateManager,
-        app: Application,
-    ) {
+    override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
         logger().debug("Initializing application...")
 
         KeyMap.registerMappings(app, this)
         try {
             BackgroundController.configureBackground(
-                configs.getType(BackgroundConfiguration::class),
-                this@DesktopMidis2jam2,
-                rootNode,
+                context = this@DesktopMidis2jam2,
+                config = configs.getType(BackgroundConfiguration::class),
+                root = root,
             )
-        } catch (e: ImageFormatException) {
+        } catch (e: BackgroundImageFormatException) {
             exit()
             logger().errorDisp(e.message ?: "There was an error loading the images for the background.", e)
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
             exit()
             logger().errorDisp(
-                when (e.message) {
+                message = when (e.message) {
                     "Image width and height must be the same" -> "The background image(s) must be square."
                     else -> e.message ?: "There was an error loading the images for the background."
                 },
-                e,
+                exception = e
             )
         }
-
         logger().debug("Application initialized")
     }
 
-    /**
-     * Cleans up the application.
-     */
     override fun cleanup() {
         logger().debug("Cleaning up...")
         sequencer.run {
@@ -105,89 +89,33 @@ class DesktopMidis2jam2(
         logger().debug("Cleanup complete")
     }
 
-    /**
-     * Performs a tick.
-     */
     override fun update(tpf: Float) {
         super.update(tpf)
 
-        // Start sequencer if not started
-        if (!isSequencerStarted && time > 0.0) {
-            with(sequencer) {
-                start()
-            }
-            isSequencerStarted = true
-        }
+        startSequencerIfNeeded()
+        startFadeIfNeeded()
 
-        // Initiate fade-in
-        if (!initiatedFadeIn && time > -1.5) {
-            fadeFilter.fadeIn()
-            initiatedFadeIn = true
-        }
+        instruments.forEach { it.tick(time, tpf) }
 
-        // Tick instruments
-        instruments.forEach {
-            it.tick(time, tpf)
-        }
-
-        // If at the end of the file
         if (time >= file.length) {
-            if (!isSongFinished) {
-                endTime = time
-            }
+            if (!isSongFinished) endTime = time
             isSongFinished = true
         }
 
-        // If after the end, by three seconds
-        if (isSongFinished && time >= endTime + 3.0) {
-            if (configs.getType(HomeConfiguration::class).isLooping) {
-                loop()
-            } else {
-                exit()
-            }
-        }
+        handleSongCompletionAndLoopOrExit()
 
         // This is a hack to prevent the first few frames from updating the timeSinceStart variable.
-        if (skippedTicks++ < 3) {
+        if (skippedFrames++ < 3) {
             return
         }
 
-        shadowController?.tick()
-        standController.tick()
-        lyricController.tick(time)
-        hudController.tick(time, fadeFilter.value)
-        flyByCamera.tick(tpf)
-        autocamController.tick(time, tpf)
-        slideCamController.tick(tpf, time)
-        preventCameraFromLeaving(app.camera)
-        drumSetVisibilityManager.tick(time)
+        tickControllers(tpf)
 
         if (sequencer.isOpen && !paused) {
-            // Increment time if sequencer is ready / playing
             time += tpf.toDouble()
         }
     }
 
-    private fun loop() {
-        isSequencerStarted = false
-        sequencer.stop()
-        seek(-2.0)
-        slideCamController.onLoop()
-        (sequencer as JwRealTimeSequencer).resetDevice()
-    }
-
-    override fun seek(time: Double) {
-        logger().debug("Seeking to time: $time")
-        this.time = time
-        sequencer.microsecondPosition = (time * 1E6).coerceAtLeast(0.0).toLong()
-        eventCollectors.forEach { it.seek(time) }
-        notePeriodCollectors.forEach { it.seek(time) }
-        notePeriodGroupCollectors.forEach { it.seek(time) }
-    }
-
-    /**
-     * Stops the app state.
-     */
     override fun exit() {
         logger().debug("Exiting...")
         if (sequencer.isOpen) {
@@ -198,10 +126,14 @@ class DesktopMidis2jam2(
             stop(false)
         }
         onClose()
-        if (::tempoChangeCoroutine.isInitialized) {
-            tempoChangeCoroutine.cancel()
-        }
         logger().debug("Exit complete")
+    }
+
+    override fun seek(time: Double) {
+        logger().debug("Seeking to time: $time")
+        this.time = time
+        sequencer.microsecondPosition = (time * 1E6).coerceAtLeast(0.0).toLong()
+        collectors.forEach { it.seek(time) }
     }
 
     override fun togglePause() {
@@ -210,6 +142,49 @@ class DesktopMidis2jam2(
             sequencer.stop()
         } else {
             sequencer.start()
+        }
+    }
+
+    private fun tickControllers(tpf: Float) {
+        shadowController?.tick()
+        standController.tick()
+        lyricController.tick(time, tpf)
+        hudController.tick(time, fadeFilter.value)
+        flyByCamera.tick(tpf)
+        autocamController.tick(time, tpf)
+        slideCamController.tick(tpf, time)
+        preventCameraFromLeaving(app.camera)
+        drumSetVisibilityManager.tick(time)
+    }
+
+    private fun handleSongCompletionAndLoopOrExit() {
+        if (isSongFinished && time >= endTime + 3.0) {
+            if (configs.getType(HomeConfiguration::class).isLooping) {
+                // Loop the song
+                isSequencerStarted = false
+                sequencer.stop()
+                seek(-2.0)
+                slideCamController.onLoop()
+                (sequencer as JwRealTimeSequencer).resetDevice()
+            } else {
+                exit()
+            }
+        }
+    }
+
+    private fun startFadeIfNeeded() {
+        if (!isFadeStarted && time > -1.5) {
+            fadeFilter.fadeIn()
+            isFadeStarted = true
+        }
+    }
+
+    private fun startSequencerIfNeeded() {
+        if (!isSequencerStarted && time > 0.0) {
+            with(sequencer) {
+                start()
+            }
+            isSequencerStarted = true
         }
     }
 }

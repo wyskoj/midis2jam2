@@ -25,7 +25,7 @@ import org.spongepowered.noise.Noise
 import org.spongepowered.noise.NoiseQuality
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 import java.util.*
@@ -43,7 +43,7 @@ import kotlin.math.cos
  * Finally, the helicopter moves down when not playing and moves up when playing. This motion is eased with a sinusoidal
  * function.
  */
-class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
+class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     SustainedInstrument(context, eventList) {
     /** "Seed" for X-value generation. */
     private val rotXRand: Float
@@ -76,7 +76,7 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>)
         lights.forEach { it.cullHint = Always }
 
         // Turn on active lights
-        collector.currentNotePeriods.forEach { lights[11 - (it.midiNote + 3) % 12].cullHint = Dynamic }
+        collector.currentNotePeriods.forEach { lights[11 - (it.note + 3) % 12].cullHint = Dynamic }
 
         // If playing a note, increase the force, but cap it at 1.
         if (collector.currentNotePeriods.isNotEmpty()) {

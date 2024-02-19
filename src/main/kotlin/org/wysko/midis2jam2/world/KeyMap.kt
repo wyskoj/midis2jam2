@@ -27,25 +27,18 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.util.Utils
 
 /**
- * Stores a single map between an action name and a key.
+ * Stores a map between an action name and a key.
+ *
+ * @property name The action name.
+ * @property key The key name, as defined in [KeyInput].
  */
 @Serializable
-data class KeyMap(
-    /**
-     * The name of the action.
-     */
-    val name: String,
-
-    /**
-     * The name of the key, as defined in [KeyInput].
-     */
-    val key: String
-) {
+data class KeyMap(val name: String, val key: String) {
     companion object {
         /**
-         * Registers key mappings for the given application using the provided listener.
+         * Registers key mappings for an application using the given listener.
          *
-         * @param app The application instance where the key mappings should be registered.
+         * @param app The application instance to register the key mappings.
          * @param listener The action listener to be associated with the key mappings.
          */
         fun registerMappings(app: Application, listener: ActionListener) {

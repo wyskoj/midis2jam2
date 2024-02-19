@@ -22,7 +22,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 /** The baritone sax fingering manager. */
@@ -32,7 +32,7 @@ private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingerin
 private const val STRETCH_FACTOR = 0.65f
 
 /** The baritone sax. */
-class BaritoneSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+class BaritoneSax(context: Midis2jam2, events: List<MidiChannelEvent>) :
     Saxophone(context, events, BaritoneSaxClone::class, FINGERING_MANAGER) {
 
     /** A single BaritoneSax. */

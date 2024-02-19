@@ -20,12 +20,12 @@ import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 
 /** The Synth drum. */
-class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) : OneDrumOctave(context, eventList) {
+class SynthDrum(context: Midis2jam2, eventList: List<MidiChannelEvent>) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) { i ->
         Striker(

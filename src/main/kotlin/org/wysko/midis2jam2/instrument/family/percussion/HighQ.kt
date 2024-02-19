@@ -50,7 +50,7 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxiliary
     private val laserBeam: Spatial =
         context.modelD("ZapperLaser.obj", "Laser.bmp").apply {
             setMaterial(
-                context.unshadedMaterial("Laser.bmp").apply {
+                context.diffuseMaterial("Laser.bmp").apply {
                     setColor("GlowColor", ColorRGBA.Green)
                 },
             )

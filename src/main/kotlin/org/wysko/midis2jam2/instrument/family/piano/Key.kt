@@ -20,9 +20,9 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
-import org.wysko.midis2jam2.util.cullHint
-import org.wysko.midis2jam2.util.toQuat
-import org.wysko.midis2jam2.util.toSign
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.sign
+import org.wysko.midis2jam2.util.toQuaternion
 import org.wysko.midis2jam2.world.modelD
 
 private const val KEY_PRESS_ANGLE = 0.1f
@@ -96,11 +96,11 @@ abstract class Key protected constructor(
         rotationFactor = rotationFactor.coerceIn(0f..1f)
 
         (rotationFactor == 0f).let {
-            upNode.cullHint = it.cullHint()
-            downNode.cullHint = (!it).cullHint()
+            upNode.cullHint = it.ch
+            downNode.cullHint = (!it).ch
         }
 
-        root.localRotation = rotationAxis.mult(rotationFactor * KEY_PRESS_ANGLE * -inverseRotation.toSign()).toQuat()
+        root.localRotation = rotationAxis.mult(rotationFactor * KEY_PRESS_ANGLE * -inverseRotation.sign).toQuaternion()
     }
 
     /** Attaches the up and down key nodes to the main key node. */

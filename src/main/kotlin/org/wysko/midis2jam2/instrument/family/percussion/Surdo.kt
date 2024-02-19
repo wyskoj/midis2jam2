@@ -25,7 +25,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.Surdo.HandPosition.Down
 import org.wysko.midis2jam2.instrument.family.percussion.Surdo.HandPosition.Up
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.Vector3fSmoother
+import org.wysko.midis2jam2.util.VectorSmoother
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
@@ -37,8 +37,8 @@ class Surdo(
     muteHits: MutableList<MidiNoteOnEvent>,
     openHits: MutableList<MidiNoteOnEvent>,
 ) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
-    private val muteCollector = EventCollector(muteHits, context)
-    private val openCollector = EventCollector(openHits, context)
+    private val muteCollector = EventCollector(context, muteHits)
+    private val openCollector = EventCollector(context, openHits)
 
     private val stick =
         Striker(
@@ -58,8 +58,8 @@ class Surdo(
         }
 
     private var handPosition: HandPosition = Up
-    private val handLocCtrl = Vector3fSmoother(Up.translation, 20.0)
-    private val handRotCtrl = Vector3fSmoother(Up.rotation, 20.0)
+    private val handLocCtrl = VectorSmoother(Up.translation, 20.0)
+    private val handRotCtrl = VectorSmoother(Up.rotation, 20.0)
 
     init {
         recoilNode.attachChild(

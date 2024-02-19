@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.ch
@@ -47,11 +47,11 @@ import org.wysko.midis2jam2.world.modelD
  */
 class PizzicatoStrings(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>
+    eventList: List<MidiChannelEvent>
 ) : DecayedInstrument(context, eventList) {
 
     private val eventCollector: EventCollector<MidiNoteOnEvent> =
-        EventCollector(eventList.filterIsInstance<MidiNoteOnEvent>(), context)
+        EventCollector(context, eventList.filterIsInstance<MidiNoteOnEvent>())
 
     private val strings: Array<PizzicatoString> = Array(12) {
         PizzicatoString().apply {

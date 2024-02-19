@@ -16,18 +16,19 @@
  */
 package org.wysko.midis2jam2.instrument.family.pipe
 
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.POP
+import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
@@ -35,48 +36,59 @@ import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
 
 /** The Blown bottle. */
-class BlownBottle(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-    DivisiveSustainedInstrument(context, events, true) {
+class BlownBottle(context: Midis2jam2, events: List<MidiChannelEvent>) :
+    DivisiveSustainedInstrument(context, events) {
 
-    private val nodes = List(12) { Node() }
+    override val animators: List<PitchClassAnimator> = List(12) { Bottle(it, events.notePeriodsModulus(context, it)) }
 
-    override val animators: Array<PitchClassAnimator> =
-        Array(12) {
-            Bottle(it, events.notePeriodsModulus(context, it)).apply {
-                root.loc = v3(-15f, 0f, 0f)
+    private val pitchBendModulationController = PitchBendModulationController(context, events, 0.0)
 
-                with(nodes[it]) {
-                    this += this@apply.root
-                    geometry += this
+    init {
+        repeat(12) {
+            with(geometry) {
+                +node {
+                    +animators[it].root.also {
+                        it.loc = v3(-15, 0, 0)
+                    }
                     loc = v3(0, 0.3 * it, 0)
                     rot = v3(0, 7.5 * it, 0)
                 }
             }
         }
-
-    init {
-        geometry.loc = v3(75, 0, -35)
+        placement.loc = v3(75, 0, -35)
     }
 
     override fun adjustForMultipleInstances(delta: Float) {
         with(updateInstrumentIndex(delta)) {
             root.loc = v3(0, 20 + this * 3.6, 0)
-            geometry.rot = v3(0, 90 * this, 0)
+            placement.rot = v3(0, 90 * this, 0)
         }
+    }
+
+    override fun tick(time: Double, delta: Float) {
+        super.tick(time, delta)
+        pitchBendModulationController.tick(time, delta)
     }
 
     /** A single Bottle. */
     inner class Bottle(i: Int, notePeriods: List<NotePeriod>) : PitchClassAnimator(context, notePeriods) {
 
         private val puffer: SteamPuffer = SteamPuffer(context, POP, 1.0, OUTWARDS)
+        private val bendCtrl = NumberSmoother(0f, 10.0)
 
         override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
             puffer.tick(delta, playing)
+            animation.loc = v3(
+                x = 0,
+                y = bendCtrl.tick(delta) { if (playing) pitchBendModulationController.bend else 0f },
+                z = 0
+            )
         }
+
         init {
             // Load pop bottle
-            with(root) {
+            with(geometry) {
                 +context.modelR("PopBottle.obj", "PopBottle.bmp")
                 +context.modelD("PopBottleLabel.obj", "PopLabel.bmp").apply { rot = v3(0, 180, 0) }
 

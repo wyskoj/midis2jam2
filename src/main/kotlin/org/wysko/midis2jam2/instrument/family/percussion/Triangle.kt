@@ -33,8 +33,8 @@ class Triangle(
     muteHits: MutableList<MidiNoteOnEvent>,
     openHits: MutableList<MidiNoteOnEvent>,
 ) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
-    private val muteCollector = EventCollector(muteHits, context)
-    private val openCollector = EventCollector(openHits, context)
+    private val muteCollector = EventCollector(context, muteHits)
+    private val openCollector = EventCollector(context, openHits)
 
     private val fist = with(recoilNode) {
         +context.modelD("MutedTriangle.obj", "hands.bmp").apply {

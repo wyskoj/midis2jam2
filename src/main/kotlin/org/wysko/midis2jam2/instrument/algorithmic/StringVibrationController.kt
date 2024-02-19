@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
 import kotlin.math.floor
 
 /**
@@ -33,6 +33,6 @@ class StringVibrationController(private val frames: Collection<Spatial>) {
      */
     fun tick(delta: Float) {
         animationTime = (animationTime + delta * 60) % frames.size
-        frames.forEachIndexed { index, frame -> frame.cullHint = (index == floor(animationTime).toInt()).cullHint() }
+        frames.forEachIndexed { index, frame -> frame.cullHint = (index == floor(animationTime).toInt()).ch }
     }
 }

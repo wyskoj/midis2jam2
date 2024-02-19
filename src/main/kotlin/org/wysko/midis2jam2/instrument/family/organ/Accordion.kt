@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.instrument.family.organ.Accordion.Companion.SQUEEZE_
 import org.wysko.midis2jam2.instrument.family.piano.*
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.*
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 
@@ -51,7 +51,7 @@ private const val BLACK_KEY_DOWN_TEXTURE = "AccordionKeyBlackDown.bmp"
  *
  * Because the accordion only has twenty-four playable keys, notes are modulus 24.
  */
-class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificEvent>, type: Type) :
+class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>, type: Type) :
     KeyedInstrument(context, eventList, 0, 23) {
     override val keys: Array<Key> =
         let {
@@ -190,7 +190,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
     }
 
     override fun keyStatus(midiNote: Int): Key.State {
-        collector.currentNotePeriods.firstOrNull { it.midiNote % 24 == midiNote % 24 }?.let {
+        collector.currentNotePeriods.firstOrNull { it.note % 24 == midiNote % 24 }?.let {
             return Key.State.Down(it.noteOn.velocity)
         } ?: return Key.State.Up
     }
@@ -203,8 +203,8 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
 
         // Set materials
         (leftHandCase as Node).apply {
-            getChild(1).setMaterial(context.unshadedMaterial("LeatherStrap.bmp"))
-            getChild(2).setMaterial(context.unshadedMaterial("RubberFoot.bmp"))
+            getChild(1).setMaterial(context.diffuseMaterial("LeatherStrap.bmp"))
+            getChild(2).setMaterial(context.diffuseMaterial("RubberFoot.bmp"))
         }
 
         // Add the keys
@@ -244,5 +244,5 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelSpecificE
         }
     }
 
-    override fun toString(): String = super.toString() + debugProperty("angle", angle)
+    override fun toString(): String = super.toString() + formatProperty("angle", angle)
 }

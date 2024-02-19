@@ -41,9 +41,9 @@ class NotePeriodWithFretboardPosition private constructor(
          */
         fun fromNotePeriod(notePeriod: NotePeriod): NotePeriodWithFretboardPosition {
             return NotePeriodWithFretboardPosition(
-                notePeriod.midiNote,
-                notePeriod.startTime,
-                notePeriod.endTime,
+                notePeriod.note,
+                notePeriod.start,
+                notePeriod.end,
                 notePeriod.noteOn,
                 notePeriod.noteOff
             )

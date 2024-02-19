@@ -19,17 +19,33 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
-import org.wysko.midis2jam2.util.logger
 
-class DrumSetVisibilityManager(
-    private val context: Midis2jam2,
-    drumSets: List<DrumSet>,
-) {
+/**
+ * Manages the visibility of multiple drum sets.
+ *
+ * @param context The context to the main class.
+ * @param drumSets The drum sets to manage the visibility of.
+ */
+class DrumSetVisibilityManager(private val context: Midis2jam2, drumSets: List<DrumSet>) {
+
     private val collectors = drumSets.associateWith { it.collectorForVisibility }
+
+    /**
+     * The drum set that is currently visible.
+     */
     var currentlyVisibleDrumSet: DrumSet? =
         if (drumSets.isEmpty()) null else collectors.entries.minBy { it.value.peek()?.time ?: Long.MAX_VALUE }.key
+
+    /**
+     * `true` if the drum set is visible, `false` otherwise.
+     */
     var isVisible: Boolean = false
 
+    /**
+     * Updates this manager's state.
+     *
+     * @param time The current time.
+     */
     fun tick(time: Double) {
         val collectorResults = collectors.mapValues { it.value.advanceCollectOne(time) }
 

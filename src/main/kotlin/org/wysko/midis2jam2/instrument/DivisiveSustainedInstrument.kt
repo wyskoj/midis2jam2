@@ -17,27 +17,24 @@
 package org.wysko.midis2jam2.instrument
 
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 
 /**
  * A sustained instrument that divides the animation of each note (i.e., A, A#, B, C, etc.) to a [PitchClassAnimator].
  *
  * @param context The context to the main class.
- * @param eventList The list of all events that this instrument should be aware of.
- * @property inverted `true` if the instrument should visualize notes from A up to G#, `false` if the instrument should
- * visualize notes from G# down to A.
+ * @param events The list of all events that this instrument should be aware of.
  * @see PitchClassAnimator
  */
 abstract class DivisiveSustainedInstrument protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
-    private val inverted: Boolean,
-) : SustainedInstrument(context, eventList) {
+    events: List<MidiChannelEvent>,
+) : SustainedInstrument(context, events) {
 
     /**
      * Twelve [PitchClassAnimator]s, one for each note in the octave.
      */
-    protected abstract val animators: Array<PitchClassAnimator>
+    protected abstract val animators: List<PitchClassAnimator>
 
     override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)

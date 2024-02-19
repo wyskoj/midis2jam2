@@ -16,66 +16,60 @@
  */
 package org.wysko.midis2jam2.instrument.family.organ
 
-import com.jme3.math.Quaternion
-import com.jme3.scene.Node
+import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.HARMONICA
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelD
 
-/** The harmonica uses 12 [SteamPuffers][SteamPuffer] to animate each note in the octave. */
-class Harmonica(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>) :
-    SustainedInstrument(context, eventList) {
-    /** Each note on the harmonica has a separate puffer. */
-    private val puffers = Array(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
+/**
+ * The Harmonica.
+ *
+ * @param context The context to the main class.
+ * @param eventList The list of all events that this instrument should be aware of.
+ */
+class Harmonica(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+    SustainedInstrument(context, eventList),
+    MultipleInstancesLinearAdjustment {
 
+    override val multipleInstancesDirection: Vector3f = v3(0, 10, 0)
+    private val puffers = List(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
     private val bend = PitchBendModulationController(context, eventList)
 
-    override fun tick(
-        time: Double,
-        delta: Float,
-    ) {
+    override fun tick(time: Double, delta: Float) {
         super.tick(time, delta)
-
-        // Update each steam puffer
-        puffers.forEachIndexed { index, it ->
-            it.tick(
-                delta,
-                collector.currentNotePeriods.any { it.midiNote % 12 == index },
-            )
+        puffers.forEachIndexed { index, puffer ->
+            puffer.tick(delta, collector.currentNotePeriods.any { it.note % 12 == index })
         }
-
-        // Pitch bend
-        geometry.localRotation = Quaternion().fromAngles(-bend.tick(time, delta) * 0.25f, rad(-90.0), 0f)
-    }
-
-    override fun adjustForMultipleInstances(delta: Float) {
-        root.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
+        geometry.rot = v3(-bend.tick(time, delta) * 15, -90, 0f)
     }
 
     init {
-        geometry.attachChild(context.modelD("Harmonica.obj", "Harmonica.bmp"))
-        val pufferNodes = Array(12) { Node() }
-
-        for (i in 0..11) {
-            puffers[i].run {
-                root.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
-                root.setLocalTranslation(0f, 0f, 7.2f)
-                pufferNodes[i].attachChild(this.root)
-                geometry.attachChild(pufferNodes[i])
-            }
-            pufferNodes[i].run {
-                localRotation = Quaternion().fromAngles(0f, rad(5 * (i - 5.5)), 0f)
+        with(geometry) {
+            +context.modelD("Harmonica.obj", "Harmonica.bmp")
+            repeat(12) {
+                +node {
+                    +puffers[it].root.apply {
+                        loc = v3(0, 0, 7.2)
+                        rot = v3(0, -90, 0)
+                    }
+                    rot = v3(0, 5 * (it - 5.5), 0)
+                }
             }
         }
-
-        // Position harmonica
-        geometry.setLocalTranslation(74f, 32f, -38f)
-        geometry.localRotation = Quaternion().fromAngles(0f, rad(-90.0), 0f)
+        with(placement) {
+            loc = v3(74, 32, -38)
+            rot = v3(0, -90, 0)
+        }
     }
 }

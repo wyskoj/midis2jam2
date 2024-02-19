@@ -24,35 +24,25 @@ import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.contiguousGroups
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.util.chunked
-import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
-import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTimedValue
 
-/** The base position of the guitar. */
 private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
-
-/**
- * After a while, guitars will begin to clip into the ground. We avoid this by defining after a certain index,
- * guitars should only move on the XZ plane. This is the index when that alternative transformation applies.
- */
 private const val GUITAR_VECTOR_THRESHOLD = 8
-
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/Guitar.json"))
-
 private val GUITAR_CHORD_DEFINITIONS_STANDARD_E: List<ChordDefinition> =
     Json.decodeFromString(resourceToString("/instrument/chords/Guitar.json"))
-
 private val GUITAR_CHORD_DEFINITIONS_DROP_D: List<ChordDefinition> =
     Json.decodeFromString<List<ChordDefinition>>(resourceToString("/instrument/chords/Guitar.json"))
         .map {
@@ -65,16 +55,19 @@ private val GUITAR_CHORD_DEFINITIONS_DROP_D: List<ChordDefinition> =
 /**
  * The Guitar.
  *
+ * @param context The context to the main class.
+ * @param events The list of all events that this instrument should be aware of.
+ * @param type The type of guitar.
  * @see FrettedInstrument
  */
-class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: GuitarType) : FrettedInstrument(
+class Guitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: GuitarType) : FrettedInstrument(
     context = context,
-    frettingEngine = StandardFrettingEngine(
+    events = events,
+    StandardFrettingEngine(
         numberOfStrings = 6,
         numberOfFrets = 22,
         openStringMidiNotes = if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
     ),
-    events = events,
     positioning = with(GUITAR_MODEL_PROPERTIES) {
         FrettedInstrumentPositioning(
             upperY = upperVerticalOffset,
@@ -87,13 +80,12 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     },
     numberOfStrings = 6,
     instrumentBody = context.modelD(
-        if (needsDropTuning(events)) type.modelDFileName else type.modelFileName,
-        type.textureFileName
-    ),
-    "GuitarSkin.bmp"
+        if (needsDropTuning(events)) type.modelDropD else type.model,
+        type.texture
+    ) to "GuitarSkin.bmp"
 ) {
 
-    @OptIn(ExperimentalTime::class)
+
     override val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> = run {
         // Determine contiguous groups (chords)
         val groups = notePeriods.contiguousGroups()
@@ -114,7 +106,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
             uniqueNotes: Set<Int>
         ) {
             notePeriods.forEach {
-                map += it to chordDefinition.noteToFretboardPosition(it.midiNote)
+                map += it to chordDefinition.noteToFretboardPosition(it.note)
             }
             appliedDefinitions.putIfAbsent(uniqueNotes, chordDefinition)
         }
@@ -125,9 +117,9 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
             lowFret: Boolean = false
         ): Map<NotePeriod, FretboardPosition> {
             val builtMap = mutableMapOf<NotePeriod, FretboardPosition>()
-            notePeriods.sortedBy { it.midiNote }.forEach { np ->
+            notePeriods.sortedBy { it.note }.forEach { np ->
                 (frettingEngine as StandardFrettingEngine).lowestFretboardPosition(
-                    np.midiNote,
+                    np.note,
                     occupiedStrings,
                     lowFret
                 )
@@ -141,79 +133,75 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
             return builtMap
         }
 
-        measureTimedValue {
-            polyphonySections.forEach { polyphonySection ->
-                if (polyphonySection.first().notePeriods.size == 1) { // Section has a polyphony of 1
-                    // Just use the standard fretting engine to build fingerings
-                    polyphonySection.forEach { (notePeriods) ->
-                        frettingEngine.bestFretboardPosition(notePeriods[0].midiNote)?.let {
-                            map += notePeriods[0] to it
-                            frettingEngine.applyFretboardPosition(it)
-                            frettingEngine.releaseString(it.string)
-                        }
+        polyphonySections.forEach { polyphonySection ->
+            if (polyphonySection.first().notePeriods.size == 1) { // Section has a polyphony of 1
+                // Just use the standard fretting engine to build fingerings
+                polyphonySection.forEach { (notePeriods) ->
+                    frettingEngine.bestFretboardPosition(notePeriods[0].note)?.let {
+                        map += notePeriods[0] to it
+                        frettingEngine.applyFretboardPosition(it)
+                        frettingEngine.releaseString(it.string)
                     }
-                    return@forEach
                 }
-
-                if (polyphonySection.first().notePeriods.size == 2) { // Section has a polyphony of 2
-                    // Find the group within this section that has the lowest overall note
-                    val lowestGroup =
-                        polyphonySection.minByOrNull { (notePeriods) -> notePeriods.minOf { it.midiNote } }
-
-                    // Build a fingering from this lowest group, starting at the lowest possible position
-                    lowestGroup?.let { it ->
-                        val stringsNotUsed =
-                            (0 until 6).minus(
-                                buildManually(it.notePeriods, lowFret = true).values.map { it.string }
-                                    .toSet()
-                            )
-
-                        // Build the rest of the groups avoiding using the string that were not used
-                        polyphonySection.minus(it).forEach { otherGroup ->
-                            buildManually(otherGroup.notePeriods, stringsNotUsed.toMutableList())
-                        }
-                    }
-                    return@forEach
-                }
-
-                for (group in polyphonySection) {
-                    // Find all notes in the group
-                    val uniqueNotes = group.notePeriods.distinctBy { it.midiNote }.map { it.midiNote }.toSet()
-
-                    // First, see if we have already figured out a definition for these notes
-                    val try1 = appliedDefinitions[uniqueNotes]
-                    if (try1 != null) {
-                        applyChordDefinition(try1, group.notePeriods, uniqueNotes)
-                        continue
-                    }
-
-                    // See if there is a definition that is an exact match
-                    val try2 = dictionary.firstOrNull {
-                        it.definedNotes() == uniqueNotes
-                    }
-                    if (try2 != null) {
-                        applyChordDefinition(try2, group.notePeriods, uniqueNotes)
-                        continue
-                    }
-
-                    // If there is no exact match, find the definition that has the most overlap (that contains all of our notes)
-                    val try3 = dictionary.filter {
-                        it.definedNotes().containsAll(uniqueNotes)
-                    }.associateWith {
-                        it.definedNotes().intersect(uniqueNotes)
-                    }.maxByOrNull { it.value.size }
-                    if (try3 != null) {
-                        applyChordDefinition(try3.key, group.notePeriods, uniqueNotes)
-                        continue
-                    }
-
-                    // Still haven't found a solution. We have to make one up at this point.
-                    buildManually(group.notePeriods)
-                }
+                return@forEach
             }
-        }.also {
-            this@Guitar.logger()
-                .info("Guitar fretboard calculations took ${it.duration.toDouble(DurationUnit.SECONDS)} seconds for ${notePeriods.size} NotePeriods.")
+
+            if (polyphonySection.first().notePeriods.size == 2) { // Section has a polyphony of 2
+                // Find the group within this section that has the lowest overall note
+                val lowestGroup =
+                    polyphonySection.minByOrNull { (notePeriods) -> notePeriods.minOf { it.note } }
+
+                // Build a fingering from this lowest group, starting at the lowest possible position
+                lowestGroup?.let { group ->
+                    val stringsNotUsed =
+                        (0 until 6).minus(
+                            buildManually(group.notePeriods, lowFret = true).values.map { it.string }
+                                .toSet()
+                        )
+
+                    // Build the rest of the groups avoiding using the string that were not used
+                    polyphonySection.minus(group).forEach { (notePeriods) ->
+                        buildManually(notePeriods, stringsNotUsed.toMutableList())
+                    }
+                }
+                return@forEach
+            }
+
+            for ((notePeriods) in polyphonySection) {
+                // Find all notes in the group
+                val uniqueNotes = notePeriods.distinctBy { it.note }.map { it.note }.toSet()
+
+                // First, see if we've already figured out a definition for these notes.
+                val try1 = appliedDefinitions[uniqueNotes]
+                if (try1 != null) {
+                    applyChordDefinition(try1, notePeriods, uniqueNotes)
+                    continue
+                }
+
+                // See if there is a definition that is an exact match.
+                val try2 = dictionary.firstOrNull {
+                    it.definedNotes() == uniqueNotes
+                }
+                if (try2 != null) {
+                    applyChordDefinition(try2, notePeriods, uniqueNotes)
+                    continue
+                }
+
+                // If there is no exact match, find the definition that
+                // has the most overlap and contains all of our notes.
+                val try3 = dictionary.filter {
+                    it.definedNotes().containsAll(uniqueNotes)
+                }.associateWith {
+                    it.definedNotes().intersect(uniqueNotes)
+                }.maxByOrNull { it.value.size }
+                if (try3 != null) {
+                    applyChordDefinition(try3.key, notePeriods, uniqueNotes)
+                    continue
+                }
+
+                // Still haven't found a solution. We have to make one up at this point.
+                buildManually(notePeriods)
+            }
         }
 
         map
@@ -221,27 +209,27 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
 
     override val upperStrings: Array<Spatial> = Array(6) {
         if (it < 3) {
-            context.modelD("GuitarStringLow.obj", type.textureFileName)
+            context.modelD("GuitarStringLow.obj", type.texture)
         } else {
-            context.modelD("GuitarStringHigh.obj", type.textureFileName)
+            context.modelD("GuitarStringHigh.obj", type.texture)
         }.apply {
             geometry.attachChild(this)
         }
     }.apply {
-        forEachIndexed { index, it ->
+        forEachIndexed { index, string ->
             with(GUITAR_MODEL_PROPERTIES) {
-                it.localTranslation =
+                string.localTranslation =
                     Vector3f(this.upperHorizontalOffsets[index], this.upperVerticalOffset, FORWARD_OFFSET)
-                it.localRotation = Quaternion().fromAngles(0f, 0f, rad(-this.rotations[index]))
+                string.localRotation = Quaternion().fromAngles(0f, 0f, rad(-this.rotations[index]))
             }
         }
     }
 
-    override val lowerStrings: List<List<Spatial>> = List(6) { it ->
-        List(5) { j: Int ->
+    override val lowerStrings: List<List<Spatial>> = List(6) { string ->
+        List(5) { animFrame: Int ->
             context.modelD(
-                if (it < 3) "GuitarLowStringBottom$j.obj" else "GuitarHighStringBottom$j.obj",
-                type.textureFileName
+                if (string < 3) "GuitarLowStringBottom$animFrame.obj" else "GuitarHighStringBottom$animFrame.obj",
+                type.texture
             ).also {
                 geometry.attachChild(it)
                 it.cullHint = Always
@@ -250,12 +238,11 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         }
     }.apply {
         indices.forEach { i ->
-            (0 until 5).forEach { j ->
+            repeat(5) { j ->
                 with(this[i][j]) {
                     GUITAR_MODEL_PROPERTIES.let {
-                        localTranslation =
-                            Vector3f(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, FORWARD_OFFSET)
-                        localRotation = Quaternion().fromAngles(0f, 0f, rad(-it.rotations[i]))
+                        loc = v3(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, FORWARD_OFFSET)
+                        rot = v3(0, 0, -it.rotations[i])
                     }
                 }
             }
@@ -266,30 +253,39 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
         val v = updateInstrumentIndex(delta) * 1.5f
         /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
         if (v < GUITAR_VECTOR_THRESHOLD) {
-            root.localTranslation = Vector3f(5f, -2f, 0f).mult(v)
+            root.loc = v3(5, -2, 0).mult(v)
         } else {
-            val vector = Vector3f(5f, -2f, 0f).mult(v)
+            val vector = v3(5, -2, 0).mult(v)
             vector.setY(-2f * GUITAR_VECTOR_THRESHOLD)
-            root.localTranslation = vector
+            root.loc = vector
         }
     }
 
-    /** The type of guitar. */
-    enum class GuitarType(
-        /** The Model file name. */
-        internal val modelFileName: String,
-
-        /** The Model file name for drop D tuning. */
-        internal val modelDFileName: String,
-
-        /** The Texture file name. */
-        val textureFileName: String
+    /**
+     * The type of guitar.
+     */
+    sealed class GuitarType(
+        internal val model: String,
+        internal val modelDropD: String,
+        internal val texture: String
     ) {
-        /** Acoustic guitar type. */
-        ACOUSTIC("GuitarAcoustic.obj", "GuitarAcousticDropD.obj", "AcousticGuitar.png"),
+        /**
+         * Acoustic guitar type.
+         */
+        data object Acoustic : GuitarType(
+            "GuitarAcoustic.obj",
+            "GuitarAcousticDropD.obj",
+            "AcousticGuitar.png"
+        )
 
-        /** Electric guitar type. */
-        ELECTRIC("Guitar.obj", "GuitarD.obj", "GuitarSkin.bmp");
+        /**
+         * Electric guitar type.
+         */
+        data object Electric : GuitarType(
+            "Guitar.obj",
+            "GuitarD.obj",
+            "GuitarSkin.bmp"
+        )
     }
 
     init {
@@ -299,21 +295,10 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelSpecificEvent>, type: 
     }
 }
 
-/**
- * Given a list of [events], determines if the Guitar should use the drop D tuning.
- *
- * @return true if the Guitar should use the drop D tuning, false otherwise.
- */
-private fun needsDropTuning(events: List<MidiChannelSpecificEvent>): Boolean =
+private fun needsDropTuning(events: List<MidiChannelEvent>): Boolean =
     (events.filterIsInstance<MidiNoteOnEvent>().minByOrNull { it.note }?.note ?: 127) < 40
 
-private enum class GuitarTuning(
-    /** The tuning of the Guitar. */
-    val values: IntArray
-) {
-    /** The standard tuning of the Guitar. */
+private enum class GuitarTuning(val values: IntArray) {
     STANDARD(intArrayOf(40, 45, 50, 55, 59, 64)),
-
-    /** The drop D tuning of the Guitar. */
-    DROP_D(intArrayOf(38, 45, 50, 55, 59, 64));
+    DROP_D(intArrayOf(38, 45, 50, 55, 59, 64))
 }

@@ -19,13 +19,20 @@ package org.wysko.midis2jam2.datastructure
 
 /**
  * A Kotlin version of my HeapAPQ homework submission for CS 2321!
+ *
+ * @param K The key type, which is used to determine the priority of the value.
+ * @param V The value type, which is the data stored in the priority queue.
+ * @param comparator The comparator to determine the priority of the keys.
  */
-class HeapAPQ<K, V>(
-    private val comparator: Comparator<K>
-) {
+class HeapAPQ<K, V>(private val comparator: Comparator<K>) {
     private val entries = mutableListOf<PQEntry>()
 
-    /** Inserts an entry into this APQ. The APQ will restore heap order. */
+    /**
+     * Inserts an entry into this APQ. The APQ will restore heap order.
+     *
+     * @param key The key of the entry.
+     * @param value The value of the entry.
+     */
     fun insert(key: K, value: V): PQEntry {
         val index = entries.size
         return PQEntry(key, value, index).let {
@@ -35,18 +42,11 @@ class HeapAPQ<K, V>(
         }
     }
 
-    private fun upHeap(index: Int) {
-        val target = entries[index]
-        target.parent()?.let { parent ->
-            if (comparator.compare(target.key, parent.key) < 0) {
-                val parentIndex = parent.index
-                swapEntries(index, parentIndex)
-                upHeap(parentIndex)
-            }
-        }
-    }
-
-    /** Returns the head of this APQ and removes it from the tree. */
+    /**
+     * Returns the head of this APQ and removes it from the tree.
+     *
+     * @return The head of this APQ, or `null` if the APQ is empty.
+     */
     fun removeMin(): PQEntry? {
         if (entries.isEmpty()) return null
         val entry: PQEntry = entries[0]
@@ -57,6 +57,37 @@ class HeapAPQ<K, V>(
             downHeap(0)
         }
         return entry
+    }
+
+    /**
+     * Returns the head of this APQ, without removing it.
+     */
+    fun min(): PQEntry? = entries.firstOrNull()
+
+    /**
+     * The data of this heap.
+     */
+    fun data(): MutableList<PQEntry> = entries
+
+    /**
+     * The size of this heap.
+     */
+    fun size(): Int = entries.size
+
+    /**
+     * Clears this heap.
+     */
+    fun clear(): Unit = entries.clear()
+
+    private fun upHeap(index: Int) {
+        val target = entries[index]
+        target.parent()?.let { parent ->
+            if (comparator.compare(target.key, parent.key) < 0) {
+                val parentIndex = parent.index
+                swapEntries(index, parentIndex)
+                upHeap(parentIndex)
+            }
+        }
     }
 
     private fun downHeap(index: Int) {
@@ -75,18 +106,6 @@ class HeapAPQ<K, V>(
         }
     }
 
-    /** Returns the head of this APQ, without removing it. */
-    fun min(): PQEntry? = entries.firstOrNull()
-
-    /** The data of this heap. */
-    fun data(): MutableList<PQEntry> = entries
-
-    /** The size of this heap. */
-    fun size(): Int = entries.size
-
-    /** Clears this heap. */
-    fun clear(): Unit = entries.clear()
-
     private fun swapEntries(i1: Int, i2: Int) {
         val e1 = entries[i1]
         val e2 = entries[i2]
@@ -96,35 +115,42 @@ class HeapAPQ<K, V>(
         e2.index = i1
     }
 
-    /** An entry within this priority queue. */
-    inner class PQEntry(
-        /** The key of the entry. */
-        val key: K,
-        /** The value of the entry. */
-        val value: V,
-        /** The index of this element within the list of elements. Improves efficiency. */
-        var index: Int
-    ) {
-        /** Returns the left child of this entry, or null if it does not exist. */
-        fun leftChild(): PQEntry? = when {
+    /**
+     * An entry within this priority queue.
+     *
+     * @property key The key of the entry.
+     * @property value The value of the entry.
+     * @property index The index of this element within the list of elements. Improves efficiency.
+     */
+    inner class PQEntry(val key: K, val value: V, var index: Int) {
+        /**
+         * Returns the left child of this entry, or `null` if it does not exist.
+         */
+        internal fun leftChild(): PQEntry? = when {
             entries.size <= 2 * index + 1 -> null
             else -> entries[2 * index + 1]
         }
 
-        /** Returns the right child of this entry, or null if it does not exist. */
+        /**
+         * Returns the right child of this entry, or `null` if it does not exist.
+         */
         private fun rightChild(): PQEntry? = when {
             entries.size <= 2 * index + 2 -> null
             else -> entries[2 * index + 2]
         }
 
-        /** Returns the parent of this entry, or null if it does not exist. */
-        fun parent(): PQEntry? = when (index) {
+        /**
+         * Returns the parent of this entry, or `null` if it does not exist.
+         */
+        internal fun parent(): PQEntry? = when (index) {
             0 -> null
             else -> entries[(index - 1) / 2]
         }
 
-        /** Returns the smallest child of this entry, or null if this entry does not have any children. */
-        fun smallestChild(): PQEntry? {
+        /**
+         * Returns the smallest child of this entry, or `null` if this entry does not have any children.
+         */
+        internal fun smallestChild(): PQEntry? {
             val set = setOf(leftChild(), rightChild()).filterNotNull()
             return when {
                 set.isEmpty() -> null

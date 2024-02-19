@@ -21,7 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import kotlin.reflect.KClass
 
 private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
@@ -30,7 +30,7 @@ private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
 abstract class Saxophone
 protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelSpecificEvent>,
+    eventList: List<MidiChannelEvent>,
     cloneClass: KClass<out SaxophoneClone>,
     fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {

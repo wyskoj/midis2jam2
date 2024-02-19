@@ -64,8 +64,8 @@ class Guiro(
     shortHits: MutableList<MidiNoteOnEvent>,
     longHits: MutableList<MidiNoteOnEvent>,
 ) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.time }.toMutableList()) {
-    private val shortCollector = EventCollector(shortHits, context)
-    private val longCollector = EventCollector(longHits, context)
+    private val shortCollector = EventCollector(context, shortHits)
+    private val longCollector = EventCollector(context, longHits)
 
     private val guiroNode =
         Node().apply {
@@ -150,9 +150,9 @@ class Guiro(
     override fun toString(): String {
         return super.toString() +
             buildString {
-                appendLine(debugProperty("stickPosition", stickPosition))
-                appendLine(debugProperty("isMovingLeft", isMovingLeft.toString()))
-                appendLine(debugProperty("isMoving", isMoving.toString()))
+                appendLine(formatProperty("stickPosition", stickPosition))
+                appendLine(formatProperty("isMovingLeft", isMovingLeft.toString()))
+                appendLine(formatProperty("isMoving", isMoving.toString()))
             }
     }
 }

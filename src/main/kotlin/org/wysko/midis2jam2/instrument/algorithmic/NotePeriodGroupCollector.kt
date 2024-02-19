@@ -26,11 +26,11 @@ class NotePeriodGroupCollector(
     context: Midis2jam2,
     private var notePeriodGroups: List<NotePeriodGroup>,
     private val releaseCondition: (time: Double, notePeriodGroup: NotePeriodGroup) -> Boolean =
-        { time: Double, notePeriodGroup: NotePeriodGroup -> time >= notePeriodGroup.endTime() },
+        { time: Double, notePeriodGroup: NotePeriodGroup -> time >= notePeriodGroup.endTime },
 ) : Collector<NotePeriodGroup> {
     init {
-        context.registerNotePeriodGroupCollector(this)
-        notePeriodGroups = notePeriodGroups.sortedBy { it.startTime() }
+        context.registerCollector(this)
+        notePeriodGroups = notePeriodGroups.sortedBy { it.startTime }
     }
 
     /**
@@ -44,7 +44,7 @@ class NotePeriodGroupCollector(
     fun advance(time: Double): NotePeriodGroup? {
         // Collect NotePeriods that need to be added to the heap
         var changed = false
-        while (currentIndex < notePeriodGroups.size && notePeriodGroups[currentIndex].startTime() <= time) {
+        while (currentIndex < notePeriodGroups.size && notePeriodGroups[currentIndex].startTime <= time) {
             currentNotePeriodGroup = notePeriodGroups[currentIndex++]
             changed = true
         }

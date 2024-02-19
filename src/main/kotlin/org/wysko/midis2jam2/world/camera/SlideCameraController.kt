@@ -22,6 +22,7 @@ import com.jme3.math.Vector3f
 import com.jme3.util.TempVars
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.v3
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -31,14 +32,13 @@ private const val Y_BASELINE = 92f
 private const val MAX_ANGLE = 0.5f
 private const val ROTATION_SPEED_FACTOR = 0.04f
 private const val DAMPENING = 0.6f
-private const val ROTATION_DAMPENING_FACTOR = 7f
 private const val SECONDS_LEFT_UNTIL_BRAKES = 20f
 
-/** Slides the camera back and forth, like how MIDIJam did when you pressed the 9 key. */
-class SlideCameraController(
-    private val context: Midis2jam2
-) {
-    /** True if the camera is currently sliding. */
+/** Slides the camera back and forth, like how MIDIJam did when you pressed the "nine" key. */
+context(Midis2jam2)
+class SlideCameraController {
+
+    /** `true` if the camera is currently sliding, `false` otherwise. */
     var isEnabled: Boolean = false
 
     private var goingRight = true
@@ -46,7 +46,12 @@ class SlideCameraController(
     private var brakesApplied = false
     private var angleWhenBrakesApplied = 0f
 
-    /** Called every frame. */
+    /**
+     * Called every frame.
+     *
+     * @param tpf The amount of time that has passed since the last frame.
+     * @param time The current time in the song.
+     */
     fun tick(tpf: Float, time: Double) {
         if (!isEnabled) return
 
@@ -58,7 +63,7 @@ class SlideCameraController(
 
         if (t > MAX_ANGLE) goingRight = false else if (t < -MAX_ANGLE) goingRight = true
 
-        brakesApplied = if (context.file.length - time < SECONDS_LEFT_UNTIL_BRAKES) {
+        brakesApplied = if (file.length - time < SECONDS_LEFT_UNTIL_BRAKES) {
             if (!brakesApplied) {
                 angleWhenBrakesApplied = t
             }
@@ -67,25 +72,23 @@ class SlideCameraController(
             false
         }
 
-        val brakesFactor = (
-                if (brakesApplied) {
-                    1f - ((context.file.length - 2) - time) / SECONDS_LEFT_UNTIL_BRAKES
-                } else {
-                    0f
-                }
-                )
-            .toFloat()
-            .coerceAtMost(1f)
+        val brakesFactor = let {
+            if (brakesApplied) {
+                1f - ((file.length - 2) - time) / SECONDS_LEFT_UNTIL_BRAKES
+            } else {
+                0
+            }
+        }.toFloat().coerceAtMost(1f)
 
-        context.app.camera.location.interpolateLocal(
+        app.camera.location.interpolateLocal(
             desiredLocation(Utils.lerp(t, 0f, brakesFactor)),
             (DAMPENING * tpf)
         )
-        context.app.camera.rotation.slerp(
-            lookAtRotation(context.app.camera.location.clone(), Vector3f(-2f, 47.320206f, 0f)),
+        app.camera.rotation.slerp(
+            lookAtRotation(app.camera.location.clone(), Vector3f(-2f, 47.320206f, 0f)),
             DAMPENING * 5 * tpf
         )
-        context.app.camera.rotation.normalizeLocal()
+        app.camera.rotation.normalizeLocal()
     }
 
     /**
@@ -96,17 +99,13 @@ class SlideCameraController(
         brakesApplied = false
     }
 
-    private fun desiredLocation(t: Float): Vector3f {
-        return Vector3f(
-            RADIUS * sin(tAdjusted(t)),
-            Y_BASELINE,
-            RADIUS * cos(tAdjusted(t))
-        )
-    }
+    private fun desiredLocation(t: Float): Vector3f = v3(
+        x = RADIUS * sin(tAdjusted(t)),
+        y = Y_BASELINE,
+        z = RADIUS * cos(tAdjusted(t))
+    )
 
-    private fun tAdjusted(t: Float): Float {
-        return sin(t * PI / 2f).toFloat()
-    }
+    private fun tAdjusted(t: Float): Float = sin(t * PI / 2f).toFloat()
 }
 
 /**

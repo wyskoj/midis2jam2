@@ -26,10 +26,10 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.get
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.material
@@ -69,10 +69,10 @@ private const val LASER_HEIGHT = 727.289f
  * should point in the same direction as B below Middle C.
  *
  * @param context The [Midis2jam2] instance.
- * @param eventList The list of [MidiChannelSpecificEvent]s.
+ * @param eventList The list of [MidiChannelEvent]s.
  * @param type The type of space laser.
  */
-class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>, type: SpaceLaserType) :
+class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class, null) {
     override val pitchBendModulationController: PitchBendModulationController = PitchBendModulationController(
         context,
@@ -96,7 +96,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         val base = context.modelD("SpaceLaserBase.obj", "Wood.bmp")
         (base as Node).apply {
             this[1].material = context.reflectiveMaterial("Assets/ShinySilver.bmp")
-            this[2].material = context.unshadedMaterial("Assets/RubberFoot.bmp")
+            this[2].material = context.diffuseMaterial("Assets/RubberFoot.bmp")
         }
 
         with(geometry) {
@@ -107,22 +107,22 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         /* Truncate each note period to allow some space for end-to-end notes */
         notePeriods.forEach {
             when {
-                it.duration() > 0.4 -> it.endTime -= 0.1
-                it.duration() > 0.2 -> it.endTime -= 0.08
-                it.duration() > 0.1 -> it.endTime -= 0.05
-                it.duration() > 0.05 -> it.endTime -= 0.025
-                else -> it.endTime -= 0.02
+                it.duration > 0.4 -> it.end -= 0.1
+                it.duration > 0.2 -> it.end -= 0.08
+                it.duration > 0.1 -> it.end -= 0.05
+                it.duration > 0.05 -> it.end -= 0.025
+                else -> it.end -= 0.02
             }
         }
 
         clones.forEach {
             it as SpaceLaserClone
-            val glowMaterial = context.unshadedMaterial("Assets/" + type.filename).apply {
+            val glowMaterial = context.diffuseMaterial("Assets/" + type.filename).apply {
                 setColor("GlowColor", type.glowColor)
             }
             with(it.shooter as Node) {
                 this[0].material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-                this[1].material = context.unshadedMaterial("Assets/RubberFoot.bmp")
+                this[1].material = context.diffuseMaterial("Assets/RubberFoot.bmp")
                 this[2].material = glowMaterial
             }
             it.laserBeam.material = glowMaterial
@@ -158,12 +158,12 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
             laserNode.rot = v3(0, 0, rotation + sin(50 * wobbleTime) * wobbleIntensity)
 
             // Only show laser beam if currently playing
-            laserBeam.cullHint = isPlaying.cullHint()
+            laserBeam.cullHint = isPlaying.ch
         }
 
         private fun adjustPlayingRotation(np: NotePeriod, delta: Float) {
             // Currently playing, so set the correct rotation
-            rotation = angleCalculator.angleFromNote(np.midiNote, pitchBendAmount)
+            rotation = angleCalculator.angleFromNote(np.note, pitchBendAmount)
 
             // If just starting playing, reset modulation so that we start with no vibrato
             if (wobbleTime == 0.0) {
@@ -178,9 +178,9 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelSpecificEvent>,
         private fun adjustIdleRotation(time: Double, delta: Float) {
             // Not yet playing. Look ahead to the next NotePeriod
             notePeriodCollector.peek()?.let {
-                val startTime = it.startTime
+                val startTime = it.start
                 if (startTime - time <= 1) { // Less than 1 second away from playing
-                    val targetPos = angleCalculator.angleFromNote(it.midiNote, pitchBendAmount)
+                    val targetPos = angleCalculator.angleFromNote(it.note, pitchBendAmount)
                     if (startTime - time >= delta) {
                         // Slowly inch our way to the target rotation
                         rotation += (targetPos - rotation) / (startTime - time) * delta

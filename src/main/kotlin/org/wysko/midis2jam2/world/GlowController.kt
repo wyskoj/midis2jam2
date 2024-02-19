@@ -31,11 +31,14 @@ val DIM_GLOW: ColorRGBA = ColorRGBA(0.67f, 0.67f, 0.67f, 1f)
 /**
  * Animates a decaying glow effect.
  *
- * @param glowColor the color of the glow
+ * @property glowColor The color of the glow.
  */
 class GlowController(val glowColor: ColorRGBA = STANDARD_GLOW) {
+
     /**
      * Given the current [animationTime], determines the correct color for a decaying effect.
+     *
+     * @param animationTime The time in seconds since the animation started.
      */
     fun calculate(animationTime: Double): ColorRGBA = when {
         animationTime < 0 -> ColorRGBA.Black

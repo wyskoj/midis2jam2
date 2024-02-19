@@ -31,11 +31,13 @@ import org.wysko.midis2jam2.world.Axis
 /**
  * An instance of an instrument that is used to display degrees of polyphony on a [MonophonicInstrument].
  *
- * Monophonic instruments cannot play more than one note at a time, so a duplicate of the original instrument is
+ * Monophonic instruments can't play more than one note at a time, so a duplicate of the original instrument is
  * temporarily created to play the note. The number of clones required to play the note is determined by the degree
  * of polyphony in the original instrument.
  *
- * @property parent The [MonophonicInstrument] this clone is associated with.
+ * @property parent The parent instrument.
+ * @param rotationFactor The factor by which to rotate the clone.
+ * @param rotationAxis The axis on which to rotate the clone.
  * @see MonophonicInstrument
  */
 abstract class Clone protected constructor(
@@ -43,15 +45,14 @@ abstract class Clone protected constructor(
     private val rotationFactor: Float,
     private val rotationAxis: Axis
 ) {
-    /** The note periods for which this clone should be responsible for animating. */
-    val notePeriods: MutableList<NotePeriod> = ArrayList()
-
     /**
      * Keeps track of whether this clone is currently visible.
-     * The 0-clone (the clone at index 0) is always
-     * visible, that is if the instrument itself is visible.
+     * The clone at index 0 is always visible (if the parent instrument is visible).
      */
     var isVisible: Boolean = false
+
+    /** The note periods for which this clone should be responsible for animating. */
+    val notePeriods: MutableList<NotePeriod> = ArrayList()
 
     /** Used for moving with [indexForMoving]. */
     val root: Node = Node()
@@ -100,9 +101,8 @@ abstract class Clone protected constructor(
     open fun tick(time: Double, delta: Float) {
         currentNotePeriod = notePeriodCollector.advance(time).firstOrNull()
 
-        /* Rotate clone on note play */
         currentNotePeriod?.let {
-            val rotate = -((it.endTime - time) / it.duration()).toFloat() * rotationFactor
+            val rotate = -((it.end - time) / it.duration).toFloat() * rotationFactor
             animNode.localRotation = Quaternion().fromAngles(
                 Matrix3f.IDENTITY.getRow(rotationAxis.componentIndex).mult(rotate).toArray(null)
             )
@@ -119,7 +119,7 @@ abstract class Clone protected constructor(
     }
 
     /**
-     * Returns the index for moving so that clones do not overlap.
+     * Returns the index for moving so that clones don't overlap.
      *
      * This returns the index of this clone in the list of currently visible clones, where the index is never less
      * than 0.
@@ -130,14 +130,11 @@ abstract class Clone protected constructor(
     /** Move as to not overlap with other clones. */
     protected abstract fun adjustForPolyphony(delta: Float)
 
-    /**
-     * Determines if this clone is visible when this method is called.
-     */
     private fun calcVisibility(): Boolean {
         if (currentNotePeriod != null) return true
 
         notePeriodCollector.prev()?.let { prev ->
-            val timeGap = notePeriodCollector.peek()?.startTick()?.minus(prev.endTick()) ?: Long.MAX_VALUE
+            val timeGap = notePeriodCollector.peek()?.startTick?.minus(prev.endTick) ?: Long.MAX_VALUE
             if (timeGap <= parent.context.file.division * 2) {
                 return true
             }
@@ -145,14 +142,13 @@ abstract class Clone protected constructor(
         return false
     }
 
-    /** Hides or shows this clone, given the [index]. */
     private fun hideOrShowOnPolyphony(index: Int) {
         if (index == 0) {
             // The 0-clone is always visible
             highestLevel.cullHint = Dynamic
             isVisible = true
         } else {
-            // If we are currently positioned at 0, but normally we wouldn't be, hide.
+            // If we're currently positioned at 0, but normally we wouldn't be, hide.
             if (indexForMoving() == 0f) {
                 isVisible = false
                 highestLevel.cullHint = Always
@@ -177,10 +173,13 @@ abstract class Clone protected constructor(
     }
 }
 
-/** Returns a string ready for display of a list of [Clone]s. */
-fun List<Clone>.debugString(): String {
-    return joinToString(separator = "")
-}
+/**
+ * On a list of [Clone]s, returns a string that contains the debug string of each clone.
+ *
+ * @return A string that contains the debug string of each clone.
+ * @see Clone.debugProperty
+ */
+fun List<Clone>.debugString(): String = joinToString(separator = "")
 
 /**
  * Defines a configuration for applying pitch bend animation to clones.

@@ -18,63 +18,90 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiControlEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
+import org.wysko.midis2jam2.midi.MidiControlChangeEvent
+import org.wysko.midis2jam2.midi.MidiModulationDepthRangeEvent
 import org.wysko.midis2jam2.midi.MidiPitchBendEvent
+import org.wysko.midis2jam2.midi.MidiPitchBendSensitivityEvent
+import org.wysko.midis2jam2.midi.MidiRegisteredParameterNumberChangeEvent
+import org.wysko.midis2jam2.midi.RegisteredParameterNumber
 import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.oneOf
 import kotlin.math.sin
 
-private const val MODULATION_DEPTH_CONSTANT = 100 / 12800.0
 private const val PITCH_BEND_CENTER = 0x2000
 
-// Control change parameters
 private const val CC_MODULATION_WHEEL = 1
-private const val CC_DATA_ENTRY = 6
-private const val CC_LSB_DATA = 38
-private const val CC_LSB_RPN = 0x64
-private const val CC_MSB_RPN = 0x65
-
-// Registered parameter numbers
-private const val RPN_PITCH_BEND_RANGE = 0x0
-private const val RPN_MODULATION_DEPTH_RANGE = 0x5
 
 /**
  * Handles the calculation of pitch-bend and modulation.
+ *
+ * @param context The context to the main class.
+ * @param events The list of MIDI events to process.
+ * @param smoothness The smoothness of the pitch bend.
  */
 class PitchBendModulationController(
-    private val context: Midis2jam2,
-    events: List<MidiChannelSpecificEvent>,
+    context: Midis2jam2,
+    events: List<MidiChannelEvent>,
     smoothness: Double = 10.0,
 ) {
     // Relevant events
-    private val pitchBendEvents =
-        EventCollector(events.filterIsInstance<MidiPitchBendEvent>(), context) { collector ->
-            pitchBend = collector.prev()?.let { it.value - PITCH_BEND_CENTER } ?: 0
+    private val pitchBendEvents = EventCollector(context, events.filterIsInstance<MidiPitchBendEvent>()) { collector ->
+        pitchBend = collector.prev()?.let { it.value - PITCH_BEND_CENTER } ?: 0
+    }
+
+    private val modulationWheelEvents = EventCollector(
+        context,
+        events.filterIsInstance<MidiControlChangeEvent>().filter { it.controller == CC_MODULATION_WHEEL }
+    ) {
+        modulation = it.prev()?.value ?: 0
+    }
+
+    // Pseudo-events
+    private val pitchBendSensitivityEvents =
+        EventCollector(
+            context,
+            MidiPitchBendSensitivityEvent.fromRpnChanges(
+                MidiRegisteredParameterNumberChangeEvent.collectRegisteredParameterNumberChanges(
+                    events.filterIsInstance<MidiControlChangeEvent>(),
+                    RegisteredParameterNumber.PitchBendSensitivity
+                ),
+                events.first().channel
+            ).also { context.file.registerEvents(it) }
+        ) {
+            pitchBendSensitivity = it.prev()?.value ?: 2.0
         }
 
-    private val controlChangeEvents =
-        listOf(CC_MODULATION_WHEEL, CC_DATA_ENTRY, CC_LSB_DATA, CC_LSB_RPN, CC_MSB_RPN).associateWith { controlNum ->
-            EventCollector(
-                events.filterIsInstance<MidiControlEvent>().filter { it.controlNum == controlNum },
-                context,
-            ) { collector ->
-                cc[controlNum] = (collector.prev()?.value ?: 0).also { processRPNs(controlNum, it) }
-            }
+    private val modulationDepthRangeEvents =
+        EventCollector(
+            context,
+            MidiModulationDepthRangeEvent.fromRpnChanges(
+                MidiRegisteredParameterNumberChangeEvent.collectRegisteredParameterNumberChanges(
+                    events.filterIsInstance<MidiControlChangeEvent>(),
+                    RegisteredParameterNumber.ModulationDepthRange
+                ),
+                events.first().channel
+            ).also { context.file.registerEvents(it) }
+        ) {
+            modulationRange = it.prev()?.value ?: 0.5
         }
 
-    // Relevant continuous controllers
-    private val cc = IntArray(128)
-
-    // Current states
+    // Current MIDI states
     private var pitchBend = 0
     private var pitchBendSensitivity = 2.0
     private var modulation = 0
     private var modulationRange = 0.5
-    private var modulationTime = 0.0
+
+    // Animation state
+    private var modulationPhaseOffset = 0.0
 
     // Number smoother
     private val smoother = NumberSmoother(0f, smoothness)
+
+    /**
+     * The current pitch bend amount in semitones.
+     */
+    val bend: Float
+        get() = smoother.value
 
     /**
      * Performs calculations to determine the overall pitch bend, which can be manipulated by both pitch-bend events
@@ -91,29 +118,17 @@ class PitchBendModulationController(
         applyModulationWhenIdling: Boolean = false,
         playing: () -> Boolean = { true },
     ): Float {
-        modulationTime += tpf
+        modulationPhaseOffset += tpf
 
-        // Collect pitch bend events
-        pitchBendEvents.advanceCollectAll(time).forEach {
-            pitchBend = it.value - PITCH_BEND_CENTER // Values are centered around 8192
-        }
-
-        // Collect control change events
-        controlChangeEvents.entries.forEach { (controlNum, collector) ->
-            collector.advanceCollectAll(time).forEach {
-                cc[controlNum] = it.value
-                processRPNs(controlNum, it.value)
-            }
-        }
+        pitchBendEvents.advanceCollectAll(time).forEach { pitchBend = it.value - PITCH_BEND_CENTER }
+        modulationWheelEvents.advanceCollectAll(time).forEach { modulation = it.value }
+        pitchBendSensitivityEvents.advanceCollectAll(time).forEach { pitchBendSensitivity = it.value }
+        modulationDepthRangeEvents.advanceCollectAll(time).forEach { modulationRange = it.value }
 
         return if (!playing() && !applyModulationWhenIdling) {
-            smoother.tick(tpf) {
-                pitchBendSemitones().toFloat()
-            }
+            smoother.tick(tpf) { pitchBendSemitones().toFloat() }
         } else {
-            smoother.tick(tpf) {
-                (pitchBendSemitones() + modulationSemitones()).toFloat()
-            }
+            smoother.tick(tpf) { (pitchBendSemitones() + modulationSemitones()).toFloat() }
         }
     }
 
@@ -122,37 +137,9 @@ class PitchBendModulationController(
      * Call this function to signify a new note has begun.
      */
     fun resetModulation() {
-        modulationTime = 0.0
+        modulationPhaseOffset = 0.0
     }
 
-    /** Processes registered parameter numbers. */
-    private fun processRPNs(
-        controlNum: Int,
-        value: Int,
-    ) {
-        when {
-            controlNum == CC_MODULATION_WHEEL -> modulation = value
-
-            controlNum.oneOf(CC_DATA_ENTRY, CC_LSB_DATA) -> {
-                if (isRpnChangePitchBendSensitivity()) {
-                    pitchBendSensitivity = cc[CC_DATA_ENTRY] + (cc[CC_LSB_DATA] / 100.0)
-                }
-                if (isRpnChangeModulationDepthRange()) {
-                    modulationRange = cc[CC_DATA_ENTRY] + (cc[CC_LSB_DATA] * MODULATION_DEPTH_CONSTANT)
-                }
-            }
-        }
-    }
-
-    /** The current pitch bend amount, in semitones. */
-    private fun modulationSemitones() = sin(50 * modulationTime) * modulationRange * (modulation / 128.0)
-
-    /** The current modulation amount, in semitones. */
+    private fun modulationSemitones() = sin(50 * modulationPhaseOffset) * modulationRange * (modulation / 128.0)
     private fun pitchBendSemitones() = (pitchBend / PITCH_BEND_CENTER.toDouble()) * pitchBendSensitivity
-
-    /** Are the RPNs set to change the pitch bend sensitivity? */
-    private fun isRpnChangePitchBendSensitivity() = cc[CC_MSB_RPN] == 0 && cc[CC_LSB_RPN] == RPN_PITCH_BEND_RANGE
-
-    /** Are the RPNs set to change the modulation range? */
-    private fun isRpnChangeModulationDepthRange() = cc[CC_MSB_RPN] == 0 && cc[CC_LSB_RPN] == RPN_MODULATION_DEPTH_RANGE
 }

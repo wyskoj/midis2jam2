@@ -17,41 +17,52 @@
 
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
-import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
-import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.cullHint
+import org.wysko.midis2jam2.util.ch
+import org.wysko.midis2jam2.util.get
+import org.wysko.midis2jam2.util.material
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 
 private val BASE_POSITION = Vector3f(0f, 49.5f, -152.65f)
-
 private const val BIRD_TEXTURE = "Bird.png"
 
 /**
  * The bird tweet.
  */
-class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
-    DivisiveSustainedInstrument(context, events, true) {
-    override val animators: Array<PitchClassAnimator> =
-        Array(12) {
-            Bird(events.notePeriodsModulus(context, it))
+class BirdTweet(context: Midis2jam2, events: List<MidiChannelEvent>) : DivisiveSustainedInstrument(context, events) {
+
+    override val animators: List<PitchClassAnimator> = List(12) { Bird(events.notePeriodsModulus(context, it)) }
+
+    init {
+        with(geometry) {
+            repeat(12) {
+                +node {
+                    +animators[it].root
+                    rot = v3(0, -55 + it * -2.5, 0)
+                }
+            }
         }
+    }
 
     override fun adjustForMultipleInstances(delta: Float) {
         val indexForMoving = updateInstrumentIndex(delta)
         animators.forEach {
             if (indexForMoving >= 0) {
-                it.root.localTranslation =
-                    BASE_POSITION.clone().add(Vector3f(0f, 10f, -15f).mult(indexForMoving))
+                it.root.localTranslation = BASE_POSITION.clone().add(Vector3f(0f, 10f, -15f).mult(indexForMoving))
             } else {
                 it.root.localTranslation =
                     BASE_POSITION.clone().add(Vector3f(0f, indexForMoving * 10f, indexForMoving * 10f))
@@ -59,50 +70,25 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
         }
     }
 
-    /**
-     * A single bird.
-     */
-    inner class Bird(notePeriods: List<NotePeriod>) : RisingPitchClassAnimator(context, notePeriods) {
-        /** The open beak. */
-        private val openBeak =
-            context.modelD("BirdBeak_Open.obj", BIRD_TEXTURE).also {
-                geometry.attachChild(it)
-            }
-
-        /** The closed beak. */
-        private val closedBeak =
-            context.modelD("BirdBeak_Closed.obj", BIRD_TEXTURE).also {
-                geometry.attachChild(it)
-            }
-
-        /** The wings. */
-        private val wings =
-            context.modelD("BirdWings.obj", BIRD_TEXTURE).also {
-                geometry.attachChild(it)
-            }
-
-        init {
-            geometry.attachChild(
-                context.modelD("Bird.obj", BIRD_TEXTURE).apply {
-                    this as Node
-                    getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkin.bmp"))
-                },
-            )
-        }
-
-        /**
-         * The current animation offset, or index.
-         */
+    private inner class Bird(notePeriods: List<NotePeriod>) : RisingPitchClassAnimator(context, notePeriods) {
+        private val openBeak = context.modelD("BirdBeak_Open.obj", BIRD_TEXTURE).also { geometry += it }
+        private val closedBeak = context.modelD("BirdBeak_Closed.obj", BIRD_TEXTURE).also { geometry += it }
+        private val wings = context.modelD("BirdWings.obj", BIRD_TEXTURE).also { geometry += it }
         private var animationIndex = 0.0f
 
-        override fun tick(
-            time: Double,
-            delta: Float,
-        ) {
+        init {
+            with(geometry) {
+                +context.modelD("Bird.obj", BIRD_TEXTURE).apply {
+                    (this as Node)[0].material = context.reflectiveMaterial("Assets/HornSkin.bmp")
+                }
+            }
+        }
+
+        override fun tick(time: Double, delta: Float) {
             super.tick(time, delta)
 
-            openBeak.cullHint = playing.cullHint()
-            closedBeak.cullHint = (!playing).cullHint()
+            openBeak.cullHint = playing.ch
+            closedBeak.cullHint = (!playing).ch
 
             if (playing) {
                 animationIndex += 0.3f
@@ -110,17 +96,7 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
                 animationIndex = 0f
             }
 
-            wings.localRotation = Quaternion().fromAngles(sin(animationIndex) * 0.5f, 0f, 0f)
-        }
-    }
-
-    init {
-        Array(12) {
-            Node().apply {
-                attachChild(animators[it].root)
-                localRotation = Quaternion().fromAngles(0f, Utils.rad(-55 + it * -2.5f), 0f)
-                geometry.attachChild(this)
-            }
+            wings.rot = v3(sin(animationIndex) * 30, 0, 0)
         }
     }
 }

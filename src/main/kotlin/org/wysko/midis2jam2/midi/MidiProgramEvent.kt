@@ -19,7 +19,12 @@ package org.wysko.midis2jam2.midi
 /**
  * Indicates which instrument should be playing at a certain time.
  *
- * @param programNum the program number of the instrument
+ * @property time The time of the event in MIDI ticks.
+ * @property channel The channel on which the program change should occur.
+ * @property program The program number of the instrument to be played.
  * */
-data class MidiProgramEvent(override val time: Long, override val channel: Int, val programNum: Int) :
-    MidiChannelSpecificEvent(time, channel)
+data class MidiProgramEvent(
+    override val time: Long,
+    override val channel: Int,
+    val program: Int
+) : MidiChannelEvent(time, channel)

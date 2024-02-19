@@ -22,14 +22,14 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(TenorSax::class)
 private const val STRETCH_FACTOR = 0.65f
 
 /** The Tenor sax. */
-class TenorSax(context: Midis2jam2, events: List<MidiChannelSpecificEvent>) :
+class TenorSax(context: Midis2jam2, events: List<MidiChannelEvent>) :
     Saxophone(context, events, TenorSaxClone::class, FINGERING_MANAGER) {
 
     /** A single TenorSax. */

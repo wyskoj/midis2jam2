@@ -19,11 +19,17 @@ package org.wysko.midis2jam2.world
 
 import com.jme3.font.BitmapText
 import com.jme3.math.ColorRGBA
-import com.jme3.math.Vector3f
+import com.jme3.math.ColorRGBA.White
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.scale
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 
 private const val VERTICAL_FILLBAR_SCALE = 0.7f
 private const val FILLBAR_LOCATION_OFFSET = 3f
@@ -33,64 +39,50 @@ private const val MAXIMUM_FILLBAR_SCALE = (FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION
 
 /**
  * Displays the fillbar and file name on-screen.
- *
- * @param context context to the main class
  */
-class HudController(val context: Midis2jam2) {
-    /**
-     * The node that contains the fillbar and text.
-     */
-    private val node: Node =
-        Node().also {
-            if (context.configs.getType(SettingsConfiguration::class).showHud) context.app.guiNode.attachChild(it)
-            it.move(10f, 10f, 0f)
-        }
+context(Midis2jam2)
+class HudController {
+    private val root: Node = node {
+        loc = v3(10, 10, 0)
+    }.also {
+        if (configs.getType(SettingsConfiguration::class).showHud) app.guiNode += it
+    }
 
-    /**
-     * The red fillbar.
-     */
-    private val fillbar =
-        context.assetLoader.loadSprite("SongFillbar.bmp").also {
-            node.attachChild(it)
-            it.move(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 1f)
+    private val fillbar = with(root) {
+        +assetLoader.loadSprite("SongFillbar.bmp").also {
+            loc = v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 1)
         }
+    }
 
     init {
-        context.assetLoader.loadSprite("SongFillbarBox.bmp").also {
-            node.attachChild(it)
-        }
-
-        // MIDI file name text
-        BitmapText(context.assetManager.loadFont("Interface/Fonts/Default.fnt")).apply {
-            node.attachChild(this)
-            text = context.file.name
-            this.move(0f, 40f, 0f)
-            color = ColorRGBA(1f, 1f, 1f, 1f)
+        root += assetLoader.loadSprite("SongFillbarBox.bmp")
+        BitmapText(assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
+            root += this
+            loc = v3(0f, 44f, 0f)
+            text = file.name
+            size = 24f
+            color = White
         }
     }
 
     /**
      * Updates animation.
+     *
+     * @param timeSinceStart The time since the song started.
+     * @param fadeValue The value to fade the HUD by.
      */
-    fun tick(
-        timeSinceStart: Double,
-        fadeValue: Float,
-    ) {
-        fillbar.localScale =
-            Vector3f(
-                (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / context.file.length).coerceAtMost(1.0)).toFloat(),
-                VERTICAL_FILLBAR_SCALE,
-                1f,
+    fun tick(timeSinceStart: Double, fadeValue: Float) {
+        fillbar.scale =
+            v3(
+                x = (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / file.length).coerceAtMost(1.0)).toFloat(),
+                y = VERTICAL_FILLBAR_SCALE,
+                z = 1f,
             )
-        node.children.forEach {
-            when (it) {
-                is Sprite -> {
-                    it.opacity = fadeValue
-                }
 
-                is BitmapText -> {
-                    it.color = ColorRGBA(1f, 1f, 1f, fadeValue)
-                }
+        root.children.forEach {
+            when (it) {
+                is PictureWithFade -> it.opacity = fadeValue
+                is BitmapText -> it.color = ColorRGBA(1f, 1f, 1f, fadeValue)
             }
         }
     }

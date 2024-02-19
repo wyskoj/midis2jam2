@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaserType
 import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
 import org.wysko.midis2jam2.instrument.family.brass.StageHorns
+import org.wysko.midis2jam2.instrument.family.brass.StageHornsType
 import org.wysko.midis2jam2.instrument.family.brass.Trombone
 import org.wysko.midis2jam2.instrument.family.brass.Trumpet
 import org.wysko.midis2jam2.instrument.family.brass.TrumpetType
@@ -114,14 +115,14 @@ import org.wysko.midis2jam2.instrument.family.strings.Fiddle
 import org.wysko.midis2jam2.instrument.family.strings.Harp
 import org.wysko.midis2jam2.instrument.family.strings.Viola
 import org.wysko.midis2jam2.instrument.family.strings.Violin
-import org.wysko.midis2jam2.midi.MidiChannelSpecificEvent
-import org.wysko.midis2jam2.midi.MidiControlEvent
+import org.wysko.midis2jam2.midi.MidiChannelEvent
+import org.wysko.midis2jam2.midi.MidiControlChangeEvent
 import org.wysko.midis2jam2.midi.MidiFile
 import org.wysko.midis2jam2.midi.MidiNoteEvent
+import org.wysko.midis2jam2.midi.MidiNoteEvent.Companion.maximumPolyphony
 import org.wysko.midis2jam2.midi.MidiNoteOffEvent
 import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.MidiProgramEvent
-import org.wysko.midis2jam2.midi.maxPolyphony
 import org.wysko.midis2jam2.util.logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -139,7 +140,7 @@ object InstrumentAssignment {
     ): List<Instrument> {
         // Begin by extracting events from tracks and assign them to their target channels.
         val channels =
-            with(midiFile.tracks.flatMap { it.events }.filterIsInstance<MidiChannelSpecificEvent>()) {
+            with(midiFile.tracks.flatMap { it.events }.filterIsInstance<MidiChannelEvent>()) {
                 Array(16) { arr -> this.filter { it.channel == arr }.toMutableList() }
             }
 
@@ -151,7 +152,7 @@ object InstrumentAssignment {
 
         // Create a place for auxiliary percussion to go.
         val auxiliary =
-            mutableMapOf<KClass<out AuxiliaryPercussion>, MutableList<MutableList<MidiChannelSpecificEvent>>>()
+            mutableMapOf<KClass<out AuxiliaryPercussion>, MutableList<MutableList<MidiChannelEvent>>>()
 
         // For each channel,
         channels.forEachIndexed { channel, channelSpecificEvents ->
@@ -164,8 +165,8 @@ object InstrumentAssignment {
 
             // We create "bins" that events fall into based on their corresponding program event.
             val programBins =
-                buildMap<Int, MutableList<MidiChannelSpecificEvent>> {
-                    programEvents.distinctBy { it.programNum }.forEach { this += it.programNum to mutableListOf() }
+                buildMap<Int, MutableList<MidiChannelEvent>> {
+                    programEvents.distinctBy { it.program }.forEach { this += it.program to mutableListOf() }
                 }
 
             // Since a program change event can occur in between an ON and OFF event, we also need to keep track of the
@@ -176,7 +177,7 @@ object InstrumentAssignment {
             channelSpecificEvents.forEach { event ->
                 if (event !is MidiNoteOffEvent) { // If the event is not an OFF event,
                     // Determine the last program event
-                    val currentProgram = programEvents.lastOrNull { it.time <= event.time }?.programNum ?: 0
+                    val currentProgram = programEvents.lastOrNull { it.time <= event.time }?.program ?: 0
 
                     // Add the event to the correct bin
                     programBins[currentProgram]?.plusAssign(event)
@@ -228,8 +229,8 @@ object InstrumentAssignment {
     private fun buildInstrument(
         context: Midis2jam2,
         program: Int,
-        events: MutableList<MidiChannelSpecificEvent>,
-        allChannelEvents: List<MidiChannelSpecificEvent>,
+        events: MutableList<MidiChannelEvent>,
+        allChannelEvents: List<MidiChannelEvent>,
     ): Instrument? {
         val midiNoteEvents = events.filterIsInstance<MidiNoteEvent>()
 
@@ -239,7 +240,7 @@ object InstrumentAssignment {
         // Eliminates any duplicate events from adding the two together
         @Suppress("NAME_SHADOWING")
         val events =
-            (events + allChannelEvents.filterIsInstance<MidiControlEvent>()).distinct().sortedBy { it.time }
+            (events + allChannelEvents.filterIsInstance<MidiControlChangeEvent>()).distinct().sortedBy { it.time }
                 .toMutableList()
 
         if (midiNoteEvents.isEmpty()) return null
@@ -263,13 +264,13 @@ object InstrumentAssignment {
             21 -> Accordion(context, events, Type.ACCORDION)
             22 -> Harmonica(context, events)
             23 -> Accordion(context, events, Type.BANDONEON)
-            24, 25 -> Guitar(context, events, GuitarType.ACOUSTIC)
-            26, 27, 28, 29, 30, 31, 120 -> Guitar(context, events, GuitarType.ELECTRIC)
+            24, 25 -> Guitar(context, events, GuitarType.Acoustic)
+            26, 27, 28, 29, 30, 31, 120 -> Guitar(context, events, GuitarType.Electric)
             32 -> AcousticBass(context, events, PlayingStyle.PIZZICATO)
-            33, 34, 36, 37 -> BassGuitar(context, events, BassGuitarType.STANDARD)
-            35 -> BassGuitar(context, events, BassGuitarType.FRETLESS)
-            38 -> BassGuitar(context, events, BassGuitarType.SYNTH_1)
-            39 -> BassGuitar(context, events, BassGuitarType.SYNTH_2)
+            33, 34, 36, 37 -> BassGuitar(context, events, BassGuitarType.Standard)
+            35 -> BassGuitar(context, events, BassGuitarType.Fretless)
+            38 -> BassGuitar(context, events, BassGuitarType.Synth1)
+            39 -> BassGuitar(context, events, BassGuitarType.Synth2)
             40 -> Violin(context, events)
             41 -> Viola(context, events)
             42 -> Cello(context, events)
@@ -290,9 +291,9 @@ object InstrumentAssignment {
             58 -> Tuba(context, events)
             59 -> Trumpet(context, events, TrumpetType.Muted)
             60 -> FrenchHorn(context, events)
-            61 -> StageHorns(context, events, StageHorns.StageHornsType.BrassSection)
-            62 -> StageHorns(context, events, StageHorns.StageHornsType.SynthBrass1)
-            63 -> StageHorns(context, events, StageHorns.StageHornsType.SynthBrass2)
+            61 -> StageHorns(context, events, StageHornsType.BrassSection)
+            62 -> StageHorns(context, events, StageHornsType.SynthBrass1)
+            63 -> StageHorns(context, events, StageHornsType.SynthBrass2)
             64 -> SopranoSax(context, events)
             65 -> AltoSax(context, events)
             66 -> TenorSax(context, events)
@@ -307,7 +308,7 @@ object InstrumentAssignment {
             78 -> Whistles(context, events)
             79 -> Ocarina(context, events)
             80 -> { // square
-                if (midiNoteEvents.maxPolyphony() > 4) {
+                if (midiNoteEvents.maximumPolyphony > 4) {
                     Keyboard(context, events, KeyboardSkin["square_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaserType.Square)
@@ -315,7 +316,7 @@ object InstrumentAssignment {
             }
 
             81 -> { // sawtooth
-                if (midiNoteEvents.maxPolyphony() > 4) {
+                if (midiNoteEvents.maximumPolyphony > 4) {
                     Keyboard(context, events, KeyboardSkin["saw_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaserType.Saw)
@@ -370,9 +371,9 @@ object InstrumentAssignment {
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun collectAuxiliary(
         program: Int,
-        events: MutableList<MidiChannelSpecificEvent>,
-    ): MutableMap<KClass<out AuxiliaryPercussion>, List<List<MidiChannelSpecificEvent>>> {
-        val eventMap = mutableMapOf<KClass<out AuxiliaryPercussion>, List<List<MidiChannelSpecificEvent>>>()
+        events: MutableList<MidiChannelEvent>,
+    ): MutableMap<KClass<out AuxiliaryPercussion>, List<List<MidiChannelEvent>>> {
+        val eventMap = mutableMapOf<KClass<out AuxiliaryPercussion>, List<List<MidiChannelEvent>>>()
         when (program) {
             0, 8, 16, 24, 25, 32, 40 -> {
                 events.hits(27)?.let { eventMap.put(HighQ::class, it.groupNotes(27)) }
@@ -441,7 +442,7 @@ object InstrumentAssignment {
     private fun buildSpecialCases(
         context: Midis2jam2,
         program: Int,
-        events: MutableList<MidiChannelSpecificEvent>,
+        events: MutableList<MidiChannelEvent>,
     ): List<Instrument> {
         return when (program) {
             24 -> // Electronic
@@ -454,7 +455,6 @@ object InstrumentAssignment {
                                 when (it) {
                                     is MidiNoteOnEvent -> it.copy(note = 60)
                                     is MidiNoteOffEvent -> it.copy(note = 60)
-                                    else -> error("Invalid event type")
                                 }
                             }.also { context.file.registerEvents(it) },
                         ),
@@ -472,7 +472,6 @@ object InstrumentAssignment {
                                 when (it) {
                                     is MidiNoteOnEvent -> it.copy(note = 60)
                                     is MidiNoteOffEvent -> it.copy(note = 60)
-                                    else -> error("Invalid event type")
                                 }
                             }.also { context.file.registerEvents(it) },
                             StageChoir.ChoirType.SynthVoice,
@@ -493,7 +492,7 @@ object InstrumentAssignment {
     private fun buildDrumSet(
         context: Midis2jam2,
         program: Int,
-        events: MutableList<MidiChannelSpecificEvent>,
+        events: MutableList<MidiChannelEvent>,
     ): DrumSet? {
         if (events.hits().isEmpty()) return null
         return when (program) {
@@ -531,13 +530,13 @@ object InstrumentAssignment {
         }
     }
 
-    private fun List<MidiChannelSpecificEvent>.notes(vararg notes: Int): List<MidiNoteEvent>? =
+    private fun List<MidiChannelEvent>.notes(vararg notes: Int): List<MidiNoteEvent>? =
         this.filterIsInstance<MidiNoteEvent>().filter { it.note in notes }.ifEmpty { null }
 
-    private fun List<MidiChannelSpecificEvent>.hits(vararg notes: Int): List<MidiNoteOnEvent>? =
+    private fun List<MidiChannelEvent>.hits(vararg notes: Int): List<MidiNoteOnEvent>? =
         this.filterIsInstance<MidiNoteOnEvent>().filter { it.note in notes }.ifEmpty { null }
 
-    private fun List<MidiChannelSpecificEvent>.hits(): List<MidiNoteOnEvent> = this.filterIsInstance<MidiNoteOnEvent>()
+    private fun List<MidiChannelEvent>.hits(): List<MidiNoteOnEvent> = this.filterIsInstance<MidiNoteOnEvent>()
 
     fun MutableList<MidiProgramEvent>.removeDuplicateProgramEvents() {
         // Remove program events at same time (keep the last one)
@@ -549,7 +548,7 @@ object InstrumentAssignment {
 
         // Remove program events with same value (keep the first one)
         for (i in size - 2 downTo 0) {
-            while (i != size - 1 && this[i].programNum == this[i + 1].programNum) {
+            while (i != size - 1 && this[i].program == this[i + 1].program) {
                 removeAt(i + 1)
             }
         }
