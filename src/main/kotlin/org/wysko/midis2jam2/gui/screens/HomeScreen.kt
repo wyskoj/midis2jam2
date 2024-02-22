@@ -75,44 +75,50 @@ fun HomeScreen(
     var showFilePicker by remember { mutableStateOf(false) }
     var focusCount by remember { mutableStateOf(0) }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+    Scaffold(
+        floatingActionButton = {
+            HelpButton()
+        }
     ) {
-        Column(
-            Modifier.padding(64.dp).requiredWidth(512.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            Midis2jam2Logo(Modifier.align(Alignment.CenterHorizontally))
-            SelectMidiFileRow(midiFile, {
-                showFilePicker = true
-            }, openMidiSearch, flicker, focusCount)
-            SelectMidiDeviceRow(midiDevices, selectedMidiDevice, homeViewModel) {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        I18n["refreshed_midi_devices"].value,
-                        duration = SnackbarDuration.Short,
-                    )
+            Column(
+                Modifier.padding(64.dp).requiredWidth(512.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Midis2jam2Logo(Modifier.align(Alignment.CenterHorizontally))
+                SelectMidiFileRow(midiFile, {
+                    showFilePicker = true
+                }, openMidiSearch, flicker, focusCount)
+                SelectMidiDeviceRow(midiDevices, selectedMidiDevice, homeViewModel) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            I18n["refreshed_midi_devices"].value,
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
                 }
-            }
-            AnimatedVisibility(homeViewModel.shouldShowSoundbankSelector) {
-                SelectSoundbankRow(selectedSoundbank, soundbanks.toList(), homeViewModel, onOpenSoundbankConfig)
-            }
-            Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ElevatedButton(
-                    onClick = playMidiFile,
-                    modifier = Modifier.width(160.dp).height(48.dp),
-                    enabled = !isLockPlayButton && midiFile != null,
-                ) {
-                    Icon(Icons.Default.PlayArrow, I18n["play"].value)
-                    Spacer(Modifier.width(8.dp))
-                    Text(I18n["play"].value)
+                AnimatedVisibility(homeViewModel.shouldShowSoundbankSelector) {
+                    SelectSoundbankRow(selectedSoundbank, soundbanks.toList(), homeViewModel, onOpenSoundbankConfig)
                 }
-                ToolTip(I18n["repeat"].value) {
-                    IconToggleButton(isLooping, {
-                        homeViewModel.setLooping(it)
-                    }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                        Icon(painterResource("/ico/repeat.svg"), I18n["repeat"].value)
+                Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ElevatedButton(
+                        onClick = playMidiFile,
+                        modifier = Modifier.width(160.dp).height(48.dp),
+                        enabled = !isLockPlayButton && midiFile != null,
+                    ) {
+                        Icon(Icons.Default.PlayArrow, I18n["play"].value)
+                        Spacer(Modifier.width(8.dp))
+                        Text(I18n["play"].value)
+                    }
+                    ToolTip(I18n["repeat"].value) {
+                        IconToggleButton(isLooping, {
+                            homeViewModel.setLooping(it)
+                        }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
+                            Icon(painterResource("/ico/repeat.svg"), I18n["repeat"].value)
+                        }
                     }
                 }
             }

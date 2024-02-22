@@ -15,14 +15,22 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.gui.util
+package org.wysko.midis2jam2.gui.components
 
-import java.awt.Desktop
-import java.net.URI
-
-private const val HELP_URL = "https://docs.midis2jam2.xyz"
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
+import org.wysko.midis2jam2.gui.util.openHelp
 
 /**
- * Opens the help page in the user's default browser.
+ * A floating action button that opens the help page.
  */
-fun openHelp(): Unit = Desktop.getDesktop().browse(URI(HELP_URL))
+@Composable
+fun HelpButton() {
+    FloatingActionButton({
+        openHelp()
+    }) {
+        Icon(painterResource("/ico/help.svg"), contentDescription = "Help")
+    }
+}

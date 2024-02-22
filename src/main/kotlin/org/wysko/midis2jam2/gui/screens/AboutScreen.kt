@@ -17,19 +17,27 @@
 
 package org.wysko.midis2jam2.gui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import org.wysko.midis2jam2.gui.components.HelpButton
 import org.wysko.midis2jam2.gui.components.Linkable
 import org.wysko.midis2jam2.gui.components.Midis2jam2Logo
 import org.wysko.midis2jam2.gui.components.TextWithLink
 import org.wysko.midis2jam2.gui.loadDependencies
-import org.wysko.midis2jam2.gui.util.openHelp
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.util.Utils
 
@@ -38,11 +46,7 @@ import org.wysko.midis2jam2.util.Utils
 fun AboutScreen() {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton({
-                openHelp()
-            }) {
-                Icon(painterResource("/ico/help.svg"), contentDescription = "Help")
-            }
+            HelpButton()
         }
     ) {
         LazyColumn(
