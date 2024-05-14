@@ -69,7 +69,7 @@ class Harmonica(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         }
         with(placement) {
             loc = v3(74, 32, -38)
-            rot = v3(0, -90, 0)
+            rot = v3(0, 0, 0)
         }
     }
 }
