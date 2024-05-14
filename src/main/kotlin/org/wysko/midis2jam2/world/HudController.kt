@@ -38,32 +38,49 @@ private const val FILLBAR_BOX_WIDTH = 512
 private const val MAXIMUM_FILLBAR_SCALE = (FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION_OFFSET * 2)) / FILLBAR_WIDTH
 
 /**
- * Displays the fillbar and file name on-screen.
+ * Controls the heads-up display.
+ *
+ * The HUD consists of a fillbar and a text label. The fillbar is a sprite that fills up as the song progresses. The text
+ * label displays the name of the song.
  */
 context(Midis2jam2)
 class HudController {
-    private val root: Node = node {
-        loc = v3(10, 10, 0)
-    }.also {
+    private val root: Node = node().also {
         if (configs.getType(SettingsConfiguration::class).showHud) app.guiNode += it
+        it.move(v3(16, 16, 0))
     }
+
+    init {
+        with(root) {
+            +assetLoader.loadSprite("SongFillbarBox.bmp").also {
+                it.move(v3(0, 0, -10))
+            }
+            +BitmapText(assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
+                loc = v3(0f, 46f, 0f)
+                text = file.name
+                size = 24f
+                color = White
+            }
+        }
+    }
+
 
     private val fillbar = with(root) {
         +assetLoader.loadSprite("SongFillbar.bmp").also {
-            loc = v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 1)
+            it.move(v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 10))
         }
     }
 
     init {
-        root += assetLoader.loadSprite("SongFillbarBox.bmp")
-        BitmapText(assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
-            root += this
-            loc = v3(0f, 44f, 0f)
-            text = file.name
-            size = 24f
-            color = White
+        root.children.forEach {
+            when (it) {
+                // Start with the HUD invisible for fade-in.
+                is PictureWithFade -> it.opacity = 0f
+                is BitmapText -> it.color = ColorRGBA(1f, 1f, 1f, 0f)
+            }
         }
     }
+
 
     /**
      * Updates animation.

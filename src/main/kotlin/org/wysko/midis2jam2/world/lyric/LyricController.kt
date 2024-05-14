@@ -35,10 +35,6 @@ import kotlin.math.abs
  * @property events The list of the text events.
  */
 class LyricController(val context: Midis2jam2, val events: List<MidiTextEvent>) {
-    /**
-     * Whether the controller is enabled.
-     */
-    var isEnabled: Boolean = true
 
     private val font = context.assetManager.loadFont("Assets/Fonts/Inter.fnt")
 
@@ -92,8 +88,6 @@ class LyricController(val context: Midis2jam2, val events: List<MidiTextEvent>) 
      * @param delta The time since the last update.
      */
     fun tick(time: Double, delta: Float) {
-        if (!isEnabled) return
-
         with(context) {
             lineCollector.advanceCollect(time)?.let {
                 currentLine = it

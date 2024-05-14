@@ -160,6 +160,11 @@ abstract class Midis2jam2(
     var shadowController: ShadowController? = null
 
     /**
+     * The lyric controller.
+     */
+    var lyricController: LyricController? = null
+
+    /**
      * The list of instruments.
      */
     lateinit var instruments: List<Instrument>
@@ -168,11 +173,6 @@ abstract class Midis2jam2(
      * The stand controller.
      */
     lateinit var standController: StandController
-
-    /**
-     * The lyric controller.
-     */
-    lateinit var lyricController: LyricController
 
     /**
      * The autocam controller.
@@ -229,9 +229,11 @@ abstract class Midis2jam2(
         }
         this.drumSetVisibilityManager = DrumSetVisibilityManager(this, instruments.filterIsInstance<DrumSet>())
         this.standController = StandController()
-        this.lyricController =
+        this.lyricController = if (settingsConfig.showLyrics) {
             LyricController(this, file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>())
-        this.lyricController.isEnabled = settingsConfig.showLyrics
+        } else {
+            null
+        }
         this.autocamController = AutoCamController(this, settingsConfig.startAutocamWithSong)
         this.slideCamController = SlideCameraController()
         this.debugTextController = DebugTextController(this)

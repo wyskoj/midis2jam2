@@ -148,7 +148,7 @@ class DesktopMidis2jam2(
     private fun tickControllers(tpf: Float) {
         shadowController?.tick()
         standController.tick()
-        lyricController.tick(time, tpf)
+        lyricController?.tick(time, tpf)
         hudController.tick(time, fadeFilter.value)
         flyByCamera.tick(tpf)
         autocamController.tick(time, tpf)

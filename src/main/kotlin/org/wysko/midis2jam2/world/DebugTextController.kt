@@ -198,7 +198,7 @@ private fun Midis2jam2.debugText(
         )
         appendLine()
         appendLine("Lyrics")
-        appendLine(this@debugText.lyricController.debugInfo(this@debugText.time))
+        appendLine(this@debugText.lyricController?.debugInfo(this@debugText.time))
 
         // instruments strings
         appendLine()
