@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
+import kotlin.math.abs
 
 private const val SQUARE_ROOT_OF_127: Float = 11.269427f
 
@@ -80,7 +81,13 @@ abstract class PercussionInstrument protected constructor(
                 drum.localTranslation =
                     recoilAxis.identity.mult((recoilDistance * velocityRecoilDampening(velocity)).toFloat())
             } else {
-                drum.move(recoilAxis.identity.mult(delta * recoilSpeed))
+                val distanceToGo = abs(drum.localTranslation[recoilAxis.componentIndex])
+                drum.move(
+                    recoilAxis
+                        .identity
+                        .mult(delta * recoilSpeed)
+                        .mult(distanceToGo) // Introduces some non-linearity to the recoil
+                )
                 if (drum.localTranslation[recoilAxis.componentIndex] > 0) drum.localTranslation = Vector3f.ZERO
             }
         }

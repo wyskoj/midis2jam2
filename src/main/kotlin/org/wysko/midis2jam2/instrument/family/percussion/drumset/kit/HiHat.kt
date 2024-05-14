@@ -122,7 +122,7 @@ class HiHat(
             velocity = max(stickResults.strike?.velocity ?: 0, pedalResults?.velocity ?: 0),
             delta = delta,
             recoilDistance = -0.7f,
-            recoilSpeed = 5f,
+            recoilSpeed = 12f,
         )
 
         cymbalAnimator.tick(delta)
