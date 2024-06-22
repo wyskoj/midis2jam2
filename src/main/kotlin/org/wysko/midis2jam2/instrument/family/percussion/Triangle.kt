@@ -99,7 +99,7 @@ class Triangle(
                 nextMute.time < nextOpen.time
             }
 
-            else -> error("All cases covered.")
+            else -> true // Both are null?
         }.ch
     }
 }

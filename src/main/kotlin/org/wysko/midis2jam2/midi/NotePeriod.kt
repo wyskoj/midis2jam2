@@ -17,7 +17,9 @@
 package org.wysko.midis2jam2.midi
 
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.algorithmic.AveragePolyphony
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
+import kotlin.math.roundToInt
 
 /**
  * A note period is a tuple consisting of a [MidiNoteOnEvent] and a [MidiNoteOffEvent].
@@ -104,6 +106,65 @@ open class NotePeriod(
     }
 }
 
+fun improvedContiguousGroupDetection(notePeriods: List<NotePeriod>): List<NotePeriodGroup> {
+    val overlapThreshold = 0.01 // 10 milliseconds
+
+    fun shouldIgnoreOverlap(note1: NotePeriod, note2: NotePeriod): Boolean {
+        return note1.end > note2.start && note1.end - note2.start < overlapThreshold
+    }
+
+    fun areSustainedTogether(note1: NotePeriod, note2: NotePeriod): Boolean {
+        // Check if note1 and note2 sustain together for a significant portion of their duration
+        return note1.start < note2.end && note2.start < note1.end
+    }
+
+    val groups = mutableListOf<NotePeriodGroup>()
+    var currentGroup = mutableSetOf<NotePeriod>()
+
+    for (i in notePeriods.indices) {
+        val currentNote = notePeriods[i]
+
+        if (currentGroup.isEmpty()) {
+            currentGroup.add(currentNote)
+        } else {
+            val lastNote = currentGroup.last()
+            val isOverlapping = lastNote.end > currentNote.start
+            val shouldGroup = isOverlapping && !shouldIgnoreOverlap(lastNote, currentNote)
+
+            if (shouldGroup || areSustainedTogether(lastNote, currentNote)) {
+                currentGroup.add(currentNote)
+            } else {
+                groups.add(NotePeriodGroup(currentGroup))
+                currentGroup = mutableSetOf(currentNote)
+            }
+        }
+
+        // Look ahead to handle sustained notes forming chords
+        val lookAheadNotes = notePeriods.subList(i + 1, notePeriods.size)
+
+        for (lookAheadNote in lookAheadNotes) {
+            if (areSustainedTogether(currentNote, lookAheadNote)) {
+                currentGroup.add(lookAheadNote)
+            }
+        }
+    }
+
+    if (currentGroup.isNotEmpty()) {
+        groups.add(NotePeriodGroup(currentGroup))
+    }
+
+    // Break some groups if the predominant polyphony is 1
+    val probablySoloGroups = groups.filter { AveragePolyphony.calculate(it).roundToInt() == 1 }
+    groups.removeAll(probablySoloGroups)
+    probablySoloGroups.forEach { soloGroup ->
+        soloGroup.notePeriods.forEach { notePeriod ->
+            groups.add(NotePeriodGroup(setOf(notePeriod)))
+        }
+    }
+
+    return groups
+}
+
 /**
  * Calculates the note periods based on the given context and [modulus].
  *
@@ -127,16 +188,16 @@ fun List<MidiEvent>.notePeriodsModulus(context: Midis2jam2, modulus: Int): List<
 fun List<NotePeriod>.contiguousGroups(): List<NotePeriodGroup> {
     // Easy gimmes
     if (this.isEmpty()) return emptyList()
-    if (this.size == 1) return listOf(NotePeriodGroup(listOf(first())))
+    if (this.size == 1) return listOf(NotePeriodGroup(setOf(first())))
 
     val groups = mutableListOf<NotePeriodGroup>()
-    var currentGroup: MutableList<NotePeriod> = mutableListOf()
+    var currentGroup = mutableSetOf<NotePeriod>()
     var furthestTime = 0L
 
     fun NotePeriod.register(newGroup: Boolean = false) {
         if (newGroup) {
             groups.add(NotePeriodGroup(currentGroup))
-            currentGroup = mutableListOf(this)
+            currentGroup = mutableSetOf(this)
             furthestTime = this.noteOff.time
         } else {
             currentGroup.add(this)

@@ -36,6 +36,8 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.stream.Collectors
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /** Provides various utility functions. */
 object Utils {
@@ -171,3 +173,10 @@ val Boolean.sign: Float
  * @param length The length to wrap the string to.
  */
 fun String.wrap(length: Int): String = this.chunked(length).joinToString("\n")
+
+fun Collection<Number>.stdDev(): Double {
+    val asDoubles = this.map { it.toDouble() }
+    val mean = asDoubles.average()
+    val sum = asDoubles.sumOf { (it - mean).pow(2) }
+    return sqrt(sum / asDoubles.size)
+}

@@ -18,13 +18,7 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiControlChangeEvent
-import org.wysko.midis2jam2.midi.MidiModulationDepthRangeEvent
-import org.wysko.midis2jam2.midi.MidiPitchBendEvent
-import org.wysko.midis2jam2.midi.MidiPitchBendSensitivityEvent
-import org.wysko.midis2jam2.midi.MidiRegisteredParameterNumberChangeEvent
-import org.wysko.midis2jam2.midi.RegisteredParameterNumber
+import org.wysko.midis2jam2.midi.*
 import org.wysko.midis2jam2.util.NumberSmoother
 import kotlin.math.sin
 
@@ -44,10 +38,10 @@ class PitchBendModulationController(
     events: List<MidiChannelEvent>,
     smoothness: Double = 10.0,
 ) {
-    // Relevant events
-    private val pitchBendEvents = EventCollector(context, events.filterIsInstance<MidiPitchBendEvent>()) { collector ->
-        pitchBend = collector.prev()?.let { it.value - PITCH_BEND_CENTER } ?: 0
-    }
+    private val absolutePitchBendEvents =
+        EventCollector(context, MidiAbsolutePitchBendEvent.fromEvents(events, context)) {
+            pitchBend = it.prev()?.value ?: 0.0
+        }
 
     private val modulationWheelEvents = EventCollector(
         context,
@@ -55,21 +49,6 @@ class PitchBendModulationController(
     ) {
         modulation = it.prev()?.value ?: 0
     }
-
-    // Pseudo-events
-    private val pitchBendSensitivityEvents =
-        EventCollector(
-            context,
-            MidiPitchBendSensitivityEvent.fromRpnChanges(
-                MidiRegisteredParameterNumberChangeEvent.collectRegisteredParameterNumberChanges(
-                    events.filterIsInstance<MidiControlChangeEvent>(),
-                    RegisteredParameterNumber.PitchBendSensitivity
-                ),
-                events.first().channel
-            ).also { context.file.registerEvents(it) }
-        ) {
-            pitchBendSensitivity = it.prev()?.value ?: 2.0
-        }
 
     private val modulationDepthRangeEvents =
         EventCollector(
@@ -86,8 +65,7 @@ class PitchBendModulationController(
         }
 
     // Current MIDI states
-    private var pitchBend = 0
-    private var pitchBendSensitivity = 2.0
+    private var pitchBend = 0.0
     private var modulation = 0
     private var modulationRange = 0.5
 
@@ -120,9 +98,8 @@ class PitchBendModulationController(
     ): Float {
         modulationPhaseOffset += tpf
 
-        pitchBendEvents.advanceCollectAll(time).forEach { pitchBend = it.value - PITCH_BEND_CENTER }
+        absolutePitchBendEvents.advanceCollectAll(time).forEach { pitchBend = it.value }
         modulationWheelEvents.advanceCollectAll(time).forEach { modulation = it.value }
-        pitchBendSensitivityEvents.advanceCollectAll(time).forEach { pitchBendSensitivity = it.value }
         modulationDepthRangeEvents.advanceCollectAll(time).forEach { modulationRange = it.value }
 
         return if (!playing() && !applyModulationWhenIdling) {
@@ -141,5 +118,5 @@ class PitchBendModulationController(
     }
 
     private fun modulationSemitones() = sin(50 * modulationPhaseOffset) * modulationRange * (modulation / 128.0)
-    private fun pitchBendSemitones() = (pitchBend / PITCH_BEND_CENTER.toDouble()) * pitchBendSensitivity
+    private fun pitchBendSemitones() = pitchBend
 }

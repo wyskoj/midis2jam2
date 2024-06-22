@@ -7,8 +7,6 @@ comments:
     active: true
 
 style:
-  DestructuringDeclarationWithTooManyEntries:
-    maxEntries: 4
   MagicNumber:
     active: false
   ReturnCount:

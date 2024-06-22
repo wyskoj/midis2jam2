@@ -24,33 +24,30 @@ import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.midi.contiguousGroups
+import org.wysko.midis2jam2.midi.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
-import org.wysko.midis2jam2.util.chunked
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
+import kotlin.math.abs
 
 private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
 private const val GUITAR_VECTOR_THRESHOLD = 8
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/Guitar.json"))
-private val GUITAR_CHORD_DEFINITIONS_STANDARD_E: List<ChordDefinition> =
+private val GUITAR_CHORD_DEFINITIONS_STANDARD_E: Set<ChordDefinition> =
     Json.decodeFromString(resourceToString("/instrument/chords/Guitar.json"))
-private val GUITAR_CHORD_DEFINITIONS_DROP_D: List<ChordDefinition> =
-    Json.decodeFromString<List<ChordDefinition>>(resourceToString("/instrument/chords/Guitar.json"))
+private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
+    Json.decodeFromString<Set<ChordDefinition>>(resourceToString("/instrument/chords/Guitar.json"))
         .map {
             ChordDefinition(
                 notes = listOf(if (it.notes[0] != -1) it.notes[0] - 2 else -1) + it.notes.subList(1, 6),
                 frets = it.frets
             )
-        }
+        }.toSet()
 
 /**
  * The Guitar.
@@ -85,127 +82,17 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: GuitarTy
     ) to "GuitarSkin.bmp"
 ) {
 
+    private val dictionary =
+        if (needsDropTuning(events)) GUITAR_CHORD_DEFINITIONS_DROP_D else GUITAR_CHORD_DEFINITIONS_STANDARD_E
+    private val openStringValues =
+        if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
 
-    override val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> = run {
-        // Determine contiguous groups (chords)
-        val groups = notePeriods.contiguousGroups()
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
-        val appliedDefinitions = mutableMapOf<Set<Int>, ChordDefinition>()
-        val dictionary = if (needsDropTuning(events)) {
-            GUITAR_CHORD_DEFINITIONS_DROP_D
-        } else {
-            GUITAR_CHORD_DEFINITIONS_STANDARD_E
-        }
-        val polyphonySections = groups.asSequence()
-            .chunked { (lastNPs), (currentNPs) -> lastNPs.size != currentNPs.size }
-            .toList()
+    /**
+     * Maps each [NotePeriod] that this Guitar is responsible to play to its [FretboardPosition].
+     */
+    override val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> =
+        BetterFretting(context, dictionary, openStringValues, events).calculate(notePeriods)
 
-        fun applyChordDefinition(
-            chordDefinition: ChordDefinition,
-            notePeriods: List<NotePeriod>,
-            uniqueNotes: Set<Int>
-        ) {
-            notePeriods.forEach {
-                map += it to chordDefinition.noteToFretboardPosition(it.note)
-            }
-            appliedDefinitions.putIfAbsent(uniqueNotes, chordDefinition)
-        }
-
-        fun buildManually(
-            notePeriods: List<NotePeriod>,
-            occupiedStrings: MutableList<Int> = mutableListOf(),
-            lowFret: Boolean = false
-        ): Map<NotePeriod, FretboardPosition> {
-            val builtMap = mutableMapOf<NotePeriod, FretboardPosition>()
-            notePeriods.sortedBy { it.note }.forEach { np ->
-                (frettingEngine as StandardFrettingEngine).lowestFretboardPosition(
-                    np.note,
-                    occupiedStrings,
-                    lowFret
-                )
-                    ?.let {
-                        val pair = np to it
-                        map += pair
-                        builtMap += pair
-                        occupiedStrings += it.string
-                    }
-            }
-            return builtMap
-        }
-
-        polyphonySections.forEach { polyphonySection ->
-            if (polyphonySection.first().notePeriods.size == 1) { // Section has a polyphony of 1
-                // Just use the standard fretting engine to build fingerings
-                polyphonySection.forEach { (notePeriods) ->
-                    frettingEngine.bestFretboardPosition(notePeriods[0].note)?.let {
-                        map += notePeriods[0] to it
-                        frettingEngine.applyFretboardPosition(it)
-                        frettingEngine.releaseString(it.string)
-                    }
-                }
-                return@forEach
-            }
-
-            if (polyphonySection.first().notePeriods.size == 2) { // Section has a polyphony of 2
-                // Find the group within this section that has the lowest overall note
-                val lowestGroup =
-                    polyphonySection.minByOrNull { (notePeriods) -> notePeriods.minOf { it.note } }
-
-                // Build a fingering from this lowest group, starting at the lowest possible position
-                lowestGroup?.let { group ->
-                    val stringsNotUsed =
-                        (0 until 6).minus(
-                            buildManually(group.notePeriods, lowFret = true).values.map { it.string }
-                                .toSet()
-                        )
-
-                    // Build the rest of the groups avoiding using the string that were not used
-                    polyphonySection.minus(group).forEach { (notePeriods) ->
-                        buildManually(notePeriods, stringsNotUsed.toMutableList())
-                    }
-                }
-                return@forEach
-            }
-
-            for ((notePeriods) in polyphonySection) {
-                // Find all notes in the group
-                val uniqueNotes = notePeriods.distinctBy { it.note }.map { it.note }.toSet()
-
-                // First, see if we've already figured out a definition for these notes.
-                val try1 = appliedDefinitions[uniqueNotes]
-                if (try1 != null) {
-                    applyChordDefinition(try1, notePeriods, uniqueNotes)
-                    continue
-                }
-
-                // See if there is a definition that is an exact match.
-                val try2 = dictionary.firstOrNull {
-                    it.definedNotes() == uniqueNotes
-                }
-                if (try2 != null) {
-                    applyChordDefinition(try2, notePeriods, uniqueNotes)
-                    continue
-                }
-
-                // If there is no exact match, find the definition that
-                // has the most overlap and contains all of our notes.
-                val try3 = dictionary.filter {
-                    it.definedNotes().containsAll(uniqueNotes)
-                }.associateWith {
-                    it.definedNotes().intersect(uniqueNotes)
-                }.maxByOrNull { it.value.size }
-                if (try3 != null) {
-                    applyChordDefinition(try3.key, notePeriods, uniqueNotes)
-                    continue
-                }
-
-                // Still haven't found a solution. We have to make one up at this point.
-                buildManually(notePeriods)
-            }
-        }
-
-        map
-    }
 
     override val upperStrings: Array<Spatial> = Array(6) {
         if (it < 3) {

@@ -19,7 +19,6 @@ package org.wysko.midis2jam2.instrument.family.guitar
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
-import kotlinx.serialization.Serializable
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
@@ -243,41 +242,20 @@ abstract class FrettedInstrument protected constructor(
 
     override fun toString(): String = super.toString() + formatProperty(
         name = "FRETBOARD",
-        value = collector.currentNotePeriods.joinToString {
-            """${it.note} <-> ${notePeriodFretboardPosition[it]}"""
+        value = buildString {
+            appendLine()
+            frettingEngine as StandardFrettingEngine
+            for (x in (numberOfStrings - 1) downTo 0) {
+                for (y in 0..<frettingEngine.numberOfFrets) {
+                    append(if (collector.currentNotePeriods.any {
+                            notePeriodFretboardPosition[it]?.let {
+                                it.string == x && it.fret == y
+                            } == true
+                        }) "x" else "-")
+                }
+                appendLine()
+            }
         },
     )
 }
 
-/**
- * Represents a chord definition that consists of a list of notes, and a corresponding list of frets on a fretboard.
- * This class provides methods to retrieve the defined notes and map a note to its corresponding fretboard position.
- *
- * For example, a chord definition may look like:
- * ```json
- * {"notes":[-1,45,52,57,61,64],"frets":[-1,0,2,2,2,0]}
- * ```
- * Each property will2 be a list of the same length, where the index of each note in the `notes` list corresponds to the
- * index of the fret in the `frets` list.
- *
- * @property notes The list of notes in the chord. Any note represented as -1 is considered undefined.
- * @property frets The list of frets corresponding to each note in the chord.
- */
-@Serializable
-internal data class ChordDefinition(val notes: List<Int>, val frets: List<Int>) {
-
-    /**
-     * Returns a set of notes that this chord defines.
-     */
-    fun definedNotes() = notes.filter { it != -1 }.toSet()
-
-    /**
-     * Returns the fretboard position of a note in this chord.
-     *
-     * @param note The note to find the fretboard position of.
-     */
-    fun noteToFretboardPosition(note: Int): FretboardPosition {
-        val string = notes.indexOf(note)
-        return FretboardPosition(string, frets[string])
-    }
-}

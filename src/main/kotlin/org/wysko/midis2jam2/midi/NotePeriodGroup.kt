@@ -22,7 +22,7 @@ package org.wysko.midis2jam2.midi
  *
  * @property notePeriods The [NotePeriod]s that are in this group.
  */
-data class NotePeriodGroup(val notePeriods: List<NotePeriod>) {
+data class NotePeriodGroup(val notePeriods: Set<NotePeriod>) {
 
     /**
      * The time at which the first [NotePeriod] in this group begins.
