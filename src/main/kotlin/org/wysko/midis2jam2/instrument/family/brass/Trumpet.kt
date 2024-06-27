@@ -19,24 +19,18 @@ package org.wysko.midis2jam2.instrument.family.brass
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.util.get
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.material
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.times
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Trumpet::class)
 
@@ -47,7 +41,7 @@ private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingerin
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of trumpet.
  */
-class Trumpet(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: TrumpetType) :
+class Trumpet(context: Midis2jam2, eventList: List<MidiEvent>, type: TrumpetType) :
     MonophonicInstrument(context, eventList, type.clazz, FINGERING_MANAGER), MultipleInstancesLinearAdjustment {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
@@ -91,7 +85,7 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: Trum
             keys.forEachIndexed { i, key -> key.loc = v3(0, if (i in pressed) -0.5 else 0, 0) }
         }
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.rot = v3(0, -10, 0) * indexForMoving()
             root.loc = v3(0, -1, 0) * indexForMoving()
         }

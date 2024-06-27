@@ -17,9 +17,7 @@
 package org.wysko.midis2jam2.util
 
 import com.jme3.material.Material
-import com.jme3.math.ColorRGBA.Blue
-import com.jme3.math.ColorRGBA.Green
-import com.jme3.math.ColorRGBA.Red
+import com.jme3.math.ColorRGBA.*
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
@@ -180,3 +178,12 @@ fun Collection<Number>.stdDev(): Double {
     val sum = asDoubles.sumOf { (it - mean).pow(2) }
     return sqrt(sum / asDoubles.size)
 }
+
+/**
+ * Returns the maximum of two bytes.
+ *
+ * @param byte1 The first byte.
+ * @param byte2 The second byte.
+ * @return The maximum of the two bytes.
+ */
+fun max(byte1: Byte, byte2: Byte): Byte = if (byte1 > byte2) byte1 else byte2

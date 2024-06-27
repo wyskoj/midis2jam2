@@ -16,27 +16,23 @@
  */
 package org.wysko.midis2jam2.instrument.family.pipe
 
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.POP
-import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /** The Blown bottle. */
-class BlownBottle(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class BlownBottle(context: Midis2jam2, events: List<MidiEvent>) :
     DivisiveSustainedInstrument(context, events) {
 
     override val animators: List<PitchClassAnimator> = List(12) { Bottle(it, events.notePeriodsModulus(context, it)) }
@@ -58,25 +54,25 @@ class BlownBottle(context: Midis2jam2, events: List<MidiChannelEvent>) :
         placement.loc = v3(75, 0, -35)
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         with(updateInstrumentIndex(delta)) {
             root.loc = v3(0, 20 + this * 3.6, 0)
             placement.rot = v3(0, 90 * this, 0)
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         pitchBendModulationController.tick(time, delta)
     }
 
     /** A single Bottle. */
-    inner class Bottle(i: Int, notePeriods: List<NotePeriod>) : PitchClassAnimator(context, notePeriods) {
+    inner class Bottle(i: Int, notePeriods: List<TimedArc>) : PitchClassAnimator(context, notePeriods) {
 
         private val puffer: SteamPuffer = SteamPuffer(context, POP, 1.0, OUTWARDS)
         private val bendCtrl = NumberSmoother(0f, 10.0)
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
             puffer.tick(delta, playing)
             animation.loc = v3(

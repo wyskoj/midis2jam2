@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
-import org.wysko.midis2jam2.starter.configuration.SOUNDBANK_FILE_EXTENSIONS
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
+import org.wysko.midis2jam2.starter.configuration.SOUNDBANK_FILE_EXTENSIONS
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)

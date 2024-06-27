@@ -17,8 +17,10 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Computes the visibility of instruments based on the time of the last hit and the time of the next hit.
@@ -27,8 +29,8 @@ import org.wysko.midis2jam2.midi.MidiEvent
 object Visibility {
 
     context(Midis2jam2)
-    private val MidiEvent.sec: Double
-        get() = file.eventInSeconds(this)
+    private val MidiEvent.sec: Duration
+        get() = sequence.getTimeOf(this)
 
     /**
      * Determines the visibility of an instrument based on the time of the last hit and the time of the next hit,
@@ -45,7 +47,7 @@ object Visibility {
     fun <T : MidiEvent> standardRules(
         context: Midis2jam2,
         collector: EventCollector<T>,
-        time: Double,
+        time: Duration,
         parameters: Parameters = Parameters(),
     ): Boolean = with(context) {
         collector.peek()?.let {
@@ -72,24 +74,24 @@ object Visibility {
      */
     @Suppress("ReturnCount")
     fun standardRules(
-        collector: NotePeriodCollector,
-        time: Double,
+        collector: TimedArcCollector,
+        time: Duration,
         parameters: Parameters = Parameters(),
     ): Boolean {
-        if (collector.currentNotePeriods.isNotEmpty()) return true
+        if (collector.currentTimedArcs.isNotEmpty()) return true
 
         collector.peek()?.let {
-            if (it.start - time <= parameters.showBefore) return true
+            if (it.startTime - time <= parameters.showBefore) return true
         }
 
         collector.prev()?.let { prev ->
             collector.peek()?.let { peek ->
-                if (peek.start - prev.end <= parameters.showBetween) return true
+                if (peek.startTime - prev.endTime <= parameters.showBetween) return true
             }
         }
 
         collector.prev()?.let {
-            if (time - it.end <= parameters.showAfter) return true
+            if (time - it.endTime <= parameters.showAfter) return true
         }
 
         return false
@@ -98,14 +100,14 @@ object Visibility {
     /**
      * Parameters for the visibility algorithm.
      *
-     * @property showBefore The number of seconds before the last hit that the instrument should be visible.
-     * @property showBetween The number of seconds between the last hit and the next hit that the instrument should be
+     * @property showBefore The amount of time before the last hit that the instrument should be visible.
+     * @property showBetween The amount of time between the last hit and the next hit that the instrument should be
      * visible.
-     * @property showAfter The number of seconds after the last hit that the instrument should be visible.
+     * @property showAfter The amount of time after the last hit that the instrument should be visible.
      */
     data class Parameters(
-        val showBefore: Double = 1.0,
-        val showBetween: Double = 7.0,
-        val showAfter: Double = 2.0,
+        val showBefore: Duration = 1.seconds,
+        val showBetween: Duration = 7.seconds,
+        val showAfter: Duration = 2.seconds,
     )
 }

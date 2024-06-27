@@ -18,13 +18,14 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Cello. */
-class Cello(context: Midis2jam2, events: List<MidiChannelEvent>) : StringFamilyInstrument(
+class Cello(context: Midis2jam2, events: List<MidiEvent>) : StringFamilyInstrument(
     context,
     events,
     true,
@@ -33,7 +34,7 @@ class Cello(context: Midis2jam2, events: List<MidiChannelEvent>) : StringFamilyI
     intArrayOf(36, 43, 50, 57),
     context.modelD("Cello.obj", "CelloSkin.bmp")
 ) {
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(-20 * updateInstrumentIndex(delta), 0f, 0f)
     }
 

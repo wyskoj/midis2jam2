@@ -28,5 +28,5 @@ fun interface FingeringManager<E> {
      * @return The fingering associated with the given MIDI note, or `null` if the note is outside the instrument's
      * defined range.
      */
-    fun fingering(midiNote: Int): E?
+    fun fingering(midiNote: Byte): E?
 }

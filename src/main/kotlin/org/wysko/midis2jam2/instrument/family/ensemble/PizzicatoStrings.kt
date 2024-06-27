@@ -19,24 +19,18 @@ package org.wysko.midis2jam2.instrument.family.ensemble
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.scale
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * Pizzicato strings have 12 separate strings that animate for each note. When a note is played, the string moves
@@ -47,11 +41,11 @@ import org.wysko.midis2jam2.world.modelD
  */
 class PizzicatoStrings(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>
+    eventList: List<MidiEvent>
 ) : DecayedInstrument(context, eventList) {
 
-    private val eventCollector: EventCollector<MidiNoteOnEvent> =
-        EventCollector(context, eventList.filterIsInstance<MidiNoteOnEvent>())
+    private val eventCollector: EventCollector<NoteEvent.NoteOn> =
+        EventCollector(context, eventList.filterIsInstance<NoteEvent.NoteOn>())
 
     private val strings: Array<PizzicatoString> = Array(12) {
         PizzicatoString().apply {
@@ -63,13 +57,13 @@ class PizzicatoStrings(
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         eventCollector.advanceCollectAll(time).forEach { strings[(it.note + 3) % 12].play() }
         strings.forEach { it.tick(delta) }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.rot = v3(0, 45 + 12 * updateInstrumentIndex(delta), 0)
     }
 
@@ -104,7 +98,7 @@ class PizzicatoStrings(
             }
         }
 
-        override fun tick(delta: Float) {
+        override fun tick(delta: Duration) {
             stringAnimator.tick(delta)
             if (progress >= 1) playing = false
 
@@ -113,7 +107,7 @@ class PizzicatoStrings(
             restingString.cullHint = (!playing).ch
             animNode.loc = v3(0, 0, nudgeCtrl.tick(delta) { if (playing) 2f else 0f })
 
-            progress += (delta * 7).toDouble()
+            progress += (delta * 7).toDouble(SECONDS)
         }
 
         fun play() {

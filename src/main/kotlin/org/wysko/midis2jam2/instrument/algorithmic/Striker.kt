@@ -21,13 +21,16 @@ import com.jme3.math.Matrix3f
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.NoteEvent.NoteOn
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
+import java.lang.Math.toRadians
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * The maximum angle, in degrees, at which the stick will rest and recoil to.
@@ -53,7 +56,7 @@ private const val DEFAULT_STRIKE_SPEED = 3.0
  */
 class Striker(
     private val context: Midis2jam2,
-    private val strikeEvents: List<MidiNoteOnEvent>,
+    private val strikeEvents: List<NoteOn>,
     private val stickModel: Spatial,
     private val strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
     private val maxIdleAngle: Double = MAX_STICK_IDLE_ANGLE,
@@ -64,7 +67,7 @@ class Striker(
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
         context: Midis2jam2,
-        strikeEvents: List<MidiNoteOnEvent>,
+        strikeEvents: List<NoteOn>,
         stickModel: StickType,
         strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
         maxIdleAngle: Double = MAX_STICK_IDLE_ANGLE,
@@ -100,8 +103,8 @@ class Striker(
      * Updates animation, given the current [time] and the amount of time since the last frame ([delta]).
      */
     fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ): StickStatus {
         // Collect an event if a strike is occurring now
         val strike = eventCollector.advanceCollectOne(time)
@@ -118,14 +121,16 @@ class Striker(
                 // Recoil the stick by slightly raising it
                 setRotation(
                     axis = rotationAxis,
-                    angle = (currentAngles[rotationAxis.componentIndex] + 5f * delta).coerceAtMost(rad(maxIdleAngle)),
+                    angle = (currentAngles[rotationAxis.componentIndex] + 5f * delta.toDouble(SECONDS)).coerceAtMost(
+                        toRadians(maxIdleAngle)
+                    ),
                 )
             }
         } else {
             // The proposed angle is simply less than the maximum, so we just set the angle to be that
             setRotation(
                 axis = rotationAxis,
-                angle = rad(proposedRotation.coerceIn(0.0..maxIdleAngle)),
+                angle = toRadians(proposedRotation.coerceIn(0.0..maxIdleAngle)),
             )
         }
 
@@ -146,7 +151,7 @@ class Striker(
             val peek = eventCollector.peek()
             val prev = eventCollector.prev()
 
-            if (peek != null && prev != null && peek.time - prev.time <= context.file.division * 2.1) {
+            if (peek != null && prev != null && peek.tick - prev.tick <= context.sequence.smf.tpq * 2.1) {
                 node.cullHint = Spatial.CullHint.Dynamic
             }
         }
@@ -173,7 +178,7 @@ class Striker(
     }
 
     /** Returns [EventCollector.peek]. */
-    fun peek(): MidiNoteOnEvent? = eventCollector.peek()
+    fun peek(): NoteOn? = eventCollector.peek()
 
     /**
      * If the stick needs to be moved to change the point of rotation (or otherwise operated on), you can modify it with
@@ -181,14 +186,14 @@ class Striker(
      */
     fun offsetStick(operation: (stick: Spatial) -> Unit): Unit = operation(stickModel)
 
-    private fun proposedRotation(time: Double): Double {
+    private fun proposedRotation(time: Duration): Double {
         return eventCollector.peek()?.let {
             // The rotation is essentially defined by the amount of time between NOW and the next hit.
-            var rot = context.file.eventInSeconds(it) - time
+            var rot = (context.sequence.getTimeOf(it) - time).toDouble(SECONDS)
 
             /* The rotation should be dependent on the current tempo, i.e., if the tempo is faster, the rotation should
              * happen quicker, v.v. */
-            rot *= context.file.tempoBefore(it).bpm
+            rot *= context.sequence.getTempoBeforeTick(it.tick).beatsPerMinute
 
             // We may wish to scale the entire rotation to hasten/delay the animation.
             rot *= strikeSpeed
@@ -199,10 +204,10 @@ class Striker(
 
     private fun setRotation(
         axis: Axis,
-        angle: Float,
+        angle: Double,
     ) {
         rotationNode.localRotation =
-            Quaternion().fromAngles(Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(angle).toArray(null))
+            Quaternion().fromAngles(Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(angle.toFloat()).toArray(null))
     }
 }
 
@@ -238,12 +243,12 @@ data class StickProperties(
  * otherwise.
  */
 data class StickStatus(
-    val strike: MidiNoteOnEvent?,
+    val strike: NoteOn?,
     val rotationAngle: Float,
-    val strikingFor: MidiNoteOnEvent?,
+    val strikingFor: NoteOn?,
 ) {
     /** The velocity at which the striker struck at, or `0` if it did not strike this frame. */
-    val velocity: Int
+    val velocity: Byte
         get() = strike?.velocity ?: 0
 }
 

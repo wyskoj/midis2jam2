@@ -20,22 +20,19 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.VectorSmoother
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Cuica. */
 class Cuica(
     context: Midis2jam2,
-    muteHits: MutableList<MidiNoteOnEvent>,
-    openHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
+    muteHits: MutableList<NoteEvent.NoteOn>,
+    openHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.tick }.toMutableList()) {
     private val muteCollector = EventCollector(context, muteHits)
     private val openCollector = EventCollector(context, openHits)
 
@@ -70,7 +67,7 @@ class Cuica(
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
 
         muteCollector.advanceCollectOne(time)?.let { onPlay(HandState.Resting) }

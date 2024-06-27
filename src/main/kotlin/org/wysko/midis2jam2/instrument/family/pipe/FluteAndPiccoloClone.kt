@@ -20,6 +20,7 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** Contains shared code between the flute and piccolo. */
 open class FluteAndPiccoloClone(parent: InstrumentWithHands, puffType: SteamPuffTexture, puffScale: Float) :
@@ -37,7 +38,7 @@ open class FluteAndPiccoloClone(parent: InstrumentWithHands, puffType: SteamPuff
         loadHands()
     }
 
-    override fun adjustForPolyphony(delta: Float) {
+    override fun adjustForPolyphony(delta: Duration) {
         root.setLocalTranslation((5 * indexForMoving()), 0f, (5 * -indexForMoving()))
     }
 }

@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import kotlin.time.Duration
+
 /**
  * Periodically collects elapsed events from a pool.
  *
@@ -27,9 +29,9 @@ interface Collector<T> {
      * Moves the play head forward or backward in time to "seek" to a new position in the song.
      * Don't use this method for each frame. Rather, use this when making large jumps in time.
      *
-     * @param time The new time to seek to, in seconds.
+     * @param time The new time to seek to.
      */
-    fun seek(time: Double)
+    fun seek(time: Duration)
 
     /**
      * Returns the immediate next event in the future. If there are no more events, the return is `null`.

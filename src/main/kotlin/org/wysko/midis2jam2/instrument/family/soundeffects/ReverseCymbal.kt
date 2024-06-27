@@ -21,18 +21,19 @@ import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.world.modelR
 import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * The Reverse Cymbal.
@@ -53,7 +54,7 @@ import kotlin.math.pow
  *
  * @constructor Constructs a new Reverse Cymbal.
  */
-class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class ReverseCymbal(context: Midis2jam2, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     /** The cymbal that animates backwards. */
     private val cymbal: Spatial =
@@ -63,11 +64,11 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         }
 
     /** A list of fake "pseudo" hits that correlate to the end times. */
-    private val pseudoHits: MutableList<MidiNoteOnEvent> =
-        notePeriods.map {
-            MidiNoteOnEvent(it.endTick, it.noteOn.channel, it.note, 127)
+    private val pseudoHits: MutableList<NoteEvent.NoteOn> =
+        timedArcs.map {
+            NoteEvent.NoteOn(it.end, it.noteOn.channel, it.note, 127)
         }.toMutableList().also {
-            context.file.registerEvents(it)
+            context.sequence.registerEvents(it)
         }
 
     /** Holds the stick and is rotated to the correct position. */
@@ -85,8 +86,8 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 
@@ -96,8 +97,8 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         // Find the time of the next note end. If there is none, assume it will happen infinitely in the future.
         val nextHitTime =
             stick.peek()?.let {
-                context.file.eventInSeconds(it)
-            } ?: Double.MAX_VALUE
+                context.sequence.getTimeOf(it)
+            } ?: Double.MAX_VALUE.seconds
 
         // Move the stick around the cymbal according to the note
         if (results.strikingFor != null && results.strike == null) {
@@ -110,7 +111,7 @@ class ReverseCymbal(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         cymbal.localRotation = Quaternion().fromAngles(ReverseCymbalAnimator.rotationAmount(nextHitTime - time), 0f, 0f)
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
@@ -135,13 +136,14 @@ object ReverseCymbalAnimator {
      * Calculates the amount of rotation to apply to the cymbal given the [amount of time until the next end of a
      * note][timeUntilPseudoStrike].
      */
-    fun rotationAmount(timeUntilPseudoStrike: Double): Float {
-        return if (timeUntilPseudoStrike >= 0) {
-            if (timeUntilPseudoStrike < 4.5) {
+    fun rotationAmount(timeUntilPseudoStrike: Duration): Float {
+        return if (timeUntilPseudoStrike >= 0.seconds) {
+            if (timeUntilPseudoStrike < 4.5.seconds) {
+                val timeUntilStrikeInSeconds = timeUntilPseudoStrike.toDouble(SECONDS)
                 (
                     amplitude * (
-                        cos(timeUntilPseudoStrike * wobbleSpeed * FastMath.PI) / (
-                            3 + timeUntilPseudoStrike.pow(
+                        cos(timeUntilStrikeInSeconds * wobbleSpeed * FastMath.PI) / (
+                            3 + timeUntilStrikeInSeconds.pow(
                                 3.0,
                             ) * wobbleSpeed * dampening * FastMath.PI
                         )

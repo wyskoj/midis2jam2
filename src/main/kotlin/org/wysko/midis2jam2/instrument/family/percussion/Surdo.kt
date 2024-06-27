@@ -18,25 +18,26 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.Surdo.HandPosition.Down
 import org.wysko.midis2jam2.instrument.family.percussion.Surdo.HandPosition.Up
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.VectorSmoother
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Surdo. */
 class Surdo(
     context: Midis2jam2,
-    muteHits: MutableList<MidiNoteOnEvent>,
-    openHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
+    muteHits: MutableList<NoteEvent.NoteOn>,
+    openHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.tick }.toMutableList()) {
     private val muteCollector = EventCollector(context, muteHits)
     private val openCollector = EventCollector(context, openHits)
 
@@ -73,7 +74,7 @@ class Surdo(
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
 
         val results = stick.tick(time, delta)
@@ -93,7 +94,7 @@ class Surdo(
         val handPosition = when {
             nextMute == null && nextOpen != null -> Up
             nextMute != null && nextOpen == null -> Down
-            nextMute != null && nextOpen != null -> if (nextMute.time < nextOpen.time) Down else Up
+            nextMute != null && nextOpen != null -> if (nextMute.tick < nextOpen.tick) Down else Up
             else -> error("All cases covered.")
         }
 

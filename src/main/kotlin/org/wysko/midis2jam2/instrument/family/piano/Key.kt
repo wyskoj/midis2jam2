@@ -24,6 +24,8 @@ import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.sign
 import org.wysko.midis2jam2.util.toQuaternion
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val KEY_PRESS_ANGLE = 0.1f
 private const val KEY_RECOIL_SPEED = 20f
@@ -37,7 +39,7 @@ abstract class Key protected constructor(
     private val inverseRotation: Boolean = false,
     keyboardConfiguration: KeyboardConfiguration,
     moveValue: Float,
-    val midiNote: Int,
+    val midiNote: Byte,
 ) {
     /** Whether this key is pressed. */
     @Deprecated("")
@@ -82,14 +84,14 @@ abstract class Key protected constructor(
      *
      * @param delta the amount of time since the last frame update
      */
-    open fun tick(delta: Float) {
+    open fun tick(delta: Duration) {
         currentState = keyedInstrument.keyStatus(midiNote)
         if (currentState is State.Down) {
             rotationFactor =
                 PercussionInstrument.velocityRecoilDampening((currentState as State.Down).velocity).toFloat()
         } else {
             if (rotationFactor > 0f) {
-                rotationFactor -= delta * KEY_RECOIL_SPEED
+                rotationFactor -= (delta.toDouble(SECONDS) * KEY_RECOIL_SPEED).toFloat()
             }
         }
         // Prevent over-rotation
@@ -156,7 +158,7 @@ abstract class Key protected constructor(
          *
          * @property velocity The velocity of the key press.
          */
-        data class Down(val velocity: Int) : State()
+        data class Down(val velocity: Byte) : State()
     }
 
     /** The different colors of keys on a keyboard. */
@@ -171,7 +173,7 @@ abstract class Key protected constructor(
             /**
              * Given a MIDI [note], determines if it is a [Color.White] or [Color.Black] key on a standard keyboard.
              */
-            fun fromNote(note: Int): Color =
+            fun fromNote(note: Byte): Color =
                 when (note % 12) {
                     1, 3, 6, 8, 10 -> Black
                     else -> White

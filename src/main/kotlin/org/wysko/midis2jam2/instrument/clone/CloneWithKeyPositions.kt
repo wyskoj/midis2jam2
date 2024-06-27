@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.clone
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.world.Axis
+import kotlin.time.Duration
 
 /**
  * An instrument that animates by transforming models of keys.
@@ -54,12 +55,11 @@ abstract class CloneWithKeyPositions protected constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
 
         currentNotePeriod?.let { np ->
-            val ints = parent.manager!!.fingering(np.note) as List<Int>?
-            ints?.let { animateKeys(it) }
+            (parent.manager!!.fingering(np.note) as List<Int>?)?.let { animateKeys(it) }
         }
     }
 

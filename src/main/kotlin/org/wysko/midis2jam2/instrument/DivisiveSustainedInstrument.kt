@@ -16,8 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument
 
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
+import kotlin.time.Duration
 
 /**
  * A sustained instrument that divides the animation of each note (i.e., A, A#, B, C, etc.) to a [PitchClassAnimator].
@@ -28,7 +29,7 @@ import org.wysko.midis2jam2.midi.MidiChannelEvent
  */
 abstract class DivisiveSustainedInstrument protected constructor(
     context: Midis2jam2,
-    events: List<MidiChannelEvent>,
+    events: List<MidiEvent>,
 ) : SustainedInstrument(context, events) {
 
     /**
@@ -36,7 +37,7 @@ abstract class DivisiveSustainedInstrument protected constructor(
      */
     protected abstract val animators: List<PitchClassAnimator>
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         isVisible = calculateVisibility(time, false)
         animators.forEach { it.tick(time, delta) }

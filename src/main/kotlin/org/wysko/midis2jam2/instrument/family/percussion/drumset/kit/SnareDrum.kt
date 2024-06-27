@@ -16,20 +16,21 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUM_SET_STICK
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
 import org.wysko.midis2jam2.midi.ACOUSTIC_SNARE
 import org.wysko.midis2jam2.midi.ELECTRIC_SNARE
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.SIDE_STICK
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.max
 import org.wysko.midis2jam2.world.modelD
-import java.lang.Integer.max
+import kotlin.time.Duration
 
 /** The Snare drum. */
-class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, style: ShellStyle) :
+class SnareDrum(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, style: ShellStyle) :
     DrumSetInstrument(context, hits) {
     private val regularStick =
         Striker(
@@ -73,8 +74,8 @@ class SnareDrum(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, style: 
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         val regularResults = regularStick.tick(time, delta)
         val sideResults = sideStick.tick(time, delta)

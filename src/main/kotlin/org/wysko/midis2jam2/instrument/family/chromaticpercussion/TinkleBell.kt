@@ -21,20 +21,17 @@ import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /*
  * Copyright (C) 2022 Jacob Wysko
@@ -61,7 +58,7 @@ import org.wysko.midis2jam2.world.modelR
  */
 class TinkleBell(
     context: Midis2jam2,
-    events: List<MidiChannelEvent>
+    events: List<MidiEvent>
 ) : DecayedInstrument(context, events), MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 20, 0)
@@ -75,12 +72,12 @@ class TinkleBell(
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         bells.forEach { it.tick(time, delta) }
     }
 
-    private inner class Bell(index: Int, events: List<MidiNoteOnEvent>) {
+    private inner class Bell(index: Int, events: List<NoteEvent.NoteOn>) {
         val root = node {
             loc = v3(index * -4, 0, 0)
             scale(1 - (index * 0.02f))
@@ -107,7 +104,7 @@ class TinkleBell(
             }
         }
 
-        fun tick(time: Double, delta: Float) {
+        fun tick(time: Duration, delta: Duration) {
             cymbalAnimator.tick(delta)
             with(striker.tick(time, delta)) {
                 if (velocity > 0) {

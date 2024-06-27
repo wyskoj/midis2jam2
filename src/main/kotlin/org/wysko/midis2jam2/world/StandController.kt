@@ -21,11 +21,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import kotlin.reflect.KClass
 
 /**

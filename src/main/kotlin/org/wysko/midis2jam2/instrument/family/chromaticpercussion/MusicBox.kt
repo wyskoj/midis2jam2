@@ -20,23 +20,31 @@ import com.jme3.math.FastMath.PI
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.minusAssign
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.collections.ArrayList
+import kotlin.collections.List
+import kotlin.collections.MutableList
+import kotlin.collections.MutableMap
+import kotlin.collections.filter
+import kotlin.collections.forEach
+import kotlin.collections.isNotEmpty
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.onEach
+import kotlin.collections.plusAssign
+import kotlin.collections.set
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val SHINY_SILVER: String = "ShinySilver.bmp"
 
@@ -45,7 +53,7 @@ private const val SHINY_SILVER: String = "ShinySilver.bmp"
  * turn per beat = π/2 rad. To calculate this, the spindle is rotated by `0.5 * PI * delta * (6E7 / bpm) / 60` on
  * each frame.
  */
-class MusicBox(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class MusicBox(context: Midis2jam2, eventList: List<MidiEvent>) :
     DecayedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 0, -18)
@@ -57,7 +65,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     private val pinModel: Spatial = context.modelR("MusicBoxPoint.obj", SHINY_SILVER)
     private val pinPool: MutableList<Spatial> = ArrayList()
     private val collectorForPins = EventCollector(context, hits, { event, time ->
-        context.file.tickToSeconds(event.time - context.file.division) <= time // Quarter note early
+        context.sequence.getTimeAtTick(event.tick - context.sequence.smf.tpq) <= time // Quarter note early
     })
     private val collectorForLamellae = EventCollector(context, hits)
 
@@ -72,7 +80,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         placement.loc = v3(37, 5, -5)
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         rotateCylinder(time, delta)
 
@@ -102,9 +110,9 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         else -> pinModel.clone()
     }
 
-    private fun rotateCylinder(time: Double, delta: Float) {
-        val tempo = context.file.tempoAt(time).number
-        val dRotation = 0.5f * PI * delta * (6E7f / tempo) / 60f
+    private fun rotateCylinder(time: Duration, delta: Duration) {
+        val tempo = context.sequence.getTempoAtTime(time).beatsPerMinute
+        val dRotation = (0.5 * PI * delta.toDouble(SECONDS) * tempo / 60.0).toFloat()
 
         pinRotations.entries.forEach {
             it.key.rotate(dRotation, 0f, 0f)
@@ -136,7 +144,7 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
             animator.strike()
         }
 
-        override fun tick(delta: Float) {
+        override fun tick(delta: Duration) {
             model.material.setColor("GlowColor", glowController.calculate(animator.animTime * 2))
             animator.tick(delta)
         }

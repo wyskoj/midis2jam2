@@ -23,13 +23,15 @@ import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.spongepowered.noise.Noise
 import org.spongepowered.noise.NoiseQuality
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
 import java.util.*
 import kotlin.math.cos
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * The helicopter has several animation components.
@@ -43,7 +45,7 @@ import kotlin.math.cos
  * Finally, the helicopter moves down when not playing and moves up when playing. This motion is eased with a sinusoidal
  * function.
  */
-class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class Helicopter(context: Midis2jam2, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     /** "Seed" for X-value generation. */
     private val rotXRand: Float
@@ -64,11 +66,11 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     private val lights: Array<Spatial>
 
     /** The amount of height and random movement. */
-    private var force = 0f
+    private var force = 0.0
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 
@@ -76,60 +78,60 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         lights.forEach { it.cullHint = Always }
 
         // Turn on active lights
-        collector.currentNotePeriods.forEach { lights[11 - (it.note + 3) % 12].cullHint = Dynamic }
+        collector.currentTimedArcs.forEach { lights[11 - (it.note + 3) % 12].cullHint = Dynamic }
 
         // If playing a note, increase the force, but cap it at 1.
-        if (collector.currentNotePeriods.isNotEmpty()) {
-            force += delta
-            force = force.coerceAtMost(1f)
+        if (collector.currentTimedArcs.isNotEmpty()) {
+            force += delta.toDouble(SECONDS)
+            force = force.coerceAtMost(1.0)
         } else {
             // Otherwise, decrease force but cup at 0.
-            force -= delta
-            force = force.coerceAtLeast(0f)
+            force -= delta.toDouble(SECONDS)
+            force = force.coerceAtLeast(0.0)
         }
 
         // Vroom
-        rotor.rotate(Quaternion().fromAngles(0f, rad((3141 * delta).toDouble()), 0f))
+        rotor.rotate(Quaternion().fromAngles(0f, rad((3141 * delta.toDouble(SECONDS))), 0f))
 
         // Slight wobble
         animNode.localRotation =
             Quaternion().fromAngles(
-                force * 0.5f *
-                    rad(
-                        (
-                            Noise.gradientCoherentNoise3D(
-                                0.0,
-                                0.0,
-                                time,
-                                (rotXRand * 1000).toInt(),
-                                NoiseQuality.STANDARD,
-                            ) - 0.4
-                        ) * 10,
-                    ),
-                force * 0.5f *
-                    rad(
-                        (
-                            Noise.gradientCoherentNoise3D(
-                                0.0,
-                                0.0,
-                                time,
-                                (rotYRand * 1000).toInt(),
-                                NoiseQuality.STANDARD,
-                            ) - 0.4
-                        ) * 10,
-                    ),
-                force * 0.5f *
-                    rad(
-                        (
-                            Noise.gradientCoherentNoise3D(
-                                0.0,
-                                0.0,
-                                time,
-                                (rotZRand * 1000).toInt(),
-                                NoiseQuality.STANDARD,
-                            ) - 0.4
-                        ) * 10,
-                    ),
+                (force * 0.5f *
+                        rad(
+                            (
+                                    Noise.gradientCoherentNoise3D(
+                                        0.0,
+                                        0.0,
+                                        time.toDouble(SECONDS),
+                                        (rotXRand * 1000).toInt(),
+                                        NoiseQuality.STANDARD,
+                                    ) - 0.4
+                                    ) * 10,
+                        )).toFloat(),
+                (force * 0.5f *
+                        rad(
+                            (
+                                    Noise.gradientCoherentNoise3D(
+                                        0.0,
+                                        0.0,
+                                        time.toDouble(SECONDS),
+                                        (rotYRand * 1000).toInt(),
+                                        NoiseQuality.STANDARD,
+                                    ) - 0.4
+                                    ) * 10,
+                        )).toFloat(),
+                (force * 0.5f *
+                        rad(
+                            (
+                                    Noise.gradientCoherentNoise3D(
+                                        0.0,
+                                        0.0,
+                                        time.toDouble(SECONDS),
+                                        (rotZRand * 1000).toInt(),
+                                        NoiseQuality.STANDARD,
+                                    ) - 0.4
+                                    ) * 10,
+                        )).toFloat(),
             )
         placement.localRotation = Quaternion().fromAngles(rad(5.0), rad(120.0), rad(11.0))
         animNode.setLocalTranslation(
@@ -139,7 +141,7 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
                     Noise.gradientCoherentNoise3D(
                         0.0,
                         0.0,
-                        time,
+                        time.toDouble(SECONDS),
                         (rotZRand * 1000).toInt(),
                         NoiseQuality.STANDARD,
                     ) - 0.4
@@ -150,7 +152,7 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         placement.setLocalTranslation(0f, -120 + 120 * easeInOutSine(force), 0f)
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(20 + 50 * updateInstrumentIndex(delta), 40f, -300f)
     }
 
@@ -161,8 +163,8 @@ class Helicopter(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
          * @param x in
          * @return out
          */
-        private fun easeInOutSine(x: Float): Float {
-            return (-(cos(Math.PI * x) - 1) / 2).toFloat()
+        private fun easeInOutSine(x: Number): Float {
+            return (-(cos(Math.PI * x.toDouble()) - 1) / 2).toFloat()
         }
     }
 

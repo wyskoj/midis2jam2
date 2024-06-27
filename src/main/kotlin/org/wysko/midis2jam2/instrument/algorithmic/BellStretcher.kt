@@ -17,8 +17,10 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.kmidi.midi.TimedArc
 import org.wysko.midis2jam2.world.Axis
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * Animates the stretch of an instrument's bell.
@@ -33,12 +35,12 @@ interface BellStretcher {
     fun tick(stretchAmount: Double)
 
     /**
-     * Sets the amount of bell stretch from the current [NotePeriod]. Call this method on every frame.
+     * Sets the amount of bell stretch from the current [TimedArc]. Call this method on every frame.
      *
-     * @param period NotePeriod from which to calculate the amount to stretch the bell by.
+     * @param arc NotePeriod from which to calculate the amount to stretch the bell by.
      * @param time The current time since the beginning of the song, in seconds.
      */
-    fun tick(period: NotePeriod?, time: Double)
+    fun tick(arc: TimedArc?, time: Duration)
 }
 
 /** Standard implementation of [BellStretcher]. */
@@ -61,12 +63,15 @@ class StandardBellStretcher(
         scaleBell(((stretchiness - 1) * stretchAmount + 1).toFloat())
     }
 
-    override fun tick(period: NotePeriod?, time: Double) {
-        if (period == null) {
-            scaleBell(1f)
-        } else {
-            scaleBell((stretchiness * (period.end - time) / period.duration + 1).toFloat())
-        }
+    override fun tick(arc: TimedArc?, time: Duration) {
+        scaleBell(
+            when (arc) {
+                null -> 1f
+                else -> {
+                    (stretchiness * (arc.endTime - time).toDouble(SECONDS) / arc.duration.toDouble(SECONDS) + 1).toFloat()
+                }
+            }
+        )
     }
 
     /** Sets the scale of the bell—appropriately and automatically scaling on the correct axis. */

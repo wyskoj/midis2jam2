@@ -21,12 +21,14 @@ import com.jme3.font.BitmapFont
 import com.jme3.font.BitmapText
 import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
+import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
+import kotlin.time.Duration
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A controller for displaying lyrics.
@@ -34,29 +36,29 @@ import kotlin.math.abs
  * @property context The context to the main class.
  * @property events The list of the text events.
  */
-class LyricController(val context: Midis2jam2, val events: List<MidiTextEvent>) {
+class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Text>) {
 
     private val font = context.assetManager.loadFont("Assets/Fonts/Inter.fnt")
 
     private val words = events.filter { !separators.contains(it.text) }
     private val lines = events.partitionByNewLines()
 
-    private var currentWord: MidiTextEvent? = null
+    private var currentWord: MetaEvent.Text? = null
     private var currentLine: LyricLine? = null
 
     private val wordCollector = EventCollector(context, words, onSeek = { currentWord = it.prev() })
     private val lineCollector = LyricLineCollector(context, lines, onSeek = {
         currentLine = it.prev()
-    }, triggerCondition = { line: LyricLine, time: Double ->
+    }, triggerCondition = { line: LyricLine, time: Duration ->
         with(context) {
             currentLine?.let { currentLine ->
-                if (line.startTime - currentLine.endTime < 3.0) {
+                if (line.startTime - currentLine.endTime < 3.seconds) {
                     time > ((line.startTime - currentLine.endTime) * 0.8) + currentLine.endTime
                 } else {
-                    line.startTime - time < 2.0
+                    line.startTime - time < 2.seconds
                 }
             } ?: let {
-                time >= line.startTime - 2.0
+                time >= line.startTime - 2.seconds
             }
         }
     })
@@ -87,7 +89,7 @@ class LyricController(val context: Midis2jam2, val events: List<MidiTextEvent>) 
      * @param time The current time.
      * @param delta The time since the last update.
      */
-    fun tick(time: Double, delta: Float) {
+    fun tick(time: Duration, delta: Duration) {
         with(context) {
             lineCollector.advanceCollect(time)?.let {
                 currentLine = it
@@ -130,21 +132,21 @@ class LyricController(val context: Midis2jam2, val events: List<MidiTextEvent>) 
     }
 
     context(Midis2jam2)
-    private fun calculateVisibility(time: Double) {
+    private fun calculateVisibility(time: Duration) {
         if (currentLine != null && time in currentLine!!.startTime..currentLine!!.endTime) {
             isVisible = true
             return
         }
         isVisible = when {
-            lineCollector.peek()?.let { it.startTime - time <= 2.0 } ?: false -> true
+            lineCollector.peek()?.let { it.startTime - time <= 2.0.seconds } ?: false -> true
 
             lineCollector.prev()?.let { prev ->
                 lineCollector.peek()?.let { peek ->
-                    peek.startTime - prev.endTime <= 7.0
+                    peek.startTime - prev.endTime <= 7.0.seconds
                 }
             } ?: false -> true
 
-            lineCollector.prev()?.let { time - it.endTime <= 2.0 } ?: false -> true
+            lineCollector.prev()?.let { time - it.endTime <= 2.0.seconds } ?: false -> true
             else -> false
         }
     }
@@ -155,7 +157,7 @@ class LyricController(val context: Midis2jam2, val events: List<MidiTextEvent>) 
      * @param time The current time.
      * @return The debug info.
      */
-    fun debugInfo(time: Double): String = buildString {
+    fun debugInfo(time: Duration): String = buildString {
         val lineTime = with(context) { currentLine?.endTime?.let { currentLine?.startTime?.rangeTo(it) } }
         appendLine("currentLine        ${currentLine?.renderString()}")
         appendLine("currentLineTime    ${lineTime}\n")
@@ -178,11 +180,11 @@ private fun String.clean() = when {
     else -> this
 }
 
-private fun List<MidiTextEvent>.renderString(): String = joinToString("") { it.text.display() }
+private fun List<MetaEvent.Text>.renderString(): String = joinToString("") { it.text.display() }
 
-private fun List<MidiTextEvent>.partitionByNewLines(): List<LyricLine> {
+private fun List<MetaEvent.Text>.partitionByNewLines(): List<LyricLine> {
     val result = mutableListOf<LyricLine>()
-    var line = mutableListOf<MidiTextEvent>()
+    var line = mutableListOf<MetaEvent.Text>()
 
     forEach { item ->
         when {
@@ -215,7 +217,7 @@ private fun List<MidiTextEvent>.partitionByNewLines(): List<LyricLine> {
     if (result.size == 1) {
         // The file had no newlines, so we should split it if a lyric ends with a .!?
         val newResult = mutableListOf<LyricLine>()
-        var newLine = mutableListOf<MidiTextEvent>()
+        var newLine = mutableListOf<MetaEvent.Text>()
         result[0].forEach {
             newLine.add(it)
             if (it.text.trim().endsWith(".") || it.text.trim().endsWith("!") || it.text.trim().endsWith("?")) {

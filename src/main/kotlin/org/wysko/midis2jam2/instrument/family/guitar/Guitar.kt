@@ -23,8 +23,10 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.util.loc
@@ -32,7 +34,7 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
-import kotlin.math.abs
+import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
 private const val GUITAR_VECTOR_THRESHOLD = 8
@@ -44,7 +46,9 @@ private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
     Json.decodeFromString<Set<ChordDefinition>>(resourceToString("/instrument/chords/Guitar.json"))
         .map {
             ChordDefinition(
-                notes = listOf(if (it.notes[0] != -1) it.notes[0] - 2 else -1) + it.notes.subList(1, 6),
+                notes = (
+                    listOf(if (it.notes[0].toInt() != -1) it.notes[0] - 2 else -1) + it.notes.subList(1, 6)
+                    ).map { it.toByte() },
                 frets = it.frets
             )
         }.toSet()
@@ -57,7 +61,7 @@ private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
  * @param type The type of guitar.
  * @see FrettedInstrument
  */
-class Guitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: GuitarType) : FrettedInstrument(
+class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : FrettedInstrument(
     context = context,
     events = events,
     StandardFrettingEngine(
@@ -90,9 +94,8 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: GuitarTy
     /**
      * Maps each [NotePeriod] that this Guitar is responsible to play to its [FretboardPosition].
      */
-    override val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> =
-        BetterFretting(context, dictionary, openStringValues, events).calculate(notePeriods)
-
+    override val notePeriodFretboardPosition: Map<TimedArc, FretboardPosition> =
+        BetterFretting(context, dictionary, openStringValues, events).calculate(timedArcs)
 
     override val upperStrings: Array<Spatial> = Array(6) {
         if (it < 3) {
@@ -136,7 +139,7 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: GuitarTy
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         val v = updateInstrumentIndex(delta) * 1.5f
         /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
         if (v < GUITAR_VECTOR_THRESHOLD) {
@@ -182,8 +185,8 @@ class Guitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: GuitarTy
     }
 }
 
-private fun needsDropTuning(events: List<MidiChannelEvent>): Boolean =
-    (events.filterIsInstance<MidiNoteOnEvent>().minByOrNull { it.note }?.note ?: 127) < 40
+private fun needsDropTuning(events: List<MidiEvent>): Boolean =
+    (events.filterIsInstance<NoteEvent.NoteOn>().minByOrNull { it.note }?.note ?: 127) < 40
 
 private enum class GuitarTuning(val values: IntArray) {
     STANDARD(intArrayOf(40, 45, 50, 55, 59, 64)),

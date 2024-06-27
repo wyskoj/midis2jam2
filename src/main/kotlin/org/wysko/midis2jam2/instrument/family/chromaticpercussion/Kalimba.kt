@@ -21,19 +21,20 @@ import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.GlowController
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 private val PRONG_SCALES = listOf(1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f, 1.9f, 1.7f, 1.5f, 1.3f, 1.1f, 0.9f)
 
@@ -43,14 +44,14 @@ private val PRONG_SCALES = listOf(1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f, 1.9f, 1.7f
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class Kalimba(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class Kalimba(context: Midis2jam2, events: List<MidiEvent>) :
     DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 10, 0)
 
-    private val eventCollector: EventCollector<MidiNoteOnEvent> =
-        EventCollector(context, events.filterIsInstance<MidiNoteOnEvent>())
+    private val eventCollector: EventCollector<NoteEvent.NoteOn> =
+        EventCollector(context, events.filterIsInstance<NoteEvent.NoteOn>())
 
     private val tines = List(12) { i ->
         Tine(i % 2 == 0).also {
@@ -71,7 +72,7 @@ class Kalimba(context: Midis2jam2, events: List<MidiChannelEvent>) :
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         eventCollector.advanceCollectAll(time).forEach { tines[it.note % 12].hit() }
         tines.forEach { it.tick(delta) }
@@ -88,7 +89,7 @@ class Kalimba(context: Midis2jam2, events: List<MidiChannelEvent>) :
             +context.modelD(isAlternate.tineFile(), "KalimbaSkin.png")
         } as Geometry
 
-        internal fun tick(delta: Float) {
+        internal fun tick(delta: Duration) {
             cymbalAnimator.tick(delta)
 
             val animationTime = cymbalAnimator.animTime.let { if (it == -1.0) Double.MAX_VALUE else it } * 2f

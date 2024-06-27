@@ -33,8 +33,9 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.wrap
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.SECONDS
 
 private val OPERATING_SYSTEM by lazy {
     "${System.getProperty("os.arch")} / ${System.getProperty("os.name")} / ${
@@ -114,12 +115,12 @@ class DebugTextController(val context: Midis2jam2) {
      *
      * @param tpf the time per frame
      */
-    fun tick(tpf: Float) {
+    fun tick(tpf: Duration) {
         if (enabled) {
-            with(text) { text = context.debugText(tpf, context.time) }
+            with(text) { text = context.debugText(context.time, tpf) }
             with(percussionText) { text = "" }
             val drift =
-                (((context as DesktopMidis2jam2).sequencer as JwRealTimeSequencer).time - context.time).absoluteValue
+                (((context as DesktopMidis2jam2).sequencer as JwRealTimeSequencer).time.seconds - context.time).absoluteValue.toDouble(SECONDS)
             syncIndicator.setLocalScale((drift * 5f).toFloat(), 1f, 1f)
             syncIndicator.material.setColor(
                 "Color",
@@ -133,8 +134,8 @@ class DebugTextController(val context: Midis2jam2) {
  * Generates debug text.
  */
 private fun Midis2jam2.debugText(
-    tpf: Float,
-    time: Double,
+    time: Duration,
+    delta: Duration,
 ): String {
     return buildString {
         // midis2jam2 version and build
@@ -154,7 +155,7 @@ private fun Midis2jam2.debugText(
                 }
             }",
         )
-        appendLine("${"%.0f".format(1 / tpf)} FPS")
+        appendLine("${"%.0f".format(1 / delta.toDouble(SECONDS))} FPS")
 
         // settings
         appendLine()
@@ -163,10 +164,10 @@ private fun Midis2jam2.debugText(
 
         appendLine()
         appendLine("File:")
-        with(this@debugText.file) {
-            appendLine("$name - $division TPQN")
-            appendLine("${"%.2f".format(time)}s / ${"%.2f".format(length)}s")
-            appendLine("$specification")
+        with(this@debugText.sequence) {
+            appendLine("$fileName - ${smf.tpq} TPQN")
+            appendLine("${time}s / ${duration}s")
+//            appendLine("$specification") TODO implement specification in kmidi
         }
 
         // camera position and rotation
@@ -181,7 +182,7 @@ private fun Midis2jam2.debugText(
             appendLine()
             appendLine("Sequencer time: ${seq.time}")
             appendLine("Our time:       ${this@debugText.time}")
-            appendLine("Drift:          ${((seq.time - time) * 1000).roundToInt()}")
+            appendLine("Drift:          ${seq.time.seconds - time}")
             appendLine("StartLocal:     ${seq.startTimeLocal}")
             appendLine("StartGlobal:    ${seq.startTimeGlobal}")
         }

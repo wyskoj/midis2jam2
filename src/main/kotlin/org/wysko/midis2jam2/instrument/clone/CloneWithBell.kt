@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.Axis
+import kotlin.time.Duration
 
 /**
  * Instruments that stretch when they play. Formally, the [bell] is scaled by the inverse of the current
@@ -44,7 +45,7 @@ abstract class CloneWithBell protected constructor(
     protected val bell: Node = with(geometry) { +node() }
     private val bellStretcher = StandardBellStretcher(stretchFactor, scaleAxis, bell)
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         bellStretcher.tick(currentNotePeriod, time)
     }

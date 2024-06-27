@@ -16,13 +16,13 @@
  */
 package org.wysko.midis2jam2.instrument
 
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
+import kotlin.time.Duration
 
 /**
  * An instrument that uses both NoteOn and NoteOff events to play notes.
@@ -30,27 +30,27 @@ import org.wysko.midis2jam2.midi.NotePeriod.Companion.calculateNotePeriods
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-abstract class SustainedInstrument(context: Midis2jam2, events: List<MidiChannelEvent>) : Instrument(context) {
+abstract class SustainedInstrument(context: Midis2jam2, events: List<MidiEvent>) : Instrument(context) {
 
     /**
      * The list of all note periods that this instrument should play.
      */
-    protected val notePeriods: MutableList<NotePeriod> =
-        calculateNotePeriods(context.file, events.filterIsInstance<MidiNoteEvent>())
+    protected val timedArcs: MutableList<TimedArc> =
+        TimedArc.fromNoteEvents(context.sequence, events.filterIsInstance<NoteEvent>()).toMutableList()
 
     /**
      * The collector that manages the note periods.
      */
-    protected open val collector: NotePeriodCollector =
-        NotePeriodCollector(context = context, notePeriods = notePeriods)
+    protected open val collector: TimedArcCollector =
+        TimedArcCollector(context = context, arcs = timedArcs)
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         collector.advance(time)
         isVisible = calculateVisibility(time)
         adjustForMultipleInstances(delta)
     }
 
-    override fun calculateVisibility(time: Double, future: Boolean): Boolean =
+    override fun calculateVisibility(time: Duration, future: Boolean): Boolean =
         Visibility.standardRules(collector, time).also {
             if (!isVisible && it) onEntry()
             if (isVisible && !it) onExit()

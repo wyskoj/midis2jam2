@@ -1,11 +1,17 @@
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.VirtualCompositePitchBendEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.datastructure.RunningAverage
-import org.wysko.midis2jam2.midi.*
+import org.wysko.midis2jam2.midi.TimedArcGroup
+import org.wysko.midis2jam2.midi.improvedContiguousGroupDetection
 import org.wysko.midis2jam2.util.chunked
 import org.wysko.midis2jam2.util.stdDev
 import kotlin.math.abs
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A better fretting engine.
@@ -19,23 +25,22 @@ class BetterFretting(
     private val context: Midis2jam2,
     private val chordDictionary: Set<ChordDefinition>,
     private val openStringNoteValues: IntArray,
-    private val events: List<MidiChannelEvent>,
+    private val events: List<MidiEvent>,
 ) {
-    private val absolutePitchBendEventsWithTime = MidiAbsolutePitchBendEvent.fromEvents(events)
-        .let { absolutePitchBendEvents ->
+    private val absolutePitchBendEventsWithTime =
+        VirtualCompositePitchBendEvent.fromEvents(events).let { absolutePitchBendEvents ->
             if (absolutePitchBendEvents.isEmpty()) {
                 // No pitch bends defined, so we assume the pitch bend is at 0.0
-                listOf(MidiAbsolutePitchBendEvent(0, 0, 0.0))
+                listOf(VirtualCompositePitchBendEvent(0, 0.0))
             } else {
-                if (absolutePitchBendEvents.sortedBy { it.time }.none { it.time == 0L }) {
+                if (absolutePitchBendEvents.sortedBy { it.tick }.none { it.tick == 0 }) {
                     // No pitch bend at time 0, so we add one
-                    listOf(MidiAbsolutePitchBendEvent(0, 0, 0.0)) + absolutePitchBendEvents
+                    listOf(VirtualCompositePitchBendEvent(0, 0.0)) + absolutePitchBendEvents
                 } else {
                     absolutePitchBendEvents
                 }
             }
-        }
-        .associateWith { context.file.tickToSeconds(it.time) }
+        }.associateWith { context.sequence.getTimeAtTick(it.tick) }
 
     /**
      * Calculates the fretboard positions for a list of note periods.
@@ -43,19 +48,17 @@ class BetterFretting(
      * @param notePeriods The list of note periods.
      * @return A map containing the calculated fretboard positions for each note period.
      */
-    fun calculate(
-        notePeriods: List<NotePeriod>,
-    ): Map<NotePeriod, FretboardPosition> {
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
+    fun calculate(notePeriods: List<TimedArc>): Map<TimedArc, FretboardPosition> {
+        val map = mutableMapOf<TimedArc, FretboardPosition>()
 
         val groups = improvedContiguousGroupDetection(notePeriods)
         val groupsChunkedByPolyphony = groups.asSequence().chunked { last, current ->
-            last.notePeriods.size != current.notePeriods.size || current.startTime - last.endTime > 1.0
+            last.arcs.size != current.arcs.size || current.startTime - last.endTime > 1.0.seconds
         }.toList()
 
         val chordCalculationResults = mutableListOf<ChordCalculationResult>()
         for (chunk in groupsChunkedByPolyphony) {
-            chunk.first().notePeriods.size.let { size ->
+            chunk.first().arcs.size.let { size ->
                 when (size) {
                     1 -> map.putAll(calculateMonophonic(chunk))
                     2 -> map.putAll(
@@ -78,10 +81,10 @@ class BetterFretting(
     }
 
     private fun calculateIntervals(
-        groups: List<NotePeriodGroup>,
+        groups: List<TimedArcGroup>,
         chordDefinitionsUsed: Set<ChordDefinition>
-    ): Map<NotePeriod, FretboardPosition> {
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
+    ): Map<TimedArc, FretboardPosition> {
+        val map = mutableMapOf<TimedArc, FretboardPosition>()
         val shapes = groups.associateWith { (notePeriods) ->
             with(notePeriods.map { it.note }.sorted()) {
                 this.map { it - this.min() }
@@ -89,31 +92,27 @@ class BetterFretting(
         }
 
         // Chunk the groups based on intervals, but also break up groups if there is enough time between them
-        val groupsChunkedByShape =
-            shapes.asSequence().chunked { (key, value), (key1, value1) ->
-                value != value1 || key1.startTime - key.endTime > 1.0
-            }.toList().map { entries ->
-                entries.first().value to entries.map { it.key }
-            }
+        val groupsChunkedByShape = shapes.asSequence().chunked { (key, value), (key1, value1) ->
+            value != value1 || key1.startTime - key.endTime > 1.0.seconds
+        }.toList().map { entries ->
+            entries.first().value to entries.map { it.key }
+        }
 
         for (chunk in groupsChunkedByShape) {
-
             val groupWithLowestOverallNote = chunk.second.minBy { (notePeriods) -> notePeriods.minOf { it.note } }
-            val lowestGroupPosition =
-                buildDuet(
-                    groupWithLowestOverallNote.notePeriods.minBy { it.note },
-                    groupWithLowestOverallNote.notePeriods.maxBy { it.note }
-                )
+            val lowestGroupPosition = buildDuet(
+                groupWithLowestOverallNote.arcs.minBy { it.note },
+                groupWithLowestOverallNote.arcs.maxBy { it.note }
+            )
 
             for ((notePeriods) in chunk.second) {
                 // First thing, check if there is a chord definition that contains all the notes in this group
-                val matchingDefinition =
-                    chordDefinitionsUsed.find { definition ->
-                        definition.definedNotes().containsAll(notePeriods.map { it.note })
-                    }
+                val matchingDefinition = chordDefinitionsUsed.find { definition ->
+                    definition.getDefinedNotes().containsAll(notePeriods.map { it.note })
+                }
                 if (matchingDefinition != null) {
                     for (np in notePeriods) {
-                        matchingDefinition.noteToFretboardPosition(np.note)?.let { pos ->
+                        matchingDefinition.calculateFretboardPosition(np.note)?.let { pos ->
                             map += np to pos
                         }
                     }
@@ -121,18 +120,15 @@ class BetterFretting(
                 }
 
                 val lowNoteOfGroup = notePeriods.minOf { it.note }
-                val difference = lowNoteOfGroup - groupWithLowestOverallNote.notePeriods.minOf { it.note }
+                val difference = lowNoteOfGroup - groupWithLowestOverallNote.arcs.minOf { it.note }
                 lowestGroupPosition?.let { (first, second) ->
                     map += notePeriods.minBy { it.note } to FretboardPosition(
-                        first.string,
-                        first.fret + difference
+                        first.string, first.fret + difference
                     )
                     map += notePeriods.maxBy { it.note } to FretboardPosition(
-                        second.string,
-                        second.fret + difference
+                        second.string, second.fret + difference
                     )
                 }
-
             }
         }
 
@@ -140,17 +136,17 @@ class BetterFretting(
     }
 
     private data class ChordCalculationResult(
-        val fretboardPositions: Map<NotePeriod, FretboardPosition>,
+        val fretboardPositions: Map<TimedArc, FretboardPosition>,
         val chordDefinitionsUsed: Set<ChordDefinition>
     )
 
-    private fun calculateChords(groups: List<NotePeriodGroup>): ChordCalculationResult {
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
+    private fun calculateChords(groups: List<TimedArcGroup>): ChordCalculationResult {
+        val map = mutableMapOf<TimedArc, FretboardPosition>()
         val definitionsUsed = mutableSetOf<ChordDefinition>()
 
-        fun applyDefinition(definition: ChordDefinition, notePeriods: Set<NotePeriod>) {
+        fun applyDefinition(definition: ChordDefinition, notePeriods: Set<TimedArc>) {
             for (np in notePeriods) {
-                definition.noteToFretboardPosition(np.note)?.let { pos ->
+                definition.calculateFretboardPosition(np.note)?.let { pos ->
                     map += np to pos
                 }
             }
@@ -161,23 +157,23 @@ class BetterFretting(
             val notes = notePeriods.map { it.note }.toSet()
 
             // First, look for an exact match
-            val exactMatches = chordDictionary.filter { it.definedNotes() == notes }.toSet()
+            val exactMatches = chordDictionary.filter { it.getDefinedNotes() == notes }.toSet()
             if (exactMatches.isNotEmpty()) {
                 applyDefinition(evaluateChords(exactMatches), notePeriods)
                 continue
             }
 
             // If no exact match, look for a definition that contains all of our notes
-            val comprehensiveMatches = chordDictionary.filter { it.definedNotes().containsAll(notes) }.toSet()
+            val comprehensiveMatches = chordDictionary.filter { it.getDefinedNotes().containsAll(notes) }.toSet()
             if (comprehensiveMatches.isNotEmpty()) {
                 applyDefinition(evaluateChords(comprehensiveMatches), notePeriods)
                 continue
             }
 
             // If no comprehensive match, look for the definition that contains the most of our notes
-            val partialMatches = chordDictionary.filter { it.definedNotes().intersect(notes).isNotEmpty() }.toSet()
+            val partialMatches = chordDictionary.filter { it.getDefinedNotes().intersect(notes).isNotEmpty() }.toSet()
             if (partialMatches.isNotEmpty()) {
-                val best = partialMatches.maxBy { it.definedNotes().intersect(notes).size }
+                val best = partialMatches.maxBy { it.getDefinedNotes().intersect(notes).size }
                 applyDefinition(best, notePeriods)
             }
 
@@ -188,9 +184,9 @@ class BetterFretting(
         return ChordCalculationResult(map, definitionsUsed)
     }
 
-    private fun buildChord(notePeriods: Set<NotePeriod>): Map<NotePeriod, FretboardPosition> {
+    private fun buildChord(notePeriods: Set<TimedArc>): Map<TimedArc, FretboardPosition> {
         val frets = Array(6) { -1 }
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
+        val map = mutableMapOf<TimedArc, FretboardPosition>()
         for (np in notePeriods.sortedBy { it.note }) {
             val allPossibleFretboardPositions = allPossibleFretboardPositions(
                 np.note,
@@ -211,15 +207,15 @@ class BetterFretting(
         return losses.minBy { it.value }.key
     }
 
-    private fun buildDuet(np1: NotePeriod, np2: NotePeriod): Pair<FretboardPosition, FretboardPosition>? {
+    private fun buildDuet(arc1: TimedArc, arc2: TimedArc): Pair<FretboardPosition, FretboardPosition>? {
         // Try every combination
         val possibleFretboardPositions = mutableListOf<Pair<FretboardPosition, FretboardPosition>>()
         for (x in 0..<6) {
             for (y in 0..<6) {
                 if (x >= y) continue // The first note must be lower than the second note
 
-                val fret1 = np1.note - openStringNoteValues[x]
-                val fret2 = np2.note - openStringNoteValues[y]
+                val fret1 = arc1.note - openStringNoteValues[x]
+                val fret2 = arc2.note - openStringNoteValues[y]
 
                 if (fret1 < 0 || fret2 < 0 || fret1 > 22 || fret2 > 22) continue // Fret is out of bounds
 
@@ -228,20 +224,18 @@ class BetterFretting(
         }
         possibleFretboardPositions.minByOrNull { (fp1, fp2) ->
             abs(fp1.fret - fp2.fret) + (fp1.fret + fp2.fret) // Minimize finger spread and stay close to head
+        }?.let { (fp1, fp2) ->
+            return fp1 to fp2
         }
-            ?.let { (fp1, fp2) ->
-                return fp1 to fp2
-            }
         return null
     }
 
-    private fun calculateMonophonic(list: List<NotePeriodGroup>): Map<NotePeriod, FretboardPosition> {
-        val notePeriods = list.map { it.notePeriods.first() }.sortedBy { it.start }
+    private fun calculateMonophonic(list: List<TimedArcGroup>): Map<TimedArc, FretboardPosition> {
+        val notePeriods = list.map { it.arcs.first() }.sortedBy { it.start }
         val runningAverage = RunningAverage(3, 0)
 
-        val map = mutableMapOf<NotePeriod, FretboardPosition>()
+        val map = mutableMapOf<TimedArc, FretboardPosition>()
         for ((index, notePeriod) in notePeriods.withIndex()) {
-
             /*
              * First, check if this is the same as the previous note period, if so, use that fretboard position.
              * This will probably never be different because it would move the running average closer to that position,
@@ -257,9 +251,8 @@ class BetterFretting(
             // Calculate the best fretboard position for this note
             allPossibleFretboardPositions(
                 notePeriod.note,
-                pitchBendExtremes = findPitchBendExtremesDuringRange(notePeriod.start, notePeriod.end)
-            )
-                .associateWith { abs(runningAverage() - it.fret) } // "Loss"
+                pitchBendExtremes = findPitchBendExtremesDuringRange(notePeriod.startTime, notePeriod.endTime)
+            ).associateWith { abs(runningAverage() - it.fret) } // "Loss"
                 .minByOrNull { it.value }?.let { (key) ->
                     map += notePeriod to key
                     runningAverage += key.fret
@@ -270,43 +263,47 @@ class BetterFretting(
     }
 
     private fun allPossibleFretboardPositions(
-        midiNote: Int,
+        midiNote: Byte,
         occupiedStrings: Set<Int> = setOf(),
-        pitchBendExtremes: Pair<Double, Double>? = null
-    ): List<FretboardPosition> =
-        openStringNoteValues.mapIndexed { string, openStringNoteValue ->
-            with(midiNote - openStringNoteValue) {
-                if (this < 0) null else FretboardPosition(
+        pitchBendExtremes: ClosedFloatingPointRange<Double>? = null
+    ): List<FretboardPosition> = openStringNoteValues.mapIndexed { string, openStringNoteValue ->
+        with(midiNote - openStringNoteValue) {
+            if (this < 0) {
+                null
+            } else {
+                FretboardPosition(
                     string,
                     this
                 )
             }
-        }.filterNotNull() // null means the fret is negative, which is impossible
-            .filter { it.string !in occupiedStrings }
-            .let { positions ->
-                positions.filter {
-                    if (pitchBendExtremes == null) true
-                    else {
-                        when {
-                            it.fret + pitchBendExtremes.first < 0 -> false
-                            it.fret + pitchBendExtremes.second > 22 -> false
-                            else -> true
-                        }
+        }
+    }.filterNotNull() // null means the fret is negative, which is impossible
+        .filter { it.string !in occupiedStrings }.let { positions ->
+            positions.filter {
+                if (pitchBendExtremes == null) {
+                    true
+                } else {
+                    when {
+                        it.fret + pitchBendExtremes.start < 0 -> false
+                        it.fret + pitchBendExtremes.endInclusive > 22 -> false
+                        else -> true
                     }
-                }.ifEmpty { positions }
-            }
+                }
+            }.ifEmpty { positions }
+        }
 
-    private fun findPitchBendExtremesDuringRange(start: Double, end: Double): Pair<Double, Double> {
+    private fun findPitchBendExtremesDuringRange(start: Duration, end: Duration): ClosedFloatingPointRange<Double> {
         val startEventIndex =
-            absolutePitchBendEventsWithTime.entries.sortedBy { it.key.time }.indexOfLast { it.value <= start }
+            absolutePitchBendEventsWithTime.entries.sortedBy { it.key.tick }.indexOfLast { it.value <= start }
+
         var endEventIndex =
-            absolutePitchBendEventsWithTime.entries.sortedBy { it.key.time }.indexOfFirst { it.value >= end }
+            absolutePitchBendEventsWithTime.entries.sortedBy { it.key.tick }.indexOfFirst { it.value >= end }
         if (endEventIndex == -1) {
             endEventIndex = startEventIndex // All pitch bend events are before the range
         }
-        val eventsInRange = absolutePitchBendEventsWithTime.entries.sortedBy { it.key.time }
-            .subList(startEventIndex, endEventIndex + 1)
+        val eventsInRange =
+            absolutePitchBendEventsWithTime.entries.sortedBy { it.key.tick }.subList(startEventIndex, endEventIndex + 1)
 
-        return eventsInRange.map { it.key.value }.let { it.minOrNull()!! to it.maxOrNull()!! }
+        return eventsInRange.map { it.key.bend }.let { it.minOrNull()!!..it.maxOrNull()!! }
     }
 }

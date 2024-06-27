@@ -20,21 +20,18 @@ import com.jme3.math.FastMath.PI
 import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
 import com.jme3.scene.Geometry
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /**
  * The Tubular Bells.
@@ -42,15 +39,15 @@ import org.wysko.midis2jam2.world.modelR
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class TubularBells(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class TubularBells(context: Midis2jam2, events: List<MidiEvent>) :
     DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(-10, 0, -10)
     private val bells =
-        List(12) { i -> Bell(i, events.filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == i }) }
+        List(12) { i -> Bell(i, events.filterIsInstance<NoteEvent.NoteOn>().filter { (it.note + 3) % 12 == i }) }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         bells.forEach { it.tick(time, delta) }
     }
@@ -65,7 +62,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelEvent>) :
     /**
      * Contains a single bell.
      */
-    private inner class Bell(i: Int, events: List<MidiNoteOnEvent>) {
+    private inner class Bell(i: Int, events: List<NoteEvent.NoteOn>) {
         val root = with(geometry) {
             +node {
                 loc = v3((i - 5) * 4, 0, 0)
@@ -102,7 +99,7 @@ class TubularBells(context: Midis2jam2, events: List<MidiChannelEvent>) :
          * @param time The current time since the beginning of the song, in seconds.
          * @param delta The amount of time that elapsed since the last frame, in seconds.
          */
-        fun tick(time: Double, delta: Float) {
+        fun tick(time: Duration, delta: Duration) {
             with(mallet.tick(time, delta)) { if (velocity > 0) animator.strike() }
             animator.tick(delta)
 

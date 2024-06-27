@@ -19,6 +19,8 @@ package org.wysko.midis2jam2.instrument.clone
 import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
+import org.wysko.midis2jam2.util.unaryPlus
+import kotlin.time.Duration
 
 /** Any clone that visualizes playing by using a [SteamPuffer]. */
 abstract class CloneWithPuffer protected constructor(
@@ -31,12 +33,14 @@ abstract class CloneWithPuffer protected constructor(
     val puffer: SteamPuffer =
         SteamPuffer(parent.context, puffType, pufferScale.toDouble(), SteamPuffer.PuffBehavior.OUTWARDS)
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         puffer.tick(delta, isPlaying)
     }
 
     init {
-        geometry.attachChild(puffer.root)
+        with(geometry) {
+            +puffer.root
+        }
     }
 }

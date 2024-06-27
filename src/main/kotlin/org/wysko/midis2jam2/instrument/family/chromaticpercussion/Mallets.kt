@@ -20,6 +20,8 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.MAX_STICK_IDLE_ANGLE
@@ -29,18 +31,12 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.BarState.DOWN
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.BarState.UP
 import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration.Companion.isFakeShadows
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val MALLET_CASE_SCALE: Float = 0.6666667f
 private val RANGE = 21..108
@@ -50,11 +46,11 @@ private val RANGE = 21..108
  */
 class Mallets(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>,
+    eventList: List<MidiEvent>,
     private val type: MalletType
 ) : DecayedInstrument(context, eventList) {
 
-    private val hitsByNote: List<List<MidiNoteOnEvent>> = RANGE.map { x -> hits.filter { it.note == x } }
+    private val hitsByNote: List<List<NoteEvent.NoteOn>> = RANGE.map { x -> hits.filter { it.note.toInt() == x } }
 
     private val fakeShadow: Spatial? =
         if (context.isFakeShadows) {
@@ -72,10 +68,11 @@ class Mallets(
         let {
             var whiteCount = 0
             RANGE.mapIndexed { index, note ->
-                if (Key.Color.fromNote(note) == White) {
-                    MalletBar(note, whiteCount++, hitsByNote[index])
+                val byte = note.toByte()
+                if (Key.Color.fromNote(byte) == White) {
+                    MalletBar(byte, whiteCount++, hitsByNote[index])
                 } else {
-                    MalletBar(note, note, hitsByNote[index])
+                    MalletBar(byte, note, hitsByNote[index])
                 }
             }
         }.onEach { geometry += it.root }
@@ -90,8 +87,8 @@ class Mallets(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 
@@ -105,7 +102,7 @@ class Mallets(
         bars.forEach { it.tick(time, delta) }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         val index = updateInstrumentIndex(delta) - 2
         geometry.loc = v3(-50, 26.5 + (2 * index), 0)
         placement.rot = v3(0, -18 * index, 0)
@@ -139,7 +136,7 @@ class Mallets(
     /**
      * Represents a single bar on the mallet instrument.
      */
-    inner class MalletBar(midiNote: Int, startPos: Int, events: List<MidiNoteOnEvent>) {
+    inner class MalletBar(midiNote: Byte, startPos: Int, events: List<NoteEvent.NoteOn>) {
 
         internal val root = Node()
         private val bar = with(root) {
@@ -205,7 +202,7 @@ class Mallets(
          * @param time the current time
          * @param delta the amount of time since the last frame update
          */
-        fun tick(time: Double, delta: Float) {
+        fun tick(time: Duration, delta: Duration) {
             mallet.tick(time, delta).let {
                 if (it.velocity > 0) recoilBar()
                 setShadowScale(it)
@@ -227,7 +224,7 @@ class Mallets(
 
             // Inch the bar back up
             if (downBar.loc.y < -0.0001) {
-                downBar.move(0f, 5 * delta, 0f)
+                downBar.move(0f, (5 * delta.toDouble(SECONDS)).toFloat(), 0f)
                 downBar.loc.y = downBar.loc.y.coerceAtMost(0f)
             } else {
                 // Done recoiling, reset

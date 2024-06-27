@@ -17,26 +17,22 @@
 package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
 import org.wysko.midis2jam2.instrument.family.percussive.modulus
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.util.get
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.material
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /**
  * The Timpani.
  */
-class Timpani(context: Midis2jam2, eventList: List<MidiChannelEvent>) : OneDrumOctave(context, eventList) {
+class Timpani(context: Midis2jam2, eventList: List<MidiEvent>) : OneDrumOctave(context, eventList) {
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.rot = v3(0f, -27 + updateInstrumentIndex(delta) * -18, 0f)
     }
 

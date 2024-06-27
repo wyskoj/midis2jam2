@@ -20,26 +20,23 @@ import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
 
 /** The full, 88-key keyboard. */
 open class Keyboard(
     context: Midis2jam2,
-    events: MutableList<MidiChannelEvent>,
+    events: MutableList<MidiEvent>,
     internal val skin: KeyboardSkin,
 ) : KeyedInstrument(context, events, 21, 108), MultipleInstancesLinearAdjustment {
     private val pitchBendController = PitchBendModulationController(context, events)
@@ -48,9 +45,9 @@ open class Keyboard(
         let {
             var whiteCount = 0
             Array(keyCount()) {
-                when (Color.fromNote(it + rangeLow)) {
-                    White -> KeyboardKey(this, it + rangeLow, whiteCount++)
-                    Black -> KeyboardKey(this, it + rangeLow, it)
+                when (Color.fromNote((it + rangeLow).toByte())) {
+                    White -> KeyboardKey(this, (it + rangeLow).toByte(), whiteCount++)
+                    Black -> KeyboardKey(this, (it + rangeLow).toByte(), it)
                 }
             }
         }
@@ -65,7 +62,7 @@ open class Keyboard(
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         geometry.localTranslation = PITCH_BEND_DIRECTION_VECTOR.mult(pitchBendController.tick(time, delta) { true })
     }

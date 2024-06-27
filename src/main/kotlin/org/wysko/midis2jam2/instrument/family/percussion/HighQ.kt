@@ -21,11 +21,13 @@ import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /** The amount of time the laser should appear for when the laser gun shoots, expressed in seconds. */
 private const val LASER_LIFE = 0.05
@@ -35,7 +37,7 @@ private const val LASER_LIFE = 0.05
  *
  * Looks like a laser gun. The laser that shoots out of the gun is stationary and appears for [LASER_LIFE] seconds.
  */
-class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+class HighQ(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val laserGun =
         Striker(
             context = context,
@@ -72,8 +74,8 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxiliary
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         val stickStatus = laserGun.tick(time, delta)
@@ -85,7 +87,7 @@ class HighQ(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxiliary
         }
 
         // Increment counter
-        laserShowTime += delta.toDouble()
+        laserShowTime += delta.toDouble(SECONDS)
 
         // If the counter has surpassed the maximum time, hide the laser
         if (laserShowTime > LASER_LIFE) {

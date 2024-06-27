@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
+import kotlin.time.Duration
 
 /**
  * Manages the visibility of multiple drum sets.
@@ -34,7 +35,7 @@ class DrumSetVisibilityManager(private val context: Midis2jam2, drumSets: List<D
      * The drum set that is currently visible.
      */
     var currentlyVisibleDrumSet: DrumSet? =
-        if (drumSets.isEmpty()) null else collectors.entries.minBy { it.value.peek()?.time ?: Long.MAX_VALUE }.key
+        if (drumSets.isEmpty()) null else collectors.entries.minBy { it.value.peek()?.tick ?: Int.MAX_VALUE }.key
 
     /**
      * `true` if the drum set is visible, `false` otherwise.
@@ -46,7 +47,7 @@ class DrumSetVisibilityManager(private val context: Midis2jam2, drumSets: List<D
      *
      * @param time The current time.
      */
-    fun tick(time: Double) {
+    fun tick(time: Duration) {
         val collectorResults = collectors.mapValues { it.value.advanceCollectOne(time) }
 
         val individuallyComputedVisibilities = collectors.entries.associateWith {
@@ -59,7 +60,7 @@ class DrumSetVisibilityManager(private val context: Midis2jam2, drumSets: List<D
         // If we go from a non-visible state to a visible state, we want to make sure that the drum set that is
         // currently visible is the one that is going to play next.
         if (!isVisible && individuallyComputedVisibilities.values.any { it }) {
-            currentlyVisibleDrumSet = collectors.minBy { it.value.peek()?.time ?: Long.MAX_VALUE }.key
+            currentlyVisibleDrumSet = collectors.minBy { it.value.peek()?.tick ?: Int.MAX_VALUE }.key
         }
 
         isVisible = individuallyComputedVisibilities.values.any { it }

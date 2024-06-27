@@ -18,24 +18,25 @@
 package org.wysko.midis2jam2.instrument
 
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.TimedArc
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
-import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.util.plusAssign
+import kotlin.time.Duration
 
 /**
  * Used with [DivisiveSustainedInstrument], this class animates a single note (i.e., A, A#, B, C, etc.).
  *
  * @param context The context to the main class.
- * @param notePeriods The list of all note periods that this instrument should play.
+ * @param arcs The list of all arcs that this instrument should play.
  * @see DivisiveSustainedInstrument
  */
-abstract class PitchClassAnimator protected constructor(context: Midis2jam2, notePeriods: List<NotePeriod>) {
+abstract class PitchClassAnimator protected constructor(context: Midis2jam2, arcs: List<TimedArc>) {
 
     /**
      * The collector that manages the note periods.
      */
-    protected val collector: NotePeriodCollector = NotePeriodCollector(context, notePeriods)
+    protected val collector: TimedArcCollector = TimedArcCollector(context, arcs)
 
     /**
      * The highest level node.
@@ -60,13 +61,13 @@ abstract class PitchClassAnimator protected constructor(context: Midis2jam2, not
     /**
      * `true` if the animator is playing, `false` otherwise.
      *
-     * *This is a convenience property for checking if [NotePeriodCollector.currentNotePeriods] is empty.*
+     * *This is a convenience property for checking if [TimedArcCollector.currentTimedArcs] is empty.*
      */
     val playing: Boolean
-        get() = collector.currentNotePeriods.isNotEmpty()
+        get() = collector.currentTimedArcs.isNotEmpty()
 
     /** Call this method every frame to update the twelfth. */
-    open fun tick(time: Double, delta: Float) {
+    open fun tick(time: Duration, delta: Duration) {
         collector.advance(time)
     }
 }

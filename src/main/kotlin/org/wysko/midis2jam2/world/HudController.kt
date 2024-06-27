@@ -24,12 +24,8 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.scale
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
+import kotlin.time.Duration
 
 private const val VERTICAL_FILLBAR_SCALE = 0.7f
 private const val FILLBAR_LOCATION_OFFSET = 3f
@@ -57,7 +53,7 @@ class HudController {
             }
             +BitmapText(assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
                 loc = v3(0f, 46f, 0f)
-                text = file.name
+                text = fileName
                 size = 24f
                 color = White
             }
@@ -85,13 +81,13 @@ class HudController {
     /**
      * Updates animation.
      *
-     * @param timeSinceStart The time since the song started.
+     * @param time The time since the song started.
      * @param fadeValue The value to fade the HUD by.
      */
-    fun tick(timeSinceStart: Double, fadeValue: Float) {
+    fun tick(time: Duration, fadeValue: Float) {
         fillbar.scale =
             v3(
-                x = (MAXIMUM_FILLBAR_SCALE * (timeSinceStart / file.length).coerceAtMost(1.0)).toFloat(),
+                x = (MAXIMUM_FILLBAR_SCALE * (time / sequence.duration).coerceAtMost(1.0)).toFloat(),
                 y = VERTICAL_FILLBAR_SCALE,
                 z = 1f,
             )

@@ -21,15 +21,20 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelD
-import java.util.Random
+import java.util.*
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /** *You used to call me on my cellphone...* */
-class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class TelephoneRing(context: Midis2jam2, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     /** The Up node. */
     private val upNode =
@@ -76,7 +81,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         }
 
     /** The amount to shake the handle. */
-    private var force = 0f
+    private var force = 0.0
 
     /** Random for phone animation. */
     private val random = Random()
@@ -92,8 +97,8 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 
@@ -103,7 +108,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         downKeys.forEach { it.cullHint = Always }
 
         // Turn on current note periods
-        collector.currentNotePeriods.forEach {
+        collector.currentTimedArcs.forEach {
             with((it.note + 3) % 12) {
                 playing[this] = true
                 upKeys[this].cullHint = Always
@@ -112,23 +117,22 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         }
 
         // Animate phone handle
-        handle.setLocalTranslation(0f, (2 + random.nextGaussian() * 0.3).toFloat() * force, 0f)
-        handle.localRotation =
-            Quaternion().fromAngles(
-                rad(random.nextGaussian() * 3) * force,
-                rad(random.nextGaussian() * 3) * force,
-                0f,
-            )
+        handle.loc = v3(0f, (2 + random.nextGaussian() * 0.3).toFloat() * force, 0f)
+        handle.rot = v3(
+            rad(random.nextGaussian() * 3) * force,
+            rad(random.nextGaussian() * 3) * force,
+            0f,
+        )
         if (playing.any { it }) {
-            force += 12 * delta
-            force = 1f.coerceAtMost(force)
+            force += 12 * delta.toDouble(SECONDS)
+            force = 1.0.coerceAtMost(force)
         } else {
-            force -= 12 * delta
-            force = 0f.coerceAtLeast(force)
+            force -= 12 * delta.toDouble(SECONDS)
+            force = 0.0.coerceAtLeast(force)
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(13f * updateInstrumentIndex(delta), 0f, 0f)
     }
 }

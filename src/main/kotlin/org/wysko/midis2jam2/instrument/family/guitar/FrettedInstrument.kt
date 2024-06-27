@@ -19,16 +19,14 @@ package org.wysko.midis2jam2.instrument.family.guitar
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.plusAssign
@@ -37,6 +35,7 @@ import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.time.Duration
 
 /**
  * Any instrument that has strings and frets.
@@ -57,7 +56,7 @@ import kotlin.math.floor
  */
 abstract class FrettedInstrument protected constructor(
     context: Midis2jam2,
-    events: List<MidiChannelEvent>,
+    events: List<MidiEvent>,
     protected val frettingEngine: FrettingEngine,
     protected val positioning: FrettedInstrumentPositioning,
     private val numberOfStrings: Int,
@@ -88,20 +87,20 @@ abstract class FrettedInstrument protected constructor(
     /**
      * Maps each [NotePeriod] to its [FretboardPosition].
      */
-    protected open val notePeriodFretboardPosition: Map<NotePeriod, FretboardPosition> = run {
-        val fretboardPositions = mutableMapOf<NotePeriod, FretboardPosition>()
+    protected open val notePeriodFretboardPosition: Map<TimedArc, FretboardPosition> = run {
+        val fretboardPositions = mutableMapOf<TimedArc, FretboardPosition>()
 
         val periodByNoteEvent = buildMap {
-            notePeriods.forEach {
+            timedArcs.forEach {
                 put(it.noteOff, it)
                 put(it.noteOn, it)
             }
         }
         val occupiedStrings = mutableSetOf<Int>()
-        val stringByNoteEvent = mutableMapOf<Int, Int>()
-        events.filterIsInstance<MidiNoteEvent>().forEach { noteEvent ->
+        val stringByNoteEvent = mutableMapOf<Byte, Int>()
+        events.filterIsInstance<NoteEvent>().forEach { noteEvent ->
             when (noteEvent) {
-                is MidiNoteOnEvent -> {
+                is NoteEvent.NoteOn -> {
                     frettingEngine.bestFretboardPosition(midiNote = noteEvent.note)?.let {
                         occupiedStrings += it.string
                         fretboardPositions[periodByNoteEvent[noteEvent] ?: return@let] = it
@@ -110,7 +109,7 @@ abstract class FrettedInstrument protected constructor(
                     }
                 }
 
-                is MidiNoteOffEvent -> {
+                is NoteEvent.NoteOff -> {
                     stringByNoteEvent.remove(noteEvent.note)?.let { frettingEngine.releaseString(it) }
                 }
             }
@@ -129,11 +128,13 @@ abstract class FrettedInstrument protected constructor(
         }
     }
 
+    private val animatedStartedMap = timedArcs.associateWith { false }.toMutableMap()
+
     init {
         geometry += instrumentBody.first
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
 
         repeat(numberOfStrings) {
@@ -144,17 +145,17 @@ abstract class FrettedInstrument protected constructor(
                 pitchBendAmount = pitchBendModulationController.tick(
                     time,
                     delta,
-                    playing = collector.currentNotePeriods::isNotEmpty
+                    playing = collector.currentTimedArcs::isNotEmpty
                 ),
             )
         }
     }
 
     private fun fretPressedOnString(string: Int): Int? {
-        val np = collector.currentNotePeriods.firstOrNull { notePeriodFretboardPosition[it]?.string == string }
+        val np = collector.currentTimedArcs.firstOrNull { notePeriodFretboardPosition[it]?.string == string }
         return np?.let {
-            return if (!it.animationStarted) {
-                it.animationStarted = true
+            return if (!animatedStartedMap[it]!!) {
+                animatedStartedMap[it] = true
 
                 // This will kick animation to the next frame
                 // so that consecutive notes have some temporal distinction.
@@ -196,7 +197,7 @@ abstract class FrettedInstrument protected constructor(
         }
     }
 
-    private fun animateString(string: Int, fret: Int, delta: Float, pitchBendAmount: Float) {
+    private fun animateString(string: Int, fret: Int, delta: Duration, pitchBendAmount: Float) {
         // If fret is -1, stop animating anything on this string and hide all animation components.
         if (fret == -1) {
             // Reset scale, hide lower strings, hide note finger.
@@ -247,15 +248,21 @@ abstract class FrettedInstrument protected constructor(
             frettingEngine as StandardFrettingEngine
             for (x in (numberOfStrings - 1) downTo 0) {
                 for (y in 0..<frettingEngine.numberOfFrets) {
-                    append(if (collector.currentNotePeriods.any {
-                            notePeriodFretboardPosition[it]?.let {
-                                it.string == x && it.fret == y
-                            } == true
-                        }) "x" else "-")
+                    append(
+                        if (collector.currentTimedArcs.any {
+                                notePeriodFretboardPosition[it]?.let {
+                                    it.string == x && it.fret == y
+                                } == true
+                            }
+                        ) {
+                            "x"
+                        } else {
+                            "-"
+                        }
+                    )
                 }
                 appendLine()
             }
         },
     )
 }
-

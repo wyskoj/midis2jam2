@@ -17,11 +17,13 @@
 
 package org.wysko.midis2jam2.instrument.family.piano
 
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * An instrument that uses keys to play notes.
@@ -31,18 +33,18 @@ import org.wysko.midis2jam2.midi.NotePeriod
  */
 abstract class KeyedInstrument(
     context: Midis2jam2,
-    eventList: MutableList<MidiChannelEvent>,
-    val rangeLow: Int,
-    val rangeHigh: Int,
+    eventList: MutableList<MidiEvent>,
+    val rangeLow: Byte,
+    val rangeHigh: Byte,
 ) : SustainedInstrument(context, eventList) {
     /** The keys of this instrument. */
     abstract val keys: Array<Key>
 
-    override val collector: NotePeriodCollector =
-        NotePeriodCollector(
+    override val collector: TimedArcCollector =
+        TimedArcCollector(
             context = context,
-            notePeriods = notePeriods,
-            releaseCondition = { time: Double, notePeriod: NotePeriod ->
+            arcs = timedArcs,
+            releaseCondition = { time: Duration, notePeriod: TimedArc ->
                 processEventDuration(notePeriod, time)
             },
         )
@@ -54,39 +56,34 @@ abstract class KeyedInstrument(
     protected abstract fun getKeyByMidiNote(midiNote: Int): Key?
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         collector.advance(time)
         keys.forEach { it.tick(delta) }
     }
 
-    private fun processEventDuration(
-        it: NotePeriod,
-        time: Double,
-    ): Boolean {
-        return when {
-            it.duration > 0.5 -> time >= it.end - 0.1
-            it.duration > 0.2 -> time >= it.end - 0.05
-            else -> time >= it.start + (it.duration * 0.5)
-        }
+    private fun processEventDuration(it: TimedArc, time: Duration): Boolean = when {
+        it.duration > 0.5.seconds -> time >= it.endTime - 0.1.seconds
+        it.duration > 0.2.seconds -> time >= it.endTime - 0.05.seconds
+        else -> time >= it.startTime + (it.duration * 0.5)
     }
 
     override fun toString(): String {
         return super.toString() +
-            buildString {
-                append(
-                    formatProperty(
-                        "keys",
-                        keys.joinToString(separator = "") { if (it.currentState is Key.State.Down) "X" else "_" },
-                    ),
-                )
-            }
+                buildString {
+                    append(
+                        formatProperty(
+                            "keys",
+                            keys.joinToString(separator = "") { if (it.currentState is Key.State.Down) "X" else "_" },
+                        ),
+                    )
+                }
     }
 
-    open fun keyStatus(midiNote: Int): Key.State =
-        collector.currentNotePeriods.firstOrNull { it.note == midiNote }?.let {
+    open fun keyStatus(midiNote: Byte): Key.State =
+        collector.currentTimedArcs.firstOrNull { it.note == midiNote }?.let {
             Key.State.Down(it.noteOn.velocity)
         } ?: Key.State.Up
 }

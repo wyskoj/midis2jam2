@@ -27,6 +27,8 @@ import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.times
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * Represents an instrument.
@@ -103,7 +105,7 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param time The current time since the beginning of the song, in seconds.
      * @param delta The amount of time that elapsed since the last frame, in seconds.
      */
-    abstract fun tick(time: Double, delta: Float)
+    abstract fun tick(time: Duration, delta: Duration)
 
     /**
      * Calculates the visibility of the instrument.
@@ -111,7 +113,7 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param time The current time since the beginning of the song, in seconds.
      * @param future Whether to calculate the visibility for the future.
      */
-    abstract fun calculateVisibility(time: Double, future: Boolean = false): Boolean
+    abstract fun calculateVisibility(time: Duration, future: Boolean = false): Boolean
 
     /**
      * Called when the instrument's [visibility][isVisible] changes from `false` to `true`.
@@ -128,7 +130,7 @@ abstract class Instrument(val context: Midis2jam2) {
      *
      * @param delta The amount of time that elapsed since the last frame, in seconds.
      */
-    protected open fun adjustForMultipleInstances(delta: Float) {
+    protected open fun adjustForMultipleInstances(delta: Duration) {
         when (this) {
             is MultipleInstancesLinearAdjustment -> {
                 root.loc = this.multipleInstancesDirection * updateInstrumentIndex(delta)
@@ -150,13 +152,13 @@ abstract class Instrument(val context: Midis2jam2) {
      * @return The new index.
      * @see index
      */
-    protected fun updateInstrumentIndex(delta: Float): Float {
+    protected fun updateInstrumentIndex(delta: Duration): Float {
         val targetIndex = if (isVisible) {
             findSimilarAndVisible().indexOf(this).coerceAtLeast(0)
         } else {
             findSimilarAndVisible().size - 1
         }
-        index += delta * 2500 * (targetIndex - index) / 500.0
+        index += delta.toDouble(SECONDS) * 2500 * (targetIndex - index) / 500.0
         index = index.coerceAtMost(findSimilar().size.toDouble())
         return index.toFloat()
     }

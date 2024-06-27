@@ -19,12 +19,12 @@ package org.wysko.midis2jam2.instrument.family.brass
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
 import org.wysko.midis2jam2.instrument.clone.CloneWithBell
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
@@ -34,22 +34,25 @@ import org.wysko.midis2jam2.world.modelR
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.SECONDS
 
 private val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trombone::class)
 
 /**
  * The Trombone.
  */
-class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class Trombone(context: Midis2jam2, eventList: List<MidiEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class, SLIDE_MANAGER) {
 
     private var bend = 0f
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.loc = v3(0, 10 * updateInstrumentIndex(delta), 0)
     }
 
-    override fun handlePitchBend(time: Double, delta: Float) {
+    override fun handlePitchBend(time: Duration, delta: Duration, isNewNote: Boolean) {
         bend = pitchBendModulationController.tick(time, delta, false) {
             clones.any { it.isPlaying }
         }
@@ -59,11 +62,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
      * A Trombone clone.
      */
     inner class TromboneClone : CloneWithBell(
-        parent = this@Trombone,
-        rotationFactor = 0.1f,
-        stretchFactor = 1f,
-        scaleAxis = Axis.Z,
-        rotationAxis = Axis.X
+        parent = this@Trombone, rotationFactor = 0.1f, stretchFactor = 1f, scaleAxis = Axis.Z, rotationAxis = Axis.X
     ) {
 
         private val slide: Spatial = context.modelR("TromboneSlide.obj", "HornSkin.bmp")
@@ -97,7 +96,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
 
         private fun slideLocation(position: Double): Vector3f = Vector3f(0f, 0f, (3.333333 * position - 1).toFloat())
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
 
             if (!isPlaying) {
@@ -105,14 +104,14 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
                 return
             }
 
-            notePeriodCollector.peek()?.let {
+            timedArcCollector.peek()?.let {
                 /* Buffer room lets slide move at the end of a note
                  * to get to the next if we are still playing.
                  *
                  * We'll only also do this if the note is long enough
                  * (so that notes in rapid succession are animated desirably).
                  */
-                if (it.start - time < 0.1 && currentNotePeriod?.duration!! >= 0.15) {
+                if (it.startTime - time < 0.1.seconds && currentNotePeriod?.duration!! >= 0.15.seconds) {
                     advanceSlide(time, delta)
                 } else {
                     snapSlide()
@@ -125,21 +124,23 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
             return false
         }
 
-        private fun advanceSlide(time: Double, delta: Float) {
-            notePeriodCollector.peek()?.let {
+        private fun advanceSlide(time: Duration, delta: Duration) {
+            timedArcCollector.peek()?.let {
                 if (it.note !in 21..80) {
                     return
                 }
-
-                val startTime = it.start
-                if (startTime - time in delta..1.0F) {
+                if (it.startTime - time in delta..1.0.seconds) {
                     val target = getSlidePositionFromNote(it)
-                    moveToPosition(slidePosition + (target - slidePosition) / (startTime - time) * delta)
+                    moveToPosition(
+                        slidePosition + (target - slidePosition) / (it.startTime - time).toDouble(SECONDS) * delta.toDouble(
+                            SECONDS
+                        )
+                    )
                 }
             }
         }
 
-        private fun getSlidePositionFromNote(period: NotePeriod): Int {
+        private fun getSlidePositionFromNote(period: TimedArc): Int {
             val positionList = SLIDE_MANAGER.fingering(period.note) ?: return slidePosition.roundToInt()
             if (positionList.size == 1) return positionList[0]
 
@@ -151,7 +152,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
             return positionScoreMap.firstEntry().value
         }
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.loc = v3(0, indexForMoving(), 0)
             root.rot = v3(0, -70 + indexForMoving() * 15, 0)
         }

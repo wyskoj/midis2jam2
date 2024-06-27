@@ -142,6 +142,8 @@ dependencies {
 
     implementation(files("libs/Gervill-0.2.31.jar", "libs/jme-ttf-2.2.2.jar"))
     implementation("org.nutz:nutz-plugins-sfntly:1.r.60.r3")
+
+    implementation("org.wysko:kmidi:0.0.4")
 }
 
 tasks.withType<ShadowJar> {

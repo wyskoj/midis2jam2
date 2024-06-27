@@ -19,12 +19,14 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val METAL_TEXTURE = "MetalTexture.bmp"
 private const val BASS_DRUM_RECOIL_DISTANCE = -3f
@@ -41,7 +43,7 @@ private const val BASS_DRUM_RECOIL_DISTANCE = -3f
  */
 class BassDrum(
     context: Midis2jam2,
-    hits: MutableList<MidiNoteOnEvent>,
+    hits: MutableList<NoteEvent.NoteOn>,
     style: ShellStyle,
 ) :
     DrumSetInstrument(context, hits) {
@@ -83,8 +85,8 @@ class BassDrum(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         val results = eventCollector.advanceCollectOne(time)
@@ -101,23 +103,19 @@ class BassDrum(
         beaterArm.localRotation = beaterRotation()
         pedal.localRotation = pedalRotation()
 
-        rotationFactor -= delta * 8f
+        rotationFactor -= (delta.toDouble(SECONDS) * 8.0).toFloat()
         rotationFactor = rotationFactor.coerceAtLeast(0f)
     }
 
-    private fun beaterRotation(): Quaternion {
-        return Quaternion().fromAngles(
-            -rotationFactor + 0.87f,
-            0f,
-            0f,
-        )
-    }
+    private fun beaterRotation(): Quaternion = Quaternion().fromAngles(
+        -rotationFactor + 0.87f,
+        0f,
+        0f,
+    )
 
-    private fun pedalRotation(): Quaternion {
-        return Quaternion().fromAngles(
-            (-rotationFactor * 0.5f) + 0.2f,
-            0f,
-            0f,
-        )
-    }
+    private fun pedalRotation(): Quaternion = Quaternion().fromAngles(
+        (-rotationFactor * 0.5f) + 0.2f,
+        0f,
+        0f,
+    )
 }

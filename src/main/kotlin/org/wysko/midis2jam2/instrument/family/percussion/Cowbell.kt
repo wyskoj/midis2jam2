@@ -17,15 +17,16 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /** The Cowbell. */
-class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+class Cowbell(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val stick =
         Striker(context, hits, StickType.DRUM_SET_STICK).apply {
             setParent(recoilNode)
@@ -41,8 +42,8 @@ class Cowbell(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxilia
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         recoilDrum(recoilNode, stick.tick(time, delta).velocity, delta)

@@ -18,14 +18,16 @@ package org.wysko.midis2jam2.instrument.family.organ
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Companion.SQUEEZE_RANGE
 import org.wysko.midis2jam2.instrument.family.piano.*
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.*
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val WHITE_KEY_FRONT = "AccordionKeyWhiteFront.obj"
 private const val WHITE_KEY_BACK = "AccordionKeyWhiteBack.obj"
@@ -51,15 +53,15 @@ private const val BLACK_KEY_DOWN_TEXTURE = "AccordionKeyBlackDown.bmp"
  *
  * Because the accordion only has twenty-four playable keys, notes are modulus 24.
  */
-class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>, type: Type) :
+class Accordion(context: Midis2jam2, eventList: MutableList<MidiEvent>, type: Type) :
     KeyedInstrument(context, eventList, 0, 23) {
     override val keys: Array<Key> =
         let {
             var whiteCount = 0
             Array(24) {
-                when (Color.fromNote(it)) {
-                    White -> AccordionKey(it, whiteCount++, this)
-                    Black -> AccordionKey(it, it, this)
+                when (Color.fromNote(it.toByte())) {
+                    White -> AccordionKey(it.toByte(), whiteCount++, this)
+                    Black -> AccordionKey(it.toByte(), it, this)
                 }
             }
         }
@@ -98,7 +100,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>, t
      */
     private fun calculateAngle(delta: Float) {
         // Squeeze at maximum speed if any key is being pressed.
-        if (collector.currentNotePeriods.isNotEmpty()) {
+        if (collector.currentTimedArcs.isNotEmpty()) {
             squeezingSpeed = MAX_SQUEEZING_SPEED.toDouble()
         } else {
             if (squeezingSpeed > 0) { // Gradually decrease squeezing speed
@@ -122,11 +124,11 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>, t
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
-        calculateAngle(delta)
+        calculateAngle(delta.toDouble(SECONDS).toFloat())
 
         // Set the rotation of each section
         accordionSections.indices.forEach {
@@ -138,7 +140,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>, t
         return keys[midiNote % 24]
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(0f, 30 * updateInstrumentIndex(delta), 0f)
     }
 
@@ -189,8 +191,8 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>, t
             )
     }
 
-    override fun keyStatus(midiNote: Int): Key.State {
-        collector.currentNotePeriods.firstOrNull { it.note % 24 == midiNote % 24 }?.let {
+    override fun keyStatus(midiNote: Byte): Key.State {
+        collector.currentTimedArcs.firstOrNull { it.note % 24 == midiNote % 24 }?.let {
             return Key.State.Down(it.noteOn.velocity)
         } ?: return Key.State.Up
     }

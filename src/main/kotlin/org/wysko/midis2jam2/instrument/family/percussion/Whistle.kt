@@ -18,21 +18,23 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /** The long and short percussion whistles. */
 class Whistle(
     context: Midis2jam2,
-    shortHits: MutableList<MidiNoteOnEvent>,
-    longHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.time }.toMutableList()) {
+    shortHits: MutableList<NoteEvent.NoteOn>,
+    longHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.tick }.toMutableList()) {
     /** The short whistle. */
     private val shortWhistle: PercussionWhistle =
         PercussionWhistle(WhistleLength.SHORT).apply {
@@ -55,8 +57,8 @@ class Whistle(
     private val longEventCollector = EventCollector(context, longHits)
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         shortEventCollector.advanceCollectOne(time)?.let {
@@ -130,13 +132,13 @@ class Whistle(
          *
          * @param delta the amount of time since the last frame update
          */
-        fun tick(delta: Float) {
+        fun tick(delta: Duration) {
             if (progress >= 1) {
                 playing = false
                 progress = 0.0
             }
             if (playing) {
-                progress += delta / duration
+                progress += delta.toDouble(SECONDS) / duration
                 animNode.setLocalTranslation(0f, 2 - 2 * progress.toFloat(), 0f)
             } else {
                 animNode.setLocalTranslation(0f, 0f, 0f)

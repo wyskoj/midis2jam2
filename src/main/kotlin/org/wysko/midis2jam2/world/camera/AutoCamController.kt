@@ -22,11 +22,7 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
-import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
-import org.wysko.midis2jam2.instrument.family.brass.StageHorns
-import org.wysko.midis2jam2.instrument.family.brass.Trombone
-import org.wysko.midis2jam2.instrument.family.brass.Trumpet
-import org.wysko.midis2jam2.instrument.family.brass.Tuba
+import org.wysko.midis2jam2.instrument.family.brass.*
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
@@ -40,20 +36,9 @@ import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
-import org.wysko.midis2jam2.instrument.family.percussive.Agogos
-import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
-import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
-import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
-import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
-import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
+import org.wysko.midis2jam2.instrument.family.percussive.*
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
-import org.wysko.midis2jam2.instrument.family.pipe.Flute
-import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
-import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
-import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
-import org.wysko.midis2jam2.instrument.family.pipe.Recorder
-import org.wysko.midis2jam2.instrument.family.pipe.Whistles
+import org.wysko.midis2jam2.instrument.family.pipe.*
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -61,19 +46,17 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
-import org.wysko.midis2jam2.instrument.family.strings.Cello
-import org.wysko.midis2jam2.instrument.family.strings.Fiddle
-import org.wysko.midis2jam2.instrument.family.strings.Harp
-import org.wysko.midis2jam2.instrument.family.strings.Viola
-import org.wysko.midis2jam2.instrument.family.strings.Violin
+import org.wysko.midis2jam2.instrument.family.strings.*
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.SECONDS
 
 /** The speed at which to transition from one camera angle to another. */
 private const val MOVE_SPEED = (1 / 3f)
 
 /** The amount of time to wait before transitioning to the next camera angle. */
-private const val WAIT_TIME = 3f
+private val WAIT_TIME = 3.seconds
 
 /**
  * The auto-cam controller is responsible for controlling the automatic movement of the camera. It picks camera angles
@@ -91,7 +74,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
         }
 
     /** The amount of time that has passed since the last camera angle change. */
-    private var waiting = 0f
+    private var waiting = 0.seconds
 
     /** True if the camera is currently moving to a new angle, false otherwise. */
     private var moving = false
@@ -119,13 +102,13 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 
     /** Performs a tick of the auto-cam controller. */
     fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ): Boolean {
         if (!enabled) return false
 
         // If the camera is not moving, and the song has started,
-        if (!moving && time > 0) {
+        if (!moving && time > 0.seconds) {
             // Increment the waiting timer
             waiting += delta
 
@@ -143,7 +126,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
         // If we have waited longer than the wait time,
         if (waiting >= WAIT_TIME) {
             // Reset the waiting timer
-            waiting = 0f
+            waiting = 0.seconds
 
             // Pick a new camera angle
             angles.add(randomCamera(time))
@@ -160,7 +143,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
         // If we are in the process of moving to a new camera angle,
         if (moving) {
             // Increment interpolation index
-            x += delta * MOVE_SPEED
+            x += (delta.toDouble(SECONDS) * MOVE_SPEED).toFloat()
 
             // Set the camera location and rotation to the interpolated values
             cam.location =
@@ -185,10 +168,9 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
         return true
     }
 
-    private fun randomCamera(time: Double): AutoCamPosition {
+    private fun randomCamera(time: Duration): AutoCamPosition {
         // If we are near the end of the song,
-        if (context.file.length - time < WAIT_TIME * 2.5) {
-            // Pick GENERAL_A
+        if (context.sequence.duration - time < WAIT_TIME * 2.5) {
             return AutoCamPosition.GENERAL_A
         }
 
@@ -260,8 +242,8 @@ enum class AutoCamPosition(
     /** The rotation of the camera. */
     val rotation: Quaternion,
     /** The condition that must be met for the camera to be picked. */
-    val pickMe: (time: Double, instruments: List<Instrument>) -> Boolean,
-    val stayHere: (time: Double, instruments: List<Instrument>) -> Boolean,
+    val pickMe: (time: Duration, instruments: List<Instrument>) -> Boolean,
+    val stayHere: (time: Duration, instruments: List<Instrument>) -> Boolean,
     /** The type of camera. */
     val type: AutoCamPositionType,
 ) {
@@ -719,11 +701,11 @@ enum class AutoCamPosition(
 fun visibleNowAndLater(
     instruments: List<Instrument>,
     instrument: Class<out Instrument>,
-    time: Double,
-    buffer: Number,
+    time: Duration,
+    buffer: Duration,
 ): Boolean =
     instruments.filterIsInstance(instrument).any {
-        it.isVisible && it.calculateVisibility(time + buffer.toDouble(), future = true)
+        it.isVisible && it.calculateVisibility(time + buffer, future = true)
     }
 
 /**

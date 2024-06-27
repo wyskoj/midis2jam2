@@ -17,19 +17,18 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic.assignment
 
-import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification.ExtendedGeneralMidi
-import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification.GeneralMidi
-import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification.GeneralStandardMidi
-import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.midi.MidiSysexEvent
+import org.wysko.kmidi.midi.StandardMidiFile
+import org.wysko.kmidi.midi.event.SysexEvent
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification.*
 
 /**
- * Searches a MIDI file for a [MidiSysexEvent] that has a specification reset.
+ * Searches a MIDI file for a [SysexEvent] that has a specification reset.
  *
  * @return The [MidiSpecification] of the MIDI file.
  */
-fun MidiFile.identifySpecification(): MidiSpecification =
-    with(tracks.flatMap { it.events }.filterIsInstance<MidiSysexEvent>()) {
+@Deprecated("Should go to kmidi.")
+fun StandardMidiFile.identifySpecification(): MidiSpecification =
+    with(tracks.flatMap { it.events }.filterIsInstance<SysexEvent>()) {
         return when {
             any { GeneralStandardMidi.matches(it) } -> GeneralStandardMidi
             any { ExtendedGeneralMidi.matches(it) } -> ExtendedGeneralMidi
@@ -40,14 +39,15 @@ fun MidiFile.identifySpecification(): MidiSpecification =
 /**
  * A MIDI specification.
  */
+@Deprecated("Should go to kmidi.")
 sealed class MidiSpecification(private val resetMessage: Array<Byte?>? = null) {
     /**
-     * Checks if a [MidiSysexEvent] matches this specification.
+     * Checks if a [SysexEvent] matches this specification.
      *
-     * @param sysexEvent The [MidiSysexEvent] to check.
-     * @return Whether the [MidiSysexEvent] matches this specification.
+     * @param sysexEvent The [SysexEvent] to check.
+     * @return Whether the [SysexEvent] matches this specification.
      */
-    fun matches(sysexEvent: MidiSysexEvent): Boolean {
+    fun matches(sysexEvent: SysexEvent): Boolean {
         val data = sysexEvent.data
         if (data.size != resetMessage?.size) return false
 

@@ -22,6 +22,7 @@ import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.Axis
+import kotlin.time.Duration
 
 /**
  * Instruments that have separate geometry for up keys and down keys.
@@ -44,7 +45,7 @@ abstract class CloneWithKeyStates protected constructor(
     /** Geometry for keys down. */
     protected lateinit var keysDown: List<Spatial>
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         currentNotePeriod?.let { this.setAllKeyStates(it.note) }
     }
@@ -55,7 +56,7 @@ abstract class CloneWithKeyStates protected constructor(
      * If the instrument can't play the specified MIDI note, the instrument plays with all keys up (this is technically
      * incorrect on saxophones, since all open keys is a standard fingering for middle C#, but whatever).
      */
-    private fun setAllKeyStates(midiNote: Int) {
+    private fun setAllKeyStates(midiNote: Byte) {
         with((parent.manager ?: return).fingering(midiNote) as List<*>? ?: listOf<Spatial>()) {
             repeat(keyCount) { i -> setKeyState(i, any { it == i }) }
         }

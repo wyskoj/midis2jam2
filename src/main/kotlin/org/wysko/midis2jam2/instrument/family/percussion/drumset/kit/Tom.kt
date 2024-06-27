@@ -21,19 +21,20 @@ import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 private val STICK_NODE_OFFSET = Vector3f(0f, 0f, 10f)
 
 /** A Tom. */
-class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPitch, style: ShellStyle) :
+class Tom(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, pitch: TomPitch, style: ShellStyle) :
     DrumSetInstrument(context, hits) {
     /** The drum. */
     private val drum =
@@ -58,8 +59,8 @@ class Tom(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, pitch: TomPit
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         val result = stick.tick(time, delta)

@@ -18,13 +18,14 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Viola. */
-class Viola(context: Midis2jam2, events: List<MidiChannelEvent>) : StringFamilyInstrument(
+class Viola(context: Midis2jam2, events: List<MidiEvent>) : StringFamilyInstrument(
     context,
     events,
     true,
@@ -33,7 +34,7 @@ class Viola(context: Midis2jam2, events: List<MidiChannelEvent>) : StringFamilyI
     intArrayOf(48, 55, 62, 69),
     context.modelD("Violin.obj", "ViolaSkin.bmp")
 ) {
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(20f * updateInstrumentIndex(delta), 0f, 0f)
     }
 

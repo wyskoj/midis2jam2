@@ -27,13 +27,13 @@ import com.jme3.material.Material
 import com.jme3.post.filters.FadeFilter
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.algorithmic.Collector
 import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetVisibilityManager
-import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.midi.MidiTextEvent
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
@@ -54,18 +54,22 @@ import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
 import org.wysko.midis2jam2.world.lyric.LyricController
 import org.wysko.midis2jam2.world.modelD
 import kotlin.properties.Delegates
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Controls all aspects of the program. This is the main class of the program.
  *
- * @property file The MIDI file to be played.
+ * @property sequence The MIDI file to be played.
+ * @property fileName The name of the MIDI file.
  * @property configs The configurations to be used.
  */
 abstract class Midis2jam2(
-    val file: MidiFile,
+    val sequence: TimeBasedSequence,
+    open val fileName: String,
     val configs: Collection<Configuration>,
-) : AbstractAppState(), ActionListener {
-
+) : AbstractAppState(),
+    ActionListener {
     /**
      * The root node of the scene.
      */
@@ -91,15 +95,16 @@ abstract class Midis2jam2(
      * If this value is negative, the MIDI sequence has not started yet, and is the negation of the time until the
      * sequence starts.
      */
-    var time: Double = -2.0
+    var time: Duration = (-2.0).seconds
         protected set
 
     /** The current state of the camera. */
-    var cameraState: CameraState = if (configs.getType(SettingsConfiguration::class).startAutocamWithSong) {
-        CameraState.AUTO_CAM
-    } else {
-        CameraState.FREE_CAM
-    }
+    var cameraState: CameraState =
+        if (configs.getType(SettingsConfiguration::class).startAutocamWithSong) {
+            CameraState.AUTO_CAM
+        } else {
+            CameraState.FREE_CAM
+        }
         set(value) {
             // Enable/disable controllers based on camera state when value is changed
             autocamController.enabled = value == CameraState.AUTO_CAM
@@ -147,7 +152,7 @@ abstract class Midis2jam2(
      * When the MIDI sequence ends, the [time] is recorded to this variable to know when to close the
      * app.
      */
-    protected var endTime: Double by Delegates.notNull()
+    protected var endTime: Duration by Delegates.notNull()
 
     /**
      * Used for the fade in of the performance screen.
@@ -202,7 +207,10 @@ abstract class Midis2jam2(
             field = value
         }
 
-    override fun initialize(stateManager: AppStateManager, app: Application) {
+    override fun initialize(
+        stateManager: AppStateManager,
+        app: Application,
+    ) {
         val settingsConfig = configs.getType(SettingsConfiguration::class)
         this.app = (app as SimpleApplication)
         this.app.run {
@@ -213,27 +221,35 @@ abstract class Midis2jam2(
             }
         }
         this.assetLoader = AssetLoader(this)
-        this.flyByCamera = SmoothFlyByCamera(this) {
-            isEnabled = true
-            cameraState = CameraState.FREE_CAM
-        }.apply {
-            actLikeNormalFlyByCamera = !settingsConfig.isCameraSmooth
-            isEnabled = !settingsConfig.startAutocamWithSong
-        }
+        this.flyByCamera =
+            SmoothFlyByCamera(this) {
+                isEnabled = true
+                cameraState = CameraState.FREE_CAM
+            }.apply {
+                actLikeNormalFlyByCamera = !settingsConfig.isCameraSmooth
+                isEnabled = !settingsConfig.startAutocamWithSong
+            }
         this.stage = with(root) { +modelD("Stage.obj", "Stage.bmp") }
         this.fadeFilter = FadeFilter(0.5f).apply { value = 0f }
-        this.instruments = InstrumentAssignment.assign(this, midiFile = file).onEach {
-            // This is a bit of a hack to prevent stuttering when the instrument would first appear
-            root += it.root
-            root -= it.root
-        }
+        this.instruments =
+            InstrumentAssignment.assign(this, midiFile = sequence).onEach {
+                // This is a bit of a hack to prevent stuttering when the instrument would first appear
+                root += it.root
+                root -= it.root
+            }
         this.drumSetVisibilityManager = DrumSetVisibilityManager(this, instruments.filterIsInstance<DrumSet>())
         this.standController = StandController()
-        this.lyricController = if (settingsConfig.showLyrics) {
-            LyricController(this, file.tracks.flatMap { it.events }.filterIsInstance<MidiTextEvent>())
-        } else {
-            null
-        }
+        this.lyricController =
+            if (settingsConfig.showLyrics) {
+                LyricController(
+                    this,
+                    sequence.smf.tracks
+                        .flatMap { it.events }
+                        .filterIsInstance<MetaEvent.Text>(),
+                )
+            } else {
+                null
+            }
         this.autocamController = AutoCamController(this, settingsConfig.startAutocamWithSong)
         this.slideCamController = SlideCameraController()
         this.debugTextController = DebugTextController(this)
@@ -253,11 +269,14 @@ abstract class Midis2jam2(
 
     override fun update(tpf: Float) {
         super.update(tpf)
-        debugTextController.tick(tpf)
+        debugTextController.tick(tpf.toDouble().seconds)
     }
 
     /** Sets the speed of the camera, given a speed [name] and whether that key is [pressed]. */
-    private fun setCameraSpeed(name: String, pressed: Boolean) = if (!pressed) {
+    private fun setCameraSpeed(
+        name: String,
+        pressed: Boolean,
+    ) = if (!pressed) {
         flyByCamera.moveSpeed = 100f
     } else {
         flyByCamera.moveSpeed =
@@ -274,7 +293,10 @@ abstract class Midis2jam2(
      * @param name The name of the key-binding pressed.
      * @param isPressed `true` if the key is pressed, `false` otherwise.
      */
-    private fun handleCameraSetting(name: String, isPressed: Boolean) {
+    private fun handleCameraSetting(
+        name: String,
+        isPressed: Boolean,
+    ) {
         if (!isPressed) return
         when (name) {
             "autoCam" -> {
@@ -299,22 +321,26 @@ abstract class Midis2jam2(
      * @param isPressed `true` if the action is "pressed", `false` otherwise
      * @param tpf The amount of time that has passed since the last frame, in seconds.
      */
-    override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
+    override fun onAction(
+        name: String,
+        isPressed: Boolean,
+        tpf: Float,
+    ) {
         setCameraSpeed(name, isPressed)
         handleCameraSetting(name, isPressed)
         if (isPressed) {
             when (name) {
                 "exit" -> exit()
                 "debug" -> debugTextController.toggle()
-                "seek_forward" -> seek(time + 10.0)
-                "seek_backward" -> seek((time - 10.0).coerceAtLeast(0.0))
+                "seek_forward" -> seek(time + 10.seconds)
+                "seek_backward" -> seek((time - 10.seconds).coerceAtLeast(0.seconds))
                 "play/pause" -> togglePause()
             }
         }
     }
 
     /** Seeks to a given point in time. */
-    abstract fun seek(time: Double)
+    abstract fun seek(time: Duration)
 
     /** Exits the application. */
     abstract fun exit()

@@ -17,17 +17,18 @@
 package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Melodic tom. */
 class MelodicTom(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>
+    eventList: List<MidiEvent>
 ) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) { i ->
@@ -42,7 +43,7 @@ class MelodicTom(
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.localRotation = Quaternion().fromAngles(0f, rad(-26.3 + updateInstrumentIndex(delta) * -15), 0f)
     }
 

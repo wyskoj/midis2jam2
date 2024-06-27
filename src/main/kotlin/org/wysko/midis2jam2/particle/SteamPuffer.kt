@@ -25,10 +25,13 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.particle.SteamPuffer.Cloud
 import org.wysko.midis2jam2.world.modelD
-import java.util.Random
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * The red, blue, white, and brown substances that emanate from the shaft of an instrument.
@@ -64,12 +67,12 @@ class SteamPuffer(
         root.detachChild(cloud.cloudNode)
     }
 
-    override fun tick(delta: Float, active: Boolean) {
+    override fun tick(delta: Duration, active: Boolean) {
         if (active) {
             /* If it happens to be the case that the amount of time since the last frame was so large that it
              * warrants more than one cloud to be spawned on this frame, calculate the number of clouds to spawn. But we
              * should always spawn at least one cloud on each frame. */
-            val n = ceil(max(delta / (1f / 60f), 1f).toDouble())
+            val n = ceil(max(delta.toDouble(SECONDS) * 60.0, 1.0))
             var i = 0
             while (i < n) {
                 val cloud: Cloud = if (cloudPool.isEmpty()) {
@@ -147,7 +150,7 @@ class SteamPuffer(
         private var randB = 0f
 
         /** The current duration into the life of the cloud. */
-        private var life = 0.0
+        private var life = 0.seconds
 
         /** True if this cloud is currently being animated, false if it is idling in the pool. */
         var currentlyUsing = false
@@ -163,18 +166,25 @@ class SteamPuffer(
                     RANDOM.nextFloat() * FastMath.TWO_PI
                 )
             )
-            life = (RANDOM.nextFloat() * 0.02f).toDouble()
+            life = (RANDOM.nextFloat() * 0.02).seconds
             cloudNode.localTranslation = Vector3f.ZERO
         }
 
-        override fun tick(delta: Float): Boolean {
+        override fun tick(delta: Duration): Boolean {
             if (!currentlyUsing) return false
             if (behavior == PuffBehavior.OUTWARDS) {
-                cloudNode.setLocalTranslation(locEase(life) * 6, locEase(life) * randA, locEase(life) * randB)
+                cloudNode.setLocalTranslation(
+                    locEase(life.toDouble(SECONDS)) * 6,
+                    locEase(life.toDouble(SECONDS)) * randA,
+                    locEase(life.toDouble(SECONDS)) * randB
+                )
             } else {
-                cloudNode.setLocalTranslation(locEase(life) * 6, life.toFloat() * 10, locEase(life) * randB)
+                cloudNode.setLocalTranslation(
+                    locEase(life.toDouble(SECONDS)) * 6,
+                    (life.toDouble(SECONDS) * 10).toFloat(), locEase(life.toDouble(SECONDS)) * randB
+                )
             }
-            cloudNode.setLocalScale(((0.75 * life + 1.2) * scale).toFloat())
+            cloudNode.setLocalScale(((0.75 * life.toDouble(SECONDS) + 1.2) * scale).toFloat())
             life += delta * 1.5
             return life <= END_OF_LIFE
         }
@@ -195,6 +205,6 @@ class SteamPuffer(
         private val RANDOM = Random()
 
         /** How long a cloud deserves to live. */
-        const val END_OF_LIFE: Double = 0.7
+        private val END_OF_LIFE = 0.7.seconds
     }
 }

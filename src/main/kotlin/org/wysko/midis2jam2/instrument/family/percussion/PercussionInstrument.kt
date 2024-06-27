@@ -20,28 +20,30 @@ import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
 import kotlin.math.abs
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val SQUARE_ROOT_OF_127: Float = 11.269427f
 
 /** Anything on the percussion channel. */
 abstract class PercussionInstrument protected constructor(
     context: Midis2jam2,
-    hits: MutableList<MidiNoteOnEvent>,
+    hits: MutableList<NoteEvent.NoteOn>,
 ) : DecayedInstrument(context, hits) {
 
     /** Node that recoils when the instrument is hit. */
     protected val recoilNode: Node = with(geometry) { +node() }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.loc = v3(0, 10 * updateInstrumentIndex(delta), 0)
     }
 
@@ -60,7 +62,7 @@ abstract class PercussionInstrument protected constructor(
          * @param x the velocity of the note
          * @return a percentage to multiply by the target recoil
          */
-        fun velocityRecoilDampening(x: Int): Double = (FastMath.sqrt(x.toFloat()) / SQUARE_ROOT_OF_127).toDouble()
+        fun velocityRecoilDampening(x: Byte): Double = (FastMath.sqrt(x.toFloat()) / SQUARE_ROOT_OF_127).toDouble()
 
         /**
          * Animates a drum recoiling. Call this method on every frame to ensure animation is handled.
@@ -71,13 +73,13 @@ abstract class PercussionInstrument protected constructor(
          */
         fun recoilDrum(
             drum: Spatial,
-            velocity: Int,
-            delta: Float,
+            velocity: Byte,
+            delta: Duration,
             recoilDistance: Float = RECOIL_DISTANCE,
             recoilSpeed: Float = DRUM_RECOIL_COMEBACK,
             recoilAxis: Axis = Axis.Y,
         ) {
-            if (velocity != 0) {
+            if (velocity != 0.toByte()) {
                 drum.localTranslation =
                     recoilAxis.identity.mult((recoilDistance * velocityRecoilDampening(velocity)).toFloat())
             } else {
@@ -85,7 +87,7 @@ abstract class PercussionInstrument protected constructor(
                 drum.move(
                     recoilAxis
                         .identity
-                        .mult(delta * recoilSpeed)
+                        .mult(delta.toDouble(SECONDS).toFloat() * recoilSpeed)
                         .mult(distanceToGo) // Introduces some non-linearity to the recoil
                 )
                 if (drum.localTranslation[recoilAxis.componentIndex] > 0) drum.localTranslation = Vector3f.ZERO

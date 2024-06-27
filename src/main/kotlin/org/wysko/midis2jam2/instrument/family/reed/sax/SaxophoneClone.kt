@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyStates
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /** The number of keys on a saxophone. */
 private const val NUMBER_OF_KEYS = 20
@@ -31,7 +32,7 @@ private const val ROTATION_FACTOR = 0.1f
 abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFactor: Float) :
     CloneWithKeyStates(NUMBER_OF_KEYS, parent, ROTATION_FACTOR, stretchFactor) {
 
-    override fun adjustForPolyphony(delta: Float) {
+    override fun adjustForPolyphony(delta: Duration) {
         root.localRotation = Quaternion().fromAngles(0f, rad((25f * indexForMoving()).toDouble()), 0f)
     }
 

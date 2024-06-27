@@ -24,5 +24,5 @@ interface SpaceLaserAngleCalculator {
      * Given a MIDI [note] and a [pitchBendAmount], determines the correct angle to rotate the space laser to properly
      * visualize this.
      */
-    fun angleFromNote(note: Int, pitchBendAmount: Float): Double
+    fun angleFromNote(note: Byte, pitchBendAmount: Float): Double
 }

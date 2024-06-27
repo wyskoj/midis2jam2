@@ -65,12 +65,12 @@ sealed class ShellStyle(
         data object Brush : TypicalDrumShell("DrumShell_Jazz.png", "DrumShell_Snare_Jazz.png")
 
         companion object {
-            fun fromProgramNumber(program: Int): TypicalDrumShell? {
+            fun fromProgramNumber(program: Byte): TypicalDrumShell? {
                 return when (program) {
-                    0 -> Standard
-                    8 -> Room
-                    16 -> Power
-                    32 -> Jazz
+                    0.toByte() -> Standard
+                    8.toByte() -> Room
+                    16.toByte() -> Power
+                    32.toByte() -> Jazz
                     else -> null
                 }
             }

@@ -24,6 +24,8 @@ import com.jme3.math.Vector3f
 import com.jme3.renderer.Camera
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.Utils
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val DEFAULT_MOVE_SPEED = 100f
 
@@ -90,7 +92,7 @@ class SmoothFlyByCamera(
     /**
      * Updates the camera's location and rotation to slowly move towards the dummy camera's location and rotation.
      */
-    fun tick(delta: Float) {
+    fun tick(delta: Duration) {
         if (!isEnabled) return
 
         with(context.app.camera) {
@@ -99,12 +101,12 @@ class SmoothFlyByCamera(
                 rotation = dummyCamera.rotation
                 fov = dummyCamera.fov.coerceAtLeast(1f)
             } else {
-                location.interpolateLocal(dummyCamera.location, delta * 3.0f)
+                location.interpolateLocal(dummyCamera.location, (delta.toDouble(SECONDS) * 3.0f).toFloat())
                 rotation.run {
-                    slerp(dummyCamera.rotation, delta * 3.0f)
+                    slerp(dummyCamera.rotation, (delta.toDouble(SECONDS) * 3.0f).toFloat())
                     normalizeLocal()
                 }
-                fov = fov.interpolate(dummyCamera.fov, delta * 3.0f).coerceAtLeast(1f)
+                fov = fov.interpolate(dummyCamera.fov, (delta.toDouble(SECONDS) * 3.0f).toFloat()).coerceAtLeast(1f)
             }
         }
     }

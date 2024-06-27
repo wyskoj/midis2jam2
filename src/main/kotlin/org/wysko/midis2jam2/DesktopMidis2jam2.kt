@@ -20,7 +20,7 @@ package org.wysko.midis2jam2
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import org.wysko.gervill.JwRealTimeSequencer
-import org.wysko.midis2jam2.midi.MidiFile
+import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
@@ -32,6 +32,9 @@ import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import javax.sound.midi.Sequencer
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Implementation of [Midis2jam2] for desktop. This is so that we can access `javax` classes.
@@ -42,11 +45,12 @@ import javax.sound.midi.Sequencer
  * @param configs A collection of the application's configurations.
  */
 class DesktopMidis2jam2(
+    override val fileName: String,
     val sequencer: Sequencer,
-    val midiFile: MidiFile,
+    val midiFile: TimeBasedSequence,
     val onClose: () -> Unit,
     configs: Collection<Configuration>,
-) : Midis2jam2(midiFile, configs) {
+) : Midis2jam2(midiFile, fileName, configs) {
 
     private var isSequencerStarted: Boolean = false
     private var skippedFrames = 0
@@ -92,12 +96,14 @@ class DesktopMidis2jam2(
     override fun update(tpf: Float) {
         super.update(tpf)
 
+        val delta = tpf.toDouble().seconds
+
         startSequencerIfNeeded()
         startFadeIfNeeded()
 
-        instruments.forEach { it.tick(time, tpf) }
+        instruments.forEach { it.tick(time, delta) }
 
-        if (time >= file.length) {
+        if (time >= sequence.duration) {
             if (!isSongFinished) endTime = time
             isSongFinished = true
         }
@@ -109,10 +115,10 @@ class DesktopMidis2jam2(
             return
         }
 
-        tickControllers(tpf)
+        tickControllers(delta)
 
         if (sequencer.isOpen && !paused) {
-            time += tpf.toDouble()
+            time += delta
         }
     }
 
@@ -129,10 +135,10 @@ class DesktopMidis2jam2(
         logger().debug("Exit complete")
     }
 
-    override fun seek(time: Double) {
+    override fun seek(time: Duration) {
         logger().debug("Seeking to time: $time")
         this.time = time
-        sequencer.microsecondPosition = (time * 1E6).coerceAtLeast(0.0).toLong()
+        sequencer.microsecondPosition = time.coerceAtLeast(ZERO).inWholeMicroseconds
         collectors.forEach { it.seek(time) }
     }
 
@@ -145,25 +151,25 @@ class DesktopMidis2jam2(
         }
     }
 
-    private fun tickControllers(tpf: Float) {
+    private fun tickControllers(delta: Duration) {
         shadowController?.tick()
         standController.tick()
-        lyricController?.tick(time, tpf)
+        lyricController?.tick(time, delta)
         hudController.tick(time, fadeFilter.value)
-        flyByCamera.tick(tpf)
-        autocamController.tick(time, tpf)
-        slideCamController.tick(tpf, time)
+        flyByCamera.tick(delta)
+        autocamController.tick(time, delta)
+        slideCamController.tick(time, delta)
         preventCameraFromLeaving(app.camera)
         drumSetVisibilityManager.tick(time)
     }
 
     private fun handleSongCompletionAndLoopOrExit() {
-        if (isSongFinished && time >= endTime + 3.0) {
+        if (isSongFinished && time >= endTime + 3.seconds) {
             if (configs.getType(HomeConfiguration::class).isLooping) {
                 // Loop the song
                 isSequencerStarted = false
                 sequencer.stop()
-                seek(-2.0)
+                seek((-2).seconds)
                 slideCamController.onLoop()
                 (sequencer as JwRealTimeSequencer).resetDevice()
             } else {
@@ -173,14 +179,14 @@ class DesktopMidis2jam2(
     }
 
     private fun startFadeIfNeeded() {
-        if (!isFadeStarted && time > -1.5) {
+        if (!isFadeStarted && time > (-1.5).seconds) {
             fadeFilter.fadeIn()
             isFadeStarted = true
         }
     }
 
     private fun startSequencerIfNeeded() {
-        if (!isSequencerStarted && time > 0.0) {
+        if (!isSequencerStarted && time > ZERO) {
             with(sequencer) {
                 start()
             }

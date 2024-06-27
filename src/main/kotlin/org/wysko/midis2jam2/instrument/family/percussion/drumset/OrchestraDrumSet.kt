@@ -17,18 +17,12 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
+import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.BassDrum
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.Cymbal
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.CymbalType
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.HiHat
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.HiHatNoteMapping
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.RideCymbal
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.SnareDrum
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.filterByNotes
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.*
+import kotlin.time.Duration
 
 /**
  * A [DrumSet] that uses standard models and can be skinned with [TypicalDrumSetSkin].
@@ -40,9 +34,9 @@ import org.wysko.midis2jam2.midi.filterByNotes
  */
 class OrchestraDrumSet(
     context: Midis2jam2,
-    events: List<MidiNoteOnEvent>,
+    events: List<NoteEvent.NoteOn>,
 ) : DrumSet(context, events) {
-    override val collectorForVisibility: EventCollector<MidiNoteOnEvent> =
+    override val collectorForVisibility: EventCollector<NoteEvent.NoteOn> =
         EventCollector(
             context,
             events.filter {
@@ -64,8 +58,8 @@ class OrchestraDrumSet(
         }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         instruments.forEach { it.tick(time, delta) }

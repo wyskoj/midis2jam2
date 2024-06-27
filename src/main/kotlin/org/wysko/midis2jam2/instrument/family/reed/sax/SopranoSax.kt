@@ -20,10 +20,11 @@ import com.jme3.material.Material
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
+import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class)
 private const val STRETCH_FACTOR = 2f
@@ -33,14 +34,14 @@ private const val STRETCH_FACTOR = 2f
  */
 class SopranoSax(
     context: Midis2jam2,
-    events: List<MidiChannelEvent>
+    events: List<MidiEvent>
 ) : Saxophone(context, events, SopranoSaxClone::class, FINGERING_MANAGER) {
 
     /**
      * A single Soprano saxophone.
      */
     inner class SopranoSaxClone : SaxophoneClone(this@SopranoSax, STRETCH_FACTOR) {
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.localRotation = Quaternion().fromAngles(0f, rad((20f * indexForMoving()).toDouble()), 0f)
         }
 

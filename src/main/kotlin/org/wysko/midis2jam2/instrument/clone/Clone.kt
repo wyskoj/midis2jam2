@@ -21,12 +21,13 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
+import org.wysko.kmidi.midi.TimedArc
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
-import org.wysko.midis2jam2.midi.NotePeriod
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.Axis
+import kotlin.time.Duration
 
 /**
  * An instance of an instrument that is used to display degrees of polyphony on a [MonophonicInstrument].
@@ -52,7 +53,7 @@ abstract class Clone protected constructor(
     var isVisible: Boolean = false
 
     /** The note periods for which this clone should be responsible for animating. */
-    val notePeriods: MutableList<NotePeriod> = ArrayList()
+    val arcs: MutableList<TimedArc> = ArrayList()
 
     /** Used for moving with [indexForMoving]. */
     val root: Node = Node()
@@ -70,10 +71,10 @@ abstract class Clone protected constructor(
     val bendNode: Node = Node()
 
     /** The current note period that is being handled. */
-    var currentNotePeriod: NotePeriod? = null
+    var currentNotePeriod: TimedArc? = null
 
     /** The note period collector. */
-    protected lateinit var notePeriodCollector: NotePeriodCollector
+    protected lateinit var timedArcCollector: TimedArcCollector
 
     /** Determines if this clone is playing. */
     val isPlaying: Boolean
@@ -92,17 +93,17 @@ abstract class Clone protected constructor(
      *
      * The base implementation performs the following:
      *
-     * * Uses [NotePeriodCollector] to determine the [currentNotePeriod].
+     * * Uses [TimedArcCollector] to determine the [currentNotePeriod].
      * * Clears the [currentNotePeriod] if it has elapsed.
      * * Rotates the clone using the [animNode].
      * * Updates the visibility of the clone.
      * * Updates the position of the clone.
      */
-    open fun tick(time: Double, delta: Float) {
-        currentNotePeriod = notePeriodCollector.advance(time).firstOrNull()
+    open fun tick(time: Duration, delta: Duration) {
+        currentNotePeriod = timedArcCollector.advance(time).currentTimedArcs.firstOrNull()
 
         currentNotePeriod?.let {
-            val rotate = -((it.end - time) / it.duration).toFloat() * rotationFactor
+            val rotate = -((it.endTime - time) / it.duration).toFloat() * rotationFactor
             animNode.localRotation = Quaternion().fromAngles(
                 Matrix3f.IDENTITY.getRow(rotationAxis.componentIndex).mult(rotate).toArray(null)
             )
@@ -113,9 +114,9 @@ abstract class Clone protected constructor(
         adjustForPolyphony(delta)
     }
 
-    /** Initializes [notePeriodCollector]. */
-    fun createCollector() {
-        notePeriodCollector = NotePeriodCollector(parent.context, notePeriods)
+    /** Initializes [timedArcCollector]. */
+    open fun createCollector() {
+        timedArcCollector = TimedArcCollector(parent.context, arcs)
     }
 
     /**
@@ -128,14 +129,14 @@ abstract class Clone protected constructor(
         0f.coerceAtLeast(parent.clones.filter { it.isVisible }.indexOf(this).toFloat())
 
     /** Move as to not overlap with other clones. */
-    protected abstract fun adjustForPolyphony(delta: Float)
+    protected abstract fun adjustForPolyphony(delta: Duration)
 
     private fun calcVisibility(): Boolean {
         if (currentNotePeriod != null) return true
 
-        notePeriodCollector.prev()?.let { prev ->
-            val timeGap = notePeriodCollector.peek()?.startTick?.minus(prev.endTick) ?: Long.MAX_VALUE
-            if (timeGap <= parent.context.file.division * 2) {
+        timedArcCollector.prev()?.let { prev ->
+            val timeGap = timedArcCollector.peek()?.start?.minus(prev.end) ?: Int.MAX_VALUE
+            if (timeGap <= parent.context.sequence.smf.tpq * 2) {
                 return true
             }
         }

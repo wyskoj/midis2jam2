@@ -20,16 +20,18 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.LONG
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.SHORT
 import org.wysko.midis2jam2.midi.LONG_GUIRO
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.SHORT_GUIRO
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.abs
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private val GUIRO_SLIDE_RANGE = 0f..1f
 private val BASE_POSITION = Vector3f(30f, 55f, -51f)
@@ -61,9 +63,9 @@ private const val EASING_POWER = 2
  */
 class Guiro(
     context: Midis2jam2,
-    shortHits: MutableList<MidiNoteOnEvent>,
-    longHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.time }.toMutableList()) {
+    shortHits: MutableList<NoteEvent.NoteOn>,
+    longHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.tick }.toMutableList()) {
     private val shortCollector = EventCollector(context, shortHits)
     private val longCollector = EventCollector(context, longHits)
 
@@ -92,8 +94,8 @@ class Guiro(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 
@@ -112,7 +114,9 @@ class Guiro(
         }
 
         if (isMoving) {
-            stickPosition += (if (isMovingLeft) -1f else 1f) * (if (movingSpeed == LONG) LONG_TIME_SCALE else QUICK_TIME_SCALE) * delta
+            stickPosition += ((if (isMovingLeft) -1f else 1f) * (if (movingSpeed == LONG) LONG_TIME_SCALE else QUICK_TIME_SCALE) * delta.toDouble(
+                SECONDS
+            )).toFloat()
 
             if (stickPosition !in GUIRO_SLIDE_RANGE) isMoving = false // If exceeded range, we've reached the end
             stickPosition = stickPosition.coerceIn(GUIRO_SLIDE_RANGE) // Don't ever show the stick outside the range
@@ -149,11 +153,11 @@ class Guiro(
 
     override fun toString(): String {
         return super.toString() +
-            buildString {
-                appendLine(formatProperty("stickPosition", stickPosition))
-                appendLine(formatProperty("isMovingLeft", isMovingLeft.toString()))
-                appendLine(formatProperty("isMoving", isMoving.toString()))
-            }
+                buildString {
+                    appendLine(formatProperty("stickPosition", stickPosition))
+                    appendLine(formatProperty("isMovingLeft", isMovingLeft.toString()))
+                    appendLine(formatProperty("isMoving", isMoving.toString()))
+                }
     }
 }
 

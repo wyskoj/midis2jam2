@@ -18,19 +18,20 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Timbales. */
 class Timbales(
     context: Midis2jam2,
-    highHits: MutableList<MidiNoteOnEvent>,
-    lowHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (highHits + lowHits).sortedBy { it.time }.toMutableList()) {
+    highHits: MutableList<NoteEvent.NoteOn>,
+    lowHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (highHits + lowHits).sortedBy { it.tick }.toMutableList()) {
     /** The left timbale anim node. */
     private val lowTimbaleAnimNode =
         Node().also {
@@ -88,8 +89,8 @@ class Timbales(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 

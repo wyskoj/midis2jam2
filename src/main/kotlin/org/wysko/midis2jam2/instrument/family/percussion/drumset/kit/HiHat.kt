@@ -20,15 +20,16 @@ import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.max
 import org.wysko.midis2jam2.world.modelR
-import java.lang.Integer.max
+import kotlin.time.Duration
 
 private val CLOSED_POSITION = Vector3f(0f, 1.2f, 0f)
 private val OPEN_POSITION = Vector3f(0f, 2f, 0f)
@@ -39,7 +40,7 @@ private const val WOBBLE_SPEED = 10.0
 /** The hi-hat. */
 class HiHat(
     context: Midis2jam2,
-    hits: MutableList<MidiNoteOnEvent>,
+    hits: MutableList<NoteEvent.NoteOn>,
     private val noteMapping: HiHatNoteMapping = HiHatNoteMapping.Standard,
 ) : DrumSetInstrument(context, hits) {
     private val cymbalsNode =
@@ -93,8 +94,8 @@ class HiHat(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 
@@ -137,9 +138,9 @@ class HiHat(
  * @property pedal The MIDI note for the hi-hat pedal.
  */
 sealed class HiHatNoteMapping(
-    val closed: Int,
-    val open: Int,
-    val pedal: Int,
+    val closed: Byte,
+    val open: Byte,
+    val pedal: Byte,
 ) {
     /** The mapping as seen in most all kits. */
     data object Standard : HiHatNoteMapping(

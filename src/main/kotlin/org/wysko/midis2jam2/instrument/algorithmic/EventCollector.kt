@@ -17,17 +17,18 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import org.wysko.kmidi.midi.event.Event
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiEvent
+import kotlin.time.Duration
 
 /**
- * Periodically collects elapsed events from a pool of [MidiEvent].
+ * Periodically collects elapsed events from a pool of [Event]s.
  */
-class EventCollector<T : MidiEvent>(
+class EventCollector<T : Event>(
     private val context: Midis2jam2,
     private val events: List<T>,
-    private val triggerCondition: (MidiEvent, Double) -> Boolean =
-        { event, time -> context.file.eventInSeconds(event) <= time },
+    private val triggerCondition: (Event, Duration) -> Boolean =
+        { event, time -> context.sequence.getTimeOf(event) <= time },
     private val onSeek: (EventCollector<T>) -> Unit = {},
 ) : Collector<T> {
 
@@ -38,10 +39,10 @@ class EventCollector<T : MidiEvent>(
     private var currentIndex = 0
 
     /**
-     * Advances the play head and returns a list of [MidiEvents][MidiEvent] that have elapsed since the last invocation
+     * Advances the play head and returns a list of [Event]s that have elapsed since the last invocation
      * of this function or the [seek] function.
      */
-    fun advanceCollectAll(time: Double): List<T> {
+    fun advanceCollectAll(time: Duration): List<T> {
         val startingIndex = currentIndex
 
         // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
@@ -55,12 +56,12 @@ class EventCollector<T : MidiEvent>(
     }
 
     /**
-     * Advances the play head and returns a list of [MidiEvents][MidiEvent] that have elapsed since the last invocation
+     * Advances the play head and returns a list of [Event]s that have elapsed since the last invocation
      * of this function or the [seek] function.
      *
      * If we collected no events during the time elapsed since the last invocation, the return is `null`.
      */
-    fun advanceCollectOne(time: Double): T? {
+    fun advanceCollectOne(time: Duration): T? {
         // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
         // event in the future.
         var advanced = false
@@ -78,8 +79,8 @@ class EventCollector<T : MidiEvent>(
      * Don't use this method for each frame.
      * Rather, use this when making large jumps in time.
      */
-    override fun seek(time: Double) {
-        currentIndex = events.indexOfFirst { context.file.eventInSeconds(it) >= time }
+    override fun seek(time: Duration) {
+        currentIndex = events.indexOfFirst { context.sequence.getTimeOf(it) >= time }
         if (currentIndex == -1) currentIndex = events.size
         onSeek(this)
     }

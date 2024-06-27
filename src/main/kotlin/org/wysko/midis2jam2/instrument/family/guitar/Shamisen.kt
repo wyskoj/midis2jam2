@@ -18,14 +18,10 @@ package org.wysko.midis2jam2.instrument.family.guitar
 
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 
 private const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
@@ -37,7 +33,7 @@ private const val FORWARD = -0.23126f
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class Shamisen(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class Shamisen(context: Midis2jam2, events: List<MidiEvent>) :
     FrettedInstrument(
         context,
         events,

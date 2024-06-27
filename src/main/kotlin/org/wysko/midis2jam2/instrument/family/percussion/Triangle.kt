@@ -16,23 +16,24 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /** The Triangle. */
 class Triangle(
     context: Midis2jam2,
-    muteHits: MutableList<MidiNoteOnEvent>,
-    openHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.time }.toMutableList()) {
+    muteHits: MutableList<NoteEvent.NoteOn>,
+    openHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.tick }.toMutableList()) {
     private val muteCollector = EventCollector(context, muteHits)
     private val openCollector = EventCollector(context, openHits)
 
@@ -66,7 +67,7 @@ class Triangle(
         geometry.rot = v3(0f, 0f, -45f)
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
 
         // Beater
@@ -96,7 +97,7 @@ class Triangle(
             }
 
             nextMute != null && nextOpen != null -> {
-                nextMute.time < nextOpen.time
+                nextMute.tick < nextOpen.tick
             }
 
             else -> true // Both are null?

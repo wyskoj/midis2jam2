@@ -17,30 +17,22 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.kmidi.midi.analysis.Polyphony
+import org.wysko.kmidi.midi.event.ControlChangeEvent
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaserType
-import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
-import org.wysko.midis2jam2.instrument.family.brass.StageHorns
-import org.wysko.midis2jam2.instrument.family.brass.StageHornsType
-import org.wysko.midis2jam2.instrument.family.brass.Trombone
-import org.wysko.midis2jam2.instrument.family.brass.Trumpet
-import org.wysko.midis2jam2.instrument.family.brass.TrumpetType
-import org.wysko.midis2jam2.instrument.family.brass.Tuba
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Kalimba
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
+import org.wysko.midis2jam2.instrument.family.brass.*
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.*
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets.MalletType
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
-import org.wysko.midis2jam2.instrument.family.ensemble.ApplauseChoir
-import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings
-import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir
-import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
+import org.wysko.midis2jam2.instrument.family.ensemble.*
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringsType
-import org.wysko.midis2jam2.instrument.family.ensemble.Timpani
 import org.wysko.midis2jam2.instrument.family.guitar.Banjo
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar.BassGuitarType
@@ -50,54 +42,15 @@ import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Type
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
-import org.wysko.midis2jam2.instrument.family.percussion.Agogo
-import org.wysko.midis2jam2.instrument.family.percussion.AuxiliaryPercussion
-import org.wysko.midis2jam2.instrument.family.percussion.Bongos
-import org.wysko.midis2jam2.instrument.family.percussion.Cabasa
-import org.wysko.midis2jam2.instrument.family.percussion.Castanets
-import org.wysko.midis2jam2.instrument.family.percussion.Claves
-import org.wysko.midis2jam2.instrument.family.percussion.Congas
-import org.wysko.midis2jam2.instrument.family.percussion.Cowbell
-import org.wysko.midis2jam2.instrument.family.percussion.Cuica
-import org.wysko.midis2jam2.instrument.family.percussion.Guiro
-import org.wysko.midis2jam2.instrument.family.percussion.HandClap
-import org.wysko.midis2jam2.instrument.family.percussion.HighQ
-import org.wysko.midis2jam2.instrument.family.percussion.JingleBell
-import org.wysko.midis2jam2.instrument.family.percussion.Maracas
-import org.wysko.midis2jam2.instrument.family.percussion.Metronome
-import org.wysko.midis2jam2.instrument.family.percussion.Shaker
-import org.wysko.midis2jam2.instrument.family.percussion.Slap
-import org.wysko.midis2jam2.instrument.family.percussion.SquareClick
-import org.wysko.midis2jam2.instrument.family.percussion.Sticks
-import org.wysko.midis2jam2.instrument.family.percussion.Surdo
-import org.wysko.midis2jam2.instrument.family.percussion.Tambourine
-import org.wysko.midis2jam2.instrument.family.percussion.Timbales
-import org.wysko.midis2jam2.instrument.family.percussion.Triangle
-import org.wysko.midis2jam2.instrument.family.percussion.Whistle
-import org.wysko.midis2jam2.instrument.family.percussion.Woodblock
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.BrushDrumSet
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.ElectronicDrumSet
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.OrchestraDrumSet
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.*
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.TypicalDrumShell
-import org.wysko.midis2jam2.instrument.family.percussive.Agogos
-import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
-import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
-import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
-import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
-import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
+import org.wysko.midis2jam2.instrument.family.percussive.*
 import org.wysko.midis2jam2.instrument.family.piano.FifthsKeyboard
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.piano.KeyboardSkin
-import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
-import org.wysko.midis2jam2.instrument.family.pipe.Flute
-import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
-import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
-import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
-import org.wysko.midis2jam2.instrument.family.pipe.Recorder
-import org.wysko.midis2jam2.instrument.family.pipe.Whistles
+import org.wysko.midis2jam2.instrument.family.pipe.*
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -108,21 +61,8 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter
 import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
+import org.wysko.midis2jam2.instrument.family.strings.*
 import org.wysko.midis2jam2.instrument.family.strings.AcousticBass.PlayingStyle
-import org.wysko.midis2jam2.instrument.family.strings.Cello
-import org.wysko.midis2jam2.instrument.family.strings.Fiddle
-import org.wysko.midis2jam2.instrument.family.strings.Harp
-import org.wysko.midis2jam2.instrument.family.strings.Viola
-import org.wysko.midis2jam2.instrument.family.strings.Violin
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiControlChangeEvent
-import org.wysko.midis2jam2.midi.MidiFile
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent.Companion.maximumPolyphony
-import org.wysko.midis2jam2.midi.MidiNoteOffEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
-import org.wysko.midis2jam2.midi.MidiProgramEvent
 import org.wysko.midis2jam2.util.logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -136,54 +76,53 @@ object InstrumentAssignment {
      */
     fun assign(
         context: Midis2jam2,
-        midiFile: MidiFile,
+        midiFile: TimeBasedSequence,
     ): List<Instrument> {
         // Begin by extracting events from tracks and assign them to their target channels.
         val channels =
-            with(midiFile.tracks.flatMap { it.events }.filterIsInstance<MidiChannelEvent>()) {
-                Array(16) { arr -> this.filter { it.channel == arr }.toMutableList() }
+            with(midiFile.smf.tracks.flatMap { it.events }.filterIsInstance<MidiEvent>()) {
+                Array(16) { arr -> this.filter { it.channel.toInt() == arr }.toMutableList() }
             }
 
         // As a safety precaution, we will sort each channel by the time of each event.
-        channels.onEach { channel -> channel.sortBy { it.time } }
+        channels.onEach { channel -> channel.sortBy { it.tick } }
 
         // Create a place for instruments to go.
         val instruments = mutableListOf<Instrument>()
 
         // Create a place for auxiliary percussion to go.
         val auxiliary =
-            mutableMapOf<KClass<out AuxiliaryPercussion>, MutableList<MutableList<MidiChannelEvent>>>()
+            mutableMapOf<KClass<out AuxiliaryPercussion>, MutableList<MutableList<MidiEvent>>>()
 
         // For each channel,
         channels.forEachIndexed { channel, channelSpecificEvents ->
             // Instrument created relies on the program change events.
-            val programEvents = channelSpecificEvents.filterIsInstance<MidiProgramEvent>().toMutableList()
+            val programEvents = channelSpecificEvents.filterIsInstance<ProgramEvent>().toMutableList()
             if (programEvents.isEmpty()) { // If there are no program events, we default to instrument 0.
-                programEvents += MidiProgramEvent(0, channel, 0)
+                programEvents += ProgramEvent(0, channel.toByte(), 0)
             }
             programEvents.removeDuplicateProgramEvents()
 
             // We create "bins" that events fall into based on their corresponding program event.
-            val programBins =
-                buildMap<Int, MutableList<MidiChannelEvent>> {
-                    programEvents.distinctBy { it.program }.forEach { this += it.program to mutableListOf() }
-                }
+            val programBins = buildMap<Byte, MutableList<MidiEvent>> {
+                programEvents.distinctBy { it.program }.forEach { this += it.program to mutableListOf() }
+            }
 
             // Since a program change event can occur in between an ON and OFF event, we also need to keep track of the
             // current program when an ON event occurs, so that the corresponding OFF event can be assigned to the same
             // instrument.
-            val programPerNote = mutableMapOf<Int, Int>()
+            val programPerNote = mutableMapOf<Byte, Byte>()
 
             channelSpecificEvents.forEach { event ->
-                if (event !is MidiNoteOffEvent) { // If the event is not an OFF event,
+                if (event !is NoteEvent.NoteOff) { // If the event is not an OFF event,
                     // Determine the last program event
-                    val currentProgram = programEvents.lastOrNull { it.time <= event.time }?.program ?: 0
+                    val currentProgram = programEvents.lastOrNull { it.tick <= event.tick }?.program ?: 0
 
                     // Add the event to the correct bin
                     programBins[currentProgram]?.plusAssign(event)
 
                     // Keep track of current program for ON events.
-                    if (event is MidiNoteOnEvent) programPerNote[event.note] = currentProgram
+                    if (event is NoteEvent.NoteOn) programPerNote[event.note] = currentProgram
                 } else {
                     programBins[programPerNote[event.note]]?.plusAssign(event) ?: kotlin.run {
                         logger().warn("Unbalanced MIDI note events.")
@@ -193,16 +132,16 @@ object InstrumentAssignment {
 
             if (channel == 9) {
                 programBins.entries.forEach { (key, value) ->
-                    buildDrumSet(context, key, value)?.let { instruments += it }
-                    buildSpecialCases(context, key, value).let { instruments += it }
-                    collectAuxiliary(key, value).let {
+                    buildDrumSet(context, key.toInt(), value)?.let { instruments += it }
+                    buildSpecialCases(context, key.toInt(), value).let { instruments += it }
+                    collectAuxiliary(key.toInt(), value).let {
                         it.forEach { (t, u) ->
                             if (auxiliary[t] == null) {
                                 auxiliary[t] = u.map { it.toMutableList() }.toMutableList()
                             } else {
                                 u.forEachIndexed { index, list ->
                                     auxiliary[t]!![index].addAll(list)
-                                    auxiliary[t]!![index] = auxiliary[t]!![index].sortedBy { it.time }.toMutableList()
+                                    auxiliary[t]!![index] = auxiliary[t]!![index].sortedBy { it.tick }.toMutableList()
                                 }
                             }
                         }
@@ -228,11 +167,11 @@ object InstrumentAssignment {
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun buildInstrument(
         context: Midis2jam2,
-        program: Int,
-        events: MutableList<MidiChannelEvent>,
-        allChannelEvents: List<MidiChannelEvent>,
+        program: Byte,
+        events: MutableList<MidiEvent>,
+        allChannelEvents: List<MidiEvent>,
     ): Instrument? {
-        val midiNoteEvents = events.filterIsInstance<MidiNoteEvent>()
+        val midiNoteEvents = events.filterIsInstance<NoteEvent>()
 
         // We need to also get Pitch Bend RPN events because they are "sticky" meaning if the events occurred during one
         // instrument, it should apply to the next if the channel program changes. We can do this by just collecting all
@@ -240,11 +179,11 @@ object InstrumentAssignment {
         // Eliminates any duplicate events from adding the two together
         @Suppress("NAME_SHADOWING")
         val events =
-            (events + allChannelEvents.filterIsInstance<MidiControlChangeEvent>()).distinct().sortedBy { it.time }
+            (events + allChannelEvents.filterIsInstance<ControlChangeEvent>()).distinct().sortedBy { it.tick }
                 .toMutableList()
 
         if (midiNoteEvents.isEmpty()) return null
-        return when (program) {
+        return when (program.toInt()) {
             0 -> Keyboard(context, events, KeyboardSkin["piano"])
             1 -> Keyboard(context, events, KeyboardSkin["bright"])
             2 -> Keyboard(context, events, KeyboardSkin["electric_grand"])
@@ -308,7 +247,7 @@ object InstrumentAssignment {
             78 -> Whistles(context, events)
             79 -> Ocarina(context, events)
             80 -> { // square
-                if (midiNoteEvents.maximumPolyphony > 4) {
+                if (Polyphony.calculateMaximumPolyphony(midiNoteEvents) > 4) {
                     Keyboard(context, events, KeyboardSkin["square_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaserType.Square)
@@ -316,7 +255,7 @@ object InstrumentAssignment {
             }
 
             81 -> { // sawtooth
-                if (midiNoteEvents.maximumPolyphony > 4) {
+                if (Polyphony.calculateMaximumPolyphony(midiNoteEvents) > 4) {
                     Keyboard(context, events, KeyboardSkin["saw_wave"])
                 } else {
                     SpaceLaser(context, events, SpaceLaserType.Saw)
@@ -365,15 +304,15 @@ object InstrumentAssignment {
         }
     }
 
-    private fun List<MidiNoteOnEvent>.groupNotes(vararg programNums: Int): List<List<MidiNoteOnEvent>> =
-        programNums.map { program -> this.filter { it.note == program } }
+    private fun List<NoteEvent.NoteOn>.groupNotes(vararg programNums: Int): List<List<NoteEvent.NoteOn>> =
+        programNums.map { program -> this.filter { it.note.toInt() == program } }
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun collectAuxiliary(
         program: Int,
-        events: MutableList<MidiChannelEvent>,
-    ): MutableMap<KClass<out AuxiliaryPercussion>, List<List<MidiChannelEvent>>> {
-        val eventMap = mutableMapOf<KClass<out AuxiliaryPercussion>, List<List<MidiChannelEvent>>>()
+        events: MutableList<MidiEvent>,
+    ): MutableMap<KClass<out AuxiliaryPercussion>, List<List<MidiEvent>>> {
+        val eventMap = mutableMapOf<KClass<out AuxiliaryPercussion>, List<List<MidiEvent>>>()
         when (program) {
             0, 8, 16, 24, 25, 32, 40 -> {
                 events.hits(27)?.let { eventMap.put(HighQ::class, it.groupNotes(27)) }
@@ -442,7 +381,7 @@ object InstrumentAssignment {
     private fun buildSpecialCases(
         context: Midis2jam2,
         program: Int,
-        events: MutableList<MidiChannelEvent>,
+        events: MutableList<MidiEvent>,
     ): List<Instrument> {
         return when (program) {
             24 -> // Electronic
@@ -453,10 +392,10 @@ object InstrumentAssignment {
                             notes.map {
                                 // Change the note to 60 (C4) so that it is "standardized"
                                 when (it) {
-                                    is MidiNoteOnEvent -> it.copy(note = 60)
-                                    is MidiNoteOffEvent -> it.copy(note = 60)
+                                    is NoteEvent.NoteOn -> it.copy(note = 60)
+                                    is NoteEvent.NoteOff -> it.copy(note = 60)
                                 }
-                            }.also { context.file.registerEvents(it) },
+                            }.also { context.sequence.registerEvents(it) },
                         ),
                     )
                 } ?: mutableListOf()
@@ -470,10 +409,10 @@ object InstrumentAssignment {
                             notes.map {
                                 // Change the note to 60 (C4) so that it is "standardized"
                                 when (it) {
-                                    is MidiNoteOnEvent -> it.copy(note = 60)
-                                    is MidiNoteOffEvent -> it.copy(note = 60)
+                                    is NoteEvent.NoteOn -> it.copy(note = 60)
+                                    is NoteEvent.NoteOff -> it.copy(note = 60)
                                 }
-                            }.also { context.file.registerEvents(it) },
+                            }.also { context.sequence.registerEvents(it) },
                             StageChoir.ChoirType.SynthVoice,
                         )
                     },
@@ -492,10 +431,10 @@ object InstrumentAssignment {
     private fun buildDrumSet(
         context: Midis2jam2,
         program: Int,
-        events: MutableList<MidiChannelEvent>,
+        events: MutableList<MidiEvent>,
     ): DrumSet? {
         if (events.hits().isEmpty()) return null
-        return when (program) {
+        return when (program.toInt()) {
             24 -> // Electronic
                 ElectronicDrumSet(
                     context,
@@ -524,24 +463,24 @@ object InstrumentAssignment {
             else ->
                 TypicalDrumSet(
                     context,
-                    TypicalDrumShell.fromProgramNumber(program) ?: TypicalDrumShell.Standard,
+                    TypicalDrumShell.fromProgramNumber(program.toByte()) ?: TypicalDrumShell.Standard,
                     events.hits(),
                 )
         }
     }
 
-    private fun List<MidiChannelEvent>.notes(vararg notes: Int): List<MidiNoteEvent>? =
-        this.filterIsInstance<MidiNoteEvent>().filter { it.note in notes }.ifEmpty { null }
+    private fun List<MidiEvent>.notes(vararg notes: Int): List<NoteEvent>? =
+        this.filterIsInstance<NoteEvent>().filter { it.note.toInt() in notes }.ifEmpty { null }
 
-    private fun List<MidiChannelEvent>.hits(vararg notes: Int): List<MidiNoteOnEvent>? =
-        this.filterIsInstance<MidiNoteOnEvent>().filter { it.note in notes }.ifEmpty { null }
+    private fun List<MidiEvent>.hits(vararg notes: Int): List<NoteEvent.NoteOn>? =
+        this.filterIsInstance<NoteEvent.NoteOn>().filter { it.note.toInt() in notes }.ifEmpty { null }
 
-    private fun List<MidiChannelEvent>.hits(): List<MidiNoteOnEvent> = this.filterIsInstance<MidiNoteOnEvent>()
+    private fun List<MidiEvent>.hits(): List<NoteEvent.NoteOn> = this.filterIsInstance<NoteEvent.NoteOn>()
 
-    fun MutableList<MidiProgramEvent>.removeDuplicateProgramEvents() {
+    fun MutableList<ProgramEvent>.removeDuplicateProgramEvents() {
         // Remove program events at same time (keep the last one)
         for (i in size - 2 downTo 0) {
-            while (i < size - 1 && this[i].time == this[i + 1].time) {
+            while (i < size - 1 && this[i].tick == this[i + 1].tick) {
                 removeAt(i)
             }
         }

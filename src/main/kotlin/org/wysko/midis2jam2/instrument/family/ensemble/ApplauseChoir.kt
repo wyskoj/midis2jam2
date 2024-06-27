@@ -18,27 +18,25 @@
 package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent
-import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 
 /**
  * A modified version of the stage choir that animates applause.
  */
-class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannelEvent>) :
+class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiEvent>) :
     DivisiveSustainedInstrument(context, eventList) {
 
     override val animators: List<PitchClassAnimator> = List(12) { ApplauseChoirPeep() }
@@ -58,7 +56,7 @@ class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannel
         // Order matters here to preserve index
         context.instruments.filterIsInstance<StageChoir>() + context.instruments.filterIsInstance<ApplauseChoir>()
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         val indexForMoving = updateInstrumentIndex(delta)
         animators.forEach {
             if (indexForMoving >= 0) {
@@ -73,10 +71,10 @@ class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannel
 
     private inner class ApplauseChoirPeep : PitchClassAnimator(
         context,
-        NotePeriod.calculateNotePeriods(context.file, eventList.filterIsInstance<MidiNoteEvent>()),
+        TimedArc.fromNoteEvents(context.sequence, eventList.filterIsInstance<NoteEvent>())
     ) {
         private val bounceSpeed = 2 * Math.random() + 2f
-        private var animInfluence = 0f
+        private var animInfluence = 0.0
 
         init {
             with(geometry) {
@@ -85,17 +83,22 @@ class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiChannel
             root.loc = BASE_POSITION
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             collector.advance(time)
 
             // Progress animation
-            animInfluence += if (collector.currentNotePeriods.isNotEmpty()) delta else -delta
-            animInfluence = animInfluence.coerceIn(0f..1f)
+            val duration = when {
+                collector.currentTimedArcs.isNotEmpty() -> delta
+                else -> -delta
+            }
+            animInfluence += duration.toDouble(DurationUnit.SECONDS).toFloat()
+            animInfluence = animInfluence.coerceIn(0.0..1.0)
 
             // Set bounce
             animation.loc = v3(0, animation(time) * animInfluence, 0)
         }
 
-        private fun animation(time: Double) = ((-(((time * bounceSpeed) % 1) - 0.5).pow(2) + 0.25) * 38).toFloat()
+        private fun animation(time: Duration) =
+            ((-(((time.toDouble(DurationUnit.SECONDS) * bounceSpeed) % 1) - 0.5).pow(2) + 0.25) * 38).toFloat()
     }
 }

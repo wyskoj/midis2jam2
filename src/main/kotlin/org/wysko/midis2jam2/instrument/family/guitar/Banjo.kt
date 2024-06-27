@@ -21,11 +21,12 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
 
@@ -37,7 +38,7 @@ private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
  * @param context context to the main class
  * @param events the list of events for this Banjo
  */
-class Banjo(context: Midis2jam2, events: List<MidiChannelEvent>) : FrettedInstrument(
+class Banjo(context: Midis2jam2, events: List<MidiEvent>) : FrettedInstrument(
     context,
     events,
     StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),
@@ -56,7 +57,7 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelEvent>) : FrettedInstru
     ),
     4,
     context.modelD("Banjo.obj", "BanjoSkin.png") to
-    "BanjoSkin.png"
+            "BanjoSkin.png"
 ) {
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BanjoString.obj", "BassSkin.bmp").also {
@@ -102,7 +103,7 @@ class Banjo(context: Midis2jam2, events: List<MidiChannelEvent>) : FrettedInstru
         flatMap { it.asIterable() }.forEach { it.cullHint = Always }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.localTranslation = Vector3f(7f, -2.43f, 0f).mult(updateInstrumentIndex(delta))
     }
 

@@ -18,6 +18,8 @@
 package org.wysko.midis2jam2.util
 
 import kotlin.math.abs
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /** Applies smoothing to a given value by slowing encroaching on that value over time. */
 class NumberSmoother(initialValue: Float, private val smoothness: Double) {
@@ -35,15 +37,19 @@ class NumberSmoother(initialValue: Float, private val smoothness: Double) {
      * @param target the target value
      * @return [value]
      */
-    fun tick(delta: Float, target: () -> Float): Float {
+    fun tick(delta: Duration, target: () -> Float): Float {
         when (smoothness) {
             0.0 -> value = target.invoke()
             else -> with(target.invoke()) {
-                value += ((this - value) * delta * smoothness).toFloat().coerceIn(
+                value += ((this - value) * delta.toDouble(SECONDS) * smoothness).toFloat().coerceIn(
                     -abs(this - value)..abs(this - value) // Prevent the change from overshooting
                 )
             }
         }
         return value
+    }
+
+    fun snap(value: Float) {
+        this.value = value
     }
 }

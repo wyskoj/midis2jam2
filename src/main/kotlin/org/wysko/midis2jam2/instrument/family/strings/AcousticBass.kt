@@ -18,13 +18,14 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The upright bass. */
-class AcousticBass(context: Midis2jam2, events: List<MidiChannelEvent>, style: PlayingStyle) :
+class AcousticBass(context: Midis2jam2, events: List<MidiEvent>, style: PlayingStyle) :
     StringFamilyInstrument(
         context,
         events,
@@ -37,7 +38,7 @@ class AcousticBass(context: Midis2jam2, events: List<MidiChannelEvent>, style: P
             if (style == PlayingStyle.ARCO) "DoubleBassSkin.bmp" else "DoubleBassSkinAlt.png"
         )
     ) {
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)
     }
 

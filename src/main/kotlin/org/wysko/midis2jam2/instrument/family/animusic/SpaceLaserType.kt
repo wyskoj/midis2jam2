@@ -26,10 +26,7 @@ import com.jme3.math.ColorRGBA
  * @property glowColor The glow color.
  * @see SpaceLaser
  */
-sealed class SpaceLaserType(
-    val filename: String,
-    val glowColor: ColorRGBA
-) {
+sealed class SpaceLaserType(val filename: String, val glowColor: ColorRGBA) {
     /**
      * Sawtooth laser.
      */

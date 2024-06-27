@@ -34,12 +34,12 @@ import kotlinx.serialization.Serializable
  * @property frets The list of frets corresponding to each note in the chord.
  */
 @Serializable
-data class ChordDefinition(val notes: List<Int>, val frets: List<Int>) {
+data class ChordDefinition(val notes: List<Byte>, val frets: List<Int>) {
 
     /**
      * Returns the set of notes that this chord defines.
      */
-    fun definedNotes() = notes.filter { it != -1 }.toSet()
+    fun getDefinedNotes(): Set<Byte> = notes.filter { it.toInt() != -1 }.toSet()
 
     /**
      * Returns the fretboard position of a note in this chord.
@@ -49,7 +49,7 @@ data class ChordDefinition(val notes: List<Int>, val frets: List<Int>) {
      * @param note The note to find the fretboard position of.
      * @return The fretboard position of the note.
      */
-    fun noteToFretboardPosition(note: Int): FretboardPosition? = when (val string = notes.indexOf(note)) {
+    fun calculateFretboardPosition(note: Byte): FretboardPosition? = when (val string = notes.indexOf(note)) {
         -1 -> null
         else -> FretboardPosition(string, frets[string])
     }

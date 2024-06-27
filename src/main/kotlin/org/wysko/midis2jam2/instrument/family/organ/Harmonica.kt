@@ -17,20 +17,17 @@
 package org.wysko.midis2jam2.instrument.family.organ
 
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.HARMONICA
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /**
  * The Harmonica.
@@ -38,7 +35,7 @@ import org.wysko.midis2jam2.world.modelD
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
  */
-class Harmonica(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class Harmonica(context: Midis2jam2, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
 
@@ -46,10 +43,10 @@ class Harmonica(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
     private val puffers = List(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
     private val bend = PitchBendModulationController(context, eventList)
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         puffers.forEachIndexed { index, puffer ->
-            puffer.tick(delta, collector.currentNotePeriods.any { it.note % 12 == index })
+            puffer.tick(delta, collector.currentTimedArcs.any { it.note % 12 == index })
         }
         geometry.rot = v3(-bend.tick(time, delta) * 15, -90, 0f)
     }

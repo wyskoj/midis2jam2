@@ -30,9 +30,9 @@ import kotlin.reflect.KClass
 @Serializable
 class SlidePositionManager private constructor() : FingeringManager<List<Int>> {
 
-    private val slideTable = HashMap<Int, List<Int>>()
+    private val slideTable = HashMap<Byte, List<Int>>()
 
-    override fun fingering(midiNote: Int): List<Int>? = slideTable[midiNote]
+    override fun fingering(midiNote: Byte): List<Int>? = slideTable[midiNote]
 
     companion object {
         /** Loads the slide position manager from a file based on the class name. */

@@ -19,20 +19,17 @@ package org.wysko.midis2jam2.instrument.family.brass
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.times
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class)
 private const val TRIGGER_KEY_INDEX = 0
@@ -43,7 +40,7 @@ private const val TRIGGER_KEY_INDEX = 0
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
  */
-class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
     MonophonicInstrument(context, eventList, FrenchHornClone::class, FINGERING_MANAGER),
     MultipleInstancesLinearAdjustment {
 
@@ -86,7 +83,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
             animNode.loc = v3(0, 0, 20)
         }
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.rot = v3(0, 47, 0) * indexForMoving()
         }
 

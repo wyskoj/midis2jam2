@@ -21,24 +21,22 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodGroupCollector
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcGroupCollector
 import org.wysko.midis2jam2.instrument.family.guitar.FretHeightCalculator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.contiguousGroups
-import org.wysko.midis2jam2.util.NumberSmoother
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.sign
-import org.wysko.midis2jam2.util.times
-import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /**
  * The type String family instrument, including the violin, viola, cello, and double bass.
@@ -51,7 +49,7 @@ import kotlin.math.pow
 abstract class StringFamilyInstrument protected constructor(
     /** Context to midis2jam2. */
     context: Midis2jam2,
-    events: List<MidiChannelEvent>,
+    events: List<MidiEvent>,
     showBow: Boolean,
     bowRotation: Double,
     bowScale: Vector3f,
@@ -154,7 +152,7 @@ abstract class StringFamilyInstrument protected constructor(
             bowNode.attachChild(this)
         }
 
-    private val groupCollector = NotePeriodGroupCollector(context, notePeriods.contiguousGroups())
+    private val groupCollector = TimedArcGroupCollector(context, timedArcs.contiguousGroups())
 
     init {
         body.setLocalTranslation(0f, 0f, -1.2f)
@@ -162,7 +160,7 @@ abstract class StringFamilyInstrument protected constructor(
 
     private var bowGoesLeft = false
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         groupCollector.advance(time)?.let {
             bowGoesLeft = !bowGoesLeft
@@ -174,18 +172,18 @@ abstract class StringFamilyInstrument protected constructor(
     private val bowRaise = NumberSmoother(2f, 7.0)
     private val dragIntensity = NumberSmoother(1f, 10.0)
 
-    private fun animateBow(time: Double, delta: Float) {
-        val progress = groupCollector.currentNotePeriodGroup?.calculateProgress(time) ?: (1.0)
+    private fun animateBow(time: Duration, delta: Duration) {
+        val progress = groupCollector.currentTimedArcGroup?.calculateProgress(time) ?: (1.0)
 
         bow.loc = v3(MAX_BOW_TRANSLATION, 0, 0) * bowGoesLeft.sign * (progress - 0.5) * dragIntensity.value
 
         dragIntensity.tick(delta) {
-            if (groupCollector.currentNotePeriodGroup == null) {
+            if (groupCollector.currentTimedArcGroup == null) {
                 groupCollector.peek()?.let {
-                    if (it.startTime - time < 1.0) durationToIntensity(it.duration) else null
+                    if (it.startTime - time < 1.seconds) durationToIntensity(it.duration) else null
                 } ?: dragIntensity.value
             } else {
-                durationToIntensity(groupCollector.currentNotePeriodGroup!!.duration)
+                durationToIntensity(groupCollector.currentTimedArcGroup!!.duration)
             }
         }
 
@@ -193,13 +191,13 @@ abstract class StringFamilyInstrument protected constructor(
         collector.peek()?.let {
             isBowDown = when {
                 // Playing?
-                groupCollector.currentNotePeriodGroup != null -> true
+                groupCollector.currentTimedArcGroup != null -> true
 
                 // Not playing, but about to play
-                !isBowDown && it.start - time <= 0.5 -> true
+                !isBowDown && it.startTime - time <= 0.5.seconds -> true
 
                 // Just played, about to play again soon
-                isBowDown && it.start - time < 5 -> true
+                isBowDown && it.startTime - time < 5.seconds -> true
 
                 // Not playing
                 else -> false
@@ -217,13 +215,13 @@ abstract class StringFamilyInstrument protected constructor(
         super.toString() +
                 formatProperty("intensity", dragIntensity.value) +
                 formatProperty("bowGoesLeft", bowGoesLeft) +
-                formatProperty("group", groupCollector.currentNotePeriodGroup.toString()) +
+                formatProperty("group", groupCollector.currentTimedArcGroup.toString()) +
                 formatProperty("isBowDown", isBowDown)
 }
 
-private fun durationToIntensity(duration: Double): Float = when {
-    duration > 0.5 -> 1f
-    else -> duration.toFloat() * 2f
+private fun durationToIntensity(duration: Duration): Float = when {
+    duration > 0.5.seconds -> 1f
+    else -> duration.toDouble(DurationUnit.SECONDS).toFloat() * 2f
 }.coerceAtLeast(0.2f)
 
 private const val MAX_BOW_TRANSLATION = 10

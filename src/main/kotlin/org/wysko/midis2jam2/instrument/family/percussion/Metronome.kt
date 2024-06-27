@@ -18,20 +18,21 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /**
  * The Metronome.
  */
 class Metronome(
     context: Midis2jam2,
-    clickHits: MutableList<MidiNoteOnEvent>,
-    bellHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (clickHits + bellHits).sortedBy { it.time }.toMutableList()) {
+    clickHits: MutableList<NoteEvent.NoteOn>,
+    bellHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (clickHits + bellHits).sortedBy { it.tick }.toMutableList()) {
     private val bellStriker =
         Striker(
             context = context,
@@ -66,8 +67,8 @@ class Metronome(
     private var clickSwingsRight = true
     private var bellSwingsRight = true
 
-    private var previousBellTarget: MidiNoteOnEvent? = null
-    private var previousClickTarget: MidiNoteOnEvent? = null
+    private var previousBellTarget: NoteEvent.NoteOn? = null
+    private var previousClickTarget: NoteEvent.NoteOn? = null
 
     init {
         geometry.apply {
@@ -79,8 +80,8 @@ class Metronome(
 
     @Suppress("DuplicatedCode")
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 

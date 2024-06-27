@@ -17,29 +17,32 @@
 
 package org.wysko.midis2jam2.midi
 
+import org.wysko.kmidi.midi.TimedArc
+import kotlin.time.Duration
+
 /**
  * A collection of [NotePeriod]s that have overlapping times.
  *
- * @property notePeriods The [NotePeriod]s that are in this group.
+ * @property arcs The [NotePeriod]s that are in this group.
  */
-data class NotePeriodGroup(val notePeriods: Set<NotePeriod>) {
+data class TimedArcGroup(val arcs: Set<TimedArc>) {
 
     /**
      * The time at which the first [NotePeriod] in this group begins.
      */
-    val startTime: Double
-        get() = notePeriods.minOf { it.start }
+    val startTime: Duration
+        get() = arcs.minOf { it.startTime }
 
     /**
      * The time at which the last [NotePeriod] in this group ends.
      */
-    val endTime: Double
-        get() = notePeriods.maxOf { it.end }
+    val endTime: Duration
+        get() = arcs.maxOf { it.endTime }
 
     /**
      * The duration of this group, expressed in seconds.
      */
-    val duration: Double
+    val duration: Duration
         get() = endTime - startTime
 
     /**
@@ -50,5 +53,5 @@ data class NotePeriodGroup(val notePeriods: Set<NotePeriod>) {
      *
      * @param time The current time, expressed in seconds.
      */
-    fun calculateProgress(time: Double): Double = (1.0 - (endTime - time) / duration).coerceIn(0.0..1.0)
+    fun calculateProgress(time: Duration): Double = (1.0 - (endTime - time) / duration).coerceIn(0.0..1.0)
 }

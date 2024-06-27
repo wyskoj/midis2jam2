@@ -17,12 +17,13 @@
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import kotlin.reflect.KClass
+import kotlin.time.Duration
 
 private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
 
@@ -30,11 +31,11 @@ private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
 abstract class Saxophone
 protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>,
+    eventList: List<MidiEvent>,
     cloneClass: KClass<out SaxophoneClone>,
     fingeringManager: PressedKeysFingeringManager
 ) : MonophonicInstrument(context, eventList, cloneClass, fingeringManager) {
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.localTranslation = OFFSET_DIRECTION_VECTOR.mult(updateInstrumentIndex(delta))
     }
 

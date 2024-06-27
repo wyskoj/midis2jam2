@@ -16,23 +16,25 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.RIDE_BELL
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 private const val BELL_POSITION = 12f
 private const val EDGE_POSITION = 18f
 private const val STICK_MOVE_SPEED = 30f
 
 /** The ride cymbal. */
-class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
+class RideCymbal(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, type: CymbalType) :
     Cymbal(context, hits, type) {
     private var targetStickPosition = EDGE_POSITION
     private var stickPosition = EDGE_POSITION
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         val results = stick.tick(time, delta)
         results.strike?.let {
@@ -45,7 +47,7 @@ class RideCymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: 
         }
 
         // Update influence and position
-        stickPosition += (delta * (targetStickPosition - stickPosition) * STICK_MOVE_SPEED)
+        stickPosition += ((delta.toDouble(SECONDS) * (targetStickPosition - stickPosition) * STICK_MOVE_SPEED)).toFloat()
         stickPosition = stickPosition.coerceIn(BELL_POSITION..EDGE_POSITION) // Prevent overshooting
         stick.node.setLocalTranslation(0f, 2f, stickPosition)
 

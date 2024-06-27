@@ -21,6 +21,8 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /** Animates the wobble on cymbals using [a sinusoidal function](https://www.desmos.com/calculator/vvbwlit9he). */
 class CymbalAnimator(
@@ -58,9 +60,9 @@ class CymbalAnimator(
      *
      * @param delta the amount of time since the last frame
      */
-    fun tick(delta: Float) {
+    fun tick(delta: Duration) {
         if (animTime != -1.0) {
-            animTime += delta.toDouble()
+            animTime += delta.toDouble(SECONDS)
         }
         cymbal.localRotation = Quaternion().fromAngles(rotationAmount(), 0f, 0f)
     }

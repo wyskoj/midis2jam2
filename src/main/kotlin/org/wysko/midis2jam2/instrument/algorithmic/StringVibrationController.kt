@@ -19,6 +19,8 @@ package org.wysko.midis2jam2.instrument.algorithmic
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.util.ch
 import kotlin.math.floor
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * Controls the animation of vibrating strings.
@@ -31,8 +33,8 @@ class StringVibrationController(private val frames: Collection<Spatial>) {
      *
      * @param delta the amount of time since the last frame update
      */
-    fun tick(delta: Float) {
-        animationTime = (animationTime + delta * 60) % frames.size
+    fun tick(delta: Duration) {
+        animationTime = (animationTime + delta.toDouble(SECONDS) * 60) % frames.size
         frames.forEachIndexed { index, frame -> frame.cullHint = (index == floor(animationTime).toInt()).ch }
     }
 }

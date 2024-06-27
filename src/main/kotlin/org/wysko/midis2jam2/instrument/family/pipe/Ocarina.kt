@@ -18,16 +18,17 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithHands
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Ocarina. */
-class Ocarina(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class Ocarina(context: Midis2jam2, events: List<MidiEvent>) :
     InstrumentWithHands(context, events, OcarinaClone::class, OcarinaHandGenerator()) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(scaleFactor = 0.1f)
@@ -37,7 +38,7 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelEvent>) :
      * need to be stored in XML.
      */
     internal class OcarinaHandGenerator : HandPositionFingeringManager() {
-        override fun fingering(midiNote: Int): Hands {
+        override fun fingering(midiNote: Byte): Hands {
             return Hands(0, (midiNote + 3) % 12)
         }
     }
@@ -50,7 +51,7 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelEvent>) :
             context.modelD("OcarinaHand$it.obj", "hands.bmp")
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
             /* Collect note periods to execute */
             if (isPlaying) {
@@ -58,13 +59,13 @@ class Ocarina(context: Midis2jam2, events: List<MidiChannelEvent>) :
                     animNode.setLocalTranslation(
                         0f,
                         0f,
-                        3 * ((it.end - time) / it.duration).toFloat()
+                        3 * ((it.endTime - time) / it.duration).toFloat()
                     )
                 }
             }
         }
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.localRotation = Quaternion().fromAngles(0f, rad((17f * indexForMoving()).toDouble()), 0f)
         }
 

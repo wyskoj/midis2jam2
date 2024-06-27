@@ -19,19 +19,20 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /**
  * The Hand Clap.
  *
  * The hand clap consists of two hands that come together and recoil, just like a regular hand clap.
  */
-class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+class HandClap(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val leftHand =
         Striker(
             context = context,
@@ -65,8 +66,8 @@ class HandClap(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxili
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 

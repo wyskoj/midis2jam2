@@ -17,42 +17,40 @@
 package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument.Companion.recoilDrum
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import kotlin.time.Duration
 
 /** A drum that is hit at different spots to represent the notes in an octave. */
-abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
-    DecayedInstrument(
-        context,
-        eventList.filterIsInstance<MidiNoteOnEvent>().toMutableList(),
-    ) {
-        /** The strikers. */
-        protected abstract val strikers: Array<Striker>
+abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiEvent>) : DecayedInstrument(
+    context,
+    eventList.filterIsInstance<NoteEvent.NoteOn>().toMutableList(),
+) {
+    /** The strikers. */
+    protected abstract val strikers: Array<Striker>
 
-        /** The recoil node. */
-        protected val recoilNode: Node =
-            Node().also {
-                geometry.attachChild(it)
-            }
-
-        override fun tick(
-            time: Double,
-            delta: Float,
-        ) {
-            super.tick(time, delta)
-
-            val maxVelocity = strikers.maxOf { it.tick(time, delta).velocity }
-            recoilDrum(recoilNode, maxVelocity, delta)
-        }
+    /** The recoil node. */
+    protected val recoilNode: Node = Node().also {
+        geometry.attachChild(it)
     }
 
-/**
- * Returns the [MidiNoteOnEvent]s that would animate given the index of the note modulus 12.
- */
-fun List<MidiChannelEvent>.modulus(int: Int): List<MidiNoteOnEvent> {
-    return filterIsInstance<MidiNoteOnEvent>().filter { (it.note + 3) % 12 == int }
+    override fun tick(
+        time: Duration,
+        delta: Duration,
+    ) {
+        super.tick(time, delta)
+
+        val maxVelocity = strikers.maxOf { it.tick(time, delta).velocity }
+        recoilDrum(recoilNode, maxVelocity, delta)
+    }
 }
+
+/**
+ * Returns the [NoteEvent.NoteOn]s that would animate given the index of the note modulus 12.
+ */
+fun List<MidiEvent>.modulus(int: Int): List<NoteEvent.NoteOn> =
+    filterIsInstance<NoteEvent.NoteOn>().filter { (it.note + 3) % 12 == int }

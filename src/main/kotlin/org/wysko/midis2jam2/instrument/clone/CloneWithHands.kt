@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.Axis
+import kotlin.time.Duration
 
 /**
  * Some instruments visualize notes by showing hands in different playing positions. To do this, a separate 3D model for
@@ -60,7 +61,7 @@ abstract class CloneWithHands protected constructor(parent: InstrumentWithHands,
         rightHands.forEachIndexed { index, spatial -> spatial.cullHint = (index == 0).ch }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         if (isPlaying) {
             if (parent.manager == null) return

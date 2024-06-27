@@ -19,16 +19,16 @@ package org.wysko.midis2jam2.world.lyric
 
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Collector
-import org.wysko.midis2jam2.midi.MidiEvent
+import kotlin.time.Duration
 
 /**
- * Periodically collects elapsed events from a pool of [MidiEvent].
+ * Periodically collects elapsed events from a pool of events.
  */
 class LyricLineCollector(
     private val context: Midis2jam2,
     private val lines: List<LyricLine>,
-    private val triggerCondition: (LyricLine, Double) -> Boolean =
-        { event, time -> context.file.eventInSeconds(event.minBy { it.time }) <= time },
+    private val triggerCondition: (LyricLine, Duration) -> Boolean =
+        { event, time -> context.sequence.getTimeOf(event.minBy { it.tick }) <= time },
     private val onSeek: (LyricLineCollector) -> Unit = {},
 ) : Collector<LyricLine> {
 
@@ -44,7 +44,7 @@ class LyricLineCollector(
      *
      * If we collected no events during the time elapsed since the last invocation, the return is `null`.
      */
-    fun advanceCollect(time: Double): LyricLine? {
+    fun advanceCollect(time: Duration): LyricLine? {
         // Keep advancing the play head while we haven't reached the end of the list, and we aren't looking at an
         // event in the future.
         var advanced = false
@@ -62,7 +62,7 @@ class LyricLineCollector(
      * Don't use this method for each frame.
      * Rather, use this when making large jumps in time.
      */
-    override fun seek(time: Double) {
+    override fun seek(time: Duration) {
         with(context) {
             currentIndex = lines.indexOfLast { it.startTime < time }
         }

@@ -21,13 +21,14 @@ import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
     Json.decodeFromString(resourceToString("/instrument/alignment/SteelDrums.json"))
@@ -35,7 +36,7 @@ private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
 /** The Steel drums. */
 class SteelDrums(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>
+    eventList: List<MidiEvent>
 ) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) {
@@ -51,7 +52,7 @@ class SteelDrums(
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.localRotation =
             Quaternion().fromAngles(0f, rad((-37f - 15 * updateInstrumentIndex(delta)).toDouble()), 0f)
     }

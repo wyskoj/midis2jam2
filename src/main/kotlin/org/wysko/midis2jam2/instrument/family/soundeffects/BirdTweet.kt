@@ -19,23 +19,17 @@ package org.wysko.midis2jam2.instrument.family.soundeffects
 
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.get
-import org.wysko.midis2jam2.util.material
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
+import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(0f, 49.5f, -152.65f)
 private const val BIRD_TEXTURE = "Bird.png"
@@ -43,7 +37,7 @@ private const val BIRD_TEXTURE = "Bird.png"
 /**
  * The bird tweet.
  */
-class BirdTweet(context: Midis2jam2, events: List<MidiChannelEvent>) : DivisiveSustainedInstrument(context, events) {
+class BirdTweet(context: Midis2jam2, events: List<MidiEvent>) : DivisiveSustainedInstrument(context, events) {
 
     override val animators: List<PitchClassAnimator> = List(12) { Bird(events.notePeriodsModulus(context, it)) }
 
@@ -58,7 +52,7 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelEvent>) : DivisiveS
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         val indexForMoving = updateInstrumentIndex(delta)
         animators.forEach {
             if (indexForMoving >= 0) {
@@ -70,7 +64,7 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelEvent>) : DivisiveS
         }
     }
 
-    private inner class Bird(notePeriods: List<NotePeriod>) : RisingPitchClassAnimator(context, notePeriods) {
+    private inner class Bird(notePeriods: List<TimedArc>) : RisingPitchClassAnimator(context, notePeriods) {
         private val openBeak = context.modelD("BirdBeak_Open.obj", BIRD_TEXTURE).also { geometry += it }
         private val closedBeak = context.modelD("BirdBeak_Closed.obj", BIRD_TEXTURE).also { geometry += it }
         private val wings = context.modelD("BirdWings.obj", BIRD_TEXTURE).also { geometry += it }
@@ -84,7 +78,7 @@ class BirdTweet(context: Midis2jam2, events: List<MidiChannelEvent>) : DivisiveS
             }
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
 
             openBeak.cullHint = playing.ch

@@ -18,16 +18,17 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.LOW_CONGA
 import org.wysko.midis2jam2.midi.MUTE_HIGH_CONGA
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.midi.OPEN_HIGH_CONGA
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.max
 import org.wysko.midis2jam2.world.modelD
-import kotlin.math.max
+import kotlin.time.Duration
 
 /**
  * Although there are three MIDI congas, there are two physical congas on stage. The left conga plays [OPEN_HIGH_CONGA]
@@ -41,10 +42,10 @@ import kotlin.math.max
  */
 class Congas(
     context: Midis2jam2,
-    muteHiHits: MutableList<MidiNoteOnEvent>,
-    openHiHits: MutableList<MidiNoteOnEvent>,
-    lowHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (muteHiHits + openHiHits + lowHits).sortedBy { it.time }.toMutableList()) {
+    muteHiHits: MutableList<NoteEvent.NoteOn>,
+    openHiHits: MutableList<NoteEvent.NoteOn>,
+    lowHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (muteHiHits + openHiHits + lowHits).sortedBy { it.tick }.toMutableList()) {
     private val leftNode =
         Node().apply {
             geometry.attachChild(this)
@@ -122,8 +123,8 @@ class Congas(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 

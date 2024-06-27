@@ -18,14 +18,15 @@ package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /** The Taiko drum. */
-class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelEvent>) : OneDrumOctave(context, eventList) {
+class TaikoDrum(context: Midis2jam2, eventList: List<MidiEvent>) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) { i ->
         Striker(
@@ -39,7 +40,7 @@ class TaikoDrum(context: Midis2jam2, eventList: List<MidiChannelEvent>) : OneDru
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.localRotation = Quaternion().fromAngles(0f, rad(-27.9 + updateInstrumentIndex(delta) * -11), 0f)
     }
 

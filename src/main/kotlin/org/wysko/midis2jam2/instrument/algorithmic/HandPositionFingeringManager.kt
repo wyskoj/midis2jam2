@@ -28,9 +28,9 @@ import kotlin.reflect.KClass
 @Serializable
 open class HandPositionFingeringManager : FingeringManager<Hands> {
 
-    private val table = HashMap<Int, Hands>()
+    private val table = HashMap<Byte, Hands>()
 
-    override fun fingering(midiNote: Int): Hands? = table[midiNote]
+    override fun fingering(midiNote: Byte): Hands? = table[midiNote]
 
     /**
      * A pair of indexes.

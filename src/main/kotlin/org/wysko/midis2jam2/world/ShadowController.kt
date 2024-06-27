@@ -36,12 +36,7 @@ import org.wysko.midis2jam2.instrument.family.strings.Harp
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration.Companion.isFakeShadows
 import org.wysko.midis2jam2.starter.configuration.getType
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import kotlin.reflect.KClass
 
 /**

@@ -30,7 +30,7 @@ interface FrettingEngine {
      * no possible positions exists (all the strings are occupied), returns null.
      */
     @Contract(pure = true)
-    fun bestFretboardPosition(midiNote: Int): FretboardPosition?
+    fun bestFretboardPosition(midiNote: Byte): FretboardPosition?
 
     /** Applies the usage of this fretboard [position], occupying the string. */
     fun applyFretboardPosition(position: FretboardPosition)

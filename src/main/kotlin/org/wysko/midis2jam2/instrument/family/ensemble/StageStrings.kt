@@ -20,35 +20,29 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesRadialAdjustment
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.notePeriodsModulus
-import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.get
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.material
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.Axis.Y
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * The Stage Strings.
  */
 class StageStrings(
     context: Midis2jam2,
-    private val eventList: List<MidiChannelEvent>,
+    private val eventList: List<MidiEvent>,
     type: StageStringsType,
     private val stageStringBehavior: StageStringBehavior = StageStringBehavior.Normal,
 ) : DivisiveSustainedInstrument(context, eventList), MultipleInstancesRadialAdjustment {
@@ -63,7 +57,7 @@ class StageStrings(
     override val rotationAngle: Float = 11.6f
     override val baseAngle: Float = 35.6f
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         bend = pitchBendModulationController.tick(time, delta)
     }
@@ -122,7 +116,7 @@ class StageStrings(
             }
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
             bowNode.cullHint = playing.ch
             animStringNode.cullHint = playing.ch
@@ -135,10 +129,10 @@ class StageStrings(
             )
 
             if (playing) {
-                val progress = collector.currentNotePeriods.first().calculateProgress(time)
+                val progress = collector.currentTimedArcs.first().calculateProgress(time)
                 bow.loc = when (stageStringBehavior) {
                     StageStringBehavior.Normal -> v3(0, 8 * (progress - 0.5), 0)
-                    StageStringBehavior.Tremolo -> v3(0, sin(30 * time) * 4, 0)
+                    StageStringBehavior.Tremolo -> v3(0, sin(30 * time.toDouble(SECONDS)) * 4, 0)
                 }
             }
 

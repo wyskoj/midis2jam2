@@ -21,21 +21,22 @@ import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 internal val STICK_POSITION = Vector3f(0f, 2f, 18f)
 private val STICK_PIVOT_OFFSET = Vector3f(0f, 0f, 0f)
 
 /** Cymbals are represented with this class, excluding the [HiHat]. */
-open class Cymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type: CymbalType) :
+open class Cymbal(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, type: CymbalType) :
     DrumSetInstrument(context, hits) {
     /** The stick. */
     protected val stick: Striker =
@@ -47,7 +48,7 @@ open class Cymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type:
                 it.rotate(rad(-20.0), 0f, 0f) // Angles stick down slightly
             }
         }
-    private val cymbal =
+    private val cymbalModel =
         context.modelR(type.model, "CymbalSkinSphereMap.bmp").apply {
             geometry.attachChild(this)
             this.scale(type.size)
@@ -55,7 +56,7 @@ open class Cymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type:
 
     /** The cymbal animator. */
     protected val cymbalAnimator: CymbalAnimator =
-        CymbalAnimator(cymbal, type.amplitude, type.wobbleSpeed, type.dampening)
+        CymbalAnimator(cymbalModel, type.amplitude, type.wobbleSpeed, type.dampening)
 
     init {
         // Position cymbal
@@ -64,8 +65,8 @@ open class Cymbal(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>, type:
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         stick.tick(time, delta).strike?.let {

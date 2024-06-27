@@ -17,22 +17,15 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
+import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.BassDrum
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.Cymbal
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.CymbalType
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.HiHat
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.RideCymbal
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.SnareDrum
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.Tom
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.TomPitch
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.*
 import org.wysko.midis2jam2.midi.RIDE_BELL
 import org.wysko.midis2jam2.midi.RIDE_CYMBAL_1
 import org.wysko.midis2jam2.midi.RIDE_CYMBAL_2
-import org.wysko.midis2jam2.midi.filterByNotes
+import kotlin.time.Duration
 
 /**
  * A [DrumSet] that uses standard models and can be skinned with [TypicalDrumSetSkin], but does not have a china cymbal.
@@ -43,9 +36,9 @@ import org.wysko.midis2jam2.midi.filterByNotes
  */
 class ElectronicDrumSet(
     context: Midis2jam2,
-    events: List<MidiNoteOnEvent>,
+    events: List<NoteEvent.NoteOn>,
 ) : DrumSet(context, events) {
-    override val collectorForVisibility: EventCollector<MidiNoteOnEvent> =
+    override val collectorForVisibility: EventCollector<NoteEvent.NoteOn> =
         EventCollector(
             context,
             events.filter {
@@ -114,8 +107,8 @@ class ElectronicDrumSet(
 
             val rides = events.filterByNotes(RIDE_BELL, RIDE_CYMBAL_1, RIDE_CYMBAL_2)
             var currentRide = 1
-            val ride1Notes = ArrayList<MidiNoteOnEvent>()
-            val ride2Notes = ArrayList<MidiNoteOnEvent>()
+            val ride1Notes = ArrayList<NoteEvent.NoteOn>()
+            val ride2Notes = ArrayList<NoteEvent.NoteOn>()
             rides.forEach {
                 when (it.note) {
                     RIDE_CYMBAL_1 -> {
@@ -145,8 +138,8 @@ class ElectronicDrumSet(
         }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         instruments.forEach { it.tick(time, delta) }

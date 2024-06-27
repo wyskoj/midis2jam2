@@ -16,22 +16,18 @@
  */
 package org.wysko.midis2jam2.instrument.family.pipe
 
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
 import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.WHISTLE
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.scale
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /**
  * The whistles.
@@ -39,12 +35,12 @@ import org.wysko.midis2jam2.world.modelR
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  **/
-class Whistles(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class Whistles(context: Midis2jam2, events: List<MidiEvent>) :
     DivisiveSustainedInstrument(context, events) {
 
     override val animators: List<PitchClassAnimator> = List(12) { Whistle(it, events.notePeriodsModulus(context, it)) }
 
-    override fun adjustForMultipleInstances(delta: Float): Unit = updateInstrumentIndex(delta).run {
+    override fun adjustForMultipleInstances(delta: Duration): Unit = updateInstrumentIndex(delta).run {
         root.loc = v3(0, 22.5 + this * 6.8, 0)
         geometry.rot = v3(0, 90 * this, 0)
     }
@@ -68,7 +64,7 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelEvent>) :
      * @param i The index of the whistle.
      * @param notePeriodsModulus The list of note periods.
      */
-    inner class Whistle(i: Int, notePeriodsModulus: List<NotePeriod>) :
+    inner class Whistle(i: Int, notePeriodsModulus: List<TimedArc>) :
         PitchClassAnimator(context, notePeriodsModulus) {
 
         private val puffer: SteamPuffer = SteamPuffer(context, WHISTLE, 1.0, OUTWARDS)
@@ -89,12 +85,12 @@ class Whistles(context: Midis2jam2, events: List<MidiChannelEvent>) :
             root.loc = v3(-12, 0, 0)
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
             puffer.tick(delta, playing)
 
             geometry.loc = if (playing) {
-                val progress = collector.currentNotePeriods.first().calculateProgress(time)
+                val progress = collector.currentTimedArcs.first().calculateProgress(time)
                 v3(0, 2 - 2 * progress.toFloat(), 0)
             } else {
                 v3(0, 0, 0)

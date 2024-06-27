@@ -17,21 +17,15 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.midi.notePeriodsModulus
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plus
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.times
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 
@@ -42,7 +36,7 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of stage horns to use.
  */
-class StageHorns(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: StageHornsType) :
+class StageHorns(context: Midis2jam2, eventList: List<MidiEvent>, type: StageHornsType) :
     DivisiveSustainedInstrument(context, eventList) {
 
     override val animators: List<PitchClassAnimator> = List(12) {
@@ -66,7 +60,7 @@ class StageHorns(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         val index = updateInstrumentIndex(delta)
         animators.forEach {
             it.root.loc = BASE_POSITION + v3(0f, 3f, if (index >= 0) -5f else 5f) * index

@@ -19,24 +19,20 @@ package org.wysko.midis2jam2.instrument.family.ensemble
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Off
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.midi.notePeriodsModulus
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.material
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.exp
 import kotlin.math.pow
+import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 
@@ -47,7 +43,7 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of choir peep.
  */
-class StageChoir(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: ChoirType) :
+class StageChoir(context: Midis2jam2, eventList: List<MidiEvent>, type: ChoirType) :
     DivisiveSustainedInstrument(context, eventList) {
 
     private val pitchBendModulationController = PitchBendModulationController(context, eventList)
@@ -72,12 +68,12 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: C
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         bend = pitchBendModulationController.tick(time, delta)
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         val indexForMoving = updateInstrumentIndex(delta)
         animators.forEach {
             it as ChoirPeep
@@ -95,7 +91,7 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: C
         context.instruments.filterIsInstance<StageChoir>() + context.instruments.filterIsInstance<ApplauseChoir>()
 
     /** A single choir peep. */
-    open inner class ChoirPeep(type: ChoirType, notePeriods: List<NotePeriod>) :
+    open inner class ChoirPeep(type: ChoirType, notePeriods: List<TimedArc>) :
         RisingPitchClassAnimator(context, notePeriods) {
         private val head = with(geometry) {
             +context.modelD("StageChoirHead.obj", type.textureFile).also { it.move(v3(0, 24.652, 0)) }
@@ -108,14 +104,14 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: C
             root.loc = BASE_POSITION
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
             head.rot = v3(if (playing) (1.0 / (1 + exp(bend / 4))) * 180 - 90 else 0, 0, 0)
         }
     }
 
     /** A single choir peep with a halo. */
-    inner class ChoirPeepHalo(notePeriods: List<NotePeriod>) : ChoirPeep(ChoirType.HaloSynth, notePeriods) {
+    inner class ChoirPeepHalo(notePeriods: List<TimedArc>) : ChoirPeep(ChoirType.HaloSynth, notePeriods) {
         private val halo = with(geometry) {
             +context.modelD("StageChoirHalo.obj", "ChoirHalo.png").also {
                 it.material = context.diffuseMaterial("ChoirHalo.png")
@@ -123,9 +119,9 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: C
             }
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
-            val progress = collector.currentNotePeriods.firstOrNull()?.calculateProgress(time) ?: 1.0
+            val progress = collector.currentTimedArcs.firstOrNull()?.calculateProgress(time) ?: 1.0
             val glowIntensity = (-progress.pow(64) + 1).toFloat()
             halo.material.setColor("GlowColor", ColorRGBA(glowIntensity, glowIntensity, 0f, 1f))
         }

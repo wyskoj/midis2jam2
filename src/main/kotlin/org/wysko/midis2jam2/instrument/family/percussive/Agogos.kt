@@ -18,14 +18,15 @@ package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.world.modelR
+import kotlin.time.Duration
 
 /** The Melodic Agogos. */
 class Agogos(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>
+    eventList: List<MidiEvent>
 ) : TwelveDrumOctave(context, eventList, pivotOffset = 17f) {
 
     override val twelfths: Array<TwelfthOfOctaveDecayed> = Array(12) {
@@ -37,7 +38,7 @@ class Agogos(
         }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         with(updateInstrumentIndex(delta)) {
             root.setLocalTranslation(0f, 18 + 3.6f * this, 0f)
             geometry.localRotation =

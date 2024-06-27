@@ -18,6 +18,8 @@
 package org.wysko.midis2jam2.util
 
 import com.jme3.math.Vector3f
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
 /**
  * Applies smoothing to a given vector by slowly moving to that vector over time.
@@ -39,12 +41,12 @@ class VectorSmoother(initialValue: Vector3f, private val smoothness: Double) {
      * @param target the target vector
      * @return [value]
      */
-    fun tick(delta: Float, target: () -> Vector3f): Vector3f {
+    fun tick(delta: Duration, target: () -> Vector3f): Vector3f {
         when (smoothness) {
             0.0 -> value = target.invoke()
             else -> with(target.invoke()) {
                 value.addLocal(
-                    this.subtract(value).multLocal(delta * smoothness.toFloat())
+                    this.subtract(value).multLocal((delta.toDouble(SECONDS) * smoothness).toFloat())
                 )
             }
         }

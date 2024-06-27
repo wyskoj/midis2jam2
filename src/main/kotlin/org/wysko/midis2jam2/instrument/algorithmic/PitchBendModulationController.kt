@@ -17,14 +17,18 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import org.wysko.kmidi.midi.event.ControlChangeEvent
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.VirtualCompositePitchBendEvent
+import org.wysko.kmidi.midi.event.VirtualParameterNumberChangeEvent
+import org.wysko.kmidi.midi.event.VirtualParameterNumberChangeEvent.VirtualModulationDepthRangeChangeEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.midi.*
 import org.wysko.midis2jam2.util.NumberSmoother
 import kotlin.math.sin
+import kotlin.time.Duration
+import kotlin.time.DurationUnit.SECONDS
 
-private const val PITCH_BEND_CENTER = 0x2000
-
-private const val CC_MODULATION_WHEEL = 1
+private const val CC_MODULATION_WHEEL = 1.toByte()
 
 /**
  * Handles the calculation of pitch-bend and modulation.
@@ -35,17 +39,20 @@ private const val CC_MODULATION_WHEEL = 1
  */
 class PitchBendModulationController(
     context: Midis2jam2,
-    events: List<MidiChannelEvent>,
+    events: List<MidiEvent>,
     smoothness: Double = 10.0,
 ) {
-    private val absolutePitchBendEvents =
-        EventCollector(context, MidiAbsolutePitchBendEvent.fromEvents(events, context)) {
-            pitchBend = it.prev()?.value ?: 0.0
-        }
+    private val bendEvents = VirtualCompositePitchBendEvent.fromEvents(events).also {
+        context.sequence.registerEvents(it)
+    }
 
-    private val modulationWheelEvents = EventCollector(
+    private val pitchBendCollector = EventCollector(context, bendEvents) {
+        pitchBend = it.prev()?.bend ?: 0.0
+    }
+
+    private val modulationCollector = EventCollector(
         context,
-        events.filterIsInstance<MidiControlChangeEvent>().filter { it.controller == CC_MODULATION_WHEEL }
+        events.filterIsInstance<ControlChangeEvent>().filter { it.controller == CC_MODULATION_WHEEL }
     ) {
         modulation = it.prev()?.value ?: 0
     }
@@ -53,20 +60,15 @@ class PitchBendModulationController(
     private val modulationDepthRangeEvents =
         EventCollector(
             context,
-            MidiModulationDepthRangeEvent.fromRpnChanges(
-                MidiRegisteredParameterNumberChangeEvent.collectRegisteredParameterNumberChanges(
-                    events.filterIsInstance<MidiControlChangeEvent>(),
-                    RegisteredParameterNumber.ModulationDepthRange
-                ),
-                events.first().channel
-            ).also { context.file.registerEvents(it) }
+            VirtualParameterNumberChangeEvent.fromEvents(events)
+                .filterIsInstance<VirtualModulationDepthRangeChangeEvent>()
         ) {
             modulationRange = it.prev()?.value ?: 0.5
         }
 
     // Current MIDI states
     private var pitchBend = 0.0
-    private var modulation = 0
+    private var modulation = 0.toByte()
     private var modulationRange = 0.5
 
     // Animation state
@@ -86,28 +88,35 @@ class PitchBendModulationController(
      * and modulation events. Returns the overall pitch bend, represented as a semitone.
      *
      * @param time The current time, in seconds.
-     * @param tpf Delta time.
+     * @param delta Delta time.
      * @param applyModulationWhenIdling Should the modulation effect be applied when the instrument is idling?
      * @param playing Returns `true` when the instrument is playing, `false` otherwise.
      */
     fun tick(
-        time: Double,
-        tpf: Float,
+        time: Duration,
+        delta: Duration,
         applyModulationWhenIdling: Boolean = false,
-        playing: () -> Boolean = { true },
+        isNewNote: Boolean = false,
+        playing: () -> Boolean = { true }
     ): Float {
-        modulationPhaseOffset += tpf
+        modulationPhaseOffset += delta.toDouble(SECONDS)
 
-        absolutePitchBendEvents.advanceCollectAll(time).forEach { pitchBend = it.value }
-        modulationWheelEvents.advanceCollectAll(time).forEach { modulation = it.value }
+        pitchBendCollector.advanceCollectAll(time).forEach { pitchBend = it.bend }
+        modulationCollector.advanceCollectAll(time).forEach { modulation = it.value }
         modulationDepthRangeEvents.advanceCollectAll(time).forEach { modulationRange = it.value }
 
+        if (isNewNote) {
+            smoother.snap(pitchBend.toFloat())
+        }
+
         return if (!playing() && !applyModulationWhenIdling) {
-            smoother.tick(tpf) { pitchBendSemitones().toFloat() }
+            smoother.tick(delta) { pitchBend.toFloat() }
         } else {
-            smoother.tick(tpf) { (pitchBendSemitones() + modulationSemitones()).toFloat() }
+            smoother.tick(delta) { (pitchBend + modulationSemitones()).toFloat() }
         }
     }
+
+    fun getPitchBendAtTick(tick: Int): Double = bendEvents.lastOrNull { it.tick <= tick }?.bend ?: 0.0
 
     /**
      * When a note is played, the phase offset of the sinusoidal function that modulates the sound is reset to 0.
@@ -118,5 +127,4 @@ class PitchBendModulationController(
     }
 
     private fun modulationSemitones() = sin(50 * modulationPhaseOffset) * modulationRange * (modulation / 128.0)
-    private fun pitchBendSemitones() = pitchBend
 }

@@ -16,19 +16,20 @@
  */
 package org.wysko.midis2jam2.instrument
 
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.debugString
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.times
 import kotlin.math.PI
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
+import kotlin.time.Duration
 
 /**
  * An instrument that uses [Clone]s to represent polyphony.
@@ -43,7 +44,7 @@ import kotlin.reflect.full.primaryConstructor
  */
 abstract class MonophonicInstrument protected constructor(
     context: Midis2jam2,
-    eventList: List<MidiChannelEvent>,
+    eventList: List<MidiEvent>,
     cloneClass: KClass<out Clone>,
     val manager: FingeringManager<*>?,
 ) : SustainedInstrument(context, eventList) {
@@ -60,15 +61,15 @@ abstract class MonophonicInstrument protected constructor(
     protected open val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration()
 
     /**
-     * [notePeriods] assigned to [Clone]s.
+     * [timedArcs] assigned to [Clone]s.
      */
     val clones: List<Clone> = run {
-        val sortedNotePeriods = notePeriods.sortedWith(compareBy({ it.startTick }, { it.note }))
+        val sortedNotePeriods = timedArcs.sortedWith(compareBy({ it.start }, { it.note }))
 
-        val bins = sortedNotePeriods.fold(mutableListOf<MutableList<NotePeriod>>()) { list, notePeriod ->
+        val bins = sortedNotePeriods.fold(mutableListOf<MutableList<TimedArc>>()) { list, notePeriod ->
             // Search for a clone that isn't playing (or is just about to finish playing, helps with small overlaps)
             val firstAvailableClone =
-                list.firstOrNull { it.last().endTick - (context.file.division / 8) <= notePeriod.startTick }
+                list.firstOrNull { it.last().end - (context.sequence.smf.tpq / 8) <= notePeriod.start }
 
             if (firstAvailableClone == null) {
                 list += mutableListOf(notePeriod)
@@ -81,7 +82,7 @@ abstract class MonophonicInstrument protected constructor(
 
         bins.map {
             cloneClass.primaryConstructor!!.call(this).apply {
-                notePeriods.addAll(it)
+                arcs.addAll(it)
                 createCollector()
             }
         }
@@ -94,8 +95,8 @@ abstract class MonophonicInstrument protected constructor(
      * @param time The current time since the beginning of the song, in seconds.
      * @param delta The amount of time that elapsed since the last frame, in seconds.
      */
-    open fun handlePitchBend(time: Double, delta: Float) {
-        val bend = pitchBendModulationController.tick(time, delta) { collector.currentNotePeriods.isNotEmpty() }
+    open fun handlePitchBend(time: Duration, delta: Duration, isNewNote: Boolean = false) {
+        val bend = pitchBendModulationController.tick(time, delta) { collector.currentTimedArcs.isNotEmpty() }
         val rotation = (if (pitchBendConfiguration.reversed) -bend else bend) * pitchBendConfiguration.scaleFactor
 
         clones.forEach {
@@ -103,10 +104,10 @@ abstract class MonophonicInstrument protected constructor(
         }
     }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
-        clones.forEach { it.tick(time, delta) }
         handlePitchBend(time, delta)
+        clones.forEach { it.tick(time, delta) }
     }
 
     override fun toString(): String = super.toString() + clones.debugString()

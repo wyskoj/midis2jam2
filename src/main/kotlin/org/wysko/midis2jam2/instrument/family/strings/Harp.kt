@@ -19,45 +19,39 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.instrument.algorithmic.NotePeriodCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.scale
-import org.wysko.midis2jam2.util.times
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * The Harp.
  */
-class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>) :
+class Harp(context: Midis2jam2, eventList: MutableList<MidiEvent>) :
     SustainedInstrument(context, eventList) {
-    override val collector: NotePeriodCollector =
-        NotePeriodCollector(context, notePeriods) { time: Double, notePeriod: NotePeriod ->
-            time - 0.033f >= notePeriod.end
+    override val collector: TimedArcCollector =
+        TimedArcCollector(context, timedArcs) { time: Duration, notePeriod: TimedArc ->
+            time - 33.milliseconds >= notePeriod.endTime
         }
 
     private val strings: List<HarpString> = List(47) { HarpString(it) }
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         strings.forEach { it.tick(delta) }
     }
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.loc = with(updateInstrumentIndex(delta)) {
             if (index < 0) {
                 v3(0, -60, 0) * this
@@ -79,12 +73,12 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>) :
 
     private inner class HarpString(i: Int) {
         private val midiNotes = (24..103).filter {
-            var note = it
+            var note = it.toByte()
             if (Key.Color.fromNote(note) == Black) {
                 note--
             }
             getHarpString(note % 12) + (note - 24) / 12 * 7 == i
-        }
+        }.map { it.toByte() }
 
         private val textures = when {
             i % 7 == 0 -> HarpTextures.Red
@@ -112,8 +106,8 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiChannelEvent>) :
 
         private val stringAnimator = StringVibrationController(vibratingStrings)
 
-        fun tick(delta: Float) {
-            with(collector.currentNotePeriods.any { it.note in midiNotes }) {
+        fun tick(delta: Duration) {
+            with(collector.currentTimedArcs.any { it.note in midiNotes }) {
                 idleString.cullHint = (!this).ch
                 vibratingStringNode.cullHint = this.ch
             }

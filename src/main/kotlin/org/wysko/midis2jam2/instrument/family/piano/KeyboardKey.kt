@@ -29,7 +29,7 @@ private const val BLACK_KEY = "PianoBlackKey.obj"
 private const val BLACK_KEY_DOWN = "PianoKeyBlackDown.obj"
 
 /** A single key on the keyboard. */
-class KeyboardKey(keyboard: Keyboard, midiNote: Int, whiteKeyIndex: Int) : Key(
+class KeyboardKey(keyboard: Keyboard, midiNote: Byte, whiteKeyIndex: Int) : Key(
     rotationAxis = Axis.X.identity,
     keyboardConfiguration =
     KeyboardConfiguration(

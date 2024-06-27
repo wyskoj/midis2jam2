@@ -30,9 +30,9 @@ import kotlin.reflect.KClass
 @Serializable
 class PressedKeysFingeringManager private constructor() : FingeringManager<List<Int>> {
 
-    private val fingerTable = HashMap<Int, List<Int>>()
+    private val fingerTable = HashMap<Byte, List<Int>>()
 
-    override fun fingering(midiNote: Int): List<Int>? = fingerTable[midiNote]
+    override fun fingering(midiNote: Byte): List<Int>? = fingerTable[midiNote]
 
     companion object {
         /** Loads the fingering manager from a file based on the class name. */

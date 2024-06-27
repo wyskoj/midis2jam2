@@ -19,16 +19,17 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 /**
  * The Castanets.
  */
-class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : AuxiliaryPercussion(context, hits) {
+class Castanets(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val castanet =
         Striker(
             context = context,
@@ -63,8 +64,8 @@ class Castanets(context: Midis2jam2, hits: MutableList<MidiNoteOnEvent>) : Auxil
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
         val results = castanet.tick(time, delta)

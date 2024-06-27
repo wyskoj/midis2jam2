@@ -21,25 +21,21 @@ import com.jme3.math.Ray
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Off
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.TimedArc
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
+import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.instrument.clone.Clone
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.NotePeriod
-import org.wysko.midis2jam2.util.NumberSmoother
-import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.get
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.material
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit.SECONDS
 
 private const val LASER_HEIGHT = 727.289f
 
@@ -69,10 +65,10 @@ private const val LASER_HEIGHT = 727.289f
  * should point in the same direction as B below Middle C.
  *
  * @param context The [Midis2jam2] instance.
- * @param eventList The list of [MidiChannelEvent]s.
+ * @param eventList The list of [MidiEvent]s.
  * @param type The type of space laser.
  */
-class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: SpaceLaserType) :
+class SpaceLaser(context: Midis2jam2, eventList: List<MidiEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class, null) {
     override val pitchBendModulationController: PitchBendModulationController = PitchBendModulationController(
         context,
@@ -82,14 +78,32 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
 
     private var pitchBendAmount = 0f
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    private val earlyReleases = timedArcs.associateWith {
+        when {
+            it.duration > 0.4.seconds -> 0.1.seconds
+            it.duration > 0.2.seconds -> 0.08.seconds
+            it.duration > 0.1.seconds -> 0.05.seconds
+            it.duration > 0.05.seconds -> 0.025.seconds
+            else -> 0.02.seconds
+        }
+    }
+
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.loc = v3(-22.5 + updateInstrumentIndex(delta) * 15, 0, 0)
     }
 
-    override fun handlePitchBend(time: Double, delta: Float) {
-        pitchBendAmount = pitchBendModulationController.tick(time, delta) {
-            clones.any { it.isPlaying }
+    override fun handlePitchBend(time: Duration, delta: Duration, isNewNote: Boolean) {
+        pitchBendAmount = pitchBendModulationController.tick(time, delta, isNewNote = isNewNote) {
+            collector.currentTimedArcs.isNotEmpty()
         }
+    }
+
+    override fun tick(time: Duration, delta: Duration) {
+        val isNewNote = collector.advance(time).hasChanged
+        isVisible = calculateVisibility(time)
+        adjustForMultipleInstances(delta)
+        handlePitchBend(time, delta, isNewNote)
+        clones.forEach { it.tick(time, delta) }
     }
 
     init {
@@ -102,17 +116,6 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
         with(geometry) {
             +base
             loc = v3(0, 10, -30)
-        }
-
-        /* Truncate each note period to allow some space for end-to-end notes */
-        notePeriods.forEach {
-            when {
-                it.duration > 0.4 -> it.end -= 0.1
-                it.duration > 0.2 -> it.end -= 0.08
-                it.duration > 0.1 -> it.end -= 0.05
-                it.duration > 0.05 -> it.end -= 0.025
-                else -> it.end -= 0.02
-            }
         }
 
         clones.forEach {
@@ -147,7 +150,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
         }
         private val index: NumberSmoother = NumberSmoother(0f, 17.0)
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
 
             currentNotePeriod?.run {
@@ -161,7 +164,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
             laserBeam.cullHint = isPlaying.ch
         }
 
-        private fun adjustPlayingRotation(np: NotePeriod, delta: Float) {
+        private fun adjustPlayingRotation(np: TimedArc, delta: Duration) {
             // Currently playing, so set the correct rotation
             rotation = angleCalculator.angleFromNote(np.note, pitchBendAmount)
 
@@ -169,21 +172,26 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
             if (wobbleTime == 0.0) {
                 pitchBendModulationController.resetModulation()
             }
-            wobbleTime += delta
+            wobbleTime += delta.toDouble(SECONDS)
 
             // Start wobbling 0.1 secs after starting playing
             wobbleIntensity = (wobbleTime - 0.1).coerceIn(0.0..0.07)
         }
 
-        private fun adjustIdleRotation(time: Double, delta: Float) {
+        private fun adjustIdleRotation(time: Duration, delta: Duration) {
             // Not yet playing. Look ahead to the next NotePeriod
-            notePeriodCollector.peek()?.let {
-                val startTime = it.start
-                if (startTime - time <= 1) { // Less than 1 second away from playing
-                    val targetPos = angleCalculator.angleFromNote(it.note, pitchBendAmount)
+            timedArcCollector.peek()?.let {
+                val startTime = it.startTime
+                if (startTime - time <= 1.seconds) { // Less than 1 second away from playing
+                    val targetPos = angleCalculator.angleFromNote(
+                        it.note,
+                        pitchBendModulationController.getPitchBendAtTick(it.start).toFloat()
+                    )
                     if (startTime - time >= delta) {
                         // Slowly inch our way to the target rotation
-                        rotation += (targetPos - rotation) / (startTime - time) * delta
+                        rotation += (targetPos - rotation) / (startTime - time).toDouble(SECONDS) * delta.toDouble(
+                            SECONDS
+                        )
                     }
                 }
             }
@@ -205,14 +213,21 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiChannelEvent>, type: S
             return -0.5f * visible - 1 + myIndex
         }
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             laserNode.loc = v3(0, 0, index.tick(delta) { indexForMoving() * 5f } + 6)
+        }
+
+        override fun createCollector() {
+            timedArcCollector = TimedArcCollector(context, arcs) { time: Duration, arc: TimedArc ->
+                time >= arc.endTime - earlyReleases[arc]!!
+            }
         }
 
         override fun toString(): String {
             return super.toString() + buildString {
                 append(debugProperty("rotation", rotation.toFloat()))
                 append(debugProperty("wobble", wobbleIntensity.toFloat()))
+                append(debugProperty("pitchBendAmount", pitchBendAmount))
             }
         }
     }

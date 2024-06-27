@@ -17,9 +17,9 @@
 
 package org.wysko.midis2jam2.gui.viewmodel
 
-import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 
 /**
  * ViewModel class for managing settings configuration.

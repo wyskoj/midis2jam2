@@ -22,10 +22,10 @@ package org.wysko.midis2jam2.starter.configuration
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.wysko.midis2jam2.util.logger
-import org.wysko.midis2jam2.util.FileAsStringSerializer
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
 import org.wysko.midis2jam2.gui.viewmodel.I18n
+import org.wysko.midis2jam2.util.FileAsStringSerializer
+import org.wysko.midis2jam2.util.logger
 import java.io.File
 import java.util.*
 

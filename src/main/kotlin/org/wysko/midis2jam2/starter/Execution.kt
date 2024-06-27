@@ -23,26 +23,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.launch
 import org.wysko.gervill.RealTimeSequencerProvider
+import org.wysko.kmidi.midi.StandardMidiFileReader
+import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
+import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
-import org.wysko.midis2jam2.midi.DesktopMidiFile
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
-import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
-import org.wysko.midis2jam2.starter.configuration.Resolution
-import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import java.awt.GraphicsEnvironment
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
-import javax.sound.midi.InvalidMidiDataException
-import javax.sound.midi.MidiDevice
-import javax.sound.midi.MidiSystem
-import javax.sound.midi.MidiUnavailableException
-import javax.sound.midi.Sequence
-import javax.sound.midi.Sequencer
+import javax.sound.midi.*
 
 /**
  * This class represents the execution of a MIDI file with given configurations.
@@ -141,7 +134,7 @@ object Execution {
 }
 
 private class Midis2jam2Application(
-    val midiFile: File,
+    val file: File,
     val configurations: Collection<Configuration>,
     val onFinish: () -> Unit,
     val sequencer: Sequencer,
@@ -184,12 +177,13 @@ private class Midis2jam2Application(
     }
 
     override fun simpleInitApp() {
-        val parsedMidiFile = DesktopMidiFile(midiFile)
+        val sequence = StandardMidiFileReader.readFile(file).toTimeBasedSequence()
         DesktopMidis2jam2(
             sequencer = sequencer,
-            midiFile = parsedMidiFile,
+            midiFile = sequence,
             onClose = { stop() },
             configs = configurations,
+            fileName = file.name
         ).also {
             stateManager.attach(it)
             rootNode.attachChild(it.root)

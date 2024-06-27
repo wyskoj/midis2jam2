@@ -24,6 +24,6 @@ import kotlin.math.exp
  * a sigmoid function.
  */
 object SigmoidAngleCalculator : SpaceLaserAngleCalculator {
-    override fun angleFromNote(note: Int, pitchBendAmount: Float): Double =
+    override fun angleFromNote(note: Byte, pitchBendAmount: Float): Double =
         (-(1 / (1 + exp((-((note + pitchBendAmount) - 64) / 16f))) * 208 - 104)).toDouble()
 }

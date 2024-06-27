@@ -19,22 +19,26 @@ package org.wysko.midis2jam2.instrument.family.piano
 
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.Geometry
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
-import org.wysko.midis2jam2.midi.MidiChannelEvent
+import kotlin.time.Duration
 
 /**
  * A keyboard that glows the key 7 semitones below the currently playing note.
  */
-class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiChannelEvent>, skin: KeyboardSkin) :
+class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiEvent>, skin: KeyboardSkin) :
     Keyboard(context, events, skin) {
 
-    override fun tick(time: Double, delta: Float) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         keys.forEach { key ->
             key.root.breadthFirstTraversal {
                 if (it is Geometry) {
-                    it.material.setColor("GlowColor", glowColor(collector.currentNotePeriods.any { it.note == key.midiNote + 5 }))
+                    it.material.setColor(
+                        "GlowColor",
+                        glowColor(collector.currentTimedArcs.any { it.note == (key.midiNote + 5).toByte() })
+                    )
                 }
             }
         }

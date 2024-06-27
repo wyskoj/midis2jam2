@@ -17,13 +17,14 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration.Companion.isFakeShadows
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.v3
+import kotlin.time.Duration
 
 /**
  * A drum set consists of the [BassDrum], [SnareDrum], [HiHat], [Toms][Tom], and [Cymbals][Cymbal]. This class abstracts
@@ -34,7 +35,7 @@ import org.wysko.midis2jam2.util.v3
  */
 abstract class DrumSet(
     context: Midis2jam2,
-    events: List<MidiNoteOnEvent>,
+    events: List<NoteEvent.NoteOn>,
 ) : PercussionInstrument(context, events.toMutableList()) {
     init {
         if (context.isFakeShadows) {
@@ -44,11 +45,11 @@ abstract class DrumSet(
         }
     }
 
-    override fun calculateVisibility(time: Double, future: Boolean): Boolean =
+    override fun calculateVisibility(time: Duration, future: Boolean): Boolean =
         (context.drumSetVisibilityManager.isVisible && context.drumSetVisibilityManager.currentlyVisibleDrumSet == this).also {
             if (!isVisible && it) onEntry()
             if (isVisible && !it) onExit()
         }
 
-    override fun adjustForMultipleInstances(delta: Float): Unit = Unit // The drum set is always in the same place.
+    override fun adjustForMultipleInstances(delta: Duration): Unit = Unit // The drum set is always in the same place.
 }

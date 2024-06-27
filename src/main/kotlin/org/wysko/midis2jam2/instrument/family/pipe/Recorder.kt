@@ -18,24 +18,25 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
-import org.wysko.midis2jam2.midi.MidiChannelEvent
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class)
 
 /** The Recorder. */
-class Recorder(context: Midis2jam2, events: List<MidiChannelEvent>) :
+class Recorder(context: Midis2jam2, events: List<MidiEvent>) :
     InstrumentWithHands(context, events, RecorderClone::class, FINGERING_MANAGER) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(0f, 10f * updateInstrumentIndex(delta), 0f)
     }
 
@@ -50,7 +51,7 @@ class Recorder(context: Midis2jam2, events: List<MidiChannelEvent>) :
             parent.context.modelD("RecorderHandRight$it.obj", "hands.bmp")
         }
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.localRotation = Quaternion().fromAngles(0f, rad((15f + indexForMoving() * 15).toDouble()), 0f)
         }
 

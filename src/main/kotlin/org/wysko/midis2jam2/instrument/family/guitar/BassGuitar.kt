@@ -24,12 +24,12 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.DROP_D
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.STANDARD
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
 import org.wysko.midis2jam2.util.loc
@@ -52,7 +52,7 @@ private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
  * @param events the list of events for this BassGuitar
  * @param type specifies the type of BassGuitar
  */
-class BassGuitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: BassGuitarType) :
+class BassGuitar(context: Midis2jam2, events: List<MidiEvent>, type: BassGuitarType) :
     FrettedInstrument(
         context,
         events,
@@ -82,7 +82,6 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: Bass
         }
     ),
     MultipleInstancesLinearAdjustment {
-
 
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BassString.obj", BASS_SKIN_BMP).apply {
@@ -171,8 +170,8 @@ class BassGuitar(context: Midis2jam2, events: List<MidiChannelEvent>, type: Bass
     }
 }
 
-private fun needsDropTuning(events: List<MidiChannelEvent>): Boolean =
-    (events.filterIsInstance<MidiNoteOnEvent>().minByOrNull { it.note }?.note ?: 127) < 28
+private fun needsDropTuning(events: List<MidiEvent>): Boolean =
+    (events.filterIsInstance<NoteEvent.NoteOn>().minByOrNull { it.note }?.note ?: 127) < 28
 
 private enum class BassGuitarTuning(val values: IntArray) {
     STANDARD(intArrayOf(28, 33, 38, 43)),

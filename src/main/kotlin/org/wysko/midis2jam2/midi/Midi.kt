@@ -14,311 +14,310 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-@file:Suppress("SpellCheckingInspection", "unused")
 
 package org.wysko.midis2jam2.midi
 
 /**
  * The constant `HIGH_Q`.
  */
-const val HIGH_Q: Int = 27
+const val HIGH_Q: Byte = 27
 
 /**
  * The constant `SLAP`.
  */
-const val SLAP: Int = 28
+const val SLAP: Byte = 28
 
 /**
  * The constant `SCRATCH_PUSH`.
  */
-const val SCRATCH_PUSH: Int = 29
+const val SCRATCH_PUSH: Byte = 29
 
 /**
  * The constant `SCRATCH_PULL`.
  */
-const val SCRATCH_PULL: Int = 30
+const val SCRATCH_PULL: Byte = 30
 
 /**
  * The constant `STICKS`.
  */
-const val STICKS: Int = 31
+const val STICKS: Byte = 31
 
 /**
  * The constant `SQUARE_CLICK`.
  */
-const val SQUARE_CLICK: Int = 32
+const val SQUARE_CLICK: Byte = 32
 
 /**
  * The constant `METRONOME_CLICK`.
  */
-const val METRONOME_CLICK: Int = 33
+const val METRONOME_CLICK: Byte = 33
 
 /**
  * The constant `METRONOME_BELL`.
  */
-const val METRONOME_BELL: Int = 34
+const val METRONOME_BELL: Byte = 34
 
 /**
  * The constant `ACOUSTIC_BASS_DRUM`.
  */
-const val ACOUSTIC_BASS_DRUM: Int = 35
+const val ACOUSTIC_BASS_DRUM: Byte = 35
 
 /**
  * The constant `ELECTRIC_BASS_DRUM`.
  */
-const val ELECTRIC_BASS_DRUM: Int = 36
+const val ELECTRIC_BASS_DRUM: Byte = 36
 
 /**
  * The constant `SIDE_STICK`.
  */
-const val SIDE_STICK: Int = 37
+const val SIDE_STICK: Byte = 37
 
 /**
  * The constant `ACOUSTIC_SNARE`.
  */
-const val ACOUSTIC_SNARE: Int = 38
+const val ACOUSTIC_SNARE: Byte = 38
 
 /**
  * The constant `HAND_CLAP`.
  */
-const val HAND_CLAP: Int = 39
+const val HAND_CLAP: Byte = 39
 
 /**
  * The constant `ELECTRIC_SNARE`.
  */
-const val ELECTRIC_SNARE: Int = 40
+const val ELECTRIC_SNARE: Byte = 40
 
 /**
  * The constant `LOW_FLOOR_TOM`.
  */
-const val LOW_FLOOR_TOM: Int = 41
+const val LOW_FLOOR_TOM: Byte = 41
 
 /**
  * The constant `CLOSED_HI_HAT`.
  */
-const val CLOSED_HI_HAT: Int = 42
+const val CLOSED_HI_HAT: Byte = 42
 
 /**
  * The constant `HIGH_FLOOR_TOM`.
  */
-const val HIGH_FLOOR_TOM: Int = 43
+const val HIGH_FLOOR_TOM: Byte = 43
 
 /**
  * The constant `PEDAL_HI_HAT`.
  */
-const val PEDAL_HI_HAT: Int = 44
+const val PEDAL_HI_HAT: Byte = 44
 
 /**
  * The constant `LOW_TOM`.
  */
-const val LOW_TOM: Int = 45
+const val LOW_TOM: Byte = 45
 
 /**
  * The constant `OPEN_HI_HAT`.
  */
-const val OPEN_HI_HAT: Int = 46
+const val OPEN_HI_HAT: Byte = 46
 
 /**
  * The constant `LOW_MID_TOM`.
  */
-const val LOW_MID_TOM: Int = 47
+const val LOW_MID_TOM: Byte = 47
 
 /**
  * The constant `HI_MID_TOM`.
  */
-const val HI_MID_TOM: Int = 48
+const val HI_MID_TOM: Byte = 48
 
 /**
  * The constant `CRASH_CYMBAL_1`.
  */
-const val CRASH_CYMBAL_1: Int = 49
+const val CRASH_CYMBAL_1: Byte = 49
 
 /**
  * The constant `HIGH_TOM`.
  */
-const val HIGH_TOM: Int = 50
+const val HIGH_TOM: Byte = 50
 
 /**
  * The constant `RIDE_CYMBAL_1`.
  */
-const val RIDE_CYMBAL_1: Int = 51
+const val RIDE_CYMBAL_1: Byte = 51
 
 /**
  * The constant `CHINESE_CYMBAL`.
  */
-const val CHINESE_CYMBAL: Int = 52
+const val CHINESE_CYMBAL: Byte = 52
 
 /**
  * The constant `RIDE_BELL`.
  */
-const val RIDE_BELL: Int = 53
+const val RIDE_BELL: Byte = 53
 
 /**
  * The constant `TAMBOURINE`.
  */
-const val TAMBOURINE: Int = 54
+const val TAMBOURINE: Byte = 54
 
 /**
  * The constant `SPLASH_CYMBAL`.
  */
-const val SPLASH_CYMBAL: Int = 55
+const val SPLASH_CYMBAL: Byte = 55
 
 /**
  * The constant `COWBELL`.
  */
-const val COWBELL: Int = 56
+const val COWBELL: Byte = 56
 
 /**
  * The constant `CRASH_CYMBAL_2`.
  */
-const val CRASH_CYMBAL_2: Int = 57
+const val CRASH_CYMBAL_2: Byte = 57
 
 /**
  * The constant `VIBRA_SLAP`.
  */
-const val VIBRA_SLAP: Int = 58
+const val VIBRA_SLAP: Byte = 58
 
 /**
  * The constant `RIDE_CYMBAL_2`.
  */
-const val RIDE_CYMBAL_2: Int = 59
+const val RIDE_CYMBAL_2: Byte = 59
 
 /**
  * The constant `HIGH_BONGO`.
  */
-const val HIGH_BONGO: Int = 60
+const val HIGH_BONGO: Byte = 60
 
 /**
  * The constant `LOW_BONGO`.
  */
-const val LOW_BONGO: Int = 61
+const val LOW_BONGO: Byte = 61
 
 /**
  * The constant `MUTE_HIGH_CONGA`.
  */
-const val MUTE_HIGH_CONGA: Int = 62
+const val MUTE_HIGH_CONGA: Byte = 62
 
 /**
  * The constant `OPEN_HIGH_CONGA`.
  */
-const val OPEN_HIGH_CONGA: Int = 63
+const val OPEN_HIGH_CONGA: Byte = 63
 
 /**
  * The constant `LOW_CONGA`.
  */
-const val LOW_CONGA: Int = 64
+const val LOW_CONGA: Byte = 64
 
 /**
  * The constant `HIGH_TIMBALE`.
  */
-const val HIGH_TIMBALE: Int = 65
+const val HIGH_TIMBALE: Byte = 65
 
 /**
  * The constant `LOW_TIMBALE`.
  */
-const val LOW_TIMBALE: Int = 66
+const val LOW_TIMBALE: Byte = 66
 
 /**
  * The constant `HIGH_AGOGO`.
  */
-const val HIGH_AGOGO: Int = 67
+const val HIGH_AGOGO: Byte = 67
 
 /**
  * The constant `LOW_AGOGO`.
  */
-const val LOW_AGOGO: Int = 68
+const val LOW_AGOGO: Byte = 68
 
 /**
  * The constant `CABASA`.
  */
-const val CABASA: Int = 69
+const val CABASA: Byte = 69
 
 /**
  * The constant `MARACAS`.
  */
-const val MARACAS: Int = 70
+const val MARACAS: Byte = 70
 
 /**
  * The constant `SHORT_WHISTLE`.
  */
-const val SHORT_WHISTLE: Int = 71
+const val SHORT_WHISTLE: Byte = 71
 
 /**
  * The constant `LONG_WHISTLE`.
  */
-const val LONG_WHISTLE: Int = 72
+const val LONG_WHISTLE: Byte = 72
 
 /**
  * The constant `SHORT_GUIRO`.
  */
-const val SHORT_GUIRO: Int = 73
+const val SHORT_GUIRO: Byte = 73
 
 /**
  * The constant `LONG_GUIRO`.
  */
-const val LONG_GUIRO: Int = 74
+const val LONG_GUIRO: Byte = 74
 
 /**
  * The constant `CLAVES`.
  */
-const val CLAVES: Int = 75
+const val CLAVES: Byte = 75
 
 /**
  * The constant `HIGH_WOODBLOCK`.
  */
-const val HIGH_WOODBLOCK: Int = 76
+const val HIGH_WOODBLOCK: Byte = 76
 
 /**
  * The constant `LOW_WOODBLOCK`.
  */
-const val LOW_WOODBLOCK: Int = 77
+const val LOW_WOODBLOCK: Byte = 77
 
 /**
  * The constant `MUTE_CUICA`.
  */
-const val MUTE_CUICA: Int = 78
+const val MUTE_CUICA: Byte = 78
 
 /**
  * The constant `OPEN_CUICA`.
  */
-const val OPEN_CUICA: Int = 79
+const val OPEN_CUICA: Byte = 79
 
 /**
  * The constant `MUTE_TRIANGLE`.
  */
-const val MUTE_TRIANGLE: Int = 80
+const val MUTE_TRIANGLE: Byte = 80
 
 /**
  * The constant `OPEN_TRIANGLE`.
  */
-const val OPEN_TRIANGLE: Int = 81
+const val OPEN_TRIANGLE: Byte = 81
 
 /**
  * The constant `SHAKER`.
  */
-const val SHAKER: Int = 82
+const val SHAKER: Byte = 82
 
 /**
  * The constant `JINGLE_BELL`.
  */
-const val JINGLE_BELL: Int = 83
+const val JINGLE_BELL: Byte = 83
 
 /**
  * The constant `BELLTREE`.
  */
-const val BELLTREE: Int = 84
+const val BELLTREE: Byte = 84
 
 /**
  * The constant `CASTANETS`.
  */
-const val CASTANETS: Int = 85
+const val CASTANETS: Byte = 85
 
 /**
  * The constant `MUTE_SURDO`.
  */
-const val MUTE_SURDO: Int = 86
+const val MUTE_SURDO: Byte = 86
 
 /**
  * The constant `OPEN_SURDO`.
  */
-const val OPEN_SURDO: Int = 87
+const val OPEN_SURDO: Byte = 87

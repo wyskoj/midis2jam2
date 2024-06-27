@@ -17,21 +17,22 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.math.Vector3f
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.midi.MidiNoteOnEvent
+import org.wysko.midis2jam2.util.max
 import org.wysko.midis2jam2.world.modelD
-import java.lang.Integer.max
+import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(-5f, 50f, -85f)
 
 /** The Agogo. */
 class Agogo(
     context: Midis2jam2,
-    highHits: MutableList<MidiNoteOnEvent>,
-    lowHits: MutableList<MidiNoteOnEvent>,
-) : AuxiliaryPercussion(context, (highHits + lowHits).sortedBy { it.time }.toMutableList()) {
+    highHits: MutableList<NoteEvent.NoteOn>,
+    lowHits: MutableList<NoteEvent.NoteOn>,
+) : AuxiliaryPercussion(context, (highHits + lowHits).sortedBy { it.tick }.toMutableList()) {
     private val leftStick =
         Striker(
             context = context,
@@ -58,8 +59,8 @@ class Agogo(
     }
 
     override fun tick(
-        time: Double,
-        delta: Float,
+        time: Duration,
+        delta: Duration,
     ) {
         super.tick(time, delta)
 

@@ -53,7 +53,7 @@ class StandardFrettingEngine(
      * @param midiNote The MIDI note to find the best fretboard position.
      * @return The best fretboard position, or `null` if one doesn't exist.
      */
-    override fun bestFretboardPosition(midiNote: Int): FretboardPosition? {
+    override fun bestFretboardPosition(midiNote: Byte): FretboardPosition? {
         val possiblePositions: MutableList<FretboardPosition> = allPossibleFretboardPositions(midiNote)
 
         // Sort possible positions by distance to running average
@@ -99,14 +99,14 @@ class StandardFrettingEngine(
      * @param lowestByFret If `true`, the lowest fret is prioritized over the lowest string.
      */
     fun lowestFretboardPosition(
-        midiNote: Int,
+        midiNote: Byte,
         occupiedStrings: List<Int>,
         lowestByFret: Boolean = false
     ): FretboardPosition? = allPossibleFretboardPositions(midiNote)
         .filter { !occupiedStrings.contains(it.string) }
         .minByOrNull { if (lowestByFret) it.fret else it.string }
 
-    private fun allPossibleFretboardPositions(midiNote: Int): MutableList<FretboardPosition> =
+    private fun allPossibleFretboardPositions(midiNote: Byte): MutableList<FretboardPosition> =
         openStringMidiNotes.mapIndexed { index, openStringNote ->
             val fret = midiNote - openStringNote
             if (fret !in 0..numberOfFrets || frets[index] != -1) {

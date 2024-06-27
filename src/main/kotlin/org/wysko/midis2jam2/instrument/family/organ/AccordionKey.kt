@@ -23,7 +23,7 @@ import org.wysko.midis2jam2.world.Axis
 /** A single key on the accordion. It behaves just like any other key. */
 context(Accordion)
 class AccordionKey(
-    midiNote: Int,
+    midiNote: Byte,
     whiteKeyIndex: Int,
     accordion: Accordion,
 ) : Key(

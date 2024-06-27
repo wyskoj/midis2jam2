@@ -17,10 +17,10 @@
 
 package org.wysko.midis2jam2.gui.viewmodel
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
 import org.wysko.midis2jam2.starter.configuration.QualityScale
 import org.wysko.midis2jam2.starter.configuration.Resolution
-import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Represents a ViewModel for graphics configuration.

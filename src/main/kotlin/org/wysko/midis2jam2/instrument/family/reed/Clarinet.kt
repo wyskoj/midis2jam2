@@ -18,6 +18,8 @@ package org.wysko.midis2jam2.instrument.family.reed
 
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
+import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
@@ -26,11 +28,10 @@ import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithHands
 import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
-import org.wysko.midis2jam2.midi.MidiChannelEvent
-import org.wysko.midis2jam2.midi.MidiNoteEvent
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
+import kotlin.time.Duration
 
 private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::class)
 
@@ -39,19 +40,19 @@ private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::cla
  *
  * [Fingering chart](https://bit.ly/34Quj4e)
  */
-class Clarinet(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
+class Clarinet(context: Midis2jam2, eventList: List<MidiEvent>) :
     InstrumentWithHands(
         context,
         /* Strip notes outside of standard range */
-        eventList.filterIsInstance<MidiNoteEvent>().filter { it.note in 50..90 }
-            .plus(eventList.filter { it !is MidiNoteEvent }),
+        eventList.filterIsInstance<NoteEvent>().filter { it.note in 50..90 }
+            .plus(eventList.filter { it !is NoteEvent }),
         ClarinetClone::class,
         FINGERING_MANAGER
     ) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
-    override fun adjustForMultipleInstances(delta: Float) {
+    override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(0f, 20 * updateInstrumentIndex(delta), 0f)
     }
 
@@ -86,11 +87,11 @@ class Clarinet(context: Midis2jam2, eventList: List<MidiChannelEvent>) :
         /** The bell stretcher. */
         private val bellStretcher: BellStretcher = StandardBellStretcher(0.7f, Axis.Y, bell)
 
-        override fun adjustForPolyphony(delta: Float) {
+        override fun adjustForPolyphony(delta: Duration) {
             root.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 
-        override fun tick(time: Double, delta: Float) {
+        override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
 
             /* Stretch bell */

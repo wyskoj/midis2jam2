@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import org.wysko.midis2jam2.gui.TabFactory.tabs
 
 /**
  * Represents a screen in the application.

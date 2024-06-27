@@ -17,31 +17,22 @@
 
 package org.wysko.midis2jam2.gui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.wysko.midis2jam2.gui.components.ExposedDropDownMenu
-import org.wysko.midis2jam2.starter.configuration.QualityScale
-import org.wysko.midis2jam2.starter.configuration.Resolution
 import org.wysko.midis2jam2.gui.viewmodel.GraphicsConfigurationViewModel
 import org.wysko.midis2jam2.gui.viewmodel.I18n
+import org.wysko.midis2jam2.starter.configuration.QualityScale
+import org.wysko.midis2jam2.starter.configuration.Resolution
 
 /**
  * The screen for configuring graphics settings.
