@@ -18,7 +18,7 @@ plugins {
     // Kotlin
     kotlin("jvm") version "1.9.21"
     kotlin("plugin.serialization") version "1.9.21"
-    id("org.jetbrains.compose") version "1.5.11"
+    id("org.jetbrains.compose") version "1.6.11"
     id("io.gitlab.arturbosch.detekt") version ("1.23.3")
 
     java

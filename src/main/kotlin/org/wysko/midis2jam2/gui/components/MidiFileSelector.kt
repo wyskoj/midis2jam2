@@ -22,8 +22,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -58,7 +62,7 @@ fun MidiFileSelector(
                     IconButton({
                         openMidiFileBrowse()
                     }, Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                        Icon(Icons.Default.List, contentDescription = I18n["browse"].value)
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = I18n["browse"].value)
                     }
                 }
             })

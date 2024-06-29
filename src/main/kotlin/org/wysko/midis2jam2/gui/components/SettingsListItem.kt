@@ -18,8 +18,12 @@
 package org.wysko.midis2jam2.gui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Divider
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
@@ -57,7 +61,7 @@ fun SettingsListItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (onOpenOptions != null && state != null) {
-                    Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+                    HorizontalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
                 }
                 state?.let { state ->
                     Switch(

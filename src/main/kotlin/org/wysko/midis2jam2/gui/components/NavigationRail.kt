@@ -17,11 +17,15 @@
 
 package org.wysko.midis2jam2.gui.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Divider
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -48,6 +52,6 @@ fun NavigationRail(currentScreen: ApplicationScreen, tabClickHandler: (Applicati
             }
             Spacer(Modifier.weight(1f))
         }
-        Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+        VerticalDivider(modifier = Modifier.fillMaxHeight().width(1.dp))
     }
 }

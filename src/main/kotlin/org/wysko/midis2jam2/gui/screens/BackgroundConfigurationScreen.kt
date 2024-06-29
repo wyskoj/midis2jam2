@@ -19,21 +19,37 @@ package org.wysko.midis2jam2.gui.screens
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.wysko.midis2jam2.gui.components.*
+import org.wysko.midis2jam2.gui.components.ColorPicker
+import org.wysko.midis2jam2.gui.components.ExposedDropDownMenu
+import org.wysko.midis2jam2.gui.components.Linkable
+import org.wysko.midis2jam2.gui.components.RadioButtonWithText
+import org.wysko.midis2jam2.gui.components.SettingsSectionHeader
+import org.wysko.midis2jam2.gui.components.TextWithLink
 import org.wysko.midis2jam2.gui.viewmodel.BackgroundConfigurationViewModel
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
@@ -53,7 +69,7 @@ fun BackgroundConfigurationScreen(
             IconButton(onClick = {
                 onGoBack()
             }) {
-                Icon(Icons.Default.ArrowBack, I18n["back"].value)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, I18n["back"].value)
             }
         })
     }) { paddingValues ->
