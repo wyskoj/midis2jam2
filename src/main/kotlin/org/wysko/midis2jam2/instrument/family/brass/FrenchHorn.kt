@@ -26,7 +26,11 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
-import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.times
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
@@ -48,7 +52,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
     override val multipleInstancesDirection: Vector3f = v3(0, 25, 0)
 
     init {
-        placement.loc = v3(-83.1, 41.6, -63.7)
+        placement.loc = v3(-120, 41.6, 0.0)
     }
 
     /** A single instance of a French Horn. */
