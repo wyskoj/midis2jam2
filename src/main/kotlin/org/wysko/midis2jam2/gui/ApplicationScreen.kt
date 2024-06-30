@@ -120,5 +120,10 @@ object TabFactory {
         parentScreen = settings,
     )
 
+    val record = ApplicationScreen.ScreenWithoutTab(
+        name = "tab_record",
+        parentScreen = home,
+    )
+
     val tabs: List<ApplicationScreen.ScreenWithTab> = listOf(home, search, settings, about)
 }

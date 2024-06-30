@@ -144,6 +144,7 @@ dependencies {
     implementation("org.nutz:nutz-plugins-sfntly:1.r.60.r3")
 
     implementation("org.wysko:kmidi:0.0.4")
+    implementation("io.humble:humble-video-all:0.3.0")
 }
 
 tasks.withType<ShadowJar> {

@@ -28,14 +28,26 @@ import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
-import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.record.FixedTimer
+import org.wysko.midis2jam2.record.RecordOptions
+import org.wysko.midis2jam2.record.captureVideo
+import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
+import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.Resolution
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import java.awt.GraphicsEnvironment
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
-import javax.sound.midi.*
+import javax.sound.midi.InvalidMidiDataException
+import javax.sound.midi.MidiDevice
+import javax.sound.midi.MidiSystem
+import javax.sound.midi.MidiUnavailableException
+import javax.sound.midi.Sequence
+import javax.sound.midi.Sequencer
 
 /**
  * This class represents the execution of a MIDI file with given configurations.
@@ -56,6 +68,7 @@ object Execution {
         onStart: () -> Unit,
         onReady: () -> Unit,
         onFinish: () -> Unit,
+        recordOptions: RecordOptions? = null,
     ) {
         CoroutineScope(Default).launch {
             onStart()
@@ -73,23 +86,28 @@ object Execution {
                 return@launch
             }
 
-            val midiDevice = try {
-                MidiSystem.getMidiDevice(
-                    MidiSystem.getMidiDeviceInfo().first { it.name == homeConfiguration.selectedMidiDevice },
-                )
-            } catch (e: MidiUnavailableException) {
-                this@Execution.logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
-                onFinish()
-                return@launch
-            } catch (e: IllegalArgumentException) {
-                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
-                onFinish()
-                return@launch
-            } catch (e: NoSuchElementException) {
-                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
-                onFinish()
-                return@launch
-            }
+            val midiDevice =
+                try {
+                    if (recordOptions == null) { // Not recording
+                        MidiSystem.getMidiDevice(
+                            MidiSystem.getMidiDeviceInfo().first { it.name == homeConfiguration.selectedMidiDevice },
+                        )
+                    } else {
+                        null
+                    }
+                } catch (e: MidiUnavailableException) {
+                    this@Execution.logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
+                    onFinish()
+                    return@launch
+                } catch (e: IllegalArgumentException) {
+                    this@Execution.logger().errorDisp("The MIDI device is not found.", e)
+                    onFinish()
+                    return@launch
+                } catch (e: NoSuchElementException) {
+                    this@Execution.logger().errorDisp("The MIDI device is not found.", e)
+                    onFinish()
+                    return@launch
+                }
 
             val sequencer = try {
                 getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
@@ -100,31 +118,36 @@ object Execution {
             }
 
             onReady()
-            Midis2jam2Application(midiFile, configurations, onFinish, sequencer).execute()
+            Midis2jam2Application(midiFile, configurations, onFinish, sequencer, recordOptions).execute()
         }
     }
 
     private fun getAndLoadSequencer(
         homeConfiguration: HomeConfiguration,
-        midiDevice: MidiDevice,
+        midiDevice: MidiDevice?,
         sequence: Sequence?,
     ): Sequencer {
         val provider = RealTimeSequencerProvider()
         return when (homeConfiguration.selectedMidiDevice) {
             GERVILL -> {
-                val synthesizer = MidiSystem.getSynthesizer().apply {
-                    open()
-                    homeConfiguration.selectedSoundbank?.let { loadAllInstruments(MidiSystem.getSoundbank(File(it))) }
-                }
+                val synthesizer =
+                    MidiSystem.getSynthesizer().apply {
+                        open()
+                        homeConfiguration.selectedSoundbank?.let { loadAllInstruments(MidiSystem.getSoundbank(File(it))) }
+                    }
 
-                provider.getDevice(provider.deviceInfo[0])
+                provider
+                    .getDevice(provider.deviceInfo[0])
                     .apply { transmitter.receiver = synthesizer.receiver } as Sequencer
             }
 
             else -> {
-                midiDevice.open()
-                provider.getDevice(provider.deviceInfo[0])
-                    .apply { transmitter.receiver = midiDevice.receiver } as Sequencer
+                provider.getDevice(provider.deviceInfo[0]).apply {
+                    midiDevice?.let {
+                        it.open()
+                        transmitter.receiver = it.receiver
+                    }
+                } as Sequencer
             }
         }.also {
             it.open()
@@ -138,6 +161,7 @@ private class Midis2jam2Application(
     val configurations: Collection<Configuration>,
     val onFinish: () -> Unit,
     val sequencer: Sequencer,
+    val recordOptions: RecordOptions?,
 ) : SimpleApplication() {
     fun execute() {
         val jmeSettings = AppSettings(false).apply { copyFrom(DEFAULT_JME_SETTINGS) }
@@ -187,6 +211,17 @@ private class Midis2jam2Application(
         ).also {
             stateManager.attach(it)
             rootNode.attachChild(it.root)
+        }
+
+        recordOptions?.let {
+            setTimer(FixedTimer(it.videoFps.toLong()))
+            captureVideo(
+                app = this,
+                video = it.outputVideoFile,
+                frameRate = it.videoFps,
+                resolution = settings.width to settings.height,
+                quality = it.videoQuality
+            )
         }
     }
 

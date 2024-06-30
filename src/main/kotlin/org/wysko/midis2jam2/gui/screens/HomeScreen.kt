@@ -57,6 +57,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     soundbankConfigurationViewModel: SoundBankConfigurationViewModel,
     openMidiSearch: () -> Unit,
+    openRecordScreen: () -> Unit,
     playMidiFile: () -> Unit,
     flicker: Boolean,
     snackbarHostState: SnackbarHostState,
@@ -78,7 +79,7 @@ fun HomeScreen(
     Scaffold(
         floatingActionButton = {
             HelpButton()
-        }
+        },
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -103,7 +104,17 @@ fun HomeScreen(
                 AnimatedVisibility(homeViewModel.shouldShowSoundbankSelector) {
                     SelectSoundbankRow(selectedSoundbank, soundbanks.toList(), homeViewModel, onOpenSoundbankConfig)
                 }
-                Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(Modifier.align(Alignment.CenterHorizontally).height(48.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ElevatedButton(
+                        onClick = openRecordScreen,
+                        modifier = Modifier.width(160.dp).height(48.dp),
+                        enabled = !isLockPlayButton && midiFile != null,
+                    ) {
+                        Icon(painterResource("/ico/dot.svg"), "Record", modifier = Modifier.height(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Record")
+                    }
+                    VerticalDivider()
                     ElevatedButton(
                         onClick = playMidiFile,
                         modifier = Modifier.width(160.dp).height(48.dp),
