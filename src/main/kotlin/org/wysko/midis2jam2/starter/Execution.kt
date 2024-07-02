@@ -28,14 +28,23 @@ import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
-import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
+import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.Resolution
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import java.awt.GraphicsEnvironment
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
-import javax.sound.midi.*
+import javax.sound.midi.InvalidMidiDataException
+import javax.sound.midi.MidiDevice
+import javax.sound.midi.MidiSystem
+import javax.sound.midi.MidiUnavailableException
+import javax.sound.midi.Sequence
+import javax.sound.midi.Sequencer
 
 /**
  * This class represents the execution of a MIDI file with given configurations.
@@ -177,7 +186,7 @@ private class Midis2jam2Application(
     }
 
     override fun simpleInitApp() {
-        val sequence = StandardMidiFileReader.readFile(file).toTimeBasedSequence()
+        val sequence = StandardMidiFileReader().readFile(file).toTimeBasedSequence()
         DesktopMidis2jam2(
             sequencer = sequencer,
             midiFile = sequence,
