@@ -27,12 +27,27 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaserType
-import org.wysko.midis2jam2.instrument.family.brass.*
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.*
+import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
+import org.wysko.midis2jam2.instrument.family.brass.StageHorns
+import org.wysko.midis2jam2.instrument.family.brass.StageHornsType
+import org.wysko.midis2jam2.instrument.family.brass.Trombone
+import org.wysko.midis2jam2.instrument.family.brass.Trumpet
+import org.wysko.midis2jam2.instrument.family.brass.TrumpetType
+import org.wysko.midis2jam2.instrument.family.brass.Tuba
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Kalimba
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets.MalletType
-import org.wysko.midis2jam2.instrument.family.ensemble.*
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
+import org.wysko.midis2jam2.instrument.family.ensemble.ApplauseChoir
+import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings
+import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir
+import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringBehavior
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings.StageStringsType
+import org.wysko.midis2jam2.instrument.family.ensemble.Timpani
+import org.wysko.midis2jam2.instrument.family.ethnic.BagPipe
 import org.wysko.midis2jam2.instrument.family.guitar.Banjo
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar.BassGuitarType
@@ -42,15 +57,54 @@ import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Type
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
-import org.wysko.midis2jam2.instrument.family.percussion.*
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.*
+import org.wysko.midis2jam2.instrument.family.percussion.Agogo
+import org.wysko.midis2jam2.instrument.family.percussion.AuxiliaryPercussion
+import org.wysko.midis2jam2.instrument.family.percussion.Bongos
+import org.wysko.midis2jam2.instrument.family.percussion.Cabasa
+import org.wysko.midis2jam2.instrument.family.percussion.Castanets
+import org.wysko.midis2jam2.instrument.family.percussion.Claves
+import org.wysko.midis2jam2.instrument.family.percussion.Congas
+import org.wysko.midis2jam2.instrument.family.percussion.Cowbell
+import org.wysko.midis2jam2.instrument.family.percussion.Cuica
+import org.wysko.midis2jam2.instrument.family.percussion.Guiro
+import org.wysko.midis2jam2.instrument.family.percussion.HandClap
+import org.wysko.midis2jam2.instrument.family.percussion.HighQ
+import org.wysko.midis2jam2.instrument.family.percussion.JingleBell
+import org.wysko.midis2jam2.instrument.family.percussion.Maracas
+import org.wysko.midis2jam2.instrument.family.percussion.Metronome
+import org.wysko.midis2jam2.instrument.family.percussion.Shaker
+import org.wysko.midis2jam2.instrument.family.percussion.Slap
+import org.wysko.midis2jam2.instrument.family.percussion.SquareClick
+import org.wysko.midis2jam2.instrument.family.percussion.Sticks
+import org.wysko.midis2jam2.instrument.family.percussion.Surdo
+import org.wysko.midis2jam2.instrument.family.percussion.Tambourine
+import org.wysko.midis2jam2.instrument.family.percussion.Timbales
+import org.wysko.midis2jam2.instrument.family.percussion.Triangle
+import org.wysko.midis2jam2.instrument.family.percussion.Whistle
+import org.wysko.midis2jam2.instrument.family.percussion.Woodblock
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.BrushDrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.ElectronicDrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.OrchestraDrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.TypicalDrumShell
-import org.wysko.midis2jam2.instrument.family.percussive.*
+import org.wysko.midis2jam2.instrument.family.percussive.Agogos
+import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
+import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
+import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
+import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
+import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
 import org.wysko.midis2jam2.instrument.family.piano.FifthsKeyboard
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.piano.KeyboardSkin
-import org.wysko.midis2jam2.instrument.family.pipe.*
+import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
+import org.wysko.midis2jam2.instrument.family.pipe.Flute
+import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
+import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
+import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
+import org.wysko.midis2jam2.instrument.family.pipe.Recorder
+import org.wysko.midis2jam2.instrument.family.pipe.Whistles
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -61,8 +115,13 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter
 import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.*
+import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
 import org.wysko.midis2jam2.instrument.family.strings.AcousticBass.PlayingStyle
+import org.wysko.midis2jam2.instrument.family.strings.Cello
+import org.wysko.midis2jam2.instrument.family.strings.Fiddle
+import org.wysko.midis2jam2.instrument.family.strings.Harp
+import org.wysko.midis2jam2.instrument.family.strings.Viola
+import org.wysko.midis2jam2.instrument.family.strings.Violin
 import org.wysko.midis2jam2.util.logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -286,6 +345,7 @@ object InstrumentAssignment {
             105 -> Banjo(context, events)
             106 -> Shamisen(context, events)
             108 -> Kalimba(context, events)
+            109 -> BagPipe(context, events)
             110 -> Fiddle(context, events)
             112 -> TinkleBell(context, events)
             113 -> Agogos(context, events)

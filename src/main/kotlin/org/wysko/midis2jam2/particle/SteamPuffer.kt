@@ -24,6 +24,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.particle.SteamPuffer.Cloud
+import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
 import java.util.*
 import kotlin.math.ceil
@@ -50,7 +51,9 @@ class SteamPuffer(
     private val scale: Double,
 
     /** The behavior of the steam puffer. */
-    private val behavior: PuffBehavior
+    private val behavior: PuffBehavior,
+
+    private val outwardsAxis: Axis = Axis.X,
 ) : ParticleGenerator {
 
     /** Defines the root of the steam puffer. */
@@ -173,11 +176,29 @@ class SteamPuffer(
         override fun tick(delta: Duration): Boolean {
             if (!currentlyUsing) return false
             if (behavior == PuffBehavior.OUTWARDS) {
-                cloudNode.setLocalTranslation(
-                    locEase(life.toDouble(SECONDS)) * 6,
-                    locEase(life.toDouble(SECONDS)) * randA,
-                    locEase(life.toDouble(SECONDS)) * randB
-                )
+                when (outwardsAxis) {
+                    Axis.X -> {
+                        cloudNode.setLocalTranslation(
+                            locEase(life.toDouble(SECONDS)) * 6,
+                            locEase(life.toDouble(SECONDS)) * randA,
+                            locEase(life.toDouble(SECONDS)) * randB
+                        )
+                    }
+                    Axis.Y -> {
+                        cloudNode.setLocalTranslation(
+                            locEase(life.toDouble(SECONDS)) * randA,
+                            locEase(life.toDouble(SECONDS)) * 6,
+                            locEase(life.toDouble(SECONDS)) * randB
+                        )
+                    }
+                    Axis.Z -> {
+                        cloudNode.setLocalTranslation(
+                            locEase(life.toDouble(SECONDS)) * randA,
+                            locEase(life.toDouble(SECONDS)) * randB,
+                            locEase(life.toDouble(SECONDS)) * 6
+                        )
+                    }
+                }
             } else {
                 cloudNode.setLocalTranslation(
                     locEase(life.toDouble(SECONDS)) * 6,

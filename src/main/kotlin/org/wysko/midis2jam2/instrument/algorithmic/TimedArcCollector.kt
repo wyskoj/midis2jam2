@@ -50,10 +50,12 @@ class TimedArcCollector(
     /** Advances the play head forwards to update the set of current note periods, given the current [time]. */
     fun advance(time: Duration): AdvanceResult {
         var hasChanged = false
+        val newlyRemovedTimedArcs = mutableSetOf<TimedArc>()
         // Collect Arcs that need to be added to the heap
         while (currentIndex < arcs.size && arcs[currentIndex].startTime <= time) {
             val np = arcs[currentIndex]
             heap.insert(np.endTime.toDouble(SECONDS), np)
+            newlyRemovedTimedArcs += np
             currentTimedArcs.add(np)
             currentIndex++
             hasChanged = true
@@ -68,7 +70,7 @@ class TimedArcCollector(
             }
         }
 
-        return AdvanceResult(currentTimedArcs, hasChanged)
+        return AdvanceResult(currentTimedArcs, newlyRemovedTimedArcs, hasChanged)
     }
 
     /**
@@ -89,5 +91,5 @@ class TimedArcCollector(
     /** Returns the last fully elapsed [TimedArc]. */
     override fun prev(): TimedArc? = lastRemoved
 
-    class AdvanceResult(val currentTimedArcs: Set<TimedArc>, val hasChanged: Boolean)
+    class AdvanceResult(val currentTimedArcs: Set<TimedArc>, val newlyRemovedTimedArcs: Set<TimedArc>, val hasChanged: Boolean)
 }
