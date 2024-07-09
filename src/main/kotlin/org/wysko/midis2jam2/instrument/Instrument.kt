@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.loc
@@ -39,8 +40,9 @@ import kotlin.time.DurationUnit.SECONDS
  *
  * @property context The context to the main class.
  */
-abstract class Instrument(val context: Midis2jam2) {
-
+abstract class Instrument(
+    val context: Midis2jam2,
+) {
     /**
      * This node is translated when multiple instances of the same instrument are on the stage.
      * It is at the top of the node hierarchy.
@@ -81,16 +83,24 @@ abstract class Instrument(val context: Midis2jam2) {
      * @see Visibility
      */
     open var isVisible: Boolean = true
-        get() = context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible || field
+        get() = (alwaysVisible()) || field
         set(value) {
             field = value
             with(context.root) {
-                if (context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible || field) {
+                if (alwaysVisible() || field) {
                     this += root
                 } else {
                     this -= root
                 }
             }
+        }
+
+    private fun alwaysVisible() =
+        if (this is DrumSet) {
+            context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible &&
+                context.drumSetVisibilityManager.currentlyVisibleDrumSet == this
+        } else {
+            context.configs.getType(SettingsConfiguration::class).instrumentsAlwaysVisible
         }
 
     init {
@@ -105,7 +115,10 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param time The current time since the beginning of the song, in seconds.
      * @param delta The amount of time that elapsed since the last frame, in seconds.
      */
-    abstract fun tick(time: Duration, delta: Duration)
+    abstract fun tick(
+        time: Duration,
+        delta: Duration,
+    )
 
     /**
      * Calculates the visibility of the instrument.
@@ -113,7 +126,10 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param time The current time since the beginning of the song, in seconds.
      * @param future Whether to calculate the visibility for the future.
      */
-    abstract fun calculateVisibility(time: Duration, future: Boolean = false): Boolean
+    abstract fun calculateVisibility(
+        time: Duration,
+        future: Boolean = false,
+    ): Boolean
 
     /**
      * Called when the instrument's [visibility][isVisible] changes from `false` to `true`.
@@ -137,10 +153,11 @@ abstract class Instrument(val context: Midis2jam2) {
             }
 
             is MultipleInstancesRadialAdjustment -> {
-                root.rot = rotationAxis
-                    .identity
-                    .clone()
-                    .mult(baseAngle + rotationAngle * updateInstrumentIndex(delta))
+                root.rot =
+                    rotationAxis
+                        .identity
+                        .clone()
+                        .mult(baseAngle + rotationAngle * updateInstrumentIndex(delta))
             }
         }
     }
@@ -153,11 +170,12 @@ abstract class Instrument(val context: Midis2jam2) {
      * @see index
      */
     protected fun updateInstrumentIndex(delta: Duration): Float {
-        val targetIndex = if (isVisible) {
-            findSimilarAndVisible().indexOf(this).coerceAtLeast(0)
-        } else {
-            findSimilarAndVisible().size - 1
-        }
+        val targetIndex =
+            if (isVisible) {
+                findSimilarAndVisible().indexOf(this).coerceAtLeast(0)
+            } else {
+                findSimilarAndVisible().size - 1
+            }
         index += delta.toDouble(SECONDS) * 2500 * (targetIndex - index) / 500.0
         index = index.coerceAtMost(findSimilar().size.toDouble())
         return index.toFloat()
@@ -179,10 +197,14 @@ abstract class Instrument(val context: Midis2jam2) {
      * @param name The name of the property.
      * @param value The value of the property.
      */
-    protected fun formatProperty(name: String, value: Any): String = when (value) {
-        is Float -> "\t- $name: ${"%.3f".format(value)}\n"
-        else -> "\t- $name: $value\n"
-    }
+    protected fun formatProperty(
+        name: String,
+        value: Any,
+    ): String =
+        when (value) {
+            is Float -> "\t- $name: ${"%.3f".format(value)}\n"
+            else -> "\t- $name: $value\n"
+        }
 
     override fun toString(): String = "* ${this@Instrument.javaClass.simpleName} / ${"%.3f".format(index)}\n"
 }

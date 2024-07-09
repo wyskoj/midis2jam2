@@ -39,14 +39,21 @@ abstract class DrumSet(
 ) : PercussionInstrument(context, events.toMutableList()) {
     init {
         if (context.isFakeShadows) {
-            geometry += context.assetLoader.fakeShadow("Assets/DrumShadow.obj", "Assets/DrumShadow.png").apply {
-                loc = v3(0, 0.01, -80)
-            }
+            geometry +=
+                context.assetLoader.fakeShadow("Assets/DrumShadow.obj", "Assets/DrumShadow.png").apply {
+                    loc = v3(0, 0.01, -80)
+                }
         }
     }
 
-    override fun calculateVisibility(time: Duration, future: Boolean): Boolean =
-        (context.drumSetVisibilityManager.isVisible && context.drumSetVisibilityManager.currentlyVisibleDrumSet == this).also {
+    override fun calculateVisibility(
+        time: Duration,
+        future: Boolean,
+    ): Boolean =
+        (
+            context.drumSetVisibilityManager.isVisible &&
+                context.drumSetVisibilityManager.currentlyVisibleDrumSet == this
+        ).also {
             if (!isVisible && it) onEntry()
             if (isVisible && !it) onExit()
         }
