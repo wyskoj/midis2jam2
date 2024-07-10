@@ -26,8 +26,8 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
-import kotlin.time.Duration
 import kotlin.math.abs
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -36,14 +36,14 @@ import kotlin.time.Duration.Companion.seconds
  * @property context The context to the main class.
  * @property events The list of the text events.
  */
-class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Text>) {
+class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Lyric>) {
 
     private val font = context.assetManager.loadFont("Assets/Fonts/Inter.fnt")
 
     private val words = events.filter { !separators.contains(it.text) }
     private val lines = events.partitionByNewLines()
 
-    private var currentWord: MetaEvent.Text? = null
+    private var currentWord: MetaEvent.Lyric? = null
     private var currentLine: LyricLine? = null
 
     private val wordCollector = EventCollector(context, words, onSeek = { currentWord = it.prev() })
@@ -180,11 +180,11 @@ private fun String.clean() = when {
     else -> this
 }
 
-private fun List<MetaEvent.Text>.renderString(): String = joinToString("") { it.text.display() }
+private fun List<MetaEvent.Lyric>.renderString(): String = joinToString("") { it.text.display() }
 
-private fun List<MetaEvent.Text>.partitionByNewLines(): List<LyricLine> {
+private fun List<MetaEvent.Lyric>.partitionByNewLines(): List<LyricLine> {
     val result = mutableListOf<LyricLine>()
-    var line = mutableListOf<MetaEvent.Text>()
+    var line = mutableListOf<MetaEvent.Lyric>()
 
     forEach { item ->
         when {
@@ -217,7 +217,7 @@ private fun List<MetaEvent.Text>.partitionByNewLines(): List<LyricLine> {
     if (result.size == 1) {
         // The file had no newlines, so we should split it if a lyric ends with a .!?
         val newResult = mutableListOf<LyricLine>()
-        var newLine = mutableListOf<MetaEvent.Text>()
+        var newLine = mutableListOf<MetaEvent.Lyric>()
         result[0].forEach {
             newLine.add(it)
             if (it.text.trim().endsWith(".") || it.text.trim().endsWith("!") || it.text.trim().endsWith("?")) {

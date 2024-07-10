@@ -24,7 +24,7 @@ import kotlin.time.Duration
 /**
  * A line of lyrics.
  */
-internal typealias LyricLine = List<MetaEvent.Text>
+internal typealias LyricLine = List<MetaEvent.Lyric>
 
 
 context(Midis2jam2)

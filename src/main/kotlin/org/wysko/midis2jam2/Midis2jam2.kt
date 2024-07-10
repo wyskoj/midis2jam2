@@ -245,7 +245,7 @@ abstract class Midis2jam2(
                     this,
                     sequence.smf.tracks
                         .flatMap { it.events }
-                        .filterIsInstance<MetaEvent.Text>(),
+                        .filterIsInstance<MetaEvent.Lyric>(),
                 )
             } else {
                 null
