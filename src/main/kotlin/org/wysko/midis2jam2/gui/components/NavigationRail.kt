@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRailItem
@@ -34,20 +35,30 @@ import org.wysko.midis2jam2.gui.TabFactory
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 
 @Composable
-fun NavigationRail(currentScreen: ApplicationScreen, tabClickHandler: (ApplicationScreen) -> Unit) {
+fun NavigationRail(
+    currentScreen: ApplicationScreen,
+    tabClickHandler: (ApplicationScreen) -> Unit,
+) {
     Row {
         androidx.compose.material3.NavigationRail {
             Spacer(Modifier.weight(1f))
             TabFactory.tabs.forEach {
-                NavigationRailItem(icon = {
-                    Icon(
-                        if (currentScreen.uid == it.uid) it.filledIcon else it.outlinedIcon,
-                        contentDescription = I18n[it.i18nKey].value
-                    )
-                }, label = { Text(I18n[it.i18nKey].value) }, selected = when (currentScreen) {
-                    is ApplicationScreen.ScreenWithTab -> currentScreen.uid == it.uid
-                    is ApplicationScreen.ScreenWithoutTab -> currentScreen.parentScreen.uid == it.uid
-                }, onClick = { tabClickHandler(it) })
+                NavigationRailItem(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    icon = {
+                        Icon(
+                            if (currentScreen.uid == it.uid) it.filledIcon else it.outlinedIcon,
+                            contentDescription = I18n[it.i18nKey].value,
+                        )
+                    },
+                    label = { Text(I18n[it.i18nKey].value) },
+                    selected =
+                        when (currentScreen) {
+                            is ApplicationScreen.ScreenWithTab -> currentScreen.uid == it.uid
+                            is ApplicationScreen.ScreenWithoutTab -> currentScreen.parentScreen.uid == it.uid
+                        },
+                    onClick = { tabClickHandler(it) },
+                )
                 Spacer(Modifier.height(12.dp))
             }
             Spacer(Modifier.weight(1f))
