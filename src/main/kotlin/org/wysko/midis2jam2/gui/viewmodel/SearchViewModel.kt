@@ -187,7 +187,7 @@ class SearchViewModel {
         }
 
         _matchingMidiFiles.value = searchEngine.index.filter { (_, instruments) ->
-            instruments.containsAll(selectedInstruments.value.map { generalMidiInstruments.indexOf(it) })
+            instruments.containsAll(selectedInstruments.value.map { generalMidiInstruments.indexOf(it).toByte() })
         }.keys.toList().sortedBy { it.name.lowercase() }
     }
 

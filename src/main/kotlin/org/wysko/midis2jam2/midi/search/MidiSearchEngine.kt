@@ -21,12 +21,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.wysko.midis2jam2.midi.StandardMidiFileReader
+import org.wysko.kmidi.midi.StandardMidiFile
+import org.wysko.kmidi.midi.StandardMidiFileReader
+import org.wysko.kmidi.midi.event.Event
+import org.wysko.kmidi.midi.event.ProgramEvent
+import org.wysko.kmidi.readFile
 import java.io.File
-import javax.sound.midi.MidiMessage
-import javax.sound.midi.Sequence
-import javax.sound.midi.ShortMessage
-import javax.sound.midi.Track
 
 /**
  * Represents the list of file extensions for MIDI files.
@@ -46,13 +46,12 @@ class MidiSearchEngine(
     private val directory: File,
     private val searchRecursively: Boolean,
 ) {
-
     /**
      * Maps MIDI files to a list of the instruments used in the file.
      * **This property is only valid after `buildIndex`
      * has finished successfully.**
      */
-    lateinit var index: Map<File, List<Int>>
+    lateinit var index: Map<File, List<Byte>>
 
     private var indexJob: Job? = null
     private val midiFileReader = StandardMidiFileReader()
@@ -73,7 +72,9 @@ class MidiSearchEngine(
          *
          * @param value The percentage of the total progress, from 0 to 100.
          */
-        data class Percentage(val value: Int) : IndexingProgress()
+        data class Percentage(
+            val value: Int,
+        ) : IndexingProgress()
     }
 
     /**
@@ -94,24 +95,26 @@ class MidiSearchEngine(
     fun buildIndex(
         onFinish: () -> Unit = {},
         onProgress: (IndexingProgress) -> Unit = {},
-        onError: (Throwable) -> Unit = {}
+        onError: (Throwable) -> Unit = {},
     ) {
-        indexJob = CoroutineScope(IO).launch {
-            try {
-                onProgress(IndexingProgress.Indeterminate)
-                val midiFiles = if (searchRecursively) {
-                    searchRecursively(directory)
-                } else {
-                    searchNonRecursively(directory)
-                }
-                val asSequences = extractSequencesFromMidiFiles(midiFiles, onProgress)
-                index = buildProgramChangeIndex(asSequences)
+        indexJob =
+            CoroutineScope(IO).launch {
+                try {
+                    onProgress(IndexingProgress.Indeterminate)
+                    val midiFiles =
+                        if (searchRecursively) {
+                            searchRecursively(directory)
+                        } else {
+                            searchNonRecursively(directory)
+                        }
+                    val asSequences = extractSequencesFromMidiFiles(midiFiles, onProgress)
+                    index = buildProgramChangeIndex(asSequences)
 
-                onFinish()
-            } catch (e: Throwable) {
-                onError(e)
+                    onFinish()
+                } catch (e: Throwable) {
+                    onError(e)
+                }
             }
-        }
     }
 
     /** Cancels the currently running index job, if any. */
@@ -130,21 +133,27 @@ class MidiSearchEngine(
      */
     private fun extractSequencesFromMidiFiles(
         midiFiles: List<File>,
-        onProgress: (IndexingProgress) -> Unit
-    ): Map<File, Sequence> = midiFiles.mapIndexedNotNull { index, file ->
-        runCatching { midiFileReader.getSequence(file) }.getOrNull()?.let { file to it }
-            .also {
-                onProgress(IndexingProgress.Percentage((index + 1) * 100 / midiFiles.size))
-            }
-    }.toMap()
+        onProgress: (IndexingProgress) -> Unit,
+    ): Map<File, StandardMidiFile> =
+        midiFiles
+            .mapIndexedNotNull { index, file ->
+                runCatching { midiFileReader.readFile(file) }
+                    .getOrNull()
+                    ?.let { file to it }
+                    .also {
+                        onProgress(IndexingProgress.Percentage((index + 1) * 100 / midiFiles.size))
+                    }
+            }.toMap()
 
     /**
      * Builds the program change index for a given collection of sequences.
      *
-     * @param sequences The collection of sequences to process. The keys represent the files and the values represent the sequences.
-     * @return A map that associates each file with a list of program change events extracted from its corresponding sequence.
+     * @param sequences The collection of sequences to process.
+     * The keys represent the files and the values represent the sequences.
+     * @return A map that associates each file with a list of program change events extracted from its corresponding
+     * sequence.
      */
-    private fun buildProgramChangeIndex(sequences: Map<File, Sequence>): Map<File, List<Int>> =
+    private fun buildProgramChangeIndex(sequences: Map<File, StandardMidiFile>): Map<File, List<Byte>> =
         sequences.mapValues { (_, sequence) -> extractProgramChangeEvents(sequence) }
 
     /**
@@ -153,7 +162,7 @@ class MidiSearchEngine(
      * @param sequence The input sequence from which to extract program change events.
      * @return A list of integers representing the program change events extracted from the sequence.
      */
-    private fun extractProgramChangeEvents(sequence: Sequence): List<Int> =
+    private fun extractProgramChangeEvents(sequence: StandardMidiFile): List<Byte> =
         sequence.tracks.flatMap { track -> extractDataFromEvents(track) }
 
     /**
@@ -162,18 +171,17 @@ class MidiSearchEngine(
      * @param track The track from which to extract the data.
      * @return The list of extracted data integers.
      */
-    private fun extractDataFromEvents(track: Track): List<Int> =
-        track.events().mapNotNull { event -> extractProgramChangeData1Value(event.message) }
+    private fun extractDataFromEvents(track: StandardMidiFile.Track): List<Byte> =
+        track.events.mapNotNull { event -> extractProgramChangeData1Value(event) }
 
     /**
      * Processes the provided MIDI message and returns the data1 value if the message is a program change
      * command (ShortMessage.PROGRAM_CHANGE).
      *
-     * @param message The MIDI message to process.
+     * @param event The MIDI message to process.
      * @return The data1 value of the message if it's a program change command, otherwise null.
      */
-    private fun extractProgramChangeData1Value(message: MidiMessage): Int? =
-        (message as? ShortMessage)?.takeIf { it.command == ShortMessage.PROGRAM_CHANGE }?.data1
+    private fun extractProgramChangeData1Value(event: Event): Byte? = if (event is ProgramEvent) event.program else null
 
     /**
      * Search recursively for MIDI files in the given directory.
@@ -189,9 +197,10 @@ class MidiSearchEngine(
      * @param directory The directory to search in.
      * @return A list of MIDI files found in the directory.
      */
-    private fun searchNonRecursively(directory: File): List<File> = directory.listFiles()?.filter { file ->
-        isMidiFile(file)
-    } ?: emptyList()
+    private fun searchNonRecursively(directory: File): List<File> =
+        directory.listFiles()?.filter { file ->
+            isMidiFile(file)
+        } ?: emptyList()
 
     /**
      * Checks whether the given file is a MIDI file.
@@ -202,12 +211,3 @@ class MidiSearchEngine(
      */
     private fun isMidiFile(file: File) = file.isFile && file.extension.lowercase() in MIDI_FILE_EXTENSIONS
 }
-
-/**
- * Returns a list of events associated with the track.
- *
- * This method iterates over all the elements in the track and creates a new list containing all the events.
- *
- * @return A list of events.
- */
-private fun Track.events() = (0..<size()).map { index -> get(index) }
