@@ -45,6 +45,7 @@ import javax.sound.midi.MidiSystem
 import javax.sound.midi.MidiUnavailableException
 import javax.sound.midi.Sequence
 import javax.sound.midi.Sequencer
+import javax.sound.midi.Synthesizer
 
 /**
  * This class represents the execution of a MIDI file with given configurations.
@@ -100,7 +101,7 @@ object Execution {
                 return@launch
             }
 
-            val sequencer = try {
+            val (sequencer, synthesizer) = try {
                 getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
             } catch (e: Exception) {
                 logger().errorDisp("There was an error.", e)
@@ -109,7 +110,7 @@ object Execution {
             }
 
             onReady()
-            Midis2jam2Application(midiFile, configurations, onFinish, sequencer).execute()
+            Midis2jam2Application(midiFile, configurations, onFinish, sequencer, synthesizer).execute()
         }
     }
 
@@ -117,7 +118,7 @@ object Execution {
         homeConfiguration: HomeConfiguration,
         midiDevice: MidiDevice,
         sequence: Sequence?,
-    ): Sequencer {
+    ): Pair<Sequencer, Synthesizer?> {
         val provider = RealTimeSequencerProvider()
         return when (homeConfiguration.selectedMidiDevice) {
             GERVILL -> {
@@ -127,17 +128,17 @@ object Execution {
                 }
 
                 provider.getDevice(provider.deviceInfo[0])
-                    .apply { transmitter.receiver = synthesizer.receiver } as Sequencer
+                    .apply { transmitter.receiver = synthesizer.receiver } as Sequencer to synthesizer
             }
 
             else -> {
                 midiDevice.open()
                 provider.getDevice(provider.deviceInfo[0])
-                    .apply { transmitter.receiver = midiDevice.receiver } as Sequencer
+                    .apply { transmitter.receiver = midiDevice.receiver } as Sequencer to null
             }
         }.also {
-            it.open()
-            it.sequence = sequence
+            it.first.open()
+            it.first.sequence = sequence
         }
     }
 }
@@ -147,6 +148,7 @@ private class Midis2jam2Application(
     val configurations: Collection<Configuration>,
     val onFinish: () -> Unit,
     val sequencer: Sequencer,
+    val synthesizer: Synthesizer?,
 ) : SimpleApplication() {
     fun execute() {
         val jmeSettings = AppSettings(false).apply { copyFrom(DEFAULT_JME_SETTINGS) }
@@ -192,7 +194,8 @@ private class Midis2jam2Application(
             midiFile = sequence,
             onClose = { stop() },
             configs = configurations,
-            fileName = file.name
+            fileName = file.name,
+            synthesizer = synthesizer,
         ).also {
             stateManager.attach(it)
             rootNode.attachChild(it.root)

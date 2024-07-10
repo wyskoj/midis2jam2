@@ -24,6 +24,7 @@ import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.SynthesizerConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
@@ -32,6 +33,7 @@ import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import javax.sound.midi.Sequencer
+import javax.sound.midi.Synthesizer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
@@ -49,6 +51,7 @@ class DesktopMidis2jam2(
     val sequencer: Sequencer,
     val midiFile: TimeBasedSequence,
     val onClose: () -> Unit,
+    val synthesizer: Synthesizer?,
     configs: Collection<Configuration>,
 ) : Midis2jam2(midiFile, fileName, configs) {
 
@@ -187,10 +190,20 @@ class DesktopMidis2jam2(
 
     private fun startSequencerIfNeeded() {
         if (!isSequencerStarted && time > ZERO) {
-            with(sequencer) {
-                start()
-            }
+            sequencer.start()
             isSequencerStarted = true
+            setSynthEffects()
+        }
+    }
+
+    private fun setSynthEffects() {
+        synthesizer?.let {
+            if (!configs.getType(SynthesizerConfiguration::class).isReverbEnabled) {
+                synthesizer.channels.forEach { it.controlChange(91, 0) }
+            }
+            if (!configs.getType(SynthesizerConfiguration::class).isChorusEnabled) {
+                synthesizer.channels.forEach { it.controlChange(93, 0) }
+            }
         }
     }
 }

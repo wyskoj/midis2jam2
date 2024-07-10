@@ -17,7 +17,12 @@
 
 package org.wysko.midis2jam2.gui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedButton
@@ -97,6 +102,13 @@ fun SettingsScreen(
             { Text(I18n["settings_features_soundbanks_description"].value) },
             onOpenOptions = {
                 openScreen(TabFactory.soundbankConfiguration)
+            }
+        )
+        SettingsListItem(
+            { Text(I18n["settings_features_synthesizer"].value) },
+            { Text(I18n["settings_features_synthesizer_description"].value) },
+            onOpenOptions = {
+                openScreen(TabFactory.synthesizerConfiguration)
             }
         )
         SettingsListItem(

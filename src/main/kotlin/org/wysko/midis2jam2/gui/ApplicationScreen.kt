@@ -120,5 +120,10 @@ object TabFactory {
         parentScreen = settings,
     )
 
+    val synthesizerConfiguration = ApplicationScreen.ScreenWithoutTab(
+        name = "tab_synthesizer",
+        parentScreen = settings,
+    )
+
     val tabs: List<ApplicationScreen.ScreenWithTab> = listOf(home, search, settings, about)
 }
