@@ -1,10 +1,12 @@
 = 🎵 midis2jam2
 
 image:https://img.shields.io/github/v/release/wyskoj/midis2jam2[]
-image:https://img.shields.io/github/license/wyskoj/midis2jam2[]
+image:https://img.shields.io/github/downloads/wyskoj/midis2jam2/total[GitHub Downloads (all assets, all releases)]
 image:https://img.shields.io/appveyor/build/wyskoj/midis2jam2[]
-image:https://img.shields.io/tokei/lines/github/wyskoj/midis2jam2[]
+image:https://img.shields.io/codacy/grade/2685466ed5224e58b52d707a64737352[Codacy grade]
+image:https://img.shields.io/github/license/wyskoj/midis2jam2[]
 image:https://img.shields.io/github/issues-closed/wyskoj/midis2jam2[]
+image:https://img.shields.io/discord/815077208149327882[Discord]
 
 midis2jam2 is a remaster of MIDIJam, a 3D MIDI file visualizer.
 It plays and animates any MIDI file with a 3D virtual band.
