@@ -108,7 +108,6 @@ class BagPipe(
         collector.advance(time).newlyRemovedTimedArcs.sortedBy { it.note }.forEach {
             val midiNote = removeSharpsAndFlats(it.note)
             fingeringManager.fingering(midiNote)?.let { hands ->
-                println(hands)
                 updateHandVisibility(hands)
             }
         }
