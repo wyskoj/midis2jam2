@@ -17,7 +17,12 @@
 
 package org.wysko.midis2jam2.gui.viewmodel
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import org.wysko.midis2jam2.starter.configuration.APPLICATION_CONFIG_HOME
 import org.wysko.midis2jam2.util.logger
 import java.io.File
@@ -31,10 +36,12 @@ private val LOCALE_FILE = File(APPLICATION_CONFIG_HOME, "locale.txt")
 object I18n {
 
     private val supportedLocales = arrayOf(
+        "de",
         "en",
         "es",
         "fi",
         "fr",
+        "hi",
         "it",
         "no",
         "ru",
