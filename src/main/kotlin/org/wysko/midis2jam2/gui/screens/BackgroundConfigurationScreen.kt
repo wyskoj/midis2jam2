@@ -18,11 +18,11 @@
 package org.wysko.midis2jam2.gui.screens
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -56,7 +56,7 @@ import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
 import kotlin.reflect.KClass
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackgroundConfigurationScreen(
     viewModel: BackgroundConfigurationViewModel,
@@ -74,15 +74,18 @@ fun BackgroundConfigurationScreen(
         })
     }) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(
-                state = rememberScrollState(),
-            )
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .verticalScroll(
+                        state = rememberScrollState(),
+                    ).fillMaxWidth(),
         ) {
             TextWithLink(
                 Modifier.padding(horizontal = 16.dp),
                 I18n["background_configure_description"].value,
                 I18n["background_configure_description_link"].value,
-                Linkable.File(BACKGROUND_IMAGES_FOLDER)
+                Linkable.File(BACKGROUND_IMAGES_FOLDER),
             )
             SettingsSectionHeader(I18n["background_type"].value)
             BackgroundOptions(backgroundClass, viewModel)
@@ -110,47 +113,55 @@ private fun ColorBackground(viewModel: BackgroundConfigurationViewModel) {
 
 @Composable
 private fun BackgroundOptions(
-    backgroundClass: KClass<out BackgroundConfiguration>, viewModel: BackgroundConfigurationViewModel
+    backgroundClass: KClass<out BackgroundConfiguration>,
+    viewModel: BackgroundConfigurationViewModel,
 ) {
     Column(
-        Modifier.selectableGroup()
+        Modifier.selectableGroup(),
     ) {
         RadioButtonWithText(
-            backgroundClass == BackgroundConfiguration.DefaultBackground::class, onSelected = {
+            backgroundClass == BackgroundConfiguration.DefaultBackground::class,
+            onSelected = {
                 viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.DefaultBackground::class)
-            }, text = I18n["background_type_default"].value
+            },
+            text = I18n["background_type_default"].value,
         )
         RadioButtonWithText(
-            backgroundClass == BackgroundConfiguration.RepeatedCubeMapBackground::class, onSelected = {
+            backgroundClass == BackgroundConfiguration.RepeatedCubeMapBackground::class,
+            onSelected = {
                 viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.RepeatedCubeMapBackground::class)
-            }, text = I18n["background_type_repeated_cubemap"].value
+            },
+            text = I18n["background_type_repeated_cubemap"].value,
         )
         RadioButtonWithText(
-            backgroundClass == BackgroundConfiguration.UniqueCubeMapBackground::class, onSelected = {
+            backgroundClass == BackgroundConfiguration.UniqueCubeMapBackground::class,
+            onSelected = {
                 viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.UniqueCubeMapBackground::class)
-            }, text = I18n["background_type_unique_cubemap"].value
+            },
+            text = I18n["background_type_unique_cubemap"].value,
         )
         RadioButtonWithText(
-            backgroundClass == BackgroundConfiguration.ColorBackground::class, onSelected = {
+            backgroundClass == BackgroundConfiguration.ColorBackground::class,
+            onSelected = {
                 viewModel.setSelectedBackgroundConfigurationClass(BackgroundConfiguration.ColorBackground::class)
-            }, text = I18n["background_type_color"].value
+            },
+            text = I18n["background_type_color"].value,
         )
     }
 }
 
-
 @Composable
-private fun RepeatedCubemapBackground(
-    viewModel: BackgroundConfigurationViewModel
-) {
+private fun RepeatedCubemapBackground(viewModel: BackgroundConfigurationViewModel) {
     val images by viewModel.availableImages.collectAsState()
     val config by viewModel.repeatedCubeMapBackgroundConfiguration.collectAsState()
 
     Column(
-        Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+        Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         RefreshImagesButton(viewModel)
-        ExposedDropDownMenu(Modifier.width(512.dp),
+        ExposedDropDownMenu(
+            Modifier.width(512.dp),
             images,
             config.texture,
             I18n["background_cubemap_texture"].value,
@@ -158,21 +169,19 @@ private fun RepeatedCubemapBackground(
                 viewModel.setRepeatedCubemapTexture(it)
             },
             displayText = { it },
-            secondaryText = null
+            secondaryText = null,
         )
     }
 }
 
-
 @Composable
-private fun UniqueCubemapBackground(
-    viewModel: BackgroundConfigurationViewModel
-) {
+private fun UniqueCubemapBackground(viewModel: BackgroundConfigurationViewModel) {
     val images by viewModel.availableImages.collectAsState()
     val config by viewModel.uniqueCubeMapBackgroundConfiguration.collectAsState()
 
     Column(
-        modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         RefreshImagesButton(viewModel)
         ExposedDropDownMenu(
@@ -184,7 +193,7 @@ private fun UniqueCubemapBackground(
                 viewModel.setUniqueCubemapTexture(config.cubemap.copy(north = it))
             },
             displayText = { it ?: "" },
-            secondaryText = null
+            secondaryText = null,
         )
         ExposedDropDownMenu(
             Modifier.width(512.dp),
@@ -195,7 +204,7 @@ private fun UniqueCubemapBackground(
                 viewModel.setUniqueCubemapTexture(config.cubemap.copy(south = it))
             },
             displayText = { it ?: "" },
-            secondaryText = null
+            secondaryText = null,
         )
         ExposedDropDownMenu(
             Modifier.width(512.dp),
@@ -206,7 +215,7 @@ private fun UniqueCubemapBackground(
                 viewModel.setUniqueCubemapTexture(config.cubemap.copy(east = it))
             },
             displayText = { it ?: "" },
-            secondaryText = null
+            secondaryText = null,
         )
         ExposedDropDownMenu(
             Modifier.width(512.dp),
@@ -217,7 +226,7 @@ private fun UniqueCubemapBackground(
                 viewModel.setUniqueCubemapTexture(config.cubemap.copy(west = it))
             },
             displayText = { it ?: "" },
-            secondaryText = null
+            secondaryText = null,
         )
         ExposedDropDownMenu(
             Modifier.width(512.dp),
@@ -228,7 +237,7 @@ private fun UniqueCubemapBackground(
                 viewModel.setUniqueCubemapTexture(config.cubemap.copy(up = it))
             },
             displayText = { it ?: "" },
-            secondaryText = null
+            secondaryText = null,
         )
         ExposedDropDownMenu(
             Modifier.width(512.dp),
@@ -239,7 +248,7 @@ private fun UniqueCubemapBackground(
                 viewModel.setUniqueCubemapTexture(config.cubemap.copy(down = it))
             },
             displayText = { it ?: "" },
-            secondaryText = null
+            secondaryText = null,
         )
     }
 }

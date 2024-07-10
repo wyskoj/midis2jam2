@@ -19,12 +19,14 @@ package org.wysko.midis2jam2
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +36,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -195,50 +199,63 @@ suspend fun main(args: Array<String>) {
                 Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
                     when (it.value) {
                         true -> ErrorDialog()
-                        false -> SetupUi(
-                            homeViewModel,
-                            searchViewModel,
-                            settingsViewModel,
-                            backgroundConfigurationViewModel,
-                            graphicsConfigurationViewModel,
-                            soundBankConfigurationViewModel,
-                            synthesizerConfigurationViewModel,
-                            isLockPlayButton,
-                        ) {
-                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
-                            when (backgroundConfiguration) {
-                                is BackgroundConfiguration.CubemapBackground -> {
-                                    if (!backgroundConfiguration.validate()) {
-                                        logger().errorDisp(
-                                            "Background configuration is invalid. Perhaps you forgot to set a texture?",
-                                            Throwable("Invalid background configuration"),
-                                        )
-                                        return@SetupUi
-                                    }
-                                }
-
-                                else -> Unit
+                        false ->
+                            CompositionLocalProvider(
+                                LocalLayoutDirection provides
+                                    when (
+                                        I18n.currentLocale.language
+                                    ) {
+                                        "ar" -> LayoutDirection.Rtl
+                                        else -> LayoutDirection.Ltr
                             }
-                            Execution.start(
-                                midiFile = homeViewModel.midiFile.value!!,
-                                configurations = listOf(
-                                    homeViewModel.generateConfiguration(),
-                                    settingsViewModel.generateConfiguration(),
-                                    backgroundConfiguration,
-                                    graphicsConfigurationViewModel.generateConfiguration(),
-                                    soundBankConfigurationViewModel.generateConfiguration(),
-                                    synthesizerConfigurationViewModel.generateConfiguration()
-                                ),
-                                onStart = {
-                                    isLockPlayButton = true
-                                },
-                                onReady = {
-                                    // Nothing to do.
-                                },
-                                onFinish = {
-                                    isLockPlayButton = false
-                                },
-                            )
+                        ) {
+                            Box {
+                                SetupUi(
+                                    homeViewModel,
+                                    searchViewModel,
+                                    settingsViewModel,
+                                    backgroundConfigurationViewModel,
+                                    graphicsConfigurationViewModel,
+                                    soundBankConfigurationViewModel,
+                                    synthesizerConfigurationViewModel,
+                                    isLockPlayButton,
+                                ) {
+                                    val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                                    when (backgroundConfiguration) {
+                                        is BackgroundConfiguration.CubemapBackground -> {
+                                            if (!backgroundConfiguration.validate()) {
+                                                logger().errorDisp(
+                                                    "Background configuration is invalid. Perhaps you forgot to set a texture?",
+                                                    Throwable("Invalid background configuration"),
+                                                )
+                                                return@SetupUi
+                                            }
+                                        }
+
+                                        else -> Unit
+                                    }
+                                    Execution.start(
+                                        midiFile = homeViewModel.midiFile.value!!,
+                                        configurations = listOf(
+                                            homeViewModel.generateConfiguration(),
+                                            settingsViewModel.generateConfiguration(),
+                                            backgroundConfiguration,
+                                            graphicsConfigurationViewModel.generateConfiguration(),
+                                            soundBankConfigurationViewModel.generateConfiguration(),
+                                            synthesizerConfigurationViewModel.generateConfiguration()
+                                        ),
+                                        onStart = {
+                                            isLockPlayButton = true
+                                        },
+                                        onReady = {
+                                            // Nothing to do.
+                                        },
+                                        onFinish = {
+                                            isLockPlayButton = false
+                                        },
+                                    )
+                                }
+                            }
                         }
                     }
                 }

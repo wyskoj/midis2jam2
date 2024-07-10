@@ -44,6 +44,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property sequencer The sequencer responsible for playing the MIDI file.
  * @property midiFile The MIDI file that this instance is playing.
  * @property onClose A function to call when the application is closed.
+ * @property synthesizer The synthesizer responsible for playing the MIDI file, if any.
  * @param configs A collection of the application's configurations.
  */
 class DesktopMidis2jam2(

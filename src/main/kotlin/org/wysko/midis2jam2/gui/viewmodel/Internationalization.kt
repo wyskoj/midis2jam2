@@ -36,6 +36,7 @@ private val LOCALE_FILE = File(APPLICATION_CONFIG_HOME, "locale.txt")
 object I18n {
 
     private val supportedLocales = arrayOf(
+        "ar",
         "de",
         "en",
         "es",

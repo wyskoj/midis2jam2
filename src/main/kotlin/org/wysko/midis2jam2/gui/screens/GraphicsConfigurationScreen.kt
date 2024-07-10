@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.gui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -68,7 +69,7 @@ fun GraphicsConfigurationScreen(
     }) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             Column(
-                modifier = Modifier.verticalScroll(state = rememberScrollState()).padding(16.dp).width(512.dp),
+                modifier = Modifier.verticalScroll(state = rememberScrollState()).padding(16.dp).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 GraphicsOptions(viewModel, windowResolution, shadowQuality, antiAliasingQuality)
@@ -124,15 +125,17 @@ private fun <T> createDropDownMenu(
     selectedItem: T,
     onItemSelected: (T) -> Unit,
 ) {
-    ExposedDropDownMenu(
-        modifier = Modifier,
-        items = items,
-        selectedItem = selectedItem,
-        title = title,
-        displayText = { it.toString() },
-        secondaryText = null,
-        onItemSelected,
-    )
+    Box(Modifier.width(512.dp)) {
+        ExposedDropDownMenu(
+            modifier = Modifier,
+            items = items,
+            selectedItem = selectedItem,
+            title = title,
+            displayText = { it.toString() },
+            secondaryText = null,
+            onItemSelected,
+        )
+    }
 }
 
 /**
@@ -150,13 +153,15 @@ private fun createQualityDropDownMenu(
     selectedItem: QualityScale,
     onItemSelected: (QualityScale) -> Unit,
 ) {
-    ExposedDropDownMenu(
-        modifier = Modifier,
-        items = items,
-        selectedItem = selectedItem,
-        title = title,
-        displayText = { I18n[it.name.lowercase()].value },
-        secondaryText = null,
-        onItemSelected,
-    )
+    Box(Modifier.width(512.dp)) {
+        ExposedDropDownMenu(
+            modifier = Modifier,
+            items = items,
+            selectedItem = selectedItem,
+            title = title,
+            displayText = { I18n[it.name.lowercase()].value },
+            secondaryText = null,
+            onItemSelected,
+        )
+    }
 }
