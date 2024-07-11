@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -48,26 +47,25 @@ import org.wysko.midis2jam2.gui.loadDependencies
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.util.Utils
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen() {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Scaffold(
-            floatingActionButton = {
-                HelpButton()
-            },
+    Scaffold(
+        floatingActionButton = {
+            HelpButton()
+        },
+    ) {
+        LazyColumn(
+            Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
         ) {
-            LazyColumn(
-                Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-            ) {
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                        Midis2jam2Logo()
-                        Text(I18n["midis2jam2_description"].value, style = MaterialTheme.typography.titleLarge)
-                    }
+            item {
+                Spacer(Modifier.height(16.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    Midis2jam2Logo()
+                    Text(I18n["midis2jam2_description"].value, style = MaterialTheme.typography.titleLarge)
+                }
 
-                    HorizontalDivider(Modifier.padding(vertical = 16.dp))
+                HorizontalDivider(Modifier.padding(vertical = 16.dp))
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Text("Copyright © MMXXI–MMXXIV Jacob Wysko • ${Utils.resourceToString("/version.txt")}")
                     Text("This program comes with absolutely no warranty.")
                     TextWithLink(
