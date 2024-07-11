@@ -7,14 +7,14 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     application
-    kotlin("jvm") version "1.9.21"
-    kotlin("plugin.serialization") version "1.9.21"
-    id("org.jetbrains.compose") version "1.6.11"
-    id("io.gitlab.arturbosch.detekt") version ("1.23.6")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.github.hierynomus.license-report") version "0.16.1"
-    id("com.autonomousapps.dependency-analysis") version "1.32.0"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.licenseReport)
+    alias(libs.plugins.dependencyAnalysis)
+    alias(libs.plugins.versions)
 }
 
 repositories {
@@ -59,62 +59,57 @@ tasks.processResources {
 
 dependencies {
     // JMonkeyEngine
-    val jmeVersion = "3.6.1-stable"
-    implementation("org.jmonkeyengine:jme3-core:$jmeVersion")
-    implementation("org.jmonkeyengine:jme3-desktop:$jmeVersion")
-    implementation("org.jmonkeyengine:jme3-effects:$jmeVersion")
+    implementation(libs.bundles.jme3)
 
     // Compose Multiplatform
     if (project.ext.has("targetplatform")) {
         when (project.ext["targetplatform"]) {
             "windows" -> {
                 implementation(compose.desktop.windows_x64)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
+                implementation(libs.jme3.lwjgl3)
             }
 
             "macos_x64" -> {
                 implementation(compose.desktop.macos_x64)
-                implementation("org.jmonkeyengine:jme3-lwjgl:$jmeVersion")
+                implementation(libs.jme3.lwjgl)
             }
 
             "macos_arm64" -> {
                 implementation(compose.desktop.macos_arm64)
-                implementation("org.jmonkeyengine:jme3-lwjgl:$jmeVersion")
+                implementation(libs.jme3.lwjgl)
             }
 
             "linux_x64" -> {
                 implementation(compose.desktop.linux_x64)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
+                implementation(libs.jme3.lwjgl3)
             }
 
             "linux_arm64" -> {
                 implementation(compose.desktop.linux_arm64)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
+                implementation(libs.jme3.lwjgl3)
             }
 
             else -> {
                 println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
                 implementation(compose.desktop.currentOs)
-                implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
+                implementation(libs.jme3.lwjgl3)
             }
         }
         println("used platform: ${project.properties["targetplatform"]}")
     } else {
         println("used platform: current")
         implementation(compose.desktop.currentOs)
-        implementation("org.jmonkeyengine:jme3-lwjgl3:$jmeVersion")
+        implementation(libs.jme3.lwjgl3)
     }
     implementation(compose.material3)
-    implementation("com.darkrockstudios:mpfilepicker:2.0.2")
-
-    // Misc.
-    implementation("com.install4j:install4j-runtime:10.0.8")
-    implementation("org.spongepowered:noise:2.0.0-SNAPSHOT")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-    implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation(libs.mpfilepicker)
+    implementation(libs.install4j.runtime)
+    implementation(libs.noise)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.logback.classic)
+    implementation(libs.kmidi)
     implementation(files("libs/Gervill-0.2.31.jar", "libs/jme-ttf-2.2.2.jar"))
-    implementation("org.wysko:kmidi:0.0.6")
 }
 
 tasks.withType<ShadowJar> {
