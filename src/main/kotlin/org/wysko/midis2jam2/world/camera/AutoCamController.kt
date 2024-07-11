@@ -22,7 +22,11 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
-import org.wysko.midis2jam2.instrument.family.brass.*
+import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
+import org.wysko.midis2jam2.instrument.family.brass.StageHorns
+import org.wysko.midis2jam2.instrument.family.brass.Trombone
+import org.wysko.midis2jam2.instrument.family.brass.Trumpet
+import org.wysko.midis2jam2.instrument.family.brass.Tuba
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
@@ -30,15 +34,27 @@ import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings
 import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
 import org.wysko.midis2jam2.instrument.family.ensemble.Timpani
+import org.wysko.midis2jam2.instrument.family.ethnic.BagPipe
 import org.wysko.midis2jam2.instrument.family.guitar.Banjo
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
-import org.wysko.midis2jam2.instrument.family.percussive.*
+import org.wysko.midis2jam2.instrument.family.percussive.Agogos
+import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
+import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
+import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
+import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
+import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.instrument.family.pipe.*
+import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
+import org.wysko.midis2jam2.instrument.family.pipe.Flute
+import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
+import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
+import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
+import org.wysko.midis2jam2.instrument.family.pipe.Recorder
+import org.wysko.midis2jam2.instrument.family.pipe.Whistles
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -46,11 +62,16 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.*
+import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
+import org.wysko.midis2jam2.instrument.family.strings.Cello
+import org.wysko.midis2jam2.instrument.family.strings.Fiddle
+import org.wysko.midis2jam2.instrument.family.strings.Harp
+import org.wysko.midis2jam2.instrument.family.strings.Viola
+import org.wysko.midis2jam2.instrument.family.strings.Violin
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit.SECONDS
+import kotlin.time.DurationUnit
 
 /** The speed at which to transition from one camera angle to another. */
 private const val MOVE_SPEED = (1 / 3f)
@@ -63,6 +84,7 @@ private val WAIT_TIME = 3.seconds
  * randomly and moves the camera to them.
  */
 class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) {
+
     /** When true, the auto-cam controller is enabled. */
     var enabled: Boolean = startEnabled
         set(value) {
@@ -80,10 +102,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
     private var moving = false
 
     /** A list of previously used camera angles. */
-    private val angles =
-        mutableListOf<AutoCamPosition>().apply {
-            add(AutoCamPosition.GENERAL_A)
-        }
+    private val angles = mutableListOf(AutoCamPosition.GENERAL_A)
 
     /** The current amount of transition, from 0 to 1. */
     private var x = 0f
@@ -101,108 +120,107 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
     var currentRotation: Quaternion = AutoCamPosition.GENERAL_A.rotation.clone()
 
     /** Performs a tick of the auto-cam controller. */
-    fun tick(
-        time: Duration,
-        delta: Duration,
-    ): Boolean {
+    fun tick(time: Duration, delta: Duration): Boolean {
         if (!enabled) return false
 
-        // If the camera is not moving, and the song has started,
+        /* If the camera is not moving, and the song has started, */
         if (!moving && time > 0.seconds) {
-            // Increment the waiting timer
+            /* Increment the waiting timer */
             waiting += delta
 
-            // If the instrument dictates that it should no longer be focused on,
+            /* If the instrument dictates that it should no longer be focused on, */
             if (!angles.last().stayHere.invoke(time, context.instruments)) {
-                // Pick a new angle
+                /* Pick a new angle */
                 trigger()
             }
 
-            // Copy down the current location and rotation so that we can do some interpolation
+            /* Copy down the current location and rotation so that we can do some interpolation */
             startLocation = context.app.camera.location.clone()
             startRotation = context.app.camera.rotation.clone()
         }
 
-        // If we have waited longer than the wait time,
+        /* If we have waited longer than the wait time, */
         if (waiting >= WAIT_TIME) {
-            // Reset the waiting timer
-            waiting = 0.seconds
+            /* Reset the waiting timer */
+            waiting = Duration.ZERO
 
-            // Pick a new camera angle
+            /* Pick a new camera angle */
             angles.add(randomCamera(time))
 
-            // We are now moving
+            /* We are now moving */
             moving = true
 
-            // About 1/5 of the time, do not interpolate and just move to the new angle (jump-cut)
+            /* About 1/5 of the time, do not interpolate and just move to the new angle (jump-cut) */
             if (Math.random() < 0.2) {
                 x = 1f
             }
         }
 
-        // If we are in the process of moving to a new camera angle,
+        /* If we are in the process of moving to a new camera angle, */
         if (moving) {
-            // Increment interpolation index
-            x += (delta.toDouble(SECONDS) * MOVE_SPEED).toFloat()
+            /* Increment interpolation index */
+            x += (delta.toDouble(DurationUnit.SECONDS) * MOVE_SPEED).toFloat()
 
-            // Set the camera location and rotation to the interpolated values
-            cam.location =
-                Vector3f().interpolateLocal(startLocation, angles.last().location, x.smooth()).also {
-                    currentLocation = it
-                }
-            cam.rotation =
-                quaternionInterpolation(startRotation, angles.last().rotation, x.smooth()).also {
-                    currentRotation = it
-                }
 
-            // If we have reached the end of the interpolation,
+
+            /* If we have reached the end of the interpolation, */
             if (x > 1f) {
-                // Reset the interpolation index
+                /* Reset the interpolation index */
                 x = 0f
 
-                // We are no longer moving
+                /* We are no longer moving */
                 moving = false
+
+                startLocation = context.app.camera.location.clone()
+                startRotation = context.app.camera.rotation.clone()
             }
+        }
+
+        /* Set the camera location and rotation to the interpolated values */
+        cam.location = Vector3f().interpolateLocal(startLocation, angles.last().location, x.smooth()).also {
+            currentLocation = it
+        }
+        cam.rotation = quaternionInterpolation(startRotation, angles.last().rotation, x.smooth()).also {
+            currentRotation = it
         }
 
         return true
     }
 
     private fun randomCamera(time: Duration): AutoCamPosition {
-        // If we are near the end of the song,
+        /* If we are near the end of the song, */
         if (context.sequence.duration - time < WAIT_TIME * 2.5) {
+            /* Pick GENERAL_A */
             return AutoCamPosition.GENERAL_A
         }
 
-        // About 1/4 of the time, pick a stage angle
+        /* About 1/4 of the time, pick a stage angle */
         return if (Math.random() < 0.25) {
-            // Collect all stage camera angles
+            /* Collect all stage camera angles */
             val stageCameras = AutoCamPosition.values().filter { it.type == AutoCamPositionType.STAGE }
 
-            // Valid stage cameras are those that are not the current one
+            /* Valid stage cameras are those that are not the current one */
             val validStageCameras = stageCameras.filter { it != angles.last() }
 
-            // Pick a random valid stage camera
+            /* Pick a random valid stage camera */
             validStageCameras.random()
         } else {
-            // Collect all valid instrument camera angles
-            val validInstrumentCameras =
-                AutoCamPosition.values()
-                    .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, context.instruments) }
+            /* Collect all valid instrument camera angles */
+            val validInstrumentCameras = AutoCamPosition.values()
+                .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, context.instruments) }
 
-            // Collect some the last used instrument camera angles
-            val lastUsedInstrumentCameras =
-                angles.filter { it.type == AutoCamPositionType.INSTRUMENT }
-                    .takeLast((context.instruments.filter { it.isVisible }.size - 2).coerceAtLeast(1))
+            /* Collect some the last used instrument camera angles */
+            val lastUsedInstrumentCameras = angles.filter { it.type == AutoCamPositionType.INSTRUMENT }
+                .takeLast((context.instruments.filter { it.isVisible }.size - 2).coerceAtLeast(1))
 
             val notRecentlyUsedInstrumentAngles = validInstrumentCameras.minus(lastUsedInstrumentCameras.toSet())
 
-            // If there are any valid camera angles that are not the last used ones,
+            /* If there are any valid camera angles that are not the last used ones, */
             if (notRecentlyUsedInstrumentAngles.isNotEmpty()) {
-                // Pick a random camera from that list
+                /* Pick a random camera from that list */
                 notRecentlyUsedInstrumentAngles.random()
             } else {
-                // Otherwise, just pick the last used camera that has been the longest time since it was used
+                /* Otherwise, just pick the last used camera that has been the longest time since it was used */
                 angles.firstOrNull { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe(time, context.instruments) }
                     ?: AutoCamPosition.GENERAL_A
             }
@@ -232,7 +250,7 @@ enum class AutoCamPositionType {
     INSTRUMENT,
 
     /** Focuses on many instruments, or on the stage. */
-    STAGE,
+    STAGE
 }
 
 @Suppress("KDocMissingDocumentation")
@@ -245,14 +263,14 @@ enum class AutoCamPosition(
     val pickMe: (time: Duration, instruments: List<Instrument>) -> Boolean,
     val stayHere: (time: Duration, instruments: List<Instrument>) -> Boolean,
     /** The type of camera. */
-    val type: AutoCamPositionType,
+    val type: AutoCamPositionType
 ) {
     GENERAL_A(
         Vector3f(-2.00f, 92.00f, 134.00f),
         Quaternion(-0.00f, 0.99f, -0.16f, -0.00f),
         { _, _ -> true },
         { _, _ -> true },
-        AutoCamPositionType.STAGE,
+        AutoCamPositionType.STAGE
     ),
 
     GENERAL_B(
@@ -260,7 +278,7 @@ enum class AutoCamPosition(
         Quaternion(-0.03f, 0.97f, -0.15f, -0.18f),
         { _, _ -> true },
         { _, _ -> true },
-        AutoCamPositionType.STAGE,
+        AutoCamPositionType.STAGE
     ),
 
     GENERAL_C(
@@ -268,7 +286,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.18f, 0.15f),
         { _, _ -> true },
         { _, _ -> true },
-        AutoCamPositionType.STAGE,
+        AutoCamPositionType.STAGE
     ),
 
     BASS_GUITAR(
@@ -276,7 +294,7 @@ enum class AutoCamPosition(
         Quaternion(0.07f, 0.90f, -0.17f, 0.40f),
         { time, instruments -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     GUITAR(
@@ -284,7 +302,7 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.95f, 0.06f, 0.31f),
         { time, instruments -> visibleNowAndLater(instruments, Guitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Guitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     SOPRANO_SAX(
@@ -292,7 +310,7 @@ enum class AutoCamPosition(
         Quaternion(-0.04f, 0.96f, -0.19f, -0.19f),
         { time, instruments -> visibleNowAndLater(instruments, SopranoSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<SopranoSax>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     ALTO_SAX(
@@ -300,7 +318,7 @@ enum class AutoCamPosition(
         Quaternion(-0.05f, 0.95f, -0.21f, -0.24f),
         { time, instruments -> visibleNowAndLater(instruments, AltoSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<AltoSax>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TENOR_SAX(
@@ -308,7 +326,7 @@ enum class AutoCamPosition(
         Quaternion(0.00f, 0.98f, -0.20f, 0.02f),
         { time, instruments -> visibleNowAndLater(instruments, TenorSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<TenorSax>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     BARITONE_SAX(
@@ -316,7 +334,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.98f, -0.19f, 0.06f),
         { time, instruments -> visibleNowAndLater(instruments, BaritoneSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<BaritoneSax>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     KEYBOARDS(
@@ -324,7 +342,7 @@ enum class AutoCamPosition(
         Quaternion(-0.06f, 0.94f, -0.27f, -0.20f),
         { time, instruments -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     MALLETS(
@@ -332,7 +350,7 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.98f, -0.18f, -0.11f),
         { time, instruments -> visibleNowAndLater(instruments, Mallets::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Mallets>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     MUSIC_BOX(
@@ -340,7 +358,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.97f, -0.06f, 0.22f),
         { time, instruments -> visibleNowAndLater(instruments, MusicBox::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<MusicBox>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TELEPHONE_RING(
@@ -348,7 +366,7 @@ enum class AutoCamPosition(
         Quaternion(0.04f, 0.96f, -0.18f, 0.22f),
         { time, instruments -> visibleNowAndLater(instruments, TelephoneRing::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<TelephoneRing>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     SPACE_LASER(
@@ -356,7 +374,7 @@ enum class AutoCamPosition(
         Quaternion(-0.05f, 0.95f, 0.18f, 0.24f),
         { time, instruments -> visibleNowAndLater(instruments, SpaceLaser::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<SpaceLaser>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     ACOUSTIC_BASS(
@@ -364,7 +382,7 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.98f, -0.20f, -0.09f),
         { time, instruments -> visibleNowAndLater(instruments, AcousticBass::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<AcousticBass>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     VIOLIN(
@@ -372,7 +390,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.99f, -0.12f, 0.05f),
         { time, instruments -> visibleNowAndLater(instruments, Violin::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Violin>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     VIOLA(
@@ -380,7 +398,7 @@ enum class AutoCamPosition(
         Quaternion(0.02f, 0.98f, -0.18f, 0.12f),
         { time, instruments -> visibleNowAndLater(instruments, Viola::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Viola>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     CELLO(
@@ -388,7 +406,7 @@ enum class AutoCamPosition(
         Quaternion(-0.03f, 0.97f, -0.21f, -0.15f),
         { time, instruments -> visibleNowAndLater(instruments, Cello::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Cello>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     HARP(
@@ -396,7 +414,7 @@ enum class AutoCamPosition(
         Quaternion(-0.06f, 0.94f, -0.18f, -0.29f),
         { time, instruments -> visibleNowAndLater(instruments, Harp::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Harp>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     CHOIR(
@@ -404,7 +422,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.99f, -0.10f, 0.08f),
         { time, instruments -> visibleNowAndLater(instruments, StageChoir::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<StageChoir>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TUBULAR_BELLS(
@@ -412,55 +430,52 @@ enum class AutoCamPosition(
         Quaternion(-0.01f, 0.99f, -0.10f, -0.05f),
         { time, instruments -> visibleNowAndLater(instruments, TubularBells::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<TubularBells>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_STRINGS_1(
         Vector3f(-76.30f, 76.00f, -57.11f),
         Quaternion(-0.02f, 0.98f, -0.09f, -0.19f),
         { time, instruments ->
-            instruments.filterIsInstance<StageStrings>().any { it.isVisible } &&
-                visibleNowAndLater(
-                    instruments,
-                    StageStrings::class.java,
-                    time,
-                    WAIT_TIME,
-                )
+            instruments.filterIsInstance<StageStrings>().any { it.isVisible } && visibleNowAndLater(
+                instruments,
+                StageStrings::class.java,
+                time,
+                WAIT_TIME
+            )
         },
         { _, instruments -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_STRINGS_2(
         Vector3f(-68.73f, 81.60f, -51.70f),
         Quaternion(-0.05f, 0.92f, -0.12f, -0.38f),
         { time, instruments ->
-            instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 2 &&
-                visibleNowAndLater(
-                    instruments,
-                    StageStrings::class.java,
-                    time,
-                    WAIT_TIME,
-                )
+            instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 2 && visibleNowAndLater(
+                instruments,
+                StageStrings::class.java,
+                time,
+                WAIT_TIME
+            )
         },
         { _, instruments -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_STRINGS_3_PLUS(
         Vector3f(-34.77f, 87.41f, -13.06f),
         Quaternion(-0.06f, 0.86f, -0.10f, -0.49f),
         { time, instruments ->
-            instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 3 &&
-                visibleNowAndLater(
-                    instruments,
-                    StageStrings::class.java,
-                    time,
-                    WAIT_TIME,
-                )
+            instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 3 && visibleNowAndLater(
+                instruments,
+                StageStrings::class.java,
+                time,
+                WAIT_TIME
+            )
         },
         { _, instruments -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_HORNS(
@@ -468,7 +483,7 @@ enum class AutoCamPosition(
         Quaternion(-0.01f, 0.99f, -0.09f, -0.07f),
         { time, instruments -> visibleNowAndLater(instruments, StageHorns::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<StageHorns>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     PIZZICATO_STRINGS(
@@ -476,7 +491,7 @@ enum class AutoCamPosition(
         Quaternion(-0.05f, 0.95f, -0.24f, -0.19f),
         { time, instruments -> visibleNowAndLater(instruments, PizzicatoStrings::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<PizzicatoStrings>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     ACCORDION(
@@ -484,7 +499,7 @@ enum class AutoCamPosition(
         Quaternion(-0.03f, 0.97f, -0.16f, -0.16f),
         { time, instruments -> visibleNowAndLater(instruments, Accordion::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Accordion>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     BANJO(
@@ -492,7 +507,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.12f, 0.23f),
         { time, instruments -> visibleNowAndLater(instruments, Banjo::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Banjo>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     SHAMISEN(
@@ -500,7 +515,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.11f, 0.24f),
         { time, instruments -> visibleNowAndLater(instruments, Shamisen::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Shamisen>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TIMPANI(
@@ -508,7 +523,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.98f, -0.21f, 0.07f),
         { time, instruments -> visibleNowAndLater(instruments, Timpani::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Timpani>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     MELODIC_TOM(
@@ -516,7 +531,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.98f, -0.19f, 0.04f),
         { time, instruments -> visibleNowAndLater(instruments, MelodicTom::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<MelodicTom>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     SYNTH_DRUM(
@@ -524,7 +539,7 @@ enum class AutoCamPosition(
         Quaternion(0.06f, 0.90f, -0.13f, 0.42f),
         { time, instruments -> visibleNowAndLater(instruments, SynthDrum::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<SynthDrum>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TAIKO_DRUM(
@@ -532,7 +547,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.91f, -0.07f, 0.42f),
         { time, instruments -> visibleNowAndLater(instruments, TaikoDrum::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<TaikoDrum>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TROMBONE(
@@ -540,7 +555,7 @@ enum class AutoCamPosition(
         Quaternion(0.026606327f, 0.97332513f, -0.1550696f, 0.16698427f),
         { time, instruments -> visibleNowAndLater(instruments, Trombone::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Trombone>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     FLUTE(
@@ -548,7 +563,7 @@ enum class AutoCamPosition(
         Quaternion(-0.00f, 1.00f, -0.06f, -0.03f),
         { time, instruments -> visibleNowAndLater(instruments, Flute::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Flute>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     PICCOLO(
@@ -556,7 +571,7 @@ enum class AutoCamPosition(
         Quaternion(-0.00f, 1.00f, -0.06f, -0.03f),
         { time, instruments -> visibleNowAndLater(instruments, Piccolo::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Piccolo>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     RECORDER(
@@ -564,7 +579,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.99f, -0.07f, 0.09f),
         { time, instruments -> visibleNowAndLater(instruments, Recorder::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Recorder>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     HARMONICA(
@@ -572,7 +587,7 @@ enum class AutoCamPosition(
         Quaternion(0.10f, 0.86f, -0.18f, 0.47f),
         { time, instruments -> visibleNowAndLater(instruments, Harmonica::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Harmonica>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     PAN_FLUTE(
@@ -580,7 +595,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.16f, 0.18f),
         { time, instruments -> visibleNowAndLater(instruments, PanFlute::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<PanFlute>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     WHISTLES(
@@ -588,7 +603,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.20f, 0.17f),
         { time, instruments -> visibleNowAndLater(instruments, Whistles::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Whistles>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     BLOWN_BOTTLE(
@@ -596,7 +611,7 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.17f, 0.16f),
         { time, instruments -> visibleNowAndLater(instruments, BlownBottle::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<BlownBottle>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     AGOGOS(
@@ -604,7 +619,7 @@ enum class AutoCamPosition(
         Quaternion(0.02f, 0.98f, -0.17f, 0.11f),
         { time, instruments -> visibleNowAndLater(instruments, Agogos::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Agogos>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     WOODBLOCKS(
@@ -612,7 +627,7 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.99f, -0.13f, 0.11f),
         { time, instruments -> visibleNowAndLater(instruments, Woodblocks::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Woodblocks>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TUBA(
@@ -620,15 +635,15 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.97f, -0.11f, -0.22f),
         { time, instruments -> visibleNowAndLater(instruments, Tuba::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Tuba>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     FRENCH_HORN(
-        Vector3f(-44.77f, 41.35f, -16.86f),
-        Quaternion(-0.02f, 0.97f, -0.12f, -0.20f),
+        Vector3f(-82.14993f, 43.444687f, 30.638006f),
+        Quaternion(-0.05368753f, 0.9447794f, -0.19924761f, -0.2545779f),
         { time, instruments -> visibleNowAndLater(instruments, FrenchHorn::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<FrenchHorn>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     TRUMPET(
@@ -636,7 +651,7 @@ enum class AutoCamPosition(
         Quaternion(-0.01f, 0.93f, -0.03f, -0.37f),
         { time, instruments -> visibleNowAndLater(instruments, Trumpet::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Trumpet>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     OBOE(
@@ -644,7 +659,7 @@ enum class AutoCamPosition(
         Quaternion(-0.01f, 0.98f, -0.17f, -0.05f),
         { time, instruments -> visibleNowAndLater(instruments, Oboe::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Oboe>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     CLARINET(
@@ -652,7 +667,7 @@ enum class AutoCamPosition(
         Quaternion(-0.01f, 0.99f, -0.15f, -0.04f),
         { time, instruments -> visibleNowAndLater(instruments, Clarinet::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Clarinet>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
 //    PERCUSSION(
@@ -668,7 +683,7 @@ enum class AutoCamPosition(
         Quaternion(0.02f, 0.97f, -0.18f, 0.13f),
         { time, instruments -> visibleNowAndLater(instruments, SteelDrums::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<SteelDrums>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     FIDDLE(
@@ -676,7 +691,7 @@ enum class AutoCamPosition(
         Quaternion(-0.01f, 0.98f, -0.18f, -0.04f),
         { time, instruments -> visibleNowAndLater(instruments, Fiddle::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Fiddle>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
 
     OCARINA(
@@ -684,8 +699,17 @@ enum class AutoCamPosition(
         Quaternion(0.04f, 0.96f, -0.18f, 0.21f),
         { time, instruments -> visibleNowAndLater(instruments, Ocarina::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<Ocarina>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT,
+        AutoCamPositionType.INSTRUMENT
     ),
+
+    BAG_PIPE(
+        Vector3f(-49.76239f, 33.13658f, 82.276375f),
+        Quaternion(-0.0023348634f, 0.9805548f, -0.011687864f, -0.19588324f),
+        { time, instruments -> visibleNowAndLater(instruments, BagPipe::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments -> instruments.filterIsInstance<BagPipe>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT
+    ),
+
 }
 
 /**
@@ -702,26 +726,20 @@ fun visibleNowAndLater(
     instruments: List<Instrument>,
     instrument: Class<out Instrument>,
     time: Duration,
-    buffer: Duration,
-): Boolean =
-    instruments.filterIsInstance(instrument).any {
-        it.isVisible && it.calculateVisibility(time + buffer, future = true)
-    }
+    buffer: Duration
+): Boolean = instruments.filterIsInstance(instrument).any {
+    it.isVisible && it.calculateVisibility(time + buffer, future = true)
+}
 
 /**
  * Performs an interpolation between two quaternions.
  */
-fun quaternionInterpolation(
-    start: Quaternion,
-    end: Quaternion,
-    x: Float,
-): Quaternion =
-    Quaternion(
-        start.x + (end.x - start.x) * x,
-        start.y + (end.y - start.y) * x,
-        start.z + (end.z - start.z) * x,
-        start.w + (end.w - start.w) * x,
-    ).apply { this.normalizeLocal() }
+fun quaternionInterpolation(start: Quaternion, end: Quaternion, x: Float): Quaternion = Quaternion(
+    start.x + (end.x - start.x) * x,
+    start.y + (end.y - start.y) * x,
+    start.z + (end.z - start.z) * x,
+    start.w + (end.w - start.w) * x
+).apply { this.normalizeLocal() }
 
 /**
  * Applies cubic-ease-in-out interpolation to a value.
