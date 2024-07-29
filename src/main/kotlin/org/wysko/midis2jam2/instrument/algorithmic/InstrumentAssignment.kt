@@ -334,13 +334,13 @@ object InstrumentAssignment {
             92 -> StageStrings(context, events, StageStringsType.BowedSynth, StageStringBehavior.Normal) // bowed
             93 -> Keyboard(context, events, KeyboardSkin["metallic"]) // metallic
             94 -> StageChoir(context, events, StageChoir.ChoirType.HaloSynth) // halo
-            95 -> Keyboard(context, events, KeyboardSkin["synth"]) // sweep
+            95 -> Keyboard(context, events, KeyboardSkin["sweep"]) // sweep
             96 -> Keyboard(context, events, KeyboardSkin["synth"]) // rain
             97 -> Keyboard(context, events, KeyboardSkin["synth"]) // soundtrack
-            99 -> Keyboard(context, events, KeyboardSkin["synth"]) // atmosphere
+            99 -> Keyboard(context, events, KeyboardSkin["atmosphere"]) // atmosphere
             100 -> Keyboard(context, events, KeyboardSkin["synth"]) // brightness
             101 -> StageChoir(context, events, StageChoir.ChoirType.GoblinSynth) // goblins
-            102 -> Keyboard(context, events, KeyboardSkin["synth"]) // echoes
+            102 -> Keyboard(context, events, KeyboardSkin["echoes"]) // echoes
             103 -> Keyboard(context, events, KeyboardSkin["synth"]) // sci-fi
             105 -> Banjo(context, events)
             106 -> Shamisen(context, events)

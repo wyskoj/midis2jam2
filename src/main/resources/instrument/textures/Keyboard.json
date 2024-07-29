@@ -82,5 +82,17 @@
   {
     "name": "warm",
     "file": "WarmSynthSkin.png"
+  },
+  {
+    "name": "atmosphere",
+    "file": "AtmosphereSynthSkin.png"
+  },
+  {
+    "name": "sweep",
+    "file": "SweepSynthSkin.png"
+  },
+  {
+    "name": "echoes",
+    "file": "EchoesSynthSkin.png"
   }
 ]
