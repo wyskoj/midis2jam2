@@ -1,0 +1,26 @@
+[
+  {
+    "name": "jazz",
+    "file": "JazzGuitarSkin.png"
+  },
+  {
+    "name": "clean",
+    "file": "GuitarSkin.bmp"
+  },
+  {
+    "name": "muted",
+    "file": "MutedGuitarSkin.png"
+  },
+  {
+    "name": "overdriven",
+    "file": "OverdrivenGuitarSkin.png"
+  },
+  {
+    "name": "distortion",
+    "file": "DistortionGuitarSkin.png"
+  },
+  {
+    "name": "harmonics",
+    "file": "HarmonicsGuitarSkin.png"
+  }
+]

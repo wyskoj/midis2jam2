@@ -27,29 +27,27 @@ import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.Utils.resourceToString
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
-private val BASE_POSITION = Vector3f(43.431f, 35.292f, 7.063f)
+private val BASE_POSITION = v3(43.4, 35.3, 7.0)
 private const val GUITAR_VECTOR_THRESHOLD = 8
+
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/Guitar.json"))
 private val GUITAR_CHORD_DEFINITIONS_STANDARD_E: Set<ChordDefinition> =
     Json.decodeFromString(resourceToString("/instrument/chords/Guitar.json"))
 private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
     Json.decodeFromString<Set<ChordDefinition>>(resourceToString("/instrument/chords/Guitar.json"))
-        .map {
+        .map { (notes, frets) ->
             ChordDefinition(
-                notes = (
-                    listOf(if (it.notes[0].toInt() != -1) it.notes[0] - 2 else -1) + it.notes.subList(1, 6)
-                    ).map { it.toByte() },
-                frets = it.frets
+                notes = (listOf(if (notes[0].toInt() != -1) notes[0] - 2 else -1) + notes.subList(1, 6))
+                    .map { it.toByte() },
+                frets = frets
             )
         }.toSet()
 
@@ -64,7 +62,7 @@ private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
 class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : FrettedInstrument(
     context = context,
     events = events,
-    StandardFrettingEngine(
+    frettingEngine = StandardFrettingEngine(
         numberOfStrings = 6,
         numberOfFrets = 22,
         openStringMidiNotes = if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
@@ -92,25 +90,19 @@ class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : F
         if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
 
     /**
-     * Maps each [NotePeriod] that this Guitar is responsible to play to its [FretboardPosition].
+     * Maps each [TimedArc] that this Guitar is responsible to play to its [FretboardPosition].
      */
     override val notePeriodFretboardPosition: Map<TimedArc, FretboardPosition> =
         BetterFretting(context, dictionary, openStringValues, events).calculate(timedArcs)
 
     override val upperStrings: Array<Spatial> = Array(6) {
-        if (it < 3) {
-            context.modelD("GuitarStringLow.obj", type.texture)
-        } else {
-            context.modelD("GuitarStringHigh.obj", type.texture)
-        }.apply {
-            geometry.attachChild(this)
-        }
+        context.modelD(if (it < 3) "GuitarStringLow.obj" else "GuitarStringHigh.obj", type.texture)
     }.apply {
         forEachIndexed { index, string ->
+            geometry += string
             with(GUITAR_MODEL_PROPERTIES) {
-                string.localTranslation =
-                    Vector3f(this.upperHorizontalOffsets[index], this.upperVerticalOffset, FORWARD_OFFSET)
-                string.localRotation = Quaternion().fromAngles(0f, 0f, rad(-this.rotations[index]))
+                string.loc = v3(upperHorizontalOffsets[index], upperVerticalOffset, FORWARD_OFFSET)
+                string.rot = v3(0, 0, -rotations[index])
             }
         }
     }
@@ -140,14 +132,13 @@ class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : F
     }
 
     override fun adjustForMultipleInstances(delta: Duration) {
-        val v = updateInstrumentIndex(delta) * 1.5f
-        /* After a certain threshold, stop moving guitars down—only along the XZ plane. */
-        if (v < GUITAR_VECTOR_THRESHOLD) {
-            root.loc = v3(5, -2, 0).mult(v)
-        } else {
-            val vector = v3(5, -2, 0).mult(v)
-            vector.setY(-2f * GUITAR_VECTOR_THRESHOLD)
-            root.loc = vector
+        (updateInstrumentIndex(delta) * 1.5f).let {
+            with(v3(5, -2, 0).mult(it)) {
+                root.loc = when {
+                    it < GUITAR_VECTOR_THRESHOLD -> this
+                    else -> this.apply { setY(-2f * GUITAR_VECTOR_THRESHOLD) }
+                }
+            }
         }
     }
 
@@ -159,23 +150,26 @@ class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : F
         internal val modelDropD: String,
         internal val texture: String
     ) {
-        /**
-         * Acoustic guitar type.
-         */
-        data object Acoustic : GuitarType(
-            "GuitarAcoustic.obj",
-            "GuitarAcousticDropD.obj",
-            "AcousticGuitar.png"
-        )
+        /** Acoustic guitar type. */
+        data object Acoustic : GuitarType("GuitarAcoustic.obj", "GuitarAcousticDropD.obj", "AcousticGuitar.png")
 
-        /**
-         * Electric guitar type.
-         */
-        data object Electric : GuitarType(
-            "Guitar.obj",
-            "GuitarD.obj",
-            "GuitarSkin.bmp"
-        )
+        /** Clean guitar type. */
+        data object Clean : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["clean"].file)
+
+        /** Jazz guitar type. */
+        data object Jazz : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["jazz"].file)
+
+        /** Muted guitar type. */
+        data object Muted : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["muted"].file)
+
+        /** Overdrive guitar type. */
+        data object Overdriven : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["overdriven"].file)
+
+        /** Distortion guitar type. */
+        data object Distortion : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["distortion"].file)
+
+        /** Harmonics guitar type. */
+        data object Harmonics : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["harmonics"].file)
     }
 
     init {
