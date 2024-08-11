@@ -45,6 +45,7 @@ object I18n {
         "hi",
         "it",
         "no",
+        "pl",
         "ru",
         "th",
         "tl",

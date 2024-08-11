@@ -97,6 +97,7 @@ fun AboutScreen() {
                         Text("Français: Jacob Wysko")
                         Text("Italiano: SamuDrummer")
                         Text("Norsk: Trygve Larsen")
+                        Text("Polski: endermanek24")
                         Text("Pусский: Rxuglr")
                         Text("ไทย: Hariwong Lonarai")
                         Text("Tagalog: GlovePerson")
