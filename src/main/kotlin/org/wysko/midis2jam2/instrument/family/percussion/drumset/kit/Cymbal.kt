@@ -29,79 +29,93 @@ import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
-internal val STICK_POSITION = Vector3f(0f, 2f, 18f)
-private val STICK_PIVOT_OFFSET = Vector3f(0f, 0f, 0f)
+private val POSITION_MAP = buildMap {
+    put("splash", v3(0, 2, 14))
+}
+private val DEFAULT_STICK_POSITION = v3(0, 2, 18)
 
-/** Cymbals are represented with this class, excluding the [HiHat]. */
+/**
+ * A crash, splash, ride, or china cymbal.
+ */
 open class Cymbal(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, type: CymbalType) :
     DrumSetInstrument(context, hits) {
-    /** The stick. */
+    /**
+     * The stick.
+     */
     protected val stick: Striker =
         Striker(context, hits, StickType.DRUM_SET_STICK).apply {
             setParent(geometry)
-            node.move(STICK_POSITION) // So the stick hits the edge of cymbal
+            node.move(
+                POSITION_MAP.getOrDefault(
+                    type.name,
+                    DEFAULT_STICK_POSITION
+                )
+            )
             offsetStick {
-                it.move(STICK_PIVOT_OFFSET) // Changes rotation pivot
                 it.rotate(rad(-20.0), 0f, 0f) // Angles stick down slightly
             }
         }
-    private val cymbalModel =
-        context.modelR(type.model, "CymbalSkinSphereMap.bmp").apply {
-            geometry.attachChild(this)
-            this.scale(type.size)
+
+    private val cymbalModel = with(geometry) {
+        +context.modelR(type.model, "CymbalSkinSphereMap.bmp").apply {
+            scale(type.size)
         }
+    }
 
     /** The cymbal animator. */
     protected val cymbalAnimator: CymbalAnimator =
         CymbalAnimator(cymbalModel, type.amplitude, type.wobbleSpeed, type.dampening)
 
     init {
-        // Position cymbal
         geometry.localTranslation = type.location()
         geometry.localRotation = type.rotation()
     }
 
-    override fun tick(
-        time: Duration,
-        delta: Duration,
-    ) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
-        stick.tick(time, delta).strike?.let {
-            cymbalAnimator.strike()
-        }
+        stick.tick(time, delta).strike?.let { cymbalAnimator.strike() }
         cymbalAnimator.tick(delta)
     }
 }
 
 /**
  * Defines properties about a type of cymbal.
+ *
+ * @property name The name of the cymbal.
+ * @property model The name of the model file.
+ * @property size The size (or scale) of the cymbal.
+ * @property amplitude The total rotational amplitude when the cymbal is struck.
+ * @property wobbleSpeed The speed at which the cymbal should wobble after it is struck.
  */
 @Suppress("kotlin:S6218", "ArrayInDataClass")
 @Serializable
 data class CymbalType(
-    /** The name of the cymbal. */
     val name: String,
-    /** The name of its model. */
     val model: String,
+    val size: Float,
+    val amplitude: Double,
+    val wobbleSpeed: Double,
     private val location: Array<Float>,
     private val rotation: Array<Float>,
-    /** The size, or scale factor, of the cymbal. */
-    val size: Float,
-    /** The total rotational amplitude when the cymbal is struck. */
-    val amplitude: Double,
-    /** The speed at which the cymbal should wobble after it is struck. */
-    val wobbleSpeed: Double,
 ) {
-    /** The rate at which the wobble fades out to rest. */
+    /**
+     * The rate at which the wobble fades out to rest.
+     */
     val dampening: Double = 1.5
 
-    /** Returns the location of this as a [Vector3f]. */
+    /**
+     * Returns the location of this as a [Vector3f].
+     */
     fun location(): Vector3f = Vector3f(location[0], location[1], location[2])
 
-    /** Returns the rotation of this as a [Quaternion]. */
+    /**
+     * Returns the rotation of this as a [Quaternion].
+     */
     fun rotation(): Quaternion = Quaternion().fromAngles(rad(rotation[0]), rad(rotation[1]), rad(rotation[2]))
 
     companion object {
