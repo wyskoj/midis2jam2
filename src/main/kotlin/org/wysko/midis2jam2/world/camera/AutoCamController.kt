@@ -22,14 +22,8 @@ import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
-import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
-import org.wysko.midis2jam2.instrument.family.brass.StageHorns
-import org.wysko.midis2jam2.instrument.family.brass.Trombone
-import org.wysko.midis2jam2.instrument.family.brass.Trumpet
-import org.wysko.midis2jam2.instrument.family.brass.Tuba
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
-import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
+import org.wysko.midis2jam2.instrument.family.brass.*
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.*
 import org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings
 import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir
 import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
@@ -41,33 +35,18 @@ import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
-import org.wysko.midis2jam2.instrument.family.percussive.Agogos
-import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
-import org.wysko.midis2jam2.instrument.family.percussive.SteelDrums
-import org.wysko.midis2jam2.instrument.family.percussive.SynthDrum
-import org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum
-import org.wysko.midis2jam2.instrument.family.percussive.Woodblocks
+import org.wysko.midis2jam2.instrument.family.percussive.*
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.instrument.family.pipe.BlownBottle
-import org.wysko.midis2jam2.instrument.family.pipe.Flute
-import org.wysko.midis2jam2.instrument.family.pipe.Ocarina
-import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
-import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
-import org.wysko.midis2jam2.instrument.family.pipe.Recorder
-import org.wysko.midis2jam2.instrument.family.pipe.Whistles
+import org.wysko.midis2jam2.instrument.family.pipe.*
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
+import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
-import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
-import org.wysko.midis2jam2.instrument.family.strings.Cello
-import org.wysko.midis2jam2.instrument.family.strings.Fiddle
-import org.wysko.midis2jam2.instrument.family.strings.Harp
-import org.wysko.midis2jam2.instrument.family.strings.Viola
-import org.wysko.midis2jam2.instrument.family.strings.Violin
+import org.wysko.midis2jam2.instrument.family.strings.*
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -707,6 +686,30 @@ enum class AutoCamPosition(
         Quaternion(-0.0023348634f, 0.9805548f, -0.011687864f, -0.19588324f),
         { time, instruments -> visibleNowAndLater(instruments, BagPipe::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments -> instruments.filterIsInstance<BagPipe>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT
+    ),
+
+    KALIMBA(
+        Vector3f(20.016724f, 50.83171f, 53.29627f),
+        Quaternion(-0.0011894251f, 0.9525223f, -0.30444378f, -0.0037213443f),
+        { time, instruments -> visibleNowAndLater(instruments, Kalimba::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments -> instruments.filterIsInstance<Kalimba>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT
+    ),
+
+    TINKLE_BELL(
+        Vector3f(34.142365f, 50.831703f, 54.312134f),
+        Quaternion(0.024830274f, 0.94041014f, -0.33174983f, 0.070386335f),
+        { time, instruments -> visibleNowAndLater(instruments, TinkleBell::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments -> instruments.filterIsInstance<TinkleBell>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT
+    ),
+
+    BIRD_TWEET(
+        Vector3f(126.65341f, 55.186848f, -5.279584f),
+        Quaternion(0.027039362f, 0.9644452f, -0.1090079f, 0.2392313f),
+        { time, instruments -> visibleNowAndLater(instruments, BirdTweet::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments -> instruments.filterIsInstance<BirdTweet>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
