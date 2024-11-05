@@ -18,6 +18,12 @@
     "default": "true"
   },
   {
+    "name": "lockcursor",
+    "type": "Boolean",
+    "category": "display",
+    "default": "false"
+  },
+  {
     "name": "lyrics",
     "type": "Boolean",
     "category": "features",

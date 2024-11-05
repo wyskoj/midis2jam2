@@ -17,8 +17,16 @@
 
 package org.wysko.midis2jam2.world.camera
 
+import com.jme3.input.CameraInput.FLYCAM_DOWN
+import com.jme3.input.CameraInput.FLYCAM_LEFT
+import com.jme3.input.CameraInput.FLYCAM_RIGHT
+import com.jme3.input.CameraInput.FLYCAM_UP
 import com.jme3.input.FlyByCamera
+import com.jme3.input.InputManager
+import com.jme3.input.KeyInput
+import com.jme3.input.controls.KeyTrigger
 import com.jme3.renderer.Camera
+import org.wysko.midis2jam2.util.logger
 
 private val listenedActions = listOf(
     "FLYCAM_Forward",
@@ -36,6 +44,17 @@ private val listenedActions = listOf(
  * @param onUserInput a callback that will run everytime an action occurs
  */
 class FlyByCameraListenable(cam: Camera, val onUserInput: (name: String) -> Unit) : FlyByCamera(cam) {
+
+    override fun registerWithInput(inputManager: InputManager?) {
+        super.registerWithInput(inputManager)
+        // We need to remove arrow keys from the list of listened actions because they are used for seeking in the song
+        inputManager?.let {
+            it.deleteTrigger(FLYCAM_UP, KeyTrigger(KeyInput.KEY_UP))
+            it.deleteTrigger(FLYCAM_DOWN, KeyTrigger(KeyInput.KEY_DOWN))
+            it.deleteTrigger(FLYCAM_LEFT, KeyTrigger(KeyInput.KEY_LEFT))
+            it.deleteTrigger(FLYCAM_RIGHT, KeyTrigger(KeyInput.KEY_RIGHT))
+        } ?: logger().warn("InputManager is null")
+    }
 
     /** Determines the state of "dragging". That is, is the mouse being held down? */
     private var dragging: Boolean = false

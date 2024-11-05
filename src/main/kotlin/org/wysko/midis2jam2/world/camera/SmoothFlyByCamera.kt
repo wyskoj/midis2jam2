@@ -23,6 +23,8 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.renderer.Camera
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.Utils
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -80,7 +82,7 @@ class SmoothFlyByCamera(
         onAction()
     }.apply {
         registerWithInput(context.app.inputManager)
-        isDragToRotate = true
+        isDragToRotate = !context.configs.getType(SettingsConfiguration::class).isCursorLocked
         moveSpeed = DEFAULT_MOVE_SPEED
         zoomSpeed = -10f
     }

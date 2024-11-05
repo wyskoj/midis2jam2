@@ -47,6 +47,7 @@ fun SettingsScreen(
     openScreen: (ApplicationScreen) -> Unit,
 ) {
     val fullscreen = viewModel.isFullscreen.collectAsState()
+    val isCursorLocked = viewModel.isCursorLocked.collectAsState()
     val startAutocamWithSong = viewModel.isStartAutocamWithSong.collectAsState()
     val showHud = viewModel.isShowHud.collectAsState()
     val showLyrics = viewModel.isShowLyrics.collectAsState()
@@ -81,6 +82,12 @@ fun SettingsScreen(
             { Text(I18n["settings_display_fullscreen_description"].value) },
             fullscreen,
             setState = { viewModel.setFullscreen(it) }
+        )
+        SettingsListItem(
+            { Text(I18n["settings_display_lockcursor"].value) },
+            { Text(I18n["settings_display_lockcursor_description"].value) },
+            isCursorLocked,
+            setState = { viewModel.setIsCursorLocked(it) }
         )
         SettingsListItem(
             { Text(I18n["settings_display_background"].value) },

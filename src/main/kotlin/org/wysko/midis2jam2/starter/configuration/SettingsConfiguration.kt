@@ -63,6 +63,12 @@ data class SettingsConfiguration(
      */
     @SerialName("smooth_camera")
     val isCameraSmooth: Boolean = true,
+
+    /**
+     * Whether the cursor is locked.
+     */
+    @SerialName("lockcursor")
+    val isCursorLocked: Boolean = false,
 ) : Configuration {
     companion object {
         val preserver by lazy { ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE) }
