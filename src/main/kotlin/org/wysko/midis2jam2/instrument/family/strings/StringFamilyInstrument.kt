@@ -58,7 +58,7 @@ abstract class StringFamilyInstrument protected constructor(
 ) : FrettedInstrument(
     context,
     events,
-    StandardFrettingEngine(4, 48, openStringMidiNotes),
+    StandardFrettingEngine(4, 24, openStringMidiNotes),
     FrettedInstrumentPositioningWithZ(
         8.84f,
         -6.17f,
