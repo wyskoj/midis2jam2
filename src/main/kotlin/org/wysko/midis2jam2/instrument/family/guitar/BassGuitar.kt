@@ -43,6 +43,8 @@ private const val BASS_SKIN_BMP = "BassSkin.bmp"
 private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/BassGuitar.json"))
 
+private const val BASS_GUITAR_FORWARD_OFFSET = 0.02
+
 /**
  * The Bass Guitar.
  *
@@ -90,7 +92,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiEvent>, type: BassGuitarT
     }.apply {
         forEachIndexed { index, string ->
             with(BASS_GUITAR_MODEL_PROPERTIES) {
-                string.loc = v3(upperHorizontalOffsets[index], upperVerticalOffset, FORWARD_OFFSET)
+                string.loc = v3(upperHorizontalOffsets[index], upperVerticalOffset, BASS_GUITAR_FORWARD_OFFSET)
                 string.rot = v3(0, 0, rotations[index])
             }
         }
@@ -109,7 +111,7 @@ class BassGuitar(context: Midis2jam2, events: List<MidiEvent>, type: BassGuitarT
             for (j in 0..<5) {
                 with(this[i][j]) {
                     BASS_GUITAR_MODEL_PROPERTIES.let {
-                        loc = v3(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, FORWARD_OFFSET)
+                        loc = v3(it.lowerHorizontalOffsets[i], it.lowerVerticalOffset, BASS_GUITAR_FORWARD_OFFSET)
                         rot = v3(0, 0, it.rotations[i])
                     }
                 }
