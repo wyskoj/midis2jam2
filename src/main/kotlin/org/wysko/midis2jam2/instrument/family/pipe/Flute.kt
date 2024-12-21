@@ -34,7 +34,7 @@ class Flute(context: Midis2jam2, events: List<MidiEvent>) :
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
 
     /** The type Flute clone. */
-    inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.SteamPuffTexture.WHISTLE, 1f) {
+    inner class FluteClone : FluteAndPiccoloClone(this@Flute, SteamPuffer.Texture.Whistle, 1f) {
         init {
             puffer.root.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.root.setLocalTranslation(0f, -12.3f, 0f)

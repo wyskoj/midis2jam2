@@ -22,8 +22,8 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
+import org.wysko.midis2jam2.particle.SteamPuffer.Behavior
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
@@ -97,9 +97,9 @@ class Whistle(
         private val puffer: SteamPuffer =
             SteamPuffer(
                 context,
-                type = if (length == WhistleLength.LONG) SteamPuffTexture.WHISTLE else SteamPuffTexture.NORMAL,
+                type = if (length == WhistleLength.LONG) Texture.Whistle else Texture.Normal,
                 scale = 1.0,
-                behavior = PuffBehavior.UPWARDS,
+                behavior = Behavior.Upwards,
             ).apply {
                 root.setLocalTranslation(0f, 4f, 0f)
                 root.localRotation = Quaternion().fromAngles(0f, -1.57f, 0f)

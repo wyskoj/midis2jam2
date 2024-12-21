@@ -18,12 +18,12 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** Contains shared code between the flute and piccolo. */
-open class FluteAndPiccoloClone(parent: InstrumentWithHands, puffType: SteamPuffTexture, puffScale: Float) :
+open class FluteAndPiccoloClone(parent: InstrumentWithHands, puffType: Texture, puffScale: Float) :
     CloneWithPuffer(parent, puffType, puffScale) {
 
     override val leftHands: List<Spatial> = List(13) {

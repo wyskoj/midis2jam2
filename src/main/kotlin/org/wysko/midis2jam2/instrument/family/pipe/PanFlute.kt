@@ -24,8 +24,8 @@ import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.NORMAL
+import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Normal
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
@@ -86,7 +86,7 @@ class PanFlute(context: Midis2jam2, eventList: List<MidiEvent>, skin: PipeSkin) 
     private inner class PanFlutePipe(skin: PipeSkin, notePeriodsModulus: List<TimedArc>) :
         PitchClassAnimator(context, notePeriodsModulus) {
 
-        val puffer = SteamPuffer(context, NORMAL, 1.0, OUTWARDS)
+        val puffer = SteamPuffer(context, Normal, 1.0, Outwards)
         val bendCtrl = NumberSmoother(0f, 10.0)
 
         init {

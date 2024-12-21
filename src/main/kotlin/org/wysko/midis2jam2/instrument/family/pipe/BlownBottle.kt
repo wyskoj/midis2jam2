@@ -24,8 +24,8 @@ import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.POP
+import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Pop
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
@@ -69,7 +69,7 @@ class BlownBottle(context: Midis2jam2, events: List<MidiEvent>) :
     /** A single Bottle. */
     inner class Bottle(i: Int, notePeriods: List<TimedArc>) : PitchClassAnimator(context, notePeriods) {
 
-        private val puffer: SteamPuffer = SteamPuffer(context, POP, 1.0, OUTWARDS)
+        private val puffer: SteamPuffer = SteamPuffer(context, Pop, 1.0, Outwards)
         private val bendCtrl = NumberSmoother(0f, 10.0)
 
         override fun tick(time: Duration, delta: Duration) {

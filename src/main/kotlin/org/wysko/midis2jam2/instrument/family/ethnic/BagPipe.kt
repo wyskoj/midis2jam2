@@ -25,8 +25,8 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.NORMAL
+import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Normal
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.material
@@ -59,7 +59,7 @@ class BagPipe(
             .onEachIndexed { i, hand -> geometry += hand.also { it.cullHint = (i == 0).ch } }
 
     private val puffers =
-        List(3) { SteamPuffer(context, NORMAL, 1.0, OUTWARDS, Axis.Y) }.apply {
+        List(3) { SteamPuffer(context, Normal, 1.0, Outwards, Axis.Y) }.apply {
             forEach { geometry += it.root }
             with(this[0].root) {
                 loc = v3(2.14, 11.68, -3.84)

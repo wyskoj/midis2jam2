@@ -36,7 +36,7 @@ class Piccolo(context: Midis2jam2, events: List<MidiEvent>) :
     /**
      * A single Piccolo.
      */
-    inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.SteamPuffTexture.NORMAL, 1f) {
+    inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.Texture.Normal, 1f) {
         init {
             val horn = context.modelR(
                 "Piccolo.obj",

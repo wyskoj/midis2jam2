@@ -187,3 +187,12 @@ fun Collection<Number>.stdDev(): Double {
  * @return The maximum of the two bytes.
  */
 fun max(byte1: Byte, byte2: Byte): Byte = if (byte1 > byte2) byte1 else byte2
+
+fun randomRotation(): Quaternion = Quaternion().apply {
+    val x = FastMath.nextRandomFloat() * 2 - 1
+    val y = FastMath.nextRandomFloat() * 2 - 1
+    val z = FastMath.nextRandomFloat() * 2 - 1
+    val w = FastMath.nextRandomFloat() * 2 - 1
+    set(x, y, z, w)
+    normalizeLocal()
+}

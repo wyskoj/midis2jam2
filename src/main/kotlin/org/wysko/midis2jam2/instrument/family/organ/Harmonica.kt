@@ -23,8 +23,8 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.HARMONICA
+import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Harmonica
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
@@ -40,7 +40,8 @@ class Harmonica(context: Midis2jam2, eventList: List<MidiEvent>) :
     MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 10, 0)
-    private val puffers = List(12) { SteamPuffer(context, HARMONICA, 0.75, OUTWARDS) }
+    private val puffers = List(12) { SteamPuffer(context,
+        Harmonica, 0.75, Outwards) }
     private val bend = PitchBendModulationController(context, eventList)
 
     override fun tick(time: Duration, delta: Duration) {

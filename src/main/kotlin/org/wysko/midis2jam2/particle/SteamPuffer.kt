@@ -16,216 +16,198 @@
  */
 package org.wysko.midis2jam2.particle
 
-import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
+import com.jme3.math.Quaternion.IDENTITY
 import com.jme3.math.Vector3f
+import com.jme3.math.Vector3f.ZERO
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.particle.SteamPuffer.Cloud
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
-import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.SECONDS
 
+private val LIFE_SPAN = 0.7.seconds
+
 /**
- * The red, blue, white, and brown substances that emanate from the shaft of an instrument.
- *
- * The SteamPuffer works by creating a pool of [Clouds][Cloud] that are spawned and despawned. SteamPuffer only
- * handles the generation and spawning of [Clouds][Cloud]—animation is handled in the respective class.
+ * Spawns steam particles.
  */
 class SteamPuffer(
-    /** Context to the main class. */
     private val context: Midis2jam2,
-
-    /** The type of steam puffer. */
-    private val type: SteamPuffTexture,
-
-    /** How large the clouds are. */
+    private val type: Texture,
     private val scale: Double,
-
-    /** The behavior of the steam puffer. */
-    private val behavior: PuffBehavior,
-
-    private val outwardsAxis: Axis = Axis.X,
+    private val behavior: Behavior,
+    private val axis: Axis = Axis.X,
 ) : ParticleGenerator {
 
-    /** Defines the root of the steam puffer. */
+    /**
+     * The root of the steam puffer.
+     */
     val root: Node = Node()
 
-    /** The list of currently visible clouds. */
-    private val visibleClouds: MutableList<Cloud> = ArrayList()
-
-    /** A pool of clouds that this steam puffer can use. */
-    private val cloudPool: MutableList<Cloud> = ArrayList()
-
-    /** Despawns a [cloud]. */
-    private fun despawnCloud(cloud: Cloud) {
-        root.detachChild(cloud.cloudNode)
-    }
+    private val activeClouds: MutableList<Cloud> = mutableListOf()
+    private val pool: MutableList<Cloud> = mutableListOf()
 
     override fun tick(delta: Duration, active: Boolean) {
         if (active) {
-            /* If it happens to be the case that the amount of time since the last frame was so large that it
-             * warrants more than one cloud to be spawned on this frame, calculate the number of clouds to spawn. But we
-             * should always spawn at least one cloud on each frame. */
-            val n = ceil(max(delta.toDouble(SECONDS) * 60.0, 1.0))
-            var i = 0
-            while (i < n) {
-                val cloud: Cloud = if (cloudPool.isEmpty()) {
-                    /* If the pool is empty, we need to make a new cloud. */
-                    Cloud()
-                } else {
-                    /* If there exists a cloud we can use, grab the first one. */
-                    cloudPool.removeAt(0) // NOSONAR java:S5413
-                }
-                /* Reinitialize cloud */
-                visibleClouds.add(cloud)
-                cloud.currentlyUsing = true
-                cloud.randomInit()
-                root.attachChild(cloud.cloudNode)
-                i++
+            repeat(calculateCloudsToSpawn(delta)) {
+                getCloud().start()
             }
         }
-        val iterator = visibleClouds.iterator()
-        /* Loop over each visible cloud */
-        while (iterator.hasNext()) {
-            val cloud = iterator.next()
-            val tick = cloud.tick(delta)
+
+        activeClouds.removeAll {
+            val tick = it.tick(delta)
             if (!tick) {
-                /* We need to despawn the cloud */
-                cloud.currentlyUsing = false
-                cloudPool.add(cloud)
-                despawnCloud(cloud)
-                iterator.remove()
+                it.end()
             }
+            !tick
         }
     }
 
-    /** Defines how the clouds should animate. */
-    enum class PuffBehavior {
-        /** The clouds move along the relative XZ plane with only some marginal variation in the Y-axis. */
-        OUTWARDS,
+    private fun calculateCloudsToSpawn(delta: Duration) = ceil(max(delta.toDouble(SECONDS) * 60.0, 1.0)).toInt()
 
-        /** The clouds move along the Y-axis with only some marginal variation on the relative XZ plane. */
-        UPWARDS
+    private fun getCloud(): Cloud = pool.removeFirstOrNull() ?: Cloud()
+
+    private fun Cloud.start() {
+        initialize(root.worldTranslation, root.worldRotation)
+        isActive = true
+        activeClouds += this
+        context.root += node
     }
 
-    /** There are a few different textures for the steam puffer. */
-    enum class SteamPuffTexture(
-        /** The filename of the cloud texture. */
-        val filename: String
-    ) {
-        /** Normal steam puff type. */
-        NORMAL("SteamPuff.bmp"),
-
-        /** Harmonica steam puff type. */
-        HARMONICA("SteamPuff_Harmonica.bmp"),
-
-        /** Pop steam puff type. */
-        POP("SteamPuff_Pop.bmp"),
-
-        /** Whistle steam puff type. */
-        WHISTLE("SteamPuff_Whistle.bmp");
+    private fun Cloud.end() {
+        isActive = false
+        pool += this
+        context.root -= node
     }
 
-    /** Defines how a cloud in the steam puffer animates. */
+    /**
+     * A cloud of steam.
+     */
     internal inner class Cloud : ParticleGenerator.Particle {
 
-        /** Contains the geometry of the cloud (the [.cube]). */
-        val cloudNode = Node()
+        /**
+         * The node of the cloud.
+         */
+        val node = Node()
 
-        /** The mesh of the cloud. */
-        private val cube: Spatial = context.modelD("SteamCloud.obj", type.filename).apply {
+        /**
+         * `true` if this cloud is active, `false` otherwise.
+         */
+        var isActive = false
+
+        private val cube = context.modelD("SteamCloud.obj", type.filename).apply {
             shadowMode = RenderQueue.ShadowMode.Cast
+        }.also {
+            node += it
+        }
+        private var randomParameters = 0.0f to 0.0f
+        private var age = 0.seconds
+        private var baseLocation = ZERO
+        private var baseRotation = IDENTITY
+
+        init {
+            initialize(ZERO, IDENTITY)
         }
 
-        /** A seed for random first axis transformation. */
-        private var randA = 0f
-
-        /** A seed for random second axis transformation. */
-        private var randB = 0f
-
-        /** The current duration into the life of the cloud. */
-        private var life = 0.seconds
-
-        /** True if this cloud is currently being animated, false if it is idling in the pool. */
-        var currentlyUsing = false
-
-        /** Resets the life of the cloud, its transformation, and redefines random seeds. */
-        fun randomInit() {
-            randA = (RANDOM.nextFloat() - 0.5f) * 1.5f
-            randB = (RANDOM.nextFloat() - 0.5f) * 1.5f
-            cube.localRotation = Quaternion().fromAngles(
-                floatArrayOf(
-                    RANDOM.nextFloat() * FastMath.TWO_PI,
-                    RANDOM.nextFloat() * FastMath.TWO_PI,
-                    RANDOM.nextFloat() * FastMath.TWO_PI
-                )
-            )
-            life = (RANDOM.nextFloat() * 0.02).seconds
-            cloudNode.localTranslation = Vector3f.ZERO
+        /**
+         * Prepares the cloud for animation.
+         */
+        fun initialize(location: Vector3f, rotation: Quaternion) {
+            randomParameters = ((Random.nextFloat() - 0.5f) * 1.5f) to ((Random.nextFloat() - 0.5f) * 1.5f)
+            cube.localRotation = randomRotation()
+            age = (Random.nextFloat() * 0.02).seconds
+            baseLocation = location.clone()
+            baseRotation = rotation.clone()
         }
 
         override fun tick(delta: Duration): Boolean {
-            if (!currentlyUsing) return false
-            if (behavior == PuffBehavior.OUTWARDS) {
-                when (outwardsAxis) {
-                    Axis.X -> {
-                        cloudNode.setLocalTranslation(
-                            locEase(life.toDouble(SECONDS)) * 6,
-                            locEase(life.toDouble(SECONDS)) * randA,
-                            locEase(life.toDouble(SECONDS)) * randB
+            if (!isActive) return false
+
+            val movementVector = when (behavior) {
+                Behavior.Outwards -> {
+                    when (axis) {
+                        Axis.X -> v3(
+                            easeOut(age) * 6,
+                            easeOut(age) * randomParameters.first,
+                            easeOut(age) * randomParameters.second
                         )
-                    }
-                    Axis.Y -> {
-                        cloudNode.setLocalTranslation(
-                            locEase(life.toDouble(SECONDS)) * randA,
-                            locEase(life.toDouble(SECONDS)) * 6,
-                            locEase(life.toDouble(SECONDS)) * randB
+
+                        Axis.Y -> v3(
+                            easeOut(age) * randomParameters.first,
+                            easeOut(age) * 6,
+                            easeOut(age) * randomParameters.second
                         )
-                    }
-                    Axis.Z -> {
-                        cloudNode.setLocalTranslation(
-                            locEase(life.toDouble(SECONDS)) * randA,
-                            locEase(life.toDouble(SECONDS)) * randB,
-                            locEase(life.toDouble(SECONDS)) * 6
+
+                        Axis.Z -> v3(
+                            easeOut(age) * randomParameters.first,
+                            easeOut(age) * randomParameters.second,
+                            easeOut(age) * 6
                         )
                     }
                 }
-            } else {
-                cloudNode.setLocalTranslation(
-                    locEase(life.toDouble(SECONDS)) * 6,
-                    (life.toDouble(SECONDS) * 10).toFloat(), locEase(life.toDouble(SECONDS)) * randB
-                )
+
+                Behavior.Upwards -> {
+                    v3(
+                        easeOut(age) * 6, (age.toDouble(SECONDS) * 10), easeOut(age) * randomParameters.first
+                    )
+                }
             }
-            cloudNode.setLocalScale(((0.75 * life.toDouble(SECONDS) + 1.2) * scale).toFloat())
-            life += delta * 1.5
-            return life <= END_OF_LIFE
+            node.loc = baseLocation + baseRotation.mult(movementVector)
+            node.setLocalScale(((0.75 * age.toDouble(SECONDS) + 1.2) * scale).toFloat())
+            age += delta * 1.5
+            return age <= LIFE_SPAN
         }
 
-        /** Easing function to smoothen particle travel. */
-        private fun locEase(x: Double): Float {
-            return if (x == 1.0) 1f else (1 - 2.0.pow(-10 * x)).toFloat()
-        }
-
-        init {
-            randomInit()
-            cloudNode.attachChild(cube)
-        }
+        private fun easeOut(x: Duration): Double = if (x == 1.seconds) 1.0 else (1 - 2.0.pow(-10 * x.toDouble(SECONDS)))
     }
 
-    companion object {
-        /** For RNG. */
-        private val RANDOM = Random()
+    /**
+     * Defines how the clouds should animate.
+     */
+    sealed class Behavior {
+        /**
+         * The clouds move along the relative XZ plane with only some marginal variation in the Y-axis.
+         */
+        data object Outwards : Behavior()
 
-        /** How long a cloud deserves to live. */
-        private val END_OF_LIFE = 0.7.seconds
+        /**
+         * The clouds move along the Y-axis with only some marginal variation on the relative XZ plane.
+         */
+        data object Upwards : Behavior()
+    }
+
+    /**
+     * The texture of the steam puff.
+     *
+     * @property filename The filename of the cloud texture.
+     */
+    sealed class Texture(val filename: String) {
+        /**
+         * The normal steam puff texture.
+         */
+        data object Normal : Texture("SteamPuff.bmp")
+
+        /**
+         * The harmonica steam puff texture.
+         */
+        data object Harmonica : Texture("SteamPuff_Harmonica.bmp")
+
+        /**
+         * The pop steam puff texture.
+         */
+        data object Pop : Texture("SteamPuff_Pop.bmp")
+
+        /**
+         * The whistle steam puff texture.
+         */
+        data object Whistle : Texture("SteamPuff_Whistle.bmp")
     }
 }

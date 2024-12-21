@@ -23,8 +23,8 @@ import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.particle.SteamPuffer
-import org.wysko.midis2jam2.particle.SteamPuffer.PuffBehavior.OUTWARDS
-import org.wysko.midis2jam2.particle.SteamPuffer.SteamPuffTexture.WHISTLE
+import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
+import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Whistle
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
@@ -67,7 +67,8 @@ class Whistles(context: Midis2jam2, events: List<MidiEvent>) :
     inner class Whistle(i: Int, notePeriodsModulus: List<TimedArc>) :
         PitchClassAnimator(context, notePeriodsModulus) {
 
-        private val puffer: SteamPuffer = SteamPuffer(context, WHISTLE, 1.0, OUTWARDS)
+        private val puffer: SteamPuffer = SteamPuffer(context,
+            Whistle, 1.0, Outwards)
 
         init {
             with(geometry) {

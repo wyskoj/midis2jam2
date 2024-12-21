@@ -43,7 +43,7 @@ class Recorder(context: Midis2jam2, events: List<MidiEvent>) :
     /**
      * A single Recorder.
      */
-    inner class RecorderClone : CloneWithPuffer(this@Recorder, SteamPuffer.SteamPuffTexture.POP, 1f) {
+    inner class RecorderClone : CloneWithPuffer(this@Recorder, SteamPuffer.Texture.Pop, 1f) {
         override val leftHands: List<Spatial> = List(13) {
             parent.context.modelD("RecorderHandLeft$it.obj", "hands.bmp")
         }
