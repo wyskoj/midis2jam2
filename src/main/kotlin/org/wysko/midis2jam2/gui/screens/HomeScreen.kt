@@ -108,7 +108,7 @@ fun HomeScreen(
                     ElevatedButton(
                         onClick = openRecordScreen,
                         modifier = Modifier.width(160.dp).height(48.dp),
-                        enabled = !isLockPlayButton && midiFile != null,
+                        enabled = !isLockPlayButton && midiFile != null && !isLooping,
                     ) {
                         Icon(painterResource("/ico/dot.svg"), "Record", modifier = Modifier.height(18.dp))
                         Spacer(Modifier.width(8.dp))
