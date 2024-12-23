@@ -58,6 +58,9 @@ class SettingsViewModel(
     private val _isCursorLocked = MutableStateFlow(false)
     val isCursorLocked: StateFlow<Boolean> get() = _isCursorLocked
 
+    private val _isSpeedModifierMode = MutableStateFlow(false)
+    val isSpeedModifierMode: StateFlow<Boolean> get() = _isSpeedModifierMode
+
     fun setFullscreen(fullscreen: Boolean) = setOption(_isFullscreen, fullscreen)
 
     fun setStartAutocamWithSong(startAutocamWithSong: Boolean) =
@@ -74,6 +77,8 @@ class SettingsViewModel(
 
     fun setIsCursorLocked(bool: Boolean) = setOption(_isCursorLocked, bool)
 
+    fun setIsSpeedModifierMode(bool: Boolean) = setOption(_isSpeedModifierMode, bool)
+
     private fun setOption(option: MutableStateFlow<Boolean>, value: Boolean) {
         option.value = value
         onConfigurationChanged(generateConfiguration())
@@ -86,7 +91,8 @@ class SettingsViewModel(
         showLyrics = _isShowLyrics.value,
         instrumentsAlwaysVisible = _isInstrumentsAlwaysVisible.value,
         isCameraSmooth = _isCameraSmooth.value,
-        isCursorLocked = _isCursorLocked.value
+        isCursorLocked = _isCursorLocked.value,
+        isSpeedModifierMode = _isSpeedModifierMode.value
     )
 
     override fun applyConfiguration(configuration: SettingsConfiguration) {
@@ -96,6 +102,8 @@ class SettingsViewModel(
         _isShowLyrics.value = configuration.showLyrics
         _isInstrumentsAlwaysVisible.value = configuration.instrumentsAlwaysVisible
         _isCameraSmooth.value = configuration.isCameraSmooth
+        _isCursorLocked.value = configuration.isCursorLocked
+        _isSpeedModifierMode.value = configuration.isSpeedModifierMode
     }
 
     init {

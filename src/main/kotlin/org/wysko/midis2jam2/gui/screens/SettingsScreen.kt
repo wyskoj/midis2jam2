@@ -48,6 +48,7 @@ fun SettingsScreen(
 ) {
     val fullscreen = viewModel.isFullscreen.collectAsState()
     val isCursorLocked = viewModel.isCursorLocked.collectAsState()
+    val isSpeedModifierMode = viewModel.isSpeedModifierMode.collectAsState()
     val startAutocamWithSong = viewModel.isStartAutocamWithSong.collectAsState()
     val showHud = viewModel.isShowHud.collectAsState()
     val showLyrics = viewModel.isShowLyrics.collectAsState()
@@ -102,6 +103,13 @@ fun SettingsScreen(
             onOpenOptions = {
                 openScreen(TabFactory.graphicsConfiguration)
             }
+        )
+        SettingsSectionHeader(I18n["settings_controls"].value)
+        SettingsListItem(
+            { Text(I18n["settings_controls_speed_modifier_mode"].value) },
+            { Text(I18n["settings_controls_speed_modifier_mode_description"].value) },
+            isSpeedModifierMode,
+            setState = { viewModel.setIsSpeedModifierMode(it) }
         )
         SettingsSectionHeader(I18n["settings_features"].value)
         SettingsListItem(

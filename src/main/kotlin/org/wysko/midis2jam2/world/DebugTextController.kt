@@ -175,6 +175,7 @@ private fun Midis2jam2.debugText(
         appendLine("Camera:")
         appendLine("${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}")
         appendLine(this@debugText.cameraState)
+        appendLine(this@debugText.cameraSpeed)
 
         // sequencer
         if (this@debugText is DesktopMidis2jam2) {

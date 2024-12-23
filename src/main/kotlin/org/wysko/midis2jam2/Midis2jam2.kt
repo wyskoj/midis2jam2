@@ -36,6 +36,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetVisibilityManager
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.get
 import org.wysko.midis2jam2.starter.configuration.getType
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.minusAssign
@@ -46,11 +47,7 @@ import org.wysko.midis2jam2.world.DebugTextController
 import org.wysko.midis2jam2.world.HudController
 import org.wysko.midis2jam2.world.ShadowController
 import org.wysko.midis2jam2.world.StandController
-import org.wysko.midis2jam2.world.camera.AutoCamController
-import org.wysko.midis2jam2.world.camera.CameraAngle
-import org.wysko.midis2jam2.world.camera.CameraState
-import org.wysko.midis2jam2.world.camera.SlideCameraController
-import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
+import org.wysko.midis2jam2.world.camera.*
 import org.wysko.midis2jam2.world.lyric.LyricController
 import org.wysko.midis2jam2.world.modelD
 import kotlin.properties.Delegates
@@ -207,6 +204,8 @@ abstract class Midis2jam2(
             field = value
         }
 
+    var cameraSpeed: CameraSpeed = CameraSpeed.Normal
+
     override fun initialize(
         stateManager: AppStateManager,
         app: Application,
@@ -273,18 +272,25 @@ abstract class Midis2jam2(
     }
 
     /** Sets the speed of the camera, given a speed [name] and whether that key is [pressed]. */
-    private fun setCameraSpeed(
-        name: String,
-        pressed: Boolean,
-    ) = if (!pressed) {
-        flyByCamera.moveSpeed = 100f
-    } else {
-        flyByCamera.moveSpeed =
-            when (name) {
-                "slow" -> 10f
-                "fast" -> 200f
-                else -> 100f
+    private fun handleCameraSpeedPress(name: String, pressed: Boolean) {
+        if (CameraSpeed.entries.none { it.name.lowercase() == name }) return
+
+        val pressedCameraSpeed = CameraSpeed[name]
+        when (configs[SettingsConfiguration::class].isSpeedModifierMode) {
+            true -> {
+                if (pressed) return // Only on release
+                cameraSpeed = if (pressedCameraSpeed == cameraSpeed) CameraSpeed.Normal else pressedCameraSpeed
             }
+
+            false -> {
+                cameraSpeed = if (pressed) pressedCameraSpeed else CameraSpeed.Normal
+            }
+        }
+        applyCameraSpeed(cameraSpeed)
+    }
+
+    private fun applyCameraSpeed(speed: CameraSpeed) {
+        flyByCamera.moveSpeed = speed.speedValue
     }
 
     /**
@@ -326,7 +332,7 @@ abstract class Midis2jam2(
         isPressed: Boolean,
         tpf: Float,
     ) {
-        setCameraSpeed(name, isPressed)
+        handleCameraSpeedPress(name, isPressed)
         handleCameraSetting(name, isPressed)
         if (isPressed) {
             when (name) {

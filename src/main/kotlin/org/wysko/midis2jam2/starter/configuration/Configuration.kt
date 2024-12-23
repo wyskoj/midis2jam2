@@ -36,3 +36,12 @@ interface Configuration
 fun <T : Configuration> Collection<Configuration>.getType(type: KClass<T>): T {
     return this.firstOrNull { type.isInstance(it) } as T
 }
+
+/**
+ * Returns the first element in the collection that is an instance of the specified type.
+ * If no such element is found, throws an exception with the specified message.
+ *
+ * @param type the class reference representing the type
+ * @return the first element of the specified type in the collection
+ */
+operator fun <T : Configuration> Collection<Configuration>.get(type: KClass<T>): T = getType(type)

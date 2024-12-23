@@ -69,6 +69,12 @@ data class SettingsConfiguration(
      */
     @SerialName("lockcursor")
     val isCursorLocked: Boolean = false,
+
+    /**
+     * Whether the speed modifier mode is enabled.
+     */
+    @SerialName("speed_modifier_mode")
+    val isSpeedModifierMode: Boolean = false
 ) : Configuration {
     companion object {
         val preserver by lazy { ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE) }
