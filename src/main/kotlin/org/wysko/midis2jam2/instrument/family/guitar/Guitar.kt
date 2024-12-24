@@ -34,7 +34,7 @@ import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
-private val BASE_POSITION = v3(43.4, 35.3, 7.0)
+private val BASE_POSITION = v3(47, 35.3, 7.0)
 private const val GUITAR_VECTOR_THRESHOLD = 8
 
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =

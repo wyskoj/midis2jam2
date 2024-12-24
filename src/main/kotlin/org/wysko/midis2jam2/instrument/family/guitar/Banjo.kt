@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
-private val BASE_POSITION = Vector3f(54.6f, 48.7f, 2f)
+private val BASE_POSITION = Vector3f(56.5f, 51f, -1.5f)
 
 /**
  * The Banjo.
