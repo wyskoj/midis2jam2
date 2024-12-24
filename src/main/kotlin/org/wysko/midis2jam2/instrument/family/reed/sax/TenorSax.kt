@@ -59,7 +59,7 @@ class TenorSax(context: Midis2jam2, events: List<MidiEvent>) :
 
     init {
         with(geometry) {
-            setLocalTranslation(-11f, 34.5f, -22f)
+            setLocalTranslation(-8f, 34.5f, -22f)
             setLocalScale(1.15f)
         }
     }

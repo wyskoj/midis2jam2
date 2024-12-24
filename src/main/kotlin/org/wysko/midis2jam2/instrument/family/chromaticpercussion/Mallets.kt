@@ -104,7 +104,7 @@ class Mallets(
 
     override fun adjustForMultipleInstances(delta: Duration) {
         val index = updateInstrumentIndex(delta) - 2
-        geometry.loc = v3(-50, 26.5 + (2 * index), 0)
+        geometry.loc = v3(-53, 26.5 + (2 * index), 0)
         placement.rot = v3(0, -18 * index, 0)
     }
 

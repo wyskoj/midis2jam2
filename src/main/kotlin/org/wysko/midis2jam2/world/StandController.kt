@@ -39,7 +39,7 @@ class StandController {
 
     private val malletStand = with(root) {
         +modelD("XylophoneLegs.obj", "RubberFoot.bmp").apply {
-            loc = v3(-22F, 22.2F, 23F)
+            loc = v3(-25F, 22.2F, 23F)
             rot = v3(0f, 33.7, 0f)
             scale(2 / 3F)
         }
