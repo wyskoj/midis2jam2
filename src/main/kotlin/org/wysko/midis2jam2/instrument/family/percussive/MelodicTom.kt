@@ -53,6 +53,6 @@ class MelodicTom(
                 localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
             }
         )
-        geometry.setLocalTranslation(0f, 61.1f, -133.8f)
+        geometry.setLocalTranslation(0f, 61.1f, -125f)
     }
 }
