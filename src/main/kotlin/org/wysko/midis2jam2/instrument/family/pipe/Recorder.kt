@@ -69,6 +69,6 @@ class Recorder(context: Midis2jam2, events: List<MidiEvent>) :
     }
 
     init {
-        geometry.setLocalTranslation(-7f, 35f, -30f)
+        geometry.setLocalTranslation(-7f, 35f, -25f)
     }
 }
