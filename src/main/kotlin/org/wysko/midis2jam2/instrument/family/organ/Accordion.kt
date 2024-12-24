@@ -241,7 +241,7 @@ class Accordion(context: Midis2jam2, eventList: MutableList<MidiEvent>, type: Ty
 
         // Positioning
         geometry.run {
-            setLocalTranslation(-70f, 10f, -60f)
+            setLocalTranslation(-75f, 10f, -65f)
             localRotation = Quaternion().fromAngles(rad(0.0), rad(45.0), rad(-5.0))
         }
     }
