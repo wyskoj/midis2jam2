@@ -39,7 +39,7 @@ class Violin(context: Midis2jam2, events: List<MidiEvent>) : StringFamilyInstrum
     }
 
     init {
-        geometry.setLocalTranslation(10f, 57f, -15f)
+        geometry.setLocalTranslation(10f, 62f, -15f)
         geometry.setLocalScale(1f)
         geometry.localRotation = Quaternion().fromAngles(rad(-130.0), rad(-174.0), rad(-28.1))
     }
