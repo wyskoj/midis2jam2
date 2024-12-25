@@ -82,6 +82,12 @@ abstract class KeyedInstrument(
                 }
     }
 
+    /**
+     * Returns the state of the key associated with the [midiNote].
+     *
+     * @param midiNote The MIDI note to check.
+     * @return The state of the key.
+     */
     open fun keyStatus(midiNote: Byte): Key.State =
         collector.currentTimedArcs.firstOrNull { it.note == midiNote }?.let {
             Key.State.Down(it.noteOn.velocity)

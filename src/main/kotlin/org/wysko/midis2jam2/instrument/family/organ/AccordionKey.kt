@@ -29,9 +29,9 @@ class AccordionKey(
 ) : Key(
     rotationAxis = Axis.Y.identity,
     inverseRotation = true,
-    keyboardConfiguration = Accordion.KEY_CONFIGURATION,
+    keyboardConfiguration = Accordion.keyboardConfiguration,
     moveValue = when (Color.fromNote(midiNote)) {
-        Color.White -> -whiteKeyIndex + (Accordion.WHITE_KEY_COUNT / 2)
+        Color.White -> -whiteKeyIndex + Accordion.WHITE_KEY_COUNT / 2.0f
         Color.Black -> -midiNote * (7f / 12f) + 6.2f
     },
     midiNote = midiNote,
