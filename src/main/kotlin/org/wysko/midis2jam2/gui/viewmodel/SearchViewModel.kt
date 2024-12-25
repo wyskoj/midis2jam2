@@ -142,7 +142,7 @@ class SearchViewModel {
      * Builds the search index for MIDI files in the selected directory.
      */
     private fun buildSearchIndex() {
-        searchEngine = MidiSearchEngine(File(selectedDirectory.value), searchRecursively = true).also { engine ->
+        searchEngine = MidiSearchEngine(File(selectedDirectory.value)).also { engine ->
             val waitThenShowProgressTask = CoroutineScope(IO).launch {
                 delay(1000)
                 _showProgress.value = true
