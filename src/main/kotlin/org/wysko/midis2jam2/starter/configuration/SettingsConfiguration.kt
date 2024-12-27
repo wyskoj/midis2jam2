@@ -56,7 +56,7 @@ data class SettingsConfiguration(
      * Whether to always show instruments throughout the song.
      */
     @SerialName("never_hidden")
-    val instrumentsAlwaysVisible: Boolean = true,
+    val instrumentsAlwaysVisible: Boolean = false,
 
     /**
      * Whether the free-cam is smooth.
