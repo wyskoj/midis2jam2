@@ -16,147 +16,107 @@
  */
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
-import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
+import org.spongepowered.noise.Noise.gradientCoherentNoise3D
+import org.spongepowered.noise.NoiseQuality.STANDARD
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.rot
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
-import java.util.*
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
-/** *You used to call me on my cellphone...* */
-class TelephoneRing(context: Midis2jam2, eventList: List<MidiEvent>) :
-    SustainedInstrument(context, eventList) {
-    /** The Up node. */
-    private val upNode =
-        Node().apply {
-            localRotation = Quaternion().fromAngles(rad(19.0), 0f, 0f)
-        }.also {
-            geometry.attachChild(it)
-        }
-
-    /** The Down node. */
-    private val downNode =
-        Node().apply {
-            localRotation = Quaternion().fromAngles(rad(19.0), 0f, 0f)
-        }.also {
-            geometry.attachChild(it)
-        }
-
-    /** The Up keys. */
-    private val upKeys =
-        Array(12) {
-            context.modelD("TelePhoneKey.obj", "TelePhoneKey${it.toKeyString()}Dark.bmp").apply {
-                setLocalTranslation(1.2f * (it % 3 - 1), 3.89f, -2.7f - 1.2f * -(it / 3))
-                upNode.attachChild(this)
-            }
-        }
-
-    /** The Down keys. */
-    private val downKeys =
-        Array(12) {
-            context.modelD("TelePhoneKey.obj", "TelePhoneKey${it.toKeyString()}.bmp").apply {
-                setLocalTranslation(1.2f * (it % 3 - 1), 3.4f, -2.7f - 1.2f * -(it / 3))
-                cullHint = Always
-                downNode.attachChild(this)
-            }
-        }
-
-    /** For each key, is it playing? */
-    private val playing: BooleanArray = BooleanArray(12)
-
-    /** The handle. */
-    private val handle: Spatial =
-        context.modelD("TelePhoneHandle.obj", "TelephoneHandle.bmp").also {
-            geometry.attachChild(it)
-        }
-
-    /** The amount to shake the handle. */
-    private var force = 0.0
-
-    /** Random for phone animation. */
-    private val random = Random()
-
-    init {
-        context.modelD("TelePhoneBase.obj", "TelephoneBase.bmp").apply {
-            (this as Node).getChild(0).setMaterial(context.diffuseMaterial("RubberFoot.bmp"))
-        }.also {
-            geometry.attachChild(it)
-        }
-
-        geometry.setLocalTranslation(0f, 1f, -50f)
-    }
-
-    override fun tick(
-        time: Duration,
-        delta: Duration,
-    ) {
-        super.tick(time, delta)
-
-        // Turn off everything
-        playing.fill(false)
-        upKeys.forEach { it.cullHint = Dynamic }
-        downKeys.forEach { it.cullHint = Always }
-
-        // Turn on current note periods
-        collector.currentTimedArcs.forEach {
-            with((it.note + 3) % 12) {
-                playing[this] = true
-                upKeys[this].cullHint = Always
-                downKeys[this].cullHint = Dynamic
-            }
-        }
-
-        // Animate phone handle
-        handle.loc = v3(0f, (2 + random.nextGaussian() * 0.3).toFloat() * force, 0f)
-        handle.rot = v3(
-            rad(random.nextGaussian() * 3) * force,
-            rad(random.nextGaussian() * 3) * force,
-            0f,
-        )
-        if (playing.any { it }) {
-            force += 12 * delta.toDouble(SECONDS)
-            force = 1.0.coerceAtMost(force)
-        } else {
-            force -= 12 * delta.toDouble(SECONDS)
-            force = 0.0.coerceAtLeast(force)
-        }
-    }
-
-    override fun adjustForMultipleInstances(delta: Duration) {
-        root.setLocalTranslation(13f * updateInstrumentIndex(delta), 0f, 0f)
-    }
-}
+private const val KEY_MODEL = "TelePhoneKey.obj"
 
 /**
- * Converts an integer to the telephone key string.
+ * The telephone ring.
+ *
+ * @param context Context to the main class.
+ * @param eventList List of MIDI events.
  */
-fun Int.toKeyString(): String =
-    when {
-        this < 9 -> {
-            (this + 1).toString()
-        }
+class TelephoneRing(context: Midis2jam2, eventList: List<MidiEvent>) : SustainedInstrument(context, eventList),
+    MultipleInstancesLinearAdjustment {
+    override val multipleInstancesDirection: Vector3f = v3(13, 0, 0)
 
-        this == 9 -> {
-            "Star"
+    private val keysUp = List(12) {
+        context.modelD(KEY_MODEL, "TelePhoneKey${it.toKeyString()}Dark.bmp").apply {
+            loc = v3(
+                x = 1.2 * (it % 3 - 1), y = 3.9, z = -2.7 - 1.2 * -(it / 3)
+            )
         }
-
-        this == 10 -> {
-            "0"
-        }
-
-        this == 11 -> {
-            "Pound"
-        }
-
-        else -> throw IllegalStateException()
     }
+
+    private val keysDown = List(12) {
+        context.modelD(KEY_MODEL, "TelePhoneKey${it.toKeyString()}.bmp").apply {
+            loc = v3(
+                x = 1.2 * (it % 3 - 1), y = 3.4, z = -2.7 - 1.2 * -(it / 3)
+            )
+            cullHint = false.ch // Start hidden
+        }
+    }
+
+    private val handle = context.modelD("TelePhoneHandle.obj", "TelephoneHandle.bmp")
+
+    init {
+        with(geometry) {
+            loc = v3(0, 1, -50)
+            +node {
+                rot = v3(19, 0, 0)
+                keysUp.forEach { +it }
+                keysDown.forEach { +it }
+            }
+            +context.modelD("TelePhoneBase.obj", "TelephoneBase.bmp").apply {
+                (this as Node).children[0].material = context.diffuseMaterial("RubberFoot.bmp")
+            }
+            +handle
+        }
+    }
+
+    private val keyStates = MutableList(12) { false }
+    private var force = 0.0
+
+    override fun tick(time: Duration, delta: Duration) {
+        super.tick(time, delta)
+
+        // Reset state
+        keyStates.fill(false)
+        keysUp.forEach { it.cullHint = true.ch }
+        keysDown.forEach { it.cullHint = false.ch }
+
+        // Update key states
+        collector.currentTimedArcs.forEach {
+            with((it.note + 3) % 12) {
+                keyStates[this] = true
+                keysUp[this].cullHint = Always
+                keysDown[this].cullHint = Dynamic
+            }
+        }
+
+        handle.run {
+            loc = v3(0, force * handleRandomLocation(time), 0)
+            rot = v3(0, 0, 20 * force * handleRandomRotation(time))
+        }
+        force = interpolateTo(force, if (keyStates.any { it }) 1.0 else 0.0, delta, 20.0)
+    }
+
+    private fun handleRandomLocation(time: Duration) =
+        3 + gradientCoherentNoise3D(0.0, 0.0, time.toDouble(SECONDS) * 10, 0, STANDARD)
+
+    private fun handleRandomRotation(time: Duration) =
+        gradientCoherentNoise3D(0.0, 0.0, time.toDouble(SECONDS) * 15, 1, STANDARD) - 0.5
+
+    override fun toString(): String = super.toString() + formatProperties(::force, ::keyStates)
+}
+
+private fun Int.toKeyString(): String = when {
+    this < 9 -> (this + 1).toString()
+    this == 9 -> "Star"
+    this == 10 -> "0"
+    this == 11 -> "Pound"
+    else -> throw IllegalArgumentException()
+}
