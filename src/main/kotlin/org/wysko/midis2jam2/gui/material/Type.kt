@@ -15,24 +15,11 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.gui.components
+package org.wysko.midis2jam2.gui.material
 
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import midis2jam2.generated.resources.Res
-import midis2jam2.generated.resources.help
-import org.jetbrains.compose.resources.painterResource
-import org.wysko.midis2jam2.gui.util.openHelp
+import androidx.compose.material3.Typography
 
 /**
- * A floating action button that opens the help page.
+ * The typography for the application.
  */
-@Composable
-fun HelpButton() {
-    FloatingActionButton({
-        openHelp()
-    }) {
-        Icon(painterResource(Res.drawable.help), contentDescription = "Help")
-    }
-}
+val AppTypography: Typography = Typography()

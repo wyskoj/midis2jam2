@@ -1,6 +1,7 @@
 [versions]
 jme3 = "3.6.1-stable"
 kotlin = "1.9.21"
+compose = "1.7.3"
 
 [libraries]
 jme3-core = { group = "org.jmonkeyengine", name = "jme3-core", version.ref = "jme3" }
@@ -15,6 +16,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.9.0" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.6" }
 kmidi = { group = "org.wysko", name = "kmidi", version = "0.0.6" }
+compose-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
 
 [bundles]
 jme3 = ["jme3-core", "jme3-desktop", "jme3-effects"]
@@ -22,7 +24,7 @@ jme3 = ["jme3-core", "jme3-desktop", "jme3-effects"]
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-compose = { id = "org.jetbrains.compose", version = "1.7.3" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.6" }
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
 licenseReport = { id = "com.github.hierynomus.license-report", version = "0.16.1" }

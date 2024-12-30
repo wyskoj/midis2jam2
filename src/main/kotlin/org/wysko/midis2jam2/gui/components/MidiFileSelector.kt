@@ -23,11 +23,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -40,18 +36,30 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * A composable that allows the user to select a MIDI file.
+ *
+ * @param modifier The modifier to apply to this layout.
+ * @param selectedMidiFile The currently selected MIDI file.
+ * @param focusCount The number of times the focus has been requested.
+ * @param openMidiFileBrowse The function to call when the user wants to browse for a MIDI file.
+ */
 @Composable
 fun MidiFileSelector(
-    modifier: Modifier = Modifier, selectedMidiFile: String, focusCount: Int, openMidiFileBrowse: () -> Unit
+    modifier: Modifier = Modifier,
+    selectedMidiFile: String,
+    focusCount: Int,
+    openMidiFileBrowse: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
     ) {
-        TextField(modifier = Modifier.focusable(false).fillMaxWidth().focusRequester(focusRequester),
+        TextField(
+            modifier = Modifier.focusable(false).fillMaxWidth().focusRequester(focusRequester),
             value = selectedMidiFile,
             onValueChange = { },
             label = { Text(I18n["midi_file"].value) },
@@ -65,8 +73,9 @@ fun MidiFileSelector(
                         Icon(Icons.AutoMirrored.Filled.List, contentDescription = I18n["browse"].value)
                     }
                 }
-            })
-
+            },
+            colors = TextFieldDefaults.colors()
+        )
     }
 
     DisposableEffect(focusCount) {
