@@ -324,7 +324,9 @@ val extendedDarkHighContrast: ExtendedColorScheme = ExtendedColorScheme(
     ),
 )
 
-
+/**
+ * A set of colors used in the app, based on the Material Design color system.
+ */
 @Immutable
 data class ColorFamily(
     val color: Color,
