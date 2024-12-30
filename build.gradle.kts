@@ -102,6 +102,7 @@ dependencies {
         implementation(libs.jme3.lwjgl3)
     }
     implementation(compose.material3)
+    implementation(compose.components.resources)
     implementation(libs.mpfilepicker)
     implementation(libs.install4j.runtime)
     implementation(libs.noise)
@@ -141,4 +142,11 @@ detekt { config.setFrom(files("detekt-config.yml")) }
 downloadLicenses {
     includeProjectDependencies = true
     dependencyConfiguration = "compileClasspath"
+}
+
+compose.resources {
+    customDirectory(
+        sourceSetName = "main",
+        directoryProvider = provider { layout.projectDirectory.dir("src/main/resources/composeResources") },
+    )
 }

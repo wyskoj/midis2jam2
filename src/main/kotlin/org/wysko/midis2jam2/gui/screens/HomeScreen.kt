@@ -31,10 +31,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import kotlinx.coroutines.launch
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.graphic_eq
+import midis2jam2.generated.resources.repeat
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.components.*
 import org.wysko.midis2jam2.gui.viewmodel.HomeViewModel
 import org.wysko.midis2jam2.gui.viewmodel.I18n
@@ -117,7 +120,7 @@ fun HomeScreen(
                         IconToggleButton(isLooping, {
                             homeViewModel.setLooping(it)
                         }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                            Icon(painterResource("/ico/repeat.svg"), I18n["repeat"].value)
+                            Icon(painterResource(Res.drawable.repeat), I18n["repeat"].value)
                         }
                     }
                 }
@@ -217,7 +220,7 @@ private fun SelectSoundbankRow(
             IconButton({
                 onOpenSoundbankConfig()
             }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                Icon(painterResource("/ico/graphic_eq.svg"), I18n["soundbank_configure"].value)
+                Icon(painterResource(Res.drawable.graphic_eq), I18n["soundbank_configure"].value)
             }
         }
     }

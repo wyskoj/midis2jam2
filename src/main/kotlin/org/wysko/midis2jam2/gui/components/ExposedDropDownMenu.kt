@@ -97,7 +97,7 @@ fun <T> ExposedDropDownMenu(
                 ).onGloballyPositioned { textFieldSize = it.size.toSize() },
             ) {
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceVariant, shape = shape
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainerHighest, shape = shape
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
