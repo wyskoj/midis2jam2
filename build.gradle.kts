@@ -103,7 +103,7 @@ dependencies {
     }
     implementation(compose.material3)
     implementation(compose.components.resources)
-    implementation(libs.mpfilepicker)
+    implementation(libs.filekit)
     implementation(libs.install4j.runtime)
     implementation(libs.noise)
     implementation(libs.kotlinx.serialization.json)

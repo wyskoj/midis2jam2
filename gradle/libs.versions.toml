@@ -9,7 +9,7 @@ jme3-desktop = { group = "org.jmonkeyengine", name = "jme3-desktop", version.ref
 jme3-effects = { group = "org.jmonkeyengine", name = "jme3-effects", version.ref = "jme3" }
 jme3-lwjgl = { group = "org.jmonkeyengine", name = "jme3-lwjgl", version.ref = "jme3" }
 jme3-lwjgl3 = { group = "org.jmonkeyengine", name = "jme3-lwjgl3", version.ref = "jme3" }
-mpfilepicker = { group = "com.darkrockstudios", name = "mpfilepicker", version = "2.0.2!!" }
+filekit = { group = "io.github.vinceglb", name = "filekit-compose", version = "0.8.8" }
 install4j-runtime = { group = "com.install4j", name = "install4j-runtime", version = "10.0.8" }
 noise = { group = "org.spongepowered", name = "noise", version = "2.0.0-SNAPSHOT" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.0" }

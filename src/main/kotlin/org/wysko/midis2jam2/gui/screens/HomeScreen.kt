@@ -32,7 +32,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import midis2jam2.generated.resources.Res
 import midis2jam2.generated.resources.graphic_eq
@@ -44,7 +46,6 @@ import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import java.io.File
-import java.nio.file.FileSystems
 import javax.sound.midi.MidiDevice
 
 /**
@@ -75,8 +76,19 @@ fun HomeScreen(
     val isLooping by homeViewModel.isLooping.collectAsState()
 
     val scope = rememberCoroutineScope()
-    var showFilePicker by remember { mutableStateOf(false) }
     var focusCount by remember { mutableStateOf(0) }
+
+    val selectMidiFileLauncher = rememberFilePickerLauncher(
+        mode = PickerMode.Single,
+        type = PickerType.File(MIDI_FILE_EXTENSIONS),
+        title = "Select MIDI file",
+        initialDirectory = lastMidiFileSelectedDirectory
+    ) { file ->
+        file?.path?.let {
+            homeViewModel.selectMidiFile(File(it))
+        }
+        focusCount++
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -93,7 +105,7 @@ fun HomeScreen(
             ) {
                 Midis2jam2Logo(Modifier.align(Alignment.CenterHorizontally))
                 SelectMidiFileRow(midiFile, {
-                    showFilePicker = true
+                    selectMidiFileLauncher.launch()
                 }, openMidiSearch, flicker, focusCount)
                 SelectMidiDeviceRow(midiDevices, selectedMidiDevice, homeViewModel) {
                     scope.launch {
@@ -126,17 +138,6 @@ fun HomeScreen(
                 }
             }
         }
-    }
-    FilePicker(
-        showFilePicker,
-        fileExtensions = MIDI_FILE_EXTENSIONS,
-        initialDirectory = "$lastMidiFileSelectedDirectory${FileSystems.getDefault().separator}",
-    ) { path ->
-        showFilePicker = false
-        path?.let {
-            homeViewModel.selectMidiFile(File(it.path))
-        }
-        focusCount++
     }
 }
 

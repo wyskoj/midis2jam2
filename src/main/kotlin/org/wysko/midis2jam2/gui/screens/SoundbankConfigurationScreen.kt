@@ -26,12 +26,16 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
 import org.wysko.midis2jam2.starter.configuration.SOUNDBANK_FILE_EXTENSIONS
@@ -43,10 +47,21 @@ fun SoundbankConfigurationScreen(
     onGoBack: () -> Unit,
 ) {
     val soundbanks by viewModel.soundbanks.collectAsState()
-    var showFilePicker by remember { mutableStateOf(false) }
+    val soundbankFilesSelectLauncher = rememberFilePickerLauncher(
+        mode = PickerMode.Multiple(),
+        type = PickerType.File(SOUNDBANK_FILE_EXTENSIONS),
+        title = "Select soundbanks",
+    ) { files ->
+        files?.forEach { file ->
+            file.path?.let {
+                viewModel.addSoundbank(it)
+            }
+        }
+    }
 
-    Scaffold(topBar = { SoundbankTopBar(onGoBack) },
-        floatingActionButton = { AddSoundbankFab { showFilePicker = true } }) { paddingValues ->
+    Scaffold(
+        topBar = { SoundbankTopBar(onGoBack) },
+        floatingActionButton = { AddSoundbankFab { soundbankFilesSelectLauncher.launch() } }) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             AnimatedContent(soundbanks) { soundbanks ->
                 Column(
@@ -63,15 +78,6 @@ fun SoundbankConfigurationScreen(
                     }
                 }
             }
-        }
-    }
-
-    FilePicker(
-        showFilePicker, fileExtensions = SOUNDBANK_FILE_EXTENSIONS
-    ) { path ->
-        showFilePicker = false
-        path?.let {
-            viewModel.addSoundbank(it.path)
         }
     }
 }
