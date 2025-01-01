@@ -19,6 +19,8 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
@@ -30,17 +32,25 @@ import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
 import org.wysko.midis2jam2.world.modelD
-import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+private val HARP_SCALES =
+    Json.decodeFromString<List<Float>>(Utils.resourceToString("/instrument/Harp.json")).mapIndexed { index, fl ->
+        fl - (index / 47.0 * 4.5 + 1.0) // MidiJam.exe
+    }
+
 /**
  * The Harp.
+ *
+ * @param context The context to the main class.
+ * @param eventList The list of MIDI events.
  */
 class Harp(context: Midis2jam2, eventList: MutableList<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     override val collector: TimedArcCollector =
         TimedArcCollector(context, timedArcs) { time: Duration, notePeriod: TimedArc ->
+            // Release early so consecutive notes have a frame of buffer
             time - 33.milliseconds >= notePeriod.endTime
         }
 
@@ -64,6 +74,7 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiEvent>) :
     init {
         with(geometry) {
             +context.modelD("Harp.obj", "HarpSkin.bmp")
+            strings.forEach { +it.node }
         }
         with(placement) {
             loc = v3(-126, 3.6, -30)
@@ -72,6 +83,13 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiEvent>) :
     }
 
     private inner class HarpString(i: Int) {
+        val node = node {
+            // MidiJam.exe
+            loc = v3(0, i / 47.0 * 42.0 + 4.7379999, -i * 0.75 - 4.0)
+            rot = v3(4, 0, 0)
+            scale = v3(1, ((1.0 - i / 47.0) * 42.0 + HARP_SCALES[i] - 42.0) / 72.0, 1)
+        }
+
         private val midiNotes = (24..103).filter {
             var note = it.toByte()
             if (Key.Color.fromNote(note) == Black) {
@@ -86,30 +104,34 @@ class Harp(context: Midis2jam2, eventList: MutableList<MidiEvent>) :
             else -> HarpTextures.White
         }
 
-        private val stringNode = node {
-            loc = v3(0f, 2.1444f + 0.8777f * i, -2.27f + 0.75651f * -i)
-            scale = v3(1f, (2.44816E-4 * i.toDouble().pow(2.0) + -0.02866 * i + 0.97509), 1f)
-        }.also { geometry += it }
-
-        private val idleString: Spatial = with(stringNode) {
+        private val idleString: Spatial = with(node) {
             +context.modelD("HarpString.obj", textures.idle)
         }
 
-        private val vibratingStringNode = with(stringNode) { +node() }
+        private val vibratingStringNode = node()
 
         private val vibratingStrings: List<Spatial> = List(5) {
             context.modelD("HarpStringPlaying$it.obj", textures.playing).apply {
                 cullHint = false.ch
                 (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
             }
-        }.onEach { vibratingStringNode += it }
+        }
 
         private val stringAnimator = StringVibrationController(vibratingStrings)
 
+        init {
+            with(node) {
+                +idleString
+                +vibratingStringNode.apply {
+                    vibratingStrings.forEach { +it }
+                }
+            }
+        }
+
         fun tick(delta: Duration) {
-            with(collector.currentTimedArcs.any { it.note in midiNotes }) {
-                idleString.cullHint = (!this).ch
-                vibratingStringNode.cullHint = this.ch
+            collector.currentTimedArcs.any { it.note in midiNotes }.let { playing ->
+                idleString.cullHint = (!playing).ch
+                vibratingStringNode.cullHint = playing.ch
             }
             stringAnimator.tick(delta)
         }
