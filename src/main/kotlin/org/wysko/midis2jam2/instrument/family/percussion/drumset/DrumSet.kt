@@ -18,8 +18,12 @@
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
+import org.wysko.midis2jam2.midi.RIDE_BELL
+import org.wysko.midis2jam2.midi.RIDE_CYMBAL_1
+import org.wysko.midis2jam2.midi.RIDE_CYMBAL_2
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration.Companion.isFakeShadows
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.plusAssign
@@ -27,36 +31,65 @@ import org.wysko.midis2jam2.util.v3
 import kotlin.time.Duration
 
 /**
- * A drum set consists of the [BassDrum], [SnareDrum], [HiHat], [Toms][Tom], and [Cymbals][Cymbal]. This class abstracts
- * the common functionality of these instruments. It also handles the visibility of the drum set.
+ * The drum set.
  *
  * @param context The context to the main class.
  * @param events The events that this drum set is responsible for.
  */
-abstract class DrumSet(
-    context: Midis2jam2,
-    events: List<NoteEvent.NoteOn>,
-) : PercussionInstrument(context, events.toMutableList()) {
+abstract class DrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>) :
+    PercussionInstrument(context, events.toMutableList()) {
+
     init {
         if (context.isFakeShadows) {
-            geometry +=
-                context.assetLoader.fakeShadow("Assets/DrumShadow.obj", "Assets/DrumShadow.png").apply {
-                    loc = v3(0, 0.01, -80)
-                }
+            geometry += context.assetLoader.fakeShadow("Assets/DrumShadow.obj", "Assets/DrumShadow.png").apply {
+                loc = v3(0, 0.01, -80)
+            }
         }
     }
 
-    override fun calculateVisibility(
-        time: Duration,
-        future: Boolean,
-    ): Boolean =
-        (
-            context.drumSetVisibilityManager.isVisible &&
-                context.drumSetVisibilityManager.currentlyVisibleDrumSet == this
-        ).also {
-            if (!isVisible && it) onEntry()
-            if (isVisible && !it) onExit()
+    override fun calculateVisibility(time: Duration, future: Boolean): Boolean =
+        with(context.drumSetVisibilityManager) {
+            return (isVisible && currentlyVisibleDrumSet == this@DrumSet).also {
+                if (!this@DrumSet.isVisible && it) onEntry()
+                if (this@DrumSet.isVisible && !it) onExit()
+            }
         }
 
     override fun adjustForMultipleInstances(delta: Duration): Unit = Unit // The drum set is always in the same place.
+
+    companion object {
+        /**
+         * Given a set of events for ride cymbals, partitions them based on which cymbal each event is for.
+         *
+         * @param events The events to partition.
+         * @return A pair of lists, the first list is for the first cymbal, the second list is for the second cymbal.
+         */
+        fun partitionRideCymbals(events: List<NoteEvent.NoteOn>): Pair<List<NoteEvent.NoteOn>, List<NoteEvent.NoteOn>> {
+            var currentRide = 1
+            val ride1Notes = mutableListOf<NoteEvent.NoteOn>()
+            val ride2Notes = mutableListOf<NoteEvent.NoteOn>()
+            events.filterByNotes(RIDE_BELL, RIDE_CYMBAL_1, RIDE_CYMBAL_2).forEach {
+                when (it.note) {
+                    RIDE_CYMBAL_1 -> {
+                        ride1Notes.add(it)
+                        currentRide = 1
+                    }
+
+                    RIDE_CYMBAL_2 -> {
+                        ride2Notes.add(it)
+                        currentRide = 2
+                    }
+
+                    RIDE_BELL -> {
+                        if (currentRide == 1) {
+                            ride1Notes.add(it)
+                        } else {
+                            ride2Notes.add(it)
+                        }
+                    }
+                }
+            }
+            return Pair(ride1Notes, ride2Notes)
+        }
+    }
 }

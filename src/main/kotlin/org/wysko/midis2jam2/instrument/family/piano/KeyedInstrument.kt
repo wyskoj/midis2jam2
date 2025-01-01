@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 abstract class KeyedInstrument(
     context: Midis2jam2,
-    eventList: MutableList<MidiEvent>,
+    eventList: List<MidiEvent>,
     val rangeLow: Byte,
     val rangeHigh: Byte,
 ) : SustainedInstrument(context, eventList) {

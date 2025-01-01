@@ -27,8 +27,8 @@ private const val EDGE_POSITION = 18f
 private const val STICK_MOVE_SPEED = 30f
 
 /** The ride cymbal. */
-class RideCymbal(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, type: CymbalType) :
-    Cymbal(context, hits, type) {
+class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: CymbalType, style: Style = Style.Standard) :
+    Cymbal(context, hits, type, style) {
     private var targetStickPosition = EDGE_POSITION
     private var stickPosition = EDGE_POSITION
 

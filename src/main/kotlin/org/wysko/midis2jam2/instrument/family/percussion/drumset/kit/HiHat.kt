@@ -40,7 +40,7 @@ private const val WOBBLE_SPEED = 10.0
 /** The hi-hat. */
 class HiHat(
     context: Midis2jam2,
-    hits: MutableList<NoteEvent.NoteOn>,
+    hits: List<NoteEvent.NoteOn>,
     private val noteMapping: HiHatNoteMapping = HiHatNoteMapping.Standard,
 ) : DrumSetInstrument(context, hits) {
     private val cymbalsNode =

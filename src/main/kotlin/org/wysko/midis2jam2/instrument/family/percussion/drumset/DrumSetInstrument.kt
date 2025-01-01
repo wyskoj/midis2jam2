@@ -25,7 +25,7 @@ import kotlin.time.Duration
 /**
  * An instrument that is part of the drum set.
  */
-open class DrumSetInstrument(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) :
+open class DrumSetInstrument(context: Midis2jam2, hits: List<NoteEvent.NoteOn>) :
     PercussionInstrument(context, hits) {
     override fun calculateVisibility(time: Duration, future: Boolean): Boolean = true
 }

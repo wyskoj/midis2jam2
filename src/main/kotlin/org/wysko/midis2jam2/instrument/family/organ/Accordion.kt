@@ -53,7 +53,7 @@ private const val MAX_SQUEEZING_SPEED = 2.0
  * @param eventList The list of MIDI events.
  * @param type The type of accordion.
  */
-class Accordion(context: Midis2jam2, eventList: MutableList<MidiEvent>, type: Type) :
+class Accordion(context: Midis2jam2, eventList: List<MidiEvent>, type: Type) :
     KeyedInstrument(context, eventList, 0, 23), MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 30, 0)
     override val keys: Array<Key> = let {

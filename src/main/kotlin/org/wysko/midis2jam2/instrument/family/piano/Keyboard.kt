@@ -36,7 +36,7 @@ private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
 /** The full, 88-key keyboard. */
 open class Keyboard(
     context: Midis2jam2,
-    events: MutableList<MidiEvent>,
+    events: List<MidiEvent>,
     internal val skin: KeyboardSkin,
 ) : KeyedInstrument(context, events, 21, 108), MultipleInstancesLinearAdjustment {
     private val pitchBendController = PitchBendModulationController(context, events)

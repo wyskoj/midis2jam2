@@ -194,7 +194,7 @@ private fun Midis2jam2.debugText(
         appendLine(
             "currentlyVisible: ${
                 this@debugText.drumSetVisibilityManager.currentlyVisibleDrumSet?.let {
-                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.typicalDrumSetSkin.toString() else ""}"
+                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.shellStyle.toString() else ""}"
                 } ?: "null"
             }"
         )

@@ -46,7 +46,7 @@ private val HARP_SCALES =
  * @param context The context to the main class.
  * @param eventList The list of MIDI events.
  */
-class Harp(context: Midis2jam2, eventList: MutableList<MidiEvent>) :
+class Harp(context: Midis2jam2, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     override val collector: TimedArcCollector =
         TimedArcCollector(context, timedArcs) { time: Duration, notePeriod: TimedArc ->

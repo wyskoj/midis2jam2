@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Snare drum. */
-class SnareDrum(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, style: ShellStyle) :
+class SnareDrum(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, style: ShellStyle) :
     DrumSetInstrument(context, hits) {
     private val regularStick =
         Striker(

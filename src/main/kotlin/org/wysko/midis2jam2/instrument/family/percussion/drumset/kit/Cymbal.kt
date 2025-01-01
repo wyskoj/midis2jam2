@@ -29,12 +29,13 @@ import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
-private val POSITION_MAP = buildMap {
+private val STICK_POSITION_MAP = buildMap {
     put("splash", v3(0, 2, 14))
 }
 private val DEFAULT_STICK_POSITION = v3(0, 2, 18)
@@ -42,34 +43,37 @@ private val DEFAULT_STICK_POSITION = v3(0, 2, 18)
 /**
  * A crash, splash, ride, or china cymbal.
  */
-open class Cymbal(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, type: CymbalType) :
-    DrumSetInstrument(context, hits) {
+open class Cymbal(
+    context: Midis2jam2,
+    hits: List<NoteEvent.NoteOn>,
+    type: CymbalType,
+    style: Style = Style.Standard
+) : DrumSetInstrument(context, hits) {
     /**
-     * The stick.
+     * The stick that strikes the cymbal.
      */
-    protected val stick: Striker =
-        Striker(context, hits, StickType.DRUM_SET_STICK).apply {
-            setParent(geometry)
-            node.move(
-                POSITION_MAP.getOrDefault(
-                    type.name,
-                    DEFAULT_STICK_POSITION
-                )
+    protected val stick: Striker = Striker(context, hits, StickType.DRUM_SET_STICK).apply {
+        setParent(geometry)
+        node.move(
+            STICK_POSITION_MAP.getOrDefault(
+                type.name,
+                DEFAULT_STICK_POSITION
             )
-            offsetStick {
-                it.rotate(rad(-20.0), 0f, 0f) // Angles stick down slightly
-            }
+        )
+        offsetStick {
+            it.rot = v3(-20, 0, 0) // Angles stick down slightly
         }
+    }
 
-    private val cymbalModel = with(geometry) {
-        +context.modelR(type.model, "CymbalSkinSphereMap.bmp").apply {
+    private val model = with(geometry) {
+        +context.modelR(type.model, style.texture).apply {
             scale(type.size)
         }
     }
 
     /** The cymbal animator. */
     protected val cymbalAnimator: CymbalAnimator =
-        CymbalAnimator(cymbalModel, type.amplitude, type.wobbleSpeed, type.dampening)
+        CymbalAnimator(model, type.amplitude, type.wobbleSpeed, type.dampening)
 
     init {
         geometry.localTranslation = type.location()
@@ -81,7 +85,25 @@ open class Cymbal(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, type
         stick.tick(time, delta).strike?.let { cymbalAnimator.strike() }
         cymbalAnimator.tick(delta)
     }
+
+    /**
+     * The style of the cymbal.
+     *
+     * @property texture The texture of the cymbal.
+     */
+    sealed class Style(val texture: String) {
+        /**
+         * The standard style of cymbal.
+         */
+        data object Standard : Style("CymbalSkinSphereMap.bmp")
+
+        /**
+         * The electronic style of cymbal.
+         */
+        data object Electronic : Style("black.bmp")
+    }
 }
+
 
 /**
  * Defines properties about a type of cymbal.

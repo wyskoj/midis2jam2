@@ -27,7 +27,7 @@ import kotlin.time.Duration
 /**
  * A keyboard that glows the key 7 semitones below the currently playing note.
  */
-class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiEvent>, skin: KeyboardSkin) :
+class FifthsKeyboard(context: Midis2jam2, events: List<MidiEvent>, skin: KeyboardSkin) :
     Keyboard(context, events, skin) {
 
     override fun tick(time: Duration, delta: Duration) {

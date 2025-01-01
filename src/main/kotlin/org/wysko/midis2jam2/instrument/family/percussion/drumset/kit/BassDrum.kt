@@ -43,7 +43,7 @@ private const val BASS_DRUM_RECOIL_DISTANCE = -3f
  */
 class BassDrum(
     context: Midis2jam2,
-    hits: MutableList<NoteEvent.NoteOn>,
+    hits: List<NoteEvent.NoteOn>,
     style: ShellStyle,
 ) :
     DrumSetInstrument(context, hits) {

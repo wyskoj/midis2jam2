@@ -43,12 +43,12 @@ sealed class ShellStyle(
         override val shellTexture: String,
         override val snareShellTexture: String,
     ) : ShellStyle(
-            "DrumSet_BassDrum.obj",
-            "DrumSet_Tom.obj",
-            "DrumSet_SnareDrum.obj",
-            shellTexture,
-            snareShellTexture,
-        ) {
+        "DrumSet_BassDrum.obj",
+        "DrumSet_Tom.obj",
+        "DrumSet_SnareDrum.obj",
+        shellTexture,
+        snareShellTexture,
+    ) {
         /** Standard set. */
         data object Standard : TypicalDrumShell("DrumShell.bmp", "DrumShell_Snare.bmp")
 
@@ -77,10 +77,8 @@ sealed class ShellStyle(
         }
     }
 
-    sealed class AlternativeDrumShell(
-        override val shellTexture: String,
-        override val snareShellTexture: String,
-    ) : ShellStyle(
+    sealed class AlternativeDrumShell(override val shellTexture: String, override val snareShellTexture: String) :
+        ShellStyle(
             bassDrumModel = "DrumSet_Alternative_BassDrum.obj",
             tomModel = "DrumSet_Alternative.obj",
             snareDrumModel = "DrumSet_Alternative.obj",
