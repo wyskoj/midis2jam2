@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ fun AboutScreen() {
 
                 HorizontalDivider(Modifier.padding(vertical = 16.dp))
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                    Text("Copyright © MMXXI–MMXXIV Jacob Wysko • ${Utils.resourceToString("/version.txt")}")
+                    Text("Copyright © MMXXI–MMXXV Jacob Wysko • ${Utils.resourceToString("/version.txt")}")
                     Text("This program comes with absolutely no warranty.")
                     TextWithLink(
                         text = "See the GNU General Public License for more details.",
