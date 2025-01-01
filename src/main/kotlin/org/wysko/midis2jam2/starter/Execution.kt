@@ -211,8 +211,9 @@ private class Midis2jam2Application(
 private val DEFAULT_JME_SETTINGS =
     AppSettings(true).apply {
         frameRate = -1
-        frequency =
-            GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.first().refreshRate
+        GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.firstOrNull()?.let {
+            frequency = it.refreshRate
+        }
         isVSync = true
         isResizable = false
         isGammaCorrection = false
