@@ -54,7 +54,7 @@ Check this page to see the progress of each instrument's implementation.
 |_99_ FX 3 (crystal) image:doc/check.png[]|_107_ Shamisen image:doc/plus.png[]|_115_ Steel Drums image:doc/check.png[]|_123_ Seashore image:doc/cross.png[]
 |_100_ FX 4 (atmosphere) image:doc/check.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/check.png[]
 |_101_ FX 5 (brightness) image:doc/check.png[]|_109_ Kalimba image:doc/plus.png[]|_117_ Taiko Drum image:doc/check.png[]|_125_ Telephone Ring image:doc/check.png[]
-|_102_ FX 6 (goblins) image:doc/brush.png[]|_110_ Bag pipe image:doc/cross.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
+|_102_ FX 6 (goblins) image:doc/brush.png[]|_110_ Bag pipe image:doc/plus.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
 |_103_ FX 7 (echoes) image:doc/check.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/check.png[]
 |_104_ FX 8 (sci-fi) image:doc/check.png[]|_112_ Shanai image:doc/cross.png[]|_120_ Reverse Cymbal image:doc/plus.png[]|_128_ Gunshot image:doc/cross.png[]
 |===
