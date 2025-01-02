@@ -13,26 +13,26 @@ Check this page to see the progress of each instrument's implementation.
 
 |===
 |*Piano*|*Chromatic Percussion*|*Organ*|*Guitar*
-|_1_ Acoustic Grand Piano image:doc/check.png[]|_9_ Celesta image:doc/check.png[]|_17_ Drawbar Organ image:doc/check.png[]|_25_ Acoustic Guitar (nylon) image:doc/brush.png[]
+|_1_ Acoustic Grand Piano image:doc/check.png[]|_9_ Celesta image:doc/brush.png[]|_17_ Drawbar Organ image:doc/check.png[]|_25_ Acoustic Guitar (nylon) image:doc/brush.png[]
 |_2_ Bright Acoustic Piano image:doc/brush.png[]|_10_ Glockenspiel image:doc/check.png[]|_18_ Percussive Organ image:doc/check.png[]|_26_ Acoustic Guitar (steel) image:doc/brush.png[]
 |_3_ Electric Grand Piano image:doc/brush.png[]|_11_ Music Box image:doc/check.png[]|_19_ Rock Organ image:doc/check.png[]|_27_ Electric Guitar (jazz) image:doc/check.png[]
 |_4_ Honky-tonk Piano image:doc/brush.png[]|_12_ Vibraphone image:doc/check.png[]|_20_ Church Organ image:doc/check.png[]|_28_ Electric Guitar (clean) image:doc/check.png[]
 |_5_ Electric Piano _1_ image:doc/brush.png[]|_13_ Marimba image:doc/check.png[]|_21_ Reed Organ image:doc/check.png[]|_29_ Electric Guitar (muted) image:doc/check.png[]
 |_6_ Electric Piano _2_ image:doc/brush.png[]|_14_ Xylophone image:doc/check.png[]|_22_ Accordion image:doc/check.png[]|_30_ Overdriven Guitar image:doc/check.png[]
 |_7_ Harpsichord image:doc/check.png[]|_15_ Tubular Bells image:doc/check.png[]|_23_ Harmonica image:doc/check.png[]|_31_ Distortion Guitar image:doc/check.png[]
-|_8_ Clavi image:doc/brush.png[]|_16_ Dulcimer image:doc/check.png[]|_24_ Tango Accordion image:doc/check.png[]|_32_ Guitar Harmonics image:doc/check.png[]
+|_8_ Clavi image:doc/brush.png[]|_16_ Dulcimer image:doc/check.png[]|_24_ Tango Accordion image:doc/brush.png[]|_32_ Guitar Harmonics image:doc/check.png[]
 |===
 
 |===
 |*Bass*|*Strings*|*Ensemble*|*Brass*
-|_33_ Acoustic Bass image:doc/check.png[]|_41_ Violin image:doc/check.png[]|_49_ String Ensemble 1 image:doc/check.png[]|_57_ Trumpet image:doc/check.png[]
+|_33_ Acoustic Bass image:doc/brush.png[]|_41_ Violin image:doc/check.png[]|_49_ String Ensemble 1 image:doc/check.png[]|_57_ Trumpet image:doc/check.png[]
 |_34_ Electric Bass (finger) image:doc/check.png[]|_42_ Viola image:doc/check.png[]|_50_ String Ensemble 2 image:doc/brush.png[]|_58_ Trombone image:doc/check.png[]
 |_35_ Electric Bass (pick) image:doc/check.png[]|_43_ Cello image:doc/check.png[]|_51_ Synth Strings 1 image:doc/brush.png[]|_59_ Tuba image:doc/check.png[]
 |_36_ Fretless Bass image:doc/brush.png[]|_44_ Contrabass image:doc/check.png[]|_52_ Synth Strings 2 image:doc/brush.png[]|_60_ Muted Trumpet image:doc/check.png[]
 |_37_ Slap Bass 1 image:doc/check.png[]|_45_ Tremolo Strings image:doc/brush.png[]|_53_ Choir Aahs image:doc/check.png[]|_61_ French Horn image:doc/check.png[]
 |_38_ Slap Bass 2 image:doc/check.png[]|_46_ Pizzicato Strings image:doc/check.png[]|_54_ Voice Oohs image:doc/brush.png[]|_62_ Brass Section image:doc/check.png[]
-|_39_ Synth Bass 1 image:doc/check.png[]|_47_ Orchestral Harp image:doc/check.png[]|_55_ Synth Voice image:doc/brush.png[]|_63_ Synth Brass 1 image:doc/brush.png[]
-|_40_ Synth Bass 2 image:doc/check.png[]|_48_ Timpani image:doc/check.png[]|_56_ Orchestra Hit image:doc/check.png[]|_64_ Synth Brass 2 image:doc/brush.png[]
+|_39_ Synth Bass 1 image:doc/brush.png[]|_47_ Orchestral Harp image:doc/check.png[]|_55_ Synth Voice image:doc/brush.png[]|_63_ Synth Brass 1 image:doc/brush.png[]
+|_40_ Synth Bass 2 image:doc/brush.png[]|_48_ Timpani image:doc/check.png[]|_56_ Orchestra Hit image:doc/check.png[]|_64_ Synth Brass 2 image:doc/brush.png[]
 |===
 
 |===
@@ -41,21 +41,21 @@ Check this page to see the progress of each instrument's implementation.
 |_66_ Alto Sax image:doc/check.png[]|_74_ Flute image:doc/check.png[]|_82_ Lead 2 (sawtooth) image:doc/brush.png[]|_90_ Pad 2 (warm) image:doc/brush.png[]
 |_67_ Tenor Sax image:doc/check.png[]|_75_ Recorder image:doc/check.png[]|_83_ Lead 3 (calliope) image:doc/check.png[]|_91_ Pad 3 (polysynth) image:doc/brush.png[]
 |_68_ Baritone Sax image:doc/check.png[]|_76_ Pan Flute image:doc/check.png[]|_84_ Lead 4 (chiff) image:doc/brush.png[]|_92_ Pad 4 (choir) image:doc/brush.png[]
-|_69_ Oboe image:doc/plus.png[]|_77_ Blown bottle image:doc/check.png[]|_85_ Lead 5 (charang) image:doc/brush.png[]|_93_ Pad 5 (bowed) image:doc/check.png[]
-|_70_ English Horn image:doc/cross.png[]|_78_ Shakuhachi image:doc/cross.png[]|_86_ Lead 6 (voice) image:doc/check.png[]|_94_ Pad 6 (metallic) image:doc/brush.png[]
-|_71_ Bassoon image:doc/cross.png[]|_79_ Whistle image:doc/check.png[]|_87_ Lead 7 (fifths) image:doc/check.png[]|_95_ Pad 7 (halo) image:doc/brush.png[]
+|_69_ Oboe image:doc/plus.png[]|_77_ Blown bottle image:doc/check.png[]|_85_ Lead 5 (charang) image:doc/brush.png[]|_93_ Pad 5 (bowed) image:doc/brush.png[]
+|_70_ English Horn image:doc/cross.png[]|_78_ Shakuhachi image:doc/cross.png[]|_86_ Lead 6 (voice) image:doc/brush.png[]|_94_ Pad 6 (metallic) image:doc/brush.png[]
+|_71_ Bassoon image:doc/cross.png[]|_79_ Whistle image:doc/check.png[]|_87_ Lead 7 (fifths) image:doc/brush.png[]|_95_ Pad 7 (halo) image:doc/brush.png[]
 |_72_ Clarinet image:doc/plus.png[]|_80_ Ocarina image:doc/check.png[]|_88_ Lead 8 (bass + lead) image:doc/brush.png[]|_96_ Pad 8 (sweep) image:doc/check.png[]
 |===
 
 |===
 |*Synth FX*|*Ethnic*|*Percussive*|*Sound Effects*
 |_97_ FX 1 (rain) image:doc/check.png[]|_105_ Sitar image:doc/cross.png[]|_113_ Tinkle Bell image:doc/brush.png[]|_121_ Guitar Fret Noise image:doc/check.png[]
-|_98_ FX 2 (soundtrack) image:doc/check.png[]|_106_ Banjo image:doc/plus.png[]|_114_ Agogô image:doc/check.png[]|_122_ Breath Noise image:doc/check.png[]
+|_98_ FX 2 (soundtrack) image:doc/check.png[]|_106_ Banjo image:doc/plus.png[]|_114_ Agogô image:doc/check.png[]|_122_ Breath Noise image:doc/brush.png[]
 |_99_ FX 3 (crystal) image:doc/check.png[]|_107_ Shamisen image:doc/plus.png[]|_115_ Steel Drums image:doc/check.png[]|_123_ Seashore image:doc/cross.png[]
 |_100_ FX 4 (atmosphere) image:doc/check.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/check.png[]
 |_101_ FX 5 (brightness) image:doc/check.png[]|_109_ Kalimba image:doc/plus.png[]|_117_ Taiko Drum image:doc/check.png[]|_125_ Telephone Ring image:doc/check.png[]
 |_102_ FX 6 (goblins) image:doc/brush.png[]|_110_ Bag pipe image:doc/plus.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
-|_103_ FX 7 (echoes) image:doc/check.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/check.png[]
+|_103_ FX 7 (echoes) image:doc/check.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/brush.png[]
 |_104_ FX 8 (sci-fi) image:doc/check.png[]|_112_ Shanai image:doc/cross.png[]|_120_ Reverse Cymbal image:doc/plus.png[]|_128_ Gunshot image:doc/cross.png[]
 |===
 
