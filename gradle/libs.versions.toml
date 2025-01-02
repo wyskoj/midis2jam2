@@ -1,6 +1,6 @@
 [versions]
 jme3 = "3.6.1-stable"
-kotlin = "1.9.21"
+kotlin = "2.1.0"
 compose = "1.7.3"
 
 [libraries]
@@ -25,6 +25,7 @@ jme3 = ["jme3-core", "jme3-desktop", "jme3-effects"]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-kotlin = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.6" }
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
 licenseReport = { id = "com.github.hierynomus.license-report", version = "0.16.1" }

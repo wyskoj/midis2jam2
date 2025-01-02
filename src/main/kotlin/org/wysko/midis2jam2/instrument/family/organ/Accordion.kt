@@ -59,9 +59,9 @@ class Accordion(context: Midis2jam2, eventList: List<MidiEvent>, type: Type) :
     override val keys: Array<Key> = let {
         var whiteCount = 0
         Array(24) {
-            when (Color.fromNote(it.toByte())) {
-                White -> AccordionKey(it.toByte(), whiteCount++, this)
-                Black -> AccordionKey(it.toByte(), it, this)
+            when (Color.fromNoteNumber(it.toByte())) {
+                White -> AccordionKey(this, it.toByte(), whiteCount++)
+                Black -> AccordionKey(this, it.toByte(), it)
             }
         }
     }

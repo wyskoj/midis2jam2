@@ -55,41 +55,39 @@ import kotlin.reflect.KClass
  * They only move along the X- and Z-axes.
  *
  * Mallet shadows are handled by [Mallets].
- *
  */
-context(Midis2jam2)
-class ShadowController {
-    private val keyboardShadow: Spatial = with(root) {
-        +assetLoader.fakeShadow("Assets/PianoShadow.obj", "Assets/KeyboardShadow.png").apply {
+class FakeShadowsController(private val context: Midis2jam2) {
+    private val keyboardShadow: Spatial = with(context.root) {
+        +context.assetLoader.fakeShadow("Assets/PianoShadow.obj", "Assets/KeyboardShadow.png").apply {
             loc = v3(-47, 0.1, 3)
             rot = v3(0, 45, 0)
         }
     }
-    private val harpShadows = List(instruments.count { it is Harp }) {
-        assetLoader.fakeShadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png").apply {
+    private val harpShadows = List(context.instruments.count { it is Harp }) {
+        context.assetLoader.fakeShadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png").apply {
             loc = v3(-126, 0.1, -30 + 60 * it)
             rot = v3(0, -35, 0)
-        }.also { root += it }
+        }.also { context.root += it }
     }
-    private val guitarShadows = List(instruments.count { it is Guitar }) {
-        assetLoader.fakeShadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png").apply {
+    private val guitarShadows = List(context.instruments.count { it is Guitar }) {
+        context.assetLoader.fakeShadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png").apply {
             loc = v3(43.431f + 5 * (it * 1.5f), 0.1f + 0.01f * (it * 1.5f), 7.063f)
             rot = v3(0, -49.0, 0)
-        }.also { root += it }
+        }.also { context.root += it }
     }
-    private val bassGuitarShadows = List(instruments.count { it is BassGuitar }) {
-        assetLoader.fakeShadow("Assets/BassShadow.obj", "Assets/BassShadow.png").apply {
+    private val bassGuitarShadows = List(context.instruments.count { it is BassGuitar }) {
+        context.assetLoader.fakeShadow("Assets/BassShadow.obj", "Assets/BassShadow.png").apply {
             loc = v3(51.5863f + 7 * it, 0.1f + 0.01f * it, -16.5817f)
             rot = v3(0, -43.5, 0)
-        }.also { root += it }
+        }.also { context.root += it }
     }
 
     /**
      * Updates the shadows to match the visibility of the instruments.
      */
     fun tick() {
-        keyboardShadow.cullHint = instruments.any { it is Keyboard && it.isVisible }.ch
-        val keyboards = instruments.filterIsInstance<Keyboard>()
+        keyboardShadow.cullHint = context.instruments.any { it is Keyboard && it.isVisible }.ch
+        val keyboards = context.instruments.filterIsInstance<Keyboard>()
         val scale = if (keyboards.isNotEmpty()) {
             keyboards.filter { it.isVisible }.maxOfOrNull { it.index }?.let {
                 it.toFloat() + 1f
@@ -105,7 +103,7 @@ class ShadowController {
     }
 
     private fun updateArrayShadows(shadows: List<Spatial>, clazz: KClass<out Instrument>) {
-        val numVisible = instruments.count { clazz.isInstance(it) && it.isVisible }
+        val numVisible = context.instruments.count { clazz.isInstance(it) && it.isVisible }
         shadows.forEachIndexed { index, shadow -> shadow.cullHint = (index < numVisible).ch }
     }
 
@@ -116,37 +114,38 @@ class ShadowController {
          *
          * @param fadeFilter The fade filter.
          */
-        context(Midis2jam2)
-        fun configureShadows(fadeFilter: FadeFilter) {
-            val shadowsOnly = LightingSetup.setupLights(root)
-            val graphicsConfig = configs.getType(GraphicsConfiguration::class)
+        fun configureShadows(context: Midis2jam2, fadeFilter: FadeFilter) {
+            with(context) {
+                val shadowsOnly = LightingSetup.setupLights(root)
+                val graphicsConfig = configs.getType(GraphicsConfiguration::class)
 
-            val bloomFilter = BloomFilter(Objects)
-            if (isFakeShadows) {
-                shadowController = ShadowController()
-                FilterPostProcessor(assetManager)
-            } else {
-                root.shadowMode = CastAndReceive
-                stage.shadowMode = Receive
-                FilterPostProcessor(assetManager).apply {
-                    val (nbSplits, mapSize) = GraphicsConfiguration.SHADOW_DEFINITION[graphicsConfig.shadowQuality]
-                        ?: (1 to 1024)
-                    addFilter(
-                        DirectionalLightShadowFilter(assetManager, mapSize, nbSplits).apply {
-                            light = shadowsOnly
-                            isEnabled = true
-                            shadowIntensity = 0.16f
-                            lambda = 0.65f
-                            edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
-                            edgesThickness = 10
-                        },
-                    )
+                val bloomFilter = BloomFilter(Objects)
+                if (isFakeShadows) {
+                    fakeShadowsController = FakeShadowsController(context)
+                    FilterPostProcessor(assetManager)
+                } else {
+                    root.shadowMode = CastAndReceive
+                    stage.shadowMode = Receive
+                    FilterPostProcessor(assetManager).apply {
+                        val (nbSplits, mapSize) = GraphicsConfiguration.SHADOW_DEFINITION[graphicsConfig.shadowQuality]
+                            ?: (1 to 1024)
+                        addFilter(
+                            DirectionalLightShadowFilter(assetManager, mapSize, nbSplits).apply {
+                                light = shadowsOnly
+                                isEnabled = true
+                                shadowIntensity = 0.16f
+                                lambda = 0.65f
+                                edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
+                                edgesThickness = 10
+                            },
+                        )
+                    }
+                }.apply {
+                    addFilter(fadeFilter)
+                    addFilter(bloomFilter)
+                    app.viewPort.addProcessor(this)
+                    numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
                 }
-            }.apply {
-                addFilter(fadeFilter)
-                addFilter(bloomFilter)
-                app.viewPort.addProcessor(this)
-                numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
             }
         }
     }

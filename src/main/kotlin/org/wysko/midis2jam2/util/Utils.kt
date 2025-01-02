@@ -90,7 +90,7 @@ object Utils {
      * @param b The ending value.
      * @param t The interpolation factor.
      */
-    fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t
+    fun lerp(a: Number, b: Number, t: Number): Double = a.toDouble() + (b.toDouble() - a.toDouble()) * t.toDouble()
 }
 
 /** Converts a boolean into its appropriate [CullHint]. */

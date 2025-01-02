@@ -45,7 +45,7 @@ open class Keyboard(
         let {
             var whiteCount = 0
             Array(keyCount()) {
-                when (Color.fromNote((it + rangeLow).toByte())) {
+                when (Color.fromNoteNumber((it + rangeLow).toByte())) {
                     White -> KeyboardKey(this, (it + rangeLow).toByte(), whiteCount++)
                     Black -> KeyboardKey(this, (it + rangeLow).toByte(), it)
                 }

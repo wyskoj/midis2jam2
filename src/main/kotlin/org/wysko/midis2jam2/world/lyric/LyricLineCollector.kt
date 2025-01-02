@@ -64,7 +64,7 @@ class LyricLineCollector(
      */
     override fun seek(time: Duration) {
         with(context) {
-            currentIndex = lines.indexOfLast { it.startTime < time }
+            currentIndex = lines.indexOfLast { startTime(it) < time }
         }
 
         if (currentIndex == -1) currentIndex = 0

@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property context The context to the main class.
  * @property events The list of the text events.
  */
-class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Lyric>) {
+class LyricController(private val context: Midis2jam2, private val events: List<MetaEvent.Lyric>) {
 
     private val font = context.assetManager.loadFont("Assets/Fonts/Inter.fnt")
 
@@ -52,13 +52,13 @@ class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Lyric>
     }, triggerCondition = { line: LyricLine, time: Duration ->
         with(context) {
             currentLine?.let { currentLine ->
-                if (line.startTime - currentLine.endTime < 3.seconds) {
-                    time > ((line.startTime - currentLine.endTime) * 0.8) + currentLine.endTime
+                if (startTime(line) - endTime(currentLine) < 3.seconds) {
+                    time > ((startTime(line) - endTime(currentLine)) * 0.8) + endTime(currentLine)
                 } else {
-                    line.startTime - time < 2.seconds
+                    startTime(line) - time < 2.seconds
                 }
             } ?: let {
-                time >= line.startTime - 2.seconds
+                time >= startTime(line) - 2.seconds
             }
         }
     })
@@ -131,23 +131,26 @@ class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Lyric>
         }
     }
 
-    context(Midis2jam2)
     private fun calculateVisibility(time: Duration) {
-        if (currentLine != null && time in currentLine!!.startTime..currentLine!!.endTime) {
-            isVisible = true
-            return
-        }
-        isVisible = when {
-            lineCollector.peek()?.let { it.startTime - time <= 2.0.seconds } ?: false -> true
-
-            lineCollector.prev()?.let { prev ->
-                lineCollector.peek()?.let { peek ->
-                    peek.startTime - prev.endTime <= 7.0.seconds
+        with(context) {
+            currentLine?.let {
+                if (time in startTime(it)..endTime(it)) {
+                    isVisible = true
+                    return
                 }
-            } ?: false -> true
+            }
+            isVisible = when {
+                lineCollector.peek()?.let { startTime(it) - time <= 2.0.seconds } == true -> true
 
-            lineCollector.prev()?.let { time - it.endTime <= 2.0.seconds } ?: false -> true
-            else -> false
+                lineCollector.prev()?.let { prev ->
+                    lineCollector.peek()?.let { peek ->
+                        startTime(peek) - endTime(prev) <= 7.0.seconds
+                    }
+                } == true -> true
+
+                lineCollector.prev()?.let { time - endTime(it) <= 2.0.seconds } == true -> true
+                else -> false
+            }
         }
     }
 
@@ -158,10 +161,10 @@ class LyricController(val context: Midis2jam2, val events: List<MetaEvent.Lyric>
      * @return The debug info.
      */
     fun debugInfo(time: Duration): String = buildString {
-        val lineTime = with(context) { currentLine?.endTime?.let { currentLine?.startTime?.rangeTo(it) } }
+        val lineTime = with(context) { currentLine?.let { startTime(it)..endTime(it) } }
         appendLine("currentLine        ${currentLine?.renderString()}")
         appendLine("currentLineTime    ${lineTime}\n")
-        appendLine("in currentLineTime ${lineTime?.let { time in it }}\n")
+        appendLine("in currentLineTime ${lineTime?.let { time in it } ?: ""}\n")
         appendLine("currentWord ${currentWord?.text}\n")
         appendLine("peek line   ${lineCollector.peek()?.renderString()}")
         appendLine("prev line   ${lineCollector.prev()?.renderString()}\n")

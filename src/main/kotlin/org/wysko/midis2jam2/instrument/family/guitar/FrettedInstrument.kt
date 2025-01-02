@@ -166,7 +166,9 @@ abstract class FrettedInstrument protected constructor(
         }
     }
 
-    private fun fretToDistance(fret: Int, pitchBendAmount: Float): Float {
+    private fun fretToDistance(fret: Int, pitchBendAmount: Number): Double {
+        val pitchBendAmount = pitchBendAmount.toDouble()
+
         val engine = frettingEngine as StandardFrettingEngine
         // Find the whole number of semitones bent from the pitch bend.
         val semitoneOffset = if (pitchBendAmount > 0) {
@@ -210,7 +212,7 @@ abstract class FrettedInstrument protected constructor(
         /* The fret distance is the ratio of scales for the upper and lower strings.
          * For example, if the note finger lands halfway in between the top and the bottom of the strings,
          * this should be 0.5. */
-        val fretDistance = fretToDistance(fret, pitchBendAmount)
+        val fretDistance = fretToDistance(fret, pitchBendAmount).toFloat()
 
         // Scale the resting string's Y-axis by the fret distance.
         upperStrings[string].localScale = Vector3f(positioning.restingStrings[string]).apply { y = fretDistance }

@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose)
+     alias(libs.plugins.compose.kotlin)
     alias(libs.plugins.detekt)
     alias(libs.plugins.shadow)
     alias(libs.plugins.licenseReport)
@@ -34,7 +35,7 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xcontext-receivers")
     }
 }

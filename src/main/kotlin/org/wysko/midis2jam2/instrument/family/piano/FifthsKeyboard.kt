@@ -37,7 +37,7 @@ class FifthsKeyboard(context: Midis2jam2, events: List<MidiEvent>, skin: Keyboar
                 if (it is Geometry) {
                     it.material.setColor(
                         "GlowColor",
-                        glowColor(collector.currentTimedArcs.any { it.note == (key.midiNote + 5).toByte() })
+                        glowColor(collector.currentTimedArcs.any { it.note == (key.noteNumber + 5).toByte() })
                     )
                 }
             }

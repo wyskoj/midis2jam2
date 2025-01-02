@@ -19,18 +19,8 @@ package org.wysko.midis2jam2.world.lyric
 
 import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.Midis2jam2
-import kotlin.time.Duration
 
-/**
- * A line of lyrics.
- */
 internal typealias LyricLine = List<MetaEvent.Lyric>
 
-
-context(Midis2jam2)
-internal val LyricLine.startTime: Duration
-    get() = sequence.getTimeOf(minBy { it.tick })
-
-context(Midis2jam2)
-internal val LyricLine.endTime: Duration
-    get() = sequence.getTimeOf(maxBy { it.tick })
+internal fun Midis2jam2.startTime(lyricLine: LyricLine) = sequence.getTimeOf(lyricLine.minBy { it.tick })
+internal fun Midis2jam2.endTime(lyricLine: LyricLine) = sequence.getTimeOf(lyricLine.maxBy { it.tick })

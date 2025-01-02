@@ -92,7 +92,7 @@ class Harp(context: Midis2jam2, eventList: List<MidiEvent>) :
 
         private val midiNotes = (24..103).filter {
             var note = it.toByte()
-            if (Key.Color.fromNote(note) == Black) {
+            if (Key.Color.fromNoteNumber(note) == Black) {
                 note--
             }
             getHarpString(note % 12) + (note - 24) / 12 * 7 == i

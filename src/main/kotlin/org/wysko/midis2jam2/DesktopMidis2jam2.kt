@@ -156,7 +156,7 @@ class DesktopMidis2jam2(
     }
 
     private fun tickControllers(delta: Duration) {
-        shadowController?.tick()
+        fakeShadowsController?.tick()
         standController.tick()
         lyricController?.tick(time, delta)
         hudController.tick(time, fadeFilter.value)

@@ -69,7 +69,7 @@ class Mallets(
             var whiteCount = 0
             RANGE.mapIndexed { index, note ->
                 val byte = note.toByte()
-                if (Key.Color.fromNote(byte) == White) {
+                if (Key.Color.fromNoteNumber(byte) == White) {
                     MalletBar(byte, whiteCount++, hitsByNote[index])
                 } else {
                     MalletBar(byte, note, hitsByNote[index])
@@ -167,7 +167,7 @@ class Mallets(
         init {
             val scaleFactor = (RANGE.last - midiNote + 20) / 50f
 
-            if (Key.Color.fromNote(midiNote) == White) {
+            if (Key.Color.fromNoteNumber(midiNote) == White) {
                 upBar = context.modelD("XylophoneWhiteBar.obj", type.textureFile)
                 downBar = context.modelD("XylophoneWhiteBarDown.obj", type.textureFile)
                     .apply { (this as Geometry).material.setColor("GlowColor", DIM_GLOW) }

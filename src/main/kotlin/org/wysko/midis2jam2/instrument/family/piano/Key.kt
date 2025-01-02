@@ -39,7 +39,7 @@ abstract class Key protected constructor(
     private val inverseRotation: Boolean = false,
     keyboardConfiguration: KeyboardConfiguration,
     moveValue: Float,
-    val midiNote: Byte,
+    val noteNumber: Byte,
 ) {
     /** Whether this key is pressed. */
     @Deprecated("")
@@ -61,7 +61,7 @@ abstract class Key protected constructor(
     private var rotationFactor = 0f
 
     init {
-        when (Color.fromNote(midiNote)) {
+        when (Color.fromNoteNumber(noteNumber)) {
             Color.White ->
                 configureKeyParts(
                     configuration = keyboardConfiguration.whiteKeyConfiguration,
@@ -85,7 +85,7 @@ abstract class Key protected constructor(
      * @param delta the amount of time since the last frame update
      */
     open fun tick(delta: Duration) {
-        currentState = keyedInstrument.keyStatus(midiNote)
+        currentState = keyedInstrument.keyStatus(noteNumber)
         if (currentState is State.Down) {
             rotationFactor =
                 PercussionInstrument.velocityRecoilDampening((currentState as State.Down).velocity).toFloat()
@@ -173,7 +173,7 @@ abstract class Key protected constructor(
             /**
              * Given a MIDI [note], determines if it is a [Color.White] or [Color.Black] key on a standard keyboard.
              */
-            fun fromNote(note: Byte): Color =
+            fun fromNoteNumber(note: Byte): Color =
                 when (note % 12) {
                     1, 3, 6, 8, 10 -> Black
                     else -> White
