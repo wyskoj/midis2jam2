@@ -290,7 +290,7 @@ enum class AutoCamPosition(
     GENERAL_D(
         Vector3f(5f, 432f, 24f),
         Quaternion().fromAngles(-1.695151f, 0f, -3.1415927f),
-        { _, _, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera },
+        { _, _, context -> context.configs.getType(SettingsConfiguration::class).isClassicCamera },
         alwaysTrue,
         AutoCamPositionType.STAGE
     ),
