@@ -50,5 +50,11 @@
     "type": "Boolean",
     "category": "tweaks",
     "default": "false"
+  },
+  {
+    "name": "classic_camera",
+    "type": "Boolean",
+    "category": "tweaks",
+    "default": "false"
   }
 ]

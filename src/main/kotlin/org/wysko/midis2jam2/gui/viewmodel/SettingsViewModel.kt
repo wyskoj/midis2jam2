@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
  * @property isShowLyrics Whether the lyrics should be shown.
  * @property isInstrumentsAlwaysVisible Whether the instruments should always be visible.
  * @property isCameraSmooth Whether the camera should be smooth.
+ * @property isClassicCamera Whether the camera should be rigid.
  */
 class SettingsViewModel(
     initialConfiguration: SettingsConfiguration? = null,
@@ -61,6 +62,9 @@ class SettingsViewModel(
     private val _isSpeedModifierMode = MutableStateFlow(false)
     val isSpeedModifierMode: StateFlow<Boolean> get() = _isSpeedModifierMode
 
+    private val _isClassicCamera = MutableStateFlow(false)
+    val isClassicCamera: StateFlow<Boolean> get() = _isClassicCamera
+
     fun setFullscreen(fullscreen: Boolean) = setOption(_isFullscreen, fullscreen)
 
     fun setStartAutocamWithSong(startAutocamWithSong: Boolean) =
@@ -79,6 +83,8 @@ class SettingsViewModel(
 
     fun setIsSpeedModifierMode(bool: Boolean) = setOption(_isSpeedModifierMode, bool)
 
+    fun setIsClassicCamera(bool: Boolean) = setOption(_isClassicCamera, bool)
+
     private fun setOption(option: MutableStateFlow<Boolean>, value: Boolean) {
         option.value = value
         onConfigurationChanged(generateConfiguration())
@@ -92,7 +98,8 @@ class SettingsViewModel(
         instrumentsAlwaysVisible = _isInstrumentsAlwaysVisible.value,
         isCameraSmooth = _isCameraSmooth.value,
         isCursorLocked = _isCursorLocked.value,
-        isSpeedModifierMode = _isSpeedModifierMode.value
+        isSpeedModifierMode = _isSpeedModifierMode.value,
+        isClassicCamera = _isClassicCamera.value
     )
 
     override fun applyConfiguration(configuration: SettingsConfiguration) {
@@ -104,6 +111,7 @@ class SettingsViewModel(
         _isCameraSmooth.value = configuration.isCameraSmooth
         _isCursorLocked.value = configuration.isCursorLocked
         _isSpeedModifierMode.value = configuration.isSpeedModifierMode
+        _isClassicCamera.value = configuration.isClassicCamera
     }
 
     init {
