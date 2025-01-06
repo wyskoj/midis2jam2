@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Snare drum. */
-class SnareDrum(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, style: ShellStyle) :
+class SnareDrum(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, style: ShellStyle) :
     DrumSetInstrument(context, hits) {
     private val regularStick =
         Striker(

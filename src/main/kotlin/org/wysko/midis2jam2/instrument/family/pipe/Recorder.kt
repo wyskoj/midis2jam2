@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,6 +69,6 @@ class Recorder(context: Midis2jam2, events: List<MidiEvent>) :
     }
 
     init {
-        geometry.setLocalTranslation(-7f, 35f, -30f)
+        geometry.setLocalTranslation(-7f, 35f, -25f)
     }
 }

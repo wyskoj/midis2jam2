@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,10 +51,10 @@ class KeyboardKey(keyboard: Keyboard, midiNote: Byte, whiteKeyIndex: Int) : Key(
         ),
     ),
     moveValue =
-    when (Color.fromNote(midiNote)) {
+    when (Color.fromNoteNumber(midiNote)) {
         White -> whiteKeyIndex - (Keyboard.WHITE_KEY_COUNT / 2)
         Black -> midiNote * (7f / 12f) - 38.2f
     },
-    midiNote = midiNote,
+    noteNumber = midiNote,
     keyedInstrument = keyboard,
 )

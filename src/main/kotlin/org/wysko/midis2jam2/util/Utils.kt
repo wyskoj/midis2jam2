@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ import java.net.URL
 import java.util.stream.Collectors
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /** Provides various utility functions. */
 object Utils {
@@ -88,7 +90,7 @@ object Utils {
      * @param b The ending value.
      * @param t The interpolation factor.
      */
-    fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t
+    fun lerp(a: Number, b: Number, t: Number): Double = a.toDouble() + (b.toDouble() - a.toDouble()) * t.toDouble()
 }
 
 /** Converts a boolean into its appropriate [CullHint]. */
@@ -195,4 +197,19 @@ fun randomRotation(): Quaternion = Quaternion().apply {
     val w = FastMath.nextRandomFloat() * 2 - 1
     set(x, y, z, w)
     normalizeLocal()
+}
+
+/**
+ * Gradually advances a value towards a target.
+ *
+ * @param current The current value.
+ * @param target The target value.
+ * @param deltaTime The time since the last frame.
+ * @param interpolationSpeed The speed at which to interpolate.
+ * @return The new value.
+ */
+fun interpolateTo(current: Number, target: Number, deltaTime: Duration, interpolationSpeed: Number): Double {
+    val delta = target.toDouble() - current.toDouble()
+    val interpolationRate = deltaTime.toDouble(DurationUnit.SECONDS) * interpolationSpeed.toDouble()
+    return current.toDouble() + delta * interpolationRate
 }

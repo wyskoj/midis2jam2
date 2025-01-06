@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.ElectronicDrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.OrchestraDrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.AlternativeDrumShell.Analog
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.TypicalDrumShell
 import org.wysko.midis2jam2.instrument.family.percussive.Agogos
 import org.wysko.midis2jam2.instrument.family.percussive.MelodicTom
@@ -237,9 +237,7 @@ object InstrumentAssignment {
         // the controller events.
         // Eliminates any duplicate events from adding the two together
         @Suppress("NAME_SHADOWING")
-        val events =
-            (events + allChannelEvents.filterIsInstance<ControlChangeEvent>()).distinct().sortedBy { it.tick }
-                .toMutableList()
+        val events = (events + allChannelEvents.filterIsInstance<ControlChangeEvent>()).distinct().sortedBy { it.tick }
 
         if (midiNoteEvents.isEmpty()) return null
         return when (program.toInt()) {
@@ -259,9 +257,9 @@ object InstrumentAssignment {
             13 -> Mallets(context, events, MalletType.Xylophone)
             14, 98 -> TubularBells(context, events)
             15, 16, 17, 18, 19, 20, 55 -> Keyboard(context, events, KeyboardSkin["wood"])
-            21 -> Accordion(context, events, Type.ACCORDION)
+            21 -> Accordion(context, events, Type.Accordion)
             22 -> Harmonica(context, events)
-            23 -> Accordion(context, events, Type.BANDONEON)
+            23 -> Accordion(context, events, Type.Bandoneon)
             24, 25, 120 -> Guitar(context, events, GuitarType.Acoustic)
             26 -> Guitar(context, events, GuitarType.Jazz)
             27 -> Guitar(context, events, GuitarType.Clean)
@@ -497,41 +495,20 @@ object InstrumentAssignment {
         context: Midis2jam2,
         program: Int,
         events: MutableList<MidiEvent>,
-    ): DrumSet? {
-        if (events.hits().isEmpty()) return null
-        return when (program.toInt()) {
-            24 -> // Electronic
-                ElectronicDrumSet(
-                    context,
-                    events.hits(),
-                )
-
-            25 -> // Analog
-                TypicalDrumSet(
-                    context,
-                    ShellStyle.AlternativeDrumShell.Analog,
-                    events.hits(),
-                )
-
-            40 -> // Brush
-                BrushDrumSet(
-                    context,
-                    events.hits(),
-                )
-
-            48 -> // Orchestra
-                OrchestraDrumSet(
-                    context,
-                    events.hits(),
-                )
-
-            else ->
-                TypicalDrumSet(
-                    context,
-                    TypicalDrumShell.fromProgramNumber(program.toByte()) ?: TypicalDrumShell.Standard,
-                    events.hits(),
-                )
+    ): DrumSet? = if (events.hits().isNotEmpty()) {
+        when (program) {
+            24 -> ElectronicDrumSet(context, events.hits())
+            25 -> TypicalDrumSet(context, events.hits(), Analog)
+            40 -> BrushDrumSet(context, events.hits())
+            48 -> OrchestraDrumSet(context, events.hits())
+            else -> TypicalDrumSet(
+                context,
+                events.hits(),
+                TypicalDrumShell.fromProgramNumber(program.toByte()) ?: TypicalDrumShell.Standard,
+            )
         }
+    } else {
+        null
     }
 
     private fun List<MidiEvent>.notes(vararg notes: Int): List<NoteEvent>? =

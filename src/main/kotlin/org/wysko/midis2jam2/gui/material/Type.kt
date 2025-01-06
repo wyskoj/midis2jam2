@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,4 +15,11 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset
+package org.wysko.midis2jam2.gui.material
+
+import androidx.compose.material3.Typography
+
+/**
+ * The typography for the application.
+ */
+val AppTypography: Typography = Typography()

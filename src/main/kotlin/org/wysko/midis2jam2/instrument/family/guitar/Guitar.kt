@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
-private val BASE_POSITION = v3(43.4, 35.3, 7.0)
+private val BASE_POSITION = v3(47, 35.3, 7.0)
 private const val GUITAR_VECTOR_THRESHOLD = 8
 
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =

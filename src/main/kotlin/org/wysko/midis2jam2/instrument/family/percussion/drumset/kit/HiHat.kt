@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ private const val WOBBLE_SPEED = 10.0
 /** The hi-hat. */
 class HiHat(
     context: Midis2jam2,
-    hits: MutableList<NoteEvent.NoteOn>,
+    hits: List<NoteEvent.NoteOn>,
     private val noteMapping: HiHatNoteMapping = HiHatNoteMapping.Standard,
 ) : DrumSetInstrument(context, hits) {
     private val cymbalsNode =

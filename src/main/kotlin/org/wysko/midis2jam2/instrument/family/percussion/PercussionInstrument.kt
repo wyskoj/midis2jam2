@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ private const val SQUARE_ROOT_OF_127: Float = 11.269427f
 /** Anything on the percussion channel. */
 abstract class PercussionInstrument protected constructor(
     context: Midis2jam2,
-    hits: MutableList<NoteEvent.NoteOn>,
+    hits: List<NoteEvent.NoteOn>,
 ) : DecayedInstrument(context, hits) {
 
     /** Node that recoils when the instrument is hit. */

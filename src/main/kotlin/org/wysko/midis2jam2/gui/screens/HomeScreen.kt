@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,17 +31,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.graphic_eq
+import midis2jam2.generated.resources.repeat
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.components.*
 import org.wysko.midis2jam2.gui.viewmodel.HomeViewModel
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import java.io.File
-import java.nio.file.FileSystems
 import javax.sound.midi.MidiDevice
 
 /**
@@ -72,8 +76,19 @@ fun HomeScreen(
     val isLooping by homeViewModel.isLooping.collectAsState()
 
     val scope = rememberCoroutineScope()
-    var showFilePicker by remember { mutableStateOf(false) }
     var focusCount by remember { mutableStateOf(0) }
+
+    val selectMidiFileLauncher = rememberFilePickerLauncher(
+        mode = PickerMode.Single,
+        type = PickerType.File(MIDI_FILE_EXTENSIONS),
+        title = "Select MIDI file",
+        initialDirectory = lastMidiFileSelectedDirectory
+    ) { file ->
+        file?.path?.let {
+            homeViewModel.selectMidiFile(File(it))
+        }
+        focusCount++
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -90,7 +105,7 @@ fun HomeScreen(
             ) {
                 Midis2jam2Logo(Modifier.align(Alignment.CenterHorizontally))
                 SelectMidiFileRow(midiFile, {
-                    showFilePicker = true
+                    selectMidiFileLauncher.launch()
                 }, openMidiSearch, flicker, focusCount)
                 SelectMidiDeviceRow(midiDevices, selectedMidiDevice, homeViewModel) {
                     scope.launch {
@@ -117,23 +132,12 @@ fun HomeScreen(
                         IconToggleButton(isLooping, {
                             homeViewModel.setLooping(it)
                         }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                            Icon(painterResource("/ico/repeat.svg"), I18n["repeat"].value)
+                            Icon(painterResource(Res.drawable.repeat), I18n["repeat"].value)
                         }
                     }
                 }
             }
         }
-    }
-    FilePicker(
-        showFilePicker,
-        fileExtensions = MIDI_FILE_EXTENSIONS,
-        initialDirectory = "$lastMidiFileSelectedDirectory${FileSystems.getDefault().separator}",
-    ) { path ->
-        showFilePicker = false
-        path?.let {
-            homeViewModel.selectMidiFile(File(it.path))
-        }
-        focusCount++
     }
 }
 
@@ -217,7 +221,7 @@ private fun SelectSoundbankRow(
             IconButton({
                 onOpenSoundbankConfig()
             }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                Icon(painterResource("/ico/graphic_eq.svg"), I18n["soundbank_configure"].value)
+                Icon(painterResource(Res.drawable.graphic_eq), I18n["soundbank_configure"].value)
             }
         }
     }

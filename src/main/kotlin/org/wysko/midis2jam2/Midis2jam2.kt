@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.AssetLoader
 import org.wysko.midis2jam2.world.DebugTextController
 import org.wysko.midis2jam2.world.HudController
-import org.wysko.midis2jam2.world.ShadowController
+import org.wysko.midis2jam2.world.FakeShadowsController
 import org.wysko.midis2jam2.world.StandController
 import org.wysko.midis2jam2.world.camera.*
 import org.wysko.midis2jam2.world.lyric.LyricController
@@ -159,7 +159,7 @@ abstract class Midis2jam2(
     /**
      * The shadow controller.
      */
-    var shadowController: ShadowController? = null
+    var fakeShadowsController: FakeShadowsController? = null
 
     /**
      * The lyric controller.
@@ -250,10 +250,10 @@ abstract class Midis2jam2(
                 null
             }
         this.autocamController = AutoCamController(this, settingsConfig.startAutocamWithSong)
-        this.slideCamController = SlideCameraController()
+        this.slideCamController = SlideCameraController(this)
         this.debugTextController = DebugTextController(this)
-        this.hudController = HudController()
-        ShadowController.configureShadows(fadeFilter)
+        this.hudController = HudController(this)
+        FakeShadowsController.configureShadows(this, fadeFilter)
         if (settingsConfig.startAutocamWithSong) {
             with(this.app.camera) {
                 let {

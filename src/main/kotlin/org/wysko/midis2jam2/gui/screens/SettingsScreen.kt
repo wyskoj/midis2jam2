@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,7 @@
 
 package org.wysko.midis2jam2.gui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedButton
@@ -32,8 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.language
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.ApplicationScreen
 import org.wysko.midis2jam2.gui.TabFactory
 import org.wysko.midis2jam2.gui.components.SettingsListItem
@@ -74,7 +71,7 @@ fun SettingsScreen(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(painterResource("/ico/language.svg"), contentDescription = null)
+                Icon(painterResource(Res.drawable.language), contentDescription = null)
                 Text(locale.isO3Language.uppercase(locale))
             }
         }
