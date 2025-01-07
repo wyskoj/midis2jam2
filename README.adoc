@@ -65,7 +65,7 @@ Find guides and answers to common questions on the https://wyskoj.github.io/midi
 
 == ⚖️ License
 
-midis2jam2 © MMXXI–MMXXIV Jacob Wysko. The software is licensed under the https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0] and comes with absolutely no warranty.
+midis2jam2 © MMXXI–MMXXV Jacob Wysko. The software is licensed under the https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0] and comes with absolutely no warranty.
 
 Some assets Copyright © 2007 Scott Haag  (used with permission).
 

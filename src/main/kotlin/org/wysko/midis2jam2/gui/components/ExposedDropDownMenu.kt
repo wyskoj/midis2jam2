@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ fun <T> ExposedDropDownMenu(
                 ).onGloballyPositioned { textFieldSize = it.size.toSize() },
             ) {
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceVariant, shape = shape
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainerHighest, shape = shape
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.error
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.material.AppTheme
 import org.wysko.midis2jam2.util.ErrorHandling
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun ErrorDialog() {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -65,7 +66,7 @@ fun ErrorDialog() {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(painterResource("/ico/error.svg"), "Error", modifier = Modifier.size(48.dp))
+                        Icon(painterResource(Res.drawable.error), "Error", modifier = Modifier.size(48.dp))
                         Text(ErrorHandling.errorMessage.value)
                     }
                     OutlinedTextField(

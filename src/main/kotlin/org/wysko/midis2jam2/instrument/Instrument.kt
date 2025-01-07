@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import org.wysko.midis2jam2.util.node
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.times
+import kotlin.reflect.KProperty
+import kotlin.reflect.jvm.isAccessible
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -199,12 +201,25 @@ abstract class Instrument(
      */
     protected fun formatProperty(
         name: String,
-        value: Any,
+        value: Any?,
     ): String =
         when (value) {
             is Float -> "\t- $name: ${"%.3f".format(value)}\n"
             else -> "\t- $name: $value\n"
         }
+
+    /**
+     * Formats a list of properties about this instrument for debugging purposes.
+     *
+     * @param properties The properties to format.
+     * @return The formatted properties.
+     */
+    protected fun formatProperties(vararg properties: KProperty<*>): String = buildString {
+        properties.forEach {
+            it.isAccessible = true
+            append(formatProperty(it.name, it.getter.call()))
+        }
+    }
 
     override fun toString(): String = "* ${this@Instrument.javaClass.simpleName} / ${"%.3f".format(index)}\n"
 }

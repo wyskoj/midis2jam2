@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,7 @@ package org.wysko.midis2jam2.gui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -35,29 +28,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -66,7 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.gui.viewmodel.I18n
@@ -82,11 +54,12 @@ import java.io.File
  */
 @Composable
 fun SearchScreen(
-    searchViewModel: SearchViewModel, snackbarHost: SnackbarHostState, onMidiFileSelected: (File) -> Unit = {}
+    searchViewModel: SearchViewModel,
+    snackbarHost: SnackbarHostState,
+    onMidiFileSelected: (File) -> Unit = {}
 ) {
     val selectedInstruments by searchViewModel.selectedInstruments.collectAsState()
     val selectedDirectory by searchViewModel.selectedDirectory.collectAsState()
-    var showDirPicker by remember { mutableStateOf(false) }
     val matchingMidiFiles by searchViewModel.matchingMidiFiles.collectAsState()
     val indexProgress by searchViewModel.indexProgress.collectAsState()
     val showProgress by searchViewModel.showProgress.collectAsState()
@@ -94,9 +67,15 @@ fun SearchScreen(
     val scope = rememberCoroutineScope()
     var focusIndex by remember { mutableStateOf(0) }
 
-    DirectoryPickerComponent(showDirPicker, { showDirPicker = it }, searchViewModel, focusIndex) {
-        focusIndex = it
+    val selectSearchDirectoryLauncher = rememberDirectoryPickerLauncher(
+        title = "Select search directory",
+    ) { directory ->
+        directory?.path?.let {
+            searchViewModel.directorySelected(it)
+        }
+        focusIndex++
     }
+
     ProgressIndicatorComponent(showProgress, indexProgress)
     ErrorSnackbarComponent(showError, snackbarHost, scope)
 
@@ -106,9 +85,11 @@ fun SearchScreen(
         matchingMidiFiles = matchingMidiFiles
     )
 
-    val searchScreenActions = SearchScreenActions(showDirPicker = { showDirPicker = true },
+    val searchScreenActions = SearchScreenActions(
+        showDirPicker = { selectSearchDirectoryLauncher.launch() },
         onMidiFileSelected = onMidiFileSelected,
-        cancelIndex = { searchViewModel.cancelIndex() })
+        cancelIndex = { searchViewModel.cancelIndex() }
+    )
 
     SearchScreenContents(
         searchScreenData = searchScreenData,
@@ -120,25 +101,9 @@ fun SearchScreen(
 }
 
 @Composable
-private fun DirectoryPickerComponent(
-    showDirPicker: Boolean,
-    setShowDirPicker: (Boolean) -> Unit,
-    searchViewModel: SearchViewModel,
-    focusIndex: Int,
-    setFocusIndex: (Int) -> Unit
-) {
-    DirectoryPicker(showDirPicker) { path ->
-        setShowDirPicker(false)
-        path?.let {
-            searchViewModel.directorySelected(it)
-        }
-        setFocusIndex(focusIndex + 1)
-    }
-}
-
-@Composable
 private fun ProgressIndicatorComponent(
-    showProgress: Boolean, indexProgress: Float
+    showProgress: Boolean,
+    indexProgress: Float
 ) {
     if (!showProgress) {
         return
@@ -154,13 +119,17 @@ private fun ProgressIndicatorComponent(
 
 @Composable
 private fun ErrorSnackbarComponent(
-    showError: String?, snackbarHost: SnackbarHostState, scope: CoroutineScope
+    showError: String?,
+    snackbarHost: SnackbarHostState,
+    scope: CoroutineScope
 ) {
     LaunchedEffect(showError) {
         if (showError != null) {
             scope.launch {
                 snackbarHost.showSnackbar(
-                    message = showError, actionLabel = I18n["dismiss"].value, duration = SnackbarDuration.Long
+                    message = showError,
+                    actionLabel = I18n["dismiss"].value,
+                    duration = SnackbarDuration.Long
                 )
             }
         }
@@ -168,11 +137,15 @@ private fun ErrorSnackbarComponent(
 }
 
 private data class SearchScreenData(
-    val searchViewModel: SearchViewModel, val selectedInstruments: List<String>, val matchingMidiFiles: List<File>
+    val searchViewModel: SearchViewModel,
+    val selectedInstruments: List<String>,
+    val matchingMidiFiles: List<File>
 )
 
 private data class SearchScreenActions(
-    val showDirPicker: () -> Unit, val onMidiFileSelected: (File) -> Unit, val cancelIndex: () -> Unit = {}
+    val showDirPicker: () -> Unit,
+    val onMidiFileSelected: (File) -> Unit,
+    val cancelIndex: () -> Unit = {}
 )
 
 @Composable
@@ -200,23 +173,27 @@ private fun SearchScreenContents(
 
 @Composable
 private fun HeaderTexts(
-    showProgress: Boolean, cancelIndex: () -> Unit = {}
+    showProgress: Boolean,
+    cancelIndex: () -> Unit = {}
 ) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
     ) {
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(I18n["search_title"].value, style = MaterialTheme.typography.headlineSmall)
             Text(
-                I18n["search_description"].value, style = MaterialTheme.typography.bodyLarge
+                I18n["search_description"].value,
+                style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
         AnimatedVisibility(showProgress) {
             ElevatedButton(
-                cancelIndex, colors = ButtonDefaults.elevatedButtonColors(
+                cancelIndex,
+                colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
@@ -229,14 +206,15 @@ private fun HeaderTexts(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DirectoryTextField(showDirPicker: () -> Unit, selectedDirectory: String, focusIndex: Int) {
     val focusRequester = remember { FocusRequester() }
     Row(
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TextField(modifier = Modifier.focusable(false).fillMaxWidth().focusRequester(focusRequester),
+        TextField(
+            modifier = Modifier.focusable(false).fillMaxWidth().focusRequester(focusRequester),
             value = selectedDirectory,
             onValueChange = { },
             label = { Text(I18n["search_directory"].value) },
@@ -246,7 +224,8 @@ private fun DirectoryTextField(showDirPicker: () -> Unit, selectedDirectory: Str
                 IconButton(showDirPicker, Modifier.pointerHoverIcon(PointerIcon.Hand)) {
                     Icon(Icons.AutoMirrored.Filled.List, contentDescription = I18n["browse"].value)
                 }
-            })
+            }
+        )
     }
 
     DisposableEffect(focusIndex) {
@@ -327,16 +306,20 @@ private fun InstrumentCard(
     iconDescription: String
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(), colors = colors
+        modifier = Modifier.fillMaxWidth(),
+        colors = colors
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { addToSearchModifier(instrument) }) {
                 Icon(icon, contentDescription = iconDescription)
             }
             Text(
-                instrument, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(8.dp).weight(1f)
+                instrument,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(8.dp).weight(1f)
             )
         }
     }
@@ -345,7 +328,9 @@ private fun InstrumentCard(
 
 @Composable
 private fun MidiFileList(
-    matchingMidiFiles: List<File>, onMidiFileSelected: (File) -> Unit, modifier: Modifier = Modifier
+    matchingMidiFiles: List<File>,
+    onMidiFileSelected: (File) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -353,7 +338,8 @@ private fun MidiFileList(
         modifier = modifier
     ) {
         Text(
-            I18n["search_matching_midi_files"].value, style = MaterialTheme.typography.labelLarge
+            I18n["search_matching_midi_files"].value,
+            style = MaterialTheme.typography.labelLarge
         )
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(matchingMidiFiles) { file ->
@@ -370,7 +356,8 @@ private fun MidiFileCard(file: File, onMidiFileSelected: (File) -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 file.name,

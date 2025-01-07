@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ class LyricLineCollector(
      */
     override fun seek(time: Duration) {
         with(context) {
-            currentIndex = lines.indexOfLast { it.startTime < time }
+            currentIndex = lines.indexOfLast { startTime(it) < time }
         }
 
         if (currentIndex == -1) currentIndex = 0

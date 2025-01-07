@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class Mallets(
             var whiteCount = 0
             RANGE.mapIndexed { index, note ->
                 val byte = note.toByte()
-                if (Key.Color.fromNote(byte) == White) {
+                if (Key.Color.fromNoteNumber(byte) == White) {
                     MalletBar(byte, whiteCount++, hitsByNote[index])
                 } else {
                     MalletBar(byte, note, hitsByNote[index])
@@ -104,7 +104,7 @@ class Mallets(
 
     override fun adjustForMultipleInstances(delta: Duration) {
         val index = updateInstrumentIndex(delta) - 2
-        geometry.loc = v3(-50, 26.5 + (2 * index), 0)
+        geometry.loc = v3(-53, 26.5 + (2 * index), 0)
         placement.rot = v3(0, -18 * index, 0)
     }
 
@@ -167,7 +167,7 @@ class Mallets(
         init {
             val scaleFactor = (RANGE.last - midiNote + 20) / 50f
 
-            if (Key.Color.fromNote(midiNote) == White) {
+            if (Key.Color.fromNoteNumber(midiNote) == White) {
                 upBar = context.modelD("XylophoneWhiteBar.obj", type.textureFile)
                 downBar = context.modelD("XylophoneWhiteBarDown.obj", type.textureFile)
                     .apply { (this as Geometry).material.setColor("GlowColor", DIM_GLOW) }

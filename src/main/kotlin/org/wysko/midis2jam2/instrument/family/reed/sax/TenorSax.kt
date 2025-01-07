@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ class TenorSax(context: Midis2jam2, events: List<MidiEvent>) :
 
     init {
         with(geometry) {
-            setLocalTranslation(-11f, 34.5f, -22f)
+            setLocalTranslation(-8f, 34.5f, -22f)
             setLocalScale(1.15f)
         }
     }

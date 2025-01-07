@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ private val PITCH_BEND_DIRECTION_VECTOR = Vector3f(0.333f, 0f, 0f)
 /** The full, 88-key keyboard. */
 open class Keyboard(
     context: Midis2jam2,
-    events: MutableList<MidiEvent>,
+    events: List<MidiEvent>,
     internal val skin: KeyboardSkin,
 ) : KeyedInstrument(context, events, 21, 108), MultipleInstancesLinearAdjustment {
     private val pitchBendController = PitchBendModulationController(context, events)
@@ -45,7 +45,7 @@ open class Keyboard(
         let {
             var whiteCount = 0
             Array(keyCount()) {
-                when (Color.fromNote((it + rangeLow).toByte())) {
+                when (Color.fromNoteNumber((it + rangeLow).toByte())) {
                     White -> KeyboardKey(this, (it + rangeLow).toByte(), whiteCount++)
                     Black -> KeyboardKey(this, (it + rangeLow).toByte(), it)
                 }

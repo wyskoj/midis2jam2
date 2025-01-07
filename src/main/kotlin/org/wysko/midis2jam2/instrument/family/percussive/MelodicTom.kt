@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,6 @@ class MelodicTom(
                 localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
             }
         )
-        geometry.setLocalTranslation(0f, 61.1f, -133.8f)
+        geometry.setLocalTranslation(0f, 61.1f, -125f)
     }
 }

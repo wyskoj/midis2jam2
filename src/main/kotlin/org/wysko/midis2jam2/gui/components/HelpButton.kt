@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@ package org.wysko.midis2jam2.gui.components
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.help
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.util.openHelp
 
 /**
@@ -31,6 +33,6 @@ fun HelpButton() {
     FloatingActionButton({
         openHelp()
     }) {
-        Icon(painterResource("/ico/help.svg"), contentDescription = "Help")
+        Icon(painterResource(Res.drawable.help), contentDescription = "Help")
     }
 }
