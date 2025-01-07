@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +22,11 @@ import com.jme3.font.BitmapText
 import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
 import com.jme3.math.ColorRGBA.White
-import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.getType
-import org.wysko.midis2jam2.util.loc
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.scale
-import org.wysko.midis2jam2.util.unaryPlus
-import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.util.*
 import kotlin.time.Duration
 
 private const val VERTICAL_FILLBAR_SCALE = 0.7f
@@ -47,9 +41,8 @@ private const val MAXIMUM_FILLBAR_SCALE = (FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION
  * The HUD consists of a fillbar and a text label. The fillbar is a sprite that fills up as the song progresses. The text
  * label displays the name of the song.
  */
-context(Midis2jam2)
-class HudController {
-    private val root: Node =
+class HudController(private val context: Midis2jam2) {
+    private val root = with(context) {
         node().also {
             if (configs.getType(SettingsConfiguration::class).showHud) app.guiNode += it
             it.move(
@@ -59,15 +52,16 @@ class HudController {
                 },
             )
         }
+    }
 
     init {
         with(root) {
-            +assetLoader.loadSprite("SongFillbarBox.bmp").also {
+            +context.assetLoader.loadSprite("SongFillbarBox.bmp").also {
                 it.move(v3(0, 0, -10))
             }
-            +BitmapText(assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
+            +BitmapText(context.assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
                 loc = v3(0f, 46f, 0f)
-                text = fileName
+                text = context.fileName
                 size = 24f
                 color = White
                 setBox(Rectangle(0f, 488f, FILLBAR_BOX_WIDTH.toFloat(), 512f))
@@ -83,7 +77,7 @@ class HudController {
 
     private val fillbar =
         with(root) {
-            +assetLoader.loadSprite("SongFillbar.bmp").also {
+            +context.assetLoader.loadSprite("SongFillbar.bmp").also {
                 if (I18n.currentLocale.language != "ar") {
                     it.move(v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 10))
                 }
@@ -106,26 +100,16 @@ class HudController {
      * @param time The time since the song started.
      * @param fadeValue The value to fade the HUD by.
      */
-    fun tick(
-        time: Duration,
-        fadeValue: Float,
-    ) {
-        val scale = (MAXIMUM_FILLBAR_SCALE * (time / sequence.duration).coerceAtMost(1.0)).toFloat()
-        fillbar.scale =
-            v3(
-                x = scale,
-                y = VERTICAL_FILLBAR_SCALE,
-                z = 1f,
-            )
+    fun tick(time: Duration, fadeValue: Float) {
+        val scale = (MAXIMUM_FILLBAR_SCALE * (time / context.sequence.duration).coerceAtMost(1.0)).toFloat()
+        fillbar.scale = v3(scale, VERTICAL_FILLBAR_SCALE, 1f)
 
         // Essentially go in reverse by moving the fillbar to the left
         if (I18n.currentLocale.language == "ar") {
-            fillbar.loc = (
-                v3(
-                    x = FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION_OFFSET + scale * FILLBAR_WIDTH),
-                    y = FILLBAR_LOCATION_OFFSET,
-                    z = 10f,
-                )
+            fillbar.loc = v3(
+                x = FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION_OFFSET + scale * FILLBAR_WIDTH),
+                y = FILLBAR_LOCATION_OFFSET,
+                z = 10f,
             )
         }
 

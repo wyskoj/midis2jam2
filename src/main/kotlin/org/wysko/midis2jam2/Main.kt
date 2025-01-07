@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,19 +25,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -46,38 +38,22 @@ import androidx.compose.ui.window.rememberWindowState
 import com.install4j.api.launcher.SplashScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.midis2jam2_icon
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.ApplicationScreen
 import org.wysko.midis2jam2.gui.TabFactory
 import org.wysko.midis2jam2.gui.UpdateChecker
 import org.wysko.midis2jam2.gui.components.ErrorDialog
 import org.wysko.midis2jam2.gui.components.NavigationRail
 import org.wysko.midis2jam2.gui.material.AppTheme
-import org.wysko.midis2jam2.gui.screens.AboutScreen
-import org.wysko.midis2jam2.gui.screens.BackgroundConfigurationScreen
-import org.wysko.midis2jam2.gui.screens.GraphicsConfigurationScreen
-import org.wysko.midis2jam2.gui.screens.HomeScreen
-import org.wysko.midis2jam2.gui.screens.SearchScreen
-import org.wysko.midis2jam2.gui.screens.SettingsScreen
-import org.wysko.midis2jam2.gui.screens.SoundbankConfigurationScreen
-import org.wysko.midis2jam2.gui.screens.SynthesizerConfigurationScreen
+import org.wysko.midis2jam2.gui.screens.*
 import org.wysko.midis2jam2.gui.util.centerWindow
 import org.wysko.midis2jam2.gui.util.openHelp
 import org.wysko.midis2jam2.gui.util.registerDragAndDrop
-import org.wysko.midis2jam2.gui.viewmodel.BackgroundConfigurationViewModel
-import org.wysko.midis2jam2.gui.viewmodel.GraphicsConfigurationViewModel
-import org.wysko.midis2jam2.gui.viewmodel.HomeViewModel
-import org.wysko.midis2jam2.gui.viewmodel.I18n
-import org.wysko.midis2jam2.gui.viewmodel.SearchViewModel
-import org.wysko.midis2jam2.gui.viewmodel.SettingsViewModel
-import org.wysko.midis2jam2.gui.viewmodel.SoundBankConfigurationViewModel
-import org.wysko.midis2jam2.gui.viewmodel.SynthesizerConfigurationViewModel
+import org.wysko.midis2jam2.gui.viewmodel.*
 import org.wysko.midis2jam2.starter.Execution
-import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
-import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
-import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
-import org.wysko.midis2jam2.starter.configuration.LegacyConfigurationImporter
-import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.SoundbankConfiguration
+import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
@@ -180,7 +156,7 @@ suspend fun main(args: Array<String>) {
                 onCloseRequest = ::exitApplication,
                 title = I18n["midis2jam2_window_title"].value,
                 state = windowState,
-                icon = painterResource("/ico/icon512.png"),
+                icon = painterResource(Res.drawable.midis2jam2_icon),
                 onKeyEvent = {
                     when (it.key) {
                         Key.F1 -> {

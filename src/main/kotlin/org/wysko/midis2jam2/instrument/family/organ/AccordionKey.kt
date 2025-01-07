@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,22 +18,19 @@
 package org.wysko.midis2jam2.instrument.family.organ
 
 import org.wysko.midis2jam2.instrument.family.piano.Key
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
+import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
 import org.wysko.midis2jam2.world.Axis
 
 /** A single key on the accordion. It behaves just like any other key. */
-context(Accordion)
-class AccordionKey(
-    midiNote: Byte,
-    whiteKeyIndex: Int,
-    accordion: Accordion,
-) : Key(
+class AccordionKey(accordion: Accordion, noteNumber: Byte, whiteKeyIndex: Int) : Key(
     rotationAxis = Axis.Y.identity,
     inverseRotation = true,
-    keyboardConfiguration = Accordion.KEY_CONFIGURATION,
-    moveValue = when (Color.fromNote(midiNote)) {
-        Color.White -> -whiteKeyIndex + (Accordion.WHITE_KEY_COUNT / 2)
-        Color.Black -> -midiNote * (7f / 12f) + 6.2f
+    keyboardConfiguration = Accordion.keyboardConfiguration,
+    moveValue = when (Color.fromNoteNumber(noteNumber)) {
+        White -> -whiteKeyIndex + Accordion.WHITE_KEY_COUNT / 2.0f
+        Black -> -noteNumber * (7f / 12f) + 6.2f
     },
-    midiNote = midiNote,
+    noteNumber = noteNumber,
     keyedInstrument = accordion,
 )

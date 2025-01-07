@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -211,8 +211,9 @@ private class Midis2jam2Application(
 private val DEFAULT_JME_SETTINGS =
     AppSettings(true).apply {
         frameRate = -1
-        frequency =
-            GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.first().refreshRate
+        GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.firstOrNull()?.let {
+            frequency = it.refreshRate
+        }
         isVSync = true
         isResizable = false
         isGammaCorrection = false

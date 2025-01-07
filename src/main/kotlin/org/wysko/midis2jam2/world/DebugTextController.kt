@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ private fun Midis2jam2.debugText(
         appendLine(
             "currentlyVisible: ${
                 this@debugText.drumSetVisibilityManager.currentlyVisibleDrumSet?.let {
-                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.typicalDrumSetSkin.toString() else ""}"
+                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.shellStyle.toString() else ""}"
                 } ?: "null"
             }"
         )

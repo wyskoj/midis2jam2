@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.Midis2jam2
 import kotlin.time.Duration
@@ -28,18 +29,14 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("DuplicatedCode")
 object Visibility {
 
-    context(Midis2jam2)
-    private val MidiEvent.sec: Duration
-        get() = sequence.getTimeOf(this)
-
     /**
      * Determines the visibility of an instrument based on the time of the last hit and the time of the next hit,
      * according to the standard rules.
      *
      * @param T The type of the event collected by the [collector].
-     * @param context The context to use.
-     * @param collector The collector to use.
-     * @param time The time to use.
+     * @param context Context to the main class.
+     * @param collector The collector that is operating on these events.
+     * @param time The current time.
      * @param parameters The parameters to use.
      * @return Whether the instrument should be visible.
      */
@@ -51,17 +48,17 @@ object Visibility {
         parameters: Parameters = Parameters(),
     ): Boolean = with(context) {
         collector.peek()?.let {
-            if (it.sec - time <= parameters.showBefore) return true
+            if (this.time(it) - time <= parameters.showBefore) return true
         }
 
         collector.peek()?.let { peek ->
             collector.prev()?.let { prev ->
-                if (peek.sec - prev.sec <= parameters.showBetween) return true
+                if (this.time(peek) - this.time(prev) <= parameters.showBetween) return true
             }
         }
 
         collector.prev()?.let {
-            if (time - it.sec <= parameters.showAfter) return true
+            if (time - this.time(it) <= parameters.showAfter) return true
         }
 
         // Invisible.
@@ -71,6 +68,11 @@ object Visibility {
     /**
      * Determines the visibility of an instrument based on the time of the last hit and the time of the next hit,
      * according to the standard rules.
+     *
+     * @param collector The collector operating on the arcs.
+     * @param time The curren time.
+     * @param parameters The parameters to use.
+     * @return Whether the instrument should be visible.
      */
     @Suppress("ReturnCount")
     fun standardRules(
@@ -96,6 +98,8 @@ object Visibility {
 
         return false
     }
+
+    private fun Midis2jam2.time(event: Event): Duration = sequence.getTimeOf(event)
 
     /**
      * Parameters for the visibility algorithm.

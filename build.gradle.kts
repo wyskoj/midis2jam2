@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose)
+     alias(libs.plugins.compose.kotlin)
     alias(libs.plugins.detekt)
     alias(libs.plugins.shadow)
     alias(libs.plugins.licenseReport)
@@ -34,7 +35,7 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xcontext-receivers")
     }
 }
@@ -102,7 +103,8 @@ dependencies {
         implementation(libs.jme3.lwjgl3)
     }
     implementation(compose.material3)
-    implementation(libs.mpfilepicker)
+    implementation(compose.components.resources)
+    implementation(libs.filekit)
     implementation(libs.install4j.runtime)
     implementation(libs.noise)
     implementation(libs.kotlinx.serialization.json)
@@ -141,4 +143,11 @@ detekt { config.setFrom(files("detekt-config.yml")) }
 downloadLicenses {
     includeProjectDependencies = true
     dependencyConfiguration = "compileClasspath"
+}
+
+compose.resources {
+    customDirectory(
+        sourceSetName = "main",
+        directoryProvider = provider { layout.projectDirectory.dir("src/main/resources/composeResources") },
+    )
 }

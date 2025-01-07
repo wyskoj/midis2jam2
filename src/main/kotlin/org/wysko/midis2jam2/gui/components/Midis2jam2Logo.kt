@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@ package org.wysko.midis2jam2.gui.components
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.midis2jam2_logo
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 
 /**
@@ -32,7 +33,7 @@ fun Midis2jam2Logo(
     modifier: Modifier = Modifier
 ) {
     Image(
-        bitmap = useResource("logo.png", ::loadImageBitmap),
+        painter = painterResource(Res.drawable.midis2jam2_logo),
         contentDescription = I18n["midis2jam2"].value,
         modifier = modifier,
     )

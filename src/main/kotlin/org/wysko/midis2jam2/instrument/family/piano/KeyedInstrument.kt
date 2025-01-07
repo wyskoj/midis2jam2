@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 abstract class KeyedInstrument(
     context: Midis2jam2,
-    eventList: MutableList<MidiEvent>,
+    eventList: List<MidiEvent>,
     val rangeLow: Byte,
     val rangeHigh: Byte,
 ) : SustainedInstrument(context, eventList) {
@@ -82,6 +82,12 @@ abstract class KeyedInstrument(
                 }
     }
 
+    /**
+     * Returns the state of the key associated with the [midiNote].
+     *
+     * @param midiNote The MIDI note to check.
+     * @return The state of the key.
+     */
     open fun keyStatus(midiNote: Byte): Key.State =
         collector.currentTimedArcs.firstOrNull { it.note == midiNote }?.let {
             Key.State.Down(it.noteOn.velocity)

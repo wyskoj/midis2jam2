@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import kotlin.time.Duration
 private val STICK_NODE_OFFSET = Vector3f(0f, 0f, 10f)
 
 /** A Tom. */
-class Tom(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>, pitch: TomPitch, style: ShellStyle) :
+class Tom(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, pitch: TomPitch, style: ShellStyle) :
     DrumSetInstrument(context, hits) {
     /** The drum. */
     private val drum =

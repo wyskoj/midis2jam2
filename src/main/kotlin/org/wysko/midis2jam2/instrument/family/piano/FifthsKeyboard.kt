@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Jacob Wysko
+ * Copyright (C) 2025 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import kotlin.time.Duration
 /**
  * A keyboard that glows the key 7 semitones below the currently playing note.
  */
-class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiEvent>, skin: KeyboardSkin) :
+class FifthsKeyboard(context: Midis2jam2, events: List<MidiEvent>, skin: KeyboardSkin) :
     Keyboard(context, events, skin) {
 
     override fun tick(time: Duration, delta: Duration) {
@@ -37,7 +37,7 @@ class FifthsKeyboard(context: Midis2jam2, events: MutableList<MidiEvent>, skin: 
                 if (it is Geometry) {
                     it.material.setColor(
                         "GlowColor",
-                        glowColor(collector.currentTimedArcs.any { it.note == (key.midiNote + 5).toByte() })
+                        glowColor(collector.currentTimedArcs.any { it.note == (key.noteNumber + 5).toByte() })
                     )
                 }
             }
