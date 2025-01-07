@@ -291,6 +291,7 @@ enum class AutoCamPosition(
         Vector3f(5f, 432f, 24f),
         Quaternion().fromAngles(-1.695151f, 0f, -3.1415927f),
         { _, _, context -> context.configs.getType(SettingsConfiguration::class).isClassicCamera },
+        { _, _, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera },
         alwaysTrue,
         AutoCamPositionType.STAGE
     ),
@@ -330,6 +331,7 @@ enum class AutoCamPosition(
     DRUM_SET_2(
         Vector3f(-19.6f, 78.7f, 3.8f),
         Quaternion().fromAngles(-2.6581365f, -0.2827433f, -3.1415927f),
+        Quaternion().fromAngles(-2.6581365f, -0.2827433f, 3.1415927f),
         { _, _, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera && context.drumSetVisibilityManager.isVisible },
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
         AutoCamPositionType.INSTRUMENT
