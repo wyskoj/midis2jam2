@@ -51,6 +51,7 @@ fun SettingsScreen(
     val showLyrics = viewModel.isShowLyrics.collectAsState()
     val instrumentsAlwaysVisible = viewModel.isInstrumentsAlwaysVisible.collectAsState()
     val isCameraSmooth = viewModel.isCameraSmooth.collectAsState()
+    val isClassicCamera = viewModel.isClassicCamera.collectAsState()
 
     Column(
         modifier = Modifier.padding(top = 16.dp).verticalScroll(
@@ -153,6 +154,12 @@ fun SettingsScreen(
             { Text(I18n["settings_tweaks_camera_smooth_description"].value) },
             isCameraSmooth,
             setState = { viewModel.setIsCameraSmooth(it) }
+        )
+        SettingsListItem(
+            { Text(I18n["settings_tweaks_classic_camera"].value) },
+            { Text(I18n["settings_tweaks_classic_camera_description"].value) },
+            isClassicCamera,
+            setState = { viewModel.setIsClassicCamera(it) }
         )
     }
 }

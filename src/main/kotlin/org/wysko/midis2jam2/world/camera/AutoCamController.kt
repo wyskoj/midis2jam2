@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.world.camera
 
+import androidx.compose.animation.core.rememberTransition
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
@@ -47,6 +48,9 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.*
+import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.get
+import org.wysko.midis2jam2.util.Utils
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -81,7 +85,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
     private var moving = false
 
     /** A list of previously used camera angles. */
-    private val angles = mutableListOf(AutoCamPosition.GENERAL_A)
+    val angles = mutableListOf(AutoCamPosition.GENERAL_A)
 
     /** The current amount of transition, from 0 to 1. */
     private var x = 0f
@@ -131,7 +135,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 
             /* About 1/5 of the time, do not interpolate and just move to the new angle (jump-cut) */
             if (Math.random() < 0.2) {
-                x = 1f
+                x = 0.99f
             }
         }
 
@@ -173,13 +177,19 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
             return AutoCamPosition.GENERAL_A
         }
 
+        if (context.configs[SettingsConfiguration::class].isClassicCamera) {
+            return AutoCamPosition.values()
+                .filter { it.isClassicCamUsed && it != angles.last() && it.pickMe(time, context.instruments, context) }
+                .random()
+        }
+
         /* About 1/4 of the time, pick a stage angle */
         return if (Math.random() < 0.25) {
             /* Collect all stage camera angles */
             val stageCameras = AutoCamPosition.values().filter { it.type == AutoCamPositionType.STAGE }
 
-            /* Valid stage cameras are those that are not the current one */
-            val validStageCameras = stageCameras.filter { it != angles.last() }
+            /* Valid stage cameras are those that are not the current one (and not the overhead) */
+            val validStageCameras = stageCameras.filter { it != angles.last() && it != AutoCamPosition.GENERAL_D }
 
             /* Pick a random valid stage camera */
             validStageCameras.random()
@@ -204,6 +214,16 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
                     ?: AutoCamPosition.GENERAL_A
             }
         }
+    }
+
+
+
+    /**
+     * Applies cubic-ease-in-out interpolation to a value.
+     */
+    private fun Float.smooth(): Float = when (context.configs[SettingsConfiguration::class].isClassicCamera) {
+        true -> this
+        false -> if (this < 0.5) 4 * this.pow(3) else 1 - (-2 * this + 2).pow(3) / 2
     }
 
     /** Moves the camera to a new position, if it is not currently moving. */
@@ -244,14 +264,16 @@ enum class AutoCamPosition(
     val pickMe: (time: Duration, instruments: List<Instrument>, context: Midis2jam2) -> Boolean,
     val stayHere: (time: Duration, instruments: List<Instrument>, context: Midis2jam2) -> Boolean,
     /** The type of camera. */
-    val type: AutoCamPositionType
+    val type: AutoCamPositionType,
+    val isClassicCamUsed: Boolean = false,
 ) {
     GENERAL_A(
         Vector3f(-2.00f, 92.00f, 134.00f),
         Quaternion(-0.00f, 0.99f, -0.16f, -0.00f),
         alwaysTrue,
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     GENERAL_B(
@@ -259,7 +281,8 @@ enum class AutoCamPosition(
         Quaternion(-0.03f, 0.97f, -0.15f, -0.18f),
         alwaysTrue,
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     GENERAL_C(
@@ -267,7 +290,17 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.18f, 0.15f),
         alwaysTrue,
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
+    ),
+
+    GENERAL_D(
+        Vector3f(5f, 432f, 24f),
+        Quaternion().fromAngles(Utils.rad(82.875f), Utils.rad(180f), 0f),
+        alwaysTrue,
+        alwaysTrue,
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     BASS_GUITAR(
@@ -275,7 +308,17 @@ enum class AutoCamPosition(
         Quaternion(0.07f, 0.90f, -0.17f, 0.40f),
         { time, instruments, _ -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
+    ),
+
+    BASS_GUITAR_2(
+        Vector3f(35f, 25.4f, -19f),
+        Quaternion().fromAngles(2.268928f, -1.0646509f, 3.0979594f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
     ),
 
     GUITAR(
@@ -283,7 +326,44 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.95f, 0.06f, 0.31f),
         { time, instruments, _ -> visibleNowAndLater(instruments, Guitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Guitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true,
+    ),
+
+    DRUM_SET(
+        Vector3f(-0.2f, 61.6f, 38.6f),
+        Quaternion(-5.8945218E-9f, 0.9908659f, -0.13485093f, -4.3312124E-8f),
+        { _, _, context -> context.drumSetVisibilityManager.isVisible },
+        { _, _, context -> context.drumSetVisibilityManager.isVisible },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
+    ),
+
+    DRUM_SET_2(
+        Vector3f(-19.6f, 78.7f, 3.8f),
+        Quaternion().fromAngles(Utils.rad(27.7), Utils.rad(163.8), 0f),
+        { _, _, context -> context.drumSetVisibilityManager.isVisible },
+        { _, _, context -> context.drumSetVisibilityManager.isVisible },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
+    ),
+
+    KEYBOARDS(
+        Vector3f(-32.76f, 59.79f, 38.55f),
+        Quaternion(-0.06f, 0.94f, -0.27f, -0.20f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
+    ),
+
+    KEYBOARDS_2(
+        Vector3f(-35f, 76.4f, 33.6f),
+        Quaternion().fromAngles(Utils.rad(55.8), Utils.rad(198.5), 0f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
     ),
 
     SOPRANO_SAX(
@@ -315,14 +395,6 @@ enum class AutoCamPosition(
         Quaternion(0.01f, 0.98f, -0.19f, 0.06f),
         { time, instruments, _ -> visibleNowAndLater(instruments, BaritoneSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BaritoneSax>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
-    ),
-
-    KEYBOARDS(
-        Vector3f(-32.76f, 59.79f, 38.55f),
-        Quaternion(-0.06f, 0.94f, -0.27f, -0.20f),
-        { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
-        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
@@ -651,14 +723,6 @@ enum class AutoCamPosition(
         AutoCamPositionType.INSTRUMENT
     ),
 
-    DRUM_SET(
-        Vector3f(-0.2f, 61.6f, 38.6f),
-        Quaternion(-5.8945218E-9f, 0.9908659f, -0.13485093f, -4.3312124E-8f),
-        { _, _, context -> context.drumSetVisibilityManager.isVisible },
-        { _, _, context -> context.drumSetVisibilityManager.isVisible },
-        AutoCamPositionType.INSTRUMENT
-    ),
-
     STEEL_DRUMS(
         Vector3f(46.01f, 62.34f, -29.49f),
         Quaternion(0.02f, 0.97f, -0.18f, 0.13f),
@@ -745,8 +809,3 @@ fun quaternionInterpolation(start: Quaternion, end: Quaternion, x: Float): Quate
     start.z + (end.z - start.z) * x,
     start.w + (end.w - start.w) * x
 ).apply { this.normalizeLocal() }
-
-/**
- * Applies cubic-ease-in-out interpolation to a value.
- */
-fun Float.smooth(): Float = if (this < 0.5) 4 * this.pow(3) else 1 - (-2 * this + 2).pow(3) / 2

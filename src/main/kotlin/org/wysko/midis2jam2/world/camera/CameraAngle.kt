@@ -52,13 +52,13 @@ enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY:
     /** Camera 4B. */
     CAMERA_4B(35f, 25.4f, -19f, Utils.rad(-50f), Utils.rad(119f), Utils.rad(-2.5)),
 
-    /** Camera 5. */
+    /** Camera 5.c */
     CAMERA_5(5f, 432f, 24f, Utils.rad(82.875f), Utils.rad(180f), 0f),
 
-    /** Camera 6. */
+    /** Camera 6A. */
     CAMERA_6A(17f, 30.5f, 42.9f, Utils.rad(-6.7), Utils.rad(144.3), 0f),
 
-    /** Camera 6. */
+    /** Camera 6B. */
     CAMERA_6B(38.8f, 58.8f, 23.5f, 2.206f, -0.635f, 0.003f);
 
     /** The location of the camera. */

@@ -74,7 +74,13 @@ data class SettingsConfiguration(
      * Whether the speed modifier mode is enabled.
      */
     @SerialName("speed_modifier_mode")
-    val isSpeedModifierMode: Boolean = false
+    val isSpeedModifierMode: Boolean = false,
+
+    /**
+     * Whether the camera is rigid.
+     */
+    @SerialName("classic_camera")
+    val isClassicCamera: Boolean = false
 ) : Configuration {
     companion object {
         val preserver by lazy { ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE) }
