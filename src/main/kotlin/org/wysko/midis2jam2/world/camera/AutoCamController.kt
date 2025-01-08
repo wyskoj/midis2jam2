@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.world.camera
 
+import androidx.compose.animation.core.rememberTransition
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
@@ -48,7 +49,8 @@ import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.*
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.getType
+import org.wysko.midis2jam2.starter.configuration.get
+import org.wysko.midis2jam2.util.Utils
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -83,7 +85,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
     private var moving = false
 
     /** A list of previously used camera angles. */
-    private val angles = mutableListOf(AutoCamPosition.GENERAL_A)
+    val angles = mutableListOf(AutoCamPosition.GENERAL_A)
 
     /** The current amount of transition, from 0 to 1. */
     private var x = 0f
@@ -99,15 +101,6 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 
     /** The rotation at which the camera started at in this transition. */
     var currentRotation: Quaternion = AutoCamPosition.GENERAL_A.rotation.clone()
-
-    /**
-     * Applies cubic-ease-in-out interpolation to a value unless classic camera is enabled.
-     */
-    fun Float.smooth(): Float = if (context.configs.getType(SettingsConfiguration::class).isClassicCamera) {
-        this
-    } else {
-        if (this < 0.5) 4 * this.pow(3) else 1 - (-2 * this + 2).pow(3) / 2
-    }
 
     /** Performs a tick of the auto-cam controller. */
     fun tick(time: Duration, delta: Duration): Boolean {
@@ -141,14 +134,8 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
             moving = true
 
             /* About 1/5 of the time, do not interpolate and just move to the new angle (jump-cut) */
-            if (context.configs.getType(SettingsConfiguration::class).isClassicCamera) {
-                if (Math.random() < 0.4) {
-                    x = 1f
-                }
-            } else {
-                if (Math.random() < 0.2) {
-                    x = 1f
-                }
+            if (Math.random() < 0.2) {
+                x = 0.99f
             }
         }
 
@@ -190,13 +177,19 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
             return AutoCamPosition.GENERAL_A
         }
 
+        if (context.configs[SettingsConfiguration::class].isClassicCamera) {
+            return AutoCamPosition.values()
+                .filter { it.isClassicCamUsed && it != angles.last() && it.pickMe(time, context.instruments, context) }
+                .random()
+        }
+
         /* About 1/4 of the time, pick a stage angle */
         return if (Math.random() < 0.25) {
             /* Collect all stage camera angles */
             val stageCameras = AutoCamPosition.values().filter { it.type == AutoCamPositionType.STAGE }
 
-            /* Valid stage cameras are those that are not the current one */
-            val validStageCameras = stageCameras.filter { it != angles.last() }
+            /* Valid stage cameras are those that are not the current one (and not the overhead) */
+            val validStageCameras = stageCameras.filter { it != angles.last() && it != AutoCamPosition.GENERAL_D }
 
             /* Pick a random valid stage camera */
             validStageCameras.random()
@@ -221,6 +214,16 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
                     ?: AutoCamPosition.GENERAL_A
             }
         }
+    }
+
+
+
+    /**
+     * Applies cubic-ease-in-out interpolation to a value.
+     */
+    private fun Float.smooth(): Float = when (context.configs[SettingsConfiguration::class].isClassicCamera) {
+        true -> this
+        false -> if (this < 0.5) 4 * this.pow(3) else 1 - (-2 * this + 2).pow(3) / 2
     }
 
     /** Moves the camera to a new position, if it is not currently moving. */
@@ -262,13 +265,15 @@ enum class AutoCamPosition(
     val stayHere: (time: Duration, instruments: List<Instrument>, context: Midis2jam2) -> Boolean,
     /** The type of camera. */
     val type: AutoCamPositionType,
+    val isClassicCamUsed: Boolean = false,
 ) {
     GENERAL_A(
         Vector3f(-2.00f, 92.00f, 134.00f),
         Quaternion(-0.00f, 0.99f, -0.16f, -0.00f),
         alwaysTrue,
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     GENERAL_B(
@@ -276,7 +281,8 @@ enum class AutoCamPosition(
         Quaternion(-0.03f, 0.97f, -0.15f, -0.18f),
         alwaysTrue,
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     GENERAL_C(
@@ -284,16 +290,17 @@ enum class AutoCamPosition(
         Quaternion(0.03f, 0.97f, -0.18f, 0.15f),
         alwaysTrue,
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     GENERAL_D(
         Vector3f(5f, 432f, 24f),
-        Quaternion().fromAngles(-1.695151f, 0f, -3.1415927f),
-        { _, _, context -> context.configs.getType(SettingsConfiguration::class).isClassicCamera },
-        { _, _, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera },
+        Quaternion().fromAngles(Utils.rad(82.875f), Utils.rad(180f), 0f),
         alwaysTrue,
-        AutoCamPositionType.STAGE
+        alwaysTrue,
+        AutoCamPositionType.STAGE,
+        isClassicCamUsed = true
     ),
 
     BASS_GUITAR(
@@ -301,7 +308,17 @@ enum class AutoCamPosition(
         Quaternion(0.07f, 0.90f, -0.17f, 0.40f),
         { time, instruments, _ -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
+    ),
+
+    BASS_GUITAR_2(
+        Vector3f(35f, 25.4f, -19f),
+        Quaternion().fromAngles(2.268928f, -1.0646509f, 3.0979594f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
     ),
 
     GUITAR(
@@ -309,7 +326,8 @@ enum class AutoCamPosition(
         Quaternion(-0.02f, 0.95f, 0.06f, 0.31f),
         { time, instruments, _ -> visibleNowAndLater(instruments, Guitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Guitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true,
     ),
 
     DRUM_SET(
@@ -317,47 +335,49 @@ enum class AutoCamPosition(
         Quaternion(-5.8945218E-9f, 0.9908659f, -0.13485093f, -4.3312124E-8f),
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
-        AutoCamPositionType.INSTRUMENT
-    ),
-
-    KEYBOARDS_2(
-        Vector3f(0f, 71.8f, 44.5f),
-        Quaternion().fromAngles(-2.867576f, 0.7836529f, -3.1415927f),
-        { time, instruments, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
-        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
     ),
 
     DRUM_SET_2(
         Vector3f(-19.6f, 78.7f, 3.8f),
-        Quaternion().fromAngles(-2.6581365f, -0.2827433f, -3.1415927f),
-        Quaternion().fromAngles(-2.6581365f, -0.2827433f, 3.1415927f),
-        { _, _, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera && context.drumSetVisibilityManager.isVisible },
+        Quaternion().fromAngles(Utils.rad(27.7), Utils.rad(163.8), 0f),
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
-        AutoCamPositionType.INSTRUMENT
+        { _, _, context -> context.drumSetVisibilityManager.isVisible },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
     ),
 
-    BASS_GUITAR_2(
-        Vector3f(35f, 25.4f, -19f),
-        Quaternion().fromAngles(2.268928f, -1.0646509f, 3.0979594f),
-        { time, instruments, context -> context.configs.getType(org.wysko.midis2jam2.starter.configuration.SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
-        { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
+    KEYBOARDS(
+        Vector3f(-32.76f, 59.79f, 38.55f),
+        Quaternion(-0.06f, 0.94f, -0.27f, -0.20f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
+    ),
+
+    KEYBOARDS_2(
+        Vector3f(-35f, 76.4f, 33.6f),
+        Quaternion().fromAngles(Utils.rad(55.8), Utils.rad(198.5), 0f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
+        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
+        AutoCamPositionType.INSTRUMENT,
+        isClassicCamUsed = true
     ),
 
     SOPRANO_SAX(
         Vector3f(18.91f, 40.76f, -11.10f),
         Quaternion(-0.04f, 0.96f, -0.19f, -0.19f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, SopranoSax::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, SopranoSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<SopranoSax>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
-
     ALTO_SAX(
         Vector3f(0.14f, 51.05f, -18.93f),
         Quaternion(-0.05f, 0.95f, -0.21f, -0.24f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, AltoSax::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, AltoSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<AltoSax>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -365,7 +385,7 @@ enum class AutoCamPosition(
     TENOR_SAX(
         Vector3f(-1.57f, 44.77f, 43.48f),
         Quaternion(0.00f, 0.98f, -0.20f, 0.02f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, TenorSax::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, TenorSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<TenorSax>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -373,23 +393,15 @@ enum class AutoCamPosition(
     BARITONE_SAX(
         Vector3f(18.66f, 58.02f, 37.77f),
         Quaternion(0.01f, 0.98f, -0.19f, 0.06f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, BaritoneSax::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, BaritoneSax::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BaritoneSax>().any { it.isVisible } },
-        AutoCamPositionType.INSTRUMENT
-    ),
-
-    KEYBOARDS(
-        Vector3f(-32.76f, 59.79f, 38.55f),
-        Quaternion(-0.06f, 0.94f, -0.27f, -0.20f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
-        { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
     MALLETS(
         Vector3f(-13.29f, 53.30f, 86.90f),
         Quaternion(-0.02f, 0.98f, -0.18f, -0.11f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Mallets::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Mallets::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Mallets>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -397,7 +409,7 @@ enum class AutoCamPosition(
     MUSIC_BOX(
         Vector3f(20.54f, 15.92f, 27.50f),
         Quaternion(0.01f, 0.97f, -0.06f, 0.22f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, MusicBox::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, MusicBox::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<MusicBox>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -405,7 +417,7 @@ enum class AutoCamPosition(
     TELEPHONE_RING(
         Vector3f(-10.25f, 14.42f, -30.20f),
         Quaternion(0.04f, 0.96f, -0.18f, 0.22f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, TelephoneRing::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, TelephoneRing::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<TelephoneRing>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -413,7 +425,7 @@ enum class AutoCamPosition(
     SPACE_LASER(
         Vector3f(-32.91f, 1.40f, 4.15f),
         Quaternion(-0.05f, 0.95f, 0.18f, 0.24f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, SpaceLaser::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, SpaceLaser::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<SpaceLaser>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -421,7 +433,7 @@ enum class AutoCamPosition(
     ACOUSTIC_BASS(
         Vector3f(-35.41f, 76.72f, -13.02f),
         Quaternion(-0.02f, 0.98f, -0.20f, -0.09f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, AcousticBass::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, AcousticBass::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<AcousticBass>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -429,7 +441,7 @@ enum class AutoCamPosition(
     VIOLIN(
         Vector3f(6.86f, 67.31f, 24.77f),
         Quaternion(0.01f, 0.99f, -0.12f, 0.05f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Violin::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Violin::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Violin>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -437,7 +449,7 @@ enum class AutoCamPosition(
     VIOLA(
         Vector3f(-10.58f, 39.79f, 17.41f),
         Quaternion(0.02f, 0.98f, -0.18f, 0.12f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Viola::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Viola::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Viola>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -445,7 +457,7 @@ enum class AutoCamPosition(
     CELLO(
         Vector3f(-49.57f, 62.85f, 10.76f),
         Quaternion(-0.03f, 0.97f, -0.21f, -0.15f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Cello::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Cello::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Cello>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -453,7 +465,7 @@ enum class AutoCamPosition(
     HARP(
         Vector3f(-70.15f, 78.19f, 33.63f),
         Quaternion(-0.06f, 0.94f, -0.18f, -0.29f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Harp::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Harp::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Harp>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -461,7 +473,7 @@ enum class AutoCamPosition(
     CHOIR(
         Vector3f(28.63f, 74.08f, -7.62f),
         Quaternion(0.01f, 0.99f, -0.10f, 0.08f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, StageChoir::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, StageChoir::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<StageChoir>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -469,7 +481,7 @@ enum class AutoCamPosition(
     TUBULAR_BELLS(
         Vector3f(-57.10f, 95.29f, -52.64f),
         Quaternion(-0.01f, 0.99f, -0.10f, -0.05f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, TubularBells::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, TubularBells::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<TubularBells>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -477,7 +489,7 @@ enum class AutoCamPosition(
     STAGE_STRINGS_1(
         Vector3f(-76.30f, 76.00f, -57.11f),
         Quaternion(-0.02f, 0.98f, -0.09f, -0.19f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera &&
+        { time, instruments, _ ->
             instruments.filterIsInstance<StageStrings>().any { it.isVisible } && visibleNowAndLater(
                 instruments,
                 StageStrings::class.java,
@@ -485,14 +497,14 @@ enum class AutoCamPosition(
                 WAIT_TIME
             )
         },
-        { _, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
+        { _, instruments, _ -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_STRINGS_2(
         Vector3f(-68.73f, 81.60f, -51.70f),
         Quaternion(-0.05f, 0.92f, -0.12f, -0.38f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera &&
+        { time, instruments, _ ->
             instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 2 && visibleNowAndLater(
                 instruments,
                 StageStrings::class.java,
@@ -500,14 +512,14 @@ enum class AutoCamPosition(
                 WAIT_TIME
             )
         },
-        { _, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
+        { _, instruments, _ -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_STRINGS_3_PLUS(
         Vector3f(-34.77f, 87.41f, -13.06f),
         Quaternion(-0.06f, 0.86f, -0.10f, -0.49f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera &&
+        { time, instruments, _ ->
             instruments.filterIsInstance<StageStrings>().count { it.isVisible } >= 3 && visibleNowAndLater(
                 instruments,
                 StageStrings::class.java,
@@ -515,14 +527,14 @@ enum class AutoCamPosition(
                 WAIT_TIME
             )
         },
-        { _, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
+        { _, instruments, _ -> instruments.filterIsInstance<StageStrings>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
 
     STAGE_HORNS(
         Vector3f(-52.16f, 67.44f, -51.44f),
         Quaternion(-0.01f, 0.99f, -0.09f, -0.07f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, StageHorns::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, StageHorns::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<StageHorns>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -530,7 +542,7 @@ enum class AutoCamPosition(
     PIZZICATO_STRINGS(
         Vector3f(-68.83f, 56.76f, -52.56f),
         Quaternion(-0.05f, 0.95f, -0.24f, -0.19f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, PizzicatoStrings::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, PizzicatoStrings::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<PizzicatoStrings>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -538,7 +550,7 @@ enum class AutoCamPosition(
     ACCORDION(
         Vector3f(-55.93f, 44.35f, -16.56f),
         Quaternion(-0.03f, 0.97f, -0.16f, -0.16f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Accordion::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Accordion::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Accordion>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -546,7 +558,7 @@ enum class AutoCamPosition(
     BANJO(
         Vector3f(32.83f, 62.14f, 46.33f),
         Quaternion(0.03f, 0.97f, -0.12f, 0.23f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Banjo::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Banjo::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Banjo>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -554,7 +566,7 @@ enum class AutoCamPosition(
     SHAMISEN(
         Vector3f(40.64f, 73.55f, 30.32f),
         Quaternion(0.03f, 0.97f, -0.11f, 0.24f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Shamisen::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Shamisen::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Shamisen>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -562,7 +574,7 @@ enum class AutoCamPosition(
     TIMPANI(
         Vector3f(43.85f, 55.59f, -38.73f),
         Quaternion(0.01f, 0.98f, -0.21f, 0.07f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Timpani::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Timpani::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Timpani>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -570,7 +582,7 @@ enum class AutoCamPosition(
     MELODIC_TOM(
         Vector3f(54.01f, 83.03f, -52.03f),
         Quaternion(0.01f, 0.98f, -0.19f, 0.04f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, MelodicTom::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, MelodicTom::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<MelodicTom>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -578,7 +590,7 @@ enum class AutoCamPosition(
     SYNTH_DRUM(
         Vector3f(10.73f, 103.13f, -78.50f),
         Quaternion(0.06f, 0.90f, -0.13f, 0.42f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, SynthDrum::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, SynthDrum::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<SynthDrum>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -586,7 +598,7 @@ enum class AutoCamPosition(
     TAIKO_DRUM(
         Vector3f(19.72f, 99.17f, -121.31f),
         Quaternion(0.03f, 0.91f, -0.07f, 0.42f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, TaikoDrum::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, TaikoDrum::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<TaikoDrum>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -594,7 +606,7 @@ enum class AutoCamPosition(
     TROMBONE(
         Vector3f(28.212189f, 86.88116f, 41.177956f),
         Quaternion(0.026606327f, 0.97332513f, -0.1550696f, 0.16698427f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Trombone::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Trombone::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Trombone>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -602,7 +614,7 @@ enum class AutoCamPosition(
     FLUTE(
         Vector3f(5.84f, 54.35f, 9.74f),
         Quaternion(-0.00f, 1.00f, -0.06f, -0.03f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Flute::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Flute::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Flute>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -610,7 +622,7 @@ enum class AutoCamPosition(
     PICCOLO(
         Vector3f(5.84f, 60.25f, 9.74f),
         Quaternion(-0.00f, 1.00f, -0.06f, -0.03f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Piccolo::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Piccolo::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Piccolo>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -618,7 +630,7 @@ enum class AutoCamPosition(
     RECORDER(
         Vector3f(-4.77f, 48.54f, 9.77f),
         Quaternion(0.01f, 0.99f, -0.07f, 0.09f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Recorder::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Recorder::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Recorder>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -626,7 +638,7 @@ enum class AutoCamPosition(
     HARMONICA(
         Vector3f(56.07f, 38.10f, -30.10f),
         Quaternion(0.10f, 0.86f, -0.18f, 0.47f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Harmonica::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Harmonica::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Harmonica>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -634,7 +646,7 @@ enum class AutoCamPosition(
     PAN_FLUTE(
         Vector3f(58.05f, 37.40f, 0.82f),
         Quaternion(0.03f, 0.97f, -0.16f, 0.18f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, PanFlute::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, PanFlute::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<PanFlute>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -642,7 +654,7 @@ enum class AutoCamPosition(
     WHISTLES(
         Vector3f(58.05f, 37.40f, 0.82f),
         Quaternion(0.03f, 0.97f, -0.20f, 0.17f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Whistles::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Whistles::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Whistles>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -650,7 +662,7 @@ enum class AutoCamPosition(
     BLOWN_BOTTLE(
         Vector3f(58.05f, 31.78f, 0.82f),
         Quaternion(0.03f, 0.97f, -0.17f, 0.16f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, BlownBottle::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, BlownBottle::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BlownBottle>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -658,7 +670,7 @@ enum class AutoCamPosition(
     AGOGOS(
         Vector3f(55.97f, 32.62f, 11.38f),
         Quaternion(0.02f, 0.98f, -0.17f, 0.11f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Agogos::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Agogos::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Agogos>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -666,7 +678,7 @@ enum class AutoCamPosition(
     WOODBLOCKS(
         Vector3f(54.60f, 29.79f, 17.34f),
         Quaternion(0.01f, 0.99f, -0.13f, 0.11f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Woodblocks::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Woodblocks::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Woodblocks>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -674,7 +686,7 @@ enum class AutoCamPosition(
     TUBA(
         Vector3f(-75.00f, 33.61f, 9.40f),
         Quaternion(-0.02f, 0.97f, -0.11f, -0.22f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Tuba::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Tuba::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Tuba>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -682,7 +694,7 @@ enum class AutoCamPosition(
     FRENCH_HORN(
         Vector3f(-82.14993f, 43.444687f, 30.638006f),
         Quaternion(-0.05368753f, 0.9447794f, -0.19924761f, -0.2545779f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, FrenchHorn::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, FrenchHorn::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<FrenchHorn>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -690,7 +702,7 @@ enum class AutoCamPosition(
     TRUMPET(
         Vector3f(-0.17f, 61.50f, 30.30f),
         Quaternion(-0.01f, 0.93f, -0.03f, -0.37f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Trumpet::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Trumpet::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Trumpet>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -698,7 +710,7 @@ enum class AutoCamPosition(
     OBOE(
         Vector3f(18.71f, 53.21f, 35.69f),
         Quaternion(-0.01f, 0.98f, -0.17f, -0.05f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Oboe::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Oboe::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Oboe>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -706,7 +718,7 @@ enum class AutoCamPosition(
     CLARINET(
         Vector3f(-13.75f, 52.54f, 37.02f),
         Quaternion(-0.01f, 0.99f, -0.15f, -0.04f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Clarinet::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Clarinet::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Clarinet>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -714,7 +726,7 @@ enum class AutoCamPosition(
     STEEL_DRUMS(
         Vector3f(46.01f, 62.34f, -29.49f),
         Quaternion(0.02f, 0.97f, -0.18f, 0.13f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, SteelDrums::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, SteelDrums::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<SteelDrums>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -722,7 +734,7 @@ enum class AutoCamPosition(
     FIDDLE(
         Vector3f(-7.67f, 79.05f, 19.95f),
         Quaternion(-0.01f, 0.98f, -0.18f, -0.04f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Fiddle::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Fiddle::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Fiddle>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -730,7 +742,7 @@ enum class AutoCamPosition(
     OCARINA(
         Vector3f(36.71f, 54.71f, 33.44f),
         Quaternion(0.04f, 0.96f, -0.18f, 0.21f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Ocarina::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Ocarina::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Ocarina>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -738,7 +750,7 @@ enum class AutoCamPosition(
     BAG_PIPE(
         Vector3f(-49.76239f, 33.13658f, 82.276375f),
         Quaternion(-0.0023348634f, 0.9805548f, -0.011687864f, -0.19588324f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, BagPipe::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, BagPipe::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BagPipe>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -746,7 +758,7 @@ enum class AutoCamPosition(
     KALIMBA(
         Vector3f(20.016724f, 50.83171f, 53.29627f),
         Quaternion(-0.0011894251f, 0.9525223f, -0.30444378f, -0.0037213443f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, Kalimba::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, Kalimba::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Kalimba>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -754,7 +766,7 @@ enum class AutoCamPosition(
     TINKLE_BELL(
         Vector3f(34.142365f, 50.831703f, 54.312134f),
         Quaternion(0.024830274f, 0.94041014f, -0.33174983f, 0.070386335f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, TinkleBell::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, TinkleBell::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<TinkleBell>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
@@ -762,7 +774,7 @@ enum class AutoCamPosition(
     BIRD_TWEET(
         Vector3f(126.65341f, 55.186848f, -5.279584f),
         Quaternion(0.027039362f, 0.9644452f, -0.1090079f, 0.2392313f),
-        { time, instruments, context -> !context.configs.getType(SettingsConfiguration::class).isClassicCamera && visibleNowAndLater(instruments, BirdTweet::class.java, time, WAIT_TIME * 1.5) },
+        { time, instruments, _ -> visibleNowAndLater(instruments, BirdTweet::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BirdTweet>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
