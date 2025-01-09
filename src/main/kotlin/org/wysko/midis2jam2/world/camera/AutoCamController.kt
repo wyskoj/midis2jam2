@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.world.camera
 
-import androidx.compose.animation.core.rememberTransition
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.Midis2jam2
