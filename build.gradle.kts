@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose)
-     alias(libs.plugins.compose.kotlin)
+    alias(libs.plugins.compose.kotlin)
     alias(libs.plugins.detekt)
     alias(libs.plugins.shadow)
     alias(libs.plugins.licenseReport)
@@ -31,7 +31,7 @@ application {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.withType<KotlinCompile> {
@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.logback.classic)
     implementation(libs.kmidi)
+    implementation(libs.reorderable)
     implementation(files("libs/Gervill-0.2.31.jar", "libs/jme-ttf-2.2.2.jar"))
 }
 

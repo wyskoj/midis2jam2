@@ -26,3 +26,9 @@ private const val HELP_URL = "https://docs.midis2jam2.xyz"
  * Opens the help page in the user's default browser.
  */
 fun openHelp(): Unit = Desktop.getDesktop().browse(URI(HELP_URL))
+
+/**
+ * Opens the help page in the user's default browser.
+ */
+fun openHelp(vararg page: String): Unit =
+    Desktop.getDesktop().browse(URI(page.joinToString("/", prefix = "$HELP_URL/")))

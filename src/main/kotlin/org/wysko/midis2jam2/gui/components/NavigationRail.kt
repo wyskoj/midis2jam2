@@ -30,6 +30,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.ApplicationScreen
 import org.wysko.midis2jam2.gui.TabFactory
 import org.wysko.midis2jam2.gui.viewmodel.I18n
@@ -47,7 +48,7 @@ fun NavigationRail(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     icon = {
                         Icon(
-                            if (currentScreen.uid == it.uid) it.filledIcon else it.outlinedIcon,
+                            painterResource(if (currentScreen.uid == it.uid) it.filledIcon else it.outlinedIcon),
                             contentDescription = I18n[it.i18nKey].value,
                         )
                     },

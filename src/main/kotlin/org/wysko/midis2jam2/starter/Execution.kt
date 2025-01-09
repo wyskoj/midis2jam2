@@ -27,6 +27,7 @@ import org.wysko.kmidi.midi.StandardMidiFileReader
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.DesktopMidis2jam2
+import org.wysko.midis2jam2.DesktopPlaylistMidis2jam2
 import org.wysko.midis2jam2.gui.viewmodel.GERVILL
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
@@ -138,9 +139,143 @@ object Execution {
             }
         }.also {
             it.first.open()
-            it.first.sequence = sequence
+            sequence?.let { sequence ->
+                it.first.sequence = sequence
+            }
         }
     }
+
+    fun playPlaylist(
+        midiFiles: List<File>,
+        configurations: Collection<Configuration>,
+        onStart: () -> Unit,
+        onFinish: () -> Unit,
+        isShuffle: Boolean,
+    ) {
+        val deviceInfo = MidiSystem.getMidiDeviceInfo().first { it.name == GERVILL }
+        val device = MidiSystem.getMidiDevice(deviceInfo)
+        device.open()
+        val provider = RealTimeSequencerProvider()
+        val sequencer = provider.getDevice(provider.deviceInfo.first()) as Sequencer
+        sequencer.open()
+        val synthesizer = MidiSystem.getSynthesizer()
+        synthesizer.open()
+        sequencer.transmitter.receiver = synthesizer.receiver
+        Midis2jam2PlaylistApplication(
+            if (isShuffle) midiFiles.shuffled() else midiFiles,
+            configurations,
+            onFinish,
+            sequencer,
+            synthesizer,
+        ).run {
+            applyConfigurations(configurations)
+            onStart()
+            start()
+        }
+    }
+}
+
+private class Midis2jam2PlaylistApplication(
+    val files: List<File>,
+    val configurations: Collection<Configuration>,
+    val onPlaylistFinish: () -> Unit,
+    val sequencer: Sequencer,
+    val synthesizer: Synthesizer?,
+) : SimpleApplication() {
+    private var currentSongIndex = 0
+    private lateinit var midis2jam2s: List<DesktopPlaylistMidis2jam2>
+    private var currentState: DesktopPlaylistMidis2jam2? = null
+
+    override fun simpleInitApp() {
+        sequencer.open()
+        buildStates()
+        loadSong(0)
+    }
+
+    private fun buildStates() {
+        midis2jam2s = files.map { file ->
+            DesktopPlaylistMidis2jam2(
+                sequencer = sequencer,
+                midiFile = loadKMidiSequence(file).toTimeBasedSequence(),
+                onClose = {
+                    stop()
+                },
+                onFinish = {
+                    logger().debug("Advance")
+                    advance()
+                },
+                configs = configurations,
+                fileName = file.name,
+                synthesizer = synthesizer,
+            )
+        }
+    }
+
+    private fun loadKMidiSequence(file: File) = StandardMidiFileReader().readFile(file)
+    private fun loadJavaXSequence(file: File) = MidiSystem.getSequence(file)
+
+    private fun advance() = when {
+        currentSongIndex != midis2jam2s.indices.last -> loadSong(currentSongIndex + 1)
+
+        else -> {
+            onPlaylistFinish()
+            stop()
+        }
+    }
+
+    private fun loadSong(index: Int) {
+        rootNode.detachAllChildren()
+        guiNode.detachAllChildren()
+        midis2jam2s.forEach {
+            stateManager.detach(it)
+        }
+
+        sequencer.stop()
+        sequencer.sequence = loadJavaXSequence(files[index])
+
+        midis2jam2s[index].let {
+            stateManager.attach(it)
+            rootNode.attachChild(it.root)
+            currentState = it
+        }
+
+        currentSongIndex = index
+    }
+}
+
+private fun SimpleApplication.applyConfigurations(configurations: Collection<Configuration>) {
+    val jmeSettings = AppSettings(false).apply { copyFrom(DEFAULT_JME_SETTINGS) }
+    val settingsConfiguration = configurations.first { it is SettingsConfiguration } as SettingsConfiguration
+    val graphicsConfiguration = configurations.first { it is GraphicsConfiguration } as GraphicsConfiguration
+
+    if (settingsConfiguration.isFullscreen) {
+        jmeSettings.isFullscreen = true
+        with(screenResolution()) {
+            jmeSettings.width = width
+            jmeSettings.height = height
+        }
+    } else {
+        jmeSettings.isFullscreen = false
+        when (graphicsConfiguration.windowResolution) {
+            is Resolution.DefaultResolution ->
+                with(preferredResolution()) {
+                    jmeSettings.width = width
+                    jmeSettings.height = height
+                }
+
+            is Resolution.CustomResolution ->
+                with(graphicsConfiguration.windowResolution) {
+                    jmeSettings.width = width
+                    jmeSettings.height = height
+                }
+        }
+    }
+
+    setSettings(jmeSettings)
+    setDisplayStatView(false)
+    setDisplayFps(false)
+    isPauseOnLostFocus = false
+    isShowSettings = false
 }
 
 private class Midis2jam2Application(
@@ -151,39 +286,7 @@ private class Midis2jam2Application(
     val synthesizer: Synthesizer?,
 ) : SimpleApplication() {
     fun execute() {
-        val jmeSettings = AppSettings(false).apply { copyFrom(DEFAULT_JME_SETTINGS) }
-        val settingsConfiguration = configurations.first { it is SettingsConfiguration } as SettingsConfiguration
-        val graphicsConfiguration = configurations.first { it is GraphicsConfiguration } as GraphicsConfiguration
-
-        if (settingsConfiguration.isFullscreen) {
-            jmeSettings.isFullscreen = true
-            with(screenResolution()) {
-                jmeSettings.width = width
-                jmeSettings.height = height
-            }
-        } else {
-            jmeSettings.isFullscreen = false
-            when (graphicsConfiguration.windowResolution) {
-                is Resolution.DefaultResolution ->
-                    with(preferredResolution()) {
-                        jmeSettings.width = width
-                        jmeSettings.height = height
-                    }
-
-                is Resolution.CustomResolution ->
-                    with(graphicsConfiguration.windowResolution) {
-                        jmeSettings.width = width
-                        jmeSettings.height = height
-                    }
-            }
-        }
-
-        setSettings(jmeSettings)
-        setDisplayStatView(false)
-        setDisplayFps(false)
-        isPauseOnLostFocus = false
-        isShowSettings = false
-
+        applyConfigurations(configurations)
         start()
     }
 

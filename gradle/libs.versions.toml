@@ -17,6 +17,7 @@ kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", vers
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.6" }
 kmidi = { group = "org.wysko", name = "kmidi", version = "0.0.6" }
 compose-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.4.2" }
 
 [bundles]
 jme3 = ["jme3-core", "jme3-desktop", "jme3-effects"]
