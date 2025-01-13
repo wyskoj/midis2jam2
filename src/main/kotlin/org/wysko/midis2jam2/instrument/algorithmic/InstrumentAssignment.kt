@@ -112,6 +112,7 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
+import org.wysko.midis2jam2.instrument.family.soundeffects.Gunshot
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter
 import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
@@ -363,6 +364,7 @@ object InstrumentAssignment {
             124 -> TelephoneRing(context, events)
             125 -> Helicopter(context, events)
             126 -> ApplauseChoir(context, events)
+            127 -> Gunshot(context, events)
             else -> null
         }
     }
