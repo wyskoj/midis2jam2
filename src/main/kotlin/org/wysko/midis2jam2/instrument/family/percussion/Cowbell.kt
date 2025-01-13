@@ -16,35 +16,34 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
-import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.util.rot
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Cowbell. */
 class Cowbell(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
-    private val stick =
-        Striker(context, hits, StickType.DRUM_SET_STICK).apply {
-            setParent(recoilNode)
-            offsetStick { it.move(0f, 0f, -2f) }
-            node.move(0f, 0f, 14f)
-        }
-
-    init {
-        recoilNode.attachChild(context.modelR("CowBell.obj", "MetalTexture.bmp"))
-
-        geometry.setLocalTranslation(-9.7f, 40f, -99f)
-        geometry.localRotation = Quaternion().fromAngles(rad(24.0), rad(26.7), rad(-3.81))
+    private val stick = Striker(context, hits, StickType.DRUM_SET_STICK).apply {
+        setParent(recoilNode)
+        offsetStick { it.move(0f, 0f, -2f) }
+        node.move(0f, 0f, 14f)
     }
 
-    override fun tick(
-        time: Duration,
-        delta: Duration,
-    ) {
+    init {
+        recoilNode += context.modelR("CowBell.obj", "MetalTexture.bmp")
+        geometry.run {
+            loc = v3(-10, 37.5, -102)
+            rot = v3(24, 26.7, -3.81)
+        }
+    }
+
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
         recoilDrum(recoilNode, stick.tick(time, delta).velocity, delta)
     }
