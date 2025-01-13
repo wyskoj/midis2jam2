@@ -23,6 +23,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /**
@@ -37,29 +38,31 @@ class Metronome(
         Striker(
             context = context,
             strikeEvents = bellHits,
-            strikeSpeed = 2.4,
-            maxIdleAngle = 30.0,
-            // Dummy node, rotation will be copied in [tick]
             stickModel = Node(),
+            strikeSpeed = 2.4,
+            // Dummy node, rotation will be copied in [tick]
+            maxIdleAngle = 30.0,
+            fixed = true,
         )
 
     private val clickStriker =
         Striker(
             context = context,
             strikeEvents = clickHits,
-            strikeSpeed = 2.4,
-            maxIdleAngle = 30.0,
-            // Dummy node, rotation will be copied in [tick]
             stickModel = Node(),
+            strikeSpeed = 2.4,
+            // Dummy node, rotation will be copied in [tick]
+            maxIdleAngle = 30.0,
+            fixed = true,
         )
 
     private val bell =
-        context.modelD("MetronomePendjulum2.obj", "HornSkin.bmp").apply {
+        context.modelR("MetronomePendjulum2.obj", "HornSkin.bmp").apply {
             geometry.attachChild(this)
             setLocalTranslation(0f, 0f, 0.5f)
         }
     private val click =
-        context.modelD("MetronomePendjulum1.obj", "ShinySilver.bmp").apply {
+        context.modelR("MetronomePendjulum1.obj", "ShinySilver.bmp").apply {
             geometry.attachChild(this)
             setLocalTranslation(0f, 0f, 1f)
         }

@@ -49,6 +49,7 @@ class SnareDrum(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, style: ShellS
             context = context,
             strikeEvents = hits.filter { it.note == SIDE_STICK },
             stickModel = DRUM_SET_STICK,
+            fixed = true,
         ).apply {
             setParent(recoilNode)
             offsetStick {

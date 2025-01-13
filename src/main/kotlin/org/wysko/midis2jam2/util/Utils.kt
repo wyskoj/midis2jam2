@@ -91,6 +91,18 @@ object Utils {
      * @param t The interpolation factor.
      */
     fun lerp(a: Number, b: Number, t: Number): Double = a.toDouble() + (b.toDouble() - a.toDouble()) * t.toDouble()
+    fun mapRangeClamped(
+        value: Double,
+        inRangeA: Double,
+        inRangeB: Double,
+        outRangeA: Double,
+        outRangeB: Double
+    ): Double {
+        val clampedValue = value.coerceIn(inRangeA, inRangeB)
+        val inRange = inRangeB - inRangeA
+        val outRange = outRangeB - outRangeA
+        return outRange * ((clampedValue - inRangeA) / inRange) + outRangeA
+    }
 }
 
 /** Converts a boolean into its appropriate [CullHint]. */

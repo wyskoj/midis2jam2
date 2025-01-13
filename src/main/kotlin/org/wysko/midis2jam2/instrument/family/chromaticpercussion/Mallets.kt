@@ -235,7 +235,7 @@ class Mallets(
 
         private fun setShadowScale(it: StickStatus) {
             shadow.setLocalScale(
-                ((1 - Math.toDegrees(it.rotationAngle.toDouble()) / MAX_STICK_IDLE_ANGLE) / 2).toFloat()
+                ((1 - Math.toDegrees(it.rotationAngle.toDouble()) / MAX_STICK_IDLE_ANGLE) / 2).toFloat().coerceAtLeast(0.0f)
             )
         }
 
