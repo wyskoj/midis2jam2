@@ -189,9 +189,6 @@ suspend fun main(args: Array<String>) {
                                                 onStart = {
                                                     isLockPlayButton = true
                                                 },
-                                                onReady = {
-                                                    // Nothing to do.
-                                                },
                                                 onFinish = {
                                                     isLockPlayButton = false
                                                 },
@@ -265,8 +262,7 @@ suspend fun main(args: Array<String>) {
                 soundBankConfigurationViewModel.generateConfiguration(),
                 synthesizerConfigurationViewModel.generateConfiguration()
             ),
-            onStart = {},
-            onReady = {
+            onStart = {
                 SplashScreen.hide()
             },
             onFinish = {

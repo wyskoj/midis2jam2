@@ -52,67 +52,75 @@ import javax.sound.midi.Synthesizer
  * This class represents the execution of a MIDI file with given configurations.
  */
 object Execution {
+
+    private fun safeGetSequence(file: File): Sequence? = try {
+        MidiSystem.getSequence(file)
+    } catch (e: InvalidMidiDataException) {
+        logger().errorDisp("The MIDI file is invalid.", e)
+        null
+    } catch (e: IOException) {
+        logger().errorDisp("There was an error reading the MIDI file.", e)
+        null
+    }
+
+    private fun safeGetMidiDevice(name: String): MidiDevice? = try {
+        MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo().first { it.name == name })
+    } catch (e: MidiUnavailableException) {
+        logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
+        null
+    } catch (e: IllegalArgumentException) {
+        logger().errorDisp("The MIDI device is not found.", e)
+        null
+    } catch (e: NoSuchElementException) {
+        logger().errorDisp("The MIDI device is not found.", e)
+        null
+    }
+
+    private fun safeGetSequencerAndSynthesizer(
+        homeConfiguration: HomeConfiguration,
+        midiDevice: MidiDevice,
+        sequence: Sequence?,
+    ): Pair<Sequencer, Synthesizer?>? = try {
+        getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
+    } catch (e: Exception) {
+        logger().errorDisp("There was an error.", e)
+        null
+    }
+
     /**
      * Starts the midis2jam2 JME application.
      *
      * @param midiFile The MIDI file to play.
      * @param configurations The configurations for the application.
      * @param onStart Callback function called when the application starts.
-     * @param onReady Callback function called when the application is ready to begin.
      * @param onFinish Callback function called when the application is finished.
      */
     fun start(
         midiFile: File,
         configurations: Collection<Configuration>,
         onStart: () -> Unit,
-        onReady: () -> Unit,
         onFinish: () -> Unit,
     ) {
-        CoroutineScope(Default).launch {
-            onStart()
-            val homeConfiguration = configurations.first { it is HomeConfiguration } as HomeConfiguration
+        onStart()
+        val homeConfiguration = configurations.first { it is HomeConfiguration } as HomeConfiguration
 
-            val sequence = try {
-                MidiSystem.getSequence(midiFile)
-            } catch (e: InvalidMidiDataException) {
-                this@Execution.logger().errorDisp("The MIDI file is invalid.", e)
-                onFinish()
-                return@launch
-            } catch (e: IOException) {
-                this@Execution.logger().errorDisp("There was an error reading the MIDI file.", e)
-                onFinish()
-                return@launch
-            }
-
-            val midiDevice = try {
-                MidiSystem.getMidiDevice(
-                    MidiSystem.getMidiDeviceInfo().first { it.name == homeConfiguration.selectedMidiDevice },
-                )
-            } catch (e: MidiUnavailableException) {
-                this@Execution.logger().errorDisp("The MIDI device is unavailable due to resource restrictions.", e)
-                onFinish()
-                return@launch
-            } catch (e: IllegalArgumentException) {
-                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
-                onFinish()
-                return@launch
-            } catch (e: NoSuchElementException) {
-                this@Execution.logger().errorDisp("The MIDI device is not found.", e)
-                onFinish()
-                return@launch
-            }
-
-            val (sequencer, synthesizer) = try {
-                getAndLoadSequencer(homeConfiguration, midiDevice, sequence)
-            } catch (e: Exception) {
-                logger().errorDisp("There was an error.", e)
-                onFinish()
-                return@launch
-            }
-
-            onReady()
-            Midis2jam2Application(midiFile, configurations, onFinish, sequencer, synthesizer).execute()
+        val sequence = safeGetSequence(midiFile) ?: run {
+            onFinish()
+            return
         }
+
+        val midiDevice = safeGetMidiDevice(homeConfiguration.selectedMidiDevice) ?: run {
+            onFinish()
+            return
+        }
+
+        val (sequencer, synthesizer) = safeGetSequencerAndSynthesizer(homeConfiguration, midiDevice, sequence)
+            ?: run {
+                onFinish()
+                return
+            }
+
+        Midis2jam2Application(midiFile, configurations, onFinish, sequencer, synthesizer).execute()
     }
 
     private fun getAndLoadSequencer(
