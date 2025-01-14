@@ -17,18 +17,18 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import com.jme3.font.BitmapText
+import com.jme3.math.FastMath
 import com.jme3.math.Matrix3f
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent.NoteOn
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.node
-import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
-import java.lang.Math.toRadians
+import kotlin.math.*
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -63,6 +63,7 @@ class Striker(
     private val rotationAxis: Axis = Axis.X,
     private val sticky: Boolean = true,
     private val actualStick: Boolean = true,
+    private val fixed: Boolean = false,
 ) {
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
@@ -74,6 +75,7 @@ class Striker(
         rotationAxis: Axis = Axis.X,
         sticky: Boolean = true,
         actualStick: Boolean = true,
+        fixed: Boolean = false,
     ) : this(
         context,
         strikeEvents,
@@ -85,6 +87,7 @@ class Striker(
         rotationAxis,
         sticky,
         actualStick,
+        fixed,
     )
 
     /**
@@ -99,75 +102,117 @@ class Striker(
         }
     }
 
+    private val anticipationTime = 0.2
+    private val recoilTime = 0.4
+    private val scaleFactor = 50.0
+
     /**
      * Updates animation, given the current [time] and the amount of time since the last frame ([delta]).
      */
-    fun tick(
-        time: Duration,
-        delta: Duration,
-    ): StickStatus {
-        // Collect an event if a strike is occurring now
+    fun tick(time: Duration, delta: Duration): StickStatus {
         val strike = eventCollector.advanceCollectOne(time)
 
-        // See what the proposed rotation angle is
-        val proposedRotation = proposedRotation(time)
+        val currentTime = time.toDouble(SECONDS)
+        val timeOfLastEvent = eventCollector.prev()?.let { context.sequence.getTimeOf(it).toDouble(SECONDS) }
+        val timeOfNextEvent = eventCollector.peek()?.let { context.sequence.getTimeOf(it).toDouble(SECONDS) }
 
-        // If the proposed angle is greater than the maximum idle angle (i.e., we need to wait a bit longer until we
-        // show the stick coming down
-        if (proposedRotation > maxIdleAngle) {
-            // If it is also the case that the stick is currently at an angle less than the proposed (recoiling)
-            val currentAngles = rotationNode.localRotation.toAngles(null)
-            if (currentAngles[rotationAxis.componentIndex] <= maxIdleAngle) {
-                // Recoil the stick by slightly raising it
-                setRotation(
-                    axis = rotationAxis,
-                    angle = (currentAngles[rotationAxis.componentIndex] + 5f * delta.toDouble(SECONDS)).coerceAtMost(
-                        toRadians(maxIdleAngle)
-                    ),
-                )
-            }
-        } else {
-            // The proposed angle is simply less than the maximum, so we just set the angle to be that
-            setRotation(
-                axis = rotationAxis,
-                angle = toRadians(proposedRotation.coerceIn(0.0..maxIdleAngle)),
-            )
-        }
+        val anticipatedVelocity = eventCollector.peek()?.velocity ?: 0
 
-        // After all the rotations have been completed, write down the new angles
-        val finalAngles = rotationNode.localRotation.toAngles(null)
+        var visibility = calculateIsVisible(currentTime, timeOfNextEvent, timeOfLastEvent)
 
-        // Determine visibility based on current rotation
-        if (finalAngles[rotationAxis.componentIndex] >= rad(maxIdleAngle)) {
-            // Not yet ready to strike, hide it
-            node.cullHint = Spatial.CullHint.Always
-        } else {
-            // Striking or recoiling, show it1
-            node.cullHint = Spatial.CullHint.Dynamic
-        }
-
-        // If the stick is sticky (should appear in between hits)
-        if (sticky) {
+        if (sticky && timeOfLastEvent != null && timeOfNextEvent != null) {
             val peek = eventCollector.peek()
             val prev = eventCollector.prev()
 
-            if (peek != null && prev != null && peek.tick - prev.tick <= context.sequence.smf.tpq * 2.1) {
-                node.cullHint = Spatial.CullHint.Dynamic
+            if (peek != null && prev != null) {
+                val division = context.sequence.smf.tpq
+                val tickSpan = peek.tick - prev.tick
+                if (tickSpan <= division * 2.1 || timeOfNextEvent - timeOfLastEvent < 2.0) {
+                    visibility = true
+                }
             }
         }
 
-        /* If this is not an actual stick, we will delegate visibility calculations to `Instrument` and just never
-         * modify our cull hint. */
-        if (!actualStick) {
-            node.cullHint = Spatial.CullHint.Dynamic
+        node.cullHint = if (!actualStick) Spatial.CullHint.Dynamic else visibility.ch
+
+        if (visibility || !actualStick) {
+            val rotation = evaluateRotation(currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity)
+            setRotation(rotationAxis, rotation)
+            if (!fixed) {
+                rotationNode.loc = v3(0, rotation / 35.0, 0)
+            }
+        } else {
+            setRotation(rotationAxis, scaleFactor)
         }
 
-        // Return some information back to the caller
         return StickStatus(
             strike = strike,
-            rotationAngle = finalAngles[rotationAxis.componentIndex],
-            strikingFor = if (proposedRotation > maxIdleAngle) null else eventCollector.peek(),
+            rotationAngle = rotationNode.localRotation.toAngles(null)[rotationAxis.componentIndex],
+            strikingFor = if (visibility) eventCollector.peek() else null,
         )
+    }
+
+    private fun calculateIsVisible(time: Double, timeOfNextEvent: Double?, timeOfLastEvent: Double?): Boolean = when {
+        timeOfNextEvent != null && timeOfLastEvent != null -> timeOfNextEvent - time < anticipationTime || time - timeOfLastEvent < recoilTime
+        timeOfNextEvent != null -> timeOfNextEvent - time < anticipationTime
+        timeOfLastEvent != null -> time - timeOfLastEvent < recoilTime
+        else -> false
+    }
+
+    private fun evaluateRotation(
+        time: Double,
+        timeOfNextEvent: Double?,
+        timeOfLastEvent: Double?,
+        anticipatedVelocity: Byte
+    ): Double {
+
+        val strikeIndex = when (timeOfNextEvent) {
+            null -> 0.0
+            else -> 1.0 - (min(timeOfNextEvent - time, anticipationTime) / anticipationTime)
+        }
+        val dampenedHit = evaluateMuteStrikeCurve(strikeIndex)
+        val forcefulHit = evaluateFullStrikeCurve(strikeIndex)
+        val strikeCurveEvaluation = Utils.lerp(dampenedHit, forcefulHit, (anticipatedVelocity / 127.0))
+
+        val recoilIndex = when (timeOfLastEvent) {
+            null -> 0.0
+            else -> ((time - timeOfLastEvent) / recoilTime)
+        }
+        val recoilCurveEvaluation = evaluateRecoilCurve(recoilIndex)
+
+        return when {
+            timeOfNextEvent != null && timeOfLastEvent != null -> Utils.lerp(
+                recoilCurveEvaluation,
+                strikeCurveEvaluation,
+                Utils.mapRangeClamped(time, timeOfLastEvent, timeOfNextEvent, 0.0, 1.0)
+            ) * scaleFactor
+
+            timeOfNextEvent != null -> strikeCurveEvaluation * scaleFactor
+            timeOfLastEvent != null -> recoilCurveEvaluation * scaleFactor
+            else -> scaleFactor
+        }
+    }
+
+    private fun evaluateRecoilCurve(index: Double): Double {
+        return 2.0 / (1 + exp(-10 * index)) - 1.0
+    }
+
+    private fun evaluateFullStrikeCurve(index: Double): Double {
+        val c = 1
+        val a = 0.5
+        val b = 5.55
+        return when {
+            index < 0.0 -> 1.0
+            index < 0.4 -> a + a * sin((FastMath.PI * (index - 0.2)) / 0.4) + c
+            index < 1.0 -> -b * (index - 0.4).pow(2) + c + 2 * a
+            else -> 0.0
+        }
+    }
+
+    private fun evaluateMuteStrikeCurve(index: Double): Double = when {
+        index < 0.4 -> 1.0
+        index < 1.0 -> 1 - 2.7777 * (index - 0.4).pow(2)
+        else -> 0.0
     }
 
     /**
@@ -186,53 +231,11 @@ class Striker(
      */
     fun offsetStick(operation: (stick: Spatial) -> Unit): Unit = operation(stickModel)
 
-    private fun proposedRotation(time: Duration): Double {
-        return eventCollector.peek()?.let {
-            // The rotation is essentially defined by the amount of time between NOW and the next hit.
-            var rot = (context.sequence.getTimeOf(it) - time).toDouble(SECONDS)
-
-            /* The rotation should be dependent on the current tempo, i.e., if the tempo is faster, the rotation should
-             * happen quicker, v.v. */
-            rot *= context.sequence.getTempoBeforeTick(it.tick).beatsPerMinute
-
-            // We may wish to scale the entire rotation to hasten/delay the animation.
-            rot *= strikeSpeed
-
-            return rot
-        } ?: (maxIdleAngle + 1) // We have nothing to hit, so idle just above the max angle
-    }
-
-    private fun setRotation(
-        axis: Axis,
-        angle: Double,
-    ) {
+    private fun setRotation(axis: Axis, angle: Double) {
         rotationNode.localRotation =
-            Quaternion().fromAngles(Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(angle.toFloat()).toArray(null))
+            Quaternion().fromAngles(Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(Utils.rad(angle)).toArray(null))
     }
 }
-
-/**
- * Defines properties for a [Striker].
- *
- * @property stickModel The model used for the stick.
- * @property strikeSpeed The speed at which the stick will animate downwards to strike.
- * @property maxIdleAngle The maximum angle, in degrees, at which the stick will rest and recoil to.
- * @property rotationAxis The axis on which the stick will rotate.
- * @property sticky `true` if the stick should remain visible between strikes up to a certain tolerance, `false`
- * otherwise.
- * @property actualStick `true` if the spatial used in this object is actually a stick, and not something that does
- * not appear as a stick but uses the same motion, `false` otherwise.
- * When `false`, this object will always remain visible when the "never_hidden"
- * midis2jam2 property is enabled.
- */
-data class StickProperties(
-    val stickModel: Spatial,
-    val strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
-    val maxIdleAngle: Double = MAX_STICK_IDLE_ANGLE,
-    val rotationAxis: Axis = Axis.X,
-    val sticky: Boolean = true,
-    val actualStick: Boolean = true,
-)
 
 /**
  * Returns data describing what the status of the stick is.

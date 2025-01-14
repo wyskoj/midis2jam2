@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import midis2jam2.generated.resources.Res
 import midis2jam2.generated.resources.graphic_eq
 import midis2jam2.generated.resources.repeat
+import midis2jam2.generated.resources.repeat_on
 import org.jetbrains.compose.resources.painterResource
 import org.wysko.midis2jam2.gui.components.*
 import org.wysko.midis2jam2.gui.viewmodel.HomeViewModel
@@ -119,7 +120,7 @@ fun HomeScreen(
                     SelectSoundbankRow(selectedSoundbank, soundbanks.toList(), homeViewModel, onOpenSoundbankConfig)
                 }
                 Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    ElevatedButton(
+                    Button(
                         onClick = playMidiFile,
                         modifier = Modifier.width(160.dp).height(48.dp),
                         enabled = !isLockPlayButton && midiFile != null,
@@ -132,7 +133,7 @@ fun HomeScreen(
                         IconToggleButton(isLooping, {
                             homeViewModel.setLooping(it)
                         }, modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-                            Icon(painterResource(Res.drawable.repeat), I18n["repeat"].value)
+                            Icon(painterResource(if (isLooping) Res.drawable.repeat_on else Res.drawable.repeat), I18n["repeat"].value)
                         }
                     }
                 }

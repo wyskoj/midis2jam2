@@ -7,6 +7,13 @@
 		"extra": "modified"
 	},
 	{
+		"name" : "Pistol",
+		"author": "Programaton",
+		"license": "CC BY 4.0",
+		"url": "https://creativecommons.org/licenses/by/4.0/",
+		"extra": "modified"
+	},
+	{
 		"name": "tabr",
 		"author": "Matthew Leonawicz",
 		"license": "MIT",

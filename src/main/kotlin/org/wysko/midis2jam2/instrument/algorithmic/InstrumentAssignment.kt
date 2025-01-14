@@ -112,6 +112,7 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax
 import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
+import org.wysko.midis2jam2.instrument.family.soundeffects.Gunshot
 import org.wysko.midis2jam2.instrument.family.soundeffects.Helicopter
 import org.wysko.midis2jam2.instrument.family.soundeffects.ReverseCymbal
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
@@ -363,6 +364,7 @@ object InstrumentAssignment {
             124 -> TelephoneRing(context, events)
             125 -> Helicopter(context, events)
             126 -> ApplauseChoir(context, events)
+            127 -> Gunshot(context, events)
             else -> null
         }
     }
@@ -377,33 +379,6 @@ object InstrumentAssignment {
     ): MutableMap<KClass<out AuxiliaryPercussion>, List<List<MidiEvent>>> {
         val eventMap = mutableMapOf<KClass<out AuxiliaryPercussion>, List<List<MidiEvent>>>()
         when (program) {
-            0, 8, 16, 24, 25, 32, 40 -> {
-                events.hits(27)?.let { eventMap.put(HighQ::class, it.groupNotes(27)) }
-                events.hits(28)?.let { eventMap.put(Slap::class, it.groupNotes(28)) }
-                events.hits(31)?.let { eventMap.put(Sticks::class, it.groupNotes(31)) }
-                events.hits(32)?.let { eventMap.put(SquareClick::class, it.groupNotes(32)) }
-                events.hits(33, 34)?.let { eventMap.put(Metronome::class, it.groupNotes(33, 34)) }
-                events.hits(39)?.let { eventMap.put(HandClap::class, it.groupNotes(39)) }
-                events.hits(54)?.let { eventMap.put(Tambourine::class, it.groupNotes(54)) }
-                events.hits(56)?.let { eventMap.put(Cowbell::class, it.groupNotes(56)) }
-                events.hits(60, 61)?.let { eventMap.put(Bongos::class, it.groupNotes(60, 61)) }
-                events.hits(62, 63, 64)?.let { eventMap.put(Congas::class, it.groupNotes(62, 63, 64)) }
-                events.hits(65, 66)?.let { eventMap.put(Timbales::class, it.groupNotes(65, 66)) }
-                events.hits(67, 68)?.let { eventMap.put(Agogo::class, it.groupNotes(67, 68)) }
-                events.hits(69)?.let { eventMap.put(Cabasa::class, it.groupNotes(69)) }
-                events.hits(70)?.let { eventMap.put(Maracas::class, it.groupNotes(70)) }
-                events.hits(71, 72)?.let { eventMap.put(Whistle::class, it.groupNotes(71, 72)) }
-                events.hits(73, 74)?.let { eventMap.put(Guiro::class, it.groupNotes(73, 74)) }
-                events.hits(75)?.let { eventMap.put(Claves::class, it.groupNotes(75)) }
-                events.hits(76, 77)?.let { eventMap.put(Woodblock::class, it.groupNotes(76, 77)) }
-                events.hits(78, 79)?.let { eventMap.put(Cuica::class, it.groupNotes(78, 79)) }
-                events.hits(80, 81)?.let { eventMap.put(Triangle::class, it.groupNotes(80, 81)) }
-                events.hits(82)?.let { eventMap.put(Shaker::class, it.groupNotes(82)) }
-                events.hits(83)?.let { eventMap.put(JingleBell::class, it.groupNotes(83)) }
-                events.hits(85)?.let { eventMap.put(Castanets::class, it.groupNotes(85)) }
-                events.hits(86, 87)?.let { eventMap.put(Surdo::class, it.groupNotes(86, 87)) }
-            }
-
             48 -> {
                 events.hits(31)?.let { eventMap.put(Sticks::class, it.groupNotes(31)) }
                 events.hits(32)?.let { eventMap.put(SquareClick::class, it.groupNotes(32)) }
@@ -435,6 +410,33 @@ object InstrumentAssignment {
                 events.hits(43)?.let { eventMap.put(Sticks::class, it.groupNotes(43)) }
                 events.hits(44)?.let { eventMap.put(SquareClick::class, it.groupNotes(44)) }
                 events.hits(45, 46)?.let { eventMap.put(Metronome::class, it.groupNotes(45, 46)) }
+            }
+
+            else -> {
+                events.hits(27)?.let { eventMap.put(HighQ::class, it.groupNotes(27)) }
+                events.hits(28)?.let { eventMap.put(Slap::class, it.groupNotes(28)) }
+                events.hits(31)?.let { eventMap.put(Sticks::class, it.groupNotes(31)) }
+                events.hits(32)?.let { eventMap.put(SquareClick::class, it.groupNotes(32)) }
+                events.hits(33, 34)?.let { eventMap.put(Metronome::class, it.groupNotes(33, 34)) }
+                events.hits(39)?.let { eventMap.put(HandClap::class, it.groupNotes(39)) }
+                events.hits(54)?.let { eventMap.put(Tambourine::class, it.groupNotes(54)) }
+                events.hits(56)?.let { eventMap.put(Cowbell::class, it.groupNotes(56)) }
+                events.hits(60, 61)?.let { eventMap.put(Bongos::class, it.groupNotes(60, 61)) }
+                events.hits(62, 63, 64)?.let { eventMap.put(Congas::class, it.groupNotes(62, 63, 64)) }
+                events.hits(65, 66)?.let { eventMap.put(Timbales::class, it.groupNotes(65, 66)) }
+                events.hits(67, 68)?.let { eventMap.put(Agogo::class, it.groupNotes(67, 68)) }
+                events.hits(69)?.let { eventMap.put(Cabasa::class, it.groupNotes(69)) }
+                events.hits(70)?.let { eventMap.put(Maracas::class, it.groupNotes(70)) }
+                events.hits(71, 72)?.let { eventMap.put(Whistle::class, it.groupNotes(71, 72)) }
+                events.hits(73, 74)?.let { eventMap.put(Guiro::class, it.groupNotes(73, 74)) }
+                events.hits(75)?.let { eventMap.put(Claves::class, it.groupNotes(75)) }
+                events.hits(76, 77)?.let { eventMap.put(Woodblock::class, it.groupNotes(76, 77)) }
+                events.hits(78, 79)?.let { eventMap.put(Cuica::class, it.groupNotes(78, 79)) }
+                events.hits(80, 81)?.let { eventMap.put(Triangle::class, it.groupNotes(80, 81)) }
+                events.hits(82)?.let { eventMap.put(Shaker::class, it.groupNotes(82)) }
+                events.hits(83)?.let { eventMap.put(JingleBell::class, it.groupNotes(83)) }
+                events.hits(85)?.let { eventMap.put(Castanets::class, it.groupNotes(85)) }
+                events.hits(86, 87)?.let { eventMap.put(Surdo::class, it.groupNotes(86, 87)) }
             }
         }
 

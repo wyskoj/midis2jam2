@@ -39,6 +39,7 @@ class Slap(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : Auxiliary
             strikeSpeed = 2.4,
             maxIdleAngle = 30.0,
             actualStick = false,
+            fixed = true,
         ).apply {
             setParent(geometry)
         }

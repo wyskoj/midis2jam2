@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property synthesizer The synthesizer responsible for playing the MIDI file, if any.
  * @param configs A collection of the application's configurations.
  */
-class DesktopMidis2jam2(
+open class DesktopMidis2jam2(
     override val fileName: String,
     val sequencer: Sequencer,
     val midiFile: TimeBasedSequence,
@@ -112,7 +112,7 @@ class DesktopMidis2jam2(
             isSongFinished = true
         }
 
-        handleSongCompletionAndLoopOrExit()
+        handleSongCompletion()
 
         // This is a hack to prevent the first few frames from updating the timeSinceStart variable.
         if (skippedFrames++ < 3) {
@@ -155,19 +155,10 @@ class DesktopMidis2jam2(
         }
     }
 
-    private fun tickControllers(delta: Duration) {
-        fakeShadowsController?.tick()
-        standController.tick()
-        lyricController?.tick(time, delta)
-        hudController.tick(time, fadeFilter.value)
-        flyByCamera.tick(delta)
-        autocamController.tick(time, delta)
-        slideCamController.tick(time, delta)
-        preventCameraFromLeaving(app.camera)
-        drumSetVisibilityManager.tick(time)
-    }
-
-    private fun handleSongCompletionAndLoopOrExit() {
+    /**
+     * Called to handle the completion of the song.
+     */
+    protected open fun handleSongCompletion() {
         if (isSongFinished && time >= endTime + 3.seconds) {
             if (configs.getType(HomeConfiguration::class).isLooping) {
                 // Loop the song
@@ -180,6 +171,18 @@ class DesktopMidis2jam2(
                 exit()
             }
         }
+    }
+
+    private fun tickControllers(delta: Duration) {
+        fakeShadowsController?.tick()
+        standController.tick()
+        lyricController?.tick(time, delta)
+        hudController.tick(time, fadeFilter.value)
+        flyByCamera.tick(delta)
+        autocamController.tick(time, delta)
+        slideCamController.tick(time, delta)
+        preventCameraFromLeaving(app.camera)
+        drumSetVisibilityManager.tick(time)
     }
 
     private fun startFadeIfNeeded() {

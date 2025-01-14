@@ -70,6 +70,7 @@ suspend fun main(args: Array<String>) {
     SplashScreen.writeMessage("Loading...")
 
     val homeViewModel = HomeViewModel.create()
+    val playlistViewModel = PlaylistViewModel.create()
     val searchViewModel = SearchViewModel()
     val settingsViewModel = SettingsViewModel.create()
     val backgroundConfigurationViewModel = BackgroundConfigurationViewModel.create()
@@ -77,43 +78,7 @@ suspend fun main(args: Array<String>) {
     val soundBankConfigurationViewModel = SoundBankConfigurationViewModel.create()
     val synthesizerConfigurationViewModel = SynthesizerConfigurationViewModel.create()
 
-    if (args.isNotEmpty()) {
-        val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
-        when (backgroundConfiguration) {
-            is BackgroundConfiguration.CubemapBackground -> {
-                if (!backgroundConfiguration.validate()) {
-                    JOptionPane.showMessageDialog(
-                        null,
-                        "The cubemap background configuration is invalid. Please fix it in the settings.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE,
-                    )
-                    return
-                }
-            }
-
-            else -> Unit
-        }
-        Execution.start(
-            midiFile = File(args.first()),
-            configurations = listOf(
-                homeViewModel.generateConfiguration(),
-                settingsViewModel.generateConfiguration(),
-                backgroundConfiguration,
-                graphicsConfigurationViewModel.generateConfiguration(),
-                soundBankConfigurationViewModel.generateConfiguration(),
-                synthesizerConfigurationViewModel.generateConfiguration()
-            ),
-            onStart = {},
-            onReady = {
-                SplashScreen.hide()
-            },
-            onFinish = {
-                exitProcess(0)
-            },
-        )
-        delay(Long.MAX_VALUE)
-    } else {
+    if (args.isEmpty()) {
         application {
             LaunchedEffect(Unit) {
                 UpdateChecker.checkForUpdates()
@@ -178,65 +143,133 @@ suspend fun main(args: Array<String>) {
                         false ->
                             CompositionLocalProvider(
                                 LocalLayoutDirection provides
-                                    when (
-                                        I18n.currentLocale.language
-                                    ) {
-                                        "ar" -> LayoutDirection.Rtl
-                                        else -> LayoutDirection.Ltr
-                            }
-                        ) {
-                            Box {
-                                SetupUi(
-                                    homeViewModel,
-                                    searchViewModel,
-                                    settingsViewModel,
-                                    backgroundConfigurationViewModel,
-                                    graphicsConfigurationViewModel,
-                                    soundBankConfigurationViewModel,
-                                    synthesizerConfigurationViewModel,
-                                    isLockPlayButton,
-                                ) {
-                                    val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
-                                    when (backgroundConfiguration) {
-                                        is BackgroundConfiguration.CubemapBackground -> {
-                                            if (!backgroundConfiguration.validate()) {
-                                                logger().errorDisp(
-                                                    "Background configuration is invalid. Perhaps you forgot to set a texture?",
-                                                    Throwable("Invalid background configuration"),
-                                                )
-                                                return@SetupUi
-                                            }
+                                        when (
+                                            I18n.currentLocale.language
+                                        ) {
+                                            "ar" -> LayoutDirection.Rtl
+                                            else -> LayoutDirection.Ltr
                                         }
+                            ) {
+                                Box {
+                                    SetupUi(
+                                        homeViewModel,
+                                        playlistViewModel,
+                                        searchViewModel,
+                                        settingsViewModel,
+                                        backgroundConfigurationViewModel,
+                                        graphicsConfigurationViewModel,
+                                        soundBankConfigurationViewModel,
+                                        synthesizerConfigurationViewModel,
+                                        isLockPlayButton,
+                                        playMidiFile = {
+                                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                                            when (backgroundConfiguration) {
+                                                is BackgroundConfiguration.CubemapBackground -> {
+                                                    if (!backgroundConfiguration.validate()) {
+                                                        logger().errorDisp(
+                                                            "Background configuration is invalid. Perhaps you forgot to set a texture?",
+                                                            Throwable("Invalid background configuration"),
+                                                        )
+                                                        return@SetupUi
+                                                    }
+                                                }
 
-                                        else -> Unit
-                                    }
-                                    Execution.start(
-                                        midiFile = homeViewModel.midiFile.value!!,
-                                        configurations = listOf(
-                                            homeViewModel.generateConfiguration(),
-                                            settingsViewModel.generateConfiguration(),
-                                            backgroundConfiguration,
-                                            graphicsConfigurationViewModel.generateConfiguration(),
-                                            soundBankConfigurationViewModel.generateConfiguration(),
-                                            synthesizerConfigurationViewModel.generateConfiguration()
-                                        ),
-                                        onStart = {
-                                            isLockPlayButton = true
+                                                else -> Unit
+                                            }
+                                            Execution.start(
+                                                midiFile = homeViewModel.midiFile.value!!,
+                                                configurations = listOf(
+                                                    homeViewModel.generateConfiguration(),
+                                                    settingsViewModel.generateConfiguration(),
+                                                    backgroundConfiguration,
+                                                    graphicsConfigurationViewModel.generateConfiguration(),
+                                                    soundBankConfigurationViewModel.generateConfiguration(),
+                                                    synthesizerConfigurationViewModel.generateConfiguration()
+                                                ),
+                                                onStart = {
+                                                    isLockPlayButton = true
+                                                },
+                                                onFinish = {
+                                                    isLockPlayButton = false
+                                                },
+                                            )
                                         },
-                                        onReady = {
-                                            // Nothing to do.
-                                        },
-                                        onFinish = {
-                                            isLockPlayButton = false
-                                        },
+                                        onPlayPlaylist = {
+                                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                                            when (backgroundConfiguration) {
+                                                is BackgroundConfiguration.CubemapBackground -> {
+                                                    if (!backgroundConfiguration.validate()) {
+                                                        logger().errorDisp(
+                                                            "Background configuration is invalid. Perhaps you forgot to set a texture?",
+                                                            Throwable("Invalid background configuration"),
+                                                        )
+                                                        return@SetupUi
+                                                    }
+                                                }
+
+                                                else -> Unit
+                                            }
+                                            Execution.playPlaylist(
+                                                midiFiles = playlistViewModel.playlist.value,
+                                                configurations = listOf(
+                                                    homeViewModel.generateConfiguration(),
+                                                    settingsViewModel.generateConfiguration(),
+                                                    backgroundConfiguration,
+                                                    graphicsConfigurationViewModel.generateConfiguration(),
+                                                    soundBankConfigurationViewModel.generateConfiguration(),
+                                                    synthesizerConfigurationViewModel.generateConfiguration()
+                                                ),
+                                                onStart = {
+                                                    isLockPlayButton = true
+                                                },
+                                                onFinish = {
+                                                    isLockPlayButton = false
+                                                },
+                                                isShuffle = playlistViewModel.isShuffle.value,
+                                            )
+                                        }
                                     )
                                 }
                             }
-                        }
                     }
                 }
             }
         }
+    } else {
+        val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+        when (backgroundConfiguration) {
+            is BackgroundConfiguration.CubemapBackground -> {
+                if (!backgroundConfiguration.validate()) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "The cubemap background configuration is invalid. Please fix it in the settings.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE,
+                    )
+                    return
+                }
+            }
+
+            else -> Unit
+        }
+        Execution.start(
+            midiFile = File(args.first()),
+            configurations = listOf(
+                homeViewModel.generateConfiguration(),
+                settingsViewModel.generateConfiguration(),
+                backgroundConfiguration,
+                graphicsConfigurationViewModel.generateConfiguration(),
+                soundBankConfigurationViewModel.generateConfiguration(),
+                synthesizerConfigurationViewModel.generateConfiguration()
+            ),
+            onStart = {
+                SplashScreen.hide()
+            },
+            onFinish = {
+                exitProcess(0)
+            },
+        )
+        delay(Long.MAX_VALUE)
     }
 }
 
@@ -254,6 +287,7 @@ suspend fun main(args: Array<String>) {
 @Composable
 private fun SetupUi(
     homeViewModel: HomeViewModel,
+    playlistViewModel: PlaylistViewModel,
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
     backgroundConfigurationViewModel: BackgroundConfigurationViewModel,
@@ -262,6 +296,7 @@ private fun SetupUi(
     synthesizerConfigurationViewModel: SynthesizerConfigurationViewModel,
     isLockPlayButton: Boolean = false,
     playMidiFile: () -> Unit,
+    onPlayPlaylist: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var isFlicker by remember { mutableStateOf(false) }
@@ -301,6 +336,10 @@ private fun SetupUi(
                                 homeViewModel.selectMidiFile(it)
                                 flicker()
                             }
+                        }
+
+                        TabFactory.playlist -> PlaylistScreen(playlistViewModel, isLockPlayButton) {
+                            onPlayPlaylist()
                         }
 
                         TabFactory.settings -> SettingsScreen(settingsViewModel) {

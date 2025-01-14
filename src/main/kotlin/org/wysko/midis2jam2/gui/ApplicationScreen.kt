@@ -31,6 +31,16 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import midis2jam2.generated.resources.Res
+import midis2jam2.generated.resources.home_fill
+import midis2jam2.generated.resources.home_outline
+import midis2jam2.generated.resources.info_fill
+import midis2jam2.generated.resources.info_outline
+import midis2jam2.generated.resources.playlist
+import midis2jam2.generated.resources.search
+import midis2jam2.generated.resources.settings_fill
+import midis2jam2.generated.resources.settings_outline
+import org.jetbrains.compose.resources.DrawableResource
 import org.wysko.midis2jam2.gui.TabFactory.tabs
 
 /**
@@ -52,10 +62,10 @@ sealed class ApplicationScreen {
      */
     data class ScreenWithTab(
         val i18nKey: String,
-        val outlinedIcon: ImageVector,
-        val filledIcon: ImageVector,
+        val outlinedIcon: DrawableResource,
+        val filledIcon: DrawableResource,
         override val uid: Int = i18nKey.hashCode(),
-    ): ApplicationScreen()
+    ) : ApplicationScreen()
 
     /**
      * Represents a screen in this application.
@@ -67,7 +77,7 @@ sealed class ApplicationScreen {
         val name: String,
         val parentScreen: ScreenWithTab,
         override val uid: Int = name.hashCode(),
-    ): ApplicationScreen()
+    ) : ApplicationScreen()
 }
 
 
@@ -83,26 +93,32 @@ sealed class ApplicationScreen {
 object TabFactory {
     val home = ApplicationScreen.ScreenWithTab(
         i18nKey = "tab_home",
-        outlinedIcon = Icons.Outlined.Home,
-        filledIcon = Icons.Default.Home,
+        outlinedIcon = Res.drawable.home_outline,
+        filledIcon = Res.drawable.home_fill,
     )
 
     val search = ApplicationScreen.ScreenWithTab(
         i18nKey = "tab_search",
-        outlinedIcon = Icons.Outlined.Search,
-        filledIcon = Icons.Default.Search,
+        outlinedIcon = Res.drawable.search,
+        filledIcon = Res.drawable.search,
+    )
+
+    val playlist = ApplicationScreen.ScreenWithTab(
+        i18nKey = "tab_playlist",
+        outlinedIcon = Res.drawable.playlist,
+        filledIcon = Res.drawable.playlist,
     )
 
     val settings = ApplicationScreen.ScreenWithTab(
         i18nKey = "tab_settings",
-        outlinedIcon = Icons.Outlined.Settings,
-        filledIcon = Icons.Default.Settings,
+        outlinedIcon = Res.drawable.settings_outline,
+        filledIcon = Res.drawable.settings_fill,
     )
 
     val about = ApplicationScreen.ScreenWithTab(
         i18nKey = "tab_about",
-        outlinedIcon = Icons.Outlined.Info,
-        filledIcon = Icons.Default.Info,
+        outlinedIcon = Res.drawable.info_outline,
+        filledIcon = Res.drawable.info_fill,
     )
 
     val backgroundConfiguration = ApplicationScreen.ScreenWithoutTab(
@@ -125,5 +141,5 @@ object TabFactory {
         parentScreen = settings,
     )
 
-    val tabs: List<ApplicationScreen.ScreenWithTab> = listOf(home, search, settings, about)
+    val tabs: List<ApplicationScreen.ScreenWithTab> = listOf(home, playlist, search, settings, about)
 }
