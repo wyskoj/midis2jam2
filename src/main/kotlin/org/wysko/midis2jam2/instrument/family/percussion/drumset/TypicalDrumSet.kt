@@ -29,9 +29,14 @@ import kotlin.time.Duration
  *
  * @param context The context to the main class.
  * @param events List of events for this drumset.
- * @property shellStyle The style (texture) of the shell.
+ * @property shellStyle The style of the drum shells.
  */
-class TypicalDrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>, val shellStyle: ShellStyle) :
+class TypicalDrumSet(
+    context: Midis2jam2,
+    events: List<NoteEvent.NoteOn>,
+    val shellStyle: ShellStyle,
+    private val cymbalStyle: Cymbal.Style = Cymbal.Style.Standard
+) :
     DrumSet(context, events) {
 
     override val collectorForVisibility: EventCollector<NoteEvent.NoteOn> =
@@ -40,20 +45,20 @@ class TypicalDrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>, val sh
     private val instruments = buildList {
         this += BassDrum(context, events.filterByNotes(35, 36).toMutableList(), shellStyle)
         this += SnareDrum(context, events.filterByNotes(37, 38, 40).toMutableList(), shellStyle)
-        this += HiHat(context, events.filterByNotes(42, 44, 46).toMutableList())
+        this += HiHat(context, events.filterByNotes(42, 44, 46).toMutableList(), style = cymbalStyle)
         this += Tom(context, events.filterByNotes(41).toMutableList(), TomPitch["low_floor"], shellStyle)
         this += Tom(context, events.filterByNotes(43).toMutableList(), TomPitch["high_floor"], shellStyle)
         this += Tom(context, events.filterByNotes(45).toMutableList(), TomPitch["low"], shellStyle)
         this += Tom(context, events.filterByNotes(47).toMutableList(), TomPitch["low_mid"], shellStyle)
         this += Tom(context, events.filterByNotes(48).toMutableList(), TomPitch["high_mid"], shellStyle)
         this += Tom(context, events.filterByNotes(50).toMutableList(), TomPitch["high"], shellStyle)
-        this += Cymbal(context, events.filterByNotes(49).toMutableList(), CymbalType["crash_1"])
-        this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"])
-        this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"])
-        this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"])
+        this += Cymbal(context, events.filterByNotes(49).toMutableList(), CymbalType["crash_1"], cymbalStyle)
+        this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"], cymbalStyle)
+        this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"], cymbalStyle)
+        this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"], cymbalStyle)
         partitionRideCymbals(events).let {
-            this += RideCymbal(context, it.first, CymbalType["ride_1"])
-            this += RideCymbal(context, it.second, CymbalType["ride_2"])
+            this += RideCymbal(context, it.first, CymbalType["ride_1"], cymbalStyle)
+            this += RideCymbal(context, it.second, CymbalType["ride_2"], cymbalStyle)
         }
     }.onEach {
         geometry.attachChild(it.placement)

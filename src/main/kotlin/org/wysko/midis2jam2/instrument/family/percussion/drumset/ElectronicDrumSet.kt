@@ -23,9 +23,6 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.Cymbal.Style.Electronic
-import org.wysko.midis2jam2.midi.RIDE_BELL
-import org.wysko.midis2jam2.midi.RIDE_CYMBAL_1
-import org.wysko.midis2jam2.midi.RIDE_CYMBAL_2
 import kotlin.time.Duration
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.AlternativeDrumShell.Electronic as DrumShellElectronic
 
@@ -42,7 +39,7 @@ class ElectronicDrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>) : D
     private val instruments = buildList {
         this += BassDrum(context, events.filterByNotes(35, 36), DrumShellElectronic)
         this += SnareDrum(context, events.filterByNotes(37, 38, 40), DrumShellElectronic)
-        this += HiHat(context, events.filterByNotes(42, 44, 46))
+        this += HiHat(context, events.filterByNotes(42, 44, 46), style = Electronic)
         this += Tom(context, events.filterByNotes(41), TomPitch["low_floor"], DrumShellElectronic)
         this += Tom(context, events.filterByNotes(43), TomPitch["high_floor"], DrumShellElectronic)
         this += Tom(context, events.filterByNotes(45), TomPitch["low"], DrumShellElectronic)

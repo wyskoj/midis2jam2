@@ -32,6 +32,8 @@ import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.MaterialType
+import org.wysko.midis2jam2.world.model
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
@@ -66,7 +68,7 @@ open class Cymbal(
     }
 
     private val model = with(geometry) {
-        +context.modelR(type.model, style.texture).apply {
+        +context.model(type.model, style.texture, style.materialType).apply {
             scale(type.size)
         }
     }
@@ -90,17 +92,18 @@ open class Cymbal(
      * The style of the cymbal.
      *
      * @property texture The texture of the cymbal.
+     * @property materialType The material type of the cymbal.
      */
-    sealed class Style(val texture: String) {
+    sealed class Style(val texture: String, val materialType: MaterialType) {
         /**
          * The standard style of cymbal.
          */
-        data object Standard : Style("CymbalSkinSphereMap.bmp")
+        data object Standard : Style("CymbalSkinSphereMap.bmp", MaterialType.Reflective)
 
         /**
          * The electronic style of cymbal.
          */
-        data object Electronic : Style("black.bmp")
+        data object Electronic : Style("RubberFoot.bmp", MaterialType.Diffuse)
     }
 }
 
