@@ -19,6 +19,7 @@ package org.wysko.midis2jam2
 
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
 import kotlin.time.Duration.Companion.seconds
@@ -40,7 +41,8 @@ class DesktopPlaylistMidis2jam2(
     onClose: () -> Unit,
     synthesizer: Synthesizer?,
     configs: Collection<Configuration>,
-) : DesktopMidis2jam2(fileName, sequencer, midiFile, onClose, synthesizer, configs) {
+    midiDevice: MidiDevice,
+) : DesktopMidis2jam2(fileName, sequencer, midiFile, onClose, synthesizer, midiDevice, configs) {
 
     override fun cleanup() {
         app.inputManager.removeListener(this)

@@ -33,6 +33,7 @@ interface Configuration
  * @suppress This function performs unchecked cast, so it suppresses the unchecked cast warning
  */
 @Suppress("kotlin:S6530", "UNCHECKED_CAST")
+@Deprecated("Use find instead", ReplaceWith("find()"))
 fun <T : Configuration> Collection<Configuration>.getType(type: KClass<T>): T {
     return this.firstOrNull { type.isInstance(it) } as T
 }
@@ -44,4 +45,7 @@ fun <T : Configuration> Collection<Configuration>.getType(type: KClass<T>): T {
  * @param type the class reference representing the type
  * @return the first element of the specified type in the collection
  */
+@Deprecated("Use find instead", ReplaceWith("find()"))
 operator fun <T : Configuration> Collection<Configuration>.get(type: KClass<T>): T = getType(type)
+
+inline fun <reified T : Configuration> Collection<Configuration>.find(): T = getType(T::class)

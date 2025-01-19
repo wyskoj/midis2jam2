@@ -21,19 +21,19 @@ import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.kmidi.midi.TimeBasedSequence
-import org.wysko.midis2jam2.starter.configuration.BackgroundConfiguration
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
-import org.wysko.midis2jam2.starter.configuration.SynthesizerConfiguration
-import org.wysko.midis2jam2.starter.configuration.getType
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification
+import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.KeyMap
 import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
+import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
+import javax.sound.midi.ShortMessage
 import javax.sound.midi.Synthesizer
+import javax.sound.midi.SysexMessage
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
@@ -53,6 +53,7 @@ open class DesktopMidis2jam2(
     val midiFile: TimeBasedSequence,
     val onClose: () -> Unit,
     val synthesizer: Synthesizer?,
+    val midiDevice: MidiDevice,
     configs: Collection<Configuration>,
 ) : Midis2jam2(midiFile, fileName, configs) {
 
@@ -84,7 +85,21 @@ open class DesktopMidis2jam2(
                 exception = e
             )
         }
+
         logger().debug("Application initialized")
+
+        // Send the reset message to MIDI device
+        with(configs.find<MidiDeviceConfiguration>()) {
+            if (isSendResetMessage) {
+                midiDevice.receiver.send(
+                    SysexMessage(
+                        resetMessageSpecification.resetMessage,
+                        resetMessageSpecification.resetMessage.size
+                    ), -1L
+                )
+                logger().debug("Sent ${resetMessageSpecification.initialism} reset message to MIDI device")
+            }
+        }
     }
 
     override fun cleanup() {

@@ -141,5 +141,10 @@ object TabFactory {
         parentScreen = settings,
     )
 
+    val midiDeviceConfiguration = ApplicationScreen.ScreenWithoutTab(
+        name = "tab_midi_device",
+        parentScreen = settings,
+    )
+
     val tabs: List<ApplicationScreen.ScreenWithTab> = listOf(home, playlist, search, settings, about)
 }

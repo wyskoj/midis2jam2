@@ -58,6 +58,7 @@ import org.wysko.midis2jam2.util.ErrorHandling
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
 import java.io.File
+import javax.sound.midi.MidiDevice
 import javax.swing.JOptionPane
 import kotlin.system.exitProcess
 
@@ -77,6 +78,7 @@ suspend fun main(args: Array<String>) {
     val graphicsConfigurationViewModel = GraphicsConfigurationViewModel.create()
     val soundBankConfigurationViewModel = SoundBankConfigurationViewModel.create()
     val synthesizerConfigurationViewModel = SynthesizerConfigurationViewModel.create()
+    val midiDeviceViewModel = MidiDeviceViewModel.create()
 
     if (args.isEmpty()) {
         application {
@@ -137,8 +139,8 @@ suspend fun main(args: Array<String>) {
                 registerDragAndDrop {
                     homeViewModel.selectMidiFile(it)
                 }
-                Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) {
-                    when (it.value) {
+                Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) { showError ->
+                    when (showError.value) {
                         true -> ErrorDialog()
                         false ->
                             CompositionLocalProvider(
@@ -160,9 +162,11 @@ suspend fun main(args: Array<String>) {
                                         graphicsConfigurationViewModel,
                                         soundBankConfigurationViewModel,
                                         synthesizerConfigurationViewModel,
+                                        midiDeviceViewModel,
                                         isLockPlayButton,
                                         playMidiFile = {
-                                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                                            val backgroundConfiguration =
+                                                backgroundConfigurationViewModel.generateConfiguration()
                                             when (backgroundConfiguration) {
                                                 is BackgroundConfiguration.CubemapBackground -> {
                                                     if (!backgroundConfiguration.validate()) {
@@ -184,18 +188,23 @@ suspend fun main(args: Array<String>) {
                                                     backgroundConfiguration,
                                                     graphicsConfigurationViewModel.generateConfiguration(),
                                                     soundBankConfigurationViewModel.generateConfiguration(),
-                                                    synthesizerConfigurationViewModel.generateConfiguration()
+                                                    synthesizerConfigurationViewModel.generateConfiguration(),
+                                                    midiDeviceViewModel.generateConfiguration()
                                                 ),
                                                 onStart = {
                                                     isLockPlayButton = true
                                                 },
                                                 onFinish = {
+                                                    it?.let {
+                                                        logger().errorDisp("There was an error.", it)
+                                                    }
                                                     isLockPlayButton = false
                                                 },
                                             )
                                         },
                                         onPlayPlaylist = {
-                                            val backgroundConfiguration = backgroundConfigurationViewModel.generateConfiguration()
+                                            val backgroundConfiguration =
+                                                backgroundConfigurationViewModel.generateConfiguration()
                                             when (backgroundConfiguration) {
                                                 is BackgroundConfiguration.CubemapBackground -> {
                                                     if (!backgroundConfiguration.validate()) {
@@ -217,15 +226,19 @@ suspend fun main(args: Array<String>) {
                                                     backgroundConfiguration,
                                                     graphicsConfigurationViewModel.generateConfiguration(),
                                                     soundBankConfigurationViewModel.generateConfiguration(),
-                                                    synthesizerConfigurationViewModel.generateConfiguration()
+                                                    synthesizerConfigurationViewModel.generateConfiguration(),
+                                                    midiDeviceViewModel.generateConfiguration()
                                                 ),
+                                                isShuffle = playlistViewModel.isShuffle.value,
                                                 onStart = {
                                                     isLockPlayButton = true
                                                 },
                                                 onFinish = {
+                                                    it?.let {
+                                                        logger().errorDisp("There was an error.", it)
+                                                    }
                                                     isLockPlayButton = false
                                                 },
-                                                isShuffle = playlistViewModel.isShuffle.value,
                                             )
                                         }
                                     )
@@ -294,6 +307,7 @@ private fun SetupUi(
     graphicsConfigurationViewModel: GraphicsConfigurationViewModel,
     soundbankConfigurationViewModel: SoundBankConfigurationViewModel,
     synthesizerConfigurationViewModel: SynthesizerConfigurationViewModel,
+    midiDeviceConfigurationViewModel: MidiDeviceViewModel,
     isLockPlayButton: Boolean = false,
     playMidiFile: () -> Unit,
     onPlayPlaylist: () -> Unit,
@@ -367,6 +381,12 @@ private fun SetupUi(
 
                         TabFactory.synthesizerConfiguration -> SynthesizerConfigurationScreen(
                             synthesizerConfigurationViewModel,
+                        ) {
+                            activeScreen = TabFactory.settings
+                        }
+
+                        TabFactory.midiDeviceConfiguration -> MidiDeviceConfigurationScreen(
+                            midiDeviceConfigurationViewModel
                         ) {
                             activeScreen = TabFactory.settings
                         }
