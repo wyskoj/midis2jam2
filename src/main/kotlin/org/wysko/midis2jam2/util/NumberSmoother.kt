@@ -22,7 +22,16 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
 /** Applies smoothing to a given value by slowing encroaching on that value over time. */
-class NumberSmoother(initialValue: Float, private val smoothness: Double) {
+class NumberSmoother(initialValue: Float, smoothness: Double) {
+
+    /**
+     * The smoothness of the smoothing.
+     */
+    var smoothness: Double = smoothness
+        set(value) {
+            require(value >= 0) { "Smoothness must be non-negative." }
+            field = value
+        }
 
     /**
      * The current smoothed value.
