@@ -57,31 +57,7 @@ import org.wysko.midis2jam2.instrument.family.guitar.Shamisen
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Accordion.Type
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
-import org.wysko.midis2jam2.instrument.family.percussion.Agogo
-import org.wysko.midis2jam2.instrument.family.percussion.AuxiliaryPercussion
-import org.wysko.midis2jam2.instrument.family.percussion.Bongos
-import org.wysko.midis2jam2.instrument.family.percussion.Cabasa
-import org.wysko.midis2jam2.instrument.family.percussion.Castanets
-import org.wysko.midis2jam2.instrument.family.percussion.Claves
-import org.wysko.midis2jam2.instrument.family.percussion.Congas
-import org.wysko.midis2jam2.instrument.family.percussion.Cowbell
-import org.wysko.midis2jam2.instrument.family.percussion.Cuica
-import org.wysko.midis2jam2.instrument.family.percussion.Guiro
-import org.wysko.midis2jam2.instrument.family.percussion.HandClap
-import org.wysko.midis2jam2.instrument.family.percussion.HighQ
-import org.wysko.midis2jam2.instrument.family.percussion.JingleBell
-import org.wysko.midis2jam2.instrument.family.percussion.Maracas
-import org.wysko.midis2jam2.instrument.family.percussion.Metronome
-import org.wysko.midis2jam2.instrument.family.percussion.Shaker
-import org.wysko.midis2jam2.instrument.family.percussion.Slap
-import org.wysko.midis2jam2.instrument.family.percussion.SquareClick
-import org.wysko.midis2jam2.instrument.family.percussion.Sticks
-import org.wysko.midis2jam2.instrument.family.percussion.Surdo
-import org.wysko.midis2jam2.instrument.family.percussion.Tambourine
-import org.wysko.midis2jam2.instrument.family.percussion.Timbales
-import org.wysko.midis2jam2.instrument.family.percussion.Triangle
-import org.wysko.midis2jam2.instrument.family.percussion.Whistle
-import org.wysko.midis2jam2.instrument.family.percussion.Woodblock
+import org.wysko.midis2jam2.instrument.family.percussion.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.BrushDrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.ElectronicDrumSet
@@ -410,11 +386,14 @@ object InstrumentAssignment {
                 events.hits(43)?.let { eventMap.put(Sticks::class, it.groupNotes(43)) }
                 events.hits(44)?.let { eventMap.put(SquareClick::class, it.groupNotes(44)) }
                 events.hits(45, 46)?.let { eventMap.put(Metronome::class, it.groupNotes(45, 46)) }
+                events.hits(41, 42)?.let { eventMap.put(Turntable::class, it.groupNotes(41, 42)) }
+                // TODO turntable also spawns kit instruments
             }
 
             else -> {
                 events.hits(27)?.let { eventMap.put(HighQ::class, it.groupNotes(27)) }
                 events.hits(28)?.let { eventMap.put(Slap::class, it.groupNotes(28)) }
+                events.hits(29, 30)?.let { eventMap.put(Turntable::class, it.groupNotes(29, 30)) }
                 events.hits(31)?.let { eventMap.put(Sticks::class, it.groupNotes(31)) }
                 events.hits(32)?.let { eventMap.put(SquareClick::class, it.groupNotes(32)) }
                 events.hits(33, 34)?.let { eventMap.put(Metronome::class, it.groupNotes(33, 34)) }
