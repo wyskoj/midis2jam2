@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
 import org.wysko.midis2jam2.util.max
+import org.wysko.midis2jam2.world.model
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
@@ -42,6 +43,7 @@ class HiHat(
     context: Midis2jam2,
     hits: List<NoteEvent.NoteOn>,
     private val noteMapping: HiHatNoteMapping = HiHatNoteMapping.Standard,
+    private val style: Cymbal.Style = Cymbal.Style.Standard,
 ) : DrumSetInstrument(context, hits) {
     private val cymbalsNode =
         Node().apply {
@@ -51,9 +53,10 @@ class HiHat(
         }
 
     private val topCymbal: Spatial =
-        context.modelR(
+        context.model(
             model = "DrumSet_Cymbal.obj",
-            texture = "CymbalSkinSphereMap.bmp"
+            texture = style.texture,
+            type = style.materialType,
         ).apply {
             localTranslation = CLOSED_POSITION // Start in closed position
             cymbalsNode.attachChild(this)
@@ -61,9 +64,10 @@ class HiHat(
 
     init {
         // Add bottom cymbal
-        context.modelR(
+        context.model(
             model = "DrumSet_Cymbal.obj",
-            texture = "CymbalSkinSphereMap.bmp"
+            texture = style.texture,
+            type = style.materialType,
         ).apply {
             rotate(FastMath.PI, 0f, 0f) // Rotate upside down
             cymbalsNode.attachChild(this)

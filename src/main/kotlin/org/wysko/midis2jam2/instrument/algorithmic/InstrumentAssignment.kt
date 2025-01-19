@@ -63,6 +63,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.ElectronicDrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.OrchestraDrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.Cymbal
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.AlternativeDrumShell.Analog
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.TypicalDrumShell
 import org.wysko.midis2jam2.instrument.family.percussive.Agogos
@@ -479,7 +480,7 @@ object InstrumentAssignment {
     ): DrumSet? = if (events.hits().isNotEmpty()) {
         when (program) {
             24 -> ElectronicDrumSet(context, events.hits())
-            25 -> TypicalDrumSet(context, events.hits(), Analog)
+            25 -> TypicalDrumSet(context, events.hits(), Analog, Cymbal.Style.Electronic)
             40 -> BrushDrumSet(context, events.hits())
             48 -> OrchestraDrumSet(context, events.hits())
             else -> TypicalDrumSet(

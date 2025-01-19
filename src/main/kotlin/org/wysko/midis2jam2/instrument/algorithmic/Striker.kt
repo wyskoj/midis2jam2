@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
-import com.jme3.font.BitmapText
 import com.jme3.math.FastMath
 import com.jme3.math.Matrix3f
 import com.jme3.math.Quaternion
@@ -28,7 +27,10 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
-import kotlin.math.*
+import kotlin.math.exp
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -64,6 +66,7 @@ class Striker(
     private val sticky: Boolean = true,
     private val actualStick: Boolean = true,
     private val fixed: Boolean = false,
+    private val lift: Boolean = true,
 ) {
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
@@ -102,9 +105,10 @@ class Striker(
         }
     }
 
-    private val anticipationTime = 0.2
-    private val recoilTime = 0.4
-    private val scaleFactor = 50.0
+    private val speedMultiplier = DEFAULT_STRIKE_SPEED / strikeSpeed
+    private val anticipationTime = 0.22 * speedMultiplier
+    private val recoilTime = 0.45 * speedMultiplier
+    private var rotation = 1.0
 
     /**
      * Updates animation, given the current [time] and the amount of time since the last frame ([delta]).
@@ -135,19 +139,19 @@ class Striker(
 
         node.cullHint = if (!actualStick) Spatial.CullHint.Dynamic else visibility.ch
 
-        if (visibility || !actualStick) {
-            val rotation = evaluateRotation(currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity)
-            setRotation(rotationAxis, rotation)
+        rotation = if (visibility || !actualStick) {
             if (!fixed) {
-                rotationNode.loc = v3(0, rotation / 35.0, 0)
+                rotationNode.loc = v3(0, rotation * 2.0, 0)
             }
+            evaluateRotation(currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity)
         } else {
-            setRotation(rotationAxis, scaleFactor)
+            1.0
         }
+        setRotation(rotationAxis, rotation)
 
         return StickStatus(
             strike = strike,
-            rotationAngle = rotationNode.localRotation.toAngles(null)[rotationAxis.componentIndex],
+            rotationAngle = rotation.toFloat(),
             strikingFor = if (visibility) eventCollector.peek() else null,
         )
     }
@@ -170,9 +174,13 @@ class Striker(
             null -> 0.0
             else -> 1.0 - (min(timeOfNextEvent - time, anticipationTime) / anticipationTime)
         }
-        val dampenedHit = evaluateMuteStrikeCurve(strikeIndex)
-        val forcefulHit = evaluateFullStrikeCurve(strikeIndex)
-        val strikeCurveEvaluation = Utils.lerp(dampenedHit, forcefulHit, (anticipatedVelocity / 127.0))
+        val weakHit = evaluateWeakStrikeCurve(strikeIndex)
+        val strongHit = evaluateStrongStrikeCurve(strikeIndex)
+        val strikeCurveEvaluation = if (lift) {
+            Utils.lerp(weakHit, strongHit, (anticipatedVelocity / 127.0))
+        } else {
+            weakHit
+        }
 
         val recoilIndex = when (timeOfLastEvent) {
             null -> 0.0
@@ -185,11 +193,11 @@ class Striker(
                 recoilCurveEvaluation,
                 strikeCurveEvaluation,
                 Utils.mapRangeClamped(time, timeOfLastEvent, timeOfNextEvent, 0.0, 1.0)
-            ) * scaleFactor
+            )
 
-            timeOfNextEvent != null -> strikeCurveEvaluation * scaleFactor
-            timeOfLastEvent != null -> recoilCurveEvaluation * scaleFactor
-            else -> scaleFactor
+            timeOfNextEvent != null -> strikeCurveEvaluation
+            timeOfLastEvent != null -> recoilCurveEvaluation
+            else -> 1.0
         }
     }
 
@@ -197,7 +205,7 @@ class Striker(
         return 2.0 / (1 + exp(-10 * index)) - 1.0
     }
 
-    private fun evaluateFullStrikeCurve(index: Double): Double {
+    private fun evaluateStrongStrikeCurve(index: Double): Double {
         val c = 1
         val a = 0.5
         val b = 5.55
@@ -209,7 +217,7 @@ class Striker(
         }
     }
 
-    private fun evaluateMuteStrikeCurve(index: Double): Double = when {
+    private fun evaluateWeakStrikeCurve(index: Double): Double = when {
         index < 0.4 -> 1.0
         index < 1.0 -> 1 - 2.7777 * (index - 0.4).pow(2)
         else -> 0.0
@@ -233,7 +241,9 @@ class Striker(
 
     private fun setRotation(axis: Axis, angle: Double) {
         rotationNode.localRotation =
-            Quaternion().fromAngles(Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(Utils.rad(angle)).toArray(null))
+            Quaternion().fromAngles(
+                Matrix3f.IDENTITY.getRow(axis.componentIndex).mult(Utils.rad(angle * maxIdleAngle)).toArray(null)
+            )
     }
 }
 

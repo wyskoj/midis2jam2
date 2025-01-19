@@ -17,68 +17,51 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic.assignment
 
-import org.wysko.kmidi.midi.StandardMidiFile
-import org.wysko.kmidi.midi.event.SysexEvent
-import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification.*
-
-/**
- * Searches a MIDI file for a [SysexEvent] that has a specification reset.
- *
- * @return The [MidiSpecification] of the MIDI file.
- */
-@Deprecated("Should go to kmidi.")
-fun StandardMidiFile.identifySpecification(): MidiSpecification =
-    with(tracks.flatMap { it.events }.filterIsInstance<SysexEvent>()) {
-        return when {
-            any { GeneralStandardMidi.matches(it) } -> GeneralStandardMidi
-            any { ExtendedGeneralMidi.matches(it) } -> ExtendedGeneralMidi
-            else -> GeneralMidi
-        }
-    }
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 /**
  * A MIDI specification.
+ *
+ * @property name The name of the MIDI specification.
+ * @property initialism The initialism (abbreviation) of the MIDI specification.
+ * @property resetMessage The data that should be sent to reset the MIDI device to this specification.
  */
-@Deprecated("Should go to kmidi.")
-sealed class MidiSpecification(private val resetMessage: Array<Byte?>? = null) {
-    /**
-     * Checks if a [SysexEvent] matches this specification.
-     *
-     * @param sysexEvent The [SysexEvent] to check.
-     * @return Whether the [SysexEvent] matches this specification.
-     */
-    fun matches(sysexEvent: SysexEvent): Boolean {
-        val data = sysexEvent.data
-        if (data.size != resetMessage?.size) return false
-
-        return data.zip(resetMessage).all { (dataByte, resetByte) ->
-            resetByte == null || resetByte == dataByte
-        }
-    }
+@Serializable
+sealed class MidiSpecification(
+    val name: String,
+    val initialism: String,
+    val resetMessage: ByteArray
+) {
 
     /** GM. */
-    data object GeneralMidi : MidiSpecification()
-
-    /** Yamaha XG. */
-    data object ExtendedGeneralMidi : MidiSpecification(
-        arrayOf(
-            0x43.toByte(),
-            null,
-            0x4C.toByte(),
-            0x00.toByte(),
-            0x00.toByte(),
+    data object GeneralMidi : MidiSpecification(
+        "General MIDI",
+        "GM",
+        byteArrayOf(
+            0xF0.toByte(),
             0x7E.toByte(),
-            0x00.toByte(),
+            0x7F.toByte(),
+            0x09.toByte(),
+            0x01.toByte(),
             0xF7.toByte(),
-        ),
+        )
     )
 
     /** Roland GS. */
     data object GeneralStandardMidi : MidiSpecification(
-        arrayOf(
+        "Roland General Standard",
+        "GS",
+        byteArrayOf(
+            0xF0.toByte(),
             0x41.toByte(),
-            null,
-            null,
+            0x10.toByte(),
+            0x42.toByte(),
             0x12.toByte(),
             0x40.toByte(),
             0x00.toByte(),
@@ -88,4 +71,50 @@ sealed class MidiSpecification(private val resetMessage: Array<Byte?>? = null) {
             0xF7.toByte(),
         ),
     )
+
+    /** Yamaha XG. */
+    data object ExtendedGeneralMidi : MidiSpecification(
+        "Yamaha Extended General",
+        "XG",
+        byteArrayOf(
+            0xF0.toByte(),
+            0x43.toByte(),
+            0x10.toByte(),
+            0x4C.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x7E.toByte(),
+            0x00.toByte(),
+            0xF7.toByte(),
+        ),
+    )
 }
+
+/**
+ * An object that serializes and deserializes [MidiSpecification] objects to and from their string representations.
+ */
+object MidiSpecificationSerializer : KSerializer<MidiSpecification> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("MidiSpecification", PrimitiveKind.STRING)
+
+    /**
+     * Serialize a [MidiSpecification] into a string.
+     *
+     * @param encoder [Encoder] to aid the serialization.
+     * @param value [MidiSpecification] object to serialize.
+     */
+    override fun serialize(encoder: Encoder, value: MidiSpecification): Unit = encoder.encodeString(value.initialism)
+
+    /**
+     * Deserialize a string into a [MidiSpecification].
+     *
+     * @param decoder [Decoder] to aid the deserialization.
+     * @return Returns [MidiSpecification] object deserialized from the string.
+     */
+    override fun deserialize(decoder: Decoder): MidiSpecification = when (val string = decoder.decodeString()) {
+        "GM" -> MidiSpecification.GeneralMidi
+        "GS" -> MidiSpecification.GeneralStandardMidi
+        "XG" -> MidiSpecification.ExtendedGeneralMidi
+        else -> throw IllegalArgumentException("Unknown MIDI specification: $string")
+    }
+}
+

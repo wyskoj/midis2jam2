@@ -80,6 +80,17 @@ class AssetLoader(val context: Midis2jam2) {
         }
 
     /**
+     * Loads a material based on its texture and the material type.
+     *
+     * @param texture The material texture.
+     * @param type The material type.
+     */
+    fun material(texture: String, type: MaterialType): Material = when (type) {
+        MaterialType.Diffuse -> diffuseMaterial(texture)
+        MaterialType.Reflective -> reflectiveMaterial(texture)
+    }
+
+    /**
      * Loads a reflective material conditionally on the enhanced graphics state.
      */
     fun reflectiveMaterial(texture: String): Material =
@@ -97,6 +108,21 @@ class AssetLoader(val context: Midis2jam2) {
 }
 
 /**
+ * A type of material.
+ */
+sealed class MaterialType {
+    /**
+     * Diffuse type.
+     */
+    data object Diffuse : MaterialType()
+
+    /**
+     * Reflective type.
+     */
+    data object Reflective : MaterialType()
+}
+
+/**
  * Convenience function for loading a [model] with a diffuse [texture].
  */
 fun Midis2jam2.modelD(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)
@@ -105,3 +131,11 @@ fun Midis2jam2.modelD(model: String, texture: String): Spatial = assetLoader.loa
  * Convenience function for loading a [model] with a reflective [texture].
  */
 fun Midis2jam2.modelR(model: String, texture: String): Spatial = assetLoader.loadReflectiveModel(model, texture)
+
+/**
+ * Convenience function for loading a [model] with a [texture] and [type].
+ */
+fun Midis2jam2.model(model: String, texture: String, type: MaterialType): Spatial = when (type) {
+    MaterialType.Diffuse -> modelD(model, texture)
+    MaterialType.Reflective -> modelR(model, texture)
+}

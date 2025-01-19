@@ -111,6 +111,13 @@ fun SettingsScreen(
         )
         SettingsSectionHeader(I18n["settings_features"].value)
         SettingsListItem(
+            { Text(I18n["settings_features_midi_device"].value) },
+            { Text(I18n["settings_features_midi_device_description"].value) },
+            onOpenOptions = {
+                openScreen(TabFactory.midiDeviceConfiguration)
+            }
+        )
+        SettingsListItem(
             { Text(I18n["settings_features_soundbanks"].value) },
             { Text(I18n["settings_features_soundbanks_description"].value) },
             onOpenOptions = {

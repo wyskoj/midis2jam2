@@ -29,9 +29,9 @@ import org.wysko.midis2jam2.gui.util.openHelp
  * A floating action button that opens the help page.
  */
 @Composable
-fun HelpButton() {
+fun HelpButton(vararg page: String) {
     FloatingActionButton({
-        openHelp()
+        openHelp(*page)
     }) {
         Icon(painterResource(Res.drawable.help), contentDescription = "Help")
     }
