@@ -79,7 +79,7 @@ sealed class ShellStyle(
 
     sealed class AlternativeDrumShell(override val shellTexture: String, override val snareShellTexture: String) :
         ShellStyle(
-            bassDrumModel = "DrumSet_Alternative_BassDrum.obj",
+            bassDrumModel = "DrumSet_Alternative_BassDrum2.obj",
             tomModel = "DrumSet_Alternative.obj",
             snareDrumModel = "DrumSet_Alternative.obj",
             shellTexture = shellTexture,
