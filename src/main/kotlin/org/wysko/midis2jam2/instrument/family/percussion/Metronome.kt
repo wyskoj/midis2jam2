@@ -16,107 +16,67 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
-import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /**
  * The Metronome.
+ *
+ * @param context The context to the main class.
+ * @param clickHits The hits to be played when the metronome clicks.
+ * @param bellHits The hits to be played when the metronome rings.
  */
-class Metronome(
-    context: Midis2jam2,
-    clickHits: MutableList<NoteEvent.NoteOn>,
-    bellHits: MutableList<NoteEvent.NoteOn>,
-) : AuxiliaryPercussion(context, (clickHits + bellHits).sortedBy { it.tick }.toMutableList()) {
-    private val bellStriker =
-        Striker(
-            context = context,
-            strikeEvents = bellHits,
-            stickModel = Node(),
-            strikeSpeed = 2.4,
-            // Dummy node, rotation will be copied in [tick]
-            maxIdleAngle = 30.0,
-            fixed = true,
-        )
+class Metronome(context: Midis2jam2, clickHits: List<NoteEvent.NoteOn>, bellHits: List<NoteEvent.NoteOn>) :
+    AuxiliaryPercussion(context, (clickHits + bellHits).sortedBy { it.tick }) {
 
-    private val clickStriker =
-        Striker(
-            context = context,
-            strikeEvents = clickHits,
-            stickModel = Node(),
-            strikeSpeed = 2.4,
-            // Dummy node, rotation will be copied in [tick]
-            maxIdleAngle = 30.0,
-            fixed = true,
-        )
+    private val bellStriker = Striker(
+        context = context, strikeEvents = bellHits, stickModel = Node(), fixed = true, lift = false
+    )
 
-    private val bell =
-        context.modelR("MetronomePendjulum2.obj", "HornSkin.bmp").apply {
-            geometry.attachChild(this)
-            setLocalTranslation(0f, 0f, 0.5f)
-        }
-    private val click =
-        context.modelR("MetronomePendjulum1.obj", "ShinySilver.bmp").apply {
-            geometry.attachChild(this)
-            setLocalTranslation(0f, 0f, 1f)
-        }
+    private val clickStriker = Striker(
+        context = context, strikeEvents = clickHits, stickModel = Node(), fixed = true, lift = false
+    )
+
+    private val bell = context.modelR("MetronomePendjulum2.obj", "HornSkin.bmp").apply {
+        loc = v3(0, 0, 0.5)
+    }
+
+    private val click = context.modelR("MetronomePendjulum1.obj", "ShinySilver.bmp").apply {
+        loc = v3(0, 0, 1)
+    }
 
     private var clickSwingsRight = true
     private var bellSwingsRight = true
 
-    private var previousBellTarget: NoteEvent.NoteOn? = null
-    private var previousClickTarget: NoteEvent.NoteOn? = null
-
     init {
-        geometry.apply {
-            attachChild(context.modelD("MetronomeBox.obj", "Wood.bmp"))
-            setLocalTranslation(-20f, 0f, -46f)
-            localRotation = Quaternion().fromAngles(0f, rad(20.0), 0f)
+        with(geometry) {
+            +bell
+            +click
+            +context.modelD("MetronomeBox.obj", "Wood.bmp")
+        }
+        with(placement) {
+            loc = v3(-20, 0, -46)
+            rot = v3(0, 20, 0)
         }
     }
 
-    @Suppress("DuplicatedCode")
-    override fun tick(
-        time: Duration,
-        delta: Duration,
-    ) {
+    override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
 
-        val bellResults = bellStriker.tick(time, delta)
-        val clickResults = clickStriker.tick(time, delta)
-
-        // Bell
-        bellResults.strikingFor?.let {
-            if (it != previousBellTarget) {
-                previousBellTarget = it
-                bellSwingsRight = !bellSwingsRight // Alternate if swinging for a new note
-            }
+        with(bellStriker.tick(time, delta)) {
+            strike?.let { bellSwingsRight = !bellSwingsRight }
+            bell.rot = v3(0, 0, bellSwingsRight.sign * rotationAngle * 20)
         }
-        val bellRotation =
-            when {
-                bellSwingsRight -> bellResults.rotationAngle - rad(30.0)
-                else -> -bellResults.rotationAngle + rad(30.0)
-            }
-        bell.localRotation = Quaternion().fromAngles(0f, 0f, bellRotation)
 
-        // Click
-        clickResults.strikingFor?.let {
-            if (it != previousClickTarget) {
-                previousClickTarget = it
-                clickSwingsRight = !clickSwingsRight // Alternate if swinging for a new note
-            }
+        with(clickStriker.tick(time, delta)) {
+            strike?.let { clickSwingsRight = !clickSwingsRight }
+            click.rot = v3(0, 0, clickSwingsRight.sign * rotationAngle * 20)
         }
-        val clickRotation =
-            when {
-                clickSwingsRight -> clickResults.rotationAngle - rad(30.0)
-                else -> -clickResults.rotationAngle + rad(30.0)
-            }
-        click.localRotation = Quaternion().fromAngles(0f, 0f, clickRotation)
     }
 }
