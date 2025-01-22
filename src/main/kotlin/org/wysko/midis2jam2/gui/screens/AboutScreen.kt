@@ -90,6 +90,7 @@ fun AboutScreen() {
                         Text("\"tabr\" by Matthew Leonawicz licensed under MIT.")
                         Text("Clarinet texture by Mr. Tremolo Measure.")
                         Text("Tinkle Bell model by TheCococQuartz.")
+                        Text("Turntable model and texture by fedex \uD83E\uDD98 and favoredbeach.")
                         Spacer(Modifier.height(16.dp))
                         Text("Internationalization contributions:", fontStyle = FontStyle.Italic)
                         Text("Español: Mr. Tremolo Measure")
