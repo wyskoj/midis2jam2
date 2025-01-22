@@ -388,7 +388,6 @@ object InstrumentAssignment {
                 events.hits(44)?.let { eventMap.put(SquareClick::class, it.groupNotes(44)) }
                 events.hits(45, 46)?.let { eventMap.put(Metronome::class, it.groupNotes(45, 46)) }
                 events.hits(41, 42)?.let { eventMap.put(Turntable::class, it.groupNotes(41, 42)) }
-                // TODO turntable also spawns kit instruments
             }
 
             else -> {
@@ -483,6 +482,7 @@ object InstrumentAssignment {
             25 -> TypicalDrumSet(context, events.hits(), Analog, Cymbal.Style.Electronic)
             40 -> BrushDrumSet(context, events.hits())
             48 -> OrchestraDrumSet(context, events.hits())
+            56 -> null // SFX has no drum set
             else -> TypicalDrumSet(
                 context,
                 events.hits(),

@@ -1,6 +1,5 @@
 # Blender 4.2.1 LTS
 # www.blender.org
-mtllib DrumSet_Alternative_BassDrum2.mtl
 o SynthDrum
 v 9.002822 5.860427 -1.657073
 v 9.503036 5.571629 -1.307920
