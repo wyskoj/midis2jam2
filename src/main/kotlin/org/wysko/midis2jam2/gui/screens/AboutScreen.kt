@@ -79,6 +79,8 @@ fun AboutScreen() {
                         Text("SoundFont is a registered trademark of E-mu Systems, Inc.")
                         Spacer(Modifier.height(16.dp))
                         Text("Development contributors:", fontStyle = FontStyle.Italic)
+                        Text("fedex \uD83E\uDD98")
+                        Text("loonaticx")
                         Text("Julian Lachniet")
                         Text("JonnyCrash420")
                         Text("nikitalita")
