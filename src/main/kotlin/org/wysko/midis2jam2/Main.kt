@@ -273,7 +273,8 @@ suspend fun main(args: Array<String>) {
                 backgroundConfiguration,
                 graphicsConfigurationViewModel.generateConfiguration(),
                 soundBankConfigurationViewModel.generateConfiguration(),
-                synthesizerConfigurationViewModel.generateConfiguration()
+                synthesizerConfigurationViewModel.generateConfiguration(),
+                midiDeviceViewModel.generateConfiguration()
             ),
             onStart = {
                 SplashScreen.hide()
