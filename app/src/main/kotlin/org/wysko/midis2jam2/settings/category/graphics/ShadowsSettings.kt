@@ -13,10 +13,10 @@ class ShadowsSettings(private val settings: Settings) {
 
     private val _shadowsQuality = MutableStateFlow(runCatching {
         settings.getStringOrNull(SettingsKeys.Graphics.Shadows.SHADOWS_QUALITY)?.let {
-            org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings.ShadowsQuality.valueOf(it)
+            ShadowsQuality.valueOf(it)
         }
-    }.getOrNull() ?: org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings.ShadowsQuality.Medium)
-    val shadowsQuality: StateFlow<org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings.ShadowsQuality>
+    }.getOrNull() ?: ShadowsQuality.Medium)
+    val shadowsQuality: StateFlow<ShadowsQuality>
         get() = _shadowsQuality
 
     fun setIsUseShadows(isUseShadows: Boolean) {
@@ -24,7 +24,7 @@ class ShadowsSettings(private val settings: Settings) {
         settings.putBoolean(SettingsKeys.Graphics.Shadows.IS_USE_SHADOWS, isUseShadows)
     }
 
-    fun setShadowsQuality(shadowsQuality: org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings.ShadowsQuality) {
+    fun setShadowsQuality(shadowsQuality: ShadowsQuality) {
         _shadowsQuality.value = shadowsQuality
         settings.putString(SettingsKeys.Graphics.Shadows.SHADOWS_QUALITY, shadowsQuality.name)
     }

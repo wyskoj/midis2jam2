@@ -28,7 +28,6 @@ object GraphicsSettingsScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val graphicsModel = koinScreenModel<GraphicsSettingsScreenModel>()
         val resolutionModel = koinScreenModel<ResolutionSettingsScreenModel>()
         val app = koinViewModel<AppModel>()
 

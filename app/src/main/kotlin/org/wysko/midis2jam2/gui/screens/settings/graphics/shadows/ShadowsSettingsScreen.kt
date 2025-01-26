@@ -35,8 +35,8 @@ object ShadowsSettingsScreen : Screen {
                 "Shadows quality",
                 icon = painterResource(Res.drawable.speed),
                 selectedOption = shadowsQuality,
-                options = org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings.ShadowsQuality.entries,
-                formatOption = org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings.ShadowsQuality::name,
+                options = ShadowsSettings.ShadowsQuality.entries,
+                formatOption = ShadowsSettings.ShadowsQuality::name,
                 onOptionSelected = app.graphics.shadows::setShadowsQuality,
                 enabled = isUseShadows,
                 description = {

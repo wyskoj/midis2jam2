@@ -32,11 +32,6 @@ class SoundbanksSettings(private val settings: Settings) {
         saveSoundbanks()
     }
 
-    fun setSoundbanks(soundbanks: List<File>) {
-        _soundbanks.value = soundbanks
-        saveSoundbanks()
-    }
-
     private fun saveSoundbanks() {
         settings.putString(
             SettingsKeys.Playback.Soundbanks.SOUNDBANKS,

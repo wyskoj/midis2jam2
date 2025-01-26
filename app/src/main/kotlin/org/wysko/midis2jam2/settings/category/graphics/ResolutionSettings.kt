@@ -3,7 +3,6 @@ package org.wysko.midis2jam2.settings.category.graphics
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.wysko.midis2jam2.settings.SettingsKeys
 import org.wysko.midis2jam2.settings.SettingsKeys.Graphics.Resolution
 
 class ResolutionSettings(private val settings: Settings) {

@@ -51,10 +51,6 @@ class HomeTabModel(private val midiService: MidiService) : ScreenModel {
         }
     }
 
-    fun playMidiFile() {
-
-    }
-
     private fun getMidiDeviceInfos(): List<MidiDevice.Info> =
         midiService.getMidiDeviceInfos().filter { it.name != "Real Time Sequencer" }
 }

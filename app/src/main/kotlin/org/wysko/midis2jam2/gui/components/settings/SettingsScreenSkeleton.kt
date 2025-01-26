@@ -1,7 +1,8 @@
 package org.wysko.midis2jam2.gui.components.settings
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,9 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
-import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.info_outline
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SettingsScreenSkeleton(

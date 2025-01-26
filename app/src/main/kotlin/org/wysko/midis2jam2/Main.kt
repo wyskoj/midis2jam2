@@ -8,7 +8,6 @@ import org.wysko.midis2jam2.gui.App
 import org.wysko.midis2jam2.gui.screens.home.HomeTabModel
 import org.wysko.midis2jam2.gui.screens.settings.background.BackgroundSettingsScreenModel
 import org.wysko.midis2jam2.gui.screens.settings.general.GeneralSettingsScreenModel
-import org.wysko.midis2jam2.gui.screens.settings.graphics.GraphicsSettingsScreenModel
 import org.wysko.midis2jam2.gui.screens.settings.graphics.resolution.ResolutionSettingsScreenModel
 import org.wysko.midis2jam2.settings.AppModel
 import org.wysko.midis2jam2.midi.MidiService
@@ -30,7 +29,6 @@ val appModule = module {
 
     // Setting screen models
     single { GeneralSettingsScreenModel() }
-    single { GraphicsSettingsScreenModel() }
     single { ResolutionSettingsScreenModel() }
     single { BackgroundSettingsScreenModel() }
 }
