@@ -12,6 +12,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.wysko.midis2jam2.gui.components.settings.SettingsScreenSkeleton
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardBoolean
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardRadio
+import org.wysko.midis2jam2.settings.AntialiasingQuality
 import org.wysko.midis2jam2.settings.AppModel
 import org.wysko.midis2jam2.settings.category.graphics.antialiasing.AntialiasingSettings
 
@@ -35,8 +36,8 @@ object AntialiasingSettingsScreen : Screen {
                 "Antialiasing quality",
                 icon = painterResource(Res.drawable.speed),
                 selectedOption = antialiasingQuality,
-                options = AntialiasingSettings.AntialiasingQuality.entries,
-                formatOption = AntialiasingSettings.AntialiasingQuality::name,
+                options = AntialiasingQuality.entries,
+                formatOption = AntialiasingQuality::name,
                 onOptionSelected = app.graphics.antialiasing::setAntialiasingQuality,
                 enabled = isUseAntialiasing,
                 description = {

@@ -7,21 +7,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.wysko.midis2jam2.BackgroundConfigurationType
+import org.wysko.midis2jam2.settings.SettingsDefaults
 import org.wysko.midis2jam2.settings.SettingsKeys
 
 class BackgroundSettings(private val settings: Settings) {
     private var _configurationType = MutableStateFlow(
         runCatching {
             settings.getStringOrNull(SettingsKeys.Background.CONFIGURATION_TYPE)?.let {
-                ConfigurationType.valueOf(it)
+                BackgroundConfigurationType.valueOf(it)
             }
-        }.getOrNull() ?: ConfigurationType.Default
+        }.getOrNull() ?: SettingsDefaults.Background.CONFIGURATION_TYPE
     )
-    val configurationType: StateFlow<ConfigurationType>
+    val configurationType: StateFlow<BackgroundConfigurationType>
         get() = _configurationType
 
     private var _repeatedCubeMapTexture = MutableStateFlow(
-        settings.getString(SettingsKeys.Background.REPEATED_CUBE_MAP_TEXTURE, "")
+        settings.getString(
+            SettingsKeys.Background.REPEATED_CUBE_MAP_TEXTURE,
+            SettingsDefaults.Background.REPEATED_CUBE_MAP_TEXTURE
+        )
     )
     val repeatedCubeMapTexture: StateFlow<String>
         get() = _repeatedCubeMapTexture
@@ -30,16 +35,17 @@ class BackgroundSettings(private val settings: Settings) {
         runCatching {
             settings.getStringOrNull(SettingsKeys.Background.UNIQUE_CUBE_MAP_TEXTURES)
                 ?.let { Json.decodeFromString<List<String>>(it) }
-        }.getOrNull() ?: List(6) { "" }
+        }.getOrNull() ?: SettingsDefaults.Background.UNIQUE_CUBE_MAP_TEXTURES
     )
     val uniqueCubeMapTextures: StateFlow<List<String>>
         get() = _uniqueCubeMapTextures
 
-    private var _color = MutableStateFlow(settings.getInt(SettingsKeys.Background.COLOR, Color.Black.toArgb()))
+    private var _color =
+        MutableStateFlow(settings.getInt(SettingsKeys.Background.COLOR, SettingsDefaults.Background.COLOR))
     val color: StateFlow<Int>
         get() = _color
 
-    fun setConfigurationType(value: ConfigurationType) {
+    fun setConfigurationType(value: BackgroundConfigurationType) {
         _configurationType.value = value
         settings.putString(SettingsKeys.Background.CONFIGURATION_TYPE, value.name)
     }
@@ -57,9 +63,5 @@ class BackgroundSettings(private val settings: Settings) {
     fun setColor(value: Int) {
         _color.value = value
         settings.putInt(SettingsKeys.Background.COLOR, value)
-    }
-
-    enum class ConfigurationType {
-        Default, RepeatedCubeMap, UniqueCubeMap, Color
     }
 }

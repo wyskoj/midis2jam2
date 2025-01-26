@@ -5,7 +5,7 @@ import org.wysko.midis2jam2.settings.category.playback.MidiSpecificationResetSet
 import org.wysko.midis2jam2.settings.category.playback.SoundbanksSettings
 import org.wysko.midis2jam2.settings.category.playback.SynthesizerSettings
 
-class PlaybackSettings(private val settings: Settings) {
+class PlaybackSettings(settings: Settings) {
     val midiSpecificationReset = MidiSpecificationResetSettings(settings)
     val soundbanks = SoundbanksSettings(settings)
     val synthesizer = SynthesizerSettings(settings)

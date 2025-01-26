@@ -18,6 +18,7 @@ import midis2jam2.app.generated.resources.texture
 import midis2jam2.app.generated.resources.wallpaper
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.wysko.midis2jam2.BackgroundConfigurationType
 import org.wysko.midis2jam2.ColorName
 import org.wysko.midis2jam2.gui.components.settings.SettingsScreenSkeleton
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardCustomForm
@@ -39,17 +40,17 @@ object BackgroundSettingsScreen : Screen {
                 "Background type",
                 icon = painterResource(Res.drawable.wallpaper),
                 selectedOption = configurationType,
-                options = BackgroundSettings.ConfigurationType.entries,
-                formatOption = BackgroundSettings.ConfigurationType::name,
+                options = BackgroundConfigurationType.entries,
+                formatOption = BackgroundConfigurationType::name,
                 onOptionSelected = app.background::setConfigurationType,
                 onMenuOpen = model::refreshAvailableImages,
             )
             when (configurationType) {
-                BackgroundSettings.ConfigurationType.Default -> {
+                BackgroundConfigurationType.Default -> {
                     // Nothing to show
                 }
 
-                BackgroundSettings.ConfigurationType.RepeatedCubeMap -> {
+                BackgroundConfigurationType.RepeatedCubeMap -> {
                     val repeatedCubeMapTexture by app.background.repeatedCubeMapTexture.collectAsState()
 
                     SettingsCardRadio(
@@ -63,7 +64,7 @@ object BackgroundSettingsScreen : Screen {
                     )
                 }
 
-                BackgroundSettings.ConfigurationType.UniqueCubeMap -> {
+                BackgroundConfigurationType.UniqueCubeMap -> {
                     val uniqueCubeMapTextures by app.background.uniqueCubeMapTextures.collectAsState()
 
                     model.directions().forEachIndexed { index, direction ->
@@ -88,7 +89,7 @@ object BackgroundSettingsScreen : Screen {
                     }
                 }
 
-                BackgroundSettings.ConfigurationType.Color -> {
+                BackgroundConfigurationType.Color -> {
                     val color by app.background.color.collectAsState()
                     var formColor by remember { mutableStateOf(color) }
                     SettingsCardCustomForm(

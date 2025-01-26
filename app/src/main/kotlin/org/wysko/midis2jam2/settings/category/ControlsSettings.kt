@@ -3,14 +3,25 @@ package org.wysko.midis2jam2.settings.category
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.wysko.midis2jam2.settings.SettingsDefaults
 import org.wysko.midis2jam2.settings.SettingsKeys
 
 class ControlsSettings(private val settings: Settings) {
-    private val _isLockCursor = MutableStateFlow(settings.getBoolean(SettingsKeys.Controls.IS_LOCK_CURSOR, false))
+    private val _isLockCursor = MutableStateFlow(
+        settings.getBoolean(
+            SettingsKeys.Controls.IS_LOCK_CURSOR,
+            SettingsDefaults.Controls.IS_LOCK_CURSOR
+        )
+    )
     val isLockCursor: StateFlow<Boolean>
         get() = _isLockCursor
 
-    private val _isSpeedModifierKeysSticky = MutableStateFlow(settings.getBoolean(SettingsKeys.Controls.IS_SPEED_MODIFIER_KEYS_STICKY, false))
+    private val _isSpeedModifierKeysSticky = MutableStateFlow(
+        settings.getBoolean(
+            SettingsKeys.Controls.IS_SPEED_MODIFIER_KEYS_STICKY,
+            SettingsDefaults.Controls.IS_SPEED_MODIFIER_KEYS_STICKY
+        )
+    )
     val isSpeedModifierKeysSticky: StateFlow<Boolean>
         get() = _isSpeedModifierKeysSticky
 

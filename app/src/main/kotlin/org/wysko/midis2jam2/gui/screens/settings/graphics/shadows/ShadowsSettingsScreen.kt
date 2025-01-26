@@ -13,6 +13,7 @@ import org.wysko.midis2jam2.gui.components.settings.SettingsScreenSkeleton
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardBoolean
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardRadio
 import org.wysko.midis2jam2.settings.AppModel
+import org.wysko.midis2jam2.settings.ShadowsQuality
 import org.wysko.midis2jam2.settings.category.graphics.ShadowsSettings
 
 object ShadowsSettingsScreen : Screen {
@@ -35,8 +36,8 @@ object ShadowsSettingsScreen : Screen {
                 "Shadows quality",
                 icon = painterResource(Res.drawable.speed),
                 selectedOption = shadowsQuality,
-                options = ShadowsSettings.ShadowsQuality.entries,
-                formatOption = ShadowsSettings.ShadowsQuality::name,
+                options = ShadowsQuality.entries,
+                formatOption = ShadowsQuality::name,
                 onOptionSelected = app.graphics.shadows::setShadowsQuality,
                 enabled = isUseShadows,
                 description = {
