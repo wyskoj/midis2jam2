@@ -46,7 +46,7 @@ class GraphicsConfigurationViewModel(
     val shadowQuality
         get() = _shadowQuality
 
-    private val _antiAliasingQuality = MutableStateFlow(QualityScale.LOW)
+    private val _antiAliasingQuality = MutableStateFlow(QualityScale.NONE)
 
     /** The quality scale of antialiasing. */
     val antiAliasingQuality

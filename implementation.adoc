@@ -44,7 +44,7 @@ Check this page to see the progress of each instrument's implementation.
 |_69_ Oboe image:doc/plus.png[]|_77_ Blown bottle image:doc/check.png[]|_85_ Lead 5 (charang) image:doc/brush.png[]|_93_ Pad 5 (bowed) image:doc/brush.png[]
 |_70_ English Horn image:doc/cross.png[]|_78_ Shakuhachi image:doc/cross.png[]|_86_ Lead 6 (voice) image:doc/brush.png[]|_94_ Pad 6 (metallic) image:doc/brush.png[]
 |_71_ Bassoon image:doc/cross.png[]|_79_ Whistle image:doc/check.png[]|_87_ Lead 7 (fifths) image:doc/brush.png[]|_95_ Pad 7 (halo) image:doc/brush.png[]
-|_72_ Clarinet image:doc/plus.png[]|_80_ Ocarina image:doc/check.png[]|_88_ Lead 8 (bass + lead) image:doc/brush.png[]|_96_ Pad 8 (sweep) image:doc/check.png[]
+|_72_ Clarinet image:doc/plus.png[]|_80_ Ocarina image:doc/check.png[]|_88_ Lead 8 (bass + lead) image:doc/brush.png[]|_96_ Pad 8 (sweep) image:doc/brush.png[]
 |===
 
 |===
@@ -52,11 +52,11 @@ Check this page to see the progress of each instrument's implementation.
 |_97_ FX 1 (rain) image:doc/check.png[]|_105_ Sitar image:doc/cross.png[]|_113_ Tinkle Bell image:doc/brush.png[]|_121_ Guitar Fret Noise image:doc/check.png[]
 |_98_ FX 2 (soundtrack) image:doc/check.png[]|_106_ Banjo image:doc/plus.png[]|_114_ Agogô image:doc/check.png[]|_122_ Breath Noise image:doc/brush.png[]
 |_99_ FX 3 (crystal) image:doc/check.png[]|_107_ Shamisen image:doc/plus.png[]|_115_ Steel Drums image:doc/check.png[]|_123_ Seashore image:doc/cross.png[]
-|_100_ FX 4 (atmosphere) image:doc/check.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/plus.png[]
+|_100_ FX 4 (atmosphere) image:doc/brush.png[]|_108_ Koto image:doc/cross.png[]|_116_ Woodblock image:doc/check.png[]|_124_ Bird Tweet image:doc/plus.png[]
 |_101_ FX 5 (brightness) image:doc/check.png[]|_109_ Kalimba image:doc/plus.png[]|_117_ Taiko Drum image:doc/check.png[]|_125_ Telephone Ring image:doc/check.png[]
 |_102_ FX 6 (goblins) image:doc/brush.png[]|_110_ Bag pipe image:doc/plus.png[]|_118_ Melodic Tom image:doc/check.png[]|_126_ Helicopter image:doc/plus.png[]
-|_103_ FX 7 (echoes) image:doc/check.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/brush.png[]
-|_104_ FX 8 (sci-fi) image:doc/check.png[]|_112_ Shanai image:doc/cross.png[]|_120_ Reverse Cymbal image:doc/plus.png[]|_128_ Gunshot image:doc/cross.png[]
+|_103_ FX 7 (echoes) image:doc/brush.png[]|_111_ Fiddle image:doc/brush.png[]|_119_ Synth Drum image:doc/check.png[]|_127_ Applause image:doc/brush.png[]
+|_104_ FX 8 (sci-fi) image:doc/check.png[]|_112_ Shanai image:doc/cross.png[]|_120_ Reverse Cymbal image:doc/plus.png[]|_128_ Gunshot image:doc/plus.png[]
 |===
 
 == Percussion instruments
@@ -64,8 +64,8 @@ Check this page to see the progress of each instrument's implementation.
 |===
 |__27__ High Q image:doc/check.png[]|__35__ Acoustic Bass Drum image:doc/check.png[]|__43__ High Floor Tom image:doc/check.png[]|__51__ Ride Cymbal 1 image:doc/check.png[]
 |__28__ Slap image:doc/plus.png[]|__36__ Electric Bass Drum image:doc/check.png[]|__44__ Pedal Hi-hat image:doc/check.png[]|_52_ Chinese Cymbal image:doc/check.png[]
-|_29_ Scratch Push image:doc/cross.png[]|_37_ Side Stick image:doc/check.png[]|_45_ Low Tom image:doc/check.png[]|_53_ Ride Bell image:doc/check.png[]
-|_30_ Scratch Pull image:doc/cross.png[]|_38_ Acoustic Snare image:doc/check.png[]|_46_ Open Hi-hat image:doc/check.png[]|_54_ Tambourine image:doc/check.png[]
+|_29_ Scratch Push image:doc/plus.png[]|_37_ Side Stick image:doc/check.png[]|_45_ Low Tom image:doc/check.png[]|_53_ Ride Bell image:doc/check.png[]
+|_30_ Scratch Pull image:doc/plus.png[]|_38_ Acoustic Snare image:doc/check.png[]|_46_ Open Hi-hat image:doc/check.png[]|_54_ Tambourine image:doc/check.png[]
 |_31_ Sticks image:doc/check.png[]|_39_ Hand Clap image:doc/check.png[]|_47_ Low-Mid Tom image:doc/check.png[]|_55_ Splash Cymbal image:doc/check.png[]
 |_32_ Square Click image:doc/check.png[]|_40_ Electric Snare image:doc/check.png[]|_48_ Hi-Mid Tom image:doc/check.png[]|_56_ Cowbell image:doc/check.png[]
 |_33_ Metronome Click image:doc/check.png[]|_41_ Low Floor Tom image:doc/check.png[]|_49_ Crash Cymbal 1 image:doc/check.png[]|_57_ Crash Cymbal 2 image:doc/check.png[]
