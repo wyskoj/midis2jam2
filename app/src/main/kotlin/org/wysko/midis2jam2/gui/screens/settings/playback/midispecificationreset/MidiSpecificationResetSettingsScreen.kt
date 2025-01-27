@@ -9,12 +9,11 @@ import midis2jam2.app.generated.resources.media_output
 import midis2jam2.app.generated.resources.replace_audio
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.wysko.midis2jam2.MidiSpecification
+import org.wysko.midis2jam2.settings.MidiSpecification
 import org.wysko.midis2jam2.gui.components.settings.SettingsScreenSkeleton
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardBoolean
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardRadio
 import org.wysko.midis2jam2.settings.AppModel
-import org.wysko.midis2jam2.settings.category.playback.MidiSpecificationResetSettings
 
 object MidiSpecificationResetSettingsScreen : Screen {
     @Composable

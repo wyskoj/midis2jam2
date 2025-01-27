@@ -1,7 +1,5 @@
 package org.wysko.midis2jam2.settings
 
-import org.wysko.midis2jam2.BackgroundConfigurationType
-import org.wysko.midis2jam2.MidiSpecification
 import java.io.File
 
 object SettingsDefaults {

@@ -1,7 +1,5 @@
 package org.wysko.midis2jam2
 
-import com.russhwolf.settings.PreferencesSettings
-import com.russhwolf.settings.Settings
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.wysko.midis2jam2.gui.App
@@ -9,17 +7,14 @@ import org.wysko.midis2jam2.gui.screens.home.HomeTabModel
 import org.wysko.midis2jam2.gui.screens.settings.background.BackgroundSettingsScreenModel
 import org.wysko.midis2jam2.gui.screens.settings.general.GeneralSettingsScreenModel
 import org.wysko.midis2jam2.gui.screens.settings.graphics.resolution.ResolutionSettingsScreenModel
-import org.wysko.midis2jam2.settings.AppModel
 import org.wysko.midis2jam2.midi.MidiService
-import java.util.prefs.Preferences
+import org.wysko.midis2jam2.settings.AppModel
+import org.wysko.midis2jam2.settings.SettingsProvider
 
 val appModule = module {
     // Services
     single { MidiService() }
-    single {
-        @Suppress("USELESS_CAST")
-        PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2")) as Settings
-    }
+    single { SettingsProvider() }
 
     // View models
     single { AppModel(get()) }

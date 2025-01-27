@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.StateFlow
 import org.wysko.midis2jam2.settings.category.*
 import java.io.File
 
-class AppModel(settings: Settings) : ViewModel() {
-    val general = GeneralSettings(settings)
-    val graphics = GraphicsSettings(settings)
-    val background = BackgroundSettings(settings)
-    val controls = ControlsSettings(settings)
-    val playback = PlaybackSettings(settings)
-    val onScreenElements = OnScreenElementsSettings(settings)
-    val camera = CameraSettings(settings)
+class AppModel(settingsProvider: SettingsProvider) : ViewModel() {
+    val general = GeneralSettings(settingsProvider.settings)
+    val graphics = GraphicsSettings(settingsProvider.settings)
+    val background = BackgroundSettings(settingsProvider.settings)
+    val controls = ControlsSettings(settingsProvider.settings)
+    val playback = PlaybackSettings(settingsProvider.settings)
+    val onScreenElements = OnScreenElementsSettings(settingsProvider.settings)
+    val camera = CameraSettings(settingsProvider.settings)
 
     private val _selectedSoundbank = MutableStateFlow<File?>(null)
     val selectedSoundbank: StateFlow<File?>

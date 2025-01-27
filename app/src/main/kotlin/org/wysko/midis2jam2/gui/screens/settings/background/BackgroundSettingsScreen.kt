@@ -18,13 +18,12 @@ import midis2jam2.app.generated.resources.texture
 import midis2jam2.app.generated.resources.wallpaper
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.wysko.midis2jam2.BackgroundConfigurationType
+import org.wysko.midis2jam2.settings.BackgroundConfigurationType
 import org.wysko.midis2jam2.ColorName
 import org.wysko.midis2jam2.gui.components.settings.SettingsScreenSkeleton
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardCustomForm
 import org.wysko.midis2jam2.gui.components.settings.card.SettingsCardRadio
 import org.wysko.midis2jam2.settings.AppModel
-import org.wysko.midis2jam2.settings.category.BackgroundSettings
 
 object BackgroundSettingsScreen : Screen {
     @Composable

@@ -3,7 +3,7 @@ package org.wysko.midis2jam2.settings.category.playback
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.wysko.midis2jam2.MidiSpecification
+import org.wysko.midis2jam2.settings.MidiSpecification
 import org.wysko.midis2jam2.settings.SettingsDefaults
 import org.wysko.midis2jam2.settings.SettingsKeys
 

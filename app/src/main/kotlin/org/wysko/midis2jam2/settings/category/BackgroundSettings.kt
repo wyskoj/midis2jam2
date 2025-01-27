@@ -1,13 +1,11 @@
 package org.wysko.midis2jam2.settings.category
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.wysko.midis2jam2.BackgroundConfigurationType
+import org.wysko.midis2jam2.settings.BackgroundConfigurationType
 import org.wysko.midis2jam2.settings.SettingsDefaults
 import org.wysko.midis2jam2.settings.SettingsKeys
 
