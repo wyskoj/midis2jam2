@@ -23,5 +23,6 @@ plugins {
 include(":app")
 include(":utils")
 include(":core")
+include(":jwmidi")
 
 rootProject.name = "midis2jam2"
