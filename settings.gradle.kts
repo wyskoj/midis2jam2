@@ -26,3 +26,4 @@ include(":core")
 include(":jwmidi")
 
 rootProject.name = "midis2jam2"
+include("jmeKtDsl")

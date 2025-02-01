@@ -10,8 +10,20 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":jmeKtDsl"))
+    implementation(project(":jwmidi"))
+    implementation(project(":utils"))
     implementation(libs.multiplatformSettings)
+    implementation(libs.bundles.logging)
+
+    // jMonkeyEngine
+    implementation(libs.bundles.jme3)
+    implementation(libs.jme3.lwjgl3)
+
+    implementation(libs.kmidi)
+
     testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinxCoroutines)
 }
 
 tasks.test {

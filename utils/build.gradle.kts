@@ -10,5 +10,9 @@ dependencies {
     // Apply the kotlinx bundle of dependencies from the version catalog (`gradle/libs.versions.toml`).
     implementation(libs.bundles.kotlinxEcosystem)
     implementation(libs.bundles.logging)
+    implementation(libs.bundles.jme3)
+
+    implementation(project(":jmeKtDsl"))
+
     testImplementation(kotlin("test"))
 }

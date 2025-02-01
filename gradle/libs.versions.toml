@@ -4,7 +4,7 @@
 
 [versions]
 compose = "1.7.3"
-jme3 = "3.6.1-stable"
+jme3 = "3.8.0-alpha2"
 kotlin = "2.1.0"
 kotlinxDatetime = "0.6.1"
 kotlinxSerializationJSON = "1.7.2"
