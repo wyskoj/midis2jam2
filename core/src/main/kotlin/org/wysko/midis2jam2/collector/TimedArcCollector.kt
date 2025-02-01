@@ -51,5 +51,5 @@ class TimedArcCollector(
     }
 
     override fun peek(): TimedArc? = arcs.getOrNull(index)
-    override fun previous(): TimedArc? = lastRemoved
+    override fun prev(): TimedArc? = lastRemoved
 }

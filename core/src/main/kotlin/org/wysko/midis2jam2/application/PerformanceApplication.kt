@@ -56,6 +56,7 @@ class PerformanceApplication private constructor(
                     setResolution(1980, 1080) // TODO: Use settingsProvider
                     setDisplayFps(false)
                     setDisplayStatView(false)
+                    isPauseOnLostFocus = false
                 }
             }
             app.start()
@@ -66,7 +67,7 @@ class PerformanceApplication private constructor(
 
 fun main() {
     val smf =
-        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\testmidi\\onestop.mid"))
+        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\MIDIJam\\SMWOPENP.mid"))
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
     PerformanceApplication.execute(sequence, settingsProvider)

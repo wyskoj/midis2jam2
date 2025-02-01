@@ -3,14 +3,18 @@ package org.wysko.midis2jam2.scene
 import com.jme3.app.Application
 import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.AppStateManager
+import org.wysko.kmidi.midi.event.Event
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.collector.TimedArcCollector
 import org.wysko.midis2jam2.dSeconds
+import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.interpTo
 import org.wysko.midis2jam2.jme3ktdsl.*
+import kotlin.reflect.KClass
 
 class InstrumentManager : AbstractAppState() {
     private lateinit var context: PerformanceAppState
@@ -31,13 +35,22 @@ class InstrumentManager : AbstractAppState() {
         applyInstrumentLocationBehaviors()
     }
 
+    fun anyVisible(type: KClass<*>): Boolean =
+        visibilities.keys.any { type.isInstance(it) && visibilities[it]!! }
+
     private fun updateInstrumentVisibilities() {
         for (instrument in context.instruments) {
             val visibility = when (instrument) {
                 is SustainedInstrument -> {
                     sustainedVisibilityRules(instrument.collector, context.time)
                 }
-                // TODO is DecayedInstrument
+
+                is DecayedInstrument -> {
+                    decayedVisibilityRules(instrument, context.time.toDouble()) {
+                        context.sequence.getTimeOf(it).dSeconds
+                    }
+                }
+
                 else -> false
             }
             setVisibility(instrument, visibility)
@@ -49,6 +62,30 @@ class InstrumentManager : AbstractAppState() {
         if (visibility) context.root += instrument.root else context.root -= instrument.root
     }
 
+    private fun decayedVisibilityRules(
+        instrument: DecayedInstrument,
+        time: Double,
+        getTime: (Event) -> Double,
+    ): Boolean {
+        val collector = instrument.collector
+
+        collector.peek()?.let {
+            if (getTime(it) - time <= 1) return true
+        }
+
+        collector.peek()?.let { peek ->
+            collector.prev()?.let { prev ->
+                if (getTime(peek) - getTime(prev) <= 7) return true
+            }
+        }
+
+        collector.prev()?.let {
+            if (time - getTime(it) <= 2) return true
+        }
+
+        return false
+    }
+
     private fun sustainedVisibilityRules(collector: TimedArcCollector, time: Float): Boolean {
         if (collector.currentArcs.isNotEmpty()) return true
 
@@ -56,13 +93,13 @@ class InstrumentManager : AbstractAppState() {
             if (it.startTime.dSeconds - time <= 1) return true
         }
 
-        collector.previous()?.let { prev ->
+        collector.prev()?.let { prev ->
             collector.peek()?.let { peek ->
                 if (peek.startTime.dSeconds - prev.endTime.dSeconds <= 7) return true
             }
         }
 
-        collector.previous()?.let {
+        collector.prev()?.let {
             if (time - it.endTime.dSeconds <= 2) return true
         }
 
@@ -74,7 +111,7 @@ class InstrumentManager : AbstractAppState() {
             val target = if (visibilities[instrument]!!) {
                 findSimilarAndVisible(instrument).indexOf(instrument).coerceAtLeast(0)
             } else {
-                findSimilarAndVisible(instrument).size
+                findSimilarAndVisible(instrument).size - 1
             }
             indices[instrument] = interpTo(indices[instrument]!!, target, tpf, 5)
         }
@@ -95,10 +132,22 @@ class InstrumentManager : AbstractAppState() {
 
     companion object {
         val behaviors = mapOf(
-            Keyboard::class to Linear(
+            Keyboard::class to InstrumentLocationBehavior.Linear(
                 baseLocation = vec3(-50, 32, -6),
                 deltaLocation = vec3(-8.294, 3.03, -8.294),
                 baseRotation = vec3(0, 45, 0).quat()
+            ),
+            Mallets::class to InstrumentLocationBehavior.Combination(
+                InstrumentLocationBehavior.Pivot(
+                    pivotLocation = vec3(18, 26.5, -5),
+                    armDirection = vec3(-53, 0, 0),
+                    baseRotation = 36f,
+                    deltaRotation = -18f,
+                ),
+                InstrumentLocationBehavior.Linear(
+                    baseLocation = vec3(0, -4, 0),
+                    deltaLocation = vec3(0, 2, 0)
+                )
             )
         )
     }

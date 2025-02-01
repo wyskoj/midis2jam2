@@ -7,7 +7,8 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.model
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.root
 
 fun PerformanceAppState.setupStage() {
     root += model("Stage.j3o")

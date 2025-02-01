@@ -4,6 +4,13 @@ import kotlin.math.pow
 
 private const val SMALL_NUMBER = 1.0e-8f
 
+fun dLerp(a: Number, b: Number, t: Number): Double {
+    val fA = a.toDouble()
+    val fB = b.toDouble()
+    val fT = t.toDouble()
+    return fA + fT * (fB - fA)
+}
+
 fun interpTo(current: Number, target: Number, deltaTime: Number, interpSpeed: Number): Float {
     val fCurrent = current.toFloat()
     val fTarget = target.toFloat()

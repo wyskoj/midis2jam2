@@ -21,6 +21,7 @@ class ExtensibleFlyByCameraState : AbstractAppState() {
         this.flyByCamera = FlyByCamera(cameraProxy).apply {
             moveSpeed = 100f
             zoomSpeed = -20f
+            isDragToRotate = true
         }.also { it.registerWithInput(app.inputManager) }
 
         // Set initial location

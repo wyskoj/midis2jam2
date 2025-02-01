@@ -9,6 +9,7 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import com.jme3.scene.Spatial.CullHint
 
 fun node(initializer: Node.() -> Unit = {}): Node = Node().apply(initializer)
 
@@ -44,6 +45,9 @@ var Spatial.scaleVec: Vector3f
     set(value) {
         localScale = value
     }
+
+val Boolean.cull: CullHint
+    get() = if (this) CullHint.Dynamic else CullHint.Always
 
 fun vec3(x: Number, y: Number, z: Number): Vector3f = Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
 

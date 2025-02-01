@@ -1,12 +1,15 @@
 package org.wysko.midis2jam2.instrument.family.piano
 
 import com.jme3.scene.Geometry
+import org.wysko.midis2jam2.dSeconds
 import org.wysko.midis2jam2.instrument.KeyedInstrument
 import org.wysko.midis2jam2.interpTo
-import org.wysko.midis2jam2.jme3ktdsl.*
-import kotlin.time.Duration
-import org.wysko.midis2jam2.dSeconds
+import org.wysko.midis2jam2.jme3ktdsl.node
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.rot
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 import org.wysko.midis2jam2.mapRangeClamped
+import kotlin.time.Duration
 
 abstract class Key(
     parent: KeyedInstrument,
