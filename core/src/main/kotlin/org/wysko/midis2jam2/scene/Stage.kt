@@ -4,6 +4,7 @@ import com.jme3.light.AmbientLight
 import com.jme3.light.DirectionalLight
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.model
@@ -11,7 +12,9 @@ import org.wysko.midis2jam2.jme3ktdsl.plusAssign
 import org.wysko.midis2jam2.jme3ktdsl.root
 
 fun PerformanceAppState.setupStage() {
-    root += model("Stage.j3o")
+    root += model("Stage.j3o").apply {
+        shadowMode = RenderQueue.ShadowMode.Receive
+    }
 
     with(root) {
         createDirectionalLight(ColorRGBA(0.9f, 0.9f, 0.9f, 1f), Vector3f(0f, -1f, -1f))

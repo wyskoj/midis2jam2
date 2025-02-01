@@ -1,6 +1,7 @@
 package org.wysko.midis2jam2.application
 
 import com.jme3.app.SimpleApplication
+import com.jme3.post.FilterPostProcessor
 import com.jme3.system.AppSettings
 import org.wysko.jwmidi.JWSequencer
 import org.wysko.kmidi.midi.TimeBasedSequence
@@ -8,6 +9,7 @@ import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.scene.InstrumentManager
+import org.wysko.midis2jam2.scene.ShadowsState
 import org.wysko.midis2jam2.scene.camera.ExtensibleFlyByCameraState
 import org.wysko.midis2jam2.settings.SettingsProvider
 import java.io.File
@@ -17,6 +19,9 @@ class PerformanceApplication private constructor(
     private val sequence: TimeBasedSequence,
     private val settingsProvider: SettingsProvider,
 ) : SimpleApplication() {
+
+    lateinit var filterPostProcessor: FilterPostProcessor
+
     private lateinit var sequencer: JWSequencer
 
     override fun simpleInitApp() {
@@ -32,15 +37,20 @@ class PerformanceApplication private constructor(
         }
         stateManager.attach(ExtensibleFlyByCameraState())
 
+        filterPostProcessor = FilterPostProcessor(assetManager).also {
+            viewPort.addProcessor(it)
+        }
+
         // Create app state
         stateManager.attach(
             PerformanceAppState(
-            sequence = sequence,
-            startSequencer = {
-                sequencer.start()
-            }
-        ))
+                sequence = sequence,
+                startSequencer = {
+                    sequencer.start()
+                }
+            ))
         stateManager.attach(InstrumentManager())
+        stateManager.attach(ShadowsState(filterPostProcessor))
     }
 
     override fun destroy() {
