@@ -26,6 +26,8 @@ class TubularBells(context: PerformanceAppState, events: List<MidiEvent>) : Deca
         root += spatial
     }
 
+
+
     init {
         repeat(12) { i ->
             context.makeStriker(

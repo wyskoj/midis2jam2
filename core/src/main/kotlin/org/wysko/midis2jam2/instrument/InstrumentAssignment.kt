@@ -7,6 +7,7 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 
@@ -66,7 +67,7 @@ object InstrumentAssignment {
                     7 -> Keyboard(this, events, Keyboard.Variant.Clavichord)
                     8 -> Keyboard(this, events, Keyboard.Variant.Celesta)
                     9 -> Mallets(this, events, Mallets.Variant.Glockenspiel)
-//                    10 -> MusicBox(this, events)
+                    10 -> MusicBox(this, events)
                     11 -> Mallets(this, events, Mallets.Variant.Vibraphone)
                     12 -> Mallets(this, events, Mallets.Variant.Marimba)
                     13 -> Mallets(this, events, Mallets.Variant.Xylophone)

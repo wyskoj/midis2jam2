@@ -68,7 +68,7 @@ operator fun Vector3f.minus(other: Vector3f): Vector3f = subtract(other)
 
 operator fun Quaternion.times(scalar: Number): Quaternion = mult(scalar.toFloat())
 
-operator fun Quaternion.plus(other: Quaternion): Quaternion = add(other)
+operator fun Quaternion.times(other: Quaternion): Quaternion = mult(other)
 
 operator fun Quaternion.minus(other: Quaternion): Quaternion = subtract(other)
 

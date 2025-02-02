@@ -79,7 +79,7 @@ class PerformanceApplication private constructor(
 
 fun main() {
     val smf =
-        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\testmidi\\tubularscale.mid"))
+        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\MIDIJam\\SuperMarioRPGWithMusicBox.mid"))
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
     PerformanceApplication.execute(sequence, settingsProvider)
