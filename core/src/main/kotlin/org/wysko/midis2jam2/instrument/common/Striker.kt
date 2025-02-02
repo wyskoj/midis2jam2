@@ -10,7 +10,7 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.control.AbstractControl
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
-import org.wysko.midis2jam2.application.model
+import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.collector.EventCollector
 import org.wysko.midis2jam2.dLerp
 import org.wysko.midis2jam2.jme3ktdsl.*
@@ -139,6 +139,11 @@ class Striker(
             override val model = "DrumSet_Stick.obj"
             override val texture = "stick.png"
         }
+
+        data object TubularBellsMallet : Variant() {
+            override val model = "tubular_bell-mallet.obj"
+            override val texture = "wood.png"
+        }
     }
 
     data class Parameters(
@@ -209,7 +214,7 @@ class Striker(
             variant: Variant = Variant.DrumStick,
             onStrike: (velocity: Int) -> Unit = {},
         ): Spatial = node {
-            this += model(variant.model, variant.texture)
+            this += modelD(variant.model, variant.texture)
         }.apply {
             addControl(Striker(this@makeStriker, hits, parameters, onStrike))
         }

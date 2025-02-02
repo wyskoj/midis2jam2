@@ -11,6 +11,7 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.interpTo
 import org.wysko.midis2jam2.jme3ktdsl.*
@@ -148,6 +149,11 @@ class InstrumentManager : AbstractAppState() {
                     baseLocation = vec3(0, -4, 0),
                     deltaLocation = vec3(0, 2, 0)
                 )
+            ),
+            TubularBells::class to InstrumentLocationBehavior.Linear(
+                baseLocation = vec3(-65, 100, -130),
+                deltaLocation = vec3(-10, 0, -10),
+                baseRotation = vec3(0, 25, 0).quat()
             )
         )
     }

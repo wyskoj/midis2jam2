@@ -2,7 +2,7 @@ package org.wysko.midis2jam2.instrument.family.piano
 
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
-import org.wysko.midis2jam2.application.model
+import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.instrument.KeyedInstrument
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard.Variant
 import org.wysko.midis2jam2.jme3ktdsl.loc
@@ -21,7 +21,7 @@ class Keyboard(context: PerformanceAppState, events: List<MidiEvent>, variant: V
     }
 
     init {
-        root += context.model("PianoCase.obj", variant?.texture ?: DEFAULT_PIANO_TEXTURE)
+        root += context.modelD("PianoCase.obj", variant?.texture ?: DEFAULT_PIANO_TEXTURE)
     }
 
     override fun keyFromNoteNumber(noteNumber: Int): Key? = keys.getOrNull(noteNumber - range.first)
@@ -29,6 +29,7 @@ class Keyboard(context: PerformanceAppState, events: List<MidiEvent>, variant: V
     enum class Variant(internal val texture: String) {
         BrightAcoustic("piano-bright_acoustic.png"),
         Celesta("piano-celesta.png"),
+        Clavichord("piano-clavichord.png"),
         Electric1("piano-electric1.png"),
         Electric2("piano-electric2.png"),
         ElectricGrand("piano-electric_grand.png"),
@@ -41,7 +42,7 @@ private class KeyboardKey(context: PerformanceAppState, keyboard: Keyboard, note
     Key(keyboard) {
     init {
         root.run {
-            this += context.model(
+            this += context.modelD(
                 model = "PianoKey_${modelKeyFromNoteNumber(noteNumber)}.obj",
                 variant?.texture ?: DEFAULT_PIANO_TEXTURE
             )

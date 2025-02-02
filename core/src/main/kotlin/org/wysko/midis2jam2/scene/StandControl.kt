@@ -4,8 +4,11 @@ import com.jme3.renderer.RenderManager
 import com.jme3.renderer.ViewPort
 import com.jme3.scene.control.AbstractControl
 import org.wysko.midis2jam2.application.PerformanceAppState
+import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.instrument.Instrument
-import org.wysko.midis2jam2.jme3ktdsl.cull
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
+import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.jme3ktdsl.*
 import kotlin.reflect.KClass
 
 class StandControl(
@@ -20,4 +23,21 @@ class StandControl(
     }
 
     override fun controlRender(rm: RenderManager, vp: ViewPort) = Unit
+
+    companion object {
+        fun PerformanceAppState.setupStands() {
+            root += modelD("stand-piano.obj", "rubber_foot.png").apply {
+                loc = vec3(-50, 32, -6)
+                rot = vec3(0, 45, 0)
+                addControl(StandControl(this@setupStands, Keyboard::class))
+            }
+
+            root += modelD("stand-mallets.obj", "rubber_foot.png").apply {
+                loc = vec3(-25, 22.2, 23)
+                rot = vec3(0, 33.7, 0)
+                scale = 2 / 3.0
+                addControl(StandControl(this@setupStands, Mallets::class))
+            }
+        }
+    }
 }

@@ -10,7 +10,7 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.control.AbstractControl
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
-import org.wysko.midis2jam2.application.model
+import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.common.Striker
 import org.wysko.midis2jam2.instrument.common.Striker.Companion.makeStriker
@@ -28,7 +28,7 @@ class Mallets(
 
     private val bars: List<Spatial> = RANGE.map { noteNumber ->
         node {
-            this += context.model(
+            this += context.modelD(
                 model = when (NoteColor.fromNoteNumber(noteNumber)) {
                     NoteColor.White -> "mallets-bar-white.obj"
                     NoteColor.Black -> "mallets-bar-black.obj"
@@ -71,7 +71,7 @@ class Mallets(
                 },
                 parameters = Striker.Parameters(visibilityBehavior = Striker.VisibilityBehavior.OnlyNecessary),
                 onStrike = { velocity ->
-                    bars[index].getControl(BarControl::class.java).hit(velocity)
+                    bars[index].control<BarControl>().hit(velocity)
                 }
             ).also {
                 root += it
@@ -91,7 +91,7 @@ class Mallets(
                 it.scale = 2 / 3.0
             }
         }
-        root += context.model("mallets-case.obj", ColorRGBA.Black).apply { scale = 2 / 3.0 }
+        root += context.modelD("mallets-case.obj", ColorRGBA.Black).apply { scale = 2 / 3.0 }
     }
 
     enum class Variant(internal val texture: String) {
@@ -109,7 +109,7 @@ class Mallets(
         override fun controlUpdate(tpf: Float) {
             with(getBar()) {
                 loc.interpolateLocal(Vector3f.ZERO, tpf * 10f)
-                material.setFloat("AOIntensity", 1 - localTranslation.y)
+                material.setFloat("AOIntensity", 1 - localTranslation.y * 2)
             }
         }
 

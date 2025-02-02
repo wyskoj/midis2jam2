@@ -27,6 +27,8 @@ fun whiteIndexFromNoteNumber(noteNumber: Int): Int = when (noteNumber % 12) {
     else -> error("Invalid note number: $noteNumber")
 } + (noteNumber / 12) * 7
 
+fun pitchClass(noteNumber: Number): Int = (noteNumber.toInt() + 3) % 12
+
 enum class NoteColor {
     White, Black;
 

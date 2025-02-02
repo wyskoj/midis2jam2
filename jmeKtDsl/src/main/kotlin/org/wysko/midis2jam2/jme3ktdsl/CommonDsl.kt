@@ -10,6 +10,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
+import com.jme3.scene.control.Control
 
 fun node(initializer: Node.() -> Unit = {}): Node = Node().apply(initializer)
 
@@ -79,3 +80,5 @@ val BaseAppState.assetManager: AssetManager
     get() = (this.application as SimpleApplication).assetManager
 
 fun Vector3f.quat(): Quaternion = Quaternion().fromAngles(x * DEG_TO_RAD, y * DEG_TO_RAD, z * DEG_TO_RAD)
+
+inline fun <reified T : Control> Spatial.control(): T = getControl(T::class.java)

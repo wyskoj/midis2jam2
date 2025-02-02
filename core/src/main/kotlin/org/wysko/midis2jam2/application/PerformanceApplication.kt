@@ -2,6 +2,7 @@ package org.wysko.midis2jam2.application
 
 import com.jme3.app.SimpleApplication
 import com.jme3.post.FilterPostProcessor
+import com.jme3.post.filters.BloomFilter
 import com.jme3.system.AppSettings
 import org.wysko.jwmidi.JWSequencer
 import org.wysko.kmidi.midi.TimeBasedSequence
@@ -39,6 +40,7 @@ class PerformanceApplication private constructor(
 
         filterPostProcessor = FilterPostProcessor(assetManager).also {
             viewPort.addProcessor(it)
+            it.addFilter(BloomFilter(BloomFilter.GlowMode.Objects))
         }
 
         // Create app state
@@ -77,7 +79,7 @@ class PerformanceApplication private constructor(
 
 fun main() {
     val smf =
-        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\MIDIJam\\SMWOPENP.mid"))
+        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\testmidi\\tubularscale.mid"))
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
     PerformanceApplication.execute(sequence, settingsProvider)
