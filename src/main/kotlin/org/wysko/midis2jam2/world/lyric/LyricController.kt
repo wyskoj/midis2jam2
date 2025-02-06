@@ -52,13 +52,13 @@ class LyricController(private val context: Midis2jam2, private val events: List<
     }, triggerCondition = { line: LyricLine, time: Duration ->
         with(context) {
             currentLine?.let { currentLine ->
-                if (startTime(line) - endTime(currentLine) < 3.seconds) {
-                    time > ((startTime(line) - endTime(currentLine)) * 0.8) + endTime(currentLine)
-                } else {
-                    startTime(line) - time < 2.seconds
+                var timeBetween = startTime(line) - endTime(currentLine)
+                if (timeBetween > 4.seconds) {
+                    timeBetween = 4.seconds
                 }
+                time > startTime(line) - (timeBetween * 0.45)
             } ?: let {
-                time >= startTime(line) - 2.seconds
+                time >= startTime(line) - 1.seconds
             }
         }
     })
