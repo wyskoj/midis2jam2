@@ -85,6 +85,7 @@ fun AboutScreen() {
                         Text("JonnyCrash420")
                         Text("nikitalita")
                         Text("rxuglr")
+                        Text("vg_coder")
                         Text("vgking1")
                         Spacer(Modifier.height(16.dp))
                         Text("Attributions and contributions:", fontStyle = FontStyle.Italic)
