@@ -3,8 +3,12 @@ package org.wysko.jwmidi
 import kotlinx.coroutines.*
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.kmidi.midi.event.*
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.ShortMessage
+import kotlin.coroutines.CoroutineContext
 import kotlin.experimental.and
 import kotlin.time.Duration
 
@@ -31,7 +35,7 @@ class JWSequencer {
         private set
     private var pump: DataPump? = null
 
-    private var job: Job? = null
+    private var job: Thread? = null
     private var device: MidiDevice? = null
     private var events: List<Event>? = null
 
@@ -57,11 +61,20 @@ class JWSequencer {
 
         isRunning = true
         pump!!.checkpoint(null)
-        job = CoroutineScope(Dispatchers.Default).launch {
-            while (true) {
-                pump!!.pump()
-                delay(1)
+        job = object : Thread() {
+            init {
+                priority = MAX_PRIORITY
             }
+
+            override fun run() {
+                super.run()
+                while (isRunning) {
+                    pump!!.pump()
+                    sleep(1)
+                }
+            }
+        }.also {
+            it.start()
         }
     }
 
@@ -70,7 +83,7 @@ class JWSequencer {
         if (!isRunning) return
 
         isRunning = false
-        job!!.cancel()
+        job!!.join()
         pump!!.sendAllNotesOff()
     }
 
