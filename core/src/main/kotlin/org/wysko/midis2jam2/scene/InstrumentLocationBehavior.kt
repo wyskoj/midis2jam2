@@ -38,7 +38,7 @@ sealed interface InstrumentLocationBehavior {
 
     class Combination(private vararg val behaviors: InstrumentLocationBehavior) : InstrumentLocationBehavior {
         override fun getTransform(index: Float): Pair<Vector3f, Quaternion> =
-            behaviors.fold((Vector3f.ZERO.clone() to Quaternion.ZERO.clone())) { acc, behavior ->
+            behaviors.fold((vec3(0, 0, 0) to vec3(0, 0, 0).quat())) { acc, behavior ->
                 val (loc, rot) = behavior.getTransform(index)
                 acc.first + loc to (acc.second * rot).normalizeLocal()
             }

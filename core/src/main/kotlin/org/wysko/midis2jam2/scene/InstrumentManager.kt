@@ -13,6 +13,7 @@ import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
+import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.interpTo
 import org.wysko.midis2jam2.jme3ktdsl.*
@@ -159,6 +160,11 @@ class InstrumentManager : AbstractAppState() {
                 baseLocation = vec3(-65, 100, -130),
                 deltaLocation = vec3(-10, 0, -10),
                 baseRotation = vec3(0, 25, 0)
+            ),
+            Accordion::class to InstrumentLocationBehavior.Linear(
+                baseLocation = vec3(-75, 10, -65),
+                deltaLocation = vec3(0, 30, 0),
+                baseRotation = vec3(0, 45, 0)
             )
         )
     }

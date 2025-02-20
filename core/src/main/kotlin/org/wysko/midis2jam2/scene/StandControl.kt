@@ -26,13 +26,13 @@ class StandControl(
 
     companion object {
         fun PerformanceAppState.setupStands() {
-            root += modelD("stand-piano.obj", "rubber_foot.png").apply {
+            root += modelD("stand-piano.obj", "common/rubber_foot.png").apply {
                 loc = vec3(-50, 32, -6)
                 rot = vec3(0, 45, 0)
                 addControl(StandControl(this@setupStands, Keyboard::class))
             }
 
-            root += modelD("stand-mallets.obj", "rubber_foot.png").apply {
+            root += modelD("stand-mallets.obj", "common/rubber_foot.png").apply {
                 loc = vec3(-25, 22.2, 23)
                 rot = vec3(0, 33.7, 0)
                 scale = 2 / 3.0

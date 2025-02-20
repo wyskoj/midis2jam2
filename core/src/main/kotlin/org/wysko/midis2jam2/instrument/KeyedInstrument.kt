@@ -1,10 +1,12 @@
 package org.wysko.midis2jam2.instrument
 
+import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.collector.TimedArcCollector
-import org.wysko.midis2jam2.instrument.family.piano.Key
+import org.wysko.midis2jam2.instrument.family.piano.KeyControl
+import org.wysko.midis2jam2.jme3ktdsl.control
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -21,19 +23,18 @@ abstract class KeyedInstrument(
             else -> time >= arc.startTime + (arc.duration * 0.5)
         }
     }
-    protected abstract val keys: List<Key>
+    protected abstract val keys: List<Spatial>
 
-    abstract fun keyFromNoteNumber(noteNumber: Int): Key?
+    abstract fun keyFromNoteNumber(noteNumber: Int): Spatial?
 
     override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
-        keys.forEach { it.tick(delta) }
         for (noteNumber in range.start..range.endInclusive) {
-            keyFromNoteNumber(noteNumber)?.setState(
-                Key.State.fromVelocity(
-                    collector.currentArcs.find { it.note.toInt() == noteNumber }?.noteOn?.velocity?.toInt() ?: 0
-                )
+            keyFromNoteNumber(noteNumber)?.control<KeyControl>()?.state = KeyControl.State.fromVelocity(
+                isNotePlaying(noteNumber)?.noteOn?.velocity?.toInt() ?: 0
             )
         }
     }
+
+    protected open fun isNotePlaying(noteNumber: Int) = collector.currentArcs.find { it.note.toInt() == noteNumber }
 }

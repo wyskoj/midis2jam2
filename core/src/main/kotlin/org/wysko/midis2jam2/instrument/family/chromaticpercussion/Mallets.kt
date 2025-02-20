@@ -30,8 +30,8 @@ class Mallets(
         node {
             this += context.modelD(
                 model = when (NoteColor.fromNoteNumber(noteNumber)) {
-                    NoteColor.White -> "mallets-bar-white.obj"
-                    NoteColor.Black -> "mallets-bar-black.obj"
+                    NoteColor.White -> "mallets/bar-white.obj"
+                    NoteColor.Black -> "mallets/bar-black.obj"
                 },
                 texture = variant.texture
             )
@@ -66,7 +66,7 @@ class Mallets(
             context.makeStriker(
                 hits = hits.filter { it.note.toInt() == noteNumber },
                 variant = object : Striker.Variant() {
-                    override val model: String = "mallet.obj"
+                    override val model: String = "mallets/mallet.obj"
                     override val texture: String = variant.texture
                 },
                 parameters = Striker.Parameters(visibilityBehavior = Striker.VisibilityBehavior.OnlyNecessary),
@@ -91,14 +91,14 @@ class Mallets(
                 it.scale = 2 / 3.0
             }
         }
-        root += context.modelD("mallets-case.obj", ColorRGBA.Black).apply { scale = 2 / 3.0 }
+        root += context.modelD("mallets/case.obj", ColorRGBA.Black).apply { scale = 2 / 3.0 }
     }
 
     enum class Variant(internal val texture: String) {
-        Glockenspiel("mallets-glockenspiel.png"),
-        Marimba("mallets-marimba.png"),
-        Vibraphone("mallets-vibraphone.png"),
-        Xylophone("mallets-xylophone.png"),
+        Glockenspiel("mallets/glockenspiel.png"),
+        Marimba("mallets/marimba.png"),
+        Vibraphone("mallets/vibraphone.png"),
+        Xylophone("mallets/xylophone.png"),
     }
 
     private class BarControl : AbstractControl() {

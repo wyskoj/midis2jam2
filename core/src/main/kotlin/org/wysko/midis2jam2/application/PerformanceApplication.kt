@@ -21,7 +21,7 @@ class PerformanceApplication private constructor(
     private val settingsProvider: SettingsProvider,
 ) : SimpleApplication() {
 
-    lateinit var filterPostProcessor: FilterPostProcessor
+    private lateinit var filterPostProcessor: FilterPostProcessor
 
     private lateinit var sequencer: JWSequencer
 
@@ -79,7 +79,7 @@ class PerformanceApplication private constructor(
 
 fun main() {
     val smf =
-        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\MIDIJam\\SuperMarioRPGWithMusicBox.mid"))
+        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\testmidi\\tango_accordion.mid"))
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
     PerformanceApplication.execute(sequence, settingsProvider)
