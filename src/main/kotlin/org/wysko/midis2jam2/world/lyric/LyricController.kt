@@ -24,6 +24,8 @@ import com.jme3.math.ColorRGBA
 import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
+import org.wysko.midis2jam2.starter.configuration.LyricsConfiguration
+import org.wysko.midis2jam2.starter.configuration.get
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
 import kotlin.math.abs
@@ -75,7 +77,7 @@ class LyricController(private val context: Midis2jam2, private val events: List<
                     100f
                 )
             )
-            setSize(64f)
+            setSize(64f * context.configs[LyricsConfiguration::class].lyricSize.times)
             color = ColorRGBA.DarkGray
             text = it.renderString()
             alignment = BitmapFont.Align.Center
