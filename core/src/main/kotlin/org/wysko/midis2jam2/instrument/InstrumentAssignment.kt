@@ -12,6 +12,7 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.strings.Timpani
 
 object InstrumentAssignment {
     fun PerformanceAppState.makeAssignments(sequence: TimeBasedSequence): List<Instrument> {
@@ -77,6 +78,7 @@ object InstrumentAssignment {
                     21 -> Accordion(this, events, Accordion.Variant.Accordion)
                     22 -> Harmonica(this, events)
                     23 -> Accordion(this, events, Accordion.Variant.TangoAccordion)
+                    47 -> Timpani(this, events)
                     else -> null
                 }
             }

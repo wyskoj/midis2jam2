@@ -16,6 +16,7 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.strings.Timpani
 import org.wysko.midis2jam2.interpTo
 import org.wysko.midis2jam2.jme3ktdsl.*
 import kotlin.reflect.KClass
@@ -171,6 +172,12 @@ class InstrumentManager : AbstractAppState() {
                 baseLocation = vec3(74, 32, -38),
                 deltaLocation = vec3(0, 10, 0),
                 baseRotation = vec3(0, -90, 0)
+            ),
+            Timpani::class to InstrumentLocationBehavior.Pivot(
+                armDirection = vec3(0, 0, -120),
+                baseRotation = -27f,
+                deltaRotation = -18f,
+                rotationAxis = Axis.Y
             )
         )
     }

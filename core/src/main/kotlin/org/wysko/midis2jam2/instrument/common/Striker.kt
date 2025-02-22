@@ -22,6 +22,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.SECONDS
+import kotlin.time.times
 
 private const val DEFAULT_STRIKE_SPEED = 3.0f
 private const val MAX_STICK_IDLE_ANGLE = 50.0f
@@ -51,7 +52,7 @@ class Striker(
             calculateVisibility(time, timeOfNextEvent, timeOfLastEvent)
         }
 
-        getSpatial().cullHint = visible.cull
+        spatial.cullHint = visible.cull
 
         rotation = when {
             visible -> evaluateRotation(time, timeOfNextEvent, timeOfLastEvent, collector.peek()?.velocity ?: 0)
@@ -59,10 +60,10 @@ class Striker(
         }
 
         if (parameters.strikeLift) {
-            (getSpatial() as Node).children.first().loc = vec3(0, rotation * 2.0, 0)
+            (spatial as Node).children.first().loc = parameters.liftAxis.identity * (rotation * -4.0 * parameters.liftIntensity)
         }
 
-        getSpatial().localRotation = Quaternion().fromAngles(
+        spatial.localRotation = Quaternion().fromAngles(
             Matrix3f.IDENTITY.getRow(parameters.rotationAxis.componentIndex)
                 .mult(rotation.toFloat() * MAX_STICK_IDLE_ANGLE * FastMath.DEG_TO_RAD).toArray(null)
         )
@@ -144,6 +145,10 @@ class Striker(
             override val model = "tubular_bell-mallet.obj"
             override val texture = "wood.png"
         }
+
+        data class Mallet(override val texture: String) : Variant() {
+            override val model = "mallets/mallet.obj"
+        }
     }
 
     data class Parameters(
@@ -151,6 +156,8 @@ class Striker(
         val strikeLift: Boolean = true,
         val visibilityBehavior: VisibilityBehavior = VisibilityBehavior.BetweenHits,
         val rotationAxis: Axis = Axis.X,
+        val liftAxis: Axis = Axis.Z,
+        val liftIntensity: Float = 1.0f,
     )
 
     sealed interface VisibilityBehavior {

@@ -13,6 +13,7 @@ import org.wysko.midis2jam2.instrument.common.Striker.Companion.makeStriker
 import org.wysko.midis2jam2.instrument.common.invokeHitControls
 import org.wysko.midis2jam2.jme3ktdsl.*
 import org.wysko.midis2jam2.midi.pitchClass
+import org.wysko.midis2jam2.scene.Axis
 
 class TubularBells(context: PerformanceAppState, events: List<MidiEvent>) : DecayedInstrument(context, events) {
     private val bells = List(12) {
@@ -33,9 +34,8 @@ class TubularBells(context: PerformanceAppState, events: List<MidiEvent>) : Deca
             context.makeStriker(
                 events.filterIsInstance<NoteEvent.NoteOn>().filter { (it.note + 3) % 12 == i },
                 variant = Striker.Variant.TubularBellsMallet,
-                onStrike = { velocity ->
-                    bells[i].invokeHitControls(velocity)
-                }
+                onStrike = bells[i]::invokeHitControls,
+                parameters = Striker.Parameters(liftAxis = Axis.Z, liftIntensity = -1f)
             ).also {
                 it.loc = vec3((i - 5) * 4, -36 + (18 / 11.0) * i, 0)
                 root += it
@@ -45,6 +45,6 @@ class TubularBells(context: PerformanceAppState, events: List<MidiEvent>) : Deca
 
     override fun onHit(noteOn: NoteEvent.NoteOn) {
         super.onHit(noteOn)
-        bells[pitchClass(noteOn.note)].control<OscillatorControl>().hit(noteOn.velocity)
+        bells[pitchClass(noteOn.note)].invokeHitControls(noteOn.velocity)
     }
 }

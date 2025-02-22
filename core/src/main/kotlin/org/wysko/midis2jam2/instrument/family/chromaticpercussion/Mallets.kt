@@ -1,17 +1,14 @@
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
 import com.jme3.math.ColorRGBA
-import com.jme3.math.Vector3f
-import com.jme3.renderer.RenderManager
-import com.jme3.renderer.ViewPort
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.scene.control.AbstractControl
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.common.RecoilControl
 import org.wysko.midis2jam2.instrument.common.Striker
 import org.wysko.midis2jam2.instrument.common.Striker.Companion.makeStriker
 import org.wysko.midis2jam2.jme3ktdsl.*
@@ -34,7 +31,9 @@ class Mallets(
                     NoteColor.Black -> "mallets/bar-black.obj"
                 },
                 texture = variant.texture
-            )
+            ).apply {
+                addControl(BarControl())
+            }
         }.apply {
             val scaleFactor = (RANGE.last - noteNumber + 20) / 100f
 
@@ -57,7 +56,6 @@ class Mallets(
                     scaleVec = vec3(0.6, 0.7, scaleFactor)
                 }
             }
-            addControl(BarControl())
         }.also { root += it }
     }
 
@@ -69,9 +67,11 @@ class Mallets(
                     override val model: String = "mallets/mallet.obj"
                     override val texture: String = variant.texture
                 },
-                parameters = Striker.Parameters(visibilityBehavior = Striker.VisibilityBehavior.OnlyNecessary),
+                parameters = Striker.Parameters(
+                    visibilityBehavior = Striker.VisibilityBehavior.OnlyNecessary,
+                ),
                 onStrike = { velocity ->
-                    bars[index].control<BarControl>().hit(velocity)
+                    (bars[index] as Node).children.first().control<BarControl>().hit(velocity)
                 }
             ).also {
                 root += it
@@ -101,20 +101,14 @@ class Mallets(
         Xylophone("mallets/xylophone.png"),
     }
 
-    private class BarControl : AbstractControl() {
-        fun hit(velocity: Int) {
-            getBar().loc = vec3(0, -1 * velocityRamp(velocity), 0)
-        }
-
+    private class BarControl : RecoilControl() {
         override fun controlUpdate(tpf: Float) {
-            with(getBar()) {
-                loc.interpolateLocal(Vector3f.ZERO, tpf * 10f)
-                material.setFloat("AOIntensity", 1 - localTranslation.y * 2)
-            }
+            super.controlUpdate(tpf)
+            getBar().material.setFloat("AOIntensity", 1 - getBar().localTranslation.y * 2)
         }
 
-        private fun getBar(): Geometry = ((spatial as Node).children.first() as Geometry)
+        override fun getRecoilSpatial(): Spatial = getBar()
 
-        override fun controlRender(rm: RenderManager, vp: ViewPort) = Unit
+        private fun getBar(): Geometry = spatial as Geometry
     }
 }
