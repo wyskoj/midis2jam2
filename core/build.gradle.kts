@@ -13,6 +13,9 @@ dependencies {
     implementation(project(":jmeKtDsl"))
     implementation(project(":jwmidi"))
     implementation(project(":utils"))
+
+    implementation(kotlin("reflect"))
+
     implementation(libs.multiplatformSettings)
     implementation(libs.bundles.logging)
 

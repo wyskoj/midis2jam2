@@ -10,6 +10,7 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
+import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 
 object InstrumentAssignment {
@@ -74,6 +75,7 @@ object InstrumentAssignment {
                     13 -> Mallets(this, events, Mallets.Variant.Xylophone)
                     14 -> TubularBells(this, events)
                     21 -> Accordion(this, events, Accordion.Variant.Accordion)
+                    22 -> Harmonica(this, events)
                     23 -> Accordion(this, events, Accordion.Variant.TangoAccordion)
                     else -> null
                 }

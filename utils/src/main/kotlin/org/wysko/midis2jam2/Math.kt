@@ -50,3 +50,5 @@ fun mapRangeClamped(value: Number, inMin: Number, inMax: Number, outMin: Number,
 
     return result.coerceIn(lowerBound, upperBound)
 }
+
+fun easeOut(x: Float): Float = if (x == 1f) 1.0f else (1 - 2.0f.pow(-10 * x))

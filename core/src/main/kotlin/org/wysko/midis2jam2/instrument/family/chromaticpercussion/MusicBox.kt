@@ -6,7 +6,7 @@ import com.jme3.renderer.ViewPort
 import com.jme3.scene.control.AbstractControl
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.ObjectPool
+import org.wysko.midis2jam2.SpatialPool
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.application.modelR
@@ -38,7 +38,7 @@ class MusicBox(private val context: PerformanceAppState, events: List<MidiEvent>
     private val pointCollector = EventCollector(context, hits, { event, time ->
         context.sequence.getTimeAtTick(event.tick - context.sequence.smf.tpq) <= time // Quarter note early
     })
-    private val pointPool = ObjectPool(context.modelR("music_box-point.obj", "silver.png"))
+    private val pointPool = SpatialPool(context.modelR("music_box-point.obj", "silver.png"))
 
     init {
         root += context.modelD("music_box-case.obj", "wood.png")

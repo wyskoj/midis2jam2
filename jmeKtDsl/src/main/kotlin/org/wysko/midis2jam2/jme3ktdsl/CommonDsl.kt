@@ -11,6 +11,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint
 import com.jme3.scene.control.Control
+import kotlin.random.Random
 
 fun node(initializer: Node.() -> Unit = {}): Node = Node().apply(initializer)
 
@@ -51,6 +52,8 @@ val Boolean.cull: CullHint
     get() = if (this) CullHint.Dynamic else CullHint.Always
 
 fun vec3(x: Number, y: Number, z: Number): Vector3f = Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+fun vec3R(x: Number, y: Number, z: Number): Vector3f =
+    Vector3f(x.toFloat() * RAD_TO_DEG, y.toFloat() * RAD_TO_DEG, z.toFloat() * RAD_TO_DEG)
 
 operator fun Node.plusAssign(child: Spatial) {
     attachChild(child)
@@ -82,3 +85,12 @@ val BaseAppState.assetManager: AssetManager
 fun Vector3f.quat(): Quaternion = Quaternion().fromAngles(x * DEG_TO_RAD, y * DEG_TO_RAD, z * DEG_TO_RAD)
 
 inline fun <reified T : Control> Spatial.control(): T = getControl(T::class.java)
+
+fun Random.nextQuaternion(): Quaternion = Quaternion().apply {
+    val x = nextFloat() * 2 - 1
+    val y = nextFloat() * 2 - 1
+    val z = nextFloat() * 2 - 1
+    val w = nextFloat() * 2 - 1
+    set(x, y, z, w)
+    normalizeLocal()
+}
