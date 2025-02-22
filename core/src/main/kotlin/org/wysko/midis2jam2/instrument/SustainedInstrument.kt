@@ -13,6 +13,9 @@ abstract class SustainedInstrument(context: PerformanceAppState, events: List<Mi
     protected val isPitchClassPlaying: (Int) -> Boolean = {
         collector.currentArcs.any { arc -> pitchClass(arc.note) == it }
     }
+    protected val pitchClassArcs: (Int) -> List<TimedArc> = {
+        collector.currentArcs.filter { arc -> pitchClass(arc.note) == it }
+    }
     open val collector = TimedArcCollector(context, arcs)
 
     override fun tick(time: Duration, delta: Duration) {

@@ -8,17 +8,20 @@ import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.collector.TimedArcCollector
 import org.wysko.midis2jam2.dSeconds
 import org.wysko.midis2jam2.instrument.DecayedInstrument
+import org.wysko.midis2jam2.instrument.DeferredLocationBehavior
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
+import org.wysko.midis2jam2.instrument.family.ensemble.Choir
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.strings.Timpani
 import org.wysko.midis2jam2.interpTo
 import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.logger
 import kotlin.reflect.KClass
 
 class InstrumentManager : AbstractAppState() {
@@ -40,8 +43,7 @@ class InstrumentManager : AbstractAppState() {
         applyInstrumentLocationBehaviors()
     }
 
-    fun anyVisible(type: KClass<*>): Boolean =
-        visibilities.keys.any { type.isInstance(it) && visibilities[it]!! }
+    fun anyVisible(type: KClass<*>): Boolean = visibilities.keys.any { type.isInstance(it) && visibilities[it]!! }
 
     private fun updateInstrumentVisibilities() {
         for (instrument in context.instruments) {
@@ -128,57 +130,70 @@ class InstrumentManager : AbstractAppState() {
 
     private fun applyInstrumentLocationBehaviors() {
         for (instrument in context.instruments) {
-            behaviors[instrument::class]!!.getTransform(indices[instrument]!!).let { (loc, rot) ->
-                instrument.root.loc = loc
-                instrument.root.rotQ = rot
+            val behavior = behaviors[instrument::class]
+            val index = indices[instrument]!!
+            when (behavior) {
+                is InstrumentLocationBehavior.Calculated -> behavior.getTransform(index).let { (loc, rot) ->
+                    instrument.root.loc = loc
+                    instrument.root.rotQ = rot
+                }
+
+                is InstrumentLocationBehavior.Deferred -> {
+                    (instrument as? DeferredLocationBehavior)?.applyLocationBehavior(index) ?: logger().error(
+                        "Instrument $instrument does not implement ${DeferredLocationBehavior::class.simpleName}, but has a deferred location behavior."
+                    )
+                }
+
+                null -> logger().error("No location behavior found for ${instrument::class.simpleName}.")
             }
         }
     }
 
     companion object {
         val behaviors = mapOf(
-            Keyboard::class to InstrumentLocationBehavior.Linear(
+            Keyboard::class to InstrumentLocationBehavior.Calculated.Linear(
                 baseLocation = vec3(-50, 32, -6),
                 deltaLocation = vec3(-8.294, 3.03, -8.294),
                 baseRotation = vec3(0, 45, 0)
             ),
-            Mallets::class to InstrumentLocationBehavior.Combination(
-                InstrumentLocationBehavior.Pivot(
+            Mallets::class to InstrumentLocationBehavior.Calculated.Combination(
+                InstrumentLocationBehavior.Calculated.Pivot(
                     pivotLocation = vec3(18, 26.5, -5),
                     armDirection = vec3(-53, 0, 0),
                     baseRotation = 36f,
                     deltaRotation = -18f,
                 ),
-                InstrumentLocationBehavior.Linear(
+                InstrumentLocationBehavior.Calculated.Linear(
                     baseLocation = vec3(0, -4, 0),
                     deltaLocation = vec3(0, 2, 0)
                 )
             ),
-            MusicBox::class to InstrumentLocationBehavior.Linear(
+            MusicBox::class to InstrumentLocationBehavior.Calculated.Linear(
                 baseLocation = vec3(37, 5, -5),
                 deltaLocation = vec3(0, 0, -18),
             ),
-            TubularBells::class to InstrumentLocationBehavior.Linear(
+            TubularBells::class to InstrumentLocationBehavior.Calculated.Linear(
                 baseLocation = vec3(-65, 100, -130),
                 deltaLocation = vec3(-10, 0, -10),
                 baseRotation = vec3(0, 25, 0)
             ),
-            Accordion::class to InstrumentLocationBehavior.Linear(
+            Accordion::class to InstrumentLocationBehavior.Calculated.Linear(
                 baseLocation = vec3(-75, 10, -65),
                 deltaLocation = vec3(0, 30, 0),
                 baseRotation = vec3(0, 45, 0)
             ),
-            Harmonica::class to InstrumentLocationBehavior.Linear(
+            Harmonica::class to InstrumentLocationBehavior.Calculated.Linear(
                 baseLocation = vec3(74, 32, -38),
                 deltaLocation = vec3(0, 10, 0),
                 baseRotation = vec3(0, -90, 0)
             ),
-            Timpani::class to InstrumentLocationBehavior.Pivot(
+            Timpani::class to InstrumentLocationBehavior.Calculated.Pivot(
                 armDirection = vec3(0, 0, -120),
                 baseRotation = -27f,
                 deltaRotation = -18f,
                 rotationAxis = Axis.Y
-            )
+            ),
+            Choir::class to InstrumentLocationBehavior.Deferred
         )
     }
 }

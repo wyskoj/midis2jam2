@@ -2,14 +2,27 @@ package org.wysko.midis2jam2.application
 
 import com.jme3.material.Material
 import com.jme3.math.ColorRGBA
+import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.jme3ktdsl.assetManager
 import org.wysko.midis2jam2.jme3ktdsl.vec3
 
 private const val MODEL_PREFIX = "Assets/Models/"
 private const val TEXTURE_PREFIX = "Assets/Textures/"
+private const val MATERIAL_PREFIX = "Assets/Materials/"
 
-fun PerformanceAppState.model(model: String): Spatial = assetManager.loadModel(prefix(model, AssetType.Model))
+fun PerformanceAppState.model(model: String, material: String? = null, texture: String? = null): Spatial =
+    assetManager.loadModel(prefix(model, AssetType.Model)).apply {
+        material?.let {
+            setMaterial(assetManager.loadMaterial(prefix(it, AssetType.Material)).apply {
+                texture?.let { setTexture("DiffuseMap", assetManager.loadTexture(prefix(it, AssetType.Texture))) }
+            })
+        }
+        texture?.let {
+            this as Geometry
+            this.material.setTexture("DiffuseMap", assetManager.loadTexture(prefix(it, AssetType.Texture)))
+        }
+    }
 
 fun PerformanceAppState.modelD(model: String, texture: String? = null): Spatial {
     val modelPath = prefix(model, AssetType.Model)
@@ -65,5 +78,6 @@ private fun prefix(model: String, type: AssetType): String = when {
 
 private enum class AssetType(val prefix: String) {
     Model(MODEL_PREFIX),
-    Texture(TEXTURE_PREFIX)
+    Texture(TEXTURE_PREFIX),
+    Material(MATERIAL_PREFIX)
 }

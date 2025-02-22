@@ -6,7 +6,7 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.modelR
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.common.GlowControl
+import org.wysko.midis2jam2.instrument.common.DecayedGlowControl
 import org.wysko.midis2jam2.instrument.common.OscillatorControl
 import org.wysko.midis2jam2.instrument.common.Striker
 import org.wysko.midis2jam2.instrument.common.Striker.Companion.makeStriker
@@ -19,7 +19,7 @@ class TubularBells(context: PerformanceAppState, events: List<MidiEvent>) : Deca
     private val bells = List(12) {
         context.modelR("tubular_bell.obj", "silver.png").also {
             it.addControl(OscillatorControl(-0.5f, 3.0f, PI / 2, 0.3f))
-            it.addControl(GlowControl())
+            it.addControl(DecayedGlowControl())
         }
     }.onEachIndexed { index, spatial ->
         spatial.loc = vec3((index - 5) * 4, 0, -4)

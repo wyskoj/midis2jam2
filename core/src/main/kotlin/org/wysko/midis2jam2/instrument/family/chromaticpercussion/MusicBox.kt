@@ -12,7 +12,7 @@ import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.application.modelR
 import org.wysko.midis2jam2.collector.EventCollector
 import org.wysko.midis2jam2.instrument.DecayedInstrument
-import org.wysko.midis2jam2.instrument.common.GlowControl
+import org.wysko.midis2jam2.instrument.common.DecayedGlowControl
 import org.wysko.midis2jam2.instrument.common.OscillatorControl
 import org.wysko.midis2jam2.instrument.common.invokeHitControls
 import org.wysko.midis2jam2.jme3ktdsl.*
@@ -31,7 +31,7 @@ class MusicBox(private val context: PerformanceAppState, events: List<MidiEvent>
                 phaseAngle = PI / 2,
                 qFactor = 2.5f
             ))
-            addControl(GlowControl())
+            addControl(DecayedGlowControl())
         }
     }.onEach { root += it }
 

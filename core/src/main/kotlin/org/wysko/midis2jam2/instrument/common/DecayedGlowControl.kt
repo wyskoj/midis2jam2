@@ -8,7 +8,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.control.AbstractControl
 import org.wysko.midis2jam2.logger
 
-class GlowControl(private val color: ColorRGBA = standardGlow) : AbstractControl(), HitAwareControl {
+class DecayedGlowControl(private val color: ColorRGBA = standardGlow) : AbstractControl(), HitAwareControl {
     private var time = -1.0f
 
     override fun hit(velocity: Number) {
