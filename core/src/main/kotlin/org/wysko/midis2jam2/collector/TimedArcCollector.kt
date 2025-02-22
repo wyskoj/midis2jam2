@@ -39,7 +39,6 @@ class TimedArcCollector(
                 lastRemoved = it.value
             }
         }
-
     }
 
     override fun seek(time: Duration) {

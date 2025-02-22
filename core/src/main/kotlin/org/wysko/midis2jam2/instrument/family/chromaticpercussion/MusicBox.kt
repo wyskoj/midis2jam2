@@ -15,22 +15,30 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.common.DecayedGlowControl
 import org.wysko.midis2jam2.instrument.common.OscillatorControl
 import org.wysko.midis2jam2.instrument.common.invokeHitControls
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.minusAssign
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.rot
+import org.wysko.midis2jam2.jme3ktdsl.scaleVec
+import org.wysko.midis2jam2.jme3ktdsl.vec3
+import org.wysko.midis2jam2.midi.PITCHES
 import org.wysko.midis2jam2.midi.pitchClass
 import org.wysko.midis2jam2.seconds
 import kotlin.time.Duration
 
 class MusicBox(private val context: PerformanceAppState, events: List<MidiEvent>) : DecayedInstrument(context, events) {
-    private val lamellae = List(12) {
+    private val lamellae = List(PITCHES) {
         context.modelR("music_box-lamella.obj", "silver.png").apply {
             loc = vec3(it - 5.5, 7, 0)
             scaleVec = vec3(-0.04545f * it + 1, 1, 1)
-            addControl(OscillatorControl(
-                amplitude = 1f,
-                frequency = 3f,
-                phaseAngle = PI / 2,
-                qFactor = 2.5f
-            ))
+            addControl(
+                OscillatorControl(
+                    amplitude = 1f,
+                    frequency = 3f,
+                    phaseAngle = PI / 2,
+                    qFactor = 2.5f
+                )
+            )
             addControl(DecayedGlowControl())
         }
     }.onEach { root += it }

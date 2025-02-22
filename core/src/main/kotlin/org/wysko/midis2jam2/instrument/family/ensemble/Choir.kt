@@ -10,7 +10,13 @@ import org.wysko.midis2jam2.instrument.DeferredLocationBehavior
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.common.RisingControl
 import org.wysko.midis2jam2.instrument.common.SustainedGlowControl
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.node
+import org.wysko.midis2jam2.jme3ktdsl.plus
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.quat
+import org.wysko.midis2jam2.jme3ktdsl.rot
+import org.wysko.midis2jam2.jme3ktdsl.times
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 
 private val BASE_POSITION = vec3(0, 29.5, -152.7)
 
@@ -30,7 +36,8 @@ class Choir(context: PerformanceAppState, events: List<MidiEvent>, variant: Vari
                     children.first().addControl(
                         SustainedGlowControl(
                             context, ColorRGBA.Yellow
-                        ) { pitchClassArcs(it).firstOrNull() })
+                        ) { pitchClassArcs(it).firstOrNull() }
+                    )
                 }
             }.apply {
                 rot = vec3(0, 11.27 + it * -5.636, 0)
@@ -40,8 +47,8 @@ class Choir(context: PerformanceAppState, events: List<MidiEvent>, variant: Vari
     }.onEach { root += it }
 
     override fun applyLocationBehavior(index: Float) {
-        peeps.forEachIndexed { peepIndex, it ->
-            it.localTranslation = when {
+        peeps.forEachIndexed { peepIndex, peep ->
+            peep.localTranslation = when {
                 index >= 0 -> vec3(0, 11.27 + -5.636 * peepIndex, 0).quat()
                     .mult(BASE_POSITION.clone() + vec3(0, 10, -15) * index)
 

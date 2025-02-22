@@ -18,6 +18,6 @@ abstract class DecayedInstrument(context: PerformanceAppState, events: List<Midi
     }
 
     companion object {
-        fun velocityRamp(velocity: Number): Double = sqrt(velocity.toInt() / 127.0)
+        fun velocityRamp(velocity: Number): Double = sqrt((velocity.toInt() / 12).toDouble())
     }
 }

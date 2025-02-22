@@ -9,9 +9,11 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument.Companion.velocityRamp
 import org.wysko.midis2jam2.jme3ktdsl.loc
 import org.wysko.midis2jam2.jme3ktdsl.vec3
 
+private const val DEFAULT_RECOIL_DISTANCE = 10f
+
 open class RecoilControl(private val recoilIntensity: Float = 1f) : AbstractControl(), HitAwareControl {
     override fun controlUpdate(tpf: Float) {
-        spatial.loc.interpolateLocal(Vector3f.ZERO, tpf * 10f)
+        spatial.loc.interpolateLocal(Vector3f.ZERO, tpf * DEFAULT_RECOIL_DISTANCE)
     }
 
     override fun hit(velocity: Number) {

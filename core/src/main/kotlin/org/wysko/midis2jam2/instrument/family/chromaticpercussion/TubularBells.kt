@@ -11,7 +11,10 @@ import org.wysko.midis2jam2.instrument.common.OscillatorControl
 import org.wysko.midis2jam2.instrument.common.Striker
 import org.wysko.midis2jam2.instrument.common.Striker.Companion.makeStriker
 import org.wysko.midis2jam2.instrument.common.invokeHitControls
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.scale
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 import org.wysko.midis2jam2.midi.pitchClass
 import org.wysko.midis2jam2.scene.Axis
 
@@ -26,8 +29,6 @@ class TubularBells(context: PerformanceAppState, events: List<MidiEvent>) : Deca
         spatial.scale = (-0.04545 * index) + 1
         root += spatial
     }
-
-
 
     init {
         repeat(12) { i ->

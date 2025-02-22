@@ -8,7 +8,13 @@ import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.cull
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.root
+import org.wysko.midis2jam2.jme3ktdsl.rot
+import org.wysko.midis2jam2.jme3ktdsl.scale
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 import kotlin.reflect.KClass
 
 class StandControl(
@@ -17,7 +23,7 @@ class StandControl(
 ) : AbstractControl() {
 
     override fun controlUpdate(tpf: Float) {
-        getSpatial().cullHint = context.instruments.any {
+        spatial.cullHint = context.instruments.any {
             context.application.stateManager.getState(InstrumentManager::class.java).anyVisible(instrumentClass)
         }.cull
     }

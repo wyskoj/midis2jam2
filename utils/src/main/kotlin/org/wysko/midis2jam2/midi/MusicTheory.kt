@@ -1,6 +1,10 @@
 package org.wysko.midis2jam2.midi
 
-fun noteNumberToPitch(noteNumber: Int): String = when (noteNumber % 12) {
+const val PITCHES = 12
+private const val MIDI_PITCH_BASE_OFFSET = 3
+
+@Suppress("MagicNumber")
+fun noteNumberToPitch(noteNumber: Int): String = when (noteNumber % PITCHES) {
     0 -> "C"
     1 -> "C#"
     2 -> "D"
@@ -16,7 +20,8 @@ fun noteNumberToPitch(noteNumber: Int): String = when (noteNumber % 12) {
     else -> error("Invalid note number: $noteNumber")
 }
 
-fun whiteIndexFromNoteNumber(noteNumber: Int): Int = when (noteNumber % 12) {
+@Suppress("MagicNumber")
+fun whiteIndexFromNoteNumber(noteNumber: Int): Int = when (noteNumber % PITCHES) {
     0 -> 0
     2 -> 1
     4 -> 2
@@ -25,15 +30,16 @@ fun whiteIndexFromNoteNumber(noteNumber: Int): Int = when (noteNumber % 12) {
     9 -> 5
     11 -> 6
     else -> error("Invalid note number: $noteNumber")
-} + (noteNumber / 12) * 7
+} + (noteNumber / PITCHES) * 7
 
-fun pitchClass(noteNumber: Number): Int = (noteNumber.toInt() + 3) % 12
+fun pitchClass(noteNumber: Number): Int = (noteNumber.toInt() + MIDI_PITCH_BASE_OFFSET) % PITCHES
 
 enum class NoteColor {
     White, Black;
 
     companion object {
-        fun fromNoteNumber(noteNumber: Int): NoteColor = when (noteNumber % 12) {
+        @Suppress("MagicNumber")
+        fun fromNoteNumber(noteNumber: Int): NoteColor = when (noteNumber % PITCHES) {
             0, 2, 4, 5, 7, 9, 11 -> White
             else -> Black
         }

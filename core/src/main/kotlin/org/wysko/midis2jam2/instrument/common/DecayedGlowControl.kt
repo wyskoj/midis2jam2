@@ -8,6 +8,8 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.control.AbstractControl
 import org.wysko.midis2jam2.logger
 
+private const val GLOW_DECAY_RATE = 0.5f
+
 class DecayedGlowControl(private val color: ColorRGBA = standardGlow) : AbstractControl(), HitAwareControl {
     private var time = -1.0f
 
@@ -26,9 +28,9 @@ class DecayedGlowControl(private val color: ColorRGBA = standardGlow) : Abstract
     private fun glowColor() = when {
         time < 0 -> ColorRGBA.Black
         else -> ColorRGBA(
-            (color.r) * exp(-time * 0.5f),
-            (color.g) * exp(-time * 0.5f),
-            (color.b) * exp(-time * 0.5f),
+            (color.r) * exp(-time * GLOW_DECAY_RATE),
+            (color.g) * exp(-time * GLOW_DECAY_RATE),
+            (color.b) * exp(-time * GLOW_DECAY_RATE),
             1f
         )
     }

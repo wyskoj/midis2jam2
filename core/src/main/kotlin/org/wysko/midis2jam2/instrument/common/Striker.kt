@@ -13,7 +13,11 @@ import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.collector.EventCollector
 import org.wysko.midis2jam2.dLerp
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.cull
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.node
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.times
 import org.wysko.midis2jam2.mapRangeClamped
 import org.wysko.midis2jam2.scene.Axis
 import kotlin.math.exp
@@ -22,10 +26,15 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.SECONDS
-import kotlin.time.times
 
 private const val DEFAULT_STRIKE_SPEED = 3.0f
-private const val MAX_STICK_IDLE_ANGLE = 50.0f
+private const val DEFAULT_LIFT_INTENSITY = -4.0
+private const val DEFAULT_IDLE_ANGLE = 50.0f
+
+private const val ANTICIPATION_DURATION = 0.22
+private const val RECOIL_DURATION = 0.45
+
+private const val OVERLAP_ALLOWANCE = 0.1
 
 class Striker(
     private val context: PerformanceAppState,
@@ -36,8 +45,8 @@ class Striker(
     private val collector = EventCollector(context, hits)
 
     private val speedMultiplier = parameters.strikeSpeed / DEFAULT_STRIKE_SPEED
-    private val anticipationTime = 0.22 * speedMultiplier
-    private val recoilTime = 0.45 * speedMultiplier
+    private val anticipationTime = ANTICIPATION_DURATION * speedMultiplier
+    private val recoilTime = RECOIL_DURATION * speedMultiplier
 
     private var rotation = 1.0
 
@@ -60,12 +69,13 @@ class Striker(
         }
 
         if (parameters.strikeLift) {
-            (spatial as Node).children.first().loc = parameters.liftAxis.identity * (rotation * -4.0 * parameters.liftIntensity)
+            (spatial as Node).children.first().loc =
+                parameters.liftAxis.identity * (rotation * DEFAULT_LIFT_INTENSITY * parameters.liftIntensity)
         }
 
         spatial.localRotation = Quaternion().fromAngles(
             Matrix3f.IDENTITY.getRow(parameters.rotationAxis.componentIndex)
-                .mult(rotation.toFloat() * MAX_STICK_IDLE_ANGLE * FastMath.DEG_TO_RAD).toArray(null)
+                .mult(rotation.toFloat() * DEFAULT_IDLE_ANGLE * FastMath.DEG_TO_RAD).toArray(null)
         )
 
         if (strike != null) {
@@ -79,7 +89,6 @@ class Striker(
         timeOfLastEvent: Double?,
         anticipatedVelocity: Byte,
     ): Double {
-
         val strikeIndex = when (timeOfNextEvent) {
             null -> 0.0
             else -> 1.0 - (min(timeOfNextEvent - time, anticipationTime) / anticipationTime)
@@ -87,7 +96,7 @@ class Striker(
         val weakHit = evaluateWeakStrikeCurve(strikeIndex)
         val strongHit = evaluateStrongStrikeCurve(strikeIndex)
         val strikeCurveEvaluation = when {
-            parameters.strikeLift -> dLerp(weakHit, strongHit, (anticipatedVelocity / 127.0))
+            parameters.strikeLift -> dLerp(weakHit, strongHit, (anticipatedVelocity / 12))
             else -> weakHit
         }
 
@@ -110,8 +119,10 @@ class Striker(
         }
     }
 
+    @Suppress("MagicNumber")
     private fun evaluateRecoilCurve(index: Double): Double = 2.0 / (1 + exp(-10 * index)) - 1.0
 
+    @Suppress("MagicNumber")
     private fun evaluateStrongStrikeCurve(index: Double): Double {
         val c = 1
         val a = 0.5
@@ -124,6 +135,7 @@ class Striker(
         }
     }
 
+    @Suppress("MagicNumber")
     private fun evaluateWeakStrikeCurve(index: Double): Double = when {
         index < 0.4 -> 1.0
         index < 1.0 -> 1 - 2.7777 * (index - 0.4).pow(2)
@@ -184,7 +196,7 @@ class Striker(
                     if (peek != null && prev != null) {
                         val division = context.sequence.smf.tpq
                         val tickSpan = peek.tick - prev.tick
-                        tickSpan <= division * 2.1 || timeOfNextEvent - timeOfLastEvent < 2.0
+                        tickSpan <= division * 2.0 + OVERLAP_ALLOWANCE || timeOfNextEvent - timeOfLastEvent < 2.0
                     } else {
                         false
                     }
@@ -207,7 +219,10 @@ class Striker(
             timeOfNextEvent: Double?,
             timeOfLastEvent: Double?,
         ) = when {
-            timeOfNextEvent != null && timeOfLastEvent != null -> timeOfNextEvent - time < anticipationTime || time - timeOfLastEvent < recoilTime
+            timeOfNextEvent != null && timeOfLastEvent != null -> {
+                timeOfNextEvent - time < anticipationTime || time - timeOfLastEvent < recoilTime
+            }
+
             timeOfNextEvent != null -> timeOfNextEvent - time < anticipationTime
             timeOfLastEvent != null -> time - timeOfLastEvent < recoilTime
             else -> false

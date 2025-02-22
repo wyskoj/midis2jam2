@@ -22,17 +22,19 @@ class RisingControl(
     override fun controlUpdate(tpf: Float) {
         val adjustedHeight = RISE_HEIGHT * riseHeight
         spatial.localTranslation.y = currentArc()?.let {
-            (adjustedHeight - adjustedHeight * blendedProgress(
-                it.calculateProgress(context.time.seconds).toFloat(),
-                it.duration.fSeconds
-            )).coerceAtLeast(0.0f)
+            val blendedProgress =
+                blendedProgress(it.calculateProgress(context.time.seconds).toFloat(), it.duration.fSeconds)
+
+            (adjustedHeight - adjustedHeight * blendedProgress).coerceAtLeast(0.0f)
         } ?: 0f
     }
 
     override fun controlRender(rm: RenderManager?, vp: ViewPort?) = Unit
 
+    @Suppress("MagicNumber")
     private fun shortDurationProgress(progress: Float): Float = sin(FastMath.PI * progress * 0.5f)
 
+    @Suppress("MagicNumber")
     private fun longDurationProgress(progress: Float): Float = when {
         progress < 0.8 -> 1.1f * progress
         else -> -3.0f * (progress - 1).pow(2) + 1.0f
@@ -43,6 +45,7 @@ class RisingControl(
         return longDurationProgress(progress) * factor + shortDurationProgress(progress) * (1 - factor)
     }
 
+    @Suppress("MagicNumber")
     private fun blendFactor(duration: Float): Float = when {
         duration < 0.5f -> 0.0f
         duration in 0.5f..1.0f -> sin((2 * duration + 0.5f) * FastMath.PI) / 2 + 0.5f

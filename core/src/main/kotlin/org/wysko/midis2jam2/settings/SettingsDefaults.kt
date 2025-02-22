@@ -9,8 +9,8 @@ object SettingsDefaults {
 
         object Resolution {
             const val IS_USE_DEFAULT_RESOLUTION = true
-            const val RESOLUTION_X = 1920
-            const val RESOLUTION_Y = 1080
+            const val RESOLUTION_X = 640
+            const val RESOLUTION_Y = 480
         }
 
         object Shadows {
@@ -43,7 +43,7 @@ object SettingsDefaults {
         }
 
         object Soundbanks {
-            val SOUNDBANKS: List<File> = listOf()
+            val SOUNDBANKS_LIST: List<File> = listOf()
         }
 
         object Synthesizer {

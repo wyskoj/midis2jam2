@@ -20,7 +20,12 @@ import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.strings.Timpani
 import org.wysko.midis2jam2.interpTo
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.minusAssign
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.root
+import org.wysko.midis2jam2.jme3ktdsl.rotQ
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 import org.wysko.midis2jam2.logger
 import kotlin.reflect.KClass
 
@@ -69,6 +74,7 @@ class InstrumentManager : AbstractAppState() {
         if (visibility) context.root += instrument.root else context.root -= instrument.root
     }
 
+    @Suppress("ReturnCount")
     private fun decayedVisibilityRules(
         instrument: DecayedInstrument,
         time: Double,
@@ -93,6 +99,7 @@ class InstrumentManager : AbstractAppState() {
         return false
     }
 
+    @Suppress("ReturnCount")
     private fun sustainedVisibilityRules(collector: TimedArcCollector, time: Float): Boolean {
         if (collector.currentArcs.isNotEmpty()) return true
 
@@ -124,9 +131,8 @@ class InstrumentManager : AbstractAppState() {
         }
     }
 
-    private fun findSimilarAndVisible(instrument: Instrument) = findSimilar(instrument).filter { visibilities[it]!! }
-
-    private fun findSimilar(instrument: Instrument) = context.instruments.filterIsInstance(instrument::class.java)
+    private fun findSimilarAndVisible(instrument: Instrument) =
+        context.instruments.filterIsInstance(instrument::class.java).filter { visibilities[it]!! }
 
     private fun applyInstrumentLocationBehaviors() {
         for (instrument in context.instruments) {
@@ -140,7 +146,7 @@ class InstrumentManager : AbstractAppState() {
 
                 is InstrumentLocationBehavior.Deferred -> {
                     (instrument as? DeferredLocationBehavior)?.applyLocationBehavior(index) ?: logger().error(
-                        "Instrument $instrument does not implement ${DeferredLocationBehavior::class.simpleName}, but has a deferred location behavior."
+                        "$instrument does not implement DeferredLocationBehavior, but is declared as such."
                     )
                 }
 

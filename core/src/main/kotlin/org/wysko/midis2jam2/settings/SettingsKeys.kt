@@ -40,12 +40,13 @@ object SettingsKeys {
 
     object Playback {
         object MidiSpecificationReset {
-            const val IS_SEND_SPECIFICATION_RESET_MESSAGE = "playback.midiSpecificationReset.isSendSpecificationResetMessage"
+            const val IS_SEND_SPECIFICATION_RESET_MESSAGE =
+                "playback.midiSpecificationReset.isSendSpecificationResetMessage"
             const val SPECIFICATION = "playback.midiSpecificationReset.specification"
         }
 
         object Soundbanks {
-            const val SOUNDBANKS = "playback.soundbanks.soundbanks"
+            const val SOUNDBANKS_LIST = "playback.soundbanks.soundbanksList"
         }
 
         object Synthesizer {

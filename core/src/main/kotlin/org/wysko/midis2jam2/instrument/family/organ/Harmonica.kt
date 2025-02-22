@@ -5,7 +5,11 @@ import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.application.modelD
 import org.wysko.midis2jam2.instrument.SustainedInstrument
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.rot
+import org.wysko.midis2jam2.jme3ktdsl.vec3
+import org.wysko.midis2jam2.jme3ktdsl.vec3R
 import org.wysko.midis2jam2.particle.SteamPufferControl
 import org.wysko.midis2jam2.scene.Axis
 import kotlin.math.cos
@@ -16,10 +20,12 @@ class Harmonica(context: PerformanceAppState, events: List<MidiEvent>) : Sustain
         SteamPufferControl.makeForPitchClasses(
             context = context,
             root = root,
-            variant = SteamPufferControl.Variant.Harmonica,
-            scale = 0.75f,
-            behavior = SteamPufferControl.Behavior.Outwards,
-            axis = Axis.X,
+            parameters = SteamPufferControl.Parameters(
+                variant = SteamPufferControl.Variant.Harmonica,
+                scale = 0.75f,
+                behavior = SteamPufferControl.Behavior.Outwards,
+                axis = Axis.X,
+            ),
             isPitchClassPlaying = { isPitchClassPlaying(it) },
             setupTransform = { index, node ->
                 val angle = 5 * (index - 5.5) * DEG_TO_RAD

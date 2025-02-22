@@ -2,7 +2,6 @@ package org.wysko.midis2jam2.application
 
 import com.jme3.app.Application
 import com.jme3.app.state.BaseAppState
-import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.collector.Collector
 import org.wysko.midis2jam2.instrument.Instrument
@@ -14,11 +13,13 @@ import org.wysko.midis2jam2.scene.StandControl.Companion.setupStands
 import org.wysko.midis2jam2.scene.setupStage
 import kotlin.time.Duration.Companion.seconds
 
+private const val START_TIME = -2.0f
+
 class PerformanceAppState(val sequence: TimeBasedSequence, val startSequencer: () -> Unit) : BaseAppState() {
     lateinit var instruments: List<Instrument>
         private set
 
-    var time = -2.0f
+    var time = START_TIME
         private set
 
     private val collectors = mutableListOf<Collector<*>>()

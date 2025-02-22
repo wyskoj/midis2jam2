@@ -14,7 +14,11 @@ import org.wysko.midis2jam2.dSeconds
 import org.wysko.midis2jam2.instrument.KeyedInstrument
 import org.wysko.midis2jam2.instrument.family.piano.KeyControl
 import org.wysko.midis2jam2.interpTo
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.node
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.rot
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 import org.wysko.midis2jam2.midi.NoteColor
 import org.wysko.midis2jam2.midi.noteNumberToPitch
 import org.wysko.midis2jam2.scene.Axis
@@ -36,12 +40,14 @@ class Accordion(
     override val keys: List<Spatial> = List(24) { i ->
         context.modelD(
             model = "accordion/key-${noteNumberToPitch(i)}.obj",
-            texture = if (NoteColor.fromNoteNumber(i) == NoteColor.White) "accordion/key-white.png" else "accordion/key-black.png"
+            texture = when (NoteColor.fromNoteNumber(i)) {
+                NoteColor.White -> "accordion/key-white.png"
+                NoteColor.Black -> "accordion/key-black.png"
+            }
         ).apply { addControl(KeyControl(rotationAxis = Axis.Y, invertRotation = true)) }.also {
             it.loc.y = -(i + PLAYING_RANGE.first) / 12 * 7f
         }
     }
-
 
     init {
         repeat(14) {

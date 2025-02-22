@@ -15,7 +15,7 @@ open class KeyControl(
     private val invertRotation: Boolean = false,
 ) : AbstractControl() {
     var state: State = State.Up
-    protected var maximumKeyRotation = 10f
+    private var maximumKeyRotation = 10f
 
     override fun controlUpdate(tpf: Float) {
         applyRotation(tpf)
@@ -40,7 +40,6 @@ open class KeyControl(
     private fun getRotation() = spatial.rot.dot(rotationAxis.identity) * if (invertRotation) -1 else 1
 
     override fun controlRender(rm: RenderManager?, vp: ViewPort?) = Unit
-
 
     sealed interface State {
         data object Up : State

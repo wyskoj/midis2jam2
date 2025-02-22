@@ -49,4 +49,3 @@ sealed interface InstrumentLocationBehavior {
 
     data object Deferred : InstrumentLocationBehavior
 }
-

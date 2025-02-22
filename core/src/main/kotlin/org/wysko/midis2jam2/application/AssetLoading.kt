@@ -10,13 +10,16 @@ import org.wysko.midis2jam2.jme3ktdsl.vec3
 private const val MODEL_PREFIX = "Assets/Models/"
 private const val TEXTURE_PREFIX = "Assets/Textures/"
 private const val MATERIAL_PREFIX = "Assets/Materials/"
+private const val DEFAULT_FRESNEL = 0.18
 
 fun PerformanceAppState.model(model: String, material: String? = null, texture: String? = null): Spatial =
     assetManager.loadModel(prefix(model, AssetType.Model)).apply {
-        material?.let {
-            setMaterial(assetManager.loadMaterial(prefix(it, AssetType.Material)).apply {
-                texture?.let { setTexture("DiffuseMap", assetManager.loadTexture(prefix(it, AssetType.Texture))) }
-            })
+        material?.let { material ->
+            setMaterial(
+                assetManager.loadMaterial(prefix(material, AssetType.Material)).apply {
+                    texture?.let { setTexture("DiffuseMap", assetManager.loadTexture(prefix(it, AssetType.Texture))) }
+                }
+            )
         }
         texture?.let {
             this as Geometry
@@ -30,9 +33,11 @@ fun PerformanceAppState.modelD(model: String, texture: String? = null): Spatial 
     return assetManager.loadModel(modelPath).also { spatial ->
         if (!modelPath.endsWith(".j3o")) {
             val texturePath = texture?.let { prefix(it, AssetType.Texture) } ?: "Assets/Textures/null.png"
-            spatial.setMaterial(Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
-                setTexture("DiffuseMap", assetManager.loadTexture(texturePath))
-            })
+            spatial.setMaterial(
+                Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
+                    setTexture("DiffuseMap", assetManager.loadTexture(texturePath))
+                }
+            )
         }
     }
 }
@@ -49,9 +54,10 @@ fun PerformanceAppState.modelR(model: String, texture: String? = null): Spatial 
 }
 
 fun PerformanceAppState.reflectiveMaterial(texturePath: String): Material {
-    @Suppress("NAME_SHADOWING") val texturePath = prefix(texturePath, AssetType.Texture)
+    @Suppress("NAME_SHADOWING")
+    val texturePath = prefix(texturePath, AssetType.Texture)
     return Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
-        setVector3("FresnelParams", vec3(0.18, 0.18, 0.18))
+        setVector3("FresnelParams", vec3(DEFAULT_FRESNEL, DEFAULT_FRESNEL, DEFAULT_FRESNEL))
         setBoolean("EnvMapAsSphereMap", true)
         setTexture("EnvMap", assetManager.loadTexture(texturePath))
         setTexture("DiffuseMap", assetManager.loadTexture("Assets/Textures/black.png"))
@@ -63,17 +69,19 @@ fun PerformanceAppState.modelD(model: String, color: ColorRGBA): Spatial {
 
     return assetManager.loadModel(modelPath).also { spatial ->
         if (!modelPath.endsWith(".j3o")) {
-            spatial.setMaterial(Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
-                setBoolean("UseMaterialColors", true)
-                setColor("Diffuse", color)
-            })
+            spatial.setMaterial(
+                Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
+                    setBoolean("UseMaterialColors", true)
+                    setColor("Diffuse", color)
+                }
+            )
         }
     }
 }
 
 private fun prefix(model: String, type: AssetType): String = when {
     model.startsWith(type.prefix) -> model
-    else -> "${type.prefix}${model}"
+    else -> "${type.prefix}$model"
 }
 
 private enum class AssetType(val prefix: String) {

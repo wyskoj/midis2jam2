@@ -15,22 +15,12 @@ import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.strings.Timpani
 
+const val DEFAULT_MELODY_BANK = 0x00
+const val DEFAULT_RHYTHM_BANK = 0x80
+
 object InstrumentAssignment {
     fun PerformanceAppState.makeAssignments(sequence: TimeBasedSequence): List<Instrument> {
-        val eventsByDestination = mutableMapOf<Destination, MutableList<MidiEvent>>()
-        for (track in sequence.smf.tracks) {
-            var port = 0
-            for (event in track.events) {
-                if (event is MetaEvent.Unknown && event.data.size == 2 && event.data.first() == 0x21.toByte()) {
-                    port = event.data.last().toInt()
-                }
-                if (event is MidiEvent) {
-                    eventsByDestination
-                        .getOrPut(Destination(event.channel.toInt(), port)) { mutableListOf() }
-                        .add(event)
-                }
-            }
-        }
+        val eventsByDestination = groupEventsByDestination(sequence)
 
         val instruments = mutableListOf<Instrument>()
         eventsByDestination.forEach { (destination, events) ->
@@ -53,14 +43,32 @@ object InstrumentAssignment {
             }
         }
 
-
         return instruments
     }
 
-    private fun PerformanceAppState.buildInstrument(patch: Patch, events: List<MidiEvent>): Instrument? {
-        return when {
-            patch.bank != 0x80 -> {
-                return when (patch.program) {
+    private fun groupEventsByDestination(sequence: TimeBasedSequence): MutableMap<Destination, MutableList<MidiEvent>> {
+        val eventsByDestination = mutableMapOf<Destination, MutableList<MidiEvent>>()
+        for (track in sequence.smf.tracks) {
+            var port = 0
+            for (event in track.events) {
+                if (event is MetaEvent.Unknown && event.data.size == 2 && event.data.first() == 0x21.toByte()) {
+                    port = event.data.last().toInt()
+                }
+                if (event is MidiEvent) {
+                    eventsByDestination.getOrPut(Destination(event.channel.toInt(), port)) { mutableListOf() }
+                        .add(event)
+                }
+            }
+        }
+        return eventsByDestination
+    }
+
+    @Suppress("CyclomaticComplexMethod")
+    private fun PerformanceAppState.buildInstrument(patch: Patch, events: List<MidiEvent>): Instrument? =
+        when {
+            patch.bank != DEFAULT_RHYTHM_BANK ->
+                @Suppress("MagicNumber")
+                when (patch.program) {
                     0 -> Keyboard(this, events)
                     1 -> Keyboard(this, events, Keyboard.Variant.BrightAcoustic)
                     2 -> Keyboard(this, events, Keyboard.Variant.ElectricGrand)
@@ -88,18 +96,14 @@ object InstrumentAssignment {
                     101 -> Choir(this, events, Choir.Variant.StaticTexture.Goblin)
                     else -> null
                 }
-            }
 
             else -> null
         }
-    }
 
     private data class Destination(val channel: Int, val port: Int = 0)
 
     private data class Patch(val program: Int, val bank: Int = 0) {
         companion object {
-            const val DEFAULT_MELODY_BANK = 0x00
-            const val DEFAULT_RHYTHM_BANK = 0x80
 
             fun default(channel: Int) = Patch(
                 program = 0,

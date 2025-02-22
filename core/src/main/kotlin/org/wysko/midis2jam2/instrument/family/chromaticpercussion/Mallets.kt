@@ -11,11 +11,20 @@ import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.common.RecoilControl
 import org.wysko.midis2jam2.instrument.common.Striker
 import org.wysko.midis2jam2.instrument.common.Striker.Companion.makeStriker
-import org.wysko.midis2jam2.jme3ktdsl.*
+import org.wysko.midis2jam2.jme3ktdsl.control
+import org.wysko.midis2jam2.jme3ktdsl.loc
+import org.wysko.midis2jam2.jme3ktdsl.node
+import org.wysko.midis2jam2.jme3ktdsl.plusAssign
+import org.wysko.midis2jam2.jme3ktdsl.scale
+import org.wysko.midis2jam2.jme3ktdsl.scaleVec
+import org.wysko.midis2jam2.jme3ktdsl.vec3
 import org.wysko.midis2jam2.midi.NoteColor
 import org.wysko.midis2jam2.midi.whiteIndexFromNoteNumber
 
+@Suppress("MagicNumber")
 private val RANGE = 21..108
+
+private const val MALLETS_SCALE = 2 / 3.0
 
 class Mallets(
     context: PerformanceAppState,
@@ -23,6 +32,7 @@ class Mallets(
     variant: Variant,
 ) : DecayedInstrument(context, events) {
 
+    @Suppress("MagicNumber")
     private val bars: List<Spatial> = RANGE.map { noteNumber ->
         node {
             this += context.modelD(
@@ -35,23 +45,20 @@ class Mallets(
                 addControl(BarControl())
             }
         }.apply {
+
             val scaleFactor = (RANGE.last - noteNumber + 20) / 100f
 
             when (NoteColor.fromNoteNumber(noteNumber)) {
                 NoteColor.White -> {
                     loc = vec3(
-                        x = (4 / 3.0) * (whiteIndexFromNoteNumber(noteNumber) - 38),
-                        y = 0,
-                        z = 0
+                        x = (4 / 3.0) * (whiteIndexFromNoteNumber(noteNumber) - 38), y = 0, z = 0
                     )
                     scaleVec = vec3(0.55, 1, scaleFactor)
                 }
 
                 NoteColor.Black -> {
                     loc = vec3(
-                        x = (4 / 3.0) * (noteNumber * 0.583 - 38.2),
-                        y = 0,
-                        z = -noteNumber / 50.0 + (8 / 3.0)
+                        x = (4 / 3.0) * (noteNumber * 0.583 - 38.2), y = 0, z = -noteNumber / 50.0 + (8 / 3.0)
                     )
                     scaleVec = vec3(0.6, 0.7, scaleFactor)
                 }
@@ -83,22 +90,22 @@ class Mallets(
                     )
 
                     NoteColor.Black -> vec3(
-                        x = 0.777 * noteNumber - 50.933,
-                        y = 2.6,
-                        z = 0.045 * noteNumber + 0.667
+                        x = 0.777 * noteNumber - 50.933, y = 2.6, z = 0.045 * noteNumber + 0.667
                     )
                 }
-                it.scale = 2 / 3.0
+                it.scale = MALLETS_SCALE
             }
         }
-        root += context.modelD("mallets/case.obj", ColorRGBA.Black).apply { scale = 2 / 3.0 }
+        root += context.modelD("mallets/case.obj", ColorRGBA.Black).apply { scale = MALLETS_SCALE }
     }
 
     enum class Variant(internal val texture: String) {
-        Glockenspiel("mallets/glockenspiel.png"),
-        Marimba("mallets/marimba.png"),
-        Vibraphone("mallets/vibraphone.png"),
-        Xylophone("mallets/xylophone.png"),
+        Glockenspiel(
+            "mallets/glockenspiel.png"
+        ),
+        Marimba("mallets/marimba.png"), Vibraphone("mallets/vibraphone.png"), Xylophone(
+            "mallets/xylophone.png"
+        ),
     }
 
     private class BarControl : RecoilControl() {

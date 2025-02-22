@@ -12,10 +12,10 @@ import java.io.File
 
 class SoundbanksSettings(private val settings: Settings) {
     private val _soundbanks = MutableStateFlow(runCatching {
-        (settings.getStringOrNull(SettingsKeys.Playback.Soundbanks.SOUNDBANKS)?.let {
+        (settings.getStringOrNull(SettingsKeys.Playback.Soundbanks.SOUNDBANKS_LIST)?.let {
             Json.decodeFromString<List<String>>(it)
         } ?: listOf()).fastMap { File(it) }.filter { it.exists() }
-    }.getOrNull() ?: SettingsDefaults.Playback.Soundbanks.SOUNDBANKS)
+    }.getOrNull() ?: SettingsDefaults.Playback.Soundbanks.SOUNDBANKS_LIST)
     val soundbanks: StateFlow<List<File>>
         get() = _soundbanks
 
@@ -35,7 +35,7 @@ class SoundbanksSettings(private val settings: Settings) {
 
     private fun saveSoundbanks() {
         settings.putString(
-            SettingsKeys.Playback.Soundbanks.SOUNDBANKS,
+            SettingsKeys.Playback.Soundbanks.SOUNDBANKS_LIST,
             Json.encodeToString(_soundbanks.value.map { it.absolutePath })
         )
     }

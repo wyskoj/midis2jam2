@@ -12,13 +12,14 @@ import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.scene.InstrumentManager
 import org.wysko.midis2jam2.scene.ShadowsState
 import org.wysko.midis2jam2.scene.camera.ExtensibleFlyByCameraState
+import org.wysko.midis2jam2.settings.SettingsDefaults
+import org.wysko.midis2jam2.settings.SettingsKeys
 import org.wysko.midis2jam2.settings.SettingsProvider
 import java.io.File
 import javax.sound.midi.MidiSystem
 
 class PerformanceApplication private constructor(
     private val sequence: TimeBasedSequence,
-    private val settingsProvider: SettingsProvider,
 ) : SimpleApplication() {
 
     private lateinit var filterPostProcessor: FilterPostProcessor
@@ -50,7 +51,8 @@ class PerformanceApplication private constructor(
                 startSequencer = {
                     sequencer.start()
                 }
-            ))
+            )
+        )
         stateManager.attach(InstrumentManager())
         stateManager.attach(ShadowsState(filterPostProcessor))
     }
@@ -62,10 +64,19 @@ class PerformanceApplication private constructor(
 
     companion object {
         fun execute(sequence: TimeBasedSequence, settingsProvider: SettingsProvider): PerformanceApplication {
-            val app = PerformanceApplication(sequence, settingsProvider).apply {
+            val app = PerformanceApplication(sequence).apply {
                 isShowSettings = false
                 settings = AppSettings(true).apply {
-                    setResolution(1980, 1080) // TODO: Use settingsProvider
+                    setResolution(
+                        settingsProvider.settings.getInt(
+                            SettingsKeys.Graphics.Resolution.RESOLUTION_X,
+                            SettingsDefaults.Graphics.Resolution.RESOLUTION_X
+                        ),
+                        settingsProvider.settings.getInt(
+                            SettingsKeys.Graphics.Resolution.RESOLUTION_Y,
+                            SettingsDefaults.Graphics.Resolution.RESOLUTION_Y
+                        )
+                    )
                     setDisplayFps(false)
                     setDisplayStatView(false)
                     isPauseOnLostFocus = false
@@ -79,7 +90,9 @@ class PerformanceApplication private constructor(
 
 fun main() {
     val smf =
-        StandardMidiFileReader().readFile(File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\MIDIJam\\help.mid"))
+        StandardMidiFileReader().readFile(
+            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\sm_test\\022.mid")
+        )
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
     PerformanceApplication.execute(sequence, settingsProvider)

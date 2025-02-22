@@ -11,11 +11,17 @@ import org.wysko.midis2jam2.logger
 import org.wysko.midis2jam2.seconds
 import kotlin.math.pow
 
-class SustainedGlowControl(private val context: PerformanceAppState, private val glowColor: ColorRGBA, private val currentArc: () -> TimedArc?) :
+private const val GLOW_DECAY_FACTOR = 64
+
+class SustainedGlowControl(
+    private val context: PerformanceAppState,
+    private val glowColor: ColorRGBA,
+    private val currentArc: () -> TimedArc?,
+) :
     AbstractControl() {
     override fun controlUpdate(tpf: Float) {
         val progress = currentArc()?.calculateProgress(context.time.seconds) ?: 1.0
-        val glowIntensity = (-progress.pow(64) + 1).toFloat()
+        val glowIntensity = (-progress.pow(GLOW_DECAY_FACTOR) + 1).toFloat()
         (spatial as? Geometry)?.material?.setColor("GlowColor", glowColor.mult(glowIntensity)) ?: logger().error(
             "${this::class.simpleName} can only be attached to a Geometry."
         )
