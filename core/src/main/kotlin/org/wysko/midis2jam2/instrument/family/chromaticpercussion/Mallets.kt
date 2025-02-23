@@ -78,7 +78,7 @@ class Mallets(
                     visibilityBehavior = Striker.VisibilityBehavior.OnlyNecessary,
                 ),
                 onStrike = { velocity ->
-                    (bars[index] as Node).children.first().control<BarControl>().hit(velocity)
+                    (bars[index] as Node).children.first().control<BarControl>()!!.hit(velocity)
                 }
             ).also {
                 root += it

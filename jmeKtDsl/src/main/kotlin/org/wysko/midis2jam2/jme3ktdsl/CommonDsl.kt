@@ -75,7 +75,6 @@ operator fun Quaternion.times(other: Quaternion): Quaternion = mult(other)
 
 operator fun Quaternion.minus(other: Quaternion): Quaternion = subtract(other)
 
-
 val BaseAppState.root: Node
     get() = (this.application as SimpleApplication).rootNode
 
@@ -84,7 +83,16 @@ val BaseAppState.assetManager: AssetManager
 
 fun Vector3f.quat(): Quaternion = Quaternion().fromAngles(x * DEG_TO_RAD, y * DEG_TO_RAD, z * DEG_TO_RAD)
 
-inline fun <reified T : Control> Spatial.control(): T = getControl(T::class.java)
+inline fun <reified T : Control> Spatial.control(): T? = getControl(T::class.java)
+inline fun <reified T : Control> Spatial.ancestorControl(): T? {
+    control<T>()?.let { return it }
+    var parent = parent
+    while (parent != null) {
+        parent.control<T>()?.let { return it }
+        parent = parent.parent
+    }
+    return null
+}
 
 fun Random.nextQuaternion(): Quaternion = Quaternion().apply {
     val x = nextFloat() * 2 - 1

@@ -56,7 +56,7 @@ class SteamPufferControl(
             }
         }
 
-        pool.inUse.filter { it.control<CloudControl>().age > MAX_AGE }.forEach {
+        pool.inUse.filter { it.control<CloudControl>()!!.age > MAX_AGE }.forEach {
             pool.free(it)
             it.removeControl(CloudControl::class.java)
             (spatial as Node) -= it

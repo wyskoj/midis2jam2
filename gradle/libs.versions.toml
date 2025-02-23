@@ -22,6 +22,7 @@ filekit = { group = "io.github.vinceglb", name = "filekit-compose", version = "0
 kmidi = { group = "org.wysko", name = "kmidi", version = "0.1.1" }
 compose-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.4.2" }
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.72.0" }
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }

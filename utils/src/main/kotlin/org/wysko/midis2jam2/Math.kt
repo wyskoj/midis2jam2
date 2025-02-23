@@ -11,18 +11,22 @@ fun dLerp(a: Number, b: Number, t: Number): Double {
     return fA + fT * (fB - fA)
 }
 
+fun fLerp(a: Number, b: Number, t: Number): Float {
+    val fA = a.toFloat()
+    val fB = b.toFloat()
+    val fT = t.toFloat()
+    return fA + fT * (fB - fA)
+}
+
 fun interpTo(current: Number, target: Number, deltaTime: Number, interpSpeed: Number): Float {
     val fCurrent = current.toFloat()
     val fTarget = target.toFloat()
     val fDeltaTime = deltaTime.toFloat()
     val fInterpSpeed = interpSpeed.toFloat()
-    if (fInterpSpeed <= 0f) {
-        return fTarget
-    }
 
     val distance = fTarget - fCurrent
 
-    if (distance.pow(2) < SMALL_NUMBER) {
+    if (distance.pow(2) < SMALL_NUMBER || fInterpSpeed <= 0f) {
         return fTarget
     }
 
@@ -30,7 +34,6 @@ fun interpTo(current: Number, target: Number, deltaTime: Number, interpSpeed: Nu
 
     return fCurrent + move
 }
-
 
 fun mapRangeClamped(value: Number, inMin: Number, inMax: Number, outMin: Number, outMax: Number): Float {
     val fValue = value.toFloat()

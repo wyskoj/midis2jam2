@@ -6,6 +6,7 @@ import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
+import org.wysko.midis2jam2.instrument.family.brass.Trumpet
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
@@ -91,6 +92,8 @@ object InstrumentAssignment {
                     52 -> Choir(this, events, Choir.Variant.StaticTexture.Standard)
                     53 -> Choir(this, events, Choir.Variant.Custom(207 / 360f))
                     54 -> Choir(this, events, Choir.Variant.Custom(117 / 360f))
+                    56 -> Trumpet(this, events, Trumpet.Variant.Standard)
+                    59 -> Trumpet(this, events, Trumpet.Variant.Muted)
                     85 -> Choir(this, events, Choir.Variant.Custom(292 / 360f))
                     94 -> Choir(this, events, Choir.Variant.Halo)
                     101 -> Choir(this, events, Choir.Variant.StaticTexture.Goblin)

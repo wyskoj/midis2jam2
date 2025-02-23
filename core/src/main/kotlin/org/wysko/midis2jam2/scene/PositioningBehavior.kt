@@ -8,8 +8,8 @@ import org.wysko.midis2jam2.jme3ktdsl.quat
 import org.wysko.midis2jam2.jme3ktdsl.times
 import org.wysko.midis2jam2.jme3ktdsl.vec3
 
-sealed interface InstrumentLocationBehavior {
-    sealed class Calculated : InstrumentLocationBehavior {
+sealed interface PositioningBehavior {
+    sealed class Calculated : PositioningBehavior {
         abstract fun getTransform(index: Float): Pair<Vector3f, Quaternion>
 
         data class Linear(
@@ -47,5 +47,5 @@ sealed interface InstrumentLocationBehavior {
         }
     }
 
-    data object Deferred : InstrumentLocationBehavior
+    data object Deferred : PositioningBehavior
 }

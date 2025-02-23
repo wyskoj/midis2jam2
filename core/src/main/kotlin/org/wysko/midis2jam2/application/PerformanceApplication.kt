@@ -16,6 +16,7 @@ import org.wysko.midis2jam2.settings.SettingsDefaults
 import org.wysko.midis2jam2.settings.SettingsKeys
 import org.wysko.midis2jam2.settings.SettingsProvider
 import java.io.File
+import java.util.logging.Logger
 import javax.sound.midi.MidiSystem
 
 class PerformanceApplication private constructor(
@@ -91,9 +92,10 @@ class PerformanceApplication private constructor(
 fun main() {
     val smf =
         StandardMidiFileReader().readFile(
-            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\sm_test\\022.mid")
+            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\sm_test\\059.mid")
         )
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
+    Logger.getLogger("com.jme3").level = java.util.logging.Level.SEVERE
     PerformanceApplication.execute(sequence, settingsProvider)
 }

@@ -16,6 +16,8 @@ dependencies {
 
     implementation(kotlin("reflect"))
 
+    implementation(libs.bundles.kotlinxEcosystem)
+    implementation(libs.kaml)
     implementation(libs.multiplatformSettings)
     implementation(libs.bundles.logging)
 
