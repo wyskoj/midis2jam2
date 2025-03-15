@@ -19,6 +19,8 @@ package org.wysko.midis2jam2
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +28,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -50,15 +56,15 @@ import org.wysko.midis2jam2.gui.material.AppTheme
 import org.wysko.midis2jam2.gui.screens.*
 import org.wysko.midis2jam2.gui.util.centerWindow
 import org.wysko.midis2jam2.gui.util.openHelp
-import org.wysko.midis2jam2.gui.util.registerDragAndDrop
 import org.wysko.midis2jam2.gui.viewmodel.*
+import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.starter.Execution
 import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.logger
+import java.awt.datatransfer.DataFlavor
 import java.io.File
-import javax.sound.midi.MidiDevice
 import javax.swing.JOptionPane
 import kotlin.system.exitProcess
 
@@ -67,6 +73,7 @@ import kotlin.system.exitProcess
  *
  * @param args The command line arguments.
  */
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 suspend fun main(args: Array<String>) {
     SplashScreen.writeMessage("Loading...")
 
@@ -136,8 +143,24 @@ suspend fun main(args: Array<String>) {
                 },
             ) {
                 centerWindow()
-                registerDragAndDrop {
-                    homeViewModel.selectMidiFile(it)
+                val dragAndDropTarget = remember {
+                    object : DragAndDropTarget {
+                        override fun onDrop(event: DragAndDropEvent): Boolean {
+                            event.awtTransferable.let {
+                                if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                    val file =
+                                        (it.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).firstOrNull()
+                                    if (file is File) {
+                                        if (file.extension in MIDI_FILE_EXTENSIONS) {
+                                            homeViewModel.selectMidiFile(file)
+                                            return true
+                                        }
+                                    }
+                                }
+                            }
+                            return false
+                        }
+                    }
                 }
                 Crossfade(targetState = ErrorHandling.isShowErrorDialog, animationSpec = tween(200)) { showError ->
                     when (showError.value) {
@@ -152,7 +175,12 @@ suspend fun main(args: Array<String>) {
                                             else -> LayoutDirection.Ltr
                                         }
                             ) {
-                                Box {
+                                Box(
+                                    Modifier.dragAndDropTarget(
+                                        shouldStartDragAndDrop = { true },
+                                        target = dragAndDropTarget
+                                    )
+                                ) {
                                     SetupUi(
                                         homeViewModel,
                                         playlistViewModel,
