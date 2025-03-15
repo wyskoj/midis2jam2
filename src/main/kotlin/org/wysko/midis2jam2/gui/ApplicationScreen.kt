@@ -21,25 +21,7 @@ package org.wysko.midis2jam2.gui
  * Defines the screens in the application.
  */
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
-import midis2jam2.generated.resources.Res
-import midis2jam2.generated.resources.home_fill
-import midis2jam2.generated.resources.home_outline
-import midis2jam2.generated.resources.info_fill
-import midis2jam2.generated.resources.info_outline
-import midis2jam2.generated.resources.playlist
-import midis2jam2.generated.resources.search
-import midis2jam2.generated.resources.settings_fill
-import midis2jam2.generated.resources.settings_outline
+import midis2jam2.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.wysko.midis2jam2.gui.TabFactory.tabs
 
@@ -143,6 +125,11 @@ object TabFactory {
 
     val midiDeviceConfiguration = ApplicationScreen.ScreenWithoutTab(
         name = "tab_midi_device",
+        parentScreen = settings,
+    )
+
+    val lyricsConfiguration = ApplicationScreen.ScreenWithoutTab(
+        name = "tab_lyrics",
         parentScreen = settings,
     )
 

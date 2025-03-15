@@ -149,6 +149,13 @@ fun SettingsScreen(
             showLyrics,
             setState = { viewModel.setShowLyrics(it) }
         )
+        SettingsListItem(
+            { Text(I18n["settings_features_lyrics_configuration"].value) },
+            { Text(I18n["settings_features_lyrics_configuration_description"].value) },
+            onOpenOptions = {
+                openScreen(TabFactory.lyricsConfiguration)
+            }
+        )
         SettingsSectionHeader(I18n["settings_tweaks"].value)
         SettingsListItem(
             { Text(I18n["settings_tweaks_instruments_always_visible"].value) },
