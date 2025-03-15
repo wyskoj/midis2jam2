@@ -49,6 +49,7 @@ object I18n {
         "ru",
         "th",
         "tl",
+        "tr",
         "uk",
         "zh",
     ).map { Locale(it) }

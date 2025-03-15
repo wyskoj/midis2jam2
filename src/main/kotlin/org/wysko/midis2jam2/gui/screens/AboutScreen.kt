@@ -105,6 +105,7 @@ fun AboutScreen() {
                         Text("Pусский: Rxuglr")
                         Text("ไทย: Hariwong Lonarai")
                         Text("Tagalog: GlovePerson")
+                        Text("Türkçe: pigeondriver45")
                         Text("Українська мова: PicoUA")
                         Text("中文: otomad")
                         Spacer(Modifier.height(16.dp))
