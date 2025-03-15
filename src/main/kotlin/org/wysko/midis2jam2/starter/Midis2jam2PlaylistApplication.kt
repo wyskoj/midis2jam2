@@ -43,6 +43,7 @@ internal class Midis2jam2PlaylistApplication(
     private var currentState: DesktopPlaylistMidis2jam2? = null
 
     override fun simpleInitApp() {
+        setupState(configurations)
         sequencer.open()
         buildStates()
         loadSong(0)
@@ -97,5 +98,10 @@ internal class Midis2jam2PlaylistApplication(
         }
 
         currentSongIndex = index
+    }
+
+    override fun stop() {
+        super.stop()
+        onPlaylistFinish()
     }
 }

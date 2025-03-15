@@ -24,7 +24,9 @@ import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetManager
 import com.jme3.input.controls.ActionListener
 import com.jme3.material.Material
+import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.FadeFilter
+import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimeBasedSequence
@@ -35,19 +37,25 @@ import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetVisibilityManager
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
+import org.wysko.midis2jam2.starter.configuration.QualityScale
 import org.wysko.midis2jam2.starter.configuration.SettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.get
-import org.wysko.midis2jam2.starter.configuration.getType
+import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.minusAssign
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.AssetLoader
 import org.wysko.midis2jam2.world.DebugTextController
-import org.wysko.midis2jam2.world.HudController
 import org.wysko.midis2jam2.world.FakeShadowsController
+import org.wysko.midis2jam2.world.HudController
 import org.wysko.midis2jam2.world.StandController
-import org.wysko.midis2jam2.world.camera.*
+import org.wysko.midis2jam2.world.camera.AutoCamController
+import org.wysko.midis2jam2.world.camera.CameraAngle
+import org.wysko.midis2jam2.world.camera.CameraSpeed
+import org.wysko.midis2jam2.world.camera.CameraState
+import org.wysko.midis2jam2.world.camera.SlideCameraController
+import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
 import org.wysko.midis2jam2.world.lyric.LyricController
 import org.wysko.midis2jam2.world.modelD
 import kotlin.properties.Delegates
@@ -97,7 +105,7 @@ abstract class Midis2jam2(
 
     /** The current state of the camera. */
     var cameraState: CameraState =
-        if (configs.getType(SettingsConfiguration::class).startAutocamWithSong) {
+        if (configs.find<SettingsConfiguration>().startAutocamWithSong) {
             CameraState.AUTO_CAM
         } else {
             CameraState.FREE_CAM
@@ -206,19 +214,9 @@ abstract class Midis2jam2(
 
     var cameraSpeed: CameraSpeed = CameraSpeed.Normal
 
-    override fun initialize(
-        stateManager: AppStateManager,
-        app: Application,
-    ) {
-        val settingsConfig = configs.getType(SettingsConfiguration::class)
-        this.app = (app as SimpleApplication)
-        this.app.run {
-            renderer.defaultAnisotropicFilter = 4
-            flyByCamera.run {
-                unregisterInput()
-                isEnabled = false
-            }
-        }
+    override fun initialize(stateManager: AppStateManager, app: Application) {
+        val settingsConfig = configs.find<SettingsConfiguration>()
+        this.app = app as SimpleApplication
         this.assetLoader = AssetLoader(this)
         this.flyByCamera =
             SmoothFlyByCamera(this) {
@@ -228,8 +226,12 @@ abstract class Midis2jam2(
                 actLikeNormalFlyByCamera = !settingsConfig.isCameraSmooth
                 isEnabled = !settingsConfig.startAutocamWithSong
             }
-        this.stage = with(root) { +modelD("Stage.obj", "Stage.bmp") }
-        this.fadeFilter = FadeFilter(0.5f).apply { value = 0f }
+        this.stage = with(root) { +modelD("Stage.obj", "Stage.bmp") }.also {
+            it.shadowMode = RenderQueue.ShadowMode.Receive
+        }
+        this.fadeFilter = FadeFilter(0.5f).apply { value = 0f }.also {
+            filterPostProcessor().addFilter(it)
+        }
         this.instruments =
             InstrumentAssignment.assign(this, midiFile = sequence).onEach {
                 // This is a bit of a hack to prevent stuttering when the instrument would first appear
@@ -253,7 +255,6 @@ abstract class Midis2jam2(
         this.slideCamController = SlideCameraController(this)
         this.debugTextController = DebugTextController(this)
         this.hudController = HudController(this)
-        FakeShadowsController.configureShadows(this, fadeFilter)
         if (settingsConfig.startAutocamWithSong) {
             with(this.app.camera) {
                 let {
@@ -262,9 +263,15 @@ abstract class Midis2jam2(
                 }
             }
         }
+        if (configs.find<GraphicsConfiguration>().shadowQuality == QualityScale.NONE) {
+            fakeShadowsController = FakeShadowsController(this)
+        }
+
 
         super.initialize(stateManager, app)
     }
+
+    private fun filterPostProcessor() = this.app.viewPort.processors.filterIsInstance<FilterPostProcessor>().first()
 
     override fun update(tpf: Float) {
         super.update(tpf)
@@ -276,7 +283,7 @@ abstract class Midis2jam2(
         if (CameraSpeed.entries.none { it.name.lowercase() == name }) return
 
         val pressedCameraSpeed = CameraSpeed[name]
-        when (configs[SettingsConfiguration::class].isSpeedModifierMode) {
+        when (configs.find<SettingsConfiguration>().isSpeedModifierMode) {
             true -> {
                 if (pressed) return // Only on release
                 cameraSpeed = if (pressedCameraSpeed == cameraSpeed) CameraSpeed.Normal else pressedCameraSpeed
@@ -369,5 +376,10 @@ abstract class Midis2jam2(
      */
     fun registerCollector(collector: Collector<*>) {
         collectors += collector
+    }
+
+    override fun stateDetached(stateManager: AppStateManager?) {
+        super.stateDetached(stateManager)
+        filterPostProcessor().removeFilter(fadeFilter)
     }
 }

@@ -18,11 +18,21 @@
 package org.wysko.midis2jam2.starter
 
 import com.jme3.app.SimpleApplication
+import com.jme3.post.FilterPostProcessor
+import com.jme3.post.filters.BloomFilter
+import com.jme3.post.filters.BloomFilter.GlowMode.Objects
+import com.jme3.renderer.queue.RenderQueue
+import com.jme3.shadow.DirectionalLightShadowFilter
+import com.jme3.shadow.EdgeFilteringMode
 import org.wysko.kmidi.midi.StandardMidiFileReader
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.readFile
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration
+import org.wysko.midis2jam2.starter.configuration.QualityScale
+import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.world.LightingSetup
 import java.io.File
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
@@ -42,6 +52,7 @@ internal class Midis2jam2Application(
     }
 
     override fun simpleInitApp() {
+        setupState(configurations)
         val sequence = StandardMidiFileReader().readFile(file).toTimeBasedSequence()
         DesktopMidis2jam2(
             sequencer = sequencer,
@@ -61,4 +72,37 @@ internal class Midis2jam2Application(
         onFinish()
         super.stop()
     }
+}
+
+internal fun SimpleApplication.setupState(configurations: Collection<Configuration>) {
+    renderer.defaultAnisotropicFilter = 4
+    flyByCamera.run {
+        unregisterInput()
+        isEnabled = false
+    }
+    val graphicsConfig = configurations.find<GraphicsConfiguration>()
+
+    val fpp = FilterPostProcessor(assetManager)
+
+    val lightForShadows = LightingSetup.setupLights(rootNode)
+
+    BloomFilter(Objects).also { fpp.addFilter(it) }
+
+    if (graphicsConfig.shadowQuality != QualityScale.NONE) {
+        rootNode.shadowMode = RenderQueue.ShadowMode.CastAndReceive
+        val (nbSplits, mapSize) = GraphicsConfiguration.SHADOW_DEFINITION[graphicsConfig.shadowQuality]
+            ?: (1 to 1024)
+
+        DirectionalLightShadowFilter(assetManager, mapSize, nbSplits).apply {
+            light = lightForShadows
+            isEnabled = true
+            shadowIntensity = 0.16f
+            lambda = 0.65f
+            edgeFilteringMode = EdgeFilteringMode.PCFPOISSON
+            edgesThickness = 10
+        }.also { fpp.addFilter(it) }
+    }
+
+    viewPort.addProcessor(fpp)
+    fpp.numSamples = GraphicsConfiguration.ANTI_ALIASING_DEFINITION[graphicsConfig.antiAliasingQuality] ?: 1
 }

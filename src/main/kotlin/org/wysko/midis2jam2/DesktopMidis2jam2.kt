@@ -21,9 +21,9 @@ import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.kmidi.midi.TimeBasedSequence
-import org.wysko.midis2jam2.instrument.algorithmic.assignment.MidiSpecification
 import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
+import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.KeyMap
 import org.wysko.midis2jam2.world.background.BackgroundController
@@ -31,12 +31,12 @@ import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
-import javax.sound.midi.ShortMessage
 import javax.sound.midi.Synthesizer
 import javax.sound.midi.SysexMessage
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /**
  * Implementation of [Midis2jam2] for desktop. This is so that we can access `javax` classes.
@@ -59,7 +59,6 @@ open class DesktopMidis2jam2(
 
     private var isSequencerStarted: Boolean = false
     private var skippedFrames = 0
-    private var isFadeStarted = false
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
@@ -118,7 +117,28 @@ open class DesktopMidis2jam2(
         val delta = tpf.toDouble().seconds
 
         startSequencerIfNeeded()
-        startFadeIfNeeded()
+
+        fadeFilter.value = when {
+            time in (-2.0).seconds..(-1.5).seconds -> {
+                0.0f
+            }
+
+            time in (-1.5).seconds..(-1.0).seconds -> {
+                Utils.mapRangeClamped(time.toDouble(DurationUnit.SECONDS), -1.5, -1.0, 0.0, 1.0).toFloat()
+            }
+
+            (midiFile.duration + 3.seconds - time) < 0.5.seconds -> {
+                Utils.mapRangeClamped(
+                    time.toDouble(DurationUnit.SECONDS),
+                    ((midiFile.duration + 3.seconds) - 0.5.seconds).toDouble(DurationUnit.SECONDS),
+                    (midiFile.duration + 3.seconds).toDouble(DurationUnit.SECONDS),
+                    1.0,
+                    0.0
+                ).toFloat()
+            }
+
+            else -> 1.0f
+        }
 
         instruments.forEach { it.tick(time, delta) }
 
@@ -198,13 +218,6 @@ open class DesktopMidis2jam2(
         slideCamController.tick(time, delta)
         preventCameraFromLeaving(app.camera)
         drumSetVisibilityManager.tick(time)
-    }
-
-    private fun startFadeIfNeeded() {
-        if (!isFadeStarted && time > (-1.5).seconds) {
-            fadeFilter.fadeIn()
-            isFadeStarted = true
-        }
     }
 
     private fun startSequencerIfNeeded() {
