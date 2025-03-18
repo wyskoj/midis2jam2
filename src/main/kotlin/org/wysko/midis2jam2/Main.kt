@@ -85,6 +85,7 @@ suspend fun main(args: Array<String>) {
     val graphicsConfigurationViewModel = GraphicsConfigurationViewModel.create()
     val soundBankConfigurationViewModel = SoundBankConfigurationViewModel.create()
     val synthesizerConfigurationViewModel = SynthesizerConfigurationViewModel.create()
+    val lyricsConfigurationViewModel = LyricsConfigurationViewModel.create()
     val midiDeviceViewModel = MidiDeviceViewModel.create()
 
     if (args.isEmpty()) {
@@ -119,6 +120,11 @@ suspend fun main(args: Array<String>) {
                         }
 
                         is SoundbankConfiguration -> soundBankConfigurationViewModel.run {
+                            applyConfiguration(it)
+                            onConfigurationChanged(generateConfiguration())
+                        }
+
+                        is LyricsConfiguration -> lyricsConfigurationViewModel.run {
                             applyConfiguration(it)
                             onConfigurationChanged(generateConfiguration())
                         }
@@ -191,6 +197,7 @@ suspend fun main(args: Array<String>) {
                                         soundBankConfigurationViewModel,
                                         synthesizerConfigurationViewModel,
                                         midiDeviceViewModel,
+                                        lyricsConfigurationViewModel,
                                         isLockPlayButton,
                                         playMidiFile = {
                                             val backgroundConfiguration =
@@ -217,7 +224,8 @@ suspend fun main(args: Array<String>) {
                                                     graphicsConfigurationViewModel.generateConfiguration(),
                                                     soundBankConfigurationViewModel.generateConfiguration(),
                                                     synthesizerConfigurationViewModel.generateConfiguration(),
-                                                    midiDeviceViewModel.generateConfiguration()
+                                                    midiDeviceViewModel.generateConfiguration(),
+                                                    lyricsConfigurationViewModel.generateConfiguration()
                                                 ),
                                                 onStart = {
                                                     isLockPlayButton = true
@@ -255,7 +263,8 @@ suspend fun main(args: Array<String>) {
                                                     graphicsConfigurationViewModel.generateConfiguration(),
                                                     soundBankConfigurationViewModel.generateConfiguration(),
                                                     synthesizerConfigurationViewModel.generateConfiguration(),
-                                                    midiDeviceViewModel.generateConfiguration()
+                                                    midiDeviceViewModel.generateConfiguration(),
+                                                    lyricsConfigurationViewModel.generateConfiguration()
                                                 ),
                                                 isShuffle = playlistViewModel.isShuffle.value,
                                                 onStart = {
@@ -302,7 +311,8 @@ suspend fun main(args: Array<String>) {
                 graphicsConfigurationViewModel.generateConfiguration(),
                 soundBankConfigurationViewModel.generateConfiguration(),
                 synthesizerConfigurationViewModel.generateConfiguration(),
-                midiDeviceViewModel.generateConfiguration()
+                midiDeviceViewModel.generateConfiguration(),
+                lyricsConfigurationViewModel.generateConfiguration()
             ),
             onStart = {
                 SplashScreen.hide()
@@ -324,6 +334,7 @@ suspend fun main(args: Array<String>) {
  * @param backgroundConfigurationViewModel The view model for the background configuration screen.
  * @param graphicsConfigurationViewModel The view model for the graphics configuration screen.
  * @param soundbankConfigurationViewModel The view model for the soundbank configuration screen.
+ * @param lyricsConfigurationViewModel The vire model for the lyrics configuration screen.
  * @param playMidiFile Callback function called when the user clicks the play button.
  */
 @Composable
@@ -337,6 +348,7 @@ private fun SetupUi(
     soundbankConfigurationViewModel: SoundBankConfigurationViewModel,
     synthesizerConfigurationViewModel: SynthesizerConfigurationViewModel,
     midiDeviceConfigurationViewModel: MidiDeviceViewModel,
+    lyricsConfigurationViewModel: LyricsConfigurationViewModel,
     isLockPlayButton: Boolean = false,
     playMidiFile: () -> Unit,
     onPlayPlaylist: () -> Unit,
@@ -416,6 +428,12 @@ private fun SetupUi(
 
                         TabFactory.midiDeviceConfiguration -> MidiDeviceConfigurationScreen(
                             midiDeviceConfigurationViewModel
+                        ) {
+                            activeScreen = TabFactory.settings
+                        }
+
+                        TabFactory.lyricsConfiguration -> LyricsConfigurationScreen(
+                            lyricsConfigurationViewModel
                         ) {
                             activeScreen = TabFactory.settings
                         }
