@@ -31,7 +31,7 @@ data class LyricsConfiguration(
          * The preserver for the graphics configuration.
          */
         val preserver: ConfigurationPreserver<LyricsConfiguration> by lazy {
-            ConfigurationPreserver(LyricsConfiguration.serializer(), LyricsConfiguration.serializer(), CONFIG_FILE)
+            ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE)
         }
     }
 }
@@ -41,6 +41,12 @@ data class LyricSize(val times: Float) {
     override fun toString(): String = "x$times"
 
     companion object {
-        val OPTIONS: List<LyricSize> = listOf(LyricSize(0.5f), LyricSize(1f), LyricSize(1.5f),LyricSize(2f), LyricSize(2.5f))
+        val OPTIONS: List<LyricSize> = listOf(
+            LyricSize(0.5f),
+            LyricSize(1f),
+            LyricSize(1.5f),
+            LyricSize(2f),
+            LyricSize(2.5f)
+        )
     }
 }

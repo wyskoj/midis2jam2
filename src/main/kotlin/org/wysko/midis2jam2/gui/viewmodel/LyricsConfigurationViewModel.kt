@@ -18,13 +18,14 @@
 package org.wysko.midis2jam2.gui.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.wysko.midis2jam2.starter.configuration.LyricSize
 import org.wysko.midis2jam2.starter.configuration.LyricsConfiguration
 
 /**
- * Represents a ViewModel for graphics configuration.
+ * Represents a ViewModel for lyrics configuration.
  *
- * This class implements the [ConfigurationViewModel] interface for graphics configuration.
+ * This class implements the [ConfigurationViewModel] interface for lyrics configuration.
  *
  * @param onConfigurationChanged Callback function that will be called whenever the configuration changes.
  */
@@ -33,10 +34,10 @@ class LyricsConfigurationViewModel(
     override val onConfigurationChanged: (LyricsConfiguration) -> Unit
 ) : ConfigurationViewModel<LyricsConfiguration> {
 
-    private val _lyricSize = MutableStateFlow<LyricSize>(LyricSize(1f))
+    private val _lyricSize = MutableStateFlow(LyricSize(1f))
 
     /** The resolution of the window. */
-    val lyricSize
+    val lyricSize: StateFlow<LyricSize>
         get() = _lyricSize
 
     /**

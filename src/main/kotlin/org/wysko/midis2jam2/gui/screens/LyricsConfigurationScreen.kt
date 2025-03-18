@@ -32,7 +32,6 @@ import org.wysko.midis2jam2.gui.components.ExposedDropDownMenu
 import org.wysko.midis2jam2.gui.viewmodel.I18n
 import org.wysko.midis2jam2.gui.viewmodel.LyricsConfigurationViewModel
 import org.wysko.midis2jam2.starter.configuration.LyricSize
-import org.wysko.midis2jam2.starter.configuration.QualityScale
 
 /**
  * The screen for configuring lyrics settings.
@@ -100,34 +99,6 @@ private fun <T> createDropDownMenu(
             selectedItem = selectedItem,
             title = title,
             displayText = { it.toString() },
-            secondaryText = null,
-            onItemSelected,
-        )
-    }
-}
-
-/**
- * Creates a drop-down menu with the specified title, list of items, selected item, and callback for item selection.
- *
- * @param title The title of the drop-down menu.
- * @param items The list of items to display in the drop-down menu.
- * @param selectedItem The currently selected item in the drop-down menu.
- * @param onItemSelected The callback to be invoked when an item is selected in the drop-down menu.
- */
-@Composable
-private fun createQualityDropDownMenu(
-    title: String,
-    items: List<QualityScale>,
-    selectedItem: QualityScale,
-    onItemSelected: (QualityScale) -> Unit,
-) {
-    Box(Modifier.width(512.dp)) {
-        ExposedDropDownMenu(
-            modifier = Modifier,
-            items = items,
-            selectedItem = selectedItem,
-            title = title,
-            displayText = { I18n[it.name.lowercase()].value },
             secondaryText = null,
             onItemSelected,
         )
