@@ -56,7 +56,9 @@ object SettingsKeys {
     }
 
     object OnScreenElements {
-        const val IS_SHOW_HEADS_UP_DISPLAY = "onScreenElements.isShowHeadsUpDisplay"
+        object HeadsUpDisplay {
+            const val IS_SHOW_HEADS_UP_DISPLAY = "onScreenElements.isShowHeadsUpDisplay"
+        }
 
         object Lyrics {
             const val IS_SHOW_LYRICS = "onScreenElements.lyrics.isShowLyrics"

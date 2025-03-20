@@ -53,7 +53,9 @@ object SettingsDefaults {
     }
 
     object OnScreenElements {
-        const val IS_SHOW_HEADS_UP_DISPLAY = true
+        object HeadsUpDisplay {
+            const val IS_SHOW_HEADS_UP_DISPLAY = true
+        }
 
         object Lyrics {
             const val IS_SHOW_LYRICS = true
