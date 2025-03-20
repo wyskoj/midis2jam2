@@ -8,12 +8,32 @@ import org.wysko.midis2jam2.settings.SettingsKeys
 
 class LyricsSettings(private val settings: Settings) {
     private var _isShowLyrics =
-        MutableStateFlow(settings.getBoolean(SettingsKeys.OnScreenElements.Lyrics.IS_SHOW_LYRICS, SettingsDefaults.OnScreenElements.Lyrics.IS_SHOW_LYRICS))
+        MutableStateFlow(
+            settings.getBoolean(
+                SettingsKeys.OnScreenElements.Lyrics.IS_SHOW_LYRICS,
+                SettingsDefaults.OnScreenElements.Lyrics.IS_SHOW_LYRICS
+            )
+        )
     val isShowLyrics: StateFlow<Boolean>
         get() = _isShowLyrics
+
+    private var _lyricsSize =
+        MutableStateFlow(
+            settings.getDouble(
+                SettingsKeys.OnScreenElements.Lyrics.LYRICS_SIZE,
+                SettingsDefaults.OnScreenElements.Lyrics.LYRICS_SIZE
+            )
+        )
+    val lyricsSize: StateFlow<Double>
+        get() = _lyricsSize
 
     fun setShowLyrics(isShowLyrics: Boolean) {
         _isShowLyrics.value = isShowLyrics
         settings.putBoolean(SettingsKeys.OnScreenElements.Lyrics.IS_SHOW_LYRICS, isShowLyrics)
+    }
+
+    fun setLyricsSize(isLyricsSize: Double) {
+        _lyricsSize.value = isLyricsSize
+        settings.putDouble(SettingsKeys.OnScreenElements.Lyrics.LYRICS_SIZE, isLyricsSize)
     }
 }

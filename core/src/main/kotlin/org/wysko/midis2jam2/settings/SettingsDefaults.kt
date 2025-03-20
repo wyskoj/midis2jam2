@@ -57,6 +57,7 @@ object SettingsDefaults {
 
         object Lyrics {
             const val IS_SHOW_LYRICS = true
+            const val LYRICS_SIZE = 1.0
         }
     }
 

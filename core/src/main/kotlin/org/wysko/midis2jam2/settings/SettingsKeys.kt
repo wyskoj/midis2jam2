@@ -60,6 +60,7 @@ object SettingsKeys {
 
         object Lyrics {
             const val IS_SHOW_LYRICS = "onScreenElements.lyrics.isShowLyrics"
+            const val LYRICS_SIZE = "onScreenElements.lyrics.lyricsSize"
         }
     }
 
