@@ -96,7 +96,7 @@ class Striker(
         val weakHit = evaluateWeakStrikeCurve(strikeIndex)
         val strongHit = evaluateStrongStrikeCurve(strikeIndex)
         val strikeCurveEvaluation = when {
-            parameters.strikeLift -> dLerp(weakHit, strongHit, (anticipatedVelocity / 12))
+            parameters.strikeLift -> dLerp(weakHit, strongHit, (anticipatedVelocity / 127.0))
             else -> weakHit
         }
 
