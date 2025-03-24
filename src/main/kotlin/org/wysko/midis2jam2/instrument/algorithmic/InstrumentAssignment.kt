@@ -447,19 +447,7 @@ object InstrumentAssignment {
             48 -> // Orchestra
                 mutableListOf(
                     events.notes(41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53)?.let { Timpani(context, it) },
-                    events.notes(88)?.let { notes ->
-                        StageChoir(
-                            context,
-                            notes.map {
-                                // Change the note to 60 (C4) so that it is "standardized"
-                                when (it) {
-                                    is NoteEvent.NoteOn -> it.copy(note = 60)
-                                    is NoteEvent.NoteOff -> it.copy(note = 60)
-                                }
-                            }.also { context.sequence.registerEvents(it) },
-                            StageChoir.ChoirType.SynthVoice,
-                        )
-                    },
+                    events.notes(88)?.let { ApplauseChoir(context, it) },
                 ).filterNotNull()
 
             56 -> // SFX
