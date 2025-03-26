@@ -8,6 +8,7 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
+import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
 import org.wysko.midis2jam2.instrument.family.brass.Trumpet
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
@@ -96,6 +97,7 @@ object InstrumentAssignment {
                     54 -> Choir(this, events, Choir.Variant.Custom(117 / 360f))
                     56 -> Trumpet(this, events, Trumpet.Variant.Standard)
                     59 -> Trumpet(this, events, Trumpet.Variant.Muted)
+                    60 -> FrenchHorn(this, events)
                     80 -> SpaceLaser(this, events, ColorRGBA.Blue)
                     81 -> SpaceLaser(this, events, ColorRGBA.Yellow)
                     85 -> Choir(this, events, Choir.Variant.Custom(292 / 360f))

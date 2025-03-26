@@ -19,8 +19,8 @@ class PressedKeyControl(
     private val keySpatialName: (Int) -> String = {
         "key-${it + 1}"
     },
-    private val keyTransformation: Spatial.(Boolean) -> Unit = {
-        localTranslation = vec3(0, if (it) -0.5 else 0, 0)
+    private val keyTransformation: Spatial.(index: Int, pressed: Boolean) -> Unit = { _, pressed ->
+        localTranslation = vec3(0, if (pressed) -0.5 else 0, 0)
     },
 ) : AbstractControl() {
     private val table = Yaml.default.decodeFromStream<PressedKeysTable>(resource("/Instrument/$instrument.yml"))
@@ -37,7 +37,7 @@ class PressedKeyControl(
     private fun setKeysState(keysState: KeysState) {
         if (keysState != state) {
             repeat(state.size) {
-                (spatial as Node).getChild(keySpatialName(it)).keyTransformation(keysState[it])
+                (spatial as Node).getChild(keySpatialName(it)).keyTransformation(it, keysState[it])
             }
         }
         state = keysState
