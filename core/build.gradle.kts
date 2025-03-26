@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization").version(libs.versions.kotlin)
 }
 
 group = "org.wysko"

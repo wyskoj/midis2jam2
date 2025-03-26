@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization").version(libs.versions.kotlin)
 }
 
 group = "org.wysko"
@@ -11,6 +12,7 @@ repositories {
 
 dependencies {
     implementation(libs.bundles.jme3)
+    implementation(libs.bundles.kotlinxEcosystem)
     testImplementation(kotlin("test"))
 }
 

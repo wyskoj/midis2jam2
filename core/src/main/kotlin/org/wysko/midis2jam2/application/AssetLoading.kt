@@ -34,11 +34,15 @@ fun PerformanceAppState.modelD(model: String, texture: String? = null): Spatial 
         if (!modelPath.endsWith(".j3o")) {
             val texturePath = texture?.let { prefix(it, AssetType.Texture) } ?: "Assets/Textures/null.png"
             spatial.setMaterial(
-                Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
-                    setTexture("DiffuseMap", assetManager.loadTexture(texturePath))
-                }
+                diffuseMaterial(texturePath)
             )
         }
+    }
+}
+
+fun PerformanceAppState.diffuseMaterial(texturePath: String): Material {
+    return Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
+        setTexture("DiffuseMap", assetManager.loadTexture(prefix(texturePath, AssetType.Texture)))
     }
 }
 
@@ -79,9 +83,9 @@ fun PerformanceAppState.modelD(model: String, color: ColorRGBA): Spatial {
     }
 }
 
-private fun prefix(model: String, type: AssetType): String = when {
-    model.startsWith(type.prefix) -> model
-    else -> "${type.prefix}$model"
+private fun prefix(name: String, type: AssetType): String = when {
+    name.startsWith(type.prefix) -> name
+    else -> "${type.prefix}$name"
 }
 
 private enum class AssetType(val prefix: String) {

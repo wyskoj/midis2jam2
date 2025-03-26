@@ -30,7 +30,11 @@ class PerformanceApplication private constructor(
     override fun simpleInitApp() {
         // Load sequencer
         sequencer = JWSequencer()
-        sequencer.open(MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo()[2]))
+        sequencer.open(
+            MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo()[0]).also {
+                println(it.deviceInfo.name)
+            }
+        )
         sequencer.sequence = sequence
 
         // Setup camera
@@ -92,7 +96,7 @@ class PerformanceApplication private constructor(
 fun main() {
     val smf =
         StandardMidiFileReader().readFile(
-            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\sm_test\\059.mid")
+            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Kevin Temmer - Delete this Tweet.mid")
         )
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
