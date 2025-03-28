@@ -16,6 +16,7 @@ import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
 import org.wysko.midis2jam2.instrument.family.brass.StageBrass
+import org.wysko.midis2jam2.instrument.family.brass.Trombone
 import org.wysko.midis2jam2.instrument.family.brass.Trumpet
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
@@ -214,6 +215,11 @@ class InstrumentManager : AbstractAppState() {
                 )
             ),
             StageBrass::class to listOf(PositioningBehavior.Deferred),
+            Trombone::class to listOf(
+                PositioningBehavior.Calculated.Linear(
+                    baseLocation = vec3(0, 65, 0), deltaLocation = vec3(0, 10, 0)
+                )
+            )
         )
         val harmonicInstanceBehaviors: Map<KClass<out MonophonicInstrument>, List<PositioningBehavior>> = mapOf(
             Trumpet::class to listOf(
@@ -233,6 +239,17 @@ class InstrumentManager : AbstractAppState() {
             SpaceLaser::class to listOf(
                 PositioningBehavior.Calculated.Linear(
                     baseLocation = vec3(0, 0, 0), deltaLocation = vec3(0, 0, 5)
+                )
+            ),
+            Trombone::class to listOf(
+                PositioningBehavior.Calculated.Linear(
+                    deltaLocation = vec3(0, 1, 0),
+                    baseRotation = vec3(-10, 0, 0)
+                ),
+                PositioningBehavior.Calculated.Pivot(
+                    armDirection = vec3(0, 0, -55),
+                    baseRotation = -70f,
+                    deltaRotation = 15f
                 )
             )
         )
