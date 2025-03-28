@@ -18,6 +18,7 @@ import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
 import org.wysko.midis2jam2.instrument.family.brass.StageBrass
 import org.wysko.midis2jam2.instrument.family.brass.Trombone
 import org.wysko.midis2jam2.instrument.family.brass.Trumpet
+import org.wysko.midis2jam2.instrument.family.brass.Tuba
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
@@ -219,6 +220,12 @@ class InstrumentManager : AbstractAppState() {
                 PositioningBehavior.Calculated.Linear(
                     baseLocation = vec3(0, 65, 0), deltaLocation = vec3(0, 10, 0)
                 )
+            ),
+            Tuba::class to listOf(
+                PositioningBehavior.Calculated.Linear(
+                    baseLocation = vec3(-110, 25, -30),
+                    deltaLocation = vec3(0, 40, 0)
+                )
             )
         )
         val harmonicInstanceBehaviors: Map<KClass<out MonophonicInstrument>, List<PositioningBehavior>> = mapOf(
@@ -250,6 +257,13 @@ class InstrumentManager : AbstractAppState() {
                     armDirection = vec3(0, 0, -55),
                     baseRotation = -70f,
                     deltaRotation = 15f
+                )
+            ),
+            Tuba::class to listOf(
+                PositioningBehavior.Calculated.Pivot(
+                    armDirection = vec3(10, 0, 0),
+                    individualRotation = vec3(-10, 90, 0),
+                    deltaRotation = 50f
                 )
             )
         )

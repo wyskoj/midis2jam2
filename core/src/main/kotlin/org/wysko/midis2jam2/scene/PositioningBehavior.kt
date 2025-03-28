@@ -33,6 +33,7 @@ sealed interface PositioningBehavior {
         data class Pivot(
             private val pivotLocation: Vector3f = vec3(0, 0, 0),
             private val armDirection: Vector3f = vec3(0, 0, 0),
+            private val individualRotation: Vector3f = vec3(0, 0, 0),
             private val baseRotation: Float = 0f,
             private val deltaRotation: Float = 0f,
             private val rotationAxis: Axis = Axis.Y,
@@ -42,7 +43,7 @@ sealed interface PositioningBehavior {
                 val rotation =
                     Quaternion().fromAngleAxis(angle * FastMath.DEG_TO_RAD, rotationAxis.identity).normalizeLocal()
                 val location = pivotLocation + rotation.mult(armDirection)
-                return location to rotation
+                return location to (rotation.mult(individualRotation.quat())).normalizeLocal()
             }
         }
 
