@@ -36,6 +36,7 @@ class DecayedGlowControl(private val color: ColorRGBA = standardGlow) : Abstract
     }
 
     companion object {
-        val standardGlow = ColorRGBA(0.75f, 0.75f, 0.85f, 1f)
+        val standardGlow: ColorRGBA = ColorRGBA(0.75f, 0.75f, 0.85f, 1f)
+        val yellowGlow: ColorRGBA = ColorRGBA.Yellow.mult(0.75f)
     }
 }

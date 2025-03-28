@@ -4,11 +4,15 @@ import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.application.PerformanceAppState
 import org.wysko.midis2jam2.collector.EventCollector
+import org.wysko.midis2jam2.midi.pitchClass
 import kotlin.math.sqrt
 import kotlin.time.Duration
 
 abstract class DecayedInstrument(context: PerformanceAppState, events: List<MidiEvent>) : Instrument() {
     protected val hits = events.filterIsInstance<NoteEvent.NoteOn>()
+    protected val pitchClassHits: (Int) -> List<NoteEvent.NoteOn> = {
+        hits.filter { hit -> pitchClass(hit.note) == it }
+    }
     open val collector = EventCollector(context, hits)
 
     open fun onHit(noteOn: NoteEvent.NoteOn) = Unit

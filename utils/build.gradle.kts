@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.bundles.kotlinxEcosystem)
     implementation(libs.bundles.logging)
     implementation(libs.bundles.jme3)
+    implementation(libs.kmidi)
 
     implementation(project(":jmeKtDsl"))
 

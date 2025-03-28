@@ -15,6 +15,7 @@ import org.wysko.midis2jam2.instrument.family.brass.Trumpet
 import org.wysko.midis2jam2.instrument.family.brass.Tuba
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.ensemble.Choir
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
@@ -111,6 +112,7 @@ object InstrumentAssignment {
                     85 -> Choir(this, events, Choir.Variant.Custom(292 / 360f))
                     94 -> Choir(this, events, Choir.Variant.Halo)
                     101 -> Choir(this, events, Choir.Variant.StaticTexture.Goblin)
+                    112 -> TinkleBell(this, events)
                     else -> null
                 }
 

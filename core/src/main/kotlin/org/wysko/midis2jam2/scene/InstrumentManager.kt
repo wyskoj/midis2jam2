@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.instrument.family.brass.Trumpet
 import org.wysko.midis2jam2.instrument.family.brass.Tuba
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
+import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.ensemble.Choir
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
@@ -225,6 +226,13 @@ class InstrumentManager : AbstractAppState() {
                 PositioningBehavior.Calculated.Linear(
                     baseLocation = vec3(-110, 25, -30),
                     deltaLocation = vec3(0, 40, 0)
+                )
+            ),
+            TinkleBell::class to listOf(
+                PositioningBehavior.Calculated.Linear(
+                    baseLocation = vec3(20, 30, 10),
+                    deltaLocation = vec3(0, 20, 0),
+                    baseRotation = vec3(0, 155, 0)
                 )
             )
         )

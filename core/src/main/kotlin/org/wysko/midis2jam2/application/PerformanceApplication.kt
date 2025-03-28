@@ -96,7 +96,7 @@ class PerformanceApplication private constructor(
 fun main() {
     val smf =
         StandardMidiFileReader().readFile(
-            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\testmidi\\anythingshedoes.mid")
+            File("C:\\Users\\Jacob\\Documents\\Dropbox\\MIDI\\MIDI Files\\Collections\\sm_test\\112.mid")
         )
     val sequence = smf.toTimeBasedSequence()
     val settingsProvider = SettingsProvider()
