@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.instrument.family.ensemble.Choir
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.sfx.Telephone
 import org.wysko.midis2jam2.instrument.family.strings.Timpani
 
 const val DEFAULT_MELODY_BANK = 0x00
@@ -113,6 +114,7 @@ object InstrumentAssignment {
                     94 -> Choir(this, events, Choir.Variant.Halo)
                     101 -> Choir(this, events, Choir.Variant.StaticTexture.Goblin)
                     112 -> TinkleBell(this, events)
+                    124 -> Telephone(this, events)
                     else -> null
                 }
 

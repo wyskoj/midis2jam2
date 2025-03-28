@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.instrument.family.ensemble.Choir
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.sfx.Telephone
 import org.wysko.midis2jam2.instrument.family.strings.Timpani
 import org.wysko.midis2jam2.interpTo
 import org.wysko.midis2jam2.jme3ktdsl.loc
@@ -233,6 +234,12 @@ class InstrumentManager : AbstractAppState() {
                     baseLocation = vec3(20, 30, 10),
                     deltaLocation = vec3(0, 20, 0),
                     baseRotation = vec3(0, 155, 0)
+                )
+            ),
+            Telephone::class to listOf(
+                PositioningBehavior.Calculated.Linear(
+                    baseLocation = vec3(0, 1, -50),
+                    deltaLocation = vec3(13, 0, 0)
                 )
             )
         )

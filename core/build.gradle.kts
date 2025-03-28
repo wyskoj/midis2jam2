@@ -8,6 +8,7 @@ version = "unspecified"
 
 repositories {
     mavenCentral()
+    maven(url = "https://repo.spongepowered.org/repository/maven-public/")
 }
 
 dependencies {
@@ -25,6 +26,7 @@ dependencies {
     // jMonkeyEngine
     implementation(libs.bundles.jme3)
     implementation(libs.jme3.lwjgl3)
+    implementation(libs.noise)
 
     implementation(libs.kmidi)
 
