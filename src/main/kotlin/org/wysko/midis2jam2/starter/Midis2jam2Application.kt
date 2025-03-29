@@ -24,9 +24,9 @@ import com.jme3.post.filters.BloomFilter.GlowMode.Objects
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
-import org.wysko.kmidi.midi.StandardMidiFileReader
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
-import org.wysko.kmidi.readFile
+import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.GraphicsConfiguration

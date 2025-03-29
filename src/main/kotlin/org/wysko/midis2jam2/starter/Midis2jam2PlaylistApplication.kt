@@ -18,9 +18,9 @@
 package org.wysko.midis2jam2.starter
 
 import com.jme3.app.SimpleApplication
-import org.wysko.kmidi.midi.StandardMidiFileReader
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
-import org.wysko.kmidi.readFile
+import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.DesktopPlaylistMidis2jam2
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.util.logger

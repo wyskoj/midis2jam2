@@ -15,7 +15,7 @@ noise = { group = "org.spongepowered", name = "noise", version = "2.0.0-SNAPSHOT
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.0" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "1.9.0" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.6" }
-kmidi = { group = "org.wysko", name = "kmidi", version = "0.0.6" }
+kmidi = { group = "org.wysko", name = "kmidi", version = "0.1.2" }
 compose-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.4.2" }
 

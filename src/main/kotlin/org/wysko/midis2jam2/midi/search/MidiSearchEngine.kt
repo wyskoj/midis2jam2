@@ -22,10 +22,10 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.wysko.kmidi.midi.StandardMidiFile
-import org.wysko.kmidi.midi.StandardMidiFileReader
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.ProgramEvent
-import org.wysko.kmidi.readFile
+import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.readFile
 import java.io.File
 import java.io.IOException
 
