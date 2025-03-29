@@ -18,6 +18,7 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells
 import org.wysko.midis2jam2.instrument.family.ensemble.Choir
+import org.wysko.midis2jam2.instrument.family.ensemble.StageStrings
 import org.wysko.midis2jam2.instrument.family.organ.Accordion
 import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
@@ -96,7 +97,10 @@ object InstrumentAssignment {
                     21 -> Accordion(this, events, Accordion.Variant.Accordion)
                     22 -> Harmonica(this, events)
                     23 -> Accordion(this, events, Accordion.Variant.TangoAccordion)
+                    44 -> StageStrings(this, events, StageStrings.Variant.Wood1, StageStrings.Behavior.Tremolo)
                     47 -> Timpani(this, events)
+                    48 -> StageStrings(this, events, StageStrings.Variant.Wood1)
+                    49 -> StageStrings(this, events, StageStrings.Variant.Wood2)
                     52 -> Choir(this, events, Choir.Variant.StaticTexture.Standard)
                     53 -> Choir(this, events, Choir.Variant.Custom(207 / 360f))
                     54 -> Choir(this, events, Choir.Variant.Custom(117 / 360f))
