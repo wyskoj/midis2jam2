@@ -183,6 +183,8 @@ open class DesktopMidis2jam2(
 
     override fun togglePause() {
         super.togglePause()
+        if (!isSequencerStarted) return
+
         if (paused) {
             sequencer.stop()
         } else {
