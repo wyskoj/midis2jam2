@@ -24,6 +24,7 @@ import com.jme3.post.filters.BloomFilter.GlowMode.Objects
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
+import com.jme3.system.lwjgl.LwjglContext
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
@@ -71,6 +72,15 @@ internal class Midis2jam2Application(
     override fun stop() {
         onFinish()
         super.stop()
+    }
+
+    override fun destroy() {
+        rootNode.detachAllChildren()
+        assetManager.clearCache()
+        renderer.invalidateState()
+        inputManager.clearMappings()
+        (context as LwjglContext).systemListener = null
+        super.destroy()
     }
 }
 
