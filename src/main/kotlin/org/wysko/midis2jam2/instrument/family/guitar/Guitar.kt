@@ -153,6 +153,9 @@ class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : F
         /** Acoustic guitar type. */
         data object Acoustic : GuitarType("GuitarAcoustic.obj", "GuitarAcousticDropD.obj", "AcousticGuitar.png")
 
+        /** Classical guitar type. */
+        data object Classical : GuitarType("ClassicalGuitar.obj", "ClassicalGuitarDropD.obj", "ClassicalGuitar.png")
+
         /** Clean guitar type. */
         data object Clean : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["clean"].file)
 
