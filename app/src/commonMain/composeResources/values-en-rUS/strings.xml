@@ -1,0 +1,122 @@
+<resources>
+    <!-- From common.xml -->
+    <string name="tab_home">Home</string>
+    <string name="tab_search">Search</string>
+    <string name="tab_settings">Settings</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+    <string name="play">Play</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="midi_file">MIDI file</string>
+    <string name="midi_device">MIDI device</string>
+    <string name="soundbank">Soundbank</string>
+    <string name="soundbank_default">Default soundbank</string>
+    <string name="play_midi_file">Play MIDI file</string>
+    <string name="quality_none">None</string>
+    <string name="quality_low">Low</string>
+    <string name="quality_medium">Medium</string>
+    <string name="quality_high">High</string>
+
+    <!-- From settings.xml -->
+    <string name="settings_general">General</string>
+    <string name="settings_general_description">Language, theme</string>
+    <string name="settings_graphics">Graphics</string>
+    <string name="settings_graphics_description">Fullscreen, resolution, anti-aliasing</string>
+    <string name="settings_graphics_description_a">Shadows</string>
+    <string name="settings_background">Background</string>
+    <string name="settings_background_description">Choose a picture or color</string>
+    <string name="settings_controls">Controls</string>
+    <string name="settings_controls_description">Cursor lock, speed modifier keys</string>
+    <string name="settings_playback">Playback</string>
+    <string name="settings_playback_description">MIDI device, synthesizer, soundbanks</string>
+    <string name="settings_on_screen_elements">On-screen elements</string>
+    <string name="settings_on_screen_elements_description">Heads-up display, lyrics</string>
+
+    <!-- From settings.graphics.xml -->
+    <string name="settings_graphics_fullscreen">Fullscreen</string>
+    <string name="settings_graphics_fullscreen_description">Use the entire screen</string>
+    <string name="settings_graphics_resolution">Resolution</string>
+    <string name="settings_graphics_resolution_fullscreen">Resolution matches monitor when fullscreen is enabled</string>
+    <string name="settings_graphics_resolution_default">Use default resolution</string>
+    <string name="settings_graphics_resolution_default_hint">Default</string>
+    <string name="settings_graphics_resolution_default_description">Default resolution uses most of the screen</string>
+    <string name="settings_graphics_resolution_custom">Custom resolution</string>
+    <string name="settings_graphics_resolution_width">Width</string>
+    <string name="settings_graphics_resolution_height">Height</string>
+    <string name="settings_graphics_shadows">Shadows</string>
+    <string name="settings_graphics_shadows_description">Render shadows under objects</string>
+    <string name="settings_graphics_shadows_none">None (fake)</string>
+    <string name="settings_graphics_shadows_description_a">Render dynamic shadows</string>
+    <string name="settings_graphics_shadows_description_hint_a">Dynamic shadows look nicer, but can impact performance</string>
+    <string name="settings_graphics_anti_aliasing">Anti-aliasing</string>
+    <string name="settings_graphics_anti_aliasing_description">Smooth edges of objects</string>
+
+    <!-- From settings.background.xml -->
+    <string name="settings_background_type">Background type</string>
+    <string name="settings_background_texture">Texture</string>
+    <string name="settings_background_direction_north">North</string>
+    <string name="settings_background_direction_east">East</string>
+    <string name="settings_background_direction_south">South</string>
+    <string name="settings_background_direction_west">West</string>
+    <string name="settings_background_direction_up">Up</string>
+    <string name="settings_background_direction_down">Down</string>
+    <string name="settings_background_direction_texture_template">%1$s texture</string>
+    <string name="settings_background_type_default">Default</string>
+    <string name="settings_background_type_default_description">Dark checkerboard pattern</string>
+    <string name="settings_background_type_cubemap_repeated">Repeated cubemap</string>
+    <string name="settings_background_type_cubemap_repeated_description">Use a texture on each wall</string>
+    <string name="settings_background_type_cubemap_unique">Unique cubemap</string>
+    <string name="settings_background_type_cubemap_unique_description">Use a different texture for each wall</string>
+    <string name="settings_background_type_color">Color</string>
+    <string name="settings_background_type_color_description">Use a solid color</string>
+    <string name="settings_background_texture_no_options_hint">No textures available.</string>
+    <string name="settings_background_texture_open_folder">Open textures folder</string>
+    <string name="settings_background_missing_textures_repeated">Background texture is not set</string>
+    <string name="settings_background_missing_textures_unique">One or more background textures are not set</string>
+
+    <!-- From settings.controls.xml -->
+    <string name="settings_controls_lock_cursor">Lock cursor</string>
+    <string name="settings_controls_lock_cursor_description">Lock the cursor to the window</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Sticky speed-modifier keys</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Press Ctrl and Shift to change freecam speed</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Hold Ctrl and Shift to change freecam speed</string>
+
+    <!-- From settings.onscreenelements.lyrics.xml -->
+    <string name="settings_onscreenelements_lyrics_size">Lyrics size</string>
+    <string name="settings_onscreenelements_lyrics_scale_template">×%1$s</string>
+
+    <!-- From settings.onscreenelements.xml -->
+    <string name="settings_onscreenelements_lyrics">Lyrics</string>
+    <string name="settings_onscreenelements_lyrics_description">If the song contains lyrics data, display them in real time</string>
+    <string name="settings_onscreenelements_hud">Heads-up display</string>
+    <string name="settings_onscreenelements_hud_description">Display song name and progress</string>
+
+    <!-- From settings.playback.soundbanks.xml -->
+    <string name="settings_playback_soundbanks_add">Add soundbanks</string>
+    <string name="settings_playback_soundbanks_none_loaded">No soundbanks loaded</string>
+    <string name="settings_playback_soundbanks_select">Select soundbanks</string>
+
+    <!-- From settings.playback.synthesizer.xml -->
+    <string name="settings_playback_synthesizer_chorus">Chorus</string>
+    <string name="settings_playback_synthesizer_chorus_description">Use chorus effect</string>
+    <string name="settings_playback_synthesizer_reverb">Reverb</string>
+    <string name="settings_playback_synthesizer_reverb_description">Use reverb effect</string>
+
+    <!-- From settings.playback.xml -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Send MIDI specification reset message</string>
+    <string name="settings_playback_midi_specification_reset_description">Send a message to the MIDI device to reset it</string>
+    <string name="settings_playback_synthesizer">Gervill synthesizer</string>
+    <string name="settings_playback_synthesizer_description">Configure the Gervill MIDI synthesizer</string>
+    <string name="settings_playback_soundbanks">Soundbanks</string>
+    <string name="settings_playback_soundbanks_description">Import soundbanks for use with Gervill synthesizer</string>
+
+    <!-- From settings.general.xml -->
+    <string name="settings_general_theme">Theme</string>
+    <string name="settings_general_theme_light">Light</string>
+    <string name="settings_general_theme_dark">Dark</string>
+    <string name="settings_general_theme_system">Follow system</string>
+    <string name="settings_general_locale">Language</string>
+</resources> 

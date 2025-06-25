@@ -1,0 +1,139 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- From common.xml -->
+    <string name="tab_home">Accueil</string>
+    <string name="tab_search">Rechercher</string>
+    <string name="tab_settings">Paramètres</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="back">Retour</string>
+    <string name="play">Lire</string>
+    <string name="enabled">Activé</string>
+    <string name="disabled">Désactivé</string>
+    <string name="midi_file">Fichier MIDI</string>
+    <string name="midi_device">Périphérique MIDI</string>
+    <string name="soundbank">Banque de sons</string>
+    <string name="soundbank_default">Banque de sons par défaut</string>
+    <string name="play_midi_file">Lire un fichier MIDI</string>
+    <string name="quality_none">Aucune</string>
+    <string name="quality_low">Basse</string>
+    <string name="quality_medium">Moyenne</string>
+    <string name="quality_high">Élevée</string>
+
+    <!-- From settings.xml -->
+    <string name="settings_general">Général</string>
+    <string name="settings_general_description">Langue, thème</string>
+    <string name="settings_graphics">Graphismes</string>
+    <string name="settings_graphics_description">Plein écran, résolution, anti-crénelage</string>
+    <string name="settings_graphics_description_a">Ombres</string>
+    <string name="settings_background">Arrière-plan</string>
+    <string name="settings_background_description">Choisir une image ou une couleur</string>
+    <string name="settings_controls">Contrôles</string>
+    <string name="settings_controls_description">Verrouillage curseur, touches de modification de vitesse</string>
+    <string name="settings_playback">Lecture</string>
+    <string name="settings_playback_description">Périphérique MIDI, synthétiseur, banques de sons</string>
+    <string name="settings_on_screen_elements">Éléments à l'écran</string>
+    <string name="settings_on_screen_elements_description">Affichage tête haute, paroles</string>
+
+    <!-- From settings.graphics.xml -->
+    <string name="settings_graphics_fullscreen">Plein écran</string>
+    <string name="settings_graphics_fullscreen_description">Utiliser tout l'écran</string>
+    <string name="settings_graphics_resolution">Résolution</string>
+    <string name="settings_graphics_resolution_fullscreen">La résolution correspond à l'écran en mode plein écran</string>
+    <string name="settings_graphics_resolution_default">Utiliser la résolution par défaut</string>
+    <string name="settings_graphics_resolution_default_hint">Par défaut</string>
+    <string name="settings_graphics_resolution_default_description">La résolution par défaut utilise la majeure partie de l'écran</string>
+    <string name="settings_graphics_resolution_custom">Résolution personnalisée</string>
+    <string name="settings_graphics_resolution_width">Largeur</string>
+    <string name="settings_graphics_resolution_height">Hauteur</string>
+    <string name="settings_graphics_shadows">Ombres</string>
+    <string name="settings_graphics_shadows_description">Afficher les ombres sous les objets</string>
+    <string name="settings_graphics_shadows_none">Aucune (simulées)</string>
+    <string name="settings_graphics_shadows_description_a">Afficher les ombres dynamiques</string>
+    <string name="settings_graphics_shadows_description_hint_a">Les ombres dynamiques sont plus belles mais peuvent réduire les performances</string>
+    <string name="settings_graphics_anti_aliasing">Anti-crénelage</string>
+    <string name="settings_graphics_anti_aliasing_description">Lisser les bords des objets</string>
+
+    <!-- From settings.background.xml -->
+    <string name="settings_background_type">Type d'arrière-plan</string>
+    <string name="settings_background_texture">Texture</string>
+    <string name="settings_background_direction_north">Nord</string>
+    <string name="settings_background_direction_east">Est</string>
+    <string name="settings_background_direction_south">Sud</string>
+    <string name="settings_background_direction_west">Ouest</string>
+    <string name="settings_background_direction_up">Haut</string>
+    <string name="settings_background_direction_down">Bas</string>
+    <string name="settings_background_direction_texture_template">Texture %1$s</string>
+    <string name="settings_background_type_default">Par défaut</string>
+    <string name="settings_background_type_default_description">Motif en damier sombre</string>
+    <string name="settings_background_type_cubemap_repeated">Cubemap répétée</string>
+    <string name="settings_background_type_cubemap_repeated_description">Utiliser une texture sur chaque mur</string>
+    <string name="settings_background_type_cubemap_unique">Cubemap unique</string>
+    <string name="settings_background_type_cubemap_unique_description">Utiliser une texture différente pour chaque mur</string>
+    <string name="settings_background_type_color">Couleur</string>
+    <string name="settings_background_type_color_description">Utiliser une couleur unie</string>
+    <string name="settings_background_texture_no_options_hint">Aucune texture disponible.</string>
+    <string name="settings_background_texture_open_folder">Ouvrir le dossier des textures</string>
+    <string name="settings_background_missing_textures_repeated">Texture d'arrière-plan non définie</string>
+    <string name="settings_background_missing_textures_unique">Une ou plusieurs textures d'arrière-plan ne sont pas définies</string>
+
+    <!-- From settings.controls.xml -->
+    <string name="settings_controls_lock_cursor">Verrouiller le curseur</string>
+    <string name="settings_controls_lock_cursor_description">Verrouiller le curseur dans la fenêtre</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Touches de vitesse persistantes</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Appuyer sur Ctrl et Maj pour modifier la vitesse de la caméra libre</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Maintenir Ctrl et Maj pour modifier la vitesse de la caméra libre</string>
+
+    <!-- From settings.onscreenelements.lyrics.xml -->
+    <string name="settings_onscreenelements_lyrics_size">Taille des paroles</string>
+    <string name="settings_onscreenelements_lyrics_scale_template">×%1$s</string>
+
+    <!-- From settings.onscreenelements.xml -->
+    <string name="settings_onscreenelements_lyrics">Paroles</string>
+    <string name="settings_onscreenelements_lyrics_description">Afficher les paroles en temps réel si la chanson en contient</string>
+    <string name="settings_onscreenelements_hud">Affichage tête haute</string>
+    <string name="settings_onscreenelements_hud_description">Afficher le nom et la progression de la chanson</string>
+
+    <!-- From settings.playback.soundbanks.xml -->
+    <string name="settings_playback_soundbanks_add">Ajouter des banques de sons</string>
+    <string name="settings_playback_soundbanks_none_loaded">Aucune banque de sons chargée</string>
+    <string name="settings_playback_soundbanks_select">Sélectionner des banques de sons</string>
+
+    <!-- From settings.playback.synthesizer.xml -->
+    <string name="settings_playback_synthesizer_chorus">Chœur</string>
+    <string name="settings_playback_synthesizer_chorus_description">Utiliser l'effet de chœur</string>
+    <string name="settings_playback_synthesizer_reverb">Réverbération</string>
+    <string name="settings_playback_synthesizer_reverb_description">Utiliser l'effet de réverbération</string>
+
+    <!-- From settings.playback.xml -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Envoyer un message de réinitialisation MIDI</string>
+    <string name="settings_playback_midi_specification_reset_description">Envoyer un message de réinitialisation au périphérique MIDI</string>
+    <string name="settings_playback_synthesizer">Synthétiseur Gervill</string>
+    <string name="settings_playback_synthesizer_description">Configurer le synthétiseur MIDI Gervill</string>
+    <string name="settings_playback_soundbanks">Banques de sons</string>
+    <string name="settings_playback_soundbanks_description">Importer des banques de sons pour le synthétiseur Gervill</string>
+
+    <!-- From settings.general.xml -->
+    <string name="settings_general_theme">Thème</string>
+    <string name="settings_general_theme_light">Clair</string>
+    <string name="settings_general_theme_dark">Sombre</string>
+    <string name="settings_general_theme_system">Suivre le système</string>
+    <string name="settings_general_locale">Langue</string>
+</resources>

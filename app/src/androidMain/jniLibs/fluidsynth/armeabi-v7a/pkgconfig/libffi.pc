@@ -1,0 +1,11 @@
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=${prefix}
+libdir=/home/vsts/work/1/s/android-build-root/opt/android/lib
+toolexeclibdir=${libdir}
+includedir=${prefix}/include
+
+Name: libffi
+Description: Library supporting Foreign Function Interfaces
+Version: 3.4.4
+Libs: -L${toolexeclibdir} -lffi
+Cflags: -I${includedir}

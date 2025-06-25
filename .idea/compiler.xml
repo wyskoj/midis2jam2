@@ -3,9 +3,4 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="21" />
   </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="midis2jam2.main" options="--add-exports java.desktop/com.sun.media.sound=ALL-UNNAMED" />
-    </option>
-  </component>
 </project>

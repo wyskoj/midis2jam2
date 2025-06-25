@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:viewportWidth="960"
+    android:viewportHeight="960"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:translateX="-0"
+        android:translateY="960">
+        <path
+            android:pathData="M668 -380l152 -130 120 10 -176 153 52 227 -102 -62 -46 -198Zm-94 -292l-42 -98 46 -110 92 217 -96 -9ZM294 -287l126 -76 126 77 -33 -144 111 -96 -146 -13 -58 -136 -58 135 -146 13 111 97 -33 143ZM173 -120l65 -281L20 -590l288 -25 112 -265 112 265 288 25 -218 189 65 281 -247 -149 -247 149Zm247 -340Z"
+            android:fillColor="#E3E3E3" />
+    </group>
+</vector>

@@ -31,3 +31,6 @@ midicsv.exe
 midis2jam2.conf
 midis2jam2.ini
 settings.json
+local.properties
+app/src/commonMain/resources/*
+app/src/androidMain/assets/*

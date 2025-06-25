@@ -6,6 +6,15 @@ comments:
   OutdatedDocumentation:
     active: true
 
+naming:
+  FunctionNaming:
+    ignoreAnnotated:
+      - Composable
+  MatchingDeclarationName:
+    multiplatformTargets:
+      - android
+      - desktop
+
 style:
   MagicNumber:
     active: false

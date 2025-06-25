@@ -1,0 +1,10 @@
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Oboe
+Description: Oboe library
+Version: 1.9.0
+Libs: -L${libdir} -loboe -landroid -llog
+Cflags: -I${includedir}
