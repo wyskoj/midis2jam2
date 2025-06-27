@@ -15,7 +15,6 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
 package org.wysko.midis2jam2
 
@@ -50,8 +49,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularWavyProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -242,7 +240,7 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.align(Alignment.Center)
                                 ) {
-                                    CircularWavyProgressIndicator(
+                                    CircularProgressIndicator(
                                         progress = { if (ready) 1f else animatedProgress },
                                         modifier = Modifier.size(64.dp)
                                     )

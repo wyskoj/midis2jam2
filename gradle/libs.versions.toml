@@ -1,30 +1,30 @@
 [versions]
 agp = "8.11.0"
-android-compileSdk = "35"
+android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "35"
 androidx-activity = "1.10.1"
-androidx-lifecycle = "2.9.0"
-androidxComposeBom = "2025.06.00"
+androidx-lifecycle = "2.9.1"
+androidxComposeBom = "2025.06.01"
 appcompat = "1.7.1"
 colorpicker = "1.1.2"
-composeHotReload = "1.0.0-alpha10"
-composeMultiplatform = "1.8.1"
+composeHotReload = "1.0.0-alpha11"
+composeMultiplatform = "1.8.2"
 fluidsynth = "2.4.6"
 jme3 = "3.6.1-stable"
-koin-bom = "4.0.3"
-kotlin = "2.1.21"
-voyager = "1.1.0-beta02"
+koin-bom = "4.1.0"
+kotlin = "2.2.0"
+voyager = "1.1.0-beta03"
 
 [libraries]
 # Compose
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-alpha", version.ref = "androidxComposeBom" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-compose-materialIcons = { module = "androidx.compose.material:material-icons-core" }
 
 # Kotlin
-kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "2.1.0" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "2.1.20" }
 kotlinx-coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version = "1.10.2" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.1" }
 
