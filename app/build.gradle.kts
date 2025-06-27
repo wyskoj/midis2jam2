@@ -126,7 +126,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = "2.0.0-alpha-20250624"
 
         externalNativeBuild {
             cmake {
