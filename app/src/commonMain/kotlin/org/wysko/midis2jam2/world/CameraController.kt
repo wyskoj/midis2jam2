@@ -15,18 +15,14 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2
+package org.wysko.midis2jam2.world
 
-sealed class Midis2jam2Action {
-    data class MoveToCameraAngle(val cameraAngle: String) : Midis2jam2Action()
-    data object SwitchToAutoCam : Midis2jam2Action()
-    data object SwitchToSlideCam : Midis2jam2Action()
-    data object SeekBackward : Midis2jam2Action()
-    data object SeekForward : Midis2jam2Action()
-    data object PlayPause : Midis2jam2Action()
+import org.wysko.midis2jam2.world.camera.CameraAngle
+import kotlin.time.Duration
 
+interface CameraController {
+    var isEnabled: Boolean
 
-    data class Pan(val panDeltaX: Float, val panDeltaY: Float) : Midis2jam2Action()
-    data class Zoom(val zoomDelta: Float) : Midis2jam2Action()
-    data class Orbit(val x: Float, val y: Float) : Midis2jam2Action()
+    fun moveToCameraAngle(cameraAngle: CameraAngle)
+    fun tick(delta: Duration)
 }

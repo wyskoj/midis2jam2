@@ -68,7 +68,7 @@ private val WAIT_TIME = 3.seconds
 class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) {
 
     /** When true, the auto-cam controller is enabled. */
-    var enabled: Boolean = startEnabled
+    var isEnabled: Boolean = startEnabled
         set(value) {
             if (value && !field) { // If the field is being set true from a false state
                 startLocation = context.app.camera.location.clone()
@@ -103,7 +103,7 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 
     /** Performs a tick of the auto-cam controller. */
     fun tick(time: Duration, delta: Duration): Boolean {
-        if (!enabled) return false
+        if (!isEnabled) return false
 
         /* If the camera is not moving, and the song has started, */
         if (!moving && time > 0.seconds) {
@@ -227,10 +227,10 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
 
     /** Moves the camera to a new position, if it is not currently moving. */
     fun trigger() {
-        if (!enabled) {
+        if (!isEnabled) {
             x = 0f
         }
-        enabled = true
+        isEnabled = true
 
         if (!moving) {
             waiting = WAIT_TIME

@@ -19,8 +19,8 @@ package org.wysko.midis2jam2.world.camera
 
 /** Defines what is controlling the location and rotation of the camera. */
 enum class CameraState {
-    /** The FlyByCamera is controlling the camera. */
-    FREE_CAM,
+    /** A device-specific camera (e.g., desktop or Android) is controlling the camera. */
+    DEVICE_SPECIFIC_CAMERA,
 
     /** The AutoCam is controlling the camera. */
     AUTO_CAM,

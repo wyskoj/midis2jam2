@@ -61,6 +61,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -161,6 +162,8 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                     registerProgressListener(listener)
                 }
             }
+            val isAutoCamActive = harness.isAutoCamActive.collectAsState()
+            val isSlideCamActive = harness.isSlideCamActive.collectAsState()
 
             onBackPressedDispatcher.addCallback {
                 logger().debug("killing harness on back press")
@@ -205,7 +208,12 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                                                 if (fingerCount == 2) {
                                                     // Two-finger drag = pan
                                                     if (pan.x != 0f || pan.y != 0f) {
-                                                        harness.callAction(Midis2jam2Action.Pan(pan.x, pan.y))
+                                                        harness.callAction(
+                                                            Midis2jam2Action.Pan(
+                                                                pan.x,
+                                                                pan.y
+                                                            )
+                                                        )
                                                     }
 
                                                     // Two-finger pinch = zoom
@@ -224,7 +232,11 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                                     visible = showControls,
                                     modifier = Modifier.align(Alignment.CenterEnd)
                                 ) {
-                                    OnScreenControls(harness::callAction)
+                                    OnScreenControls(
+                                        isAutoCamActive.value,
+                                        isSlideCamActive.value,
+                                        harness::callAction
+                                    )
                                 }
                             }
                         }
@@ -261,13 +273,21 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
 
     @Composable
     private fun OnScreenControls(
+        isAutoCamActive: Boolean,
+        isSlideCamActive: Boolean,
         callAction: (Midis2jam2Action) -> Unit,
     ) {
         val worldOneRegular = FontFamily(Font(Res.font.WorldOneRegular))
         var showCameraControls by remember { mutableStateOf(false) }
         Row(
             modifier = Modifier
-                .padding(8.dp),
+                .padding(8.dp)
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        val event = awaitPointerEvent()
+                        event.changes.forEach { it.consume() }
+                    }
+                },
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -288,9 +308,16 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                                     Text(text = "$i", fontFamily = worldOneRegular)
                                 }
                             }
-                            FilledTonalIconButton(onClick = {
-                                callAction(Midis2jam2Action.SwitchToAutoCam)
-                            }) {
+                            FilledTonalIconButton(
+                                onClick = {
+                                    callAction(Midis2jam2Action.SwitchToAutoCam)
+                                },
+                                colors = if (!isAutoCamActive) {
+                                    IconButtonDefaults.filledTonalIconButtonColors()
+                                } else {
+                                    IconButtonDefaults.filledIconButtonColors()
+                                }
+                            ) {
                                 Text(text = "A", fontFamily = worldOneRegular)
                             }
                         }
@@ -298,16 +325,26 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             for (i in 4..6) {
-                                FilledTonalIconButton(onClick = {
-                                    callAction(Midis2jam2Action.MoveToCameraAngle("cam$i"))
-                                }) {
+                                FilledTonalIconButton(
+                                    onClick = {
+                                        callAction(Midis2jam2Action.MoveToCameraAngle("cam$i"))
+                                    }
+                                ) {
                                     Text(text = "$i", fontFamily = worldOneRegular)
                                 }
                             }
 
-                            FilledTonalIconButton(onClick = {
-                                callAction(Midis2jam2Action.SwitchToSlideCam)
-                            }) {
+                            FilledTonalIconButton(
+                                onClick = {
+                                    callAction(Midis2jam2Action.SwitchToSlideCam)
+                                },
+                                colors = if (!isSlideCamActive) {
+                                    IconButtonDefaults.filledTonalIconButtonColors()
+                                } else {
+                                    IconButtonDefaults.filledIconButtonColors()
+
+                                }
+                            ) {
                                 Text(text = "S", fontFamily = worldOneRegular)
                             }
                         }
@@ -327,7 +364,8 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                         )
                     }
                     val primaryColor =
-                        IconButtonDefaults.iconButtonColors().copy(contentColor = MaterialTheme.colorScheme.primary)
+                        IconButtonDefaults.iconButtonColors()
+                            .copy(contentColor = MaterialTheme.colorScheme.primary)
                     IconButton(
                         onClick = {
                             callAction(Midis2jam2Action.SeekBackward)

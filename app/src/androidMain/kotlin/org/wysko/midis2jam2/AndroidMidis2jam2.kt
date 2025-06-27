@@ -19,6 +19,7 @@ package org.wysko.midis2jam2
 
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
+import kotlinx.coroutines.flow.StateFlow
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.sendResetMessage
@@ -30,7 +31,9 @@ import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.world.camera.CameraAngle
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
+import org.wysko.midis2jam2.world.camera.CameraState
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
@@ -47,12 +50,9 @@ class AndroidMidis2jam2(
     private var isSequencerStarted: Boolean = false
     private var skippedFrames = 0
 
-    private lateinit var orbitingCamera: AndroidOrbitingCamera
-
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
-        unloadFlyByCamera()
-        orbitingCamera = AndroidOrbitingCamera(this)
+        cameraController = AndroidOrbitingCamera(this)
     }
 
     override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {
@@ -82,7 +82,8 @@ class AndroidMidis2jam2(
             }
 
             time in (-1.5).seconds..(-1.0).seconds -> {
-                Utils.mapRangeClamped(time.toDouble(DurationUnit.SECONDS), -1.5, -1.0, 0.0, 1.0).toFloat()
+                Utils.mapRangeClamped(time.toDouble(DurationUnit.SECONDS), -1.5, -1.0, 0.0, 1.0)
+                    .toFloat()
             }
 
             (midiFile.duration + 3.seconds - time) < 0.5.seconds -> {
@@ -117,8 +118,6 @@ class AndroidMidis2jam2(
         if (sequencer.isOpen && !paused) {
             time += delta
         }
-
-        orbitingCamera.tick(delta)
     }
 
     override fun exit() {
@@ -175,7 +174,6 @@ class AndroidMidis2jam2(
         standController.tick()
         lyricController?.tick(time, delta)
         hudController.tick(time, fadeFilter.value)
-        flyByCamera.tick(delta)
         autocamController.tick(time, delta)
         slideCamController.tick(time, delta)
         preventCameraFromLeaving(app.camera)
@@ -191,7 +189,8 @@ class AndroidMidis2jam2(
     }
 
     private fun setSynthEffects() {
-        val config = configs.find<AppSettingsConfiguration>().appSettings.playbackSettings.synthesizerSettings
+        val config =
+            configs.find<AppSettingsConfiguration>().appSettings.playbackSettings.synthesizerSettings
         if (!(config.isUseChorus)) {
             midiDevice.sendControlChangeMessage(
                 channel = 0,
@@ -209,17 +208,48 @@ class AndroidMidis2jam2(
     }
 
     fun callAction(action: Midis2jam2Action) {
+
         when (action) {
-            is Midis2jam2Action.MoveToCameraAngle -> onAction(action.cameraAction, true, 0f)
-            Midis2jam2Action.SwitchToAutoCam -> onAction("autoCam", true, 0f)
-            Midis2jam2Action.SwitchToSlideCam -> onAction("slideCam", true, 0f)
+            is Midis2jam2Action.MoveToCameraAngle -> {
+                currentCameraAngle =
+                    CameraAngle.handleCameraAngle(currentCameraAngle, action.cameraAngle)
+                cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
+            }
+
+            Midis2jam2Action.SwitchToAutoCam -> {
+                onAction("autoCam", true, 0f)
+            }
+
+            Midis2jam2Action.SwitchToSlideCam -> {
+                onAction("slideCam", true, 0f)
+            }
+
             Midis2jam2Action.PlayPause -> onAction("play/pause", true, 0f)
             Midis2jam2Action.SeekBackward -> onAction("seek_backward", true, 0f)
             Midis2jam2Action.SeekForward -> onAction("seek_forward", true, 0f)
-            is Midis2jam2Action.Zoom -> orbitingCamera.zoom(action.zoomDelta)
-            is Midis2jam2Action.Pan -> orbitingCamera.pan(action.panDeltaX, action.panDeltaY)
-            is Midis2jam2Action.Orbit -> orbitingCamera.orbit(action.x, action.y)
-            else -> Unit
+            is Midis2jam2Action.Zoom -> {
+                if (cameraState != CameraState.DEVICE_SPECIFIC_CAMERA) {
+                    (cameraController as AndroidOrbitingCamera).applyFakeOrigin()
+                }
+                cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
+                (cameraController as AndroidOrbitingCamera).zoom(action.zoomDelta)
+            }
+
+            is Midis2jam2Action.Pan -> {
+                if (cameraState != CameraState.DEVICE_SPECIFIC_CAMERA) {
+                    (cameraController as AndroidOrbitingCamera).applyFakeOrigin()
+                }
+                cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
+                (cameraController as AndroidOrbitingCamera).pan(action.panDeltaX, action.panDeltaY)
+            }
+
+            is Midis2jam2Action.Orbit -> {
+                if (cameraState != CameraState.DEVICE_SPECIFIC_CAMERA) {
+                    (cameraController as AndroidOrbitingCamera).applyFakeOrigin()
+                }
+                cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
+                (cameraController as AndroidOrbitingCamera).orbit(action.x, action.y)
+            }
         }
     }
 }

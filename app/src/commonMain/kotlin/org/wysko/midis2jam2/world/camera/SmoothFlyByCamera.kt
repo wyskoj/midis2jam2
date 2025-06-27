@@ -26,8 +26,7 @@ import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.plus
-import org.wysko.midis2jam2.util.times
+import org.wysko.midis2jam2.world.CameraController
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -46,7 +45,7 @@ private const val DEFAULT_MOVE_SPEED = 100f
 class SmoothFlyByCamera(
     private val context: Midis2jam2,
     private val onAction: () -> Unit,
-) {
+) : CameraController {
     /**
      * Whether the camera should act like a normal [FlyByCamera].
      */
@@ -55,7 +54,7 @@ class SmoothFlyByCamera(
     /**
      * Whether the camera is enabled.
      */
-    var isEnabled: Boolean = true
+    override var isEnabled: Boolean = true
         set(value) {
             if (value && !field) {
                 dummyCamera.location.set(context.app.camera.location)
@@ -65,6 +64,10 @@ class SmoothFlyByCamera(
 
             field = value
         }
+
+    override fun moveToCameraAngle(cameraAngle: CameraAngle) {
+        setTargetTransform(cameraAngle.location, cameraAngle.rotation)
+    }
 
     /**
      * The speed at which the camera moves.
@@ -84,19 +87,23 @@ class SmoothFlyByCamera(
         onAction()
     }.apply {
         registerWithInput(context.app.inputManager)
-        isDragToRotate = !context.configs.find<AppSettingsConfiguration>().appSettings.controlsSettings.isLockCursor
+        isDragToRotate =
+            !context.configs.find<AppSettingsConfiguration>().appSettings.controlsSettings.isLockCursor
         moveSpeed = DEFAULT_MOVE_SPEED
         zoomSpeed = -10f
     }
 
     init {
-        setTargetTransform(Vector3f(-2f, 92f, 134f), Quaternion().fromAngles(Utils.rad(18.44f), Utils.rad(180f), 0f))
+        setTargetTransform(
+            Vector3f(-2f, 92f, 134f),
+            Quaternion().fromAngles(Utils.rad(18.44f), Utils.rad(180f), 0f)
+        )
     }
 
     /**
      * Updates the camera's location and rotation to slowly move towards the dummy camera's location and rotation.
      */
-    fun tick(delta: Duration) {
+    override fun tick(delta: Duration) {
         if (!isEnabled) return
 
         with(context.app.camera) {
@@ -105,12 +112,16 @@ class SmoothFlyByCamera(
                 rotation = dummyCamera.rotation
                 fov = dummyCamera.fov.coerceAtLeast(1f)
             } else {
-                location.interpolateLocal(dummyCamera.location, (delta.toDouble(SECONDS) * 3.0f).toFloat())
+                location.interpolateLocal(
+                    dummyCamera.location,
+                    (delta.toDouble(SECONDS) * 3.0f).toFloat()
+                )
                 rotation.run {
                     slerp(dummyCamera.rotation, (delta.toDouble(SECONDS) * 3.0f).toFloat())
                     normalizeLocal()
                 }
-                fov = fov.interpolate(dummyCamera.fov, (delta.toDouble(SECONDS) * 3.0f).toFloat()).coerceAtLeast(1f)
+                fov = fov.interpolate(dummyCamera.fov, (delta.toDouble(SECONDS) * 3.0f).toFloat())
+                    .coerceAtLeast(1f)
             }
         }
     }

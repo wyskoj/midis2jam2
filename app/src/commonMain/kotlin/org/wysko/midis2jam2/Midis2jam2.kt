@@ -29,6 +29,8 @@ import com.jme3.post.filters.FadeFilter
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
@@ -47,6 +49,7 @@ import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.AssetLoader
+import org.wysko.midis2jam2.world.CameraController
 import org.wysko.midis2jam2.world.DebugTextController
 import org.wysko.midis2jam2.world.FakeShadowsController
 import org.wysko.midis2jam2.world.HudController
@@ -56,7 +59,6 @@ import org.wysko.midis2jam2.world.camera.CameraAngle
 import org.wysko.midis2jam2.world.camera.CameraSpeed
 import org.wysko.midis2jam2.world.camera.CameraState
 import org.wysko.midis2jam2.world.camera.SlideCameraController
-import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
 import org.wysko.midis2jam2.world.lyric.LyricController
 import org.wysko.midis2jam2.world.modelD
 import kotlin.properties.Delegates
@@ -114,15 +116,27 @@ abstract class Midis2jam2(
         if (configs.find<AppSettingsConfiguration>().appSettings.cameraSettings.isStartAutocamWithSong) {
             CameraState.AUTO_CAM
         } else {
-            CameraState.FREE_CAM
+            CameraState.DEVICE_SPECIFIC_CAMERA
         }
         set(value) {
             // Enable/disable controllers based on camera state when value is changed
-            autocamController.enabled = value == CameraState.AUTO_CAM
-            flyByCamera.isEnabled = value == CameraState.FREE_CAM
+            autocamController.isEnabled = value == CameraState.AUTO_CAM
             slideCamController.isEnabled = value == CameraState.SLIDE_CAM
+            cameraController.isEnabled = value == CameraState.DEVICE_SPECIFIC_CAMERA
+
+            _isAutoCamActive.value = value == CameraState.AUTO_CAM
+            _isSlideCamActive.value = value == CameraState.SLIDE_CAM
+
             field = value
         }
+
+    private val _isAutoCamActive = MutableStateFlow(cameraState == CameraState.AUTO_CAM)
+    val isAutoCamActive: StateFlow<Boolean>
+        get() = _isAutoCamActive
+
+    private val _isSlideCamActive = MutableStateFlow(false)
+    val isSlideCamActive: StateFlow<Boolean>
+        get() = _isSlideCamActive
 
     /**
      * The jMonkeyEngine application.
@@ -206,15 +220,15 @@ abstract class Midis2jam2(
     lateinit var hudController: HudController
 
     /**
-     * The fly-by camera.
+     * The device-specific camera.
      */
-    lateinit var flyByCamera: SmoothFlyByCamera
+    protected lateinit var cameraController: CameraController
 
     protected lateinit var debugTextController: DebugTextController
-    private var currentCameraAngle: CameraAngle = CameraAngle.CAMERA_1A
+    protected var currentCameraAngle: CameraAngle = CameraAngle.CAMERA_1A
         set(value) {
-            cameraState = CameraState.FREE_CAM
-            flyByCamera.setTargetTransform(value.location, value.rotation)
+            cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
+            cameraController.moveToCameraAngle(value)
             field = value
         }
 
@@ -226,14 +240,6 @@ abstract class Midis2jam2(
         this.assetLoader = AssetLoader(this) { assetName ->
             _progressListeners.onEach { it.onLoadingAsset(assetName) }
         }
-        this.flyByCamera =
-            SmoothFlyByCamera(this) {
-                isEnabled = true
-                cameraState = CameraState.FREE_CAM
-            }.apply {
-                actLikeNormalFlyByCamera = !settingsConfig.cameraSettings.isSmoothFreecam
-                isEnabled = !settingsConfig.cameraSettings.isStartAutocamWithSong
-            }
         this.stage = with(root) { +modelD("Stage.obj", "Stage.bmp") }.also {
             it.shadowMode = RenderQueue.ShadowMode.Receive
         }
@@ -248,7 +254,8 @@ abstract class Midis2jam2(
                 root += it.root
                 root -= it.root
             }
-        this.drumSetVisibilityManager = DrumSetVisibilityManager(this, instruments.filterIsInstance<DrumSet>())
+        this.drumSetVisibilityManager =
+            DrumSetVisibilityManager(this, instruments.filterIsInstance<DrumSet>())
         this.standController = StandController(this)
         this.lyricController =
             if (settingsConfig.onScreenElementsSettings.lyricsSettings.isShowLyrics) {
@@ -261,7 +268,8 @@ abstract class Midis2jam2(
             } else {
                 null
             }
-        this.autocamController = AutoCamController(this, settingsConfig.cameraSettings.isStartAutocamWithSong)
+        this.autocamController =
+            AutoCamController(this, settingsConfig.cameraSettings.isStartAutocamWithSong)
         this.slideCamController = SlideCameraController(this)
         this.debugTextController = DebugTextController(this)
         this.hudController = HudController(this)
@@ -289,29 +297,9 @@ abstract class Midis2jam2(
 
     override fun update(tpf: Float) {
         super.update(tpf)
-        debugTextController.tick(tpf.toDouble().seconds)
-    }
-
-    /** Sets the speed of the camera, given a speed [name] and whether that key is [pressed]. */
-    private fun handleCameraSpeedPress(name: String, pressed: Boolean) {
-        if (CameraSpeed.entries.none { it.name.lowercase() == name }) return
-
-        val pressedCameraSpeed = CameraSpeed[name]
-        when (configs.find<AppSettingsConfiguration>().appSettings.controlsSettings.isSpeedModifierKeysSticky) {
-            true -> {
-                if (pressed) return // Only on release
-                cameraSpeed = if (pressedCameraSpeed == cameraSpeed) CameraSpeed.Normal else pressedCameraSpeed
-            }
-
-            false -> {
-                cameraSpeed = if (pressed) pressedCameraSpeed else CameraSpeed.Normal
-            }
-        }
-        applyCameraSpeed(cameraSpeed)
-    }
-
-    private fun applyCameraSpeed(speed: CameraSpeed) {
-        flyByCamera.moveSpeed = speed.speedValue
+        val duration = tpf.toDouble().seconds
+        debugTextController.tick(duration)
+        cameraController.tick(duration)
     }
 
     /**
@@ -337,7 +325,7 @@ abstract class Midis2jam2(
         }
         if (name.startsWith("cam")) {
             currentCameraAngle = CameraAngle.handleCameraAngle(currentCameraAngle, name)
-            cameraState = CameraState.FREE_CAM
+            cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
         }
     }
 
@@ -364,7 +352,6 @@ abstract class Midis2jam2(
         isPressed: Boolean,
         tpf: Float,
     ) {
-        handleCameraSpeedPress(name, isPressed)
         handleCameraSetting(name, isPressed)
         if (isPressed) {
             when (name) {
@@ -406,10 +393,5 @@ abstract class Midis2jam2(
     override fun stateDetached(stateManager: AppStateManager?) {
         super.stateDetached(stateManager)
         filterPostProcessor()?.removeFilter(fadeFilter)
-    }
-
-    protected fun unloadFlyByCamera() {
-        flyByCamera.isEnabled = false
-        app.flyByCamera.isEnabled = false
     }
 }

@@ -24,6 +24,7 @@ import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
 import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
@@ -31,6 +32,9 @@ import org.wysko.midis2jam2.world.KeyMap
 import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
+import org.wysko.midis2jam2.world.camera.CameraSpeed
+import org.wysko.midis2jam2.world.camera.CameraState
+import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
@@ -75,7 +79,9 @@ open class DesktopMidis2jam2(
             )
         } catch (e: BackgroundImageFormatException) {
             exit()
-            logger().errorDisp(e.message ?: "There was an error loading the images for the background.", e)
+            logger().errorDisp(
+                e.message ?: "There was an error loading the images for the background.", e
+            )
         } catch (e: IllegalArgumentException) {
             exit()
             logger().errorDisp(
@@ -85,6 +91,16 @@ open class DesktopMidis2jam2(
                 },
                 exception = e
             )
+        }
+
+
+        val settingsConfig = configs.find<AppSettingsConfiguration>().appSettings
+        this.cameraController = SmoothFlyByCamera(this) {
+            isEnabled = true
+            cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
+        }.apply {
+            actLikeNormalFlyByCamera = !settingsConfig.cameraSettings.isSmoothFreecam
+            isEnabled = !settingsConfig.cameraSettings.isStartAutocamWithSong
         }
 
         logger().debug("Application initialized")
@@ -121,7 +137,8 @@ open class DesktopMidis2jam2(
             }
 
             time in (-1.5).seconds..(-1.0).seconds -> {
-                Utils.mapRangeClamped(time.toDouble(DurationUnit.SECONDS), -1.5, -1.0, 0.0, 1.0).toFloat()
+                Utils.mapRangeClamped(time.toDouble(DurationUnit.SECONDS), -1.5, -1.0, 0.0, 1.0)
+                    .toFloat()
             }
 
             (midiFile.duration + 3.seconds - time) < 0.5.seconds -> {
@@ -194,7 +211,7 @@ open class DesktopMidis2jam2(
      */
     protected open fun handleSongCompletion() {
         if (isSongFinished && time >= endTime + 3.seconds) {
-            if (configs.getType(HomeConfiguration::class).isLooping) {
+            if (configs.find<HomeConfiguration>().isLooping) {
                 // Loop the song
                 isSequencerStarted = false
                 sequencer.stop()
@@ -212,7 +229,6 @@ open class DesktopMidis2jam2(
         standController.tick()
         lyricController?.tick(time, delta)
         hudController.tick(time, fadeFilter.value)
-        flyByCamera.tick(delta)
         autocamController.tick(time, delta)
         slideCamController.tick(time, delta)
         preventCameraFromLeaving(app.camera)
@@ -234,5 +250,30 @@ open class DesktopMidis2jam2(
             if (!isUseReverb) synthesizer.channels.forEach { it.controlChange(91, 0) }
             if (!isUseChorus) synthesizer.channels.forEach { it.controlChange(93, 0) }
         }
+    }
+
+
+    /** Sets the speed of the camera, given a speed [name] and whether that key is [pressed]. */
+    private fun handleCameraSpeedPress(name: String, pressed: Boolean) {
+        if (CameraSpeed.entries.none { it.name.lowercase() == name }) return
+
+        val pressedCameraSpeed = CameraSpeed[name]
+        when (configs.find<AppSettingsConfiguration>().appSettings.controlsSettings.isSpeedModifierKeysSticky) {
+            true -> {
+                if (pressed) return // Only on release
+                cameraSpeed =
+                    if (pressedCameraSpeed == cameraSpeed) CameraSpeed.Normal else pressedCameraSpeed
+            }
+
+            false -> {
+                cameraSpeed = if (pressed) pressedCameraSpeed else CameraSpeed.Normal
+            }
+        }
+        (cameraController as SmoothFlyByCamera).moveSpeed = pressedCameraSpeed.speedValue
+    }
+
+    override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
+        super.onAction(name, isPressed, tpf)
+        handleCameraSpeedPress(name, isPressed)
     }
 }

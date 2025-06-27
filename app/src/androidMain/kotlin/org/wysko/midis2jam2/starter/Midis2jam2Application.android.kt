@@ -21,6 +21,8 @@ import com.jme3.app.SimpleApplication
 import com.jme3.asset.plugins.AndroidLocator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.koin.core.component.KoinComponent
@@ -114,4 +116,18 @@ internal actual class Midis2jam2Application(
             androidMidis2jam2.registerProgressListener(listener)
         }
     }
+
+    val isAutoCamActive: StateFlow<Boolean>
+        get() = if (::androidMidis2jam2.isInitialized) {
+            androidMidis2jam2.isAutoCamActive
+        } else {
+            MutableStateFlow(false)
+        }
+
+    val isSlideCamActive: StateFlow<Boolean>
+        get() = if (::androidMidis2jam2.isInitialized) {
+            androidMidis2jam2.isSlideCamActive
+        } else {
+            MutableStateFlow(false)
+        }
 }
