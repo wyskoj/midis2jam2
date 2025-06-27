@@ -38,7 +38,6 @@ import androidx.compose.foundation.gestures.calculateCentroidSize
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -360,6 +359,7 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                 }
             }
         }
+
     }
 }
 
@@ -378,14 +378,17 @@ private suspend fun PointerInputScope.detectGestures(
         val touchSlop = viewConfiguration.touchSlop
         var dragAmount = Offset.Zero
 
-        // First touch
-        val down = awaitFirstDown(requireUnconsumed = false)
+        // First touch - check if it's already consumed
+        val firstDown = awaitFirstDown(requireUnconsumed = false)
         var fingerCount = 1
         onFingerCountChanged(fingerCount)
 
+        // Track if this gesture started on a consumed event
+        val initialEventConsumed = firstDown.isConsumed
+
         do {
             val event = awaitPointerEvent()
-            val canceled = event.changes.any { it.positionChanged() && it.consumed.positionChange }
+            val canceled = event.changes.any { it.positionChanged() && it.isConsumed }
 
             // Update finger count
             val currentFingerCount = event.changes.size
@@ -447,8 +450,8 @@ private suspend fun PointerInputScope.detectGestures(
             }
         } while (!canceled && event.changes.any { it.pressed })
 
-        // If no slop crossed, consider it a tap
-        if (!pastTouchSlop && fingerCount == 1) {
+        // Only consider it a tap if the initial event wasn't consumed and no slop was crossed
+        if (!pastTouchSlop && fingerCount == 1 && !initialEventConsumed) {
             onTap()
         }
     }
