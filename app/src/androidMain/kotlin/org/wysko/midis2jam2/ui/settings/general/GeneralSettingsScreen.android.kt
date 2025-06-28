@@ -64,7 +64,7 @@ internal actual fun LocaleSettingsCard(
 
             SettingsOptionsCard(
                 title = { Text(stringResource(Res.string.settings_general_locale)) },
-                label = { Text(currentLocale?.displayLanguage ?: "UNK") },
+                label = { currentLocale?.let { Text(it.displayLanguage) } },
                 icon = { Icon(painterResource(Res.drawable.language), "") },
                 options = options,
                 selectedOption = localConfig.locales.get(0).language,

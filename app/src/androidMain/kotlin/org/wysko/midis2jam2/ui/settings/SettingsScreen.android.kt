@@ -28,11 +28,35 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.display_settings
+import midis2jam2.app.generated.resources.keyboard
+import midis2jam2.app.generated.resources.media_output
+import midis2jam2.app.generated.resources.screenshot_monitor
+import midis2jam2.app.generated.resources.settings_background
+import midis2jam2.app.generated.resources.settings_background_description
+import midis2jam2.app.generated.resources.settings_controls
+import midis2jam2.app.generated.resources.settings_controls_description
+import midis2jam2.app.generated.resources.settings_fill
+import midis2jam2.app.generated.resources.settings_general
+import midis2jam2.app.generated.resources.settings_general_description
+import midis2jam2.app.generated.resources.settings_graphics
 import midis2jam2.app.generated.resources.settings_graphics_description_a
+import midis2jam2.app.generated.resources.settings_on_screen_elements
+import midis2jam2.app.generated.resources.settings_on_screen_elements_description
+import midis2jam2.app.generated.resources.settings_playback
+import midis2jam2.app.generated.resources.settings_playback_description
 import midis2jam2.app.generated.resources.tab_settings
+import midis2jam2.app.generated.resources.wallpaper
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.ui.AppNavigationBar
+import org.wysko.midis2jam2.ui.settings.background.BackgroundSettingsScreen
+import org.wysko.midis2jam2.ui.settings.controls.ControlsSettingsScreen
+import org.wysko.midis2jam2.ui.settings.general.GeneralSettingsScreen
+import org.wysko.midis2jam2.ui.settings.graphics.GraphicsSettingsScreen
+import org.wysko.midis2jam2.ui.settings.onscreenelements.OnScreenElementsSettingsScreen
+import org.wysko.midis2jam2.ui.settings.playback.PlaybackSettingsScreen
 
 internal actual val graphicsCategoryDescription: StringResource
     get() = Res.string.settings_graphics_description_a
@@ -57,3 +81,52 @@ internal actual fun SettingsScreenScaffold(content: @Composable () -> Unit) {
         }
     }
 }
+
+actual val categoryGroups: List<List<SettingsCategoryCardProps>>
+    @Composable
+    get() = listOf(
+        listOfNotNull(
+            SettingsCategoryCardProps(
+                title = Res.string.settings_general,
+                description = Res.string.settings_general_description,
+                icon = Res.drawable.settings_fill,
+                GeneralSettingsScreen,
+            ),
+            if (CompatLibrary.supportsFilterPostProcessor) {
+                SettingsCategoryCardProps(
+                    title = Res.string.settings_graphics,
+                    description = graphicsCategoryDescription,
+                    icon = Res.drawable.display_settings,
+                    GraphicsSettingsScreen
+                )
+            } else {
+                null
+            },
+            SettingsCategoryCardProps(
+                title = Res.string.settings_background,
+                description = Res.string.settings_background_description,
+                icon = Res.drawable.wallpaper,
+                BackgroundSettingsScreen
+            )
+        ),
+        listOf(
+            SettingsCategoryCardProps(
+                title = Res.string.settings_controls,
+                description = Res.string.settings_controls_description,
+                icon = Res.drawable.keyboard,
+                ControlsSettingsScreen,
+            ),
+            SettingsCategoryCardProps(
+                title = Res.string.settings_playback,
+                description = Res.string.settings_playback_description,
+                icon = Res.drawable.media_output,
+                PlaybackSettingsScreen,
+            ),
+            SettingsCategoryCardProps(
+                title = Res.string.settings_on_screen_elements,
+                description = Res.string.settings_on_screen_elements_description,
+                icon = Res.drawable.screenshot_monitor,
+                OnScreenElementsSettingsScreen,
+            ),
+        ),
+    )

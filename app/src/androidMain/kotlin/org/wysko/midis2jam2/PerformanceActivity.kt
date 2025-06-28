@@ -15,11 +15,12 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-
 package org.wysko.midis2jam2
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -178,7 +179,25 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                             modifier = Modifier
                                 .fillMaxSize()
                                 .align(Alignment.TopCenter),
-                            factory = { harness.view }
+                            factory = {
+                                harness.view.apply {
+                                    if (CompatLibrary.requiresPerformanceViewSystemBack) {
+                                        isFocusableInTouchMode = true
+                                        requestFocus()
+                                        setOnKeyListener { _, keyCode, event ->
+                                            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                                                Log.d("BackPress", "View-level back press")
+                                                harness.stop()
+                                                applicationService.onApplicationFinished()
+                                                finish()
+                                                true
+                                            } else {
+                                                false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         )
                         if (ready) {
                             Box(
@@ -342,7 +361,6 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                                     IconButtonDefaults.filledTonalIconButtonColors()
                                 } else {
                                     IconButtonDefaults.filledIconButtonColors()
-
                                 }
                             ) {
                                 Text(text = "S", fontFamily = worldOneRegular)
@@ -395,7 +413,6 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
                 }
             }
         }
-
     }
 }
 

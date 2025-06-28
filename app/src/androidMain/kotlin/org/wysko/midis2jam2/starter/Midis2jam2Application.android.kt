@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.starter
 
+import android.os.Build
 import com.jme3.app.SimpleApplication
 import com.jme3.asset.plugins.AndroidLocator
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +31,7 @@ import org.koin.core.component.inject
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.midis2jam2.AndroidMidis2jam2
+import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.MidiService
@@ -56,9 +58,7 @@ internal actual class Midis2jam2Application(
         val configurations = applicationService.configurations.value
 
         applyConfigurations(configurations)
-        setupState(configurations, addFpp = true, platform = Platform.Android)
-
-        assetManager.registerLocator("", AndroidLocator::class.java)
+        setupState(configurations, addFpp = CompatLibrary.supportsFilterPostProcessor, platform = Platform.Android)
 
         CoroutineScope(Dispatchers.IO).launch {
             val data = midiFile.readBytes()
