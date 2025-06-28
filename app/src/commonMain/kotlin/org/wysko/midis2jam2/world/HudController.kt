@@ -17,10 +17,20 @@
 
 package org.wysko.midis2jam2.world
 
-/* TODO! */
-
+import com.jme3.font.BitmapFont
+import com.jme3.font.BitmapText
+import com.jme3.font.Rectangle
+import com.jme3.math.ColorRGBA
+import com.jme3.math.ColorRGBA.White
 import org.wysko.midis2jam2.Midis2jam2
-//import org.wysko.midis2jam2.gui.viewmodel.I18n
+import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.node
+import org.wysko.midis2jam2.util.scale
+import org.wysko.midis2jam2.util.unaryPlus
+import org.wysko.midis2jam2.util.v3
+import kotlin.also
 import kotlin.time.Duration
 
 private const val VERTICAL_FILLBAR_SCALE = 0.7f
@@ -32,61 +42,53 @@ private const val MAXIMUM_FILLBAR_SCALE = (FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION
 /**
  * Controls the heads-up display.
  *
- * The HUD consists of a fillbar and a text label. The fillbar is a sprite that fills up as the song progresses. The text
- * label displays the name of the song.
+ * The HUD consists of a fillbar and a text label.
+ * The fillbar is a sprite that fills up as the song progresses.
+ * The text label displays the name of the song.
  */
 class HudController(private val context: Midis2jam2) {
-//    private val root = with(context) {
-//        node().also {
-//            if (configs.getType(SettingsConfiguration::class).showHud) app.guiNode += it
-//            it.move(
-//                when (I18n.currentLocale.language) {
-//                    "ar" -> v3(app.camera.width - FILLBAR_BOX_WIDTH - 16, 16, 0)
-//                    else -> v3(16, 16, 0)
-//                },
-//            )
-//        }
-//    }
-//
-//    init {
-//        with(root) {
-//            +context.assetLoader.loadSprite("SongFillbarBox.bmp").also {
-//                it.move(v3(0, 0, -10))
-//            }
-//            +BitmapText(context.assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
-//                loc = v3(0f, 46f, 0f)
-//                text = context.fileName
-//                size = 24f
-//                color = White
-//                setBox(Rectangle(0f, 488f, FILLBAR_BOX_WIDTH.toFloat(), 512f))
-//                alignment =
-//                    when (I18n.currentLocale.language) {
-//                        "ar" -> BitmapFont.Align.Right
-//                        else -> BitmapFont.Align.Left
-//                    }
-//                verticalAlignment = BitmapFont.VAlign.Bottom
-//            }
-//        }
-//    }
-//
-//    private val fillbar =
-//        with(root) {
-//            +context.assetLoader.loadSprite("SongFillbar.bmp").also {
-//                if (I18n.currentLocale.language != "ar") {
-//                    it.move(v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 10))
-//                }
-//            }
-//        }
-//
-//    init {
-//        root.children.forEach {
-//            when (it) {
-//                // Start with the HUD invisible for fade-in.
-//                is PictureWithFade -> it.opacity = 0f
-//                is BitmapText -> it.color = ColorRGBA(1f, 1f, 1f, 0f)
-//            }
-//        }
-//    }
+    private val root = with(context) {
+        node().also {
+            if (configs.find<AppSettingsConfiguration>().appSettings.onScreenElementsSettings.isShowHeadsUpDisplay) {
+                app.guiNode.attachChild(it)
+            }
+            it.move(v3(16, 16, 0))
+        }
+    }
+
+    init {
+        with(root) {
+            +context.assetLoader.loadSprite("SongFillbarBox.bmp").also {
+                it.move(v3(0, 0, -10))
+            }
+            +BitmapText(context.assetManager.loadFont("Assets/Fonts/Inter_24.fnt")).apply {
+                loc = v3(0f, 46f, 0f)
+                text = context.fileName
+                size = 24f
+                color = White
+                setBox(Rectangle(0f, 488f, FILLBAR_BOX_WIDTH.toFloat(), 512f))
+                alignment = BitmapFont.Align.Left
+                verticalAlignment = BitmapFont.VAlign.Bottom
+            }
+        }
+    }
+
+    private val fillbar =
+        with(root) {
+            +context.assetLoader.loadSprite("SongFillbar.bmp").also {
+                it.move(v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 10))
+            }
+        }
+
+    init {
+        root.children.forEach {
+            when (it) {
+                // Start with the HUD invisible for fade-in.
+                is PictureWithFade -> it.opacity = 0f
+                is BitmapText -> it.color = ColorRGBA(1f, 1f, 1f, 0f)
+            }
+        }
+    }
 
     /**
      * Updates animation.
@@ -95,23 +97,14 @@ class HudController(private val context: Midis2jam2) {
      * @param fadeValue The value to fade the HUD by.
      */
     fun tick(time: Duration, fadeValue: Float) {
-//        val scale = (MAXIMUM_FILLBAR_SCALE * (time / context.sequence.duration).coerceAtMost(1.0)).toFloat()
-//        fillbar.scale = v3(scale, VERTICAL_FILLBAR_SCALE, 1f)
-//
-//        // Essentially go in reverse by moving the fillbar to the left
-//        if (I18n.currentLocale.language == "ar") {
-//            fillbar.loc = v3(
-//                x = FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION_OFFSET + scale * FILLBAR_WIDTH),
-//                y = FILLBAR_LOCATION_OFFSET,
-//                z = 10f,
-//            )
-//        }
-//
-//        root.children.forEach {
-//            when (it) {
-//                is PictureWithFade -> it.opacity = fadeValue
-//                is BitmapText -> it.color = ColorRGBA(1f, 1f, 1f, fadeValue)
-//            }
-//        }
+        val scale = (MAXIMUM_FILLBAR_SCALE * (time / context.sequence.duration).coerceAtMost(1.0)).toFloat()
+        fillbar.scale = v3(scale, VERTICAL_FILLBAR_SCALE, 1f)
+
+        root.children.forEach {
+            when (it) {
+                is PictureWithFade -> it.opacity = fadeValue
+                is BitmapText -> it.color = ColorRGBA(1f, 1f, 1f, fadeValue)
+            }
+        }
     }
 }

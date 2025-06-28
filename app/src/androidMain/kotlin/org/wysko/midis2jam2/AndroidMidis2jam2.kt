@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2
 
+import Platform
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import org.wysko.kmidi.midi.TimeBasedSequence
@@ -52,7 +53,7 @@ class AndroidMidis2jam2(
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
-        BackgroundController.configureBackground(this@AndroidMidis2jam2, configs.find(), root)
+        BackgroundController.configureBackground(this@AndroidMidis2jam2, configs.find(), root, Platform.Android)
         cameraController = AndroidOrbitingCamera(this)
     }
 

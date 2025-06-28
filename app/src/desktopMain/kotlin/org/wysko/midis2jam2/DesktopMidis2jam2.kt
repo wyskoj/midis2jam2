@@ -35,6 +35,7 @@ import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFrom
 import org.wysko.midis2jam2.world.camera.CameraSpeed
 import org.wysko.midis2jam2.world.camera.CameraState
 import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
+import java.awt.Desktop
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
@@ -76,6 +77,7 @@ open class DesktopMidis2jam2(
                 context = this@DesktopMidis2jam2,
                 config = configs.find(),
                 root = root,
+                Platform.Desktop
             )
         } catch (e: BackgroundImageFormatException) {
             exit()

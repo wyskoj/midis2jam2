@@ -16,6 +16,7 @@
  */
 package org.wysko.midis2jam2.world.background
 
+import Platform
 import com.jme3.asset.plugins.FileLocator
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.Node
@@ -25,9 +26,11 @@ import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 
 object BackgroundController {
-    fun configureBackground(context: Midis2jam2, config: AppSettingsConfiguration, root: Node) {
+    fun configureBackground(context: Midis2jam2, config: AppSettingsConfiguration, root: Node, platform: Platform) {
         with(context) {
-            assetManager.registerLocator(BACKGROUND_IMAGES_FOLDER.absolutePath, FileLocator::class.java)
+            if (platform == Platform.Desktop) {
+                assetManager.registerLocator(BACKGROUND_IMAGES_FOLDER.absolutePath, FileLocator::class.java)
+            }
             when (config.appSettings.backgroundSettings.type) {
                 AppSettings.BackgroundSettings.BackgroundType.Default -> {
                     root.attachChild(BackgroundFactory.Default(assetManager).create())
