@@ -15,20 +15,19 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2
+package org.wysko.midis2jam2.domain
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
+import android.content.Context
+import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
-        setContent {
-            App()
+object LocaleHelper {
+    fun updateLocale(context: Context, localeTag: String) {
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(localeTag))
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            (context as? Activity)?.recreate()
         }
     }
 }
