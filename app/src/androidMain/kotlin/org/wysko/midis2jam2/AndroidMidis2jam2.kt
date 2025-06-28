@@ -55,6 +55,7 @@ class AndroidMidis2jam2(
         super.initialize(stateManager, app)
         BackgroundController.configureBackground(this@AndroidMidis2jam2, configs.find(), root, Platform.Android)
         cameraController = AndroidOrbitingCamera(this)
+        debugTextController.toggle()
     }
 
     override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {

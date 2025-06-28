@@ -26,31 +26,21 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.shape.Quad
-//import org.lwjgl.opengl.GL11
-import org.wysko.gervill.JwRealTimeSequencer
-//import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.wrap
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit.SECONDS
 
 private val OPERATING_SYSTEM by lazy {
-    "${System.getProperty("os.arch")} / ${System.getProperty("os.name")} / ${
-        System.getProperty(
-            "os.version",
-        )
-    }"
+    listOf("arch", "name", "version").joinToString(" / ") { System.getProperty("os.$it") }
 }
-private val GL_RENDERER: String by lazy { /*runCatching { GL11.glGetString(GL11.GL_RENDERER) }.getOrNull() ?: "UNKNOWN GL_RENDERER"*/ "TODO" }// TODO
+
+internal expect val GL_RENDERER: String
+
 private val JVM_INFORMATION by lazy {
-    "${
-        System.getProperty(
-            "java.vm.name"
-        )
-    }, ${System.getProperty("java.vm.vendor")}, ${System.getProperty("java.vm.version")}"
+    listOf("name", "vendor", "version").joinToString(" / ") { System.getProperty("java.vm.$it") }
 }
 
 /**
@@ -81,7 +71,7 @@ class DebugTextController(val context: Midis2jam2) {
                     additionalRenderState.blendMode = RenderState.BlendMode.Alpha
                 }
             setLocalTranslation(0f, 0f, -1f)
-            context.app.guiNode.attachChild(this)
+//            context.app.guiNode.attachChild(this) TODO
             cullHint = Spatial.CullHint.Always
         }
 
@@ -119,17 +109,21 @@ class DebugTextController(val context: Midis2jam2) {
         if (enabled) {
             with(text) { text = context.debugText(context.time, tpf) }
             with(percussionText) { text = "" }
-//            val drift =
-//                (((context as DesktopMidis2jam2).sequencer as JwRealTimeSequencer).time.seconds - context.time).absoluteValue.toDouble(SECONDS)
-//            syncIndicator.setLocalScale((drift * 5f).toFloat(), 1f, 1f)
-//            syncIndicator.material.setColor(
-//                "Color",
-//                ColorRGBA(0f, 1f, 0f, 1f).interpolateLocal(ColorRGBA.Red, (drift * 10).coerceIn(0.0, 1.0).toFloat())
-//            )
-            // TODO
+
+            val drift = getSequencerDrift(context)
+            syncIndicator.run {
+                setLocalScale((drift * 5f), 1f, 1f)
+                material.setColor("Color", getSequencerDriftColor(drift))
+            }
         }
     }
+
+    private fun getSequencerDriftColor(drift: Float): ColorRGBA {
+        return ColorRGBA(0f, 1f, 0f, 1f).interpolateLocal(ColorRGBA.Red, (drift * 10).coerceIn(0.0f, 1.0f))
+    }
 }
+
+internal expect fun getSequencerDrift(context: Midis2jam2): Float
 
 /**
  * Generates debug text.
@@ -168,7 +162,6 @@ private fun Midis2jam2.debugText(
         with(this@debugText.sequence) {
             appendLine("$fileName - ${smf.tpq} TPQN")
             appendLine("${time}s / ${duration}s")
-//            appendLine("$specification") TODO implement specification in kmidi
         }
 
         // camera position and rotation
@@ -177,18 +170,6 @@ private fun Midis2jam2.debugText(
         appendLine("${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}")
         appendLine(this@debugText.cameraState)
         appendLine(this@debugText.cameraSpeed)
-
-        // sequencer
-//        if (this@debugText is DesktopMidis2jam2) {
-//            val seq = this@debugText.sequencer as JwRealTimeSequencer
-//            appendLine()
-//            appendLine("Sequencer time: ${seq.time}")
-//            appendLine("Our time:       ${this@debugText.time}")
-//            appendLine("Drift:          ${seq.time.seconds - time}")
-//            appendLine("StartLocal:     ${seq.startTimeLocal}")
-//            appendLine("StartGlobal:    ${seq.startTimeGlobal}")
-//        }
-        // TODO
 
         appendLine()
         appendLine("Drum set:")
