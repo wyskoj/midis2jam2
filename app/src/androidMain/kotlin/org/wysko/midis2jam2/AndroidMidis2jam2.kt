@@ -19,7 +19,6 @@ package org.wysko.midis2jam2
 
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
-import kotlinx.coroutines.flow.StateFlow
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.sendResetMessage
@@ -31,6 +30,7 @@ import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.camera.CameraAngle
 import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFromLeaving
 import org.wysko.midis2jam2.world.camera.CameraState
@@ -52,6 +52,7 @@ class AndroidMidis2jam2(
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
+        BackgroundController.configureBackground(this@AndroidMidis2jam2, configs.find(), root)
         cameraController = AndroidOrbitingCamera(this)
     }
 
