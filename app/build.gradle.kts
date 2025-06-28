@@ -123,8 +123,8 @@ android {
         applicationId = "org.wysko.midis2jam2"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "2.0.0-alpha-20250624"
+        versionCode = 2
+        versionName = "2.0.0-alpha-20250628"
 
         externalNativeBuild {
             cmake {
