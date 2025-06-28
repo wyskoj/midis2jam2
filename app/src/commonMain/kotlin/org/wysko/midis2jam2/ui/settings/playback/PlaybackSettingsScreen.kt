@@ -17,8 +17,6 @@
 
 package org.wysko.midis2jam2.ui.settings.playback
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +29,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.audio_file
+import midis2jam2.app.generated.resources.close
 import midis2jam2.app.generated.resources.replace_audio
 import midis2jam2.app.generated.resources.settings_playback
 import midis2jam2.app.generated.resources.settings_playback_midi_specification_reset
@@ -65,7 +64,7 @@ object PlaybackSettingsScreen : Screen {
             SettingsOption(
                 value = null,
                 title = "None",
-                icon = { Icon(Icons.Default.Close, "") },
+                icon = { Icon(painterResource(Res.drawable.close), "") },
             ),
             SettingsOption(
                 value = MidiSpecification.GeneralMidi,

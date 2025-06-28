@@ -50,7 +50,8 @@ internal actual fun HomeTabLayout(
     isApplicationRunning: State<Boolean>,
 ) {
     Scaffold(
-        bottomBar = { AppNavigationBar() }
+        bottomBar = { AppNavigationBar() },
+        modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),

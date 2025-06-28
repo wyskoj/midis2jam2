@@ -30,8 +30,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,6 +60,7 @@ import midis2jam2.app.generated.resources.midi_device
 import midis2jam2.app.generated.resources.midi_file
 import midis2jam2.app.generated.resources.midis2jam2_logo
 import midis2jam2.app.generated.resources.play
+import midis2jam2.app.generated.resources.play_arrow
 import midis2jam2.app.generated.resources.soundbank
 import midis2jam2.app.generated.resources.tab_home
 import org.jetbrains.compose.resources.painterResource
@@ -141,7 +140,7 @@ fun PlayButton(
         modifier = Modifier.width(192.dp).height(56.dp),
         enabled = enabled
     ) {
-        Icon(Icons.Default.PlayArrow, "", modifier = Modifier.size(24.dp))
+        Icon(painterResource(Res.drawable.play_arrow), "", modifier = Modifier.size(24.dp))
         Spacer(Modifier.width(8.dp))
         Text(stringResource(Res.string.play), fontSize = 16.sp)
     }

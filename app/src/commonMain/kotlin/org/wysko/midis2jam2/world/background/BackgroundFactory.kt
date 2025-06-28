@@ -29,12 +29,8 @@ import com.jme3.texture.Image
 import com.jme3.texture.Texture
 import com.jme3.texture.Texture2D
 import com.jme3.texture.TextureCubeMap
-//import com.jme3.texture.plugins.AWTLoader
 import com.jme3.util.SkyFactory
-//import jme3tools.converters.ImageToAwt
 import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
-import java.awt.geom.AffineTransform
-import java.awt.image.AffineTransformOp
 
 /**
  * Background factory for different background types.
@@ -145,14 +141,6 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
                     .apply { shadowMode = RenderQueue.ShadowMode.Off }
             }
     }
-
-    private fun rotateTexture(texture: Texture): Texture2D {
-//        val image = ImageToAwt.convert(texture.image, false, true, 0)
-//        val tx = AffineTransform.getScaleInstance(-1.0, -1.0).apply {
-//            translate(-image.width.toDouble(), -image.height.toDouble())
-//        }
-//        val rotatedImage = AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(image, null)
-//        return Texture2D(AWTLoader().load(rotatedImage, true))
-        return TODO()
-    }
 }
+
+internal expect fun rotateTexture(texture: Texture): Texture2D

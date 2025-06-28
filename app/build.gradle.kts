@@ -58,42 +58,35 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.jme3.androidNative)
-            implementation(libs.midiDriver)
-            implementation(libs.appcompat)
-            implementation(libs.fluidsynth)
             implementation(libs.koin.android)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
         }
         commonMain.dependencies {
-            // -- FRONTEND LAYER -- //
+            val composeBom = project.dependencies.platform(libs.androidx.compose.bom)
+            implementation(composeBom)
 
-            // Compose
-            implementation(project.dependencies.platform(libs.androidx.compose.bom))
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-            implementation(compose.runtime)
             implementation(compose.ui)
-            implementation(libs.androidx.compose.materialIcons)
-            implementation(libs.compose.colorpicker)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
 
-            // DI and UI navigation
+            // DI and UI
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.bundles.voyager)
             implementation(libs.multiplatformSettings)
             implementation(project.dependencies.platform(libs.koin.bom))
 
+            // Components
+            implementation(libs.compose.colorpicker)
+
             // Serialization
             implementation(libs.kotlinx.serialization.json)
 
             // Filekit
             implementation(libs.filekit)
-
-            // AndroidX
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-
-            // -- BACKEND LAYER -- //
 
             // jMonkeyEngine
             implementation(libs.bundles.jme3)
@@ -102,15 +95,20 @@ kotlin {
             implementation(libs.kmidi)
             implementation(files("../libs/Gervill-0.2.31.jar"))
 
+            // Kotlin
+            implementation(libs.kotlin.reflect)
+
             // Misc.
             implementation(libs.logbackClassic)
             implementation(libs.noise)
-            implementation(libs.kotlin.reflect)
         }
 
         desktopMain.dependencies {
+            // Compose
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
+            // jMonkeyEngine
             implementation(libs.jme3.desktop)
             implementation(libs.jme3.lwjgl3)
         }
@@ -155,8 +153,9 @@ android {
         dataBinding = true
     }
     androidResources {
-        @Suppress("UnstableApiUsage")
-        localeFilters += listOf("en-rUS", "fr")
+        defaultConfig {
+            resourceConfigurations.addAll(listOf("en-rUS", "fr"))
+        }
     }
     packaging {
         jniLibs.pickFirsts.add("**/libc++_shared.so")

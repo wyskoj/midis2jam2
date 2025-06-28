@@ -20,7 +20,6 @@ package org.wysko.midis2jam2.domain
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
-import org.billthefarmer.mididriver.MidiDriver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.midi.system.MidiDevice
@@ -99,96 +98,6 @@ class FluidSynthDevice(context: Context) : MidiDevice {
 
     override fun sendSysex(data: ByteArray) {
         bridge?.sendSysex((bridge ?: return).synthPtr, data)
-    }
-}
-
-class AndroidMidiDevice(
-    override val name: String,
-) : MidiDevice {
-    private val driver = MidiDriver.getInstance()
-
-    override fun open() {
-        driver.start()
-    }
-
-    override fun close() {
-        driver.stop()
-    }
-
-    override fun sendNoteOnMessage(channel: Int, note: Int, velocity: Int) {
-        driver.write(
-            byteArrayOf(
-                (0x90 or channel).toByte(),
-                note.toByte(),
-                velocity.toByte()
-            )
-        )
-    }
-
-    override fun sendNoteOffMessage(channel: Int, note: Int) {
-        driver.write(
-            byteArrayOf(
-                (0x80 or channel).toByte(),
-                note.toByte(),
-                0.toByte()
-            )
-        )
-    }
-
-    override fun sendControlChangeMessage(channel: Int, controller: Int, value: Int) {
-        driver.write(
-            byteArrayOf(
-                (0xB0 or channel).toByte(),
-                controller.toByte(),
-                value.toByte()
-            )
-        )
-    }
-
-    override fun sendProgramChangeMessage(channel: Int, program: Int) {
-        driver.write(
-            byteArrayOf(
-                (0xC0 or channel).toByte(),
-                program.toByte()
-            )
-        )
-    }
-
-    override fun sendPitchBendMessage(channel: Int, pitch: Int) {
-        val lsb = pitch and 0x7F
-        val msb = (pitch shr 7) and 0x7F
-        driver.write(
-            byteArrayOf(
-                (0xE0 or channel).toByte(),
-                lsb.toByte(),
-                msb.toByte()
-            )
-        )
-    }
-
-    override fun sendChannelPressureMessage(channel: Int, pressure: Int) {
-        driver.write(
-            byteArrayOf(
-                (0xD0 or channel).toByte(),
-                pressure.toByte()
-            )
-        )
-    }
-
-    override fun sendPolyphonicPressureMessage(channel: Int, note: Int, pressure: Int) {
-        driver.write(
-            byteArrayOf(
-                (0xA0 or channel).toByte(),
-                note.toByte(),
-                pressure.toByte()
-            )
-        )
-    }
-
-    override fun sendSysex(data: ByteArray) {
-        driver.write(
-            byteArrayOf(0xF0.toByte()) + data + 0xF7.toByte()
-        )
     }
 }
 

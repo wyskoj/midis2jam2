@@ -17,8 +17,6 @@
 
 package org.wysko.midis2jam2.ui.settings.graphics
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +25,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.close
 import midis2jam2.app.generated.resources.fullscreen
 import midis2jam2.app.generated.resources.high_density
 import midis2jam2.app.generated.resources.hotel_class
@@ -59,7 +58,6 @@ import org.wysko.midis2jam2.ui.settings.graphics.resolution.ResolutionSettingsSc
 
 @Composable
 internal actual fun GraphicsSettingsScreenContent() {
-
     val navigator = LocalNavigator.currentOrThrow
     val settingsModel = GraphicsSettingsScreen.koinScreenModel<SettingsModel>()
     val model = GraphicsSettingsScreen.koinScreenModel<GraphicsSettingsScreenModel>()
@@ -69,7 +67,7 @@ internal actual fun GraphicsSettingsScreenContent() {
         SettingsOption(
             value = ShadowsQuality.Fake,
             title = stringResource(Res.string.settings_graphics_shadows_none),
-            icon = { Icon(Icons.Default.Close, "") },
+            icon = { Icon(painterResource(Res.drawable.close), "") },
         ),
         SettingsOption(
             value = ShadowsQuality.Low,
@@ -92,7 +90,7 @@ internal actual fun GraphicsSettingsScreenContent() {
         SettingsOption(
             value = null,
             title = stringResource(Res.string.quality_none),
-            icon = { Icon(Icons.Default.Close, "") },
+            icon = { Icon(painterResource(Res.drawable.close), "") },
         ),
         SettingsOption(
             value = AntiAliasingQuality.Low,
@@ -181,5 +179,4 @@ internal actual fun GraphicsSettingsScreenContent() {
             }
         )
     }
-
 }
