@@ -50,7 +50,7 @@ class HeapAPQ<K, V>(private val comparator: Comparator<K>) {
     fun removeMin(): PQEntry? {
         if (entries.isEmpty()) return null
         val entry: PQEntry = entries[0]
-        val e = entries.removeLast()
+        val e = entries.removeAt(entries.indices.last)
         if (entries.isNotEmpty()) {
             entries[0] = e
             e.index = 0
