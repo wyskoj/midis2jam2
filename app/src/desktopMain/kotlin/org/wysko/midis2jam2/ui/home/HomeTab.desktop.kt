@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,8 @@ internal actual fun HomeTabLayout(
     model: HomeTabModel,
     isApplicationRunning: State<Boolean>,
 ) {
+    val isPlayButtonEnabled = model.isPlayButtonEnabled.collectAsState(initial = false)
+
     Scaffold { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -62,7 +65,7 @@ internal actual fun HomeTabLayout(
                     SoundbankSelector(model, state)
                 }
                 item {
-                    PlayButton(!isApplicationRunning.value, model::startApplication)
+                    PlayButton(isPlayButtonEnabled.value, model::startApplication)
                 }
             }
         }

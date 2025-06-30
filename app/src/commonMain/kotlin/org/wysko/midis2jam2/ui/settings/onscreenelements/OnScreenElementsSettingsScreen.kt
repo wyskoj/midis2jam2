@@ -64,7 +64,7 @@ object OnScreenElementsSettingsScreen : Screen {
                 }
             )
             SettingsBooleanCard(
-                title = { Text(stringResource(Res.string.settings_onscreenelements_hud))},
+                title = { Text(stringResource(Res.string.settings_onscreenelements_hud)) },
                 icon = { Icon(painterResource(Res.drawable.browse_activity), "") },
                 label = { Text(stringResource(Res.string.settings_onscreenelements_hud_description)) },
                 isEnabled = settings.value.onScreenElementsSettings.isShowHeadsUpDisplay,

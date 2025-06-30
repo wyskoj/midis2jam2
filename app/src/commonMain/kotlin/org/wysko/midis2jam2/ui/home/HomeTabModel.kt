@@ -19,19 +19,28 @@ package org.wysko.midis2jam2.ui.home
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.ExecutionState
 import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.domain.isInternal
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.ui.settings.SettingsModel
+import java.io.File
 
 class HomeTabModel(
     private val midiService: MidiService,
@@ -42,15 +51,34 @@ class HomeTabModel(
             selectedMidiDevice = midiService.getMidiDevices().first()
         )
     )
+
     val state: StateFlow<HomeTabState>
         get() = _state
 
     val isApplicationRunning: StateFlow<Boolean>
         get() = applicationService.isApplicationRunning
 
+    val isShowSoundbankSelector: StateFlow<Boolean> = _state.map { it.selectedMidiDevice.isInternal() }.stateIn(
+        scope = screenModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = _state.value.selectedMidiDevice.isInternal()
+    )
+
+    val isPlayButtonEnabled: Flow<Boolean>
+        get() = _state.combine(applicationService.isApplicationRunning) { state, isRunning ->
+            !isRunning && state.selectedMidiFile != null
+        }
+
+    val soundbanks: Flow<List<PlatformFile>> = run {
+        val settings: SettingsModel by inject()
+        settings.appSettings.map { settings ->
+            settings.playbackSettings.soundbanksSettings.soundbanks.map { PlatformFile(File(it)) }
+        }
+    }
+
     @Composable
     fun midiFilePicker(
-        extraCallback: ((PlatformFile?) -> Unit)? = null
+        extraCallback: ((PlatformFile?) -> Unit)? = null,
     ): PickerResultLauncher {
         return rememberFilePickerLauncher(
             mode = PickerMode.Single,
@@ -74,16 +102,10 @@ class HomeTabModel(
         }
     }
 
-    fun getMidiDevices(): List<MidiDevice> {
-        return midiService.getMidiDevices()
-    }
+    fun getMidiDevices(): List<MidiDevice> = midiService.getMidiDevices()
 
     fun setSelectedMidiDevice(midiDevice: MidiDevice) {
         _state.value = _state.value.copy(selectedMidiDevice = midiDevice)
-    }
-
-    fun getSoundbanks(): List<PlatformFile> {
-        return emptyList() // TODO
     }
 
     fun setSelectedSoundbank(soundbank: PlatformFile?) {
@@ -91,6 +113,4 @@ class HomeTabModel(
             selectedSoundbank = soundbank
         )
     }
-
-    fun isShowSoundbankSelector(): Boolean = _state.value.selectedMidiDevice.isInternal()
 }

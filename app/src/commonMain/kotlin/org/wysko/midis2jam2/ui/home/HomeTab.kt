@@ -20,6 +20,8 @@
 package org.wysko.midis2jam2.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +64,7 @@ import midis2jam2.app.generated.resources.midis2jam2_logo
 import midis2jam2.app.generated.resources.play
 import midis2jam2.app.generated.resources.play_arrow
 import midis2jam2.app.generated.resources.soundbank
+import midis2jam2.app.generated.resources.soundbank_default
 import midis2jam2.app.generated.resources.tab_home
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -80,16 +83,21 @@ internal fun SoundbankSelector(
     model: HomeTabModel,
     state: State<HomeTabState>,
 ) {
-    AnimatedVisibility(model.isShowSoundbankSelector()) {
+    val isShowSoundbankSelector = model.isShowSoundbankSelector.collectAsState()
+    val soundbanks = model.soundbanks.collectAsState(initial = emptyList())
+    AnimatedVisibility(
+        visible = isShowSoundbankSelector.value,
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+    ) {
         SoundbankSelector(
-            soundbanks = model.getSoundbanks(),
+            soundbanks = soundbanks.value,
             selectedSoundbank = state.value.selectedSoundbank,
         ) { soundbank ->
             model.setSelectedSoundbank(soundbank)
         }
     }
 }
-
 
 @Composable
 internal fun MidiDeviceSelector(
@@ -155,7 +163,7 @@ internal fun SoundbankSelector(
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
-    val selectedSoundbankName = selectedSoundbank?.name ?: "Default soundbank"
+    val selectedSoundbankName = selectedSoundbank?.name ?: stringResource(Res.string.soundbank_default)
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         onExpandedChange = { },
@@ -193,7 +201,7 @@ internal fun SoundbankSelector(
         ) {
             (listOf<PlatformFile?>(null) + soundbanks).forEach { soundbank ->
                 DropdownMenuItem(
-                    text = { Text(selectedSoundbankName) },
+                    text = { Text(soundbank?.name ?: stringResource(Res.string.soundbank_default)) },
                     onClick = {
                         onSelectSoundbank(soundbank)
                         isExpanded = false

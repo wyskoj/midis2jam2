@@ -28,9 +28,7 @@ import java.io.IOException
 actual class MidiService : KoinComponent {
     actual fun getMidiDevices(): List<MidiDevice> {
         val context: Context by inject()
-        return listOf(
-            FluidSynthDevice(context)
-        )
+        return listOf(FluidSynthDevice(context))
     }
 }
 
@@ -101,6 +99,4 @@ class FluidSynthDevice(context: Context) : MidiDevice {
     }
 }
 
-actual fun MidiDevice.isInternal(): Boolean {
-    return true // TODO
-}
+actual fun MidiDevice.isInternal(): Boolean = true

@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,20 +54,23 @@ actual fun MainLayout() {
 @Composable
 fun AppNavigationRail() {
     val navigator = LocalTabNavigator.current
-    NavigationRail {
-        Spacer(Modifier.Companion.weight(1f))
-        tabs.forEach {
-            val isTabSelected = navigator.current == it.key
-            val name = stringResource(it.value.name)
-            NavigationRailItem(
-                selected = isTabSelected,
-                onClick = { navigator.current = it.key },
-                icon = { Icon(painterResource(it.value.getTab(isTabSelected)), name) },
-                label = { Text(name) },
-                modifier = Modifier.Companion.padding(horizontal = 8.dp)
-            )
-            Spacer(Modifier.Companion.height(12.dp))
+    Row {
+        NavigationRail {
+            Spacer(Modifier.Companion.weight(1f))
+            tabs.forEach {
+                val isTabSelected = navigator.current == it.key
+                val name = stringResource(it.value.name)
+                NavigationRailItem(
+                    selected = isTabSelected,
+                    onClick = { navigator.current = it.key },
+                    icon = { Icon(painterResource(it.value.getTab(isTabSelected)), name) },
+                    label = { Text(name) },
+                    modifier = Modifier.Companion.padding(horizontal = 8.dp)
+                )
+                Spacer(Modifier.Companion.height(12.dp))
+            }
+            Spacer(Modifier.Companion.weight(1f))
         }
-        Spacer(Modifier.Companion.weight(1f))
+        VerticalDivider(Modifier.fillMaxHeight())
     }
 }

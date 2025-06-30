@@ -34,6 +34,8 @@ import midis2jam2.app.generated.resources.media_output
 import midis2jam2.app.generated.resources.screenshot_monitor
 import midis2jam2.app.generated.resources.settings_background
 import midis2jam2.app.generated.resources.settings_background_description
+import midis2jam2.app.generated.resources.settings_camera
+import midis2jam2.app.generated.resources.settings_camera_description
 import midis2jam2.app.generated.resources.settings_controls
 import midis2jam2.app.generated.resources.settings_controls_description
 import midis2jam2.app.generated.resources.settings_fill
@@ -46,12 +48,14 @@ import midis2jam2.app.generated.resources.settings_on_screen_elements_descriptio
 import midis2jam2.app.generated.resources.settings_playback
 import midis2jam2.app.generated.resources.settings_playback_description
 import midis2jam2.app.generated.resources.tab_settings
+import midis2jam2.app.generated.resources.videocam
 import midis2jam2.app.generated.resources.wallpaper
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.settings.background.BackgroundSettingsScreen
+import org.wysko.midis2jam2.ui.settings.camera.CameraSettingsScreen
 import org.wysko.midis2jam2.ui.settings.controls.ControlsSettingsScreen
 import org.wysko.midis2jam2.ui.settings.general.GeneralSettingsScreen
 import org.wysko.midis2jam2.ui.settings.graphics.GraphicsSettingsScreen
@@ -127,6 +131,12 @@ actual val categoryGroups: List<List<SettingsCategoryCardProps>>
                 description = Res.string.settings_on_screen_elements_description,
                 icon = Res.drawable.screenshot_monitor,
                 OnScreenElementsSettingsScreen,
+            ),
+            SettingsCategoryCardProps(
+                title = Res.string.settings_camera,
+                description = Res.string.settings_camera_description,
+                icon = Res.drawable.videocam,
+                CameraSettingsScreen,
             ),
         ),
     )

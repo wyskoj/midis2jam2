@@ -213,10 +213,44 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         }
     }
 
-    fun setAntiAliasingQuality(antiAliasingQuality: AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality) {
+    fun setAntiAliasingQuality(
+        antiAliasingQuality: AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
+    ) {
         screenModelScope.launch {
             settingsRepository.updateAppSettings {
                 graphicsSettings.antiAliasingSettings.antiAliasingQuality = antiAliasingQuality
+            }
+        }
+    }
+
+    fun setStartAutocamWithSong(isStartWithSong: Boolean) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                cameraSettings.isStartAutocamWithSong = isStartWithSong
+            }
+        }
+    }
+
+    fun setSmoothFreecam(isSmoothFreecam: Boolean) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                cameraSettings.isSmoothFreecam = isSmoothFreecam
+            }
+        }
+    }
+
+    fun setClassicAutoCam(isClassicAutoCam: Boolean) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                cameraSettings.isClassicAutoCam = isClassicAutoCam
+            }
+        }
+    }
+
+    fun setAlwaysShowInstruments(isAlwaysShow: Boolean) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                instrumentSettings.isAlwaysShowInstruments = isAlwaysShow
             }
         }
     }

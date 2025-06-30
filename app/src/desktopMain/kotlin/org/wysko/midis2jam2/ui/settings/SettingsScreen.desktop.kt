@@ -32,9 +32,12 @@ import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.display_settings
 import midis2jam2.app.generated.resources.keyboard
 import midis2jam2.app.generated.resources.media_output
+import midis2jam2.app.generated.resources.piano
 import midis2jam2.app.generated.resources.screenshot_monitor
 import midis2jam2.app.generated.resources.settings_background
 import midis2jam2.app.generated.resources.settings_background_description
+import midis2jam2.app.generated.resources.settings_camera
+import midis2jam2.app.generated.resources.settings_camera_description
 import midis2jam2.app.generated.resources.settings_controls
 import midis2jam2.app.generated.resources.settings_controls_description
 import midis2jam2.app.generated.resources.settings_fill
@@ -42,18 +45,23 @@ import midis2jam2.app.generated.resources.settings_general
 import midis2jam2.app.generated.resources.settings_general_description
 import midis2jam2.app.generated.resources.settings_graphics
 import midis2jam2.app.generated.resources.settings_graphics_description
+import midis2jam2.app.generated.resources.settings_instruments
+import midis2jam2.app.generated.resources.settings_instruments_description
 import midis2jam2.app.generated.resources.settings_on_screen_elements
 import midis2jam2.app.generated.resources.settings_on_screen_elements_description
 import midis2jam2.app.generated.resources.settings_playback
 import midis2jam2.app.generated.resources.settings_playback_description
 import midis2jam2.app.generated.resources.tab_settings
+import midis2jam2.app.generated.resources.videocam
 import midis2jam2.app.generated.resources.wallpaper
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.wysko.midis2jam2.ui.settings.background.BackgroundSettingsScreen
+import org.wysko.midis2jam2.ui.settings.camera.CameraSettingsScreen
 import org.wysko.midis2jam2.ui.settings.controls.ControlsSettingsScreen
 import org.wysko.midis2jam2.ui.settings.general.GeneralSettingsScreen
 import org.wysko.midis2jam2.ui.settings.graphics.GraphicsSettingsScreen
+import org.wysko.midis2jam2.ui.settings.instruments.InstrumentsSettingsScreen
 import org.wysko.midis2jam2.ui.settings.onscreenelements.OnScreenElementsSettingsScreen
 import org.wysko.midis2jam2.ui.settings.playback.PlaybackSettingsScreen
 
@@ -121,6 +129,18 @@ actual val categoryGroups: List<List<SettingsCategoryCardProps>>
                 description = Res.string.settings_on_screen_elements_description,
                 icon = Res.drawable.screenshot_monitor,
                 OnScreenElementsSettingsScreen,
+            ),
+            SettingsCategoryCardProps(
+                title = Res.string.settings_camera,
+                description = Res.string.settings_camera_description,
+                icon = Res.drawable.videocam,
+                CameraSettingsScreen,
+            ),
+            SettingsCategoryCardProps(
+                title = Res.string.settings_instruments,
+                description = Res.string.settings_instruments_description,
+                icon = Res.drawable.piano,
+                InstrumentsSettingsScreen,
             ),
         ),
     )

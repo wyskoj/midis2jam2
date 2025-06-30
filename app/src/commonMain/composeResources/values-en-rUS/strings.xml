@@ -113,6 +113,22 @@
     <string name="settings_playback_soundbanks">Soundbanks</string>
     <string name="settings_playback_soundbanks_description">Import soundbanks for use with Gervill synthesizer</string>
 
+    <!-- Camera settings -->
+    <string name="settings_camera">Camera</string>
+    <string name="settings_camera_description">Auto-cam, classic camera</string>
+    <string name="settings_camera_start_autocam_with_song">Start auto-cam with song</string>
+    <string name="settings_camera_start_autocam_with_song_description">When song starts, automatically switch to auto-cam</string>
+    <string name="settings_camera_classic_autocam">Classic auto-cam</string>
+    <string name="settings_camera_classic_autocam_description">Simulate auto-cam movement from MidiJam</string>
+    <string name="settings_camera_smooth_freecam">Smooth freecam</string>
+    <string name="settings_camera_smooth_freecam_description">Make freecam movement smoother</string>
+
+    <!-- Instrument settings -->
+    <string name="settings_instruments">Instruments</string>
+    <string name="settings_instruments_description">Instrument visibility</string>
+    <string name="settings_instruments_always_show_instruments">Always show instruments</string>
+    <string name="settings_instruments_always_show_instruments_description">Never hide instruments, even when no notes are playing</string>
+
     <!-- From settings.general.xml -->
     <string name="settings_general_theme">Theme</string>
     <string name="settings_general_theme_light">Light</string>
