@@ -36,12 +36,8 @@ object BackgroundController {
                     root.attachChild(BackgroundFactory.Default(assetManager).create())
                 }
 
-                AppSettings.BackgroundSettings.BackgroundType.RepeatedCubeMap -> {
-                    root.attachChild(BackgroundFactory.RepeatedCubeMap(assetManager, config).create())
-                }
-
-                AppSettings.BackgroundSettings.BackgroundType.UniqueCubeMap -> {
-                    root.attachChild(BackgroundFactory.UniqueCubeMap(assetManager, config).create())
+                AppSettings.BackgroundSettings.BackgroundType.CubeMap -> {
+                    root.attachChild(BackgroundFactory.CubeMap(assetManager, config).create())
                 }
 
                 AppSettings.BackgroundSettings.BackgroundType.Color -> {

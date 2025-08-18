@@ -42,8 +42,25 @@ actual class ApplicationService : KoinComponent {
     val configurations: StateFlow<List<Configuration>>
         get() = _configurations
 
+    private val _isFirstLaunch = MutableStateFlow(
+        run {
+            val context by inject<Context>()
+            val prefs = context.getSharedPreferences("org.wysko.midis2jam2.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE)
+            prefs.getBoolean("isFirstLaunch", true)
+        }
+    )
+    val isFirstLaunch: StateFlow<Boolean>
+        get() = _isFirstLaunch
+
     actual fun startApplication(executionState: ExecutionState) {
         _isApplicationRunning.value = true
+
+        run {
+            val context by inject<Context>()
+            val prefs = context.getSharedPreferences("org.wysko.midis2jam2.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE)
+            prefs.edit().putBoolean("isFirstLaunch", false).apply()
+            _isFirstLaunch.value = false
+        }
 
         val homeTabModel: HomeTabModel by inject()
         val configurationService: ConfigurationService by inject()
@@ -64,4 +81,6 @@ actual class ApplicationService : KoinComponent {
     fun onApplicationFinished() {
         _isApplicationRunning.value = false
     }
+
+    actual fun startQueueApplication(executionState: QueueExecutionState) = Unit // Not implemented for Android
 }

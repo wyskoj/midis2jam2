@@ -98,4 +98,8 @@ class Midis2jam2Harness(
 
     val isSlideCamActive: StateFlow<Boolean>
         get() = app.isSlideCamActive
+
+    fun isPlaying(): Boolean {
+        return app.isPlaying()
+    }
 }

@@ -36,11 +36,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.play_midi_file
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.ui.AppNavigationBar
+import org.wysko.midis2jam2.ui.tutorial.TutorialScreen
 
 @Composable
 internal actual fun HomeTabLayout(
@@ -75,9 +80,15 @@ internal actual fun HomeTabLayout(
 fun SelectAndPlayMidiFile(
     model: HomeTabModel,
 ) {
+    val applicationService = koinInject<ApplicationService>()
+    val navigator = LocalNavigator.currentOrThrow
     val picker = model.midiFilePicker {
         if (it != null) {
-            model.startApplication()
+            if (applicationService.isFirstLaunch.value) {
+                navigator.push(TutorialScreen)
+            } else {
+                model.startApplication()
+            }
         }
     }
     Button(

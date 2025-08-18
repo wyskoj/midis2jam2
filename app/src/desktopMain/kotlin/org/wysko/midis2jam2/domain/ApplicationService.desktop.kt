@@ -23,6 +23,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.starter.MidiPackage
 import org.wysko.midis2jam2.starter.Midis2jam2Application
+import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
+import org.wysko.midis2jam2.starter.applyConfigurations
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
 import org.wysko.midis2jam2.ui.home.HomeTabModel
 
@@ -60,6 +62,36 @@ actual class ApplicationService : KoinComponent {
                 synthesizer,
                 midiDevice
             ).execute()
+        }
+    }
+
+    actual fun startQueueApplication(executionState: QueueExecutionState) {
+        _isApplicationRunning.value = true
+
+        val homeTabModel: HomeTabModel by inject()
+        val configurationService: ConfigurationService by inject()
+        val configurations = configurationService.getConfigurations()
+
+        val midiPackage = runCatching { MidiPackage.build(null, configurations) }.onFailure {
+            _isApplicationRunning.value = false
+//            onFinish(it) TODO
+            return
+        }
+
+        with(midiPackage.getOrNull() ?: return) {
+            Midis2jam2QueueApplication(
+                executionState.queue.map { it.file },
+                configurations,
+                {
+                    _isApplicationRunning.value = false
+                },
+                sequencer,
+                synthesizer,
+                midiDevice
+            ).run {
+                applyConfigurations(configurations)
+                start()
+            }
         }
     }
 }

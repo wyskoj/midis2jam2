@@ -1,139 +1,217 @@
-<!--
-  ~ Copyright (C) 2025 Jacob Wysko
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program. If not, see https://www.gnu.org/licenses/.
-  -->
-
 <resources>
-    <!-- From common.xml -->
+    <!-- Commun -->
     <string name="tab_home">Accueil</string>
-    <string name="tab_search">Rechercher</string>
+    <string name="tab_queue">File d'attente</string>
+    <string name="tab_search">Recherche</string>
     <string name="tab_settings">Paramètres</string>
+    <string name="tab_about">À propos</string>
+
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="back">Retour</string>
-    <string name="play">Lire</string>
+    <string name="play">Lecture</string>
     <string name="enabled">Activé</string>
     <string name="disabled">Désactivé</string>
+
     <string name="midi_file">Fichier MIDI</string>
     <string name="midi_device">Périphérique MIDI</string>
     <string name="soundbank">Banque de sons</string>
     <string name="soundbank_default">Banque de sons par défaut</string>
-    <string name="play_midi_file">Lire un fichier MIDI</string>
+    <string name="play_midi_file">Lire le fichier MIDI</string>
+
     <string name="quality_none">Aucune</string>
-    <string name="quality_low">Basse</string>
+    <string name="quality_low">Faible</string>
     <string name="quality_medium">Moyenne</string>
     <string name="quality_high">Élevée</string>
+    <string name="help">Aide</string>
 
-    <!-- From settings.xml -->
+    <string name="launcher_window_title">Lanceur midis2jam2</string>
+
+    <!-- File d'attente -->
+    <string name="queue_add">Ajouter à la file d'attente</string>
+    <string name="queue_clear">Effacer</string>
+    <string name="queue_clear_prompt">Effacer la file d'attente ?</string>
+
+    <string name="queue_clear_warning">Cette opération ne peut pas être annulée.</string>
+    <string name="queue_empty">Les morceaux que vous ajoutez apparaîtront ici.</string>
+    <string name="queue_load">Charger</string>
+    <string name="queue_load_prompt">Charger la file d'attente ?</string>
+
+    <string name="queue_load_warning">Cela effacera la file d'attente actuelle.</string>
+    <string name="queue_load_missing">Certains fichiers manquent</string>
+    <string name="queue_load_missing_help">Les fichiers suivants sont introuvables :</string>
+    <string name="queue_save">Enregistrer</string>
+
+    <string name="queue_save_confirmation">File d'attente enregistrée.</string>
+    <string name="queue_shuffle">Mélanger</string>
+
+    <!-- Recherche -->
+    <string name="search_criteria_too_narrow">Aucun fichier MIDI correspondant trouvé. Essayez d'ajuster vos critères.</string>
+
+    <string name="search_deselect_all">Tout désélectionner</string>
+    <string name="search_directory">Répertoire</string>
+    <string name="search_index_not_available">Sélectionnez un répertoire pour indexer les fichiers MIDI.</string>
+    <string name="search_index_waiting">Patientez ! Nous indexons vos fichiers MIDI...</string>
+
+
+    <!-- Paramètres -->
     <string name="settings_general">Général</string>
     <string name="settings_general_description">Langue, thème</string>
     <string name="settings_graphics">Graphismes</string>
-    <string name="settings_graphics_description">Plein écran, résolution, anti-crénelage</string>
+    <string name="settings_graphics_description">Plein écran, résolution, anti-aliasing</string>
+
     <string name="settings_graphics_description_a">Ombres</string>
     <string name="settings_background">Arrière-plan</string>
-    <string name="settings_background_description">Choisir une image ou une couleur</string>
-    <string name="settings_controls">Contrôles</string>
-    <string name="settings_controls_description">Verrouillage curseur, touches de modification de vitesse</string>
+    <string name="settings_background_description">Choisissez une image ou une couleur</string>
+    <string name="settings_controls">Commandes</string>
+
+    <string name="settings_controls_description">Verrouillage du curseur, touches de modification de la vitesse</string>
+    <string name="settings_controls_description_a">Entrée tactile</string>
     <string name="settings_playback">Lecture</string>
     <string name="settings_playback_description">Périphérique MIDI, synthétiseur, banques de sons</string>
+
     <string name="settings_on_screen_elements">Éléments à l'écran</string>
     <string name="settings_on_screen_elements_description">Affichage tête haute, paroles</string>
 
-    <!-- From settings.graphics.xml -->
-    <string name="settings_graphics_fullscreen">Plein écran</string>
-    <string name="settings_graphics_fullscreen_description">Utiliser tout l'écran</string>
-    <string name="settings_graphics_resolution">Résolution</string>
-    <string name="settings_graphics_resolution_fullscreen">La résolution correspond à l'écran en mode plein écran</string>
-    <string name="settings_graphics_resolution_default">Utiliser la résolution par défaut</string>
-    <string name="settings_graphics_resolution_default_hint">Par défaut</string>
-    <string name="settings_graphics_resolution_default_description">La résolution par défaut utilise la majeure partie de l'écran</string>
-    <string name="settings_graphics_resolution_custom">Résolution personnalisée</string>
-    <string name="settings_graphics_resolution_width">Largeur</string>
-    <string name="settings_graphics_resolution_height">Hauteur</string>
-    <string name="settings_graphics_shadows">Ombres</string>
-    <string name="settings_graphics_shadows_description">Afficher les ombres sous les objets</string>
-    <string name="settings_graphics_shadows_none">Aucune (simulées)</string>
-    <string name="settings_graphics_shadows_description_a">Afficher les ombres dynamiques</string>
-    <string name="settings_graphics_shadows_description_hint_a">Les ombres dynamiques sont plus belles mais peuvent réduire les performances</string>
-    <string name="settings_graphics_anti_aliasing">Anti-crénelage</string>
-    <string name="settings_graphics_anti_aliasing_description">Lisser les bords des objets</string>
 
-    <!-- From settings.background.xml -->
-    <string name="settings_background_type">Type d'arrière-plan</string>
-    <string name="settings_background_texture">Texture</string>
-    <string name="settings_background_direction_north">Nord</string>
-    <string name="settings_background_direction_east">Est</string>
-    <string name="settings_background_direction_south">Sud</string>
-    <string name="settings_background_direction_west">Ouest</string>
-    <string name="settings_background_direction_up">Haut</string>
-    <string name="settings_background_direction_down">Bas</string>
-    <string name="settings_background_direction_texture_template">Texture %1$s</string>
-    <string name="settings_background_type_default">Par défaut</string>
-    <string name="settings_background_type_default_description">Motif en damier sombre</string>
-    <string name="settings_background_type_cubemap_repeated">Cubemap répétée</string>
-    <string name="settings_background_type_cubemap_repeated_description">Utiliser une texture sur chaque mur</string>
-    <string name="settings_background_type_cubemap_unique">Cubemap unique</string>
-    <string name="settings_background_type_cubemap_unique_description">Utiliser une texture différente pour chaque mur</string>
-    <string name="settings_background_type_color">Couleur</string>
-    <string name="settings_background_type_color_description">Utiliser une couleur unie</string>
-    <string name="settings_background_texture_no_options_hint">Aucune texture disponible.</string>
-    <string name="settings_background_texture_open_folder">Ouvrir le dossier des textures</string>
-    <string name="settings_background_missing_textures_repeated">Texture d'arrière-plan non définie</string>
-    <string name="settings_background_missing_textures_unique">Une ou plusieurs textures d'arrière-plan ne sont pas définies</string>
-
-    <!-- From settings.controls.xml -->
-    <string name="settings_controls_lock_cursor">Verrouiller le curseur</string>
-    <string name="settings_controls_lock_cursor_description">Verrouiller le curseur dans la fenêtre</string>
-    <string name="settings_controls_sticky_speed_modifier_keys">Touches de vitesse persistantes</string>
-    <string name="settings_controls_sticky_speed_modifier_keys_true">Appuyer sur Ctrl et Maj pour modifier la vitesse de la caméra libre</string>
-    <string name="settings_controls_sticky_speed_modifier_keys_false">Maintenir Ctrl et Maj pour modifier la vitesse de la caméra libre</string>
-
-    <!-- From settings.onscreenelements.lyrics.xml -->
-    <string name="settings_onscreenelements_lyrics_size">Taille des paroles</string>
-    <string name="settings_onscreenelements_lyrics_scale_template">×%1$s</string>
-
-    <!-- From settings.onscreenelements.xml -->
-    <string name="settings_onscreenelements_lyrics">Paroles</string>
-    <string name="settings_onscreenelements_lyrics_description">Afficher les paroles en temps réel si la chanson en contient</string>
-    <string name="settings_onscreenelements_hud">Affichage tête haute</string>
-    <string name="settings_onscreenelements_hud_description">Afficher le nom et la progression de la chanson</string>
-
-    <!-- From settings.playback.soundbanks.xml -->
-    <string name="settings_playback_soundbanks_add">Ajouter des banques de sons</string>
-    <string name="settings_playback_soundbanks_none_loaded">Aucune banque de sons chargée</string>
-    <string name="settings_playback_soundbanks_select">Sélectionner des banques de sons</string>
-
-    <!-- From settings.playback.synthesizer.xml -->
-    <string name="settings_playback_synthesizer_chorus">Chœur</string>
-    <string name="settings_playback_synthesizer_chorus_description">Utiliser l'effet de chœur</string>
-    <string name="settings_playback_synthesizer_reverb">Réverbération</string>
-    <string name="settings_playback_synthesizer_reverb_description">Utiliser l'effet de réverbération</string>
-
-    <!-- From settings.playback.xml -->
-    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
-    <string name="settings_playback_midi_specification_reset">Envoyer un message de réinitialisation MIDI</string>
-    <string name="settings_playback_midi_specification_reset_description">Envoyer un message de réinitialisation au périphérique MIDI</string>
-    <string name="settings_playback_synthesizer">Synthétiseur Gervill</string>
-    <string name="settings_playback_synthesizer_description">Configurer le synthétiseur MIDI Gervill</string>
-    <string name="settings_playback_soundbanks">Banques de sons</string>
-    <string name="settings_playback_soundbanks_description">Importer des banques de sons pour le synthétiseur Gervill</string>
-
-    <!-- From settings.general.xml -->
+    <!-- Paramètres / Général -->
     <string name="settings_general_theme">Thème</string>
     <string name="settings_general_theme_light">Clair</string>
     <string name="settings_general_theme_dark">Sombre</string>
     <string name="settings_general_theme_system">Suivre le système</string>
+
     <string name="settings_general_locale">Langue</string>
+
+    <!-- Paramètres / Graphiques -->
+    <string name="settings_graphics_fullscreen">Plein écran</string>
+    <string name="settings_graphics_fullscreen_description">Utiliser tout l'écran</string>
+
+    <string name="settings_graphics_resolution">Résolution</string>
+    <string name="settings_graphics_resolution_fullscreen">La résolution correspond à celle du moniteur lorsque le mode plein écran est activé</string>
+    <string name="settings_graphics_resolution_default">Utiliser la résolution par défaut</string>
+    <string name="settings_graphics_resolution_default_hint">Par défaut</string>
+
+    <string name="settings_graphics_resolution_default_description">La résolution par défaut utilise la majeure partie de l'écran</string>
+    <string name="settings_graphics_resolution_custom">Résolution personnalisée</string>
+    <string name="settings_graphics_resolution_width">Largeur</string>
+    <string name="settings_graphics_resolution_height">Hauteur</string>
+
+    <string name="settings_graphics_shadows">Ombres</string>
+    <string name="settings_graphics_shadows_description">Rendu des ombres sous les objets</string>
+    <string name="settings_graphics_shadows_none">Aucune (fausse)</string>
+
+    <string name="settings_graphics_shadows_description_a">Rendre les ombres dynamiques</string>
+    <string name="settings_graphics_shadows_description_hint_a">Les ombres dynamiques sont plus esthétiques, mais peuvent affecter les performances</string>
+    <string name="settings_graphics_anti_aliasing">Anti-aliasing</string>
+
+    <string name="settings_graphics_anti_aliasing_description">Lisser les contours des objets</string>
+
+    <!-- Paramètres / Arrière-plan -->
+    <string name="settings_background_type">Type d'arrière-plan</string>
+    <string name="settings_background_texture">Texture</string>
+
+    <string name="settings_background_direction_north">Nord</string>
+    <string name="settings_background_direction_east">Est</string>
+    <string name="settings_background_direction_south">Sud</string>
+    <string name="settings_background_direction_west">Ouest</string>
+
+    <string name="settings_background_direction_up">Haut</string>
+    <string name="settings_background_direction_down">Bas</string>
+    <string name="settings_background_direction_texture_template">%1$s texture</string>
+    <string name="settings_background_type_default">Par défaut</string>
+
+    <string name="settings_background_type_default_description">Motif damier sombre</string>
+    <string name="settings_background_type_cubemap">Cube map</string>
+    <string name="settings_background_type_cubemap_description">Utiliser une texture sur chaque mur</string>
+
+    <string name="settings_background_type_color">Couleur</string>
+    <string name="settings_background_type_color_description">Utiliser une couleur unie</string>
+    <string name="settings_background_texture_no_options_hint">Aucune texture disponible.</string>
+
+    <string name="settings_background_texture_open_folder">Ouvrir le dossier des textures</string>
+    <string name="settings_background_missing_textures_repeated">La texture d'arrière-plan n'est pas définie</string>
+    <string name="settings_background_missing_textures_unique">Une ou plusieurs textures d'arrière-plan ne sont pas définies</string>
+
+
+    <!-- Paramètres / Commandes -->
+    <string name="settings_controls_lock_cursor">Verrouiller le curseur</string>
+    <string name="settings_controls_lock_cursor_description">Verrouille le curseur sur la fenêtre</string>
+    <string name="settings_controls_disable_touch">Désactiver la saisie tactile</string>
+
+    <string name="settings_controls_disable_touch_description">Toucher l'écran pour orbiter, panoramique ou zoomer est ignoré</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Touches de modification de vitesse persistantes</string>
+
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Appuyez sur Ctrl et Maj pour modifier la vitesse de la caméra libre</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Maintenez Ctrl et Maj enfoncés pour modifier la vitesse de la caméra libre</string>
+
+
+    <!-- Paramètres / Éléments à l'écran -->
+    <string name="settings_onscreenelements_lyrics">Paroles</string>
+    <string name="settings_onscreenelements_lyrics_description">Si la chanson contient des paroles, affichez-les en temps réel</string>
+
+    <string name="settings_onscreenelements_hud">Affichage tête haute</string>
+    <string name="settings_onscreenelements_hud_description">Afficher le nom de la chanson et la progression</string>
+
+    <!-- Paramètres / Éléments à l'écran / Paroles -->
+    <string name="settings_onscreenelements_lyrics_size">Taille des paroles</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Plus petite</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Petite</string>
+
+    <string name="settings_onscreenelements_lyrics_size_default">Par défaut</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Grande</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Plus grande</string>
+
+
+    <!-- Paramètres / Lecture -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Envoyer un message de réinitialisation des spécifications MIDI</string>
+
+    <string name="settings_playback_midi_specification_reset_description">Envoyer un message au périphérique MIDI pour le réinitialiser</string>
+    <string name="settings_playback_synthesizer">Synthétiseur</string>
+    <string name="settings_playback_synthesizer_description">Configurer le synthétiseur MIDI</string>
+
+    <string name="settings_playback_soundbanks">Banques de sons</string>
+    <string name="settings_playback_soundbanks_description">Importer des banques de sons à utiliser avec le synthétiseur</string>
+
+    <!-- Paramètres / Lecture / Banques de sons -->
+    <string name="settings_playback_soundbanks_add">Ajouter des banques de sons</string>
+
+    <string name="settings_playback_soundbanks_none_loaded">Aucune banque de sons chargée</string>
+    <string name="settings_playback_soundbanks_select">Sélectionner les banques de sons</string>
+
+    <!-- Paramètres / Lecture / Synthétiseur -->
+    <string name="settings_playback_synthesizer_chorus">Chorus</string>
+
+    <string name="settings_playback_synthesizer_chorus_description">Utiliser l'effet chorus</string>
+    <string name="settings_playback_synthesizer_reverb">Réverbération</string>
+    <string name="settings_playback_synthesizer_reverb_description">Utiliser l'effet de réverbération</string>
+
+
+    <!-- Paramètres / Appareil photo -->
+    <string name="settings_camera">Appareil photo</string>
+    <string name="settings_camera_description">Caméra automatique, appareil photo classique</string>
+    <string name="settings_camera_start_autocam_with_song">Démarrer la caméra automatique avec la chanson</string>
+
+    <string name="settings_camera_start_autocam_with_song_description">Lorsque la chanson commence, passer automatiquement à la caméra automatique</string>
+    <string name="settings_camera_classic_autocam">Caméra automatique classique</string>
+
+    <string name="settings_camera_classic_autocam_description">Simuler le mouvement de la caméra automatique à partir de MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Caméra libre fluide</string>
+    <string name="settings_camera_smooth_freecam_description">Rendre le mouvement de la caméra libre plus fluide</string>
+
+
+    <!-- Paramètres / Instruments -->
+    <string name="settings_instruments">Instruments</string>
+    <string name="settings_instruments_description">Visibilité des instruments</string>
+    <string name="settings_instruments_always_show_instruments">Toujours afficher les instruments</string>
+
+    <string name="settings_instruments_always_show_instruments_description">Ne jamais masquer les instruments, même lorsqu'aucune note n'est jouée</string>
+
+    <!-- À propos -->
+    <string name="about_midis2jam2_description">Une version remasterisée de MIDIJam, un visualiseur de fichiers MIDI en 3D.</string>
+
+    <string name="about_development_contributors">Contributeurs au développement</string>
+    <string name="about_attributions_and_contributions">Attributions et contributions</string>
+    <string name="about_i18n_contributions">Contributions à l'internationalisation</string>
+    <string name="about_oss_licenses">Avis de tiers</string>
 </resources>

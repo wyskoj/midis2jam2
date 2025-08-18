@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Permanent Script Dependencies">
+    <CLASSES>
+      <root url="file://$USER_HOME$/AppData/Local/JetBrains/IntelliJIdea2025.1/kotlinNotebook/midis2jam2.e0bb450b/kernels/0.13.0-485-1/kotlin-jupyter-ide-classpath-shadowed-jar/kotlin-jupyter-ide-classpath-shadowed-0.13.0-485-1.jar" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/AppData/Local/JetBrains/IntelliJIdea2025.1/kotlinNotebook/midis2jam2.e0bb450b/kernels/0.13.0-485-1/kotlin-jupyter-script-classpath-shadowed-sources-jar/kotlin-jupyter-script-classpath-shadowed-0.13.0-485-1-sources.jar" />
+    </SOURCES>
+  </library>
+</component>

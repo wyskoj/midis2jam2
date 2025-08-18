@@ -57,5 +57,6 @@ private fun SpecificationIconImpl(
         overflow = TextOverflow.Visible,
         fontSize = 14.sp,
         lineHeight = 14.sp,
+        softWrap = false,
     )
 }

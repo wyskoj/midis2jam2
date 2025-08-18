@@ -26,12 +26,23 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
+import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 
 @Composable
 internal actual fun HomeTabLayout(
@@ -41,8 +52,25 @@ internal actual fun HomeTabLayout(
     isApplicationRunning: State<Boolean>,
 ) {
     val isPlayButtonEnabled = model.isPlayButtonEnabled.collectAsState(initial = false)
+    val navigationModel = koinInject<NavigationModel>()
+    val applyHomeScreenMidiFile = navigationModel.applyHomeScreenMidiFile.collectAsState()
+    val scope = rememberCoroutineScope()
+    var flicker by remember { mutableStateOf(false) }
 
-    Scaffold { paddingValues ->
+    LaunchedEffect(applyHomeScreenMidiFile) {
+        applyHomeScreenMidiFile.value?.let { file ->
+            scope.launch {
+                delay(100)
+                model.setMidiFile(PlatformFile(file))
+                navigationModel.clearApplyHomeScreenMidiFile()
+                flicker = true
+                delay(200)
+                flicker = false
+            }
+        }
+    }
+
+    Scaffold { _ ->
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
@@ -56,7 +84,7 @@ internal actual fun HomeTabLayout(
                     Midis2jam2Logo()
                 }
                 item {
-                    MidiFilePicker(state, midiFilePicker)
+                    MidiFilePicker(state, midiFilePicker, flicker)
                 }
                 item {
                     MidiDeviceSelector(model, state)

@@ -56,7 +56,7 @@ fun AppNavigationRail() {
     val navigator = LocalTabNavigator.current
     Row {
         NavigationRail {
-            Spacer(Modifier.Companion.weight(1f))
+            Spacer(Modifier.weight(1f))
             tabs.forEach {
                 val isTabSelected = navigator.current == it.key
                 val name = stringResource(it.value.name)
@@ -65,11 +65,11 @@ fun AppNavigationRail() {
                     onClick = { navigator.current = it.key },
                     icon = { Icon(painterResource(it.value.getTab(isTabSelected)), name) },
                     label = { Text(name) },
-                    modifier = Modifier.Companion.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 )
-                Spacer(Modifier.Companion.height(12.dp))
+                Spacer(Modifier.height(12.dp))
             }
-            Spacer(Modifier.Companion.weight(1f))
+            Spacer(Modifier.weight(1f))
         }
         VerticalDivider(Modifier.fillMaxHeight())
     }

@@ -46,7 +46,6 @@ import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.minusAssign
 import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.world.AssetLoader
 import org.wysko.midis2jam2.world.CameraController
@@ -54,6 +53,7 @@ import org.wysko.midis2jam2.world.DebugTextController
 import org.wysko.midis2jam2.world.FakeShadowsController
 import org.wysko.midis2jam2.world.HudController
 import org.wysko.midis2jam2.world.StandController
+import org.wysko.midis2jam2.world.VariableSpeed
 import org.wysko.midis2jam2.world.camera.AutoCamController
 import org.wysko.midis2jam2.world.camera.CameraAngle
 import org.wysko.midis2jam2.world.camera.CameraSpeed
@@ -95,16 +95,6 @@ abstract class Midis2jam2(
     val assetManager: AssetManager by lazy { app.assetManager }
 
     /**
-     * The version of midis2jam2.
-     */
-    val version: String = resourceToString("/version.txt")
-
-    /**
-     * The build information of midis2jam2.
-     */
-    val build: String = resourceToString("/build.txt")
-
-    /**
      * If this value is positive, this is the amount of time that has elapsed since the beginning of the MIDI sequence.
      * If this value is negative, the MIDI sequence has not started yet, and is the negation of the time until the
      * sequence starts.
@@ -120,15 +110,19 @@ abstract class Midis2jam2(
         }
         set(value) {
             // Enable/disable controllers based on camera state when value is changed
-            autocamController.isEnabled = value == CameraState.AUTO_CAM
-            slideCamController.isEnabled = value == CameraState.SLIDE_CAM
-            cameraController.isEnabled = value == CameraState.DEVICE_SPECIFIC_CAMERA
-
-            _isAutoCamActive.value = value == CameraState.AUTO_CAM
-            _isSlideCamActive.value = value == CameraState.SLIDE_CAM
+            setCameraControllersActive(value)
 
             field = value
         }
+
+    internal fun setCameraControllersActive(value: CameraState) {
+        autocamController.isEnabled = value == CameraState.AUTO_CAM
+        slideCamController.isEnabled = value == CameraState.SLIDE_CAM
+        cameraController.isEnabled = value == CameraState.DEVICE_SPECIFIC_CAMERA
+
+        _isAutoCamActive.value = value == CameraState.AUTO_CAM
+        _isSlideCamActive.value = value == CameraState.SLIDE_CAM
+    }
 
     private val _isAutoCamActive = MutableStateFlow(cameraState == CameraState.AUTO_CAM)
     val isAutoCamActive: StateFlow<Boolean>
@@ -233,6 +227,11 @@ abstract class Midis2jam2(
         }
 
     var cameraSpeed: CameraSpeed = CameraSpeed.Normal
+        set(value) {
+            println("Setting camera speed to ${value.name}")
+            (this.cameraController as? VariableSpeed)?.speed = value.speedValue
+            field = value
+        }
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         val settingsConfig = configs.find<AppSettingsConfiguration>().appSettings
@@ -298,7 +297,7 @@ abstract class Midis2jam2(
     override fun update(tpf: Float) {
         super.update(tpf)
         val duration = tpf.toDouble().seconds
-        debugTextController.tick(duration)
+        debugTextController.tick()
         cameraController.tick(duration)
     }
 

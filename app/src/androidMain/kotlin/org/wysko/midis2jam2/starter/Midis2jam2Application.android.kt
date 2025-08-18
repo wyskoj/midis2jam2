@@ -17,9 +17,8 @@
 
 package org.wysko.midis2jam2.starter
 
-import android.os.Build
+import Platform
 import com.jme3.app.SimpleApplication
-import com.jme3.asset.plugins.AndroidLocator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,7 +85,7 @@ internal actual class Midis2jam2Application(
     }
 
     actual override fun stop() {
-        super<SimpleApplication>.stop()
+        super.stop()
         onFinish()
     }
 
@@ -130,4 +129,9 @@ internal actual class Midis2jam2Application(
         } else {
             MutableStateFlow(false)
         }
+
+    fun isPlaying(): Boolean = when {
+        ::androidMidis2jam2.isInitialized -> androidMidis2jam2.isPlaying()
+        else -> false
+    }
 }

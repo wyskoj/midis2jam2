@@ -21,7 +21,8 @@ import java.io.File
 import java.util.Locale
 
 expect class SystemInteractionService() {
-    fun openFolder(folder: File): Unit
-    fun openSystemLanguageSettings(): Unit
+    fun openFolder(folder: File)
+    fun openSystemLanguageSettings()
+    fun openOnlineDocumentation()
     fun getLocale(): Locale
 }

@@ -20,14 +20,14 @@ package org.wysko.midis2jam2.starter
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
 import org.wysko.midis2jam2.starter.configuration.*
-import java.awt.GraphicsEnvironment
-import javax.imageio.ImageIO
 
 internal fun SimpleApplication.applyConfigurations(configurations: Collection<Configuration>) {
-    setSettings(AppSettings(false).apply {
-        copyFrom(DEFAULT_JME_SETTINGS)
-        applyResolution(configurations)
-    })
+    setSettings(
+        AppSettings(false).apply {
+            copyFrom(DEFAULT_JME_SETTINGS)
+            applyResolution(configurations)
+        }
+    )
     setDisplayStatView(false)
     setDisplayFps(false)
     isPauseOnLostFocus = false
@@ -47,9 +47,13 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
         isFullscreen = false
         with(configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings) {
             when (resolutionSettings.isUseDefaultResolution) {
-                true -> with(preferredResolution()) {
-                    this@applyResolution.width = width
-                    this@applyResolution.height = height
+                true -> {
+                    screenResolution()?.let { screenRes ->
+                        preferredResolution(screenRes).run {
+                            this@applyResolution.width = this.width
+                            this@applyResolution.height = this.height
+                        }
+                    }
                 }
 
                 false -> with(resolutionSettings) {
@@ -61,34 +65,25 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
     }
 }
 
-internal fun screenResolution(): Resolution.CustomResolution =
-//    with(GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayMode) {
-//        Resolution.CustomResolution(width, height)
-//    }
-    Resolution.CustomResolution(
-        width = 1920, // TODO: Replace with actual screen resolution
-        height = 1080 // TODO: Replace with actual screen resolution
-    )
+internal fun screenResolution(): Resolution.CustomResolution? = getScreenResolution()
 
-internal fun preferredResolution(): Resolution.CustomResolution =
-    with(screenResolution()) {
+internal fun preferredResolution(screenResolution: Resolution.CustomResolution): Resolution.CustomResolution =
+    with(screenResolution) {
         Resolution.CustomResolution((width * 0.95).toInt(), (height * 0.85).toInt())
     }
 
 private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
     frameRate = -1
-//    GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.firstOrNull()?.let {
-//        frequency = it.refreshRate
-//    }
-    // TODO
+    applyScreenFrequency()
     isVSync = true
     isResizable = false
     isGammaCorrection = false
-//    icons =
-//        arrayOf("/ico/icon16.png", "/ico/icon32.png", "/ico/icon128.png", "/ico/icon256.png").map {
-//            ImageIO.read(this::class.java.getResource(it))
-//        }.toTypedArray() TODO
+    applyIcons()
     title = "midis2jam2"
     audioRenderer = null
     centerWindow = true
 }
+
+internal expect fun AppSettings.applyIcons()
+internal expect fun AppSettings.applyScreenFrequency()
+internal expect fun getScreenResolution(): Resolution.CustomResolution?

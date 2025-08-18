@@ -34,6 +34,7 @@ data class AppSettings(
     data class GeneralSettings(
         var theme: AppTheme = AppTheme.SYSTEM_DEFAULT,
         var locale: String = "en",
+        var isShowDebugInfo: Boolean = false,
     )
 
     @Serializable
@@ -74,12 +75,11 @@ data class AppSettings(
     @Serializable
     data class BackgroundSettings(
         var type: BackgroundType = BackgroundType.Default,
-        var repeatedCubeMapTexture: String = "",
-        var uniqueCubeMapTextures: MutableList<String> = MutableList(6) { "" },
+        var cubeMapTextures: MutableList<String> = MutableList(6) { "" },
         var color: Int = -16777216, // Black
     ) {
         enum class BackgroundType {
-            Default, RepeatedCubeMap, UniqueCubeMap, Color
+            Default, CubeMap, Color
         }
     }
 
@@ -87,6 +87,7 @@ data class AppSettings(
     data class ControlsSettings(
         var isLockCursor: Boolean = false,
         var isSpeedModifierKeysSticky: Boolean = false,
+        var isDisableTouchInput: Boolean = false,
     )
 
     @Serializable
@@ -127,7 +128,7 @@ data class AppSettings(
         @Serializable
         data class LyricsSettings(
             var isShowLyrics: Boolean = true,
-            var lyricsSize: Double = 1.0,
+            var lyricsSize: Double = 1.5,
         )
     }
 

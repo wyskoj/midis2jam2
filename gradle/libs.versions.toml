@@ -13,6 +13,9 @@ jme3 = "3.6.1-stable"
 koin-bom = "4.1.0"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
+licenseReport = "2.9"
+reorderable = "2.4.2"
+uiTooling = "1.8.3"
 voyager = "1.1.0-beta03"
 
 [libraries]
@@ -29,6 +32,8 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # UI elements
 compose-colorpicker = { module = "com.github.skydoves:colorpicker-compose", version.ref = "colorpicker" }
 filekit = { group = "io.github.vinceglb", name = "filekit-compose", version = "0.8.8" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+
 
 # jMonkeyEngine
 jme3-androidNative = { group = "org.jmonkeyengine", name = "jme3-android-native", version.ref = "jme3" }
@@ -59,6 +64,7 @@ multiplatformSettings = { group = "com.russhwolf", name = "multiplatform-setting
 # Misc.
 noise = { group = "org.spongepowered", name = "noise", version = "2.0.0-SNAPSHOT" }
 logbackClassic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.18" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
 [bundles]
 jme3 = ["jme3-core", "jme3-effects"]
@@ -73,3 +79,4 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+licenseReport = { id = "com.github.jk1.dependency-license-report", version.ref = "licenseReport" }

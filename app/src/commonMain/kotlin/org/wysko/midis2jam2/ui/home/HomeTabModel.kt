@@ -40,7 +40,6 @@ import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.domain.isInternal
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.ui.settings.SettingsModel
-import java.io.File
 
 class HomeTabModel(
     private val midiService: MidiService,
@@ -72,8 +71,13 @@ class HomeTabModel(
     val soundbanks: Flow<List<PlatformFile>> = run {
         val settings: SettingsModel by inject()
         settings.appSettings.map { settings ->
-            settings.playbackSettings.soundbanksSettings.soundbanks.map { PlatformFile(File(it)) }
+            listOf()
+//            settings.playbackSettings.soundbanksSettings.soundbanks.map { PlatformFile(File(it)) }
         }
+    }
+
+    fun setMidiFile(file: PlatformFile?) {
+        _state.value = _state.value.copy(selectedMidiFile = file)
     }
 
     @Composable
@@ -85,7 +89,7 @@ class HomeTabModel(
             type = PickerType.File(listOf("mid")),
             title = "Select MIDI file",
         ) { file ->
-            _state.value = _state.value.copy(selectedMidiFile = file)
+            setMidiFile(file)
             extraCallback?.invoke(file)
         }
     }

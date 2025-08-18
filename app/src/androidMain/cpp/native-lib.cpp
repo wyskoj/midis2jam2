@@ -3,6 +3,7 @@
 #include "include/fluidsynth.h"
 #include <unistd.h>
 #include <android/log.h>
+#include <sys/resource.h>
 
 struct FluidSynthHolder {
     fluid_settings_t *settings;
@@ -13,9 +14,22 @@ struct FluidSynthHolder {
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_wysko_midis2jam2_domain_FluidSynthBridge_initFluidSynth(
         JNIEnv *env, jobject thiz, jstring jSoundfontPath) {
+    setpriority(PRIO_PROCESS, 0, -19); // Highest priority
     const char *soundfontPath = env->GetStringUTFChars(jSoundfontPath, nullptr);
     FluidSynthHolder *holder = new FluidSynthHolder();
     holder->settings = new_fluid_settings();
+
+    // OPTIMIZATION: Reduce buffer size for lower MIDI latency
+    fluid_settings_setint(holder->settings, "audio.period-size", 64);  // Reduced from default 64-512
+    fluid_settings_setint(holder->settings, "audio.periods", 2);       // Default is 16
+
+    // OPTIMIZATION: Enable parallel rendering
+    fluid_settings_setint(holder->settings, "synth.parallel-render", 1);
+
+    fluid_settings_setint(holder->settings, "synth.reverb.active", 0);
+    fluid_settings_setint(holder->settings, "synth.chorus.active", 0);
+
+
     holder->synth = new_fluid_synth(holder->settings);
     holder->adriver = new_fluid_audio_driver(holder->settings, holder->synth);
     int sf_id = fluid_synth_sfload(holder->synth, soundfontPath, 1);
@@ -84,6 +98,36 @@ extern "C" JNIEXPORT void JNICALL
 Java_org_wysko_midis2jam2_domain_FluidSynthBridge_sendSysex(
         JNIEnv *, jobject, jlong ptr, jbyteArray data) {
     // FluidSynth does not support arbitrary sysex directly, so this is a placeholder
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_org_wysko_midis2jam2_domain_FluidSynthBridge_setChorusActiveImpl(
+    JNIEnv *, jobject, jlong ptr, jboolean isChorusActive
+) {
+    auto *holder = reinterpret_cast<FluidSynthHolder *>(ptr);
+    int value;
+    if (isChorusActive) {
+        value = 1;
+    } else {
+        value = 0;
+    }
+    fluid_settings_setint(holder->settings, "synth.chorus.active", value);
+    __android_log_print(ANDROID_LOG_DEBUG, "FluidSynthNative", "Chorus: %d", value);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_org_wysko_midis2jam2_domain_FluidSynthBridge_setReverbActiveImpl(
+    JNIEnv *, jobject, jlong ptr, jboolean isReverbActive
+) {
+    auto *holder = reinterpret_cast<FluidSynthHolder *>(ptr);
+    int value;
+    if (isReverbActive) {
+        value = 1;
+    } else {
+        value = 0;
+    }
+    fluid_settings_setint(holder->settings, "synth.reverb.active", value);
+    __android_log_print(ANDROID_LOG_DEBUG, "FluidSynthNative", "Reverb: %d", value);
 }
 
 extern "C" JNIEXPORT void JNICALL

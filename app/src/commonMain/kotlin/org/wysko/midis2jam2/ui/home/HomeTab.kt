@@ -20,6 +20,7 @@
 package org.wysko.midis2jam2.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
@@ -49,12 +50,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import cafe.adriel.voyager.transitions.FadeTransition
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
 import io.github.vinceglb.filekit.core.PlatformFile
 import midis2jam2.app.generated.resources.Res
@@ -68,7 +73,13 @@ import midis2jam2.app.generated.resources.soundbank_default
 import midis2jam2.app.generated.resources.tab_home
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.java.KoinJavaComponent.inject
+import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import kotlin.getValue
 
 @Composable
 internal expect fun HomeTabLayout(
@@ -116,13 +127,15 @@ internal fun MidiDeviceSelector(
 internal fun MidiFilePicker(
     state: State<HomeTabState>,
     midiFilePicker: PickerResultLauncher,
+    flicker: Boolean = false,
 ) {
+    val flickerSize by animateFloatAsState(if (flicker) 1.05f else 1f)
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MidiFileSelector(
             selectedMidiFile = state.value.selectedMidiFile?.name,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).scale(flickerSize)
         ) {
             midiFilePicker.launch()
         }
@@ -295,6 +308,17 @@ internal fun MidiDeviceSelector(
     }
 }
 
+object MainHomeScreen : Screen {
+    @Composable
+    override fun Content() {
+        val model = koinScreenModel<HomeTabModel>()
+        val midiFilePicker = model.midiFilePicker()
+        val state = model.state.collectAsState()
+        val isApplicationRunning = model.isApplicationRunning.collectAsState()
+        HomeTabLayout(state, midiFilePicker, model, isApplicationRunning)
+    }
+}
+
 object HomeTab : Tab {
     override val options: TabOptions
         @Composable
@@ -306,11 +330,10 @@ object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        val model = koinScreenModel<HomeTabModel>()
-        val midiFilePicker = model.midiFilePicker()
-        val state = model.state.collectAsState()
-        val isApplicationRunning = model.isApplicationRunning.collectAsState()
-
-        HomeTabLayout(state, midiFilePicker, model, isApplicationRunning)
+        Navigator(MainHomeScreen) { navigator ->
+            FadeTransition(navigator) { screen ->
+                screen.Content()
+            }
+        }
     }
 }

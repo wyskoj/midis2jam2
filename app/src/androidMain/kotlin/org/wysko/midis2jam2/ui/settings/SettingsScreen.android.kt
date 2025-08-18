@@ -17,126 +17,173 @@
 
 package org.wysko.midis2jam2.ui.settings
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.display_settings
-import midis2jam2.app.generated.resources.keyboard
-import midis2jam2.app.generated.resources.media_output
-import midis2jam2.app.generated.resources.screenshot_monitor
-import midis2jam2.app.generated.resources.settings_background
-import midis2jam2.app.generated.resources.settings_background_description
+import midis2jam2.app.generated.resources.android
+import midis2jam2.app.generated.resources.hand_gesture_off
+import midis2jam2.app.generated.resources.language
 import midis2jam2.app.generated.resources.settings_camera
-import midis2jam2.app.generated.resources.settings_camera_description
 import midis2jam2.app.generated.resources.settings_controls
-import midis2jam2.app.generated.resources.settings_controls_description
-import midis2jam2.app.generated.resources.settings_fill
+import midis2jam2.app.generated.resources.settings_controls_disable_touch
+import midis2jam2.app.generated.resources.settings_controls_disable_touch_description
 import midis2jam2.app.generated.resources.settings_general
-import midis2jam2.app.generated.resources.settings_general_description
+import midis2jam2.app.generated.resources.settings_general_locale
 import midis2jam2.app.generated.resources.settings_graphics
-import midis2jam2.app.generated.resources.settings_graphics_description_a
+import midis2jam2.app.generated.resources.settings_instruments
 import midis2jam2.app.generated.resources.settings_on_screen_elements
-import midis2jam2.app.generated.resources.settings_on_screen_elements_description
-import midis2jam2.app.generated.resources.settings_playback
-import midis2jam2.app.generated.resources.settings_playback_description
-import midis2jam2.app.generated.resources.tab_settings
-import midis2jam2.app.generated.resources.videocam
-import midis2jam2.app.generated.resources.wallpaper
-import org.jetbrains.compose.resources.StringResource
+import midis2jam2.app.generated.resources.settings_playback_synthesizer
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.wysko.midis2jam2.CompatLibrary
-import org.wysko.midis2jam2.ui.AppNavigationBar
-import org.wysko.midis2jam2.ui.settings.background.BackgroundSettingsScreen
-import org.wysko.midis2jam2.ui.settings.camera.CameraSettingsScreen
-import org.wysko.midis2jam2.ui.settings.controls.ControlsSettingsScreen
-import org.wysko.midis2jam2.ui.settings.general.GeneralSettingsScreen
-import org.wysko.midis2jam2.ui.settings.graphics.GraphicsSettingsScreen
-import org.wysko.midis2jam2.ui.settings.onscreenelements.OnScreenElementsSettingsScreen
-import org.wysko.midis2jam2.ui.settings.playback.PlaybackSettingsScreen
+import org.wysko.midis2jam2.domain.LocaleHelper
+import org.wysko.midis2jam2.domain.SystemInteractionService
+import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.ui.common.component.CategoryHeader
+import org.wysko.midis2jam2.ui.common.component.SelectOption
+import org.wysko.midis2jam2.ui.common.component.SelectRow
+import org.wysko.midis2jam2.ui.common.component.SwitchRow
+import org.wysko.midis2jam2.ui.common.component.UnitRow
+import java.util.Locale
 
-internal actual val graphicsCategoryDescription: StringResource
-    get() = Res.string.settings_graphics_description_a
+internal actual fun LazyListScope.SettingsScreenContent(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+) {
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_general))
+    }
+    item {
+        ThemeSelect(settings, model)
+    }
+    item {
+        LocaleSelect(
+            settings.value.generalSettings.locale,
+            model::setLocale,
+            screenModel.getAvailableLocales()
+        )
+    }
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_graphics))
+    }
+    item {
+        ShadowsBooleanSelect(settings, model)
+    }
+    item {
+        BackgroundSelect(settings, model)
+    }
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_on_screen_elements))
+    }
+    LyricsSelect(settings, model)
+    item {
+        HudBooleanSelect(settings, model)
+    }
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_instruments))
+    }
+    item {
+        AlwaysShowInstrumentsBooleanSelect(settings, model)
+    }
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_controls))
+    }
+    item {
+        DisableTouchInputBooleanSelect(settings, model)
+    }
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_playback_synthesizer))
+    }
+    item {
+        SynthesizerReverbSelect(settings, model)
+    }
+    item {
+        SynthesizerChorusSelect(settings, model)
+    }
+    stickyHeader {
+        CategoryHeader(stringResource(Res.string.settings_camera))
+    }
+    item {
+        StartAutocamWithSongBooleanSelect(settings, model)
+    }
+    item {
+        IsClassicAutoCamBooleanSelect(settings, model)
+    }
+    item {
+        Spacer(Modifier.height(0.dp))
+    }
+}
 
-@OptIn(ExperimentalMaterial3Api::class)
+internal actual val deviceThemeIcon: DrawableResource
+    get() = Res.drawable.android
+
 @Composable
-internal actual fun SettingsScreenScaffold(content: @Composable () -> Unit) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(Res.string.tab_settings)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
+internal actual fun LocaleSelect(
+    selectedLocale: String,
+    onSelectLocale: (String) -> Unit,
+    availableLocales: List<String>,
+) {
+    val systemInteraction = koinInject<SystemInteractionService>()
+    val localConfig = LocalConfiguration.current
+    val context = LocalContext.current
+
+    when (CompatLibrary.useLegacyLanguageSelect) {
+        true -> {
+            val options = availableLocales.map {
+                val locale = Locale(it)
+                SelectOption(
+                    value = it,
+                    title = locale.displayName,
+                )
+            }
+            // Forces recomposition on locale change (12-)
+            val currentLocale = AppCompatDelegate.getApplicationLocales().get(0)
+            SelectRow(
+                selectedLocale,
+                {
+                    onSelectLocale(it)
+                    LocaleHelper.updateLocale(context, it)
+                },
+                options = options,
+                title = { Text(stringResource(Res.string.settings_general_locale)) },
+                icon = Res.drawable.language,
             )
-        },
-        bottomBar = { AppNavigationBar() }
-    ) { paddingValues ->
-        Box(Modifier.padding(paddingValues)) {
-            content()
+        }
+
+        false -> {
+            UnitRow(
+                title = { Text(stringResource(Res.string.settings_general_locale)) },
+                label = { Text(systemInteraction.getLocale().displayLanguage) },
+                icon = Res.drawable.language,
+            ) {
+                systemInteraction.openSystemLanguageSettings()
+            }
         }
     }
 }
 
-actual val categoryGroups: List<List<SettingsCategoryCardProps>>
-    @Composable
-    get() = listOf(
-        listOfNotNull(
-            SettingsCategoryCardProps(
-                title = Res.string.settings_general,
-                description = Res.string.settings_general_description,
-                icon = Res.drawable.settings_fill,
-                GeneralSettingsScreen,
-            ),
-            if (CompatLibrary.supportsFilterPostProcessor) {
-                SettingsCategoryCardProps(
-                    title = Res.string.settings_graphics,
-                    description = graphicsCategoryDescription,
-                    icon = Res.drawable.display_settings,
-                    GraphicsSettingsScreen
-                )
-            } else {
-                null
-            },
-            SettingsCategoryCardProps(
-                title = Res.string.settings_background,
-                description = Res.string.settings_background_description,
-                icon = Res.drawable.wallpaper,
-                BackgroundSettingsScreen
-            )
-        ),
-        listOf(
-            SettingsCategoryCardProps(
-                title = Res.string.settings_controls,
-                description = Res.string.settings_controls_description,
-                icon = Res.drawable.keyboard,
-                ControlsSettingsScreen,
-            ),
-            SettingsCategoryCardProps(
-                title = Res.string.settings_playback,
-                description = Res.string.settings_playback_description,
-                icon = Res.drawable.media_output,
-                PlaybackSettingsScreen,
-            ),
-            SettingsCategoryCardProps(
-                title = Res.string.settings_on_screen_elements,
-                description = Res.string.settings_on_screen_elements_description,
-                icon = Res.drawable.screenshot_monitor,
-                OnScreenElementsSettingsScreen,
-            ),
-            SettingsCategoryCardProps(
-                title = Res.string.settings_camera,
-                description = Res.string.settings_camera_description,
-                icon = Res.drawable.videocam,
-                CameraSettingsScreen,
-            ),
-        ),
+@Composable
+private fun DisableTouchInputBooleanSelect(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+) {
+    SwitchRow(
+        settings.value.controlsSettings.isDisableTouchInput,
+        model::setDisableTouchInput,
+        title = { Text(stringResource(Res.string.settings_controls_disable_touch)) },
+        label = { Text(stringResource(Res.string.settings_controls_disable_touch_description)) },
+        icon = Res.drawable.hand_gesture_off,
     )
+}

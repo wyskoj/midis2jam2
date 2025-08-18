@@ -15,10 +15,15 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
+import com.github.jk1.license.render.TextReportRenderer
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.reload.ComposeHotRun
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -27,11 +32,15 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.licenseReport)
 }
 
 tasks.withType<ComposeHotRun>().configureEach {
     mainClass.set("org.wysko.midis2jam2.MainKt")
 }
+
+val appVersionName: String = "2.0.0-alpha-20250628"
+val appVersionCode: Int = 2
 
 kotlin {
     androidTarget {
@@ -88,6 +97,9 @@ kotlin {
             // Filekit
             implementation(libs.filekit)
 
+            // Reorderable
+            implementation(libs.reorderable)
+
             // jMonkeyEngine
             implementation(libs.bundles.jme3)
 
@@ -123,8 +135,8 @@ android {
         applicationId = "org.wysko.midis2jam2"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "2.0.0-alpha-20250628"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         externalNativeBuild {
             cmake {
@@ -179,16 +191,92 @@ compose.desktop {
     }
 }
 
-tasks.register<Copy>("copyCommonResources") {
-    from("../sharedAssets")
-    into("src/commonMain/resources")
+licenseReport {
+    renderers = arrayOf(TextReportRenderer())
 }
 
-tasks.register<Copy>("copyAndroidResources") {
-    from("../sharedAssets")
-    into("src/androidMain/assets")
+abstract class GenerateBuildInfoXmlTask : DefaultTask() {
+    @get:Input
+    abstract val versionName: Property<String>
+
+    @get:Input
+    abstract val versionCode: Property<Int>
+
+    @get:OutputDirectory
+    abstract val resourcesDir: DirectoryProperty
+
+    @TaskAction
+    fun generateXml() {
+        resourcesDir.get().asFile.mkdirs()
+
+        val buildTime = DateTimeFormatter
+            .RFC_1123_DATE_TIME
+            .withZone(ZoneId.from(ZoneOffset.UTC))
+            .format(Instant.now())
+
+        val xmlContent = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <resources>
+                <string name="build_version">${versionName.get()}</string>
+                <string name="build_version_code">${versionCode.get()}</string>
+                <string name="build_timestamp">$buildTime</string>
+            </resources>
+        """.trimIndent()
+
+        File(resourcesDir.get().asFile, "build.xml").writeText(xmlContent)
+
+        println("Generated build info XML with version ${versionName.get()} and timestamp $buildTime")
+    }
 }
 
-tasks.named("preBuild") {
-    dependsOn("copyCommonResources", "copyAndroidResources")
+val generateBuildInfoXml: TaskProvider<GenerateBuildInfoXmlTask> =
+    tasks.register<GenerateBuildInfoXmlTask>("generateBuildInfoXml") {
+        description = "Generates build.xml with version and timestamp information"
+        versionName.set(appVersionName)
+        versionCode.set(appVersionCode)
+        resourcesDir.set(file("src/commonMain/composeResources/values"))
+    }
+
+val copyLicenseReport: TaskProvider<Copy> = tasks.register<Copy>("copyLicenseReport") {
+    dependsOn(tasks.named("generateLicenseReport"))
+    from(projectDir.resolve("build/reports/dependency-license/THIRD-PARTY-NOTICES.txt"))
+    into(projectDir.resolve("src/commonMain/composeResources/files"))
+}
+
+val copyCommonAssets: TaskProvider<Copy> = tasks.register<Copy>("copyCommonAssets") {
+    from(projectDir.parentFile.resolve("sharedAssets"))
+    into(projectDir.resolve("src/commonMain/resources"))
+}
+
+val copyAndroidAssets: TaskProvider<Copy> = tasks.register<Copy>("copyAndroidAssets") {
+    from(projectDir.parentFile.resolve("sharedAssets"))
+    into(projectDir.resolve("src/androidMain/assets"))
+}
+dependencies {
+    debugImplementation(libs.androidx.ui.tooling)
+}
+
+tasks.named("convertXmlValueResourcesForCommonMain").configure {
+    dependsOn(generateBuildInfoXml, copyLicenseReport)
+}
+
+tasks.named("copyNonXmlValueResourcesForCommonMain").configure {
+    dependsOn(generateBuildInfoXml, copyLicenseReport)
+}
+
+afterEvaluate {
+    // Make all Android tasks that might use assets depend on copyAndroidAssets
+    tasks.matching { task ->
+        val relevant = task.name.contains("Assets") || task.name.contains("Lint") || task.name.contains("Resources")
+        task.name != "copyAndroidAssets" && relevant && task.name.contains("Android", ignoreCase = true)
+    }.configureEach {
+        dependsOn(copyAndroidAssets)
+    }
+
+    // Make all resource processing tasks depend on copyCommonAssets
+    tasks.matching { task ->
+        task.name != "copyCommonAssets" && (task.name.contains("ProcessResources") || task.name.contains("Resources"))
+    }.configureEach {
+        dependsOn(copyCommonAssets)
+    }
 }

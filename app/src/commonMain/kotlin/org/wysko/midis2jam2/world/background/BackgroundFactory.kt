@@ -97,12 +97,12 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
      * @param config The configuration to use.
      * @see BackgroundConfiguration.UniqueCubeMapBackground
      */
-    class UniqueCubeMap(
+    class CubeMap(
         assetManager: AssetManager,
         private val config: AppSettingsConfiguration,
     ) : BackgroundFactory(assetManager) {
         override fun create(): Spatial {
-            val textures = with(config.appSettings.backgroundSettings.uniqueCubeMapTextures) {
+            val textures = with(config.appSettings.backgroundSettings.cubeMapTextures) {
                 listOf(this[3], this[1], this[0], this[2], this[4], this[5])
             }.map(::loadTexture)
 
@@ -124,22 +124,6 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
                 }
             }
         }
-    }
-
-    /**
-     * Loads a repeated cube map background.
-     *
-     * @see BackgroundConfiguration.RepeatedCubeMapBackground
-     */
-    class RepeatedCubeMap(
-        assetManager: AssetManager,
-        private val config: AppSettingsConfiguration,
-    ) : BackgroundFactory(assetManager) {
-        override fun create(): Spatial =
-            with(loadTexture(config.appSettings.backgroundSettings.repeatedCubeMapTexture)) {
-                SkyFactory.createSky(assetManager, this, this, this, this, this, this)
-                    .apply { shadowMode = RenderQueue.ShadowMode.Off }
-            }
     }
 }
 

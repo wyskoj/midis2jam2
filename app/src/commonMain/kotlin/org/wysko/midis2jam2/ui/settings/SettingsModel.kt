@@ -85,18 +85,10 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         }
     }
 
-    fun setRepeatedCubeMapTexture(texture: String) {
+    fun setCubeMapTexture(index: Int, texture: String) {
         screenModelScope.launch {
             settingsRepository.updateAppSettings {
-                backgroundSettings.repeatedCubeMapTexture = texture
-            }
-        }
-    }
-
-    fun setUniqueCubeMapTexture(index: Int, texture: String) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                backgroundSettings.uniqueCubeMapTextures[index] = texture
+                backgroundSettings.cubeMapTextures[index] = texture
             }
         }
     }
@@ -105,6 +97,14 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         screenModelScope.launch {
             settingsRepository.updateAppSettings {
                 controlsSettings.isLockCursor = isEnabled
+            }
+        }
+    }
+
+    fun setDisableTouchInput(isDisableTouchInput: Boolean) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                controlsSettings.isDisableTouchInput = isDisableTouchInput
             }
         }
     }
@@ -214,7 +214,7 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
     }
 
     fun setAntiAliasingQuality(
-        antiAliasingQuality: AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
+        antiAliasingQuality: AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality,
     ) {
         screenModelScope.launch {
             settingsRepository.updateAppSettings {

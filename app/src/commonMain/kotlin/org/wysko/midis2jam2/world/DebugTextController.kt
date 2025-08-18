@@ -17,180 +17,59 @@
 
 package org.wysko.midis2jam2.world
 
+import com.jme3.asset.AssetManager
+import com.jme3.font.BitmapFont
 import com.jme3.font.BitmapText
 import com.jme3.material.Material
 import com.jme3.material.RenderState
 import com.jme3.math.ColorRGBA
-import com.jme3.math.Quaternion
-import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
-import com.jme3.scene.Spatial
+import com.jme3.scene.Node
 import com.jme3.scene.shape.Quad
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
 import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.wrap
-import kotlin.time.Duration
-import kotlin.time.DurationUnit.SECONDS
+import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.v3
 
-private val OPERATING_SYSTEM by lazy {
-    listOf("arch", "name", "version").joinToString(" / ") { System.getProperty("os.$it") }
-}
+private const val SCREEN_MARGIN = 64
 
-internal expect val GL_RENDERER: String
-
-private val JVM_INFORMATION by lazy {
-    listOf("name", "vendor", "version").joinToString(" / ") { System.getProperty("java.vm.$it") }
-}
-
-/**
- * Draws debug text on the screen.
- *
- * @property context Context to the main class.
- */
-class DebugTextController(val context: Midis2jam2) {
-    private val text =
-        BitmapText(context.assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
-            context.app.guiNode.attachChild(this)
-            setLocalTranslation(16f, context.app.viewPort.camera.height - 16f, 0f)
-            cullHint = Spatial.CullHint.Always
-        }
-
-    private val percussionText =
-        BitmapText(context.assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
-            context.app.guiNode.attachChild(this)
-            setLocalTranslation(1024f, context.app.viewPort.camera.height - 16f, 0f)
-            cullHint = Spatial.CullHint.Always
-        }
-
-    private val darkBackground =
-        Geometry("DebugDarken", Quad(10000f, 10000f)).apply {
-            material =
-                Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                    setColor("Color", ColorRGBA(0f, 0f, 0f, 0.5f))
-                    additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-                }
-            setLocalTranslation(0f, 0f, -1f)
-//            context.app.guiNode.attachChild(this) TODO
-            cullHint = Spatial.CullHint.Always
-        }
-
-    private val syncIndicator =
-        Geometry("SyncIndicator", Quad(100f, 16f)).apply {
-            material =
-                Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                    setColor("Color", ColorRGBA(0f, 0f, 0f, 1.0f))
-                }
-            setLocalTranslation(500f, context.app.viewPort.camera.height - 32f, 0f)
-            context.app.guiNode.attachChild(this)
-            cullHint = Spatial.CullHint.Always
-        }
-
-    private var enabled: Boolean = false
+class DebugTextController(context: Midis2jam2) {
+    var enabled: Boolean = false
         set(value) {
-            text.cullHint = value.ch
-            percussionText.cullHint = value.ch
-            darkBackground.cullHint = value.ch
-            syncIndicator.cullHint = value.ch
+            node.cullHint = value.ch
             field = value
         }
 
-    /**
-     * Toggles the visibility of the debug text.
-     */
-    fun toggle(): Unit = run { enabled = !enabled }
+    private val engine = DebugTextEngine(context)
+    private val node = Node().apply { cullHint = enabled.ch }.also(context.app.guiNode::attachChild)
 
-    /**
-     * Updates the debug text.
-     *
-     * @param tpf the time per frame
-     */
-    fun tick(tpf: Duration) {
-        if (enabled) {
-            with(text) { text = context.debugText(context.time, tpf) }
-            with(percussionText) { text = "" }
+    private val textView = context.consoleText().apply {
+        loc = v3(SCREEN_MARGIN, context.app.viewPort.camera.height - SCREEN_MARGIN, 0)
+    }.also(node::attachChild)
 
-            val drift = getSequencerDrift(context)
-            syncIndicator.run {
-                setLocalScale((drift * 5f), 1f, 1f)
-                material.setColor("Color", getSequencerDriftColor(drift))
-            }
-        }
+    init {
+        node.attachChild(context.assetManager.darkUnderlay())
     }
 
-    private fun getSequencerDriftColor(drift: Float): ColorRGBA {
-        return ColorRGBA(0f, 1f, 0f, 1f).interpolateLocal(ColorRGBA.Red, (drift * 10).coerceIn(0.0f, 1.0f))
+    fun tick() {
+        if (!enabled) return
+
+        textView.text = engine.getText()
+    }
+
+    fun toggle() {
+        enabled = !enabled
     }
 }
 
-internal expect fun getSequencerDrift(context: Midis2jam2): Float
-
-/**
- * Generates debug text.
- */
-private fun Midis2jam2.debugText(
-    time: Duration,
-    delta: Duration,
-): String {
-    return buildString {
-        // midis2jam2 version and build
-        append(
-            "midis2jam2 v${this@debugText.version} (built at ${this@debugText.build})\n",
-        )
-
-        // computer operating system and renderer
-        appendLine()
-        appendLine("OS:  $OPERATING_SYSTEM")
-        appendLine("GPU: $GL_RENDERER")
-        appendLine("JVM: $JVM_INFORMATION")
-        appendLine(
-            "JRE: ${
-                with(Runtime.getRuntime()) {
-                    "${availableProcessors()} Cores / ${freeMemory() / 1024 / 1024}/${totalMemory() / 1024 / 1024} MB / ${maxMemory() / 1024 / 1024}MB max"
-                }
-            }",
-        )
-        appendLine("${"%.0f".format(1 / delta.toDouble(SECONDS))} FPS")
-
-        // settings
-        appendLine()
-        appendLine("Settings:")
-        appendLine(this@debugText.configs.joinToString().wrap(80))
-
-        appendLine()
-        appendLine("File:")
-        with(this@debugText.sequence) {
-            appendLine("$fileName - ${smf.tpq} TPQN")
-            appendLine("${time}s / ${duration}s")
+private fun Midis2jam2.consoleText(): BitmapText = BitmapText(assetManager.consoleFont())
+private fun AssetManager.consoleFont(): BitmapFont = loadFont("Interface/Fonts/Console.fnt")
+private fun AssetManager.darkUnderlay(): Geometry {
+    return Geometry("DebugDarken", Quad(10000f, 10000f)).apply {
+        material = Material(this@darkUnderlay, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+            setColor("Color", ColorRGBA(0f, 0f, 0f, 0.5f))
+            additionalRenderState.blendMode = RenderState.BlendMode.Alpha
         }
-
-        // camera position and rotation
-        appendLine()
-        appendLine("Camera:")
-        appendLine("${this@debugText.app.camera.location.sigFigs()} / ${this@debugText.app.camera.rotation.sigFigs()}")
-        appendLine(this@debugText.cameraState)
-        appendLine(this@debugText.cameraSpeed)
-
-        appendLine()
-        appendLine("Drum set:")
-        appendLine("isVisible: ${this@debugText.drumSetVisibilityManager.isVisible}")
-        appendLine(
-            "currentlyVisible: ${
-                this@debugText.drumSetVisibilityManager.currentlyVisibleDrumSet?.let {
-                    "${it::class.simpleName} ${if (it is TypicalDrumSet) it.shellStyle.toString() else ""}"
-                } ?: "null"
-            }"
-        )
-        appendLine()
-        appendLine("Lyrics")
-        appendLine(this@debugText.lyricController?.debugInfo(this@debugText.time))
-
-        // instruments strings
-        appendLine()
-        appendLine("Instruments:")
-        append("${this@debugText.instruments.joinToString("")}\n")
+        loc = v3(0f, 0f, -1f)
     }
 }
-
-private fun Quaternion.sigFigs(): String = "%5.2f / %5.2f / %5.2f / %5.2f".format(x, y, z, w)
-private fun Vector3f.sigFigs(): String = "%7.2f / %7.2f / %7.2f".format(x, y, z)

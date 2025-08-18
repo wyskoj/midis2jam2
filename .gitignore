@@ -34,3 +34,5 @@ settings.json
 local.properties
 app/src/commonMain/resources/*
 app/src/androidMain/assets/*
+app/src/commonMain/composeResources/values/build.xml
+app/src/commonMain/composeResources/files/THIRD-PARTY-NOTICES.txt

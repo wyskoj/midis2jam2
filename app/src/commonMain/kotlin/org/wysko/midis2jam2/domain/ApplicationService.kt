@@ -23,8 +23,13 @@ import kotlinx.coroutines.flow.StateFlow
 expect class ApplicationService() {
     val isApplicationRunning: StateFlow<Boolean>
     fun startApplication(executionState: ExecutionState)
+    fun startQueueApplication(executionState: QueueExecutionState)
 }
 
 data class ExecutionState(
     val midiFile: PlatformFile,
+)
+
+data class QueueExecutionState(
+    val queue: List<PlatformFile>,
 )

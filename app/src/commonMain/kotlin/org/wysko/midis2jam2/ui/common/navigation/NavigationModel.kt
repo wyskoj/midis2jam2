@@ -17,11 +17,21 @@
 
 package org.wysko.midis2jam2.ui.common.navigation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import java.io.File
 
 class NavigationModel : ScreenModel {
-    var navigateToSoundbanksSettingsScreen: Boolean by mutableStateOf(false)
+    private var _applyHomeScreenMidiFile = MutableStateFlow<File?>(null)
+    val applyHomeScreenMidiFile: StateFlow<File?>
+        get() = _applyHomeScreenMidiFile
+
+    fun setApplyHomeScreenMidiFile(file: File?) {
+        _applyHomeScreenMidiFile.value = file
+    }
+
+    fun clearApplyHomeScreenMidiFile() {
+        _applyHomeScreenMidiFile.value = null
+    }
 }

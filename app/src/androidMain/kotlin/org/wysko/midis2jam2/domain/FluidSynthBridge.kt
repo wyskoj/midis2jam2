@@ -7,6 +7,14 @@ class FluidSynthBridge(soundfontPath: String) {
         synthPtr = initFluidSynth(soundfontPath)
     }
 
+    fun setChorusActive(isChorusActive: Boolean) {
+        setChorusActiveImpl(synthPtr, isChorusActive)
+    }
+
+    fun setReverbActive(isReverbActive: Boolean) {
+        setReverbActiveImpl(synthPtr, isReverbActive)
+    }
+
     external fun noteOn(synthPtr: Long, channel: Int, note: Int, velocity: Int)
     external fun noteOff(synthPtr: Long, channel: Int, note: Int)
     external fun controlChange(synthPtr: Long, channel: Int, controller: Int, value: Int)
@@ -16,6 +24,9 @@ class FluidSynthBridge(soundfontPath: String) {
     external fun polyPressure(synthPtr: Long, channel: Int, note: Int, pressure: Int)
     external fun sendSysex(synthPtr: Long, data: ByteArray)
 
+    private external fun setChorusActiveImpl(synthPtr: Long, isChorusActive: Boolean)
+    private external fun setReverbActiveImpl(synthPtr: Long, isReverbActive: Boolean)
+
     private external fun initFluidSynth(soundfontPath: String): Long
     private external fun closeFluidSynth(synthPtr: Long)
 
@@ -23,4 +34,4 @@ class FluidSynthBridge(soundfontPath: String) {
         closeFluidSynth(synthPtr)
         synthPtr = 0
     }
-} 
+}

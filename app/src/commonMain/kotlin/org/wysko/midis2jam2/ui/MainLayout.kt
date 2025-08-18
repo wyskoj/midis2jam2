@@ -22,25 +22,24 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.home_fill
 import midis2jam2.app.generated.resources.home_outline
+import midis2jam2.app.generated.resources.info_fill
+import midis2jam2.app.generated.resources.info_outline
 import midis2jam2.app.generated.resources.settings_fill
 import midis2jam2.app.generated.resources.settings_outline
+import midis2jam2.app.generated.resources.tab_about
 import midis2jam2.app.generated.resources.tab_home
 import midis2jam2.app.generated.resources.tab_settings
+import org.wysko.midis2jam2.ui.about.AboutTab
 import org.wysko.midis2jam2.ui.home.HomeTab
 import org.wysko.midis2jam2.ui.settings.SettingsTab
 
 @Composable
 expect fun MainLayout()
 
-val tabs: Map<Tab, TabParameters> = mapOf(
-    HomeTab to TabParameters(
-        name = Res.string.tab_home,
-        iconUnfocused = Res.drawable.home_outline,
-        iconFocused = Res.drawable.home_fill,
-    ),
-    SettingsTab to TabParameters(
-        name = Res.string.tab_settings,
-        iconUnfocused = Res.drawable.settings_outline,
-        iconFocused = Res.drawable.settings_fill,
-    ),
+@Composable
+expect fun BasicDeviceScaffold(
+    topBar: @Composable (() -> Unit) = {},
+    content: @Composable () -> Unit,
 )
+
+expect val tabs: Map<Tab, TabParameters>

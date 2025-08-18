@@ -21,7 +21,9 @@ import Platform
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import org.wysko.kmidi.midi.TimeBasedSequence
-import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.FluidSynthBridge
+import org.wysko.midis2jam2.domain.FluidSynthDevice
+import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.midi.sendResetMessage
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
@@ -55,10 +57,14 @@ class AndroidMidis2jam2(
         super.initialize(stateManager, app)
         BackgroundController.configureBackground(this@AndroidMidis2jam2, configs.find(), root, Platform.Android)
         cameraController = AndroidOrbitingCamera(this)
-        debugTextController.toggle()
+        setCameraControllersActive(cameraState)
+
+        if (configs.find<AppSettingsConfiguration>().appSettings.generalSettings.isShowDebugInfo) {
+            debugTextController.toggle()
+        }
     }
 
-    override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {
+    override fun sendResetMessage(midiSpecification: MidiSpecification) {
         midiDevice.sendResetMessage(midiSpecification)
     }
 
@@ -194,24 +200,17 @@ class AndroidMidis2jam2(
     private fun setSynthEffects() {
         val config =
             configs.find<AppSettingsConfiguration>().appSettings.playbackSettings.synthesizerSettings
-        if (!(config.isUseChorus)) {
-            midiDevice.sendControlChangeMessage(
-                channel = 0,
-                controller = 93,
-                value = 0
-            )
+        if (!config.isUseChorus) {
+            FluidSynthDevice.device.setChorusActive(false)
         }
-        if (!(config.isUseReverb)) {
-            midiDevice.sendControlChangeMessage(
-                channel = 0,
-                controller = 91,
-                value = 0
-            )
+        if (!config.isUseReverb) {
+            FluidSynthDevice.device.setReverbActive(false)
         }
     }
 
     fun callAction(action: Midis2jam2Action) {
-
+        val isDisableTouchInput =
+            configs.find<AppSettingsConfiguration>().appSettings.controlsSettings.isDisableTouchInput
         when (action) {
             is Midis2jam2Action.MoveToCameraAngle -> {
                 currentCameraAngle =
@@ -231,6 +230,7 @@ class AndroidMidis2jam2(
             Midis2jam2Action.SeekBackward -> onAction("seek_backward", true, 0f)
             Midis2jam2Action.SeekForward -> onAction("seek_forward", true, 0f)
             is Midis2jam2Action.Zoom -> {
+                if (isDisableTouchInput) return
                 if (cameraState != CameraState.DEVICE_SPECIFIC_CAMERA) {
                     (cameraController as AndroidOrbitingCamera).applyFakeOrigin()
                 }
@@ -239,6 +239,7 @@ class AndroidMidis2jam2(
             }
 
             is Midis2jam2Action.Pan -> {
+                if (isDisableTouchInput) return
                 if (cameraState != CameraState.DEVICE_SPECIFIC_CAMERA) {
                     (cameraController as AndroidOrbitingCamera).applyFakeOrigin()
                 }
@@ -247,6 +248,7 @@ class AndroidMidis2jam2(
             }
 
             is Midis2jam2Action.Orbit -> {
+                if (isDisableTouchInput) return
                 if (cameraState != CameraState.DEVICE_SPECIFIC_CAMERA) {
                     (cameraController as AndroidOrbitingCamera).applyFakeOrigin()
                 }
@@ -255,4 +257,6 @@ class AndroidMidis2jam2(
             }
         }
     }
+
+    fun isPlaying(): Boolean = sequencer.isRunning && !paused
 }

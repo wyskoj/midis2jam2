@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <string-array name="development_contributors">
+        <item>fedexkangaroo</item>
+        <item>loonaticx</item>
+        <item>Julian Lachniet</item>
+        <item>JonnyCrash420</item>
+        <item>nikitalita</item>
+        <item>rxuglr</item>
+        <item>vg_coder</item>
+        <item>vgking1</item>
+    </string-array>
+    <string-array name="attributions">
+        <item>Clarinet texture by Mr. Tremolo Measure</item>
+        <item>"Guitar" by vishnevsky.yaroslav licensed under CC BY 4.0, modified</item>
+        <item>"tabr" by Matthew Leonawicz licensed under MIT</item>
+        <item>Tinkle Bell model by TheCococQuartz</item>
+        <item>Turntable model and texture by fedexkangaroo and favoredbeach</item>
+    </string-array>
+    <string-array name="i18n_contributors">
+        <item>Español: Mr. Tremolo Measure</item>
+        <item>Français: Jacob Wysko</item>
+        <item>Italiano: SamuDrummer</item>
+        <item>Norsk: Trygve Larsen</item>
+        <item>Polski: endermanek24</item>
+        <item>Pусский: Rxuglr</item>
+        <item>Suomi: Dermoker</item>
+        <item>Tagalog: GlovePerson</item>
+        <item>Türkçe: pigeondriver45</item>
+        <item>Українська мова: PicoUA</item>
+        <item>ไทย: Hariwong Lonarai</item>
+        <item>中文: otomad</item>
+    </string-array>
+</resources>

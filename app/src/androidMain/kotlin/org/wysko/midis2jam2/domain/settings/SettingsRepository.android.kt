@@ -21,11 +21,9 @@ import android.content.Context
 import com.russhwolf.settings.SharedPreferencesSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.getValue
 
 actual class SettingsRepository : KoinComponent {
     private val sharedPreferences = SharedPreferencesSettings(

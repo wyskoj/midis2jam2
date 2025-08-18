@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import org.wysko.kmidi.midi.StandardMidiFile
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.ProgramEvent
@@ -93,6 +94,8 @@ class MidiSearchEngine(private val directory: File) {
         indexJob?.cancel()
     }
 
+    fun isIndexBuilt(): Boolean = ::index.isInitialized
+
     /**
      * Represents the progress state of the MIDI file indexing operation.
      *
@@ -113,14 +116,23 @@ class MidiSearchEngine(private val directory: File) {
         data class Percentage(val value: Int) : IndexingProgress()
     }
 
-    private fun extractSequencesFromMidiFiles(
+    private suspend fun extractSequencesFromMidiFiles(
         midiFiles: List<File>,
         onProgress: (IndexingProgress) -> Unit,
-    ): Map<File, StandardMidiFile> =
-        midiFiles.mapIndexedNotNull { index, file ->
-            runCatching { midiFileReader.readFile(file) }.getOrNull()?.let { file to it }
-                .also { onProgress(IndexingProgress.Percentage((index + 1) * 100 / midiFiles.size)) }
-        }.toMap()
+    ): Map<File, StandardMidiFile> {
+        val result = mutableMapOf<File, StandardMidiFile>()
+        for ((index, file) in midiFiles.withIndex()) {
+            yield()
+            try {
+                val sequence = midiFileReader.readFile(file)
+                result[file] = sequence
+            } catch (_: Exception) {
+                // Skip files that fail to read
+            }
+            onProgress(IndexingProgress.Percentage((index + 1) * 100 / midiFiles.size))
+        }
+        return result
+    }
 
     private fun buildProgramChangeIndex(sequences: Map<File, StandardMidiFile>): Map<File, List<Byte>> =
         sequences.mapValues { (_, sequence) -> getUsedProgramValues(sequence) }

@@ -28,7 +28,11 @@ import java.io.IOException
 actual class MidiService : KoinComponent {
     actual fun getMidiDevices(): List<MidiDevice> {
         val context: Context by inject()
-        return listOf(FluidSynthDevice(context))
+        return listOf(
+            FluidSynthDevice(context).also {
+                FluidSynthDevice.device = it
+            }
+        )
     }
 }
 
@@ -96,6 +100,18 @@ class FluidSynthDevice(context: Context) : MidiDevice {
 
     override fun sendSysex(data: ByteArray) {
         bridge?.sendSysex((bridge ?: return).synthPtr, data)
+    }
+
+    fun setChorusActive(isChorusActive: Boolean) {
+        bridge?.setChorusActive(isChorusActive)
+    }
+
+    fun setReverbActive(isReverbActive: Boolean) {
+        bridge?.setReverbActive(isReverbActive)
+    }
+
+    companion object {
+        lateinit var device: FluidSynthDevice
     }
 }
 

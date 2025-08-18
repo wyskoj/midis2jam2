@@ -1,0 +1,35 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:viewportWidth="960"
+    android:viewportHeight="960"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:translateX="-0"
+        android:translateY="960">
+        <path
+            android:pathData="M473 -80c-16 0 -31.33333 -3 -46 -9 -14.66667 -6 -27.66667 -14.66667 -39 -26l-204 -205 30 -31c10.66667 -10.66667 23.16667 -17.83333 37.5 -21.5 14.33333 -3.66667 28.5 -3.5 42.5 0.5l66 19v-327c0 -11.33333 3.83333 -20.83333 11.5 -28.5 7.66667 -7.66667 17.16667 -11.5 28.5 -11.5 11.33333 0 20.83333 3.83333 28.5 11.5 7.66667 7.66667 11.5 17.16667 11.5 28.5v433l-97 -27 102 102c3.33333 3.33333 7.5 6.16667 12.5 8.5 5 2.33333 10.16667 3.5 15.5 3.5h167c22 0 40.83333 -7.83333 56.5 -23.5 15.66667 -15.66667 23.5 -34.5 23.5 -56.5v-160c0 -11.33333 3.83333 -20.83333 11.5 -28.5 7.66667 -7.66667 17.16667 -11.5 28.5 -11.5 11.33333 0 20.83333 3.83333 28.5 11.5 7.66667 7.66667 11.5 17.16667 11.5 28.5v160c0 44 -15.66667 81.66667 -47 113 -31.33333 31.333333 -69 47 -113 47zm7 -280v-358.40379c0 -11.33333 3.83333 -20.83333 11.5 -28.5 7.66667 -7.66666 17.16667 -11.5 28.5 -11.5 11.33333 0 20.83333 3.83334 28.5 11.5 7.66667 7.66667 11.5 17.16667 11.5 28.5V-360Zm120 0v-120c0 -11.33333 3.83333 -20.83333 11.5 -28.5 7.66667 -7.66667 17.16667 -11.5 28.5 -11.5 11.33333 0 20.83333 3.83333 28.5 11.5 7.66667 7.66667 11.5 17.16667 11.5 28.5v120z"
+            android:fillColor="#E3E3E3" />
+        <path
+            android:pathData="M180 -960L38.59375 -818.59375L180 -677.1875L222.42188 -719.60938L153.4375 -788.59375L806.5625 -788.59375L737.57812 -719.60938L780 -677.1875L921.40625 -818.59375L780 -960L737.57812 -917.57812L806.5625 -848.59375L153.4375 -848.59375L222.42188 -917.57812L180 -960z"
+            android:fillColor="#E3E3E3"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>

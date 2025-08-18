@@ -45,12 +45,18 @@ actual class SystemInteractionService : KoinComponent {
         context().startActivity(intent)
     }
 
-    actual fun getLocale(): Locale {
-        return context().resources.configuration.locales.get(0)
-    }
+    actual fun getLocale(): Locale = context().resources.configuration.locales.get(0)
 
     private fun context(): Context {
         val context: Context by inject()
         return context
+    }
+
+    actual fun openOnlineDocumentation() {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(OnlineDocumentation.url)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context().startActivity(intent)
     }
 }

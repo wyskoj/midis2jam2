@@ -22,4 +22,5 @@ import android.os.Build
 object CompatLibrary {
     val requiresPerformanceViewSystemBack: Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.P
     val supportsFilterPostProcessor: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val useLegacyLanguageSelect: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2
 }

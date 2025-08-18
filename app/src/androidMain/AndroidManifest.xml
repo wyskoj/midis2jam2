@@ -27,8 +27,9 @@
 
         <activity
             android:name=".PerformanceActivity"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:screenOrientation="landscape"
+            android:supportsPictureInPicture="true"
             tools:ignore="DiscouragedApi" />
 
         <!-- Support Android 12 and lower for per-app language preferences -->

@@ -17,11 +17,15 @@
 
 package org.wysko.midis2jam2.domain
 
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.wysko.midis2jam2.domain.settings.SettingsRepository
 import java.awt.Desktop
 import java.io.File
-import java.util.Locale
+import java.net.URI
+import java.util.*
 
-actual class SystemInteractionService {
+actual class SystemInteractionService : KoinComponent {
     actual fun openFolder(folder: File) {
         Desktop.getDesktop().open(folder)
     }
@@ -31,6 +35,11 @@ actual class SystemInteractionService {
     }
 
     actual fun getLocale(): Locale {
-        TODO("Not yet implemented")
+        val appSettings: SettingsRepository by inject<SettingsRepository>()
+        return Locale.of(appSettings.appSettings.value.generalSettings.locale)
+    }
+
+    actual fun openOnlineDocumentation() {
+        Desktop.getDesktop().browse(URI(OnlineDocumentation.url))
     }
 }

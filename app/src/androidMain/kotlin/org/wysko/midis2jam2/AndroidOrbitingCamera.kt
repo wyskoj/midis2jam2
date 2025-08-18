@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2
 
-import com.jme3.font.BitmapText
 import com.jme3.math.FastMath
 import com.jme3.math.Vector2f
 import com.jme3.math.Vector3f
@@ -62,7 +61,7 @@ private val orbitCameraState: Map<CameraAngle, OrbitingCameraState> = mapOf(
         orbitOrigin = v3(-53, 30, -3),
         azimuthAngle = 70f,
         verticalAngle = 45f,
-        orbitDistance = FAKE_ORIGIN_DEFAULT_DISTANCE
+        orbitDistance = 100f
     ),
     CameraAngle.CAMERA_3A to OrbitingCameraState(
         orbitOrigin = v3(0, 30, -70),
@@ -98,10 +97,17 @@ private val orbitCameraState: Map<CameraAngle, OrbitingCameraState> = mapOf(
         orbitOrigin = v3(47, 35, 7),
         azimuthAngle = 127f,
         verticalAngle = 5f,
-        orbitDistance = FAKE_ORIGIN_DEFAULT_DISTANCE
+        orbitDistance = 50f
     ),
     // 6B requires an upside-down view, which is not possible with this camera's internal math.
     // Thus, I'm omitting it.
+)
+
+private data class OrbitingCameraState(
+    val orbitOrigin: Vector3f,
+    val azimuthAngle: Float,
+    val verticalAngle: Float,
+    val orbitDistance: Float,
 )
 
 class AndroidOrbitingCamera(private val context: Midis2jam2) : CameraController {
@@ -150,6 +156,23 @@ class AndroidOrbitingCamera(private val context: Midis2jam2) : CameraController 
         orbitOrigin.addLocal(totalMove)
     }
 
+    fun applyFakeOrigin() {
+        val forward = context.app.camera.rotation.getRotationColumn(2).normalizeLocal()
+        val origin = context.app.camera.location.clone()
+            .addLocal(forward.clone().multLocal(FAKE_ORIGIN_DEFAULT_DISTANCE))
+
+        val horizontalComponent = Vector2f(forward.x, forward.z).normalizeLocal()
+
+        val azimuth = azimuth(horizontalComponent.x, horizontalComponent.y)
+        val vertical = FastMath.asin(-forward.y)
+
+        this.orbitOrigin.set(origin)
+        this.orbitOriginInterpolated.set(origin)
+        this.azimuthAngle = azimuth
+        this.verticalAngle = vertical * 180f / FastMath.PI
+        this.orbitDistance = FAKE_ORIGIN_DEFAULT_DISTANCE
+    }
+
     override fun moveToCameraAngle(cameraAngle: CameraAngle) {
         isEnabled = true
         orbitCameraState[cameraAngle]?.let {
@@ -171,30 +194,6 @@ class AndroidOrbitingCamera(private val context: Midis2jam2) : CameraController 
         orbitDistance = state.orbitDistance
     }
 
-    fun applyFakeOrigin() {
-        val forward = context.app.camera.rotation.getRotationColumn(2).normalizeLocal()
-        val origin = context.app.camera.location.clone()
-            .addLocal(forward.clone().multLocal(FAKE_ORIGIN_DEFAULT_DISTANCE))
-
-        val horizontalComponent = Vector2f(forward.x, forward.z).normalizeLocal()
-
-        val azimuth = azimuth(horizontalComponent.x, horizontalComponent.y)
-        val vertical = FastMath.asin(-forward.y)
-
-        this.orbitOrigin.set(origin)
-        this.orbitOriginInterpolated.set(origin)
-        this.azimuthAngle = azimuth
-        this.verticalAngle = vertical * 180f / FastMath.PI
-        this.orbitDistance = FAKE_ORIGIN_DEFAULT_DISTANCE
-    }
+    private fun azimuth(x: Float, z: Float): Float =
+        ((180.0 + Math.toDegrees(FastMath.atan2(z, x).toDouble())) % 360.0).toFloat()
 }
-
-private data class OrbitingCameraState(
-    val orbitOrigin: Vector3f,
-    val azimuthAngle: Float,
-    val verticalAngle: Float,
-    val orbitDistance: Float
-)
-
-fun azimuth(x: Float, z: Float): Float =
-    ((180.0 + Math.toDegrees(FastMath.atan2(z, x).toDouble())) % 360.0).toFloat()

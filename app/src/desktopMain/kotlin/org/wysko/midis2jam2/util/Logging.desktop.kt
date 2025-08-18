@@ -19,9 +19,7 @@ package org.wysko.midis2jam2.util
 
 import org.slf4j.LoggerFactory.getLogger
 
-actual fun <T : Any> T.logger(): JwLogger {
-    return DesktopLogger(this::class.simpleName ?: "Unknown")
-}
+actual fun <T : Any> T.logger(): JwLogger = DesktopLogger(this::class.simpleName ?: "Unknown")
 
 class DesktopLogger(private val tag: String) : JwLogger {
     private val _logger = getLogger(tag)

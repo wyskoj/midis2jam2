@@ -21,23 +21,21 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 import org.wysko.midis2jam2.ui.home.HomeTabModel
+import org.wysko.midis2jam2.ui.queue.QueueTabModel
+import org.wysko.midis2jam2.ui.search.SearchTabModel
 import org.wysko.midis2jam2.ui.settings.SettingsModel
-import org.wysko.midis2jam2.ui.settings.background.BackgroundSettingsScreenModel
-import org.wysko.midis2jam2.ui.settings.graphics.GraphicsSettingsScreenModel
-import org.wysko.midis2jam2.ui.settings.graphics.resolution.ResolutionSettingsScreenModel
-import org.wysko.midis2jam2.ui.settings.playback.PlaybackSettingsScreenModel
+import org.wysko.midis2jam2.ui.settings.SettingsScreenModel
 
 val uiModule: Module = module {
     // Tabs
     single { HomeTabModel(get(), get()) }
     single { SettingsModel(get()) }
+    single { QueueTabModel(get()) }
+    single { SearchTabModel() }
 
     // Navigation
     single { NavigationModel() }
 
-    // Settings screens
-    single { ResolutionSettingsScreenModel }
-    single { GraphicsSettingsScreenModel }
-    single { PlaybackSettingsScreenModel }
-    single { BackgroundSettingsScreenModel(get(), get()) }
+    // Settings
+    single { SettingsScreenModel }
 }

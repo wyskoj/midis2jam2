@@ -17,7 +17,6 @@
 
 package org.wysko.midis2jam2.world.camera
 
-
 import com.jme3.input.FlyByCamera
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
@@ -27,11 +26,11 @@ import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.CameraController
+import org.wysko.midis2jam2.world.VariableSpeed
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
 private const val DEFAULT_MOVE_SPEED = 100f
-
 
 /**
  * The SmoothFlyByCamera class is used to smoothly move and rotate the camera towards a target location and rotation.
@@ -40,12 +39,12 @@ private const val DEFAULT_MOVE_SPEED = 100f
  * @property onAction Callback function to be called when an action is performed.
  * @property actLikeNormalFlyByCamera Whether the camera should act like a normal FlyByCamera.
  * @property isEnabled Whether the camera is enabled.
- * @property moveSpeed The speed at which the camera moves.
+ * @property speed The speed at which the camera moves.
  */
 class SmoothFlyByCamera(
     private val context: Midis2jam2,
     private val onAction: () -> Unit,
-) : CameraController {
+) : CameraController, VariableSpeed {
     /**
      * Whether the camera should act like a normal [FlyByCamera].
      */
@@ -72,7 +71,7 @@ class SmoothFlyByCamera(
     /**
      * The speed at which the camera moves.
      */
-    var moveSpeed: Float = DEFAULT_MOVE_SPEED
+    override var speed: Float = DEFAULT_MOVE_SPEED
         set(value) {
             dummyFlyByCamera.moveSpeed = value
             field = value

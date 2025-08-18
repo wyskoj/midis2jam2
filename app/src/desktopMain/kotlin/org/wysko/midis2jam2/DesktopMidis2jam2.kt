@@ -25,7 +25,6 @@ import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
 import org.wysko.midis2jam2.starter.configuration.*
 import org.wysko.midis2jam2.starter.configuration.find
-import org.wysko.midis2jam2.util.ErrorHandling.errorDisp
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.KeyMap
@@ -35,7 +34,6 @@ import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFrom
 import org.wysko.midis2jam2.world.camera.CameraSpeed
 import org.wysko.midis2jam2.world.camera.CameraState
 import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
-import java.awt.Desktop
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
@@ -81,20 +79,20 @@ open class DesktopMidis2jam2(
             )
         } catch (e: BackgroundImageFormatException) {
             exit()
-            logger().errorDisp(
-                e.message ?: "There was an error loading the images for the background.", e
+            logger().error(
+                e.message ?: "There was an error loading the images for the background.",
+                e
             )
         } catch (e: IllegalArgumentException) {
             exit()
-            logger().errorDisp(
+            logger().error(
                 message = when (e.message) {
                     "Image width and height must be the same" -> "The background image(s) must be square."
                     else -> e.message ?: "There was an error loading the images for the background."
                 },
-                exception = e
+                throwable = e
             )
         }
-
 
         val settingsConfig = configs.find<AppSettingsConfiguration>().appSettings
         this.cameraController = SmoothFlyByCamera(this) {
@@ -254,7 +252,6 @@ open class DesktopMidis2jam2(
         }
     }
 
-
     /** Sets the speed of the camera, given a speed [name] and whether that key is [pressed]. */
     private fun handleCameraSpeedPress(name: String, pressed: Boolean) {
         if (CameraSpeed.entries.none { it.name.lowercase() == name }) return
@@ -271,7 +268,6 @@ open class DesktopMidis2jam2(
                 cameraSpeed = if (pressed) pressedCameraSpeed else CameraSpeed.Normal
             }
         }
-        (cameraController as SmoothFlyByCamera).moveSpeed = pressedCameraSpeed.speedValue
     }
 
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {

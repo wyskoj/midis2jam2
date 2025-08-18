@@ -15,6 +15,12 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
+internal expect val currentPlatform: Platform
+
 enum class Platform {
-    Desktop, Android
+    Desktop, Android;
+
+    companion object {
+        fun current(): Platform = currentPlatform
+    }
 }

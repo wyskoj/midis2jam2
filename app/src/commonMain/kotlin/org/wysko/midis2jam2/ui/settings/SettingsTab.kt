@@ -18,18 +18,14 @@
 package org.wysko.midis2jam2.ui.settings
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
-import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.tab_settings
 import org.jetbrains.compose.resources.stringResource
-import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 import org.wysko.midis2jam2.ui.common.transition.SlideAndFadeTransition
-import org.wysko.midis2jam2.ui.settings.playback.soundbanks.SoundbanksSettingsScreen
 
 object SettingsTab : Tab {
 
@@ -44,18 +40,9 @@ object SettingsTab : Tab {
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        val navigationModel = koinScreenModel<NavigationModel>()
-
         Navigator(SettingsScreen) { navigator ->
             SlideAndFadeTransition(navigator) { screen ->
                 screen.Content()
-            }
-            LaunchedEffect(navigationModel.navigateToSoundbanksSettingsScreen) {
-                if (navigationModel.navigateToSoundbanksSettingsScreen) {
-                    navigator.popUntilRoot()
-                    navigator.push(SoundbanksSettingsScreen)
-                    navigationModel.navigateToSoundbanksSettingsScreen = false
-                }
             }
         }
     }
