@@ -68,13 +68,11 @@ actual class ApplicationService : KoinComponent {
     actual fun startQueueApplication(executionState: QueueExecutionState) {
         _isApplicationRunning.value = true
 
-        val homeTabModel: HomeTabModel by inject()
         val configurationService: ConfigurationService by inject()
         val configurations = configurationService.getConfigurations()
 
         val midiPackage = runCatching { MidiPackage.build(null, configurations) }.onFailure {
             _isApplicationRunning.value = false
-//            onFinish(it) TODO
             return
         }
 

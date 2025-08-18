@@ -20,12 +20,15 @@ package org.wysko.midis2jam2.ui.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
 
+/*
+ This is not needed for Android, as the locale is handled by the system.
+ */
 actual object LocalAppLocale {
     actual val current: String
-        get() = TODO("Not yet implemented")
+        get() = error("NO-OP")
 
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {
-        TODO("Not yet implemented")
+        error("NO-OP")
     }
 }
