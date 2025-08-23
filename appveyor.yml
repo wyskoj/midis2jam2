@@ -1,34 +1,69 @@
-version: 1.0.{build}
-
-# Build matrix for Windows, macOS, Linux
-matrix:
-  os:
-    - Windows
-    - macOS
-    - Ubuntu
-
-# Environment
 environment:
-  JAVA_HOME_21_x64:
+  matrix:
+    - job_name: Windows
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+
+    - job_name: Linux
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+
+    - job_name: macOS
+      APPVEYOR_BUILD_WORKER_IMAGE: macos-sonoma
+
+matrix:
+  fast_finish: true
+
+for:
+
+  # ======================================
+  #      Windows
+  # ======================================
+
+  -
     matrix:
-      - WINDOWS: C:\Program Files\Azul\zulu-21
-      - MACOS: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
-      - UBUNTU: /usr/lib/jvm/zulu-21-amd64
+      only:
+        - job_name: Windows
 
-# Install dependencies
-install:
-  - ps: if ($env:APPVEYOR_OS -eq "Windows") { choco install gradle -y }
-  - bash: if [ "$APPVEYOR_OS" = "Linux" ] || [ "$APPVEYOR_OS" = "macOS" ]; then brew install gradle || sudo apt-get install -y gradle; fi
+    init:
+      - echo "Init for Windows"
 
-# Set JDK
-before_build:
-  - set JAVA_HOME=%JAVA_HOME_21_x64%
-  - set PATH=%JAVA_HOME%\bin;%PATH%
+    build_script:
+      - gradlew.bat packageReleaseUberJarForCurrentOS
 
-# Build command
-build: 
-  - gradle packageReleaseUberJarForCurrentOS
+    test: off
 
-# Artifacts
+  # ======================================
+  #      Linux
+  # ======================================
+
+  -
+    matrix:
+      only:
+        - job_name: Linux
+
+    init:
+      - echo "Init for Linux"
+
+    build_script:
+      - ./gradlew packageReleaseUberJarForCurrentOS
+
+    test: off
+
+  # ======================================
+  #      macOS
+  # ======================================
+
+  -
+    matrix:
+      only:
+        - job_name: macOS
+
+    init:
+      - echo "Init for macOS"
+
+    build_script:
+      -./gradlew packageReleaseUberJarForCurrentOS
+
+    test: off
+
 artifacts:
-  - path: build/libs/*.jar
+  - path: app/build/compose/jars/*.jar
