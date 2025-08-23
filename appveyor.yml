@@ -1,0 +1,42 @@
+version: 1.0.{build}
+
+# Allow builds on any branch (manual or push)
+branches:
+  only:
+    - '*'
+
+# Matrix for OS builds
+matrix:
+  - platform: x64
+    image: Visual Studio 2022
+    os: windows
+    JAVA_INSTALL: "choco install zulu21jdk -y"
+    JAVA_HOME: "C:\\jdk\\zulu-21"
+    GRADLE_CMD: "gradlew.bat packageReleaseUberJarForCurrentOS --no-daemon --stacktrace"
+  - platform: x64
+    image: Ubuntu 22.04
+    os: linux
+    JAVA_INSTALL: "sudo apt update && sudo apt install -y zulu-21"
+    JAVA_HOME: "/usr/lib/jvm/zulu-21"
+    GRADLE_CMD: "./gradlew packageReleaseUberJarForCurrentOS --no-daemon --stacktrace"
+  - platform: x64
+    image: macos-14
+    os: macos
+    JAVA_INSTALL: "brew install --cask zulu21"
+    JAVA_HOME: "/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home"
+    GRADLE_CMD: "./gradlew packageReleaseUberJarForCurrentOS --no-daemon --stacktrace"
+
+# Artifacts
+artifacts:
+  - path: app/build/compose/jars/*.jar
+    name: uberjar-${os}
+
+# Build script
+build_script:
+  - ps: |
+      Write-Host "Installing JDK..."
+      iex "$env:JAVA_INSTALL"
+      Write-Host "Setting JAVA_HOME=$env:JAVA_HOME"
+      setx JAVA_HOME "$env:JAVA_HOME"
+      setx PATH "$env:JAVA_HOME\bin;$env:PATH"
+  - cmd: $env:GRADLE_CMD
