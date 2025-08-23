@@ -39,7 +39,7 @@ tasks.withType<ComposeHotRun>().configureEach {
     mainClass.set("org.wysko.midis2jam2.MainKt")
 }
 
-val appVersionName: String = "2.0.0-alpha-20250628"
+val appVersionName: String = "2.0.0"
 val appVersionCode: Int = 2
 
 kotlin {
@@ -183,10 +183,18 @@ compose.desktop {
     application {
         mainClass = "org.wysko.midis2jam2.MainKt"
 
+        buildTypes {
+            release {
+                proguard {
+                    isEnabled.set(false)
+                }
+            }
+        }
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.wysko.midis2jam2"
-            packageVersion = "1.0.0"
+            packageName = "midis2jam2"
+            packageVersion = appVersionName
         }
     }
 }
