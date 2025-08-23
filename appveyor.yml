@@ -62,7 +62,7 @@ for:
       - echo "Init for macOS"
 
     build_script:
-      -./gradlew packageReleaseUberJarForCurrentOS
+      - ./gradlew packageReleaseUberJarForCurrentOS
 
     test: off
 
