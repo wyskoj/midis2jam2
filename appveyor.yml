@@ -1,0 +1,49 @@
+version: 1.0.{build}
+
+# Allow manual builds from any branch
+trigger:
+  branch:
+    - '*'
+
+# Define a build matrix for OSes
+matrix:
+  - platform: x64
+    image: Visual Studio 2022
+    os: windows
+  - platform: x64
+    image: Ubuntu 22.04
+    os: linux
+  - platform: x64
+    image: macos-14
+    os: macos
+
+# Environment setup per OS
+environment:
+  WINDOWS_JAVA_HOME: C:\jdk\zulu-21
+  LINUX_JAVA_HOME: /usr/lib/jvm/zulu-21
+  MACOS_JAVA_HOME: /Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home
+
+# Artifacts to collect
+artifacts:
+  - path: app/build/compose/jars/*.jar
+    name: uberjar-${os}
+
+# Build script per OS
+build_script:
+  - ps: |
+      if ($env:os -eq "windows") {
+        choco install zulu21jdk -y
+        refreshenv
+        $env:JAVA_HOME = $env:WINDOWS_JAVA_HOME
+      } elseif ($env:os -eq "linux") {
+        sudo apt update
+        sudo apt install -y zulu-21
+        export JAVA_HOME=$env:LINUX_JAVA_HOME
+        export PATH=$JAVA_HOME/bin:$PATH
+      } elseif ($env:os -eq "macos") {
+        brew install --cask zulu21
+        export JAVA_HOME=$env:MACOS_JAVA_HOME
+        export PATH=$JAVA_HOME/bin:$PATH
+      }
+
+  - cmd: gradlew.bat packageReleaseUberJarForCurrentOS --no-daemon --stacktrace
