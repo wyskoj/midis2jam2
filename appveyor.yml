@@ -60,11 +60,16 @@ for:
 
     init:
       - export PATH=$JAVA_HOME/bin:$PATH
+      - brew install --cask android-commandlinetools
+      - mkdir -p "$HOME/Library/Android/sdk/cmdline-tools/latest"
+      - cp -R "$(brew --prefix)/share/android-commandlinetools"/* "$HOME/Library/Android/sdk/cmdline-tools/latest/"
+      - export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
+      - export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
+      - sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;27.0.12077973"
+      - yes | sdkmanager --licenses --sdk_root="$ANDROID_SDK_ROOT"
 
     build_script:
-      - echo "sdk.dir=$HOME/android-sdk" > local.properties
-      - mkdir -p $HOME/android-sdk
-      - ./gradlew packageReleaseUberJarForCurrentOS
+      - ./gradlew packageReleaseUberJarForCurrentOS -PskipAndroid
 
     test: off
 
