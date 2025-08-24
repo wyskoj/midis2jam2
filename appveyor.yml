@@ -59,7 +59,10 @@ for:
         - job_name: macOS
 
     init:
-      - echo "Init for macOS"
+      - export PATH=$JAVA_HOME/bin:$PATH
+      # Fake Android SDK to satisfy Gradle's Android plugin
+      - echo "sdk.dir=$HOME/android-sdk" > local.properties
+      - mkdir -p $HOME/android-sdk
 
     build_script:
       - ./gradlew packageReleaseUberJarForCurrentOS
