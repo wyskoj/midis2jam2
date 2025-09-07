@@ -18,9 +18,6 @@
 package org.wysko.midis2jam2.starter.configuration
 
 import kotlinx.serialization.Serializable
-import java.io.File
-
-private val CONFIG_FILE = File(APPLICATION_CONFIG_HOME, "home.json")
 
 @Serializable
 data class HomeConfiguration(
@@ -28,8 +25,4 @@ data class HomeConfiguration(
     val selectedMidiDevice: String = "Gervill",
     val selectedSoundbank: String? = null,
     val isLooping: Boolean = false,
-) : Configuration {
-    companion object {
-        val preserver by lazy { ConfigurationPreserver(serializer(), serializer(), CONFIG_FILE) }
-    }
-}
+) : Configuration

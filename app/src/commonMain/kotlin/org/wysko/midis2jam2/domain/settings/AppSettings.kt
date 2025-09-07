@@ -53,7 +53,7 @@ data class AppSettings(
 
         @Serializable
         data class ShadowsSettings(
-            var isUseShadows: Boolean = false,
+            var isUseShadows: Boolean = true,
             var shadowsQuality: ShadowsQuality = ShadowsQuality.Medium,
         ) {
             enum class ShadowsQuality {

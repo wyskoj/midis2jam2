@@ -1,0 +1,192 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Yleiset -->
+    <string name="tab_home">Koti</string>
+    <string name="tab_queue">Jono</string>
+    <string name="tab_search">Haku</string>
+    <string name="tab_settings">Asetukset</string>
+    <string name="tab_about">Tietoa</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Peruuta</string>
+    <string name="back">Takaisin</string>
+    <string name="play">Toista</string>
+    <string name="enabled">Käytössä</string>
+    <string name="disabled">Pois käytöstä</string>
+    <string name="midi_file">MIDI-tiedosto</string>
+    <string name="midi_device">MIDI-laite</string>
+    <string name="soundbank">Äänipankki</string>
+    <string name="soundbank_default">Oletusäänipankki</string>
+    <string name="play_midi_file">Toista MIDI-tiedosto</string>
+    <string name="quality_none">Ei</string>
+    <string name="quality_low">Matala</string>
+    <string name="quality_medium">Keskitaso</string>
+    <string name="quality_high">Korkea</string>
+    <string name="help">Ohje</string>
+    <string name="launcher_window_title">midis2jam2-käynnistin</string>
+
+    <!-- Jono -->
+    <string name="queue_add">Lisää jonoon</string>
+    <string name="queue_clear">Tyhjennä</string>
+    <string name="queue_clear_prompt">Tyhjennetäänkö jono?</string>
+    <string name="queue_clear_warning">Toimintoa ei voi peruuttaa.</string>
+    <string name="queue_empty">Tänne tulevat lisäämäsi kappaleet.</string>
+    <string name="queue_load">Lataa</string>
+    <string name="queue_load_prompt">Ladataanko jono?</string>
+    <string name="queue_load_warning">Tämä tyhjentää nykyisen jonon.</string>
+    <string name="queue_load_missing">Joitain tiedostoja puuttuu</string>
+    <string name="queue_load_missing_help">Seuraavia tiedostoja ei löytynyt:</string>
+    <string name="queue_save">Tallenna</string>
+    <string name="queue_save_confirmation">Jono tallennettu.</string>
+    <string name="queue_shuffle">Sekoita</string>
+
+    <!-- Haku -->
+    <string name="search_criteria_too_narrow">Vastaavia MIDI-tiedostoja ei löytynyt. Koeta mukauttaa hakuehtoja.</string>
+    <string name="search_deselect_all">Poista kaikki valinnat</string>
+    <string name="search_directory">Hakemisto</string>
+    <string name="search_index_not_available">Valitse hakemisto MIDI-tiedostojen indeksointia varten.</string>
+    <string name="search_index_waiting">Odota! Indeksöimme MIDI-tiedostoja...</string>
+
+    <!-- Asetukset -->
+    <string name="settings_general">Yleiset</string>
+    <string name="settings_general_description">Kieli, teema</string>
+    <string name="settings_graphics">Grafiikka</string>
+    <string name="settings_graphics_description">Koko näyttö, resoluutio, tasoitus</string>
+    <string name="settings_graphics_description_a">Varjostukset</string>
+    <string name="settings_background">Tausta</string>
+    <string name="settings_background_description">Valitse kuva tai väri</string>
+    <string name="settings_controls">Ohjaus</string>
+    <string name="settings_controls_description">Kohdistimen lukitus, nopeuden muutosnäppäimet</string>
+    <string name="settings_controls_description_a">Kosketusohjaus</string>
+    <string name="settings_playback">Toisto</string>
+    <string name="settings_playback_description">MIDI-laite, syntetisaattori, äänipankit</string>
+    <string name="settings_on_screen_elements">Näytön elementit</string>
+    <string name="settings_on_screen_elements_description">Heads-up-display, lyriikat</string>
+
+    <!-- Asetukset / Yleiset -->
+    <string name="settings_general_theme">Teema</string>
+    <string name="settings_general_theme_light">Vaalea</string>
+    <string name="settings_general_theme_dark">Tumma</string>
+    <string name="settings_general_theme_system">Seuraa järjestelmää</string>
+    <string name="settings_general_locale">Kieli</string>
+
+    <!-- Asetukset / Grafiikka -->
+    <string name="settings_graphics_fullscreen">Koko näyttö</string>
+    <string name="settings_graphics_fullscreen_description">Käytä koko näyttöä</string>
+    <string name="settings_graphics_resolution">Resoluutio</string>
+    <string name="settings_graphics_resolution_fullscreen">Resoluutio vastaa näyttöä, kun koko näyttö on käytössä</string>
+    <string name="settings_graphics_resolution_default">Käytä oletusresoluutiota</string>
+    <string name="settings_graphics_resolution_default_hint">Oletus</string>
+    <string name="settings_graphics_resolution_default_description">Oletusresoluutio käyttää suurinta osaa näytöstä</string>
+    <string name="settings_graphics_resolution_custom">Mukautettu resoluutio</string>
+    <string name="settings_graphics_resolution_width">Leveys</string>
+    <string name="settings_graphics_resolution_height">Korkeus</string>
+    <string name="settings_graphics_shadows">Varjostukset</string>
+    <string name="settings_graphics_shadows_description">Renderöi varjostuksia objektien alle</string>
+    <string name="settings_graphics_shadows_none">Ei (teko)</string>
+    <string name="settings_graphics_shadows_description_a">Renderöi dynaamisia varjostuksia</string>
+    <string name="settings_graphics_shadows_description_hint_a">Dynaamiset varjostukset näyttävät paremmilta, mutta voivat vaikuttaa suorituskykyyn</string>
+    <string name="settings_graphics_anti_aliasing">Tasointi (anti-aliasing)</string>
+    <string name="settings_graphics_anti_aliasing_description">Tasoittaa objektien reunat</string>
+
+    <!-- Asetukset / Tausta -->
+    <string name="settings_background_type">Taustatyyppi</string>
+    <string name="settings_background_texture">Tekstuuri</string>
+    <string name="settings_background_direction_north">Pohjoinen</string>
+    <string name="settings_background_direction_east">Itä</string>
+    <string name="settings_background_direction_south">Etelä</string>
+    <string name="settings_background_direction_west">Länsi</string>
+    <string name="settings_background_direction_up">Ylös</string>
+    <string name="settings_background_direction_down">Alas</string>
+    <string name="settings_background_direction_texture_template">%1$s-tekstuuri</string>
+    <string name="settings_background_type_default">Oletus</string>
+    <string name="settings_background_type_default_description">Tumma ruudukkomalli</string>
+    <string name="settings_background_type_cubemap">Kuutiosiirre (Cubemap)</string>
+    <string name="settings_background_type_cubemap_description">Käytä tekstuuria jokaisella seinällä</string>
+    <string name="settings_background_type_color">Väri</string>
+    <string name="settings_background_type_color_description">Käytä yhtä väriä</string>
+    <string name="settings_background_texture_no_options_hint">Tekstuureja ei saatavilla.</string>
+    <string name="settings_background_texture_open_folder">Avaa tekstuurien kansio</string>
+    <string name="settings_background_missing_textures_repeated">Taustatekstuuria ei ole asetettu</string>
+    <string name="settings_background_missing_textures_unique">Yhtä tai useampaa taustatekstuuria ei ole asetettu</string>
+
+    <!-- Asetukset / Ohjaus -->
+    <string name="settings_controls_lock_cursor">Lukitse kohdistin</string>
+    <string name="settings_controls_lock_cursor_description">Lukitse kohdistin ikkunaan</string>
+    <string name="settings_controls_disable_touch">Poista kosketusohjaus käytöstä</string>
+    <string name="settings_controls_disable_touch_description">Näytön koskettaminen kiertämistä, liikuttamista tai zoomaamista varten ohitetaan</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Tahmeat nopeuden muutosnäppäimet</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Paina Ctrl ja Shift vaihtaaksesi vapaakameran nopeutta</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Pidä Ctrl ja Shift pohjassa vaihtaaksesi vapaakameran nopeutta</string>
+
+    <!-- Asetukset / Näytön elementit -->
+    <string name="settings_onscreenelements_lyrics">Lyriikat</string>
+    <string name="settings_onscreenelements_lyrics_description">Jos kappale sisältää lyriikkatietoja, näytä ne reaaliaikaisesti</string>
+    <string name="settings_onscreenelements_hud">Heads-up-display (HUD)</string>
+    <string name="settings_onscreenelements_hud_description">Näytä kappaleen nimi ja eteneminen</string>
+
+    <!-- Asetukset / Näytön elementit / Lyriikat -->
+    <string name="settings_onscreenelements_lyrics_size">Lyriikoiden koko</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Pienempi</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Pieni</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Oletus</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Suuri</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Suurempi</string>
+
+    <!-- Asetukset / Toisto -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Lähetä MIDI-spesifikaation nollausviesti</string>
+    <string name="settings_playback_midi_specification_reset_description">Lähetä viesti MIDI-laitteelle nollataksesi sen</string>
+    <string name="settings_playback_synthesizer">Syntetisaattori</string>
+    <string name="settings_playback_synthesizer_description">Määritä MIDI-syntetisaattori</string>
+
+    <!-- Asetukset / Toisto / Äänipankit -->
+    <string name="settings_playback_soundbanks">Äänipankit</string>
+    <string name="settings_playback_soundbanks_add">Lisää äänipankkeja</string>
+    <string name="settings_playback_soundbanks_description">Tuo äänipankkeja syntetisaattorin käyttöön</string>
+    <string name="settings_playback_soundbanks_none_loaded">Yhtään äänipankkia ei ladattu</string>
+
+    <!-- Asetukset / Toisto / Syntetisaattori -->
+    <string name="settings_playback_synthesizer_chorus">Koruus</string>
+    <string name="settings_playback_synthesizer_chorus_description">Käytä koruusefektiä</string>
+    <string name="settings_playback_synthesizer_reverb">Kaiku (Reverb)</string>
+    <string name="settings_playback_synthesizer_reverb_description">Käytä kaikuefektiä</string>
+
+    <!-- Asetukset / Kamera -->
+    <string name="settings_camera">Kamera</string>
+    <string name="settings_camera_description">Autokamera, klassinen kamera</string>
+    <string name="settings_camera_start_autocam_with_song">Käynnistä autokamera kappaleen kanssa</string>
+    <string name="settings_camera_start_autocam_with_song_description">Kun kappale alkaa, vaihda automaattisesti autokameraan</string>
+    <string name="settings_camera_classic_autocam">Klassinen autokamera</string>
+    <string name="settings_camera_classic_autocam_description">Matkii autokameran liikettä MIDIJamista</string>
+    <string name="settings_camera_smooth_freecam">Sileä vapaakamera</string>
+    <string name="settings_camera_smooth_freecam_description">Tee vapaakameran liikkeistä sulavampia</string>
+
+    <!-- Asetukset / Soittimet -->
+    <string name="settings_instruments">Soittimet</string>
+    <string name="settings_instruments_description">Soittimien näkyvyys</string>
+    <string name="settings_instruments_always_show_instruments">Näytä soittimet aina</string>
+    <string name="settings_instruments_always_show_instruments_description">Älä koskaan piilota soittimia, vaikka nuotteja ei soiteta</string>
+
+    <!-- Tietoa -->
+    <string name="about_midis2jam2_description">Uudelleenmasterointi MIDIJamista, 3D MIDI-tiedoston visualisoijasta.</string>
+    <string name="about_development_contributors">Kehitykseen osallistuneet</string>
+    <string name="about_attributions_and_contributions">Maininnat ja panokset</string>
+    <string name="about_i18n_contributions">Kansainvälisyyspanokset</string>
+    <string name="about_oss_licenses">Kolmannen osapuolen huomautukset</string>
+</resources>

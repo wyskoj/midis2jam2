@@ -21,13 +21,14 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.BackgroundImageRepository
+import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
 
 val applicationModule: Module = module {
     single<ApplicationService> { ApplicationService() }
     single<ConfigurationService> { ConfigurationService(get(), get()) }
-
     single<BackgroundImageRepository> { BackgroundImageRepository() }
     single<SettingsRepository> { SettingsRepository() }
+    single<HomeTabPersistor> { HomeTabPersistor() }
 }

@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.ui.queue
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,6 +71,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.cancel
@@ -102,6 +104,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.SystemInteractionService
+import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
+import org.wysko.midis2jam2.util.FileDragAndDrop
+import org.wysko.midis2jam2.util.FilesDragAndDrop
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -142,10 +147,11 @@ object QueueTab : Tab {
 
         // Pickers
         val midiFilePicker = model.midiFilePicker()
-        val queueLoadPicker = model.queueLoadPicker {
+        val displayWarningDialog: (List<String>) -> Unit = {
             isPlaylistLoadWarningsDialogOpen = true
             missingFiles = it
         }
+        val queueLoadPicker = model.queueLoadPicker(displayWarningDialog)
         val queueSavePicker = model.queueSavePicker {
             scope.launch {
                 snackbarHostState.showSnackbar(queueSaveConfirmation)
@@ -171,6 +177,21 @@ object QueueTab : Tab {
                 isConfirmClearDialogOpen = true
             } else {
                 model.clearQueue()
+            }
+        }
+
+        val dragAndDropTarget = remember {
+            FilesDragAndDrop {
+                when {
+                    it.size == 1 && it.first().extension.lowercase() == "txt" -> {
+                        model.applyQueue(PlatformFile(it.first()), displayWarningDialog)
+                    }
+
+                    else -> {
+                        val midis = it.filter { MIDI_FILE_EXTENSIONS.contains(it.extension.lowercase()) }
+                        model.addToQueue(midis.map { PlatformFile(it) })
+                    }
+                }
             }
         }
 
@@ -274,6 +295,10 @@ object QueueTab : Tab {
                 )
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
+            modifier = Modifier.dragAndDropTarget(
+                shouldStartDragAndDrop = { true },
+                target = dragAndDropTarget,
+            ),
         ) { paddingValues ->
 
             when {

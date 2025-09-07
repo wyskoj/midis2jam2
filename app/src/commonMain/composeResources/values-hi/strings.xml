@@ -1,0 +1,175 @@
+<resources>
+    <!-- सामान्य -->
+    <string name="tab_home">होम</string>
+    <string name="tab_queue">कतार</string>
+    <string name="tab_search">खोज</string>
+    <string name="tab_settings">सेटिंग्स</string>
+    <string name="tab_about">के बारे में</string>
+    <string name="ok">ठीक</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="back">पीछे</string>
+    <string name="play">चलाएं</string>
+    <string name="enabled">सक्षम</string>
+    <string name="disabled">अक्षम</string>
+    <string name="midi_file">MIDI फ़ाइल</string>
+    <string name="midi_device">MIDI डिवाइस</string>
+    <string name="soundbank">साउंडबैंक</string>
+    <string name="soundbank_default">डिफ़ॉल्ट साउंडबैंक</string>
+    <string name="play_midi_file">MIDI फ़ाइल चलाएं</string>
+    <string name="quality_none">कोई नहीं</string>
+    <string name="quality_low">कम</string>
+    <string name="quality_medium">मध्यम</string>
+    <string name="quality_high">उच्च</string>
+    <string name="help">सहायता</string>
+    <string name="launcher_window_title">midis2jam2 लॉन्चर</string>
+
+    <!-- कतार -->
+    <string name="queue_add">कतार में जोड़ें</string>
+    <string name="queue_clear">साफ़ करें</string>
+    <string name="queue_clear_prompt">कतार साफ़ करें?</string>
+    <string name="queue_clear_warning">इस क्रिया को पूर्ववत नहीं किया जा सकता।</string>
+    <string name="queue_empty">आपके द्वारा जोड़े गए गाने यहां दिखाई देंगे।</string>
+    <string name="queue_load">लोड करें</string>
+    <string name="queue_load_prompt">कतार लोड करें?</string>
+    <string name="queue_load_warning">इससे वर्तमान कतार साफ़ हो जाएगी।</string>
+    <string name="queue_load_missing">कुछ फ़ाइलें गुम हैं</string>
+    <string name="queue_load_missing_help">निम्नलिखित फ़ाइलें नहीं मिलीं:</string>
+    <string name="queue_save">सहेजें</string>
+    <string name="queue_save_confirmation">कतार सहेजी गई।</string>
+    <string name="queue_shuffle">शफल करें</string>
+
+    <!-- खोज -->
+    <string name="search_criteria_too_narrow">कोई मेल खाती MIDI फ़ाइलें नहीं मिलीं। अपने मानदंड समायोजित करने का प्रयास करें।</string>
+    <string name="search_deselect_all">सभी अचयनित करें</string>
+    <string name="search_directory">डायरेक्टरी</string>
+    <string name="search_index_not_available">MIDI फ़ाइलों को अनुक्रमित करने के लिए एक डायरेक्टरी चुनें।</string>
+    <string name="search_index_waiting">प्रतीक्षा करें! हम आपकी MIDI फ़ाइलों को अनुक्रमित कर रहे हैं...</string>
+
+    <!-- सेटिंग्स -->
+    <string name="settings_general">सामान्य</string>
+    <string name="settings_general_description">भाषा, थीम</string>
+    <string name="settings_graphics">ग्राफिक्स</string>
+    <string name="settings_graphics_description">फुलस्क्रीन, रेज़ोल्यूशन, एंटी-एलियासिंग</string>
+    <string name="settings_graphics_description_a">शैडो</string>
+    <string name="settings_background">बैकग्राउंड</string>
+    <string name="settings_background_description">एक चित्र या रंग चुनें</string>
+    <string name="settings_controls">नियंत्रण</string>
+    <string name="settings_controls_description">कर्सर लॉक, गति संशोधक कुंजियाँ</string>
+    <string name="settings_controls_description_a">टच इनपुट</string>
+    <string name="settings_playback">प्लेबैक</string>
+    <string name="settings_playback_description">MIDI डिवाइस, सिंथेसाइज़र, साउंडबैंक</string>
+    <string name="settings_on_screen_elements">ऑन-स्क्रीन तत्व</string>
+    <string name="settings_on_screen_elements_description">हैड्स-अप डिस्प्ले, गीत के बोल</string>
+
+    <!-- सेटिंग्स / सामान्य -->
+    <string name="settings_general_theme">थीम</string>
+    <string name="settings_general_theme_light">लाइट</string>
+    <string name="settings_general_theme_dark">डार्क</string>
+    <string name="settings_general_theme_system">सिस्टम का अनुसरण करें</string>
+    <string name="settings_general_locale">भाषा</string>
+
+    <!-- सेटिंग्स / ग्राफिक्स -->
+    <string name="settings_graphics_fullscreen">फुलस्क्रीन</string>
+    <string name="settings_graphics_fullscreen_description">पूरी स्क्रीन का उपयोग करें</string>
+    <string name="settings_graphics_resolution">रेज़ोल्यूशन</string>
+    <string name="settings_graphics_resolution_fullscreen">फुलस्क्रीन सक्षम होने पर रेज़ोल्यूशन मॉनिटर से मेल खाता है</string>
+    <string name="settings_graphics_resolution_default">डिफ़ॉल्ट रेज़ोल्यूशन का उपयोग करें</string>
+    <string name="settings_graphics_resolution_default_hint">डिफ़ॉल्ट</string>
+    <string name="settings_graphics_resolution_default_description">डिफ़ॉल्ट रेज़ोल्यूशन स्क्रीन का अधिकांश भाग उपयोग करता है</string>
+    <string name="settings_graphics_resolution_custom">कस्टम रेज़ोल्यूशन</string>
+    <string name="settings_graphics_resolution_width">चौड़ाई</string>
+    <string name="settings_graphics_resolution_height">ऊँचाई</string>
+    <string name="settings_graphics_shadows">शैडो</string>
+    <string name="settings_graphics_shadows_description">वस्तुओं के नीचे छाया रेंडर करें</string>
+    <string name="settings_graphics_shadows_none">कोई नहीं (नकली)</string>
+    <string name="settings_graphics_shadows_description_a">डायनामिक शैडो रेंडर करें</string>
+    <string name="settings_graphics_shadows_description_hint_a">डायनामिक शैडो अच्छे दिखते हैं, लेकिन प्रदर्शन प्रभावित कर सकते हैं</string>
+    <string name="settings_graphics_anti_aliasing">एंटी-एलियासिंग</string>
+    <string name="settings_graphics_anti_aliasing_description">वस्तुओं के किनारों को चिकना करें</string>
+
+    <!-- सेटिंग्स / बैकग्राउंड -->
+    <string name="settings_background_type">बैकग्राउंड प्रकार</string>
+    <string name="settings_background_texture">टेक्सचर</string>
+    <string name="settings_background_direction_north">उत्तर</string>
+    <string name="settings_background_direction_east">पूर्व</string>
+    <string name="settings_background_direction_south">दक्षिण</string>
+    <string name="settings_background_direction_west">पश्चिम</string>
+    <string name="settings_background_direction_up">ऊपर</string>
+    <string name="settings_background_direction_down">नीचे</string>
+    <string name="settings_background_direction_texture_template">%1$s टेक्सचर</string>
+    <string name="settings_background_type_default">डिफ़ॉल्ट</string>
+    <string name="settings_background_type_default_description">डार्क चेकरबोर्ड पैटर्न</string>
+    <string name="settings_background_type_cubemap">क्यूब मैप</string>
+    <string name="settings_background_type_cubemap_description">प्रत्येक दीवार पर एक टेक्सचर का उपयोग करें</string>
+    <string name="settings_background_type_color">रंग</string>
+    <string name="settings_background_type_color_description">एक ठोस रंग का उपयोग करें</string>
+    <string name="settings_background_texture_no_options_hint">कोई टेक्सचर उपलब्ध नहीं है।</string>
+    <string name="settings_background_texture_open_folder">टेक्सचर फ़ोल्डर खोलें</string>
+    <string name="settings_background_missing_textures_repeated">बैकग्राउंड टेक्सचर सेट नहीं है</string>
+    <string name="settings_background_missing_textures_unique">एक या अधिक बैकग्राउंड टेक्सचर सेट नहीं हैं</string>
+
+    <!-- सेटिंग्स / नियंत्रण -->
+    <string name="settings_controls_lock_cursor">कर्सर लॉक करें</string>
+    <string name="settings_controls_lock_cursor_description">कर्सर को विंडो से लॉक करें</string>
+    <string name="settings_controls_disable_touch">टच इनपुट अक्षम करें</string>
+    <string name="settings_controls_disable_touch_description">ऑर्बिट, पैन, या ज़ूम करने के लिए स्क्रीन को छूना नजरअंदाज किया जाता है</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">स्टिकी स्पीड-मॉडिफायर कुंजियाँ</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">फ्रीकैम की गति बदलने के लिए Ctrl और Shift दबाएं</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">फ्रीकैम की गति बदलने के लिए Ctrl और Shift दबाए रखें</string>
+
+    <!-- सेटिंग्स / ऑन-स्क्रीन तत्व -->
+    <string name="settings_onscreenelements_lyrics">गीत के बोल</string>
+    <string name="settings_onscreenelements_lyrics_description">यदि गाने में गीत के बोल डेटा है, तो उन्हें रियल टाइम में प्रदर्शित करें</string>
+    <string name="settings_onscreenelements_hud">हैड्स-अप डिस्प्ले</string>
+    <string name="settings_onscreenelements_hud_description">गाने का नाम और प्रगति प्रदर्शित करें</string>
+
+    <!-- सेटिंग्स / ऑन-स्क्रीन तत्व / गीत के बोल -->
+    <string name="settings_onscreenelements_lyrics_size">गीत के बोल का आकार</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">छोटा</string>
+    <string name="settings_onscreenelements_lyrics_size_small">छोटा</string>
+    <string name="settings_onscreenelements_lyrics_size_default">डिफ़ॉल्ट</string>
+    <string name="settings_onscreenelements_lyrics_size_large">बड़ा</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">बड़ा</string>
+
+    <!-- सेटिंग्स / प्लेबैक -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">MIDI विशिष्टता रीसेट संदेश भेजें</string>
+    <string name="settings_playback_midi_specification_reset_description">MIDI डिवाइस को रीसेट करने के लिए एक संदेश भेजें</string>
+    <string name="settings_playback_synthesizer">सिंथेसाइज़र</string>
+    <string name="settings_playback_synthesizer_description">MIDI सिंथेसाइज़र कॉन्फ़िगर करें</string>
+
+    <!-- सेटिंग्स / प्लेबैक / साउंडबैंक -->
+    <string name="settings_playback_soundbanks">साउंडबैंक</string>
+    <string name="settings_playback_soundbanks_add">साउंडबैंक जोड़ें</string>
+    <string name="settings_playback_soundbanks_description">सिंथेसाइज़र के साथ उपयोग के लिए साउंडबैंक आयात करें</string>
+    <string name="settings_playback_soundbanks_none_loaded">कोई साउंडबैंक लोड नहीं किया गया</string>
+
+    <!-- सेटिंग्स / प्लेबैक / सिंथेसाइज़र -->
+    <string name="settings_playback_synthesizer_chorus">कोरस</string>
+    <string name="settings_playback_synthesizer_chorus_description">कोरस प्रभाव का उपयोग करें</string>
+    <string name="settings_playback_synthesizer_reverb">रिवर्ब</string>
+    <string name="settings_playback_synthesizer_reverb_description">रिवर्ब प्रभाव का उपयोग करें</string>
+
+    <!-- सेटिंग्स / कैमरा -->
+    <string name="settings_camera">कैमरा</string>
+    <string name="settings_camera_description">ऑटो-कैम, क्लासिक कैमरा</string>
+    <string name="settings_camera_start_autocam_with_song">गाने के साथ ऑटो-कैम शुरू करें</string>
+    <string name="settings_camera_start_autocam_with_song_description">जब गाना शुरू होता है, तो स्वचालित रूप से ऑटो-कैम पर स्विच करें</string>
+    <string name="settings_camera_classic_autocam">क्लासिक ऑटो-कैम</string>
+    <string name="settings_camera_classic_autocam_description">MIDIJam से ऑटो-कैम गति का अनुकरण करें</string>
+    <string name="settings_camera_smooth_freecam">स्मूद फ्रीकैम</string>
+    <string name="settings_camera_smooth_freecam_description">फ्रीकैम गति को चिकना बनाएं</string>
+
+    <!-- सेटिंग्स / वाद्ययंत्र -->
+    <string name="settings_instruments">वाद्ययंत्र</string>
+    <string name="settings_instruments_description">वाद्ययंत्र दृश्यता</string>
+    <string name="settings_instruments_always_show_instruments">हमेशा वाद्ययंत्र दिखाएं</string>
+    <string name="settings_instruments_always_show_instruments_description">वाद्ययंत्रों को कभी भी छुपाएं नहीं, भले ही कोई नोट न बज रहा हो</string>
+
+    <!-- के बारे में -->
+    <string name="about_midis2jam2_description">MIDIJam का एक रीमास्टर, एक 3D MIDI फ़ाइल विज़ुअलाइज़र।</string>
+    <string name="about_development_contributors">विकास योगदानकर्ता</string>
+    <string name="about_attributions_and_contributions">आवंटन और योगदान</string>
+    <string name="about_i18n_contributions">अंतर्राष्ट्रीयकरण योगदान</string>
+    <string name="about_oss_licenses">तृतीय-पक्ष नोटिस</string>
+</resources>

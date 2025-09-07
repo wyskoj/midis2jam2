@@ -20,5 +20,23 @@ package org.wysko.midis2jam2.ui.settings
 import cafe.adriel.voyager.core.model.ScreenModel
 
 object SettingsScreenModel : ScreenModel {
-    fun getAvailableLocales(): List<String> = listOf("en", "fr")
+    fun getAvailableLocales(): List<String> = listOf(
+        "en",
+        "de",
+        "es",
+        "fi",
+        "fr",
+        "hi",
+        "it",
+        "ja",
+        "ko",
+        "no",
+        "pl",
+        "ru",
+        "th",
+        "tl",
+        "tr",
+        "uk",
+        "zh",
+    )
 }

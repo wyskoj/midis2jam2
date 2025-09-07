@@ -15,29 +15,18 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-@file:UseSerializers(FileAsStringSerializer::class)
+package org.wysko.midis2jam2.domain
 
-package org.wysko.midis2jam2.starter.configuration
-
-import kotlinx.serialization.UseSerializers
-import org.wysko.midis2jam2.util.FileAsStringSerializer
 import kotlinx.serialization.Serializable
-import java.io.File
 
-private val CONFIG_FILE = File(APPLICATION_CONFIG_HOME, "playlist.json")
+expect class HomeTabPersistor() {
+    @Suppress("unused")
+    fun save(state: HomeTabPersistentState)
+    fun load(): HomeTabPersistentState
+}
 
 @Serializable
-data class PlaylistConfiguration(
-    val isShuffle: Boolean = false,
-    val isRepeat: Boolean = false,
-    val playlist: List<File> = listOf()
-) : Configuration {
-    companion object {
-        val preserver by lazy {
-            ConfigurationPreserver(
-                serializer(),
-                serializer(), CONFIG_FILE
-            )
-        }
-    }
-}
+data class HomeTabPersistentState(
+    val midiDevice: String = "",
+    val soundbank: String = "",
+)

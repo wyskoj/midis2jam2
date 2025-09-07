@@ -26,6 +26,7 @@ import io.github.vinceglb.filekit.compose.rememberFileSaverLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.core.PlatformFiles
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -76,9 +77,13 @@ class QueueTabModel(
         title = "Select MIDI files",
     ) { files ->
         if (files != null) {
-            setQueue((queue.value + files).distinct())
-            _isDirty.value = true
+            addToQueue(files)
         }
+    }
+
+    fun addToQueue(files: PlatformFiles) {
+        setQueue((queue.value + files).distinct())
+        _isDirty.value = true
     }
 
     @Composable
@@ -88,17 +93,24 @@ class QueueTabModel(
             mode = PickerMode.Single,
             title = "Select playlist",
         ) { file ->
-            if (file != null) {
-                val files = file.file.readText().split("\n").map { PlatformFile(File(it.trim())) }
-                val filesIsFound = files.associateWith { it.file.exists() }
-                _isDirty.value = false
-                setQueue(files.filter { filesIsFound[it] == true })
+            applyQueue(file, displayWarningDialog)
+        }
 
-                if (!filesIsFound.values.all { it }) {
-                    displayWarningDialog(filesIsFound.filterValues { !it }.keys.map { it.file.absolutePath })
-                }
+    fun applyQueue(
+        file: PlatformFile?,
+        displayWarningDialog: (List<String>) -> Unit,
+    ) {
+        if (file != null) {
+            val files = file.file.readText().split("\n").map { PlatformFile(File(it.trim())) }
+            val filesIsFound = files.associateWith { it.file.exists() }
+            _isDirty.value = false
+            setQueue(files.filter { filesIsFound[it] == true })
+
+            if (!filesIsFound.values.all { it }) {
+                displayWarningDialog(filesIsFound.filterValues { !it }.keys.map { it.file.absolutePath })
             }
         }
+    }
 
     @Composable
     fun queueSavePicker(onSave: () -> Unit = {}): SaverResultLauncher = rememberFileSaverLauncher {

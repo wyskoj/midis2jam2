@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import org.wysko.midis2jam2.midi.GENERAL_MIDI_1_PROGRAMS
 import org.wysko.midis2jam2.midi.GENERAL_MIDI_1_PROGRAM_CATEGORIES
 import org.wysko.midis2jam2.midi.search.MidiSearchEngine

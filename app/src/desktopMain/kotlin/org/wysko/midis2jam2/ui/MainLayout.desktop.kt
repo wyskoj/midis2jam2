@@ -42,7 +42,6 @@ import org.wysko.midis2jam2.ui.home.HomeTab
 import org.wysko.midis2jam2.ui.queue.QueueTab
 import org.wysko.midis2jam2.ui.search.SearchTab
 import org.wysko.midis2jam2.ui.settings.SettingsTab
-import java.util.Locale
 
 @Composable
 actual fun BasicDeviceScaffold(topBar: @Composable (() -> Unit), content: @Composable (() -> Unit)) {

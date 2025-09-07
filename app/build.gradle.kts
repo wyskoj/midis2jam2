@@ -166,7 +166,27 @@ android {
     }
     androidResources {
         defaultConfig {
-            resourceConfigurations.addAll(listOf("en-rUS", "fr"))
+            resourceConfigurations.addAll(
+                listOf(
+                    "en-rUS",
+                    "de",
+                    "es",
+                    "fi",
+                    "fr",
+                    "hi",
+                    "it",
+                    "ja",
+                    "ko",
+                    "no",
+                    "pl",
+                    "ru",
+                    "th",
+                    "tl",
+                    "tr",
+                    "uk",
+                    "zh",
+                )
+            )
         }
     }
     packaging {

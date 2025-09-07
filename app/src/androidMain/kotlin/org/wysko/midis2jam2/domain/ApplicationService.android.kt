@@ -27,7 +27,6 @@ import org.koin.core.component.inject
 import org.wysko.midis2jam2.PerformanceActivity
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
-import org.wysko.midis2jam2.ui.home.HomeTabModel
 
 actual class ApplicationService : KoinComponent {
     private val _isApplicationRunning = MutableStateFlow(false)
@@ -62,10 +61,10 @@ actual class ApplicationService : KoinComponent {
             _isFirstLaunch.value = false
         }
 
-        val homeTabModel: HomeTabModel by inject()
+        val homeScreenModel: HomeScreenModel by inject()
         val configurationService: ConfigurationService by inject()
         val configurations = configurationService.getConfigurations()
-        val midiFile = homeTabModel.state.value.selectedMidiFile!!
+        val midiFile = homeScreenModel.selectedMidiFile.value!!
 
         this._midiFile.value = midiFile
         this._configurations.value = configurations

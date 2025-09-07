@@ -52,7 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
@@ -63,13 +62,14 @@ import midis2jam2.app.generated.resources.swipe
 import midis2jam2.app.generated.resources.touch_app
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import org.wysko.midis2jam2.ui.home.HomeTabModel
+import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.HomeScreenModel
 
 object TutorialScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = koinScreenModel<HomeTabModel>()
+        val model = koinInject<HomeScreenModel>()
         Scaffold { paddingValues ->
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,

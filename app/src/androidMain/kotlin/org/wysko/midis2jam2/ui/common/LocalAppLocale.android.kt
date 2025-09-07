@@ -19,16 +19,19 @@ package org.wysko.midis2jam2.ui.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
+import androidx.compose.runtime.staticCompositionLocalOf
 
 /*
  This is not needed for Android, as the locale is handled by the system.
  */
 actual object LocalAppLocale {
     actual val current: String
-        get() = error("NO-OP")
+        get() = ""
+
+    private val noop = staticCompositionLocalOf { "" }
 
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {
-        error("NO-OP")
+        return noop.provides("")
     }
 }

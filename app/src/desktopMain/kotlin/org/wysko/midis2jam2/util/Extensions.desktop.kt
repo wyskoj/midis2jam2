@@ -17,10 +17,16 @@
 
 package org.wysko.midis2jam2.util
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.key
 import org.wysko.midis2jam2.domain.SystemInteractionService
+import java.awt.datatransfer.DataFlavor
+import java.io.File
 
 fun openHelpOnF1(systemInteractionService: SystemInteractionService): (KeyEvent) -> Boolean = {
     when (it.key) {
@@ -30,5 +36,34 @@ fun openHelpOnF1(systemInteractionService: SystemInteractionService): (KeyEvent)
         }
 
         else -> false
+    }
+}
+
+class FileDragAndDrop(val onFileDropped: (File) -> Unit) : DragAndDropTarget {
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun onDrop(event: DragAndDropEvent): Boolean {
+        event.awtTransferable.let {
+            if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                val file =
+                    (it.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).firstOrNull()
+                if (file is File) {
+                    onFileDropped(file)
+                }
+            }
+        }
+        return false
+    }
+}
+
+class FilesDragAndDrop(val onFilesDropped: (List<File>) -> Unit) : DragAndDropTarget {
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun onDrop(event: DragAndDropEvent): Boolean {
+        event.awtTransferable.let {
+            if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                val files = (it.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).filterIsInstance<File>()
+                onFilesDropped(files)
+            }
+        }
+        return false
     }
 }

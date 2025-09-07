@@ -17,14 +17,22 @@
 
 package org.wysko.midis2jam2.ui.settings
 
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -39,9 +47,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.audio_file
 import midis2jam2.app.generated.resources.close
 import midis2jam2.app.generated.resources.computer
 import midis2jam2.app.generated.resources.fit_screen
@@ -59,6 +73,8 @@ import midis2jam2.app.generated.resources.quality_none
 import midis2jam2.app.generated.resources.radio_button_unchecked
 import midis2jam2.app.generated.resources.replace_audio
 import midis2jam2.app.generated.resources.settings_camera
+import midis2jam2.app.generated.resources.settings_camera_smooth_freecam
+import midis2jam2.app.generated.resources.settings_camera_smooth_freecam_description
 import midis2jam2.app.generated.resources.settings_controls
 import midis2jam2.app.generated.resources.settings_controls_lock_cursor
 import midis2jam2.app.generated.resources.settings_controls_lock_cursor_description
@@ -86,23 +102,31 @@ import midis2jam2.app.generated.resources.settings_instruments
 import midis2jam2.app.generated.resources.settings_on_screen_elements
 import midis2jam2.app.generated.resources.settings_playback_midi_specification_reset
 import midis2jam2.app.generated.resources.settings_playback_midi_specification_reset_description
+import midis2jam2.app.generated.resources.settings_playback_soundbanks
+import midis2jam2.app.generated.resources.settings_playback_soundbanks_add
+import midis2jam2.app.generated.resources.settings_playback_soundbanks_description
+import midis2jam2.app.generated.resources.settings_playback_soundbanks_none_loaded
 import midis2jam2.app.generated.resources.settings_playback_synthesizer
 import midis2jam2.app.generated.resources.star
 import midis2jam2.app.generated.resources.tonality
+import midis2jam2.app.generated.resources.video_stable
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
+import org.wysko.midis2jam2.ui.common.appLocale
 import org.wysko.midis2jam2.ui.common.component.CategoryHeader
 import org.wysko.midis2jam2.ui.common.component.SelectOption
 import org.wysko.midis2jam2.ui.common.component.SelectRow
 import org.wysko.midis2jam2.ui.common.component.SwitchRow
 import org.wysko.midis2jam2.ui.common.component.UnitRow
-import org.wysko.midis2jam2.ui.common.appLocale
+import org.wysko.midis2jam2.util.FilesDragAndDrop
 import org.wysko.midis2jam2.util.digitsOnly
 import org.wysko.midis2jam2.util.tintEnabled
+import java.io.File
 import java.util.*
 
 internal actual val deviceThemeIcon: DrawableResource
@@ -189,6 +213,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
         CategoryHeader(stringResource(Res.string.settings_playback_synthesizer))
     }
     item {
+        SoundbanksSelect(settings, model)
+    }
+    item {
         SynthesizerReverbSelect(settings, model)
     }
     item {
@@ -208,6 +235,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
     }
     item {
         IsClassicAutoCamBooleanSelect(settings, model)
+    }
+    item {
+        IsSmoothFreecamSelect(settings, model)
     }
     item {
         Spacer(Modifier.height(0.dp))
@@ -458,4 +488,115 @@ private fun IsSpeedModifierKeysStickyBooleanSelect(settings: State<AppSettings>,
         },
         icon = Res.drawable.keyboard_lock
     )
+}
+
+@Composable
+private fun IsSmoothFreecamSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SwitchRow(
+        settings.value.cameraSettings.isSmoothFreecam,
+        model::setSmoothFreecam,
+        title = { Text(stringResource(Res.string.settings_camera_smooth_freecam)) },
+        label = {
+            Text(stringResource(Res.string.settings_camera_smooth_freecam_description))
+        },
+        icon = Res.drawable.video_stable
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel) {
+    val soundbankExtensions = listOf("sf2", "dls")
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isShowSheet by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val picker = rememberFilePickerLauncher(
+        type = PickerType.File(soundbankExtensions),
+        mode = PickerMode.Multiple(),
+        title = "Select soundbanks",
+    ) {
+        it?.let { platformFiles ->
+            model.addSoundbanks(platformFiles.map { it.file.path })
+        }
+    }
+
+    UnitRow(
+        title = { Text(stringResource(Res.string.settings_playback_soundbanks)) },
+        label = { Text(stringResource(Res.string.settings_playback_soundbanks_description)) },
+        icon = Res.drawable.audio_file
+    ) {
+        isShowSheet = true
+    }
+
+    val dragAndDropTarget = remember {
+        FilesDragAndDrop { files ->
+            model.addSoundbanks(
+                files.filter { soundbankExtensions.contains(it.extension.lowercase()) }.map { it.absolutePath }
+            )
+        }
+    }
+
+    if (isShowSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                    isShowSheet = false
+                }
+            },
+            sheetState = sheetState,
+            modifier = Modifier.dragAndDropTarget(
+                shouldStartDragAndDrop = { true },
+                target = dragAndDropTarget,
+            )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Button({
+                    picker.launch()
+                }) {
+                    Text(stringResource(Res.string.settings_playback_soundbanks_add))
+                }
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (settings.value.playbackSettings.soundbanksSettings.soundbanks.isEmpty()) {
+                        item {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                            ) {
+                                Text(
+                                    stringResource(Res.string.settings_playback_soundbanks_none_loaded),
+                                    fontStyle = FontStyle.Italic,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                    items(settings.value.playbackSettings.soundbanksSettings.soundbanks) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        ) {
+                            Text(
+                                text = File(it).name,
+                                modifier = Modifier.weight(1f, true),
+                            )
+                            IconButton({
+                                model.removeSoundbank(it)
+                            }) {
+                                Icon(painterResource(Res.drawable.close), null)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

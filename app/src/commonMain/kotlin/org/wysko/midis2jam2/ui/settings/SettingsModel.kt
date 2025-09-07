@@ -152,7 +152,8 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
     fun addSoundbanks(soundbanks: List<String>) {
         screenModelScope.launch {
             settingsRepository.updateAppSettings {
-                playbackSettings.soundbanksSettings.soundbanks.addAll(soundbanks)
+                val newSoundbanks = soundbanks.minus(playbackSettings.soundbanksSettings.soundbanks.toSet())
+                playbackSettings.soundbanksSettings.soundbanks.addAll(newSoundbanks)
             }
         }
     }
@@ -201,6 +202,7 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         screenModelScope.launch {
             settingsRepository.updateAppSettings {
                 graphicsSettings.shadowsSettings.shadowsQuality = shadowsQuality
+                graphicsSettings.shadowsSettings.isUseShadows = shadowsQuality != ShadowsQuality.Fake
             }
         }
     }

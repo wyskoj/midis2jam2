@@ -14,21 +14,14 @@ struct FluidSynthHolder {
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_wysko_midis2jam2_domain_FluidSynthBridge_initFluidSynth(
         JNIEnv *env, jobject thiz, jstring jSoundfontPath) {
-    setpriority(PRIO_PROCESS, 0, -19); // Highest priority
     const char *soundfontPath = env->GetStringUTFChars(jSoundfontPath, nullptr);
     FluidSynthHolder *holder = new FluidSynthHolder();
     holder->settings = new_fluid_settings();
 
-    // OPTIMIZATION: Reduce buffer size for lower MIDI latency
-    fluid_settings_setint(holder->settings, "audio.period-size", 64);  // Reduced from default 64-512
-    fluid_settings_setint(holder->settings, "audio.periods", 2);       // Default is 16
-
-    // OPTIMIZATION: Enable parallel rendering
-    fluid_settings_setint(holder->settings, "synth.parallel-render", 1);
+    fluid_settings_setstr(holder->settings, "audio.oboe.performance-mode", "LowLatency");
 
     fluid_settings_setint(holder->settings, "synth.reverb.active", 0);
     fluid_settings_setint(holder->settings, "synth.chorus.active", 0);
-
 
     holder->synth = new_fluid_synth(holder->settings);
     holder->adriver = new_fluid_audio_driver(holder->settings, holder->synth);

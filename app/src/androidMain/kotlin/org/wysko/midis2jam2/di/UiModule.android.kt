@@ -15,13 +15,24 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.ui.home
+package org.wysko.midis2jam2.di
 
-import io.github.vinceglb.filekit.core.PlatformFile
-import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import org.wysko.midis2jam2.domain.HomeScreenModel
+import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
+import org.wysko.midis2jam2.ui.home.AndroidHomeScreenModel
+import org.wysko.midis2jam2.ui.settings.SettingsModel
+import org.wysko.midis2jam2.ui.settings.SettingsScreenModel
 
-data class HomeTabState(
-    val selectedMidiFile: PlatformFile? = null,
-    val selectedMidiDevice: MidiDevice,
-    val selectedSoundbank: PlatformFile? = null,
-)
+actual val uiModule: Module = module {
+    // Tabs
+    single<HomeScreenModel> { AndroidHomeScreenModel(get(), get()) }
+    single { SettingsModel(get()) }
+
+    // Navigation
+    single { NavigationModel() }
+
+    // Settings
+    single { SettingsScreenModel }
+}

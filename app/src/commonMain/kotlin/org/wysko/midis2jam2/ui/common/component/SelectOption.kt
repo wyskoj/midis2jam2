@@ -299,6 +299,7 @@ fun CategoryHeader(
     Box(
         modifier = Modifier
             .height(36.dp)
+            .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.CenterStart,
     ) {

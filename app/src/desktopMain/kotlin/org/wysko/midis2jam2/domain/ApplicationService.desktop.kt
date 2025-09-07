@@ -26,7 +26,6 @@ import org.wysko.midis2jam2.starter.Midis2jam2Application
 import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
 import org.wysko.midis2jam2.starter.applyConfigurations
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
-import org.wysko.midis2jam2.ui.home.HomeTabModel
 
 actual class ApplicationService : KoinComponent {
     private val _isApplicationRunning = MutableStateFlow(false)
@@ -36,10 +35,10 @@ actual class ApplicationService : KoinComponent {
     actual fun startApplication(executionState: ExecutionState) {
         _isApplicationRunning.value = true
 
-        val homeTabModel: HomeTabModel by inject()
+        val homeTabModel: HomeScreenModel by inject()
         val configurationService: ConfigurationService by inject()
         val configurations = configurationService.getConfigurations()
-        val midiFile = homeTabModel.state.value.selectedMidiFile!!
+        val midiFile = homeTabModel.selectedMidiFile.value!!
 
         val midiPackage = runCatching {
             MidiPackage.build(
@@ -48,7 +47,6 @@ actual class ApplicationService : KoinComponent {
             )
         }.onFailure {
             _isApplicationRunning.value = false
-//            onFinish(it) TODO
             return
         }
         with(midiPackage.getOrNull() ?: return) {

@@ -18,17 +18,24 @@
 package org.wysko.midis2jam2.ui.common.material
 
 import android.os.Build
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.MainActivity
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.ui.settings.SettingsModel
-import androidx.compose.ui.platform.LocalContext
+import org.wysko.midis2jam2.util.findActivity
 
 @Composable
 actual fun AppTheme(
@@ -36,12 +43,12 @@ actual fun AppTheme(
 ) {
     val settingsModel = koinInject<SettingsModel>()
     val settings = settingsModel.appSettings.collectAsState()
+    val context = LocalContext.current
 
     val colorScheme = when (settings.value.generalSettings.theme) {
         AppTheme.SYSTEM_DEFAULT -> {
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                    val context = LocalContext.current
                     if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
                 }
 
@@ -53,6 +60,20 @@ actual fun AppTheme(
 
         AppTheme.DARK -> darkScheme
         else -> lightScheme
+    }
+
+    // Configure system UI bars based on theme
+    DisposableEffect(colorScheme) {
+        val isDarkTheme = colorScheme == darkScheme
+        val activity = context.findActivity()
+        val window = activity.window
+        
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !isDarkTheme
+            isAppearanceLightNavigationBars = !isDarkTheme
+        }
+        
+        onDispose {}
     }
 
     val typography = appTypography()

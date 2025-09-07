@@ -1,0 +1,192 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">Головна</string>
+    <string name="tab_queue">Черга</string>
+    <string name="tab_search">Пошук</string>
+    <string name="tab_settings">Налаштування</string>
+    <string name="tab_about">Про програму</string>
+    <string name="ok">Гаразд</string>
+    <string name="cancel">Скасувати</string>
+    <string name="back">Назад</string>
+    <string name="play">Відтворити</string>
+    <string name="enabled">Увімкнено</string>
+    <string name="disabled">Вимкнено</string>
+    <string name="midi_file">MIDI-файл</string>
+    <string name="midi_device">MIDI-пристрій</string>
+    <string name="soundbank">Звуковий банк</string>
+    <string name="soundbank_default">Типовий звуковий банк</string>
+    <string name="play_midi_file">Відтворити MIDI-файл</string>
+    <string name="quality_none">Відсутня</string>
+    <string name="quality_low">Низька</string>
+    <string name="quality_medium">Середня</string>
+    <string name="quality_high">Висока</string>
+    <string name="help">Допомога</string>
+    <string name="launcher_window_title">Запуск midis2jam2</string>
+
+    <!-- Queue -->
+    <string name="queue_add">Додати до черги</string>
+    <string name="queue_clear">Очистити</string>
+    <string name="queue_clear_prompt">Очистити чергу?</string>
+    <string name="queue_clear_warning">Цю дію не можна скасувати.</string>
+    <string name="queue_empty">Пісні, які ви додасте, з\'являться тут.</string>
+    <string name="queue_load">Завантажити</string>
+    <string name="queue_load_prompt">Завантажити чергу?</string>
+    <string name="queue_load_warning">Ця дія очистить поточну чергу.</string>
+    <string name="queue_load_missing">Деякі файли відсутні</string>
+    <string name="queue_load_missing_help">Наступні файли не знайдено:</string>
+    <string name="queue_save">Зберегти</string>
+    <string name="queue_save_confirmation">Чергу збережено.</string>
+    <string name="queue_shuffle">Перемішати</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">Не знайдено відповідних MIDI-файлів. Спробуйте змінити критерії.</string>
+    <string name="search_deselect_all">Зняти всі позначки</string>
+    <string name="search_directory">Директорія</string>
+    <string name="search_index_not_available">Виберіть директорію для індексації MIDI-файлів.</string>
+    <string name="search_index_waiting">Зачекайте! Ми індексуємо ваші MIDI-файли…</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Загальні</string>
+    <string name="settings_general_description">Мова, тема</string>
+    <string name="settings_graphics">Графіка</string>
+    <string name="settings_graphics_description">Повноекранний режим, роздільна здатність, згладжування</string>
+    <string name="settings_graphics_description_a">Тіні</string>
+    <string name="settings_background">Фон</string>
+    <string name="settings_background_description">Виберіть зображення або колір</string>
+    <string name="settings_controls">Керування</string>
+    <string name="settings_controls_description">Блокування курсора, клавіші зміни швидкості</string>
+    <string name="settings_controls_description_a">Сенсорне керування</string>
+    <string name="settings_playback">Відтворення</string>
+    <string name="settings_playback_description">MIDI-пристрій, синтезатор, звукові банки</string>
+    <string name="settings_on_screen_elements">Елементи на екрані</string>
+    <string name="settings_on_screen_elements_description">Індикація, тексти пісень</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">Тема</string>
+    <string name="settings_general_theme_light">Світла</string>
+    <string name="settings_general_theme_dark">Темна</string>
+    <string name="settings_general_theme_system">Як у системі</string>
+    <string name="settings_general_locale">Мова</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">Повноекранний режим</string>
+    <string name="settings_graphics_fullscreen_description">Використовувати весь екран</string>
+    <string name="settings_graphics_resolution">Роздільна здатність</string>
+    <string name="settings_graphics_resolution_fullscreen">У повноекранному режимі роздільна здатність відповідає монітору</string>
+    <string name="settings_graphics_resolution_default">Використовувати типову роздільну здатність</string>
+    <string name="settings_graphics_resolution_default_hint">Типова</string>
+    <string name="settings_graphics_resolution_default_description">Типова роздільна здатність займає більшу частину екрана</string>
+    <string name="settings_graphics_resolution_custom">Власна роздільна здатність</string>
+    <string name="settings_graphics_resolution_width">Ширина</string>
+    <string name="settings_graphics_resolution_height">Висота</string>
+    <string name="settings_graphics_shadows">Тіні</string>
+    <string name="settings_graphics_shadows_description">Відображати тіні під об\'єктами</string>
+    <string name="settings_graphics_shadows_none">Відсутні (імітація)</string>
+    <string name="settings_graphics_shadows_description_a">Відображати динамічні тіні</string>
+    <string name="settings_graphics_shadows_description_hint_a">Динамічні тіні виглядають краще, але можуть впливати на продуктивність</string>
+    <string name="settings_graphics_anti_aliasing">Згладжування</string>
+    <string name="settings_graphics_anti_aliasing_description">Згладжує краї об\'єктів</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">Тип фону</string>
+    <string name="settings_background_texture">Текстура</string>
+    <string name="settings_background_direction_north">Північ</string>
+    <string name="settings_background_direction_east">Схід</string>
+    <string name="settings_background_direction_south">Південь</string>
+    <string name="settings_background_direction_west">Захід</string>
+    <string name="settings_background_direction_up">Вгору</string>
+    <string name="settings_background_direction_down">Вниз</string>
+    <string name="settings_background_direction_texture_template">Текстура %1$s</string>
+    <string name="settings_background_type_default">Типова</string>
+    <string name="settings_background_type_default_description">Темний шаблон у клітинку</string>
+    <string name="settings_background_type_cubemap">Кубічна карта</string>
+    <string name="settings_background_type_cubemap_description">Використовувати текстуру на кожній стіні</string>
+    <string name="settings_background_type_color">Колір</string>
+    <string name="settings_background_type_color_description">Використовувати суцільний колір</string>
+    <string name="settings_background_texture_no_options_hint">Текстури недоступні.</string>
+    <string name="settings_background_texture_open_folder">Відкрити теку текстур</string>
+    <string name="settings_background_missing_textures_repeated">Текстура фону не встановлена</string>
+    <string name="settings_background_missing_textures_unique">Одна або кілька текстур фону не встановлені</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">Блокувати курсор</string>
+    <string name="settings_controls_lock_cursor_description">Блокувати курсор у вікні</string>
+    <string name="settings_controls_disable_touch">Вимкнути сенсорне керування</string>
+    <string name="settings_controls_disable_touch_description">Дотики до екрана для обертання, переміщення або масштабування ігноруються</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Фіксація клавіш швидкості</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Натисніть Ctrl та Shift, щоб змінити швидкість вільної камери</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Утримуйте Ctrl та Shift, щоб змінити швидкість вільної камери</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">Тексти пісень</string>
+    <string name="settings_onscreenelements_lyrics_description">Якщо пісня містить тексти, відображати їх у реальному часі</string>
+    <string name="settings_onscreenelements_hud">Інформаційний дисплей (HUD)</string>
+    <string name="settings_onscreenelements_hud_description">Відображати назву пісні та прогрес</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">Розмір тексту</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Менший</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Маленький</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Типовий</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Великий</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Більший</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Надіслати повідомлення скидання специфікації MIDI</string>
+    <string name="settings_playback_midi_specification_reset_description">Надіслати повідомлення на MIDI-пристрій для його скидання</string>
+    <string name="settings_playback_synthesizer">Синтезатор</string>
+    <string name="settings_playback_synthesizer_description">Налаштувати MIDI-синтезатор</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Звукові банки</string>
+    <string name="settings_playback_soundbanks_add">Додати звукові банки</string>
+    <string name="settings_playback_soundbanks_description">Імпортувати звукові банки для використання з синтезатором</string>
+    <string name="settings_playback_soundbanks_none_loaded">Звукові банки не завантажено</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">Хор</string>
+    <string name="settings_playback_synthesizer_chorus_description">Використовувати ефект хору</string>
+    <string name="settings_playback_synthesizer_reverb">Реверберація</string>
+    <string name="settings_playback_synthesizer_reverb_description">Використовувати ефект реверберації</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">Камера</string>
+    <string name="settings_camera_description">Автокамера, класична камера</string>
+    <string name="settings_camera_start_autocam_with_song">Починати з автокамери</string>
+    <string name="settings_camera_start_autocam_with_song_description">Після початку пісні автоматично перемикатися на автокамеру</string>
+    <string name="settings_camera_classic_autocam">Класична автокамера</string>
+    <string name="settings_camera_classic_autocam_description">Імітувати рух автокамери з MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Плавна вільна камера</string>
+    <string name="settings_camera_smooth_freecam_description">Зробити рух вільної камери плавнішим</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">Інструменти</string>
+    <string name="settings_instruments_description">Видимість інструментів</string>
+    <string name="settings_instruments_always_show_instruments">Завжди показувати інструменти</string>
+    <string name="settings_instruments_always_show_instruments_description">Ніколи не приховувати інструменти, навіть якщо ноти не грають</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">Ремейк MIDIJam, 3D-візуалізатора MIDI-файлів.</string>
+    <string name="about_development_contributors">Учасники розробки</string>
+    <string name="about_attributions_and_contributions">Атрибуції та внески</string>
+    <string name="about_i18n_contributions">Учасники локалізації</string>
+    <string name="about_oss_licenses">Зауваження щодо сторонніх компонентів</string>
+</resources>

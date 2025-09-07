@@ -18,19 +18,25 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.datastructure.spline.CubicSplineBuilder
 import org.wysko.midis2jam2.midi.RIDE_BELL
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
 private const val BELL_POSITION = 12f
 private const val EDGE_POSITION = 18f
-private const val STICK_MOVE_SPEED = 30f
 
 /** The ride cymbal. */
 class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: CymbalType, style: Style = Style.Standard) :
     Cymbal(context, hits, type, style) {
-    private var targetStickPosition = EDGE_POSITION
-    private var stickPosition = EDGE_POSITION
+    private val spline = when {
+        hits.size >= 2 -> CubicSplineBuilder().createSpline(
+            hits.map { context.sequence.getTimeOf(it).toDouble(SECONDS) },
+            hits.map { stickPosition(it.note).toDouble() }
+        )
+
+        else -> null
+    }
 
     override fun tick(
         time: Duration,
@@ -41,16 +47,25 @@ class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: Cymbal
             cymbalAnimator.strike()
         }
 
-        // Determine if the stick should go forwards or backwards to hit the ride bell
-        results.strikingFor?.let {
-            targetStickPosition = if (it.note == RIDE_BELL) BELL_POSITION else EDGE_POSITION
+        when {
+            spline != null -> {
+                stick.node.setLocalTranslation(
+                    0f,
+                    2f,
+                    spline.evaluate(time.toDouble(SECONDS)).coerceIn(12.0..18.0).toFloat()
+                )
+            }
+
+            hits.size == 1 -> {
+                stick.node.setLocalTranslation(0f, 2f, stickPosition(hits.first().note))
+            }
         }
 
-        // Update influence and position
-        stickPosition += ((delta.toDouble(SECONDS) * (targetStickPosition - stickPosition) * STICK_MOVE_SPEED)).toFloat()
-        stickPosition = stickPosition.coerceIn(BELL_POSITION..EDGE_POSITION) // Prevent overshooting
-        stick.node.setLocalTranslation(0f, 2f, stickPosition)
-
         cymbalAnimator.tick(delta)
+    }
+
+    private fun stickPosition(note: Byte): Float = when (note) {
+        RIDE_BELL -> BELL_POSITION
+        else -> EDGE_POSITION
     }
 }

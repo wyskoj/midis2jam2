@@ -137,13 +137,12 @@
     <string name="settings_playback_midi_specification_reset_description">Send a message to the MIDI device to reset it</string>
     <string name="settings_playback_synthesizer">Synthesizer</string>
     <string name="settings_playback_synthesizer_description">Configure the MIDI synthesizer</string>
-    <string name="settings_playback_soundbanks">Soundbanks</string>
-    <string name="settings_playback_soundbanks_description">Import soundbanks for use with synthesizer</string>
 
     <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Soundbanks</string>
     <string name="settings_playback_soundbanks_add">Add soundbanks</string>
+    <string name="settings_playback_soundbanks_description">Import soundbanks for use with synthesizer</string>
     <string name="settings_playback_soundbanks_none_loaded">No soundbanks loaded</string>
-    <string name="settings_playback_soundbanks_select">Select soundbanks</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Chorus</string>
