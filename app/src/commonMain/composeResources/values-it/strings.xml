@@ -137,7 +137,7 @@
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Testi</string>
     <string name="settings_onscreenelements_lyrics_description">Se la canzone contiene dati di testo, visualizzali in tempo reale</string>
-    <string name="settings_onscreenelements_hud">Heads-up display (HUD)</string>
+    <string name="settings_onscreenelements_hud">Head-up display (HUD)</string>
     <string name="settings_onscreenelements_hud_description">Visualizza il nome della canzone e il progresso</string>
 
     <!-- Settings / On-screen elements / Lyrics -->

@@ -137,7 +137,7 @@
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">เนื้อเพลง</string>
     <string name="settings_onscreenelements_lyrics_description">หากเพลงมีข้อมูลเนื้อเพลง ให้แสดงแบบเรียลไทม์</string>
-    <string name="settings_onscreenelements_hud">HUD ( Heads-up display)</string>
+    <string name="settings_onscreenelements_hud">HUD ( Head-up display)</string>
     <string name="settings_onscreenelements_hud_description">แสดงชื่อเพลงและความคืบหน้า</string>
 
     <!-- Settings / On-screen elements / Lyrics -->

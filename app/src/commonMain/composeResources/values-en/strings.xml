@@ -59,7 +59,7 @@
     <string name="settings_playback">Playback</string>
     <string name="settings_playback_description">MIDI device, synthesizer, soundbanks</string>
     <string name="settings_on_screen_elements">On-screen elements</string>
-    <string name="settings_on_screen_elements_description">Heads-up display, lyrics</string>
+    <string name="settings_on_screen_elements_description">Head-up display, lyrics</string>
 
     <!-- Settings / General -->
     <string name="settings_general_theme">Theme</string>
@@ -120,7 +120,7 @@
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Lyrics</string>
     <string name="settings_onscreenelements_lyrics_description">If the song contains lyrics data, display them in real time</string>
-    <string name="settings_onscreenelements_hud">Heads-up display</string>
+    <string name="settings_onscreenelements_hud">Head-up display</string>
     <string name="settings_onscreenelements_hud_description">Display song name and progress</string>
 
     <!-- Settings / On-screen elements / Lyrics -->

@@ -76,7 +76,7 @@
     <string name="settings_playback">Playback</string>
     <string name="settings_playback_description">MIDI device, synthesizer, soundbanks</string>
     <string name="settings_on_screen_elements">Mga elemento sa screen</string>
-    <string name="settings_on_screen_elements_description">Heads-up display, mga lyrics</string>
+    <string name="settings_on_screen_elements_description">Head-up display, mga lyrics</string>
 
     <!-- Settings / General -->
     <string name="settings_general_theme">Tema</string>
@@ -137,7 +137,7 @@
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Mga Lyrics</string>
     <string name="settings_onscreenelements_lyrics_description">Kung ang awit ay naglalaman ng datos ng lyrics, ipakita ang mga ito nang real time</string>
-    <string name="settings_onscreenelements_hud">Heads-up display</string>
+    <string name="settings_onscreenelements_hud">Head-up display</string>
     <string name="settings_onscreenelements_hud_description">Ipakita ang pangalan at progress ng awit</string>
 
     <!-- Settings / On-screen elements / Lyrics -->

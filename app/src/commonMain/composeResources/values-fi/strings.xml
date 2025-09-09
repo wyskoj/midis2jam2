@@ -76,7 +76,7 @@
     <string name="settings_playback">Toisto</string>
     <string name="settings_playback_description">MIDI-laite, syntetisaattori, äänipankit</string>
     <string name="settings_on_screen_elements">Näytön elementit</string>
-    <string name="settings_on_screen_elements_description">Heads-up-display, lyriikat</string>
+    <string name="settings_on_screen_elements_description">Head-up-display, lyriikat</string>
 
     <!-- Asetukset / Yleiset -->
     <string name="settings_general_theme">Teema</string>
@@ -137,7 +137,7 @@
     <!-- Asetukset / Näytön elementit -->
     <string name="settings_onscreenelements_lyrics">Lyriikat</string>
     <string name="settings_onscreenelements_lyrics_description">Jos kappale sisältää lyriikkatietoja, näytä ne reaaliaikaisesti</string>
-    <string name="settings_onscreenelements_hud">Heads-up-display (HUD)</string>
+    <string name="settings_onscreenelements_hud">Head-up-display (HUD)</string>
     <string name="settings_onscreenelements_hud_description">Näytä kappaleen nimi ja eteneminen</string>
 
     <!-- Asetukset / Näytön elementit / Lyriikat -->
