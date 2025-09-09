@@ -210,12 +210,6 @@ compose.desktop {
                 }
             }
         }
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "midis2jam2"
-            packageVersion = appVersionName
-        }
     }
 }
 
