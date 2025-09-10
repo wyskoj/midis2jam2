@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">Hjem</string>
+    <string name="tab_queue">Kø</string>
+    <string name="tab_search">Søk</string>
+    <string name="tab_settings">Innstillinger</string>
+    <string name="tab_about">Om</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Avbryt</string>
+    <string name="back">Tilbake</string>
+    <string name="play">Spill</string>
+    <string name="enabled">Aktivert</string>
+    <string name="disabled">Deaktivert</string>
+    <string name="midi_file">MIDI-fil</string>
+    <string name="midi_device">MIDI-enhet</string>
+    <string name="soundbank">Lydbank</string>
+    <string name="soundbank_default">Standard lydbank</string>
+    <string name="play_midi_file">Spill MIDI-fil</string>
+    <string name="quality_none">Ingen</string>
+    <string name="quality_low">Lav</string>
+    <string name="quality_medium">Middels</string>
+    <string name="quality_high">Høy</string>
+    <string name="help">Hjelp</string>
+    <string name="launcher_window_title">midis2jam2 oppstarter</string>
+
+    <!-- Queue -->
+    <string name="queue_add">Legg til i kø</string>
+    <string name="queue_clear">Tøm</string>
+    <string name="queue_clear_prompt">Tøm køen?</string>
+    <string name="queue_clear_warning">Denne handlingen kan ikke angres.</string>
+    <string name="queue_empty">Sanger du legger til vil vises her.</string>
+    <string name="queue_load">Last</string>
+    <string name="queue_load_prompt">Laste kø?</string>
+    <string name="queue_load_warning">Dette vil tømme den nåværende køen.</string>
+    <string name="queue_load_missing">Noen filer mangler</string>
+    <string name="queue_load_missing_help">Følgende filer ble ikke funnet:</string>
+    <string name="queue_save">Lagre</string>
+    <string name="queue_save_confirmation">Kø lagret.</string>
+    <string name="queue_shuffle">Stokk</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">Ingen samsvarende MIDI-filer funnet. Prøv å justere kriteriene.</string>
+    <string name="search_deselect_all">Fjern alle markeringer</string>
+    <string name="search_directory">Mappe</string>
+    <string name="search_index_not_available">Velg en mappe for å indeksere MIDI-filer.</string>
+    <string name="search_index_waiting">Vent litt! Vi indekserer MIDI-filene dine…</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Generelt</string>
+    <string name="settings_general_description">Språk, tema</string>
+    <string name="settings_graphics">Grafikk</string>
+    <string name="settings_graphics_description">Fullskjerm, oppløsning, kantutjevning</string>
+    <string name="settings_graphics_description_a">Skygger</string>
+    <string name="settings_background">Bakgrunn</string>
+    <string name="settings_background_description">Velg et bilde eller en farge</string>
+    <string name="settings_controls">Kontroller</string>
+    <string name="settings_controls_description">Markørlås, hastighetsmodifikasjonstaster</string>
+    <string name="settings_controls_description_a">Trykk-inndata</string>
+    <string name="settings_playback">Avspilling</string>
+    <string name="settings_playback_description">MIDI-enhet, synthesizer, lydbanker</string>
+    <string name="settings_on_screen_elements">Skjermelementer</string>
+    <string name="settings_on_screen_elements_description">Head-up-display, tekst</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">Tema</string>
+    <string name="settings_general_theme_light">Lyst</string>
+    <string name="settings_general_theme_dark">Mørkt</string>
+    <string name="settings_general_theme_system">Følg system</string>
+    <string name="settings_general_locale">Språk</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">Fullskjerm</string>
+    <string name="settings_graphics_fullscreen_description">Bruk hele skjermen</string>
+    <string name="settings_graphics_resolution">Oppløsning</string>
+    <string name="settings_graphics_resolution_fullscreen">Oppløsning matcher skjermen når fullskjerm er aktivert</string>
+    <string name="settings_graphics_resolution_default">Bruk standardoppløsning</string>
+    <string name="settings_graphics_resolution_default_hint">Standard</string>
+    <string name="settings_graphics_resolution_default_description">Standardoppløsning bruker det meste av skjermen</string>
+    <string name="settings_graphics_resolution_custom">Egendefinert oppløsning</string>
+    <string name="settings_graphics_resolution_width">Bredde</string>
+    <string name="settings_graphics_resolution_height">Høyde</string>
+    <string name="settings_graphics_shadows">Skygger</string>
+    <string name="settings_graphics_shadows_description">Tegn skygger under objekter</string>
+    <string name="settings_graphics_shadows_none">Ingen (falske)</string>
+    <string name="settings_graphics_shadows_description_a">Tegn dynamiske skygger</string>
+    <string name="settings_graphics_shadows_description_hint_a">Dynamiske skygger ser bedre ut, men kan påvirke ytelsen</string>
+    <string name="settings_graphics_anti_aliasing">Kantutjevning</string>
+    <string name="settings_graphics_anti_aliasing_description">Jevne ut kanter på objekter</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">Bakgrunnstype</string>
+    <string name="settings_background_texture">Tekstur</string>
+    <string name="settings_background_direction_north">Nord</string>
+    <string name="settings_background_direction_east">Øst</string>
+    <string name="settings_background_direction_south">Sør</string>
+    <string name="settings_background_direction_west">Vest</string>
+    <string name="settings_background_direction_up">Opp</string>
+    <string name="settings_background_direction_down">Ned</string>
+    <string name="settings_background_direction_texture_template">%1$s tekstur</string>
+    <string name="settings_background_type_default">Standard</string>
+    <string name="settings_background_type_default_description">Mørkt rutemønster</string>
+    <string name="settings_background_type_cubemap">Kubemappe</string>
+    <string name="settings_background_type_cubemap_description">Bruk en tekstur på hver vegg</string>
+    <string name="settings_background_type_color">Farge</string>
+    <string name="settings_background_type_color_description">Bruk en ensfarget bakgrunn</string>
+    <string name="settings_background_texture_no_options_hint">Ingen teksturer tilgjengelig.</string>
+    <string name="settings_background_texture_open_folder">Åpne teksturmappe</string>
+    <string name="settings_background_missing_textures_repeated">Bakgrunnstekstur er ikke satt</string>
+    <string name="settings_background_missing_textures_unique">En eller flere bakgrunnsteksturer er ikke satt</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">Lås markør</string>
+    <string name="settings_controls_lock_cursor_description">Lås markøren til vinduet</string>
+    <string name="settings_controls_disable_touch">Deaktiver trykk-inndata</string>
+    <string name="settings_controls_disable_touch_description">Trykking på skjermen for å rotere, panorerer eller zoome ignoreres</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Klistrende hastighetsmodifikasjonstaster</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Trykk Ctrl og Shift for å endre frikamerhastighet</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Hold Ctrl og Shift for å endre frikamerhastighet</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">Tekst</string>
+    <string name="settings_onscreenelements_lyrics_description">Hvis sangen inneholder tekstdata, vis dem i sanntid</string>
+    <string name="settings_onscreenelements_hud">Head-up-display</string>
+    <string name="settings_onscreenelements_hud_description">Vis sangnavn og fremdrift</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">Tekststørrelse</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Mindre</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Liten</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Standard</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Stor</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Større</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Send MIDI-spesifikasjon nullstillingsmelding</string>
+    <string name="settings_playback_midi_specification_reset_description">Send en melding til MIDI-enheten for å nullstille den</string>
+    <string name="settings_playback_synthesizer">Synthesizer</string>
+    <string name="settings_playback_synthesizer_description">Konfigurer MIDI-synthesizeren</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Lydbanker</string>
+    <string name="settings_playback_soundbanks_add">Legg til lydbanker</string>
+    <string name="settings_playback_soundbanks_description">Importer lydbanker for bruk med synthesizer</string>
+    <string name="settings_playback_soundbanks_none_loaded">Ingen lydbanker lastet</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">Kor</string>
+    <string name="settings_playback_synthesizer_chorus_description">Bruk koreffekt</string>
+    <string name="settings_playback_synthesizer_reverb">Gjenklang</string>
+    <string name="settings_playback_synthesizer_reverb_description">Bruk gjenklangseffekt</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">Kamera</string>
+    <string name="settings_camera_description">Autokam, klassisk kamera</string>
+    <string name="settings_camera_start_autocam_with_song">Start autokam med sang</string>
+    <string name="settings_camera_start_autocam_with_song_description">Når sangen starter, bytt automatisk til autokam</string>
+    <string name="settings_camera_classic_autocam">Klassisk autokam</string>
+    <string name="settings_camera_classic_autocam_description">Simuler autokam-bevegelse fra MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Myk frikam</string>
+    <string name="settings_camera_smooth_freecam_description">Gjør frikam-bevegelse mykere</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">Instrumenter</string>
+    <string name="settings_instruments_description">Instrumentvisibilitet</string>
+    <string name="settings_instruments_always_show_instruments">Vis instrumenter alltid</string>
+    <string name="settings_instruments_always_show_instruments_description">Skjul aldri instrumenter, selv når ingen noter spilles</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">En nyutgivelse av MIDIJam, en 3D MIDI-filvisualisator.</string>
+    <string name="about_development_contributors">Utviklingsbidragsytere</string>
+    <string name="about_attributions_and_contributions">Navngivelse og bidrag</string>
+    <string name="about_i18n_contributions">Internasjonaliseringsbidrag</string>
+    <string name="about_oss_licenses">Tredjepartsnotiser</string>
+    <string name="about_check_for_updates">Sjekk for oppdateringer</string>
+    <string name="about_check_for_updates_description">Sjekk raskt om det er en ny versjon tilgjengelig</string>
+</resources>

@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">Home</string>
+    <string name="tab_queue">Pila</string>
+    <string name="tab_search">Maghanap</string>
+    <string name="tab_settings">Mga Setting</string>
+    <string name="tab_about">Tungkol</string>
+    <string name="ok">Sige</string>
+    <string name="cancel">Kanselahin</string>
+    <string name="back">Bumalik</string>
+    <string name="play">I-play</string>
+    <string name="enabled">Pinagana</string>
+    <string name="disabled">Hindi Pinagana</string>
+    <string name="midi_file">File ng MIDI</string>
+    <string name="midi_device">Device ng MIDI</string>
+    <string name="soundbank">Soundbank</string>
+    <string name="soundbank_default">Default na soundbank</string>
+    <string name="play_midi_file">I-play ang MIDI file</string>
+    <string name="quality_none">Wala</string>
+    <string name="quality_low">Mababa</string>
+    <string name="quality_medium">Katamtaman</string>
+    <string name="quality_high">Mataas</string>
+    <string name="help">Tulong</string>
+    <string name="launcher_window_title">midis2jam2 launcher</string>
+
+    <!-- Queue -->
+    <string name="queue_add">Idagdag sa pila</string>
+    <string name="queue_clear">I-clear</string>
+    <string name="queue_clear_prompt">I-clear ang pila?</string>
+    <string name="queue_clear_warning">Hindi na maibabalik ang operasyong ito.</string>
+    <string name="queue_empty">Ang mga awiting idaragdag mo ay lilitaw dito.</string>
+    <string name="queue_load">I-load</string>
+    <string name="queue_load_prompt">I-load ang pila?</string>
+    <string name="queue_load_warning">Aalisin nito ang kasalukuyang pila.</string>
+    <string name="queue_load_missing">May ilang file na nawawala</string>
+    <string name="queue_load_missing_help">Ang mga sumusunod na file ay hindi natagpuan:</string>
+    <string name="queue_save">I-save</string>
+    <string name="queue_save_confirmation">Nai-save na ang pila.</string>
+    <string name="queue_shuffle">Balahurin</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">Walang nakitang katugmang mga MIDI file. Subukang iayon ang iyong mga pamantayan.</string>
+    <string name="search_deselect_all">Alisin ang lahat ng seleksyon</string>
+    <string name="search_directory">Direktoryo</string>
+    <string name="search_index_not_available">Pumili ng direktoryo para i-index ang mga MIDI file.</string>
+    <string name="search_index_waiting">Maghintay! Ina-index na namin ang iyong mga MIDI file...</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Pangkalahatan</string>
+    <string name="settings_general_description">Wika, tema</string>
+    <string name="settings_graphics">Graphics</string>
+    <string name="settings_graphics_description">Fullscreen, resolution, anti-aliasing</string>
+    <string name="settings_graphics_description_a">Mga Anino</string>
+    <string name="settings_background">Background</string>
+    <string name="settings_background_description">Pumili ng larawan o kulay</string>
+    <string name="settings_controls">Mga Kontrol</string>
+    <string name="settings_controls_description">Cursor lock, mga speed modifier key</string>
+    <string name="settings_controls_description_a">Input ng pagpindot (touch input)</string>
+    <string name="settings_playback">Playback</string>
+    <string name="settings_playback_description">MIDI device, synthesizer, soundbanks</string>
+    <string name="settings_on_screen_elements">Mga elemento sa screen</string>
+    <string name="settings_on_screen_elements_description">Head-up display, mga lyrics</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">Tema</string>
+    <string name="settings_general_theme_light">Light</string>
+    <string name="settings_general_theme_dark">Dark</string>
+    <string name="settings_general_theme_system">Sundin ang system</string>
+    <string name="settings_general_locale">Wika</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">Fullscreen</string>
+    <string name="settings_graphics_fullscreen_description">Gamitin ang buong screen</string>
+    <string name="settings_graphics_resolution">Resolution</string>
+    <string name="settings_graphics_resolution_fullscreen">Tumutugma ang resolution sa monitor kapag pinagana ang fullscreen</string>
+    <string name="settings_graphics_resolution_default">Gamitin ang default na resolution</string>
+    <string name="settings_graphics_resolution_default_hint">Default</string>
+    <string name="settings_graphics_resolution_default_description">Ginagamit ng default na resolution ang karamihan ng screen</string>
+    <string name="settings_graphics_resolution_custom">Custom resolution</string>
+    <string name="settings_graphics_resolution_width">Lapad</string>
+    <string name="settings_graphics_resolution_height">Taas</string>
+    <string name="settings_graphics_shadows">Mga Anino</string>
+    <string name="settings_graphics_shadows_description">I-render ang mga anino sa ilalim ng mga bagay</string>
+    <string name="settings_graphics_shadows_none">Wala (fake)</string>
+    <string name="settings_graphics_shadows_description_a">I-render ang mga dynamic na anino</string>
+    <string name="settings_graphics_shadows_description_hint_a">Mas maganda ang hitsura ng dynamic na anino, ngunit maaaring makaapekto sa performance</string>
+    <string name="settings_graphics_anti_aliasing">Anti-aliasing</string>
+    <string name="settings_graphics_anti_aliasing_description">Pakinisin ang mga gilid ng mga bagay</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">Uri ng Background</string>
+    <string name="settings_background_texture">Texture</string>
+    <string name="settings_background_direction_north">Hilaga</string>
+    <string name="settings_background_direction_east">Silangan</string>
+    <string name="settings_background_direction_south">Timog</string>
+    <string name="settings_background_direction_west">Kanluran</string>
+    <string name="settings_background_direction_up">Pataas</string>
+    <string name="settings_background_direction_down">Pababa</string>
+    <string name="settings_background_direction_texture_template">Texture ng %1$s</string>
+    <string name="settings_background_type_default">Default</string>
+    <string name="settings_background_type_default_description">Madilim na checkerboard pattern</string>
+    <string name="settings_background_type_cubemap">Cube map</string>
+    <string name="settings_background_type_cubemap_description">Gumamit ng texture sa bawat dingding</string>
+    <string name="settings_background_type_color">Kulay</string>
+    <string name="settings_background_type_color_description">Gumamit ng solidong kulay</string>
+    <string name="settings_background_texture_no_options_hint">Walang available na texture.</string>
+    <string name="settings_background_texture_open_folder">Buksan ang folder ng mga texture</string>
+    <string name="settings_background_missing_textures_repeated">Hindi naka-set ang background texture</string>
+    <string name="settings_background_missing_textures_unique">Isa o higit pang background texture ang hindi naka-set</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">I-lock ang cursor</string>
+    <string name="settings_controls_lock_cursor_description">I-lock ang cursor sa window</string>
+    <string name="settings_controls_disable_touch">I-disable ang touch input</string>
+    <string name="settings_controls_disable_touch_description">Hindi papansinin ang pagpindot sa screen para mag-orbit, mag-pan, o mag-zoom</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Sticky speed-modifier keys</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Pindutin ang Ctrl at Shift para baguhin ang freecam speed</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Hawakan ang Ctrl at Shift para baguhin ang freecam speed</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">Mga Lyrics</string>
+    <string name="settings_onscreenelements_lyrics_description">Kung ang awit ay naglalaman ng datos ng lyrics, ipakita ang mga ito nang real time</string>
+    <string name="settings_onscreenelements_hud">Head-up display</string>
+    <string name="settings_onscreenelements_hud_description">Ipakita ang pangalan at progress ng awit</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">Laki ng Lyrics</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Mas Maliit</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Maliit</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Default</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Malaki</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Mas Malaki</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Magpadala ng MIDI specification reset message</string>
+    <string name="settings_playback_midi_specification_reset_description">Magpadala ng mensahe sa MIDI device para i-reset ito</string>
+    <string name="settings_playback_synthesizer">Synthesizer</string>
+    <string name="settings_playback_synthesizer_description">I-configure ang MIDI synthesizer</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Soundbanks</string>
+    <string name="settings_playback_soundbanks_add">Magdagdag ng soundbanks</string>
+    <string name="settings_playback_soundbanks_description">Mag-import ng soundbanks para magamit sa synthesizer</string>
+    <string name="settings_playback_soundbanks_none_loaded">Walang naka-load na soundbanks</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">Chorus</string>
+    <string name="settings_playback_synthesizer_chorus_description">Gumamit ng chorus effect</string>
+    <string name="settings_playback_synthesizer_reverb">Reverb</string>
+    <string name="settings_playback_synthesizer_reverb_description">Gumamit ng reverb effect</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">Camera</string>
+    <string name="settings_camera_description">Auto-cam, classic camera</string>
+    <string name="settings_camera_start_autocam_with_song">Simulan ang auto-cam kasama ng awit</string>
+    <string name="settings_camera_start_autocam_with_song_description">Kapag nagsimula ang awit, awtomatikong lumipat sa auto-cam</string>
+    <string name="settings_camera_classic_autocam">Classic auto-cam</string>
+    <string name="settings_camera_classic_autocam_description">I-simulate ang paggalaw ng auto-cam mula sa MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Smooth freecam</string>
+    <string name="settings_camera_smooth_freecam_description">Gawing mas maayos ang paggalaw ng freecam</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">Mga Instrumento</string>
+    <string name="settings_instruments_description">Visibility ng instrumento</string>
+    <string name="settings_instruments_always_show_instruments">Palaging ipakita ang mga instrumento</string>
+    <string name="settings_instruments_always_show_instruments_description">Huwag itago ang mga instrumento, kahit na walang tumutugtog na mga nota</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">Isang remaster ng MIDIJam, isang 3D MIDI file visualizer.</string>
+    <string name="about_development_contributors">Mga nag-ambag sa development</string>
+    <string name="about_attributions_and_contributions">Mga pagpapatunay at kontribusyon</string>
+    <string name="about_i18n_contributions">Mga kontribusyon sa internasyonalisasyon</string>
+    <string name="about_oss_licenses">Mga paunawa mula sa third-party</string>
+    <string name="about_check_for_updates">Tingnan ang mga update</string>
+    <string name="about_check_for_updates_description">Mabilis na tingnan kung may bagong bersyon na available</string>
+</resources>

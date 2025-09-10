@@ -1,0 +1,77 @@
+environment:
+  matrix:
+    - job_name: Windows
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      JAVA_HOME: C:\Program Files\Java\jdk21
+    - job_name: Linux
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
+    - job_name: macOS
+      APPVEYOR_BUILD_WORKER_IMAGE: macos-sonoma
+      JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home
+
+matrix:
+  fast_finish: true
+
+for:
+
+  # ======================================
+  #      Windows
+  # ======================================
+
+  -
+    matrix:
+      only:
+        - job_name: Windows
+
+    init:
+      - echo "Init for Windows"
+
+    build_script:
+      - gradlew.bat packageReleaseUberJarForCurrentOS
+
+    test: off
+
+  # ======================================
+  #      Linux
+  # ======================================
+
+  -
+    matrix:
+      only:
+        - job_name: Linux
+
+    init:
+      - echo "Init for Linux"
+
+    build_script:
+      - ./gradlew packageReleaseUberJarForCurrentOS
+
+    test: off
+
+  # ======================================
+  #      macOS
+  # ======================================
+
+  -
+    matrix:
+      only:
+        - job_name: macOS
+
+    init:
+      - export PATH=$JAVA_HOME/bin:$PATH
+      - brew install --cask android-commandlinetools
+      - mkdir -p "$HOME/Library/Android/sdk/cmdline-tools/latest"
+      - cp -R "$(brew --prefix)/share/android-commandlinetools"/* "$HOME/Library/Android/sdk/cmdline-tools/latest/"
+      - export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
+      - export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
+      - sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;27.0.12077973"
+      - yes | sdkmanager --licenses --sdk_root="$ANDROID_SDK_ROOT"
+
+    build_script:
+      - ./gradlew packageReleaseUberJarForCurrentOS -PskipAndroid
+
+    test: off
+
+artifacts:
+  - path: app/build/compose/jars/*.jar

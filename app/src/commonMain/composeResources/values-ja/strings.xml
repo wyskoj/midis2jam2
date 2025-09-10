@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- 共通 -->
+    <string name="tab_home">ホーム</string>
+    <string name="tab_queue">キュー</string>
+    <string name="tab_search">検索</string>
+    <string name="tab_settings">設定</string>
+    <string name="tab_about">About</string>
+    <string name="ok">OK</string>
+    <string name="cancel">キャンセル</string>
+    <string name="back">戻る</string>
+    <string name="play">再生</string>
+    <string name="enabled">有効</string>
+    <string name="disabled">無効</string>
+    <string name="midi_file">MIDIファイル</string>
+    <string name="midi_device">MIDIデバイス</string>
+    <string name="soundbank">サウンドバンク</string>
+    <string name="soundbank_default">デフォルトサウンドバンク</string>
+    <string name="play_midi_file">MIDIファイルを再生</string>
+    <string name="quality_none">なし</string>
+    <string name="quality_low">低</string>
+    <string name="quality_medium">中</string>
+    <string name="quality_high">高</string>
+    <string name="help">ヘルプ</string>
+    <string name="launcher_window_title">midis2jam2 ランチャー</string>
+
+    <!-- キュー -->
+    <string name="queue_add">キューに追加</string>
+    <string name="queue_clear">クリア</string>
+    <string name="queue_clear_prompt">キューをクリアしますか？</string>
+    <string name="queue_clear_warning">この操作は元に戻せません。</string>
+    <string name="queue_empty">追加した曲がここに表示されます。</string>
+    <string name="queue_load">読み込み</string>
+    <string name="queue_load_prompt">キューを読み込みますか？</string>
+    <string name="queue_load_warning">現在のキューがクリアされます。</string>
+    <string name="queue_load_missing">一部ファイルが見つかりません</string>
+    <string name="queue_load_missing_help">次のファイルが見つかりませんでした：</string>
+    <string name="queue_save">保存</string>
+    <string name="queue_save_confirmation">キューを保存しました。</string>
+    <string name="queue_shuffle">シャッフル</string>
+
+    <!-- 検索 -->
+    <string name="search_criteria_too_narrow">一致するMIDIファイルが見つかりません。条件を調整してください。</string>
+    <string name="search_deselect_all">すべて選択解除</string>
+    <string name="search_directory">ディレクトリ</string>
+    <string name="search_index_not_available">MIDIファイルのインデックスを作成するディレクトリを選択してください。</string>
+    <string name="search_index_waiting">しばらくお待ちください。MIDIファイルのインデックスを作成中です…</string>
+
+    <!-- 設定 -->
+    <string name="settings_general">一般</string>
+    <string name="settings_general_description">言語、テーマ</string>
+    <string name="settings_graphics">グラフィックス</string>
+    <string name="settings_graphics_description">フルスクリーン、解像度、アンチエイリアス</string>
+    <string name="settings_graphics_description_a">シャドウ</string>
+    <string name="settings_background">背景</string>
+    <string name="settings_background_description">画像または色を選択</string>
+    <string name="settings_controls">操作</string>
+    <string name="settings_controls_description">カーソルロック、速度変更キー</string>
+    <string name="settings_controls_description_a">タッチ入力</string>
+    <string name="settings_playback">再生</string>
+    <string name="settings_playback_description">MIDIデバイス、シンセサイザー、サウンドバンク</string>
+    <string name="settings_on_screen_elements">画面上の要素</string>
+    <string name="settings_on_screen_elements_description">ヘッドアップディスプレイ、歌詞</string>
+
+    <!-- 設定 / 一般 -->
+    <string name="settings_general_theme">テーマ</string>
+    <string name="settings_general_theme_light">ライト</string>
+    <string name="settings_general_theme_dark">ダーク</string>
+    <string name="settings_general_theme_system">システムに合わせる</string>
+    <string name="settings_general_locale">言語</string>
+
+    <!-- 設定 / グラフィックス -->
+    <string name="settings_graphics_fullscreen">フルスクリーン</string>
+    <string name="settings_graphics_fullscreen_description">画面全体を使用する</string>
+    <string name="settings_graphics_resolution">解像度</string>
+    <string name="settings_graphics_resolution_fullscreen">フルスクリーン時は解像度がモニターに合わせられます</string>
+    <string name="settings_graphics_resolution_default">デフォルト解像度を使用</string>
+    <string name="settings_graphics_resolution_default_hint">デフォルト</string>
+    <string name="settings_graphics_resolution_default_description">デフォルト解像度は画面の大部分を使用します</string>
+    <string name="settings_graphics_resolution_custom">カスタム解像度</string>
+    <string name="settings_graphics_resolution_width">幅</string>
+    <string name="settings_graphics_resolution_height">高さ</string>
+    <string name="settings_graphics_shadows">シャドウ</string>
+    <string name="settings_graphics_shadows_description">オブジェクトの影を描画する</string>
+    <string name="settings_graphics_shadows_none">なし（擬似）</string>
+    <string name="settings_graphics_shadows_description_a">動的シャドウを描画する</string>
+    <string name="settings_graphics_shadows_description_hint_a">動的シャドウは見た目が良いですが、パフォーマンスに影響する可能性があります</string>
+    <string name="settings_graphics_anti_aliasing">アンチエイリアス</string>
+    <string name="settings_graphics_anti_aliasing_description">オブジェクトのエッジを滑らかにする</string>
+
+    <!-- 設定 / 背景 -->
+    <string name="settings_background_type">背景の種類</string>
+    <string name="settings_background_texture">テクスチャ</string>
+    <string name="settings_background_direction_north">北</string>
+    <string name="settings_background_direction_east">東</string>
+    <string name="settings_background_direction_south">南</string>
+    <string name="settings_background_direction_west">西</string>
+    <string name="settings_background_direction_up">上</string>
+    <string name="settings_background_direction_down">下</string>
+    <string name="settings_background_direction_texture_template">%1$s テクスチャ</string>
+    <string name="settings_background_type_default">デフォルト</string>
+    <string name="settings_background_type_default_description">ダークチェッカーパターン</string>
+    <string name="settings_background_type_cubemap">キューブマップ</string>
+    <string name="settings_background_type_cubemap_description">各壁にテクスチャを使用する</string>
+    <string name="settings_background_type_color">色</string>
+    <string name="settings_background_type_color_description">単色を使用する</string>
+    <string name="settings_background_texture_no_options_hint">利用可能なテクスチャがありません。</string>
+    <string name="settings_background_texture_open_folder">テクスチャフォルダを開く</string>
+    <string name="settings_background_missing_textures_repeated">背景テクスチャが設定されていません</string>
+    <string name="settings_background_missing_textures_unique">1つ以上の背景テクスチャが設定されていません</string>
+
+    <!-- 設定 / 操作 -->
+    <string name="settings_controls_lock_cursor">カーソルをロック</string>
+    <string name="settings_controls_lock_cursor_description">カーソルをウィンドウにロックする</string>
+    <string name="settings_controls_disable_touch">タッチ入力を無効にする</string>
+    <string name="settings_controls_disable_touch_description">画面タッチによるオービット、パン、ズーム操作を無視する</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">スティッキー速度変更キー</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">CtrlとShiftを押してフリーカム速度を変更</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">CtrlとShiftを押し続けてフリーカム速度を変更</string>
+
+    <!-- 設定 / 画面上の要素 -->
+    <string name="settings_onscreenelements_lyrics">歌詞</string>
+    <string name="settings_onscreenelements_lyrics_description">曲に歌詞データが含まれている場合、リアルタイムで表示する</string>
+    <string name="settings_onscreenelements_hud">ヘッドアップディスプレイ（HUD）</string>
+    <string name="settings_onscreenelements_hud_description">曲名と進捗状況を表示する</string>
+
+    <!-- 設定 / 画面上の要素 / 歌詞 -->
+    <string name="settings_onscreenelements_lyrics_size">歌詞のサイズ</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">より小さい</string>
+    <string name="settings_onscreenelements_lyrics_size_small">小さい</string>
+    <string name="settings_onscreenelements_lyrics_size_default">デフォルト</string>
+    <string name="settings_onscreenelements_lyrics_size_large">大きい</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">より大きい</string>
+
+    <!-- 設定 / 再生 -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">MIDI仕様リセットメッセージを送信</string>
+    <string name="settings_playback_midi_specification_reset_description">MIDIデバイスにリセットメッセージを送信する</string>
+    <string name="settings_playback_synthesizer">シンセサイザー</string>
+    <string name="settings_playback_synthesizer_description">MIDIシンセサイザーを設定する</string>
+
+    <!-- 設定 / 再生 / サウンドバンク -->
+    <string name="settings_playback_soundbanks">サウンドバンク</string>
+    <string name="settings_playback_soundbanks_add">サウンドバンクを追加</string>
+    <string name="settings_playback_soundbanks_description">シンセサイザーで使用するサウンドバンクをインポート</string>
+    <string name="settings_playback_soundbanks_none_loaded">サウンドバンクが読み込まれていません</string>
+
+    <!-- 設定 / 再生 / シンセサイザー -->
+    <string name="settings_playback_synthesizer_chorus">コーラス</string>
+    <string name="settings_playback_synthesizer_chorus_description">コーラス効果を使用する</string>
+    <string name="settings_playback_synthesizer_reverb">リバーブ</string>
+    <string name="settings_playback_synthesizer_reverb_description">リバーブ効果を使用する</string>
+
+    <!-- 設定 / カメラ -->
+    <string name="settings_camera">カメラ</string>
+    <string name="settings_camera_description">オートカム、クラシックカメラ</string>
+    <string name="settings_camera_start_autocam_with_song">曲とともにオートカムを開始</string>
+    <string name="settings_camera_start_autocam_with_song_description">曲開始時に自動的にオートカムに切り替える</string>
+    <string name="settings_camera_classic_autocam">クラシックオートカム</string>
+    <string name="settings_camera_classic_autocam_description">MIDIJamのオートカム動作をシミュレートする</string>
+    <string name="settings_camera_smooth_freecam">スムーズフリーカム</string>
+    <string name="settings_camera_smooth_freecam_description">フリーカムの動きをより滑らかにする</string>
+
+    <!-- 設定 / 楽器 -->
+    <string name="settings_instruments">楽器</string>
+    <string name="settings_instruments_description">楽器の表示/非表示</string>
+    <string name="settings_instruments_always_show_instruments">常に楽器を表示</string>
+    <string name="settings_instruments_always_show_instruments_description">音が鳴っていない場合でも楽器を非表示にしない</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">3D MIDIファイルビジュアライザー、MIDIJamのリマスター版。</string>
+    <string name="about_development_contributors">開発貢献者</string>
+    <string name="about_attributions_and_contributions">表示および貢献</string>
+    <string name="about_i18n_contributions">国際化（i18n）貢献</string>
+    <string name="about_oss_licenses">サードパーティ通知</string>
+    <string name="about_check_for_updates">アップデートを確認</string>
+    <string name="about_check_for_updates_description">新しいバージョンが利用可能かどうかを素早く確認</string>
+</resources>

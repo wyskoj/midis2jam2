@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">หน้าแรก</string>
+    <string name="tab_queue">คิว</string>
+    <string name="tab_search">ค้นหา</string>
+    <string name="tab_settings">การตั้งค่า</string>
+    <string name="tab_about">เกี่ยวกับ</string>
+    <string name="ok">ตกลง</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="back">กลับ</string>
+    <string name="play">เล่น</string>
+    <string name="enabled">เปิดใช้งาน</string>
+    <string name="disabled">ปิดใช้งาน</string>
+    <string name="midi_file">ไฟล์ MIDI</string>
+    <string name="midi_device">อุปกรณ์ MIDI</string>
+    <string name="soundbank">Soundbank</string>
+    <string name="soundbank_default">Soundbank มาตรฐาน</string>
+    <string name="play_midi_file">เล่นไฟล์ MIDI</string>
+    <string name="quality_none">ไม่มี</string>
+    <string name="quality_low">ต่ำ</string>
+    <string name="quality_medium">ปานกลาง</string>
+    <string name="quality_high">สูง</string>
+    <string name="help">ช่วยเหลือ</string>
+    <string name="launcher_window_title">ตัวเปิดใช้งาน midis2jam2</string>
+
+    <!-- Queue -->
+    <string name="queue_add">เพิ่มเข้าคิว</string>
+    <string name="queue_clear">ล้าง</string>
+    <string name="queue_clear_prompt">ล้างคิว?</string>
+    <string name="queue_clear_warning">การดำเนินการนี้ไม่สามารถยกเลิกได้</string>
+    <string name="queue_empty">เพลงที่คุณเพิ่มจะปรากฏที่นี่</string>
+    <string name="queue_load">โหลด</string>
+    <string name="queue_load_prompt">โหลดคิว?</string>
+    <string name="queue_load_warning">การดำเนินการนี้จะล้างคิวปัจจุบัน</string>
+    <string name="queue_load_missing">ไม่พบไฟล์บางส่วน</string>
+    <string name="queue_load_missing_help">ไม่พบไฟล์ต่อไปนี้:</string>
+    <string name="queue_save">บันทึก</string>
+    <string name="queue_save_confirmation">บันทึกคิวแล้ว</string>
+    <string name="queue_shuffle">สลับแบบสุ่ม</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">ไม่พบไฟล์ MIDI ที่ตรงกัน ลองปรับเกณฑ์ของคุณ</string>
+    <string name="search_deselect_all">ยกเลิกการเลือกทั้งหมด</string>
+    <string name="search_directory">ไดเรกทอรี</string>
+    <string name="search_index_not_available">เลือกไดเรกทอรีเพื่อจัดดัชนีไฟล์ MIDI</string>
+    <string name="search_index_waiting">โปรดรอสักครู่! เรากำลังจัดดัชนีไฟล์ MIDI ของคุณ...</string>
+
+    <!-- Settings -->
+    <string name="settings_general">ทั่วไป</string>
+    <string name="settings_general_description">ภาษา, ชุดรูปแบบ</string>
+    <string name="settings_graphics">กราฟิก</string>
+    <string name="settings_graphics_description">เต็มหน้าจอ, ความละเอียด, การปรับให้เรียบขอบ</string>
+    <string name="settings_graphics_description_a">เงา</string>
+    <string name="settings_background">พื้นหลัง</string>
+    <string name="settings_background_description">เลือกรูปภาพหรือสี</string>
+    <string name="settings_controls">การควบคุม</string>
+    <string name="settings_controls_description">ล็อคเคอร์เซอร์, ปุ่มปรับความเร็ว</string>
+    <string name="settings_controls_description_a">การป้อนข้อมูลแบบสัมผัส</string>
+    <string name="settings_playback">การเล่น</string>
+    <string name="settings_playback_description">อุปกรณ์ MIDI, เครื่องสังเคราะห์เสียง, soundbanks</string>
+    <string name="settings_on_screen_elements">องค์ประกอบบนหน้าจอ</string>
+    <string name="settings_on_screen_elements_description">HUD, เนื้อเพลง</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">ชุดรูปแบบ</string>
+    <string name="settings_general_theme_light">สว่าง</string>
+    <string name="settings_general_theme_dark">มืด</string>
+    <string name="settings_general_theme_system">ตามระบบ</string>
+    <string name="settings_general_locale">ภาษา</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">เต็มหน้าจอ</string>
+    <string name="settings_graphics_fullscreen_description">ใช้ทั้งหน้าจอ</string>
+    <string name="settings_graphics_resolution">ความละเอียด</string>
+    <string name="settings_graphics_resolution_fullscreen">ความละเอียดจะตรงกับจอภาพเมื่อเปิดใช้งานเต็มหน้าจอ</string>
+    <string name="settings_graphics_resolution_default">ใช้ความละเอียดมาตรฐาน</string>
+    <string name="settings_graphics_resolution_default_hint">มาตรฐาน</string>
+    <string name="settings_graphics_resolution_default_description">ความละเอียดมาตรฐานใช้พื้นที่หน้าจอส่วนใหญ่</string>
+    <string name="settings_graphics_resolution_custom">ความละเอียดที่กำหนดเอง</string>
+    <string name="settings_graphics_resolution_width">ความกว้าง</string>
+    <string name="settings_graphics_resolution_height">ความสูง</string>
+    <string name="settings_graphics_shadows">เงา</string>
+    <string name="settings_graphics_shadows_description">แสดงเงาภายใต้วัตถุ</string>
+    <string name="settings_graphics_shadows_none">ไม่มี (เทียม)</string>
+    <string name="settings_graphics_shadows_description_a">แสดงเงาแบบไดนามิก</string>
+    <string name="settings_graphics_shadows_description_hint_a">เงาแบบไดนามิกดูสวยงามกว่า แต่สามารถส่งผลต่อประสิทธิภาพ</string>
+    <string name="settings_graphics_anti_aliasing">การปรับให้เรียบขอบ</string>
+    <string name="settings_graphics_anti_aliasing_description">ทำให้ขอบของวัตถุเรียบเนียน</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">ประเภทพื้นหลัง</string>
+    <string name="settings_background_texture">พื้นผิว</string>
+    <string name="settings_background_direction_north">เหนือ</string>
+    <string name="settings_background_direction_east">ตะวันออก</string>
+    <string name="settings_background_direction_south">ใต้</string>
+    <string name="settings_background_direction_west">ตะวันตก</string>
+    <string name="settings_background_direction_up">ขึ้น</string>
+    <string name="settings_background_direction_down">ลง</string>
+    <string name="settings_background_direction_texture_template">พื้นผิว %1$s</string>
+    <string name="settings_background_type_default">มาตรฐาน</string>
+    <string name="settings_background_type_default_description">ลวดลายกระดานหมากรุกสีเข้ม</string>
+    <string name="settings_background_type_cubemap">Cube map</string>
+    <string name="settings_background_type_cubemap_description">ใช้พื้นผิวบนแต่ละผนัง</string>
+    <string name="settings_background_type_color">สี</string>
+    <string name="settings_background_type_color_description">ใช้สีทึบ</string>
+    <string name="settings_background_texture_no_options_hint">ไม่มีพื้นผิวที่ใช้งานได้</string>
+    <string name="settings_background_texture_open_folder">เปิดโฟลเดอร์พื้นผิว</string>
+    <string name="settings_background_missing_textures_repeated">ไม่ได้ตั้งค่าพื้นผิวพื้นหลัง</string>
+    <string name="settings_background_missing_textures_unique">ไม่ได้ตั้งค่าพื้นผิวพื้นหลังหนึ่งรายการขึ้นไป</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">ล็อคเคอร์เซอร์</string>
+    <string name="settings_controls_lock_cursor_description">ล็อคเคอร์เซอร์ไว้ที่หน้าต่าง</string>
+    <string name="settings_controls_disable_touch">ปิดใช้งานการป้อนข้อมูลแบบสัมผัส</string>
+    <string name="settings_controls_disable_touch_description">การสัมผัสหน้าจอเพื่อหมุน, เลื่อน, หรือซูม จะถูกละเว้น</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">ปุ่มปรับความเร็วแบบติดSticky</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">กด Ctrl และ Shift เพื่อเปลี่ยนความเร็วฟรีแคม</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">กดค้าง Ctrl และ Shift เพื่อเปลี่ยนความเร็วฟรีแคม</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">เนื้อเพลง</string>
+    <string name="settings_onscreenelements_lyrics_description">หากเพลงมีข้อมูลเนื้อเพลง ให้แสดงแบบเรียลไทม์</string>
+    <string name="settings_onscreenelements_hud">HUD ( Head-up display)</string>
+    <string name="settings_onscreenelements_hud_description">แสดงชื่อเพลงและความคืบหน้า</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">ขนาดเนื้อเพลง</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">เล็กมาก</string>
+    <string name="settings_onscreenelements_lyrics_size_small">เล็ก</string>
+    <string name="settings_onscreenelements_lyrics_size_default">มาตรฐาน</string>
+    <string name="settings_onscreenelements_lyrics_size_large">ใหญ่</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">ใหญ่มาก</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">ส่งข้อความรีเซ็ตข้อมูลจำเพาะ MIDI</string>
+    <string name="settings_playback_midi_specification_reset_description">ส่งข้อความไปยังอุปกรณ์ MIDI เพื่อรีเซ็ต</string>
+    <string name="settings_playback_synthesizer">เครื่องสังเคราะห์เสียง</string>
+    <string name="settings_playback_synthesizer_description">กำหนดค่าเครื่องสังเคราะห์เสียง MIDI</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Soundbanks</string>
+    <string name="settings_playback_soundbanks_add">เพิ่ม soundbanks</string>
+    <string name="settings_playback_soundbanks_description">นำเข้า soundbanks เพื่อใช้กับเครื่องสังเคราะห์เสียง</string>
+    <string name="settings_playback_soundbanks_none_loaded">ไม่ได้โหลด soundbanks</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">คอรัส</string>
+    <string name="settings_playback_synthesizer_chorus_description">ใช้เอฟเฟกต์คอรัส</string>
+    <string name="settings_playback_synthesizer_reverb">รีเวิร์บ</string>
+    <string name="settings_playback_synthesizer_reverb_description">ใช้เอฟเฟกต์รีเวิร์บ</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">กล้อง</string>
+    <string name="settings_camera_description">ออโต้แคม, กล้องคลาสสิก</string>
+    <string name="settings_camera_start_autocam_with_song">เริ่มออโต้แคมพร้อมเพลง</string>
+    <string name="settings_camera_start_autocam_with_song_description">เมื่อเพลงเริ่มต้น ให้เปลี่ยนไปใช้ออโต้แคมโดยอัตโนมัติ</string>
+    <string name="settings_camera_classic_autocam">ออโต้แคมคลาสสิก</string>
+    <string name="settings_camera_classic_autocam_description">จำลองการเคลื่อนไหวออโต้แคมจาก MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">ฟรีแคมแบบเรียบ</string>
+    <string name="settings_camera_smooth_freecam_description">ทำให้การเคลื่อนไหวฟรีแคมเรียบเนียนขึ้น</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">เครื่องดนตรี</string>
+    <string name="settings_instruments_description">การแสดงผลเครื่องดนตรี</string>
+    <string name="settings_instruments_always_show_instruments">แสดงเครื่องดนตรีเสมอ</string>
+    <string name="settings_instruments_always_show_instruments_description">ไม่ซ่อนเครื่องดนตรี แม้จะไม่มีโน้ตที่กำลังเล่น</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">เวอร์ชันรีมาสเตอร์ของ MIDIJam, ตัวแสดงภาพ MIDI แบบ 3D</string>
+    <string name="about_development_contributors">ผู้มีส่วนร่วมในการพัฒนา</string>
+    <string name="about_attributions_and_contributions">การอ้างอิงและผลงาน</string>
+    <string name="about_i18n_contributions">ผลงานด้านการแปลภาษา</string>
+    <string name="about_oss_licenses">ประกาศจากบุคคลที่สาม</string>
+    <string name="about_check_for_updates">ตรวจสอบการอัปเดต</string>
+    <string name="about_check_for_updates_description">ตรวจสอบอย่างรวดเร็วว่ามีเวอร์ชันใหม่หรือไม่</string>
+</resources>

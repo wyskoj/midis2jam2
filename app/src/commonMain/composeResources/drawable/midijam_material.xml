@@ -1,0 +1,60 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:viewportWidth="6.35"
+    android:viewportHeight="6.35"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:rotation="-0"
+        android:scaleX="-0.00455188"
+        android:scaleY="-0.00455188"
+        android:translateX="5.359902"
+        android:translateY="1.309686">
+        <path
+            android:pathData="M480 -120q-42 0 -71 -29 -29 -29 -29 -71 0 -42 29 -71 29 -29 71 -29 42 0 71 29 29 29 29 71 0 42 -29 71 -29 29 -71 29zm-226 -226l-84 -86q59 -59 138.5 -93.5Q388 -560 480 -560q92 0 171.5 35 79.5 35 138.5 95l-84 84q-44 -44 -102 -69 -58 -25 -124 -25 -66 0 -124 25 -58 25 -102 69zM84 -516L0 -600q92 -94 215 -147 123 -53 265 -53 142 0 265 53 123 53 215 147l-84 84Q799 -593 697.5 -636.5 596 -680 480 -680 364 -680 262.5 -636.5 161 -593 84 -516Z"
+            android:fillColor="#E3E3E3" />
+    </group>
+    <group
+        android:scaleX="0.002131"
+        android:scaleY="0.00213107"
+        android:translateX="0.598303"
+        android:translateY="2.769057">
+        <path
+            android:pathData="M400 -120q-66 0 -113 -47 -47 -47 -47 -113 0 -66 47 -113 47 -47 113 -47 23 0 42.5 5.5 19.5 5.5 37.5 16.5v-422h240v160H560v400q0 66 -47 113 -47 47 -113 47z"
+            android:fillColor="#E3E3E3" />
+    </group>
+    <group
+        android:scaleX="0.002131"
+        android:scaleY="0.00213107"
+        android:translateX="3.705937"
+        android:translateY="2.769057">
+        <path
+            android:pathData="M400 -120q-66 0 -113 -47 -47 -47 -47 -113 0 -66 47 -113 47 -47 113 -47 23 0 42.5 5.5 19.5 5.5 37.5 16.5v-422h240v160H560v400q0 66 -47 113 -47 47 -113 47z"
+            android:fillColor="#E3E3E3" />
+    </group>
+    <group
+        android:scaleX="0.00881944"
+        android:scaleY="0.00881944"
+        android:translateX="-1.058333"
+        android:translateY="7.408332">
+        <path
+            android:pathData="M200 -120q-33 0 -56.5 -23.5Q120 -167 120 -200v-560q0 -33 23.5 -56.5Q167 -840 200 -840h560q33 0 56.5 23.5 23.5 23.5 23.5 56.5v560q0 33 -23.5 56.5Q793 -120 760 -120Zm0 -80H760V-760H200Z"
+            android:fillColor="#E3E3E3" />
+    </group>
+</vector>

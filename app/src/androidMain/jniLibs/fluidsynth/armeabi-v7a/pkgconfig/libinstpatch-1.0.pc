@@ -1,0 +1,11 @@
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/libinstpatch-2
+
+Name: libInstPatch
+Description: MIDI instrument patch library
+Version: 1.1.6
+Requires: glib-2.0 gobject-2.0 gthread-2.0 sndfile
+Libs: -L${libdir} -linstpatch-1.0
+Cflags: -I${includedir}

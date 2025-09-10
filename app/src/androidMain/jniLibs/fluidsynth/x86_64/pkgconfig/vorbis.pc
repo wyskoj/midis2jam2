@@ -1,0 +1,15 @@
+# libvorbis pkg-config source file
+
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=/home/vsts/work/1/s/android-build-root/opt/android/bin
+libdir=/home/vsts/work/1/s/android-build-root/opt/android/lib
+includedir=/home/vsts/work/1/s/android-build-root/opt/android/include
+
+Name: vorbis
+Description: vorbis is the primary Ogg Vorbis library
+Version: 1.3.7
+Requires.private: ogg
+Conflicts:
+Libs: -L${libdir} -lvorbis 
+Libs.private: 
+Cflags: -I${includedir}

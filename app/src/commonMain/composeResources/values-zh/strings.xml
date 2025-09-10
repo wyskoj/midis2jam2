@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- 通用 -->
+    <string name="tab_home">主页</string>
+    <string name="tab_queue">队列</string>
+    <string name="tab_search">搜索</string>
+    <string name="tab_settings">设置</string>
+    <string name="tab_about">关于</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="back">返回</string>
+    <string name="play">播放</string>
+    <string name="enabled">已启用</string>
+    <string name="disabled">已禁用</string>
+    <string name="midi_file">MIDI 文件</string>
+    <string name="midi_device">MIDI 设备</string>
+    <string name="soundbank">音色库</string>
+    <string name="soundbank_default">默认音色库</string>
+    <string name="play_midi_file">播放 MIDI 文件</string>
+    <string name="quality_none">无</string>
+    <string name="quality_low">低</string>
+    <string name="quality_medium">中</string>
+    <string name="quality_high">高</string>
+    <string name="help">帮助</string>
+    <string name="launcher_window_title">midis2jam2 启动器</string>
+
+    <!-- 队列 -->
+    <string name="queue_add">添加到队列</string>
+    <string name="queue_clear">清空</string>
+    <string name="queue_clear_prompt">清空队列？</string>
+    <string name="queue_clear_warning">此操作无法撤销。</string>
+    <string name="queue_empty">您添加的歌曲将显示在此处。</string>
+    <string name="queue_load">加载</string>
+    <string name="queue_load_prompt">加载队列？</string>
+    <string name="queue_load_warning">这将清空当前队列。</string>
+    <string name="queue_load_missing">部分文件缺失</string>
+    <string name="queue_load_missing_help">未找到以下文件：</string>
+    <string name="queue_save">保存</string>
+    <string name="queue_save_confirmation">队列已保存。</string>
+    <string name="queue_shuffle">随机播放</string>
+
+    <!-- 搜索 -->
+    <string name="search_criteria_too_narrow">未找到匹配的 MIDI 文件。请尝试调整搜索条件。</string>
+    <string name="search_deselect_all">取消全选</string>
+    <string name="search_directory">目录</string>
+    <string name="search_index_not_available">请选择一个目录以索引 MIDI 文件。</string>
+    <string name="search_index_waiting">请稍候！我们正在索引您的 MIDI 文件…</string>
+
+    <!-- 设置 -->
+    <string name="settings_general">通用</string>
+    <string name="settings_general_description">语言、主题</string>
+    <string name="settings_graphics">图形</string>
+    <string name="settings_graphics_description">全屏、分辨率、抗锯齿</string>
+    <string name="settings_graphics_description_a">阴影</string>
+    <string name="settings_background">背景</string>
+    <string name="settings_background_description">选择图片或颜色</string>
+    <string name="settings_controls">控制</string>
+    <string name="settings_controls_description">光标锁定、速度修改键</string>
+    <string name="settings_controls_description_a">触摸输入</string>
+    <string name="settings_playback">播放</string>
+    <string name="settings_playback_description">MIDI 设备、合成器、音色库</string>
+    <string name="settings_on_screen_elements">屏幕元素</string>
+    <string name="settings_on_screen_elements_description">平视显示器、歌词</string>
+
+    <!-- 设置 / 通用 -->
+    <string name="settings_general_theme">主题</string>
+    <string name="settings_general_theme_light">浅色</string>
+    <string name="settings_general_theme_dark">深色</string>
+    <string name="settings_general_theme_system">跟随系统</string>
+    <string name="settings_general_locale">语言</string>
+
+    <!-- 设置 / 图形 -->
+    <string name="settings_graphics_fullscreen">全屏</string>
+    <string name="settings_graphics_fullscreen_description">使用整个屏幕</string>
+    <string name="settings_graphics_resolution">分辨率</string>
+    <string name="settings_graphics_resolution_fullscreen">启用全屏时，分辨率与显示器匹配</string>
+    <string name="settings_graphics_resolution_default">使用默认分辨率</string>
+    <string name="settings_graphics_resolution_default_hint">默认</string>
+    <string name="settings_graphics_resolution_default_description">默认分辨率使用大部分屏幕</string>
+    <string name="settings_graphics_resolution_custom">自定义分辨率</string>
+    <string name="settings_graphics_resolution_width">宽度</string>
+    <string name="settings_graphics_resolution_height">高度</string>
+    <string name="settings_graphics_shadows">阴影</string>
+    <string name="settings_graphics_shadows_description">渲染对象下方的阴影</string>
+    <string name="settings_graphics_shadows_none">无（模拟）</string>
+    <string name="settings_graphics_shadows_description_a">渲染动态阴影</string>
+    <string name="settings_graphics_shadows_description_hint_a">动态阴影效果更好，但可能影响性能</string>
+    <string name="settings_graphics_anti_aliasing">抗锯齿</string>
+    <string name="settings_graphics_anti_aliasing_description">平滑对象边缘</string>
+
+    <!-- 设置 / 背景 -->
+    <string name="settings_background_type">背景类型</string>
+    <string name="settings_background_texture">纹理</string>
+    <string name="settings_background_direction_north">北</string>
+    <string name="settings_background_direction_east">东</string>
+    <string name="settings_background_direction_south">南</string>
+    <string name="settings_background_direction_west">西</string>
+    <string name="settings_background_direction_up">上</string>
+    <string name="settings_background_direction_down">下</string>
+    <string name="settings_background_direction_texture_template">%1$s 纹理</string>
+    <string name="settings_background_type_default">默认</string>
+    <string name="settings_background_type_default_description">深色棋盘格图案</string>
+    <string name="settings_background_type_cubemap">立方体贴图</string>
+    <string name="settings_background_type_cubemap_description">在每个墙面使用纹理</string>
+    <string name="settings_background_type_color">颜色</string>
+    <string name="settings_background_type_color_description">使用纯色</string>
+    <string name="settings_background_texture_no_options_hint">无可用纹理。</string>
+    <string name="settings_background_texture_open_folder">打开纹理文件夹</string>
+    <string name="settings_background_missing_textures_repeated">未设置背景纹理</string>
+    <string name="settings_background_missing_textures_unique">一个或多个背景纹理未设置</string>
+
+    <!-- 设置 / 控制 -->
+    <string name="settings_controls_lock_cursor">锁定光标</string>
+    <string name="settings_controls_lock_cursor_description">将光标锁定到窗口</string>
+    <string name="settings_controls_disable_touch">禁用触摸输入</string>
+    <string name="settings_controls_disable_touch_description">忽略触摸屏幕进行环绕、平移或缩放的操作</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">粘滞速度修改键</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">按 Ctrl 和 Shift 更改自由视角速度</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">按住 Ctrl 和 Shift 更改自由视角速度</string>
+
+    <!-- 设置 / 屏幕元素 -->
+    <string name="settings_onscreenelements_lyrics">歌词</string>
+    <string name="settings_onscreenelements_lyrics_description">如果歌曲包含歌词数据，则实时显示</string>
+    <string name="settings_onscreenelements_hud">平视显示器</string>
+    <string name="settings_onscreenelements_hud_description">显示歌曲名称和进度</string>
+
+    <!-- 设置 / 屏幕元素 / 歌词 -->
+    <string name="settings_onscreenelements_lyrics_size">歌词大小</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">较小</string>
+    <string name="settings_onscreenelements_lyrics_size_small">小</string>
+    <string name="settings_onscreenelements_lyrics_size_default">默认</string>
+    <string name="settings_onscreenelements_lyrics_size_large">大</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">较大</string>
+
+    <!-- 设置 / 播放 -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">发送 MIDI 规范重置消息</string>
+    <string name="settings_playback_midi_specification_reset_description">向 MIDI 设备发送重置消息</string>
+    <string name="settings_playback_synthesizer">合成器</string>
+    <string name="settings_playback_synthesizer_description">配置 MIDI 合成器</string>
+
+    <!-- 设置 / 播放 / 音色库 -->
+    <string name="settings_playback_soundbanks">音色库</string>
+    <string name="settings_playback_soundbanks_add">添加音色库</string>
+    <string name="settings_playback_soundbanks_description">导入音色库以供合成器使用</string>
+    <string name="settings_playback_soundbanks_none_loaded">未加载任何音色库</string>
+
+    <!-- 设置 / 播放 / 合成器 -->
+    <string name="settings_playback_synthesizer_chorus">合唱</string>
+    <string name="settings_playback_synthesizer_chorus_description">使用合唱效果</string>
+    <string name="settings_playback_synthesizer_reverb">混响</string>
+    <string name="settings_playback_synthesizer_reverb_description">使用混响效果</string>
+
+    <!-- 设置 / 相机 -->
+    <string name="settings_camera">相机</string>
+    <string name="settings_camera_description">自动镜头、经典相机</string>
+    <string name="settings_camera_start_autocam_with_song">随歌曲启动自动镜头</string>
+    <string name="settings_camera_start_autocam_with_song_description">歌曲开始时自动切换到自动镜头</string>
+    <string name="settings_camera_classic_autocam">经典自动镜头</string>
+    <string name="settings_camera_classic_autocam_description">模拟 MIDIJam 中的自动镜头运动</string>
+    <string name="settings_camera_smooth_freecam">平滑自由视角</string>
+    <string name="settings_camera_smooth_freecam_description">使自由视角运动更平滑</string>
+
+    <!-- 设置 / 乐器 -->
+    <string name="settings_instruments">乐器</string>
+    <string name="settings_instruments_description">乐器可见性</string>
+    <string name="settings_instruments_always_show_instruments">始终显示乐器</string>
+    <string name="settings_instruments_always_show_instruments_description">即使没有音符播放，也从不隐藏乐器</string>
+
+    <!-- 关于 -->
+    <string name="about_midis2jam2_description">MIDIJam 的重制版，一款 3D MIDI 文件可视化工具。</string>
+    <string name="about_development_contributors">开发贡献者</string>
+    <string name="about_attributions_and_contributions">署名与贡献</string>
+    <string name="about_i18n_contributions">国际化贡献</string>
+    <string name="about_oss_licenses">第三方声明</string>
+    <string name="about_check_for_updates">检查更新</string>
+    <string name="about_check_for_updates_description">快速检查是否有新版本可用</string>
+</resources>

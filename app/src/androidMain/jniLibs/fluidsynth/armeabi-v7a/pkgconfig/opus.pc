@@ -1,0 +1,16 @@
+# Opus codec reference implementation pkg-config file
+
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=/home/vsts/work/1/s/android-build-root/opt/android
+libdir=/home/vsts/work/1/s/android-build-root/opt/android/lib
+includedir=/home/vsts/work/1/s/android-build-root/opt/android/include
+
+Name: Opus
+Description: Opus IETF audio codec ( build)
+URL: https://opus-codec.org/
+Version: 0
+Requires:
+Conflicts:
+Libs: -L/home/vsts/work/1/s/android-build-root/opt/android/lib -lopus
+Libs.private: -lm
+Cflags: -I/home/vsts/work/1/s/android-build-root/opt/android/include/opus

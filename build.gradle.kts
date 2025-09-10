@@ -1,154 +1,28 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
+/*
+ * Copyright (C) 2025 Jacob Wysko
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see https://www.gnu.org/licenses/.
+ */
 
 plugins {
-    application
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.compose.kotlin)
-    alias(libs.plugins.detekt)
-    alias(libs.plugins.shadow)
-    alias(libs.plugins.licenseReport)
-    alias(libs.plugins.dependencyAnalysis)
-    alias(libs.plugins.versions)
-}
-
-repositories {
-    mavenCentral()
-    maven(url = "https://maven.ej-technologies.com/repository")
-    maven(url = "https://repo.spongepowered.org/repository/maven-public")
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    google()
-}
-
-application {
-    mainClass.set("org.wysko.midis2jam2.MainKt")
-}
-
-kotlin {
-    jvmToolchain(21)
-}
-
-tasks.withType<KotlinCompile> {
-    compilerOptions {
-        freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn", "-Xcontext-receivers")
-    }
-}
-
-tasks.processResources {
-    dependsOn(tasks.getByName("downloadLicenses"))
-    doFirst {
-        val gitHash = System.getenv("GIT_HASH")
-        val buildTime = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now())
-        File(projectDir, "src/main/resources/build.txt").writeText("$buildTime${gitHash?.let { " $it" } ?: ""}")
-        println("Build time: $buildTime")
-
-        copy {
-            from("build/reports/license/dependency-license.json")
-            into("src/main/resources")
-        }
-
-        val midis2jam2Version: String by project
-        File(projectDir, "src/main/resources/version.txt").writeText(midis2jam2Version)
-    }
-}
-
-dependencies {
-    // JMonkeyEngine
-    implementation(libs.bundles.jme3)
-
-    // Compose Multiplatform
-    if (project.ext.has("targetplatform")) {
-        when (project.ext["targetplatform"]) {
-            "windows" -> {
-                implementation(compose.desktop.windows_x64)
-                implementation(libs.jme3.lwjgl3)
-            }
-
-            "macos_x64" -> {
-                implementation(compose.desktop.macos_x64)
-                implementation(libs.jme3.lwjgl)
-            }
-
-            "macos_arm64" -> {
-                implementation(compose.desktop.macos_arm64)
-                implementation(libs.jme3.lwjgl)
-            }
-
-            "linux_x64" -> {
-                implementation(compose.desktop.linux_x64)
-                implementation(libs.jme3.lwjgl3)
-            }
-
-            "linux_arm64" -> {
-                implementation(compose.desktop.linux_arm64)
-                implementation(libs.jme3.lwjgl3)
-            }
-
-            else -> {
-                println("Unknown target platform: ${project.properties["targetplatform"]}, reverting to default")
-                implementation(compose.desktop.currentOs)
-                implementation(libs.jme3.lwjgl3)
-            }
-        }
-        println("used platform: ${project.properties["targetplatform"]}")
-    } else {
-        println("used platform: current")
-        implementation(compose.desktop.currentOs)
-        implementation(libs.jme3.lwjgl3)
-    }
-    implementation(compose.material3)
-    implementation(compose.components.resources)
-    implementation(libs.filekit)
-    implementation(libs.install4j.runtime)
-    implementation(libs.noise)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlin.reflect)
-    implementation(libs.logback.classic)
-    implementation(libs.kmidi)
-    implementation(libs.reorderable)
-    implementation(files("libs/Gervill-0.2.31.jar", "libs/jme-ttf-2.2.2.jar"))
-}
-
-tasks.withType<ShadowJar> {
-    archiveFileName.set(
-        "midis2jam2-${
-            if (project.hasProperty("targetplatform")) {
-                when (project.properties["targetplatform"]) {
-                    "windows" -> "windows"
-                    "macos_x64" -> "macos_x64"
-                    "macos_arm64" -> "macos_arm64"
-                    "linux_x64" -> "linux_x64"
-                    "linux_arm64" -> "linux_arm64"
-                    else -> {
-                        println(
-                            "Unknown target platform: ${project.properties["targetplatform"]}, reverting to default",
-                        )
-                        "current"
-                    }
-                }
-            } else {
-                "current"
-            }
-        }-${project.properties["midis2jam2Version"]}.jar",
-    )
-}
-
-detekt { config.setFrom(files("detekt-config.yml")) }
-
-downloadLicenses {
-    includeProjectDependencies = true
-    dependencyConfiguration = "compileClasspath"
-}
-
-compose.resources {
-    customDirectory(
-        sourceSetName = "main",
-        directoryProvider = provider { layout.projectDirectory.dir("src/main/resources/composeResources") },
-    )
+    // this is necessary to avoid the plugins to be loaded multiple times
+    // in each subproject's classloader
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.composeMultiplatform) apply false
+    alias(libs.plugins.composeCompiler) apply false
+    alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.licenseReport) apply false
 }

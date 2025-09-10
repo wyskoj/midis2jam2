@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">Inicio</string>
+    <string name="tab_queue">Cola</string>
+    <string name="tab_search">Buscar</string>
+    <string name="tab_settings">Ajustes</string>
+    <string name="tab_about">Acerca de</string>
+    <string name="ok">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="back">Atrás</string>
+    <string name="play">Reproducir</string>
+    <string name="enabled">Activado</string>
+    <string name="disabled">Desactivado</string>
+    <string name="midi_file">Archivo MIDI</string>
+    <string name="midi_device">Dispositivo MIDI</string>
+    <string name="soundbank">Banco de sonidos</string>
+    <string name="soundbank_default">Banco de sonidos predeterminado</string>
+    <string name="play_midi_file">Reproducir archivo MIDI</string>
+    <string name="quality_none">Ninguna</string>
+    <string name="quality_low">Baja</string>
+    <string name="quality_medium">Media</string>
+    <string name="quality_high">Alta</string>
+    <string name="help">Ayuda</string>
+    <string name="launcher_window_title">Lanzador de midis2jam2</string>
+
+    <!-- Queue -->
+    <string name="queue_add">Añadir a la cola</string>
+    <string name="queue_clear">Limpiar</string>
+    <string name="queue_clear_prompt">¿Limpiar la cola?</string>
+    <string name="queue_clear_warning">Esta operación no se puede deshacer.</string>
+    <string name="queue_empty">Las canciones que añadas aparecerán aquí.</string>
+    <string name="queue_load">Cargar</string>
+    <string name="queue_load_prompt">¿Cargar cola?</string>
+    <string name="queue_load_warning">Esto limpiará la cola actual.</string>
+    <string name="queue_load_missing">Faltan algunos archivos</string>
+    <string name="queue_load_missing_help">No se encontraron los siguientes archivos:</string>
+    <string name="queue_save">Guardar</string>
+    <string name="queue_save_confirmation">Cola guardada.</string>
+    <string name="queue_shuffle">Mezclar</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">No se encontraron archivos MIDI que coincidan. Intenta ajustar los criterios.</string>
+    <string name="search_deselect_all">Deseleccionar todo</string>
+    <string name="search_directory">Directorio</string>
+    <string name="search_index_not_available">Selecciona un directorio para indexar archivos MIDI.</string>
+    <string name="search_index_waiting">¡Espera! Estamos indexando tus archivos MIDI...</string>
+
+    <!-- Settings -->
+    <string name="settings_general">General</string>
+    <string name="settings_general_description">Idioma, tema</string>
+    <string name="settings_graphics">Gráficos</string>
+    <string name="settings_graphics_description">Pantalla completa, resolución, anti-aliasing</string>
+    <string name="settings_graphics_description_a">Sombras</string>
+    <string name="settings_background">Fondo</string>
+    <string name="settings_background_description">Elige una imagen o color</string>
+    <string name="settings_controls">Controles</string>
+    <string name="settings_controls_description">Bloqueo del cursor, teclas modificadoras de velocidad</string>
+    <string name="settings_controls_description_a">Entrada táctil</string>
+    <string name="settings_playback">Reproducción</string>
+    <string name="settings_playback_description">Dispositivo MIDI, sintetizador, bancos de sonidos</string>
+    <string name="settings_on_screen_elements">Elementos en pantalla</string>
+    <string name="settings_on_screen_elements_description">HUD (información en pantalla), letras</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">Tema</string>
+    <string name="settings_general_theme_light">Claro</string>
+    <string name="settings_general_theme_dark">Oscuro</string>
+    <string name="settings_general_theme_system">Seguir sistema</string>
+    <string name="settings_general_locale">Idioma</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">Pantalla completa</string>
+    <string name="settings_graphics_fullscreen_description">Usar toda la pantalla</string>
+    <string name="settings_graphics_resolution">Resolución</string>
+    <string name="settings_graphics_resolution_fullscreen">La resolución coincide con el monitor cuando la pantalla completa está activada</string>
+    <string name="settings_graphics_resolution_default">Usar resolución predeterminada</string>
+    <string name="settings_graphics_resolution_default_hint">Predeterminada</string>
+    <string name="settings_graphics_resolution_default_description">La resolución predeterminada usa la mayor parte de la pantalla</string>
+    <string name="settings_graphics_resolution_custom">Resolución personalizada</string>
+    <string name="settings_graphics_resolution_width">Ancho</string>
+    <string name="settings_graphics_resolution_height">Alto</string>
+    <string name="settings_graphics_shadows">Sombras</string>
+    <string name="settings_graphics_shadows_description">Renderizar sombras bajo los objetos</string>
+    <string name="settings_graphics_shadows_none">Ninguna (falsa)</string>
+    <string name="settings_graphics_shadows_description_a">Renderizar sombras dinámicas</string>
+    <string name="settings_graphics_shadows_description_hint_a">Las sombras dinámicas se ven mejor, pero pueden afectar el rendimiento</string>
+    <string name="settings_graphics_anti_aliasing">Anti-aliasing</string>
+    <string name="settings_graphics_anti_aliasing_description">Suavizar bordes de objetos</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">Tipo de fondo</string>
+    <string name="settings_background_texture">Textura</string>
+    <string name="settings_background_direction_north">Norte</string>
+    <string name="settings_background_direction_east">Este</string>
+    <string name="settings_background_direction_south">Sur</string>
+    <string name="settings_background_direction_west">Oeste</string>
+    <string name="settings_background_direction_up">Arriba</string>
+    <string name="settings_background_direction_down">Abajo</string>
+    <string name="settings_background_direction_texture_template">Textura %1$s</string>
+    <string name="settings_background_type_default">Predeterminado</string>
+    <string name="settings_background_type_default_description">Patrón de cuadros oscuros</string>
+    <string name="settings_background_type_cubemap">Mapa cúbico</string>
+    <string name="settings_background_type_cubemap_description">Usar una textura en cada pared</string>
+    <string name="settings_background_type_color">Color</string>
+    <string name="settings_background_type_color_description">Usar un color sólido</string>
+    <string name="settings_background_texture_no_options_hint">No hay texturas disponibles.</string>
+    <string name="settings_background_texture_open_folder">Abrir carpeta de texturas</string>
+    <string name="settings_background_missing_textures_repeated">La textura de fondo no está establecida</string>
+    <string name="settings_background_missing_textures_unique">Una o más texturas de fondo no están establecidas</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">Bloquear cursor</string>
+    <string name="settings_controls_lock_cursor_description">Bloquear el cursor a la ventana</string>
+    <string name="settings_controls_disable_touch">Desactivar entrada táctil</string>
+    <string name="settings_controls_disable_touch_description">Se ignoran los toques en la pantalla para orbitar, panear o zoom</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Teclas modificadoras de velocidad persistentes</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Pulsa Ctrl y Mayús para cambiar la velocidad de la cámara libre</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Mantén pulsado Ctrl y Mayús para cambiar la velocidad de la cámara libre</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">Letras</string>
+    <string name="settings_onscreenelements_lyrics_description">Si la canción contiene datos de letras, mostrarlas en tiempo real</string>
+    <string name="settings_onscreenelements_hud">HUD (Información en pantalla)</string>
+    <string name="settings_onscreenelements_hud_description">Mostrar nombre y progreso de la canción</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">Tamaño de letras</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Más pequeño</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Pequeño</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Predeterminado</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Grande</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Más grande</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Enviar mensaje de reinicio de especificación MIDI</string>
+    <string name="settings_playback_midi_specification_reset_description">Enviar un mensaje al dispositivo MIDI para reiniciarlo</string>
+    <string name="settings_playback_synthesizer">Sintetizador</string>
+    <string name="settings_playback_synthesizer_description">Configurar el sintetizador MIDI</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Bancos de sonidos</string>
+    <string name="settings_playback_soundbanks_add">Añadir bancos de sonidos</string>
+    <string name="settings_playback_soundbanks_description">Importar bancos de sonidos para usar con el sintetizador</string>
+    <string name="settings_playback_soundbanks_none_loaded">No hay bancos de sonidos cargados</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">Coro</string>
+    <string name="settings_playback_synthesizer_chorus_description">Usar efecto de coro</string>
+    <string name="settings_playback_synthesizer_reverb">Reverberación</string>
+    <string name="settings_playback_synthesizer_reverb_description">Usar efecto de reverberación</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">Cámara</string>
+    <string name="settings_camera_description">Cámara automática, cámara clásica</string>
+    <string name="settings_camera_start_autocam_with_song">Iniciar cámara automática con la canción</string>
+    <string name="settings_camera_start_autocam_with_song_description">Cuando la canción comienza, cambiar automáticamente a cámara automática</string>
+    <string name="settings_camera_classic_autocam">Cámara automática clásica</string>
+    <string name="settings_camera_classic_autocam_description">Simular movimiento de cámara automática de MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Cámara libre suavizada</string>
+    <string name="settings_camera_smooth_freecam_description">Hacer el movimiento de la cámara libre más suave</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">Instrumentos</string>
+    <string name="settings_instruments_description">Visibilidad de instrumentos</string>
+    <string name="settings_instruments_always_show_instruments">Mostrar instrumentos siempre</string>
+    <string name="settings_instruments_always_show_instruments_description">Nunca ocultar instrumentos, incluso cuando no se reproducen notas</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">Una versión remasterizada de MIDIJam, un visualizador 3D de archivos MIDI.</string>
+    <string name="about_development_contributors">Colaboradores de desarrollo</string>
+    <string name="about_attributions_and_contributions">Atribuciones y contribuciones</string>
+    <string name="about_i18n_contributions">Contribuciones de internacionalización</string>
+    <string name="about_oss_licenses">Avisos de terceros</string>
+    <string name="about_check_for_updates">Verificar actualizaciones</string>
+    <string name="about_check_for_updates_description">Verificar rápidamente si hay una nueva versión disponible</string>
+</resources>

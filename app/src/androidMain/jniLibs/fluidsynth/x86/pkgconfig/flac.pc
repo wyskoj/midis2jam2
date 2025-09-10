@@ -1,0 +1,12 @@
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=/home/vsts/work/1/s/android-build-root/opt/android
+libdir=/home/vsts/work/1/s/android-build-root/opt/android/lib
+includedir=/home/vsts/work/1/s/android-build-root/opt/android/include
+
+Name: FLAC
+Description: Free Lossless Audio Codec Library
+Version: 1.4.3
+Requires.private: ogg
+Libs: -L${libdir} -lFLAC
+Libs.private: -lm
+Cflags: -I${includedir}

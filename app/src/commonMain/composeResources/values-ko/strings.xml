@@ -1,0 +1,194 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">홈</string>
+    <string name="tab_queue">대기열</string>
+    <string name="tab_search">검색</string>
+    <string name="tab_settings">설정</string>
+    <string name="tab_about">정보</string>
+    <string name="ok">확인</string>
+    <string name="cancel">취소</string>
+    <string name="back">뒤로</string>
+    <string name="play">재생</string>
+    <string name="enabled">사용</string>
+    <string name="disabled">사용 안 함</string>
+    <string name="midi_file">MIDI 파일</string>
+    <string name="midi_device">MIDI 장치</string>
+    <string name="soundbank">사운드뱅크</string>
+    <string name="soundbank_default">기본 사운드뱅크</string>
+    <string name="play_midi_file">MIDI 파일 재생</string>
+    <string name="quality_none">없음</string>
+    <string name="quality_low">낮음</string>
+    <string name="quality_medium">중간</string>
+    <string name="quality_high">높음</string>
+    <string name="help">도움말</string>
+    <string name="launcher_window_title">midis2jam2 실행기</string>
+
+    <!-- Queue -->
+    <string name="queue_add">대기열에 추가</string>
+    <string name="queue_clear">지우기</string>
+    <string name="queue_clear_prompt">대기열을 지우시겠습니까?</string>
+    <string name="queue_clear_warning">이 작업은 취소할 수 없습니다.</string>
+    <string name="queue_empty">추가한 노래가 여기에 표시됩니다.</string>
+    <string name="queue_load">불러오기</string>
+    <string name="queue_load_prompt">대기열을 불러오시겠습니까?</string>
+    <string name="queue_load_warning">현재 대기열이 지워집니다.</string>
+    <string name="queue_load_missing">일부 파일을 찾을 수 없음</string>
+    <string name="queue_load_missing_help">다음 파일을 찾을 수 없습니다:</string>
+    <string name="queue_save">저장</string>
+    <string name="queue_save_confirmation">대기열이 저장되었습니다.</string>
+    <string name="queue_shuffle">셔플</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">일치하는 MIDI 파일이 없습니다. 조건을 조정해 보세요.</string>
+    <string name="search_deselect_all">모두 선택 해제</string>
+    <string name="search_directory">디렉토리</string>
+    <string name="search_index_not_available">MIDI 파일을 색인화할 디렉토리를 선택하세요.</string>
+    <string name="search_index_waiting">잠시만 기다려 주세요! MIDI 파일을 색인화하는 중입니다...</string>
+
+    <!-- Settings -->
+    <string name="settings_general">일반</string>
+    <string name="settings_general_description">언어, 테마</string>
+    <string name="settings_graphics">그래픽</string>
+    <string name="settings_graphics_description">전체 화면, 해상도, 안티앨리어싱</string>
+    <string name="settings_graphics_description_a">그림자</string>
+    <string name="settings_background">배경</string>
+    <string name="settings_background_description">사진 또는 색상 선택</string>
+    <string name="settings_controls">조작</string>
+    <string name="settings_controls_description">커서 잠금, 속도 변경 키</string>
+    <string name="settings_controls_description_a">터치 입력</string>
+    <string name="settings_playback">재생</string>
+    <string name="settings_playback_description">MIDI 장치, 신디사이저, 사운드뱅크</string>
+    <string name="settings_on_screen_elements">화면 요소</string>
+    <string name="settings_on_screen_elements_description">헤드업 디스플레이, 가사</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">테마</string>
+    <string name="settings_general_theme_light">라이트</string>
+    <string name="settings_general_theme_dark">다크</string>
+    <string name="settings_general_theme_system">시스템 따라가기</string>
+    <string name="settings_general_locale">언어</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">전체 화면</string>
+    <string name="settings_graphics_fullscreen_description">전체 화면 사용</string>
+    <string name="settings_graphics_resolution">해상도</string>
+    <string name="settings_graphics_resolution_fullscreen">전체 화면 사용 시 해상도는 모니터에 맞춰집니다</string>
+    <string name="settings_graphics_resolution_default">기본 해상도 사용</string>
+    <string name="settings_graphics_resolution_default_hint">기본값</string>
+    <string name="settings_graphics_resolution_default_description">기본 해상도는 화면의 대부분을 사용합니다</string>
+    <string name="settings_graphics_resolution_custom">사용자 지정 해상도</string>
+    <string name="settings_graphics_resolution_width">너비</string>
+    <string name="settings_graphics_resolution_height">높이</string>
+    <string name="settings_graphics_shadows">그림자</string>
+    <string name="settings_graphics_shadows_description">객체 아래에 그림자 렌더링</string>
+    <string name="settings_graphics_shadows_none">없음 (가짜)</string>
+    <string name="settings_graphics_shadows_description_a">동적 그림자 렌더링</string>
+    <string name="settings_graphics_shadows_description_hint_a">동적 그림자는 더 보기 좋지만 성능에 영향을 줄 수 있습니다</string>
+    <string name="settings_graphics_anti_aliasing">안티앨리어싱</string>
+    <string name="settings_graphics_anti_aliasing_description">객체의 가장자리를 부드럽게</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">배경 유형</string>
+    <string name="settings_background_texture">텍스처</string>
+    <string name="settings_background_direction_north">북쪽</string>
+    <string name="settings_background_direction_east">동쪽</string>
+    <string name="settings_background_direction_south">남쪽</string>
+    <string name="settings_background_direction_west">서쪽</string>
+    <string name="settings_background_direction_up">위</string>
+    <string name="settings_background_direction_down">아래</string>
+    <string name="settings_background_direction_texture_template">%1$s 텍스처</string>
+    <string name="settings_background_type_default">기본값</string>
+    <string name="settings_background_type_default_description">어두운 체크무늬 패턴</string>
+    <string name="settings_background_type_cubemap">큐브맵</string>
+    <string name="settings_background_type_cubemap_description">각 벽에 텍스처 사용</string>
+    <string name="settings_background_type_color">색상</string>
+    <string name="settings_background_type_color_description">단색 사용</string>
+    <string name="settings_background_texture_no_options_hint">사용 가능한 텍스처가 없습니다.</string>
+    <string name="settings_background_texture_open_folder">텍스처 폴더 열기</string>
+    <string name="settings_background_missing_textures_repeated">배경 텍스처가 설정되지 않음</string>
+    <string name="settings_background_missing_textures_unique">하나 이상의 배경 텍스처가 설정되지 않음</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">커서 잠금</string>
+    <string name="settings_controls_lock_cursor_description">커서를 창에 고정</string>
+    <string name="settings_controls_disable_touch">터치 입력 비활성화</string>
+    <string name="settings_controls_disable_touch_description">화면을 터치하여 회전, 이동, 확대/축소하는 동작이 무시됨</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">고정 속도 변경 키</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Ctrl과 Shift를 눌러 자유 시점 카메라 속도 변경</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Ctrl과 Shift를 누르고 있어야 자유 시점 카메라 속도 변경</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">가사</string>
+    <string name="settings_onscreenelements_lyrics_description">노래에 가사 데이터가 포함된 경우 실시간으로 표시</string>
+    <string name="settings_onscreenelements_hud">헤드업 디스플레이(HUD)</string>
+    <string name="settings_onscreenelements_hud_description">노래 이름과 진행 상황 표시</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">가사 크기</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">더 작게</string>
+    <string name="settings_onscreenelements_lyrics_size_small">작게</string>
+    <string name="settings_onscreenelements_lyrics_size_default">기본값</string>
+    <string name="settings_onscreenelements_lyrics_size_large">크게</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">더 크게</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">MIDI 규격 재설정 메시지 전송</string>
+    <string name="settings_playback_midi_specification_reset_description">MIDI 장치를 재설정하는 메시지 전송</string>
+    <string name="settings_playback_synthesizer">신디사이저</string>
+    <string name="settings_playback_synthesizer_description">MIDI 신디사이저 구성</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">사운드뱅크</string>
+    <string name="settings_playback_soundbanks_add">사운드뱅크 추가</string>
+    <string name="settings_playback_soundbanks_description">신디사이저와 함께 사용할 사운드뱅크 가져오기</string>
+    <string name="settings_playback_soundbanks_none_loaded">로드된 사운드뱅크 없음</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">코러스</string>
+    <string name="settings_playback_synthesizer_chorus_description">코러스 효과 사용</string>
+    <string name="settings_playback_synthesizer_reverb">리버브</string>
+    <string name="settings_playback_synthesizer_reverb_description">리버브 효과 사용</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">카메라</string>
+    <string name="settings_camera_description">자동 카메라, 클래식 카메라</string>
+    <string name="settings_camera_start_autocam_with_song">노래 시작 시 자동 카메라 시작</string>
+    <string name="settings_camera_start_autocam_with_song_description">노래가 시작되면 자동으로 자동 카메라로 전환</string>
+    <string name="settings_camera_classic_autocam">클래식 자동 카메라</string>
+    <string name="settings_camera_classic_autocam_description">MIDIJam의 자동 카메라 움직임 시뮬레이션</string>
+    <string name="settings_camera_smooth_freecam">부드러운 자유 시점 카메라</string>
+    <string name="settings_camera_smooth_freecam_description">자유 시점 카메라 이동을 더 부드럽게</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">악기</string>
+    <string name="settings_instruments_description">악기 표시 여부</string>
+    <string name="settings_instruments_always_show_instruments">항상 악기 표시</string>
+    <string name="settings_instruments_always_show_instruments_description">음표가 재생되지 않을 때도 악기를 숨기지 않음</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">3D MIDI 파일 시각화 프로그램인 MIDIJam의 리마스터 버전입니다.</string>
+    <string name="about_development_contributors">개발 기여자</string>
+    <string name="about_attributions_and_contributions">저작권 및 기여</string>
+    <string name="about_i18n_contributions">국제화(i18n) 기여</string>
+    <string name="about_oss_licenses">서드파티 공지사항</string>
+    <string name="about_check_for_updates">업데이트 확인</string>
+    <string name="about_check_for_updates_description">새 버전이 사용 가능한지 빠르게 확인</string>
+</resources>

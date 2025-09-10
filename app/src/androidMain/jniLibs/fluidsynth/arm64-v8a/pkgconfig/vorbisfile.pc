@@ -1,0 +1,14 @@
+# libvorbisfile pkg-config source file
+
+prefix=/home/vsts/work/1/s/android-build-root/opt/android
+exec_prefix=/home/vsts/work/1/s/android-build-root/opt/android/bin
+libdir=/home/vsts/work/1/s/android-build-root/opt/android/lib
+includedir=/home/vsts/work/1/s/android-build-root/opt/android/include
+
+Name: vorbisfile
+Description: vorbisfile is a library that provides a convenient high-level API for decoding and basic manipulation of all Vorbis I audio streams
+Version: 1.3.7
+Requires.private: vorbis
+Conflicts:
+Libs: -L${libdir} -lvorbisfile
+Cflags: -I${includedir}
