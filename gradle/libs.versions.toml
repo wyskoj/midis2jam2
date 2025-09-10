@@ -9,6 +9,7 @@ androidxComposeBom = "2025.06.01"
 colorpicker = "1.1.2"
 composeHotReload = "1.0.0-alpha11"
 composeMultiplatform = "1.8.2"
+install4j = "11.0.5"
 jme3 = "3.6.1-stable"
 koin-bom = "4.1.0"
 kotlin = "2.2.0"
@@ -60,6 +61,7 @@ kmidi = { group = "org.wysko", name = "kmidi", version = "0.1.2" }
 
 # System
 multiplatformSettings = { group = "com.russhwolf", name = "multiplatform-settings", version = "1.3.0" }
+install4j-runtime = { group = "com.install4j", name = "install4j-runtime", version.ref = "install4j" }
 
 # Misc.
 noise = { group = "org.spongepowered", name = "noise", version = "2.0.0-SNAPSHOT" }

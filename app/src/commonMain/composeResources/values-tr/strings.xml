@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Atıflar ve katkılar</string>
     <string name="about_i18n_contributions">Uluslararasılaştırma katkıları</string>
     <string name="about_oss_licenses">Üçüncü taraf bildirimleri</string>
+    <string name="about_check_for_updates">Güncellemeleri kontrol et</string>
+    <string name="about_check_for_updates_description">Yeni bir sürümün mevcut olup olmadığını hızlıca kontrol et</string>
 </resources>

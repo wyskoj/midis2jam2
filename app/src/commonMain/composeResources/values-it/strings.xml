@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Attribuzioni e contributi</string>
     <string name="about_i18n_contributions">Contributi internazionalizzazione</string>
     <string name="about_oss_licenses">Notizie di terze parti</string>
+    <string name="about_check_for_updates">Controlla aggiornamenti</string>
+    <string name="about_check_for_updates_description">Controlla rapidamente se è disponibile una nuova versione</string>
 </resources>

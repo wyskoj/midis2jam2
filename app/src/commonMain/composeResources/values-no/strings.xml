@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Navngivelse og bidrag</string>
     <string name="about_i18n_contributions">Internasjonaliseringsbidrag</string>
     <string name="about_oss_licenses">Tredjepartsnotiser</string>
+    <string name="about_check_for_updates">Sjekk for oppdateringer</string>
+    <string name="about_check_for_updates_description">Sjekk raskt om det er en ny versjon tilgjengelig</string>
 </resources>

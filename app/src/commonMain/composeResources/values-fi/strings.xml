@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Maininnat ja panokset</string>
     <string name="about_i18n_contributions">Kansainvälisyyspanokset</string>
     <string name="about_oss_licenses">Kolmannen osapuolen huomautukset</string>
+    <string name="about_check_for_updates">Tarkista päivitykset</string>
+    <string name="about_check_for_updates_description">Tarkista nopeasti, onko uusi versio saatavilla</string>
 </resources>

@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">การอ้างอิงและผลงาน</string>
     <string name="about_i18n_contributions">ผลงานด้านการแปลภาษา</string>
     <string name="about_oss_licenses">ประกาศจากบุคคลที่สาม</string>
+    <string name="about_check_for_updates">ตรวจสอบการอัปเดต</string>
+    <string name="about_check_for_updates_description">ตรวจสอบอย่างรวดเร็วว่ามีเวอร์ชันใหม่หรือไม่</string>
 </resources>

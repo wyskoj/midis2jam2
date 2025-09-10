@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Mga pagpapatunay at kontribusyon</string>
     <string name="about_i18n_contributions">Mga kontribusyon sa internasyonalisasyon</string>
     <string name="about_oss_licenses">Mga paunawa mula sa third-party</string>
+    <string name="about_check_for_updates">Tingnan ang mga update</string>
+    <string name="about_check_for_updates_description">Mabilis na tingnan kung may bagong bersyon na available</string>
 </resources>

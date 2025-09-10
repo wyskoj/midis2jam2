@@ -172,4 +172,6 @@
     <string name="about_attributions_and_contributions">आवंटन और योगदान</string>
     <string name="about_i18n_contributions">अंतर्राष्ट्रीयकरण योगदान</string>
     <string name="about_oss_licenses">तृतीय-पक्ष नोटिस</string>
+    <string name="about_check_for_updates">अपडेट जांचें</string>
+    <string name="about_check_for_updates_description">जल्दी जांचें कि कोई नया संस्करण उपलब्ध है या नहीं</string>
 </resources>

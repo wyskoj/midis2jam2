@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Atribuciones y contribuciones</string>
     <string name="about_i18n_contributions">Contribuciones de internacionalización</string>
     <string name="about_oss_licenses">Avisos de terceros</string>
+    <string name="about_check_for_updates">Verificar actualizaciones</string>
+    <string name="about_check_for_updates_description">Verificar rápidamente si hay una nueva versión disponible</string>
 </resources>

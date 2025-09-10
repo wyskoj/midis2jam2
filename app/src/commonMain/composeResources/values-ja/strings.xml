@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">表示および貢献</string>
     <string name="about_i18n_contributions">国際化（i18n）貢献</string>
     <string name="about_oss_licenses">サードパーティ通知</string>
+    <string name="about_check_for_updates">アップデートを確認</string>
+    <string name="about_check_for_updates_description">新しいバージョンが利用可能かどうかを素早く確認</string>
 </resources>

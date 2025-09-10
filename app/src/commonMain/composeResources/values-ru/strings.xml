@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Атрибуции и вклады</string>
     <string name="about_i18n_contributions">Участники локализации</string>
     <string name="about_oss_licenses">Сторонние уведомления</string>
+    <string name="about_check_for_updates">Проверить обновления</string>
+    <string name="about_check_for_updates_description">Быстро проверить, доступна ли новая версия</string>
 </resources>

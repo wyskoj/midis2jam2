@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">Namensnennungen und Beiträge</string>
     <string name="about_i18n_contributions">Internationalisierungsbeiträge</string>
     <string name="about_oss_licenses">Drittanbieterhinweise</string>
+    <string name="about_check_for_updates">Nach Updates suchen</string>
+    <string name="about_check_for_updates_description">Schnell prüfen, ob eine neue Version verfügbar ist</string>
 </resources>

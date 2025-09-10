@@ -172,4 +172,6 @@
     <string name="about_attributions_and_contributions">Attributions and contributions</string>
     <string name="about_i18n_contributions">Internationalization contributions</string>
     <string name="about_oss_licenses">Third-party notices</string>
+    <string name="about_check_for_updates">Check for updates</string>
+    <string name="about_check_for_updates_description">Quickly check if there is a new version available</string>
 </resources>

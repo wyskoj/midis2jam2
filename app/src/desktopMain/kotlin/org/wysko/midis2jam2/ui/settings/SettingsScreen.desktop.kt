@@ -50,11 +50,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.install4j.api.launcher.ApplicationLauncher
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.about_check_for_updates
+import midis2jam2.app.generated.resources.about_check_for_updates_description
 import midis2jam2.app.generated.resources.audio_file
 import midis2jam2.app.generated.resources.close
 import midis2jam2.app.generated.resources.computer
@@ -109,6 +112,7 @@ import midis2jam2.app.generated.resources.settings_playback_soundbanks_none_load
 import midis2jam2.app.generated.resources.settings_playback_synthesizer
 import midis2jam2.app.generated.resources.star
 import midis2jam2.app.generated.resources.tonality
+import midis2jam2.app.generated.resources.update
 import midis2jam2.app.generated.resources.video_stable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -173,6 +177,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
             model::setLocale,
             screenModel.getAvailableLocales()
         )
+    }
+    item {
+        CheckForUpdates()
     }
     item { // stickyHeader
         CategoryHeader(stringResource(Res.string.settings_graphics))
@@ -353,6 +360,23 @@ private fun LazyListScope.windowSettings(settings: State<AppSettings>, model: Se
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CheckForUpdates() {
+    UnitRow(
+        title = { Text(stringResource(Res.string.about_check_for_updates)) },
+        label = { Text(stringResource(Res.string.about_check_for_updates_description)) },
+        icon = Res.drawable.update,
+    ) {
+        ApplicationLauncher.launchApplicationInProcess(
+            "351",
+            null,
+            null,
+            ApplicationLauncher.WindowMode.FRAME,
+            null
+        )
     }
 }
 

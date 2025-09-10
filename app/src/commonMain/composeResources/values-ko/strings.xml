@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">저작권 및 기여</string>
     <string name="about_i18n_contributions">국제화(i18n) 기여</string>
     <string name="about_oss_licenses">서드파티 공지사항</string>
+    <string name="about_check_for_updates">업데이트 확인</string>
+    <string name="about_check_for_updates_description">새 버전이 사용 가능한지 빠르게 확인</string>
 </resources>

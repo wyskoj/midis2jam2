@@ -189,4 +189,6 @@
     <string name="about_attributions_and_contributions">署名与贡献</string>
     <string name="about_i18n_contributions">国际化贡献</string>
     <string name="about_oss_licenses">第三方声明</string>
+    <string name="about_check_for_updates">检查更新</string>
+    <string name="about_check_for_updates_description">快速检查是否有新版本可用</string>
 </resources>
