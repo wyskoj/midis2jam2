@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.install4j.api.launcher.SplashScreen
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.midis2jam2_icon
 import org.jetbrains.compose.resources.painterResource
@@ -17,22 +18,33 @@ import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.ui.centerWindow
 import org.wysko.midis2jam2.util.openHelpOnF1
 
-fun main(): Unit = application {
+fun main(args: Array<String>): Unit = application {
+    SplashScreen.writeMessage("Starting midis2jam2...")
     startKoin {
         modules(applicationModule, midiSystemModule, systemModule, uiModule)
     }
 
-    val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
-    val systemInteractionService = koinInject<SystemInteractionService>()
+    when {
+        args.isNotEmpty() -> {
+            SplashScreen.writeMessage("Launching MIDI file...")
+            CmdStart.start(args)
+        }
 
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "midis2jam2",
-        state = windowState,
-        icon = painterResource(Res.drawable.midis2jam2_icon),
-        onKeyEvent = openHelpOnF1(systemInteractionService),
-    ) {
-        centerWindow()
-        App()
+        else -> {
+            SplashScreen.writeMessage("Starting user interface...")
+            val windowState = rememberWindowState(width = 1024.dp, height = 768.dp)
+            val systemInteractionService = koinInject<SystemInteractionService>()
+
+            Window(
+                onCloseRequest = ::exitApplication,
+                title = "midis2jam2",
+                state = windowState,
+                icon = painterResource(Res.drawable.midis2jam2_icon),
+                onKeyEvent = openHelpOnF1(systemInteractionService),
+            ) {
+                centerWindow()
+                App()
+            }
+        }
     }
 }

@@ -35,10 +35,9 @@ actual class ApplicationService : KoinComponent {
     actual fun startApplication(executionState: ExecutionState) {
         _isApplicationRunning.value = true
 
-        val homeTabModel: HomeScreenModel by inject()
         val configurationService: ConfigurationService by inject()
         val configurations = configurationService.getConfigurations()
-        val midiFile = homeTabModel.selectedMidiFile.value!!
+        val midiFile = executionState.midiFile
 
         val midiPackage = runCatching {
             MidiPackage.build(
