@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">第三方声明</string>
     <string name="about_check_for_updates">检查更新</string>
     <string name="about_check_for_updates_description">快速检查是否有新版本可用</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">消息日志</string>
+    <string name="log_clear_all">清除全部</string>
+    <string name="log_cleared_all_entries">已清除所有日志条目</string>
+    <string name="log_empty_message">如果应用程序遇到任何问题，将在此处记录。</string>
+    <string name="log_cleared_entry">已清除日志条目</string>
+    <string name="log_copied_to_clipboard">已复制到剪贴板</string>
+    <string name="log_copy_to_clipboard">复制到剪贴板</string>
+    <string name="log_clear">清除</string>
 </resources>

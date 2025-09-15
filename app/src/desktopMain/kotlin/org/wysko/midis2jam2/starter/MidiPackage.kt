@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.starter.configuration.find
 import java.io.File
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.MidiSystem
+import javax.sound.midi.MidiUnavailableException
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
 
@@ -32,7 +33,7 @@ private const val GERVILL = "Gervill"
 internal class MidiPackage private constructor(
     val sequencer: Sequencer,
     val synthesizer: Synthesizer?,
-    val midiDevice: MidiDevice
+    val midiDevice: MidiDevice,
 ) {
     companion object {
         fun build(midiFile: File?, configurations: Collection<Configuration>): MidiPackage {

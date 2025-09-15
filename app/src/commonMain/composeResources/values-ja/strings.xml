@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">サードパーティ通知</string>
     <string name="about_check_for_updates">アップデートを確認</string>
     <string name="about_check_for_updates_description">新しいバージョンが利用可能かどうかを素早く確認</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">メッセージログ</string>
+    <string name="log_clear_all">すべてクリア</string>
+    <string name="log_cleared_all_entries">すべてのログエントリをクリアしました</string>
+    <string name="log_empty_message">アプリで問題が発生した場合、ここにログが記録されます。</string>
+    <string name="log_cleared_entry">ログエントリをクリアしました</string>
+    <string name="log_copied_to_clipboard">クリップボードにコピーしました</string>
+    <string name="log_copy_to_clipboard">クリップボードにコピー</string>
+    <string name="log_clear">クリア</string>
 </resources>

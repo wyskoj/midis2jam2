@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">Drittanbieterhinweise</string>
     <string name="about_check_for_updates">Nach Updates suchen</string>
     <string name="about_check_for_updates_description">Schnell prüfen, ob eine neue Version verfügbar ist</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Nachrichtenprotokoll</string>
+    <string name="log_clear_all">Alle löschen</string>
+    <string name="log_cleared_all_entries">Alle Protokolleinträge gelöscht</string>
+    <string name="log_empty_message">Wenn die App auf Probleme stößt, werden sie hier protokolliert.</string>
+    <string name="log_cleared_entry">Protokolleintrag gelöscht</string>
+    <string name="log_copied_to_clipboard">In die Zwischenablage kopiert</string>
+    <string name="log_copy_to_clipboard">In die Zwischenablage kopieren</string>
+    <string name="log_clear">Löschen</string>
 </resources>

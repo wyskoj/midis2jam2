@@ -19,8 +19,11 @@ package org.wysko.midis2jam2
 
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
+import com.jme3.asset.AssetLoadException
+import org.koin.mp.KoinPlatformTools
 import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
 import org.wysko.midis2jam2.starter.configuration.*
@@ -61,6 +64,7 @@ open class DesktopMidis2jam2(
     val midiDevice: MidiDevice,
     configs: Collection<Configuration>,
 ) : Midis2jam2(midiFile, fileName, configs) {
+    private val errorLogService = KoinPlatformTools.defaultContext().get().get<ErrorLogService>()
 
     private var isSequencerStarted: Boolean = false
     private var skippedFrames = 0
@@ -79,17 +83,23 @@ open class DesktopMidis2jam2(
             )
         } catch (e: BackgroundImageFormatException) {
             exit()
-            logger().error(
+            errorLogService.addError(
                 e.message ?: "There was an error loading the images for the background.",
                 e
             )
         } catch (e: IllegalArgumentException) {
             exit()
-            logger().error(
+            errorLogService.addError(
                 message = when (e.message) {
-                    "Image width and height must be the same" -> "The background image(s) must be square."
+                    "Image width and height must be the same" -> "The background images must be square."
                     else -> e.message ?: "There was an error loading the images for the background."
                 },
+                throwable = e
+            )
+        } catch (e: AssetLoadException) {
+            exit()
+            errorLogService.addError(
+                message = "There was an error loading the background images. Did you remember to assign them in the settings?",
                 throwable = e
             )
         }

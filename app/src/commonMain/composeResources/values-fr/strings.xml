@@ -174,4 +174,14 @@
     <string name="about_oss_licenses">Mentions tierces</string>
     <string name="about_check_for_updates">Vérifier les mises à jour</string>
     <string name="about_check_for_updates_description">Vérifier rapidement s'il y a une nouvelle version disponible</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Journal des messages</string>
+    <string name="log_clear_all">Tout effacer</string>
+    <string name="log_cleared_all_entries">Toutes les entrées du journal effacées</string>
+    <string name="log_empty_message">Si l'application rencontre des problèmes, ils seront enregistrés ici.</string>
+    <string name="log_cleared_entry">Entrée du journal effacée</string>
+    <string name="log_copied_to_clipboard">Copié dans le presse-papiers</string>
+    <string name="log_copy_to_clipboard">Copier dans le presse-papiers</string>
+    <string name="log_clear">Effacer</string>
 </resources>

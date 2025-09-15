@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">Kolmannen osapuolen huomautukset</string>
     <string name="about_check_for_updates">Tarkista päivitykset</string>
     <string name="about_check_for_updates_description">Tarkista nopeasti, onko uusi versio saatavilla</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Viestiloki</string>
+    <string name="log_clear_all">Tyhjennä kaikki</string>
+    <string name="log_cleared_all_entries">Kaikki lokimerkinnät tyhjennetty</string>
+    <string name="log_empty_message">Jos sovellus kohtaa ongelmia, ne kirjataan tähän.</string>
+    <string name="log_cleared_entry">Lokimerkintä tyhjennetty</string>
+    <string name="log_copied_to_clipboard">Kopioitu leikepöydälle</string>
+    <string name="log_copy_to_clipboard">Kopioi leikepöydälle</string>
+    <string name="log_clear">Tyhjennä</string>
 </resources>

@@ -45,6 +45,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
@@ -64,13 +65,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.chat
 import midis2jam2.app.generated.resources.midi_device
 import midis2jam2.app.generated.resources.midi_file
 import midis2jam2.app.generated.resources.play
@@ -86,6 +91,8 @@ import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
+import org.wysko.midis2jam2.ui.home.log.LogScreen
+import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.util.FileDragAndDrop
 
 @Composable
@@ -95,6 +102,7 @@ internal actual fun HomeScreenLayout() {
     val applyHomeScreenMidiFile = navigationModel.applyHomeScreenMidiFile.collectAsState()
     val scope = rememberCoroutineScope()
     var flicker by remember { mutableStateOf(false) }
+    val navigator = LocalNavigator.currentOrThrow
 
     LaunchedEffect(Unit) {
         model.loadState()
@@ -129,12 +137,13 @@ internal actual fun HomeScreenLayout() {
     ) { _ ->
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
         ) {
+            LogScreenButton(navigator, Modifier.align(Alignment.TopEnd).padding(16.dp))
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.widthIn(max = 512.dp).padding(horizontal = 16.dp).fillMaxHeight()
+                    .align(Alignment.Center)
             ) {
                 item {
                     Midis2jam2Logo()

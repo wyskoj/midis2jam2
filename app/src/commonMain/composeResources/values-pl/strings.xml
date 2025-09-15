@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">Zastrzeżenia osób trzecich</string>
     <string name="about_check_for_updates">Sprawdź aktualizacje</string>
     <string name="about_check_for_updates_description">Szybko sprawdź, czy dostępna jest nowa wersja</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Dziennik wiadomości</string>
+    <string name="log_clear_all">Wyczyść wszystko</string>
+    <string name="log_cleared_all_entries">Wyczyszczono wszystkie wpisy dziennika</string>
+    <string name="log_empty_message">Jeśli aplikacja napotka problemy, będą one zapisywane tutaj.</string>
+    <string name="log_cleared_entry">Wyczyszczono wpis dziennika</string>
+    <string name="log_copied_to_clipboard">Skopiowano do schowka</string>
+    <string name="log_copy_to_clipboard">Skopiuj do schowka</string>
+    <string name="log_clear">Wyczyść</string>
 </resources>

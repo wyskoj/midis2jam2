@@ -19,10 +19,8 @@ package org.wysko.midis2jam2.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.wysko.midis2jam2.domain.ErrorHandlingService
 import org.wysko.midis2jam2.domain.SystemInteractionService
 
 val systemModule: Module = module {
     single<SystemInteractionService> { SystemInteractionService() }
-    single<ErrorHandlingService> { ErrorHandlingService() }
 }
