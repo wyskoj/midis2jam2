@@ -28,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -63,9 +62,18 @@ import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.arrow_back
 import midis2jam2.app.generated.resources.content_copy
 import midis2jam2.app.generated.resources.file_open
+import midis2jam2.app.generated.resources.log_clear
+import midis2jam2.app.generated.resources.log_clear_all
+import midis2jam2.app.generated.resources.log_cleared_all_entries
+import midis2jam2.app.generated.resources.log_cleared_entry
+import midis2jam2.app.generated.resources.log_copied_to_clipboard
+import midis2jam2.app.generated.resources.log_copy_to_clipboard
+import midis2jam2.app.generated.resources.log_empty_message
+import midis2jam2.app.generated.resources.log_title
 import midis2jam2.app.generated.resources.more_vert
 import midis2jam2.app.generated.resources.remove
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ErrorLogEntry
 import org.wysko.midis2jam2.domain.ErrorLogService
@@ -73,6 +81,7 @@ import org.wysko.midis2jam2.util.Utils
 import java.text.SimpleDateFormat
 
 object LogScreen : Screen {
+    @Suppress("AssignedValueIsNeverRead")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -82,9 +91,13 @@ object LogScreen : Screen {
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
 
+        val logClearedAllEntriesMessage = stringResource(Res.string.log_cleared_all_entries)
+        val logClearedEntryMessage = stringResource(Res.string.log_cleared_entry)
+        val logCopiedToClipboardMessage = stringResource(Res.string.log_copied_to_clipboard)
+
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text("Message log") }, navigationIcon = {
+                TopAppBar(title = { Text(stringResource(Res.string.log_title)) }, navigationIcon = {
                     IconButton(onClick = {
                         navigator.pop()
                         model.markAllAsRead()
@@ -104,13 +117,13 @@ object LogScreen : Screen {
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Clear all") },
+                            text = { Text(stringResource(Res.string.log_clear_all)) },
                             leadingIcon = { Icon(painterResource(Res.drawable.file_open), "") },
                             onClick = {
                                 isDropdownMenuExpanded = false
                                 model.clearAll()
                                 scope.launch {
-                                    snackbarHostState.showSnackbar("Cleared all log entries")
+                                    snackbarHostState.showSnackbar(logClearedAllEntriesMessage)
                                 }
                             },
                             enabled = errors.value.isNotEmpty(),
@@ -130,7 +143,7 @@ object LogScreen : Screen {
                 when (errors.value.size) {
                     0 -> item {
                         Text(
-                            text = "If the app encounters any issues, they will be logged here.",
+                            text = stringResource(Res.string.log_empty_message),
                             fontStyle = FontStyle.Italic
                         )
                     }
@@ -141,12 +154,12 @@ object LogScreen : Screen {
                             onClear = {
                                 model.removeError(error)
                                 scope.launch {
-                                    snackbarHostState.showSnackbar("Cleared log entry")
+                                    snackbarHostState.showSnackbar(logClearedEntryMessage)
                                 }
                             },
                             onCopyClick = {
                                 scope.launch {
-                                    snackbarHostState.showSnackbar("Copied to clipboard")
+                                    snackbarHostState.showSnackbar(logCopiedToClipboardMessage)
                                 }
                             }
                         )
@@ -200,7 +213,7 @@ object LogScreen : Screen {
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Copy to clipboard") },
+                                text = { Text(stringResource(Res.string.log_copy_to_clipboard)) },
                                 leadingIcon = { Icon(painterResource(Res.drawable.content_copy), "") },
                                 onClick = {
                                     isDropdownMenuExpanded = false
@@ -209,7 +222,7 @@ object LogScreen : Screen {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Clear") },
+                                text = { Text(stringResource(Res.string.log_clear)) },
                                 leadingIcon = { Icon(painterResource(Res.drawable.remove), "") },
                                 onClick = {
                                     isDropdownMenuExpanded = false

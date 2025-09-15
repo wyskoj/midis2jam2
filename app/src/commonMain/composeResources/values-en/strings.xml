@@ -174,4 +174,14 @@
     <string name="about_oss_licenses">Third-party notices</string>
     <string name="about_check_for_updates">Check for updates</string>
     <string name="about_check_for_updates_description">Quickly check if there is a new version available</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Message log</string>
+    <string name="log_clear_all">Clear all</string>
+    <string name="log_cleared_all_entries">Cleared all log entries</string>
+    <string name="log_empty_message">If the app encounters any issues, they will be logged here.</string>
+    <string name="log_cleared_entry">Cleared log entry</string>
+    <string name="log_copied_to_clipboard">Copied to clipboard</string>
+    <string name="log_copy_to_clipboard">Copy to clipboard</string>
+    <string name="log_clear">Clear</string>
 </resources>

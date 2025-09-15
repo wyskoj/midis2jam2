@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">Üçüncü taraf bildirimleri</string>
     <string name="about_check_for_updates">Güncellemeleri kontrol et</string>
     <string name="about_check_for_updates_description">Yeni bir sürümün mevcut olup olmadığını hızlıca kontrol et</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Mesaj günlüğü</string>
+    <string name="log_clear_all">Tümünü temizle</string>
+    <string name="log_cleared_all_entries">Tüm günlük girişleri temizlendi</string>
+    <string name="log_empty_message">Uygulama herhangi bir sorunla karşılaşırsa, burada kaydedilecektir.</string>
+    <string name="log_cleared_entry">Günlük girişi temizlendi</string>
+    <string name="log_copied_to_clipboard">Panoya kopyalandı</string>
+    <string name="log_copy_to_clipboard">Panoya kopyala</string>
+    <string name="log_clear">Temizle</string>
 </resources>

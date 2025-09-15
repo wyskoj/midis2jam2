@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">ประกาศจากบุคคลที่สาม</string>
     <string name="about_check_for_updates">ตรวจสอบการอัปเดต</string>
     <string name="about_check_for_updates_description">ตรวจสอบอย่างรวดเร็วว่ามีเวอร์ชันใหม่หรือไม่</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">บันทึกข้อความ</string>
+    <string name="log_clear_all">ล้างทั้งหมด</string>
+    <string name="log_cleared_all_entries">ล้างรายการบันทึกทั้งหมดแล้ว</string>
+    <string name="log_empty_message">หากแอปพบปัญหา จะถูกบันทึกไว้ที่นี่</string>
+    <string name="log_cleared_entry">ล้างรายการบันทึกแล้ว</string>
+    <string name="log_copied_to_clipboard">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
+    <string name="log_copy_to_clipboard">คัดลอกไปยังคลิปบอร์ด</string>
+    <string name="log_clear">ล้าง</string>
 </resources>

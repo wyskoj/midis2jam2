@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">Tredjepartsnotiser</string>
     <string name="about_check_for_updates">Sjekk for oppdateringer</string>
     <string name="about_check_for_updates_description">Sjekk raskt om det er en ny versjon tilgjengelig</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Meldingslogg</string>
+    <string name="log_clear_all">Tøm alle</string>
+    <string name="log_cleared_all_entries">Alle loggoppføringer tømt</string>
+    <string name="log_empty_message">Hvis appen møter problemer, vil de bli logget her.</string>
+    <string name="log_cleared_entry">Loggoppføring tømt</string>
+    <string name="log_copied_to_clipboard">Kopiert til utklippstavle</string>
+    <string name="log_copy_to_clipboard">Kopier til utklippstavle</string>
+    <string name="log_clear">Tøm</string>
 </resources>

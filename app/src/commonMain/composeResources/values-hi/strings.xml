@@ -174,4 +174,14 @@
     <string name="about_oss_licenses">तृतीय-पक्ष नोटिस</string>
     <string name="about_check_for_updates">अपडेट जांचें</string>
     <string name="about_check_for_updates_description">जल्दी जांचें कि कोई नया संस्करण उपलब्ध है या नहीं</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">संदेश लॉग</string>
+    <string name="log_clear_all">सभी साफ़ करें</string>
+    <string name="log_cleared_all_entries">सभी लॉग प्रविष्टियां साफ़ की गईं</string>
+    <string name="log_empty_message">यदि ऐप कोई समस्या का सामना करता है, तो वे यहां लॉग की जाएंगी।</string>
+    <string name="log_cleared_entry">लॉग प्रविष्टि साफ़ की गई</string>
+    <string name="log_copied_to_clipboard">क्लिपबोर्ड में कॉपी किया गया</string>
+    <string name="log_copy_to_clipboard">क्लिपबोर्ड में कॉपी करें</string>
+    <string name="log_clear">साफ़ करें</string>
 </resources>

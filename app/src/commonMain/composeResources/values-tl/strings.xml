@@ -191,4 +191,14 @@
     <string name="about_oss_licenses">Mga paunawa mula sa third-party</string>
     <string name="about_check_for_updates">Tingnan ang mga update</string>
     <string name="about_check_for_updates_description">Mabilis na tingnan kung may bagong bersyon na available</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Log ng mga mensahe</string>
+    <string name="log_clear_all">I-clear ang lahat</string>
+    <string name="log_cleared_all_entries">Na-clear ang lahat ng mga log entry</string>
+    <string name="log_empty_message">Kung makakaranas ang app ng mga problema, mai-log sila dito.</string>
+    <string name="log_cleared_entry">Na-clear ang log entry</string>
+    <string name="log_copied_to_clipboard">Na-copy sa clipboard</string>
+    <string name="log_copy_to_clipboard">I-copy sa clipboard</string>
+    <string name="log_clear">I-clear</string>
 </resources>
