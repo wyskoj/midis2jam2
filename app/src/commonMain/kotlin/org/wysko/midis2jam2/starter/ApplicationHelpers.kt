@@ -34,31 +34,34 @@ internal fun SimpleApplication.applyConfigurations(configurations: Collection<Co
     isShowSettings = false
 }
 
-private fun AppSettings.applyResolution(configurations: Collection<Configuration>) = when {
-    configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings.isFullscreen -> {
-        isFullscreen = true
-        with(screenResolution()) {
-            this@applyResolution.width = width
-            this@applyResolution.height = height
+private fun AppSettings.applyResolution(configurations: Collection<Configuration>) {
+    val measuredResolution = screenResolution()
+    when {
+        configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings.isFullscreen -> {
+            isFullscreen = true
+            if (measuredResolution != null) {
+                this@applyResolution.width = measuredResolution.width
+                this@applyResolution.height = measuredResolution.height
+            }
         }
-    }
 
-    else -> {
-        isFullscreen = false
-        with(configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings) {
-            when (resolutionSettings.isUseDefaultResolution) {
-                true -> {
-                    screenResolution()?.let { screenRes ->
-                        preferredResolution(screenRes).run {
-                            this@applyResolution.width = this.width
-                            this@applyResolution.height = this.height
+        else -> {
+            isFullscreen = false
+            with(configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings) {
+                when (resolutionSettings.isUseDefaultResolution) {
+                    true -> {
+                        measuredResolution?.let { screenRes ->
+                            preferredResolution(screenRes).run {
+                                this@applyResolution.width = this.width
+                                this@applyResolution.height = this.height
+                            }
                         }
                     }
-                }
 
-                false -> with(resolutionSettings) {
-                    this@applyResolution.width = resolutionWidth
-                    this@applyResolution.height = resolutionHeight
+                    false -> with(resolutionSettings) {
+                        this@applyResolution.width = resolutionWidth
+                        this@applyResolution.height = resolutionHeight
+                    }
                 }
             }
         }
