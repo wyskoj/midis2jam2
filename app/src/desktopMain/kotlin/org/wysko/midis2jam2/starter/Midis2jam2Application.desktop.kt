@@ -15,17 +15,23 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
+@file:Suppress("TooGenericExceptionCaught")
+
 package org.wysko.midis2jam2.starter
 
+import Platform
 import com.jme3.app.SimpleApplication
 import com.jme3.system.lwjgl.LwjglContext
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.mp.KoinPlatformTools
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.midis2jam2.DesktopMidis2jam2
+import org.wysko.midis2jam2.domain.ErrorLogService
+import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import javax.sound.midi.MidiDevice
 import javax.sound.midi.Sequencer
@@ -39,19 +45,43 @@ internal actual class Midis2jam2Application(
     private val synthesizer: Synthesizer?,
     private val midiDevice: MidiDevice,
 ) : SimpleApplication() {
+    private val errorLogService = KoinPlatformTools.defaultContext().get().get<ErrorLogService>()
+
     actual fun execute() {
-        applyConfigurations(configurations)
-        start()
+        try {
+            applyConfigurations(configurations)
+            start()
+        } catch (e: Exception) {
+            // Log the error but continue to start the application
+            errorLogService.addError("There was an error applying configurations.", e)
+            onFinish()
+        }
     }
 
     actual override fun simpleInitApp() {
+        Jme3ExceptionHandler.setup {
+            stop()
+            sequencer.stop()
+            sequencer.close()
+        }
         setupState(configurations, platform = Platform.Desktop)
         CoroutineScope(Dispatchers.IO).launch {
-            val data = file.readBytes()
-            val sequence = StandardMidiFileReader().readByteArray(data).toTimeBasedSequence()
+            val data = runCatching { file.readBytes() }.onFailure {
+                errorLogService.addError("There was an error reading the MIDI file.", it)
+                onFinish()
+                return@launch
+            }.getOrThrow()
+
+            val sequence =
+                runCatching { StandardMidiFileReader().readByteArray(data).toTimeBasedSequence() }.onFailure {
+                    errorLogService.addError("There was an error parsing the MIDI file.", it)
+                    onFinish()
+                    return@launch
+                }
+
             DesktopMidis2jam2(
                 sequencer = sequencer,
-                midiFile = sequence,
+                midiFile = sequence.getOrThrow(),
                 onClose = { stop() },
                 configs = configurations,
                 fileName = file.name,
