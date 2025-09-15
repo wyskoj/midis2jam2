@@ -17,15 +17,18 @@
 
 package org.wysko.midis2jam2.ui.home.log
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.chat
@@ -55,11 +58,21 @@ fun LogScreenButton(
             onClick = {
                 navigator.push(LogScreen)
             },
+            colors = when (unreadCount.value) {
+                0 -> IconButtonDefaults.iconButtonColors()
+                else -> IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                )
+            },
+            modifier = Modifier.size(48.dp),
         ) {
             Icon(
                 painterResource(Res.drawable.chat),
                 null,
-                tint = MaterialTheme.colorScheme.secondary,
+                tint = when (unreadCount.value) {
+                    0 -> MaterialTheme.colorScheme.secondary
+                    else -> MaterialTheme.colorScheme.onErrorContainer
+                },
             )
         }
     }
