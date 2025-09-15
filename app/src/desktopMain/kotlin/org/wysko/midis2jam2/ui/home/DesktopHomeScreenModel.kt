@@ -120,7 +120,11 @@ class DesktopHomeScreenModel(
 
     override fun loadState() {
         homeTabPersistor.load().run {
-            _selectedSoundbank.value = PlatformFile(File(soundbank))
+            soundbank?.let {
+                if (listOf("sf2", "dls").contains(File(it).extension.lowercase())) {
+                    _selectedSoundbank.value = PlatformFile(File(it))
+                }
+            }
             getMidiDevices().find { it.name == midiDevice }?.let {
                 _selectedMidiDevice.value = it
             }
@@ -131,7 +135,7 @@ class DesktopHomeScreenModel(
         homeTabPersistor.save(
             HomeTabPersistentState(
                 midiDevice = _selectedMidiDevice.value.name,
-                soundbank = _selectedSoundbank.value?.path ?: "",
+                soundbank = _selectedSoundbank.value?.path,
             )
         )
     }
