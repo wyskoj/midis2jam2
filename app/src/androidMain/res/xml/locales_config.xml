@@ -17,5 +17,20 @@
 
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
     <locale android:name="en" /> <!-- English -->
+    <locale android:name="de" /> <!-- German -->
+    <locale android:name="es" /> <!-- Spanish -->
+    <locale android:name="fi" /> <!-- Finnish -->
     <locale android:name="fr" /> <!-- French -->
+    <locale android:name="hi" /> <!-- Hindi -->
+    <locale android:name="it" /> <!-- Italian -->
+    <locale android:name="ja" /> <!-- Japanese -->
+    <locale android:name="ko" /> <!-- Korean -->
+    <locale android:name="no" /> <!-- Norwegian -->
+    <locale android:name="pl" /> <!-- Polish -->
+    <locale android:name="ru" /> <!-- Russian -->
+    <locale android:name="th" /> <!-- Thai -->
+    <locale android:name="tl" /> <!-- Tagalog -->
+    <locale android:name="tr" /> <!-- Turkish -->
+    <locale android:name="uk" /> <!-- Ukrainian -->
+    <locale android:name="zh" /> <!-- Chinese -->
 </locale-config>
