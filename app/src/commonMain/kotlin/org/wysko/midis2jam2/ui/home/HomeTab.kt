@@ -20,6 +20,7 @@
 package org.wysko.midis2jam2.ui.home
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -28,6 +29,7 @@ import cafe.adriel.voyager.transitions.FadeTransition
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.tab_home
 import org.jetbrains.compose.resources.stringResource
+import org.wysko.midis2jam2.ui.common.transition.SlideAndFadeTransition
 
 object HomeTab : Tab {
     override val options: TabOptions
@@ -40,9 +42,11 @@ object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(HomeScreen) { navigator ->
-            FadeTransition(navigator) { screen ->
-                screen.Content()
+        Scaffold {
+            Navigator(HomeScreen) { navigator ->
+                SlideAndFadeTransition(navigator) { screen ->
+                    screen.Content()
+                }
             }
         }
     }

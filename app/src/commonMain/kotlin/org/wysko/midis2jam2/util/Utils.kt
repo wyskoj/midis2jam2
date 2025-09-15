@@ -30,9 +30,8 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import com.jme3.scene.control.Control
 import com.jme3.scene.debug.Arrow
 import org.wysko.midis2jam2.Midis2jam2
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -40,19 +39,11 @@ import kotlin.time.DurationUnit
 
 /** Provides various utility functions. */
 object Utils {
-
-    /**
-     * Given a URL, retrieves the contents through HTTP GET.
-     *
-     * @param url The URL to fetch.
-     * @return A string containing the response.
-     * @throws IOException if there was an error fetching data
-     */
-    fun getHTML(url: String): String = (URL(url).openConnection() as HttpURLConnection)
-        .apply { requestMethod = "GET" }
-        .inputStream
-        .bufferedReader()
-        .use { it.readText() }
+    fun copyToClipboard(text: String) {
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        val selection = StringSelection(text)
+        clipboard.setContents(selection, selection)
+    }
 
     /**
      * Converts an angle expressed in degrees to radians.

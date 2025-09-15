@@ -21,6 +21,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.BackgroundImageRepository
+import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
@@ -31,4 +32,5 @@ val applicationModule: Module = module {
     single<BackgroundImageRepository> { BackgroundImageRepository() }
     single<SettingsRepository> { SettingsRepository() }
     single<HomeTabPersistor> { HomeTabPersistor() }
+    single<ErrorLogService> { ErrorLogService() }
 }

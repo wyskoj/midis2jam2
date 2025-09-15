@@ -36,6 +36,7 @@ actual class ApplicationService : KoinComponent {
         _isApplicationRunning.value = true
 
         val configurationService: ConfigurationService by inject()
+        val errorLogService: ErrorLogService by inject()
         val configurations = configurationService.getConfigurations()
         val midiFile = executionState.midiFile
 
@@ -44,7 +45,8 @@ actual class ApplicationService : KoinComponent {
                 midiFile.file,
                 configurations
             )
-        }.onFailure {
+        }.onFailure { t ->
+            errorLogService.addError("There was an error initializing the MIDI device.", t)
             _isApplicationRunning.value = false
             return
         }
