@@ -129,7 +129,7 @@
     <string name="settings_onscreenelements_lyrics_size_small">Petit</string>
     <string name="settings_onscreenelements_lyrics_size_default">Par défaut</string>
     <string name="settings_onscreenelements_lyrics_size_large">Grand</string>
-    <string name="settings_onscreeneelements_lyrics_size_larger">Plus grand</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Plus grand</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
