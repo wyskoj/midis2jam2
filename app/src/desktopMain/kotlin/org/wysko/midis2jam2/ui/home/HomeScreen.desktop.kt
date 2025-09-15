@@ -45,7 +45,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
@@ -54,7 +53,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +63,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,7 +72,6 @@ import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.chat
 import midis2jam2.app.generated.resources.midi_device
 import midis2jam2.app.generated.resources.midi_file
 import midis2jam2.app.generated.resources.play
@@ -91,7 +87,6 @@ import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
-import org.wysko.midis2jam2.ui.home.log.LogScreen
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.util.FileDragAndDrop
 
@@ -106,6 +101,18 @@ internal actual fun HomeScreenLayout() {
 
     LaunchedEffect(Unit) {
         model.loadState()
+    }
+
+    val selectedMidiDevice = model.selectedMidiDevice.collectAsState()
+    val selectedSoundbank = model.selectedSoundbank.collectAsState()
+    val isLooping = model.isLooping.collectAsState()
+
+    LaunchedEffect(
+        selectedMidiDevice.value,
+        selectedSoundbank.value,
+        isLooping.value,
+    ) {
+        model.saveState()
     }
 
     LaunchedEffect(applyHomeScreenMidiFile) {
@@ -128,6 +135,8 @@ internal actual fun HomeScreenLayout() {
             }
         }
     }
+
+    val isSoundbankSelectVisible = selectedMidiDevice.value.name == "Gervill"
 
     Scaffold(
         modifier = Modifier.dragAndDropTarget(
@@ -155,7 +164,7 @@ internal actual fun HomeScreenLayout() {
                     MidiDeviceSelector(model)
                 }
                 item {
-                    SoundbankSelector(model)
+                    SoundbankSelector(model, isSoundbankSelectVisible)
                 }
                 item {
                     Row(
@@ -171,20 +180,20 @@ internal actual fun HomeScreenLayout() {
     }
 }
 
-
 @Composable
 internal fun SoundbankSelector(
     model: HomeScreenModel,
+    isVisible: Boolean,
 ) {
     val selectedSoundbank = model.selectedSoundbank.collectAsState()
     val soundbanks = model.soundbanks.collectAsState(initial = emptyList())
-    val isVisible = derivedStateOf { model.selectedMidiDevice.value.name == "Gervill" }
+
     AnimatedVisibility(
-        visible = isVisible.value,
+        visible = isVisible,
         enter = expandVertically(),
         exit = shrinkVertically(),
     ) {
-        SoundbankSelector(
+        SoundbankSelectorImpl(
             soundbanks = soundbanks.value,
             selectedSoundbank = selectedSoundbank.value,
         ) { soundbank ->
@@ -303,7 +312,7 @@ fun LoopButton(model: HomeScreenModel) {
 }
 
 @Composable
-internal fun SoundbankSelector(
+internal fun SoundbankSelectorImpl(
     soundbanks: List<PlatformFile>,
     selectedSoundbank: PlatformFile? = null,
     modifier: Modifier = Modifier,

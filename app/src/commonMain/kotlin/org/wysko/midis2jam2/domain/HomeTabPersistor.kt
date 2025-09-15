@@ -28,5 +28,5 @@ expect class HomeTabPersistor() {
 @Serializable
 data class HomeTabPersistentState(
     val midiDevice: String = "",
-    val soundbank: String = "",
+    val soundbank: String? = null,
 )

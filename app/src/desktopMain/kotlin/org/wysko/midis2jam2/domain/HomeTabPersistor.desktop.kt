@@ -36,6 +36,11 @@ actual class HomeTabPersistor {
     }
 
     actual fun load(): HomeTabPersistentState {
-        return json.decodeFromString<HomeTabPersistentState>(preferences.getString(HOME_TAB_STATE_KEY, defaultStateJson))
+        return json.decodeFromString<HomeTabPersistentState>(
+            preferences.getString(
+                HOME_TAB_STATE_KEY,
+                defaultStateJson
+            )
+        )
     }
 }
