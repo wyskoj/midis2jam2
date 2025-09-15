@@ -60,6 +60,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.arrow_back
+import midis2jam2.app.generated.resources.clear_all
 import midis2jam2.app.generated.resources.content_copy
 import midis2jam2.app.generated.resources.file_open
 import midis2jam2.app.generated.resources.log_clear
@@ -118,7 +119,7 @@ object LogScreen : Screen {
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(Res.string.log_clear_all)) },
-                            leadingIcon = { Icon(painterResource(Res.drawable.file_open), "") },
+                            leadingIcon = { Icon(painterResource(Res.drawable.clear_all), "") },
                             onClick = {
                                 isDropdownMenuExpanded = false
                                 model.clearAll()
