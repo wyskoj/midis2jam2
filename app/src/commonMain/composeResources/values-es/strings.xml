@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Copiado al portapapeles</string>
     <string name="log_copy_to_clipboard">Copiar al portapapeles</string>
     <string name="log_clear">Limpiar</string>
+    <!-- Settings / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">Campo de visión</string>
+    <string name="settings_camera_field_of_view_label_prefix">Cambia qué tan ancho ve la cámara</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d grados</string>
 </resources>

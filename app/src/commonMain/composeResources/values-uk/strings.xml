@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Скопійовано в буфер обміну</string>
     <string name="log_copy_to_clipboard">Скопіювати в буфер обміну</string>
     <string name="log_clear">Очистити</string>
+    <!-- Налаштування / Камера / Кут огляду -->
+    <string name="settings_camera_field_of_view_title">Кут огляду</string>
+    <string name="settings_camera_field_of_view_label_prefix">Змінити, наскільки широко бачить камера</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d°</string>
 </resources>

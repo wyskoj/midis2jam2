@@ -248,6 +248,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
         IsSmoothFreecamSelect(settings, model)
     }
     item {
+        FieldOfViewSelect(settings, model)
+    }
+    item {
         Spacer(Modifier.height(0.dp))
     }
 }

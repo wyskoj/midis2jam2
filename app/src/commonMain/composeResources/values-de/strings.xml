@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">In die Zwischenablage kopiert</string>
     <string name="log_copy_to_clipboard">In die Zwischenablage kopieren</string>
     <string name="log_clear">Löschen</string>
+    <!-- Settings / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">Sichtfeld</string>
+    <string name="settings_camera_field_of_view_label_prefix">Ändere, wie breit die Kamera sieht</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d Grad</string>
 </resources>

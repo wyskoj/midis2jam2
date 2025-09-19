@@ -184,4 +184,8 @@
     <string name="log_copied_to_clipboard">क्लिपबोर्ड में कॉपी किया गया</string>
     <string name="log_copy_to_clipboard">क्लिपबोर्ड में कॉपी करें</string>
     <string name="log_clear">साफ़ करें</string>
+    <!-- Settings / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">दृश्य क्षेत्र</string>
+    <string name="settings_camera_field_of_view_label_prefix">कैमरा कितना चौड़ा देखता है, बदलें</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d डिग्री</string>
 </resources>
