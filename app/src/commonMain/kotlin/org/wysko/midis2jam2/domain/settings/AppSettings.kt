@@ -137,6 +137,7 @@ data class AppSettings(
         var isStartAutocamWithSong: Boolean = false,
         var isSmoothFreecam: Boolean = true,
         var isClassicAutoCam: Boolean = false,
+        var defaultFieldOfView: Float = 45f,
     )
 
     @Serializable

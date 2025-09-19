@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Copiato negli appunti</string>
     <string name="log_copy_to_clipboard">Copia negli appunti</string>
     <string name="log_clear">Cancella</string>
+    <!-- Impostazioni / Fotocamera / Campo visivo -->
+    <string name="settings_camera_field_of_view_title">Campo visivo</string>
+    <string name="settings_camera_field_of_view_label_prefix">Modifica l'ampiezza della visuale della fotocamera</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d gradi</string>
 </resources>

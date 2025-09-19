@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Скопировано в буфер обмена</string>
     <string name="log_copy_to_clipboard">Скопировать в буфер обмена</string>
     <string name="log_clear">Очистить</string>
+    <!-- Настройки / Камера / Угол обзора -->
+    <string name="settings_camera_field_of_view_title">Угол обзора</string>
+    <string name="settings_camera_field_of_view_label_prefix">Изменить ширину обзора камеры</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d°</string>
 </resources>

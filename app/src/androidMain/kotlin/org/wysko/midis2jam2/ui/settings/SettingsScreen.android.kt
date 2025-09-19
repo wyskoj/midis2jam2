@@ -122,6 +122,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
         IsClassicAutoCamBooleanSelect(settings, model)
     }
     item {
+        FieldOfViewSelect(settings, model)
+    }
+    item {
         Spacer(Modifier.height(0.dp))
     }
 }
