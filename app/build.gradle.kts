@@ -38,8 +38,8 @@ tasks.withType<ComposeHotRun>().configureEach {
     mainClass.set("org.wysko.midis2jam2.MainKt")
 }
 
-val appVersionName: String = "2.0.1"
-val appVersionCode: Int = 6
+val appVersionName: String = "2.0.2"
+val appVersionCode: Int = 7
 
 kotlin {
     androidTarget {
