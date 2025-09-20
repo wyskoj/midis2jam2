@@ -257,5 +257,13 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         }
     }
 
+    fun setDefaultFieldOfView(defaultFieldOfView: Float) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                cameraSettings.defaultFieldOfView = defaultFieldOfView
+            }
+        }
+    }
+
     val appSettings: StateFlow<AppSettings> = settingsRepository.appSettings
 }

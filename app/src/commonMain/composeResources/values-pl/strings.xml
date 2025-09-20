@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Skopiowano do schowka</string>
     <string name="log_copy_to_clipboard">Skopiuj do schowka</string>
     <string name="log_clear">Wyczyść</string>
+    <!-- Ustawienia / Kamera / Pole widzenia -->
+    <string name="settings_camera_field_of_view_title">Pole widzenia</string>
+    <string name="settings_camera_field_of_view_label_prefix">Zmień, jak szeroko widzi kamera</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d stopni</string>
 </resources>

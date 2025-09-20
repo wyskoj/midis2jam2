@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Kopiert til utklippstavle</string>
     <string name="log_copy_to_clipboard">Kopier til utklippstavle</string>
     <string name="log_clear">Tøm</string>
+    <!-- Innstillinger / Kamera / Synsfelt -->
+    <string name="settings_camera_field_of_view_title">Synsfelt</string>
+    <string name="settings_camera_field_of_view_label_prefix">Endre hvor bredt kameraet ser</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d grader</string>
 </resources>

@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Kopioitu leikepöydälle</string>
     <string name="log_copy_to_clipboard">Kopioi leikepöydälle</string>
     <string name="log_clear">Tyhjennä</string>
+    <!-- Asetukset / Kamera / Näkökenttä -->
+    <string name="settings_camera_field_of_view_title">Näkökenttä</string>
+    <string name="settings_camera_field_of_view_label_prefix">Muuta, kuinka leveästi kamera näkee</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d astetta</string>
 </resources>

@@ -106,7 +106,10 @@ open class DesktopMidis2jam2(
         }
 
         val settingsConfig = configs.find<AppSettingsConfiguration>().appSettings
-        this.cameraController = SmoothFlyByCamera(this) {
+        this.cameraController = SmoothFlyByCamera(
+            this,
+            settingsConfig.cameraSettings.defaultFieldOfView,
+        ) {
             isEnabled = true
             cameraState = CameraState.DEVICE_SPECIFIC_CAMERA
         }.apply {
