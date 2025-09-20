@@ -19,23 +19,24 @@ package org.wysko.midis2jam2.starter
 
 import Platform
 import com.jme3.app.SimpleApplication
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
+import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.DesktopPlaylistMidis2jam2
+import org.wysko.midis2jam2.midi.system.JwSequencer
+import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.util.logger
 import java.io.File
-import javax.sound.midi.MidiDevice
 import javax.sound.midi.MidiSystem
-import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
 
 internal class Midis2jam2QueueApplication(
-    private val files: List<File>,
+    private val sequences: List<TimeBasedSequence>,
+    private val fileNames: List<String>,
     private val configurations: Collection<Configuration>,
     private val onPlaylistFinish: () -> Unit,
-    private val sequencer: Sequencer,
+    private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
     private val midiDevice: MidiDevice,
 ) : SimpleApplication() {
@@ -45,16 +46,16 @@ internal class Midis2jam2QueueApplication(
 
     override fun simpleInitApp() {
         setupState(configurations, platform = Platform.Desktop)
-        sequencer.open()
+        sequencer.open(midiDevice)
         buildStates()
         loadSong(0)
     }
 
     private fun buildStates() {
-        midis2jam2s = files.map { file ->
+        midis2jam2s = sequences.mapIndexed { i, sequence ->
             DesktopPlaylistMidis2jam2(
                 sequencer = sequencer,
-                midiFile = loadKMidiSequence(file).toTimeBasedSequence(),
+                midiFile = sequence,
                 onClose = {
                     stop()
                 },
@@ -63,7 +64,7 @@ internal class Midis2jam2QueueApplication(
                     advance()
                 },
                 configs = configurations,
-                fileName = file.name,
+                fileName = fileNames[i],
                 synthesizer = synthesizer,
                 midiDevice = midiDevice
             )
@@ -90,7 +91,7 @@ internal class Midis2jam2QueueApplication(
         }
 
         sequencer.stop()
-        sequencer.sequence = loadJavaXSequence(files[index])
+        sequencer.sequence = sequences[index]
 
         midis2jam2s[index].let {
             stateManager.attach(it)

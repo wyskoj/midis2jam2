@@ -21,6 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
+import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.starter.MidiPackage
 import org.wysko.midis2jam2.starter.Midis2jam2Application
 import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
@@ -53,7 +56,8 @@ actual class ApplicationService : KoinComponent {
         }
         with(midiPackage.getOrNull() ?: return) {
             Midis2jam2Application(
-                midiFile,
+                sequence!!,
+                midiFile.file.name,
                 configurations,
                 {
                     _isApplicationRunning.value = false
@@ -77,9 +81,13 @@ actual class ApplicationService : KoinComponent {
             return
         }
 
+        val reader = StandardMidiFileReader()
+        val sequences = executionState.queue.map { reader.readFile(it.file).toTimeBasedSequence() }
+
         with(midiPackage.getOrNull() ?: return) {
             Midis2jam2QueueApplication(
-                executionState.queue.map { it.file },
+                sequences = sequences,
+                fileNames = executionState.queue.map { it.file.name },
                 configurations,
                 {
                     _isApplicationRunning.value = false
