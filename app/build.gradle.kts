@@ -212,6 +212,11 @@ compose.desktop {
                 }
             }
         }
+
+        nativeDistributions {
+            packageName = "midis2jam2"
+            packageVersion = appVersionName
+        }
     }
 }
 
