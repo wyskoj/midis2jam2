@@ -131,6 +131,7 @@ import org.wysko.midis2jam2.util.FilesDragAndDrop
 import org.wysko.midis2jam2.util.digitsOnly
 import org.wysko.midis2jam2.util.tintEnabled
 import java.io.File
+import java.io.IOException
 import java.util.*
 
 internal actual val deviceThemeIcon: DrawableResource
@@ -370,13 +371,11 @@ private fun CheckForUpdates() {
         label = { Text(stringResource(Res.string.about_check_for_updates_description)) },
         icon = Res.drawable.update,
     ) {
-        ApplicationLauncher.launchApplicationInProcess(
-            "351",
-            null,
-            null,
-            ApplicationLauncher.WindowMode.FRAME,
-            null
-        )
+        try {
+            ApplicationLauncher.launchApplication("351", null, false, null)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 }
 
