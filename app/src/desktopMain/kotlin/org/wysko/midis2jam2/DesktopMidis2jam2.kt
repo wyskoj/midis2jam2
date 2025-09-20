@@ -17,16 +17,20 @@
 
 package org.wysko.midis2jam2
 
+import Platform
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetLoadException
 import org.koin.mp.KoinPlatformTools
-import org.wysko.gervill.JwRealTimeSequencer
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
-import org.wysko.midis2jam2.starter.configuration.*
+import org.wysko.midis2jam2.midi.system.JwSequencer
+import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
@@ -37,10 +41,7 @@ import org.wysko.midis2jam2.world.camera.CameraAngle.Companion.preventCameraFrom
 import org.wysko.midis2jam2.world.camera.CameraSpeed
 import org.wysko.midis2jam2.world.camera.CameraState
 import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
-import javax.sound.midi.MidiDevice
-import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
-import javax.sound.midi.SysexMessage
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
@@ -57,7 +58,7 @@ import kotlin.time.DurationUnit
  */
 open class DesktopMidis2jam2(
     override val fileName: String,
-    val sequencer: Sequencer,
+    val sequencer: JwSequencer,
     val midiFile: TimeBasedSequence,
     val onClose: () -> Unit,
     val synthesizer: Synthesizer?,
@@ -117,11 +118,7 @@ open class DesktopMidis2jam2(
     }
 
     override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {
-        val resetMessage = midiSpecificationResetMessage[midiSpecification]!!
-        midiDevice.receiver.send(
-            SysexMessage(resetMessage, resetMessage.size),
-            -1L
-        )
+        midiDevice.sendSysex(midiSpecificationResetMessage[midiSpecification] ?: return)
     }
 
     override fun cleanup() {
@@ -201,7 +198,7 @@ open class DesktopMidis2jam2(
     override fun seek(time: Duration) {
         logger().debug("Seeking to time: $time")
         this.time = time
-        sequencer.microsecondPosition = time.coerceAtLeast(ZERO).inWholeMicroseconds
+        sequencer.setPosition(time)
         collectors.forEach { it.seek(time) }
     }
 
@@ -227,7 +224,7 @@ open class DesktopMidis2jam2(
                 sequencer.stop()
                 seek((-2).seconds)
                 slideCamController.onLoop()
-                (sequencer as JwRealTimeSequencer).resetDevice()
+                sequencer.resetDevice()
             } else {
                 exit()
             }

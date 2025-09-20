@@ -22,26 +22,25 @@ package org.wysko.midis2jam2.starter
 import Platform
 import com.jme3.app.SimpleApplication
 import com.jme3.system.lwjgl.LwjglContext
-import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatformTools
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
-import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.DesktopMidis2jam2
 import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
+import org.wysko.midis2jam2.midi.system.JwSequencer
+import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.Configuration
-import javax.sound.midi.MidiDevice
-import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
 
 internal actual class Midis2jam2Application(
-    private val file: PlatformFile,
+    private val sequence: TimeBasedSequence,
+    private val fileName: String,
     private val configurations: Collection<Configuration>,
     private val onFinish: () -> Unit,
-    private val sequencer: Sequencer,
+    private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
     private val midiDevice: MidiDevice,
 ) : SimpleApplication() {
@@ -66,25 +65,13 @@ internal actual class Midis2jam2Application(
         }
         setupState(configurations, platform = Platform.Desktop)
         CoroutineScope(Dispatchers.IO).launch {
-            val data = runCatching { file.readBytes() }.onFailure {
-                errorLogService.addError("There was an error reading the MIDI file.", it)
-                onFinish()
-                return@launch
-            }.getOrThrow()
-
-            val sequence =
-                runCatching { StandardMidiFileReader().readByteArray(data).toTimeBasedSequence() }.onFailure {
-                    errorLogService.addError("There was an error parsing the MIDI file.", it)
-                    onFinish()
-                    return@launch
-                }
 
             DesktopMidis2jam2(
                 sequencer = sequencer,
-                midiFile = sequence.getOrThrow(),
+                midiFile = sequence,
                 onClose = { stop() },
                 configs = configurations,
-                fileName = file.name,
+                fileName = fileName,
                 synthesizer = synthesizer,
                 midiDevice = midiDevice,
             ).also {

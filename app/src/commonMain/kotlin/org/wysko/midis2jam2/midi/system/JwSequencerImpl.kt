@@ -70,8 +70,10 @@ class JwSequencerImpl : JwSequencer {
     override fun close() {
         check(isOpen) { "Sequencer is not open" }
         if (isRunning) stop()
-        this.device!!.close()
-        this.device = null
+        Thread {
+            this@JwSequencerImpl.device?.close()
+            this.device = null
+        }.start()
         _isOpen = false
     }
 

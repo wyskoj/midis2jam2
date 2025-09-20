@@ -17,36 +17,44 @@
 
 package org.wysko.midis2jam2.starter
 
-import org.wysko.gervill.RealTimeSequencerProvider
+import org.koin.mp.KoinPlatformTools
+import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
+import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.readFile
+import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.midi.system.JwSequencer
+import org.wysko.midis2jam2.midi.system.JwSequencerImpl
+import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import java.io.File
-import javax.sound.midi.MidiDevice
 import javax.sound.midi.MidiSystem
-import javax.sound.midi.MidiUnavailableException
-import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
 
 private const val GERVILL = "Gervill"
 
 internal class MidiPackage private constructor(
-    val sequencer: Sequencer,
+    val sequence: TimeBasedSequence?,
+    val sequencer: JwSequencer,
     val synthesizer: Synthesizer?,
     val midiDevice: MidiDevice,
 ) {
     companion object {
         fun build(midiFile: File?, configurations: Collection<Configuration>): MidiPackage {
             val homeConfiguration = configurations.find<HomeConfiguration>()
+            val midiService = KoinPlatformTools.defaultContext().get().get<MidiService>()
 
             val deviceName = homeConfiguration.selectedMidiDevice
-            val midiDevice = MidiSystem.getMidiDevice(MidiSystem.getMidiDeviceInfo().first { it.name == deviceName })
-                .also { it.open() }
+            val midiDevice = midiService.getMidiDevices().find { it.name == deviceName }
 
-            val sequencer = with(RealTimeSequencerProvider()) {
-                (getDevice(deviceInfo.first()) as Sequencer).apply {
-                    open()
-                }
+            check(midiDevice != null) {
+                "MIDI device $deviceName not found"
+            }
+
+            val sequencer = JwSequencerImpl().apply {
+                open(midiDevice)
             }
 
             val synthesizer = when (deviceName) {
@@ -61,16 +69,13 @@ internal class MidiPackage private constructor(
                 else -> null
             }
 
-            sequencer.transmitter.receiver = when (synthesizer) {
-                null -> midiDevice.receiver
-                else -> synthesizer.receiver
-            }
-
+            val reader = StandardMidiFileReader()
             midiFile?.let {
-                sequencer.sequence = MidiSystem.getSequence(it)
+                val sequence = reader.readFile(it).toTimeBasedSequence()
+                sequencer.sequence = sequence
             }
 
-            return MidiPackage(sequencer, synthesizer, midiDevice)
+            return MidiPackage(sequencer.sequence, sequencer, synthesizer, midiDevice)
         }
     }
 }

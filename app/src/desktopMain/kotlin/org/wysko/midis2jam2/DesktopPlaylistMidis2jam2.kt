@@ -18,15 +18,15 @@
 package org.wysko.midis2jam2
 
 import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.midis2jam2.midi.system.JwSequencer
+import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.Configuration
-import javax.sound.midi.MidiDevice
-import javax.sound.midi.Sequencer
 import javax.sound.midi.Synthesizer
 import kotlin.time.Duration.Companion.seconds
 
 class DesktopPlaylistMidis2jam2(
     override val fileName: String,
-    sequencer: Sequencer,
+    sequencer: JwSequencer,
     midiFile: TimeBasedSequence,
     private val onFinish: () -> Unit,
     onClose: () -> Unit,
