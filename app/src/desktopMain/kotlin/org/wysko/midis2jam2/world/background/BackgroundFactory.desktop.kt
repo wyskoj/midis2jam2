@@ -23,12 +23,21 @@ import com.jme3.texture.plugins.AWTLoader
 import jme3tools.converters.ImageToAwt
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
+import java.awt.image.BufferedImage
 
 internal actual fun rotateTexture(texture: Texture): Texture2D {
     val image = ImageToAwt.convert(texture.image, false, true, 0)
-    val tx = AffineTransform.getScaleInstance(-1.0, -1.0).apply {
+    val rotationTransform = AffineTransform.getScaleInstance(-1.0, -1.0).apply {
         translate(-image.width.toDouble(), -image.height.toDouble())
     }
-    val rotatedImage = AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(image, null)
-    return Texture2D(AWTLoader().load(rotatedImage, true))
+    val rotatedImage = AffineTransformOp(rotationTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(image, null)
+    val size = maxOf(rotatedImage.width, rotatedImage.height)
+    val scaledImage = BufferedImage(size, size, rotatedImage.type)
+    val scaleTransform = AffineTransform.getScaleInstance(
+        size.toDouble() / rotatedImage.width,
+        size.toDouble() / rotatedImage.height
+    )
+    val op = AffineTransformOp(scaleTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
+    op.filter(rotatedImage, scaledImage)
+    return Texture2D(AWTLoader().load(scaledImage, true))
 }
