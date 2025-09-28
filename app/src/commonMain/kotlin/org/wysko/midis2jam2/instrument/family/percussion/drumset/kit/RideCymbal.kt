@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.datastructure.spline.CubicSplineBuilder
+import org.wysko.midis2jam2.datastructure.spline.CardinalSpline
 import org.wysko.midis2jam2.midi.RIDE_BELL
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -30,7 +30,7 @@ private const val EDGE_POSITION = 18f
 class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: CymbalType, style: Style = Style.Standard) :
     Cymbal(context, hits, type, style) {
     private val spline = when {
-        hits.size >= 2 -> CubicSplineBuilder().createSpline(
+        hits.size >= 2 -> CardinalSpline(
             hits.map { context.sequence.getTimeOf(it).toDouble(SECONDS) },
             hits.map { stickPosition(it.note).toDouble() }
         )
@@ -52,7 +52,7 @@ class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: Cymbal
                 stick.node.setLocalTranslation(
                     0f,
                     2f,
-                    spline.evaluate(time.toDouble(SECONDS)).coerceIn(12.0..18.0).toFloat()
+                    spline.evaluate(time.toDouble(SECONDS)).toFloat()
                 )
             }
 
