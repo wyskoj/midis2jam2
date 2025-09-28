@@ -61,7 +61,7 @@ class Metronome(context: Midis2jam2, clickHits: List<NoteEvent.NoteOn>, bellHits
             +context.modelD("MetronomeBox.obj", "Wood.bmp")
         }
         with(placement) {
-            loc = v3(-20, 0, -46)
+            loc = v3(-20, 0, -48)
             rot = v3(0, 20, 0)
         }
     }
