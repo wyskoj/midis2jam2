@@ -57,14 +57,17 @@ class PitchBendModulationController(
         modulation = it.prev()?.value ?: 0
     }
 
-    private val modulationDepthRangeEvents =
-        EventCollector(
-            context,
-            VirtualParameterNumberChangeEvent.fromEvents(events)
-                .filterIsInstance<VirtualModulationDepthRangeChangeEvent>()
-        ) {
-            modulationRange = it.prev()?.value ?: 0.5
-        }
+    private val modulationDepthRangeEvents = EventCollector(
+        context,
+        events = VirtualParameterNumberChangeEvent
+            .fromEvents(events)
+            .filterIsInstance<VirtualModulationDepthRangeChangeEvent>()
+            .also {
+                context.sequence.registerEvents(it)
+            }
+    ) {
+        modulationRange = it.prev()?.value ?: 0.5
+    }
 
     // Current MIDI states
     private var pitchBend = 0.0
