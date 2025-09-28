@@ -38,7 +38,7 @@ class Cowbell(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : Auxili
     init {
         recoilNode += context.modelR("CowBell.obj", "MetalTexture.bmp")
         geometry.run {
-            loc = v3(-10, 37.5, -102)
+            loc = v3(-10, 37.5, -85)
             rot = v3(24, 26.7, -3.81)
         }
     }

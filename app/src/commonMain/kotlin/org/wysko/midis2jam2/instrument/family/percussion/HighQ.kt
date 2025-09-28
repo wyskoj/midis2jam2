@@ -68,7 +68,7 @@ class HighQ(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : Auxiliar
 
     init {
         with(geometry) {
-            setLocalTranslation(-6f, 45f, -74f)
+            setLocalTranslation(-6f, 45f, -70f)
             localRotation = Quaternion().fromAngles(0f, rad(135.0), 0f)
         }
     }
