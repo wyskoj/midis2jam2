@@ -389,7 +389,10 @@ private fun SpecificationResetSelect(settings: State<AppSettings>, model: Settin
     }
 
     SelectRow(
-        option = settings.value.playbackSettings.midiSpecificationResetSettings.midiSpecification,
+        option = when (settings.value.playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage) {
+            true -> settings.value.playbackSettings.midiSpecificationResetSettings.midiSpecification
+            false -> null
+        },
         onOptionSelected = {
             if (it == null) {
                 model.setIsSendResetMessage(false)
