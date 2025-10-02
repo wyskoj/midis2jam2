@@ -46,7 +46,6 @@ internal class Midis2jam2QueueApplication(
 
     override fun simpleInitApp() {
         setupState(configurations, platform = Platform.Desktop)
-        sequencer.open(midiDevice)
         buildStates()
         loadSong(0)
     }
