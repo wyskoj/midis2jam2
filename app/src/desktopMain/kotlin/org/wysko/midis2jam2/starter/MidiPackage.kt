@@ -22,6 +22,7 @@ import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
+import org.wysko.midis2jam2.domain.GervillMidiDevice
 import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
@@ -58,7 +59,7 @@ internal class MidiPackage private constructor(
             }
 
             val synthesizer = when (deviceName) {
-                GERVILL -> MidiSystem.getSynthesizer().apply {
+                GERVILL -> GervillMidiDevice.instance.synthesizer.apply {
                     open()
                     homeConfiguration.selectedSoundbank?.let {
                         val soundbank = MidiSystem.getSoundbank(File(it))

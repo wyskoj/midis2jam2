@@ -20,30 +20,20 @@ package org.wysko.midis2jam2.domain
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.ShortMessage
+import javax.sound.midi.Synthesizer
 import javax.sound.midi.SysexMessage
 
-private val BANNED_DEVICES = listOf("Gervill", "Real Time Sequencer")
+class GervillMidiDevice private constructor() : MidiDevice {
+    private val device: javax.sound.midi.MidiDevice = MidiSystem.getSynthesizer()
 
-actual class MidiService {
-    actual fun getMidiDevices(): List<MidiDevice> {
-        val nonGervillDevices = MidiSystem.getMidiDeviceInfo()
-            .filter { !BANNED_DEVICES.contains(it.name) }
-            .map { DesktopMidiDevice(it) }
+    val synthesizer: Synthesizer
+        get() = device as Synthesizer
 
-        return listOf(GervillMidiDevice.instance) + nonGervillDevices
-    }
-}
-
-class DesktopMidiDevice(
-    val deviceInfo: javax.sound.midi.MidiDevice.Info,
-) : MidiDevice {
     override val name: String
-        get() = deviceInfo.name
-
-    private lateinit var device: javax.sound.midi.MidiDevice
+        get() = "Gervill"
 
     override fun open() {
-        device = MidiSystem.getMidiDevice(deviceInfo).also { it.open() }
+        device.open()
     }
 
     override fun close() {
@@ -82,5 +72,9 @@ class DesktopMidiDevice(
 
     override fun sendSysex(data: ByteArray) {
         device.receiver.send(SysexMessage(data, data.size), -1)
+    }
+
+    companion object {
+        val instance: GervillMidiDevice = GervillMidiDevice()
     }
 }

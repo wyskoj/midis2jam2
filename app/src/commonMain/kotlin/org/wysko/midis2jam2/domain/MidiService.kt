@@ -22,5 +22,3 @@ import org.wysko.midis2jam2.midi.system.MidiDevice
 expect class MidiService() {
     fun getMidiDevices(): List<MidiDevice>
 }
-
-expect fun MidiDevice.isInternal(): Boolean
