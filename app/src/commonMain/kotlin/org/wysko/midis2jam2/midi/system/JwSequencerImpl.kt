@@ -109,10 +109,10 @@ class JwSequencerImpl : JwSequencer {
         pump!!.sendAllNotesOff()
     }
 
-    override fun setPosition(position: Duration) {
+    override fun setPosition(position: Duration, start: Boolean) {
         check(isOpen) { "Sequencer is not open" }
         check(sequence != null) { "Sequence is not set" }
-        pump!!.setPosition(position.inWholeMilliseconds)
+        pump!!.setPosition(position.inWholeMilliseconds, start)
     }
 
     override fun resetDevice() {
@@ -145,10 +145,14 @@ class JwSequencerImpl : JwSequencer {
             }
         }
 
-        internal fun setPosition(time: Long) {
-            val wasRunning = isRunning
+        internal fun setPosition(time: Long, start: Boolean) {
+            val wasRunning = isRunning || start
             if (wasRunning) stop()
-            chaseEvents(time)
+
+            when (time) {
+                0L -> eventIndex = 0
+                else -> chaseEvents(time)
+            }
             checkpoint(time)
             if (wasRunning) start()
         }
