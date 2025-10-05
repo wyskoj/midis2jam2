@@ -29,7 +29,7 @@ interface JwSequencer {
     fun close()
     fun start()
     fun stop()
-    fun setPosition(position: Duration)
+    fun setPosition(position: Duration, start: Boolean)
     fun resetDevice()
     fun sendData(data: ByteArray)
 }

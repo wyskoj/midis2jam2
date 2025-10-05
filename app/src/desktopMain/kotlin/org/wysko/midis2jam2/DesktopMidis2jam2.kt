@@ -198,7 +198,7 @@ open class DesktopMidis2jam2(
     override fun seek(time: Duration) {
         logger().debug("Seeking to time: $time")
         this.time = time
-        sequencer.setPosition(time)
+        sequencer.setPosition(time, !paused)
         collectors.forEach { it.seek(time) }
     }
 
@@ -221,8 +221,10 @@ open class DesktopMidis2jam2(
             if (configs.find<HomeConfiguration>().isLooping) {
                 // Loop the song
                 isSequencerStarted = false
-                sequencer.stop()
-                seek((-2).seconds)
+                this.time = (-2).seconds
+                sequencer.setPosition(ZERO, false)
+                collectors.forEach { it.seek((-2).seconds) }
+                handleResetMessage()
                 slideCamController.onLoop()
                 sequencer.resetDevice()
             } else {
@@ -243,7 +245,7 @@ open class DesktopMidis2jam2(
     }
 
     private fun startSequencerIfNeeded() {
-        if (!isSequencerStarted && time > ZERO) {
+        if (!isSequencerStarted && time > ZERO && !paused) {
             sequencer.start()
             isSequencerStarted = true
             setSynthEffects()
