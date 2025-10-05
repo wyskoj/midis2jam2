@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.starter.configuration
 
 import org.wysko.midis2jam2.domain.HomeScreenModel
+import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
 import kotlin.reflect.KClass
 
@@ -53,16 +54,18 @@ operator fun <T : Configuration> Collection<Configuration>.get(type: KClass<T>):
 inline fun <reified T : Configuration> Collection<Configuration>.find(): T = getType(T::class)
 
 class ConfigurationService(
-    private val homeTabModel: HomeScreenModel,
+    private val homeTabPersistor: HomeTabPersistor,
+    private val homeScreenModel: HomeScreenModel,
     private val settingsRepository: SettingsRepository,
 ) {
     fun getConfigurations(): List<Configuration> {
+        val state = homeTabPersistor.load()
         return buildList {
             add(
                 HomeConfiguration(
-                    selectedMidiDevice = homeTabModel.selectedMidiDevice.value.name,
-                    selectedSoundbank = homeTabModel.selectedSoundbank.value?.path,
-                    isLooping = homeTabModel.isLooping.value,
+                    selectedMidiDevice = state.midiDevice,
+                    selectedSoundbank = state.soundbank,
+                    isLooping = homeScreenModel.isLooping.value,
                 )
             )
 

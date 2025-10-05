@@ -102,9 +102,8 @@ kotlin {
             // jMonkeyEngine
             implementation(libs.bundles.jme3)
 
-            // kmidi + Gervill
+            // kmidi
             implementation(libs.kmidi)
-            implementation(files("../libs/Gervill-0.2.31.jar"))
 
             // Kotlin
             implementation(libs.kotlin.reflect)

@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.starter.configuration.ConfigurationService
 
 val applicationModule: Module = module {
     single<ApplicationService> { ApplicationService() }
-    single<ConfigurationService> { ConfigurationService(get(), get()) }
+    single<ConfigurationService> { ConfigurationService(get(), get(), get()) }
     single<BackgroundImageRepository> { BackgroundImageRepository() }
     single<SettingsRepository> { SettingsRepository() }
     single<HomeTabPersistor> { HomeTabPersistor() }

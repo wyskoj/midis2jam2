@@ -114,5 +114,3 @@ class FluidSynthDevice(context: Context) : MidiDevice {
         lateinit var device: FluidSynthDevice
     }
 }
-
-actual fun MidiDevice.isInternal(): Boolean = true
