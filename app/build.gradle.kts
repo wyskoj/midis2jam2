@@ -142,7 +142,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags.add("-std=c++17")
-                arguments.add("-DANDROID_STL=c++_shared")
+                arguments.addAll(listOf("-DANDROID_STL=c++_shared", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"))
             }
         }
     }

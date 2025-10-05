@@ -5,8 +5,8 @@ includedir=${prefix}/include
 
 Name: FluidSynth
 Description: Software SoundFont synth
-Version: 2.4.6
-Requires.private: glib-2.0 gthread-2.0 sndfile libinstpatch-1.0 oboe-1.0
+Version: 2.5.0
+Requires.private: glib-2.0 gthread-2.0 sndfile oboe-1.0
 Libs: -L${libdir} -lfluidsynth
-Libs.private: -lm /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/lib/linux/arm/libomp.so
+Libs.private: -llog -lOpenSLES
 Cflags: -I${includedir}
