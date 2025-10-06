@@ -82,7 +82,7 @@ class Trumpet(context: Midis2jam2, eventList: List<MidiEvent>, type: TrumpetType
 
         override fun animateKeys(pressed: List<Int>) {
             super.animateKeys(pressed)
-            keys.forEachIndexed { i, key -> key.loc = v3(0, if (i in pressed) -0.5 else 0, 0) }
+            keys.forEachIndexed { i, key -> key.loc = v3(0, if (i + 1 in pressed) -0.5 else 0, 0) }
         }
 
         override fun adjustForPolyphony(delta: Duration) {
