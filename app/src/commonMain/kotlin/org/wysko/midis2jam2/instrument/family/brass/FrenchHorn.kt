@@ -36,7 +36,7 @@ import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class)
-private const val TRIGGER_KEY_INDEX = 0
+private const val TRIGGER_INDEX = 0
 
 /**
  * The French Horn.
@@ -94,17 +94,16 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
         override fun animateKeys(pressed: List<Int>) {
             super.animateKeys(pressed)
             for (i in keys.indices) {
-                if (i !in pressed) {
-                    keys[i].rot = v3(0, 0, 0)
-                    continue
-                }
-
-                if (i == TRIGGER_KEY_INDEX) {
-                    keys[i].rot = v3(-25, 0, 0)
-                } else {
-                    keys[i].rot = v3(0, 0, -30)
+                keys[i].rot = when (i) {
+                    in pressed -> getPressedRotation(i)
+                    else -> Vector3f.ZERO
                 }
             }
+        }
+
+        private fun getPressedRotation(valve: Int) = when (valve) {
+            TRIGGER_INDEX -> v3(-25, 0, 0)
+            else -> v3(0, 0, -30)
         }
     }
 }

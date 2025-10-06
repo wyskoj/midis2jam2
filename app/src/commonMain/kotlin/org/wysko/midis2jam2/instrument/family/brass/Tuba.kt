@@ -63,7 +63,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiEvent>) :
 
         override fun animateKeys(pressed: List<Int>) {
             super.animateKeys(pressed)
-            keys.forEachIndexed { i, key -> key.loc = v3(0f, if (i in pressed) -0.5 else 0, 0f) }
+            keys.forEachIndexed { i, key -> key.loc = v3(0f, if (i + 1 in pressed) -0.5 else 0, 0f) }
         }
 
         init {
