@@ -61,8 +61,8 @@ sealed class ShellStyle(
         /** Jazz set. */
         data object Jazz : TypicalDrumShell("DrumShell_Jazz.png", "DrumShell_Snare_Jazz.png")
 
-        /** Brush set. TODO: Needs new textures. */
-        data object Brush : TypicalDrumShell("DrumShell_Jazz.png", "DrumShell_Snare_Jazz.png")
+        /** Brush set. */
+        data object Brush : TypicalDrumShell("DrumShell_Brush.png", "DrumShell_Snare_Brush.png")
 
         companion object {
             fun fromProgramNumber(program: Byte): TypicalDrumShell? {
