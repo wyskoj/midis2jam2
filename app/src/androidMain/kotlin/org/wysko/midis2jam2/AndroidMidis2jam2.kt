@@ -55,11 +55,13 @@ class AndroidMidis2jam2(
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
-        BackgroundController.configureBackground(this@AndroidMidis2jam2, configs.find(), root, Platform.Android)
+        val configuration = configs.find<AppSettingsConfiguration>()
+        BackgroundController.configureBackground(this@AndroidMidis2jam2, configuration, root, Platform.Android)
         cameraController = AndroidOrbitingCamera(this)
         setCameraControllersActive(cameraState)
+        app.camera.fov = configuration.appSettings.cameraSettings.defaultFieldOfView
 
-        if (configs.find<AppSettingsConfiguration>().appSettings.generalSettings.isShowDebugInfo) {
+        if (configuration.appSettings.generalSettings.isShowDebugInfo) {
             debugTextController.toggle()
         }
     }

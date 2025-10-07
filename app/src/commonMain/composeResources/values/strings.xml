@@ -184,4 +184,8 @@
     <string name="log_copied_to_clipboard">Copied to clipboard</string>
     <string name="log_copy_to_clipboard">Copy to clipboard</string>
     <string name="log_clear">Clear</string>
+    <!-- Settings / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">Field of view</string>
+    <string name="settings_camera_field_of_view_label_prefix">Change how wide the camera sees</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
 </resources>

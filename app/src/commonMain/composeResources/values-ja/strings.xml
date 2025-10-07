@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">クリップボードにコピーしました</string>
     <string name="log_copy_to_clipboard">クリップボードにコピー</string>
     <string name="log_clear">クリア</string>
+    <!-- 設定 / カメラ / 視野角 -->
+    <string name="settings_camera_field_of_view_title">視野角</string>
+    <string name="settings_camera_field_of_view_label_prefix">カメラの視野の広さを変更</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
 </resources>

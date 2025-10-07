@@ -23,6 +23,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -41,10 +44,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -52,6 +58,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
+import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.browse_activity
 import midis2jam2.app.generated.resources.camera_video
@@ -75,6 +82,9 @@ import midis2jam2.app.generated.resources.settings_background_type_default
 import midis2jam2.app.generated.resources.settings_background_type_default_description
 import midis2jam2.app.generated.resources.settings_camera_classic_autocam
 import midis2jam2.app.generated.resources.settings_camera_classic_autocam_description
+import midis2jam2.app.generated.resources.settings_camera_field_of_view_degrees
+import midis2jam2.app.generated.resources.settings_camera_field_of_view_label_prefix
+import midis2jam2.app.generated.resources.settings_camera_field_of_view_title
 import midis2jam2.app.generated.resources.settings_camera_start_autocam_with_song
 import midis2jam2.app.generated.resources.settings_camera_start_autocam_with_song_description
 import midis2jam2.app.generated.resources.settings_general_theme
@@ -103,6 +113,8 @@ import midis2jam2.app.generated.resources.surround_sound
 import midis2jam2.app.generated.resources.tab_settings
 import midis2jam2.app.generated.resources.tonality
 import midis2jam2.app.generated.resources.wallpaper
+import midis2jam2.app.generated.resources.zoom_in
+import midis2jam2.app.generated.resources.zoom_out
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -119,6 +131,8 @@ import org.wysko.midis2jam2.ui.common.component.CubeMapImageSelect
 import org.wysko.midis2jam2.ui.common.component.SelectOption
 import org.wysko.midis2jam2.ui.common.component.SelectRow
 import org.wysko.midis2jam2.ui.common.component.SwitchRow
+import org.wysko.midis2jam2.ui.common.component.UnitRow
+import kotlin.math.roundToInt
 
 object SettingsScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
@@ -461,3 +475,70 @@ internal expect fun LocaleSelect(
     onSelectLocale: (String) -> Unit,
     availableLocales: List<String>,
 )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun FieldOfViewSelect(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var sliderPosition by remember { mutableFloatStateOf(0f) }
+    var isShowSheet by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    @Composable
+    fun formatFov(degrees: Float): String {
+        return stringResource(Res.string.settings_camera_field_of_view_degrees, degrees.roundToInt())
+    }
+
+    UnitRow(
+        title = { Text(stringResource(Res.string.settings_camera_field_of_view_title)) },
+        label = {
+            val prefix = stringResource(Res.string.settings_camera_field_of_view_label_prefix)
+            val current = formatFov(settings.value.cameraSettings.defaultFieldOfView)
+            Text("$prefix ∙ $current")
+        },
+        icon = Res.drawable.zoom_in,
+    ) {
+        isShowSheet = true
+        sliderPosition = settings.value.cameraSettings.defaultFieldOfView
+    }
+
+    if (isShowSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    model.setDefaultFieldOfView(sliderPosition)
+                    sheetState.hide()
+                    isShowSheet = false
+                }
+            },
+            sheetState = sheetState,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+            ) {
+                Text(formatFov(sliderPosition))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(painterResource(Res.drawable.zoom_in), null)
+                    Slider(
+                        value = sliderPosition,
+                        onValueChange = {
+                            sliderPosition = it
+                        },
+                        valueRange = 30f..90f,
+                        modifier = Modifier.weight(1f),
+                        steps = 11,
+                    )
+                    Icon(painterResource(Res.drawable.zoom_out), null)
+                }
+            }
+        }
+    }
+}

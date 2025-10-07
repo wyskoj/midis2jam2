@@ -43,6 +43,7 @@ private const val DEFAULT_MOVE_SPEED = 100f
  */
 class SmoothFlyByCamera(
     private val context: Midis2jam2,
+    private val defaultFov: Float,
     private val onAction: () -> Unit,
 ) : CameraController, VariableSpeed {
     /**
@@ -79,7 +80,7 @@ class SmoothFlyByCamera(
 
     private val dummyCamera = Camera(context.app.camera.width, context.app.camera.height).apply {
         isParallelProjection = false
-        fov = 40f
+        fov = defaultFov
     }
 
     private val dummyFlyByCamera: FlyByCamera = FlyByCameraListenable(dummyCamera) {

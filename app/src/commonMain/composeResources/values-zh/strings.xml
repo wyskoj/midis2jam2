@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">已复制到剪贴板</string>
     <string name="log_copy_to_clipboard">复制到剪贴板</string>
     <string name="log_clear">清除</string>
+    <!-- 设置 / 相机 / 视场 -->
+    <string name="settings_camera_field_of_view_title">视场</string>
+    <string name="settings_camera_field_of_view_label_prefix">更改摄像机视野宽度</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
 </resources>

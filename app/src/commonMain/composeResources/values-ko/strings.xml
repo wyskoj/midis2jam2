@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">클립보드에 복사했습니다</string>
     <string name="log_copy_to_clipboard">클립보드에 복사</string>
     <string name="log_clear">지우기</string>
+    <!-- 설정 / 카메라 / 시야각 -->
+    <string name="settings_camera_field_of_view_title">시야각</string>
+    <string name="settings_camera_field_of_view_label_prefix">카메라 시야의 너비 변경</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d도</string>
 </resources>

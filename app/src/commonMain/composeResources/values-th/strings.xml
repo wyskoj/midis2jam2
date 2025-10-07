@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
     <string name="log_copy_to_clipboard">คัดลอกไปยังคลิปบอร์ด</string>
     <string name="log_clear">ล้าง</string>
+    <!-- การตั้งค่า / กล้อง / มุมมองภาพ -->
+    <string name="settings_camera_field_of_view_title">มุมมองภาพ</string>
+    <string name="settings_camera_field_of_view_label_prefix">เปลี่ยนความกว้างที่กล้องมองเห็น</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d องศา</string>
 </resources>
