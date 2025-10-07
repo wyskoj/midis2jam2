@@ -177,15 +177,21 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
         }
 
         if (context.configs.find<AppSettingsConfiguration>().appSettings.cameraSettings.isClassicAutoCam) {
-            return AutoCamPosition.values()
-                .filter { it.isClassicCamUsed && it != angles.last() && it.pickMe(time, context.instruments, context) }
+            return AutoCamPosition.entries
+                .filter {
+                    it.policy != CameraAnglePolicy.NormalOnly && it != angles.last() && it.pickMe(
+                        time,
+                        context.instruments,
+                        context
+                    )
+                }
                 .random()
         }
 
         /* About 1/4 of the time, pick a stage angle */
         return if (Math.random() < 0.25) {
             /* Collect all stage camera angles */
-            val stageCameras = AutoCamPosition.values().filter { it.type == AutoCamPositionType.STAGE }
+            val stageCameras = AutoCamPosition.entries.filter { it.type == AutoCamPositionType.STAGE }
 
             /* Valid stage cameras are those that are not the current one (and not the overhead) */
             val validStageCameras = stageCameras.filter { it != angles.last() && it != AutoCamPosition.GENERAL_D }
@@ -194,8 +200,12 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
             validStageCameras.random()
         } else {
             /* Collect all valid instrument camera angles */
-            val validInstrumentCameras = AutoCamPosition.values()
-                .filter { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe.invoke(time, context.instruments, context) }
+            val validInstrumentCameras = AutoCamPosition.entries
+                .filter {
+                    it.type == AutoCamPositionType.INSTRUMENT &&
+                        it.pickMe.invoke(time, context.instruments, context) &&
+                        it.policy != CameraAnglePolicy.ClassicOnly
+                }
 
             /* Collect some the last used instrument camera angles */
             val lastUsedInstrumentCameras = angles.filter { it.type == AutoCamPositionType.INSTRUMENT }
@@ -209,7 +219,11 @@ class AutoCamController(private val context: Midis2jam2, startEnabled: Boolean) 
                 notRecentlyUsedInstrumentAngles.random()
             } else {
                 /* Otherwise, just pick the last used camera that has been the longest time since it was used */
-                angles.firstOrNull { it.type == AutoCamPositionType.INSTRUMENT && it.pickMe(time, context.instruments, context) }
+                angles.firstOrNull {
+                    it.type == AutoCamPositionType.INSTRUMENT &&
+                            it.pickMe(time, context.instruments, context) &&
+                            it.policy != CameraAnglePolicy.ClassicOnly
+                }
                     ?: AutoCamPosition.GENERAL_A
             }
         }
@@ -264,7 +278,7 @@ enum class AutoCamPosition(
     val stayHere: (time: Duration, instruments: List<Instrument>, context: Midis2jam2) -> Boolean,
     /** The type of camera. */
     val type: AutoCamPositionType,
-    val isClassicCamUsed: Boolean = false,
+    val policy: CameraAnglePolicy = CameraAnglePolicy.NormalOnly,
 ) {
     GENERAL_A(
         Vector3f(-2.00f, 92.00f, 134.00f),
@@ -272,7 +286,7 @@ enum class AutoCamPosition(
         alwaysTrue,
         alwaysTrue,
         AutoCamPositionType.STAGE,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     GENERAL_B(
@@ -281,7 +295,7 @@ enum class AutoCamPosition(
         alwaysTrue,
         alwaysTrue,
         AutoCamPositionType.STAGE,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     GENERAL_C(
@@ -290,7 +304,7 @@ enum class AutoCamPosition(
         alwaysTrue,
         alwaysTrue,
         AutoCamPositionType.STAGE,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both
     ),
 
     GENERAL_D(
@@ -299,7 +313,7 @@ enum class AutoCamPosition(
         alwaysTrue,
         alwaysTrue,
         AutoCamPositionType.STAGE,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.ClassicOnly
     ),
 
     BASS_GUITAR(
@@ -308,7 +322,7 @@ enum class AutoCamPosition(
         { time, instruments, _ -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     BASS_GUITAR_2(
@@ -317,7 +331,7 @@ enum class AutoCamPosition(
         { time, instruments, _ -> visibleNowAndLater(instruments, BassGuitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<BassGuitar>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.ClassicOnly,
     ),
 
     GUITAR(
@@ -326,7 +340,7 @@ enum class AutoCamPosition(
         { time, instruments, _ -> visibleNowAndLater(instruments, Guitar::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Guitar>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true,
+        policy = CameraAnglePolicy.Both,
     ),
 
     DRUM_SET(
@@ -335,7 +349,7 @@ enum class AutoCamPosition(
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     DRUM_SET_2(
@@ -344,7 +358,7 @@ enum class AutoCamPosition(
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
         { _, _, context -> context.drumSetVisibilityManager.isVisible },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     KEYBOARDS(
@@ -353,7 +367,7 @@ enum class AutoCamPosition(
         { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     KEYBOARDS_2(
@@ -362,7 +376,7 @@ enum class AutoCamPosition(
         { time, instruments, _ -> visibleNowAndLater(instruments, Keyboard::class.java, time, WAIT_TIME * 1.5) },
         { _, instruments, _ -> instruments.filterIsInstance<Keyboard>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT,
-        isClassicCamUsed = true
+        policy = CameraAnglePolicy.Both,
     ),
 
     SOPRANO_SAX(
@@ -777,7 +791,12 @@ enum class AutoCamPosition(
         { _, instruments, _ -> instruments.filterIsInstance<BirdTweet>().any { it.isVisible } },
         AutoCamPositionType.INSTRUMENT
     ),
+}
 
+enum class CameraAnglePolicy {
+    NormalOnly,
+    ClassicOnly,
+    Both
 }
 
 /**
