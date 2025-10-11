@@ -46,7 +46,6 @@ internal fun SimpleApplication.setupState(
     addFpp: Boolean = true,
     platform: Platform,
 ) {
-    println("setting up state")
     renderer.defaultAnisotropicFilter = 4
     flyByCamera.run {
         unregisterInput()
@@ -92,5 +91,4 @@ internal fun SimpleApplication.setupState(
             viewPort.addProcessor(fpp)
         }
     }
-    println("state setup finished")
 }

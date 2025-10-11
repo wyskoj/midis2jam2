@@ -48,7 +48,6 @@ internal actual class Midis2jam2Application(
 
     actual fun execute() {
         try {
-            println("app execute")
             applyConfigurations(configurations)
             start()
         } catch (e: Exception) {
@@ -62,7 +61,6 @@ internal actual class Midis2jam2Application(
     }
 
     actual override fun simpleInitApp() {
-        println("simple init app")
         Jme3ExceptionHandler.setup {
             stop()
             sequencer.stop()
@@ -85,7 +83,6 @@ internal actual class Midis2jam2Application(
                     rootNode.attachChild(it.root)
                 }
             }
-            println("desktop midis2jam2 initialized")
         }
     }
 

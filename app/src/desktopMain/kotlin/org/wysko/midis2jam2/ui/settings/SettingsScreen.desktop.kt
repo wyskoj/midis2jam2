@@ -129,6 +129,7 @@ import org.wysko.midis2jam2.ui.common.component.SwitchRow
 import org.wysko.midis2jam2.ui.common.component.UnitRow
 import org.wysko.midis2jam2.util.FilesDragAndDrop
 import org.wysko.midis2jam2.util.digitsOnly
+import org.wysko.midis2jam2.util.isMacOs
 import org.wysko.midis2jam2.util.tintEnabled
 import java.io.File
 import java.io.IOException
@@ -189,8 +190,10 @@ internal actual fun LazyListScope.SettingsScreenContent(
     item {
         ShadowsQualitySelect(settings, model)
     }
-    item {
-        AntiAliasingQualitySelect(settings, model)
+    if (!isMacOs()) {
+        item {
+            AntiAliasingQualitySelect(settings, model)
+        }
     }
     item {
         BackgroundSelect(settings, model)

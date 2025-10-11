@@ -135,7 +135,6 @@ open class DesktopMidis2jam2(
     }
 
     override fun update(tpf: Float) {
-        println("DesktopMidis2jam2::update")
         super.update(tpf)
 
         val delta = tpf.toDouble().seconds

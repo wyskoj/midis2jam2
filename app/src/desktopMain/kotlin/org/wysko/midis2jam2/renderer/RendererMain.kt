@@ -62,7 +62,6 @@ fun main(args: Array<String>) {
         }
 
         1 -> {
-            println("One midi file")
             val midiFile = midiFiles.first()
             val midiPackage = runCatching {
                 MidiPackage.build(
@@ -70,7 +69,6 @@ fun main(args: Array<String>) {
                     config.configurations
                 )
             }.onFailure { t ->
-                println("midi package failed")
                 t.printStackTrace()
                 serverWriter.write(
                     Json.encodeToString(
@@ -84,7 +82,6 @@ fun main(args: Array<String>) {
                 serverWriter.close()
                 return
             }
-            println("midipackage good")
             val latch = CountDownLatch(1)
             with(midiPackage.getOrNull() ?: return) {
                 Midis2jam2Application(
