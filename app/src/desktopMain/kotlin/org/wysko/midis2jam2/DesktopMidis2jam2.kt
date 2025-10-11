@@ -28,9 +28,9 @@ import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
@@ -86,7 +86,7 @@ open class DesktopMidis2jam2(
             exit()
             errorLogService.addError(
                 e.message ?: "There was an error loading the images for the background.",
-                e
+                e.stackTraceToString()
             )
         } catch (e: IllegalArgumentException) {
             exit()
@@ -95,13 +95,13 @@ open class DesktopMidis2jam2(
                     "Image width and height must be the same" -> "The background images must be square."
                     else -> e.message ?: "There was an error loading the images for the background."
                 },
-                throwable = e
+                e.stackTraceToString()
             )
         } catch (e: AssetLoadException) {
             exit()
             errorLogService.addError(
                 message = "There was an error loading the background images. Did you remember to assign them in the settings?",
-                throwable = e
+                e.stackTraceToString()
             )
         }
 

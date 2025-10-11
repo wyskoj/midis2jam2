@@ -40,7 +40,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetVisibilityManager
 import org.wysko.midis2jam2.starter.ProgressListener
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.logger

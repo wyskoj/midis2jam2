@@ -52,7 +52,10 @@ internal actual class Midis2jam2Application(
             start()
         } catch (e: Exception) {
             // Log the error but continue to start the application
-            errorLogService.addError("There was an error applying configurations.", e)
+            errorLogService.addError(
+                message = "There was an error applying configurations.",
+                stackTrace = e.stackTraceToString()
+            )
             onFinish()
         }
     }

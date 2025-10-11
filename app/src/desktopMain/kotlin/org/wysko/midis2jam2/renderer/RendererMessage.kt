@@ -15,14 +15,18 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.starter.configuration
+package org.wysko.midis2jam2.renderer
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class HomeConfiguration(
-    val lastMidiFileSelectedDirectory: String? = null,
-    val selectedMidiDevice: String = "Gervill",
-    val selectedSoundbank: String? = null,
-    val isLooping: Boolean = false,
-) : Configuration
+data class RendererMessage(
+    val type: String,
+    val message: String? = null,
+    val stackTrace: String? = null
+) {
+    companion object {
+        fun finish() = RendererMessage("Finish")
+        fun error(message: String, stackTrace: String) = RendererMessage("Error", message, stackTrace)
+    }
+}

@@ -23,7 +23,7 @@ import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
 import com.jme3.math.ColorRGBA.White
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node

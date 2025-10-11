@@ -27,9 +27,8 @@ import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpe
 import org.wysko.midis2jam2.midi.sendResetMessage
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.logger
@@ -167,7 +166,7 @@ class AndroidMidis2jam2(
      */
     private fun handleSongCompletion() {
         if (isSongFinished && time >= endTime + 3.seconds) {
-            if (configs.find<HomeConfiguration>().isLooping) {
+            if (configs.find<Configuration.HomeConfiguration>().isLooping) {
                 // Loop the song
                 isSequencerStarted = false
                 sequencer.stop()

@@ -15,8 +15,13 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.starter.configuration
+package org.wysko.midis2jam2.renderer
 
-import org.wysko.midis2jam2.domain.settings.AppSettings
+import kotlinx.serialization.Serializable
+import org.wysko.midis2jam2.starter.configuration.Configuration
 
-data class AppSettingsConfiguration(val appSettings: AppSettings = AppSettings()) : Configuration
+@Serializable
+data class RendererBundle(
+    val midiFiles: List<String>,
+    val configurations: List<Configuration>,
+)

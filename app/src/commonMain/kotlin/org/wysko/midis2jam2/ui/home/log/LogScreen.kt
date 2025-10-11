@@ -62,7 +62,6 @@ import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.arrow_back
 import midis2jam2.app.generated.resources.clear_all
 import midis2jam2.app.generated.resources.content_copy
-import midis2jam2.app.generated.resources.file_open
 import midis2jam2.app.generated.resources.log_clear
 import midis2jam2.app.generated.resources.log_clear_all
 import midis2jam2.app.generated.resources.log_cleared_all_entries
@@ -218,7 +217,7 @@ object LogScreen : Screen {
                                 leadingIcon = { Icon(painterResource(Res.drawable.content_copy), "") },
                                 onClick = {
                                     isDropdownMenuExpanded = false
-                                    Utils.copyToClipboard(error.throwable?.stackTraceToString() ?: "")
+                                    Utils.copyToClipboard(error.stackTrace)
                                     onCopyClick()
                                 }
                             )
@@ -235,7 +234,7 @@ object LogScreen : Screen {
                 }
                 HorizontalDivider()
                 Text(
-                    text = error.throwable?.stackTraceToString() ?: "",
+                    text = error.stackTrace,
                     style = TextStyle(fontFamily = FontFamily.Monospace)
                 )
             }

@@ -26,8 +26,8 @@ import com.jme3.renderer.queue.RenderQueue
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
 import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.world.LightingSetup
 import org.wysko.midis2jam2.world.graphics.antiAliasingQualityDefinition

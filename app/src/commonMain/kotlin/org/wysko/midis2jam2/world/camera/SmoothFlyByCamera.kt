@@ -22,7 +22,7 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.renderer.Camera
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.world.CameraController

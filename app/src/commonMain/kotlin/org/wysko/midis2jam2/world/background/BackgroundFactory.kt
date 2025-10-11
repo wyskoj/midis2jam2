@@ -30,7 +30,7 @@ import com.jme3.texture.Texture
 import com.jme3.texture.Texture2D
 import com.jme3.texture.TextureCubeMap
 import com.jme3.util.SkyFactory
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 
 /**
  * Background factory for different background types.

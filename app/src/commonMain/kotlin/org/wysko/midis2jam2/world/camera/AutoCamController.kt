@@ -47,7 +47,7 @@ import org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax
 import org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.*
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
 import kotlin.math.pow

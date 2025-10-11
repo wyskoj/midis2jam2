@@ -22,7 +22,7 @@ import com.jme3.math.ColorRGBA
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 
 object BackgroundController {
