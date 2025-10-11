@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.starter
 
 import Platform
+import ch.qos.logback.core.util.EnvUtil.isMacOs
 import com.jme3.app.SimpleApplication
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
@@ -45,6 +46,7 @@ internal fun SimpleApplication.setupState(
     addFpp: Boolean = true,
     platform: Platform,
 ) {
+    println("setting up state")
     renderer.defaultAnisotropicFilter = 4
     flyByCamera.run {
         unregisterInput()
@@ -58,7 +60,7 @@ internal fun SimpleApplication.setupState(
                 addFilter(BloomFilter(Objects))
 
                 // Set anti-aliasing quality
-                if (platform == Platform.Desktop) {
+                if (platform == Platform.Desktop && !isMacOs()) {
                     numSamples = antiAliasingQualityDefinition[antiAliasingSettings.antiAliasingQuality]!!
                 }
 
@@ -90,4 +92,5 @@ internal fun SimpleApplication.setupState(
             viewPort.addProcessor(fpp)
         }
     }
+    println("state setup finished")
 }

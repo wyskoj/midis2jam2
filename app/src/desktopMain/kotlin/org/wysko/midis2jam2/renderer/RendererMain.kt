@@ -34,6 +34,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.net.ServerSocket
 import java.util.*
+import java.util.concurrent.CountDownLatch
 
 const val SERVER_PORT = 31320
 
@@ -56,9 +57,12 @@ fun main(args: Array<String>) {
                     )
                 )
             )
+            serverWriter.flush()
+            serverWriter.close()
         }
 
         1 -> {
+            println("One midi file")
             val midiFile = midiFiles.first()
             val midiPackage = runCatching {
                 MidiPackage.build(
@@ -66,6 +70,7 @@ fun main(args: Array<String>) {
                     config.configurations
                 )
             }.onFailure { t ->
+                println("midi package failed")
                 t.printStackTrace()
                 serverWriter.write(
                     Json.encodeToString(
@@ -79,12 +84,15 @@ fun main(args: Array<String>) {
                 serverWriter.close()
                 return
             }
+            println("midipackage good")
+            val latch = CountDownLatch(1)
             with(midiPackage.getOrNull() ?: return) {
                 Midis2jam2Application(
                     sequence!!,
                     midiFile.name,
                     config.configurations,
                     {
+                        latch.countDown()
                         serverWriter.write(Json.encodeToString(RendererMessage.finish()))
                         serverWriter.flush()
                         serverWriter.close()
@@ -94,6 +102,7 @@ fun main(args: Array<String>) {
                     midiDevice
                 ).execute()
             }
+            latch.await()
         }
 
         else -> {

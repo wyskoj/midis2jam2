@@ -34,6 +34,7 @@ import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
 import org.wysko.midis2jam2.starter.applyConfigurations
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
+import org.wysko.midis2jam2.util.isMacOs
 import java.io.File
 import java.net.Socket
 import java.util.Base64
@@ -202,14 +203,9 @@ actual class ApplicationService : KoinComponent {
         val javaExec = detectJavaExecutable()
         val classpath = detectRendererClasspath()
 
-        val cmd = mutableListOf(javaExec, /*"-XstartOnFirstThread",*/ "-cp", classpath, mainClass)
+        val cmd = mutableListOf(javaExec, "-XstartOnFirstThread", "-cp", classpath, mainClass)
         cmd.addAll(extraArgs)
 
         return ProcessBuilder(cmd).inheritIO().redirectErrorStream(true).start()
-    }
-
-    private fun isMacOs(): Boolean {
-//        return System.getProperty("os.name").lowercase().contains("mac")
-        return true
     }
 }

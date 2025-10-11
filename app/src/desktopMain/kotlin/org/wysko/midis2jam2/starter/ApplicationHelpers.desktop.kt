@@ -19,10 +19,13 @@ package org.wysko.midis2jam2.starter
 
 import com.jme3.system.AppSettings
 import org.wysko.midis2jam2.starter.configuration.Resolution
+import org.wysko.midis2jam2.util.isMacOs
 import java.awt.GraphicsEnvironment
 import javax.imageio.ImageIO
 
 internal actual fun AppSettings.applyIcons() {
+    if (isMacOs()) return // Do not set icons on macOS
+
     icons = arrayOf("/ico/icon16.png", "/ico/icon32.png", "/ico/icon128.png", "/ico/icon256.png")
         .map { ImageIO.read(this::class.java.getResource(it)) }
         .toTypedArray()

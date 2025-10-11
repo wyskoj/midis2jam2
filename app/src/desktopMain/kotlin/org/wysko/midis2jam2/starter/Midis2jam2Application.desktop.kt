@@ -48,10 +48,11 @@ internal actual class Midis2jam2Application(
 
     actual fun execute() {
         try {
+            println("app execute")
             applyConfigurations(configurations)
             start()
         } catch (e: Exception) {
-            // Log the error but continue to start the application
+            e.printStackTrace()
             errorLogService.addError(
                 message = "There was an error applying configurations.",
                 stackTrace = e.stackTraceToString()
@@ -61,6 +62,7 @@ internal actual class Midis2jam2Application(
     }
 
     actual override fun simpleInitApp() {
+        println("simple init app")
         Jme3ExceptionHandler.setup {
             stop()
             sequencer.stop()
@@ -83,6 +85,7 @@ internal actual class Midis2jam2Application(
                     rootNode.attachChild(it.root)
                 }
             }
+            println("desktop midis2jam2 initialized")
         }
     }
 
