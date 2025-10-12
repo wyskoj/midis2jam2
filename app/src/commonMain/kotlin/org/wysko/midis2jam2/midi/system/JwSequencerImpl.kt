@@ -183,7 +183,6 @@ class JwSequencerImpl : JwSequencer {
         }
 
         private fun chaseEvents(time: Long) {
-            Thread.sleep(1000)
             val programs = MutableList(16) { -1 }
             val pitchBends = MutableList(16) { 0x2000 }
             val channelPressures = MutableList(16) { 0 }
