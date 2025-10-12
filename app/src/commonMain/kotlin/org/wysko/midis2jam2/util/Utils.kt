@@ -39,12 +39,6 @@ import kotlin.time.DurationUnit
 
 /** Provides various utility functions. */
 object Utils {
-    fun copyToClipboard(text: String) {
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        val selection = StringSelection(text)
-        clipboard.setContents(selection, selection)
-    }
-
     /**
      * Converts an angle expressed in degrees to radians.
      *
@@ -82,6 +76,8 @@ object Utils {
         return outRange * ((clampedValue - inRangeA) / inRange) + outRangeA
     }
 }
+
+expect fun copyToClipboard(text: String)
 
 /** Converts a boolean into its appropriate [CullHint]. */
 val Boolean.ch: CullHint

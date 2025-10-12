@@ -33,6 +33,7 @@ import org.wysko.midis2jam2.AndroidMidis2jam2
 import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.util.logger
@@ -51,6 +52,7 @@ internal actual class Midis2jam2Application(
 
     actual override fun simpleInitApp() {
         logger().debug("Midis2jam2Application: simpleInitApp() called")
+        val errorLogService: ErrorLogService by inject()
         val applicationService: ApplicationService by inject()
         val midiService: MidiService by inject()
         val midiFile = applicationService.midiFile.value!!
@@ -61,7 +63,14 @@ internal actual class Midis2jam2Application(
 
         CoroutineScope(Dispatchers.IO).launch {
             val data = midiFile.readBytes()
-            val sequence = StandardMidiFileReader().readByteArray(data).toTimeBasedSequence()
+            val sequence = try {
+                StandardMidiFileReader().readByteArray(data).toTimeBasedSequence()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                errorLogService.addError("The MIDI file could not be read.", e)
+                stop()
+                return@launch
+            }
             val sequencer = JwSequencerImpl()
 
             val midiDevice = midiService.getMidiDevices().first()

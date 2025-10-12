@@ -91,7 +91,7 @@ class AndroidHomeScreenModel(
     override fun midiFilePicker(onFileSelected: ((PlatformFile) -> Unit)?): PickerResultLauncher {
         return rememberFilePickerLauncher(
             mode = PickerMode.Single,
-            type = PickerType.File(listOf("mid")),
+            type = PickerType.File(),
             title = "Select MIDI file",
         ) { file ->
             _selectedMidiFile.value = file

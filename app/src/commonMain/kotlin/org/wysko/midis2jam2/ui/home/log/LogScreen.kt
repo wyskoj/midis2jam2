@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -62,7 +63,6 @@ import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.arrow_back
 import midis2jam2.app.generated.resources.clear_all
 import midis2jam2.app.generated.resources.content_copy
-import midis2jam2.app.generated.resources.file_open
 import midis2jam2.app.generated.resources.log_clear
 import midis2jam2.app.generated.resources.log_clear_all
 import midis2jam2.app.generated.resources.log_cleared_all_entries
@@ -78,7 +78,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ErrorLogEntry
 import org.wysko.midis2jam2.domain.ErrorLogService
-import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.copyToClipboard
 import java.text.SimpleDateFormat
 
 object LogScreen : Screen {
@@ -218,7 +218,7 @@ object LogScreen : Screen {
                                 leadingIcon = { Icon(painterResource(Res.drawable.content_copy), "") },
                                 onClick = {
                                     isDropdownMenuExpanded = false
-                                    Utils.copyToClipboard(error.throwable?.stackTraceToString() ?: "")
+                                    copyToClipboard(error.throwable?.stackTraceToString() ?: "")
                                     onCopyClick()
                                 }
                             )
@@ -236,7 +236,7 @@ object LogScreen : Screen {
                 HorizontalDivider()
                 Text(
                     text = error.throwable?.stackTraceToString() ?: "",
-                    style = TextStyle(fontFamily = FontFamily.Monospace)
+                    style = TextStyle(fontFamily = FontFamily.Monospace).copy(fontSize = 10.sp)
                 )
             }
         }
