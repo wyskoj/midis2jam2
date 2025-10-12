@@ -29,13 +29,16 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.StandardMidiFileReadingException
 import org.wysko.midis2jam2.AndroidMidis2jam2
 import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.util.logger
+import java.io.IOException
 
 internal actual class Midis2jam2Application(
     private val onFinish: () -> Unit = {},
@@ -51,6 +54,7 @@ internal actual class Midis2jam2Application(
 
     actual override fun simpleInitApp() {
         logger().debug("Midis2jam2Application: simpleInitApp() called")
+        val errorLogService: ErrorLogService by inject()
         val applicationService: ApplicationService by inject()
         val midiService: MidiService by inject()
         val midiFile = applicationService.midiFile.value!!
@@ -60,26 +64,34 @@ internal actual class Midis2jam2Application(
         setupState(configurations, addFpp = CompatLibrary.supportsFilterPostProcessor, platform = Platform.Android)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val data = midiFile.readBytes()
-            val sequence = StandardMidiFileReader().readByteArray(data).toTimeBasedSequence()
-            val sequencer = JwSequencerImpl()
+            try {
+                val sequence = StandardMidiFileReader().readByteArray(midiFile.readBytes()).toTimeBasedSequence()
+                val midiDevice = midiService.getMidiDevices().first()
+                val sequencer = JwSequencerImpl().apply {
+                    open(midiDevice)
+                    this.sequence = sequence
+                }
 
-            val midiDevice = midiService.getMidiDevices().first()
-            sequencer.open(midiDevice)
-            sequencer.sequence = sequence
-
-            androidMidis2jam2 = AndroidMidis2jam2(
-                fileName = midiFile.name,
-                midiFile = sequence,
-                onClose = { stop() },
-                sequencer = sequencer,
-                configs = configurations,
-                midiDevice = midiDevice,
-            )
-
-            enqueue {
-                rootNode.attachChild(androidMidis2jam2.root)
-                stateManager.attach(androidMidis2jam2)
+                androidMidis2jam2 = AndroidMidis2jam2(
+                    fileName = midiFile.name,
+                    midiFile = sequence,
+                    onClose = { stop() },
+                    sequencer = sequencer,
+                    configs = configurations,
+                    midiDevice = midiDevice,
+                )
+                enqueue {
+                    rootNode.attachChild(androidMidis2jam2.root)
+                    stateManager.attach(androidMidis2jam2)
+                }
+            } catch (e: StandardMidiFileReadingException) {
+                e.printStackTrace()
+                errorLogService.addError("The selected file is not a MIDI file or contains an error.", e)
+                stop()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                errorLogService.addError("The file could not be read.", e)
+                stop()
             }
         }
     }
