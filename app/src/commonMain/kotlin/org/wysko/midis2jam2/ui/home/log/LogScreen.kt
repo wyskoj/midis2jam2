@@ -218,7 +218,7 @@ object LogScreen : Screen {
                                 leadingIcon = { Icon(painterResource(Res.drawable.content_copy), "") },
                                 onClick = {
                                     isDropdownMenuExpanded = false
-                                    copyToClipboard(error.throwable?.stackTraceToString() ?: "")
+                                    copyToClipboard(error.stackTrace)
                                     onCopyClick()
                                 }
                             )
@@ -235,7 +235,7 @@ object LogScreen : Screen {
                 }
                 HorizontalDivider()
                 Text(
-                    text = error.throwable?.stackTraceToString() ?: "",
+                    text = error.stackTrace,
                     style = TextStyle(fontFamily = FontFamily.Monospace).copy(fontSize = 10.sp)
                 )
             }

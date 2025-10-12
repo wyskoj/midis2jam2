@@ -86,11 +86,17 @@ internal actual class Midis2jam2Application(
                 }
             } catch (e: StandardMidiFileReadingException) {
                 e.printStackTrace()
-                errorLogService.addError("The selected file is not a MIDI file or contains an error.", e)
+                errorLogService.addError(
+                    message = "The selected file is not a MIDI file or contains an error.",
+                    stackTrace = e.stackTraceToString()
+                )
                 stop()
             } catch (e: IOException) {
                 e.printStackTrace()
-                errorLogService.addError("The file could not be read.", e)
+                errorLogService.addError(
+                    message = "The file could not be read.",
+                    stackTrace = e.stackTraceToString()
+                )
                 stop()
             }
         }
