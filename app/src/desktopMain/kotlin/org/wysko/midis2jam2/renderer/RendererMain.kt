@@ -39,9 +39,7 @@ import java.util.concurrent.CountDownLatch
 const val SERVER_PORT = 31320
 
 fun main(args: Array<String>) {
-    startKoin {
-        modules(applicationModule, midiSystemModule, systemModule, uiModule)
-    }
+    startKoin { modules(applicationModule, midiSystemModule, systemModule, uiModule) }
     val arguments = Base64.getDecoder().decode(args.first()).toString(Charsets.UTF_8)
     val config = Json.decodeFromString<RendererBundle>(arguments)
     val serverWriter = startTcpListener()
@@ -49,60 +47,70 @@ fun main(args: Array<String>) {
 
     when (midiFiles.size) {
         0 -> exit(serverWriter)
+        1 -> launchApplication(midiFiles, config, serverWriter)
+        else -> launchQueueApplication(midiFiles, config, serverWriter)
+    }
+}
 
-        1 -> {
-            val midiFile = midiFiles.first()
-            val midiPackage = runCatching { MidiPackage.build(midiFile, config.configurations) }.onFailure { t ->
-                onFailGetMidiPackage(t, serverWriter)
-                return
-            }
-            val latch = CountDownLatch(1)
-            with(midiPackage.getOrNull() ?: return) {
-                Midis2jam2Application(
-                    sequence!!,
-                    midiFile.name,
-                    config.configurations,
-                    {
-                        latch.countDown()
-                        serverWriter.write(Json.encodeToString(RendererMessage.finish()))
-                        serverWriter.flush()
-                        serverWriter.close()
-                    },
-                    sequencer,
-                    synthesizer,
-                    midiDevice
-                ).execute()
-            }
-            latch.await()
-        }
+private fun launchApplication(
+    midiFiles: List<File>,
+    config: RendererBundle,
+    serverWriter: BufferedWriter,
+) {
+    val midiFile = midiFiles.first()
+    val midiPackage = runCatching { MidiPackage.build(midiFile, config.configurations) }.onFailure { t ->
+        onFailGetMidiPackage(t, serverWriter)
+        return
+    }
+    val latch = CountDownLatch(1)
+    with(midiPackage.getOrNull() ?: return) {
+        Midis2jam2Application(
+            sequence!!,
+            midiFile.name,
+            config.configurations,
+            {
+                latch.countDown()
+                serverWriter.write(Json.encodeToString(RendererMessage.finish()))
+                serverWriter.flush()
+                serverWriter.close()
+            },
+            sequencer,
+            synthesizer,
+            midiDevice
+        ).execute()
+    }
+    latch.await()
+}
 
-        else -> {
-            val reader = StandardMidiFileReader()
-            val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
+private fun launchQueueApplication(
+    midiFiles: List<File>,
+    config: RendererBundle,
+    serverWriter: BufferedWriter,
+) {
+    val reader = StandardMidiFileReader()
+    val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
 
-            val midiPackage = runCatching { MidiPackage.build(null, config.configurations) }.onFailure { t ->
-                onFailGetMidiPackage(t, serverWriter)
-                return
-            }
+    val midiPackage = runCatching { MidiPackage.build(null, config.configurations) }.onFailure { t ->
+        onFailGetMidiPackage(t, serverWriter)
+        return
+    }
 
-            with(midiPackage.getOrNull() ?: return) {
-                Midis2jam2QueueApplication(
-                    sequences = sequences,
-                    fileNames = midiFiles.map { it.name },
-                    config.configurations,
-                    {
-                        serverWriter.write(Json.encodeToString(RendererMessage.finish()))
-                        serverWriter.flush()
-                        serverWriter.close()
-                    },
-                    sequencer,
-                    synthesizer,
-                    midiDevice
-                ).run {
-                    applyConfigurations(config.configurations)
-                    start()
-                }
-            }
+    with(midiPackage.getOrNull() ?: return) {
+        Midis2jam2QueueApplication(
+            sequences = sequences,
+            fileNames = midiFiles.map { it.name },
+            config.configurations,
+            {
+                serverWriter.write(Json.encodeToString(RendererMessage.finish()))
+                serverWriter.flush()
+                serverWriter.close()
+            },
+            sequencer,
+            synthesizer,
+            midiDevice
+        ).run {
+            applyConfigurations(config.configurations)
+            start()
         }
     }
 }
