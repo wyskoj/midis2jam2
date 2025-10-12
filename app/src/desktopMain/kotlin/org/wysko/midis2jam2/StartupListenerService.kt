@@ -27,53 +27,34 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-/**
- * Service to handle startup notifications, particularly for macOS file associations.
- * This allows the application to respond to file open events when launched from Finder.
- */
 object StartupListenerService : KoinComponent {
 
     private var isListenerRegistered = false
     private var fileAssociationUsed = false
     private val startupLatch = CountDownLatch(1)
 
-    /**
-     * Registers a startup listener for macOS file associations.
-     * This should be called early in the application lifecycle.
-     */
     fun registerStartupListener() {
         if (!isMacOs() || isListenerRegistered) return
 
-        try {
-            StartupNotification.registerStartupListener { parameters ->
-                handleFileOpenEvent(parameters)
-            }
-            isListenerRegistered = true
-
-            // Start a background thread to count down the latch after a timeout
-            // This ensures we don't wait forever if no file association event occurs
-            Thread {
-                try {
-                    Thread.sleep(100) // Give a brief moment for any events
-                    if (startupLatch.count > 0) {
-                        startupLatch.countDown()
-                    }
-                } catch (e: InterruptedException) {
-                    Thread.currentThread().interrupt()
-                }
-            }.start()
-        } catch (e: Exception) {
-            // Log error but don't fail the application
-            println("Failed to register startup listener: ${e.message}")
-            startupLatch.countDown()
+        StartupNotification.registerStartupListener { parameters ->
+            handleFileOpenEvent(parameters)
         }
+        isListenerRegistered = true
+
+        // Start a background thread to count down the latch after a timeout
+        // This ensures we don't wait forever if no file association event occurs
+        Thread {
+            try {
+                Thread.sleep(100) // Give a brief moment for any events
+                if (startupLatch.count > 0) {
+                    startupLatch.countDown()
+                }
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
+        }.start()
     }
 
-    /**
-     * Checks if a file association was used to launch the application.
-     * This should be called before starting the UI to determine if it should be shown.
-     * Waits for a short period to allow any file association events to be processed.
-     */
     fun wasFileAssociationUsed(): Boolean {
         if (!isMacOs()) return false
 
@@ -81,43 +62,34 @@ object StartupListenerService : KoinComponent {
         // This prevents race conditions where the listener hasn't processed yet
         try {
             startupLatch.await(200, TimeUnit.MILLISECONDS)
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
         }
 
         return fileAssociationUsed
     }
 
-    /**
-     * Handles file open events from macOS file associations.
-     * This method processes the file path and starts the application with the file.
-     */
     private fun handleFileOpenEvent(parameters: String) {
         if (parameters.isBlank()) {
             startupLatch.countDown()
             return
         }
 
-        try {
-            val file = File(parameters)
-            if (!file.exists() || !file.isFile) {
-                println("Invalid file path provided: $parameters")
-                startupLatch.countDown()
-                return
-            }
-
-            // Mark that file association was used
-            fileAssociationUsed = true
-
-            val applicationService: ApplicationService by inject()
-            val midiFile = PlatformFile(file)
-
-            // Use the shared method from CmdStart to start the application
-            CmdStart.startApplicationWithFile(applicationService, midiFile)
-        } catch (e: Exception) {
-            println("Error handling file open event: ${e.message}")
-        } finally {
+        val file = File(parameters)
+        if (!file.exists() || !file.isFile) {
+            println("Invalid file path provided: $parameters")
             startupLatch.countDown()
+            return
         }
+
+        // Mark that file association was used
+        fileAssociationUsed = true
+
+        val applicationService: ApplicationService by inject()
+        val midiFile = PlatformFile(file)
+
+        // Use the shared method from CmdStart to start the application
+        CmdStart.startApplicationWithFile(applicationService, midiFile)
+        startupLatch.countDown()
     }
 }

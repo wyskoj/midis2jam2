@@ -39,7 +39,6 @@ fun main(args: Array<String>): Unit = application {
         // On macOS, check if file association was used to prevent UI from starting
         isMacOs() && StartupListenerService.wasFileAssociationUsed() -> {
             // File association was used, don't start UI
-            return@application
         }
 
         else -> {

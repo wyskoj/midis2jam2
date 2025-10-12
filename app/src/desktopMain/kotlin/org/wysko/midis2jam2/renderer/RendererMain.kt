@@ -48,38 +48,12 @@ fun main(args: Array<String>) {
     val midiFiles = config.midiFiles.map { File(it) }
 
     when (midiFiles.size) {
-        0 -> {
-            serverWriter.write(
-                Json.encodeToString(
-                    RendererMessage.error(
-                        "No MIDI files passed to renderer server.",
-                        IllegalArgumentException("No MIDI files passed to renderer server.").stackTraceToString()
-                    )
-                )
-            )
-            serverWriter.flush()
-            serverWriter.close()
-        }
+        0 -> exit(serverWriter)
 
         1 -> {
             val midiFile = midiFiles.first()
-            val midiPackage = runCatching {
-                MidiPackage.build(
-                    midiFile,
-                    config.configurations
-                )
-            }.onFailure { t ->
-                t.printStackTrace()
-                serverWriter.write(
-                    Json.encodeToString(
-                        RendererMessage.error(
-                            "There was an error initializing the MIDI device.",
-                            t.stackTraceToString()
-                        )
-                    )
-                )
-                serverWriter.flush()
-                serverWriter.close()
+            val midiPackage = runCatching { MidiPackage.build(midiFile, config.configurations) }.onFailure { t ->
+                onFailGetMidiPackage(t, serverWriter)
                 return
             }
             val latch = CountDownLatch(1)
@@ -107,16 +81,7 @@ fun main(args: Array<String>) {
             val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
 
             val midiPackage = runCatching { MidiPackage.build(null, config.configurations) }.onFailure { t ->
-                serverWriter.write(
-                    Json.encodeToString(
-                        RendererMessage.error(
-                            "There was an error initializing the MIDI device.",
-                            t.stackTraceToString()
-                        )
-                    )
-                )
-                serverWriter.flush()
-                serverWriter.close()
+                onFailGetMidiPackage(t, serverWriter)
                 return
             }
 
@@ -140,8 +105,33 @@ fun main(args: Array<String>) {
             }
         }
     }
+}
 
+private fun onFailGetMidiPackage(t: Throwable, serverWriter: BufferedWriter) {
+    t.printStackTrace()
+    serverWriter.write(
+        Json.encodeToString(
+            RendererMessage.error(
+                "There was an error initializing the MIDI device.",
+                t.stackTraceToString()
+            )
+        )
+    )
+    serverWriter.flush()
+    serverWriter.close()
+}
 
+private fun exit(serverWriter: BufferedWriter) {
+    serverWriter.write(
+        Json.encodeToString(
+            RendererMessage.error(
+                "No MIDI files passed to renderer server.",
+                IllegalArgumentException("No MIDI files passed to renderer server.").stackTraceToString()
+            )
+        )
+    )
+    serverWriter.flush()
+    serverWriter.close()
 }
 
 private fun startTcpListener(): BufferedWriter {
