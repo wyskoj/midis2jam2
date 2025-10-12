@@ -21,19 +21,23 @@ import Platform
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetLoadException
+import com.jme3.font.BitmapText
 import org.koin.mp.KoinPlatformTools
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
 import org.wysko.midis2jam2.midi.system.JwSequencer
+import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.KeyMap
 import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
@@ -42,6 +46,7 @@ import org.wysko.midis2jam2.world.camera.CameraSpeed
 import org.wysko.midis2jam2.world.camera.CameraState
 import org.wysko.midis2jam2.world.camera.SmoothFlyByCamera
 import javax.sound.midi.Synthesizer
+import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
@@ -69,6 +74,7 @@ open class DesktopMidis2jam2(
 
     private var isSequencerStarted: Boolean = false
     private var skippedFrames = 0
+    private var lettingSequencerCatchUp = false
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
@@ -118,6 +124,11 @@ open class DesktopMidis2jam2(
         }
 
         logger().debug("Application initialized")
+
+        text = BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
+            this@DesktopMidis2jam2.app.guiNode.attachChild(this)
+            this.loc = v3(app.viewPort.camera.width / 2, app.viewPort.camera.height * 0.80, 0)
+        }
     }
 
     override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {
@@ -134,8 +145,19 @@ open class DesktopMidis2jam2(
         logger().debug("Cleanup complete")
     }
 
+    private lateinit var text: BitmapText
+
     override fun update(tpf: Float) {
         super.update(tpf)
+
+        val ourTime = time.toDouble(DurationUnit.SECONDS)
+        val theirTime = (sequencer as JwSequencerImpl).position.toDouble(DurationUnit.SECONDS)
+        text.text = "Performance: %.2f\nSequencer:   %.2f\nDrift:       %.2f (%s ahead)".format(
+            ourTime,
+            theirTime,
+            abs(ourTime - theirTime),
+            if (ourTime > theirTime) "Performance" else "Sequencer"
+        )
 
         val delta = tpf.toDouble().seconds
 
@@ -180,7 +202,7 @@ open class DesktopMidis2jam2(
 
         tickControllers(delta)
 
-        if (sequencer.isOpen && !paused) {
+        if (sequencer.isOpen && !paused && !lettingSequencerCatchUp) {
             time += delta
         }
     }
@@ -199,9 +221,18 @@ open class DesktopMidis2jam2(
     }
 
     override fun seek(time: Duration) {
+        if (lettingSequencerCatchUp) {
+            println("Catching up on last seek, aborting seek request")
+            return
+        }
+
         logger().debug("Seeking to time: $time")
         this.time = time
-        sequencer.setPosition(time, !paused)
+        sequencer.setPosition(time, !paused) {
+            println("Catch up complete")
+            lettingSequencerCatchUp = false
+        }
+        lettingSequencerCatchUp = true
         collectors.forEach { it.seek(time) }
     }
 
@@ -225,7 +256,7 @@ open class DesktopMidis2jam2(
                 // Loop the song
                 isSequencerStarted = false
                 this.time = (-2).seconds
-                sequencer.setPosition(ZERO, false)
+                sequencer.setPosition(ZERO, false) {}
                 collectors.forEach { it.seek((-2).seconds) }
                 handleResetMessage()
                 slideCamController.onLoop()

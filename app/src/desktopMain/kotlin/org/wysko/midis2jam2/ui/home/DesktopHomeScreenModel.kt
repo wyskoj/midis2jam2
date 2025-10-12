@@ -36,6 +36,7 @@ import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.HomeTabPersistentState
 import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.ui.settings.SettingsModel
 import java.io.File
@@ -108,7 +109,7 @@ class DesktopHomeScreenModel(
     ): PickerResultLauncher {
         return rememberFilePickerLauncher(
             mode = PickerMode.Single,
-            type = PickerType.File(listOf("mid")),
+            type = PickerType.File(MIDI_FILE_EXTENSIONS),
             title = "Select MIDI file",
         ) { file ->
             _selectedMidiFile.value = file

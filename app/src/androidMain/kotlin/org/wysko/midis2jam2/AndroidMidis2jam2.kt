@@ -147,7 +147,7 @@ class AndroidMidis2jam2(
     override fun seek(time: Duration) {
         logger().debug("Seeking to time: $time")
         this.time = time
-        sequencer.setPosition(time.coerceAtLeast(ZERO), !paused)
+        sequencer.setPosition(time.coerceAtLeast(ZERO), !paused) {}
         collectors.forEach { it.seek(time) }
     }
 

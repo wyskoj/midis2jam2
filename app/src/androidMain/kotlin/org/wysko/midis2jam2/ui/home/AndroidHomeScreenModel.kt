@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.ExecutionState
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.midi.system.MidiDevice
 
 class AndroidHomeScreenModel(
