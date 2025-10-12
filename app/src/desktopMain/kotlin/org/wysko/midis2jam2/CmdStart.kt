@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2
 
+import com.install4j.api.launcher.SplashScreen
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -33,7 +34,9 @@ object CmdStart : KoinComponent {
         val midiFile = PlatformFile(File(args.first()))
 
         applicationService.startApplication(ExecutionState(midiFile))
-
+        try {
+            SplashScreen.hide()
+        } catch (_: Exception) {}
         runBlocking {
             applicationService.isApplicationRunning.first { !it }
         }
