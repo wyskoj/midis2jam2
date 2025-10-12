@@ -39,7 +39,7 @@ tasks.withType<ComposeHotRun>().configureEach {
 }
 
 val appVersionName: String = "2.0.3"
-val appVersionCode: Int = 8
+val appVersionCode: Int = 9
 
 kotlin {
     androidTarget {
