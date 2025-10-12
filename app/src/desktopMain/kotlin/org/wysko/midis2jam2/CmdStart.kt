@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.ExecutionState
 import java.io.File
 
@@ -30,9 +31,20 @@ object CmdStart : KoinComponent {
     fun start(args: Array<String>) {
         if (args.isEmpty()) return
 
-        val applicationService: org.wysko.midis2jam2.domain.ApplicationService by inject()
+        val applicationService: ApplicationService by inject()
         val midiFile = PlatformFile(File(args.first()))
 
+        startApplicationWithFile(applicationService, midiFile)
+    }
+
+    /**
+     * Starts the application with a specific MIDI file.
+     * This method can be called from both command line args and startup listener events.
+     */
+    fun startApplicationWithFile(
+        applicationService: ApplicationService,
+        midiFile: PlatformFile
+    ) {
         applicationService.startApplication(ExecutionState(midiFile))
         try {
             SplashScreen.hide()
