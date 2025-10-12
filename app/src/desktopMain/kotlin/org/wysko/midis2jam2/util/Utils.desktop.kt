@@ -15,21 +15,13 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.midi.system
+package org.wysko.midis2jam2.util
 
-import org.wysko.kmidi.midi.TimeBasedSequence
-import kotlin.time.Duration
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 
-interface JwSequencer {
-    var sequence: TimeBasedSequence?
-    val isRunning: Boolean
-    val isOpen: Boolean
-
-    fun open(device: MidiDevice)
-    fun close()
-    fun start()
-    fun stop()
-    fun setPosition(position: Duration, start: Boolean, onFinish: () -> Unit)
-    fun resetDevice()
-    fun sendData(data: ByteArray)
+actual fun copyToClipboard(text: String) {
+    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+    val selection = StringSelection(text)
+    clipboard.setContents(selection, selection)
 }

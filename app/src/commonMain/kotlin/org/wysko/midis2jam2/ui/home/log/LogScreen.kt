@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -77,7 +78,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ErrorLogEntry
 import org.wysko.midis2jam2.domain.ErrorLogService
-import org.wysko.midis2jam2.util.Utils
+import org.wysko.midis2jam2.util.copyToClipboard
 import java.text.SimpleDateFormat
 
 object LogScreen : Screen {
@@ -217,7 +218,7 @@ object LogScreen : Screen {
                                 leadingIcon = { Icon(painterResource(Res.drawable.content_copy), "") },
                                 onClick = {
                                     isDropdownMenuExpanded = false
-                                    Utils.copyToClipboard(error.stackTrace)
+                                    copyToClipboard(error.throwable?.stackTraceToString() ?: "")
                                     onCopyClick()
                                 }
                             )
@@ -234,8 +235,8 @@ object LogScreen : Screen {
                 }
                 HorizontalDivider()
                 Text(
-                    text = error.stackTrace,
-                    style = TextStyle(fontFamily = FontFamily.Monospace)
+                    text = error.throwable?.stackTraceToString() ?: "",
+                    style = TextStyle(fontFamily = FontFamily.Monospace).copy(fontSize = 10.sp)
                 )
             }
         }

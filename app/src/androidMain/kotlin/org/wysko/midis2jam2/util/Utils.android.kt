@@ -15,21 +15,15 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.midi.system
+package org.wysko.midis2jam2.util
 
-import org.wysko.kmidi.midi.TimeBasedSequence
-import kotlin.time.Duration
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import org.koin.mp.KoinPlatformTools
 
-interface JwSequencer {
-    var sequence: TimeBasedSequence?
-    val isRunning: Boolean
-    val isOpen: Boolean
-
-    fun open(device: MidiDevice)
-    fun close()
-    fun start()
-    fun stop()
-    fun setPosition(position: Duration, start: Boolean, onFinish: () -> Unit)
-    fun resetDevice()
-    fun sendData(data: ByteArray)
+actual fun copyToClipboard(text: String) {
+    val context: Context = KoinPlatformTools.defaultContext().get().get<Context>()
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(ClipData.newPlainText(null, text))
 }

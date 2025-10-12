@@ -18,8 +18,11 @@
 package org.wysko.midis2jam2.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,27 +48,33 @@ import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
+import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.ui.tutorial.TutorialScreen
 
 @Composable
 internal actual fun HomeScreenLayout() {
     val model = koinInject<HomeScreenModel>()
+    val navigator = LocalNavigator.currentOrThrow
     Scaffold(
         bottomBar = { AppNavigationBar() },
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .fillMaxSize()
+        Box(
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
         ) {
-            item {
+            LogScreenButton(
+                navigator, Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+            ) {
                 Midis2jam2Logo()
-            }
-            item {
                 SelectAndPlayMidiFile(model)
             }
         }
