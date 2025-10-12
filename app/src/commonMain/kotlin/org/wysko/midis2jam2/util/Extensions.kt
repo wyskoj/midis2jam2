@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.util
 
 import androidx.compose.ui.graphics.Color
 import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 
 fun Color.tintEnabled(enabled: Boolean): Color = if (enabled) this else this.copy(alpha = 0.38f)

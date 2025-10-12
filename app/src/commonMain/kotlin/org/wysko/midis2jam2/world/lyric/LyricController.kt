@@ -24,7 +24,7 @@ import com.jme3.math.ColorRGBA
 import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.Midis2jam2
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign

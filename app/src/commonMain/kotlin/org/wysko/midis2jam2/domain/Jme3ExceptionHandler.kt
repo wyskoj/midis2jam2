@@ -25,7 +25,10 @@ class Jme3ExceptionHandler(
     private val errorLogService = KoinPlatformTools.defaultContext().get().get<ErrorLogService>()
     override fun uncaughtException(t: Thread?, e: Throwable?) {
         if (t?.name == "jME3 Main") {
-            errorLogService.addError("An unexpected error occurred in the 3D engine.", e)
+            errorLogService.addError(
+                message = "An unexpected error occurred in the 3D engine.",
+                stackTrace = e?.stackTraceToString() ?: "No stacktrace."
+            )
             onUncaught()
         }
     }

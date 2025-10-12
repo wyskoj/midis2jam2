@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.starter
 
 import Platform
+import ch.qos.logback.core.util.EnvUtil.isMacOs
 import com.jme3.app.SimpleApplication
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
@@ -26,8 +27,8 @@ import com.jme3.renderer.queue.RenderQueue
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
 import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.world.LightingSetup
 import org.wysko.midis2jam2.world.graphics.antiAliasingQualityDefinition
@@ -58,7 +59,7 @@ internal fun SimpleApplication.setupState(
                 addFilter(BloomFilter(Objects))
 
                 // Set anti-aliasing quality
-                if (platform == Platform.Desktop) {
+                if (platform == Platform.Desktop && !isMacOs()) {
                     numSamples = antiAliasingQualityDefinition[antiAliasingSettings.antiAliasingQuality]!!
                 }
 

@@ -16,6 +16,7 @@ import org.wysko.midis2jam2.di.systemModule
 import org.wysko.midis2jam2.di.uiModule
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.ui.centerWindow
+import org.wysko.midis2jam2.util.isMacOs
 import org.wysko.midis2jam2.util.openHelpOnF1
 
 fun main(args: Array<String>): Unit = application {
@@ -24,10 +25,20 @@ fun main(args: Array<String>): Unit = application {
         modules(applicationModule, midiSystemModule, systemModule, uiModule)
     }
 
+    // Register startup listener for macOS file associations
+    if (isMacOs()) {
+        StartupListenerService.registerStartupListener()
+    }
+
     when {
         args.isNotEmpty() -> {
             SplashScreen.writeMessage("Launching MIDI file...")
             CmdStart.start(args)
+        }
+
+        // On macOS, check if file association was used to prevent UI from starting
+        isMacOs() && StartupListenerService.wasFileAssociationUsed() -> {
+            // File association was used, don't start UI
         }
 
         else -> {

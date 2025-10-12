@@ -37,7 +37,7 @@ internal fun SimpleApplication.applyConfigurations(configurations: Collection<Co
 private fun AppSettings.applyResolution(configurations: Collection<Configuration>) {
     val measuredResolution = screenResolution()
     when {
-        configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings.isFullscreen -> {
+        configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings.isFullscreen -> {
             isFullscreen = true
             if (measuredResolution != null) {
                 this@applyResolution.width = measuredResolution.width
@@ -47,7 +47,7 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
 
         else -> {
             isFullscreen = false
-            with(configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings) {
+            with(configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings) {
                 when (resolutionSettings.isUseDefaultResolution) {
                     true -> {
                         measuredResolution?.let { screenRes ->
