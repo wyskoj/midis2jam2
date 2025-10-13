@@ -124,11 +124,6 @@ open class DesktopMidis2jam2(
         }
 
         logger().debug("Application initialized")
-
-        text = BitmapText(assetManager.loadFont("Interface/Fonts/Console.fnt")).apply {
-            this@DesktopMidis2jam2.app.guiNode.attachChild(this)
-            this.loc = v3(app.viewPort.camera.width / 2, app.viewPort.camera.height * 0.80, 0)
-        }
     }
 
     override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {
@@ -145,19 +140,8 @@ open class DesktopMidis2jam2(
         logger().debug("Cleanup complete")
     }
 
-    private lateinit var text: BitmapText
-
     override fun update(tpf: Float) {
         super.update(tpf)
-
-        val ourTime = time.toDouble(DurationUnit.SECONDS)
-        val theirTime = (sequencer as JwSequencerImpl).position.toDouble(DurationUnit.SECONDS)
-        text.text = "Performance: %.2f\nSequencer:   %.2f\nDrift:       %.2f (%s ahead)".format(
-            ourTime,
-            theirTime,
-            abs(ourTime - theirTime),
-            if (ourTime > theirTime) "Performance" else "Sequencer"
-        )
 
         val delta = tpf.toDouble().seconds
 
