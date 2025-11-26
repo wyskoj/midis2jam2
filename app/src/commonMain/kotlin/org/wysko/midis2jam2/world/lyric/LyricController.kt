@@ -182,7 +182,7 @@ class LyricController(private val context: Midis2jam2, private val events: List<
 
 private val separators = listOf("\n", "\r", "\r\n")
 
-private fun String.display() = clean().replace("/", "").replace("\\", "").replace(">", "").replace("<", "").replace("^", " ")
+private fun String.display() = clean().replace("/", "").replace("\\", "").removePrefix("<").replace("^", " ")
 
 private fun String.clean() = when {
     this.trim().startsWith("\"") && this.trim().endsWith("\"") -> this.trim().removeSurrounding("\"")
@@ -202,7 +202,7 @@ private fun List<MetaEvent.Lyric>.partitionByNewLines(): List<LyricLine> {
                 line = mutableListOf()
             }
 
-            item.text.clean().startsWith("/") || item.text.clean().startsWith("\\") -> {
+            item.text.clean().startsWith("/") || item.text.clean().startsWith("\\") || item.text.clean().startsWith("<") -> {
                 if (line.isNotEmpty()) result.add(line)
                 line = mutableListOf()
                 line.add(item)
