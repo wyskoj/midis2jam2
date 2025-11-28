@@ -203,7 +203,7 @@ actual class ApplicationService : KoinComponent {
         val javaExec = detectJavaExecutable()
         val classpath = detectRendererClasspath()
 
-        val cmd = mutableListOf(javaExec, "-XstartOnFirstThread", "-cp", classpath, mainClass)
+        val cmd = mutableListOf(javaExec, "-cp", classpath, mainClass)
         cmd.addAll(extraArgs)
 
         return ProcessBuilder(cmd).inheritIO().redirectErrorStream(true).start()

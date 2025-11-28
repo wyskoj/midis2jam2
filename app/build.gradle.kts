@@ -120,7 +120,13 @@ kotlin {
 
             // jMonkeyEngine
             implementation(libs.jme3.desktop)
-            implementation(libs.jme3.lwjgl3)
+
+            val os = System.getProperty("os.name").lowercase()
+            if (os.contains("mac")) {
+                implementation(libs.jme3.lwjgl)
+            } else {
+                implementation(libs.jme3.lwjgl3)
+            }
 
             // install4j integration
             implementation(libs.install4j.runtime)

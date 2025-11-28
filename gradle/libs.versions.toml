@@ -41,6 +41,7 @@ jme3-androidNative = { group = "org.jmonkeyengine", name = "jme3-android-native"
 jme3-core = { group = "org.jmonkeyengine", name = "jme3-core", version.ref = "jme3" }
 jme3-desktop = { group = "org.jmonkeyengine", name = "jme3-desktop", version.ref = "jme3" }
 jme3-effects = { group = "org.jmonkeyengine", name = "jme3-effects", version.ref = "jme3" }
+jme3-lwjgl = { group = "org.jmonkeyengine", name = "jme3-lwjgl", version.ref = "jme3" }
 jme3-lwjgl3 = { group = "org.jmonkeyengine", name = "jme3-lwjgl3", version.ref = "jme3" }
 
 # Koin (Dependency Injection)
