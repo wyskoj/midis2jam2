@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://docs.midis2jam2.xyz/
+    about: Please read the documentation for questions related to using the app.
+  - name: Discord
+    url: https://discord.gg/HD6KFQ2zkW
+    about: If the documentation didn't answer your question, ask in our Discord server.
