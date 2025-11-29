@@ -1,0 +1,75 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature]: "
+labels: [enhancement]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **⚠️ IMPORTANT: FEATURE REQUEST REQUIREMENTS**
+        - I have **searched extensively** and confirmed this feature hasn't been requested
+        - I can **clearly articulate the problem and solution**
+        - **Requests for new instruments will be closed** - this is already being tracked in another issue
+        - Low-effort requests like "make it better" will be **closed immediately**
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: Type of Feature
+      description: What category does this feature fall into?
+      options:
+        - "🚀 New performance enhancement (playback, camera, etc.)"
+        - "🎨 UI/UX improvement"
+        - "✨ Quality of life enhancement"
+        - "📚 Other (explain in detail)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Exactly how should this work? Be specific about implementation details.
+      placeholder: |
+        Ideal Behavior: [Describe exactly how the feature should work]
+        User Interface: [How would this appear in the UI?]
+        Configuration: [What settings/options would be needed?]
+        Usage Example: [Walk through a typical usage scenario]
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What have you tried instead? Why don't current solutions work?
+      placeholder: |
+        Current Workarounds: [What are you doing now to solve this?]
+        Why Workarounds Fail: [What's inadequate about current solutions?]
+        Other Approaches: [What other solutions have you considered and rejected?]
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups & Examples
+      description: Include sketches, UI mockups, or examples from other software.
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Feature Request Verification
+      description: Confirm you meet these requirements
+      options:
+        - label: I have searched existing issues and this feature hasn't been requested
+          required: true
+        - label: I understand that requests for new instruments will be closed
+          required: true
+        - label: I have provided a detailed proposed solution
+          required: true
+        - label: I have explained why current alternatives are insufficient
+          required: true
+        - label: I understand that vague or low-effort requests will be closed
+          required: true
