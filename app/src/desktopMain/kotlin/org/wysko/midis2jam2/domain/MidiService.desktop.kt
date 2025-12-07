@@ -80,7 +80,8 @@ class DesktopMidiDevice(
         device.receiver.send(ShortMessage(ShortMessage.POLY_PRESSURE, channel, note, pressure), -1)
     }
 
-    override fun sendSysex(data: ByteArray) {
-        device.receiver.send(SysexMessage(data, data.size), -1)
+    override fun sendData(data: ByteArray) {
+        val dataWithPrefix = if (data.first() == 0xF0.toByte()) data else byteArrayOf(0xF0.toByte()) + data
+        device.receiver.send(SysexMessage(dataWithPrefix, dataWithPrefix.size), -1)
     }
 }

@@ -58,5 +58,5 @@ val midiSpecificationResetMessage: Map<MidiSpecification, ByteArray> = mapOf(
 fun MidiDevice.sendResetMessage(specification: MidiSpecification) {
     val message = midiSpecificationResetMessage[specification]
     check(message != null) { "Unsupported MIDI specification: $specification" }
-    sendSysex(message)
+    sendData(message)
 }

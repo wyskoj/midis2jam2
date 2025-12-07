@@ -127,7 +127,7 @@ open class DesktopMidis2jam2(
     }
 
     override fun sendResetMessage(midiSpecification: AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification) {
-        midiDevice.sendSysex(midiSpecificationResetMessage[midiSpecification] ?: return)
+        midiDevice.sendData(midiSpecificationResetMessage[midiSpecification] ?: return)
     }
 
     override fun cleanup() {

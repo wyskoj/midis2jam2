@@ -30,5 +30,5 @@ interface MidiDevice {
     fun sendPitchBendMessage(channel: Int, pitch: Int)
     fun sendChannelPressureMessage(channel: Int, pressure: Int)
     fun sendPolyphonicPressureMessage(channel: Int, note: Int, pressure: Int)
-    fun sendSysex(data: ByteArray)
+    fun sendData(data: ByteArray)
 }

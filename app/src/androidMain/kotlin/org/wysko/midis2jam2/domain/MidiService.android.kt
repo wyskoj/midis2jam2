@@ -98,7 +98,7 @@ class FluidSynthDevice(context: Context) : MidiDevice {
         bridge?.polyPressure((bridge ?: return).synthPtr, channel, note, pressure)
     }
 
-    override fun sendSysex(data: ByteArray) {
+    override fun sendData(data: ByteArray) {
         bridge?.sendSysex((bridge ?: return).synthPtr, data)
     }
 

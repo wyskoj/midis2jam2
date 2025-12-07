@@ -23,6 +23,7 @@ import org.wysko.kmidi.midi.event.ControlChangeEvent
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.kmidi.midi.event.SysexEvent
 import org.wysko.kmidi.midi.event.PitchWheelChangeEvent
 import org.wysko.kmidi.midi.event.PolyphonicKeyPressureEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
@@ -128,7 +129,7 @@ class JwSequencerImpl : JwSequencer {
     }
 
     override fun sendData(data: ByteArray) {
-        device?.sendSysex(data)
+        device?.sendData(data)
     }
 
     val position: Duration
@@ -280,6 +281,9 @@ class JwSequencerImpl : JwSequencer {
                         event.program.toInt()
                     )
                 }
+            }
+            if (event is SysexEvent) {
+                sendData(event.data)
             }
         }
     }
