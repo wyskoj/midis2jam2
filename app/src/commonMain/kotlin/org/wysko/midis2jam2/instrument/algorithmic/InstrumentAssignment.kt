@@ -103,6 +103,8 @@ import org.wysko.midis2jam2.util.logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
+private typealias PatchKey = Pair<Byte, Byte> // (bankMSB, program)
+
 /**
  * Assigns instruments to MIDI data.
  */
@@ -140,28 +142,45 @@ object InstrumentAssignment {
             }
             programEvents.removeDuplicateProgramEvents()
 
+            val bankMsbEvents = channelSpecificEvents
+                .filterIsInstance<ControlChangeEvent>()
+                .filter { it.controller.toInt() == 0 }
+                .toMutableList()
+
             // We create "bins" that events fall into based on their corresponding program event.
-            val programBins = buildMap<Byte, MutableList<MidiEvent>> {
-                programEvents.distinctBy { it.program }.forEach { this += it.program to mutableListOf() }
-            }
+            val programBins = mutableMapOf<PatchKey, MutableList<MidiEvent>>()
 
             // Since a program change event can occur in between an ON and OFF event, we also need to keep track of the
             // current program when an ON event occurs, so that the corresponding OFF event can be assigned to the same
             // instrument.
-            val programPerNote = mutableMapOf<Byte, Byte>()
+            val programPerNote = mutableMapOf<Byte, Byte>() // note -> program
+            val bankPerNote = mutableMapOf<Byte, Byte>() // note -> bank MSB
 
             channelSpecificEvents.forEach { event ->
-                if (event !is NoteEvent.NoteOff) { // If the event is not an OFF event,
-                    // Determine the last program event
-                    val currentProgram = programEvents.lastOrNull { it.tick <= event.tick }?.program ?: 0
+                // Determine the last program event
+                val currentProgram = programEvents.lastOrNull { it.tick <= event.tick }?.program ?: 0.toByte()
+                val currentBank = bankMsbEvents.lastOrNull { it.tick <= event.tick }?.value ?: 0.toByte()
 
+                val key = currentBank to currentProgram
+
+                if (programBins[key] == null) programBins[key] = mutableListOf()
+
+                if (event !is NoteEvent.NoteOff) {
                     // Add the event to the correct bin
-                    programBins[currentProgram]?.plusAssign(event)
+                    programBins[key]?.plusAssign(event)
 
                     // Keep track of current program for ON events.
-                    if (event is NoteEvent.NoteOn) programPerNote[event.note] = currentProgram
+                    if (event is NoteEvent.NoteOn) {
+                        programPerNote[event.note] = currentProgram
+                        bankPerNote[event.note] = currentBank
+                    }
                 } else {
-                    programBins[programPerNote[event.note]]?.plusAssign(event) ?: kotlin.run {
+                    val note = event.note
+                    val noteProg = programPerNote[note] ?: currentProgram
+                    val noteBank = bankPerNote[note] ?: currentBank
+                    val noteKey = noteBank to noteProg
+
+                    programBins[noteKey]?.plusAssign(event) ?: kotlin.run {
                         logger().warn("Unbalanced MIDI note events.")
                     }
                 }
@@ -170,9 +189,10 @@ object InstrumentAssignment {
             if (channel == 9) {
                 programBins.entries.forEachIndexed { i, e ->
                     onLoadingProgress((channel / 16f) + (i / programBins.entries.size / 16f))
-                    buildDrumSet(context, e.key.toInt(), e.value)?.let { instruments += it }
-                    buildSpecialCases(context, e.key.toInt(), e.value).let { instruments += it }
-                    collectAuxiliary(e.key.toInt(), e.value).let {
+                    val program = e.key.second.toInt()
+                    buildDrumSet(context, program, e.value)?.let { instruments += it }
+                    buildSpecialCases(context, program, e.value).let { instruments += it }
+                    collectAuxiliary(program, e.value).let {
                         it.forEach { (t, u) ->
                             if (auxiliary[t] == null) {
                                 auxiliary[t] = u.map { it.toMutableList() }.toMutableList()
@@ -189,7 +209,9 @@ object InstrumentAssignment {
                 // Convert lists of events to their corresponding instrument.
                 programBins.entries.forEachIndexed { i, e ->
                     onLoadingProgress((channel / 16f) + (i / programBins.entries.size / 16f))
-                    buildInstrument(context, e.key, e.value, channelSpecificEvents)?.let { instruments += it }
+                    val bank = e.key.first
+                    val program = e.key.second
+                    buildInstrument(context, bank, program, e.value, channelSpecificEvents)?.let { instruments += it }
                 }
             }
         }
@@ -206,6 +228,7 @@ object InstrumentAssignment {
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun buildInstrument(
         context: Midis2jam2,
+        bank: Byte,
         program: Byte,
         events: MutableList<MidiEvent>,
         allChannelEvents: List<MidiEvent>,
@@ -220,130 +243,156 @@ object InstrumentAssignment {
         val events = (events + allChannelEvents.filterIsInstance<ControlChangeEvent>()).distinct().sortedBy { it.tick }
 
         if (midiNoteEvents.isEmpty()) return null
-        return when (program.toInt()) {
-            0 -> Keyboard(context, events)
-            1 -> Keyboard(context, events, Keyboard.Variant.BrightAcoustic)
-            2 -> Keyboard(context, events, Keyboard.Variant.ElectricGrand)
-            3 -> Keyboard(context, events, Keyboard.Variant.HonkyTonk)
-            4 -> Keyboard(context, events, Keyboard.Variant.Electric1)
-            5 -> Keyboard(context, events, Keyboard.Variant.Electric2)
-            6 -> Keyboard(context, events, Keyboard.Variant.Harpsichord)
-            7 -> Keyboard(context, events, Keyboard.Variant.Clavichord)
-            8 -> Keyboard(context, events, Keyboard.Variant.Celesta)
-            9 -> Mallets(context, events, MalletType.Glockenspiel)
-            10 -> MusicBox(context, events)
-            11 -> Mallets(context, events, MalletType.Vibraphone)
-            12 -> Mallets(context, events, MalletType.Marimba)
-            13 -> Mallets(context, events, MalletType.Xylophone)
-            14, 98 -> TubularBells(context, events)
-            15, 16, 17, 18, 19, 20, 55 -> Keyboard(context, events, Keyboard.Variant.Wood)
-            21 -> Accordion(context, events, Type.Accordion)
-            22 -> Harmonica(context, events)
-            23 -> Accordion(context, events, Type.Bandoneon)
-            24, 25, 120 -> Guitar(context, events, GuitarType.Acoustic)
-            26 -> Guitar(context, events, GuitarType.Jazz)
-            27 -> Guitar(context, events, GuitarType.Clean)
-            28 -> Guitar(context, events, GuitarType.Muted)
-            29 -> Guitar(context, events, GuitarType.Overdriven)
-            30 -> Guitar(context, events, GuitarType.Distortion)
-            31 -> Guitar(context, events, GuitarType.Harmonics)
-            32 -> AcousticBass(context, events, PlayingStyle.PIZZICATO)
-            33, 34, 36, 37 -> BassGuitar(context, events, BassGuitarType.Standard)
-            35 -> BassGuitar(context, events, BassGuitarType.Fretless)
-            38 -> BassGuitar(context, events, BassGuitarType.Synth1)
-            39 -> BassGuitar(context, events, BassGuitarType.Synth2)
-            40 -> Violin(context, events)
-            41 -> Viola(context, events)
-            42 -> Cello(context, events)
-            43 -> AcousticBass(context, events, PlayingStyle.ARCO)
-            44 -> StageStrings(context, events, StageStringsType.StringEnsemble1, StageStringBehavior.Tremolo)
-            45 -> PizzicatoStrings(context, events)
-            46 -> Harp(context, events)
-            47 -> Timpani(context, events)
-            48 -> StageStrings(context, events, StageStringsType.StringEnsemble1, StageStringBehavior.Normal)
-            49 -> StageStrings(context, events, StageStringsType.StringEnsemble2, StageStringBehavior.Normal)
-            50 -> StageStrings(context, events, StageStringsType.SynthStrings1, StageStringBehavior.Normal)
-            51 -> StageStrings(context, events, StageStringsType.SynthStrings2, StageStringBehavior.Normal)
-            52 -> StageChoir(context, events, StageChoir.ChoirType.ChoirAahs)
-            53 -> StageChoir(context, events, StageChoir.ChoirType.VoiceOohs)
-            54 -> StageChoir(context, events, StageChoir.ChoirType.SynthVoice)
-            56 -> Trumpet(context, events, TrumpetType.Normal)
-            57 -> Trombone(context, events)
-            58 -> Tuba(context, events)
-            59 -> Trumpet(context, events, TrumpetType.Muted)
-            60 -> FrenchHorn(context, events)
-            61 -> StageHorns(context, events, StageHornsType.BrassSection)
-            62 -> StageHorns(context, events, StageHornsType.SynthBrass1)
-            63 -> StageHorns(context, events, StageHornsType.SynthBrass2)
-            64 -> SopranoSax(context, events)
-            65 -> AltoSax(context, events)
-            66 -> TenorSax(context, events)
-            67 -> BaritoneSax(context, events)
-            68 -> Oboe(context, events)
-            71 -> Clarinet(context, events)
-            72 -> Piccolo(context, events)
-            73 -> Flute(context, events)
-            74 -> Recorder(context, events)
-            75 -> PanFlute(context, events, PanFlute.PipeSkin.WOOD)
-            76 -> BlownBottle(context, events)
-            78 -> Whistles(context, events)
-            79 -> Ocarina(context, events)
-            80 -> { // square
-                if (Polyphony.calculateMaximumPolyphony(midiNoteEvents) > 4) {
-                    Keyboard(context, events, Keyboard.Variant.Square)
-                } else {
-                    SpaceLaser(context, events, SpaceLaserType.Square)
+
+        return when (bank.toInt()) {
+            0 -> {
+                when (program.toInt()) {
+                    0 -> Keyboard(context, events)
+                    1 -> Keyboard(context, events, Keyboard.Variant.BrightAcoustic)
+                    2 -> Keyboard(context, events, Keyboard.Variant.ElectricGrand)
+                    3 -> Keyboard(context, events, Keyboard.Variant.HonkyTonk)
+                    4 -> Keyboard(context, events, Keyboard.Variant.Electric1)
+                    5 -> Keyboard(context, events, Keyboard.Variant.Electric2)
+                    6 -> Keyboard(context, events, Keyboard.Variant.Harpsichord)
+                    7 -> Keyboard(context, events, Keyboard.Variant.Clavichord)
+                    8 -> Keyboard(context, events, Keyboard.Variant.Celesta)
+                    9 -> Mallets(context, events, MalletType.Glockenspiel)
+                    10 -> MusicBox(context, events)
+                    11 -> Mallets(context, events, MalletType.Vibraphone)
+                    12 -> Mallets(context, events, MalletType.Marimba)
+                    13 -> Mallets(context, events, MalletType.Xylophone)
+                    14, 98 -> TubularBells(context, events)
+                    15, 16, 17, 18, 19, 20, 55 -> Keyboard(context, events, Keyboard.Variant.Wood)
+                    21 -> Accordion(context, events, Type.Accordion)
+                    22 -> Harmonica(context, events)
+                    23 -> Accordion(context, events, Type.Bandoneon)
+                    24, 25, 120 -> Guitar(context, events, GuitarType.Acoustic)
+                    26 -> Guitar(context, events, GuitarType.Jazz)
+                    27 -> Guitar(context, events, GuitarType.Clean)
+                    28 -> Guitar(context, events, GuitarType.Muted)
+                    29 -> Guitar(context, events, GuitarType.Overdriven)
+                    30 -> Guitar(context, events, GuitarType.Distortion)
+                    31 -> Guitar(context, events, GuitarType.Harmonics)
+                    32 -> AcousticBass(context, events, PlayingStyle.PIZZICATO)
+                    33, 34, 36, 37 -> BassGuitar(context, events, BassGuitarType.Standard)
+                    35 -> BassGuitar(context, events, BassGuitarType.Fretless)
+                    38 -> BassGuitar(context, events, BassGuitarType.Synth1)
+                    39 -> BassGuitar(context, events, BassGuitarType.Synth2)
+                    40 -> Violin(context, events)
+                    41 -> Viola(context, events)
+                    42 -> Cello(context, events)
+                    43 -> AcousticBass(context, events, PlayingStyle.ARCO)
+                    44 -> StageStrings(context, events, StageStringsType.StringEnsemble1, StageStringBehavior.Tremolo)
+                    45 -> PizzicatoStrings(context, events)
+                    46 -> Harp(context, events)
+                    47 -> Timpani(context, events)
+                    48 -> StageStrings(context, events, StageStringsType.StringEnsemble1, StageStringBehavior.Normal)
+                    49 -> StageStrings(context, events, StageStringsType.StringEnsemble2, StageStringBehavior.Normal)
+                    50 -> StageStrings(context, events, StageStringsType.SynthStrings1, StageStringBehavior.Normal)
+                    51 -> StageStrings(context, events, StageStringsType.SynthStrings2, StageStringBehavior.Normal)
+                    52 -> StageChoir(context, events, StageChoir.ChoirType.ChoirAahs)
+                    53 -> StageChoir(context, events, StageChoir.ChoirType.VoiceOohs)
+                    54 -> StageChoir(context, events, StageChoir.ChoirType.SynthVoice)
+                    56 -> Trumpet(context, events, TrumpetType.Normal)
+                    57 -> Trombone(context, events)
+                    58 -> Tuba(context, events)
+                    59 -> Trumpet(context, events, TrumpetType.Muted)
+                    60 -> FrenchHorn(context, events)
+                    61 -> StageHorns(context, events, StageHornsType.BrassSection)
+                    62 -> StageHorns(context, events, StageHornsType.SynthBrass1)
+                    63 -> StageHorns(context, events, StageHornsType.SynthBrass2)
+                    64 -> SopranoSax(context, events)
+                    65 -> AltoSax(context, events)
+                    66 -> TenorSax(context, events)
+                    67 -> BaritoneSax(context, events)
+                    68 -> Oboe(context, events)
+                    71 -> Clarinet(context, events)
+                    72 -> Piccolo(context, events)
+                    73 -> Flute(context, events)
+                    74 -> Recorder(context, events)
+                    75 -> PanFlute(context, events, PanFlute.PipeSkin.WOOD)
+                    76 -> BlownBottle(context, events)
+                    78 -> Whistles(context, events)
+                    79 -> Ocarina(context, events)
+                    80 -> { // square
+                        if (Polyphony.calculateMaximumPolyphony(midiNoteEvents) > 4) {
+                            Keyboard(context, events, Keyboard.Variant.Square)
+                        } else {
+                            SpaceLaser(context, events, SpaceLaserType.Square)
+                        }
+                    }
+
+                    81 -> { // sawtooth
+                        if (Polyphony.calculateMaximumPolyphony(midiNoteEvents) > 4) {
+                            Keyboard(context, events, Keyboard.Variant.Saw)
+                        } else {
+                            SpaceLaser(context, events, SpaceLaserType.Saw)
+                        }
+                    }
+
+                    82 -> PanFlute(context, events, PanFlute.PipeSkin.GOLD) // calliope
+                    83 -> Keyboard(context, events, Keyboard.Variant.Chiff) // chiff
+                    84 -> Keyboard(context, events, Keyboard.Variant.Charang) // charang
+                    85 -> StageChoir(context, events, StageChoir.ChoirType.VoiceSynth)
+                    86 -> FifthsKeyboard(context, events, Keyboard.Variant.Synth) // fifths
+                    87 -> Keyboard(context, events, Keyboard.Variant.BassAndLead) // bass + lead
+                    88 -> Keyboard(context, events, Keyboard.Variant.NewAge) // new age
+                    89 -> Keyboard(context, events, Keyboard.Variant.Warm) // warm
+                    90 -> Keyboard(context, events, Keyboard.Variant.Polysynth) // polysynth
+                    91 -> Keyboard(context, events, Keyboard.Variant.Choir) // choir
+                    92 -> StageStrings(context, events, StageStringsType.BowedSynth, StageStringBehavior.Normal) // bowed
+                    93 -> Keyboard(context, events, Keyboard.Variant.Metallic) // metallic
+                    94 -> StageChoir(context, events, StageChoir.ChoirType.HaloSynth) // halo
+                    95 -> Keyboard(context, events, Keyboard.Variant.Sweep) // sweep
+                    96 -> Keyboard(context, events, Keyboard.Variant.Synth) // rain
+                    97 -> Keyboard(context, events, Keyboard.Variant.Synth) // soundtrack
+                    99 -> Keyboard(context, events, Keyboard.Variant.Atmosphere) // atmosphere
+                    100 -> Keyboard(context, events, Keyboard.Variant.Synth) // brightness
+                    101 -> StageChoir(context, events, StageChoir.ChoirType.GoblinSynth) // goblins
+                    102 -> Keyboard(context, events, Keyboard.Variant.Echoes) // echoes
+                    103 -> Keyboard(context, events, Keyboard.Variant.Synth) // sci-fi
+                    105 -> Banjo(context, events)
+                    106 -> Shamisen(context, events)
+                    108 -> Kalimba(context, events)
+                    109 -> BagPipe(context, events)
+                    110 -> Fiddle(context, events)
+                    112 -> TinkleBell(context, events)
+                    113 -> Agogos(context, events)
+                    114 -> SteelDrums(context, events)
+                    115 -> Woodblocks(context, events)
+                    116 -> TaikoDrum(context, events)
+                    117 -> MelodicTom(context, events)
+                    118 -> SynthDrum(context, events)
+                    119 -> ReverseCymbal(context, events)
+                    121 -> StageChoir(context, events, StageChoir.ChoirType.SynthVoice)
+                    123 -> BirdTweet(context, events)
+                    124 -> TelephoneRing(context, events)
+                    125 -> Helicopter(context, events)
+                    126 -> ApplauseChoir(context, events)
+                    127 -> Gunshot(context, events)
+                    else -> null
                 }
             }
 
-            81 -> { // sawtooth
-                if (Polyphony.calculateMaximumPolyphony(midiNoteEvents) > 4) {
-                    Keyboard(context, events, Keyboard.Variant.Saw)
-                } else {
-                    SpaceLaser(context, events, SpaceLaserType.Saw)
+            8 -> {
+                when (program.toInt()) {
+                    0 -> Keyboard(context, events)
+                    1 -> Keyboard(context, events, Keyboard.Variant.BrightAcoustic)
+                    2 -> Keyboard(context, events, Keyboard.Variant.ElectricGrand)
+                    3 -> Keyboard(context, events, Keyboard.Variant.HonkyTonk)
+                    4 -> Keyboard(context, events, Keyboard.Variant.Electric1)
+                    5 -> Keyboard(context, events, Keyboard.Variant.Electric2)
+                    6 -> Keyboard(context, events, Keyboard.Variant.Harpsichord)
+                    11 -> Mallets(context, events, MalletType.Vibraphone)
+                    12 -> Mallets(context, events, MalletType.Marimba)
+                    14 -> TubularBells(context, events)
+                    16, 17, 19 -> Keyboard(context, events, Keyboard.Variant.Wood)
+                    21 -> Accordion(context, events, Type.Accordion)
+                    24, 25 -> Guitar(context, events, GuitarType.Acoustic)
+                    else -> null
                 }
             }
 
-            82 -> PanFlute(context, events, PanFlute.PipeSkin.GOLD) // calliope
-            83 -> Keyboard(context, events, Keyboard.Variant.Chiff) // chiff
-            84 -> Keyboard(context, events, Keyboard.Variant.Charang) // charang
-            85 -> StageChoir(context, events, StageChoir.ChoirType.VoiceSynth)
-            86 -> FifthsKeyboard(context, events, Keyboard.Variant.Synth) // fifths
-            87 -> Keyboard(context, events, Keyboard.Variant.BassAndLead) // bass + lead
-            88 -> Keyboard(context, events, Keyboard.Variant.NewAge) // new age
-            89 -> Keyboard(context, events, Keyboard.Variant.Warm) // warm
-            90 -> Keyboard(context, events, Keyboard.Variant.Polysynth) // polysynth
-            91 -> Keyboard(context, events, Keyboard.Variant.Choir) // choir
-            92 -> StageStrings(context, events, StageStringsType.BowedSynth, StageStringBehavior.Normal) // bowed
-            93 -> Keyboard(context, events, Keyboard.Variant.Metallic) // metallic
-            94 -> StageChoir(context, events, StageChoir.ChoirType.HaloSynth) // halo
-            95 -> Keyboard(context, events, Keyboard.Variant.Sweep) // sweep
-            96 -> Keyboard(context, events, Keyboard.Variant.Synth) // rain
-            97 -> Keyboard(context, events, Keyboard.Variant.Synth) // soundtrack
-            99 -> Keyboard(context, events, Keyboard.Variant.Atmosphere) // atmosphere
-            100 -> Keyboard(context, events, Keyboard.Variant.Synth) // brightness
-            101 -> StageChoir(context, events, StageChoir.ChoirType.GoblinSynth) // goblins
-            102 -> Keyboard(context, events, Keyboard.Variant.Echoes) // echoes
-            103 -> Keyboard(context, events, Keyboard.Variant.Synth) // sci-fi
-            105 -> Banjo(context, events)
-            106 -> Shamisen(context, events)
-            108 -> Kalimba(context, events)
-            109 -> BagPipe(context, events)
-            110 -> Fiddle(context, events)
-            112 -> TinkleBell(context, events)
-            113 -> Agogos(context, events)
-            114 -> SteelDrums(context, events)
-            115 -> Woodblocks(context, events)
-            116 -> TaikoDrum(context, events)
-            117 -> MelodicTom(context, events)
-            118 -> SynthDrum(context, events)
-            119 -> ReverseCymbal(context, events)
-            121 -> StageChoir(context, events, StageChoir.ChoirType.SynthVoice)
-            123 -> BirdTweet(context, events)
-            124 -> TelephoneRing(context, events)
-            125 -> Helicopter(context, events)
-            126 -> ApplauseChoir(context, events)
-            127 -> Gunshot(context, events)
             else -> null
         }
     }
