@@ -50,6 +50,6 @@ class MidiDeviceManager(
             .playbackSettings
             .midiSpecificationResetSettings
             .midiSpecification
-        midiDevice.sendSysex(midiSpecificationResetMessage[specification] ?: return)
+        midiDevice.sendData(midiSpecificationResetMessage[specification] ?: return)
     }
 }

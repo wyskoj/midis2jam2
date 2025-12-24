@@ -29,7 +29,8 @@ class DesktopCameraManager : CameraManager() {
         return FreeCameraPlugin {
             setCurrentCameraPlugin<FreeCameraPlugin>()
         }.apply {
-            movementType = if (preferences.getAppSettings().cameraSettings.isSmoothFreecam) Smooth else Normal
+            movementType =
+                if (preferences?.getAppSettings()?.cameraSettings?.isSmoothFreecam ?: false) Smooth else Normal
         }
     }
 
