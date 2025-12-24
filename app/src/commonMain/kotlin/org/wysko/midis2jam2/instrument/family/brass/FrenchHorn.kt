@@ -20,7 +20,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
@@ -32,6 +32,7 @@ import org.wysko.midis2jam2.util.times
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
@@ -44,7 +45,7 @@ private const val TRIGGER_INDEX = 0
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
  */
-class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
+class FrenchHorn(context: PerformanceManager, eventList: List<MidiEvent>) :
     MonophonicInstrument(context, eventList, FrenchHornClone::class, FINGERING_MANAGER),
     MultipleInstancesLinearAdjustment {
 
@@ -73,7 +74,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
         init {
             with(geometry) {
                 +context.modelR("FrenchHornBody.obj", "HornSkin.bmp").also {
-                    (it as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                    (it as Node).getChild(1).setMaterial(context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                 }
             }
 

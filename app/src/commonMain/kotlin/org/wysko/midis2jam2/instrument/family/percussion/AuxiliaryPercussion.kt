@@ -17,10 +17,10 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 
 /** Any percussion instrument that is not attached to the drum set. */
 open class AuxiliaryPercussion protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     hits: List<NoteEvent.NoteOn>,
 ) : PercussionInstrument(context, hits)

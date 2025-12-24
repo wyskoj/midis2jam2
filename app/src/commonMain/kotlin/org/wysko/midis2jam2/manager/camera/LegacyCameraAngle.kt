@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
-package org.wysko.midis2jam2.world.camera
+
+package org.wysko.midis2jam2.manager.camera
 
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.util.Utils
-import kotlin.math.max
-import kotlin.math.min
 
 /** Defines angles for cameras. */
-enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY: Float, rotZ: Float) {
+enum class LegacyCameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY: Float, rotZ: Float) {
 
     /** Camera 1A. */
     CAMERA_1A(-2f, 92f, 134f, Utils.rad(18.44f), Utils.rad(180f), 0f),
@@ -66,39 +65,4 @@ enum class CameraAngle(locX: Float, locY: Float, locZ: Float, rotX: Float, rotY:
 
     /** The rotation of the camera. */
     val rotation: Quaternion = Quaternion().fromAngles(rotX, rotY, rotZ)
-
-    companion object {
-        /** Checks the camera's position and ensures it stays within a certain bounding box. */
-        fun preventCameraFromLeaving(camera: com.jme3.renderer.Camera) {
-            val location = camera.location
-            camera.location = Vector3f(
-                if (location.x > 0) min(location.x, 400f) else max(location.x, -400f),
-                if (location.y > 0) min(location.y, 432f) else max(location.y, -432f),
-                if (location.z > 0) min(location.z, 400f) else max(location.z, -400f)
-            )
-        }
-
-        /**
-         * Given the [currentCameraAngle] and the [name] of the specified camera action, determines the correct
-         * [CameraAngle] to switch to.
-         *
-         * @param currentCameraAngle The current camera angle.
-         * @param name The name of the camera action.
-         */
-        fun handleCameraAngle(currentCameraAngle: CameraAngle, name: String): CameraAngle = when (name) {
-            "cam1" -> when (currentCameraAngle) {
-                CAMERA_1A -> CAMERA_1B
-                CAMERA_1B -> CAMERA_1C
-                else -> CAMERA_1A
-            }
-
-            "cam2" -> if (currentCameraAngle == CAMERA_2A) CAMERA_2B else CAMERA_2A
-            "cam3" -> if (currentCameraAngle == CAMERA_3A) CAMERA_3B else CAMERA_3A
-            "cam4" -> if (currentCameraAngle == CAMERA_4A) CAMERA_4B else CAMERA_4A
-            "cam5" -> CAMERA_5
-            "cam6" -> if (currentCameraAngle == CAMERA_6A) CAMERA_6B else CAMERA_6A
-            "cam_reset" -> CAMERA_1A
-            else -> CAMERA_1A // Shouldn't ever happen
-        }
-    }
 }

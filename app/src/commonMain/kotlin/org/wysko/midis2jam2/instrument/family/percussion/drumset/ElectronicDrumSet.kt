@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.Cymbal.Style.Electronic
@@ -32,7 +32,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.
  * @param context Context to the main class.
  * @param events List of events for this drum set.
  */
-class ElectronicDrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>) : DrumSet(context, events) {
+class ElectronicDrumSet(context: PerformanceManager, events: List<NoteEvent.NoteOn>) : DrumSet(context, events) {
     override val collectorForVisibility: EventCollector<NoteEvent.NoteOn> =
         EventCollector(context, events.filter { it.note in 35..51 || it.note % 2 == 1 && it.note in 53..59 })
 

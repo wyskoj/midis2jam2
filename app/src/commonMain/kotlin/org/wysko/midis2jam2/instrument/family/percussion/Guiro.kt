@@ -21,7 +21,7 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.LONG
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.SHORT
@@ -62,7 +62,7 @@ private const val EASING_POWER = 2
  * The gourd is slightly lowered during the motion of the stick. This vertical offset is defined by [verticalTransform].
  */
 class Guiro(
-    context: Midis2jam2,
+    context: PerformanceManager,
     shortHits: MutableList<NoteEvent.NoteOn>,
     longHits: MutableList<NoteEvent.NoteOn>,
 ) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.tick }.toMutableList()) {

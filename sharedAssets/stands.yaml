@@ -1,0 +1,24 @@
+- modelName: "Assets/PianoStand.obj"
+  textureName: "Assets/RubberFoot.bmp"
+  position:
+    x: -50
+    y: 32
+    z: -6
+  rotation:
+    x: 0
+    y: 45
+    z: 0
+  scale: 1
+  instrumentType: "org.wysko.midis2jam2.instrument.family.piano.Keyboard"
+- modelName: "Assets/XylophoneLegs.obj"
+  textureName: "Assets/RubberFoot.bmp"
+  position:
+    x: -25
+    y: 22.2
+    z: 23
+  rotation:
+    x: 0
+    y: 33.7
+    z: 0
+  scale: 0.667
+  instrumentType: "org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets"

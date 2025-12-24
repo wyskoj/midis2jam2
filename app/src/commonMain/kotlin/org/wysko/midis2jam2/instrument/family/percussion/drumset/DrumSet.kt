@@ -19,8 +19,9 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
+import org.wysko.midis2jam2.manager.DrumSetVisibilityManager.Companion.drumSetVisibilityManagerReal
 import org.wysko.midis2jam2.midi.RIDE_BELL
 import org.wysko.midis2jam2.midi.RIDE_CYMBAL_1
 import org.wysko.midis2jam2.midi.RIDE_CYMBAL_2
@@ -28,6 +29,7 @@ import org.wysko.midis2jam2.util.isFakeShadows
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.v3
+import org.wysko.midis2jam2.world.assetLoader
 import kotlin.time.Duration
 
 /**
@@ -36,7 +38,7 @@ import kotlin.time.Duration
  * @param context The context to the main class.
  * @param events The events that this drum set is responsible for.
  */
-abstract class DrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>) :
+abstract class DrumSet(context: PerformanceManager, events: List<NoteEvent.NoteOn>) :
     PercussionInstrument(context, events.toMutableList()) {
 
     init {
@@ -47,8 +49,8 @@ abstract class DrumSet(context: Midis2jam2, events: List<NoteEvent.NoteOn>) :
         }
     }
 
-    override fun calculateVisibility(time: Duration, future: Boolean): Boolean =
-        with(context.drumSetVisibilityManager) {
+    override fun calculateVisibility(time: Duration): Boolean =
+        with(context.drumSetVisibilityManagerReal) {
             return (isVisible && currentlyVisibleDrumSet == this@DrumSet).also {
                 if (!this@DrumSet.isVisible && it) onEntry()
                 if (this@DrumSet.isVisible && !it) onExit()

@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.algorithmic
 
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,7 +42,7 @@ object Visibility {
      */
     @Suppress("NestedBlockDepth")
     fun <T : MidiEvent> standardRules(
-        context: Midis2jam2,
+        context: PerformanceManager,
         collector: EventCollector<T>,
         time: Duration,
         parameters: Parameters = Parameters(),
@@ -99,7 +99,7 @@ object Visibility {
         return false
     }
 
-    private fun Midis2jam2.time(event: Event): Duration = sequence.getTimeOf(event)
+    private fun PerformanceManager.time(event: Event): Duration = sequence.getTimeOf(event)
 
     /**
      * Parameters for the visibility algorithm.

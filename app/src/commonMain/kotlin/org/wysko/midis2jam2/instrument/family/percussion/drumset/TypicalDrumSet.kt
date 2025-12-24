@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.*
 import kotlin.time.Duration
@@ -32,7 +32,7 @@ import kotlin.time.Duration
  * @property shellStyle The style of the drum shells.
  */
 class TypicalDrumSet(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<NoteEvent.NoteOn>,
     val shellStyle: ShellStyle,
     private val cymbalStyle: Cymbal.Style = Cymbal.Style.Standard

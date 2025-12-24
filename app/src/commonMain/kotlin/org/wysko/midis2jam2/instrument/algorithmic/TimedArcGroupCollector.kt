@@ -17,7 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.manager.CollectorsManager.Companion.registerCollector
 import org.wysko.midis2jam2.midi.TimedArcGroup
 import kotlin.time.Duration
 
@@ -25,7 +26,7 @@ import kotlin.time.Duration
  * Collects [TimedArcGroup]s that have overlapping times.
  */
 class TimedArcGroupCollector(
-    context: Midis2jam2,
+    context: PerformanceManager,
     private var timedArcGroups: List<TimedArcGroup>,
     private val releaseCondition: (time: Duration, timedArcGroup: TimedArcGroup) -> Boolean =
         { time, timedArcGroup -> time >= timedArcGroup.endTime },

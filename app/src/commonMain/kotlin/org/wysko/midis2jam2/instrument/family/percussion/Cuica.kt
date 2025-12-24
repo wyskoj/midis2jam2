@@ -21,15 +21,16 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Cuica. */
 class Cuica(
-    context: Midis2jam2,
+    context: PerformanceManager,
     muteHits: MutableList<NoteEvent.NoteOn>,
     openHits: MutableList<NoteEvent.NoteOn>,
 ) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.tick }.toMutableList()) {
@@ -40,7 +41,7 @@ class Cuica(
         // Load drum
         context.modelD("DrumSet_Cuica.obj", "DrumShell_Cuica.png").also {
             geometry.attachChild(it)
-            (it as Node).getChild(0).setMaterial(context.diffuseMaterial("Wood.bmp"))
+            (it as Node).getChild(0).setMaterial(context.assetLoader.diffuseMaterial("Wood.bmp"))
         }
     }
 

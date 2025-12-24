@@ -17,9 +17,10 @@
 package org.wysko.midis2jam2.instrument
 
 import com.jme3.scene.Node
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
+import org.wysko.midis2jam2.manager.DrumSetVisibilityManager.Companion.drumSetVisibilityManagerReal
 import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.loc
@@ -43,7 +44,7 @@ import kotlin.time.DurationUnit.SECONDS
  * @property context The context to the main class.
  */
 abstract class Instrument(
-    val context: Midis2jam2,
+    val context: PerformanceManager,
 ) {
     /**
      * This node is translated when multiple instances of the same instrument are on the stage.
@@ -102,7 +103,7 @@ abstract class Instrument(
             context.configs.find<AppSettingsConfiguration>().appSettings.instrumentSettings.isAlwaysShowInstruments
 
         return if (this is DrumSet) {
-            alwaysShowInstruments && context.drumSetVisibilityManager.currentlyVisibleDrumSet == this
+            alwaysShowInstruments && context.drumSetVisibilityManagerReal.currentlyVisibleDrumSet == this
         } else {
             alwaysShowInstruments
         }
@@ -129,12 +130,8 @@ abstract class Instrument(
      * Calculates the visibility of the instrument.
      *
      * @param time The current time since the beginning of the song, in seconds.
-     * @param future Whether to calculate the visibility for the future.
      */
-    abstract fun calculateVisibility(
-        time: Duration,
-        future: Boolean = false,
-    ): Boolean
+    abstract fun calculateVisibility(time: Duration): Boolean
 
     /**
      * Called when the instrument's [visibility][isVisible] changes from `false` to `true`.

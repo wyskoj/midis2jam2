@@ -29,9 +29,7 @@ import com.jme3.scene.Spatial.CullHint.Always
 import com.jme3.scene.Spatial.CullHint.Dynamic
 import com.jme3.scene.control.Control
 import com.jme3.scene.debug.Arrow
-import org.wysko.midis2jam2.Midis2jam2
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
+import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -113,7 +111,7 @@ fun <T> Sequence<T>.chunked(predicate: (T, T) -> Boolean): Sequence<List<T>> {
  * @param context The context to the main class.
  */
 @Suppress("Unused")
-fun debugAxes(context: Midis2jam2): Node {
+fun debugAxes(context: PerformanceManager): Node {
     val axes = mapOf(
         Vector3f.UNIT_X to Red,
         Vector3f.UNIT_Y to Green,
@@ -124,7 +122,7 @@ fun debugAxes(context: Midis2jam2): Node {
             +Geometry(
                 "coordinate axis",
                 Arrow(axis.mult(10f)).apply {
-                    material = Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+                    material = Material(context.app.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
                         additionalRenderState.run {
                             isWireframe = true
                             lineWidth = 4f

@@ -22,6 +22,7 @@ import android.opengl.GLSurfaceView
 import com.jme3.system.SystemListener
 import com.jme3.system.android.JmeAndroidSystem
 import com.jme3.system.android.OGLESContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.util.logger
@@ -93,13 +94,14 @@ class Midis2jam2Harness(
         app.registerProgressListener(listener)
 
 
+    // TODO
     val isAutoCamActive: StateFlow<Boolean>
-        get() = app.isAutoCamActive
+        get() = MutableStateFlow(false)
 
     val isSlideCamActive: StateFlow<Boolean>
-        get() = app.isSlideCamActive
+        get() = MutableStateFlow(false)
 
     fun isPlaying(): Boolean {
-        return app.isPlaying()
+        return true
     }
 }

@@ -23,10 +23,11 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.spongepowered.noise.Noise.gradientCoherentNoise3D
 import org.spongepowered.noise.NoiseQuality.STANDARD
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -39,7 +40,7 @@ private const val KEY_MODEL = "TelePhoneKey.obj"
  * @param context Context to the main class.
  * @param eventList List of MIDI events.
  */
-class TelephoneRing(context: Midis2jam2, eventList: List<MidiEvent>) : SustainedInstrument(context, eventList),
+class TelephoneRing(context: PerformanceManager, eventList: List<MidiEvent>) : SustainedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(13, 0, 0)
 
@@ -71,7 +72,7 @@ class TelephoneRing(context: Midis2jam2, eventList: List<MidiEvent>) : Sustained
                 keysDown.forEach { +it }
             }
             +context.modelD("TelePhoneBase.obj", "TelephoneBase.bmp").apply {
-                (this as Node).children[0].material = context.diffuseMaterial("RubberFoot.bmp")
+                (this as Node).children[0].material = context.assetLoader.diffuseMaterial("RubberFoot.bmp")
             }
             +handle
         }

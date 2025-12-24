@@ -85,6 +85,7 @@ private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
     title = "midis2jam2"
     audioRenderer = null
     centerWindow = true
+    setUseJoysticks(true)
 }
 
 internal expect fun AppSettings.applyIcons()

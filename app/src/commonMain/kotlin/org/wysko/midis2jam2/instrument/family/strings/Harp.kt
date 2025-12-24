@@ -19,11 +19,10 @@ package org.wysko.midis2jam2.instrument.family.strings
 
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
@@ -46,7 +45,7 @@ private val HARP_SCALES =
  * @param context The context to the main class.
  * @param eventList The list of MIDI events.
  */
-class Harp(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Harp(context: PerformanceManager, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     override val collector: TimedArcCollector =
         TimedArcCollector(context, timedArcs) { time: Duration, notePeriod: TimedArc ->

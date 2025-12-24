@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithHands
@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Ocarina. */
-class Ocarina(context: Midis2jam2, events: List<MidiEvent>) :
+class Ocarina(context: PerformanceManager, events: List<MidiEvent>) :
     InstrumentWithHands(context, events, OcarinaClone::class, OcarinaHandGenerator()) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(scaleFactor = 0.1f)

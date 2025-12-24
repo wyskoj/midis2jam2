@@ -20,14 +20,14 @@ package org.wysko.midis2jam2.instrument.family.piano
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.util.control
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class KeyedInstrumentReal(context: Midis2jam2, events: List<MidiEvent>, protected val range: ClosedRange<Int>) :
+abstract class KeyedInstrumentReal(context: PerformanceManager, events: List<MidiEvent>, protected val range: ClosedRange<Int>) :
     SustainedInstrument(context, events) {
     override val collector: TimedArcCollector = TimedArcCollector(context, timedArcs) { time: Duration, arc: TimedArc ->
         when {

@@ -19,10 +19,9 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
@@ -45,7 +44,7 @@ private val DEFAULT_STICK_POSITION = v3(0, 2, 18)
  * A crash, splash, ride, or china cymbal.
  */
 open class Cymbal(
-    context: Midis2jam2,
+    context: PerformanceManager,
     hits: List<NoteEvent.NoteOn>,
     type: CymbalType,
     style: Style = Style.Standard

@@ -92,6 +92,7 @@ kotlin {
 
             // Serialization
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.yaml)
 
             // Filekit
             implementation(libs.filekit)

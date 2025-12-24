@@ -50,6 +50,8 @@ class HeapAPQ<K, V>(private val comparator: Comparator<K>) {
     fun removeMin(): PQEntry? {
         if (entries.isEmpty()) return null
         val entry: PQEntry = entries[0]
+        println("removeMin being called by ${Thread.currentThread()}")
+        println("entries size before removeMin: ${entries.size} and index of last: ${entries.indices.last}")
         val e = entries.removeAt(entries.indices.last)
         if (entries.isNotEmpty()) {
             entries[0] = e

@@ -19,21 +19,22 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Jingle Bells. */
-class JingleBell(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
+class JingleBell(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val bells =
         Striker(
             context = context,
             strikeEvents = hits,
             stickModel =
             context.modelD("JingleBells.obj", "JingleBells.bmp").apply {
-                (this as Node).getChild(1).setMaterial(context.diffuseMaterial("Assets/StickSkin.bmp"))
+                (this as Node).getChild(1).setMaterial(context.assetLoader.diffuseMaterial("Assets/StickSkin.bmp"))
             },
             actualStick = false,
         ).apply {

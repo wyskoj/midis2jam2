@@ -20,7 +20,7 @@ package org.wysko.midis2jam2.instrument.family.guitar
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.VirtualCompositePitchBendEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.datastructure.RunningAverage
 import org.wysko.midis2jam2.midi.TimedArcGroup
 import org.wysko.midis2jam2.midi.improvedContiguousGroupDetection
@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property events The list of all events for this instrument.
  */
 class BetterFretting(
-    private val context: Midis2jam2,
+    private val context: PerformanceManager,
     private val chordDictionary: Set<ChordDefinition>,
     private val openStringNoteValues: IntArray,
     private val events: List<MidiEvent>,

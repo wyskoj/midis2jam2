@@ -17,10 +17,13 @@
 
 package org.wysko.midis2jam2.instrument.family.piano
 
+import com.jme3.bounding.BoundingBox
 import com.jme3.math.Vector3f
+import com.jme3.scene.Geometry
+import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.noteNumberToPitch
@@ -33,7 +36,7 @@ private val range = 21..108
 
 private const val DEFAULT_PIANO_TEXTURE = "piano/piano.png"
 
-open class Keyboard(context: Midis2jam2, events: List<MidiEvent>, variant: Variant? = null) :
+open class Keyboard(context: PerformanceManager, events: List<MidiEvent>, variant: Variant? = null) :
     KeyedInstrumentReal(context, events, range), MultipleInstancesLinearAdjustment {
 
     override val keys: List<Spatial> = List(88) { i ->

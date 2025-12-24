@@ -22,7 +22,7 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
 import com.jme3.scene.Geometry
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
@@ -39,7 +39,7 @@ import kotlin.time.Duration
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class TubularBells(context: Midis2jam2, events: List<MidiEvent>) :
+class TubularBells(context: PerformanceManager, events: List<MidiEvent>) :
     DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 

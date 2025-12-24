@@ -21,28 +21,32 @@ import Platform
 import com.jme3.app.SimpleApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
-import org.wysko.kmidi.midi.reader.StandardMidiFileReadingException
-import org.wysko.midis2jam2.AndroidMidis2jam2
-import org.wysko.midis2jam2.CompatLibrary
+import org.wysko.midis2jam2.AndroidPerformanceManager
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.ErrorLogService
+import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.manager.AndroidInputManager
+import org.wysko.midis2jam2.manager.LoadingProgressManager
+import org.wysko.midis2jam2.manager.MidiDeviceManager
+import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
+import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.util.logger
-import java.io.IOException
+import org.wysko.midis2jam2.util.state
+import org.wysko.midis2jam2.world.AssetLoader
 
 internal actual class Midis2jam2Application(
     private val onFinish: () -> Unit = {},
 ) : SimpleApplication(), KoinComponent {
+
     actual fun execute() = Unit
 
     override fun start() {
@@ -50,54 +54,48 @@ internal actual class Midis2jam2Application(
         logger().debug("Midis2jam2Application: start() called")
     }
 
-    private lateinit var androidMidis2jam2: AndroidMidis2jam2
-
     actual override fun simpleInitApp() {
         logger().debug("Midis2jam2Application: simpleInitApp() called")
+
         val errorLogService: ErrorLogService by inject()
         val applicationService: ApplicationService by inject()
         val midiService: MidiService by inject()
         val midiFile = applicationService.midiFile.value!!
         val configurations = applicationService.configurations.value
 
-        applyConfigurations(configurations)
-        setupState(configurations, addFpp = CompatLibrary.supportsFilterPostProcessor, platform = Platform.Android)
+        CoroutineScope(Dispatchers.Default).launch {
+            val sequence = StandardMidiFileReader().readByteArray(midiFile.readBytes()).toTimeBasedSequence()
+            val midiDevice = midiService.getMidiDevices().first()
+            val sequencer = JwSequencerImpl().apply {
+                open(midiDevice)
+                this.sequence = sequence
+            }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val sequence = StandardMidiFileReader().readByteArray(midiFile.readBytes()).toTimeBasedSequence()
-                val midiDevice = midiService.getMidiDevices().first()
-                val sequencer = JwSequencerImpl().apply {
-                    open(midiDevice)
-                    this.sequence = sequence
-                }
+            Jme3ExceptionHandler.setup {
+                stop()
+                sequencer.stop()
+                sequencer.close()
+            }
 
-                androidMidis2jam2 = AndroidMidis2jam2(
-                    fileName = midiFile.name,
+            enqueue {
+                setupState(configurations, platform = Platform.Desktop)
+                val loadingProgressManager = LoadingProgressManager()
+                stateManager.attach(loadingProgressManager)
+                stateManager.attach(AssetLoader {
+                    loadingProgressManager.onLoadingAsset(it)
+                })
+                val performanceAppState = AndroidPerformanceManager(
+                    sequencer = sequencer,
                     midiFile = sequence,
                     onClose = { stop() },
-                    sequencer = sequencer,
+                    fileName = midiFile.name,
                     configs = configurations,
-                    midiDevice = midiDevice,
                 )
-                enqueue {
-                    rootNode.attachChild(androidMidis2jam2.root)
-                    stateManager.attach(androidMidis2jam2)
-                }
-            } catch (e: StandardMidiFileReadingException) {
-                e.printStackTrace()
-                errorLogService.addError(
-                    message = "The selected file is not a MIDI file or contains an error.",
-                    stackTrace = e.stackTraceToString()
-                )
-                stop()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                errorLogService.addError(
-                    message = "The file could not be read.",
-                    stackTrace = e.stackTraceToString()
-                )
-                stop()
+                stateManager.attach(performanceAppState)
+                rootNode.attachChild(performanceAppState.root)
+                addManagers(configurations, sequence, sequencer)
+                stateManager.attach(AndroidInputManager())
+                stateManager.attach(MidiDeviceManager(configurations, midiDevice))
             }
         }
     }
@@ -116,11 +114,7 @@ internal actual class Midis2jam2Application(
     }
 
     fun callAction(action: Midis2jam2Action) {
-        if (::androidMidis2jam2.isInitialized) {
-            enqueue {
-                androidMidis2jam2.callAction(action)
-            }
-        }
+        state<AndroidInputManager>().callAction(action)
     }
 
     fun enqueue(block: () -> Unit) {
@@ -128,28 +122,13 @@ internal actual class Midis2jam2Application(
     }
 
     fun registerProgressListener(listener: ProgressListener) {
+        fun getProgressManager(): LoadingProgressManager? =
+            stateManager.getState(LoadingProgressManager::class.java)
         CoroutineScope(Dispatchers.Default).launch {
-            while (!(::androidMidis2jam2.isInitialized)) yield()
-            androidMidis2jam2.registerProgressListener(listener)
+            while (getProgressManager() == null) yield()
+            (getProgressManager() ?: return@launch).registerProgressListener(listener)
         }
-    }
-
-    val isAutoCamActive: StateFlow<Boolean>
-        get() = if (::androidMidis2jam2.isInitialized) {
-            androidMidis2jam2.isAutoCamActive
-        } else {
-            MutableStateFlow(false)
-        }
-
-    val isSlideCamActive: StateFlow<Boolean>
-        get() = if (::androidMidis2jam2.isInitialized) {
-            androidMidis2jam2.isSlideCamActive
-        } else {
-            MutableStateFlow(false)
-        }
-
-    fun isPlaying(): Boolean = when {
-        ::androidMidis2jam2.isInitialized -> androidMidis2jam2.isPlaying()
-        else -> false
     }
 }
+
+internal actual fun getCameraManager(): CameraManager = AndroidCameraManager()

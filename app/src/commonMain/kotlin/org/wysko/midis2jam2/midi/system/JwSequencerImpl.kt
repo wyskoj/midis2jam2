@@ -68,13 +68,13 @@ class JwSequencerImpl : JwSequencer {
         get() = _isOpen
 
     override fun open(device: MidiDevice) {
-        check(!isOpen) { "Sequencer is already open" }
+        if (isOpen) return
         this.device = device.also { it.open() }
         _isOpen = true
     }
 
     override fun close() {
-        check(isOpen) { "Sequencer is not open" }
+        if (!isOpen) return
         if (isRunning) stop()
         threadPool.execute {
             this@JwSequencerImpl.device?.close()
@@ -107,8 +107,7 @@ class JwSequencerImpl : JwSequencer {
     }
 
     override fun stop() {
-        check(isOpen) { "Sequencer is open" }
-        if (!isRunning) return
+        if (!isOpen || !isRunning) return
 
         _isRunning = false
         job!!.join()

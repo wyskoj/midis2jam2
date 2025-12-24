@@ -19,11 +19,13 @@ package org.wysko.midis2jam2.world
 
 import com.jme3.material.Material
 import com.jme3.material.RenderState
+import com.jme3.math.ColorRGBA.Black
 import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue.Bucket.Transparent
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.Midis2jam2
-import org.wysko.midis2jam2.util.logger
+import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.manager.BaseManager
+import org.wysko.midis2jam2.manager.LoadingProgressManager
 
 private const val LIGHTING_MAT: String = "Common/MatDefs/Light/Lighting.j3md"
 private const val UNSHADED_MAT: String = "Common/MatDefs/Misc/Unshaded.j3md"
@@ -44,17 +46,18 @@ private fun String.assetPrefix(): String = if (this.startsWith("Assets/")) this 
  *
  * @property context The context to the main class.
  */
-class AssetLoader(val context: Midis2jam2, val onLoadAsset: (String) -> Unit) {
+class AssetLoader(val onLoadAsset: (String) -> Unit = {}) : BaseManager() {
 
-    private val assetManager
-        get() = context.assetManager
+    private val progressListener by lazy {
+        stateManager.getState(LoadingProgressManager::class.java)
+    }
 
     /**
      * Loads a [model] and applies a regular [texture].
      */
     fun loadDiffuseModel(model: String, texture: String): Spatial {
         onLoadAsset(model)
-        return assetManager.loadModel(model.assetPrefix()).apply {
+        return application.assetManager.loadModel(model.assetPrefix()).apply {
             setMaterial(diffuseMaterial(texture))
         }
     }
@@ -65,7 +68,7 @@ class AssetLoader(val context: Midis2jam2, val onLoadAsset: (String) -> Unit) {
     fun loadDiffuseModelReal(model: String, texture: String): Spatial {
         val modelPath = prefix(model, AssetType.Model)
         onLoadAsset(model)
-        return assetManager.loadModel(modelPath).also { spatial ->
+        return application.assetManager.loadModel(modelPath).also { spatial ->
             if (!modelPath.endsWith(".j3o")) {
                 val texturePath = prefix(texture, AssetType.Texture)
                 spatial.setMaterial(
@@ -80,16 +83,16 @@ class AssetLoader(val context: Midis2jam2, val onLoadAsset: (String) -> Unit) {
      */
     fun loadReflectiveModel(model: String, texture: String): Spatial {
         onLoadAsset(model)
-        return assetManager.loadModel(model.assetPrefix()).apply {
+        return application.assetManager.loadModel(model.assetPrefix()).apply {
             setMaterial(reflectiveMaterial(texture))
         }
     }
 
     /** Loads a fake shadow, given the paths to its [model] and [texture]. */
-    fun fakeShadow(model: String, texture: String): Spatial = assetManager.loadModel(model).apply {
+    fun fakeShadow(model: String, texture: String): Spatial = application.assetManager.loadModel(model).apply {
         setMaterial(
-            Material(context.assetManager, UNSHADED_MAT).apply {
-                setTexture(COLOR_MAP, context.assetManager.loadTexture(texture))
+            Material(application.assetManager, UNSHADED_MAT).apply {
+                setTexture(COLOR_MAP, application.assetManager.loadTexture(texture))
                 additionalRenderState.blendMode = RenderState.BlendMode.Alpha
                 setFloat("AlphaDiscardThreshold", 0.01F)
             }
@@ -100,16 +103,17 @@ class AssetLoader(val context: Midis2jam2, val onLoadAsset: (String) -> Unit) {
     /**
      * Loads a diffuse material conditionally on the enhanced graphics state.
      */
-    fun diffuseMaterial(texture: String): Material = Material(assetManager, LIGHTING_MAT).apply {
-        setTexture(DIFFUSE_MAP, assetManager.loadTexture(texture.assetPrefix()))
+    fun diffuseMaterial(texture: String): Material = Material(application.assetManager, LIGHTING_MAT).apply {
+        setTexture(DIFFUSE_MAP, application.assetManager.loadTexture(texture.assetPrefix()))
     }
 
     /**
      * Loads a diffuse material conditionally on the enhanced graphics state.
      */
-    fun diffuseMaterialReal(texture: String): Material = Material(assetManager, "Assets/MatDefs/Lighting.j3md").apply {
-        setTexture(DIFFUSE_MAP, assetManager.loadTexture(prefix(texture, AssetType.Texture)))
-    }
+    fun diffuseMaterialReal(texture: String): Material =
+        Material(application.assetManager, "Assets/MatDefs/Lighting.j3md").apply {
+            setTexture(DIFFUSE_MAP, application.assetManager.loadTexture(prefix(texture, AssetType.Texture)))
+        }
 
     /**
      * Loads a material based on its texture and the material type.
@@ -125,17 +129,12 @@ class AssetLoader(val context: Midis2jam2, val onLoadAsset: (String) -> Unit) {
     /**
      * Loads a reflective material conditionally on the enhanced graphics state.
      */
-    fun reflectiveMaterial(texture: String): Material = Material(assetManager, LIGHTING_MAT).apply {
+    fun reflectiveMaterial(texture: String): Material = Material(application.assetManager, LIGHTING_MAT).apply {
         setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
-        setTexture(ENV_MAP, assetManager.loadTexture(texture.assetPrefix()))
-        setTexture("DiffuseMap", assetManager.loadTexture("Assets/Black.bmp"))
+        setTexture(ENV_MAP, application.assetManager.loadTexture(texture.assetPrefix()))
+        setTexture("DiffuseMap", application.assetManager.loadTexture("Assets/Black.bmp"))
     }
-
-    /**
-     * Loads a 2D sprite for GUI, given the sprite's [texture].
-     */
-    fun loadSprite(texture: String): PictureWithFade = PictureWithFade(assetManager, texture.assetPrefix())
 }
 
 /**
@@ -153,28 +152,42 @@ sealed class MaterialType {
     data object Reflective : MaterialType()
 }
 
-/**
- * Convenience function for loading a [model] with a diffuse [texture].
- */
-fun Midis2jam2.modelD(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)
+val PerformanceManager.assetLoader: AssetLoader
+    get() = app.stateManager.getState(AssetLoader::class.java)
 
 /**
  * Convenience function for loading a [model] with a diffuse [texture].
  */
-fun Midis2jam2.modelDReal(model: String, texture: String): Spatial = assetLoader.loadDiffuseModelReal(model, texture)
+fun PerformanceManager.modelD(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)
+
+/**
+ * Convenience function for loading a [model] with a diffuse [texture].
+ */
+fun PerformanceManager.modelDReal(model: String, texture: String): Spatial =
+    assetLoader.loadDiffuseModelReal(model, texture)
 
 /**
  * Convenience function for loading a [model] with a reflective [texture].
  */
-fun Midis2jam2.modelR(model: String, texture: String): Spatial = assetLoader.loadReflectiveModel(model, texture)
+fun PerformanceManager.modelR(model: String, texture: String): Spatial = assetLoader.loadReflectiveModel(model, texture)
 
 /**
  * Convenience function for loading a [model] with a [texture] and [type].
  */
-fun Midis2jam2.model(model: String, texture: String, type: MaterialType): Spatial = when (type) {
+fun PerformanceManager.model(model: String, texture: String, type: MaterialType): Spatial = when (type) {
     MaterialType.Diffuse -> modelD(model, texture)
     MaterialType.Reflective -> modelR(model, texture)
 }
+
+/**
+ * Convenience function for loading a [model] with a [texture] and [type].
+ */
+fun PerformanceManager.model(model: String): Spatial = app.assetManager.loadModel(model)
+
+fun PerformanceManager.blackMaterial() = Material(app.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
+    setColor("Color", Black)
+}
+
 
 private fun prefix(name: String, type: AssetType): String = when {
     name.startsWith(type.prefix) -> name

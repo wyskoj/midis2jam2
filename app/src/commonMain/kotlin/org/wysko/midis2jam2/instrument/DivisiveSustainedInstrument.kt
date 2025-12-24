@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument
 
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.time.Duration
 
 /**
@@ -28,7 +28,7 @@ import kotlin.time.Duration
  * @see PitchClassAnimator
  */
 abstract class DivisiveSustainedInstrument protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>,
 ) : SustainedInstrument(context, events) {
 
@@ -39,7 +39,7 @@ abstract class DivisiveSustainedInstrument protected constructor(
 
     override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
-        isVisible = calculateVisibility(time, false)
+        isVisible = calculateVisibility(time)
         animators.forEach { it.tick(time, delta) }
     }
 }

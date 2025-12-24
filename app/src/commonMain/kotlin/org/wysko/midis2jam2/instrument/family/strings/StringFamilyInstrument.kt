@@ -22,7 +22,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcGroupCollector
 import org.wysko.midis2jam2.instrument.family.guitar.FretHeightCalculator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
@@ -48,7 +48,7 @@ import kotlin.time.DurationUnit
  */
 abstract class StringFamilyInstrument protected constructor(
     /** Context to midis2jam2. */
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>,
     showBow: Boolean,
     bowRotation: Double,

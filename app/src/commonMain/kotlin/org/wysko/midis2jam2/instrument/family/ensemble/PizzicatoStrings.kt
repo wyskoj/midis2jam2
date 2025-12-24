@@ -21,7 +21,7 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
@@ -40,7 +40,7 @@ import kotlin.time.DurationUnit.SECONDS
  * @param eventList The list of all events that this instrument should be aware of.
  */
 class PizzicatoStrings(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>
 ) : DecayedInstrument(context, eventList) {
 

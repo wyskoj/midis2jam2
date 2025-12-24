@@ -21,7 +21,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesRadialAdjustment
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
@@ -41,7 +41,7 @@ import kotlin.time.DurationUnit.SECONDS
  * The Stage Strings.
  */
 class StageStrings(
-    context: Midis2jam2,
+    context: PerformanceManager,
     private val eventList: List<MidiEvent>,
     type: StageStringsType,
     private val stageStringBehavior: StageStringBehavior = StageStringBehavior.Normal,

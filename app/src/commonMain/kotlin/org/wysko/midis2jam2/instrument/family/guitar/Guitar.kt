@@ -21,12 +21,11 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
@@ -59,7 +58,7 @@ private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
  * @param type The type of guitar.
  * @see FrettedInstrument
  */
-class Guitar(context: Midis2jam2, events: List<MidiEvent>, type: GuitarType) : FrettedInstrument(
+class Guitar(context: PerformanceManager, events: List<MidiEvent>, type: GuitarType) : FrettedInstrument(
     context = context,
     events = events,
     frettingEngine = StandardFrettingEngine(

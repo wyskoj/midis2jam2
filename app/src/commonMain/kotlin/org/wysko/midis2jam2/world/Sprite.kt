@@ -31,7 +31,7 @@ import com.jme3.ui.Picture
  * @param assetManager The asset manager.
  * @param texture The texture to use.
  */
-class PictureWithFade(assetManager: AssetManager, texture: String) : Node() {
+class Sprite(assetManager: AssetManager, texture: String) : Node() {
 
     private val picture: Picture = Picture(texture).apply {
         (assetManager.loadTexture(texture) as Texture2D).also {

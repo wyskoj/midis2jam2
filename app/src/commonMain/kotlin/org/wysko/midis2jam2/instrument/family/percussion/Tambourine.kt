@@ -20,22 +20,23 @@ import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Tambourine. */
-class Tambourine(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
+class Tambourine(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val tambourineHand =
         Striker(
             context = context,
             strikeEvents = hits,
             stickModel =
             context.modelD("hand_tambourine.obj", "hands.bmp").apply {
-                (this as Node).getChild(2).setMaterial(context.diffuseMaterial("TambourineWood.bmp"))
-                getChild(1).setMaterial(context.diffuseMaterial("MetalTexture.bmp"))
+                (this as Node).getChild(2).setMaterial(context.assetLoader.diffuseMaterial("TambourineWood.bmp"))
+                getChild(1).setMaterial(context.assetLoader.diffuseMaterial("MetalTexture.bmp"))
             },
             strikeSpeed = 2.0,
             maxIdleAngle = 30.0,

@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.percussive
 
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
@@ -26,7 +26,7 @@ import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Synth drum. */
-class SynthDrum(context: Midis2jam2, eventList: List<MidiEvent>) : OneDrumOctave(context, eventList) {
+class SynthDrum(context: PerformanceManager, eventList: List<MidiEvent>) : OneDrumOctave(context, eventList) {
 
     override val strikers: Array<Striker> = Array(12) { i ->
         Striker(

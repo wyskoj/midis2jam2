@@ -21,7 +21,7 @@ import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
@@ -36,7 +36,7 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
 /**
  * A modified version of the stage choir that animates applause.
  */
-class ApplauseChoir(context: Midis2jam2, private val eventList: List<MidiEvent>) :
+class ApplauseChoir(context: PerformanceManager, private val eventList: List<MidiEvent>) :
     DivisiveSustainedInstrument(context, eventList) {
 
     override val animators: List<PitchClassAnimator> = List(12) { ApplauseChoirPeep() }

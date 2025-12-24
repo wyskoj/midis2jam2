@@ -23,7 +23,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
@@ -44,7 +44,7 @@ private val PRONG_SCALES = listOf(1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f, 1.9f, 1.7f
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-class Kalimba(context: Midis2jam2, events: List<MidiEvent>) :
+class Kalimba(context: PerformanceManager, events: List<MidiEvent>) :
     DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 

@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument
 
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.TimedArc
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.util.plusAssign
 import kotlin.time.Duration
@@ -31,7 +31,7 @@ import kotlin.time.Duration
  * @param arcs The list of all arcs that this instrument should play.
  * @see DivisiveSustainedInstrument
  */
-abstract class PitchClassAnimator protected constructor(context: Midis2jam2, arcs: List<TimedArc>) {
+abstract class PitchClassAnimator protected constructor(context: PerformanceManager, arcs: List<TimedArc>) {
 
     /**
      * The collector that manages the note periods.

@@ -152,7 +152,7 @@ private fun CameraControlsModal(
             ) {
                 for (i in 1..3) {
                     FilledTonalIconButton(onClick = {
-                        callAction(Midis2jam2Action.MoveToCameraAngle("cam$i"))
+                        callAction(Midis2jam2Action.MoveToCameraAngle("camera_angle_$i"))
                     }) {
                         Text(text = "$i", fontFamily = worldOneRegular)
                     }
@@ -176,7 +176,7 @@ private fun CameraControlsModal(
                 for (i in 4..6) {
                     FilledTonalIconButton(
                         onClick = {
-                            callAction(Midis2jam2Action.MoveToCameraAngle("cam$i"))
+                            callAction(Midis2jam2Action.MoveToCameraAngle("camera_angle_$i"))
                         }
                     ) {
                         Text(text = "$i", fontFamily = worldOneRegular)

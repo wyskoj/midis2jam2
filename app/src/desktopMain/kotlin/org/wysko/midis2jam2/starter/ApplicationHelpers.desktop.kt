@@ -32,8 +32,8 @@ internal actual fun AppSettings.applyIcons() {
 }
 
 internal actual fun AppSettings.applyScreenFrequency() {
-    GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayModes.firstOrNull()?.let {
-        frequency = it.refreshRate
+    GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices.maxOf { it.displayMode.refreshRate }.let {
+        frequency = it
     }
 }
 
