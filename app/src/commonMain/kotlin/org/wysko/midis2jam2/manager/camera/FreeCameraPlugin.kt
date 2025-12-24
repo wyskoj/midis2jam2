@@ -55,7 +55,10 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         app.inputManager.addListener(this, *cameraAngleActions, ACTION_CAMERA_PLUGIN_FREE)
     }
 
-    override fun onEnable(): Unit = Unit
+    override fun onEnable() {
+        dummyCamera.location = application.camera.location
+        dummyCamera.rotation = application.camera.rotation
+    }
 
     override fun onDisable(): Unit = Unit
 
