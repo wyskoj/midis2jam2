@@ -21,13 +21,12 @@ import com.jme3.app.Application
 import com.jme3.math.FastMath
 import com.jme3.math.Vector2f
 import com.jme3.math.Vector3f
-import org.wysko.midis2jam2.manager.camera.CameraAngleCategory
 import org.wysko.midis2jam2.manager.camera.CameraPlugin
 import org.wysko.midis2jam2.manager.camera.MidiJamAngleEngine
+import org.wysko.midis2jam2.manager.camera.MidiJamAngleEngine.Angle
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.plus
 import org.wysko.midis2jam2.util.v3
-import org.wysko.midis2jam2.manager.camera.MidiJamAngleEngine.Angle
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -39,7 +38,6 @@ class AndroidOrbitingCamera : CameraPlugin() {
     private var azimuthAngle = 90f
     private var verticalAngle = 18.44f
     private var orbitDistance = 150.0f
-    private var isFirstEnable = false
 
     private val angleEngine = MidiJamAngleEngine(
         prohibitedAngles = setOf(Angle.Angle6B)
@@ -120,15 +118,6 @@ class AndroidOrbitingCamera : CameraPlugin() {
         ((180.0 + Math.toDegrees(FastMath.atan2(z, x).toDouble())) % 360.0).toFloat()
 
 
-    override fun onEnable() {
-        if (!isFirstEnable) {
-            isFirstEnable = true
-            return
-        }
-
-        applyFakeOrigin()
-    }
-
     internal data class State(
         val orbitOrigin: Vector3f,
         val azimuthAngle: Float,
@@ -136,6 +125,7 @@ class AndroidOrbitingCamera : CameraPlugin() {
         val orbitDistance: Float,
     )
 
+    override fun onEnable(): Unit = Unit
     override fun initialize(app: Application?): Unit = Unit
     override fun cleanup(app: Application?): Unit = Unit
     override fun onDisable(): Unit = Unit

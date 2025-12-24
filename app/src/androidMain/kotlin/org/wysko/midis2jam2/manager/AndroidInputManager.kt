@@ -37,15 +37,15 @@ class AndroidInputManager : BaseManager() {
                 is Midis2jam2Action.SwitchToSlideCam -> cameraManager.switchToRotatingCamera()
 
                 is Midis2jam2Action.SeekBackward -> {
-                    playbackManager.seek(PlaybackManager.SeekDirection.Backward)
+                    playbackManager?.seek(PlaybackManager.SeekDirection.Backward)
                 }
 
                 is Midis2jam2Action.SeekForward -> {
-                    playbackManager.seek(PlaybackManager.SeekDirection.Forward)
+                    playbackManager?.seek(PlaybackManager.SeekDirection.Forward)
                 }
 
                 is Midis2jam2Action.PlayPause -> {
-                    playbackManager.togglePlayPause()
+                    playbackManager?.togglePlayPause()
                 }
 
                 is Midis2jam2Action.Pan -> cameraManager.pan(action.panDeltaX, action.panDeltaY)

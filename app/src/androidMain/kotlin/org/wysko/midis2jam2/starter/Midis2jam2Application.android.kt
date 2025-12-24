@@ -38,6 +38,7 @@ import org.wysko.midis2jam2.manager.LoadingProgressManager
 import org.wysko.midis2jam2.manager.MidiDeviceManager
 import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
+import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.state
@@ -114,7 +115,7 @@ internal actual class Midis2jam2Application(
     }
 
     fun callAction(action: Midis2jam2Action) {
-        state<AndroidInputManager>().callAction(action)
+        state<AndroidInputManager>()?.callAction(action)
     }
 
     fun enqueue(block: () -> Unit) {
@@ -127,6 +128,13 @@ internal actual class Midis2jam2Application(
         CoroutineScope(Dispatchers.Default).launch {
             while (getProgressManager() == null) yield()
             (getProgressManager() ?: return@launch).registerProgressListener(listener)
+        }
+    }
+
+    fun registerCameraStateListener(listener: CameraStateListener) {
+        CoroutineScope(Dispatchers.Default).launch {
+            while (state<CameraManager>() == null) yield()
+            (state<CameraManager>() ?: return@launch).registerCameraStateListener(listener)
         }
     }
 }

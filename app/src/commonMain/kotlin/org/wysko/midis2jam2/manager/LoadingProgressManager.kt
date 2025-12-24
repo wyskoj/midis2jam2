@@ -41,7 +41,7 @@ class LoadingProgressManager : BaseManager() {
     }
 
     override fun update(tpf: Float) {
-        if (!hasDispatchedReady && app.state<PerformanceManager>().isInitialized) {
+        if (!hasDispatchedReady && app.state<PerformanceManager>()?.isInitialized ?: false) {
             onReady()
             hasDispatchedReady = true
         }

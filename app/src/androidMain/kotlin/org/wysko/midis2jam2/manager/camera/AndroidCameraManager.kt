@@ -17,11 +17,21 @@
 
 package org.wysko.midis2jam2.manager.camera
 
+import com.jme3.app.Application
 import org.wysko.midis2jam2.AndroidOrbitingCamera
+import org.wysko.midis2jam2.manager.PreferencesManager
+import org.wysko.midis2jam2.util.state
 
 class AndroidCameraManager : CameraManager() {
     private val orbitingCamera: AndroidOrbitingCamera
         get() = cameraPlugins.find { it is AndroidOrbitingCamera } as AndroidOrbitingCamera
+
+    private var ignoreInput: Boolean = false
+
+    override fun initialize(app: Application) {
+        super.initialize(app)
+        ignoreInput = app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isDisableTouchInput ?: false
+    }
 
     override fun getDeviceCameraPlugin(): CameraPlugin {
         return AndroidOrbitingCamera()
@@ -32,23 +42,33 @@ class AndroidCameraManager : CameraManager() {
     }
 
     fun moveToCameraAngle(cameraAngle: String) {
-        setCurrentCameraPlugin<AndroidOrbitingCamera>()
+        setOrbitAsCurrentCamera()
         orbitingCamera.applyCameraCategory(cameraAngle.last().digitToInt())
     }
 
     fun pan(panDeltaX: Float, panDeltaY: Float) {
-        setCurrentCameraPlugin<AndroidOrbitingCamera>()
+        if (ignoreInput) return
+        setOrbitAsCurrentCamera()
         orbitingCamera.pan(panDeltaX, panDeltaY)
     }
 
     fun zoom(zoomDelta: Float) {
-        setCurrentCameraPlugin<AndroidOrbitingCamera>()
+        if (ignoreInput) return
+        setOrbitAsCurrentCamera()
         orbitingCamera.zoom(zoomDelta)
     }
 
     fun orbit(x: Float, y: Float) {
-        setCurrentCameraPlugin<AndroidOrbitingCamera>()
+        if (ignoreInput) return
+        setOrbitAsCurrentCamera()
         orbitingCamera.orbit(x, y)
+    }
+
+    private fun setOrbitAsCurrentCamera() {
+        if (currentCameraPlugin !is AndroidOrbitingCamera) {
+            orbitingCamera.applyFakeOrigin()
+        }
+        setCurrentCameraPlugin<AndroidOrbitingCamera>()
     }
 
     fun switchToRotatingCamera() {

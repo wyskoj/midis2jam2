@@ -31,19 +31,28 @@ abstract class CameraManager : BaseManager(), ActionListener {
     protected abstract fun getDeviceCameraPlugin(): CameraPlugin
     protected abstract fun getDeviceCameraActions(): Array<String>
 
+    protected val cameraStateListeners: MutableSet<CameraStateListener> = mutableSetOf()
+
     override fun initialize(app: Application) {
         super.initialize(app)
         val preferences = this.app.state<PreferencesManager>()
         cameraPlugins = buildList {
             add(getDeviceCameraPlugin())
-            when (preferences.getAppSettings().cameraSettings.isClassicAutoCam) {
+            when (preferences?.getAppSettings()?.cameraSettings?.isClassicAutoCam) {
                 true -> add(ClassicAutoCamPlugin())
                 else -> add(StandardAutoCamPlugin())
             }
             add(RotatingCameraPlugin())
         }
         app.stateManager.attachAll(cameraPlugins)
-        currentCameraPlugin = cameraPlugins.first()
+        currentCameraPlugin = when (preferences?.getAppSettings()?.cameraSettings?.isStartAutocamWithSong) {
+            true -> {
+                cameraStateListeners.forEach { it.onAutoCameraEnabled() }
+                cameraPlugins.first { it is AutoCamPlugin }
+            }
+
+            else -> cameraPlugins.first()
+        }
         cameraPlugins.forEach { it.isEnabled = it == currentCameraPlugin }
         application.inputManager.addListener(
             this,
@@ -61,8 +70,18 @@ abstract class CameraManager : BaseManager(), ActionListener {
         }
     }
 
+    fun registerCameraStateListener(listener: CameraStateListener) {
+        cameraStateListeners.add(listener)
+    }
+
     protected inline fun <reified T> setCurrentCameraPlugin() {
         currentCameraPlugin = cameraPlugins.first { it is T }
         cameraPlugins.forEach { it.isEnabled = it == currentCameraPlugin }
+
+        when (T::class) {
+            AutoCamPlugin::class -> cameraStateListeners.forEach { it.onAutoCameraEnabled() }
+            RotatingCameraPlugin::class -> cameraStateListeners.forEach { it.onRotatingCameraEnabled() }
+            else -> cameraStateListeners.forEach { it.onFreeCameraEnabled() }
+        }
     }
 }

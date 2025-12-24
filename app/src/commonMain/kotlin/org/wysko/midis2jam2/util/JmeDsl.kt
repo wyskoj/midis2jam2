@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.util
 
+import com.jme3.app.Application
 import com.jme3.app.SimpleApplication
 import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.AppState
@@ -143,4 +144,4 @@ operator fun Vector3f.times(number: Number): Vector3f = this.mult(number.toFloat
  */
 operator fun Vector3f.plus(other: Vector3f): Vector3f = this.add(other)
 
-inline fun <reified T : AppState> SimpleApplication.state(): T = this.stateManager.getState<T>(T::class.java)
+inline fun <reified T : AppState> Application.state(): T? = this.stateManager.getState<T>(T::class.java)
