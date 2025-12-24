@@ -24,6 +24,8 @@ import com.jme3.input.controls.ActionListener
 import com.jme3.math.Vector3f
 import com.jme3.renderer.Camera
 import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_PLUGIN_FREE
+import org.wysko.midis2jam2.manager.PreferencesManager
+import org.wysko.midis2jam2.util.state
 
 private const val DEFAULT_MOVE_SPEED = 100f
 private const val DEFAULT_ZOOM_SPEED = -10f
@@ -46,7 +48,8 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         }
         dummyFlyByCamera = ExtendedJoystickFlyByCamera(dummyCamera, onCameraInput).apply {
             registerWithInput(app.inputManager)
-            isDragToRotate = true
+            isDragToRotate =
+                app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isLockCursor?.not() ?: true
             moveSpeed = DEFAULT_MOVE_SPEED
             zoomSpeed = DEFAULT_ZOOM_SPEED
         }
