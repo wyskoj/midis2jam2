@@ -15,8 +15,22 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.world
+package org.wysko.midis2jam2.manager.camera
 
-interface VariableSpeed {
-    var speed: Float
+import com.charleskorn.kaml.Yaml
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import org.wysko.midis2jam2.util.KClassAsString
+import org.wysko.midis2jam2.util.resourceToString
+
+@Serializable
+data class CameraAngleCategory(
+    val category: Int,
+    val angles: List<CameraAngle>,
+    val instrumentClass: KClassAsString? = null,
+) {
+    companion object {
+        val categories: List<CameraAngleCategory> =
+            Yaml.default.decodeFromString(resourceToString("/camera_angles.yaml"))
+    }
 }

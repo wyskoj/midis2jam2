@@ -17,12 +17,12 @@
 
 package org.wysko.midis2jam2.world
 
-import org.wysko.midis2jam2.world.camera.CameraAngle
+import org.wysko.midis2jam2.manager.camera.LegacyCameraAngle
 import kotlin.time.Duration
 
 interface CameraController {
     var isEnabled: Boolean
 
-    fun moveToCameraAngle(cameraAngle: CameraAngle)
+    fun moveToCameraAngle(cameraAngle: LegacyCameraAngle)
     fun tick(delta: Duration)
 }

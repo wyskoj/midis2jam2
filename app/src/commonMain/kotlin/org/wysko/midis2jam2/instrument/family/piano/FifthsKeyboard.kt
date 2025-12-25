@@ -20,14 +20,14 @@ package org.wysko.midis2jam2.instrument.family.piano
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.Geometry
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.Instrument
 import kotlin.time.Duration
 
 /**
  * A keyboard that glows the key 7 semitones below the currently playing note.
  */
-class FifthsKeyboard(context: Midis2jam2, events: List<MidiEvent>, variant: Keyboard.Variant) :
+class FifthsKeyboard(context: PerformanceManager, events: List<MidiEvent>, variant: Keyboard.Variant) :
     Keyboard(context, events, variant) {
 
     override fun tick(time: Duration, delta: Duration) {

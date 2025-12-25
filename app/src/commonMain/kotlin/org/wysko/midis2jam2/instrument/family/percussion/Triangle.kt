@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.ch
@@ -30,7 +30,7 @@ import kotlin.time.Duration
 
 /** The Triangle. */
 class Triangle(
-    context: Midis2jam2,
+    context: PerformanceManager,
     muteHits: MutableList<NoteEvent.NoteOn>,
     openHits: MutableList<NoteEvent.NoteOn>,
 ) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.tick }.toMutableList()) {
@@ -46,7 +46,7 @@ class Triangle(
     private val beater =
         Striker(
             context = context,
-            strikeEvents = hits,
+            strikeEvents = _hits,
             stickModel = context.modelR("Triangle_Stick.obj", "ShinySilver.bmp"),
         ).apply {
             setParent(geometry)

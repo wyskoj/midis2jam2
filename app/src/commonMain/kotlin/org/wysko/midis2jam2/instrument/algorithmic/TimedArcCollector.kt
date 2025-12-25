@@ -18,8 +18,9 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import org.wysko.kmidi.midi.TimedArc
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.datastructure.HeapAPQ
+import org.wysko.midis2jam2.manager.CollectorsManager.Companion.registerCollector
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -27,7 +28,7 @@ import kotlin.time.DurationUnit.SECONDS
  * A collector that manages a set of [TimedArc]s.
  */
 class TimedArcCollector(
-    context: Midis2jam2,
+    context: PerformanceManager,
     private var arcs: List<TimedArc>,
     private val releaseCondition: (time: Duration, np: TimedArc) -> Boolean = { time: Duration, arc: TimedArc ->
         time >= arc.endTime

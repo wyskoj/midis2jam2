@@ -21,7 +21,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
 import org.wysko.midis2jam2.instrument.clone.CloneWithBell
@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelR
 import java.util.*
 import kotlin.math.abs
@@ -43,7 +44,7 @@ private val SLIDE_MANAGER: SlidePositionManager = SlidePositionManager.from(Trom
 /**
  * The Trombone.
  */
-class Trombone(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Trombone(context: PerformanceManager, eventList: List<MidiEvent>) :
     MonophonicInstrument(context, eventList, TromboneClone::class, SLIDE_MANAGER) {
 
     private var bend = 0f
@@ -75,7 +76,7 @@ class Trombone(context: Midis2jam2, eventList: List<MidiEvent>) :
                 +slide
                 +context.modelR("TromboneBody.obj", "HornSkin.bmp").apply {
                     this as Node
-                    getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                    getChild(1).setMaterial(context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                 }
                 rot = v3(-10.0, 0, 0)
                 localScale = v3(0.8f, 0.8f, 0.8f)

@@ -18,9 +18,9 @@
 package org.wysko.midis2jam2.world.lyric
 
 import org.wysko.kmidi.midi.event.MetaEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 
 internal typealias LyricLine = List<MetaEvent.Lyric>
 
-internal fun Midis2jam2.startTime(lyricLine: LyricLine) = sequence.getTimeOf(lyricLine.minBy { it.tick })
-internal fun Midis2jam2.endTime(lyricLine: LyricLine) = sequence.getTimeOf(lyricLine.maxBy { it.tick })
+internal fun PerformanceManager.startTime(lyricLine: LyricLine) = sequence.getTimeOf(lyricLine.minBy { it.tick })
+internal fun PerformanceManager.endTime(lyricLine: LyricLine) = sequence.getTimeOf(lyricLine.maxBy { it.tick })

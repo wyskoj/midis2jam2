@@ -22,11 +22,10 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.DROP_D
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.STANDARD
@@ -54,7 +53,7 @@ private const val BASS_GUITAR_FORWARD_OFFSET = 0.02
  * @param events the list of events for this BassGuitar
  * @param type specifies the type of BassGuitar
  */
-class BassGuitar(context: Midis2jam2, events: List<MidiEvent>, type: BassGuitarType) :
+class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: BassGuitarType) :
     FrettedInstrument(
         context,
         events,

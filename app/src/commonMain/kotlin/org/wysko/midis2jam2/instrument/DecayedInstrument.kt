@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument
 
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
 import kotlin.time.Duration
@@ -30,14 +30,16 @@ import kotlin.time.Duration
  * @param events The list of all events that this instrument should be aware of.
  */
 abstract class DecayedInstrument protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     private val events: List<MidiEvent>
 ) : Instrument(context) {
 
     /**
      * A filter of [events] that only contains [NoteEvent.NoteOn]s.
      */
-    val hits: MutableList<NoteEvent.NoteOn> = events.filterIsInstance<NoteEvent.NoteOn>().toMutableList()
+    protected val _hits: MutableList<NoteEvent.NoteOn> = events.filterIsInstance<NoteEvent.NoteOn>().toMutableList()
+    val hits: List<NoteEvent.NoteOn>
+        get() = _hits
 
     /**
      * An [EventCollector] used to collect events for visibility calculations.
@@ -45,7 +47,7 @@ abstract class DecayedInstrument protected constructor(
     open val collectorForVisibility: EventCollector<NoteEvent.NoteOn> =
         EventCollector(context, events.filterIsInstance<NoteEvent.NoteOn>())
 
-    override fun calculateVisibility(time: Duration, future: Boolean): Boolean = with(collectorForVisibility) {
+    override fun calculateVisibility(time: Duration): Boolean = with(collectorForVisibility) {
         advanceCollectOne(time)
         Visibility.standardRules(context, this, time).also {
             if (!isVisible && it) onEntry()
@@ -54,7 +56,7 @@ abstract class DecayedInstrument protected constructor(
     }
 
     override fun tick(time: Duration, delta: Duration) {
-        isVisible = calculateVisibility(time, false)
+        isVisible = calculateVisibility(time)
         adjustForMultipleInstances(delta)
     }
 }

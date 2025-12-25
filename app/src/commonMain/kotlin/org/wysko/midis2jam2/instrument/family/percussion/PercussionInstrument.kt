@@ -21,7 +21,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.node
@@ -36,7 +36,7 @@ private const val SQUARE_ROOT_OF_127: Float = 11.269427f
 
 /** Anything on the percussion channel. */
 abstract class PercussionInstrument protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     hits: List<NoteEvent.NoteOn>,
 ) : DecayedInstrument(context, hits) {
 

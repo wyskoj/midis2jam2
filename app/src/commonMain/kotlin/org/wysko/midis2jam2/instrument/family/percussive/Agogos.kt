@@ -19,13 +19,13 @@ package org.wysko.midis2jam2.instrument.family.percussive
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Melodic Agogos. */
 class Agogos(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>
 ) : TwelveDrumOctave(context, eventList, pivotOffset = 17f) {
 

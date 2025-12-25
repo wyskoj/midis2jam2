@@ -19,10 +19,9 @@ package org.wysko.midis2jam2.instrument.family.percussive
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
@@ -35,7 +34,7 @@ private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
 
 /** The Steel drums. */
 class SteelDrums(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>
 ) : OneDrumOctave(context, eventList) {
 

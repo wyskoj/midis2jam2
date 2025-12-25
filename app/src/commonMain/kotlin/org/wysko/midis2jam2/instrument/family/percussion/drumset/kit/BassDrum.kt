@@ -20,10 +20,11 @@ import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -42,7 +43,7 @@ private const val BASS_DRUM_RECOIL_DISTANCE = -3f
  * time to recoil.
  */
 class BassDrum(
-    context: Midis2jam2,
+    context: PerformanceManager,
     hits: List<NoteEvent.NoteOn>,
     style: ShellStyle,
 ) :
@@ -66,8 +67,8 @@ class BassDrum(
             beaterAssembly.attachChild(this)
             move(0f, 5.5f, 1.35f)
             (this as Node).let { // Set correct materials
-                it.children[0].setMaterial(context.reflectiveMaterial("ShinySilver.bmp"))
-                it.children[1].setMaterial(context.diffuseMaterial("MetalTextureDark.bmp"))
+                it.children[0].setMaterial(context.assetLoader.reflectiveMaterial("ShinySilver.bmp"))
+                it.children[1].setMaterial(context.assetLoader.diffuseMaterial("MetalTextureDark.bmp"))
             }
         }
 

@@ -21,12 +21,13 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 import kotlin.time.Duration
@@ -37,7 +38,7 @@ private const val BIRD_TEXTURE = "Bird.png"
 /**
  * The bird tweet.
  */
-class BirdTweet(context: Midis2jam2, events: List<MidiEvent>) : DivisiveSustainedInstrument(context, events) {
+class BirdTweet(context: PerformanceManager, events: List<MidiEvent>) : DivisiveSustainedInstrument(context, events) {
 
     override val animators: List<PitchClassAnimator> = List(12) { Bird(events.notePeriodsModulus(context, it)) }
 
@@ -73,7 +74,7 @@ class BirdTweet(context: Midis2jam2, events: List<MidiEvent>) : DivisiveSustaine
         init {
             with(geometry) {
                 +context.modelD("Bird.obj", BIRD_TEXTURE).apply {
-                    (this as Node)[0].material = context.reflectiveMaterial("Assets/HornSkin.bmp")
+                    (this as Node)[0].material = context.assetLoader.reflectiveMaterial("Assets/HornSkin.bmp")
                 }
             }
         }

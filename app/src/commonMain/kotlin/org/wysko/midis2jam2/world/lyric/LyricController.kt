@@ -22,7 +22,7 @@ import com.jme3.font.BitmapText
 import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
 import org.wysko.kmidi.midi.event.MetaEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
@@ -38,9 +38,9 @@ import kotlin.time.Duration.Companion.seconds
  * @property context The context to the main class.
  * @property events The list of the text events.
  */
-class LyricController(private val context: Midis2jam2, private val events: List<MetaEvent.Lyric>) {
+class LyricController(private val context: PerformanceManager, private val events: List<MetaEvent.Lyric>) {
 
-    private val font = context.assetManager.loadFont("Assets/Fonts/Inter.fnt")
+    private val font = context.app.assetManager.loadFont("Assets/Fonts/Inter.fnt")
 
     private val words = events.filter { !separators.contains(it.text) }
     private val lines = events.partitionByNewLines()

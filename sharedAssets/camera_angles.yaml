@@ -1,0 +1,105 @@
+# Add 0, 32, 14 to MidiJam camera angles
+- category: 1
+  angles:
+    - location:
+        x: -2
+        y: 92
+        z: 134
+      lookAt:
+        x: -2
+        y: 52
+        z: 14
+    - location:
+        x: 60
+        y: 92
+        z: 124
+      lookAt:
+        x: 10
+        y: 52
+        z: 14
+    - location:
+        x: -60
+        y: 92
+        z: 94
+      lookAt:
+        x: -20
+        y: 52
+        z: 14
+- category: 2
+  angles:
+    - location:
+        x: 0
+        y: 72
+        z: 44
+      lookAt:
+        x: -50
+        y: 52
+        z: -6
+    - location:
+        x: -35
+        y: 77
+        z: 34
+      lookAt:
+        x: -50
+        y: 7
+        z: -11
+  instrumentClass: 'org.wysko.midis2jam2.instrument.family.piano.Keyboard'
+- category: 3
+  angles:
+    - location:
+        x: 0
+        y: 62
+        z: 39
+      lookAt:
+        x: 0
+        y: 37
+        z: -51
+    - location:
+        x: -20
+        y: 77
+        z: -6
+      lookAt:
+        x: 5
+        y: 32
+        z: -81
+  instrumentClass: 'org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet'
+- category: 4
+  angles:
+    - location:
+        x: 0
+        y: 82
+        z: 34
+      lookAt:
+        x: 50
+        y: 56
+        z: -11
+    - location:
+        x: 35
+        y: 27
+        z: -16
+      lookAt:
+        x: 55
+        y: 57
+        z: -26
+  instrumentClass: 'org.wysko.midis2jam2.instrument.family.guitar.BassGuitar'
+- category: 5
+  angles:
+    - location:
+        x: 5
+        y: 432
+        z: 24
+      lookAt:
+        x: 5
+        y: 32
+        z: -26
+- category: 6
+  angles:
+    - location:
+        x: 17
+        y: 31
+        z: 44
+      lookAt:
+        x: 42
+        y: 36
+        z: 9
+  instrumentClass: 'org.wysko.midis2jam2.instrument.family.guitar.Guitar'

@@ -22,7 +22,7 @@ import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
@@ -55,7 +55,7 @@ import kotlin.time.Duration
  *
  */
 abstract class FrettedInstrument protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>,
     protected val frettingEngine: FrettingEngine,
     protected val positioning: FrettedInstrumentPositioning,

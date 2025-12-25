@@ -22,7 +22,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
@@ -38,7 +38,7 @@ private val BASE_POSITION = Vector3f(56.5f, 51f, -1.5f)
  * @param context context to the main class
  * @param events the list of events for this Banjo
  */
-class Banjo(context: Midis2jam2, events: List<MidiEvent>) : FrettedInstrument(
+class Banjo(context: PerformanceManager, events: List<MidiEvent>) : FrettedInstrument(
     context,
     events,
     StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),

@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.Behavior
@@ -31,7 +31,7 @@ import kotlin.time.DurationUnit.SECONDS
 
 /** The long and short percussion whistles. */
 class Whistle(
-    context: Midis2jam2,
+    context: PerformanceManager,
     shortHits: MutableList<NoteEvent.NoteOn>,
     longHits: MutableList<NoteEvent.NoteOn>,
 ) : AuxiliaryPercussion(context, (shortHits + longHits).sortedBy { it.tick }.toMutableList()) {

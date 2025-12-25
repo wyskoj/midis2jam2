@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.*
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.kit.ShellStyle.TypicalDrumShell.Standard
@@ -32,7 +32,7 @@ import kotlin.time.Duration
  * @param events List of events for this drum set.
  */
 class OrchestraDrumSet(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<NoteEvent.NoteOn>,
 ) : DrumSet(context, events) {
 

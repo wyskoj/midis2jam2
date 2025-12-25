@@ -20,24 +20,24 @@ import Platform
 import com.jme3.asset.plugins.FileLocator
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.Node
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 
 object BackgroundController {
-    fun configureBackground(context: Midis2jam2, config: AppSettingsConfiguration, root: Node, platform: Platform) {
+    fun configureBackground(context: PerformanceManager, config: AppSettingsConfiguration, root: Node, platform: Platform) {
         with(context) {
             if (platform == Platform.Desktop) {
-                assetManager.registerLocator(BACKGROUND_IMAGES_FOLDER.absolutePath, FileLocator::class.java)
+                app.assetManager.registerLocator(BACKGROUND_IMAGES_FOLDER.absolutePath, FileLocator::class.java)
             }
             when (config.appSettings.backgroundSettings.type) {
                 AppSettings.BackgroundSettings.BackgroundType.Default -> {
-                    root.attachChild(BackgroundFactory.Default(assetManager).create())
+                    root.attachChild(BackgroundFactory.Default(app.assetManager).create())
                 }
 
                 AppSettings.BackgroundSettings.BackgroundType.CubeMap -> {
-                    root.attachChild(BackgroundFactory.CubeMap(assetManager, config).create())
+                    root.attachChild(BackgroundFactory.CubeMap(app.assetManager, config).create())
                 }
 
                 AppSettings.BackgroundSettings.BackgroundType.Color -> {

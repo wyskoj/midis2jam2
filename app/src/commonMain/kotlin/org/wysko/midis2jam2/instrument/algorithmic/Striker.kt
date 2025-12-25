@@ -23,7 +23,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent.NoteOn
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
@@ -57,7 +57,7 @@ private const val DEFAULT_STRIKE_SPEED = 3.0
  * the "never_hidden" midis2jam2 property is enabled.
  */
 class Striker(
-    private val context: Midis2jam2,
+    private val context: PerformanceManager,
     private val strikeEvents: List<NoteOn>,
     private val stickModel: Spatial,
     private val strikeSpeed: Double = DEFAULT_STRIKE_SPEED,
@@ -70,7 +70,7 @@ class Striker(
 ) {
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
-        context: Midis2jam2,
+        context: PerformanceManager,
         strikeEvents: List<NoteOn>,
         stickModel: StickType,
         strikeSpeed: Double = DEFAULT_STRIKE_SPEED,

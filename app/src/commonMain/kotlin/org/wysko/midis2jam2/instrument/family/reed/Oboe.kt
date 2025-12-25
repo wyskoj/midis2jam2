@@ -20,7 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.StandardBellStretcher
@@ -38,7 +38,7 @@ private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFinger
 /**
  * The Oboe.
  */
-class Oboe(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Oboe(context: PerformanceManager, eventList: List<MidiEvent>) :
     InstrumentWithHands(
         context,
         /* Strip notes outside standard range */

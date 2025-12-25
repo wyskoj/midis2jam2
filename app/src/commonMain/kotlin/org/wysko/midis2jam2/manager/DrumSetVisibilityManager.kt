@@ -15,46 +15,43 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.instrument.family.percussion.drumset
+package org.wysko.midis2jam2.manager
 
-import org.wysko.midis2jam2.Midis2jam2
+import com.jme3.app.Application
+import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
-import kotlin.time.Duration
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
+import org.wysko.midis2jam2.manager.PlaybackManager.Companion.time
 
-/**
- * Manages the visibility of multiple drum sets.
- *
- * @param context The context to the main class.
- * @param drumSets The drum sets to manage the visibility of.
- */
-class DrumSetVisibilityManager(private val context: Midis2jam2, drumSets: List<DrumSet>) {
+class DrumSetVisibilityManager() : BaseManager() {
+    private lateinit var drumSets: List<DrumSet>
+    private lateinit var collectors: Map<DrumSet, EventCollector<NoteEvent.NoteOn>>
 
-    private val collectors = drumSets.associateWith { it.collectorForVisibility }
+    var currentlyVisibleDrumSet: DrumSet? = null
+        private set
 
-    /**
-     * The drum set that is currently visible.
-     */
-    var currentlyVisibleDrumSet: DrumSet? =
-        if (drumSets.isEmpty()) null else collectors.entries.minBy { it.value.peek()?.tick ?: Int.MAX_VALUE }.key
-
-    /**
-     * `true` if the drum set is visible, `false` otherwise.
-     */
     var isVisible: Boolean = false
 
-    /**
-     * Updates this manager's state.
-     *
-     * @param time The current time.
-     */
-    fun tick(time: Duration) {
-        val collectorResults = collectors.mapValues { it.value.advanceCollectOne(time) }
+    override fun initialize(app: Application) {
+        super.initialize(app)
+        drumSets = context.instruments.filterIsInstance<DrumSet>()
+        collectors = drumSets.associateWith { it.collectorForVisibility }
+        currentlyVisibleDrumSet = when {
+            drumSets.isEmpty() -> null
+            else -> collectors.entries.minBy { it.value.peek()?.tick ?: Int.MAX_VALUE }.key
+        }
+    }
+
+    override fun update(tpf: Float) {
+        val collectorResults = collectors.mapValues { it.value.advanceCollectOne(app.time) }
 
         val individuallyComputedVisibilities = collectors.entries.associateWith {
             Visibility.standardRules(
                 context = context,
                 collector = it.value,
-                time = time,
+                time = app.time,
             )
         }
         // If we go from a non-visible state to a visible state, we want to make sure that the drum set that is
@@ -67,5 +64,10 @@ class DrumSetVisibilityManager(private val context: Midis2jam2, drumSets: List<D
         collectorResults.filter { it.value != null }.forEach {
             currentlyVisibleDrumSet = it.key
         }
+    }
+
+    companion object {
+        val PerformanceManager.drumSetVisibilityManagerReal: DrumSetVisibilityManager
+            get() = this.app.stateManager.getState(DrumSetVisibilityManager::class.java)
     }
 }

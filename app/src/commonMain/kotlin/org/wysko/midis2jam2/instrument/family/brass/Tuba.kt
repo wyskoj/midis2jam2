@@ -20,7 +20,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
@@ -36,7 +37,7 @@ private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingerin
 /**
  * The Tuba.
  */
-class Tuba(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Tuba(context: PerformanceManager, eventList: List<MidiEvent>) :
     MonophonicInstrument(context, eventList, TubaClone::class, FINGERING_MANAGER), MultipleInstancesLinearAdjustment {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(Axis.Z)
@@ -69,7 +70,7 @@ class Tuba(context: Midis2jam2, eventList: List<MidiEvent>) :
         init {
             with(geometry) {
                 +context.modelR("TubaBody.obj", "HornSkin.bmp").apply {
-                    (this as Node)[1].material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
+                    (this as Node)[1].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
                 }
             }
             with(bell) {

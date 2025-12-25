@@ -22,7 +22,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.MAX_STICK_IDLE_ANGLE
 import org.wysko.midis2jam2.instrument.algorithmic.StickStatus
@@ -33,6 +33,7 @@ import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -44,12 +45,12 @@ private val RANGE = 21..108
  * The mallet instruments.
  */
 class Mallets(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>,
     private val type: MalletType
 ) : DecayedInstrument(context, eventList) {
 
-    private val hitsByNote: List<List<NoteEvent.NoteOn>> = RANGE.map { x -> hits.filter { it.note.toInt() == x } }
+    private val hitsByNote: List<List<NoteEvent.NoteOn>> = RANGE.map { x -> _hits.filter { it.note.toInt() == x } }
 
     private val fakeShadow: Spatial? =
         if (context.isFakeShadows) {

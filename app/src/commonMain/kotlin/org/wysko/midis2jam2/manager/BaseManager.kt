@@ -15,16 +15,24 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.world.camera
+package org.wysko.midis2jam2.manager
 
-/** Defines what is controlling the location and rotation of the camera. */
-enum class CameraState {
-    /** A device-specific camera (e.g., desktop or Android) is controlling the camera. */
-    DEVICE_SPECIFIC_CAMERA,
+import com.jme3.app.Application
+import com.jme3.app.SimpleApplication
+import com.jme3.app.state.BaseAppState
+import org.wysko.midis2jam2.manager.PerformanceManager
 
-    /** The AutoCam is controlling the camera. */
-    AUTO_CAM,
+abstract class BaseManager() : BaseAppState() {
+    protected lateinit var context: PerformanceManager
 
-    /** The SlideCam is controlling the camera. */
-    SLIDE_CAM
+    override fun initialize(app: Application) {
+        context = application.stateManager.getState(PerformanceManager::class.java)
+    }
+
+    override fun cleanup(app: Application?): Unit = Unit
+    override fun onEnable(): Unit = Unit
+    override fun onDisable(): Unit = Unit
+
+    protected val app: SimpleApplication
+        get() = application as SimpleApplication
 }

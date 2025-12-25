@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.organ
 
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
@@ -35,7 +35,7 @@ import kotlin.time.Duration
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
  */
-class Harmonica(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Harmonica(context: PerformanceManager, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
 

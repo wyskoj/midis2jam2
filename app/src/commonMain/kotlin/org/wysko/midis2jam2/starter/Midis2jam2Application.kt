@@ -26,7 +26,21 @@ import com.jme3.post.filters.BloomFilter.GlowMode.Objects
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.shadow.DirectionalLightShadowFilter
 import com.jme3.shadow.EdgeFilteringMode
+import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.manager.ActionsManager
+import org.wysko.midis2jam2.manager.CollectorsManager
+import org.wysko.midis2jam2.manager.DebugTextManager
+import org.wysko.midis2jam2.manager.DrumSetVisibilityManager
+import org.wysko.midis2jam2.manager.FadeManager
+import org.wysko.midis2jam2.manager.FakeShadowsManager
+import org.wysko.midis2jam2.manager.HudManager
+import org.wysko.midis2jam2.manager.PlaybackManager
+import org.wysko.midis2jam2.manager.PreferencesManager
+import org.wysko.midis2jam2.manager.StageManager
+import org.wysko.midis2jam2.manager.StandManager
+import org.wysko.midis2jam2.manager.camera.CameraManager
+import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
@@ -39,6 +53,38 @@ internal expect class Midis2jam2Application : SimpleApplication {
     override fun simpleInitApp()
     override fun stop()
     override fun destroy()
+}
+
+internal expect fun getCameraManager(): CameraManager
+
+internal fun SimpleApplication.addManagers(
+    configurations: Collection<Configuration>,
+    sequence: TimeBasedSequence,
+    sequencer: JwSequencer,
+) {
+    val settings = configurations.find<AppSettingsConfiguration>()
+    val isLooping = configurations.find<Configuration.HomeConfiguration>().isLooping
+
+    this.stateManager.run {
+        if (!settings.appSettings.graphicsSettings.shadowsSettings.isUseShadows) {
+            attach(FakeShadowsManager())
+        }
+        attachAll(
+            PreferencesManager(settings.appSettings),
+            ActionsManager(),
+            getCameraManager(),
+            CollectorsManager(),
+            DebugTextManager().apply {
+                isEnabled = false
+            },
+            DrumSetVisibilityManager(),
+            FadeManager(),
+            HudManager(),
+            StageManager(),
+            StandManager(),
+            PlaybackManager(sequence, sequencer, isLooping),
+        )
+    }
 }
 
 internal fun SimpleApplication.setupState(

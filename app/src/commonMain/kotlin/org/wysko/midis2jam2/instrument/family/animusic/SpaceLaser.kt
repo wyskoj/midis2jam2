@@ -23,14 +23,15 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.instrument.clone.Clone
-import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser.SpaceLaserClone
+import org.wysko.midis2jam2.manager.StageManager.Companion.stageManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 import kotlin.time.Duration
@@ -64,11 +65,11 @@ private const val LASER_HEIGHT = 727.289f
  * the note playing is Middle C and the pitch bend dictates that the sound should be pitched -100 cents, the laser
  * should point in the same direction as B below Middle C.
  *
- * @param context The [Midis2jam2] instance.
+ * @param context The [PerformanceManager] instance.
  * @param eventList The list of [MidiEvent]s.
  * @param type The type of space laser.
  */
-class SpaceLaser(context: Midis2jam2, eventList: List<MidiEvent>, type: SpaceLaserType) :
+class SpaceLaser(context: PerformanceManager, eventList: List<MidiEvent>, type: SpaceLaserType) :
     MonophonicInstrument(context, eventList, SpaceLaserClone::class, null) {
     override val pitchBendModulationController: PitchBendModulationController = PitchBendModulationController(
         context,
@@ -109,8 +110,8 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiEvent>, type: SpaceLas
     init {
         val base = context.modelD("SpaceLaserBase.obj", "Wood.bmp")
         (base as Node).apply {
-            this[1].material = context.reflectiveMaterial("Assets/ShinySilver.bmp")
-            this[2].material = context.diffuseMaterial("Assets/RubberFoot.bmp")
+            this[1].material = context.assetLoader.reflectiveMaterial("Assets/ShinySilver.bmp")
+            this[2].material = context.assetLoader.diffuseMaterial("Assets/RubberFoot.bmp")
         }
 
         with(geometry) {
@@ -120,12 +121,12 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiEvent>, type: SpaceLas
 
         clones.forEach {
             it as SpaceLaserClone
-            val glowMaterial = context.diffuseMaterial("Assets/" + type.filename).apply {
+            val glowMaterial = context.assetLoader.diffuseMaterial("Assets/" + type.filename).apply {
                 setColor("GlowColor", type.glowColor)
             }
             with(it.shooter as Node) {
-                this[0].material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-                this[1].material = context.diffuseMaterial("Assets/RubberFoot.bmp")
+                this[0].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
+                this[1].material = context.assetLoader.diffuseMaterial("Assets/RubberFoot.bmp")
                 this[2].material = glowMaterial
             }
             it.laserBeam.material = glowMaterial
@@ -141,6 +142,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiEvent>, type: SpaceLas
         internal val laserBeam: Spatial = with(laserNode) {
             +context.modelD("SpaceLaserLaser.obj", "Laser.bmp").apply {
                 shadowMode = Off
+                setUserData("bounding_box", false)
             }
         }
         private var wobbleIntensity = 0.0
@@ -199,7 +201,7 @@ class SpaceLaser(context: Midis2jam2, eventList: List<MidiEvent>, type: SpaceLas
         }
 
         private fun scaleByStageCollision() = CollisionResults().apply {
-            context.stage.collideWith(
+            context.stageManager.stageNode.collideWith(
                 Ray(laserBeam.worldTranslation, laserBeam.worldRotation.getRotationColumn(1)),
                 this
             )

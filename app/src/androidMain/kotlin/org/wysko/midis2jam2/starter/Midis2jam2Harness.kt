@@ -22,8 +22,10 @@ import android.opengl.GLSurfaceView
 import com.jme3.system.SystemListener
 import com.jme3.system.android.JmeAndroidSystem
 import com.jme3.system.android.OGLESContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.wysko.midis2jam2.Midis2jam2Action
+import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.util.logger
 
 class Midis2jam2Harness(
@@ -42,6 +44,22 @@ class Midis2jam2Harness(
         view = ctx.createView(context)
         JmeAndroidSystem.setView(view)
         ctx.systemListener = this
+        app.registerCameraStateListener(object : CameraStateListener {
+            override fun onFreeCameraEnabled() {
+                _isAutoCamActive.value = false
+                _isSlideCamActive.value = false
+            }
+
+            override fun onAutoCameraEnabled() {
+                _isAutoCamActive.value = true
+                _isSlideCamActive.value = false
+            }
+
+            override fun onRotatingCameraEnabled() {
+                _isAutoCamActive.value = false
+                _isSlideCamActive.value = true
+            }
+        })
     }
 
     override fun initialize() {
@@ -92,14 +110,11 @@ class Midis2jam2Harness(
     fun registerProgressListener(listener: ProgressListener): Unit =
         app.registerProgressListener(listener)
 
-
+    private val _isAutoCamActive = MutableStateFlow(false)
     val isAutoCamActive: StateFlow<Boolean>
-        get() = app.isAutoCamActive
+        get() = _isAutoCamActive
 
+    private val _isSlideCamActive = MutableStateFlow(false)
     val isSlideCamActive: StateFlow<Boolean>
-        get() = app.isSlideCamActive
-
-    fun isPlaying(): Boolean {
-        return app.isPlaying()
-    }
+        get() = _isSlideCamActive
 }

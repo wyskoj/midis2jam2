@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.particle.SteamPuffer
@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.world.modelR
 private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Piccolo::class)
 
 /** The Piccolo. */
-class Piccolo(context: Midis2jam2, events: List<MidiEvent>) :
+class Piccolo(context: PerformanceManager, events: List<MidiEvent>) :
     InstrumentWithHands(context, events, PiccoloClone::class, FINGERING_MANAGER) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)
