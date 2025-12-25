@@ -162,17 +162,17 @@
     <string name="settings_playback_soundbanks_none_loaded">Chưa có soundbank được nạp</string>
 
     <!-- Settings / Playback / Synthesizer -->
-    <string name="settings_playback_synthesizer_chorus">Chorus</string>
-    <string name="settings_playback_synthesizer_chorus_description">Dùng hiệu ứng chorus</string>
-    <string name="settings_playback_synthesizer_reverb">Reverb</string>
-    <string name="settings_playback_synthesizer_reverb_description">Dùng hiệu ứng reverb</string>
+    <string name="settings_playback_synthesizer_chorus">Điệp khúc</string>
+    <string name="settings_playback_synthesizer_chorus_description">Dùng hiệu ứng điệp khúc</string>
+    <string name="settings_playback_synthesizer_reverb">Âm vang</string>
+    <string name="settings_playback_synthesizer_reverb_description">Dùng hiệu ứng âm vang</string>
 
     <!-- Settings / Camera -->
     <string name="settings_camera">Camera</string>
-    <string name="settings_camera_description">Auto-cam, camera cổ điển</string>
+    <string name="settings_camera_description">Auto-cam, camera kiểu cũ</string>
     <string name="settings_camera_start_autocam_with_song">Bật auto-cam với bài hát</string>
     <string name="settings_camera_start_autocam_with_song_description">Khi bài hát bắt đầu, tự động chuyển sang auto-cam</string>
-    <string name="settings_camera_classic_autocam">Classic auto-cam</string>
+    <string name="settings_camera_classic_autocam">Auto-cam kiểu cũ</string>
     <string name="settings_camera_classic_autocam_description">Mô phỏng chuyển động auto-cam từ MIDIJam</string>
     <string name="settings_camera_smooth_freecam">Làm mượt freecam</string>
     <string name="settings_camera_smooth_freecam_description">Làm cho chuyển động freecam mượt mà hơn</string>
