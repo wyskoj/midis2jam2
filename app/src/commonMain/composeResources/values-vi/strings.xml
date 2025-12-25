@@ -1,0 +1,208 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">Trang chủ</string>
+    <string name="tab_queue">Hàng chờ</string>
+    <string name="tab_search">Tìm</string>
+    <string name="tab_settings">Cài đặt</string>
+    <string name="tab_about">Giới thiệu</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Hủy</string>
+    <string name="back">Quay lại</string>
+    <string name="play">Phát</string>
+    <string name="enabled">Bật</string>
+    <string name="disabled">Tắt</string>
+    <string name="midi_file">Tập tin MIDI</string>
+    <string name="midi_device">Thiết bị MIDI</string>
+    <string name="soundbank">Soundbank</string>
+    <string name="soundbank_default">Soundbank mặc định</string>
+    <string name="play_midi_file">Phát tập tin MIDI</string>
+    <string name="quality_none">Không có</string>
+    <string name="quality_low">Thấp</string>
+    <string name="quality_medium">Trung bình</string>
+    <string name="quality_high">Cao</string>
+    <string name="help">Trợ giúp</string>
+    <string name="launcher_window_title">Trình chạy midis2jam2</string>
+
+    <!-- Queue -->
+    <string name="queue_add">Thêm vào hàng chờ</string>
+    <string name="queue_clear">Xóa hàng chờ</string>
+    <string name="queue_clear_prompt">Xóa hàng chờ?</string>
+    <string name="queue_clear_warning">Thao tác này không thể hoàn tác.</string>
+    <string name="queue_empty">Bài hát bạn thêm sẽ xuất hiện ở đây.</string>
+    <string name="queue_load">Nạp</string>
+    <string name="queue_load_prompt">Nạp hàng chờ?</string>
+    <string name="queue_load_warning">Thao tác này sẽ xóa hàng chờ hiện tại.</string>
+    <string name="queue_load_missing">Một số file bị thiếu</string>
+    <string name="queue_load_missing_help">Các file sau không được tìm thấy:</string>
+    <string name="queue_save">Lưu</string>
+    <string name="queue_save_confirmation">Hàng chờ đã được lưu.</string>
+    <string name="queue_shuffle">Trộn bài</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">Không tìm thấy tập tin MIDI phù hợp. Hãy thử điều chỉnh tiêu chí tìm kiếm.</string>
+    <string name="search_deselect_all">Bỏ chọn tất cả</string>
+    <string name="search_directory">Thư mục</string>
+    <string name="search_index_not_available">Chọn một thư mục để lập chỉ mục cho các tập tin MIDI.</string>
+    <string name="search_index_waiting">Chờ tí! Đang lập chỉ mục các tập tin MIDI của bạn...</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Chung</string>
+    <string name="settings_general_description">Ngôn ngữ, kiểu giao diện</string>
+    <string name="settings_graphics">Đồ họa</string>
+    <string name="settings_graphics_description">Toàn màn hình, độ phân giải, khử răng cưa</string>
+    <string name="settings_graphics_description_a">Đổ bóng</string>
+    <string name="settings_background">Phông nền</string>
+    <string name="settings_background_description">Chọn tập tin ảnh hoặc màu</string>
+    <string name="settings_controls">Điều khiển</string>
+    <string name="settings_controls_description">Khóa con trỏ, các phím điều chỉnh tốc độ</string>
+    <string name="settings_controls_description_a">Đầu vào cảm ứng</string>
+    <string name="settings_playback">Phát lại</string>
+    <string name="settings_playback_description">Thiết bị MIDI, bộ tổng hợp, soundbank</string>
+    <string name="settings_on_screen_elements">Các yếu tố trên màn hình</string>
+    <string name="settings_on_screen_elements_description">Hiển thị trước mặt, lời bài hát</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">Kiểu giao diện</string>
+    <string name="settings_general_theme_light">Sáng</string>
+    <string name="settings_general_theme_dark">Tối</string>
+    <string name="settings_general_theme_system">Theo hệ thống</string>
+    <string name="settings_general_locale">Ngôn ngữ</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">Toàn màn hình</string>
+    <string name="settings_graphics_fullscreen_description">Sử dụng toàn bộ màn hình</string>
+    <string name="settings_graphics_resolution">Độ phân giải</string>
+    <string name="settings_graphics_resolution_fullscreen">Khi bật toàn màn hình, sẽ sử dụng độ phân giải gốc màn hình</string>
+    <string name="settings_graphics_resolution_default">Sử dụng độ phân giải mặc định</string>
+    <string name="settings_graphics_resolution_default_hint">Mặc định</string>
+    <string name="settings_graphics_resolution_default_description">Độ phân giải mặc định sử dụng hầu hết màn hình</string>
+    <string name="settings_graphics_resolution_custom">Độ phân giải tùy chỉnh</string>
+    <string name="settings_graphics_resolution_width">Chiều rộng</string>
+    <string name="settings_graphics_resolution_height">Chiều cao</string>
+    <string name="settings_graphics_shadows">Đổ bóng</string>
+    <string name="settings_graphics_shadows_description">Kết xuất bóng dưới các vật thể</string>
+    <string name="settings_graphics_shadows_none">Không có (bóng giả)</string>
+    <string name="settings_graphics_shadows_description_a">Kết xuất bóng động</string>
+    <string name="settings_graphics_shadows_description_hint_a">Bóng động trông sẽ đẹp hơn, nhưng có thể ảnh hưởng đến hiệu năng</string>
+    <string name="settings_graphics_anti_aliasing">Khử răng cưa</string>
+    <string name="settings_graphics_anti_aliasing_description">Làm mượt cạnh của các vật thể</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">Loại phông nền</string>
+    <string name="settings_background_texture">Họa tiết</string>
+    <string name="settings_background_direction_north">Mặt phía bắc</string>
+    <string name="settings_background_direction_east">Mặt phía đông</string>
+    <string name="settings_background_direction_south">Mặt phía nam</string>
+    <string name="settings_background_direction_west">Mặt phía tây</string>
+    <string name="settings_background_direction_up">Mặt trên</string>
+    <string name="settings_background_direction_down">Mặt dưới</string>
+    <string name="settings_background_direction_texture_template">Họa tiết %1$s</string>
+    <string name="settings_background_type_default">Mặc định</string>
+    <string name="settings_background_type_default_description">Mẫu kết cấu caro tối</string>
+    <string name="settings_background_type_cubemap">Mặt khối lập phương</string>
+    <string name="settings_background_type_cubemap_description">Sử dụng họa tiết trên mỗi mặt tường</string>
+    <string name="settings_background_type_color">Màu</string>
+    <string name="settings_background_type_color_description">Chọn một màu đơn</string>
+    <string name="settings_background_texture_no_options_hint">Không có sẵn họa tiết.</string>
+    <string name="settings_background_texture_open_folder">Mở thư mục chứa họa tiết</string>
+    <string name="settings_background_missing_textures_repeated">Họa tiết nền chưa được thiết đặt</string>
+    <string name="settings_background_missing_textures_unique">Một hoặc nhiều họa tiết nền chưa được đặt</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">Khóa con trỏ</string>
+    <string name="settings_controls_lock_cursor_description">Khóa con trỏ vào màn hình</string>
+    <string name="settings_controls_disable_touch">Vô hiệu hóa đầu vào cảm ứng</string>
+    <string name="settings_controls_disable_touch_description">Chạm vào màn hình để xoay, di chuyển hoặc phóng to bị bỏ qua</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Phím dính chỉnh tốc độ</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Nhấn Ctrl và Shift để chỉnh tốc độ freecam</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Giữ Ctrl và Shift để chỉnh tốc độ freecam</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">Lời bài hát</string>
+    <string name="settings_onscreenelements_lyrics_description">Nếu bài hát chứa dữ liệu ca từ, hiển thị trong thời gian thực</string>
+    <string name="settings_onscreenelements_hud">Hiển thị trước mặt</string>
+    <string name="settings_onscreenelements_hud_description">Hiển thị tên bài hát và tiến độ phát</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">Kích thước lời bài hát</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Nhỏ hơn</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Nhỏ</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Mặc định</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Lớn</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Lớn hơn</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Gửi thông điệp đặt lại cấu hình MIDI</string>
+    <string name="settings_playback_midi_specification_reset_description">Gửi thông điệp đến thiết bị MIDI để đặt lại nó</string>
+    <string name="settings_playback_synthesizer">Bộ tổng hợp</string>
+    <string name="settings_playback_synthesizer_description">Cấu hình bộ tổng hợp MIDI</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Soundbank</string>
+    <string name="settings_playback_soundbanks_add">Thêm soundbank</string>
+    <string name="settings_playback_soundbanks_description">Nhập soundbank để dùng cho bộ tổng hợp</string>
+    <string name="settings_playback_soundbanks_none_loaded">Chưa có soundbank được nạp</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">Chorus</string>
+    <string name="settings_playback_synthesizer_chorus_description">Dùng hiệu ứng chorus</string>
+    <string name="settings_playback_synthesizer_reverb">Reverb</string>
+    <string name="settings_playback_synthesizer_reverb_description">Dùng hiệu ứng reverb</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">Camera</string>
+    <string name="settings_camera_description">Auto-cam, camera cổ điển</string>
+    <string name="settings_camera_start_autocam_with_song">Bật auto-cam với bài hát</string>
+    <string name="settings_camera_start_autocam_with_song_description">Khi bài hát bắt đầu, tự động chuyển sang auto-cam</string>
+    <string name="settings_camera_classic_autocam">Classic auto-cam</string>
+    <string name="settings_camera_classic_autocam_description">Mô phỏng chuyển động auto-cam từ MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Làm mượt freecam</string>
+    <string name="settings_camera_smooth_freecam_description">Làm cho chuyển động freecam mượt mà hơn</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">Nhạc cụ</string>
+    <string name="settings_instruments_description">Hiển thị nhạc cụ</string>
+    <string name="settings_instruments_always_show_instruments">Luôn hiện nhạc cụ</string>
+    <string name="settings_instruments_always_show_instruments_description">Không ẩn các nhạc cụ kể cả khi không có nốt nào để chơi</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">Một bản cải tiến của MIDIJam, một trình trực quan hóa 3D tập tin MIDI.</string>
+    <string name="about_development_contributors">Người đóng góp phát triển</string>
+    <string name="about_attributions_and_contributions">Ghi công và đóng góp</string>
+    <string name="about_i18n_contributions">Đóng góp trong việc toàn cầu hóa</string>
+    <string name="about_oss_licenses">Cáo thị bên thứ ba</string>
+    <string name="about_check_for_updates">Kiểm tra cập nhật</string>
+    <string name="about_check_for_updates_description">Nhanh chóng kiểm tra xem có phiên bản mới nào khả dụng không</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Nhật ký hoạt động</string>
+    <string name="log_clear_all">Xóa tất cả</string>
+    <string name="log_cleared_all_entries">Đã xóa tất cả các mục nhật ký</string>
+    <string name="log_empty_message">Nếu ứng dụng gặp bất kỳ sự cố nào, chúng sẽ được ghi lại ở đây.</string>
+    <string name="log_cleared_entry">Đã xóa mục nhật ký</string>
+    <string name="log_copied_to_clipboard">Đã sao chép vào clipboard</string>
+    <string name="log_copy_to_clipboard">Sao chép vào clipboard</string>
+    <string name="log_clear">Xóa</string>
+    <!-- Settings / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">Trường nhìn</string>
+    <string name="settings_camera_field_of_view_label_prefix">Điều chỉnh độ rộng trường nhìn của camera</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d độ</string>
+</resources>
