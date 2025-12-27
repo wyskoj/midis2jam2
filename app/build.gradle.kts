@@ -186,6 +186,7 @@ android {
                     "tl",
                     "tr",
                     "uk",
+                    "vi",
                     "zh",
                 )
             )
