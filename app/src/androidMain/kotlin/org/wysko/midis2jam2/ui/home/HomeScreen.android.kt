@@ -27,8 +27,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -41,7 +39,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.play_arrow
 import midis2jam2.app.generated.resources.play_midi_file
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ApplicationService
@@ -105,7 +105,7 @@ private fun SelectAndPlayMidiFile(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 24.dp)
         ) {
-            Icon(Icons.Default.PlayArrow, "", modifier = Modifier.size(24.dp))
+            Icon(painterResource(Res.drawable.play_arrow), "", modifier = Modifier.size(24.dp))
             Text(stringResource(Res.string.play_midi_file), fontSize = 16.sp)
         }
     }
