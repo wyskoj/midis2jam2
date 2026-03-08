@@ -122,17 +122,28 @@ internal actual class Midis2jam2Application(
                 callbackIClass.classLoader,
                 arrayOf(callbackIClass),
             ) { _, method, args ->
-                if (method.name == "invoke" && args != null) {
-                    try {
-                        previousCallback[0]?.let { prev -> invokeMethod.invoke(prev, args[0], args[1]) }
-                    } catch (e: java.lang.reflect.InvocationTargetException) {
-                        val cause = e.cause
-                        if (cause !is NullPointerException) throw cause ?: e
-                        // Swallow the NPE: known jME3/LWJGL3 bug where joyInput is null
-                        // when a controller disconnects.
+                when (method.name) {
+                    "invoke" -> {
+                        if (args != null) {
+                            try {
+                                previousCallback[0]?.let { prev -> invokeMethod.invoke(prev, args[0], args[1]) }
+                            } catch (e: java.lang.reflect.InvocationTargetException) {
+                                val cause = e.cause
+                                if (cause !is NullPointerException) throw cause ?: e
+                                // Swallow the NPE: known jME3/LWJGL3 bug where joyInput is null
+                                // when a controller disconnects.
+                            }
+                        }
+                        null
                     }
+                    "address" -> {
+                        // Return the address of the previous callback, or 0L if none exists
+                        previousCallback[0]?.let { prev ->
+                            method.invoke(prev)
+                        } ?: 0L
+                    }
+                    else -> null
                 }
-                null
             }
 
             previousCallback[0] = setCallbackMethod.invoke(null, safeCallback)
