@@ -118,8 +118,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.wysko.midis2jam2.domain.BackgroundWarning
+import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
@@ -133,7 +133,6 @@ import org.wysko.midis2jam2.util.FilesDragAndDrop
 import org.wysko.midis2jam2.util.digitsOnly
 import org.wysko.midis2jam2.util.isMacOs
 import org.wysko.midis2jam2.util.tintEnabled
-import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -200,12 +199,7 @@ internal actual fun LazyListScope.SettingsScreenContent(
     }
     item {
         val bg = settings.value.backgroundSettings
-        val bgWarning = when {
-            bg.type != BackgroundType.CubeMap -> null
-            bg.cubeMapTextures.any { it.isBlank() } -> BackgroundWarning.UNASSIGNED
-            bg.cubeMapTextures.any { it.isNotBlank() && !File(BACKGROUND_IMAGES_FOLDER, it).exists() } -> BackgroundWarning.MISSING
-            else -> null
-        }
+        val bgWarning = computeBackgroundWarning(bg)
         BackgroundSelect(settings, model, bgWarning)
     }
     item { // stickyHeader

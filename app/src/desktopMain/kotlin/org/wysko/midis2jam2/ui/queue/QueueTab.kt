@@ -103,6 +103,7 @@ import midis2jam2.app.generated.resources.tab_queue
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
@@ -144,6 +145,7 @@ object QueueTab : Tab {
         var isPlaylistLoadDialogOpen by remember { mutableStateOf(false) }
         var isPlaylistLoadWarningsDialogOpen by remember { mutableStateOf(false) }
         var isBackgroundWarningDialogOpen by remember { mutableStateOf(false) }
+        var capturedBackgroundWarning by remember { mutableStateOf<BackgroundWarning?>(null) }
         var missingFiles by remember { mutableStateOf(listOf<String>()) }
         val isPlayButtonEnabled = model.isPlayButtonEnabled.collectAsState(initial = false)
         val backgroundWarning = model.backgroundWarning.collectAsState(initial = null)
@@ -210,7 +212,9 @@ object QueueTab : Tab {
                     ) {
                         ExtendedFloatingActionButton(
                             onClick = {
-                                if (backgroundWarning.value != null) {
+                                val warning = backgroundWarning.value
+                                if (warning != null) {
+                                    capturedBackgroundWarning = warning
                                     isBackgroundWarningDialogOpen = true
                                 } else {
                                     model.startApplication()
@@ -333,8 +337,8 @@ object QueueTab : Tab {
                     isPlaylistLoadWarningsDialogOpen = false
                 }
 
-                isBackgroundWarningDialogOpen -> BackgroundWarningDialog(
-                    warningType = backgroundWarning.value!!,
+                isBackgroundWarningDialogOpen && capturedBackgroundWarning != null -> BackgroundWarningDialog(
+                    warningType = capturedBackgroundWarning!!,
                     onConfirm = {
                         isBackgroundWarningDialogOpen = false
                         model.startApplication()

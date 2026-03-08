@@ -66,7 +66,6 @@ import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.background_warning_settings_badge
 import midis2jam2.app.generated.resources.browse_activity
-import midis2jam2.app.generated.resources.cancel
 import midis2jam2.app.generated.resources.camera_video
 import midis2jam2.app.generated.resources.dark_mode
 import midis2jam2.app.generated.resources.error

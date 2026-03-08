@@ -83,6 +83,7 @@ import midis2jam2.app.generated.resources.soundbank_default
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
@@ -101,6 +102,7 @@ internal actual fun HomeScreenLayout() {
     val navigator = LocalNavigator.currentOrThrow
     var isBackgroundWarningDialogOpen by remember { mutableStateOf(false) }
     val backgroundWarning = model.backgroundWarning.collectAsState(initial = null)
+    var capturedBackgroundWarning by remember { mutableStateOf<BackgroundWarning?>(null) }
 
     LaunchedEffect(Unit) {
         model.loadState()
@@ -142,16 +144,18 @@ internal actual fun HomeScreenLayout() {
     val isSoundbankSelectVisible = selectedMidiDevice.value.name == "Gervill"
 
     if (isBackgroundWarningDialogOpen) {
-        BackgroundWarningDialog(
-            warningType = backgroundWarning.value!!,
-            onConfirm = {
-                isBackgroundWarningDialogOpen = false
-                model.startApplication()
-            },
-            onDismiss = {
-                isBackgroundWarningDialogOpen = false
-            }
-        )
+        capturedBackgroundWarning?.let { warning ->
+            BackgroundWarningDialog(
+                warningType = warning,
+                onConfirm = {
+                    isBackgroundWarningDialogOpen = false
+                    model.startApplication()
+                },
+                onDismiss = {
+                    isBackgroundWarningDialogOpen = false
+                }
+            )
+        }
     }
 
     Scaffold(
@@ -188,7 +192,9 @@ internal actual fun HomeScreenLayout() {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         PlayButton(model) {
-                            if (backgroundWarning.value != null) {
+                            val warning = backgroundWarning.value
+                            if (warning != null) {
+                                capturedBackgroundWarning = warning
                                 isBackgroundWarningDialogOpen = true
                             } else {
                                 model.startApplication()

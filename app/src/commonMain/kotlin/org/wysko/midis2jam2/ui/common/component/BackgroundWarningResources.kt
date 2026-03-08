@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.wysko.midis2jam2.domain.BackgroundWarning
 
 /** Amber/yellow tint used for background warning indicators. */
-val WarningAmber = Color(0xFFFFC107.toInt())
+val WarningAmber = Color(0xFFFFC107)
 
 /** Returns the dialog title for the given [warning] type. */
 @Composable

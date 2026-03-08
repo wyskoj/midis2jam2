@@ -49,7 +49,7 @@
     <string name="background_cubemap_warning_title">Background misconfigured</string>
     <string name="background_cubemap_warning_message">The background is set to cube map, but not all 6 images have been assigned. The default background will be used instead. You can cancel and fix this in the background settings.</string>
     <string name="background_cubemap_missing_warning_title">Background images not found</string>
-    <string name="background_cubemap_missing_warning_message">One or more of the specified cube map images could not be found on disk. The default background will be used for missing images. You can cancel and fix this in the background settings.</string>
+    <string name="background_cubemap_missing_warning_message">One or more of the specified cube map images could not be found on disk. The default background will be used instead. You can cancel and fix this in the background settings.</string>
     <string name="background_cubemap_warning_continue">Continue anyway</string>
     <string name="background_warning_settings_badge">Background configuration issue</string>
 
