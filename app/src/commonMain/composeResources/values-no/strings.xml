@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Velg en mappe for å indeksere MIDI-filer.</string>
     <string name="search_index_waiting">Vent litt! Vi indekserer MIDI-filene dine…</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Bakgrunnen er feil konfigurert</string>
+    <string name="background_cubemap_warning_message">Bakgrunnen er satt til kubiskart, men ikke alle seks bilder er tildelt. Standardbakgrunnen vil bli brukt i stedet. Du kan avbryte og fikse dette i bakgrunnsinnstillingene.</string>
+    <string name="background_cubemap_missing_warning_title">Bakgrunnsbilder ikke funnet</string>
+    <string name="background_cubemap_missing_warning_message">Ett eller flere av de angitte kubiskart-bildene ble ikke funnet på disken. Standardbakgrunnen vil bli brukt i stedet. Du kan avbryte og fikse dette i bakgrunnsinnstillingene.</string>
+    <string name="background_cubemap_warning_continue">Fortsett uansett</string>
+    <string name="background_warning_settings_badge">Problem med bakgrunnskonfigurasjonen</string>
+
     <!-- Settings -->
     <string name="settings_general">Generelt</string>
     <string name="settings_general_description">Språk, tema</string>

@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Chọn một thư mục để lập chỉ mục cho các tập tin MIDI.</string>
     <string name="search_index_waiting">Chờ tí! Đang lập chỉ mục các tập tin MIDI của bạn...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Cấu hình nền không đúng</string>
+    <string name="background_cubemap_warning_message">Nền được đặt thành cube map, nhưng không phải tất cả sáu hình ảnh đã được gán. Nền mặc định sẽ được sử dụng thay thế. Bạn có thể hủy và sửa điều này trong cài đặt nền.</string>
+    <string name="background_cubemap_missing_warning_title">Không tìm thấy hình ảnh nền</string>
+    <string name="background_cubemap_missing_warning_message">Một hoặc nhiều hình ảnh cube map được chỉ định không thể tìm thấy trên đĩa. Nền mặc định sẽ được sử dụng thay thế. Bạn có thể hủy và sửa điều này trong cài đặt nền.</string>
+    <string name="background_cubemap_warning_continue">Tiếp tục dù sao</string>
+    <string name="background_warning_settings_badge">Sự cố cấu hình nền</string>
+
     <!-- Settings -->
     <string name="settings_general">Chung</string>
     <string name="settings_general_description">Ngôn ngữ, kiểu giao diện</string>

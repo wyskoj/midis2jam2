@@ -45,6 +45,14 @@
     <string name="search_index_not_available">Sélectionnez un dossier pour indexer les fichiers MIDI.</string>
     <string name="search_index_waiting">Patientez ! Nous indexons vos fichiers MIDI...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Arrière-plan mal configuré</string>
+    <string name="background_cubemap_warning_message">L'arrière-plan est défini sur cube map, mais les six images n'ont pas toutes été assignées. L'arrière-plan par défaut sera utilisé à la place. Vous pouvez annuler et corriger cela dans les paramètres d'arrière-plan.</string>
+    <string name="background_cubemap_missing_warning_title">Images d'arrière-plan introuvables</string>
+    <string name="background_cubemap_missing_warning_message">Une ou plusieurs des images de cube map spécifiées n'ont pas pu être trouvées sur le disque. L'arrière-plan par défaut sera utilisé à la place. Vous pouvez annuler et corriger cela dans les paramètres d'arrière-plan.</string>
+    <string name="background_cubemap_warning_continue">Continuer quand même</string>
+    <string name="background_warning_settings_badge">Problème de configuration d'arrière-plan</string>
+
     <!-- Settings -->
     <string name="settings_general">Général</string>
     <string name="settings_general_description">Langue, thème</string>

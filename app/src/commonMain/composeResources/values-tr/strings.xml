@@ -62,6 +62,14 @@
     <string name="search_index_not_available">MIDI dosyalarını indekslemek için bir dizin seçin.</string>
     <string name="search_index_waiting">Bekleyin! MIDI dosyalarınız indeksleniyor...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Arka plan yanlış yapılandırılmış</string>
+    <string name="background_cubemap_warning_message">Arka plan küp haritası olarak ayarlanmış, ancak altı görüntünün tamamı atanmamış. Bunun yerine varsayılan arka plan kullanılacak. İptal edip bunu arka plan ayarlarında düzeltebilirsiniz.</string>
+    <string name="background_cubemap_missing_warning_title">Arka plan görüntüleri bulunamadı</string>
+    <string name="background_cubemap_missing_warning_message">Belirtilen küp haritası görüntülerinden biri veya daha fazlası diskte bulunamadı. Bunun yerine varsayılan arka plan kullanılacak. İptal edip bunu arka plan ayarlarında düzeltebilirsiniz.</string>
+    <string name="background_cubemap_warning_continue">Yine de devam et</string>
+    <string name="background_warning_settings_badge">Arka plan yapılandırma sorunu</string>
+
     <!-- Settings -->
     <string name="settings_general">Genel</string>
     <string name="settings_general_description">Dil, tema</string>

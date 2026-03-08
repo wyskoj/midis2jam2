@@ -62,6 +62,14 @@
     <string name="search_index_not_available">เลือกไดเรกทอรีเพื่อจัดดัชนีไฟล์ MIDI</string>
     <string name="search_index_waiting">โปรดรอสักครู่! เรากำลังจัดดัชนีไฟล์ MIDI ของคุณ...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">พื้นหลังกำหนดค่าไม่ถูกต้อง</string>
+    <string name="background_cubemap_warning_message">พื้นหลังถูกตั้งค่าเป็น cube map แต่ยังไม่ได้กำหนดภาพทั้งหกภาพ จะใช้พื้นหลังเริ่มต้นแทน คุณสามารถยกเลิกและแก้ไขในการตั้งค่าพื้นหลัง</string>
+    <string name="background_cubemap_missing_warning_title">ไม่พบรูปภาพพื้นหลัง</string>
+    <string name="background_cubemap_missing_warning_message">ไม่พบรูปภาพ cube map ที่ระบุหนึ่งรูปขึ้นไปบนดิสก์ จะใช้พื้นหลังเริ่มต้นแทน คุณสามารถยกเลิกและแก้ไขในการตั้งค่าพื้นหลัง</string>
+    <string name="background_cubemap_warning_continue">ดำเนินการต่อไปอยู่ดี</string>
+    <string name="background_warning_settings_badge">ปัญหาการกำหนดค่าพื้นหลัง</string>
+
     <!-- Settings -->
     <string name="settings_general">ทั่วไป</string>
     <string name="settings_general_description">ภาษา, ชุดรูปแบบ</string>

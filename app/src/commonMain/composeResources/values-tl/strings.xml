@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Pumili ng direktoryo para i-index ang mga MIDI file.</string>
     <string name="search_index_waiting">Maghintay! Ina-index na namin ang iyong mga MIDI file...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Maling configuration ng background</string>
+    <string name="background_cubemap_warning_message">Ang background ay nakatakda sa cube map, ngunit hindi lahat ng anim na larawan ang itinalaga. Ang default na background ay gagamitin sa halip. Maaari kang mag-cancel at ayusin ito sa mga setting ng background.</string>
+    <string name="background_cubemap_missing_warning_title">Hindi nahanap ang mga larawan ng background</string>
+    <string name="background_cubemap_missing_warning_message">Isa o higit pang mga tinukoy na larawan ng cube map ay hindi mahanap sa disk. Ang default na background ay gagamitin sa halip. Maaari kang mag-cancel at ayusin ito sa mga setting ng background.</string>
+    <string name="background_cubemap_warning_continue">Magpatuloy nang gayon pa man</string>
+    <string name="background_warning_settings_badge">Problema sa configuration ng background</string>
+
     <!-- Settings -->
     <string name="settings_general">Pangkalahatan</string>
     <string name="settings_general_description">Wika, tema</string>
