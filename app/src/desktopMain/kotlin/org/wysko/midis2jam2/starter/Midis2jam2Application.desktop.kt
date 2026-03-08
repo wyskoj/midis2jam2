@@ -62,6 +62,7 @@ internal actual class Midis2jam2Application(
     }
 
     actual override fun simpleInitApp() {
+        installGlfwJoystickCallbackWorkaround()
         Jme3ExceptionHandler.setup {
             stop()
             sequencer.stop()
@@ -94,6 +95,50 @@ internal actual class Midis2jam2Application(
         inputManager.clearMappings()
         (context as LwjglContext).systemListener = null
         super.destroy()
+    }
+
+    /**
+     * Installs a null-safe wrapper around jME3's GLFW joystick callback.
+     *
+     * This works around a jME3 bug where `LwjglContext.joyInput`
+     * can be null when a controller disconnect event fires, causing an NPE that propagates
+     * through [org.lwjgl.glfw.GLFW.glfwPollEvents] and kills the render thread.
+     *
+     * Implemented via reflection so that macOS builds (which use the LWJGL2 backend and
+     * therefore do not have GLFW on the classpath) still compile and run normally; the
+     * [ClassNotFoundException] is silently ignored on those platforms.
+     */
+    private fun installGlfwJoystickCallbackWorkaround() {
+        try {
+            val glfwClass = Class.forName("org.lwjgl.glfw.GLFW")
+            val callbackIClass = Class.forName("org.lwjgl.glfw.GLFWJoystickCallbackI")
+            val setCallbackMethod = glfwClass.getMethod("glfwSetJoystickCallback", callbackIClass)
+            val invokeMethod = callbackIClass.getMethod("invoke", Integer.TYPE, Integer.TYPE)
+
+            // Single-element array lets the lambda capture a mutable reference.
+            val previousCallback = arrayOfNulls<Any>(1)
+
+            val safeCallback = java.lang.reflect.Proxy.newProxyInstance(
+                callbackIClass.classLoader,
+                arrayOf(callbackIClass),
+            ) { _, method, args ->
+                if (method.name == "invoke" && args != null) {
+                    try {
+                        previousCallback[0]?.let { prev -> invokeMethod.invoke(prev, args[0], args[1]) }
+                    } catch (e: java.lang.reflect.InvocationTargetException) {
+                        val cause = e.cause
+                        if (cause !is NullPointerException) throw cause ?: e
+                        // Swallow the NPE: known jME3/LWJGL3 bug where joyInput is null
+                        // when a controller disconnects.
+                    }
+                }
+                null
+            }
+
+            previousCallback[0] = setCallbackMethod.invoke(null, safeCallback)
+        } catch (_: ClassNotFoundException) {
+            // GLFW is not on the classpath (macOS uses the LWJGL2 backend), nothing to do.
+        }
     }
 }
 
