@@ -17,17 +17,12 @@
 
 package org.wysko.midis2jam2.ui.common.component
 
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.background_cubemap_warning_continue
 import midis2jam2.app.generated.resources.cancel
-import midis2jam2.app.generated.resources.wallpaper
+import midis2jam2.app.generated.resources.warning
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.wysko.midis2jam2.domain.BackgroundWarning
@@ -58,9 +53,9 @@ fun BackgroundWarningDialog(
         title = { Text(title) },
         icon = {
             Icon(
-                painterResource(Res.drawable.wallpaper),
+                painterResource(Res.drawable.warning),
                 contentDescription = title,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = WarningAmber,
             )
         },
         text = { Text(message) },
