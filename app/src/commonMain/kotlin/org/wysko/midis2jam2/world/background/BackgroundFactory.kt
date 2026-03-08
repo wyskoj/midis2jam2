@@ -102,9 +102,15 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
         private val config: AppSettingsConfiguration,
     ) : BackgroundFactory(assetManager) {
         override fun create(): Spatial {
-            val textures = with(config.appSettings.backgroundSettings.cubeMapTextures) {
+            val texturePaths = with(config.appSettings.backgroundSettings.cubeMapTextures) {
                 listOf(this[3], this[1], this[0], this[2], this[4], this[5])
-            }.map(::loadTexture)
+            }
+
+            if (texturePaths.any { it.isBlank() }) {
+                throw BackgroundImageMissingException()
+            }
+
+            val textures = texturePaths.map(::loadTexture)
 
             try {
                 return SkyFactory.createSky(
