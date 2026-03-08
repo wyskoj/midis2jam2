@@ -105,6 +105,8 @@
     <string name="settings_background_type_color_description">एक ठोस रंग का उपयोग करें</string>
     <string name="settings_background_texture_no_options_hint">कोई टेक्सचर उपलब्ध नहीं है।</string>
     <string name="settings_background_texture_open_folder">टेक्सचर फ़ोल्डर खोलें</string>
+    <string name="settings_background_texture_none">कोई नहीं</string>
+    <string name="settings_background_texture_file_not_found">फ़ाइल नहीं मिली</string>
     <string name="settings_background_missing_textures_repeated">बैकग्राउंड टेक्सचर सेट नहीं है</string>
     <string name="settings_background_missing_textures_unique">एक या अधिक बैकग्राउंड टेक्सचर सेट नहीं हैं</string>
 

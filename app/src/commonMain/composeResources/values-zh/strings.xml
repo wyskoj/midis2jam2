@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">使用纯色</string>
     <string name="settings_background_texture_no_options_hint">无可用纹理。</string>
     <string name="settings_background_texture_open_folder">打开纹理文件夹</string>
+    <string name="settings_background_texture_none">无</string>
+    <string name="settings_background_texture_file_not_found">文件未找到</string>
     <string name="settings_background_missing_textures_repeated">未设置背景纹理</string>
     <string name="settings_background_missing_textures_unique">一个或多个背景纹理未设置</string>
 

@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Використовувати суцільний колір</string>
     <string name="settings_background_texture_no_options_hint">Текстури недоступні.</string>
     <string name="settings_background_texture_open_folder">Відкрити теку текстур</string>
+    <string name="settings_background_texture_none">Немає</string>
+    <string name="settings_background_texture_file_not_found">Файл не знайдено</string>
     <string name="settings_background_missing_textures_repeated">Текстура фону не встановлена</string>
     <string name="settings_background_missing_textures_unique">Одна або кілька текстур фону не встановлені</string>
 

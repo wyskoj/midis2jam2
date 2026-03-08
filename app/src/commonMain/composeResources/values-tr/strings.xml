@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Düz bir renk kullan</string>
     <string name="settings_background_texture_no_options_hint">Kullanılabilir doku yok.</string>
     <string name="settings_background_texture_open_folder">Doku klasörünü aç</string>
+    <string name="settings_background_texture_none">Yok</string>
+    <string name="settings_background_texture_file_not_found">Dosya bulunamadı</string>
     <string name="settings_background_missing_textures_repeated">Arka plan dokusu ayarlanmamış</string>
     <string name="settings_background_missing_textures_unique">Bir veya daha fazla arka plan dokusu ayarlanmamış</string>
 

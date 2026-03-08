@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">単色を使用する</string>
     <string name="settings_background_texture_no_options_hint">利用可能なテクスチャがありません。</string>
     <string name="settings_background_texture_open_folder">テクスチャフォルダを開く</string>
+    <string name="settings_background_texture_none">なし</string>
+    <string name="settings_background_texture_file_not_found">ファイルが見つかりません</string>
     <string name="settings_background_missing_textures_repeated">背景テクスチャが設定されていません</string>
     <string name="settings_background_missing_textures_unique">1つ以上の背景テクスチャが設定されていません</string>
 

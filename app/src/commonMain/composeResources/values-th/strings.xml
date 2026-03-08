@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">ใช้สีทึบ</string>
     <string name="settings_background_texture_no_options_hint">ไม่มีพื้นผิวที่ใช้งานได้</string>
     <string name="settings_background_texture_open_folder">เปิดโฟลเดอร์พื้นผิว</string>
+    <string name="settings_background_texture_none">ไม่มี</string>
+    <string name="settings_background_texture_file_not_found">ไม่พบไฟล์</string>
     <string name="settings_background_missing_textures_repeated">ไม่ได้ตั้งค่าพื้นผิวพื้นหลัง</string>
     <string name="settings_background_missing_textures_unique">ไม่ได้ตั้งค่าพื้นผิวพื้นหลังหนึ่งรายการขึ้นไป</string>
 

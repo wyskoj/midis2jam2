@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Użyj jednolitego koloru</string>
     <string name="settings_background_texture_no_options_hint">Brak dostępnych tekstur.</string>
     <string name="settings_background_texture_open_folder">Otwórz folder tekstur</string>
+    <string name="settings_background_texture_none">Brak</string>
+    <string name="settings_background_texture_file_not_found">Plik nie znaleziony</string>
     <string name="settings_background_missing_textures_repeated">Tekstura tła nie jest ustawiona</string>
     <string name="settings_background_missing_textures_unique">Jedna lub więcej tekstur tła nie jest ustawiona</string>
 

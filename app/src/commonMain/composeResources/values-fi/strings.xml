@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Käytä yhtä väriä</string>
     <string name="settings_background_texture_no_options_hint">Tekstuureja ei saatavilla.</string>
     <string name="settings_background_texture_open_folder">Avaa tekstuurien kansio</string>
+    <string name="settings_background_texture_none">Ei mitään</string>
+    <string name="settings_background_texture_file_not_found">Tiedostoa ei löydy</string>
     <string name="settings_background_missing_textures_repeated">Taustatekstuuria ei ole asetettu</string>
     <string name="settings_background_missing_textures_unique">Yhtä tai useampaa taustatekstuuria ei ole asetettu</string>
 

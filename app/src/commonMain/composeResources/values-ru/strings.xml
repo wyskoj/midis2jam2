@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Использовать сплошной цвет</string>
     <string name="settings_background_texture_no_options_hint">Нет доступных текстур.</string>
     <string name="settings_background_texture_open_folder">Открыть папку с текстурами</string>
+    <string name="settings_background_texture_none">Нет</string>
+    <string name="settings_background_texture_file_not_found">Файл не найден</string>
     <string name="settings_background_missing_textures_repeated">Текстура фона не задана</string>
     <string name="settings_background_missing_textures_unique">Одна или несколько текстур фона не заданы</string>
 

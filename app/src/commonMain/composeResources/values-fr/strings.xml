@@ -105,6 +105,8 @@
     <string name="settings_background_type_color_description">Utiliser une couleur unie</string>
     <string name="settings_background_texture_no_options_hint">Aucune texture disponible.</string>
     <string name="settings_background_texture_open_folder">Ouvrir le dossier des textures</string>
+    <string name="settings_background_texture_none">Aucune</string>
+    <string name="settings_background_texture_file_not_found">Fichier introuvable</string>
     <string name="settings_background_missing_textures_repeated">La texture d'arrière-plan n'est pas définie</string>
     <string name="settings_background_missing_textures_unique">Une ou plusieurs textures d'arrière-plan ne sont pas définies</string>
 

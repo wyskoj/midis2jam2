@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Eine einfache Farbe verwenden</string>
     <string name="settings_background_texture_no_options_hint">Keine Texturen verfügbar.</string>
     <string name="settings_background_texture_open_folder">Texturenordner öffnen</string>
+    <string name="settings_background_texture_none">Keine</string>
+    <string name="settings_background_texture_file_not_found">Datei nicht gefunden</string>
     <string name="settings_background_missing_textures_repeated">Hintergrundtextur ist nicht festgelegt</string>
     <string name="settings_background_missing_textures_unique">Eine oder mehrere Hintergrundtexturen sind nicht festgelegt</string>
 

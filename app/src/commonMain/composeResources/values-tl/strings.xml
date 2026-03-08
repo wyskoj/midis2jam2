@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Gumamit ng solidong kulay</string>
     <string name="settings_background_texture_no_options_hint">Walang available na texture.</string>
     <string name="settings_background_texture_open_folder">Buksan ang folder ng mga texture</string>
+    <string name="settings_background_texture_none">Wala</string>
+    <string name="settings_background_texture_file_not_found">Hindi nahanap ang file</string>
     <string name="settings_background_missing_textures_repeated">Hindi naka-set ang background texture</string>
     <string name="settings_background_missing_textures_unique">Isa o higit pang background texture ang hindi naka-set</string>
 

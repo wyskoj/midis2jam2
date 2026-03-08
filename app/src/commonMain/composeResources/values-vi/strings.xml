@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Chọn một màu đơn</string>
     <string name="settings_background_texture_no_options_hint">Không có sẵn họa tiết.</string>
     <string name="settings_background_texture_open_folder">Mở thư mục chứa họa tiết</string>
+    <string name="settings_background_texture_none">Không có</string>
+    <string name="settings_background_texture_file_not_found">Không tìm thấy tệp</string>
     <string name="settings_background_missing_textures_repeated">Họa tiết nền chưa được thiết đặt</string>
     <string name="settings_background_missing_textures_unique">Một hoặc nhiều họa tiết nền chưa được đặt</string>
 

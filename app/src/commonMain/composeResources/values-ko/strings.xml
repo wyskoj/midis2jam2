@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">단색 사용</string>
     <string name="settings_background_texture_no_options_hint">사용 가능한 텍스처가 없습니다.</string>
     <string name="settings_background_texture_open_folder">텍스처 폴더 열기</string>
+    <string name="settings_background_texture_none">없음</string>
+    <string name="settings_background_texture_file_not_found">파일을 찾을 수 없음</string>
     <string name="settings_background_missing_textures_repeated">배경 텍스처가 설정되지 않음</string>
     <string name="settings_background_missing_textures_unique">하나 이상의 배경 텍스처가 설정되지 않음</string>
 

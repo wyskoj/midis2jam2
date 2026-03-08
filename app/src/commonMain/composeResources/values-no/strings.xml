@@ -122,6 +122,8 @@
     <string name="settings_background_type_color_description">Bruk en ensfarget bakgrunn</string>
     <string name="settings_background_texture_no_options_hint">Ingen teksturer tilgjengelig.</string>
     <string name="settings_background_texture_open_folder">Åpne teksturmappe</string>
+    <string name="settings_background_texture_none">Ingen</string>
+    <string name="settings_background_texture_file_not_found">Filen ble ikke funnet</string>
     <string name="settings_background_missing_textures_repeated">Bakgrunnstekstur er ikke satt</string>
     <string name="settings_background_missing_textures_unique">En eller flere bakgrunnsteksturer er ikke satt</string>
 
