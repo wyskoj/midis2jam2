@@ -26,39 +26,44 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.background_cubemap_warning_continue
-import midis2jam2.app.generated.resources.background_cubemap_warning_message
-import midis2jam2.app.generated.resources.background_cubemap_warning_title
 import midis2jam2.app.generated.resources.cancel
 import midis2jam2.app.generated.resources.wallpaper
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.wysko.midis2jam2.domain.BackgroundWarning
 
 /**
- * A warning dialog shown when the user attempts to start playback with the cube map background
- * type selected but not all 6 images have been assigned.
+ * A warning dialog shown when the user attempts to start playback with a cube map background
+ * misconfiguration:
+ * - [BackgroundWarning.UNASSIGNED]: not all 6 images have been assigned.
+ * - [BackgroundWarning.MISSING]: some specified image files cannot be found on disk.
  *
+ * @param warningType The type of background misconfiguration.
  * @param onConfirm Called when the user chooses to continue anyway.
  * @param onDismiss Called when the user cancels.
  */
 @Composable
 fun BackgroundWarningDialog(
+    warningType: BackgroundWarning,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val textButtonColors = ButtonDefaults.textButtonColors(
         contentColor = MaterialTheme.colorScheme.primary
     )
+    val title = backgroundWarningTitle(warningType)
+    val message = backgroundWarningMessage(warningType)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.background_cubemap_warning_title)) },
+        title = { Text(title) },
         icon = {
             Icon(
                 painterResource(Res.drawable.wallpaper),
-                contentDescription = stringResource(Res.string.background_cubemap_warning_title),
+                contentDescription = title,
                 tint = MaterialTheme.colorScheme.primary,
             )
         },
-        text = { Text(stringResource(Res.string.background_cubemap_warning_message)) },
+        text = { Text(message) },
         confirmButton = {
             TextButton(onClick = onConfirm, colors = textButtonColors) {
                 Text(stringResource(Res.string.background_cubemap_warning_continue))

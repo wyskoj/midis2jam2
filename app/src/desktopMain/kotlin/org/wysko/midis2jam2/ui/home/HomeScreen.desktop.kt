@@ -100,7 +100,7 @@ internal actual fun HomeScreenLayout() {
     var flicker by remember { mutableStateOf(false) }
     val navigator = LocalNavigator.currentOrThrow
     var isBackgroundWarningDialogOpen by remember { mutableStateOf(false) }
-    val shouldWarnAboutBackground = model.shouldWarnAboutBackground.collectAsState(initial = false)
+    val backgroundWarning = model.backgroundWarning.collectAsState(initial = null)
 
     LaunchedEffect(Unit) {
         model.loadState()
@@ -143,6 +143,7 @@ internal actual fun HomeScreenLayout() {
 
     if (isBackgroundWarningDialogOpen) {
         BackgroundWarningDialog(
+            warningType = backgroundWarning.value!!,
             onConfirm = {
                 isBackgroundWarningDialogOpen = false
                 model.startApplication()
@@ -187,7 +188,7 @@ internal actual fun HomeScreenLayout() {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         PlayButton(model) {
-                            if (shouldWarnAboutBackground.value) {
+                            if (backgroundWarning.value != null) {
                                 isBackgroundWarningDialogOpen = true
                             } else {
                                 model.startApplication()

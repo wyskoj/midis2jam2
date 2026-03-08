@@ -146,7 +146,7 @@ object QueueTab : Tab {
         var isBackgroundWarningDialogOpen by remember { mutableStateOf(false) }
         var missingFiles by remember { mutableStateOf(listOf<String>()) }
         val isPlayButtonEnabled = model.isPlayButtonEnabled.collectAsState(initial = false)
-        val shouldWarnAboutBackground = model.shouldWarnAboutBackground.collectAsState(initial = false)
+        val backgroundWarning = model.backgroundWarning.collectAsState(initial = null)
 
         // Pickers
         val midiFilePicker = model.midiFilePicker()
@@ -210,7 +210,7 @@ object QueueTab : Tab {
                     ) {
                         ExtendedFloatingActionButton(
                             onClick = {
-                                if (shouldWarnAboutBackground.value) {
+                                if (backgroundWarning.value != null) {
                                     isBackgroundWarningDialogOpen = true
                                 } else {
                                     model.startApplication()
@@ -334,6 +334,7 @@ object QueueTab : Tab {
                 }
 
                 isBackgroundWarningDialogOpen -> BackgroundWarningDialog(
+                    warningType = backgroundWarning.value!!,
                     onConfirm = {
                         isBackgroundWarningDialogOpen = false
                         model.startApplication()

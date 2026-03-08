@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.ExecutionState
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.HomeTabPersistentState
@@ -75,11 +76,14 @@ class DesktopHomeScreenModel(
         }
     }
 
-    override val shouldWarnAboutBackground: Flow<Boolean> = run {
+    override val backgroundWarning: Flow<BackgroundWarning?> = run {
         val settings: SettingsModel by inject()
         settings.appSettings.map { appSettings ->
             val bg = appSettings.backgroundSettings
-            bg.type == BackgroundType.CubeMap && bg.cubeMapTextures.any { it.isBlank() }
+            if (bg.type != BackgroundType.CubeMap) return@map null
+            if (bg.cubeMapTextures.any { it.isBlank() }) return@map BackgroundWarning.UNASSIGNED
+            if (bg.cubeMapTextures.any { !File(it).exists() }) return@map BackgroundWarning.MISSING
+            null
         }
     }
 

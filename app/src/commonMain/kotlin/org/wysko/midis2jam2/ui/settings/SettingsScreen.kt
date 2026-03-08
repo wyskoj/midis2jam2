@@ -31,13 +31,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -60,9 +64,12 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.background_warning_settings_badge
 import midis2jam2.app.generated.resources.browse_activity
+import midis2jam2.app.generated.resources.cancel
 import midis2jam2.app.generated.resources.camera_video
 import midis2jam2.app.generated.resources.dark_mode
+import midis2jam2.app.generated.resources.error
 import midis2jam2.app.generated.resources.format_size
 import midis2jam2.app.generated.resources.graphic_eq
 import midis2jam2.app.generated.resources.help
@@ -119,7 +126,11 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.SystemInteractionService
+import org.wysko.midis2jam2.ui.common.component.backgroundWarningMessage
+import org.wysko.midis2jam2.ui.common.component.backgroundWarningTitle
+import org.wysko.midis2jam2.ui.common.component.WarningAmber
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Color
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.CubeMap
@@ -330,9 +341,11 @@ internal fun LazyListScope.LyricsSelect(
 internal fun BackgroundSelect(
     settings: State<AppSettings>,
     model: SettingsModel,
+    backgroundWarning: BackgroundWarning? = null,
 ) {
     var showColorSelectModal by remember { mutableStateOf(false) }
     val colorSelectSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showBackgroundWarningDialog by remember { mutableStateOf(false) }
 
     var showCubeMapSelectModal by remember { mutableStateOf(false) }
     val cubeMapSelectSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -381,9 +394,47 @@ internal fun BackgroundSelect(
                     color = Color(color),
                 ) {}
             }
+            if (backgroundWarning != null) {
+                IconButton(onClick = { showBackgroundWarningDialog = true }) {
+                    Icon(
+                        painterResource(Res.drawable.error),
+                        contentDescription = stringResource(Res.string.background_warning_settings_badge),
+                        tint = WarningAmber,
+                    )
+                }
+            }
         },
         description = stringResource(Res.string.settings_background_description)
     )
+
+    if (showBackgroundWarningDialog && backgroundWarning != null) {
+        val textButtonColors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.primary
+        )
+        val title = backgroundWarningTitle(backgroundWarning)
+        val message = backgroundWarningMessage(backgroundWarning)
+        AlertDialog(
+            onDismissRequest = { showBackgroundWarningDialog = false },
+            title = { Text(title) },
+            icon = {
+                Icon(
+                    painterResource(Res.drawable.error),
+                    contentDescription = title,
+                    tint = WarningAmber,
+                )
+            },
+            text = { Text(message) },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(
+                    onClick = { showBackgroundWarningDialog = false },
+                    colors = textButtonColors,
+                ) {
+                    Text(stringResource(Res.string.ok))
+                }
+            }
+        )
+    }
 
     if (showColorSelectModal) {
         ModalBottomSheet(
