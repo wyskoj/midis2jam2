@@ -16,7 +16,7 @@
  */
 
 import com.github.jk1.license.render.TextReportRenderer
-import org.jetbrains.compose.reload.ComposeHotRun
+import org.jetbrains.compose.reload.gradle.ComposeHotRun
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.time.Instant
@@ -29,7 +29,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.licenseReport)
 }
