@@ -34,6 +34,7 @@ import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.world.AssetLoader
+import java.lang.invoke.MethodHandles
 import javax.sound.midi.Synthesizer
 
 internal actual class Midis2jam2Application(
@@ -106,7 +107,12 @@ internal actual class Midis2jam2Application(
      *
      * Implemented via reflection so that macOS builds (which use the LWJGL2 backend and
      * therefore do not have GLFW on the classpath) still compile and run normally; the
-     * [ClassNotFoundException] is silently ignored on those platforms.
+     * [ReflectiveOperationException] is silently ignored on those platforms.
+     *
+     * The proxy delegates all default interface methods (including `address()` from
+     * [org.lwjgl.system.CallbackI], which creates the libffi native trampoline) via
+     * [MethodHandles.privateLookupIn] so that LWJGL's callback registration mechanism works
+     * correctly.
      */
     private fun installGlfwJoystickCallbackWorkaround() {
         try {
@@ -121,7 +127,7 @@ internal actual class Midis2jam2Application(
             val safeCallback = java.lang.reflect.Proxy.newProxyInstance(
                 callbackIClass.classLoader,
                 arrayOf(callbackIClass),
-            ) { _, method, args ->
+            ) { proxy, method, args ->
                 when (method.name) {
                     "invoke" -> {
                         if (args != null) {
@@ -136,19 +142,32 @@ internal actual class Midis2jam2Application(
                         }
                         null
                     }
-                    "address" -> {
-                        // Return the address of the previous callback, or 0L if none exists
-                        previousCallback[0]?.let { prev ->
-                            method.invoke(prev)
-                        } ?: 0L
+                    "hashCode" -> System.identityHashCode(proxy)
+                    "equals" -> args != null && args.isNotEmpty() && proxy === args[0]
+                    "toString" -> "${proxy.javaClass.name}@${Integer.toHexString(System.identityHashCode(proxy))}"
+                    else -> {
+                        // Delegate default interface methods (address(), callback(), getCallInterface())
+                        // to their default implementations so the proxy functions as a valid LWJGL
+                        // callback with a proper native function pointer.
+                        if (method.isDefault) {
+                            MethodHandles.privateLookupIn(method.declaringClass, MethodHandles.lookup())
+                                .unreflectSpecial(method, method.declaringClass)
+                                .bindTo(proxy)
+                                .invokeWithArguments(args?.toList() ?: emptyList<Any?>())
+                        } else {
+                            null
+                        }
                     }
-                    else -> null
                 }
             }
 
             previousCallback[0] = setCallbackMethod.invoke(null, safeCallback)
-        } catch (_: ClassNotFoundException) {
-            // GLFW is not on the classpath (macOS uses the LWJGL2 backend), nothing to do.
+        } catch (_: ReflectiveOperationException) {
+            // GLFW is not on the classpath (macOS uses the LWJGL2 backend) or its API differs;
+            // skip this optional workaround and leave normal startup unaffected.
+        } catch (_: LinkageError) {
+            // LWJGL classes cannot be linked (e.g., incompatible native libraries);
+            // skip this optional workaround and leave normal startup unaffected.
         }
     }
 }
