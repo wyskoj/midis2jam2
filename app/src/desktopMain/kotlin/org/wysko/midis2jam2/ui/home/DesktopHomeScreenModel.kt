@@ -36,6 +36,7 @@ import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.HomeTabPersistentState
 import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.ui.settings.SettingsModel
@@ -71,6 +72,14 @@ class DesktopHomeScreenModel(
         val settings: SettingsModel by inject()
         settings.appSettings.map { settings ->
             settings.playbackSettings.soundbanksSettings.soundbanks.map { PlatformFile(File(it)) }
+        }
+    }
+
+    override val shouldWarnAboutBackground: Flow<Boolean> = run {
+        val settings: SettingsModel by inject()
+        settings.appSettings.map { appSettings ->
+            val bg = appSettings.backgroundSettings
+            bg.type == BackgroundType.CubeMap && bg.cubeMapTextures.any { it.isBlank() }
         }
     }
 

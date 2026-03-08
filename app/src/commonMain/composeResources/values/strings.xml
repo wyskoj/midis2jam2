@@ -45,6 +45,11 @@
     <string name="search_index_not_available">Select a directory to index MIDI files.</string>
     <string name="search_index_waiting">Hang tight! We're indexing your MIDI files...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Background misconfigured</string>
+    <string name="background_cubemap_warning_message">The background is set to cube map, but not all 6 images have been assigned. The default background will be used instead. You can cancel and fix this in the background settings.</string>
+    <string name="background_cubemap_warning_continue">Continue anyway</string>
+
     <!-- Settings -->
     <string name="settings_general">General</string>
     <string name="settings_general_description">Language, theme</string>

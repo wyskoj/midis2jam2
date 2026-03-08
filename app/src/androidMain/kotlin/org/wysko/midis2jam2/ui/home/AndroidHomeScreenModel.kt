@@ -57,6 +57,9 @@ class AndroidHomeScreenModel(
     override val soundbanks: Flow<List<PlatformFile>>
         get() = error("Not supported on Android")
 
+    override val shouldWarnAboutBackground: Flow<Boolean>
+        get() = flowOf(false)
+
     override fun startApplication() {
         check(selectedMidiFile.value != null) { "MIDI file not set" }
 
