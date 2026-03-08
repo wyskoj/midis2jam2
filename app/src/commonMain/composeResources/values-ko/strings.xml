@@ -62,6 +62,14 @@
     <string name="search_index_not_available">MIDI 파일을 색인화할 디렉토리를 선택하세요.</string>
     <string name="search_index_waiting">잠시만 기다려 주세요! MIDI 파일을 색인화하는 중입니다...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">배경이 잘못 설정되었습니다</string>
+    <string name="background_cubemap_warning_message">배경이 큐브 맵으로 설정되었지만 여섯 개의 이미지가 모두 할당되지 않았습니다. 기본 배경이 대신 사용됩니다. 취소하고 배경 설정에서 수정할 수 있습니다.</string>
+    <string name="background_cubemap_missing_warning_title">배경 이미지를 찾을 수 없습니다</string>
+    <string name="background_cubemap_missing_warning_message">지정된 큐브 맵 이미지 중 하나 이상을 디스크에서 찾을 수 없습니다. 기본 배경이 대신 사용됩니다. 취소하고 배경 설정에서 수정할 수 있습니다.</string>
+    <string name="background_cubemap_warning_continue">어쨌든 계속</string>
+    <string name="background_warning_settings_badge">배경 설정 문제</string>
+
     <!-- Settings -->
     <string name="settings_general">일반</string>
     <string name="settings_general_description">언어, 테마</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">단색 사용</string>
     <string name="settings_background_texture_no_options_hint">사용 가능한 텍스처가 없습니다.</string>
     <string name="settings_background_texture_open_folder">텍스처 폴더 열기</string>
+    <string name="settings_background_texture_none">없음</string>
+    <string name="settings_background_texture_file_not_found">파일을 찾을 수 없음</string>
     <string name="settings_background_missing_textures_repeated">배경 텍스처가 설정되지 않음</string>
     <string name="settings_background_missing_textures_unique">하나 이상의 배경 텍스처가 설정되지 않음</string>
 

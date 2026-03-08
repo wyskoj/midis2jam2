@@ -62,6 +62,14 @@
     <string name="search_index_not_available">请选择一个目录以索引 MIDI 文件。</string>
     <string name="search_index_waiting">请稍候！我们正在索引您的 MIDI 文件…</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">背景配置错误</string>
+    <string name="background_cubemap_warning_message">背景已设置为立方体贴图，但六张图片并非全部已分配。将改用默认背景。您可以取消并在背景设置中修复此问题。</string>
+    <string name="background_cubemap_missing_warning_title">未找到背景图片</string>
+    <string name="background_cubemap_missing_warning_message">无法在磁盘上找到一个或多个指定的立方体贴图图片。将改用默认背景。您可以取消并在背景设置中修复此问题。</string>
+    <string name="background_cubemap_warning_continue">仍然继续</string>
+    <string name="background_warning_settings_badge">背景配置问题</string>
+
     <!-- 设置 -->
     <string name="settings_general">通用</string>
     <string name="settings_general_description">语言、主题</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">使用纯色</string>
     <string name="settings_background_texture_no_options_hint">无可用纹理。</string>
     <string name="settings_background_texture_open_folder">打开纹理文件夹</string>
+    <string name="settings_background_texture_none">无</string>
+    <string name="settings_background_texture_file_not_found">文件未找到</string>
     <string name="settings_background_missing_textures_repeated">未设置背景纹理</string>
     <string name="settings_background_missing_textures_unique">一个或多个背景纹理未设置</string>
 

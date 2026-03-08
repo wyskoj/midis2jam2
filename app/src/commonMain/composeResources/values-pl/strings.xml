@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Wybierz katalog, aby indeksować pliki MIDI.</string>
     <string name="search_index_waiting">Proszę czekać! Indeksujemy Twoje pliki MIDI...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Tło nieprawidłowo skonfigurowane</string>
+    <string name="background_cubemap_warning_message">Tło jest ustawione na mapę sześcienną, ale nie wszystkie sześć obrazów zostało przypisanych. Zamiast tego zostanie użyte domyślne tło. Możesz anulować i naprawić to w ustawieniach tła.</string>
+    <string name="background_cubemap_missing_warning_title">Nie znaleziono obrazów tła</string>
+    <string name="background_cubemap_missing_warning_message">Jeden lub więcej z podanych obrazów mapy sześciennej nie został znaleziony na dysku. Zamiast tego zostanie użyte domyślne tło. Możesz anulować i naprawić to w ustawieniach tła.</string>
+    <string name="background_cubemap_warning_continue">Kontynuuj mimo to</string>
+    <string name="background_warning_settings_badge">Problem z konfiguracją tła</string>
+
     <!-- Settings -->
     <string name="settings_general">Ogólne</string>
     <string name="settings_general_description">Język, motyw</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">Użyj jednolitego koloru</string>
     <string name="settings_background_texture_no_options_hint">Brak dostępnych tekstur.</string>
     <string name="settings_background_texture_open_folder">Otwórz folder tekstur</string>
+    <string name="settings_background_texture_none">Brak</string>
+    <string name="settings_background_texture_file_not_found">Plik nie znaleziony</string>
     <string name="settings_background_missing_textures_repeated">Tekstura tła nie jest ustawiona</string>
     <string name="settings_background_missing_textures_unique">Jedna lub więcej tekstur tła nie jest ustawiona</string>
 

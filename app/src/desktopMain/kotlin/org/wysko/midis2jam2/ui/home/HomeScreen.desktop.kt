@@ -83,8 +83,10 @@ import midis2jam2.app.generated.resources.soundbank_default
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
+import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
@@ -98,6 +100,9 @@ internal actual fun HomeScreenLayout() {
     val scope = rememberCoroutineScope()
     var flicker by remember { mutableStateOf(false) }
     val navigator = LocalNavigator.currentOrThrow
+    var isBackgroundWarningDialogOpen by remember { mutableStateOf(false) }
+    val backgroundWarning = model.backgroundWarning.collectAsState(initial = null)
+    var capturedBackgroundWarning by remember { mutableStateOf<BackgroundWarning?>(null) }
 
     LaunchedEffect(Unit) {
         model.loadState()
@@ -138,6 +143,21 @@ internal actual fun HomeScreenLayout() {
 
     val isSoundbankSelectVisible = selectedMidiDevice.value.name == "Gervill"
 
+    if (isBackgroundWarningDialogOpen) {
+        capturedBackgroundWarning?.let { warning ->
+            BackgroundWarningDialog(
+                warningType = warning,
+                onConfirm = {
+                    isBackgroundWarningDialogOpen = false
+                    model.startApplication()
+                },
+                onDismiss = {
+                    isBackgroundWarningDialogOpen = false
+                }
+            )
+        }
+    }
+
     Scaffold(
         modifier = Modifier.dragAndDropTarget(
             shouldStartDragAndDrop = { true },
@@ -171,7 +191,15 @@ internal actual fun HomeScreenLayout() {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        PlayButton(model, model::startApplication)
+                        PlayButton(model) {
+                            val warning = backgroundWarning.value
+                            if (warning != null) {
+                                capturedBackgroundWarning = warning
+                                isBackgroundWarningDialogOpen = true
+                            } else {
+                                model.startApplication()
+                            }
+                        }
                         LoopButton(model)
                     }
                 }

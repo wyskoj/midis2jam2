@@ -31,14 +31,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.QueueExecutionState
+import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
+import org.wysko.midis2jam2.ui.settings.SettingsModel
 import java.io.File
 
 class QueueTabModel(
     private val applicationService: ApplicationService,
-) : ScreenModel {
+) : ScreenModel, KoinComponent {
     private val _queue = MutableStateFlow<List<PlatformFile>>(listOf())
     val queue: StateFlow<List<PlatformFile>>
         get() = _queue
@@ -51,6 +57,13 @@ class QueueTabModel(
         get() = _queue.combine(applicationService.isApplicationRunning) { queue, isRunning ->
             !isRunning && queue.isNotEmpty()
         }
+
+    val backgroundWarning: Flow<BackgroundWarning?> = run {
+        val settings: SettingsModel by inject()
+        settings.appSettings.map { appSettings ->
+            computeBackgroundWarning(appSettings.backgroundSettings)
+        }
+    }
 
     fun setQueue(queue: List<PlatformFile>) {
         _queue.value = queue

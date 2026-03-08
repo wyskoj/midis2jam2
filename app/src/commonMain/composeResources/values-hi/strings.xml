@@ -45,6 +45,14 @@
     <string name="search_index_not_available">MIDI फ़ाइलों को अनुक्रमित करने के लिए एक डायरेक्टरी चुनें।</string>
     <string name="search_index_waiting">प्रतीक्षा करें! हम आपकी MIDI फ़ाइलों को अनुक्रमित कर रहे हैं...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">बैकग्राउंड गलत तरीके से कॉन्फ़िगर की गई है</string>
+    <string name="background_cubemap_warning_message">बैकग्राउंड क्यूब मैप पर सेट है, लेकिन सभी छह चित्र असाइन नहीं किए गए हैं। इसके बजाय डिफ़ॉल्ट बैकग्राउंड उपयोग की जाएगी। आप रद्द कर सकते हैं और बैकग्राउंड सेटिंग्स में इसे ठीक कर सकते हैं।</string>
+    <string name="background_cubemap_missing_warning_title">बैकग्राउंड चित्र नहीं मिले</string>
+    <string name="background_cubemap_missing_warning_message">निर्दिष्ट क्यूब मैप चित्रों में से एक या अधिक डिस्क पर नहीं मिल सके। इसके बजाय डिफ़ॉल्ट बैकग्राउंड उपयोग की जाएगी। आप रद्द कर सकते हैं और बैकग्राउंड सेटिंग्स में इसे ठीक कर सकते हैं।</string>
+    <string name="background_cubemap_warning_continue">फिर भी जारी रखें</string>
+    <string name="background_warning_settings_badge">बैकग्राउंड कॉन्फ़िगरेशन समस्या</string>
+
     <!-- सेटिंग्स -->
     <string name="settings_general">सामान्य</string>
     <string name="settings_general_description">भाषा, थीम</string>
@@ -105,6 +113,8 @@
     <string name="settings_background_type_color_description">एक ठोस रंग का उपयोग करें</string>
     <string name="settings_background_texture_no_options_hint">कोई टेक्सचर उपलब्ध नहीं है।</string>
     <string name="settings_background_texture_open_folder">टेक्सचर फ़ोल्डर खोलें</string>
+    <string name="settings_background_texture_none">कोई नहीं</string>
+    <string name="settings_background_texture_file_not_found">फ़ाइल नहीं मिली</string>
     <string name="settings_background_missing_textures_repeated">बैकग्राउंड टेक्सचर सेट नहीं है</string>
     <string name="settings_background_missing_textures_unique">एक या अधिक बैकग्राउंड टेक्सचर सेट नहीं हैं</string>
 

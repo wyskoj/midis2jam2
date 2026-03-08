@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Wähle ein Verzeichnis aus, um MIDI-Dateien zu indizieren.</string>
     <string name="search_index_waiting">Moment mal! Wir indizieren deine MIDI-Dateien…</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Hintergrund falsch konfiguriert</string>
+    <string name="background_cubemap_warning_message">Der Hintergrund ist auf Cube Map eingestellt, aber nicht alle sechs Bilder wurden zugewiesen. Stattdessen wird der Standardhintergrund verwendet. Du kannst den Vorgang abbrechen und dies in den Hintergrundeinstellungen beheben.</string>
+    <string name="background_cubemap_missing_warning_title">Hintergrundbilder nicht gefunden</string>
+    <string name="background_cubemap_missing_warning_message">Ein oder mehrere der angegebenen Cube-Map-Bilder konnten auf dem Datenträger nicht gefunden werden. Stattdessen wird der Standardhintergrund verwendet. Du kannst den Vorgang abbrechen und dies in den Hintergrundeinstellungen beheben.</string>
+    <string name="background_cubemap_warning_continue">Trotzdem fortfahren</string>
+    <string name="background_warning_settings_badge">Problem mit der Hintergrundkonfiguration</string>
+
     <!-- Settings -->
     <string name="settings_general">Allgemein</string>
     <string name="settings_general_description">Sprache, Design</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">Eine einfache Farbe verwenden</string>
     <string name="settings_background_texture_no_options_hint">Keine Texturen verfügbar.</string>
     <string name="settings_background_texture_open_folder">Texturenordner öffnen</string>
+    <string name="settings_background_texture_none">Keine</string>
+    <string name="settings_background_texture_file_not_found">Datei nicht gefunden</string>
     <string name="settings_background_missing_textures_repeated">Hintergrundtextur ist nicht festgelegt</string>
     <string name="settings_background_missing_textures_unique">Eine oder mehrere Hintergrundtexturen sind nicht festgelegt</string>
 

@@ -62,6 +62,14 @@
     <string name="search_index_not_available">MIDIファイルのインデックスを作成するディレクトリを選択してください。</string>
     <string name="search_index_waiting">しばらくお待ちください。MIDIファイルのインデックスを作成中です…</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">背景が正しく設定されていません</string>
+    <string name="background_cubemap_warning_message">背景はキューブマップに設定されていますが、六枚の画像がすべて割り当てられていません。代わりにデフォルトの背景が使用されます。キャンセルして背景の設定で修正できます。</string>
+    <string name="background_cubemap_missing_warning_title">背景画像が見つかりません</string>
+    <string name="background_cubemap_missing_warning_message">指定されたキューブマップの画像の一つ以上がディスク上で見つかりませんでした。代わりにデフォルトの背景が使用されます。キャンセルして背景の設定で修正できます。</string>
+    <string name="background_cubemap_warning_continue">このまま続ける</string>
+    <string name="background_warning_settings_badge">背景の設定に問題があります</string>
+
     <!-- 設定 -->
     <string name="settings_general">一般</string>
     <string name="settings_general_description">言語、テーマ</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">単色を使用する</string>
     <string name="settings_background_texture_no_options_hint">利用可能なテクスチャがありません。</string>
     <string name="settings_background_texture_open_folder">テクスチャフォルダを開く</string>
+    <string name="settings_background_texture_none">なし</string>
+    <string name="settings_background_texture_file_not_found">ファイルが見つかりません</string>
     <string name="settings_background_missing_textures_repeated">背景テクスチャが設定されていません</string>
     <string name="settings_background_missing_textures_unique">1つ以上の背景テクスチャが設定されていません</string>
 

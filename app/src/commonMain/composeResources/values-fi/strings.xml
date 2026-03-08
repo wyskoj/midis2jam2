@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Valitse hakemisto MIDI-tiedostojen indeksointia varten.</string>
     <string name="search_index_waiting">Odota! Indeksöimme MIDI-tiedostoja...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Tausta väärin määritetty</string>
+    <string name="background_cubemap_warning_message">Taustaksi on asetettu kuutiokuvastokartta, mutta kaikkia kuutta kuvaa ei ole määritetty. Oletustaustaa käytetään sen sijaan. Voit peruuttaa ja korjata tämän taustan asetuksissa.</string>
+    <string name="background_cubemap_missing_warning_title">Taustakuvia ei löydy</string>
+    <string name="background_cubemap_missing_warning_message">Yhtä tai useampaa määritettyä kuutiokuvastokarttakuvaa ei löydy levyltä. Oletustaustaa käytetään sen sijaan. Voit peruuttaa ja korjata tämän taustan asetuksissa.</string>
+    <string name="background_cubemap_warning_continue">Jatka kuitenkin</string>
+    <string name="background_warning_settings_badge">Taustan konfigurointiongelma</string>
+
     <!-- Asetukset -->
     <string name="settings_general">Yleiset</string>
     <string name="settings_general_description">Kieli, teema</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">Käytä yhtä väriä</string>
     <string name="settings_background_texture_no_options_hint">Tekstuureja ei saatavilla.</string>
     <string name="settings_background_texture_open_folder">Avaa tekstuurien kansio</string>
+    <string name="settings_background_texture_none">Ei mitään</string>
+    <string name="settings_background_texture_file_not_found">Tiedostoa ei löydy</string>
     <string name="settings_background_missing_textures_repeated">Taustatekstuuria ei ole asetettu</string>
     <string name="settings_background_missing_textures_unique">Yhtä tai useampaa taustatekstuuria ei ole asetettu</string>
 

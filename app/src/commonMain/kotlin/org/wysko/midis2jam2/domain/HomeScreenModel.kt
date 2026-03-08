@@ -31,6 +31,7 @@ interface HomeScreenModel {
     val isLooping: StateFlow<Boolean>
     val isPlayButtonEnabled: Flow<Boolean>
     val soundbanks: Flow<List<PlatformFile>>
+    val backgroundWarning: Flow<BackgroundWarning?>
 
     fun startApplication()
 

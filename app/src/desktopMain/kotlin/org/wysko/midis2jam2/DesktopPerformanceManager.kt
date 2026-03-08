@@ -21,6 +21,7 @@ import Platform
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
 import com.jme3.asset.AssetLoadException
+import com.jme3.asset.AssetNotFoundException
 import org.koin.mp.KoinPlatformTools
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.domain.ErrorLogService
@@ -31,7 +32,9 @@ import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.background.BackgroundController
+import org.wysko.midis2jam2.world.background.BackgroundFactory
 import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
+import org.wysko.midis2jam2.world.background.BackgroundImageMissingException
 import kotlin.time.Duration.Companion.seconds
 
 open class DesktopPerformanceManager(
@@ -55,11 +58,18 @@ open class DesktopPerformanceManager(
                 root = root,
                 Platform.Desktop
             )
+        } catch (e: BackgroundImageMissingException) {
+            errorLogService.addError(
+                e.message ?: "Not all cubemap background images have been assigned.",
+                e.stackTraceToString()
+            )
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
         } catch (e: BackgroundImageFormatException) {
             errorLogService.addError(
                 e.message ?: "There was an error loading the images for the background.",
                 e.stackTraceToString()
             )
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
         } catch (e: IllegalArgumentException) {
             errorLogService.addError(
                 message = when (e.message) {
@@ -68,11 +78,19 @@ open class DesktopPerformanceManager(
                 },
                 e.stackTraceToString()
             )
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
+        } catch (e: AssetNotFoundException) {
+            errorLogService.addError(
+                message = "One or more background images could not be found. Please check your background settings.",
+                e.stackTraceToString()
+            )
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
         } catch (e: AssetLoadException) {
             errorLogService.addError(
                 message = "There was an error loading the background images. Did you remember to assign them in the settings?",
                 e.stackTraceToString()
             )
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
         }
 
         logger().debug("Application initialized")

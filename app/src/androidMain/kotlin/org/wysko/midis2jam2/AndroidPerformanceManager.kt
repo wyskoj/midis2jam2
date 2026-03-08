@@ -20,6 +20,8 @@ package org.wysko.midis2jam2
 import Platform
 import com.jme3.app.Application
 import com.jme3.app.state.AppStateManager
+import com.jme3.asset.AssetLoadException
+import com.jme3.asset.AssetNotFoundException
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.manager.LoadingProgressManager
 import org.wysko.midis2jam2.manager.PerformanceManager
@@ -30,6 +32,9 @@ import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfi
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.background.BackgroundController
+import org.wysko.midis2jam2.world.background.BackgroundFactory
+import org.wysko.midis2jam2.world.background.BackgroundImageFormatException
+import org.wysko.midis2jam2.world.background.BackgroundImageMissingException
 import kotlin.time.Duration.Companion.seconds
 
 class AndroidPerformanceManager(
@@ -46,7 +51,29 @@ class AndroidPerformanceManager(
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
         val configuration = configs.find<AppSettingsConfiguration>()
-        BackgroundController.configureBackground(this@AndroidPerformanceManager, configuration, root, Platform.Android)
+        try {
+            BackgroundController.configureBackground(this@AndroidPerformanceManager, configuration, root, Platform.Android)
+        } catch (e: BackgroundImageMissingException) {
+            logger().warn(e.message ?: "Not all cubemap background images have been assigned.")
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
+        } catch (e: BackgroundImageFormatException) {
+            logger().warn(e.message ?: "There was an error loading the images for the background.")
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
+        } catch (e: IllegalArgumentException) {
+            logger().warn(
+                when (e.message) {
+                    "Image width and height must be the same" -> "The background images must be square."
+                    else -> e.message ?: "There was an error loading the images for the background."
+                }
+            )
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
+        } catch (e: AssetNotFoundException) {
+            logger().warn("One or more background images could not be found. Please check your background settings.")
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
+        } catch (e: AssetLoadException) {
+            logger().warn("There was an error loading the background images.")
+            root.attachChild(BackgroundFactory.Default(app.assetManager).create())
+        }
         app.camera.fov = configuration.appSettings.cameraSettings.defaultFieldOfView
     }
 

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.ExecutionState
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.MidiService
@@ -56,6 +57,9 @@ class AndroidHomeScreenModel(
 
     override val soundbanks: Flow<List<PlatformFile>>
         get() = error("Not supported on Android")
+
+    override val backgroundWarning: Flow<BackgroundWarning?>
+        get() = flowOf(null)
 
     override fun startApplication() {
         check(selectedMidiFile.value != null) { "MIDI file not set" }

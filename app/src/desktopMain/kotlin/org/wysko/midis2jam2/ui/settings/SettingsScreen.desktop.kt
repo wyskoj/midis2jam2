@@ -117,6 +117,8 @@ import midis2jam2.app.generated.resources.video_stable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.wysko.midis2jam2.domain.BackgroundWarning
+import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
@@ -196,7 +198,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
         }
     }
     item {
-        BackgroundSelect(settings, model)
+        val bg = settings.value.backgroundSettings
+        val bgWarning = computeBackgroundWarning(bg)
+        BackgroundSelect(settings, model, bgWarning)
     }
     item { // stickyHeader
         CategoryHeader(stringResource(Res.string.settings_on_screen_elements))

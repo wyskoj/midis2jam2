@@ -45,6 +45,14 @@
     <string name="search_index_not_available">Select a directory to index MIDI files.</string>
     <string name="search_index_waiting">Hang tight! We're indexing your MIDI files...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Background misconfigured</string>
+    <string name="background_cubemap_warning_message">The background is set to cube map, but not all six images have been assigned. The default background will be used instead. You can cancel and fix this in the background settings.</string>
+    <string name="background_cubemap_missing_warning_title">Background images not found</string>
+    <string name="background_cubemap_missing_warning_message">One or more of the specified cube map images could not be found on disk. The default background will be used instead. You can cancel and fix this in the background settings.</string>
+    <string name="background_cubemap_warning_continue">Continue anyway</string>
+    <string name="background_warning_settings_badge">Background configuration issue</string>
+
     <!-- Settings -->
     <string name="settings_general">General</string>
     <string name="settings_general_description">Language, theme</string>
@@ -105,6 +113,8 @@
     <string name="settings_background_type_color_description">Use a solid color</string>
     <string name="settings_background_texture_no_options_hint">No textures available.</string>
     <string name="settings_background_texture_open_folder">Open textures folder</string>
+    <string name="settings_background_texture_none">None</string>
+    <string name="settings_background_texture_file_not_found">File not found</string>
     <string name="settings_background_missing_textures_repeated">Background texture is not set</string>
     <string name="settings_background_missing_textures_unique">One or more background textures are not set</string>
 

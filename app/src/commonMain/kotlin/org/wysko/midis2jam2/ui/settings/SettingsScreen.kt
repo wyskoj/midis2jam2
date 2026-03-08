@@ -21,35 +21,12 @@ import Platform
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,66 +36,12 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import kotlinx.coroutines.launch
-import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.browse_activity
-import midis2jam2.app.generated.resources.camera_video
-import midis2jam2.app.generated.resources.dark_mode
-import midis2jam2.app.generated.resources.format_size
-import midis2jam2.app.generated.resources.graphic_eq
-import midis2jam2.app.generated.resources.help
-import midis2jam2.app.generated.resources.image
-import midis2jam2.app.generated.resources.keep
-import midis2jam2.app.generated.resources.light_mode
-import midis2jam2.app.generated.resources.lyrics
-import midis2jam2.app.generated.resources.motion_photos_auto
-import midis2jam2.app.generated.resources.palette
-import midis2jam2.app.generated.resources.settings_background_description
-import midis2jam2.app.generated.resources.settings_background_type
-import midis2jam2.app.generated.resources.settings_background_type_color
-import midis2jam2.app.generated.resources.settings_background_type_color_description
-import midis2jam2.app.generated.resources.settings_background_type_cubemap
-import midis2jam2.app.generated.resources.settings_background_type_cubemap_description
-import midis2jam2.app.generated.resources.settings_background_type_default
-import midis2jam2.app.generated.resources.settings_background_type_default_description
-import midis2jam2.app.generated.resources.settings_camera_classic_autocam
-import midis2jam2.app.generated.resources.settings_camera_classic_autocam_description
-import midis2jam2.app.generated.resources.settings_camera_field_of_view_degrees
-import midis2jam2.app.generated.resources.settings_camera_field_of_view_label_prefix
-import midis2jam2.app.generated.resources.settings_camera_field_of_view_title
-import midis2jam2.app.generated.resources.settings_camera_start_autocam_with_song
-import midis2jam2.app.generated.resources.settings_camera_start_autocam_with_song_description
-import midis2jam2.app.generated.resources.settings_general_theme
-import midis2jam2.app.generated.resources.settings_general_theme_dark
-import midis2jam2.app.generated.resources.settings_general_theme_light
-import midis2jam2.app.generated.resources.settings_general_theme_system
-import midis2jam2.app.generated.resources.settings_graphics_shadows_description_a
-import midis2jam2.app.generated.resources.settings_graphics_shadows_description_hint_a
-import midis2jam2.app.generated.resources.settings_instruments_always_show_instruments
-import midis2jam2.app.generated.resources.settings_instruments_always_show_instruments_description
-import midis2jam2.app.generated.resources.settings_onscreenelements_hud
-import midis2jam2.app.generated.resources.settings_onscreenelements_hud_description
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_description
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_size
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_size_default
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_size_large
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_size_larger
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_size_small
-import midis2jam2.app.generated.resources.settings_onscreenelements_lyrics_size_smaller
-import midis2jam2.app.generated.resources.settings_playback_synthesizer_chorus
-import midis2jam2.app.generated.resources.settings_playback_synthesizer_chorus_description
-import midis2jam2.app.generated.resources.settings_playback_synthesizer_reverb
-import midis2jam2.app.generated.resources.settings_playback_synthesizer_reverb_description
-import midis2jam2.app.generated.resources.surround_sound
-import midis2jam2.app.generated.resources.tab_settings
-import midis2jam2.app.generated.resources.tonality
-import midis2jam2.app.generated.resources.wallpaper
-import midis2jam2.app.generated.resources.zoom_in
-import midis2jam2.app.generated.resources.zoom_out
+import midis2jam2.app.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Color
@@ -126,12 +49,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.Backg
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Default
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.ui.BasicDeviceScaffold
-import org.wysko.midis2jam2.ui.common.component.ColorPicker
-import org.wysko.midis2jam2.ui.common.component.CubeMapImageSelect
-import org.wysko.midis2jam2.ui.common.component.SelectOption
-import org.wysko.midis2jam2.ui.common.component.SelectRow
-import org.wysko.midis2jam2.ui.common.component.SwitchRow
-import org.wysko.midis2jam2.ui.common.component.UnitRow
+import org.wysko.midis2jam2.ui.common.component.*
 import kotlin.math.roundToInt
 
 object SettingsScreen : Screen {
@@ -330,9 +248,11 @@ internal fun LazyListScope.LyricsSelect(
 internal fun BackgroundSelect(
     settings: State<AppSettings>,
     model: SettingsModel,
+    backgroundWarning: BackgroundWarning? = null,
 ) {
     var showColorSelectModal by remember { mutableStateOf(false) }
     val colorSelectSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showBackgroundWarningDialog by remember { mutableStateOf(false) }
 
     var showCubeMapSelectModal by remember { mutableStateOf(false) }
     val cubeMapSelectSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -381,9 +301,47 @@ internal fun BackgroundSelect(
                     color = Color(color),
                 ) {}
             }
+            if (backgroundWarning != null) {
+                IconButton(onClick = { showBackgroundWarningDialog = true }) {
+                    Icon(
+                        painterResource(Res.drawable.warning),
+                        contentDescription = stringResource(Res.string.background_warning_settings_badge),
+                        tint = WarningAmber,
+                    )
+                }
+            }
         },
         description = stringResource(Res.string.settings_background_description)
     )
+
+    if (showBackgroundWarningDialog && backgroundWarning != null) {
+        val textButtonColors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.primary
+        )
+        val title = backgroundWarningTitle(backgroundWarning)
+        val message = backgroundWarningMessage(backgroundWarning)
+        AlertDialog(
+            onDismissRequest = { showBackgroundWarningDialog = false },
+            title = { Text(title) },
+            icon = {
+                Icon(
+                    painterResource(Res.drawable.warning),
+                    contentDescription = title,
+                    tint = WarningAmber,
+                )
+            },
+            text = { Text(message) },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(
+                    onClick = { showBackgroundWarningDialog = false },
+                    colors = textButtonColors,
+                ) {
+                    Text(stringResource(Res.string.ok))
+                }
+            }
+        )
+    }
 
     if (showColorSelectModal) {
         ModalBottomSheet(

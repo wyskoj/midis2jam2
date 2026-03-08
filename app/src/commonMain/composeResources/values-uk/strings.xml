@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Виберіть директорію для індексації MIDI-файлів.</string>
     <string name="search_index_waiting">Зачекайте! Ми індексуємо ваші MIDI-файли…</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Фон неправильно налаштовано</string>
+    <string name="background_cubemap_warning_message">Фон встановлено на кубічну карту, але не всі шість зображень призначено. Замість цього буде використано фон за замовчуванням. Ви можете скасувати та виправити це в налаштуваннях фону.</string>
+    <string name="background_cubemap_missing_warning_title">Зображення фону не знайдено</string>
+    <string name="background_cubemap_missing_warning_message">Одне або кілька зазначених зображень кубічної карти не знайдено на диску. Замість цього буде використано фон за замовчуванням. Ви можете скасувати та виправити це в налаштуваннях фону.</string>
+    <string name="background_cubemap_warning_continue">Продовжити в будь-якому разі</string>
+    <string name="background_warning_settings_badge">Проблема з конфігурацією фону</string>
+
     <!-- Settings -->
     <string name="settings_general">Загальні</string>
     <string name="settings_general_description">Мова, тема</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">Використовувати суцільний колір</string>
     <string name="settings_background_texture_no_options_hint">Текстури недоступні.</string>
     <string name="settings_background_texture_open_folder">Відкрити теку текстур</string>
+    <string name="settings_background_texture_none">Немає</string>
+    <string name="settings_background_texture_file_not_found">Файл не знайдено</string>
     <string name="settings_background_missing_textures_repeated">Текстура фону не встановлена</string>
     <string name="settings_background_missing_textures_unique">Одна або кілька текстур фону не встановлені</string>
 

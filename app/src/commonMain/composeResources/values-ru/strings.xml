@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Выберите папку для индексации MIDI-файлов.</string>
     <string name="search_index_waiting">Подождите! Индексируем ваши MIDI-файлы…</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Фон неправильно настроен</string>
+    <string name="background_cubemap_warning_message">Фон установлен на кубическую карту, но не все шесть изображений были назначены. Вместо этого будет использован фон по умолчанию. Вы можете отменить и исправить это в настройках фона.</string>
+    <string name="background_cubemap_missing_warning_title">Изображения фона не найдены</string>
+    <string name="background_cubemap_missing_warning_message">Одно или несколько указанных изображений кубической карты не были найдены на диске. Вместо этого будет использован фон по умолчанию. Вы можете отменить и исправить это в настройках фона.</string>
+    <string name="background_cubemap_warning_continue">Продолжить в любом случае</string>
+    <string name="background_warning_settings_badge">Проблема с конфигурацией фона</string>
+
     <!-- Settings -->
     <string name="settings_general">Основные</string>
     <string name="settings_general_description">Язык, тема</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">Использовать сплошной цвет</string>
     <string name="settings_background_texture_no_options_hint">Нет доступных текстур.</string>
     <string name="settings_background_texture_open_folder">Открыть папку с текстурами</string>
+    <string name="settings_background_texture_none">Нет</string>
+    <string name="settings_background_texture_file_not_found">Файл не найден</string>
     <string name="settings_background_missing_textures_repeated">Текстура фона не задана</string>
     <string name="settings_background_missing_textures_unique">Одна или несколько текстур фона не заданы</string>
 

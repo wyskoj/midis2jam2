@@ -62,6 +62,14 @@
     <string name="search_index_not_available">Seleziona una directory per indicizzare i file MIDI.</string>
     <string name="search_index_waiting">Tieniti forte! Stiamo indicizzando i tuoi file MIDI...</string>
 
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Sfondo mal configurato</string>
+    <string name="background_cubemap_warning_message">Lo sfondo è impostato su cube map, ma non tutte e sei le immagini sono state assegnate. Verrà utilizzato lo sfondo predefinito. Puoi annullare e correggere questo nelle impostazioni dello sfondo.</string>
+    <string name="background_cubemap_missing_warning_title">Immagini di sfondo non trovate</string>
+    <string name="background_cubemap_missing_warning_message">Una o più delle immagini della cube map specificate non sono state trovate sul disco. Verrà utilizzato lo sfondo predefinito. Puoi annullare e correggere questo nelle impostazioni dello sfondo.</string>
+    <string name="background_cubemap_warning_continue">Continua comunque</string>
+    <string name="background_warning_settings_badge">Problema di configurazione dello sfondo</string>
+
     <!-- Settings -->
     <string name="settings_general">Generali</string>
     <string name="settings_general_description">Lingua, tema</string>
@@ -122,6 +130,8 @@
     <string name="settings_background_type_color_description">Usa un colore solido</string>
     <string name="settings_background_texture_no_options_hint">Nessuna texture disponibile.</string>
     <string name="settings_background_texture_open_folder">Apri cartella texture</string>
+    <string name="settings_background_texture_none">Nessuna</string>
+    <string name="settings_background_texture_file_not_found">File non trovato</string>
     <string name="settings_background_missing_textures_repeated">La texture di sfondo non è impostata</string>
     <string name="settings_background_missing_textures_unique">Una o più texture di sfondo non sono impostate</string>
 

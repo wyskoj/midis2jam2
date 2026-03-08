@@ -31,11 +31,13 @@ import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.ExecutionState
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.HomeTabPersistentState
 import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.ui.settings.SettingsModel
@@ -71,6 +73,13 @@ class DesktopHomeScreenModel(
         val settings: SettingsModel by inject()
         settings.appSettings.map { settings ->
             settings.playbackSettings.soundbanksSettings.soundbanks.map { PlatformFile(File(it)) }
+        }
+    }
+
+    override val backgroundWarning: Flow<BackgroundWarning?> = run {
+        val settings: SettingsModel by inject()
+        settings.appSettings.map { appSettings ->
+            computeBackgroundWarning(appSettings.backgroundSettings)
         }
     }
 
