@@ -133,6 +133,7 @@ import org.wysko.midis2jam2.util.FilesDragAndDrop
 import org.wysko.midis2jam2.util.digitsOnly
 import org.wysko.midis2jam2.util.isMacOs
 import org.wysko.midis2jam2.util.tintEnabled
+import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -202,7 +203,7 @@ internal actual fun LazyListScope.SettingsScreenContent(
         val bgWarning = when {
             bg.type != BackgroundType.CubeMap -> null
             bg.cubeMapTextures.any { it.isBlank() } -> BackgroundWarning.UNASSIGNED
-            bg.cubeMapTextures.any { !File(it).exists() } -> BackgroundWarning.MISSING
+            bg.cubeMapTextures.any { it.isNotBlank() && !File(BACKGROUND_IMAGES_FOLDER, it).exists() } -> BackgroundWarning.MISSING
             else -> null
         }
         BackgroundSelect(settings, model, bgWarning)

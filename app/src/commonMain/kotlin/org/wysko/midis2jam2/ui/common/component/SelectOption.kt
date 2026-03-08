@@ -32,9 +32,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
@@ -65,6 +67,7 @@ data class SelectOption<T>(
     val title: String,
     val label: String? = null,
     val icon: DrawableResource? = null,
+    val isError: Boolean = false,
 )
 
 @Composable
@@ -207,12 +210,13 @@ fun <T> SelectRow(
                 isShowBottomSheet = true
             },
     ) {
+        val foundOption = options.find { it.value == option }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
             Icon(
-                painterResource(icon ?: options.find { it.value == option }?.icon ?: Res.drawable.android),
+                painterResource(icon ?: foundOption?.icon ?: Res.drawable.android),
                 null,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -222,18 +226,22 @@ fun <T> SelectRow(
                 ProvideTextStyle(MaterialTheme.typography.labelLarge) {
                     title()
                 }
+                val errorColor = MaterialTheme.colorScheme.error
                 ProvideTextStyle(
-                    MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    MaterialTheme.typography.labelSmall.copy(
+                        color = if (foundOption?.isError == true) errorColor
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 ) {
                     if (label != null) {
                         label.invoke()
                     } else {
-                        options.find { it.value == option }?.let { option ->
-                            description?.let { description ->
-                                Text("$description ∙ ${option.title}")
-                            } ?: run {
-                                Text(option.title)
-                            }
+                        foundOption?.let { opt ->
+                            val text = description?.let { "$it ∙ ${opt.title}" } ?: opt.title
+                            Text(
+                                text,
+                                textDecoration = if (opt.isError) TextDecoration.LineThrough else null,
+                            )
                         }
                     }
                 }
@@ -259,28 +267,40 @@ fun <T> SelectRow(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 LazyColumn {
-                    items(options) {
+                    items(options) { opt ->
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    onOptionSelected?.invoke(it.value)
+                                    onOptionSelected?.invoke(opt.value)
                                     scope.launch {
                                         sheetState.hide()
                                         isShowBottomSheet = false
                                     }
                                 },
                         ) {
+                            val itemColor = if (opt.isError) MaterialTheme.colorScheme.error else Color.Unspecified
                             Row(
                                 modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                it.icon?.let { resource -> Icon(painterResource(resource), null) }
+                                opt.icon?.let { resource ->
+                                    Icon(
+                                        painterResource(resource),
+                                        null,
+                                        tint = if (opt.isError) MaterialTheme.colorScheme.error
+                                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                                 Column {
-                                    Text(it.title)
+                                    Text(
+                                        opt.title,
+                                        color = itemColor,
+                                        textDecoration = if (opt.isError) TextDecoration.LineThrough else null,
+                                    )
                                     ProvideTextStyle(MaterialTheme.typography.labelMedium) {
-                                        it.label?.let { label -> Text(label) }
+                                        opt.label?.let { label -> Text(label, color = itemColor) }
                                     }
                                 }
                             }

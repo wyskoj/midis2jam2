@@ -40,6 +40,7 @@ import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 import org.wysko.midis2jam2.ui.settings.SettingsModel
 import java.io.File
 
@@ -82,7 +83,7 @@ class DesktopHomeScreenModel(
             val bg = appSettings.backgroundSettings
             if (bg.type != BackgroundType.CubeMap) return@map null
             if (bg.cubeMapTextures.any { it.isBlank() }) return@map BackgroundWarning.UNASSIGNED
-            if (bg.cubeMapTextures.any { !File(it).exists() }) return@map BackgroundWarning.MISSING
+            if (bg.cubeMapTextures.any { it.isNotBlank() && !File(BACKGROUND_IMAGES_FOLDER, it).exists() }) return@map BackgroundWarning.MISSING
             null
         }
     }

@@ -113,6 +113,8 @@
     <string name="settings_background_type_color_description">Use a solid color</string>
     <string name="settings_background_texture_no_options_hint">No textures available.</string>
     <string name="settings_background_texture_open_folder">Open textures folder</string>
+    <string name="settings_background_texture_none">None</string>
+    <string name="settings_background_texture_file_not_found">File not found</string>
     <string name="settings_background_missing_textures_repeated">Background texture is not set</string>
     <string name="settings_background_missing_textures_unique">One or more background textures are not set</string>
 
