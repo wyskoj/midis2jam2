@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.piano
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import kotlin.time.Duration
@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param rangeHigh The highest note that this instrument can play.
  */
 abstract class KeyedInstrument(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>,
     val rangeLow: Byte,
     val rangeHigh: Byte,

@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
@@ -27,13 +27,14 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
 import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Normal
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
  * The Pan Flute.
  */
-class PanFlute(context: Midis2jam2, eventList: List<MidiEvent>, skin: PipeSkin) :
+class PanFlute(context: PerformanceManager, eventList: List<MidiEvent>, skin: PipeSkin) :
     DivisiveSustainedInstrument(context, eventList) {
 
     override val animators: List<PitchClassAnimator> = List(12) { index ->

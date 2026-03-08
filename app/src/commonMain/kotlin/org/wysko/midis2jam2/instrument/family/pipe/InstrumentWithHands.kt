@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.Clone
@@ -27,7 +27,7 @@ import kotlin.time.Duration
 /** Any instrument that animates using hands. */
 abstract class InstrumentWithHands
 protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>,
     clazz: KClass<out Clone>,
     manager: HandPositionFingeringManager

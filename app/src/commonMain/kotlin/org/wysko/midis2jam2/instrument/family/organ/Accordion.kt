@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.organ
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color
@@ -29,6 +29,7 @@ import org.wysko.midis2jam2.instrument.family.piano.KeyConfiguration
 import org.wysko.midis2jam2.instrument.family.piano.KeyboardConfiguration
 import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -53,7 +54,7 @@ private const val MAX_SQUEEZING_SPEED = 2.0
  * @param eventList The list of MIDI events.
  * @param type The type of accordion.
  */
-class Accordion(context: Midis2jam2, eventList: List<MidiEvent>, type: Type) :
+class Accordion(context: PerformanceManager, eventList: List<MidiEvent>, type: Type) :
     KeyedInstrument(context, eventList, 0, 23), MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 30, 0)
     override val keys: Array<Key> = let {
@@ -74,8 +75,8 @@ class Accordion(context: Midis2jam2, eventList: List<MidiEvent>, type: Type) :
         accordionSections.first().run {
             +context.modelD("AccordionLeftHand.obj", type.textureCaseName).also {
                 it as Node
-                it.children[1].material = context.diffuseMaterial("LeatherStrap.bmp")
-                it.children[2].material = context.diffuseMaterial("RubberFoot.bmp")
+                it.children[1].material = context.assetLoader.diffuseMaterial("LeatherStrap.bmp")
+                it.children[2].material = context.assetLoader.diffuseMaterial("RubberFoot.bmp")
             }
         }
 

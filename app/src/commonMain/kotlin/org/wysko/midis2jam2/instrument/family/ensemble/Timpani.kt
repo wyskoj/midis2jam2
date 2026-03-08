@@ -18,11 +18,12 @@ package org.wysko.midis2jam2.instrument.family.ensemble
 
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
 import org.wysko.midis2jam2.instrument.family.percussive.modulus
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
@@ -30,7 +31,7 @@ import kotlin.time.Duration
 /**
  * The Timpani.
  */
-class Timpani(context: Midis2jam2, eventList: List<MidiEvent>) : OneDrumOctave(context, eventList) {
+class Timpani(context: PerformanceManager, eventList: List<MidiEvent>) : OneDrumOctave(context, eventList) {
 
     override fun adjustForMultipleInstances(delta: Duration) {
         root.rot = v3(0f, -27 + updateInstrumentIndex(delta) * -18, 0f)
@@ -51,7 +52,7 @@ class Timpani(context: Midis2jam2, eventList: List<MidiEvent>) : OneDrumOctave(c
     init {
         with(recoilNode) {
             +context.modelR("TimpaniBody.obj", "HornSkin.bmp").apply {
-                (this as Node)[0].material = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
+                (this as Node)[0].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
             }
             +context.modelD("TimpaniHead.obj", "TimpaniSkin.bmp")
         }

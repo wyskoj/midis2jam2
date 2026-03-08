@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.loc
@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Cowbell. */
-class Cowbell(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
+class Cowbell(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val stick = Striker(context, hits, StickType.DRUM_SET_STICK).apply {
         setParent(recoilNode)
         offsetStick { it.move(0f, 0f, -2f) }

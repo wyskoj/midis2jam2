@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.reed.sax
 
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
@@ -30,7 +30,7 @@ private val OFFSET_DIRECTION_VECTOR = Vector3f(0f, 40f, 0f)
 /** Shared code for Saxophones. */
 abstract class Saxophone
 protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>,
     cloneClass: KClass<out SaxophoneClone>,
     fingeringManager: PressedKeysFingeringManager

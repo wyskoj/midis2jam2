@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
@@ -36,7 +36,7 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of stage horns to use.
  */
-class StageHorns(context: Midis2jam2, eventList: List<MidiEvent>, type: StageHornsType) :
+class StageHorns(context: PerformanceManager, eventList: List<MidiEvent>, type: StageHornsType) :
     DivisiveSustainedInstrument(context, eventList) {
 
     override val animators: List<PitchClassAnimator> = List(12) {

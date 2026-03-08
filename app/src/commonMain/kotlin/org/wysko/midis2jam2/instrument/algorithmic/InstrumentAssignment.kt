@@ -23,7 +23,7 @@ import org.wysko.kmidi.midi.event.ControlChangeEvent
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaserType
@@ -111,9 +111,9 @@ object InstrumentAssignment {
      * Given a [midiFile], determines the appropriate instruments to properly visualize the events within.
      */
     fun assign(
-        context: Midis2jam2,
+        context: PerformanceManager,
         midiFile: TimeBasedSequence,
-        onLoadingProgress: (Float) -> Unit,
+        onLoadingProgress: (Float) -> Unit = {},
     ): List<Instrument> {
         // Begin by extracting events from tracks and assign them to their target channels.
         val channels =
@@ -205,7 +205,7 @@ object InstrumentAssignment {
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun buildInstrument(
-        context: Midis2jam2,
+        context: PerformanceManager,
         program: Byte,
         events: MutableList<MidiEvent>,
         allChannelEvents: List<MidiEvent>,
@@ -425,7 +425,7 @@ object InstrumentAssignment {
     }
 
     private fun buildSpecialCases(
-        context: Midis2jam2,
+        context: PerformanceManager,
         program: Int,
         events: MutableList<MidiEvent>,
     ): List<Instrument> {
@@ -463,7 +463,7 @@ object InstrumentAssignment {
     }
 
     private fun buildDrumSet(
-        context: Midis2jam2,
+        context: PerformanceManager,
         program: Int,
         events: MutableList<MidiEvent>,
     ): DrumSet? = if (events.hits().isNotEmpty()) {

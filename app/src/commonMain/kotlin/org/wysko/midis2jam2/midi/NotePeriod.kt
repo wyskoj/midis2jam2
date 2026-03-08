@@ -20,7 +20,7 @@ import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.analysis.Polyphony
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -92,7 +92,7 @@ fun improvedContiguousGroupDetection(notePeriods: List<TimedArc>): List<TimedArc
  * @param modulus The index of the pitch class in the list `A, A#, B, ..., G#` (0-indexed).
  * @return The note-periods based on the given context and modulus.
  */
-fun List<MidiEvent>.notePeriodsModulus(context: Midis2jam2, modulus: Int): List<TimedArc> =
+fun List<MidiEvent>.notePeriodsModulus(context: PerformanceManager, modulus: Int): List<TimedArc> =
     TimedArc.fromNoteEvents(
         context.sequence,
         filterIsInstance<NoteEvent>().filter { (it.note + 3) % 12 == modulus }

@@ -32,12 +32,11 @@ class ErrorLogService {
 
     val unreadCount = _mapIsRead.map { map -> map.values.count { !it } }
 
-    fun addError(message: String, throwable: Throwable? = null) {
-        val newEntry = ErrorLogEntry(System.currentTimeMillis(), message, throwable)
+    fun addError(message: String, stackTrace: String) {
+        val newEntry = ErrorLogEntry(System.currentTimeMillis(), message, stackTrace)
         _errors.value += newEntry
         _mapIsRead.value += (newEntry to false)
     }
-
 
     fun removeError(entry: ErrorLogEntry) {
         _errors.value -= entry
@@ -57,5 +56,5 @@ class ErrorLogService {
 class ErrorLogEntry(
     val timestamp: Long,
     val message: String,
-    val throwable: Throwable? = null,
+    val stackTrace: String,
 )

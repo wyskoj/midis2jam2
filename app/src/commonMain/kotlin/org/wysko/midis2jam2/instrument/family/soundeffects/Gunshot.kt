@@ -22,7 +22,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
@@ -40,7 +40,7 @@ import kotlin.time.DurationUnit
  * @param context Context to the main class.
  * @param events List of MIDI events.
  */
-class Gunshot(context: Midis2jam2, events: List<MidiEvent>) : DecayedInstrument(context, events),
+class Gunshot(context: PerformanceManager, events: List<MidiEvent>) : DecayedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 15, 0)
@@ -97,7 +97,7 @@ class Gunshot(context: Midis2jam2, events: List<MidiEvent>) : DecayedInstrument(
     }
 }
 
-private class CasingGenerator(private val context: Midis2jam2) : ParticleGenerator {
+private class CasingGenerator(private val context: PerformanceManager) : ParticleGenerator {
 
     private val activeCasings: MutableList<Spatial> = mutableListOf()
     private val pool: MutableList<Spatial> = mutableListOf()

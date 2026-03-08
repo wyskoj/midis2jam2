@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument
 
 import org.wysko.kmidi.midi.TimedArc
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.v3
 import kotlin.math.PI
@@ -39,7 +39,7 @@ private const val RISE_HEIGHT = 9.5
  * @param context The context to the main class.
  * @param arcs The list of notes to animate.
  */
-open class RisingPitchClassAnimator(context: Midis2jam2, arcs: List<TimedArc>) :
+open class RisingPitchClassAnimator(context: PerformanceManager, arcs: List<TimedArc>) :
     PitchClassAnimator(context, arcs) {
 
     override fun tick(time: Duration, delta: Duration) {

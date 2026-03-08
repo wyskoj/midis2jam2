@@ -39,6 +39,9 @@ fun openHelpOnF1(systemInteractionService: SystemInteractionService): (KeyEvent)
     }
 }
 
+
+fun isMacOs(): Boolean = System.getProperty("os.name").lowercase().contains("mac")
+
 class FileDragAndDrop(val onFileDropped: (File) -> Unit) : DragAndDropTarget {
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onDrop(event: DragAndDropEvent): Boolean {

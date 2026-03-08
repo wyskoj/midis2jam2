@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
 import kotlin.time.Duration
@@ -30,12 +30,12 @@ import kotlin.time.Duration
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  */
-abstract class SustainedInstrument(context: Midis2jam2, events: List<MidiEvent>) : Instrument(context) {
+abstract class SustainedInstrument(context: PerformanceManager, events: List<MidiEvent>) : Instrument(context) {
 
     /**
      * The list of all note periods that this instrument should play.
      */
-    protected val timedArcs: MutableList<TimedArc> =
+    val timedArcs: MutableList<TimedArc> =
         TimedArc.fromNoteEvents(context.sequence, events.filterIsInstance<NoteEvent>()).toMutableList()
 
     /**
@@ -50,7 +50,7 @@ abstract class SustainedInstrument(context: Midis2jam2, events: List<MidiEvent>)
         adjustForMultipleInstances(delta)
     }
 
-    override fun calculateVisibility(time: Duration, future: Boolean): Boolean =
+    override fun calculateVisibility(time: Duration): Boolean =
         Visibility.standardRules(collector, time).also {
             if (!isVisible && it) onEntry()
             if (isVisible && !it) onExit()

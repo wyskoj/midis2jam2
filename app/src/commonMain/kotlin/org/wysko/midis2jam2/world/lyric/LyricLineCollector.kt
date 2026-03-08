@@ -17,15 +17,16 @@
 
 package org.wysko.midis2jam2.world.lyric
 
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Collector
+import org.wysko.midis2jam2.manager.CollectorsManager.Companion.registerCollector
 import kotlin.time.Duration
 
 /**
  * Periodically collects elapsed events from a pool of events.
  */
 class LyricLineCollector(
-    private val context: Midis2jam2,
+    private val context: PerformanceManager,
     private val lines: List<LyricLine>,
     private val triggerCondition: (LyricLine, Duration) -> Boolean =
         { event, time -> context.sequence.getTimeOf(event.minBy { it.tick }) <= time },

@@ -29,14 +29,14 @@ import midis2jam2.app.generated.resources.build_timestamp
 import midis2jam2.app.generated.resources.build_version
 import midis2jam2.app.generated.resources.build_version_code
 import org.jetbrains.compose.resources.getString
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.wrap
 
 internal expect fun getGlRendererInfo(): String
 
 internal expect fun getOperatingSystemInfo(): String
 
-class DebugTextEngine(private val context: Midis2jam2) {
+class DebugTextEngine(private val context: PerformanceManager) {
     private val scope = CoroutineScope(Dispatchers.Default)
 
     private val buildInfo = scope.async {

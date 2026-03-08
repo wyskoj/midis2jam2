@@ -20,7 +20,7 @@ import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
@@ -30,7 +30,7 @@ import kotlin.time.Duration
  *
  * It animates very similarly to [HandClap].
  */
-class Slap(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
+class Slap(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val leftSlap =
         Striker(
             context = context,

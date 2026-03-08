@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUM_SET_STICK
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
@@ -30,7 +30,7 @@ import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Snare drum. */
-class SnareDrum(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, style: ShellStyle) :
+class SnareDrum(context: PerformanceManager, hits: List<NoteEvent.NoteOn>, style: ShellStyle) :
     DrumSetInstrument(context, hits) {
     private val regularStick =
         Striker(

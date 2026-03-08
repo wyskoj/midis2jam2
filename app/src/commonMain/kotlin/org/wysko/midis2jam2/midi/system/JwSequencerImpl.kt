@@ -23,12 +23,18 @@ import org.wysko.kmidi.midi.event.ControlChangeEvent
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.kmidi.midi.event.SysexEvent
 import org.wysko.kmidi.midi.event.PitchWheelChangeEvent
 import org.wysko.kmidi.midi.event.PolyphonicKeyPressureEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
+import java.util.concurrent.Executors
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTimedValue
 
 class JwSequencerImpl : JwSequencer {
+    private val threadPool = Executors.newCachedThreadPool()
+
     override var sequence: TimeBasedSequence? = null
         set(value) {
             check(isOpen) { "Sequencer is not open." }
@@ -62,18 +68,18 @@ class JwSequencerImpl : JwSequencer {
         get() = _isOpen
 
     override fun open(device: MidiDevice) {
-        check(!isOpen) { "Sequencer is already open" }
+        if (isOpen) return
         this.device = device.also { it.open() }
         _isOpen = true
     }
 
     override fun close() {
-        check(isOpen) { "Sequencer is not open" }
+        if (!isOpen) return
         if (isRunning) stop()
-        Thread {
+        threadPool.execute {
             this@JwSequencerImpl.device?.close()
             this.device = null
-        }.start()
+        }
         _isOpen = false
     }
 
@@ -83,7 +89,7 @@ class JwSequencerImpl : JwSequencer {
 
         _isRunning = true
         pump!!.checkpoint(null)
-        job = object : Thread() {
+        job = object : Thread("JwSequencerPumpingStation") {
             init {
                 priority = MAX_PRIORITY
             }
@@ -101,18 +107,20 @@ class JwSequencerImpl : JwSequencer {
     }
 
     override fun stop() {
-        check(isOpen) { "Sequencer is open" }
-        if (!isRunning) return
+        if (!isOpen || !isRunning) return
 
         _isRunning = false
         job!!.join()
         pump!!.sendAllNotesOff()
     }
 
-    override fun setPosition(position: Duration) {
-        check(isOpen) { "Sequencer is not open" }
-        check(sequence != null) { "Sequence is not set" }
-        pump!!.setPosition(position.inWholeMilliseconds)
+    override fun setPosition(position: Duration, start: Boolean, onFinish: () -> Unit) {
+        threadPool.execute {
+            check(isOpen) { "Sequencer is not open" }
+            check(sequence != null) { "Sequence is not set" }
+            pump!!.setPosition(position.inWholeMilliseconds, start)
+            onFinish()
+        }
     }
 
     override fun resetDevice() {
@@ -120,13 +128,16 @@ class JwSequencerImpl : JwSequencer {
     }
 
     override fun sendData(data: ByteArray) {
-        device?.sendSysex(data)
+        device?.sendData(data)
     }
+
+    val position: Duration
+        get() = (pump?.localCurrentTime?.div(1000.0))?.seconds ?: Duration.ZERO
 
     inner class DataPump(private val sequence: TimeBasedSequence) {
         private var globalCheckpoint = 0L
         private var localCheckpoint = 0L
-        private var localCurrentTime = 0L
+        internal var localCurrentTime = 0L
         private var eventIndex = 0
 
         internal fun pump() {
@@ -145,10 +156,14 @@ class JwSequencerImpl : JwSequencer {
             }
         }
 
-        internal fun setPosition(time: Long) {
-            val wasRunning = isRunning
+        internal fun setPosition(time: Long, start: Boolean) {
+            val wasRunning = isRunning || start
             if (wasRunning) stop()
-            chaseEvents(time)
+
+            when (time) {
+                0L -> eventIndex = 0
+                else -> chaseEvents(time)
+            }
             checkpoint(time)
             if (wasRunning) start()
         }
@@ -265,6 +280,9 @@ class JwSequencerImpl : JwSequencer {
                         event.program.toInt()
                     )
                 }
+            }
+            if (event is SysexEvent) {
+                sendData(event.data)
             }
         }
     }

@@ -184,4 +184,8 @@
     <string name="log_copied_to_clipboard">Copié dans le presse-papiers</string>
     <string name="log_copy_to_clipboard">Copier dans le presse-papiers</string>
     <string name="log_clear">Effacer</string>
+    <!-- Paramètres / Caméra / Champ de vision -->
+    <string name="settings_camera_field_of_view_title">Champ de vision</string>
+    <string name="settings_camera_field_of_view_label_prefix">Modifier la largeur de la vision de la caméra</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d degrés</string>
 </resources>

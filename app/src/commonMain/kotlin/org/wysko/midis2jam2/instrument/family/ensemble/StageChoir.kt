@@ -21,7 +21,7 @@ import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Off
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
@@ -29,6 +29,7 @@ import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.util.*
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.math.exp
 import kotlin.math.pow
@@ -43,7 +44,7 @@ private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
  * @param eventList The list of all events that this instrument should be aware of.
  * @param type The type of choir peep.
  */
-class StageChoir(context: Midis2jam2, eventList: List<MidiEvent>, type: ChoirType) :
+class StageChoir(context: PerformanceManager, eventList: List<MidiEvent>, type: ChoirType) :
     DivisiveSustainedInstrument(context, eventList) {
 
     private val pitchBendModulationController = PitchBendModulationController(context, eventList)
@@ -114,7 +115,7 @@ class StageChoir(context: Midis2jam2, eventList: List<MidiEvent>, type: ChoirTyp
     inner class ChoirPeepHalo(notePeriods: List<TimedArc>) : ChoirPeep(ChoirType.HaloSynth, notePeriods) {
         private val halo = with(geometry) {
             +context.modelD("StageChoirHalo.obj", "ChoirHalo.png").also {
-                it.material = context.diffuseMaterial("ChoirHalo.png")
+                it.material = context.assetLoader.diffuseMaterial("ChoirHalo.png")
                 it.shadowMode = Off
             }
         }

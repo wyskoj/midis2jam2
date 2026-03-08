@@ -21,7 +21,7 @@ import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUM_SET_STICK
@@ -44,7 +44,7 @@ private const val DAMPENING = 1.5f
  * @param context The context to the main class.
  * @param eventList The list of MIDI events to play.
  */
-class ReverseCymbal(context: Midis2jam2, eventList: List<MidiEvent>) : SustainedInstrument(context, eventList),
+class ReverseCymbal(context: PerformanceManager, eventList: List<MidiEvent>) : SustainedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 20, 0)
     private val cymbal = context.modelR("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp")

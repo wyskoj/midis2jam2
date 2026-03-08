@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
@@ -34,7 +34,7 @@ import kotlin.time.Duration
 
 /** The Surdo. */
 class Surdo(
-    context: Midis2jam2,
+    context: PerformanceManager,
     muteHits: MutableList<NoteEvent.NoteOn>,
     openHits: MutableList<NoteEvent.NoteOn>,
 ) : AuxiliaryPercussion(context, (muteHits + openHits).sortedBy { it.tick }.toMutableList()) {
@@ -44,7 +44,7 @@ class Surdo(
     private val stick =
         Striker(
             context = context,
-            strikeEvents = hits,
+            strikeEvents = _hits,
             stickModel = StickType.DRUM_SET_STICK,
         ).apply {
             setParent(recoilNode)

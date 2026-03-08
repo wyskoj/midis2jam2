@@ -33,7 +33,7 @@ import java.io.IOException
 /**
  * Represents the list of file extensions for MIDI files.
  */
-val MIDI_FILE_EXTENSIONS: List<String> = listOf("mid", "midi", "kar")
+val MIDI_FILE_EXTENSIONS: List<String> = listOf("mid", "midi", "kar", "smf")
 
 /**
  * A class to perform MIDI file searching and indexing operations.

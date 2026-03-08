@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussive
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
@@ -27,7 +27,7 @@ import kotlin.time.Duration
  * The melodic woodblocks.
  */
 class Woodblocks(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>
 ) : TwelveDrumOctave(context, eventList, 20f) {
 

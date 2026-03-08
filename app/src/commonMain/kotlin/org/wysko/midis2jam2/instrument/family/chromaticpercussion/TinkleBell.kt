@@ -23,13 +23,14 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
@@ -57,12 +58,12 @@ import kotlin.time.Duration
  * @param events The list of all events that this instrument should be aware of.
  */
 class TinkleBell(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>
 ) : DecayedInstrument(context, events), MultipleInstancesLinearAdjustment {
 
     override val multipleInstancesDirection: Vector3f = v3(0, 20, 0)
-    private val hitsByNote = List(12) { idx -> hits.filter { (it.note + 3) % 12 == idx } }
+    private val hitsByNote = List(12) { idx -> _hits.filter { (it.note + 3) % 12 == idx } }
     private val bells: List<Bell> = List(12) { Bell(it, hitsByNote[it]) }
 
     init {
@@ -100,7 +101,7 @@ class TinkleBell(
         private val outerBell = with(root) {
             +context.modelR("TinkleBell.obj", "HornSkin.bmp").apply {
                 loc = v3(0, -10, 0)
-                ((this as Node).children[0] as Geometry).material = context.diffuseMaterial("Wood.bmp")
+                ((this as Node).children[0] as Geometry).material = context.assetLoader.diffuseMaterial("Wood.bmp")
             }
         }
 

@@ -1,0 +1,581 @@
+- instrument: null
+  angle:
+    location:
+      x: -2
+      y: 92
+      z: 134
+    lookAt:
+      x: -2
+      y: 52
+      z: 14
+  default: true
+- instrument: null
+  angle:
+    location:
+      x: 60
+      y: 92
+      z: 124
+    lookAt:
+      x: 10
+      y: 52
+      z: 14
+- instrument: null
+  angle:
+    location:
+      x: -59.5
+      y: 90.8
+      z: 94.4
+    lookAt:
+      x: -20
+      y: 52
+      z: 14
+- instrument: 'org.wysko.midis2jam2.instrument.family.guitar.BassGuitar'
+  angle:
+    location:
+      x: 0.2
+      y: 81.1
+      z: 32.2
+    lookAt:
+      x: 51.5
+      y: 54.5
+      z: -16.5
+- instrument: 'org.wysko.midis2jam2.instrument.family.guitar.Guitar'
+  angle:
+    location:
+      x: 17
+      y: 30.5
+      z: 42.9
+    lookAt:
+      x: 47
+      y: 35
+      z: 7
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet'
+  angle:
+    location:
+      x: -0.2
+      y: 61.6
+      z: 38.6
+    lookAt:
+      x: 0
+      y: 37
+      z: -51
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet'
+  angle:
+    location:
+      x: -19.6
+      y: 78.7
+      z: 3.8
+    lookAt:
+      x: 5
+      y: 32
+      z: -81
+- instrument: 'org.wysko.midis2jam2.instrument.family.piano.Keyboard'
+  angle:
+    location:
+      x: -32.76
+      y: 59.79
+      z: 38.55
+    lookAt:
+      x: -50
+      y: 32
+      z: -6
+- instrument: 'org.wysko.midis2jam2.instrument.family.piano.Keyboard'
+  angle:
+    location:
+      x: -35
+      y: 76.4
+      z: 33.6
+    lookAt:
+      x: -50
+      y: 32
+      z: -6
+- instrument: 'org.wysko.midis2jam2.instrument.family.reed.sax.SopranoSax'
+  angle:
+    location:
+      x: 18.91
+      y: 40.76
+      z: -11.1
+    lookAt:
+      x: -7
+      y: 22
+      z: -51
+- instrument: 'org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax'
+  angle:
+    location:
+      x: 0.14
+      y: 51.05
+      z: -18.93
+    lookAt:
+      x: -32
+      y: 46.5
+      z: -50
+- instrument: 'org.wysko.midis2jam2.instrument.family.reed.sax.TenorSax'
+  angle:
+    location:
+      x: -1.57
+      y: 44.77
+      z: 43.48
+    lookAt:
+      x: 0
+      y: 40
+      z: 30
+- instrument: 'org.wysko.midis2jam2.instrument.family.reed.sax.BaritoneSax'
+  angle:
+    location:
+      x: 18.66
+      y: 58.02
+      z: 37.77
+    lookAt:
+      x: 0
+      y: 50
+      z: 30
+- instrument: 'org.wysko.midis2jam2.instrument.family.chromaticpercussion.Mallets'
+  angle:
+    location:
+      x: -13.29
+      y: 53.3
+      z: 86.9
+    lookAt:
+      x: 0
+      y: 50
+      z: 70
+- instrument: 'org.wysko.midis2jam2.instrument.family.chromaticpercussion.MusicBox'
+  angle:
+    location:
+      x: 20.54
+      y: 15.92
+      z: 27.5
+    lookAt:
+      x: 20
+      y: 15
+      z: 10
+- instrument: 'org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing'
+  angle:
+    location:
+      x: -10.25
+      y: 14.42
+      z: -30.2
+    lookAt:
+      x: -10
+      y: 14
+      z: -45
+- instrument: 'org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser'
+  angle:
+    location:
+      x: -32.91
+      y: 1.4
+      z: 4.15
+    lookAt:
+      x: -30
+      y: 1
+      z: -10
+- instrument: 'org.wysko.midis2jam2.instrument.family.strings.AcousticBass'
+  angle:
+    location:
+      x: -35.41
+      y: 76.72
+      z: -13.02
+    lookAt:
+      x: -35
+      y: 70
+      z: -30
+- instrument: 'org.wysko.midis2jam2.instrument.family.strings.Violin'
+  angle:
+    location:
+      x: 6.86
+      y: 67.31
+      z: 24.77
+    lookAt:
+      x: 5
+      y: 60
+      z: 10
+- instrument: 'org.wysko.midis2jam2.instrument.family.strings.Viola'
+  angle:
+    location:
+      x: -10.58
+      y: 39.79
+      z: 17.41
+    lookAt:
+      x: -10
+      y: 35
+      z: 5
+- instrument: 'org.wysko.midis2jam2.instrument.family.strings.Cello'
+  angle:
+    location:
+      x: -49.57
+      y: 62.85
+      z: 10.76
+    lookAt:
+      x: -50
+      y: 55
+      z: -5
+- instrument: 'org.wysko.midis2jam2.instrument.family.strings.Harp'
+  angle:
+    location:
+      x: -70.15
+      y: 78.19
+      z: 33.63
+    lookAt:
+      x: -70
+      y: 70
+      z: 20
+- instrument: 'org.wysko.midis2jam2.instrument.family.ensemble.StageChoir'
+  angle:
+    location:
+      x: 28.63
+      y: 74.08
+      z: -7.62
+    lookAt:
+      x: 30
+      y: 70
+      z: -20
+- instrument: 'org.wysko.midis2jam2.instrument.family.chromaticpercussion.TubularBells'
+  angle:
+    location:
+      x: -57.1
+      y: 95.29
+      z: -52.64
+    lookAt:
+      x: -57
+      y: 90
+      z: -65
+- instrument: 'org.wysko.midis2jam2.instrument.family.ensemble.StageStrings'
+  angle:
+    location:
+      x: -76.3
+      y: 76
+      z: -57.11
+    lookAt:
+      x: -75
+      y: 70
+      z: -70
+- instrument: 'org.wysko.midis2jam2.instrument.family.ensemble.StageStrings'
+  angle:
+    location:
+      x: -68.73
+      y: 81.6
+      z: -51.7
+    lookAt:
+      x: -65
+      y: 75
+      z: -65
+- instrument: 'org.wysko.midis2jam2.instrument.family.ensemble.StageStrings'
+  angle:
+    location:
+      x: -34.77
+      y: 87.41
+      z: -13.06
+    lookAt:
+      x: -30
+      y: 80
+      z: -25
+- instrument: 'org.wysko.midis2jam2.instrument.family.brass.StageHorns'
+  angle:
+    location:
+      x: -52.16
+      y: 67.44
+      z: -51.44
+    lookAt:
+      x: -50
+      y: 60
+      z: -65
+- instrument: 'org.wysko.midis2jam2.instrument.family.ensemble.PizzicatoStrings'
+  angle:
+    location:
+      x: -68.83
+      y: 56.76
+      z: -52.56
+    lookAt:
+      x: -65
+      y: 50
+      z: -65
+- instrument: 'org.wysko.midis2jam2.instrument.family.organ.Accordion'
+  angle:
+    location:
+      x: -55.93
+      y: 44.35
+      z: -16.56
+    lookAt:
+      x: -55
+      y: 40
+      z: -30
+- instrument: 'org.wysko.midis2jam2.instrument.family.guitar.Banjo'
+  angle:
+    location:
+      x: 32.83
+      y: 62.14
+      z: 46.33
+    lookAt:
+      x: 35
+      y: 55
+      z: 35
+- instrument: 'org.wysko.midis2jam2.instrument.family.guitar.Shamisen'
+  angle:
+    location:
+      x: 40.64
+      y: 73.55
+      z: 30.32
+    lookAt:
+      x: 42
+      y: 65
+      z: 20
+- instrument: 'org.wysko.midis2jam2.instrument.family.ensemble.Timpani'
+  angle:
+    location:
+      x: 43.85
+      y: 55.59
+      z: -38.73
+    lookAt:
+      x: 45
+      y: 50
+      z: -50
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussive.MelodicTom'
+  angle:
+    location:
+      x: 54.01
+      y: 83.03
+      z: -52.03
+    lookAt:
+      x: 55
+      y: 75
+      z: -65
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussive.SynthDrum'
+  angle:
+    location:
+      x: 10.73
+      y: 103.13
+      z: -78.5
+    lookAt:
+      x: 12
+      y: 95
+      z: -90
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussive.TaikoDrum'
+  angle:
+    location:
+      x: 19.72
+      y: 99.17
+      z: -121.31
+    lookAt:
+      x: 20
+      y: 90
+      z: -135
+- instrument: 'org.wysko.midis2jam2.instrument.family.brass.Trombone'
+  angle:
+    location:
+      x: 28.21
+      y: 86.88
+      z: 41.18
+    lookAt:
+      x: 30
+      y: 80
+      z: 30
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.Flute'
+  angle:
+    location:
+      x: 5.84
+      y: 54.35
+      z: 9.74
+    lookAt:
+      x: 5
+      y: 50
+      z: -5
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.Piccolo'
+  angle:
+    location:
+      x: 5.84
+      y: 60.25
+      z: 9.74
+    lookAt:
+      x: 5
+      y: 55
+      z: -5
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.Recorder'
+  angle:
+    location:
+      x: -4.77
+      y: 48.54
+      z: 9.77
+    lookAt:
+      x: -5
+      y: 45
+      z: -5
+- instrument: 'org.wysko.midis2jam2.instrument.family.organ.Harmonica'
+  angle:
+    location:
+      x: 56.07
+      y: 38.1
+      z: -30.1
+    lookAt:
+      x: 58
+      y: 35
+      z: -45
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.PanFlute'
+  angle:
+    location:
+      x: 58.05
+      y: 37.4
+      z: 0.82
+    lookAt:
+      x: 60
+      y: 35
+      z: -15
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.Whistles'
+  angle:
+    location:
+      x: 58.05
+      y: 37.4
+      z: 0.82
+    lookAt:
+      x: 60
+      y: 35
+      z: -15
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.BlownBottle'
+  angle:
+    location:
+      x: 58.05
+      y: 31.78
+      z: 0.82
+    lookAt:
+      x: 60
+      y: 30
+      z: -15
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussive.Agogos'
+  angle:
+    location:
+      x: 55.97
+      y: 32.62
+      z: 11.38
+    lookAt:
+      x: 58
+      y: 30
+      z: 0
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussive.Woodblocks'
+  angle:
+    location:
+      x: 54.6
+      y: 29.79
+      z: 17.34
+    lookAt:
+      x: 56
+      y: 28
+      z: 5
+- instrument: 'org.wysko.midis2jam2.instrument.family.brass.Tuba'
+  angle:
+    location:
+      x: -75
+      y: 33.61
+      z: 9.4
+    lookAt:
+      x: -75
+      y: 30
+      z: -5
+- instrument: 'org.wysko.midis2jam2.instrument.family.brass.FrenchHorn'
+  angle:
+    location:
+      x: -82.15
+      y: 43.44
+      z: 30.64
+    lookAt:
+      x: -80
+      y: 40
+      z: 20
+- instrument: 'org.wysko.midis2jam2.instrument.family.brass.Trumpet'
+  angle:
+    location:
+      x: -0.17
+      y: 61.5
+      z: 30.3
+    lookAt:
+      x: 0
+      y: 55
+      z: 20
+- instrument: 'org.wysko.midis2jam2.instrument.family.reed.Oboe'
+  angle:
+    location:
+      x: 18.71
+      y: 53.21
+      z: 35.69
+    lookAt:
+      x: 20
+      y: 50
+      z: 25
+- instrument: 'org.wysko.midis2jam2.instrument.family.reed.Clarinet'
+  angle:
+    location:
+      x: -13.75
+      y: 52.54
+      z: 37.02
+    lookAt:
+      x: -15
+      y: 50
+      z: 25
+- instrument: 'org.wysko.midis2jam2.instrument.family.percussive.SteelDrums'
+  angle:
+    location:
+      x: 46.01
+      y: 62.34
+      z: -29.49
+    lookAt:
+      x: 48
+      y: 60
+      z: -40
+- instrument: 'org.wysko.midis2jam2.instrument.family.strings.Fiddle'
+  angle:
+    location:
+      x: -7.67
+      y: 79.05
+      z: 19.95
+    lookAt:
+      x: -10
+      y: 75
+      z: 5
+- instrument: 'org.wysko.midis2jam2.instrument.family.pipe.Ocarina'
+  angle:
+    location:
+      x: 36.71
+      y: 54.71
+      z: 33.44
+    lookAt:
+      x: 38
+      y: 50
+      z: 20
+- instrument: 'org.wysko.midis2jam2.instrument.family.ethnic.BagPipe'
+  angle:
+    location:
+      x: -49.76
+      y: 33.14
+      z: 82.28
+    lookAt:
+      x: -50
+      y: 30
+      z: 70
+- instrument: 'org.wysko.midis2jam2.instrument.family.chromaticpercussion.Kalimba'
+  angle:
+    location:
+      x: 20.02
+      y: 50.83
+      z: 53.3
+    lookAt:
+      x: 22
+      y: 48
+      z: 40
+- instrument: 'org.wysko.midis2jam2.instrument.family.chromaticpercussion.TinkleBell'
+  angle:
+    location:
+      x: 34.14
+      y: 50.83
+      z: 54.31
+    lookAt:
+      x: 36
+      y: 48
+      z: 40
+- instrument: 'org.wysko.midis2jam2.instrument.family.soundeffects.BirdTweet'
+  angle:
+    location:
+      x: 126.65
+      y: 55.19
+      z: -5.28
+    lookAt:
+      x: 125
+      y: 50
+      z: -20

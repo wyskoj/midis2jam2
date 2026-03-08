@@ -19,14 +19,14 @@ package org.wysko.midis2jam2.instrument.family.percussive
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument.Companion.recoilDrum
 import kotlin.time.Duration
 
 /** A drum that is hit at different spots to represent the notes in an octave. */
-abstract class OneDrumOctave protected constructor(context: Midis2jam2, eventList: List<MidiEvent>) : DecayedInstrument(
+abstract class OneDrumOctave protected constructor(context: PerformanceManager, eventList: List<MidiEvent>) : DecayedInstrument(
     context,
     eventList.filterIsInstance<NoteEvent.NoteOn>().toMutableList(),
 ) {

@@ -17,15 +17,29 @@
 
 package org.wysko.midis2jam2.starter.configuration
 
+import kotlinx.serialization.Serializable
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.HomeTabPersistor
+import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
 import kotlin.reflect.KClass
 
 /**
  * The parent of all configuration classes.
  */
-interface Configuration
+@Serializable
+sealed class Configuration {
+    @Serializable
+    data class HomeConfiguration(
+        val lastMidiFileSelectedDirectory: String? = null,
+        val selectedMidiDevice: String = "Gervill",
+        val selectedSoundbank: String? = null,
+        val isLooping: Boolean = false,
+    ) : Configuration()
+
+    @Serializable
+    data class AppSettingsConfiguration(val appSettings: AppSettings = AppSettings()) : Configuration()
+}
 
 /**
  * Returns the first element in the collection that is an instance of the specified type.
@@ -62,14 +76,14 @@ class ConfigurationService(
         val state = homeTabPersistor.load()
         return buildList {
             add(
-                HomeConfiguration(
+                Configuration.HomeConfiguration(
                     selectedMidiDevice = state.midiDevice,
                     selectedSoundbank = state.soundbank,
                     isLooping = homeScreenModel.isLooping.value,
                 )
             )
 
-            add(AppSettingsConfiguration(settingsRepository.appSettings.value))
+            add(Configuration.AppSettingsConfiguration(settingsRepository.appSettings.value))
         }
     }
 }

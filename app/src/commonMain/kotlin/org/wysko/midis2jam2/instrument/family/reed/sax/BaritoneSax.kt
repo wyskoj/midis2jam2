@@ -16,14 +16,15 @@
  */
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
-import com.jme3.material.Material
-import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.blackMaterial
+import org.wysko.midis2jam2.world.model
 
 /** The baritone sax fingering manager. */
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(BaritoneSax::class)
@@ -32,28 +33,24 @@ private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingerin
 private const val STRETCH_FACTOR = 0.65f
 
 /** The baritone sax. */
-class BaritoneSax(context: Midis2jam2, events: List<MidiEvent>) :
+class BaritoneSax(context: PerformanceManager, events: List<MidiEvent>) :
     Saxophone(context, events, BaritoneSaxClone::class, FINGERING_MANAGER) {
 
     /** A single BaritoneSax. */
     inner class BaritoneSaxClone : SaxophoneClone(this@BaritoneSax, STRETCH_FACTOR) {
         init {
-            val shine = context.reflectiveMaterial("Assets/HornSkin.bmp")
+            val shine = context.assetLoader.reflectiveMaterial("Assets/HornSkin.bmp")
 
             with(bell) {
                 move(0f, -10f, 0f)
-                attachChild(context.assetManager.loadModel("Assets/BaritoneSaxHorn.obj"))
+                attachChild(context.model("Assets/BaritoneSaxHorn.obj"))
                 setMaterial(shine)
             }
 
-            context.assetManager.loadModel("Assets/BaritoneSaxBody.obj").apply {
+            context.model("Assets/BaritoneSaxBody.obj").apply {
                 this as Node
-                getChild(0).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                getChild(1).setMaterial(
-                    Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                        setColor("Color", ColorRGBA.Black)
-                    }
-                )
+                getChild(0).setMaterial(context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                getChild(1).setMaterial(context.blackMaterial())
                 getChild(2).setMaterial(shine)
                 geometry.attachChild(this)
             }

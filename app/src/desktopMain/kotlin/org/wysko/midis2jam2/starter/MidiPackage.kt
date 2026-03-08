@@ -28,7 +28,7 @@ import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import java.io.File
 import javax.sound.midi.MidiSystem

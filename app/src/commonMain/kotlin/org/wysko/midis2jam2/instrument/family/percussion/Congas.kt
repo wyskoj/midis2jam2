@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.LOW_CONGA
@@ -41,7 +41,7 @@ import kotlin.time.Duration
  * use the maximum velocity of the two for recoiling animation.
  */
 class Congas(
-    context: Midis2jam2,
+    context: PerformanceManager,
     muteHiHits: MutableList<NoteEvent.NoteOn>,
     openHiHits: MutableList<NoteEvent.NoteOn>,
     lowHits: MutableList<NoteEvent.NoteOn>,

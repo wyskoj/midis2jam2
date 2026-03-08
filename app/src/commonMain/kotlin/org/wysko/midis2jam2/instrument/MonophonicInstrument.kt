@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.FingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.clone.Clone
@@ -43,7 +43,7 @@ import kotlin.time.Duration
  * @see Clone
  */
 abstract class MonophonicInstrument protected constructor(
-    context: Midis2jam2,
+    context: PerformanceManager,
     eventList: List<MidiEvent>,
     cloneClass: KClass<out Clone>,
     val manager: FingeringManager<*>?,

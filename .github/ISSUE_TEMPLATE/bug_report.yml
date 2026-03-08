@@ -1,0 +1,101 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: [bug]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **⚠️ IMPORTANT: BEFORE YOU SUBMIT**
+        - I confirm I have **searched existing issues** and this is not a duplicate
+        - I understand that **incomplete reports will be closed immediately**
+        - I have provided **all required information** including a reproducible case
+        - This is a **bug report**, not a support question (use Discord for help)
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Impact
+      description: How severely does this bug affect your usage?
+      options:
+        - "🚨 Crash"
+        - "⚠️ Major Functionality Broken"
+        - "🐛 Minor Bug / Annoyance"
+        - "💎 Cosmetic Issue"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is. What were you trying to accomplish?
+      placeholder: |
+        When I perform [specific action] with [specific file], I encounter [specific error].
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Software Version
+      description: What version are you using? Find this in the About tab in the app.
+      placeholder: "e.g., 2.0.3 or commit hash"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide EXACT steps to reproduce this issue. We should be able to follow these steps exactly and see the same problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-file
+    attributes:
+      label: Reproduction File
+      description: |
+        **If this bug is file-specific:** Upload a ZIP file containing the MIDI file that reproduces the issue (GitHub doesn't allow direct MIDI uploads).
+        
+        **If this bug is NOT file-specific:** Explain why no file is needed and describe the exact conditions that trigger the bug.
+      placeholder: |
+        Either:
+        Upload the zipped MIDI file to this box, or explain why the issue is not file-specific. The bug occurs when [describe exact conditions].
+    validations:
+      required: true
+
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System information
+      description: Your complete system configuration. Consider uploading a DxDiag report if this is a crash or performance issue.
+      value: |
+        - OS: 
+        - OS Version:
+        - CPU:
+        - GPU:
+        - Any other relevant hardware:
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: Error Logs & Console Output
+      description: Paste any error messages, stack traces, or console output here. Use code blocks.
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification
+      description: Confirm these requirements are met
+      options:
+        - label: I have searched existing issues and this is not a duplicate
+          required: true
+        - label: I have provided exact steps to reproduce this issue
+          required: true
+        - label: I understand that issues missing required information will be closed
+          required: true

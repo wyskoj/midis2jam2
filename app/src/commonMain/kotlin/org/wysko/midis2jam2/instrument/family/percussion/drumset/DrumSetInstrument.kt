@@ -18,14 +18,14 @@
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
 import kotlin.time.Duration
 
 /**
  * An instrument that is part of the drum set.
  */
-open class DrumSetInstrument(context: Midis2jam2, hits: List<NoteEvent.NoteOn>) :
+open class DrumSetInstrument(context: PerformanceManager, hits: List<NoteEvent.NoteOn>) :
     PercussionInstrument(context, hits) {
-    override fun calculateVisibility(time: Duration, future: Boolean): Boolean = true
+    override fun calculateVisibility(time: Duration): Boolean = true
 }

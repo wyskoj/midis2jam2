@@ -22,9 +22,9 @@ import com.jme3.font.BitmapText
 import com.jme3.font.Rectangle
 import com.jme3.math.ColorRGBA
 import org.wysko.kmidi.midi.event.MetaEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.starter.configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
@@ -38,9 +38,9 @@ import kotlin.time.Duration.Companion.seconds
  * @property context The context to the main class.
  * @property events The list of the text events.
  */
-class LyricController(private val context: Midis2jam2, private val events: List<MetaEvent.Lyric>) {
+class LyricController(private val context: PerformanceManager, private val events: List<MetaEvent.Lyric>) {
 
-    private val font = context.assetManager.loadFont("Assets/Fonts/Inter.fnt")
+    private val font = context.app.assetManager.loadFont("Assets/Fonts/Inter.fnt")
 
     private val words = events.filter { !separators.contains(it.text) }
     private val lines = events.partitionByNewLines()
@@ -182,7 +182,7 @@ class LyricController(private val context: Midis2jam2, private val events: List<
 
 private val separators = listOf("\n", "\r", "\r\n")
 
-private fun String.display() = clean().removePrefix("\\").removePrefix("/")
+private fun String.display() = clean().replace("/", "").replace("\\", "").removePrefix("<").replace("^", " ")
 
 private fun String.clean() = when {
     this.trim().startsWith("\"") && this.trim().endsWith("\"") -> this.trim().removeSurrounding("\"")
@@ -202,13 +202,13 @@ private fun List<MetaEvent.Lyric>.partitionByNewLines(): List<LyricLine> {
                 line = mutableListOf()
             }
 
-            item.text.clean().startsWith("/") || item.text.clean().startsWith("\\") -> {
+            item.text.clean().startsWith("/") || item.text.clean().startsWith("\\") || item.text.clean().startsWith("<") -> {
                 if (line.isNotEmpty()) result.add(line)
                 line = mutableListOf()
                 line.add(item)
             }
 
-            item.text.endsWith("\n") || item.text.endsWith("\r") || item.text.endsWith("\r\n") -> {
+            item.text.endsWith("\n") || item.text.endsWith("\r") || item.text.endsWith("\r\n") || item.text.endsWith("/") -> {
                 line.add(item)
                 result.add(line)
                 line = mutableListOf()

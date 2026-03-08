@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
@@ -31,7 +31,7 @@ import kotlin.time.Duration
 private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class)
 
 /** The Recorder. */
-class Recorder(context: Midis2jam2, events: List<MidiEvent>) :
+class Recorder(context: PerformanceManager, events: List<MidiEvent>) :
     InstrumentWithHands(context, events, RecorderClone::class, FINGERING_MANAGER) {
 
     override val pitchBendConfiguration: ClonePitchBendConfiguration = ClonePitchBendConfiguration(reversed = true)

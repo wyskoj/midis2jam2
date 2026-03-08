@@ -37,6 +37,7 @@ object SettingsScreenModel : ScreenModel {
         "tl",
         "tr",
         "uk",
+        "vi",
         "zh",
     )
 }

@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The sticks. */
-class Sticks(context: Midis2jam2, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
+class Sticks(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : AuxiliaryPercussion(context, hits) {
     private val mainStick =
         Striker(
             context = context,

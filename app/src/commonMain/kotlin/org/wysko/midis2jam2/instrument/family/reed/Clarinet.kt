@@ -20,7 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager.Companion.from
@@ -40,7 +40,7 @@ private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::cla
  *
  * [Fingering chart](https://bit.ly/34Quj4e)
  */
-class Clarinet(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Clarinet(context: PerformanceManager, eventList: List<MidiEvent>) :
     InstrumentWithHands(
         context,
         /* Strip notes outside of standard range */

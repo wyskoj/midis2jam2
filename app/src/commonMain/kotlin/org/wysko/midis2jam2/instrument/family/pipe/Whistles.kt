@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.midi.notePeriodsModulus
@@ -35,7 +35,7 @@ import kotlin.time.Duration
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  **/
-class Whistles(context: Midis2jam2, events: List<MidiEvent>) :
+class Whistles(context: PerformanceManager, events: List<MidiEvent>) :
     DivisiveSustainedInstrument(context, events) {
 
     override val animators: List<PitchClassAnimator> = List(12) { Whistle(it, events.notePeriodsModulus(context, it)) }

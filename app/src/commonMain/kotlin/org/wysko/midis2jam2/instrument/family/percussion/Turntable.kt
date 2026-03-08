@@ -18,7 +18,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.Turntable.Position.Companion.opposite
 import org.wysko.midis2jam2.util.*
@@ -29,7 +29,7 @@ import kotlin.time.Duration
  * The Turntable.
  */
 class Turntable(
-    context: Midis2jam2,
+    context: PerformanceManager,
     pushEvents: List<NoteEvent.NoteOn>,
     pullEvents: List<NoteEvent.NoteOn>,
 ) : AuxiliaryPercussion(context, (pushEvents + pullEvents).sortedBy { it.tick }) {

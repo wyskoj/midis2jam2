@@ -22,7 +22,7 @@ import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.VirtualCompositePitchBendEvent
 import org.wysko.kmidi.midi.event.VirtualParameterNumberChangeEvent
 import org.wysko.kmidi.midi.event.VirtualParameterNumberChangeEvent.VirtualModulationDepthRangeChangeEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.NumberSmoother
 import kotlin.math.sin
 import kotlin.time.Duration
@@ -38,7 +38,7 @@ private const val CC_MODULATION_WHEEL = 1.toByte()
  * @param smoothness The smoothness of the pitch bend.
  */
 class PitchBendModulationController(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>,
     smoothness: Double = 10.0,
 ) {

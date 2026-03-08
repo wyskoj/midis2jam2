@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.percussion
 
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.modelD
@@ -32,7 +32,7 @@ import kotlin.time.Duration
  * @param clickHits The hits to be played when the metronome clicks.
  * @param bellHits The hits to be played when the metronome rings.
  */
-class Metronome(context: Midis2jam2, clickHits: List<NoteEvent.NoteOn>, bellHits: List<NoteEvent.NoteOn>) :
+class Metronome(context: PerformanceManager, clickHits: List<NoteEvent.NoteOn>, bellHits: List<NoteEvent.NoteOn>) :
     AuxiliaryPercussion(context, (clickHits + bellHits).sortedBy { it.tick }) {
 
     private val bellStriker = Striker(

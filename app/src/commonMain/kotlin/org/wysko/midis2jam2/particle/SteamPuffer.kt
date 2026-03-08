@@ -22,7 +22,7 @@ import com.jme3.math.Vector3f
 import com.jme3.math.Vector3f.ZERO
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.modelD
@@ -40,7 +40,7 @@ private val LIFE_SPAN = 0.7.seconds
  * Spawns steam particles.
  */
 class SteamPuffer(
-    private val context: Midis2jam2,
+    private val context: PerformanceManager,
     private val type: Texture,
     private val scale: Double,
     private val behavior: Behavior,

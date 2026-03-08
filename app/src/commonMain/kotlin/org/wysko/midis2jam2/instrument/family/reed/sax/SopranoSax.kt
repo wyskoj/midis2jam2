@@ -16,14 +16,15 @@
  */
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
-import com.jme3.material.Material
-import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.blackMaterial
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(SopranoSax::class)
@@ -33,7 +34,7 @@ private const val STRETCH_FACTOR = 2f
  * The Soprano saxophone.
  */
 class SopranoSax(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>
 ) : Saxophone(context, events, SopranoSaxClone::class, FINGERING_MANAGER) {
 
@@ -46,21 +47,17 @@ class SopranoSax(
         }
 
         init {
-            val shine = context.reflectiveMaterial("Assets/HornSkinGrey.bmp")
+            val shine = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
 
             with(bell) {
                 move(0f, -22f, 0f)
-                attachChild(context.assetManager.loadModel("Assets/SopranoSaxHorn.obj"))
+                attachChild(context.model("Assets/SopranoSaxHorn.obj"))
                 setMaterial(shine)
             }
 
-            context.assetManager.loadModel("Assets/SopranoSaxBody.obj").apply {
+            context.model("Assets/SopranoSaxBody.obj").apply {
                 this as Node
-                getChild(0).setMaterial(
-                    Material(context.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                        setColor("Color", ColorRGBA.Black)
-                    }
-                )
+                getChild(0).setMaterial(context.blackMaterial())
                 getChild(1).setMaterial(shine)
                 geometry.attachChild(this)
             }

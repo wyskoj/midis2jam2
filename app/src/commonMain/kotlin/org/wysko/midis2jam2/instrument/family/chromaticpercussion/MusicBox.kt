@@ -21,7 +21,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
@@ -53,7 +53,7 @@ private const val SHINY_SILVER: String = "ShinySilver.bmp"
  * turn per beat = π/2 rad. To calculate this, the spindle is rotated by `0.5 * PI * delta * (6E7 / bpm) / 60` on
  * each frame.
  */
-class MusicBox(context: Midis2jam2, eventList: List<MidiEvent>) :
+class MusicBox(context: PerformanceManager, eventList: List<MidiEvent>) :
     DecayedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 0, -18)
@@ -64,10 +64,10 @@ class MusicBox(context: Midis2jam2, eventList: List<MidiEvent>) :
     private val pinRotations: MutableMap<Spatial, Float> = mutableMapOf()
     private val pinModel: Spatial = context.modelR("MusicBoxPoint.obj", SHINY_SILVER)
     private val pinPool: MutableList<Spatial> = ArrayList()
-    private val collectorForPins = EventCollector(context, hits, { event, time ->
+    private val collectorForPins = EventCollector(context, _hits, { event, time ->
         context.sequence.getTimeAtTick(event.tick - context.sequence.smf.tpq) <= time // Quarter note early
     })
-    private val collectorForLamellae = EventCollector(context, hits)
+    private val collectorForLamellae = EventCollector(context, _hits)
 
     init {
         with(geometry) {

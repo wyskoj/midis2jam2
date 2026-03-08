@@ -37,8 +37,8 @@ tasks.withType<ComposeHotRun>().configureEach {
     mainClass.set("org.wysko.midis2jam2.MainKt")
 }
 
-val appVersionName: String = "2.0.2"
-val appVersionCode: Int = 7
+val appVersionName: String = "2.0.3"
+val appVersionCode: Int = 9
 
 kotlin {
     androidTarget {
@@ -91,6 +91,7 @@ kotlin {
 
             // Serialization
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.yaml)
 
             // Filekit
             implementation(libs.filekit)
@@ -119,7 +120,13 @@ kotlin {
 
             // jMonkeyEngine
             implementation(libs.jme3.desktop)
-            implementation(libs.jme3.lwjgl3)
+
+            val os = System.getProperty("os.name").lowercase()
+            if (os.contains("mac")) {
+                implementation(libs.jme3.lwjgl)
+            } else {
+                implementation(libs.jme3.lwjgl3)
+            }
 
             // install4j integration
             implementation(libs.install4j.runtime)
@@ -184,6 +191,7 @@ android {
                     "tl",
                     "tr",
                     "uk",
+                    "vi",
                     "zh",
                 )
             )

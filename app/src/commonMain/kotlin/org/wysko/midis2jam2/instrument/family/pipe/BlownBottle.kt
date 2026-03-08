@@ -18,7 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
@@ -32,7 +32,7 @@ import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Blown bottle. */
-class BlownBottle(context: Midis2jam2, events: List<MidiEvent>) :
+class BlownBottle(context: PerformanceManager, events: List<MidiEvent>) :
     DivisiveSustainedInstrument(context, events) {
 
     override val animators: List<PitchClassAnimator> = List(12) { Bottle(it, events.notePeriodsModulus(context, it)) }

@@ -20,7 +20,7 @@ import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
@@ -32,11 +32,12 @@ import org.wysko.midis2jam2.util.times
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class)
-private const val TRIGGER_KEY_INDEX = 0
+private const val TRIGGER_INDEX = 0
 
 /**
  * The French Horn.
@@ -44,7 +45,7 @@ private const val TRIGGER_KEY_INDEX = 0
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
  */
-class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
+class FrenchHorn(context: PerformanceManager, eventList: List<MidiEvent>) :
     MonophonicInstrument(context, eventList, FrenchHornClone::class, FINGERING_MANAGER),
     MultipleInstancesLinearAdjustment {
 
@@ -73,7 +74,7 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
         init {
             with(geometry) {
                 +context.modelR("FrenchHornBody.obj", "HornSkin.bmp").also {
-                    (it as Node).getChild(1).setMaterial(context.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
+                    (it as Node).getChild(1).setMaterial(context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
                 }
             }
 
@@ -94,17 +95,16 @@ class FrenchHorn(context: Midis2jam2, eventList: List<MidiEvent>) :
         override fun animateKeys(pressed: List<Int>) {
             super.animateKeys(pressed)
             for (i in keys.indices) {
-                if (i !in pressed) {
-                    keys[i].rot = v3(0, 0, 0)
-                    continue
-                }
-
-                if (i == TRIGGER_KEY_INDEX) {
-                    keys[i].rot = v3(-25, 0, 0)
-                } else {
-                    keys[i].rot = v3(0, 0, -30)
+                keys[i].rot = when (i) {
+                    in pressed -> getPressedRotation(i)
+                    else -> Vector3f.ZERO
                 }
             }
+        }
+
+        private fun getPressedRotation(valve: Int) = when (valve) {
+            TRIGGER_INDEX -> v3(-25, 0, 0)
+            else -> v3(0, 0, -30)
         }
     }
 }

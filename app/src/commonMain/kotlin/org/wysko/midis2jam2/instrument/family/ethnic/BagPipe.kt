@@ -20,7 +20,7 @@ package org.wysko.midis2jam2.instrument.family.ethnic
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
@@ -35,6 +35,7 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
@@ -42,7 +43,7 @@ import kotlin.time.Duration
  * The bag pipes.
  */
 class BagPipe(
-    context: Midis2jam2,
+    context: PerformanceManager,
     events: List<MidiEvent>,
 ) : SustainedInstrument(context, events),
     MultipleInstancesLinearAdjustment {
@@ -78,7 +79,7 @@ class BagPipe(
     init {
         with(geometry) {
             +context.modelD("BagPipe.obj", "BagPipeSkin.png").also {
-                (it as Node).children.first().material = context.reflectiveMaterial("HornSkinGrey.bmp")
+                (it as Node).children.first().material = context.assetLoader.reflectiveMaterial("HornSkinGrey.bmp")
             }
         }
         with(placement) {

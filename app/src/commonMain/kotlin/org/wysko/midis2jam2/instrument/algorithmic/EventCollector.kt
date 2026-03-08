@@ -18,14 +18,15 @@
 package org.wysko.midis2jam2.instrument.algorithmic
 
 import org.wysko.kmidi.midi.event.Event
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.manager.CollectorsManager.Companion.registerCollector
 import kotlin.time.Duration
 
 /**
  * Periodically collects elapsed events from a pool of [Event]s.
  */
 class EventCollector<T : Event>(
-    private val context: Midis2jam2,
+    private val context: PerformanceManager,
     private val events: List<T>,
     private val triggerCondition: (Event, Duration) -> Boolean =
         { event, time -> context.sequence.getTimeOf(event) <= time },

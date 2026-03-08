@@ -20,7 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
@@ -34,7 +34,7 @@ import kotlin.time.Duration
  */
 abstract class TwelveDrumOctave protected constructor(
     /** Context to midis2jam2. */
-    context: Midis2jam2,
+    context: PerformanceManager,
     /** The list of events for this instrument. */
     eventList: List<MidiEvent>,
     /** The distance to move the drums away from the rotational pivot point. */

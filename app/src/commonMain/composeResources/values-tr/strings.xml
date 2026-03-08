@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Panoya kopyalandı</string>
     <string name="log_copy_to_clipboard">Panoya kopyala</string>
     <string name="log_clear">Temizle</string>
+    <!-- Ayarlar / Kamera / Görüş alanı -->
+    <string name="settings_camera_field_of_view_title">Görüş alanı</string>
+    <string name="settings_camera_field_of_view_label_prefix">Kameranın ne kadar geniş gördüğünü değiştir</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d derece</string>
 </resources>

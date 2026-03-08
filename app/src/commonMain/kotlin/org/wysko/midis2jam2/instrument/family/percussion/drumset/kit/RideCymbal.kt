@@ -17,7 +17,7 @@
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
 import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.datastructure.spline.CardinalSpline
 import org.wysko.midis2jam2.midi.RIDE_BELL
 import kotlin.time.Duration
@@ -27,7 +27,7 @@ private const val BELL_POSITION = 12f
 private const val EDGE_POSITION = 18f
 
 /** The ride cymbal. */
-class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: CymbalType, style: Style = Style.Standard) :
+class RideCymbal(context: PerformanceManager, hits: List<NoteEvent.NoteOn>, type: CymbalType, style: Style = Style.Standard) :
     Cymbal(context, hits, type, style) {
     private val spline = when {
         hits.size >= 2 -> CardinalSpline(
@@ -56,8 +56,8 @@ class RideCymbal(context: Midis2jam2, hits: List<NoteEvent.NoteOn>, type: Cymbal
                 )
             }
 
-            hits.size == 1 -> {
-                stick.node.setLocalTranslation(0f, 2f, stickPosition(hits.first().note))
+            _hits.size == 1 -> {
+                stick.node.setLocalTranslation(0f, 2f, stickPosition(_hits.first().note))
             }
         }
 

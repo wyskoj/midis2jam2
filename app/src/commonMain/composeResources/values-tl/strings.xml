@@ -201,4 +201,8 @@
     <string name="log_copied_to_clipboard">Na-copy sa clipboard</string>
     <string name="log_copy_to_clipboard">I-copy sa clipboard</string>
     <string name="log_clear">I-clear</string>
+    <!-- Mga Setting / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">Field of view</string>
+    <string name="settings_camera_field_of_view_label_prefix">Baguhin kung gaano kalapad ang nakikita ng camera</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
 </resources>

@@ -31,6 +31,7 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin-reflect" }
 kotlinx-coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+kotlinx-serialization-yaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.98.0" }
 
 # UI elements
 compose-colorpicker = { module = "com.github.skydoves:colorpicker-compose", version.ref = "colorpicker" }
@@ -43,6 +44,7 @@ jme3-androidNative = { group = "org.jmonkeyengine", name = "jme3-android-native"
 jme3-core = { group = "org.jmonkeyengine", name = "jme3-core", version.ref = "jme3" }
 jme3-desktop = { group = "org.jmonkeyengine", name = "jme3-desktop", version.ref = "jme3" }
 jme3-effects = { group = "org.jmonkeyengine", name = "jme3-effects", version.ref = "jme3" }
+jme3-lwjgl = { group = "org.jmonkeyengine", name = "jme3-lwjgl", version.ref = "jme3" }
 jme3-lwjgl3 = { group = "org.jmonkeyengine", name = "jme3-lwjgl3", version.ref = "jme3" }
 
 # Koin (Dependency Injection)

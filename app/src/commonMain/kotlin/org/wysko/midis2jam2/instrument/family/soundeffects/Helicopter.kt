@@ -24,9 +24,10 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import org.spongepowered.noise.Noise
 import org.spongepowered.noise.NoiseQuality
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.midis2jam2.Midis2jam2
+import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.util.Utils.rad
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import java.util.*
 import kotlin.math.cos
@@ -45,7 +46,7 @@ import kotlin.time.DurationUnit.SECONDS
  * Finally, the helicopter moves down when not playing and moves up when playing. This motion is eased with a sinusoidal
  * function.
  */
-class Helicopter(context: Midis2jam2, eventList: List<MidiEvent>) :
+class Helicopter(context: PerformanceManager, eventList: List<MidiEvent>) :
     SustainedInstrument(context, eventList) {
     /** "Seed" for X-value generation. */
     private val rotXRand: Float
