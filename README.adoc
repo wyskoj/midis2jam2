@@ -61,11 +61,11 @@ Internationalization contributors can be found on the _About_ screen of the appl
 
 == ⁉️ Support
 
-Find guides and answers to common questions on the https://wyskoj.github.io/midis2jam2-docs/[documentation site]. For support, join our https://discord.gg/HD6KFQ2zkW[Discord server].
+Find guides and answers to common questions on the https://wyskoj.github.io/midis2jam2-docs/[documentation site]. For support, visit https://github.com/wyskoj/midis2jam2/discussions[the discussions page].
 
 == ⚖️ License
 
-midis2jam2 © MMXXI–MMXXV Jacob Wysko. The software is licensed under the https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0] and comes with absolutely no warranty.
+midis2jam2 © MMXXI–MMXXVI Jacob Wysko. The software is licensed under the https://github.com/wyskoj/midis2jam2/blob/master/LICENSE[GNU General Public License v3.0] and comes with absolutely no warranty.
 
 Some assets Copyright © 2007 Scott Haag  (used with permission).
 
