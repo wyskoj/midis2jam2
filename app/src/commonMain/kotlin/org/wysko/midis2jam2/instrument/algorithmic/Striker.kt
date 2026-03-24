@@ -233,6 +233,9 @@ class Striker(
     /** Returns [EventCollector.peek]. */
     fun peek(): NoteOn? = eventCollector.peek()
 
+    /** Returns [EventCollector.prev]. */
+    fun prev(): NoteOn? = eventCollector.prev()
+
     /**
      * If the stick needs to be moved to change the point of rotation (or otherwise operated on), you can modify it with
      * this function.
