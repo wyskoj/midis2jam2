@@ -74,7 +74,7 @@ class HudManager : BaseManager() {
 
     override fun update(tpf: Float) {
         super.update(tpf)
-        val scale = (MAXIMUM_FILLBAR_SCALE * (app.time / context.sequence.duration).coerceAtMost(1.0)).toFloat()
+        val scale = (MAXIMUM_FILLBAR_SCALE * (app.time / context.sequence.duration).coerceIn(0.0..1.0)).toFloat()
         fillbar.scale = v3(scale, VERTICAL_FILLBAR_SCALE, 1f)
 
         fadeManager?.let { fadeManager ->
