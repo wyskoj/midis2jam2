@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.ui.home
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
@@ -41,6 +42,7 @@ import org.wysko.midis2jam2.ui.settings.SettingsModel
 import java.io.File
 
 class AndroidHomeScreenModel(
+    private val androidContext: Context,
     private val applicationService: ApplicationService,
     private val midiService: MidiService,
     private val homeTabPersistor: HomeTabPersistor,
@@ -66,7 +68,7 @@ class AndroidHomeScreenModel(
     override val soundbanks: Flow<List<PlatformFile>>
         get() = settingsModel.appSettings.map { appSettings ->
             appSettings.playbackSettings.soundbanksSettings.soundbanks.map { path ->
-                PlatformFile(Uri.fromFile(File(path)))
+                PlatformFile(Uri.fromFile(File(path)), androidContext)
             }
         }
 
@@ -123,7 +125,7 @@ class AndroidHomeScreenModel(
         homeTabPersistor.load().soundbank?.let { path ->
             val file = File(path)
             if (file.exists()) {
-                _selectedSoundbank.value = PlatformFile(Uri.fromFile(file))
+                _selectedSoundbank.value = PlatformFile(Uri.fromFile(file), androidContext)
             }
         }
     }
