@@ -27,7 +27,7 @@ import org.wysko.midis2jam2.ui.settings.SettingsScreenModel
 
 actual val uiModule: Module = module {
     // Tabs
-    single<HomeScreenModel> { AndroidHomeScreenModel(get(), get()) }
+    single<HomeScreenModel> { AndroidHomeScreenModel(get(), get(), get(), get()) }
     single { SettingsModel(get()) }
 
     // Navigation

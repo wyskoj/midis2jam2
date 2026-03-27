@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.AndroidPerformanceManager
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.ErrorLogService
+import org.wysko.midis2jam2.domain.FluidSynthDevice
 import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.manager.AndroidInputManager
@@ -40,6 +41,8 @@ import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
+import org.wysko.midis2jam2.starter.configuration.Configuration.HomeConfiguration
+import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.state
 import org.wysko.midis2jam2.world.AssetLoader
@@ -67,6 +70,8 @@ internal actual class Midis2jam2Application(
         CoroutineScope(Dispatchers.Default).launch {
             val sequence = StandardMidiFileReader().readByteArray(midiFile.readBytes()).toTimeBasedSequence()
             val midiDevice = midiService.getMidiDevices().first()
+            val homeConfiguration = configurations.find<HomeConfiguration>()
+            (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = homeConfiguration.selectedSoundbank
             val sequencer = JwSequencerImpl().apply {
                 open(midiDevice)
                 this.sequence = sequence
