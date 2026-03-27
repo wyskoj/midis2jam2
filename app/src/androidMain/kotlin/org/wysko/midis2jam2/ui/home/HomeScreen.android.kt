@@ -19,8 +19,6 @@
 
 package org.wysko.midis2jam2.ui.home
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,16 +28,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,17 +47,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.vinceglb.filekit.core.PlatformFile
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.audio_file
+import midis2jam2.app.generated.resources.background_cubemap_warning_continue
+import midis2jam2.app.generated.resources.cancel
 import midis2jam2.app.generated.resources.play_arrow
 import midis2jam2.app.generated.resources.play_midi_file
-import midis2jam2.app.generated.resources.soundbank
 import midis2jam2.app.generated.resources.soundbank_default
+import midis2jam2.app.generated.resources.soundbank_missing_warning_message
+import midis2jam2.app.generated.resources.soundbank_missing_warning_title
+import midis2jam2.app.generated.resources.warning
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -67,8 +69,10 @@ import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
+import org.wysko.midis2jam2.ui.common.component.WarningAmber
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.ui.tutorial.TutorialScreen
+import java.io.File
 
 @Composable
 internal actual fun HomeScreenLayout() {
@@ -99,8 +103,8 @@ internal actual fun HomeScreenLayout() {
                     .align(Alignment.Center)
             ) {
                 Midis2jam2Logo()
-                SoundbankSelector(model)
                 SelectAndPlayMidiFile(model)
+                SoundbankSelector(model)
             }
         }
     }
@@ -111,42 +115,27 @@ private fun SoundbankSelector(model: HomeScreenModel) {
     val selectedSoundbank = model.selectedSoundbank.collectAsState()
     val soundbanks = model.soundbanks.collectAsState(initial = emptyList())
     val selectedSoundbankName = selectedSoundbank.value?.name ?: stringResource(Res.string.soundbank_default)
+    val isMissing = remember(selectedSoundbank.value) {
+        val path = selectedSoundbank.value?.uri?.path
+        path != null && !File(path).exists()
+    }
 
     var isExpanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
 
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = { },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp),
-    ) {
-        TextFieldDefaults.DecorationBox(
-            value = selectedSoundbankName,
-            innerTextField = {
-                Text(selectedSoundbankName, modifier = Modifier.fillMaxWidth())
-            },
-            enabled = true,
-            singleLine = true,
-            visualTransformation = VisualTransformation.None,
-            interactionSource = interactionSource,
-            label = { Text(stringResource(Res.string.soundbank)) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-            },
-            container = {
-                TextFieldDefaults.Container(
-                    enabled = true,
-                    isError = false,
-                    interactionSource = interactionSource,
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                        .clickable { isExpanded = !isExpanded },
+    Box {
+        AssistChip(
+            onClick = { isExpanded = !isExpanded },
+            label = { Text(selectedSoundbankName) },
+            leadingIcon = {
+                Icon(
+                    painterResource(if (isMissing) Res.drawable.warning else Res.drawable.audio_file),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = if (isMissing) WarningAmber else androidx.compose.ui.graphics.Color.Unspecified,
                 )
             },
         )
-        ExposedDropdownMenu(
+        DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
         ) {
@@ -169,17 +158,30 @@ private fun SelectAndPlayMidiFile(
 ) {
     val applicationService = koinInject<ApplicationService>()
     val navigator = LocalNavigator.currentOrThrow
-    val picker = model.midiFilePicker {
+    val selectedSoundbank = model.selectedSoundbank.collectAsState()
+
+    var showMissingSoundbankDialog by remember { mutableStateOf(false) }
+
+    val proceed = {
         if (applicationService.isFirstLaunch.value) {
             navigator.push(TutorialScreen)
         } else {
             model.startApplication()
         }
     }
+
+    val picker = model.midiFilePicker {
+        val currentSoundbank = selectedSoundbank.value
+        val isMissing = currentSoundbank?.uri?.path?.let { !File(it).exists() } == true
+        if (isMissing) {
+            showMissingSoundbankDialog = true
+        } else {
+            proceed()
+        }
+    }
+
     Button(
-        onClick = {
-            picker.launch()
-        },
+        onClick = { picker.launch() },
         modifier = Modifier.height(56.dp)
     ) {
         Row(
@@ -190,5 +192,33 @@ private fun SelectAndPlayMidiFile(
             Icon(painterResource(Res.drawable.play_arrow), "", modifier = Modifier.size(24.dp))
             Text(stringResource(Res.string.play_midi_file), fontSize = 16.sp)
         }
+    }
+
+    if (showMissingSoundbankDialog) {
+        AlertDialog(
+            onDismissRequest = { showMissingSoundbankDialog = false },
+            icon = {
+                Icon(
+                    painterResource(Res.drawable.warning),
+                    contentDescription = null,
+                    tint = WarningAmber,
+                )
+            },
+            title = { Text(stringResource(Res.string.soundbank_missing_warning_title)) },
+            text = { Text(stringResource(Res.string.soundbank_missing_warning_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showMissingSoundbankDialog = false
+                    proceed()
+                }) {
+                    Text(stringResource(Res.string.background_cubemap_warning_continue))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMissingSoundbankDialog = false }) {
+                    Text(stringResource(Res.string.cancel))
+                }
+            },
+        )
     }
 }

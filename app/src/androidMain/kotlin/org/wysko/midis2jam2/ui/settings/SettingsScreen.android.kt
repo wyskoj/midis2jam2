@@ -75,6 +75,7 @@ import midis2jam2.app.generated.resources.settings_playback_soundbanks_add
 import midis2jam2.app.generated.resources.settings_playback_soundbanks_description
 import midis2jam2.app.generated.resources.settings_playback_soundbanks_none_loaded
 import midis2jam2.app.generated.resources.settings_playback_synthesizer
+import midis2jam2.app.generated.resources.warning
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -89,6 +90,7 @@ import org.wysko.midis2jam2.ui.common.component.SelectOption
 import org.wysko.midis2jam2.ui.common.component.SelectRow
 import org.wysko.midis2jam2.ui.common.component.SwitchRow
 import org.wysko.midis2jam2.ui.common.component.UnitRow
+import org.wysko.midis2jam2.ui.common.component.WarningAmber
 import java.io.File
 import java.util.Locale
 
@@ -302,10 +304,19 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
                         }
                     }
                     items(settings.value.playbackSettings.soundbanksSettings.soundbanks) {
+                        val isMissing = !File(it).exists()
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         ) {
+                            if (isMissing) {
+                                Icon(
+                                    painterResource(Res.drawable.warning),
+                                    contentDescription = null,
+                                    tint = WarningAmber,
+                                    modifier = Modifier.padding(end = 4.dp).size(18.dp),
+                                )
+                            }
                             Text(
                                 text = File(it).name,
                                 modifier = Modifier.weight(1f, true),

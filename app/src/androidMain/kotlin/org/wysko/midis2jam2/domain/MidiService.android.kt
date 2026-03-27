@@ -54,12 +54,11 @@ private fun Context.copyAssetToTmpFile(fileName: String): String {
 
 @Throws(IOException::class)
 internal fun Context.copyBytesToInternalStorage(fileName: String, bytes: ByteArray): String {
-    val destFileName = "soundbank_$fileName"
-    openFileOutput(destFileName, MODE_PRIVATE).use { fos ->
-        fos.write(bytes)
-    }
-    Log.d("MidiService", "Copied soundbank to internal storage: $destFileName")
-    return "$filesDir/$destFileName"
+    val dir = getDir("soundbanks", MODE_PRIVATE)
+    val destFile = java.io.File(dir, fileName)
+    destFile.writeBytes(bytes)
+    Log.d("MidiService", "Copied soundbank to internal storage: ${destFile.absolutePath}")
+    return destFile.absolutePath
 }
 
 class FluidSynthDevice(context: Context) : MidiDevice {

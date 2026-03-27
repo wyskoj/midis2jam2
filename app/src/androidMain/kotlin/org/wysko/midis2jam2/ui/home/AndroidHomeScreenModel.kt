@@ -24,11 +24,15 @@ import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.ExecutionState
@@ -46,6 +50,9 @@ class AndroidHomeScreenModel(
     private val homeTabPersistor: HomeTabPersistor,
     private val settingsModel: SettingsModel,
 ) : HomeScreenModel {
+
+    private val modelScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     private val _selectedMidiFile = MutableStateFlow<PlatformFile?>(null)
     override val selectedMidiFile: StateFlow<PlatformFile?>
         get() = _selectedMidiFile
@@ -72,6 +79,20 @@ class AndroidHomeScreenModel(
 
     override val backgroundWarning: Flow<BackgroundWarning?>
         get() = flowOf(null)
+
+    init {
+        // When a soundbank is removed from settings, clear the selection if it was the removed one
+        modelScope.launch {
+            soundbanks.collect { availableSoundbanks ->
+                val currentPath = _selectedSoundbank.value?.uri?.path ?: return@collect
+                val stillAvailable = availableSoundbanks.any { it.uri?.path == currentPath }
+                if (!stillAvailable) {
+                    _selectedSoundbank.value = null
+                    saveState()
+                }
+            }
+        }
+    }
 
     override fun startApplication() {
         check(selectedMidiFile.value != null) { "MIDI file not set" }

@@ -15,6 +15,8 @@
     <string name="midi_device">MIDI device</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Default soundbank</string>
+    <string name="soundbank_missing_warning_title">Soundbank not found</string>
+    <string name="soundbank_missing_warning_message">The selected soundbank file could not be found on disk. The default soundbank will be used instead. You can cancel and select a different soundbank in Settings.</string>
     <string name="play_midi_file">Play MIDI file</string>
     <string name="quality_none">None</string>
     <string name="quality_low">Low</string>
