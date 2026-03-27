@@ -83,6 +83,15 @@ internal actual fun HomeScreenLayout() {
         model.loadState()
     }
 
+    // When a soundbank is removed from settings, clear the selection on the home tab
+    val soundbanks = model.soundbanks.collectAsState(initial = emptyList())
+    LaunchedEffect(soundbanks.value) {
+        val currentPath = model.selectedSoundbank.value?.uri?.path ?: return@LaunchedEffect
+        if (soundbanks.value.none { it.uri?.path == currentPath }) {
+            model.setSelectedSoundbank(null)
+        }
+    }
+
     Scaffold(
         bottomBar = { AppNavigationBar() },
         modifier = Modifier.fillMaxSize(),
