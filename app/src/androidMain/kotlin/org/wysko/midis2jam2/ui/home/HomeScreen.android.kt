@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -68,7 +69,6 @@ import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.ui.tutorial.TutorialScreen
-import androidx.compose.material3.Button
 
 @Composable
 internal actual fun HomeScreenLayout() {

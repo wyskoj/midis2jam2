@@ -131,7 +131,7 @@ class AndroidHomeScreenModel(
     override fun saveState() {
         homeTabPersistor.save(
             HomeTabPersistentState(
-                midiDevice = "",
+                midiDevice = "", // Android always uses FluidSynth; no device selection to persist
                 soundbank = _selectedSoundbank.value?.uri?.path,
             )
         )
