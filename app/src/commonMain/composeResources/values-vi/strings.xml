@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Trường nhìn</string>
     <string name="settings_camera_field_of_view_label_prefix">Điều chỉnh độ rộng trường nhìn của camera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d độ</string>
+    <string name="history_empty">Lịch sử phát của bạn sẽ hiển thị ở đây.</string>
+    <string name="clear_all">Xóa tất cả</string>
+    <string name="history_file_missing_message">Tệp MIDI này không còn khả dụng.</string>
+    <string name="tab_history">Lịch sử</string>
+    <string name="history_file_missing_title">Bài hát không khả dụng</string>
+    <string name="history_unknown_song">Bài hát không xác định</string>
+    <string name="history_clear_invalid_song">Xóa</string>
 </resources>
+

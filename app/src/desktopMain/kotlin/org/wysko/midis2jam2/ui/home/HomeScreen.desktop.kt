@@ -89,6 +89,7 @@ import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
+import org.wysko.midis2jam2.ui.history.HistoryScreenButton
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.util.FileDragAndDrop
 
@@ -167,7 +168,13 @@ internal actual fun HomeScreenLayout() {
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            LogScreenButton(navigator, Modifier.align(Alignment.TopEnd).padding(16.dp))
+            Row(
+                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                HistoryScreenButton(navigator)
+                LogScreenButton(navigator)
+            }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">視野角</string>
     <string name="settings_camera_field_of_view_label_prefix">カメラの視野の広さを変更</string>
     <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
+    <string name="history_empty">再生履歴がここに表示されます。</string>
+    <string name="clear_all">すべて消去</string>
+    <string name="history_file_missing_message">この MIDI ファイルは現在利用できません。</string>
+    <string name="tab_history">履歴</string>
+    <string name="history_file_missing_title">曲を再生できません</string>
+    <string name="history_unknown_song">不明な曲</string>
+    <string name="history_clear_invalid_song">クリア</string>
 </resources>
+

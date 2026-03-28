@@ -41,6 +41,7 @@ import java.util.Base64
 
 actual class ApplicationService : KoinComponent {
     private val errorLogService: ErrorLogService by inject()
+    private val playbackHistoryStore: PlaybackHistoryStore by inject()
     private val _isApplicationRunning = MutableStateFlow(false)
     actual val isApplicationRunning: StateFlow<Boolean>
         get() = _isApplicationRunning
@@ -49,6 +50,7 @@ actual class ApplicationService : KoinComponent {
         _isApplicationRunning.value = true
         val configurations = getConfigurations()
         val midiFile = executionState.midiFile
+        recordPlaybackHistory(midiFile.file)
 
         when {
             isMacOs() -> {
@@ -91,6 +93,9 @@ actual class ApplicationService : KoinComponent {
         _isApplicationRunning.value = true
         val midiFiles = executionState.queue
         val configurations = getConfigurations()
+        midiFiles.forEach { queuedFile ->
+            recordPlaybackHistory(queuedFile.file)
+        }
 
         when {
             isMacOs() -> {
@@ -207,5 +212,12 @@ actual class ApplicationService : KoinComponent {
         cmd.addAll(extraArgs)
 
         return ProcessBuilder(cmd).inheritIO().redirectErrorStream(true).start()
+    }
+
+    private fun recordPlaybackHistory(file: File) {
+        playbackHistoryStore.addPlayback(
+            filePath = file.absolutePath,
+            title = file.name,
+        )
     }
 }
