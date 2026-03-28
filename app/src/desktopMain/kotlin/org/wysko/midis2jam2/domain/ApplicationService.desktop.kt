@@ -93,9 +93,6 @@ actual class ApplicationService : KoinComponent {
         _isApplicationRunning.value = true
         val midiFiles = executionState.queue
         val configurations = getConfigurations()
-        midiFiles.forEach { queuedFile ->
-            recordPlaybackHistory(queuedFile.file)
-        }
 
         when {
             isMacOs() -> {
@@ -103,7 +100,7 @@ actual class ApplicationService : KoinComponent {
                     RendererBundle(midiFiles = midiFiles.map { it.file.absolutePath }, configurations)
                 )
                 val process = launchRendererProcess(extraArgs = listOf(bundle))
-                listenOnSocket(process)
+                listenOnSocket(process, midiFiles.map { it.file })
             }
 
             else -> {
@@ -121,7 +118,10 @@ actual class ApplicationService : KoinComponent {
                         sequences = sequences,
                         fileNames = executionState.queue.map { it.file.name },
                         configurations,
-                        {
+                        onTrackStart = { trackIndex ->
+                            executionState.queue.getOrNull(trackIndex)?.file?.let(::recordPlaybackHistory)
+                        },
+                        onPlaylistFinish = {
                             _isApplicationRunning.value = false
                         },
                         sequencer,
@@ -136,12 +136,17 @@ actual class ApplicationService : KoinComponent {
         }
     }
 
-    private fun listenOnSocket(process: Process) {
+    private fun listenOnSocket(process: Process, queueFiles: List<File> = emptyList()) {
         Thread {
             val socket = waitForPort("127.0.0.1", SERVER_PORT)
             socket.inputStream.bufferedReader().forEachLine {
                 val message = Json.decodeFromString<RendererMessage>(it)
                 when (message.type) {
+                    "QueueTrackStart" -> {
+                        val trackIndex = message.trackIndex ?: return@forEachLine
+                        queueFiles.getOrNull(trackIndex)?.let(::recordPlaybackHistory)
+                    }
+
                     "Error" -> {
                         errorLogService.addError(message.message!!, message.stackTrace!!)
                         _isApplicationRunning.value = false

@@ -23,10 +23,12 @@ import kotlinx.serialization.Serializable
 data class RendererMessage(
     val type: String,
     val message: String? = null,
-    val stackTrace: String? = null
+    val stackTrace: String? = null,
+    val trackIndex: Int? = null,
 ) {
     companion object {
         fun finish() = RendererMessage("Finish")
         fun error(message: String, stackTrace: String) = RendererMessage("Error", message, stackTrace)
+        fun queueTrackStart(trackIndex: Int) = RendererMessage("QueueTrackStart", trackIndex = trackIndex)
     }
 }

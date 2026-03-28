@@ -34,6 +34,7 @@ internal class Midis2jam2QueueApplication(
     private val sequences: List<TimeBasedSequence>,
     private val fileNames: List<String>,
     private val configurations: Collection<Configuration>,
+    private val onTrackStart: (Int) -> Unit,
     private val onPlaylistFinish: () -> Unit,
     private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
@@ -92,6 +93,7 @@ internal class Midis2jam2QueueApplication(
         }
 
         currentSongIndex = index
+        onTrackStart(index)
     }
 
     override fun stop() {

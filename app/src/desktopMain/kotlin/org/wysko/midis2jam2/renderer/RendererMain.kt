@@ -100,8 +100,14 @@ private fun launchQueueApplication(
             sequences = sequences,
             fileNames = midiFiles.map { it.name },
             config.configurations,
+            onTrackStart = { trackIndex ->
+                serverWriter.write(Json.encodeToString(RendererMessage.queueTrackStart(trackIndex)))
+                serverWriter.newLine()
+                serverWriter.flush()
+            },
             {
                 serverWriter.write(Json.encodeToString(RendererMessage.finish()))
+                serverWriter.newLine()
                 serverWriter.flush()
                 serverWriter.close()
             },
