@@ -125,7 +125,7 @@ object HistoryScreen : Screen {
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(Res.string.clear_all)) },
-                                leadingIcon = { Icon(painterResource(Res.drawable.close), null) },
+                                leadingIcon = { Icon(painterResource(Res.drawable.clear_all), null) },
                                 onClick = {
                                     isDropdownMenuExpanded = false
                                     model.clearAll()
