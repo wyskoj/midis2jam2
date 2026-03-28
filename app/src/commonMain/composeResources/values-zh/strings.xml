@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">视场</string>
     <string name="settings_camera_field_of_view_label_prefix">更改摄像机视野宽度</string>
     <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
+    <string name="history_empty">你的播放历史将显示在这里。</string>
+    <string name="clear_all">全部清除</string>
+    <string name="history_file_missing_message">此 MIDI 文件已不可用。</string>
+    <string name="tab_history">历史记录</string>
+    <string name="history_file_missing_title">歌曲不可用</string>
+    <string name="history_unknown_song">未知歌曲</string>
+    <string name="history_clear_invalid_song">清除</string>
 </resources>
+

@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Näkökenttä</string>
     <string name="settings_camera_field_of_view_label_prefix">Muuta, kuinka leveästi kamera näkee</string>
     <string name="settings_camera_field_of_view_degrees">%1$d astetta</string>
+    <string name="history_empty">Toistohistoriasi näkyy täällä.</string>
+    <string name="clear_all">Tyhjennä kaikki</string>
+    <string name="history_file_missing_message">Tämä MIDI-tiedosto ei ole enää saatavilla.</string>
+    <string name="tab_history">Historia</string>
+    <string name="history_file_missing_title">Kappale ei ole saatavilla</string>
+    <string name="history_unknown_song">Tuntematon kappale</string>
+    <string name="history_clear_invalid_song">Tyhjennä</string>
 </resources>
+

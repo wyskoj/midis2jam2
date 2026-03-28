@@ -37,6 +37,7 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.wysko.midis2jam2.ui.home.HomeTab
 
 @Composable
 actual fun MainLayout() {
@@ -62,7 +63,12 @@ fun AppNavigationRail() {
                 val name = stringResource(it.value.name)
                 NavigationRailItem(
                     selected = isTabSelected,
-                    onClick = { navigator.current = it.key },
+                    onClick = {
+                        if (navigator.current == HomeTab && it.key != HomeTab) {
+                            HomeTab.resetToRoot()
+                        }
+                        navigator.current = it.key
+                    },
                     icon = { Icon(painterResource(it.value.getTab(isTabSelected)), name) },
                     label = { Text(name) },
                     modifier = Modifier.padding(horizontal = 8.dp)

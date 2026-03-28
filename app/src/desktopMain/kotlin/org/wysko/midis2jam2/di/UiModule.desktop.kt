@@ -21,6 +21,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
+import org.wysko.midis2jam2.ui.history.HistoryScreenModel
 import org.wysko.midis2jam2.ui.home.DesktopHomeScreenModel
 import org.wysko.midis2jam2.ui.queue.QueueTabModel
 import org.wysko.midis2jam2.ui.search.SearchTabModel
@@ -31,6 +32,7 @@ actual val uiModule: Module = module {
     // Tabs
     single<HomeScreenModel> { DesktopHomeScreenModel(get(), get(), get()) }
     single { SettingsModel(get()) }
+    single { HistoryScreenModel(get()) }
 
     single { QueueTabModel(get()) }
     single { SearchTabModel() }

@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Field of view</string>
     <string name="settings_camera_field_of_view_label_prefix">Baguhin kung gaano kalapad ang nakikita ng camera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
+    <string name="history_empty">Lalabas dito ang iyong history ng playback.</string>
+    <string name="clear_all">I-clear lahat</string>
+    <string name="history_file_missing_message">Hindi na available ang MIDI file na ito.</string>
+    <string name="tab_history">Kasaysayan</string>
+    <string name="history_file_missing_title">Hindi available ang kanta</string>
+    <string name="history_unknown_song">Hindi kilalang kanta</string>
+    <string name="history_clear_invalid_song">I-clear</string>
 </resources>
+
