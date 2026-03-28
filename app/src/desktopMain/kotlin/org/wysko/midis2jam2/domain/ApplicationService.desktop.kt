@@ -50,7 +50,6 @@ actual class ApplicationService : KoinComponent {
         _isApplicationRunning.value = true
         val configurations = getConfigurations()
         val midiFile = executionState.midiFile
-        recordPlaybackHistory(midiFile.file)
 
         when {
             isMacOs() -> {
@@ -73,6 +72,7 @@ actual class ApplicationService : KoinComponent {
                     return
                 }
                 with(midiPackage.getOrNull() ?: return) {
+                    recordPlaybackHistory(midiFile.file)
                     Midis2jam2Application(
                         sequence!!,
                         fileName = midiFile.file.name,
