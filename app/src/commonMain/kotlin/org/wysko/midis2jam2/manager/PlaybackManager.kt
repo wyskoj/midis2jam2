@@ -40,6 +40,7 @@ class PlaybackManager(
     private val sequence: TimeBasedSequence,
     private val sequencer: JwSequencer,
     private val isLooping: Boolean,
+    private val onPlaybackComplete: (() -> Unit)? = null,
 ) : BaseManager(), ActionListener {
     val duration: Duration = sequence.duration
     var time: Duration = -INTRO
@@ -71,7 +72,7 @@ class PlaybackManager(
         if (time > duration + OUTRO) {
             when (isLooping) {
                 true -> onLoop()
-                false -> app.stop()
+                false -> onPlaybackComplete?.invoke() ?: app.stop()
             }
         }
     }
@@ -98,10 +99,8 @@ class PlaybackManager(
     }
 
     override fun cleanup(app: Application?) {
-        sequencer.run {
-            stop()
-            close()
-        }
+        app?.inputManager?.removeListener(this)
+        sequencer.stop()
     }
 
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
