@@ -42,11 +42,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -263,7 +263,7 @@ internal fun MidiDeviceSelector(
                     enabled = true,
                     isError = false,
                     interactionSource = interactionSource,
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).clickable {
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).clickable {
                         isExpanded = !isExpanded
                     }
                 )
@@ -374,7 +374,7 @@ internal fun SoundbankSelectorImpl(
                     enabled = true,
                     isError = false,
                     interactionSource = interactionSource,
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).clickable {
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).clickable {
                         isExpanded = !isExpanded
                     }
                 )
