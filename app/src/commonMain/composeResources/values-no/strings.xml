@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Synsfelt</string>
     <string name="settings_camera_field_of_view_label_prefix">Endre hvor bredt kameraet ser</string>
     <string name="settings_camera_field_of_view_degrees">%1$d grader</string>
+    <string name="history_empty">Avspillingshistorikken din vises her.</string>
+    <string name="clear_all">Tøm alt</string>
+    <string name="history_file_missing_message">Denne MIDI-filen er ikke lenger tilgjengelig.</string>
+    <string name="tab_history">Historikk</string>
+    <string name="history_file_missing_title">Sang utilgjengelig</string>
+    <string name="history_unknown_song">Ukjent sang</string>
+    <string name="history_clear_invalid_song">Tøm</string>
 </resources>
+

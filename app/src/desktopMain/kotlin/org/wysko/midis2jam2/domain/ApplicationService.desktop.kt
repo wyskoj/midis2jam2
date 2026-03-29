@@ -41,6 +41,7 @@ import java.util.Base64
 
 actual class ApplicationService : KoinComponent {
     private val errorLogService: ErrorLogService by inject()
+    private val playbackHistoryStore: PlaybackHistoryStore by inject()
     private val _isApplicationRunning = MutableStateFlow(false)
     actual val isApplicationRunning: StateFlow<Boolean>
         get() = _isApplicationRunning
@@ -71,6 +72,7 @@ actual class ApplicationService : KoinComponent {
                     return
                 }
                 with(midiPackage.getOrNull() ?: return) {
+                    recordPlaybackHistory(midiFile.file)
                     Midis2jam2Application(
                         sequence!!,
                         fileName = midiFile.file.name,
@@ -98,7 +100,7 @@ actual class ApplicationService : KoinComponent {
                     RendererBundle(midiFiles = midiFiles.map { it.file.absolutePath }, configurations)
                 )
                 val process = launchRendererProcess(extraArgs = listOf(bundle))
-                listenOnSocket(process)
+                listenOnSocket(process, midiFiles.map { it.file })
             }
 
             else -> {
@@ -116,7 +118,10 @@ actual class ApplicationService : KoinComponent {
                         sequences = sequences,
                         fileNames = executionState.queue.map { it.file.name },
                         configurations,
-                        {
+                        onTrackStart = { trackIndex ->
+                            executionState.queue.getOrNull(trackIndex)?.file?.let(::recordPlaybackHistory)
+                        },
+                        onPlaylistFinish = {
                             _isApplicationRunning.value = false
                         },
                         sequencer,
@@ -131,12 +136,17 @@ actual class ApplicationService : KoinComponent {
         }
     }
 
-    private fun listenOnSocket(process: Process) {
+    private fun listenOnSocket(process: Process, queueFiles: List<File> = emptyList()) {
         Thread {
             val socket = waitForPort("127.0.0.1", SERVER_PORT)
             socket.inputStream.bufferedReader().forEachLine {
                 val message = Json.decodeFromString<RendererMessage>(it)
                 when (message.type) {
+                    "QueueTrackStart" -> {
+                        val trackIndex = message.trackIndex ?: return@forEachLine
+                        queueFiles.getOrNull(trackIndex)?.let(::recordPlaybackHistory)
+                    }
+
                     "Error" -> {
                         errorLogService.addError(message.message!!, message.stackTrace!!)
                         _isApplicationRunning.value = false
@@ -207,5 +217,12 @@ actual class ApplicationService : KoinComponent {
         cmd.addAll(extraArgs)
 
         return ProcessBuilder(cmd).inheritIO().redirectErrorStream(true).start()
+    }
+
+    private fun recordPlaybackHistory(file: File) {
+        playbackHistoryStore.addPlayback(
+            filePath = file.absolutePath,
+            title = file.name,
+        )
     }
 }

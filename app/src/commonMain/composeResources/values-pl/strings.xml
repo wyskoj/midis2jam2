@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Pole widzenia</string>
     <string name="settings_camera_field_of_view_label_prefix">Zmień, jak szeroko widzi kamera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d stopni</string>
+    <string name="history_empty">Twoja historia odtwarzania pojawi się tutaj.</string>
+    <string name="clear_all">Wyczyść wszystko</string>
+    <string name="history_file_missing_message">Ten plik MIDI nie jest już dostępny.</string>
+    <string name="tab_history">Historia</string>
+    <string name="history_file_missing_title">Utwór niedostępny</string>
+    <string name="history_unknown_song">Nieznany utwór</string>
+    <string name="history_clear_invalid_song">Wyczyść</string>
 </resources>
+

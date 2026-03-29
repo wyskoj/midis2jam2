@@ -29,9 +29,12 @@ import kotlinx.serialization.decodeFromString
 import org.wysko.midis2jam2.util.resourceToString
 
 class ActionsManager : BaseManager() {
+    private var registeredActions: List<Action> = emptyList()
+
     override fun initialize(app: Application) {
         super.initialize(app)
-        registerActions(loadActions())
+        registeredActions = loadActions()
+        registerActions(registeredActions)
     }
 
     private fun loadActions(): List<Action> = Yaml.default.decodeFromString(resourceToString("/actions.yaml"))
@@ -40,6 +43,16 @@ class ActionsManager : BaseManager() {
         for (action in actions) {
             app.inputManager.addMapping(action.name, action.trigger)
         }
+    }
+
+    override fun cleanup(app: Application?) {
+        val inputManager = app?.inputManager ?: return
+        registeredActions.forEach { action ->
+            if (inputManager.hasMapping(action.name)) {
+                inputManager.deleteMapping(action.name)
+            }
+        }
+        registeredActions = emptyList()
     }
 
     @Serializable

@@ -57,6 +57,11 @@ class DebugTextManager : BaseManager(), ActionListener {
         app.guiNode.detachChild(node)
     }
 
+    override fun cleanup(app: Application?) {
+        app?.inputManager?.removeListener(this)
+        node.removeFromParent()
+    }
+
     override fun update(tpf: Float) {
         super.update(tpf)
         textView.text = engine.getText()

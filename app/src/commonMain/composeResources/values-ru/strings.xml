@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Угол обзора</string>
     <string name="settings_camera_field_of_view_label_prefix">Изменить ширину обзора камеры</string>
     <string name="settings_camera_field_of_view_degrees">%1$d°</string>
+    <string name="history_empty">Здесь будет отображаться история воспроизведения.</string>
+    <string name="clear_all">Очистить всё</string>
+    <string name="history_file_missing_message">Этот MIDI-файл больше недоступен.</string>
+    <string name="tab_history">История</string>
+    <string name="history_file_missing_title">Песня недоступна</string>
+    <string name="history_unknown_song">Неизвестная песня</string>
+    <string name="history_clear_invalid_song">Очистить</string>
 </resources>
+
