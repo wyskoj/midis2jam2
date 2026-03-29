@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.playlist_play
+import midis2jam2.app.generated.resources.music_history
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -41,7 +41,7 @@ fun HistoryScreenButton(
         modifier = modifier.size(48.dp),
     ) {
         Icon(
-            painterResource(Res.drawable.playlist_play),
+            painterResource(Res.drawable.music_history),
             null,
             tint = MaterialTheme.colorScheme.secondary,
         )
