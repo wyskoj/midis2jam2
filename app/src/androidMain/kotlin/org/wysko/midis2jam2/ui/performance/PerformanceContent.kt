@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -83,9 +84,15 @@ fun PerformanceContent(
     val isAutoCamActive by harness.isAutoCamActive.collectAsState()
     val isSlideCamActive by harness.isSlideCamActive.collectAsState()
 
+    DisposableEffect(harness) {
+        onDispose {
+            harness.shutdown()
+        }
+    }
+
     // back handling at activity level
     BackHandler {
-        harness.stop()
+        harness.shutdown()
         applicationService.onApplicationFinished()
     }
 
