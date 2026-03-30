@@ -141,6 +141,13 @@ internal actual val deviceThemeIcon: DrawableResource
     get() = Res.drawable.computer
 
 @Composable
+internal actual fun SettingsScreenOverlay(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+) = Unit
+
+@Composable
 internal actual fun LocaleSelect(
     selectedLocale: String,
     onSelectLocale: (String) -> Unit,

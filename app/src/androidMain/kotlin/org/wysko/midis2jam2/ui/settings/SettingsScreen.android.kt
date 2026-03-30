@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,7 +40,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +60,7 @@ import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
+import midis2jam2.app.generated.resources.add_circle
 import midis2jam2.app.generated.resources.android
 import midis2jam2.app.generated.resources.audio_file
 import midis2jam2.app.generated.resources.close
@@ -94,6 +98,19 @@ import org.wysko.midis2jam2.ui.common.component.UnitRow
 import org.wysko.midis2jam2.ui.common.component.WarningAmber
 import java.io.File
 import java.util.Locale
+
+@Composable
+internal actual fun SettingsScreenOverlay(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+) {
+    SettingsSoundbanksSheet(
+        settings = settings,
+        model = model,
+        screenModel = screenModel,
+    )
+}
 
 internal actual fun LazyListScope.SettingsScreenContent(
     settings: State<AppSettings>,
@@ -145,7 +162,7 @@ internal actual fun LazyListScope.SettingsScreenContent(
         CategoryHeader(stringResource(Res.string.settings_playback_synthesizer))
     }
     item {
-        SoundbanksSelect(settings, model)
+        SoundbanksSelect(settings, model, screenModel)
     }
     item {
         SynthesizerReverbSelect(settings, model)
@@ -234,12 +251,31 @@ private fun DisableTouchInputBooleanSelect(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel) {
-    val context = LocalContext.current
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var isShowSheet by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+private fun SoundbanksSelect(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+) {
+    UnitRow(
+        title = { Text(stringResource(Res.string.settings_playback_soundbanks)) },
+        label = { Text(stringResource(Res.string.settings_playback_soundbanks_description)) },
+        icon = Res.drawable.audio_file,
+    ) {
+        screenModel.requestOpenSoundbanks()
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsSoundbanksSheet(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+) {
+    val soundbanks = settings.value.playbackSettings.soundbanksSettings.soundbanks
+    val context = LocalContext.current
+    var isImportingSoundbanks by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val picker = rememberFilePickerLauncher(
         type = PickerType.File(listOf("sf2")),
         mode = PickerMode.Multiple(),
@@ -247,6 +283,7 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
     ) { files ->
         files?.let { platformFiles ->
             scope.launch {
+                isImportingSoundbanks = true
                 val paths = platformFiles.mapNotNull { pf ->
                     runCatching {
                         val bytes = pf.readBytes()
@@ -256,16 +293,19 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
                 if (paths.isNotEmpty()) {
                     model.addSoundbanks(paths)
                 }
+                isImportingSoundbanks = false
             }
         }
     }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isShowSheet by remember { mutableStateOf(false) }
+    val openSoundbanksRequest by screenModel.openSoundbanksRequest.collectAsState()
 
-    UnitRow(
-        title = { Text(stringResource(Res.string.settings_playback_soundbanks)) },
-        label = { Text(stringResource(Res.string.settings_playback_soundbanks_description)) },
-        icon = Res.drawable.audio_file,
-    ) {
-        isShowSheet = true
+    LaunchedEffect(openSoundbanksRequest) {
+        if (openSoundbanksRequest) {
+            isShowSheet = true
+            screenModel.consumeOpenSoundbanksRequest()
+        }
     }
 
     if (isShowSheet) {
@@ -283,14 +323,33 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Button(onClick = { picker.launch() }) {
-                    Text(stringResource(Res.string.settings_playback_soundbanks_add))
+                Button(
+                    onClick = { picker.launch() },
+                    enabled = !isImportingSoundbanks,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                ) {
+                    if (isImportingSoundbanks) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(Res.drawable.add_circle),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                    Text(
+                        text = stringResource(Res.string.settings_playback_soundbanks_add),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
                 }
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    if (settings.value.playbackSettings.soundbanksSettings.soundbanks.isEmpty()) {
+                    if (soundbanks.isEmpty()) {
                         item {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -304,7 +363,7 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
                             }
                         }
                     }
-                    items(settings.value.playbackSettings.soundbanksSettings.soundbanks) {
+                    items(soundbanks) {
                         val isMissing = !File(it).exists()
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

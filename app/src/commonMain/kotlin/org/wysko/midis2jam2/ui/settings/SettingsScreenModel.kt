@@ -18,8 +18,21 @@
 package org.wysko.midis2jam2.ui.settings
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 object SettingsScreenModel : ScreenModel {
+    private val _openSoundbanksRequest = MutableStateFlow(false)
+    val openSoundbanksRequest: StateFlow<Boolean> = _openSoundbanksRequest
+
+    fun requestOpenSoundbanks() {
+        _openSoundbanksRequest.value = true
+    }
+
+    fun consumeOpenSoundbanksRequest() {
+        _openSoundbanksRequest.value = false
+    }
+
     fun getAvailableLocales(): List<String> = listOf(
         "en",
         "de",
