@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">시야각</string>
     <string name="settings_camera_field_of_view_label_prefix">카메라 시야의 너비 변경</string>
     <string name="settings_camera_field_of_view_degrees">%1$d도</string>
+    <string name="history_empty">재생 기록이 여기에 표시됩니다.</string>
+    <string name="clear_all">모두 지우기</string>
+    <string name="history_file_missing_message">이 MIDI 파일은 더 이상 사용할 수 없습니다.</string>
+    <string name="tab_history">기록</string>
+    <string name="history_file_missing_title">곡을 사용할 수 없음</string>
+    <string name="history_unknown_song">알 수 없는 곡</string>
+    <string name="history_clear_invalid_song">지우기</string>
 </resources>
+

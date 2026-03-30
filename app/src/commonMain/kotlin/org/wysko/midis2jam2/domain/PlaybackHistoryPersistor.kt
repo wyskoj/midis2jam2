@@ -15,20 +15,20 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.renderer
+package org.wysko.midis2jam2.domain
 
 import kotlinx.serialization.Serializable
 
+const val MAX_PLAYBACK_HISTORY_ENTRIES = 100
+
 @Serializable
-data class RendererMessage(
-    val type: String,
-    val message: String? = null,
-    val stackTrace: String? = null,
-    val trackIndex: Int? = null,
-) {
-    companion object {
-        fun finish() = RendererMessage("Finish")
-        fun error(message: String, stackTrace: String) = RendererMessage("Error", message, stackTrace)
-        fun queueTrackStart(trackIndex: Int) = RendererMessage("QueueTrackStart", trackIndex = trackIndex)
-    }
+data class PlaybackHistoryEntry(
+    val filePath: String,
+    val title: String,
+    val playedAtEpochMillis: Long,
+)
+
+expect class PlaybackHistoryPersistor() {
+    fun save(entries: List<PlaybackHistoryEntry>)
+    fun load(): List<PlaybackHistoryEntry>
 }

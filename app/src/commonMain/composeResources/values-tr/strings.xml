@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">Görüş alanı</string>
     <string name="settings_camera_field_of_view_label_prefix">Kameranın ne kadar geniş gördüğünü değiştir</string>
     <string name="settings_camera_field_of_view_degrees">%1$d derece</string>
+    <string name="history_empty">Çalma geçmişiniz burada görünecek.</string>
+    <string name="clear_all">Tümünü temizle</string>
+    <string name="history_file_missing_message">Bu MIDI dosyası artık kullanılamıyor.</string>
+    <string name="tab_history">Geçmiş</string>
+    <string name="history_file_missing_title">Şarkı kullanılamıyor</string>
+    <string name="history_unknown_song">Bilinmeyen şarkı</string>
+    <string name="history_clear_invalid_song">Temizle</string>
 </resources>
+

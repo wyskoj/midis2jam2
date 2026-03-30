@@ -215,4 +215,12 @@
     <string name="settings_camera_field_of_view_title">มุมมองภาพ</string>
     <string name="settings_camera_field_of_view_label_prefix">เปลี่ยนความกว้างที่กล้องมองเห็น</string>
     <string name="settings_camera_field_of_view_degrees">%1$d องศา</string>
+    <string name="history_empty">ประวัติการเล่นของคุณจะแสดงที่นี่</string>
+    <string name="clear_all">ล้างทั้งหมด</string>
+    <string name="history_file_missing_message">ไฟล์ MIDI นี้ไม่พร้อมใช้งานอีกต่อไป</string>
+    <string name="tab_history">ประวัติ</string>
+    <string name="history_file_missing_title">เพลงไม่พร้อมใช้งาน</string>
+    <string name="history_unknown_song">เพลงที่ไม่รู้จัก</string>
+    <string name="history_clear_invalid_song">ล้าง</string>
 </resources>
+

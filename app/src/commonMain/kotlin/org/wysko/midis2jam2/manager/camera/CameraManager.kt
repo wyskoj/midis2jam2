@@ -70,6 +70,13 @@ abstract class CameraManager : BaseManager(), ActionListener {
         }
     }
 
+    override fun cleanup(app: Application?) {
+        val safeApp = app ?: return
+        safeApp.inputManager.removeListener(this)
+        cameraPlugins.reversed().forEach(safeApp.stateManager::detach)
+        cameraStateListeners.clear()
+    }
+
     fun registerCameraStateListener(listener: CameraStateListener) {
         cameraStateListeners.add(listener)
     }

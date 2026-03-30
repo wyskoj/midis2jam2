@@ -15,20 +15,24 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.renderer
+package org.wysko.midis2jam2.ui.history
 
-import kotlinx.serialization.Serializable
+import cafe.adriel.voyager.core.model.ScreenModel
+import kotlinx.coroutines.flow.StateFlow
+import org.wysko.midis2jam2.domain.PlaybackHistoryEntry
+import org.wysko.midis2jam2.domain.PlaybackHistoryStore
 
-@Serializable
-data class RendererMessage(
-    val type: String,
-    val message: String? = null,
-    val stackTrace: String? = null,
-    val trackIndex: Int? = null,
-) {
-    companion object {
-        fun finish() = RendererMessage("Finish")
-        fun error(message: String, stackTrace: String) = RendererMessage("Error", message, stackTrace)
-        fun queueTrackStart(trackIndex: Int) = RendererMessage("QueueTrackStart", trackIndex = trackIndex)
+class HistoryScreenModel(
+    private val playbackHistoryStore: PlaybackHistoryStore,
+) : ScreenModel {
+    val historyEntries: StateFlow<List<PlaybackHistoryEntry>>
+        get() = playbackHistoryStore.historyEntries
+
+    fun removeEntry(entry: PlaybackHistoryEntry) {
+        playbackHistoryStore.removeEntry(entry)
+    }
+
+    fun clearAll() {
+        playbackHistoryStore.clearAll()
     }
 }

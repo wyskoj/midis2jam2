@@ -66,7 +66,7 @@ fun View.systemBackLegacy(
     requestFocus()
     setOnKeyListener { _, keyCode, _ ->
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            harness.stop()
+            harness.shutdown()
             applicationService.onApplicationFinished()
             onFinish()
             true

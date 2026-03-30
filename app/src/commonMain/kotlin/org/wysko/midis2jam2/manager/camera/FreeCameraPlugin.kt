@@ -40,6 +40,7 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
 
     private lateinit var dummyCamera: Camera
     private lateinit var dummyFlyByCamera: FlyByCamera
+    private var registeredActions: Array<String> = emptyArray()
 
     override fun initialize(app: Application?) {
         (app as SimpleApplication).flyByCamera.unregisterInput()
@@ -55,7 +56,8 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         }
         applyCameraAngle()
         snapCamera()
-        app.inputManager.addListener(this, *cameraAngleActions, ACTION_CAMERA_PLUGIN_FREE)
+        registeredActions = cameraAngleActions + ACTION_CAMERA_PLUGIN_FREE
+        app.inputManager.addListener(this, *registeredActions)
     }
 
     override fun onEnable() {
@@ -96,7 +98,19 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         applyCameraAngle()
     }
 
-    override fun cleanup(app: Application?): Unit = Unit
+    override fun cleanup(app: Application?) {
+        val inputManager = app?.inputManager ?: return
+        inputManager.removeListener(this)
+        if (registeredActions.isNotEmpty()) {
+            registeredActions.forEach { action ->
+                if (inputManager.hasMapping(action)) {
+                    inputManager.deleteMapping(action)
+                }
+            }
+        }
+        dummyFlyByCamera.unregisterInput()
+        registeredActions = emptyArray()
+    }
 
     private fun applyCameraCategory(name: String) {
         val targetCategory = name.last().digitToInt()

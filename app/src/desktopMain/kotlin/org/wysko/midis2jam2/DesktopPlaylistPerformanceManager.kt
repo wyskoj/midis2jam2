@@ -20,6 +20,7 @@ package org.wysko.midis2jam2
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.util.logger
 
 class DesktopPlaylistPerformanceManager(
     fileName: String,
@@ -27,4 +28,11 @@ class DesktopPlaylistPerformanceManager(
     midiFile: TimeBasedSequence,
     onClose: () -> Unit,
     configs: Collection<Configuration>,
-) : DesktopPerformanceManager(sequencer, midiFile, onClose, fileName, configs)
+) : DesktopPerformanceManager(sequencer, midiFile, onClose, fileName, configs) {
+    override fun cleanup() {
+        logger().debug("Cleaning up playlist performance manager...")
+        // In queue mode, app lifecycle is controlled by the queue application.
+        // Track transitions should not close shared MIDI resources or stop the app.
+        sequencer.stop()
+    }
+}

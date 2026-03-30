@@ -198,4 +198,12 @@
     <string name="settings_camera_field_of_view_title">Champ de vision</string>
     <string name="settings_camera_field_of_view_label_prefix">Modifier la largeur de la vision de la caméra</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrés</string>
+    <string name="history_empty">Votre historique de lecture s&apos;affichera ici.</string>
+    <string name="clear_all">Tout effacer</string>
+    <string name="history_file_missing_message">Ce fichier MIDI n&apos;est plus disponible.</string>
+    <string name="tab_history">Historique</string>
+    <string name="history_file_missing_title">Morceau indisponible</string>
+    <string name="history_unknown_song">Morceau inconnu</string>
+    <string name="history_clear_invalid_song">Effacer</string>
 </resources>
+

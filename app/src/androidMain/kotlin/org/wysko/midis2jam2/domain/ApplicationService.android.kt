@@ -61,10 +61,9 @@ actual class ApplicationService : KoinComponent {
             _isFirstLaunch.value = false
         }
 
-        val homeScreenModel: HomeScreenModel by inject()
         val configurationService: ConfigurationService by inject()
         val configurations = configurationService.getConfigurations()
-        val midiFile = homeScreenModel.selectedMidiFile.value!!
+        val midiFile = executionState.midiFile
 
         this._midiFile.value = midiFile
         this._configurations.value = configurations

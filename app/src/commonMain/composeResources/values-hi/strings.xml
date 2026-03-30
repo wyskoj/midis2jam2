@@ -198,4 +198,12 @@
     <string name="settings_camera_field_of_view_title">दृश्य क्षेत्र</string>
     <string name="settings_camera_field_of_view_label_prefix">कैमरा कितना चौड़ा देखता है, बदलें</string>
     <string name="settings_camera_field_of_view_degrees">%1$d डिग्री</string>
+    <string name="history_empty">आपका प्लेबैक इतिहास यहां दिखाई देगा।</string>
+    <string name="clear_all">सब साफ करें</string>
+    <string name="history_file_missing_message">यह MIDI फ़ाइल अब उपलब्ध नहीं है।</string>
+    <string name="tab_history">इतिहास</string>
+    <string name="history_file_missing_title">गीत उपलब्ध नहीं है</string>
+    <string name="history_unknown_song">अज्ञात गीत</string>
+    <string name="history_clear_invalid_song">साफ़ करें</string>
 </resources>
+

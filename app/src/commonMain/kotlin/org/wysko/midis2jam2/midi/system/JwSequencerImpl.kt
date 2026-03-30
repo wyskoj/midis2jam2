@@ -27,6 +27,7 @@ import org.wysko.kmidi.midi.event.SysexEvent
 import org.wysko.kmidi.midi.event.PitchWheelChangeEvent
 import org.wysko.kmidi.midi.event.PolyphonicKeyPressureEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
+import org.wysko.midis2jam2.util.logger
 import java.util.concurrent.Executors
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -147,7 +148,11 @@ class JwSequencerImpl : JwSequencer {
 
             events?.let {
                 while (eventIndex in it.indices && tickToTime(it[eventIndex].tick) < localCurrentTime) {
-                    dispatch(it[eventIndex++])
+                    try {
+                        dispatch(it[eventIndex++])
+                    } catch (e: Exception) {
+                        logger().error("MIDI event dispatch failed.", e)
+                    }
                 }
             }
 
