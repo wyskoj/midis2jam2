@@ -90,7 +90,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.HomeScreenModel
-import org.wysko.midis2jam2.domain.copyBytesToInternalStorage
+import org.wysko.midis2jam2.domain.importValidSoundbanks
 import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.component.WarningAmber
@@ -172,16 +172,8 @@ private fun SoundbankSelector(model: HomeScreenModel) {
         files?.let { platformFiles ->
             scope.launch {
                 isImportingSoundbanks = true
-                val importedPaths = platformFiles.mapNotNull { pf ->
-                    runCatching {
-                        if (!pf.name.endsWith(".sf2", ignoreCase = true)) {
-                            null
-                        } else {
-                            val bytes = pf.readBytes()
-                            context.copyBytesToInternalStorage(pf.name, bytes)
-                        }
-                    }.getOrNull()
-                }
+                val importResult = context.importValidSoundbanks(platformFiles)
+                val importedPaths = importResult.importedPaths
 
                 if (importedPaths.isNotEmpty()) {
                     settingsModel.addSoundbanks(importedPaths)
@@ -195,7 +187,7 @@ private fun SoundbankSelector(model: HomeScreenModel) {
                     )
                 }
 
-                if (platformFiles.isNotEmpty() && importedPaths.isEmpty()) {
+                if (importResult.hasInvalidSelection) {
                     showInvalidSoundbankDialog = true
                 }
                 isImportingSoundbanks = false

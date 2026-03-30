@@ -80,6 +80,9 @@ import midis2jam2.app.generated.resources.settings_playback_soundbanks_add
 import midis2jam2.app.generated.resources.settings_playback_soundbanks_description
 import midis2jam2.app.generated.resources.settings_playback_soundbanks_none_loaded
 import midis2jam2.app.generated.resources.settings_playback_synthesizer
+import midis2jam2.app.generated.resources.soundbank_invalid_file_message
+import midis2jam2.app.generated.resources.soundbank_invalid_file_title
+import midis2jam2.app.generated.resources.ok
 import midis2jam2.app.generated.resources.warning
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -88,7 +91,7 @@ import org.koin.compose.koinInject
 import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.domain.LocaleHelper
 import org.wysko.midis2jam2.domain.SystemInteractionService
-import org.wysko.midis2jam2.domain.copyBytesToInternalStorage
+import org.wysko.midis2jam2.domain.importValidSoundbanks
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.ui.common.component.CategoryHeader
 import org.wysko.midis2jam2.ui.common.component.SelectOption
@@ -275,23 +278,23 @@ private fun SettingsSoundbanksSheet(
     val soundbanks = settings.value.playbackSettings.soundbanksSettings.soundbanks
     val context = LocalContext.current
     var isImportingSoundbanks by remember { mutableStateOf(false) }
+    var showInvalidSoundbankDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val picker = rememberFilePickerLauncher(
-        type = PickerType.File(listOf("sf2")),
+        type = PickerType.File(listOf("sf2", "SF2")),
         mode = PickerMode.Multiple(),
         title = stringResource(Res.string.settings_playback_soundbanks_add),
     ) { files ->
         files?.let { platformFiles ->
             scope.launch {
                 isImportingSoundbanks = true
-                val paths = platformFiles.mapNotNull { pf ->
-                    runCatching {
-                        val bytes = pf.readBytes()
-                        context.copyBytesToInternalStorage(pf.name, bytes)
-                    }.getOrNull()
-                }
+                val importResult = context.importValidSoundbanks(platformFiles)
+                val paths = importResult.importedPaths
                 if (paths.isNotEmpty()) {
                     model.addSoundbanks(paths)
+                }
+                if (importResult.hasInvalidSelection) {
+                    showInvalidSoundbankDialog = true
                 }
                 isImportingSoundbanks = false
             }
@@ -389,5 +392,18 @@ private fun SettingsSoundbanksSheet(
                 }
             }
         }
+    }
+
+    if (showInvalidSoundbankDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showInvalidSoundbankDialog = false },
+            title = { Text(stringResource(Res.string.soundbank_invalid_file_title)) },
+            text = { Text(stringResource(Res.string.soundbank_invalid_file_message)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = { showInvalidSoundbankDialog = false }) {
+                    Text(stringResource(Res.string.ok))
+                }
+            },
+        )
     }
 }
