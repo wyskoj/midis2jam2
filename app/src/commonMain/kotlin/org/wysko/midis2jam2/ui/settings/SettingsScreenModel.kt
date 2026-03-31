@@ -18,19 +18,19 @@
 package org.wysko.midis2jam2.ui.settings
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 object SettingsScreenModel : ScreenModel {
-    private val _openSoundbanksRequest = MutableStateFlow(false)
-    val openSoundbanksRequest: StateFlow<Boolean> = _openSoundbanksRequest
+    private val _openSoundbanksRequest = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val openSoundbanksRequest: SharedFlow<Unit> = _openSoundbanksRequest
 
     fun requestOpenSoundbanks() {
-        _openSoundbanksRequest.value = true
+        _openSoundbanksRequest.tryEmit(Unit)
     }
 
     fun consumeOpenSoundbanksRequest() {
-        _openSoundbanksRequest.value = false
+        // No-op with SharedFlow: events are consumed by collectors as they are emitted.
     }
 
     fun getAvailableLocales(): List<String> = listOf(

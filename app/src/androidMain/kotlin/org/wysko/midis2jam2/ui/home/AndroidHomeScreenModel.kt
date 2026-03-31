@@ -125,9 +125,7 @@ class AndroidHomeScreenModel(
     override fun loadState() {
         homeTabPersistor.load().soundbank?.let { path ->
             val file = File(path)
-            if (file.exists()) {
-                _selectedSoundbank.value = PlatformFile(Uri.fromFile(file), androidContext)
-            }
+            _selectedSoundbank.value = PlatformFile(Uri.fromFile(file), androidContext)
         }
     }
 
