@@ -172,25 +172,28 @@ private fun SoundbankSelector(model: HomeScreenModel) {
         files?.let { platformFiles ->
             scope.launch {
                 isImportingSoundbanks = true
-                val importResult = context.importValidSoundbanks(platformFiles)
-                val importedPaths = importResult.importedPaths
+                try {
+                    val importResult = context.importValidSoundbanks(platformFiles)
+                    val importedPaths = importResult.importedPaths
 
-                if (importedPaths.isNotEmpty()) {
-                    settingsModel.addSoundbanks(importedPaths)
-                    val mostRecentlyImported = importedPaths.last()
-                    val importedFile = File(mostRecentlyImported)
-                    model.setSelectedSoundbank(
-                        PlatformFile(
-                            android.net.Uri.fromFile(importedFile),
-                            context,
+                    if (importedPaths.isNotEmpty()) {
+                        settingsModel.addSoundbanks(importedPaths)
+                        val mostRecentlyImported = importedPaths.last()
+                        val importedFile = File(mostRecentlyImported)
+                        model.setSelectedSoundbank(
+                            PlatformFile(
+                                android.net.Uri.fromFile(importedFile),
+                                context,
+                            )
                         )
-                    )
-                }
+                    }
 
-                if (importResult.hasInvalidSelection) {
-                    showInvalidSoundbankDialog = true
+                    if (importResult.hasInvalidSelection) {
+                        showInvalidSoundbankDialog = true
+                    }
+                } finally {
+                    isImportingSoundbanks = false
                 }
-                isImportingSoundbanks = false
             }
         }
     }
