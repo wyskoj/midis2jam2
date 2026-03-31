@@ -55,7 +55,11 @@ private fun Context.copyAssetToTmpFile(fileName: String): String {
 @Throws(IOException::class)
 internal fun Context.copyBytesToInternalStorage(fileName: String, bytes: ByteArray): String {
     val dir = getDir("soundbanks", MODE_PRIVATE)
-    val destFile = java.io.File(dir, fileName)
+    val safeFileName = java.io.File(fileName).name
+    if (safeFileName.isBlank()) {
+        throw IOException("Invalid file name")
+    }
+    val destFile = java.io.File(dir, safeFileName)
     destFile.writeBytes(bytes)
     Log.d("MidiService", "Copied soundbank to internal storage: ${destFile.absolutePath}")
     return destFile.absolutePath
