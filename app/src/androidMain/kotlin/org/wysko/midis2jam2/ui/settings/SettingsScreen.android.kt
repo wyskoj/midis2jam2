@@ -288,15 +288,18 @@ private fun SettingsSoundbanksSheet(
         files?.let { platformFiles ->
             scope.launch {
                 isImportingSoundbanks = true
-                val importResult = context.importValidSoundbanks(platformFiles)
-                val paths = importResult.importedPaths
-                if (paths.isNotEmpty()) {
-                    model.addSoundbanks(paths)
+                try {
+                    val importResult = context.importValidSoundbanks(platformFiles)
+                    val paths = importResult.importedPaths
+                    if (paths.isNotEmpty()) {
+                        model.addSoundbanks(paths)
+                    }
+                    if (importResult.hasInvalidSelection) {
+                        showInvalidSoundbankDialog = true
+                    }
+                } finally {
+                    isImportingSoundbanks = false
                 }
-                if (importResult.hasInvalidSelection) {
-                    showInvalidSoundbankDialog = true
-                }
-                isImportingSoundbanks = false
             }
         }
     }
