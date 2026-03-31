@@ -42,7 +42,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -305,12 +304,10 @@ private fun SettingsSoundbanksSheet(
     }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isShowSheet by remember { mutableStateOf(false) }
-    val openSoundbanksRequest by screenModel.openSoundbanksRequest.collectAsState()
 
-    LaunchedEffect(openSoundbanksRequest) {
-        if (openSoundbanksRequest) {
+    LaunchedEffect(screenModel) {
+        screenModel.openSoundbanksRequest.collect {
             isShowSheet = true
-            screenModel.consumeOpenSoundbanksRequest()
         }
     }
 
