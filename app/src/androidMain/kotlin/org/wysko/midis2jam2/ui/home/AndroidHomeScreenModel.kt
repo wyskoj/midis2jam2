@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.ui.home
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
@@ -27,18 +29,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.ExecutionState
 import org.wysko.midis2jam2.domain.HomeScreenModel
+import org.wysko.midis2jam2.domain.HomeTabPersistentState
+import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.MidiService
-import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.ui.settings.SettingsModel
+import java.io.File
 
 class AndroidHomeScreenModel(
+    private val androidContext: Context,
     private val applicationService: ApplicationService,
     private val midiService: MidiService,
+    private val homeTabPersistor: HomeTabPersistor,
+    private val settingsModel: SettingsModel,
 ) : HomeScreenModel {
+
     private val _selectedMidiFile = MutableStateFlow<PlatformFile?>(null)
     override val selectedMidiFile: StateFlow<PlatformFile?>
         get() = _selectedMidiFile
@@ -46,8 +56,9 @@ class AndroidHomeScreenModel(
     override val selectedMidiDevice: StateFlow<MidiDevice>
         get() = MutableStateFlow(getMidiDevices().first())
 
+    private val _selectedSoundbank = MutableStateFlow<PlatformFile?>(null)
     override val selectedSoundbank: StateFlow<PlatformFile?>
-        get() = MutableStateFlow(null)
+        get() = _selectedSoundbank
 
     override val isLooping: StateFlow<Boolean>
         get() = MutableStateFlow(false)
@@ -56,7 +67,11 @@ class AndroidHomeScreenModel(
         get() = flowOf(true)
 
     override val soundbanks: Flow<List<PlatformFile>>
-        get() = error("Not supported on Android")
+        get() = settingsModel.appSettings.map { appSettings ->
+            appSettings.playbackSettings.soundbanksSettings.soundbanks.map { path ->
+                PlatformFile(Uri.fromFile(File(path)), androidContext)
+            }
+        }
 
     override val backgroundWarning: Flow<BackgroundWarning?>
         get() = flowOf(null)
@@ -81,7 +96,8 @@ class AndroidHomeScreenModel(
     }
 
     override fun setSelectedSoundbank(soundbank: PlatformFile?) {
-        error("Not supported on Android")
+        _selectedSoundbank.value = soundbank
+        saveState()
     }
 
     override fun setLooping(looping: Boolean) {
@@ -107,10 +123,18 @@ class AndroidHomeScreenModel(
     }
 
     override fun loadState() {
-        error("Not supported on Android")
+        homeTabPersistor.load().soundbank?.let { path ->
+            val file = File(path)
+            _selectedSoundbank.value = PlatformFile(Uri.fromFile(file), androidContext)
+        }
     }
 
     override fun saveState() {
-        error("Not supported on Android")
+        homeTabPersistor.save(
+            HomeTabPersistentState(
+                midiDevice = "", // Android always uses FluidSynth; no device selection to persist
+                soundbank = _selectedSoundbank.value?.uri?.path,
+            )
+        )
     }
 }

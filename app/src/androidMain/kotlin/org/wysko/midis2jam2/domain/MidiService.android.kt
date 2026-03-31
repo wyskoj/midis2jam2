@@ -52,16 +52,35 @@ private fun Context.copyAssetToTmpFile(fileName: String): String {
     }
 }
 
+@Throws(IOException::class)
+internal fun Context.copyBytesToInternalStorage(fileName: String, bytes: ByteArray): String {
+    val dir = getDir("soundbanks", MODE_PRIVATE)
+    val safeFileName = java.io.File(fileName).name
+    if (safeFileName.isBlank()) {
+        throw IOException("Invalid file name")
+    }
+    val destFile = java.io.File(dir, safeFileName)
+    destFile.writeBytes(bytes)
+    Log.d("MidiService", "Copied soundbank to internal storage: ${destFile.absolutePath}")
+    return destFile.absolutePath
+}
+
 class FluidSynthDevice(context: Context) : MidiDevice {
     override val name: String
         get() = "FluidSynth MIDI Device"
 
     private var bridge: FluidSynthBridge? = null
-    private val soundfontPath = context.copyAssetToTmpFile("general_user.sf2")
+    private val builtInSoundfontPath = context.copyAssetToTmpFile("general_user.sf2")
+
+    /** Override path to a user-supplied SF2 file. Set before calling [open]. */
+    var soundfontOverridePath: String? = null
 
     override fun open() {
         if (bridge == null) {
-            bridge = FluidSynthBridge(soundfontPath)
+            val path = soundfontOverridePath
+                ?.takeIf { java.io.File(it).exists() }
+                ?: builtInSoundfontPath
+            bridge = FluidSynthBridge(path)
         }
     }
 

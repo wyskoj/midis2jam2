@@ -89,11 +89,19 @@ object SettingsScreen : Screen {
             ) {
                 SettingsScreenContent(settings, model, screenModel)
             }
+            SettingsScreenOverlay(settings, model, screenModel)
         }
     }
 }
 
 internal expect fun LazyListScope.SettingsScreenContent(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+)
+
+@Composable
+internal expect fun SettingsScreenOverlay(
     settings: State<AppSettings>,
     model: SettingsModel,
     screenModel: SettingsScreenModel,

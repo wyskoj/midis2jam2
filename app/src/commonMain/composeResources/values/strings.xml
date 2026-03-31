@@ -17,6 +17,12 @@
     <string name="midi_device">MIDI device</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Default soundbank</string>
+    <string name="soundbank_selector_title">Select soundbank</string>
+    <string name="soundbank_manage">Manage soundbanks</string>
+    <string name="soundbank_invalid_file_title">Invalid soundbank file</string>
+    <string name="soundbank_invalid_file_message">Please select a valid SoundFont file with the .sf2 extension.</string>
+    <string name="soundbank_missing_warning_title">Soundbank not found</string>
+    <string name="soundbank_missing_warning_message">The selected soundbank file could not be found on disk. The default soundbank will be used instead. You can cancel and select a different soundbank in Settings.</string>
     <string name="play_midi_file">Play MIDI file</string>
     <string name="quality_none">None</string>
     <string name="quality_low">Low</string>
@@ -208,5 +214,3 @@
     <string name="settings_camera_field_of_view_label_prefix">Change how wide the camera sees</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
 </resources>
-
-
