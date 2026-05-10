@@ -93,6 +93,7 @@ import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 import org.wysko.midis2jam2.ui.history.HistoryScreenButton
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
 import org.wysko.midis2jam2.util.FileDragAndDrop
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal actual fun HomeScreenLayout() {
@@ -125,11 +126,11 @@ internal actual fun HomeScreenLayout() {
     LaunchedEffect(applyHomeScreenMidiFile) {
         applyHomeScreenMidiFile.value?.let { file ->
             scope.launch {
-                delay(100)
+                delay(100.milliseconds)
                 model.setMidiFile(PlatformFile(file))
                 navigationModel.clearApplyHomeScreenMidiFile()
                 flicker = true
-                delay(200)
+                delay(200.milliseconds)
                 flicker = false
             }
         }

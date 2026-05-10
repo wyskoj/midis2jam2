@@ -108,7 +108,6 @@ import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
-import org.wysko.midis2jam2.util.FileDragAndDrop
 import org.wysko.midis2jam2.util.FilesDragAndDrop
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
