@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.di
 
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.wysko.midis2jam2.domain.HomeScreenModel
@@ -29,10 +30,10 @@ actual val uiModule: Module = module {
     // Tabs
     single<HomeScreenModel> {
         AndroidHomeScreenModel(
+            context = androidContext(),
             applicationService = get(),
             midiService = get(),
             homeTabPersistor = get(),
-            settingsModel = get(),
             soundbankManager = get()
         )
     }

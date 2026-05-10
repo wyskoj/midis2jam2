@@ -285,25 +285,12 @@ private fun SelectAndPlayMidiFile(
 ) {
     val applicationService = koinInject<ApplicationService>()
     val navigator = LocalNavigator.currentOrThrow
-    val selectedSoundbank = model.selectedSoundbank.collectAsState()
 
-    var showMissingSoundbankDialog by remember { mutableStateOf(false) }
-
-    val proceed = {
+    val picker = model.midiFilePicker {
         if (applicationService.isFirstLaunch.value) {
             navigator.push(TutorialScreen)
         } else {
             model.startApplication()
-        }
-    }
-
-    val picker = model.midiFilePicker {
-        val currentSoundbank = selectedSoundbank.value
-        val isMissing = currentSoundbank?.toAndroidUri()?.path?.let { !File(it).exists() } == true
-        if (isMissing) {
-            showMissingSoundbankDialog = true
-        } else {
-            proceed()
         }
     }
 
@@ -319,33 +306,5 @@ private fun SelectAndPlayMidiFile(
             Icon(painterResource(Res.drawable.play_arrow), "", modifier = Modifier.size(24.dp))
             Text(stringResource(Res.string.play_midi_file), fontSize = 16.sp)
         }
-    }
-
-    if (showMissingSoundbankDialog) {
-        AlertDialog(
-            onDismissRequest = { showMissingSoundbankDialog = false },
-            icon = {
-                Icon(
-                    painterResource(Res.drawable.warning),
-                    contentDescription = null,
-                    tint = WarningAmber,
-                )
-            },
-            title = { Text(stringResource(Res.string.soundbank_missing_warning_title)) },
-            text = { Text(stringResource(Res.string.soundbank_missing_warning_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showMissingSoundbankDialog = false
-                    proceed()
-                }) {
-                    Text(stringResource(Res.string.background_cubemap_warning_continue))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showMissingSoundbankDialog = false }) {
-                    Text(stringResource(Res.string.cancel))
-                }
-            },
-        )
     }
 }

@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.starter
 
+import android.content.Context
 import Platform
 import com.jme3.app.SimpleApplication
 import io.github.vinceglb.filekit.name
@@ -32,7 +33,6 @@ import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.midis2jam2.AndroidPerformanceManager
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
-import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.FluidSynthDevice
 import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.domain.MidiService
@@ -48,6 +48,7 @@ import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.state
 import org.wysko.midis2jam2.world.AssetLoader
+import java.io.File
 
 internal actual class Midis2jam2Application(
     private val onFinish: () -> Unit = {},
@@ -64,7 +65,6 @@ internal actual class Midis2jam2Application(
     actual override fun simpleInitApp() {
         logger().debug("Midis2jam2Application: simpleInitApp() called")
 
-        val errorLogService: ErrorLogService by inject()
         val applicationService: ApplicationService by inject()
         val midiService: MidiService by inject()
         val midiFile = applicationService.midiFile.value!!
@@ -74,7 +74,9 @@ internal actual class Midis2jam2Application(
             val sequence = StandardMidiFileReader().readByteArray(midiFile.readBytes()).toTimeBasedSequence()
             val midiDevice = midiService.getMidiDevices().first()
             val homeConfiguration = configurations.find<HomeConfiguration>()
-            (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = homeConfiguration.selectedSoundbank
+            homeConfiguration.selectedSoundbank?.let { soundbankPath ->
+                (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)
+            }
             val currentSequencer = JwSequencerImpl().apply {
                 open(midiDevice)
                 this.sequence = sequence
@@ -155,6 +157,17 @@ internal actual class Midis2jam2Application(
             while (state<AndroidInputManager>() == null) yield()
             (state<AndroidInputManager>() ?: return@launch).registerPlaybackStateListener(listener)
         }
+    }
+
+    private fun resolveSoundbankPath(path: String): String {
+        val context: Context by inject()
+        val directFile = File(path)
+        if (directFile.exists()) {
+            return directFile.absolutePath
+        }
+
+        val fallbackFile = File(context.filesDir, "soundbanks/${directFile.name}")
+        return fallbackFile.absolutePath
     }
 }
 

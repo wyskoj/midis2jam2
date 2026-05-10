@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.ui.home
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
@@ -24,12 +25,11 @@ import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
-import io.github.vinceglb.filekit.dialogs.toAndroidUri
+import io.github.vinceglb.filekit.path
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.ExecutionState
@@ -39,14 +39,13 @@ import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.manager.AndroidSoundbanksManager
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.ui.settings.SettingsModel
 import java.io.File
 
 class AndroidHomeScreenModel(
+    private val context: Context,
     private val applicationService: ApplicationService,
     private val midiService: MidiService,
     private val homeTabPersistor: HomeTabPersistor,
-    private val settingsModel: SettingsModel,
     private val soundbankManager: AndroidSoundbanksManager,
 ) : HomeScreenModel {
 
@@ -120,8 +119,9 @@ class AndroidHomeScreenModel(
 
     override fun loadState() {
         homeTabPersistor.load().soundbank?.let { path ->
-            val file = File(path)
-            _selectedSoundbank.value = PlatformFile(Uri.fromFile(file))
+            resolveSoundbankFile(path)?.let { file ->
+                _selectedSoundbank.value = PlatformFile(Uri.fromFile(file))
+            }
         }
     }
 
@@ -129,8 +129,18 @@ class AndroidHomeScreenModel(
         homeTabPersistor.save(
             HomeTabPersistentState(
                 midiDevice = "", // Android always uses FluidSynth; no device selection to persist
-                soundbank = _selectedSoundbank.value?.toAndroidUri()?.path,
+                soundbank = _selectedSoundbank.value?.path,
             )
         )
+    }
+
+    private fun resolveSoundbankFile(path: String): File? {
+        val directFile = File(path)
+        if (directFile.exists()) {
+            return directFile
+        }
+
+        val fallbackFile = File(context.filesDir, "soundbanks/${directFile.name}")
+        return fallbackFile.takeIf { it.exists() }
     }
 }
