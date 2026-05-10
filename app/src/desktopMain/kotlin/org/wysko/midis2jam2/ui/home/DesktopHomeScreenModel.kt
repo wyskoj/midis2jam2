@@ -20,9 +20,11 @@ package org.wysko.midis2jam2.ui.home
 import androidx.compose.runtime.Composable
 import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.path
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,9 +119,11 @@ class DesktopHomeScreenModel(
         onFileSelected: ((PlatformFile) -> Unit)?,
     ): PickerResultLauncher {
         return rememberFilePickerLauncher(
-            mode = PickerMode.Single,
-            type = PickerType.File(MIDI_FILE_EXTENSIONS),
-            title = "Select MIDI file",
+            mode = FileKitMode.Single,
+            type = FileKitType.File(MIDI_FILE_EXTENSIONS),
+            dialogSettings = FileKitDialogSettings(
+                title = "Select MIDI file"
+            ),
         ) { file ->
             _selectedMidiFile.value = file
             file?.let {

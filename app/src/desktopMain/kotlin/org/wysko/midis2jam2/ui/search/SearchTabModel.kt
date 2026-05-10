@@ -19,8 +19,9 @@ package org.wysko.midis2jam2.ui.search
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
+import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
 import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
-import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -108,7 +109,7 @@ class SearchTabModel : ScreenModel {
         startShowWaitingPageJob: () -> Unit = {},
         onFinish: () -> Unit = {},
     ): PickerResultLauncher = rememberDirectoryPickerLauncher(
-        title = "Select directory",
+        dialogSettings = FileKitDialogSettings(title = "Select directory")
     ) { platformDirectory ->
         platformDirectory?.let {
             startShowWaitingPageJob()

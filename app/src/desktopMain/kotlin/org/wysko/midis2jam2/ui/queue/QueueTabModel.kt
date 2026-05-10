@@ -19,14 +19,14 @@ package org.wysko.midis2jam2.ui.queue
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
-import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
-import io.github.vinceglb.filekit.compose.SaverResultLauncher
-import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.compose.rememberFileSaverLauncher
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.PlatformFiles
+import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
+import io.github.vinceglb.filekit.dialogs.compose.SaverResultLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -85,16 +85,18 @@ class QueueTabModel(
 
     @Composable
     fun midiFilePicker(): PickerResultLauncher = rememberFilePickerLauncher(
-        type = PickerType.File(MIDI_FILE_EXTENSIONS),
-        mode = PickerMode.Multiple(),
-        title = "Select MIDI files",
+        type = FileKitType.File(MIDI_FILE_EXTENSIONS),
+        mode = FileKitMode.Multiple(),
+        dialogSettings = FileKitDialogSettings(
+            title = "Select MIDI files",
+        )
     ) { files ->
         if (files != null) {
             addToQueue(files)
         }
     }
 
-    fun addToQueue(files: PlatformFiles) {
+    fun addToQueue(files: List<PlatformFile>) {
         setQueue((queue.value + files).distinct())
         _isDirty.value = true
     }
@@ -102,9 +104,11 @@ class QueueTabModel(
     @Composable
     fun queueLoadPicker(displayWarningDialog: (missingFiles: List<String>) -> Unit = {}): PickerResultLauncher =
         rememberFilePickerLauncher(
-            type = PickerType.File(listOf("txt")),
-            mode = PickerMode.Single,
-            title = "Select playlist",
+            type = FileKitType.File(listOf("txt")),
+            mode = FileKitMode.Single,
+            dialogSettings = FileKitDialogSettings(
+                title = "Select playlist",
+            )
         ) { file ->
             applyQueue(file, displayWarningDialog)
         }
@@ -126,12 +130,17 @@ class QueueTabModel(
     }
 
     @Composable
-    fun queueSavePicker(onSave: () -> Unit = {}): SaverResultLauncher = rememberFileSaverLauncher {
-        _isDirty.value = false
-        if (it != null) {
-            onSave()
+    fun queueSavePicker(onSave: (PlatformFile) -> Unit = { (_) -> }): SaverResultLauncher =
+        rememberFileSaverLauncher(
+            FileKitDialogSettings(
+                title = "Save queue"
+            )
+        ) {
+            _isDirty.value = false
+            if (it != null) {
+                onSave(it)
+            }
         }
-    }
 
     fun shuffleQueue() {
         _queue.value = _queue.value.shuffled()
