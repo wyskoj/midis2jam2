@@ -24,6 +24,7 @@
     <string name="tab_about">Über</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
+    <string name="warning">Warnung</string>
     <string name="back">Zurück</string>
     <string name="play">Abspielen</string>
     <string name="enabled">Aktiviert</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI-Gerät</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Standard-Soundbank</string>
+    <string name="soundbank_selector_title">Soundbank auswählen</string>
+    <string name="soundbank_manage">Verwalten</string>
+    <string name="soundbank_invalid_file_title">Ungültige Soundbank-Datei</string>
+    <string name="soundbank_invalid_file_message">Bitte wähle eine gültige SoundFont-Datei mit der Erweiterung .sf2 aus.</string>
+    <string name="soundbank_missing_warning_title">Soundbank nicht gefunden</string>
+    <string name="soundbank_missing_warning_message">Die ausgewählte Soundbank-Datei konnte auf dem Datenträger nicht gefunden werden. Stattdessen wird die Standardsoundbank verwendet. Du kannst abbrechen und in den Einstellungen eine andere Soundbank auswählen.</string>
     <string name="play_midi_file">MIDI-Datei abspielen</string>
     <string name="quality_none">Keine</string>
     <string name="quality_low">Niedrig</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Soundbanks hinzufügen</string>
     <string name="settings_playback_soundbanks_description">Soundbanks für die Verwendung mit dem Synthesizer importieren</string>
     <string name="settings_playback_soundbanks_none_loaded">Keine Soundbanks geladen</string>
+    <string name="settings_playback_soundbanks_import">Importieren</string>
+    <string name="settings_playback_soundbanks_importing">Wird importiert</string>
+    <string name="settings_playback_soundbanks_delete">Löschen</string>
+    <string name="settings_playback_soundbanks_delete_title">Soundbank löschen?</string>
+    <string name="settings_playback_soundbanks_delete_message">Möchten Sie %1$s wirklich löschen?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Chorus</string>

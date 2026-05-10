@@ -24,6 +24,7 @@
     <string name="tab_about">Tungkol</string>
     <string name="ok">Sige</string>
     <string name="cancel">Kanselahin</string>
+    <string name="warning">Babala</string>
     <string name="back">Bumalik</string>
     <string name="play">I-play</string>
     <string name="enabled">Pinagana</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">Device ng MIDI</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Default na soundbank</string>
+    <string name="soundbank_selector_title">Pumili ng soundbank</string>
+    <string name="soundbank_manage">Pamahalaan</string>
+    <string name="soundbank_invalid_file_title">Hindi wastong soundbank file</string>
+    <string name="soundbank_invalid_file_message">Pumili ng wastong SoundFont file na may extension na .sf2.</string>
+    <string name="soundbank_missing_warning_title">Hindi nakita ang soundbank</string>
+    <string name="soundbank_missing_warning_message">Hindi nakita sa disk ang napiling soundbank file. Gagamitin sa halip ang default na soundbank. Maaari mong kanselahin at pumili ng ibang soundbank sa Mga Setting.</string>
     <string name="play_midi_file">I-play ang MIDI file</string>
     <string name="quality_none">Wala</string>
     <string name="quality_low">Mababa</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Magdagdag ng soundbanks</string>
     <string name="settings_playback_soundbanks_description">Mag-import ng soundbanks para magamit sa synthesizer</string>
     <string name="settings_playback_soundbanks_none_loaded">Walang naka-load na soundbanks</string>
+    <string name="settings_playback_soundbanks_import">I-import</string>
+    <string name="settings_playback_soundbanks_importing">Ini-import</string>
+    <string name="settings_playback_soundbanks_delete">Burahin</string>
+    <string name="settings_playback_soundbanks_delete_title">Burahin ang soundbank?</string>
+    <string name="settings_playback_soundbanks_delete_message">Sigurado ka bang gusto mong burahin ang %1$s?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Chorus</string>

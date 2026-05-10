@@ -24,6 +24,7 @@
     <string name="tab_about">关于</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
+    <string name="warning">警告</string>
     <string name="back">返回</string>
     <string name="play">播放</string>
     <string name="enabled">已启用</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI 设备</string>
     <string name="soundbank">音色库</string>
     <string name="soundbank_default">默认音色库</string>
+    <string name="soundbank_selector_title">选择音色库</string>
+    <string name="soundbank_manage">管理</string>
+    <string name="soundbank_invalid_file_title">无效的音色库文件</string>
+    <string name="soundbank_invalid_file_message">请选择扩展名为 .sf2 的有效 SoundFont 文件。</string>
+    <string name="soundbank_missing_warning_title">未找到音色库</string>
+    <string name="soundbank_missing_warning_message">所选音色库文件在磁盘上找不到。将改用默认音色库。您可以取消并在“设置”中选择其他音色库。</string>
     <string name="play_midi_file">播放 MIDI 文件</string>
     <string name="quality_none">无</string>
     <string name="quality_low">低</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">添加音色库</string>
     <string name="settings_playback_soundbanks_description">导入音色库以供合成器使用</string>
     <string name="settings_playback_soundbanks_none_loaded">未加载任何音色库</string>
+    <string name="settings_playback_soundbanks_import">导入</string>
+    <string name="settings_playback_soundbanks_importing">正在导入</string>
+    <string name="settings_playback_soundbanks_delete">删除</string>
+    <string name="settings_playback_soundbanks_delete_title">删除音色库？</string>
+    <string name="settings_playback_soundbanks_delete_message">您确定要删除 %1$s 吗？</string>
 
     <!-- 设置 / 播放 / 合成器 -->
     <string name="settings_playback_synthesizer_chorus">合唱</string>

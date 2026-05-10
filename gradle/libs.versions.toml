@@ -8,6 +8,7 @@ androidx-lifecycle = "2.9.6"
 androidxComposeBom = "2026.02.01"
 colorpicker = "1.1.3"
 composeMultiplatform = "1.10.2"
+filekit = "0.14.1"
 install4j = "12.0.3"
 jme3 = "3.9.0-stable"
 koin-bom = "4.1.1"
@@ -35,9 +36,11 @@ kotlinx-serialization-yaml = { group = "com.charleskorn.kaml", name = "kaml", ve
 
 # UI elements
 compose-colorpicker = { module = "com.github.skydoves:colorpicker-compose", version.ref = "colorpicker" }
-filekit = { group = "io.github.vinceglb", name = "filekit-compose", version = "0.8.8" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
+# FileKit
+filekit-core = { group = "io.github.vinceglb", name = "filekit-core", version.ref = "filekit" }
+filekit-dialogs = { group = "io.github.vinceglb", name = "filekit-dialogs-compose", version.ref = "filekit" }
 
 # jMonkeyEngine
 jme3-androidNative = { group = "org.jmonkeyengine", name = "jme3-android-native", version.ref = "jme3" }
@@ -75,6 +78,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", vers
 [bundles]
 jme3 = ["jme3-core", "jme3-effects"]
 voyager = ["voyager-navigator", "voyager-screenmodel", "voyager-koin", "voyager-tab-navigator", "voyager-transitions"]
+filekit = ["filekit-core", "filekit-dialogs"]
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

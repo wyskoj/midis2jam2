@@ -19,7 +19,7 @@ package org.wysko.midis2jam2.domain
 
 import android.content.Context
 import android.content.Intent
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent

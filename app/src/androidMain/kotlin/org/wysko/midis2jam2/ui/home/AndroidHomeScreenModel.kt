@@ -17,14 +17,14 @@
 
 package org.wysko.midis2jam2.ui.home
 
-import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import io.github.vinceglb.filekit.compose.PickerResultLauncher
-import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.toAndroidUri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,16 +37,17 @@ import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.domain.HomeTabPersistentState
 import org.wysko.midis2jam2.domain.HomeTabPersistor
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.manager.AndroidSoundbanksManager
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.ui.settings.SettingsModel
 import java.io.File
 
 class AndroidHomeScreenModel(
-    private val androidContext: Context,
     private val applicationService: ApplicationService,
     private val midiService: MidiService,
     private val homeTabPersistor: HomeTabPersistor,
     private val settingsModel: SettingsModel,
+    private val soundbankManager: AndroidSoundbanksManager,
 ) : HomeScreenModel {
 
     private val _selectedMidiFile = MutableStateFlow<PlatformFile?>(null)
@@ -67,11 +68,7 @@ class AndroidHomeScreenModel(
         get() = flowOf(true)
 
     override val soundbanks: Flow<List<PlatformFile>>
-        get() = settingsModel.appSettings.map { appSettings ->
-            appSettings.playbackSettings.soundbanksSettings.soundbanks.map { path ->
-                PlatformFile(Uri.fromFile(File(path)), androidContext)
-            }
-        }
+        get() = soundbankManager.soundbanks
 
     override val backgroundWarning: Flow<BackgroundWarning?>
         get() = flowOf(null)
@@ -111,9 +108,8 @@ class AndroidHomeScreenModel(
     @Composable
     override fun midiFilePicker(onFileSelected: ((PlatformFile) -> Unit)?): PickerResultLauncher {
         return rememberFilePickerLauncher(
-            mode = PickerMode.Single,
-            type = PickerType.File(),
-            title = "Select MIDI file",
+            mode = FileKitMode.Single,
+            type = FileKitType.File(),
         ) { file ->
             _selectedMidiFile.value = file
             file?.let {
@@ -125,7 +121,7 @@ class AndroidHomeScreenModel(
     override fun loadState() {
         homeTabPersistor.load().soundbank?.let { path ->
             val file = File(path)
-            _selectedSoundbank.value = PlatformFile(Uri.fromFile(file), androidContext)
+            _selectedSoundbank.value = PlatformFile(Uri.fromFile(file))
         }
     }
 
@@ -133,7 +129,7 @@ class AndroidHomeScreenModel(
         homeTabPersistor.save(
             HomeTabPersistentState(
                 midiDevice = "", // Android always uses FluidSynth; no device selection to persist
-                soundbank = _selectedSoundbank.value?.uri?.path,
+                soundbank = _selectedSoundbank.value?.toAndroidUri()?.path,
             )
         )
     }

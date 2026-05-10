@@ -24,6 +24,7 @@
     <string name="tab_about">정보</string>
     <string name="ok">확인</string>
     <string name="cancel">취소</string>
+    <string name="warning">경고</string>
     <string name="back">뒤로</string>
     <string name="play">재생</string>
     <string name="enabled">사용</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI 장치</string>
     <string name="soundbank">사운드뱅크</string>
     <string name="soundbank_default">기본 사운드뱅크</string>
+    <string name="soundbank_selector_title">사운드뱅크 선택</string>
+    <string name="soundbank_manage">관리</string>
+    <string name="soundbank_invalid_file_title">잘못된 사운드뱅크 파일</string>
+    <string name="soundbank_invalid_file_message">.sf2 확장자를 가진 올바른 SoundFont 파일을 선택하세요.</string>
+    <string name="soundbank_missing_warning_title">사운드뱅크를 찾을 수 없습니다</string>
+    <string name="soundbank_missing_warning_message">선택한 사운드뱅크 파일을 디스크에서 찾을 수 없습니다. 대신 기본 사운드뱅크를 사용합니다. 취소하고 설정에서 다른 사운드뱅크를 선택할 수 있습니다.</string>
     <string name="play_midi_file">MIDI 파일 재생</string>
     <string name="quality_none">없음</string>
     <string name="quality_low">낮음</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">사운드뱅크 추가</string>
     <string name="settings_playback_soundbanks_description">신디사이저와 함께 사용할 사운드뱅크 가져오기</string>
     <string name="settings_playback_soundbanks_none_loaded">로드된 사운드뱅크 없음</string>
+    <string name="settings_playback_soundbanks_import">가져오기</string>
+    <string name="settings_playback_soundbanks_importing">가져오는 중</string>
+    <string name="settings_playback_soundbanks_delete">삭제</string>
+    <string name="settings_playback_soundbanks_delete_title">사운드뱅크를 삭제하시겠습니까?</string>
+    <string name="settings_playback_soundbanks_delete_message">%1$s을(를) 삭제하시겠습니까?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">코러스</string>

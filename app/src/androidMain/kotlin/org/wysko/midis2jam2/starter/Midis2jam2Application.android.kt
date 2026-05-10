@@ -19,6 +19,8 @@ package org.wysko.midis2jam2.starter
 
 import Platform
 import com.jme3.app.SimpleApplication
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,6 +52,7 @@ import org.wysko.midis2jam2.world.AssetLoader
 internal actual class Midis2jam2Application(
     private val onFinish: () -> Unit = {},
 ) : SimpleApplication(), KoinComponent {
+    private var sequencer: JwSequencerImpl? = null
 
     actual fun execute() = Unit
 
@@ -72,15 +75,16 @@ internal actual class Midis2jam2Application(
             val midiDevice = midiService.getMidiDevices().first()
             val homeConfiguration = configurations.find<HomeConfiguration>()
             (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = homeConfiguration.selectedSoundbank
-            val sequencer = JwSequencerImpl().apply {
+            val currentSequencer = JwSequencerImpl().apply {
                 open(midiDevice)
                 this.sequence = sequence
             }
+            sequencer = currentSequencer
 
             Jme3ExceptionHandler.setup {
                 stop()
-                sequencer.stop()
-                sequencer.close()
+                currentSequencer.stop()
+                currentSequencer.close()
             }
 
             enqueue {
@@ -91,7 +95,7 @@ internal actual class Midis2jam2Application(
                     loadingProgressManager.onLoadingAsset(it)
                 })
                 val performanceAppState = AndroidPerformanceManager(
-                    sequencer = sequencer,
+                    sequencer = currentSequencer,
                     midiFile = sequence,
                     onClose = { stop() },
                     fileName = midiFile.name,
@@ -99,7 +103,7 @@ internal actual class Midis2jam2Application(
                 )
                 stateManager.attach(performanceAppState)
                 rootNode.attachChild(performanceAppState.root)
-                addManagers(configurations, sequence, sequencer)
+                addManagers(configurations, sequence, currentSequencer)
                 stateManager.attach(AndroidInputManager())
                 stateManager.attach(MidiDeviceManager(configurations, midiDevice))
             }
@@ -107,6 +111,9 @@ internal actual class Midis2jam2Application(
     }
 
     actual override fun stop() {
+        sequencer?.stop()
+        sequencer?.close()
+        sequencer = null
         super.stop()
         onFinish()
     }
@@ -140,6 +147,13 @@ internal actual class Midis2jam2Application(
         CoroutineScope(Dispatchers.Default).launch {
             while (state<CameraManager>() == null) yield()
             (state<CameraManager>() ?: return@launch).registerCameraStateListener(listener)
+        }
+    }
+
+    fun registerPlaybackStateListener(listener: (Boolean) -> Unit) {
+        CoroutineScope(Dispatchers.Default).launch {
+            while (state<AndroidInputManager>() == null) yield()
+            (state<AndroidInputManager>() ?: return@launch).registerPlaybackStateListener(listener)
         }
     }
 }

@@ -24,6 +24,7 @@
     <string name="tab_about">Giới thiệu</string>
     <string name="ok">OK</string>
     <string name="cancel">Hủy</string>
+    <string name="warning">Cảnh báo</string>
     <string name="back">Quay lại</string>
     <string name="play">Phát</string>
     <string name="enabled">Bật</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">Thiết bị MIDI</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Soundbank mặc định</string>
+    <string name="soundbank_selector_title">Chọn soundbank</string>
+    <string name="soundbank_manage">Quản lý</string>
+    <string name="soundbank_invalid_file_title">Tệp soundbank không hợp lệ</string>
+    <string name="soundbank_invalid_file_message">Vui lòng chọn một tệp SoundFont hợp lệ với phần mở rộng .sf2.</string>
+    <string name="soundbank_missing_warning_title">Không tìm thấy soundbank</string>
+    <string name="soundbank_missing_warning_message">Tệp soundbank đã chọn không được tìm thấy trên đĩa. Thay vào đó sẽ dùng soundbank mặc định. Bạn có thể hủy và chọn soundbank khác trong Cài đặt.</string>
     <string name="play_midi_file">Phát tập tin MIDI</string>
     <string name="quality_none">Không có</string>
     <string name="quality_low">Thấp</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Thêm soundbank</string>
     <string name="settings_playback_soundbanks_description">Nhập soundbank để dùng cho bộ tổng hợp</string>
     <string name="settings_playback_soundbanks_none_loaded">Chưa có soundbank được nạp</string>
+    <string name="settings_playback_soundbanks_import">Nhập</string>
+    <string name="settings_playback_soundbanks_importing">Đang nhập</string>
+    <string name="settings_playback_soundbanks_delete">Xóa</string>
+    <string name="settings_playback_soundbanks_delete_title">Xóa soundbank?</string>
+    <string name="settings_playback_soundbanks_delete_message">Bạn có chắc muốn xóa %1$s không?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Điệp khúc</string>

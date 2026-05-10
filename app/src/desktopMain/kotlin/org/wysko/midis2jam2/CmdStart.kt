@@ -18,7 +18,7 @@
 package org.wysko.midis2jam2
 
 import com.install4j.api.launcher.SplashScreen
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent

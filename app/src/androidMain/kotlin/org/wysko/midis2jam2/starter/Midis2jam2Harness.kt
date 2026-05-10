@@ -112,7 +112,7 @@ class Midis2jam2Harness(
         if (!isShuttingDown.compareAndSet(false, true)) return
         cancelPendingGestureCallbacks()
         loseFocus()
-        app.enqueue { app.stop() }
+        app.stop()
     }
 
     private fun cancelPendingGestureCallbacks() {
@@ -158,6 +158,9 @@ class Midis2jam2Harness(
 
     fun registerProgressListener(listener: ProgressListener): Unit =
         app.registerProgressListener(listener)
+
+    fun registerPlaybackStateListener(listener: (Boolean) -> Unit): Unit =
+        app.registerPlaybackStateListener(listener)
 
     private val _isAutoCamActive = MutableStateFlow(false)
     val isAutoCamActive: StateFlow<Boolean>

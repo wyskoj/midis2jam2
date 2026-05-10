@@ -24,6 +24,7 @@
     <string name="tab_about">About</string>
     <string name="ok">OK</string>
     <string name="cancel">キャンセル</string>
+    <string name="warning">警告</string>
     <string name="back">戻る</string>
     <string name="play">再生</string>
     <string name="enabled">有効</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDIデバイス</string>
     <string name="soundbank">サウンドバンク</string>
     <string name="soundbank_default">デフォルトサウンドバンク</string>
+    <string name="soundbank_selector_title">サウンドバンクを選択</string>
+    <string name="soundbank_manage">管理</string>
+    <string name="soundbank_invalid_file_title">無効なサウンドバンクファイル</string>
+    <string name="soundbank_invalid_file_message">.sf2 拡張子の有効な SoundFont ファイルを選択してください。</string>
+    <string name="soundbank_missing_warning_title">サウンドバンクが見つかりません</string>
+    <string name="soundbank_missing_warning_message">選択されたサウンドバンクファイルはディスク上で見つかりませんでした。代わりにデフォルトのサウンドバンクが使用されます。キャンセルして、設定で別のサウンドバンクを選択できます。</string>
     <string name="play_midi_file">MIDIファイルを再生</string>
     <string name="quality_none">なし</string>
     <string name="quality_low">低</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">サウンドバンクを追加</string>
     <string name="settings_playback_soundbanks_description">シンセサイザーで使用するサウンドバンクをインポート</string>
     <string name="settings_playback_soundbanks_none_loaded">サウンドバンクが読み込まれていません</string>
+    <string name="settings_playback_soundbanks_import">インポート</string>
+    <string name="settings_playback_soundbanks_importing">インポート中</string>
+    <string name="settings_playback_soundbanks_delete">削除</string>
+    <string name="settings_playback_soundbanks_delete_title">サウンドバンクを削除しますか？</string>
+    <string name="settings_playback_soundbanks_delete_message">本当に %1$s を削除しますか？</string>
 
     <!-- 設定 / 再生 / シンセサイザー -->
     <string name="settings_playback_synthesizer_chorus">コーラス</string>

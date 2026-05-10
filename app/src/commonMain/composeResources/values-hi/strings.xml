@@ -7,6 +7,7 @@
     <string name="tab_about">के बारे में</string>
     <string name="ok">ठीक</string>
     <string name="cancel">रद्द करें</string>
+    <string name="warning">चेतावनी</string>
     <string name="back">पीछे</string>
     <string name="play">चलाएं</string>
     <string name="enabled">सक्षम</string>
@@ -15,6 +16,12 @@
     <string name="midi_device">MIDI डिवाइस</string>
     <string name="soundbank">साउंडबैंक</string>
     <string name="soundbank_default">डिफ़ॉल्ट साउंडबैंक</string>
+    <string name="soundbank_selector_title">साउंडबैंक चुनें</string>
+    <string name="soundbank_manage">प्रबंधित करें</string>
+    <string name="soundbank_invalid_file_title">अमान्य साउंडबैंक फ़ाइल</string>
+    <string name="soundbank_invalid_file_message">.sf2 एक्सटेंशन वाली एक मान्य SoundFont फ़ाइल चुनें।</string>
+    <string name="soundbank_missing_warning_title">साउंडबैंक नहीं मिला</string>
+    <string name="soundbank_missing_warning_message">चयनित साउंडबैंक फ़ाइल डिस्क पर नहीं मिली। इसके बजाय डिफ़ॉल्ट साउंडबैंक का उपयोग किया जाएगा। आप रद्द कर सकते हैं और सेटिंग्स में कोई दूसरा साउंडबैंक चुन सकते हैं।</string>
     <string name="play_midi_file">MIDI फ़ाइल चलाएं</string>
     <string name="quality_none">कोई नहीं</string>
     <string name="quality_low">कम</string>
@@ -153,6 +160,11 @@
     <string name="settings_playback_soundbanks_add">साउंडबैंक जोड़ें</string>
     <string name="settings_playback_soundbanks_description">सिंथेसाइज़र के साथ उपयोग के लिए साउंडबैंक आयात करें</string>
     <string name="settings_playback_soundbanks_none_loaded">कोई साउंडबैंक लोड नहीं किया गया</string>
+    <string name="settings_playback_soundbanks_import">आयात करें</string>
+    <string name="settings_playback_soundbanks_importing">आयात हो रहा है</string>
+    <string name="settings_playback_soundbanks_delete">हटाएँ</string>
+    <string name="settings_playback_soundbanks_delete_title">साउंडबैंक हटाएँ?</string>
+    <string name="settings_playback_soundbanks_delete_message">क्या आप वाकई %1$s हटाना चाहते हैं?</string>
 
     <!-- सेटिंग्स / प्लेबैक / सिंथेसाइज़र -->
     <string name="settings_playback_synthesizer_chorus">कोरस</string>

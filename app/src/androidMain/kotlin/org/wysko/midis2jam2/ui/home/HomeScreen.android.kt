@@ -19,6 +19,7 @@
 
 package org.wysko.midis2jam2.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,14 +33,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,49 +56,39 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.dialogs.toAndroidUri
+import io.github.vinceglb.filekit.name
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.add_circle
 import midis2jam2.app.generated.resources.audio_file
 import midis2jam2.app.generated.resources.background_cubemap_warning_continue
 import midis2jam2.app.generated.resources.cancel
-import midis2jam2.app.generated.resources.ok
 import midis2jam2.app.generated.resources.play_arrow
 import midis2jam2.app.generated.resources.play_midi_file
 import midis2jam2.app.generated.resources.settings_fill
+import midis2jam2.app.generated.resources.settings_playback_soundbanks
 import midis2jam2.app.generated.resources.soundbank_default
+import midis2jam2.app.generated.resources.soundbank_manage
 import midis2jam2.app.generated.resources.soundbank_missing_warning_message
 import midis2jam2.app.generated.resources.soundbank_missing_warning_title
-import midis2jam2.app.generated.resources.settings_playback_soundbanks_add
-import midis2jam2.app.generated.resources.soundbank_manage
-import midis2jam2.app.generated.resources.soundbank_invalid_file_message
-import midis2jam2.app.generated.resources.soundbank_invalid_file_title
-import midis2jam2.app.generated.resources.soundbank_selector_title
 import midis2jam2.app.generated.resources.warning
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.HomeScreenModel
-import org.wysko.midis2jam2.domain.importValidSoundbanks
+import org.wysko.midis2jam2.manager.AndroidSoundbanksManager
 import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.component.WarningAmber
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
-import org.wysko.midis2jam2.ui.settings.SettingsModel
-import org.wysko.midis2jam2.ui.settings.SettingsScreenModel
-import org.wysko.midis2jam2.ui.settings.SettingsTab
+import org.wysko.midis2jam2.ui.settings.SoundbanksScreen
 import org.wysko.midis2jam2.ui.tutorial.TutorialScreen
 import java.io.File
 
@@ -111,10 +102,11 @@ internal actual fun HomeScreenLayout() {
     }
 
     // When a soundbank is removed from settings, clear the selection on the home tab
-    val soundbanks = model.soundbanks.collectAsState(initial = emptyList())
+    val soundbanks = model.soundbanks.collectAsState(initial = null)
     LaunchedEffect(soundbanks.value) {
-        val currentPath = model.selectedSoundbank.value?.uri?.path ?: return@LaunchedEffect
-        if (soundbanks.value.none { it.uri?.path == currentPath }) {
+        val loaded = soundbanks.value ?: return@LaunchedEffect
+        if (loaded.none { it.name == model.selectedSoundbank.value?.name }) {
+            Log.i("HomeScreen", "Reverting to default soundbank")
             model.setSelectedSoundbank(null)
         }
     }
@@ -124,7 +116,9 @@ internal actual fun HomeScreenLayout() {
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
         ) {
             LogScreenButton(
                 navigator, Modifier
@@ -148,73 +142,24 @@ internal actual fun HomeScreenLayout() {
 
 @Composable
 private fun SoundbankSelector(model: HomeScreenModel) {
-    val settingsModel = koinInject<SettingsModel>()
-    val settingsScreenModel = koinInject<SettingsScreenModel>()
-    val tabNavigator = LocalTabNavigator.current
-    val context = LocalContext.current
+    val navigator = LocalNavigator.current
     val scope = rememberCoroutineScope()
     val selectedSoundbank = model.selectedSoundbank.collectAsState()
-    val soundbanks = model.soundbanks.collectAsState(initial = emptyList())
+    val soundbankManager = koinInject<AndroidSoundbanksManager>()
+    val soundbanks = soundbankManager.soundbanks.collectAsState(initial = emptyList())
     val selectedSoundbankName = selectedSoundbank.value?.name ?: stringResource(Res.string.soundbank_default)
-    val isMissing = remember(selectedSoundbank.value) {
-        val path = selectedSoundbank.value?.uri?.path
-        path != null && !File(path).exists()
-    }
     val selectorSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isShowSelectorSheet by remember { mutableStateOf(false) }
-    var isImportingSoundbanks by remember { mutableStateOf(false) }
-    var showInvalidSoundbankDialog by remember { mutableStateOf(false) }
-    val addSoundbanksLauncher = rememberFilePickerLauncher(
-        type = PickerType.File(listOf("sf2", "SF2")),
-        mode = PickerMode.Multiple(),
-        title = stringResource(Res.string.settings_playback_soundbanks_add),
-    ) { files ->
-        files?.let { platformFiles ->
-            scope.launch {
-                isImportingSoundbanks = true
-                try {
-                    val importResult = context.importValidSoundbanks(platformFiles)
-                    val importedPaths = importResult.importedPaths
-
-                    if (importedPaths.isNotEmpty()) {
-                        settingsModel.addSoundbanks(importedPaths)
-                        val mostRecentlyImported = importedPaths.last()
-                        val importedFile = File(mostRecentlyImported)
-                        model.setSelectedSoundbank(
-                            PlatformFile(
-                                android.net.Uri.fromFile(importedFile),
-                                context,
-                            )
-                        )
-                    }
-
-                    if (importResult.hasInvalidSelection) {
-                        showInvalidSoundbankDialog = true
-                    }
-                } finally {
-                    isImportingSoundbanks = false
-                }
-            }
-        }
-    }
 
     AssistChip(
         onClick = { isShowSelectorSheet = true },
         label = { Text(selectedSoundbankName) },
         leadingIcon = {
-            if (isImportingSoundbanks) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(18.dp),
-                    strokeWidth = 2.dp,
-                )
-            } else {
-                Icon(
-                    painterResource(if (isMissing) Res.drawable.warning else Res.drawable.audio_file),
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = if (isMissing) WarningAmber else androidx.compose.ui.graphics.Color.Unspecified,
-                )
-            }
+            Icon(
+                painterResource(Res.drawable.audio_file),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+            )
         },
     )
 
@@ -229,46 +174,20 @@ private fun SoundbankSelector(model: HomeScreenModel) {
             sheetState = selectorSheetState,
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    text = stringResource(Res.string.soundbank_selector_title),
-                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                )
-                Button(
-                    onClick = { addSoundbanksLauncher.launch() },
-                    enabled = !isImportingSoundbanks,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    if (isImportingSoundbanks) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(Res.drawable.add_circle),
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
-                    Text(
-                        text = stringResource(Res.string.settings_playback_soundbanks_add),
-                        modifier = Modifier.padding(start = 8.dp),
-                    )
-                }
-                HorizontalDivider()
-                TextButton(
+                OutlinedButton(
                     onClick = {
-                        settingsScreenModel.requestOpenSoundbanks()
                         scope.launch {
                             selectorSheetState.hide()
                             isShowSelectorSheet = false
                         }
-                        tabNavigator.current = SettingsTab
+                        navigator?.push(SoundbanksScreen)
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.settings_fill),
@@ -280,10 +199,17 @@ private fun SoundbankSelector(model: HomeScreenModel) {
                         modifier = Modifier.padding(start = 6.dp),
                     )
                 }
-
+                Text(
+                    text = stringResource(Res.string.settings_playback_soundbanks),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 320.dp),
                 ) {
                     item {
                         val isDefaultSelected = selectedSoundbank.value == null
@@ -316,8 +242,8 @@ private fun SoundbankSelector(model: HomeScreenModel) {
                             Text(stringResource(Res.string.soundbank_default))
                         }
                     }
-                    items(soundbanks.value) { soundbank ->
-                        val isSelected = selectedSoundbank.value?.uri?.path == soundbank.uri?.path
+                    items(soundbanks.value.sortedBy { it.name }) { soundbank ->
+                        val isSelected = selectedSoundbank.value?.name == soundbank.name
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -351,19 +277,6 @@ private fun SoundbankSelector(model: HomeScreenModel) {
             }
         }
     }
-
-    if (showInvalidSoundbankDialog) {
-        AlertDialog(
-            onDismissRequest = { showInvalidSoundbankDialog = false },
-            title = { Text(stringResource(Res.string.soundbank_invalid_file_title)) },
-            text = { Text(stringResource(Res.string.soundbank_invalid_file_message)) },
-            confirmButton = {
-                TextButton(onClick = { showInvalidSoundbankDialog = false }) {
-                    Text(stringResource(Res.string.ok))
-                }
-            },
-        )
-    }
 }
 
 @Composable
@@ -386,7 +299,7 @@ private fun SelectAndPlayMidiFile(
 
     val picker = model.midiFilePicker {
         val currentSoundbank = selectedSoundbank.value
-        val isMissing = currentSoundbank?.uri?.path?.let { !File(it).exists() } == true
+        val isMissing = currentSoundbank?.toAndroidUri()?.path?.let { !File(it).exists() } == true
         if (isMissing) {
             showMissingSoundbankDialog = true
         } else {

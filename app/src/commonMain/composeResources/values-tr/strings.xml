@@ -24,6 +24,7 @@
     <string name="tab_about">Hakkında</string>
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
+    <string name="warning">Uyarı</string>
     <string name="back">Geri</string>
     <string name="play">Oynat</string>
     <string name="enabled">Etkin</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI aygıtı</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Varsayılan soundbank</string>
+    <string name="soundbank_selector_title">Soundbank seç</string>
+    <string name="soundbank_manage">Yönet</string>
+    <string name="soundbank_invalid_file_title">Geçersiz soundbank dosyası</string>
+    <string name="soundbank_invalid_file_message">Lütfen .sf2 uzantılı geçerli bir SoundFont dosyası seçin.</string>
+    <string name="soundbank_missing_warning_title">Soundbank bulunamadı</string>
+    <string name="soundbank_missing_warning_message">Seçilen soundbank dosyası diskte bulunamadı. Bunun yerine varsayılan soundbank kullanılacak. İptal edip Ayarlar'da başka bir soundbank seçebilirsiniz.</string>
     <string name="play_midi_file">MIDI dosyası çal</string>
     <string name="quality_none">Yok</string>
     <string name="quality_low">Düşük</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Soundbank ekle</string>
     <string name="settings_playback_soundbanks_description">Sentezleyici ile kullanım için soundbank içe aktar</string>
     <string name="settings_playback_soundbanks_none_loaded">Yüklü soundbank yok</string>
+    <string name="settings_playback_soundbanks_import">İçe aktar</string>
+    <string name="settings_playback_soundbanks_importing">İçe aktarılıyor</string>
+    <string name="settings_playback_soundbanks_delete">Sil</string>
+    <string name="settings_playback_soundbanks_delete_title">Soundbank silinsin mi?</string>
+    <string name="settings_playback_soundbanks_delete_message">%1$s silinsin mi?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Koro</string>

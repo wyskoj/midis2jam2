@@ -51,9 +51,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.install4j.api.launcher.ApplicationLauncher
-import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.core.PickerMode
-import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.dialogs.FileKitMode
+import io.github.vinceglb.filekit.dialogs.FileKitType
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.about_check_for_updates
@@ -117,7 +117,6 @@ import midis2jam2.app.generated.resources.video_stable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
@@ -139,13 +138,6 @@ import java.util.*
 
 internal actual val deviceThemeIcon: DrawableResource
     get() = Res.drawable.computer
-
-@Composable
-internal actual fun SettingsScreenOverlay(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-    screenModel: SettingsScreenModel,
-) = Unit
 
 @Composable
 internal actual fun LocaleSelect(
@@ -555,9 +547,8 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
     var isShowSheet by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val picker = rememberFilePickerLauncher(
-        type = PickerType.File(soundbankExtensions),
-        mode = PickerMode.Multiple(),
-        title = "Select soundbanks",
+        type = FileKitType.File(soundbankExtensions),
+        mode = FileKitMode.Multiple(),
     ) {
         it?.let { platformFiles ->
             model.addSoundbanks(platformFiles.map { it.file.path })

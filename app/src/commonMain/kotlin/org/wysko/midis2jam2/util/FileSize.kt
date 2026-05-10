@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,29 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.domain
+package org.wysko.midis2jam2.util
 
-import io.github.vinceglb.filekit.PlatformFile
-import kotlinx.coroutines.flow.StateFlow
+fun formatFileSize(size: Long): String {
+    return when {
+        size < 1000 -> {
+            "$size B"
+        }
 
-expect class ApplicationService() {
-    val isApplicationRunning: StateFlow<Boolean>
-    fun startApplication(executionState: ExecutionState)
-    fun startQueueApplication(executionState: QueueExecutionState)
+        size < 1_000_000 -> {
+            val inKb = size / 1_000.0
+            "%.2f KB".format(inKb)
+        }
+
+        size < 1_000_000_000 -> {
+            val inMb = size / 1_000_000.0
+            "%.2f MB".format(inMb)
+        }
+
+        size < 1_000_000_000_000 -> {
+            val inGb = size / 1_000_000_000.0
+            "%.2f GB".format(inGb)
+        }
+
+        else -> "> 1 TB"
+    }
 }
-
-data class ExecutionState(
-    val midiFile: PlatformFile,
-)
-
-data class QueueExecutionState(
-    val queue: List<PlatformFile>,
-)

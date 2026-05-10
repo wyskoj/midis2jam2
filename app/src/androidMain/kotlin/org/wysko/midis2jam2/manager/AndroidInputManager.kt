@@ -17,14 +17,27 @@
 
 package org.wysko.midis2jam2.manager
 
+import com.jme3.app.Application
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.util.state
 
 class AndroidInputManager : BaseManager() {
-    private val cameraManager by lazy { app.state<CameraManager>() as AndroidCameraManager }
-    private val playbackManager by lazy { app.state<PlaybackManager>() }
+    private lateinit var cameraManager: AndroidCameraManager
+    private lateinit var playbackManager: PlaybackManager
+    private var playbackStateListener: ((Boolean) -> Unit)? = null
+
+    override fun initialize(app: Application) {
+        super.initialize(app)
+        cameraManager = app.state<CameraManager>() as AndroidCameraManager
+        playbackManager = app.state<PlaybackManager>()!!
+    }
+
+    fun registerPlaybackStateListener(listener: (Boolean) -> Unit) {
+        playbackStateListener = listener
+        listener(true)
+    }
 
     fun callAction(action: Midis2jam2Action) {
         app.enqueue {
@@ -37,15 +50,16 @@ class AndroidInputManager : BaseManager() {
                 is Midis2jam2Action.SwitchToSlideCam -> cameraManager.switchToRotatingCamera()
 
                 is Midis2jam2Action.SeekBackward -> {
-                    playbackManager?.seek(PlaybackManager.SeekDirection.Backward)
+                    playbackManager.seek(PlaybackManager.SeekDirection.Backward)
                 }
 
                 is Midis2jam2Action.SeekForward -> {
-                    playbackManager?.seek(PlaybackManager.SeekDirection.Forward)
+                    playbackManager.seek(PlaybackManager.SeekDirection.Forward)
                 }
 
                 is Midis2jam2Action.PlayPause -> {
-                    playbackManager?.togglePlayPause()
+                    playbackManager.togglePlayPause()
+                    playbackStateListener?.invoke(playbackManager.isPlaying)
                 }
 
                 is Midis2jam2Action.Pan -> cameraManager.pan(action.panDeltaX, action.panDeltaY)

@@ -24,6 +24,7 @@
     <string name="tab_about">เกี่ยวกับ</string>
     <string name="ok">ตกลง</string>
     <string name="cancel">ยกเลิก</string>
+    <string name="warning">คำเตือน</string>
     <string name="back">กลับ</string>
     <string name="play">เล่น</string>
     <string name="enabled">เปิดใช้งาน</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">อุปกรณ์ MIDI</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Soundbank มาตรฐาน</string>
+    <string name="soundbank_selector_title">เลือก soundbank</string>
+    <string name="soundbank_manage">จัดการ</string>
+    <string name="soundbank_invalid_file_title">ไฟล์ soundbank ไม่ถูกต้อง</string>
+    <string name="soundbank_invalid_file_message">โปรดเลือกไฟล์ SoundFont ที่ถูกต้องที่มีนามสกุล .sf2.</string>
+    <string name="soundbank_missing_warning_title">ไม่พบ soundbank</string>
+    <string name="soundbank_missing_warning_message">ไม่พบไฟล์ soundbank ที่เลือกบนดิสก์ ระบบจะใช้ soundbank เริ่มต้นแทน คุณสามารถยกเลิกและเลือก soundbank อื่นในการตั้งค่าได้</string>
     <string name="play_midi_file">เล่นไฟล์ MIDI</string>
     <string name="quality_none">ไม่มี</string>
     <string name="quality_low">ต่ำ</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">เพิ่ม soundbanks</string>
     <string name="settings_playback_soundbanks_description">นำเข้า soundbanks เพื่อใช้กับเครื่องสังเคราะห์เสียง</string>
     <string name="settings_playback_soundbanks_none_loaded">ไม่ได้โหลด soundbanks</string>
+    <string name="settings_playback_soundbanks_import">นำเข้า</string>
+    <string name="settings_playback_soundbanks_importing">กำลังนำเข้า</string>
+    <string name="settings_playback_soundbanks_delete">ลบ</string>
+    <string name="settings_playback_soundbanks_delete_title">ลบ soundbank หรือไม่?</string>
+    <string name="settings_playback_soundbanks_delete_message">คุณแน่ใจหรือไม่ว่าต้องการลบ %1$s?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">คอรัส</string>

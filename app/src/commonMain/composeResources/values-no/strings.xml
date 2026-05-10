@@ -24,6 +24,7 @@
     <string name="tab_about">Om</string>
     <string name="ok">OK</string>
     <string name="cancel">Avbryt</string>
+    <string name="warning">Advarsel</string>
     <string name="back">Tilbake</string>
     <string name="play">Spill</string>
     <string name="enabled">Aktivert</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI-enhet</string>
     <string name="soundbank">Lydbank</string>
     <string name="soundbank_default">Standard lydbank</string>
+    <string name="soundbank_selector_title">Velg lydbank</string>
+    <string name="soundbank_manage">Administrer</string>
+    <string name="soundbank_invalid_file_title">Ugyldig lydbankfil</string>
+    <string name="soundbank_invalid_file_message">Velg en gyldig SoundFont-fil med .sf2-utvidelse.</string>
+    <string name="soundbank_missing_warning_title">Lydbanken ble ikke funnet</string>
+    <string name="soundbank_missing_warning_message">Den valgte lydbank-filen ble ikke funnet på disken. Standard lydbank brukes i stedet. Du kan avbryte og velge en annen lydbank i Innstillinger.</string>
     <string name="play_midi_file">Spill MIDI-fil</string>
     <string name="quality_none">Ingen</string>
     <string name="quality_low">Lav</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Legg til lydbanker</string>
     <string name="settings_playback_soundbanks_description">Importer lydbanker for bruk med synthesizer</string>
     <string name="settings_playback_soundbanks_none_loaded">Ingen lydbanker lastet</string>
+    <string name="settings_playback_soundbanks_import">Importer</string>
+    <string name="settings_playback_soundbanks_importing">Importerer</string>
+    <string name="settings_playback_soundbanks_delete">Slett</string>
+    <string name="settings_playback_soundbanks_delete_title">Slette lydbank?</string>
+    <string name="settings_playback_soundbanks_delete_message">Er du sikker på at du vil slette %1$s?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Kor</string>

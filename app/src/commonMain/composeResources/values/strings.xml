@@ -9,6 +9,7 @@
     <string name="ok">OK</string>
     <string name="clear_all">Clear all</string>
     <string name="cancel">Cancel</string>
+    <string name="warning">Warning</string>
     <string name="back">Back</string>
     <string name="play">Play</string>
     <string name="enabled">Enabled</string>
@@ -18,7 +19,7 @@
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Default soundbank</string>
     <string name="soundbank_selector_title">Select soundbank</string>
-    <string name="soundbank_manage">Manage soundbanks</string>
+    <string name="soundbank_manage">Manage</string>
     <string name="soundbank_invalid_file_title">Invalid soundbank file</string>
     <string name="soundbank_invalid_file_message">Please select a valid SoundFont file with the .sf2 extension.</string>
     <string name="soundbank_missing_warning_title">Soundbank not found</string>
@@ -168,6 +169,11 @@
     <string name="settings_playback_soundbanks_add">Add soundbanks</string>
     <string name="settings_playback_soundbanks_description">Import soundbanks for use with synthesizer</string>
     <string name="settings_playback_soundbanks_none_loaded">No soundbanks loaded</string>
+    <string name="settings_playback_soundbanks_import">Import</string>
+    <string name="settings_playback_soundbanks_importing">Importing</string>
+    <string name="settings_playback_soundbanks_delete">Delete</string>
+    <string name="settings_playback_soundbanks_delete_title">Delete soundbank?</string>
+    <string name="settings_playback_soundbanks_delete_message">Are you sure you want to delete %1$s?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Chorus</string>

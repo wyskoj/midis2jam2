@@ -17,10 +17,15 @@
 
 package org.wysko.midis2jam2
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
@@ -28,9 +33,11 @@ import org.wysko.midis2jam2.ui.common.material.AppTheme
 import org.wysko.midis2jam2.ui.performance.PerformanceContent
 import org.wysko.midis2jam2.util.hideSystemBars
 import org.wysko.midis2jam2.util.keepScreenOn
+import kotlin.time.Duration.Companion.milliseconds
 
 class PerformanceActivity : ComponentActivity(), KoinComponent {
     private val applicationService: ApplicationService by inject()
+    private var isPerformanceFinished = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -42,12 +49,31 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
             AppTheme {
                 PerformanceContent(
                     applicationService = applicationService,
-                    onFinish = {
-                        applicationService.onApplicationFinished()
-                        finish()
-                    }
+                    onFinish = ::finishPerformance
                 )
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        lifecycleScope.launch {
+            repeat(20) {
+                delay(100.milliseconds)
+                val inPip = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isInPictureInPictureMode
+                val visible = lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                if (!inPip && !visible) {
+                    finishPerformance()
+                    return@launch
+                }
+            }
+        }
+    }
+
+    private fun finishPerformance() {
+        if (isPerformanceFinished) return
+        isPerformanceFinished = true
+        applicationService.onApplicationFinished()
+        finish()
     }
 }

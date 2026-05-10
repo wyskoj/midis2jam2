@@ -18,7 +18,7 @@
 package org.wysko.midis2jam2
 
 import com.install4j.api.launcher.StartupNotification
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService

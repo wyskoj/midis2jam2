@@ -18,8 +18,8 @@
 package org.wysko.midis2jam2.domain
 
 import androidx.compose.runtime.Composable
-import io.github.vinceglb.filekit.compose.PickerResultLauncher
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import org.wysko.midis2jam2.midi.system.MidiDevice

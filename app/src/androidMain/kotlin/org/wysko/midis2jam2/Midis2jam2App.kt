@@ -24,13 +24,14 @@ import org.wysko.midis2jam2.di.applicationModule
 import org.wysko.midis2jam2.di.midiSystemModule
 import org.wysko.midis2jam2.di.systemModule
 import org.wysko.midis2jam2.di.uiModule
+import org.wysko.midis2jam2.manager.soundbanksModule
 
 class Midis2jam2App : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidContext(this@Midis2jam2App)
-            modules(applicationModule, midiSystemModule, systemModule, uiModule)
+            modules(applicationModule, midiSystemModule, systemModule, uiModule, soundbanksModule)
         }
     }
 

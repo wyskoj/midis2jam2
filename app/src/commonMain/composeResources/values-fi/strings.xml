@@ -24,6 +24,7 @@
     <string name="tab_about">Tietoa</string>
     <string name="ok">OK</string>
     <string name="cancel">Peruuta</string>
+    <string name="warning">Varoitus</string>
     <string name="back">Takaisin</string>
     <string name="play">Toista</string>
     <string name="enabled">Käytössä</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI-laite</string>
     <string name="soundbank">Äänipankki</string>
     <string name="soundbank_default">Oletusäänipankki</string>
+    <string name="soundbank_selector_title">Valitse äänipankki</string>
+    <string name="soundbank_manage">Hallitse</string>
+    <string name="soundbank_invalid_file_title">Virheellinen äänipankkitiedosto</string>
+    <string name="soundbank_invalid_file_message">Valitse kelvollinen SoundFont-tiedosto, jonka pääte on .sf2.</string>
+    <string name="soundbank_missing_warning_title">Äänipankkia ei löytynyt</string>
+    <string name="soundbank_missing_warning_message">Valittua äänipankkitiedostoa ei löytynyt levyltä. Oletusäänipankkia käytetään sen sijaan. Voit peruuttaa ja valita toisen äänipankin Asetuksista.</string>
     <string name="play_midi_file">Toista MIDI-tiedosto</string>
     <string name="quality_none">Ei</string>
     <string name="quality_low">Matala</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Lisää äänipankkeja</string>
     <string name="settings_playback_soundbanks_description">Tuo äänipankkeja syntetisaattorin käyttöön</string>
     <string name="settings_playback_soundbanks_none_loaded">Yhtään äänipankkia ei ladattu</string>
+    <string name="settings_playback_soundbanks_import">Tuo</string>
+    <string name="settings_playback_soundbanks_importing">Tuodaan</string>
+    <string name="settings_playback_soundbanks_delete">Poista</string>
+    <string name="settings_playback_soundbanks_delete_title">Poistetaanko äänipankki?</string>
+    <string name="settings_playback_soundbanks_delete_message">Haluatko varmasti poistaa %1$s?</string>
 
     <!-- Asetukset / Toisto / Syntetisaattori -->
     <string name="settings_playback_synthesizer_chorus">Koruus</string>

@@ -24,6 +24,7 @@
     <string name="tab_about">Informazioni</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
+    <string name="warning">Avviso</string>
     <string name="back">Indietro</string>
     <string name="play">Riproduci</string>
     <string name="enabled">Abilitato</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">Dispositivo MIDI</string>
     <string name="soundbank">Soundbank</string>
     <string name="soundbank_default">Soundbank predefinito</string>
+    <string name="soundbank_selector_title">Seleziona soundbank</string>
+    <string name="soundbank_manage">Gestisci</string>
+    <string name="soundbank_invalid_file_title">File soundbank non valido</string>
+    <string name="soundbank_invalid_file_message">Seleziona un file SoundFont valido con estensione .sf2.</string>
+    <string name="soundbank_missing_warning_title">Soundbank non trovata</string>
+    <string name="soundbank_missing_warning_message">Il file soundbank selezionato non è stato trovato sul disco. Verrà usata la soundbank predefinita. Puoi annullare e selezionare un'altra soundbank in Impostazioni.</string>
     <string name="play_midi_file">Riproduci file MIDI</string>
     <string name="quality_none">Nessuna</string>
     <string name="quality_low">Bassa</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Aggiungi soundbank</string>
     <string name="settings_playback_soundbanks_description">Importa soundbank per l\'uso con il sintetizzatore</string>
     <string name="settings_playback_soundbanks_none_loaded">Nessun soundbank caricato</string>
+    <string name="settings_playback_soundbanks_import">Importa</string>
+    <string name="settings_playback_soundbanks_importing">Importazione in corso</string>
+    <string name="settings_playback_soundbanks_delete">Elimina</string>
+    <string name="settings_playback_soundbanks_delete_title">Eliminare soundbank?</string>
+    <string name="settings_playback_soundbanks_delete_message">Sei sicuro di voler eliminare %1$s?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Chorus</string>

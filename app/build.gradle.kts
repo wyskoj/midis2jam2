@@ -94,7 +94,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.yaml)
 
             // Filekit
-            implementation(libs.filekit)
+            implementation(libs.bundles.filekit)
 
             // Reorderable
             implementation(libs.reorderable)

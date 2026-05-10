@@ -18,7 +18,9 @@
 package org.wysko.midis2jam2.domain
 
 import android.content.Context
-import io.github.vinceglb.filekit.core.PlatformFile
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 
 internal data class SoundbankImportResult(
     val importedPaths: List<String>,

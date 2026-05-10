@@ -24,6 +24,7 @@
     <string name="tab_about">Про програму</string>
     <string name="ok">Гаразд</string>
     <string name="cancel">Скасувати</string>
+    <string name="warning">Попередження</string>
     <string name="back">Назад</string>
     <string name="play">Відтворити</string>
     <string name="enabled">Увімкнено</string>
@@ -32,6 +33,12 @@
     <string name="midi_device">MIDI-пристрій</string>
     <string name="soundbank">Звуковий банк</string>
     <string name="soundbank_default">Типовий звуковий банк</string>
+    <string name="soundbank_selector_title">Вибрати звуковий банк</string>
+    <string name="soundbank_manage">Керувати</string>
+    <string name="soundbank_invalid_file_title">Недійсний файл звукового банку</string>
+    <string name="soundbank_invalid_file_message">Виберіть допустимий файл SoundFont з розширенням .sf2.</string>
+    <string name="soundbank_missing_warning_title">Звуковий банк не знайдено</string>
+    <string name="soundbank_missing_warning_message">Вибраний файл звукового банку не знайдено на диску. Замість нього буде використано звуковий банк за замовчуванням. Ви можете скасувати та вибрати інший звуковий банк у Налаштуваннях.</string>
     <string name="play_midi_file">Відтворити MIDI-файл</string>
     <string name="quality_none">Відсутня</string>
     <string name="quality_low">Низька</string>
@@ -170,6 +177,11 @@
     <string name="settings_playback_soundbanks_add">Додати звукові банки</string>
     <string name="settings_playback_soundbanks_description">Імпортувати звукові банки для використання з синтезатором</string>
     <string name="settings_playback_soundbanks_none_loaded">Звукові банки не завантажено</string>
+    <string name="settings_playback_soundbanks_import">Імпортувати</string>
+    <string name="settings_playback_soundbanks_importing">Імпортується</string>
+    <string name="settings_playback_soundbanks_delete">Видалити</string>
+    <string name="settings_playback_soundbanks_delete_title">Видалити звуковий банк?</string>
+    <string name="settings_playback_soundbanks_delete_message">Ви впевнені, що хочете видалити %1$s?</string>
 
     <!-- Settings / Playback / Synthesizer -->
     <string name="settings_playback_synthesizer_chorus">Хор</string>

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">midis2jam2</string>
+    <string name="pip_play_pause">Play/Pause</string>
+    <string name="pip_play">Play</string>
+    <string name="pip_pause">Pause</string>
+    <string name="pip_rewind_10_seconds">Rewind 10 seconds</string>
+    <string name="pip_fast_forward_10_seconds">Fast-forward 10 seconds</string>
 </resources>
