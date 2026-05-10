@@ -44,6 +44,8 @@ class Midis2jam2Harness(
     private val isShuttingDown = AtomicBoolean(false)
 
     init {
+        app.setDisplayFps(false)
+        app.setDisplayStatView(false)
         app.start()
         ctx = app.context as OGLESContext
         view = ctx.createView(context)
