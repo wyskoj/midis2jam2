@@ -46,6 +46,9 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         (app as SimpleApplication).flyByCamera.unregisterInput()
         dummyCamera = Camera(app.camera.width, app.camera.height).apply {
             isParallelProjection = false
+            app.state<PreferencesManager>()?.getAppSettings()?.cameraSettings?.defaultFieldOfView?.let {
+                fov = it
+            }
         }
         dummyFlyByCamera = ExtendedJoystickFlyByCamera(dummyCamera, onCameraInput).apply {
             registerWithInput(app.inputManager)
