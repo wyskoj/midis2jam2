@@ -52,22 +52,16 @@ import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import org.wysko.midis2jam2.domain.ApplicationService
-import org.wysko.midis2jam2.starter.Midis2jam2Harness
 import kotlin.math.PI
 import kotlin.math.abs
 
 fun View.systemBackLegacy(
-    harness: Midis2jam2Harness,
-    applicationService: ApplicationService,
     onFinish: () -> Unit,
 ) {
     isFocusableInTouchMode = true
     requestFocus()
     setOnKeyListener { _, keyCode, _ ->
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            harness.shutdown()
-            applicationService.onApplicationFinished()
             onFinish()
             true
         } else {

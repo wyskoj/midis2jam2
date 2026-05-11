@@ -48,7 +48,6 @@ class PerformanceActivity : ComponentActivity(), KoinComponent {
         setContent {
             AppTheme {
                 PerformanceContent(
-                    applicationService = applicationService,
                     onFinish = ::finishPerformance
                 )
             }

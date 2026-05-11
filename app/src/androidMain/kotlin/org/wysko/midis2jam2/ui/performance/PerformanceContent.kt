@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.R
-import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.starter.Midis2jam2Harness
 import org.wysko.midis2jam2.util.findActivity
 import org.wysko.midis2jam2.util.rememberIsInPipMode
@@ -71,7 +70,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PerformanceContent(
-    applicationService: ApplicationService,
     onFinish: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -187,8 +185,7 @@ fun PerformanceContent(
 
     // back handling at activity level
     BackHandler {
-        harness.shutdown()
-        applicationService.onApplicationFinished()
+        onFinish()
     }
 
     val inPipMode = rememberIsInPipMode()
@@ -211,7 +208,7 @@ fun PerformanceContent(
             factory = {
                 harness.view.apply {
                     if (CompatLibrary.requiresPerformanceViewSystemBack) {
-                        systemBackLegacy(harness, applicationService, onFinish)
+                        systemBackLegacy(onFinish)
                     }
                 }
             }
