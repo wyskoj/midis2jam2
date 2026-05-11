@@ -87,7 +87,7 @@ object SoundbanksScreen : Screen {
         val soundbanks = soundbanksManager.soundbanks.collectAsState()
         val importJobs = soundbanksManager.jobs.collectAsState()
         val addSoundbanksLauncher = rememberFilePickerLauncher(
-            type = FileKitType.File(listOf("sf2", "SF2")),
+            type = FileKitType.File(listOf("sf2")),
             mode = FileKitMode.Multiple()
         ) { files ->
             files?.let { platformFiles ->

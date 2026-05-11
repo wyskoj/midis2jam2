@@ -64,7 +64,7 @@ class AndroidSoundbanksManager(
 
     fun importSoundbanks(files: List<PlatformFile>) {
         files.forEach {
-            if (it.extension == "sf2") {
+            if (it.extension.lowercase() == "sf2") {
                 copyPlatformFile(it, File(soundbanksDir, it.name))
             }
         }
