@@ -19,9 +19,9 @@ Java_org_wysko_midis2jam2_domain_FluidSynthBridge_initFluidSynth(
     holder->settings = new_fluid_settings();
 
     fluid_settings_setstr(holder->settings, "audio.oboe.performance-mode", "LowLatency");
-
     fluid_settings_setint(holder->settings, "synth.reverb.active", 0);
     fluid_settings_setint(holder->settings, "synth.chorus.active", 0);
+    fluid_settings_setnum(holder->settings, "synth.gain", 1.0);
 
     holder->synth = new_fluid_synth(holder->settings);
     holder->adriver = new_fluid_audio_driver(holder->settings, holder->synth);
