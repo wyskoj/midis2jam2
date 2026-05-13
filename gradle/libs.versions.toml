@@ -11,6 +11,7 @@ composeMultiplatform = "1.10.2"
 filekit = "0.14.1"
 install4j = "12.0.3"
 jme3 = "3.9.0-stable"
+kmidi = "0.2.0"
 koin-bom = "4.1.1"
 kotlin = "2.3.10"
 kotlin-reflect = "2.3.0"
@@ -64,7 +65,7 @@ voyager-tab-navigator = { group = "cafe.adriel.voyager", name = "voyager-tab-nav
 voyager-transitions = { group = "cafe.adriel.voyager", name = "voyager-transitions", version.ref = "voyager" }
 
 # MIDI
-kmidi = { group = "org.wysko", name = "kmidi", version = "0.1.2" }
+kmidi = { group = "org.wysko", name = "kmidi", version.ref = "kmidi" }
 
 # System
 multiplatformSettings = { group = "com.russhwolf", name = "multiplatform-settings", version = "1.3.0" }
