@@ -1,4 +1,3 @@
-*.blend1
 .classpath
 .netlify
 .project
@@ -21,13 +20,9 @@
 /src/main/resources/dependency-license.json
 /src/main/resources/version.txt
 OpenAL64.dll
-cleanmidi.csv
 liblwjgl64.so
 libopenal64.so
 lwjgl64.dll
-midi.csv
-midicsv
-midicsv.exe
 midis2jam2.conf
 midis2jam2.ini
 settings.json

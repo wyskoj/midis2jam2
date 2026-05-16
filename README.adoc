@@ -2,35 +2,23 @@
 
 image:https://img.shields.io/github/v/release/wyskoj/midis2jam2[]
 image:https://img.shields.io/github/downloads/wyskoj/midis2jam2/total[GitHub Downloads (all assets, all releases)]
-image:https://img.shields.io/appveyor/build/wyskoj/midis2jam2[]
 image:https://img.shields.io/codacy/grade/2685466ed5224e58b52d707a64737352[Codacy grade]
 image:https://img.shields.io/github/license/wyskoj/midis2jam2[]
 image:https://img.shields.io/github/issues-closed/wyskoj/midis2jam2[]
-image:https://img.shields.io/discord/815077208149327882[Discord]
 
 midis2jam2 is a remaster of MIDIJam, a 3D MIDI file visualizer.
 It plays and animates any MIDI file with a 3D virtual band.
 
 It is written in Kotlin/JVM and uses jMonkeyEngine for graphics.
 
-https://github.com/wyskoj/midis2jam2/blob/master/implementation.adoc[Not all instruments are implemented yet]; this is a work in progress.
-
 == 🖥️ Installation
 
 Install midis2jam2 with the https://github.com/wyskoj/midis2jam2/releases[appropriate installer for the latest version].
 
-== ⌨️️ Controls
-
-* *WASDQZ* &mdash; Forwards / Left / Backwards / Right / Up / Down
-* *Click and drag* to rotate the camera
-** *Shift* &mdash; Move fast
-** *Ctrl* &mdash; Move slow
-* *1&ndash;6* &mdash; Cameras 1&ndash;6 / Exit autocam
-* *Grave/Tilde* &mdash; Reset camera
-* *0* &mdash; Autocam
-* *Esc* &mdash; Exit
-
 == 💾 Building
+
+midis2jam2 requires JDK 17 to be on your machine's PATH to build and run.
+https://www.azul.com/downloads/#zulu[Azul Zulu 17] is known to work well.
 
 [source,bash]
 ----
@@ -38,30 +26,14 @@ $ git clone https://github.com/wyskoj/midis2jam2
 $ cd midis2jam2 && ./gradlew run
 ----
 
-== ✒️ Authors
+== ⁉️ Support
 
-Executive developer:
-
-* https://wysko.org[wyskoj]
-
-Development contributors:
-
-* https://github.com/jlachniet[jlachniet]
-* https://github.com/JonnyCrash420[JonnyCrash420]
-* https://github.com/nikitalita[nikitalita]
-* https://github.com/vgking1[vgking1]
-
-Internationalization contributors can be found on the _About_ screen of the application.
+Find guides and answers to common questions on the https://wyskoj.github.io/midis2jam2-docs/[documentation site]. For support, visit https://github.com/wyskoj/midis2jam2/discussions[the discussions page].
 
 == ✴️ Acknowledgements
 
 * http://www.gamesbyscott.com/midijam.htm[MIDIJam]
 * https://jmonkeyengine.org/[jMonkeyEngine]
-
-
-== ⁉️ Support
-
-Find guides and answers to common questions on the https://wyskoj.github.io/midis2jam2-docs/[documentation site]. For support, visit https://github.com/wyskoj/midis2jam2/discussions[the discussions page].
 
 == ⚖️ License
 
