@@ -22,17 +22,24 @@ import Platform
 import com.jme3.app.SimpleApplication
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
+import io.github.vinceglb.filekit.source
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlinx.io.buffered
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatformTools
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
+import org.wysko.kmidi.midi.reader.InvalidHeaderException
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
+import org.wysko.kmidi.midi.reader.StandardMidiFileReadingException
+import org.wysko.kmidi.midi.reader.readInputStream
 import org.wysko.midis2jam2.AndroidPerformanceManager
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.domain.ApplicationService
+import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.FluidSynthDevice
 import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.domain.MidiService
@@ -45,6 +52,7 @@ import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.starter.configuration.Configuration.HomeConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.util.SourceInputStream
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.state
 import org.wysko.midis2jam2.world.AssetLoader
@@ -71,43 +79,53 @@ internal actual class Midis2jam2Application(
         val configurations = applicationService.configurations.value
 
         CoroutineScope(Dispatchers.Default).launch {
-            val sequence = StandardMidiFileReader().readByteArray(midiFile.readBytes()).toTimeBasedSequence()
-            val midiDevice = midiService.getMidiDevices().first()
-            val homeConfiguration = configurations.find<HomeConfiguration>()
-            homeConfiguration.selectedSoundbank?.let { soundbankPath ->
-                (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)
-            }
-            val currentSequencer = JwSequencerImpl().apply {
-                open(midiDevice)
-                this.sequence = sequence
-            }
-            sequencer = currentSequencer
+            try {
+                val midiFileBuffered = midiFile.source().buffered()
+                val sequence = StandardMidiFileReader().readStream(SourceInputStream(midiFileBuffered)).toTimeBasedSequence()
+                val midiDevice = midiService.getMidiDevices().first()
+                val homeConfiguration = configurations.find<HomeConfiguration>()
+                homeConfiguration.selectedSoundbank?.let { soundbankPath ->
+                    (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)
+                }
+                val currentSequencer = JwSequencerImpl().apply {
+                    open(midiDevice)
+                    this.sequence = sequence
+                }
+                sequencer = currentSequencer
 
-            Jme3ExceptionHandler.setup {
-                stop()
-                currentSequencer.stop()
-                currentSequencer.close()
-            }
+                Jme3ExceptionHandler.setup {
+                    stop()
+                    currentSequencer.stop()
+                    currentSequencer.close()
+                }
 
-            enqueue {
-                setupState(configurations, platform = Platform.Desktop)
-                val loadingProgressManager = LoadingProgressManager()
-                stateManager.attach(loadingProgressManager)
-                stateManager.attach(AssetLoader {
-                    loadingProgressManager.onLoadingAsset(it)
-                })
-                val performanceAppState = AndroidPerformanceManager(
-                    sequencer = currentSequencer,
-                    midiFile = sequence,
-                    onClose = { stop() },
-                    fileName = midiFile.name,
-                    configs = configurations,
+                enqueue {
+                    setupState(configurations, platform = Platform.Desktop)
+                    val loadingProgressManager = LoadingProgressManager()
+                    stateManager.attach(loadingProgressManager)
+                    stateManager.attach(AssetLoader {
+                        loadingProgressManager.onLoadingAsset(it)
+                    })
+                    val performanceAppState = AndroidPerformanceManager(
+                        sequencer = currentSequencer,
+                        midiFile = sequence,
+                        onClose = { stop() },
+                        fileName = midiFile.name,
+                        configs = configurations,
+                    )
+                    stateManager.attach(performanceAppState)
+                    rootNode.attachChild(performanceAppState.root)
+                    addManagers(configurations, sequence, currentSequencer)
+                    stateManager.attach(AndroidInputManager())
+                    stateManager.attach(MidiDeviceManager(configurations, midiDevice))
+                }
+            } catch (e: Exception) {
+                logger().error("MIDI file failed to read.", e)
+                KoinPlatformTools.defaultContext().get().get<ErrorLogService>().addError(
+                    "The MIDI file failed to load. Make sure you select a valid MIDI file.",
+                    e.stackTraceToString()
                 )
-                stateManager.attach(performanceAppState)
-                rootNode.attachChild(performanceAppState.root)
-                addManagers(configurations, sequence, currentSequencer)
-                stateManager.attach(AndroidInputManager())
-                stateManager.attach(MidiDeviceManager(configurations, midiDevice))
+                stop()
             }
         }
     }
