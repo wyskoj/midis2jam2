@@ -31,6 +31,7 @@ private const val DEFAULT_MOVE_SPEED = 100f
 private const val DEFAULT_ZOOM_SPEED = -10f
 private const val INTERPOLATION_SPEED = 3.0f
 private const val NUM_CATEGORIES = 6
+private val FOV_VALID_RANGE = 5f..150f
 
 class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), ActionListener {
     private val cameraAngleCategories = CameraAngleCategory.categories
@@ -80,7 +81,7 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
                         slerp(dummyCamera.rotation, tpf * INTERPOLATION_SPEED)
                         normalizeLocal()
                     }
-                    fov = fov.interpolate(dummyCamera.fov, tpf * INTERPOLATION_SPEED)
+                    fov = fov.interpolate(dummyCamera.fov, tpf * INTERPOLATION_SPEED).coerceIn(FOV_VALID_RANGE)
                 }
             }
         }
