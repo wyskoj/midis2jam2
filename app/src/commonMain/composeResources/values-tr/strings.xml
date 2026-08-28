@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2025 Jacob Wysko
+  ~ Copyright (C) 2026 Jacob Wysko
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -26,19 +26,19 @@
     <string name="cancel">İptal</string>
     <string name="warning">Uyarı</string>
     <string name="back">Geri</string>
-    <string name="play">Oynat</string>
+    <string name="play">Yürüt</string>
     <string name="enabled">Etkin</string>
     <string name="disabled">Devre dışı</string>
     <string name="midi_file">MIDI dosyası</string>
     <string name="midi_device">MIDI aygıtı</string>
-    <string name="soundbank">Soundbank</string>
-    <string name="soundbank_default">Varsayılan soundbank</string>
-    <string name="soundbank_selector_title">Soundbank seç</string>
+    <string name="soundbank">Ses bankı</string>
+    <string name="soundbank_default">Varsayılan ses bankı</string>
+    <string name="soundbank_selector_title">Ses bankını seç</string>
     <string name="soundbank_manage">Yönet</string>
-    <string name="soundbank_invalid_file_title">Geçersiz soundbank dosyası</string>
-    <string name="soundbank_invalid_file_message">Lütfen .sf2 uzantılı geçerli bir SoundFont dosyası seçin.</string>
-    <string name="soundbank_missing_warning_title">Soundbank bulunamadı</string>
-    <string name="soundbank_missing_warning_message">Seçilen soundbank dosyası diskte bulunamadı. Bunun yerine varsayılan soundbank kullanılacak. İptal edip Ayarlar'da başka bir soundbank seçebilirsiniz.</string>
+    <string name="soundbank_invalid_file_title">Geçersiz ses bankı </string>
+    <string name="soundbank_invalid_file_message">Lütfen .sf2 uzantılı geçerli bir ses bankı seçin.</string>
+    <string name="soundbank_missing_warning_title">Ses bankı bulunamadı</string>
+    <string name="soundbank_missing_warning_message">Seçilen ses bankının dosyası diskte bulunamadı. Bunun yerine varsayılan ses bankı kullanılacak. İptal edip Ayarlar'da başka bir ses bankı seçebilirsiniz.</string>
     <string name="play_midi_file">MIDI dosyası çal</string>
     <string name="quality_none">Yok</string>
     <string name="quality_low">Düşük</string>
@@ -60,14 +60,14 @@
     <string name="queue_load_missing_help">Aşağıdaki dosyalar bulunamadı:</string>
     <string name="queue_save">Kaydet</string>
     <string name="queue_save_confirmation">Sıra kaydedildi.</string>
-    <string name="queue_shuffle">Karıştır</string>
+    <string name="queue_shuffle">Şarkıları Karıştır</string>
 
     <!-- Search -->
-    <string name="search_criteria_too_narrow">Eşleşen MIDI dosyası bulunamadı. Kriterlerinizi ayarlamayı deneyin.</string>
-    <string name="search_deselect_all">Tümünü seçimi kaldır</string>
+    <string name="search_criteria_too_narrow">Eşleşen MIDI dosyası bulunamadı. Ölçütü ayarlamayı deneyin.</string>
+    <string name="search_deselect_all">Tüm seçimleri kaldır</string>
     <string name="search_directory">Dizin</string>
-    <string name="search_index_not_available">MIDI dosyalarını indekslemek için bir dizin seçin.</string>
-    <string name="search_index_waiting">Bekleyin! MIDI dosyalarınız indeksleniyor...</string>
+    <string name="search_index_not_available">MIDI dosyalarını dizinlemek için bir dizin seçin.</string>
+    <string name="search_index_waiting">Lütfen bekleyin.. MIDI dosyalarınız dizinleniyor...</string>
 
     <!-- Background warning dialog -->
     <string name="background_cubemap_warning_title">Arka plan yanlış yapılandırılmış</string>
@@ -78,33 +78,33 @@
     <string name="background_warning_settings_badge">Arka plan yapılandırma sorunu</string>
 
     <!-- Settings -->
-    <string name="settings_general">Genel</string>
-    <string name="settings_general_description">Dil, tema</string>
-    <string name="settings_graphics">Grafik</string>
-    <string name="settings_graphics_description">Tam ekran, çözünürlük, yumuşatma</string>
+    <string name="settings_general">Genel ayarlar</string>
+    <string name="settings_general_description">Dil ve temalar</string>
+    <string name="settings_graphics">Grafikler</string>
+    <string name="settings_graphics_description">Tam ekran, çözünürlük ve nesne kenarlarını yumuşatma</string>
     <string name="settings_graphics_description_a">Gölgeler</string>
     <string name="settings_background">Arka plan</string>
     <string name="settings_background_description">Bir resim veya renk seçin</string>
     <string name="settings_controls">Kontroller</string>
-    <string name="settings_controls_description">İmleç kilidi, hız değiştirme tuşları</string>
+    <string name="settings_controls_description">İmleç kilidi ve hız değiştirme tuşları</string>
     <string name="settings_controls_description_a">Dokunma girişi</string>
-    <string name="settings_playback">Oynatma</string>
-    <string name="settings_playback_description">MIDI aygıtı, sentezleyici, soundbank\'ler</string>
+    <string name="settings_playback">Yürütme</string>
+    <string name="settings_playback_description">MIDI aygıtı, sentezleyici, ses bankaları </string>
     <string name="settings_on_screen_elements">Ekran öğeleri</string>
-    <string name="settings_on_screen_elements_description">Head-up display, şarkı sözleri</string>
+    <string name="settings_on_screen_elements_description">Baş üstü göstergesi ve şarkı sözleri</string>
 
     <!-- Settings / General -->
     <string name="settings_general_theme">Tema</string>
     <string name="settings_general_theme_light">Açık</string>
     <string name="settings_general_theme_dark">Koyu</string>
-    <string name="settings_general_theme_system">Sistemi izle</string>
+    <string name="settings_general_theme_system">Sistemin teması</string>
     <string name="settings_general_locale">Dil</string>
 
     <!-- Settings / Graphics -->
     <string name="settings_graphics_fullscreen">Tam ekran</string>
-    <string name="settings_graphics_fullscreen_description">Tüm ekranı kullan</string>
+    <string name="settings_graphics_fullscreen_description">Tam ekran moduna girin</string>
     <string name="settings_graphics_resolution">Çözünürlük</string>
-    <string name="settings_graphics_resolution_fullscreen">Tam ekran etkinken çözünürlük monitörle aynı olur</string>
+    <string name="settings_graphics_resolution_fullscreen">Tam ekran etkinken çözünürlük monitörle aynı olur.</string>
     <string name="settings_graphics_resolution_default">Varsayılan çözünürlüğü kullan</string>
     <string name="settings_graphics_resolution_default_hint">Varsayılan</string>
     <string name="settings_graphics_resolution_default_description">Varsayılan çözünürlük ekranın çoğunu kullanır</string>
@@ -112,11 +112,11 @@
     <string name="settings_graphics_resolution_width">Genişlik</string>
     <string name="settings_graphics_resolution_height">Yükseklik</string>
     <string name="settings_graphics_shadows">Gölgeler</string>
-    <string name="settings_graphics_shadows_description">Nesnelerin altına gölge renderla</string>
-    <string name="settings_graphics_shadows_none">Yok (sahte)</string>
-    <string name="settings_graphics_shadows_description_a">Dinamik gölgeleri renderla</string>
+    <string name="settings_graphics_shadows_description">Nesnelerin altına gölge oluştur.</string>
+    <string name="settings_graphics_shadows_none">Yok (sahte gölge)</string>
+    <string name="settings_graphics_shadows_description_a">Dinamik gölgeleri oluştur.</string>
     <string name="settings_graphics_shadows_description_hint_a">Dinamik gölgeler daha güzel görünür ancak performansı etkileyebilir</string>
-    <string name="settings_graphics_anti_aliasing">Yumuşatma</string>
+    <string name="settings_graphics_anti_aliasing">Nesne Kenarlarını Yumuşatma</string>
     <string name="settings_graphics_anti_aliasing_description">Nesne kenarlarını yumuşat</string>
 
     <!-- Settings / Background -->
@@ -137,7 +137,7 @@
     <string name="settings_background_type_color_description">Düz bir renk kullan</string>
     <string name="settings_background_texture_no_options_hint">Kullanılabilir doku yok.</string>
     <string name="settings_background_texture_open_folder">Doku klasörünü aç</string>
-    <string name="settings_background_texture_none">Yok</string>
+    <string name="settings_background_texture_none">Doku seçilmedi</string>
     <string name="settings_background_texture_file_not_found">Dosya bulunamadı</string>
     <string name="settings_background_missing_textures_repeated">Arka plan dokusu ayarlanmamış</string>
     <string name="settings_background_missing_textures_unique">Bir veya daha fazla arka plan dokusu ayarlanmamış</string>
@@ -146,7 +146,7 @@
     <string name="settings_controls_lock_cursor">İmleci kilitle</string>
     <string name="settings_controls_lock_cursor_description">İmleci pencereye kilitle</string>
     <string name="settings_controls_disable_touch">Dokunma girişini devre dışı bırak</string>
-    <string name="settings_controls_disable_touch_description">Ekrana orbit, pan veya zoom için dokunma göz ardı edilir</string>
+    <string name="settings_controls_disable_touch_description">Ekrana dokunarak yörüngeyi, yatay dikey kaydırmayı, yakınlaştırmayı kapatır.</string>
     <string name="settings_controls_sticky_speed_modifier_keys">Yapışkan hız değiştirme tuşları</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Serbest kamera hızını değiştirmek için Ctrl ve Shift\'e basın</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Serbest kamera hızını değiştirmek için Ctrl ve Shift\'i basılı tutun</string>
@@ -154,33 +154,33 @@
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Şarkı Sözleri</string>
     <string name="settings_onscreenelements_lyrics_description">Şarkı şarkı sözü verisi içeriyorsa, gerçek zamanlı olarak görüntüle</string>
-    <string name="settings_onscreenelements_hud">Head-up display</string>
+    <string name="settings_onscreenelements_hud">Baş üstü göstergesi</string>
     <string name="settings_onscreenelements_hud_description">Şarkı adını ve ilerlemesini göster</string>
 
     <!-- Settings / On-screen elements / Lyrics -->
-    <string name="settings_onscreenelements_lyrics_size">Şarkı sözleri boyutu</string>
-    <string name="settings_onscreenelements_lyrics_size_smaller">Daha Küçük</string>
+    <string name="settings_onscreenelements_lyrics_size">Şarkı sözlerinin boyutu</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">En Küçük</string>
     <string name="settings_onscreenelements_lyrics_size_small">Küçük</string>
     <string name="settings_onscreenelements_lyrics_size_default">Varsayılan</string>
     <string name="settings_onscreenelements_lyrics_size_large">Büyük</string>
-    <string name="settings_onscreenelements_lyrics_size_larger">Daha Büyük</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">En Büyük</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
-    <string name="settings_playback_midi_specification_reset">MIDI spesifikasyon sıfırlama mesajı gönder</string>
+    <string name="settings_playback_midi_specification_reset">MIDI spesifikasyonunu sıfırlama mesajı gönder</string>
     <string name="settings_playback_midi_specification_reset_description">MIDI aygıtını sıfırlamak için bir mesaj gönder</string>
     <string name="settings_playback_synthesizer">Sentezleyici</string>
-    <string name="settings_playback_synthesizer_description">MIDI sentezleyiciyi yapılandır</string>
+    <string name="settings_playback_synthesizer_description">MIDI sentezleyicisini yapılandır</string>
 
     <!-- Settings / Playback / Soundbanks -->
-    <string name="settings_playback_soundbanks">Soundbank\'ler</string>
-    <string name="settings_playback_soundbanks_add">Soundbank ekle</string>
-    <string name="settings_playback_soundbanks_description">Sentezleyici ile kullanım için soundbank içe aktar</string>
-    <string name="settings_playback_soundbanks_none_loaded">Yüklü soundbank yok</string>
+    <string name="settings_playback_soundbanks">Ses bankaları</string>
+    <string name="settings_playback_soundbanks_add">Ses bankası ekle</string>
+    <string name="settings_playback_soundbanks_description">Sentezleyici ile kullanım için ses bankasını aktar</string>
+    <string name="settings_playback_soundbanks_none_loaded">Yüklü ses bankası yok</string>
     <string name="settings_playback_soundbanks_import">İçe aktar</string>
     <string name="settings_playback_soundbanks_importing">İçe aktarılıyor</string>
     <string name="settings_playback_soundbanks_delete">Sil</string>
-    <string name="settings_playback_soundbanks_delete_title">Soundbank silinsin mi?</string>
+    <string name="settings_playback_soundbanks_delete_title">Ses bankası silinsin mi?</string>
     <string name="settings_playback_soundbanks_delete_message">%1$s silinsin mi?</string>
 
     <!-- Settings / Playback / Synthesizer -->
@@ -191,11 +191,11 @@
 
     <!-- Settings / Camera -->
     <string name="settings_camera">Kamera</string>
-    <string name="settings_camera_description">Oto-kam, klasik kamera</string>
-    <string name="settings_camera_start_autocam_with_song">Şarkıyla birlikte oto-kam\'ı başlat</string>
-    <string name="settings_camera_start_autocam_with_song_description">Şarkı başladığında, otomatik olarak oto-kam\'a geç</string>
-    <string name="settings_camera_classic_autocam">Klasik oto-kam</string>
-    <string name="settings_camera_classic_autocam_description">MIDIJam\'den oto-kam hareketini simüle et</string>
+    <string name="settings_camera_description">Otomatik kamera ve klasik kamera</string>
+    <string name="settings_camera_start_autocam_with_song">Şarkıyla birlikte otomatik kamerayı başlat</string>
+    <string name="settings_camera_start_autocam_with_song_description">Şarkı başladığında, otomatik olarak otomatik kameraya geç</string>
+    <string name="settings_camera_classic_autocam">Klasik otomatik kamera</string>
+    <string name="settings_camera_classic_autocam_description">MIDIJam'ın otomatik kamerasını simule et</string>
     <string name="settings_camera_smooth_freecam">Yumuşak serbest kamera</string>
     <string name="settings_camera_smooth_freecam_description">Serbest kamera hareketini yumuşat</string>
 
@@ -203,14 +203,14 @@
     <string name="settings_instruments">Enstrümanlar</string>
     <string name="settings_instruments_description">Enstrüman görünürlüğü</string>
     <string name="settings_instruments_always_show_instruments">Enstrümanları her zaman göster</string>
-    <string name="settings_instruments_always_show_instruments_description">Notlar çalınmasa bile enstrümanları asla gizleme</string>
+    <string name="settings_instruments_always_show_instruments_description">Notalar çalınmasa bile enstrümanları asla gizleme</string>
 
     <!-- About -->
-    <string name="about_midis2jam2_description">Bir 3D MIDI dosyası görselleştiricisi olan MIDIJam\'in yeniden düzenlenmiş halidir.</string>
+    <string name="about_midis2jam2_description">Bir 3D MIDI dosyası görselleştiricisi olan MIDIJam'ın yeniden düzenlenmiş hali.</string>
     <string name="about_development_contributors">Geliştirme katkıda bulunanları</string>
     <string name="about_attributions_and_contributions">Atıflar ve katkılar</string>
-    <string name="about_i18n_contributions">Uluslararasılaştırma katkıları</string>
-    <string name="about_oss_licenses">Üçüncü taraf bildirimleri</string>
+    <string name="about_i18n_contributions">Dil katkıları</string>
+    <string name="about_oss_licenses">Üçüncü taraf bildirimler</string>
     <string name="about_check_for_updates">Güncellemeleri kontrol et</string>
     <string name="about_check_for_updates_description">Yeni bir sürümün mevcut olup olmadığını hızlıca kontrol et</string>
 
