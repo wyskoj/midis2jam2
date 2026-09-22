@@ -461,11 +461,6 @@
   source: features/synthesizer.md
   platforms: [desktop, android]
   claim: "Reverb and chorus settings work by sending a control change event to the synthesizer"
-  pending: >-
-    NOT IMPLEMENTED, confirmed by inspection. The settings are stored and the settings screen
-    offers both toggles, but no code reads isUseReverb or isUseChorus, and no control change
-    is ever sent. On Android, MidiService.setReverbActive and setChorusActive wrap the
-    FluidSynth bridge but nothing calls them either.
 
 - id: app.settings.persist
   source: code

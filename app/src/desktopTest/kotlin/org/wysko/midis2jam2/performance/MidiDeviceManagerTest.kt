@@ -30,10 +30,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * The reset message the app can send to an external MIDI device when playback begins.
+ * What the app says to the MIDI device when a performance starts.
  *
- * The point of the message is to put a device that someone else's song left in a strange
- * state back to a known one, so it has to go out at the start and match the chosen standard.
+ * Two things go out: the specification reset, which puts a device that someone else's song
+ * left in a strange state back to a known one, and the synthesizer effect levels, which
+ * silence whichever of reverb and chorus the user has turned off.
  */
 class MidiDeviceManagerTest {
 
@@ -80,6 +81,93 @@ class MidiDeviceManagerTest {
         )
     }
 
+    @Test
+    @Spec("synth.effects-sent-as-control-change")
+    fun `turning reverb off silences it on every channel`() {
+        val device = NoOpMidiDevice()
+
+        withDevice(device) { it.playbackSettings.synthesizerSettings.isUseReverb = false }
+
+        assertEquals(
+            (0 until CHANNELS).map { "controlChange ch=$it controller=$REVERB value=0" },
+            device.messages,
+            "Turning reverb off should send a zero reverb level to every channel"
+        )
+    }
+
+    @Test
+    fun `turning chorus off silences it on every channel`() {
+        val device = NoOpMidiDevice()
+
+        withDevice(device) { it.playbackSettings.synthesizerSettings.isUseChorus = false }
+
+        assertEquals(
+            (0 until CHANNELS).map { "controlChange ch=$it controller=$CHORUS value=0" },
+            device.messages,
+            "Turning chorus off should send a zero chorus level to every channel"
+        )
+    }
+
+    @Test
+    fun `leaving an effect on sends nothing, so the soundbank decides`() {
+        val device = NoOpMidiDevice()
+
+        withDevice(device) {
+            it.playbackSettings.synthesizerSettings.isUseReverb = true
+            it.playbackSettings.synthesizerSettings.isUseChorus = true
+        }
+
+        assertEquals(
+            emptyList(),
+            device.messages,
+            "An effect that is left on should not be touched at all"
+        )
+    }
+
+    @Test
+    fun `turning both effects off silences both`() {
+        val device = NoOpMidiDevice()
+
+        withDevice(device) {
+            it.playbackSettings.synthesizerSettings.isUseReverb = false
+            it.playbackSettings.synthesizerSettings.isUseChorus = false
+        }
+
+        assertEquals(
+            CHANNELS * 2,
+            device.messages.size,
+            "Both effects off means a message per effect per channel"
+        )
+        assertTrue(device.messages.count { it.contains("controller=$REVERB") } == CHANNELS)
+        assertTrue(device.messages.count { it.contains("controller=$CHORUS") } == CHANNELS)
+    }
+
+    @Test
+    fun `the effect levels are sent after the reset message`() {
+        val device = NoOpMidiDevice()
+
+        withDevice(device) {
+            it.playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage = true
+            it.playbackSettings.synthesizerSettings.isUseReverb = false
+        }
+
+        val reset = device.messages.indexOfFirst { it.startsWith("data ") }
+        val firstEffect = device.messages.indexOfFirst { it.contains("controller=$REVERB") }
+
+        assertTrue(reset >= 0, "The reset message was not sent")
+        assertTrue(
+            reset < firstEffect,
+            "A specification reset restores the device's default effect levels, so it has to " +
+                "go out before the levels this app wants"
+        )
+    }
+
+    /** Boots a performance with [configure] applied to the settings, recording what the device receives. */
+    private fun withDevice(device: NoOpMidiDevice, configure: (AppSettings) -> Unit) {
+        val settings = AppSettings().apply(configure)
+        attach(device, settings)
+    }
+
     /** Boots a performance with the reset option configured, and a device that records what it receives. */
     private fun withDevice(
         device: NoOpMidiDevice,
@@ -90,7 +178,10 @@ class MidiDeviceManagerTest {
             playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage = sendReset
             playbackSettings.midiSpecificationResetSettings.midiSpecification = specification
         }
+        attach(device, settings)
+    }
 
+    private fun attach(device: NoOpMidiDevice, settings: AppSettings) {
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = settings)
             .use { performance ->
                 val configurations = listOf(
@@ -106,5 +197,13 @@ class MidiDeviceManagerTest {
                 performance.onEngineThread { }
                 performance.throwIfEngineFailed()
             }
+    }
+
+    private companion object {
+        /** Effects 1 and 3 depth: the reverb and chorus send levels. */
+        const val REVERB = 91
+        const val CHORUS = 93
+
+        const val CHANNELS = 16
     }
 }
