@@ -143,20 +143,17 @@ class AssetIntegrityTest {
 
         /** Lower bounds that keep the scans from passing vacuously. */
         const val MINIMUM_EXPECTED_ASSET_REFERENCES = 300
-        const val MINIMUM_EXPECTED_DATA_FILES = 25
+        const val MINIMUM_EXPECTED_DATA_FILES = 20
 
         /**
-         * Data files that are bundled but read by nothing, left behind by past refactors.
+         * Bundled data files that nothing reads.
          *
-         * They are recorded rather than deleted so the fact is visible, and this list must
-         * not grow. modern_autocam_angles.yaml in particular still holds the per-instrument
-         * camera angles for an auto-cam that no longer reads them.
+         * Deliberately empty. The three that were here - keymap.json, fret-heights.json and
+         * modern_autocam_angles.yaml, all stranded by past refactors - have been deleted. A
+         * new entry means a file is shipping that nothing uses, so prefer wiring it up or
+         * removing it over listing it here.
          */
-        val KNOWN_ORPHANS = setOf(
-            "keymap.json",
-            "fret-heights.json",
-            "modern_autocam_angles.yaml",
-        )
+        val KNOWN_ORPHANS = emptySet<String>()
 
         val ASSET_LITERAL =
             Regex("\"([A-Za-z0-9_][A-Za-z0-9_/.\\-]*\\.(?:obj|bmp|png|jpg|jpeg|gif|fnt|j3md|frag))\"")
