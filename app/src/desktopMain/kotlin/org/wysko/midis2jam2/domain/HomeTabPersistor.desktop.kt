@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,29 +18,10 @@
 package org.wysko.midis2jam2.domain
 
 import com.russhwolf.settings.PreferencesSettings
-import kotlinx.serialization.json.Json
 import java.util.prefs.Preferences
 
-private const val HOME_TAB_STATE_KEY = "home_tab_state"
-
-actual class HomeTabPersistor {
-    private val preferences = PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2"))
-    private val json = Json {
-        encodeDefaults = true
-        ignoreUnknownKeys = true
-    }
-    private val defaultStateJson = json.encodeToString(HomeTabPersistentState())
-
-    actual fun save(state: HomeTabPersistentState) {
-        preferences.putString(HOME_TAB_STATE_KEY, json.encodeToString(state))
-    }
-
-    actual fun load(): HomeTabPersistentState {
-        return json.decodeFromString<HomeTabPersistentState>(
-            preferences.getString(
-                HOME_TAB_STATE_KEY,
-                defaultStateJson
-            )
-        )
-    }
-}
+/** On the desktop, the home tab's state lives in the user's Java preferences. */
+actual fun createHomeTabPersistor(): HomeTabPersistor =
+    PreferenceBackedHomeTabPersistor(
+        PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2"))
+    )

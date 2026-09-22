@@ -123,7 +123,7 @@ class SearchTabModel : ScreenModel {
         }
     }
 
-    private fun indexDirectory(
+    internal fun indexDirectory(
         directory: File,
         onFinish: () -> Unit = {},
     ) {

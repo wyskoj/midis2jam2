@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,33 +19,14 @@ package org.wysko.midis2jam2.domain
 
 import android.content.Context
 import com.russhwolf.settings.SharedPreferencesSettings
-import kotlinx.serialization.json.Json
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.mp.KoinPlatformTools
 
-private const val HOME_TAB_STATE_KEY = "home_tab_state"
-
-actual class HomeTabPersistor : KoinComponent {
-
-    private val sharedPreferences = SharedPreferencesSettings(
-        delegate = context().getSharedPreferences("midis2jam2_home_tab_state", Context.MODE_PRIVATE)
+/** On Android, the home tab's state lives in its own shared preferences file. */
+actual fun createHomeTabPersistor(): HomeTabPersistor {
+    val context = KoinPlatformTools.defaultContext().get().get<Context>()
+    return PreferenceBackedHomeTabPersistor(
+        SharedPreferencesSettings(
+            delegate = context.getSharedPreferences("midis2jam2_home_tab_state", Context.MODE_PRIVATE)
+        )
     )
-    private val json = Json {
-        encodeDefaults = true
-        ignoreUnknownKeys = true
-    }
-    private val defaultStateJson = json.encodeToString(HomeTabPersistentState())
-
-    private fun context(): Context {
-        val context: Context by inject()
-        return context
-    }
-
-    actual fun save(state: HomeTabPersistentState) {
-        sharedPreferences.putString(HOME_TAB_STATE_KEY, json.encodeToString(state))
-    }
-
-    actual fun load(): HomeTabPersistentState {
-        return json.decodeFromString(sharedPreferences.getString(HOME_TAB_STATE_KEY, defaultStateJson))
-    }
 }

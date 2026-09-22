@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,5 @@
 
 package org.wysko.midis2jam2.domain
 
-actual class PlaybackHistoryPersistor {
-    actual fun save(entries: List<PlaybackHistoryEntry>) = Unit
-
-    actual fun load(): List<PlaybackHistoryEntry> = emptyList()
-
-    actual fun getDataString(entries: List<PlaybackHistoryEntry>): String = ""
-}
+/** Playback history is a desktop feature; Android keeps none. */
+actual fun createPlaybackHistoryPersistor(): PlaybackHistoryPersistor = NoPlaybackHistoryPersistor

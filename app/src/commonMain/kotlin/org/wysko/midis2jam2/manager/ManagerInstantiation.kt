@@ -18,11 +18,29 @@
 package org.wysko.midis2jam2.manager
 
 import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.midis2jam2.manager.LyricManager.Companion.lyricEvents
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
 import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.starter.getCameraManager
+
+/**
+ * Which set of managers a performance needs.
+ */
+enum class ManagerProfile {
+    /** Everything, for a performance shown on screen. */
+    Full,
+
+    /**
+     * Everything that works with no window attached.
+     *
+     * Used when the engine runs on a headless context. This leaves out the debug overlay,
+     * whose text is built from Compose string resources; reading those asks the windowing
+     * system for the screen resolution, which is not something a headless process can answer.
+     */
+    Headless,
+}
 
 fun instantiateManagers(
     configurations: Collection<Configuration>,
@@ -30,6 +48,7 @@ fun instantiateManagers(
     sequencer: JwSequencer,
     isQueueApplication: Boolean = false,
     onPlaybackComplete: (() -> Unit)? = null,
+    profile: ManagerProfile = ManagerProfile.Full,
 ): List<BaseManager> {
     val settings = configurations.find<AppSettingsConfiguration>()
     val isLooping = configurations.find<Configuration.HomeConfiguration>().isLooping
@@ -42,12 +61,19 @@ fun instantiateManagers(
         add(ActionsManager())
         add(getCameraManager())
         add(CollectorsManager())
-        add(DebugTextManager().apply { isEnabled = false })
+        if (profile == ManagerProfile.Full) {
+            add(DebugTextManager().apply { isEnabled = false })
+        }
         add(DrumSetVisibilityManager())
         add(FadeManager())
         add(HudManager())
         add(StageManager())
         add(StandManager())
+        // Only worth attaching when the file has something to sing and the user wants to see
+        // it; the controller builds a text object per line up front.
+        if (settings.appSettings.onScreenElementsSettings.lyricsSettings.isShowLyrics) {
+            sequence.lyricEvents().takeIf { it.isNotEmpty() }?.let { add(LyricManager(it)) }
+        }
         add(
             PlaybackManager(
                 sequence = sequence,

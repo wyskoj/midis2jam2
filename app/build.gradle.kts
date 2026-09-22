@@ -113,6 +113,21 @@ kotlin {
             implementation(libs.noise)
         }
 
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+        }
+
+        val desktopTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.kotlinx.serialization.yaml)
+                implementation(libs.jme3.desktop)
+                implementation(libs.kotlin.reflect)
+            }
+        }
+
         desktopMain.dependencies {
             // Compose
             implementation(compose.desktop.currentOs)
@@ -204,6 +219,25 @@ android {
         cmake {
             path = file("src/androidMain/CMakeLists.txt")
         }
+    }
+}
+
+tasks.named<Test>("desktopTest") {
+    useJUnitPlatform()
+    // The suite must run with no display, no window and no audio device attached.
+    systemProperty("java.awt.headless", "true")
+    // SpecCoverageTest scans the compiled test classes for @Spec citations.
+    val compiledTestClasses = testClassesDirs
+    jvmArgumentProviders.add(
+        CommandLineArgumentProvider {
+            val dirs = compiledTestClasses.joinToString(File.pathSeparator) { it.absolutePath }
+            listOf("-Dmidis2jam2.testClassesDirs=$dirs")
+        }
+    )
+    testLogging {
+        events("failed", "skipped")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStackTraces = true
     }
 }
 

@@ -45,15 +45,16 @@ sealed class Configuration {
  * Returns the first element in the collection that is an instance of the specified type.
  *
  * @param type the class reference representing the type
- * @return the first element of the specified type in the collection, or `null` if no such element is found
+ * @return the first element of the specified type in the collection
+ * @throws IllegalStateException if the collection holds no element of that type
  *
  * @suppress This function performs unchecked cast, so it suppresses the unchecked cast warning
  */
 @Suppress("kotlin:S6530", "UNCHECKED_CAST")
 @Deprecated("Use find instead", ReplaceWith("find()"))
-fun <T : Configuration> Collection<Configuration>.getType(type: KClass<T>): T {
-    return this.firstOrNull { type.isInstance(it) } as T
-}
+fun <T : Configuration> Collection<Configuration>.getType(type: KClass<T>): T =
+    this.firstOrNull { type.isInstance(it) } as? T
+        ?: error("No ${type.simpleName} is present in this configuration collection.")
 
 /**
  * Returns the first element in the collection that is an instance of the specified type.

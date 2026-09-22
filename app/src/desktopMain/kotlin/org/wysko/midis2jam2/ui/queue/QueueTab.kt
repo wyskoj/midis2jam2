@@ -134,12 +134,7 @@ object QueueTab : Tab {
         val queue = model.queue.collectAsState()
         val lazyListState = rememberLazyListState()
         val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-            model.setQueue(
-                queue.value.toMutableList().apply {
-                    add(to.index, removeAt(from.index))
-                    model.setIsDirty(true)
-                }
-            )
+            model.moveItem(from.index, to.index)
         }
         var isConfirmClearDialogOpen by remember { mutableStateOf(false) }
         var isPlaylistLoadDialogOpen by remember { mutableStateOf(false) }
