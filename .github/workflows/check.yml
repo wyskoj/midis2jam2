@@ -1,12 +1,12 @@
-name: Tests
+name: Checks
 
 on:
   push:
   pull_request:
 
 jobs:
-  test:
-    name: Test on ${{ matrix.os }}
+  check:
+    name: Check on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -26,18 +26,18 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Not `check`: Android lint currently reports a pre-existing error, so the tests are
-      # run directly until that is fixed. The suite needs no display, no audio device and no
-      # MIDI hardware - the performance tests boot jMonkeyEngine on its headless context.
-      - name: Run tests
-        run: ./gradlew :app:desktopTest :app:testDebugUnitTest --no-daemon --stacktrace
+      # check runs the tests and Android lint. The suite is built to need no display, no
+      # audio device and no MIDI hardware: the performance tests boot jMonkeyEngine on its
+      # headless context.
+      - name: Run checks
+        run: ./gradlew check --no-daemon --stacktrace
 
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports-${{ matrix.os }}
+          name: reports-${{ matrix.os }}
           path: |
-            app/build/reports/tests/
+            app/build/reports/
             app/build/test-results/
           retention-days: 14
