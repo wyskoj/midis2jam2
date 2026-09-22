@@ -50,7 +50,11 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
                 fov = it
             }
         }
-        dummyFlyByCamera = ExtendedJoystickFlyByCamera(dummyCamera, onCameraInput).apply {
+        dummyFlyByCamera = ExtendedJoystickFlyByCamera(
+            dummyCamera,
+            onCameraInput,
+            app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isGamepadEnabled ?: false,
+        ).apply {
             registerWithInput(app.inputManager)
             isDragToRotate =
                 app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isLockCursor?.not() ?: true

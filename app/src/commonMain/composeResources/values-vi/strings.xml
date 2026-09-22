@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Phím dính chỉnh tốc độ</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Nhấn Ctrl và Shift để chỉnh tốc độ freecam</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Giữ Ctrl và Shift để chỉnh tốc độ freecam</string>
+    <string name="settings_controls_gamepad_enabled">Đầu vào tay cầm chơi game</string>
+    <string name="settings_controls_gamepad_enabled_description">Cho phép tay cầm chơi game đã kết nối điều khiển freecam</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Lời bài hát</string>

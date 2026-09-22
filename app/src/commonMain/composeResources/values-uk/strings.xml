@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Фіксація клавіш швидкості</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Натисніть Ctrl та Shift, щоб змінити швидкість вільної камери</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Утримуйте Ctrl та Shift, щоб змінити швидкість вільної камери</string>
+    <string name="settings_controls_gamepad_enabled">Введення з геймпада</string>
+    <string name="settings_controls_gamepad_enabled_description">Дозволити підключеному геймпаду керувати вільною камерою</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Тексти пісень</string>

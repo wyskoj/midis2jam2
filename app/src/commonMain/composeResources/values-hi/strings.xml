@@ -133,6 +133,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">स्टिकी स्पीड-मॉडिफायर कुंजियाँ</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">फ्रीकैम की गति बदलने के लिए Ctrl और Shift दबाएं</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">फ्रीकैम की गति बदलने के लिए Ctrl और Shift दबाए रखें</string>
+    <string name="settings_controls_gamepad_enabled">गेमपैड इनपुट</string>
+    <string name="settings_controls_gamepad_enabled_description">कनेक्टेड गेमपैड को फ्रीकैम नियंत्रित करने की अनुमति दें</string>
 
     <!-- सेटिंग्स / ऑन-स्क्रीन तत्व -->
     <string name="settings_onscreenelements_lyrics">गीत के बोल</string>

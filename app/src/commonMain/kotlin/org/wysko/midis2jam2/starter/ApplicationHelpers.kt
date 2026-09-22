@@ -26,6 +26,10 @@ internal fun SimpleApplication.applyConfigurations(configurations: Collection<Co
         AppSettings(false).apply {
             copyFrom(DEFAULT_JME_SETTINGS)
             applyResolution(configurations)
+            setUseJoysticks(
+                configurations.find<Configuration.AppSettingsConfiguration>()
+                    .appSettings.controlsSettings.isGamepadEnabled
+            )
         }
     )
     setDisplayStatView(false)
@@ -85,7 +89,6 @@ private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
     title = "midis2jam2"
     audioRenderer = null
     centerWindow = true
-    setUseJoysticks(true)
 }
 
 internal expect fun AppSettings.applyIcons()
