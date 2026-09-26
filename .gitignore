@@ -13,7 +13,15 @@
 /.idea/kotlinScripting.xml
 /.idea/sonarlint
 /.idea/sqldialects.xml
-/.idea/*.iml
+/.idea/AndroidProjectSystem.xml
+/.idea/assetWizardSettings.xml
+/.idea/compiler.xml
+/.idea/deviceManager.xml
+/.idea/discord.xml
+/.idea/kotlinc.xml
+/.idea/libraries-with-intellij-classes.xml
+/.idea/migrations.xml
+/.idea/**/*.iml
 /.settings
 /bin
 /build/
