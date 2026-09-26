@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Przyklejające się klawisze modyfikatora prędkości</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Naciśnij Ctrl i Shift, aby zmienić prędkość kamery swobodnej</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Przytrzymaj Ctrl i Shift, aby zmienić prędkość kamery swobodnej</string>
+    <string name="settings_controls_gamepad_enabled">Wejście gamepada</string>
+    <string name="settings_controls_gamepad_enabled_description">Zezwól podłączonemu gamepadowi na sterowanie kamerą swobodną</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Teksty utworów</string>

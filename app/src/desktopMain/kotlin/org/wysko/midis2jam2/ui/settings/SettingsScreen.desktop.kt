@@ -63,6 +63,7 @@ import midis2jam2.app.generated.resources.close
 import midis2jam2.app.generated.resources.computer
 import midis2jam2.app.generated.resources.fit_screen
 import midis2jam2.app.generated.resources.fullscreen
+import midis2jam2.app.generated.resources.gamepad
 import midis2jam2.app.generated.resources.high_density
 import midis2jam2.app.generated.resources.hotel_class
 import midis2jam2.app.generated.resources.keyboard_lock
@@ -79,6 +80,8 @@ import midis2jam2.app.generated.resources.settings_camera
 import midis2jam2.app.generated.resources.settings_camera_smooth_freecam
 import midis2jam2.app.generated.resources.settings_camera_smooth_freecam_description
 import midis2jam2.app.generated.resources.settings_controls
+import midis2jam2.app.generated.resources.settings_controls_gamepad_enabled
+import midis2jam2.app.generated.resources.settings_controls_gamepad_enabled_description
 import midis2jam2.app.generated.resources.settings_controls_lock_cursor
 import midis2jam2.app.generated.resources.settings_controls_lock_cursor_description
 import midis2jam2.app.generated.resources.settings_controls_sticky_speed_modifier_keys
@@ -222,6 +225,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
     }
     item {
         IsSpeedModifierKeysStickyBooleanSelect(settings, model)
+    }
+    item {
+        GamepadEnabledBooleanSelect(settings, model)
     }
     stickyHeader { // stickyHeader
         CategoryHeader(stringResource(Res.string.settings_playback_synthesizer))
@@ -502,6 +508,17 @@ private fun LockCursorBooleanSelect(settings: State<AppSettings>, model: Setting
         title = { Text(stringResource(Res.string.settings_controls_lock_cursor)) },
         label = { Text(stringResource(Res.string.settings_controls_lock_cursor_description)) },
         icon = Res.drawable.mouse_lock
+    )
+}
+
+@Composable
+private fun GamepadEnabledBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SwitchRow(
+        settings.value.controlsSettings.isGamepadEnabled,
+        model::setGamepadEnabled,
+        title = { Text(stringResource(Res.string.settings_controls_gamepad_enabled)) },
+        label = { Text(stringResource(Res.string.settings_controls_gamepad_enabled_description)) },
+        icon = Res.drawable.gamepad,
     )
 }
 

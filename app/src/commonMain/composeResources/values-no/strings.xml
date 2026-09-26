@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Klistrende hastighetsmodifikasjonstaster</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Trykk Ctrl og Shift for å endre frikamerhastighet</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Hold Ctrl og Shift for å endre frikamerhastighet</string>
+    <string name="settings_controls_gamepad_enabled">Spillkontroller-inndata</string>
+    <string name="settings_controls_gamepad_enabled_description">Tillat en tilkoblet spillkontroller å styre frikameraet</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Tekst</string>

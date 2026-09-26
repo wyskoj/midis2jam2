@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">ปุ่มปรับความเร็วแบบติดSticky</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">กด Ctrl และ Shift เพื่อเปลี่ยนความเร็วฟรีแคม</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">กดค้าง Ctrl และ Shift เพื่อเปลี่ยนความเร็วฟรีแคม</string>
+    <string name="settings_controls_gamepad_enabled">อินพุตเกมแพด</string>
+    <string name="settings_controls_gamepad_enabled_description">อนุญาตให้เกมแพดที่เชื่อมต่ออยู่ควบคุมฟรีแคม</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">เนื้อเพลง</string>

@@ -142,6 +142,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Sticky speed-modifier keys</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Press Ctrl and Shift to change freecam speed</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Hold Ctrl and Shift to change freecam speed</string>
+    <string name="settings_controls_gamepad_enabled">Gamepad input</string>
+    <string name="settings_controls_gamepad_enabled_description">Allow a connected gamepad to control the free camera</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Lyrics</string>

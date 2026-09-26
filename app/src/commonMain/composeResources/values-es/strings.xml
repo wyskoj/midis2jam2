@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Teclas modificadoras de velocidad persistentes</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Pulsa Ctrl y Mayús para cambiar la velocidad de la cámara libre</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Mantén pulsado Ctrl y Mayús para cambiar la velocidad de la cámara libre</string>
+    <string name="settings_controls_gamepad_enabled">Entrada de mando</string>
+    <string name="settings_controls_gamepad_enabled_description">Permite que un mando conectado controle la cámara libre</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Letras</string>

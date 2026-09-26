@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Sticky speed-modifier keys</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Pindutin ang Ctrl at Shift para baguhin ang freecam speed</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Hawakan ang Ctrl at Shift para baguhin ang freecam speed</string>
+    <string name="settings_controls_gamepad_enabled">Gamepad input</string>
+    <string name="settings_controls_gamepad_enabled_description">Payagan ang nakakonektang gamepad na kontrolin ang freecam</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Mga Lyrics</string>

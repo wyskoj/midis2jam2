@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">고정 속도 변경 키</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Ctrl과 Shift를 눌러 자유 시점 카메라 속도 변경</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Ctrl과 Shift를 누르고 있어야 자유 시점 카메라 속도 변경</string>
+    <string name="settings_controls_gamepad_enabled">게임패드 입력</string>
+    <string name="settings_controls_gamepad_enabled_description">연결된 게임패드로 자유 시점 카메라 조작 허용</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">가사</string>
