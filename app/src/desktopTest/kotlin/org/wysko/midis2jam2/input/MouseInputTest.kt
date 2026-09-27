@@ -112,13 +112,50 @@ class MouseInputTest {
         }
     }
 
+    /**
+     * Regression test for #410: zooming out far enough pushed the free camera's field of view past
+     * 180 degrees, where the engine can no longer represent it, and the next camera update crashed
+     * with "Field of view must be greater than 0".
+     */
+    @Test
+    fun `zooming out as far as the wheel goes does not crash the free camera`() {
+        withCamera(smooth = false) { performance, input -> zoomOutToTheLimit(performance, input) }
+    }
+
+    /** As above, for smooth freecam, which eases the field of view toward the target instead. */
+    @Test
+    fun `zooming out as far as the wheel goes does not crash the smooth free camera`() {
+        withCamera(smooth = true) { performance, input -> zoomOutToTheLimit(performance, input) }
+    }
+
+    private fun zoomOutToTheLimit(performance: HeadlessPerformance, input: InputHarness) {
+        val before = input.cameraPose().fieldOfView
+        repeat(ZOOM_OUT_CLICKS) { input.scroll(clicks = -1) }
+        input.frames(ZOOM_CATCH_UP_FRAMES)
+
+        performance.throwIfEngineFailed()
+        val after = input.cameraPose().fieldOfView
+        assertTrue(after > before, "Scrolling this way should zoom out, but the field of view went from $before to $after")
+        assertTrue(
+            after < MAX_FIELD_OF_VIEW,
+            "After scrolling out $ZOOM_OUT_CLICKS clicks the field of view should still be a usable angle, but it is $after"
+        )
+    }
+
     private companion object {
 
         const val SETTLE_FRAMES = 12
         const val ROTATION_TOLERANCE = 0.01f
+        const val MAX_FIELD_OF_VIEW = 180f
 
-        fun withCamera(block: (HeadlessPerformance, InputHarness) -> Unit) {
-            val settings = AppSettings().apply { cameraSettings.isSmoothFreecam = false }
+        /** Enough clicks to take the default field of view well past [MAX_FIELD_OF_VIEW]. */
+        const val ZOOM_OUT_CLICKS = 150
+
+        /** Frames for smooth freecam to catch up with a zoom; it covers a few percent per frame. */
+        const val ZOOM_CATCH_UP_FRAMES = 180
+
+        fun withCamera(smooth: Boolean = false, block: (HeadlessPerformance, InputHarness) -> Unit) {
+            val settings = AppSettings().apply { cameraSettings.isSmoothFreecam = smooth }
             HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = settings)
                 .use { performance ->
                     val input = InputHarness(performance)

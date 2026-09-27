@@ -95,7 +95,9 @@ class InputHarness(private val performance: HeadlessPerformance) {
 
     /** Turns the scroll wheel by [clicks]; positive scrolls one way, negative the other. */
     fun scroll(clicks: Int, x: Int = 400, y: Int = 300) {
-        deliver(MouseMotionEvent(x, y, 0, 0, clicks * WHEEL_UNITS_PER_CLICK, clicks))
+        // The engine reacts to the delta, which the desktop backend reports in wheel units, not clicks.
+        val units = clicks * WHEEL_UNITS_PER_CLICK
+        deliver(MouseMotionEvent(x, y, 0, 0, units, units))
     }
 
     /** Drags the pointer with the left button held, as rotating the camera does. */
@@ -133,7 +135,7 @@ class InputHarness(private val performance: HeadlessPerformance) {
 
     private companion object {
 
-        /** jMonkeyEngine counts a wheel click as this many units of travel. */
+        /** jMonkeyEngine's desktop (GLFW) backend counts a wheel click as this many units of travel. */
         const val WHEEL_UNITS_PER_CLICK = 120
 
         /** The guard the engine uses to reject input outside its own polling window. */

@@ -37,6 +37,7 @@ import org.wysko.midis2jam2.world.AssetLoader
 import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -101,10 +102,24 @@ class HeadlessPerformance private constructor(
         InstrumentAssignment.assign(performance, sequence)
     }
 
-    /** Runs [block] on the engine thread and waits for it, rethrowing whatever it throws. */
+    /**
+     * Runs [block] on the engine thread and waits for it, rethrowing whatever it throws.
+     *
+     * If the engine thread fails while waiting, it stops draining its queue, so the wait gives up
+     * with that failure rather than running out the timeout.
+     */
     fun <T> onEngineThread(block: () -> T): T {
         throwIfEngineFailed()
-        return app.enqueue(Callable { block() }).get(ENGINE_CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        val task = app.enqueue(Callable { block() })
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(ENGINE_CALL_TIMEOUT_SECONDS)
+        while (true) {
+            try {
+                return task.get(ENGINE_FAILURE_POLL_MILLIS, TimeUnit.MILLISECONDS)
+            } catch (timeout: TimeoutException) {
+                throwIfEngineFailed()
+                if (System.nanoTime() > deadline) throw timeout
+            }
+        }
     }
 
     /** Fails with whatever the engine thread threw, if anything has. */
@@ -148,6 +163,7 @@ class HeadlessPerformance private constructor(
 
         private const val BOOT_TIMEOUT_SECONDS = 180L
         private const val ENGINE_CALL_TIMEOUT_SECONDS = 180L
+        private const val ENGINE_FAILURE_POLL_MILLIS = 100L
         private const val STOP_TIMEOUT_MILLIS = 15_000L
 
         /**

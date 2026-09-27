@@ -44,6 +44,9 @@ private const val TRIGGER_REST_THRESHOLD = 0.6f
 /** Upper bound on the tracked frame delta, so a hitch or a pause doesn't produce a huge jump. */
 private const val MAX_FRAME_DELTA_SECONDS = 0.1f
 
+/** Degrees of field of view per unit of zoom input, before [FlyByCamera.zoomSpeed]; matches jME's own. */
+private const val ZOOM_DEGREES_PER_UNIT = 0.1f
+
 /** Multiplier for right-stick look rotation. Rotation reads much less "responsive" than movement
  *  at the same nominal sensitivity, since [FlyByCamera]'s rotation speed is tuned for the tiny
  *  per-pixel deltas mouse-look produces, not a full-range analog stick - so this is tuned higher
@@ -224,6 +227,18 @@ class ExtendedJoystickFlyByCamera(
             CameraInput.FLYCAM_ZOOMIN -> zoomCamera(value)
             CameraInput.FLYCAM_ZOOMOUT -> zoomCamera(-value)
         }
+    }
+
+    /**
+     * Zooms as [FlyByCamera.zoomCamera] does, but keeps the field of view within [FOV_VALID_RANGE].
+     *
+     * The base class only stops the field of view going below zero. Past 180 degrees it wraps
+     * around to a negative angle, which the engine rejects when it is next applied to a camera,
+     * crashing the performance (#410).
+     */
+    override fun zoomCamera(value: Float) {
+        if (cam.isParallelProjection) return super.zoomCamera(value)
+        cam.fov = (cam.fov + value * ZOOM_DEGREES_PER_UNIT * zoomSpeed).coerceIn(FOV_VALID_RANGE)
     }
 
     private fun joyMoveCamera(value: Float, sideways: Boolean) {
