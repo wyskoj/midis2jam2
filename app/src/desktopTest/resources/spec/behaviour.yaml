@@ -67,6 +67,14 @@
   source: code
   platforms: [desktop, android]
   claim: "In GS mode, drum kits laid out unlike the General MIDI kits (such as Ethnic or Rhythm FX) draw nothing, while drum machine kits draw a drum set"
+- id: midi.assignment.bank-select.xg-sfx
+  source: code
+  platforms: [desktop, android]
+  claim: "In XG mode, sound effects in bank 64 are drawn as their own instrument or nothing, never as the General MIDI instrument with the same program number"
+- id: midi.assignment.bank-select.xg-kits
+  source: code
+  platforms: [desktop, android]
+  claim: "In XG mode, drum kits are chosen from XG's own kit list, so kits numbered like GS kits but different (such as the Symphony Kit) are drawn correctly"
 - id: midi.assignment.bank-select.unlike-sound-shows-nothing
   source: code
   platforms: [desktop, android]

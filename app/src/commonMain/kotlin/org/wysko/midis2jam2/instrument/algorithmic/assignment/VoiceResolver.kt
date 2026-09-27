@@ -46,6 +46,9 @@ class VoiceResolver(private val catalogues: Catalogues = VoiceCatalogues) {
             // In GS, the LSB only picks which Sound Canvas's sound map to use; the instrument is the same.
             MidiMode.GS -> catalogues.gs[setup.msb, 0, program]
             MidiMode.XG -> catalogues.xg[setup.msb, setup.lsb, program]
+                // Bank 64 is XG's sound effects, not variations of the General MIDI program with the same number.
+                ?: if (setup.msb == XG_SFX_BANK) return look(Looks.NONE) else null
+
             MidiMode.GM2 -> catalogues.gm2[setup.msb, setup.lsb, program]
         }
         return entry?.look?.let(::look) ?: melodic(program)
@@ -60,7 +63,9 @@ class VoiceResolver(private val catalogues: Catalogues = VoiceCatalogues) {
         val entry = when (setup.mode) {
             MidiMode.GM -> null
             MidiMode.GS -> catalogues.gsKits[0, 0, program]
-            MidiMode.XG -> catalogues.xgKits[setup.msb, 0, program]
+            // XG keeps its drum kits in bank 127 and SFX kits in 126. A rhythm channel on any other bank (such as
+            // channel 10 left on bank 0) still plays the drum kit.
+            MidiMode.XG -> catalogues.xgKits[if (setup.msb == XG_SFX_KIT_BANK) XG_SFX_KIT_BANK else XG_DRUM_BANK, 0, program]
             MidiMode.GM2 -> catalogues.gm2Kits[setup.msb, setup.lsb, program]
         }
         return entry?.look?.let(::kitLook) ?: kit(program)
@@ -70,6 +75,12 @@ class VoiceResolver(private val catalogues: Catalogues = VoiceCatalogues) {
     fun kit(program: Int): KitLook = catalogues.gmKits[0, 0, program]?.look?.let(::kitLook) ?: KitLooks.Standard
 
     private fun look(id: String): Look = Looks[id] ?: error("The voice catalogues name an unknown look: $id")
+
+    private companion object {
+        const val XG_SFX_BANK = 64
+        const val XG_SFX_KIT_BANK = 126
+        const val XG_DRUM_BANK = 127
+    }
 
     private fun kitLook(id: String): KitLook = KitLooks[id] ?: error("The kit catalogues name an unknown kit look: $id")
 }

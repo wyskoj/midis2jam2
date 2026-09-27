@@ -47,9 +47,19 @@ class VoiceResolverTest {
             )
             override val xg = catalogue("""- { program: 29, msb: 0, lsb: 3, name: "Jazz Man", look: Guitar.Jazz }""")
             override val gm2 = catalogue("""- { program: 29, msb: 121, lsb: 3, name: "Jazz Man", look: Guitar.Jazz }""")
-            override val gmKits = catalogue("""- { program: 9, name: "Room", look: Room }""")
+            override val gmKits = catalogue(
+                """
+                - { program: 9, name: "Room", look: Room }
+                - { program: 49, name: "Orchestra", look: Orchestra }
+                """,
+            )
             override val gsKits = catalogue("""- { program: 49, name: "Orchestra", look: Orchestra }""")
-            override val xgKits = catalogue("""- { program: 1, msb: 126, name: "SFX Kit 1", look: None }""")
+            override val xgKits = catalogue(
+                """
+                - { program: 1, msb: 126, name: "SFX Kit 1", look: None }
+                - { program: 49, msb: 127, name: "Symphony Kit", look: Standard }
+                """,
+            )
             override val gm2Kits = catalogue("""- { program: 33, msb: 120, name: "Jazz Set", look: Jazz }""")
         },
     )
@@ -90,6 +100,25 @@ class VoiceResolverTest {
         assertEquals(Looks.NONE, resolver.kit(setup(MidiMode.XG, msb = 126, program = 0, state = Rhythm)).id)
         assertEquals("Room", resolver.kit(setup(MidiMode.XG, msb = 127, program = 8, state = Rhythm)).id)
         assertEquals("Standard", resolver.kit(setup(MidiMode.GM, program = 100, state = Rhythm)).id)
+    }
+
+    @Test
+    @Spec("midi.assignment.bank-select.xg-sfx")
+    fun `an XG sound effect the catalogue doesn't list puts nothing on stage, rather than its program's instrument`() {
+        // Bank 64 is XG's sound effects: program 29 there is not a muted guitar.
+        assertEquals(Looks.NONE, resolver.melodic(setup(MidiMode.XG, msb = 64, program = 28))?.id)
+        // Other unlisted XG banks are variations, and fall back as usual.
+        assertEquals("Guitar.Muted", resolver.melodic(setup(MidiMode.XG, msb = 0, lsb = 99, program = 28))?.id)
+    }
+
+    @Test
+    @Spec("midi.assignment.bank-select.xg-kits")
+    fun `XG kits are read from bank 127 even when the rhythm channel is left on bank 0`() {
+        // XG's Symphony Kit is a drum kit; GS's kit 49 is the orchestra.
+        assertEquals("Standard", resolver.kit(setup(MidiMode.XG, msb = 0, program = 48, state = Rhythm)).id)
+        assertEquals("Standard", resolver.kit(setup(MidiMode.XG, msb = 127, program = 48, state = Rhythm)).id)
+        assertEquals("Orchestra", resolver.kit(setup(MidiMode.GS, program = 48, state = Rhythm)).id)
+        assertEquals(Looks.NONE, resolver.kit(setup(MidiMode.XG, msb = 126, program = 0, state = Rhythm)).id)
     }
 
     private fun setup(mode: MidiMode, msb: Int = 0, lsb: Int = 0, program: Int, state: ChannelState = Melody) =

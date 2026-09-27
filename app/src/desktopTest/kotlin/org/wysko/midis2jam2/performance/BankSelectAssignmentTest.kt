@@ -24,7 +24,10 @@ import org.wysko.midis2jam2.instrument.algorithmic.assignment.Looks
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.VoiceCatalogue
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.VoiceCatalogues
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar
+import org.wysko.midis2jam2.instrument.family.ensemble.Timpani
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.OrchestraDrumSet
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.TypicalDrumSet
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.pipe.Flute
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
@@ -161,6 +164,26 @@ class BankSelectAssignmentTest {
 
         assertTrue(ethnic.none { it is DrumSet }, "The Ethnic kit isn't laid out like a drum set: $ethnic")
         assertTrue(hipHop.any { it is DrumSet }, "The Hip Hop kit is a drum set: $hipHop")
+    }
+
+    @Test
+    @Spec("midi.assignment.bank-select.xg-sfx", "midi.assignment.bank-select.xg-kits")
+    fun `XG sound effects and kits are read from XG's own tables`() {
+        // Bank 64, program 49 is XG's Dog. General MIDI program 49 is a string ensemble.
+        val dog = build(MidiFixtures.bankSelect(MidiFixtures.XG_SYSTEM_ON, Patch(64, 0, 48)))
+        assertEquals(emptyList(), dog, "An XG dog is not a string section")
+
+        // Kit 49 is XG's Symphony Kit, a drum kit, where GS kit 49 is the orchestra with timpani.
+        val symphony = HeadlessPerformance.start(
+            MidiFixtures.bankSelect(
+                MidiFixtures.XG_SYSTEM_ON,
+                Patch(127, 0, 48),
+                channel = MidiFixtures.PERCUSSION_CHANNEL,
+                firstNote = 41,
+            ),
+        ).use { it.instruments }
+        assertTrue(symphony.any { it is TypicalDrumSet }, "The Symphony Kit is drawn as a drum set: $symphony")
+        assertTrue(symphony.none { it is OrchestraDrumSet || it is Timpani }, "It has no timpani: $symphony")
     }
 
     @Test
