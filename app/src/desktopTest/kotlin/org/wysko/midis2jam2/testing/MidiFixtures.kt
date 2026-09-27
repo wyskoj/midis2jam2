@@ -140,6 +140,79 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /** Channel 11 in one-based terms: the channel `take5.mid` turns into a second rhythm channel. */
+    const val SECOND_RHYTHM_CHANNEL = 10
+
+    /** What channel 10 plays in [secondRhythmChannel]: a bass drum. */
+    const val PRIMARY_RHYTHM_NOTE = 36
+
+    /** What the second rhythm channel plays in [secondRhythmChannel]: a snare. */
+    const val SECOND_RHYTHM_NOTE = 40
+
+    /**
+     * Two rhythm channels at once, the way GS files like `take5.mid` do it: a GS reset, then the "use for rhythm
+     * part" message turning channel 11 into a rhythm part, which then picks its kit by program number.
+     *
+     * Channel 10 plays [beats] of [PRIMARY_RHYTHM_NOTE] on [primaryKit], or nothing if it's `null`. Channel 11 plays
+     * [beats] of [SECOND_RHYTHM_NOTE] on [secondKit]. If [melodicFrom] is given, channel 11 is turned back into a
+     * melodic part at that beat, and plays a few notes under the same program.
+     */
+    fun secondRhythmChannel(
+        primaryKit: Int?,
+        secondKit: Int,
+        beats: Int = 8,
+        melodicFrom: Int? = null,
+        asRhythmPart: Boolean = true,
+    ): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            sysex(GS_RESET, absoluteTime = 0)
+            if (asRhythmPart) sysex(gsUseForRhythmPart(SECOND_RHYTHM_CHANNEL, rhythm = true), absoluteTime = 0)
+            if (primaryKit != null) {
+                channel(PERCUSSION_CHANNEL) {
+                    program(primaryKit, absoluteTime = 0)
+                    repeat(beats) {
+                        note(PRIMARY_RHYTHM_NOTE, duration = 1.eighth, absoluteTime = it * TICKS_PER_QUARTER)
+                    }
+                }
+            }
+            channel(SECOND_RHYTHM_CHANNEL) {
+                program(secondKit, absoluteTime = 0)
+                repeat(beats) {
+                    note(SECOND_RHYTHM_NOTE, duration = 1.eighth, absoluteTime = it * TICKS_PER_QUARTER)
+                }
+            }
+            if (melodicFrom != null) {
+                val start = melodicFrom * TICKS_PER_QUARTER
+                sysex(gsUseForRhythmPart(SECOND_RHYTHM_CHANNEL, rhythm = false), absoluteTime = start)
+                channel(SECOND_RHYTHM_CHANNEL) {
+                    repeat(4) { note(40 + it, duration = 1.quarter, absoluteTime = start + it * TICKS_PER_QUARTER) }
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The GS reset message, as it appears in a file (without the leading F0). */
+    private val GS_RESET = byteArrayOf(0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7.toByte())
+
+    /** The GS "use for rhythm part" message for the zero-based [channel], as it appears in a file. */
+    private fun gsUseForRhythmPart(channel: Int, rhythm: Boolean): ByteArray {
+        // GS numbers its parts 10, 1-9, 11-16.
+        val part = when (channel) {
+            PERCUSSION_CHANNEL -> 0
+            in 0..8 -> channel + 1
+            else -> channel
+        }
+        val address = listOf(0x40, 0x10 or part, 0x15)
+        val value = if (rhythm) 2 else 0
+        val checksum = (128 - (address.sum() + value) % 128) % 128
+        return (listOf(0x41, 0x10, 0x42, 0x12) + address + listOf(value, checksum, 0xF7))
+            .map { it.toByte() }
+            .toByteArray()
+    }
+
     /**
      * A sung line, one syllable at a time, with an explicit line break.
      *

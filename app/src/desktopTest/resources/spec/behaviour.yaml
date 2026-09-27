@@ -43,6 +43,22 @@
   source: troubleshooting.md
   platforms: [desktop, android]
   claim: "The app supports General MIDI instruments only; XG instruments are not supported"
+- id: midi.assignment.rhythm-channel.gs
+  source: code
+  platforms: [desktop, android]
+  claim: "A channel set as a rhythm part by the GS 'use for rhythm part' message plays drums, not the melodic instrument of its program"
+- id: midi.assignment.rhythm-channel.xg
+  source: code
+  platforms: [desktop, android]
+  claim: "In XG mode, a channel selecting drum bank 127 or 126, or set to a drum part mode, plays drums"
+- id: midi.assignment.rhythm-channel.gm2
+  source: code
+  platforms: [desktop, android]
+  claim: "In GM2 mode, bank 120 makes a channel a rhythm channel and bank 121 a melodic one"
+- id: midi.assignment.rhythm-channel.shared-kit
+  source: code
+  platforms: [desktop, android]
+  claim: "Drums on a second rhythm channel play on channel 10's drum set when both kits share the General MIDI drum layout; orchestra and SFX kits get their own"
 
 # ------------------------------------------------------------------- background (background.md)
 - id: background.default.checkerboard
