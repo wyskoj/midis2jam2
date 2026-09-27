@@ -187,6 +187,7 @@ android {
                     "no",
                     "pl",
                     "ru",
+                    "sv",
                     "th",
                     "tl",
                     "tr",
