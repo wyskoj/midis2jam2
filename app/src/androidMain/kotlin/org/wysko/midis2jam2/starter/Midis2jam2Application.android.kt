@@ -141,7 +141,6 @@ internal actual class Midis2jam2Application(
     actual override fun destroy() {
         rootNode.detachAllChildren()
         assetManager.clearCache()
-        renderer.invalidateState()
         inputManager.clearMappings()
         super.destroy()
     }
