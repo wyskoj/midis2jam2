@@ -60,6 +60,21 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /** One channel playing four notes under [first], then switching to [second] for four more. */
+    fun programSwitch(first: Int, second: Int): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(first, absoluteTime = 0)
+                repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = it * TICKS_PER_QUARTER) }
+                program(second, absoluteTime = 4 * TICKS_PER_QUARTER)
+                repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = (4 + it) * TICKS_PER_QUARTER) }
+            }
+        }
+    }.toTimeBasedSequence()
+
     /**
      * A file with no program change at all.
      *

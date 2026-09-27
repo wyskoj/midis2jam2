@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
@@ -96,6 +97,21 @@ class InstrumentAssignmentTest {
             table.keys.sorted(),
             "The assignment table should cover the General MIDI programs, and only those"
         )
+    }
+
+    @Test
+    @Spec("midi.assignment.same-look-merges")
+    fun `switching between programs that look the same keeps one instrument`() {
+        // Programs 25 and 26 (zero-based 24 and 25) are both drawn as the acoustic guitar.
+        HeadlessPerformance.start(MidiFixtures.programSwitch(24, 25), attachManagers = false).use { performance ->
+            val guitars = performance.instruments.filterIsInstance<Guitar>()
+            assertEquals(1, guitars.size, "Expected one guitar across the program change, got ${performance.instruments}")
+        }
+        // Programs that look different still get an instrument each.
+        HeadlessPerformance.start(MidiFixtures.programSwitch(24, 26), attachManagers = false).use { performance ->
+            val guitars = performance.instruments.filterIsInstance<Guitar>()
+            assertEquals(2, guitars.size, "Nylon and jazz guitars should be two instruments, got ${performance.instruments}")
+        }
     }
 
     @Test

@@ -26,6 +26,8 @@ import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.ChannelState
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.ChannelStateTimeline
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.KitLayout
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.KitLook
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.Look
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.PRIMARY_RHYTHM_CHANNEL
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.VoiceResolver
 import org.wysko.midis2jam2.instrument.family.percussion.AuxiliaryPercussion
@@ -75,10 +77,12 @@ object InstrumentAssignment {
             }
             programEvents.removeDuplicateProgramEvents()
 
-            // We create "bins" that events fall into based on their corresponding program event.
-            val programBins = buildMap<Byte, MutableList<MidiEvent>> {
-                programEvents.distinctBy { it.program }.forEach { this += it.program to mutableListOf() }
+            // Each program appears as a look, and events fall into a "bin" for each look. Programs that look the same
+            // share a bin, and so share an instrument.
+            val lookOfProgram = programEvents.map { it.program }.distinct().associateWith {
+                VoiceResolver.melodic(it.toInt())
             }
+            val lookBins = lookOfProgram.values.filterNotNull().distinct().associateWith { mutableListOf<MidiEvent>() }
 
             // Since a program change event can occur in between an ON and OFF event, we also need to keep track of the
             // current program when an ON event occurs, so that the corresponding OFF event can be assigned to the same
@@ -86,7 +90,7 @@ object InstrumentAssignment {
             val programPerNote = mutableMapOf<Byte, Byte>()
 
             // Likewise, an OFF event goes wherever its ON event went, even if the channel changed state in between.
-            val rhythmKitPerNote = mutableMapOf<Byte, Int>()
+            val rhythmKitPerNote = mutableMapOf<Byte, KitLook>()
 
             channelSpecificEvents.forEach { event ->
                 if (event !is NoteEvent.NoteOff) { // If the event is not an OFF event,
@@ -94,12 +98,12 @@ object InstrumentAssignment {
                     val currentProgram = programEvents.lastOrNull { it.tick <= event.tick }?.program ?: 0
 
                     if (event is NoteEvent.NoteOn && timeline.stateAt(channel, event.tick) == ChannelState.Rhythm) {
-                        val kit = timeline.kitAt(channel, event.tick, currentProgram.toInt())
+                        val kit = VoiceResolver.kit(timeline.kitAt(channel, event.tick, currentProgram.toInt()))
                         rhythmNotes += RhythmNote(channel, kit, event)
                         rhythmKitPerNote[event.note] = kit
                     } else {
                         // Add the event to the correct bin
-                        programBins[currentProgram]?.plusAssign(event)
+                        lookBins[lookOfProgram[currentProgram]]?.plusAssign(event)
                         if (event is NoteEvent.NoteOn) rhythmKitPerNote.remove(event.note)
                     }
 
@@ -107,7 +111,7 @@ object InstrumentAssignment {
                     if (event is NoteEvent.NoteOn) programPerNote[event.note] = currentProgram
                 } else {
                     rhythmKitPerNote[event.note]?.let { rhythmNotes += RhythmNote(channel, it, event) }
-                        ?: programBins[programPerNote[event.note]]?.plusAssign(event)
+                        ?: lookBins[lookOfProgram[programPerNote[event.note]]]?.plusAssign(event)
                         ?: kotlin.run { logger().warn("Unbalanced MIDI note events.") }
                 }
             }
@@ -118,8 +122,8 @@ object InstrumentAssignment {
             }
 
             // Convert lists of events to their corresponding instrument.
-            programBins.entries.forEachIndexed { i, e ->
-                onLoadingProgress((channel / 16f) + (i / programBins.entries.size / 16f))
+            lookBins.entries.forEachIndexed { i, e ->
+                onLoadingProgress((channel / 16f) + (i / lookBins.entries.size / 16f))
                 buildInstrument(context, e.key, e.value, channelSpecificEvents)?.let { instruments += it }
             }
         }
@@ -157,13 +161,12 @@ object InstrumentAssignment {
 
         return buildList {
             drumSetBins.forEach { (kit, events) ->
-                VoiceResolver.kit(kit).buildDrumSet(context, events.sortedBy { it.tick })?.let { add(it) }
+                kit.buildDrumSet(context, events.sortedBy { it.tick })?.let { add(it) }
             }
             kitBins.forEach { (kit, events) ->
-                val look = VoiceResolver.kit(kit)
                 val sorted = events.sortedBy { it.tick }
-                addAll(look.buildSpecialCases(context, sorted))
-                look.collectAuxiliary(sorted).forEach { (t, u) ->
+                addAll(kit.buildSpecialCases(context, sorted))
+                kit.collectAuxiliary(sorted).forEach { (t, u) ->
                     if (auxiliary[t] == null) {
                         auxiliary[t] = u.map { it.toMutableList() }.toMutableList()
                     } else {
@@ -199,10 +202,10 @@ object InstrumentAssignment {
         }
 
     /** The kit channel 10 is playing at [tick], or `null` if it isn't playing drums then. */
-    private fun ChannelStateTimeline.primaryKitAt(tick: Int, spans: List<KitSpan>): Int? {
+    private fun ChannelStateTimeline.primaryKitAt(tick: Int, spans: List<KitSpan>): KitLook? {
         if (stateAt(PRIMARY_RHYTHM_CHANNEL, tick) != ChannelState.Rhythm) return null
         val span = spans.firstOrNull { tick in it.start until it.end } ?: return null
-        return kitAt(PRIMARY_RHYTHM_CHANNEL, tick, span.program)
+        return VoiceResolver.kit(kitAt(PRIMARY_RHYTHM_CHANNEL, tick, span.program))
     }
 
     /**
@@ -211,24 +214,21 @@ object InstrumentAssignment {
      * Most kits share the General MIDI drum layout and differ only in sound, but the orchestra and SFX kits have their
      * own layouts, and a note either kit turns into a special case isn't a drum set note at all.
      */
-    private fun canFold(from: Int, onto: Int, note: Int): Boolean {
-        val fromLook = VoiceResolver.kit(from)
-        val ontoLook = VoiceResolver.kit(onto)
-        return fromLook.layout == KitLayout.General &&
-            ontoLook.layout == KitLayout.General &&
-            note !in fromLook.specialCaseNotes &&
-            note !in ontoLook.specialCaseNotes
-    }
+    private fun canFold(from: KitLook, onto: KitLook, note: Int): Boolean =
+        from.layout == KitLayout.General &&
+            onto.layout == KitLayout.General &&
+            note !in from.specialCaseNotes &&
+            note !in onto.specialCaseNotes
 
     /** A note on a rhythm channel, and the kit it was played on. */
-    private class RhythmNote(val channel: Int, val kit: Int, val event: NoteEvent)
+    private class RhythmNote(val channel: Int, val kit: KitLook, val event: NoteEvent)
 
     /** A stretch of ticks, [start] inclusive to [end] exclusive, where a channel had [program] selected. */
     private class KitSpan(val start: Int, val end: Int, val program: Int)
 
     private fun buildInstrument(
         context: PerformanceManager,
-        program: Byte,
+        look: Look,
         events: MutableList<MidiEvent>,
         allChannelEvents: List<MidiEvent>,
     ): Instrument? {
@@ -241,7 +241,7 @@ object InstrumentAssignment {
         @Suppress("NAME_SHADOWING")
         val events = (events + allChannelEvents.filterIsInstance<ControlChangeEvent>()).distinct().sortedBy { it.tick }
 
-        return VoiceResolver.melodic(program.toInt())?.build(context, events)
+        return look.build(context, events)
     }
 
     fun MutableList<ProgramEvent>.removeDuplicateProgramEvents() {
