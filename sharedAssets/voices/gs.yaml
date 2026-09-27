@@ -5,7 +5,9 @@
 # picks between the SC-55, SC-88, SC-88Pro and SC-8850 sound maps, so it isn't part of the key.
 # A voice with no `look` appears as the General MIDI voice with the same program (its capital tone).
 #
-# Transcribed so far: Piano and Chromatic percussion (pages 167-168).
+# Transcribed so far: Piano and Chromatic percussion (pages 167-168), and SFX (pages 184-185).
+# A voice marked `look: None` is a different sound from its program's instrument (a door is not a telephone), so
+# it puts nothing on stage rather than the wrong thing.
 
 
 # Instrument List, page 167: Piano
@@ -281,3 +283,520 @@
 - program: 16
   msb: 24
   name: "Dulcimer"
+
+# Instrument List, pages 184-185: SFX
+- program: 121
+  msb: 0
+  name: "Gt.FretNoise"
+- program: 121
+  msb: 1
+  name: "Gt.Cut Noise"
+- program: 121
+  msb: 2
+  name: "String Slap"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 3
+  name: "Gt.CutNoise2"
+- program: 121
+  msb: 4
+  name: "Dist.CutNoiz"
+- program: 121
+  msb: 5
+  name: "Bass Slide"
+- program: 121
+  msb: 6
+  name: "Pick Scrape"
+- program: 121
+  msb: 8
+  name: "Gt. FX Menu"
+- program: 121
+  msb: 9
+  name: "Bartok Pizz."
+- program: 121
+  msb: 10
+  name: "Guitar Slap"
+- program: 121
+  msb: 11
+  name: "Chord Stroke"
+- program: 121
+  msb: 12
+  name: "Biwa Stroke"
+- program: 121
+  msb: 13
+  name: "Biwa Tremolo"
+- program: 121
+  msb: 16
+  name: "A.Bs.Nz Menu"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 17
+  name: "D.Gt.Nz Menu"
+- program: 121
+  msb: 18
+  name: "E.Gt.NzMenu1"
+- program: 121
+  msb: 19
+  name: "E.Gt.NzMenu2"
+- program: 121
+  msb: 20
+  name: "G.StrokeMenu"
+- program: 121
+  msb: 21
+  name: "Gt.SlideMenu"
+- program: 121
+  msb: 22
+  name: "A.Bs.Mute Nz"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 23
+  name: "A.Bs.TouchNz"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 24
+  name: "A.Bs.AtackNz"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 25
+  name: "TC Up Nz"
+- program: 121
+  msb: 26
+  name: "TC DownMt.Nz"
+- program: 121
+  msb: 27
+  name: "TC UpMt.Nz"
+- program: 121
+  msb: 28
+  name: "TC Down Nz"
+- program: 121
+  msb: 29
+  name: "DstGT.Up Nz"
+- program: 121
+  msb: 30
+  name: "DstGT.DwnNz1"
+- program: 121
+  msb: 31
+  name: "DstGT.DwnNz2"
+- program: 121
+  msb: 32
+  name: "DstGT.MuteNz"
+- program: 121
+  msb: 34
+  name: "Gt.StrokeNz5"
+- program: 121
+  msb: 35
+  name: "StlGt.SldNz1"
+- program: 121
+  msb: 36
+  name: "StlGt.SldNz2"
+- program: 121
+  msb: 37
+  name: "StlGt.SldNz3"
+- program: 121
+  msb: 38
+  name: "StlGt.SldNz4"
+- program: 121
+  msb: 39
+  name: "Gt.StrokeNz1"
+- program: 121
+  msb: 40
+  name: "Gt.StrokeNz2"
+- program: 121
+  msb: 41
+  name: "Gt.StrokeNz3"
+- program: 121
+  msb: 42
+  name: "Gt.StrokeNz4"
+- program: 122
+  msb: 0
+  name: "Breath Noise"
+- program: 122
+  msb: 1
+  name: "Fl.Key Click"
+  look: Flute
+- program: 122
+  msb: 2
+  name: "Brth Nz Menu"
+- program: 122
+  msb: 3
+  name: "Fl.Breath 1"
+  look: Flute
+- program: 122
+  msb: 4
+  name: "Fl.Breath 2"
+  look: Flute
+- program: 122
+  msb: 5
+  name: "Fl.Breath 3"
+  look: Flute
+- program: 122
+  msb: 6
+  name: "Vox Breath 1"
+- program: 122
+  msb: 7
+  name: "Vox Breath 2"
+- program: 122
+  msb: 8
+  name: "Trombone Nz"
+  look: Trombone
+- program: 122
+  msb: 9
+  name: "Trumpet Nz"
+  look: Trumpet
+- program: 123
+  msb: 0
+  name: "Seashore"
+- program: 123
+  msb: 1
+  name: "Rain"
+- program: 123
+  msb: 2
+  name: "Thunder"
+- program: 123
+  msb: 3
+  name: "Wind"
+- program: 123
+  msb: 4
+  name: "Stream"
+- program: 123
+  msb: 5
+  name: "Bubble"
+- program: 123
+  msb: 6
+  name: "Wind 2"
+- program: 123
+  msb: 7
+  name: "Cricket"
+- program: 123
+  msb: 16
+  name: "Pink Noise"
+- program: 123
+  msb: 17
+  name: "White Noise"
+- program: 124
+  msb: 0
+  name: "Bird"
+- program: 124
+  msb: 1
+  name: "Dog"
+  look: None
+- program: 124
+  msb: 2
+  name: "Horse-Gallop"
+  look: None
+- program: 124
+  msb: 3
+  name: "Bird 2"
+- program: 124
+  msb: 4
+  name: "Kitty"
+  look: None
+- program: 124
+  msb: 5
+  name: "Growl"
+  look: None
+- program: 124
+  msb: 6
+  name: "Growl 2"
+  look: None
+- program: 124
+  msb: 7
+  name: "Fancy Animal"
+  look: None
+- program: 124
+  msb: 8
+  name: "Seal"
+  look: None
+- program: 125
+  msb: 0
+  name: "Telephone 1"
+- program: 125
+  msb: 1
+  name: "Telephone 2"
+- program: 125
+  msb: 2
+  name: "DoorCreaking"
+  look: None
+- program: 125
+  msb: 3
+  name: "Door"
+  look: None
+- program: 125
+  msb: 4
+  name: "Scratch"
+  look: None
+- program: 125
+  msb: 5
+  name: "Wind Chimes"
+  look: None
+- program: 125
+  msb: 7
+  name: "Scratch 2"
+  look: None
+- program: 125
+  msb: 8
+  name: "ScratchKey"
+  look: None
+- program: 125
+  msb: 9
+  name: "TapeRewind"
+  look: None
+- program: 125
+  msb: 10
+  name: "Phono Noise"
+  look: None
+- program: 125
+  msb: 11
+  name: "MC-500 Beep"
+  look: None
+- program: 125
+  msb: 12
+  name: "Scratch 3"
+  look: None
+- program: 125
+  msb: 13
+  name: "Scratch 4"
+  look: None
+- program: 125
+  msb: 14
+  name: "Scratch 5"
+  look: None
+- program: 125
+  msb: 15
+  name: "Scratch 6"
+  look: None
+- program: 125
+  msb: 16
+  name: "Scratch 7"
+  look: None
+- program: 126
+  msb: 0
+  name: "Helicopter"
+- program: 126
+  msb: 1
+  name: "Car-Engine"
+  look: None
+- program: 126
+  msb: 2
+  name: "Car-Stop"
+  look: None
+- program: 126
+  msb: 3
+  name: "Car-Pass"
+  look: None
+- program: 126
+  msb: 4
+  name: "Car-Crash"
+  look: None
+- program: 126
+  msb: 5
+  name: "Siren"
+  look: None
+- program: 126
+  msb: 6
+  name: "Train"
+  look: None
+- program: 126
+  msb: 7
+  name: "Jetplane"
+  look: None
+- program: 126
+  msb: 8
+  name: "Starship"
+  look: None
+- program: 126
+  msb: 9
+  name: "Burst Noise"
+  look: None
+- program: 126
+  msb: 10
+  name: "Calculating"
+  look: None
+- program: 126
+  msb: 11
+  name: "Perc. Bang"
+  look: None
+- program: 126
+  msb: 12
+  name: "Burner"
+  look: None
+- program: 126
+  msb: 13
+  name: "Glass & Glam"
+  look: None
+- program: 126
+  msb: 14
+  name: "Ice Ring"
+  look: None
+- program: 126
+  msb: 15
+  name: "Over Blow"
+  look: None
+- program: 126
+  msb: 16
+  name: "Crack Bottle"
+  look: None
+- program: 126
+  msb: 17
+  name: "Pour Bottle"
+  look: None
+- program: 126
+  msb: 18
+  name: "Soda"
+  look: None
+- program: 126
+  msb: 19
+  name: "Open CD Tray"
+  look: None
+- program: 126
+  msb: 20
+  name: "Audio Switch"
+  look: None
+- program: 126
+  msb: 21
+  name: "Key Typing"
+  look: None
+- program: 126
+  msb: 22
+  name: "SL 1"
+  look: None
+- program: 126
+  msb: 23
+  name: "SL 2"
+  look: None
+- program: 126
+  msb: 24
+  name: "Car Engine 2"
+  look: None
+- program: 126
+  msb: 25
+  name: "Car Horn"
+  look: None
+- program: 126
+  msb: 26
+  name: "Boeeeen"
+  look: None
+- program: 126
+  msb: 27
+  name: "R.Crossing"
+  look: None
+- program: 126
+  msb: 28
+  name: "Compressor"
+  look: None
+- program: 126
+  msb: 29
+  name: "Sword Boom!"
+  look: None
+- program: 126
+  msb: 30
+  name: "Sword Cross"
+  look: None
+- program: 126
+  msb: 31
+  name: "Stab! 1"
+  look: None
+- program: 126
+  msb: 32
+  name: "Stab! 2"
+  look: None
+- program: 127
+  msb: 0
+  name: "Applause"
+- program: 127
+  msb: 1
+  name: "Laughing"
+  look: None
+- program: 127
+  msb: 2
+  name: "Screaming"
+  look: None
+- program: 127
+  msb: 3
+  name: "Punch"
+  look: None
+- program: 127
+  msb: 4
+  name: "Heart Beat"
+  look: None
+- program: 127
+  msb: 5
+  name: "Footsteps"
+  look: None
+- program: 127
+  msb: 6
+  name: "Applause 2"
+- program: 127
+  msb: 7
+  name: "Small Club"
+- program: 127
+  msb: 8
+  name: "ApplauseWave"
+- program: 127
+  msb: 9
+  name: "BabyLaughing"
+  look: None
+- program: 127
+  msb: 16
+  name: "Voice One"
+  look: None
+- program: 127
+  msb: 17
+  name: "Voice Two"
+  look: None
+- program: 127
+  msb: 18
+  name: "Voice Three"
+  look: None
+- program: 127
+  msb: 19
+  name: "Voice Tah"
+  look: None
+- program: 127
+  msb: 20
+  name: "Voice Whey"
+  look: None
+- program: 127
+  msb: 22
+  name: "Voice Kikit"
+  look: None
+- program: 127
+  msb: 23
+  name: "Voice ComeOn"
+  look: None
+- program: 127
+  msb: 24
+  name: "Voice Aou"
+  look: None
+- program: 127
+  msb: 25
+  name: "Voice Oou"
+  look: None
+- program: 127
+  msb: 26
+  name: "Voice Hie"
+  look: None
+- program: 128
+  msb: 0
+  name: "Gun Shot"
+- program: 128
+  msb: 1
+  name: "Machine Gun"
+- program: 128
+  msb: 2
+  name: "Lasergun"
+- program: 128
+  msb: 3
+  name: "Explosion"
+  look: None
+- program: 128
+  msb: 4
+  name: "Eruption"
+  look: None
+- program: 128
+  msb: 5
+  name: "Big Shot"
+- program: 128
+  msb: 6
+  name: "Explosion 2"
+  look: None

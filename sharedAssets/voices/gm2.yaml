@@ -4,6 +4,8 @@
 # prints it; `lsb` is the bank select LSB (controller 32), 0 when omitted.
 # A voice with no `look` appears as the General MIDI voice with the same program (gm.yaml), which is also what
 # the specification (section 2.6) says a device should play for a variation it doesn't have.
+# A voice marked `look: None` is a different sound from its program's instrument (a door is not a telephone), so
+# it puts nothing on stage rather than the wrong thing.
 
 
 # Appendix A, 1 of 7 (printed page 25): Piano, Chromatic Percussion
@@ -810,10 +812,12 @@
   msb: 121
   lsb: 1
   name: "Dog"
+  look: None
 - program: 124
   msb: 121
   lsb: 2
   name: "Horse Gallop"
+  look: None
 - program: 124
   msb: 121
   lsb: 3
@@ -829,18 +833,22 @@
   msb: 121
   lsb: 2
   name: "Door Creaking"
+  look: None
 - program: 125
   msb: 121
   lsb: 3
   name: "Door"
+  look: None
 - program: 125
   msb: 121
   lsb: 4
   name: "Scratch"
+  look: None
 - program: 125
   msb: 121
   lsb: 5
   name: "Wind Chime"
+  look: None
 - program: 126
   msb: 121
   name: "Helicopter"
@@ -848,38 +856,47 @@
   msb: 121
   lsb: 1
   name: "Car Engine"
+  look: None
 - program: 126
   msb: 121
   lsb: 2
   name: "Car Stop"
+  look: None
 - program: 126
   msb: 121
   lsb: 3
   name: "Car Pass"
+  look: None
 - program: 126
   msb: 121
   lsb: 4
   name: "Car Crash"
+  look: None
 - program: 126
   msb: 121
   lsb: 5
   name: "Siren"
+  look: None
 - program: 126
   msb: 121
   lsb: 6
   name: "Train"
+  look: None
 - program: 126
   msb: 121
   lsb: 7
   name: "Jetplane"
+  look: None
 - program: 126
   msb: 121
   lsb: 8
   name: "Starship"
+  look: None
 - program: 126
   msb: 121
   lsb: 9
   name: "Burst Noise"
+  look: None
 - program: 127
   msb: 121
   name: "Applause"
@@ -887,22 +904,27 @@
   msb: 121
   lsb: 1
   name: "Laughing"
+  look: None
 - program: 127
   msb: 121
   lsb: 2
   name: "Screaming"
+  look: None
 - program: 127
   msb: 121
   lsb: 3
   name: "Punch"
+  look: None
 - program: 127
   msb: 121
   lsb: 4
   name: "Heart Beat"
+  look: None
 - program: 127
   msb: 121
   lsb: 5
   name: "Footsteps"
+  look: None
 - program: 128
   msb: 121
   name: "Gunshot"
@@ -918,3 +940,4 @@
   msb: 121
   lsb: 3
   name: "Explosion"
+  look: None

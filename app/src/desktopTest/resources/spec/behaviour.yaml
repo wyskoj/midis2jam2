@@ -59,6 +59,10 @@
   source: code
   platforms: [desktop, android]
   claim: "In XG mode, voices are chosen by both bank select MSB and LSB"
+- id: midi.assignment.bank-select.unlike-sound-shows-nothing
+  source: code
+  platforms: [desktop, android]
+  claim: "A sound effect variation that is a different sound from its program's instrument (such as a door under Telephone) puts nothing on stage rather than the wrong instrument"
 - id: midi.assignment.bank-select.fallback
   source: code
   platforms: [desktop, android]

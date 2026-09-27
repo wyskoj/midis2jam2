@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.pipe.Flute
+import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
 import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
@@ -116,6 +117,26 @@ class BankSelectAssignmentTest {
                 "With no reset, bank 127 is ignored and program 1 is a piano, but got ${performance.instruments}",
             )
         }
+    }
+
+    @Test
+    @Spec("midi.assignment.bank-select.unlike-sound-shows-nothing")
+    fun `sound effects that aren't what their program draws put nothing on stage`() {
+        // As "It's Me, It's Verity" (issue #427) does it: GS variations of Telephone 1 on the SC-55 map (LSB 1).
+        val door = build(MidiFixtures.bankSelect(MidiFixtures.GS_RESET, Patch(3, 1, 124)))
+        val windChimes = build(MidiFixtures.bankSelect(MidiFixtures.GS_RESET, Patch(5, 1, 124)))
+        val gm2Door = build(MidiFixtures.bankSelect(MidiFixtures.GM2_SYSTEM_ON, Patch(121, 3, 124)))
+
+        assertEquals(emptyList(), door, "A GS door is not a telephone")
+        assertEquals(emptyList(), windChimes, "GS wind chimes are not a telephone")
+        assertEquals(emptyList(), gm2Door, "A GM2 door is not a telephone")
+    }
+
+    @Test
+    fun `sound effect variations of the same thing still appear as it`() {
+        val telephone2 = build(MidiFixtures.bankSelect(MidiFixtures.GS_RESET, Patch(1, 1, 124)))
+
+        assertTrue(telephone2.any { it is TelephoneRing }, "Telephone 2 is still a telephone: $telephone2")
     }
 
     @Test
