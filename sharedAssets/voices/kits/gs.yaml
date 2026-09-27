@@ -1,6 +1,160 @@
 # Roland GS drum sets.
 #
-# Not transcribed yet (SC-8850 Owner's Manual, drum set lists). kits/gm.yaml already reads kits by their GS
-# numbers, so every GS kit falls back to it.
+# Transcribed from the SC-8850 Owner's Manual, Drum Set List, using the SC-8850 map's names. `program` is 1-based,
+# as the manual prints it. Drum machine kits (Hip Hop, House, TR-808 and the like) are drawn as the analog kit.
+# Kits marked `look: None` lay their notes out differently from the General MIDI kits, so they draw nothing
+# rather than hitting the wrong drums.
 
-[]
+# Drum Set List (page 187)
+- program: 1
+  msb: 0
+  name: "STANDARD 1"
+  look: Standard
+- program: 2
+  msb: 0
+  name: "STANDARD 2"
+  look: Standard
+- program: 3
+  msb: 0
+  name: "STANDARD L/R"
+  look: Standard
+- program: 9
+  msb: 0
+  name: "ROOM"
+  look: Room
+- program: 10
+  msb: 0
+  name: "HIP HOP"
+  look: Analog
+- program: 11
+  msb: 0
+  name: "JUNGLE"
+  look: Analog
+- program: 12
+  msb: 0
+  name: "TECHNO"
+  look: Analog
+- program: 13
+  msb: 0
+  name: "ROOM L/R"
+  look: Room
+- program: 14
+  msb: 0
+  name: "HOUSE"
+  look: Analog
+- program: 17
+  msb: 0
+  name: "POWER"
+  look: Power
+- program: 25
+  msb: 0
+  name: "ELECTRONIC"
+  look: Electronic
+- program: 26
+  msb: 0
+  name: "TR-808"
+  look: Analog
+- program: 27
+  msb: 0
+  name: "DANCE"
+  look: Analog
+- program: 28
+  msb: 0
+  name: "CR-78"
+  look: Analog
+- program: 29
+  msb: 0
+  name: "TR-606"
+  look: Analog
+- program: 30
+  msb: 0
+  name: "TR-707"
+  look: Analog
+- program: 31
+  msb: 0
+  name: "TR-909"
+  look: Analog
+- program: 33
+  msb: 0
+  name: "JAZZ"
+  look: Jazz
+- program: 34
+  msb: 0
+  name: "JAZZ L/R"
+  look: Jazz
+- program: 41
+  msb: 0
+  name: "BRUSH"
+  look: Brush
+- program: 42
+  msb: 0
+  name: "BRUSH 2"
+  look: Brush
+- program: 43
+  msb: 0
+  name: "BRUSH 2 L/R"
+  look: Brush
+- program: 49
+  msb: 0
+  name: "ORCHESTRA"
+  look: Orchestra
+- program: 50
+  msb: 0
+  name: "ETHNIC"
+  look: None
+- program: 51
+  msb: 0
+  name: "KICK & SNARE"
+  look: None
+- program: 52
+  msb: 0
+  name: "KICK & SNARE 2"
+  look: None
+- program: 53
+  msb: 0
+  name: "ASIA"
+  look: None
+- program: 54
+  msb: 0
+  name: "CYMBAL&CLAPS"
+  look: None
+- program: 55
+  msb: 0
+  name: "GAMELAN 1"
+  look: None
+- program: 56
+  msb: 0
+  name: "GAMELAN 2"
+  look: None
+- program: 57
+  msb: 0
+  name: "SFX"
+  look: Sfx
+- program: 58
+  msb: 0
+  name: "RHYTHM FX"
+  look: None
+- program: 59
+  msb: 0
+  name: "RHYTHM FX 2"
+  look: None
+- program: 60
+  msb: 0
+  name: "RHYTHM FX 3"
+  look: None
+- program: 61
+  msb: 0
+  name: "SFX 2"
+  look: None
+- program: 62
+  msb: 0
+  name: "VOICE"
+  look: None
+- program: 63
+  msb: 0
+  name: "CYM&CLAPS 2"
+  look: None
+- program: 128
+  msb: 0
+  name: "CM-64/32L"
+  look: Standard

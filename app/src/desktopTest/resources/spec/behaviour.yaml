@@ -59,6 +59,14 @@
   source: code
   platforms: [desktop, android]
   claim: "In XG mode, voices are chosen by both bank select MSB and LSB"
+- id: midi.assignment.bank-select.gs-cm64
+  source: code
+  platforms: [desktop, android]
+  claim: "In GS mode, banks 126 and 127 select the CM-64 (MT-32) sounds, each drawn as its General MIDI counterpart rather than by its program number"
+- id: midi.assignment.bank-select.gs-kits
+  source: code
+  platforms: [desktop, android]
+  claim: "In GS mode, drum kits laid out unlike the General MIDI kits (such as Ethnic or Rhythm FX) draw nothing, while drum machine kits draw a drum set"
 - id: midi.assignment.bank-select.unlike-sound-shows-nothing
   source: code
   platforms: [desktop, android]

@@ -732,6 +732,7 @@
   msb: 121
   lsb: 1
   name: "Castanets"
+  look: None
 - program: 117
   msb: 121
   name: "Taiko Drum"

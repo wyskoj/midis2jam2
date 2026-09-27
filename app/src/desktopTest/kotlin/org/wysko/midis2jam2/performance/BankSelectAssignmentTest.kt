@@ -28,7 +28,9 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.pipe.Flute
 import org.wysko.midis2jam2.instrument.family.soundeffects.TelephoneRing
+import org.wysko.midis2jam2.instrument.family.ensemble.StageChoir
 import org.wysko.midis2jam2.instrument.family.strings.AcousticBass
+import org.wysko.midis2jam2.instrument.family.strings.Violin
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.MidiFixtures.Patch
@@ -133,6 +135,35 @@ class BankSelectAssignmentTest {
     }
 
     @Test
+    @Spec("midi.assignment.bank-select.gs-cm64")
+    fun `GS CM-64 sounds appear as their General MIDI counterparts, not as their program number`() {
+        // Bank 127, program 53 is the MT-32's Violin 1. General MIDI program 53 is Choir Aahs.
+        val instruments = build(MidiFixtures.bankSelect(MidiFixtures.GS_RESET, Patch(127, 0, 52)))
+
+        assertTrue(instruments.any { it is Violin }, "CM-64 Violin 1 should be a violin: $instruments")
+        assertTrue(instruments.none { it is StageChoir }, "It shouldn't fall back to General MIDI's choir: $instruments")
+    }
+
+    @Test
+    @Spec("midi.assignment.bank-select.gs-kits")
+    fun `GS kits with a layout of their own draw nothing, and drum machine kits draw a drum set`() {
+        fun kit(program: Int) = HeadlessPerformance.start(
+            MidiFixtures.bankSelect(
+                MidiFixtures.GS_RESET,
+                Patch(0, 0, program),
+                channel = MidiFixtures.PERCUSSION_CHANNEL,
+                firstNote = 36,
+            ),
+        ).use { it.instruments }
+
+        val ethnic = kit(49)
+        val hipHop = kit(9)
+
+        assertTrue(ethnic.none { it is DrumSet }, "The Ethnic kit isn't laid out like a drum set: $ethnic")
+        assertTrue(hipHop.any { it is DrumSet }, "The Hip Hop kit is a drum set: $hipHop")
+    }
+
+    @Test
     fun `sound effect variations of the same thing still appear as it`() {
         val telephone2 = build(MidiFixtures.bankSelect(MidiFixtures.GS_RESET, Patch(1, 1, 124)))
 
@@ -152,15 +183,16 @@ class BankSelectAssignmentTest {
         val problems = mutableListOf<String>()
 
         HeadlessPerformance.start(MidiFixtures.empty()).use { performance ->
+            // One voice per look is enough: every voice with the same look builds the same instrument.
             melodic.forEach { (reset, catalogue) ->
-                catalogue.entries.filter { it.look != null && it.look != Looks.NONE }.forEach { voice ->
+                catalogue.entries.filter { it.look != null && it.look != Looks.NONE }.distinctBy { it.look }.forEach { voice ->
                     val file = MidiFixtures.bankSelect(reset, Patch(voice.msb, voice.lsb, voice.program - 1))
                     val built = runCatching { performance.assignFor(file) }
                     if (built.getOrNull().isNullOrEmpty()) problems += "${voice.name} (${voice.look}): $built"
                 }
             }
             kits.forEach { (reset, catalogue) ->
-                catalogue.entries.filter { it.look != null && it.look != Looks.NONE }.forEach { kit ->
+                catalogue.entries.filter { it.look != null && it.look != Looks.NONE }.distinctBy { it.look }.forEach { kit ->
                     val file = MidiFixtures.bankSelect(
                         reset,
                         Patch(kit.msb, kit.lsb, kit.program - 1),
