@@ -57,7 +57,7 @@
     <string name="queue_empty">Låtar som du lägger till visas här.</string>
     <string name="queue_load">Ladda</string>
     <string name="queue_load_prompt">Ladda kö?</string>
-    <string name="queue_load_warning">Detta kommer att rensa den nuvarande kön..</string>
+    <string name="queue_load_warning">Detta kommer att rensa den nuvarande kön.</string>
     <string name="queue_load_missing">Några filer fattas</string>
     <string name="queue_load_missing_help">De följande filer hittades inte:</string>
     <string name="queue_save">Spara</string>
@@ -149,20 +149,20 @@
     <string name="settings_background_texture_none">Ingen</string>
     <string name="settings_background_texture_file_not_found">Filen hittades inte</string>
     <string name="settings_background_missing_textures_repeated">Bakgrundstexturen är inte inställd</string>
-    <string name="settings_background_missing_textures_unique">En eller flera bakgrundstexturer är inte inställda.</string>
+    <string name="settings_background_missing_textures_unique">En eller flera bakgrundstexturer är inte inställda</string>
 
     <!-- Settings / Controls -->
     <string name="settings_controls_lock_cursor">Lås pekaren</string>
-    <string name="settings_controls_lock_cursor_description">Lås pekaren till fönstret.</string>
+    <string name="settings_controls_lock_cursor_description">Lås pekaren till fönstret</string>
     <string name="settings_controls_disable_touch">Inaktivera pekstyrning</string>
-    <string name="settings_controls_disable_touch_description">Pekskärmsgester för att rotera, panorera eller zooma ignoreras.</string>
+    <string name="settings_controls_disable_touch_description">Pekskärmsgester för att rotera, panorera eller zooma ignoreras</string>
     <string name="settings_controls_sticky_speed_modifier_keys">Tröga hastighetstangenter</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Tryck på Ctrl och Skift för att ändra hastigheten för fri kamera</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Håll in Ctrl och Skift för att ändra hastigheten för fri kamera</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Låttexter</string>
-    <string name="settings_onscreenelements_lyrics_description">Om låten innehåller textdata visas den i realtid.</string>
+    <string name="settings_onscreenelements_lyrics_description">Om låten innehåller textdata visas den i realtid</string>
     <string name="settings_onscreenelements_hud">Head-up display</string>
     <string name="settings_onscreenelements_hud_description">Visa låtnamn och förlopp</string>
 
@@ -226,7 +226,7 @@
     <!-- Log Screen -->
     <string name="log_title">Meddelandelogg</string>
     <string name="log_clear_all">Rensa alla</string>
-    <string name="log_cleared_all_entries">Alla logginlägg har rensats.</string>
+    <string name="log_cleared_all_entries">Alla logginlägg har rensats</string>
     <string name="log_empty_message">Om programmet stöter på problem loggas de här.</string>
     <string name="log_cleared_entry">Rensat logginlägg</string>
     <string name="log_copied_to_clipboard">Kopierat till urklipp</string>
