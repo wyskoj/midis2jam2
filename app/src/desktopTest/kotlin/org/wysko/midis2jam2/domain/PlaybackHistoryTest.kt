@@ -17,9 +17,11 @@
 
 package org.wysko.midis2jam2.domain
 
+import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.PropertiesSettings
 import org.wysko.midis2jam2.testing.Spec
 import java.util.Properties
+import java.util.prefs.AbstractPreferences
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -132,6 +134,37 @@ class PlaybackHistoryTest {
         )
     }
 
+    /**
+     * Regression test for #423: once the stored history grew past what a single preference value
+     * can hold (8192 characters), recording the next song threw from `Preferences.put` and the
+     * app crashed on startup whenever a file was opened. It only takes about fifty entries with
+     * long Windows paths, well under [MAX_PLAYBACK_HISTORY_ENTRIES], so the entry cap alone does
+     * not prevent it. The store here is a real (in-memory) preference node, so it enforces the
+     * same limit the desktop's does.
+     */
+    @Test
+    fun `a history too long for one preference value does not stop the next song being recorded`() {
+        val settings = PreferencesSettings(InMemoryPreferences())
+        val folder = """C:\Users\Example User\Documents\Music\MIDI Files\Collected Over The Years\Favourites"""
+        fun title(song: Int) = "Canción número $song.mid"
+        fun path(song: Int) = "$folder\\${title(song)}"
+
+        // As in the report: each launch of the app opens one file and records it.
+        repeat(80) { song ->
+            val launch = PlaybackHistoryStore(PreferenceBackedPlaybackHistoryPersistor(settings))
+            val result = runCatching { launch.addPlayback(path(song), title(song)) }
+            assertTrue(
+                result.isSuccess,
+                "Opening a file with ${launch.historyEntries.value.size} songs in the history should trim " +
+                    "the history, but recording it threw: ${result.exceptionOrNull()}"
+            )
+        }
+
+        val history = PlaybackHistoryStore(PreferenceBackedPlaybackHistoryPersistor(settings)).historyEntries.value
+        assertEquals(path(79), history.firstOrNull()?.filePath, "The song played last should top the history")
+        assertTrue(history.size > 1, "Only the oldest entries should be dropped to make room, not the whole history")
+    }
+
     @Test
     fun `the history survives a restart`() {
         val settings = PropertiesSettings(Properties())
@@ -171,5 +204,32 @@ class PlaybackHistoryTest {
     private fun newStore(): PlaybackHistoryStore {
         persistor = PreferenceBackedPlaybackHistoryPersistor(PropertiesSettings(Properties()))
         return PlaybackHistoryStore(persistor)
+    }
+
+    /** A root preference node held in memory, with the size limits of the real thing. */
+    private class InMemoryPreferences : AbstractPreferences(null, "") {
+        private val values = mutableMapOf<String, String>()
+
+        override fun putSpi(key: String, value: String) {
+            values[key] = value
+        }
+
+        override fun getSpi(key: String): String? = values[key]
+
+        override fun removeSpi(key: String) {
+            values.remove(key)
+        }
+
+        override fun keysSpi(): Array<String> = values.keys.toTypedArray()
+
+        override fun childrenNamesSpi(): Array<String> = emptyArray()
+
+        override fun childSpi(name: String): AbstractPreferences = throw UnsupportedOperationException()
+
+        override fun removeNodeSpi() = Unit
+
+        override fun syncSpi() = Unit
+
+        override fun flushSpi() = Unit
     }
 }
