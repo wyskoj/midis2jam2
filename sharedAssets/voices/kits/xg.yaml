@@ -1,0 +1,14 @@
+# Yamaha XG drum kits.
+#
+# Drum kits are bank 127 (msb: 127); the SFX kits are bank 126. `program` is 1-based, as the specification prints it.
+# A kit with no `look` plays as the kit with the same program in kits/gm.yaml.
+
+# The SFX kits lay their notes out differently from every other kit, and nothing draws them yet.
+- program: 1
+  msb: 126
+  name: "SFX Kit 1"
+  look: None
+- program: 2
+  msb: 126
+  name: "SFX Kit 2"
+  look: None

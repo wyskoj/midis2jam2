@@ -19,14 +19,55 @@ package org.wysko.midis2jam2.instrument.algorithmic.assignment
 
 /**
  * Decides how a channel's current voice appears on stage, by looking it up in the voice catalogues.
+ *
+ * A voice the specification's catalogue gives a look appears as that look. Every other voice appears as the General
+ * MIDI voice with the same program, which is what the specifications themselves fall back to: GM2 plays bank 79H/00
+ * for an undefined variation, and GS plays the capital tone.
  */
-object VoiceResolver {
+class VoiceResolver(private val catalogues: Catalogues = VoiceCatalogues) {
 
-    /** The look for the zero-based melodic [program], or `null` if it has no instrument. */
-    fun melodic(program: Int): Look? = VoiceCatalogues.gm[0, 0, program]?.look?.let(::look)
+    /** The catalogues a resolver reads. */
+    interface Catalogues {
+        val gm: VoiceCatalogue
+        val gs: VoiceCatalogue
+        val xg: VoiceCatalogue
+        val gm2: VoiceCatalogue
+        val gmKits: VoiceCatalogue
+        val gsKits: VoiceCatalogue
+        val xgKits: VoiceCatalogue
+        val gm2Kits: VoiceCatalogue
+    }
+
+    /** The look for a melodic channel set up as [setup], or `null` if it has no instrument. */
+    fun melodic(setup: ChannelSetup): Look? {
+        val program = setup.program ?: 0
+        val entry = when (setup.mode) {
+            MidiMode.GM -> null
+            // In GS, the LSB only picks which Sound Canvas's sound map to use; the instrument is the same.
+            MidiMode.GS -> catalogues.gs[setup.msb, 0, program]
+            MidiMode.XG -> catalogues.xg[setup.msb, setup.lsb, program]
+            MidiMode.GM2 -> catalogues.gm2[setup.msb, setup.lsb, program]
+        }
+        return entry?.look?.let(::look) ?: melodic(program)
+    }
+
+    /** The look for the zero-based General MIDI [program], or `null` if it has no instrument. */
+    fun melodic(program: Int): Look? = catalogues.gm[0, 0, program]?.look?.let(::look)
+
+    /** The kit look for a rhythm channel set up as [setup]. */
+    fun kit(setup: ChannelSetup): KitLook {
+        val program = setup.program ?: 0
+        val entry = when (setup.mode) {
+            MidiMode.GM -> null
+            MidiMode.GS -> catalogues.gsKits[0, 0, program]
+            MidiMode.XG -> catalogues.xgKits[setup.msb, 0, program]
+            MidiMode.GM2 -> catalogues.gm2Kits[setup.msb, setup.lsb, program]
+        }
+        return entry?.look?.let(::kitLook) ?: kit(program)
+    }
 
     /** The kit look for the zero-based kit [program]. Kits the catalogue doesn't list play the Standard kit. */
-    fun kit(program: Int): KitLook = VoiceCatalogues.gmKits[0, 0, program]?.look?.let(::kitLook) ?: KitLooks.Standard
+    fun kit(program: Int): KitLook = catalogues.gmKits[0, 0, program]?.look?.let(::kitLook) ?: KitLooks.Standard
 
     private fun look(id: String): Look = Looks[id] ?: error("The voice catalogues name an unknown look: $id")
 

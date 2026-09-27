@@ -66,10 +66,34 @@ class VoiceCatalogue(val entries: List<VoiceEntry>) {
 /**
  * The shipped voice catalogues, loaded the first time each is needed.
  */
-object VoiceCatalogues {
+object VoiceCatalogues : VoiceResolver.Catalogues {
     /** General MIDI: the base every other specification falls back to. */
-    val gm: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/gm.yaml") }
+    override val gm: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/gm.yaml") }
+
+    override val gs: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/gs.yaml") }
+
+    override val xg: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/xg.yaml") }
+
+    override val gm2: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/gm2.yaml") }
 
     /** The drum kits, by program, as the app has always read them. */
-    val gmKits: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/kits/gm.yaml") }
+    override val gmKits: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/kits/gm.yaml") }
+
+    override val gsKits: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/kits/gs.yaml") }
+
+    override val xgKits: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/kits/xg.yaml") }
+
+    override val gm2Kits: VoiceCatalogue by lazy { VoiceCatalogue.load("/voices/kits/gm2.yaml") }
+
+    /** Every catalogue file, by its path under `sharedAssets`, and whether it lists kits. */
+    val FILES: Map<String, Boolean> = mapOf(
+        "voices/gm.yaml" to false,
+        "voices/gs.yaml" to false,
+        "voices/xg.yaml" to false,
+        "voices/gm2.yaml" to false,
+        "voices/kits/gm.yaml" to true,
+        "voices/kits/gs.yaml" to true,
+        "voices/kits/xg.yaml" to true,
+        "voices/kits/gm2.yaml" to true,
+    )
 }

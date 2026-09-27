@@ -43,6 +43,18 @@
   source: troubleshooting.md
   platforms: [desktop, android]
   claim: "The app supports General MIDI instruments only; XG instruments are not supported"
+- id: midi.assignment.mode.reset-message
+  source: code
+  platforms: [desktop, android]
+  claim: "A GM, GM2, GS or XG reset message in the file decides how its bank select messages are read from then on"
+- id: midi.assignment.mode.settings
+  source: code
+  platforms: [desktop, android]
+  claim: "A file without a reset message of its own is read in the specification the app is set to send a reset for, or as General MIDI if none"
+- id: midi.assignment.bank-select.fallback
+  source: code
+  platforms: [desktop, android]
+  claim: "A GS, XG or GM2 voice without an instrument of its own is shown as the General MIDI instrument with the same program"
 - id: midi.assignment.same-look-merges
   source: code
   platforms: [desktop, android]
