@@ -194,7 +194,7 @@ class MidiDeviceManagerTest {
                 performance.onEngineThread {
                     performance.app.stateManager.attach(MidiDeviceManager(configurations, device))
                 }
-                performance.onEngineThread { }
+                performance.awaitFrames(1)
                 performance.throwIfEngineFailed()
             }
     }

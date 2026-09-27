@@ -107,14 +107,9 @@ class InputHarness(private val performance: HeadlessPerformance) {
         releaseMouse(x = 400 + dx, y = 300 + dy)
     }
 
-    /**
-     * Lets [count] engine frames pass.
-     *
-     * Each queued call is drained once per frame, so waiting for one to complete is waiting
-     * for a frame.
-     */
+    /** Lets [count] engine frames pass, so input delivered before now has been acted on. */
     fun frames(count: Int = 1) {
-        repeat(count) { performance.onEngineThread { } }
+        performance.awaitFrames(count)
     }
 
     /** A snapshot of where the camera is and which way it faces. */

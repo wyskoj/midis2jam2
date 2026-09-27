@@ -67,7 +67,7 @@ class OnScreenElementsTest {
 
             // The progress bar is scaled from the playback clock, so it widens as time passes.
             val early = performance.onEngineThread { fillbarWidth(performance.app.guiNode) }
-            performance.onEngineThread { }
+            performance.awaitFrames(1)
             Thread.sleep(PROGRESS_OBSERVATION_MILLIS)
             val later = performance.onEngineThread { fillbarWidth(performance.app.guiNode) }
 
@@ -186,8 +186,7 @@ class OnScreenElementsTest {
                         "No head-up display manager was attached"
                     )
 
-                    // Each call waits for one engine update.
-                    repeat(SETTLE_FRAMES) { performance.onEngineThread { } }
+                    performance.awaitFrames(SETTLE_FRAMES)
 
                     val (texts, sprites) = performance.onEngineThread {
                         val gui = performance.app.guiNode

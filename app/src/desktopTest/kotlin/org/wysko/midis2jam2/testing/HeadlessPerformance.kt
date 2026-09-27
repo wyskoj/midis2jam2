@@ -39,6 +39,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import com.jme3.system.AppSettings as JmeAppSettings
@@ -62,6 +64,7 @@ class HeadlessPerformance private constructor(
     val app: SimpleApplication,
     val performance: TestPerformanceManager,
     private val engineFailure: AtomicReference<Throwable?>,
+    private val frameCounter: FrameCounter,
     /** The sequencer the performance was given, for asserting what playback asked it to do. */
     val sequencer: NoOpSequencer,
 ) : AutoCloseable {
@@ -122,6 +125,22 @@ class HeadlessPerformance private constructor(
         }
     }
 
+    /**
+     * Waits until the engine has run [count] complete updates - input, app states and scene -
+     * beyond the one in progress now, so everything queued before the call has been acted on.
+     *
+     * Queued calls can't measure this: the engine drains its whole queue each update, so on a
+     * busy machine many of them run within the same one.
+     */
+    fun awaitFrames(count: Int = 1) {
+        val target = onEngineThread { frameCounter.completed } + count
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(ENGINE_CALL_TIMEOUT_SECONDS)
+        while (!frameCounter.awaitAtLeast(target, ENGINE_FAILURE_POLL_MILLIS)) {
+            throwIfEngineFailed()
+            check(System.nanoTime() < deadline) { "The engine did not run $count more frames in time" }
+        }
+    }
+
     /** Fails with whatever the engine thread threw, if anything has. */
     fun throwIfEngineFailed() {
         engineFailure.get()?.let {
@@ -153,6 +172,27 @@ class HeadlessPerformance private constructor(
 
         override fun initialize(stateManager: AppStateManager, app: Application) {
             super.initialize(stateManager, app)
+        }
+    }
+
+    /** Counts the engine updates that have run to completion. */
+    internal class FrameCounter {
+        private val lock = ReentrantLock()
+        private val advanced = lock.newCondition()
+
+        var completed = 0L
+            get() = lock.withLock { field }
+            private set
+
+        fun increment() = lock.withLock {
+            completed++
+            advanced.signalAll()
+        }
+
+        /** Waits up to [timeoutMillis] for [target] updates to have completed; `true` if they have. */
+        fun awaitAtLeast(target: Long, timeoutMillis: Long): Boolean = lock.withLock {
+            if (completed < target) advanced.await(timeoutMillis, TimeUnit.MILLISECONDS)
+            completed >= target
         }
     }
 
@@ -189,6 +229,7 @@ class HeadlessPerformance private constructor(
             val performance = TestPerformanceManager(sequence, fileName, configurations)
             val ready = CountDownLatch(1)
             val failure = AtomicReference<Throwable?>(null)
+            val frameCounter = FrameCounter()
 
             val app = object : SimpleApplication(FlyCamAppState()) {
                 private var initialised = false
@@ -226,6 +267,7 @@ class HeadlessPerformance private constructor(
                         initialised = true
                         ready.countDown()
                     }
+                    frameCounter.increment()
                 }
 
                 override fun handleError(errorMsg: String?, t: Throwable?) {
@@ -260,7 +302,7 @@ class HeadlessPerformance private constructor(
                 error("The headless performance did not initialise within ${BOOT_TIMEOUT_SECONDS}s")
             }
 
-            return HeadlessPerformance(app, performance, failure, sequencer)
+            return HeadlessPerformance(app, performance, failure, frameCounter, sequencer)
         }
 
         /**
