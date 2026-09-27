@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.performance
 
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.strings.Violin
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
@@ -110,6 +111,30 @@ class InstrumentAssignmentTest {
         HeadlessPerformance.start(MidiFixtures.programSwitch(24, 26), attachManagers = false).use { performance ->
             val guitars = performance.instruments.filterIsInstance<Guitar>()
             assertEquals(2, guitars.size, "Nylon and jazz guitars should be two instruments, got ${performance.instruments}")
+        }
+    }
+
+    @Test
+    fun `a note held across a program change is released by the instrument that started it`() {
+        // If the note off went to the new program's instrument instead, the piano's key would never come back up.
+        val file = MidiFixtures.noteHeldAcrossProgramChange(first = 0, second = 40)
+
+        HeadlessPerformance.start(file, attachManagers = false).use { performance ->
+            val piano = performance.instruments.filterIsInstance<Keyboard>().single()
+            val violin = performance.instruments.filterIsInstance<Violin>().single()
+            val held = MidiFixtures.HELD_NOTE.toByte()
+
+            val pianoArcs = piano.timedArcs.filter { it.noteOn.note == held }
+            assertEquals(1, pianoArcs.size, "The piano should play the held note once, got $pianoArcs")
+            assertEquals(
+                2 * MidiFixtures.TICKS_PER_QUARTER,
+                pianoArcs.single().noteOff.tick,
+                "The held note should end at its note off, after the program change",
+            )
+            assertTrue(
+                violin.timedArcs.none { it.noteOn.note == held || it.noteOff.note == held },
+                "The violin should know nothing of the piano's held note, got ${violin.timedArcs}",
+            )
         }
     }
 

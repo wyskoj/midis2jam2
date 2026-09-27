@@ -75,6 +75,27 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /** The note [noteHeldAcrossProgramChange] holds across the program change. */
+    const val HELD_NOTE = 60
+
+    /**
+     * One channel that starts [HELD_NOTE] under [first], changes to [second] while the note is still held, and then
+     * releases it. The channel also plays a note of its own under [second], so both programs have an instrument.
+     */
+    fun noteHeldAcrossProgramChange(first: Int, second: Int): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(first, absoluteTime = 0)
+                note(HELD_NOTE, duration = 2.quarter, absoluteTime = 0)
+                program(second, absoluteTime = TICKS_PER_QUARTER)
+                note(HELD_NOTE + 7, duration = 1.quarter, absoluteTime = TICKS_PER_QUARTER)
+            }
+        }
+    }.toTimeBasedSequence()
+
     /**
      * A file with no program change at all.
      *
