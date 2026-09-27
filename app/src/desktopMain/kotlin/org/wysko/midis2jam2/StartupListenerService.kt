@@ -23,6 +23,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.util.isMacOs
+import org.wysko.midis2jam2.util.logger
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -77,7 +78,7 @@ object StartupListenerService : KoinComponent {
 
         val file = File(parameters)
         if (!file.exists() || !file.isFile) {
-            println("Invalid file path provided: $parameters")
+            logger().warn("Invalid file path provided: $parameters")
             startupLatch.countDown()
             return
         }

@@ -66,7 +66,7 @@ fun instantiateManagers(
         }
         add(DrumSetVisibilityManager())
         add(FadeManager())
-        add(HudManager())
+        add(HudManager().apply { isEnabled = settings.appSettings.onScreenElementsSettings.isShowHeadsUpDisplay })
         add(StageManager())
         add(StandManager())
         // Only worth attaching when the file has something to sing and the user wants to see
