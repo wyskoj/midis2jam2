@@ -125,8 +125,8 @@ class DesktopHomeScreenModel(
                 title = "Select MIDI file"
             ),
         ) { file ->
-            _selectedMidiFile.value = file
             file?.let {
+                _selectedMidiFile.value = file
                 onFileSelected?.invoke(it)
             }
         }
