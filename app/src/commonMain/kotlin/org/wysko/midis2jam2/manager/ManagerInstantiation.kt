@@ -45,7 +45,7 @@ fun instantiateManagers(
         add(DebugTextManager().apply { isEnabled = false })
         add(DrumSetVisibilityManager())
         add(FadeManager())
-        add(HudManager())
+        add(HudManager().apply { isEnabled = settings.appSettings.onScreenElementsSettings.isShowHeadsUpDisplay })
         add(StageManager())
         add(StandManager())
         add(
