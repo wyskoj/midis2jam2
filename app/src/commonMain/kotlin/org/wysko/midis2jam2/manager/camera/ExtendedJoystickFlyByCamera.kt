@@ -32,7 +32,7 @@ import kotlin.math.sign
 private const val CALIBRATION_FRAMES = 15
 
 /** Deviation from an axis's calibrated rest value below which input is ignored. */
-private const val STICK_DEADZONE = 0.2f
+internal const val STICK_DEADZONE = 0.2f
 
 /**
  * If an axis's calibrated rest value sits further than this from zero, it's assumed to be a
@@ -43,6 +43,9 @@ private const val TRIGGER_REST_THRESHOLD = 0.6f
 
 /** Upper bound on the tracked frame delta, so a hitch or a pause doesn't produce a huge jump. */
 private const val MAX_FRAME_DELTA_SECONDS = 0.1f
+
+/** Degrees of field of view per unit of zoom input, before [FlyByCamera.zoomSpeed]; matches jME's own. */
+private const val ZOOM_DEGREES_PER_UNIT = 0.1f
 
 /** Multiplier for right-stick look rotation. Rotation reads much less "responsive" than movement
  *  at the same nominal sensitivity, since [FlyByCamera]'s rotation speed is tuned for the tiny
@@ -63,7 +66,7 @@ private const val JOYSTICK_MOVE_SENSITIVITY = 1.0f
  * above 1 flatten the response near center (fine control) while still reaching full speed at full
  * deflection. Applies only to joystick input; keyboard and mouse are untouched.
  */
-private const val RESPONSE_CURVE_EXPONENT = 2.5f
+internal const val RESPONSE_CURVE_EXPONENT = 2.5f
 
 private const val LEFT_STICK_X_AXIS = 0
 private const val LEFT_STICK_Y_AXIS = 1
@@ -226,6 +229,18 @@ class ExtendedJoystickFlyByCamera(
         }
     }
 
+    /**
+     * Zooms as [FlyByCamera.zoomCamera] does, but keeps the field of view within [FOV_VALID_RANGE].
+     *
+     * The base class only stops the field of view going below zero. Past 180 degrees it wraps
+     * around to a negative angle, which the engine rejects when it is next applied to a camera,
+     * crashing the performance (#410).
+     */
+    override fun zoomCamera(value: Float) {
+        if (cam.isParallelProjection) return super.zoomCamera(value)
+        cam.fov = (cam.fov + value * ZOOM_DEGREES_PER_UNIT * zoomSpeed).coerceIn(FOV_VALID_RANGE)
+    }
+
     private fun joyMoveCamera(value: Float, sideways: Boolean) {
         moveCamera(value * JOYSTICK_MOVE_SENSITIVITY * frameDeltaSeconds, sideways)
     }
@@ -242,7 +257,7 @@ class ExtendedJoystickFlyByCamera(
     }
 
     /** Applies [STICK_DEADZONE] and [RESPONSE_CURVE_EXPONENT] to a raw axis deviation, preserving its sign. */
-    private fun applyDeadzoneAndCurve(deviation: Float): Float {
+    internal fun applyDeadzoneAndCurve(deviation: Float): Float {
         val magnitude = abs(deviation)
         if (magnitude < STICK_DEADZONE) return 0f
         val normalized = ((magnitude - STICK_DEADZONE) / (1f - STICK_DEADZONE)).coerceIn(0f, 1f)

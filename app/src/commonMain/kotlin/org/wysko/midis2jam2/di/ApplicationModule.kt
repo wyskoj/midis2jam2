@@ -23,18 +23,21 @@ import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.BackgroundImageRepository
 import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.domain.HomeTabPersistor
+import org.wysko.midis2jam2.domain.createHomeTabPersistor
 import org.wysko.midis2jam2.domain.PlaybackHistoryPersistor
+import org.wysko.midis2jam2.domain.createPlaybackHistoryPersistor
 import org.wysko.midis2jam2.domain.PlaybackHistoryStore
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
+import org.wysko.midis2jam2.domain.settings.createSettingsRepository
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
 
 val applicationModule: Module = module {
     single<ApplicationService> { ApplicationService() }
     single<ConfigurationService> { ConfigurationService(get(), get(), get()) }
     single<BackgroundImageRepository> { BackgroundImageRepository() }
-    single<SettingsRepository> { SettingsRepository() }
-    single<HomeTabPersistor> { HomeTabPersistor() }
-    single<PlaybackHistoryPersistor> { PlaybackHistoryPersistor() }
+    single<SettingsRepository> { createSettingsRepository() }
+    single<HomeTabPersistor> { createHomeTabPersistor() }
+    single<PlaybackHistoryPersistor> { createPlaybackHistoryPersistor() }
     single<PlaybackHistoryStore> { PlaybackHistoryStore(get()) }
     single<ErrorLogService> { ErrorLogService() }
 }

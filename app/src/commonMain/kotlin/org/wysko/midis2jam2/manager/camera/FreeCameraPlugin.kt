@@ -35,7 +35,8 @@ private const val FAST_MOVE_SPEED = 200f
 private const val DEFAULT_ZOOM_SPEED = -10f
 private const val INTERPOLATION_SPEED = 3.0f
 private const val NUM_CATEGORIES = 6
-private val FOV_VALID_RANGE = 5f..150f
+/** The field of view, in degrees, the free camera is kept within. */
+internal val FOV_VALID_RANGE = 5f..150f
 
 class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), ActionListener {
     private val cameraAngleCategories = CameraAngleCategory.categories

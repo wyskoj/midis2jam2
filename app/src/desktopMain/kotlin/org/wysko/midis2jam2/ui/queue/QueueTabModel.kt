@@ -77,6 +77,20 @@ class QueueTabModel(
         _isDirty.value = isDirty
     }
 
+    /**
+     * Moves the song at [from] to [to], as dragging a row does.
+     */
+    fun moveItem(from: Int, to: Int) {
+        val current = _queue.value
+        if (from !in current.indices || to !in current.indices || from == to) return
+
+        _queue.value = current.toMutableList().apply { add(to, removeAt(from)) }
+        _isDirty.value = true
+    }
+
+    /** The queue as it is written to a playlist file: one absolute path per line. */
+    fun asPlaylistText(): String = _queue.value.joinToString(separator = "\n") { it.file.absolutePath }
+
     fun removeAtIndex(index: Int) {
         _queue.value = _queue.value.toMutableList().apply {
             removeAt(index)

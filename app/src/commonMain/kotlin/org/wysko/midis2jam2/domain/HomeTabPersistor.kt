@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 
 package org.wysko.midis2jam2.domain
 
+import com.russhwolf.settings.Settings
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
-expect class HomeTabPersistor() {
+/** Remembers what the home tab was last set to, so it comes back that way. */
+interface HomeTabPersistor {
     @Suppress("unused")
     fun save(state: HomeTabPersistentState)
     fun load(): HomeTabPersistentState
@@ -30,3 +33,28 @@ data class HomeTabPersistentState(
     val midiDevice: String = "",
     val soundbank: String? = null,
 )
+
+/** Keeps the home tab's state as one JSON document in a key-value store. */
+class PreferenceBackedHomeTabPersistor(private val settings: Settings) : HomeTabPersistor {
+
+    override fun save(state: HomeTabPersistentState) {
+        settings.putString(KEY, json.encodeToString(state))
+    }
+
+    override fun load(): HomeTabPersistentState =
+        json.decodeFromString(settings.getString(KEY, defaultStateJson))
+
+    private companion object {
+        const val KEY = "home_tab_state"
+
+        val json = Json {
+            encodeDefaults = true
+            ignoreUnknownKeys = true
+        }
+
+        val defaultStateJson: String = json.encodeToString(HomeTabPersistentState())
+    }
+}
+
+/** Builds the home tab store backed by this platform's own preference store. */
+expect fun createHomeTabPersistor(): HomeTabPersistor

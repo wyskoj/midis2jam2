@@ -1,0 +1,508 @@
+# Behaviour catalogue for midis2jam2.
+#
+# Every entry is one behavioural claim the product makes. Most are transcribed from the
+# documentation site (https://docs.midis2jam2.xyz/, source in the sibling midis2jam2-docs
+# repository); entries with "source: code" are behaviours the app implements that the docs
+# do not yet describe.
+#
+# Tests cite an id with @Spec("..."). SpecCoverageTest fails if a catalogued id has no
+# citing test and is neither waived nor pending. Re-sync this file when the docs change.
+#
+# Fields:
+#   id        - stable dotted identifier, cited by tests
+#   source    - docs page it came from, or "code"
+#   platforms - desktop, android, or both
+#   claim     - the behaviour, in the docs' own words where possible
+#   waived    - if present, why no automated test will ever cover it (reported, never silent)
+#   pending   - if present, why it is not covered *yet*. This is the backlog, and it must
+#               shrink to nothing. Delete the marker when you add the test - the suite
+#               fails if a pending behaviour turns out to have one.
+
+# ---------------------------------------------------------------- getting started (index.md)
+- id: home.midi-file.picker
+  source: index.md
+  platforms: [desktop]
+  claim: "Clicking the MIDI file text field opens a file picker"
+  waived: "Opens a native file dialog; not drivable headlessly."
+- id: home.play.opens-performance
+  source: index.md
+  platforms: [desktop, android]
+  claim: "Clicking Play opens the performance screen and starts the MIDI file"
+  waived: "Requires a real window and MIDI device; covered indirectly by the headless harness."
+
+# ------------------------------------------------------------------------------- faq (faq.md)
+- id: midi.assignment.by-program-change
+  source: faq.md
+  platforms: [desktop, android]
+  claim: "Instruments are assigned to tracks based on the program change messages in the MIDI file"
+- id: midi.assignment.default-piano
+  source: faq.md
+  platforms: [desktop, android]
+  claim: "If the MIDI file contains no program change messages, a piano is assigned to the track"
+- id: midi.assignment.gm-only
+  source: troubleshooting.md
+  platforms: [desktop, android]
+  claim: "The app supports General MIDI instruments only; XG instruments are not supported"
+
+# ------------------------------------------------------------------- background (background.md)
+- id: background.default.checkerboard
+  source: features/background.md
+  platforms: [desktop, android]
+  claim: "The default background is a dark checkerboard pattern with no configuration options"
+- id: background.cubemap.six-faces
+  source: features/background.md
+  platforms: [desktop]
+  claim: "Image backgrounds use a cubemap of six images, one per cube face, shown on the inside"
+- id: background.cubemap.folder
+  source: features/background.md
+  platforms: [desktop]
+  claim: "Cubemap images are placed in the ~/.midis2jam2/backgrounds directory"
+- id: background.cubemap.formats
+  source: features/background.md
+  platforms: [desktop]
+  claim: "Cubemap images can be in JPEG, PNG, BMP, or GIF format"
+- id: background.cubemap.unassigned-warning
+  source: features/background.md
+  platforms: [desktop]
+  claim: "A cubemap with an unassigned face is reported as a configuration warning"
+- id: background.cubemap.missing-warning
+  source: features/background.md
+  platforms: [desktop]
+  claim: "A cubemap naming a file that does not exist is reported as a configuration warning"
+- id: background.color.solid
+  source: features/background.md
+  platforms: [desktop, android]
+  claim: "A solid colour can be set as the performance background"
+
+# --------------------------------------------------------------------------- camera (camera.md)
+- id: camera.modes.three
+  source: features/camera.md
+  platforms: [desktop, android]
+  claim: "There are three camera modes: free camera, auto-cam and slide camera"
+- id: camera.freecam.key.forward
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "W moves the free camera forward"
+- id: camera.freecam.key.backward
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "S moves the free camera backward"
+- id: camera.freecam.key.left
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "A moves the free camera left"
+- id: camera.freecam.key.right
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "D moves the free camera right"
+- id: camera.freecam.key.up
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Q moves the free camera up"
+- id: camera.freecam.key.down
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Z moves the free camera down"
+- id: camera.freecam.mouse.drag-rotates
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Left-click drag rotates the camera"
+- id: camera.freecam.mouse.scroll-zooms
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Scrolling the mouse wheel zooms in and out"
+- id: camera.freecam.angle.1
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 1 moves the free camera to the Overview position"
+- id: camera.freecam.angle.2
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 2 moves the free camera to the Keyboards position"
+- id: camera.freecam.angle.3
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 3 moves the free camera to the Drums position"
+- id: camera.freecam.angle.4
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 4 moves the free camera to the Bass position"
+- id: camera.freecam.angle.5
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 5 moves the free camera to the Overhead position"
+- id: camera.freecam.angle.6
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 6 moves the free camera to the Guitar position"
+- id: camera.freecam.angle.repeat-press-alternates
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Pressing the same camera key again switches to that position's alternate view"
+- id: camera.freecam.reset
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "The grave accent key resets the camera to the default position"
+- id: camera.autocam.activate
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 0 activates the auto-cam"
+- id: camera.autocam.repeat-press-advances
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Pressing 0 again moves the auto-cam to a different position"
+- id: camera.autocam.highlights-playing-instruments
+  source: features/camera.md
+  platforms: [desktop, android]
+  claim: "The auto-cam automatically highlights the instruments currently playing"
+- id: camera.slidecam.activate
+  source: features/camera.md
+  platforms: [desktop]
+  claim: "Key 9 activates the slide camera"
+- id: camera.slidecam.rotates-around-stage
+  source: features/camera.md
+  platforms: [desktop, android]
+  claim: "The slide camera slowly rotates around the stage"
+- id: camera.settings.start-autocam-with-song
+  source: features/camera.md
+  platforms: [desktop, android]
+  claim: "When Start auto-cam with song is on, the auto-cam activates when a song starts playing"
+- id: camera.settings.classic-autocam
+  source: features/camera.md
+  platforms: [desktop, android]
+  claim: "When Classic auto-cam is on, the auto-cam uses the classic MIDIJam movement style"
+- id: camera.settings.smooth-freecam
+  source: features/camera.md
+  platforms: [desktop, android]
+  claim: "When Smooth freecam is on, free camera movements are smoothed"
+- id: camera.android.gestures
+  source: features/camera.md
+  platforms: [android]
+  claim: "One-finger drag rotates, two-finger pinch zooms, two-finger drag pans the camera"
+  waived: "Android touch input; no Android instrumentation suite yet."
+- id: camera.android.smooth-freecam-always-on
+  source: features/camera.md
+  platforms: [android]
+  claim: "On Android the Smooth freecam setting is always enabled"
+  waived: "Android-only; no Android instrumentation suite yet."
+
+# ---------------------------------------------------- free camera speed modifiers (undocumented)
+- id: camera.freecam.speed.default
+  source: code
+  platforms: [desktop]
+  claim: "With no modifier held, the free camera moves at the default speed"
+- id: camera.freecam.speed.fast
+  source: code
+  platforms: [desktop]
+  claim: "Holding Shift moves the free camera at the fast speed"
+- id: camera.freecam.speed.slow
+  source: code
+  platforms: [desktop]
+  claim: "Holding Ctrl moves the free camera at the slow speed"
+- id: camera.freecam.speed.release-restores-default
+  source: code
+  platforms: [desktop]
+  claim: "Releasing a speed modifier restores the default speed"
+- id: camera.freecam.speed.sticky-toggle
+  source: code
+  platforms: [desktop]
+  claim: "With sticky speed modifiers on, a modifier toggles on release and the other cancels it"
+
+# ------------------------------------------------------------------------ gamepad (undocumented)
+- id: gamepad.deadzone
+  source: code
+  platforms: [desktop]
+  claim: "Joystick axis deviations inside the deadzone produce no camera movement"
+- id: gamepad.response-curve
+  source: code
+  platforms: [desktop]
+  claim: "Axis deviations outside the deadzone are shaped by a response curve, preserving sign"
+- id: gamepad.disable-setting
+  source: code
+  platforms: [desktop]
+  claim: "When gamepad input is disabled in settings, joystick events do not move the camera"
+
+# ------------------------------------------------------------------------- graphics (graphics.md)
+- id: graphics.fullscreen
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: "When fullscreen is on the performance fills the screen; otherwise it is windowed"
+  waived: "Requires a real display."
+- id: graphics.resolution.default
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: "The Default resolution sizes the window to most of the screen with a small border"
+  waived: "Requires a real display."
+- id: graphics.resolution.custom
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: "The Custom resolution uses the exact width and height specified in pixels"
+- id: graphics.shadows.none-fake
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: "None (fake) renders no real shadows and instead darkens the ground beneath objects"
+- id: graphics.shadows.quality-levels
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: "Low, Medium and High render real-time shadows at increasing levels of detail"
+- id: graphics.shadows.android-on-off
+  source: features/graphics.md
+  platforms: [android]
+  claim: "On Android, shadows can only be enabled or disabled"
+  waived: "Android-only; no Android instrumentation suite yet."
+- id: graphics.antialiasing.levels
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: "Antialiasing can be None, or Low, Medium and High at increasing quality"
+- id: graphics.fov
+  source: features/graphics.md
+  platforms: [desktop, android]
+  claim: "The camera's default field of view is set in degrees; smaller is more zoomed in"
+
+# ------------------------------------------------------------------- head-up display (hud) page
+- id: hud.shows-file-name
+  source: features/head-up-display.md
+  platforms: [desktop, android]
+  claim: "The HUD shows the name of the loaded MIDI file"
+- id: hud.shows-playback-time
+  source: features/head-up-display.md
+  platforms: [desktop, android]
+  claim: "The HUD shows the current playback time"
+- id: hud.toggle-setting
+  source: features/head-up-display.md
+  platforms: [desktop, android]
+  claim: "The HUD is toggled by the Head-up display option in the settings"
+
+# --------------------------------------------------------------------------- history (history.md)
+- id: history.records-played-songs
+  source: features/history.md
+  platforms: [desktop]
+  claim: "Recently played songs are listed in the history"
+- id: history.entry.timestamp-and-path
+  source: features/history.md
+  platforms: [desktop]
+  claim: "Each history entry shows its last playback timestamp and its path on disk"
+- id: history.entry.play-loads-on-home
+  source: features/history.md
+  platforms: [desktop]
+  claim: "Pressing Play on a history entry loads that song on the home screen"
+- id: history.entry.remove
+  source: features/history.md
+  platforms: [desktop]
+  claim: "An individual song can be removed from the history"
+- id: history.clear-all
+  source: features/history.md
+  platforms: [desktop]
+  claim: "The entire history can be cleared from the menu"
+
+# ----------------------------------------------------------------------------- lyrics (lyrics.md)
+- id: lyrics.displayed-when-present
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "If the MIDI file contains lyrics, they are displayed on screen"
+- id: lyrics.current-line-first
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "The first line shows the current line of lyrics"
+- id: lyrics.elapsed-syllables-white
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "As syllables elapse, their colour changes to white"
+- id: lyrics.upcoming-syllables-gray
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "Upcoming syllables are gray"
+- id: lyrics.setting.toggle
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "Lyrics can be turned on or off in the settings tab"
+- id: lyrics.setting.size
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "The size of the lyrics can be set in the settings tab"
+- id: lyrics.known-bug.special-characters
+  source: features/lyrics.md
+  platforms: [desktop, android]
+  claim: "Lyrics using special characters such as accented letters are not supported"
+  waived: "Documented as a known bug, not a behaviour to lock in."
+
+# --------------------------------------------------------------------- midi device (midi-device.md)
+- id: mididevice.external-plays-notes
+  source: features/midi-device.md
+  platforms: [desktop]
+  claim: "A connected MIDI device can be used to play the notes in the MIDI file"
+  waived: "Requires real MIDI hardware."
+- id: mididevice.spec-reset.setting
+  source: features/midi-device.md
+  platforms: [desktop]
+  claim: "A MIDI specification is selectable from a dropdown in the settings tab"
+- id: mididevice.spec-reset.sent-on-start
+  source: features/midi-device.md
+  platforms: [desktop]
+  claim: "When enabled, the matching specification reset message is sent when playback starts"
+
+# ------------------------------------------------------------------------- playback (playback.md)
+- id: playback.seek.backward
+  source: features/playback.md
+  platforms: [desktop]
+  claim: "The left arrow key seeks backward by 10 seconds"
+- id: playback.seek.forward
+  source: features/playback.md
+  platforms: [desktop]
+  claim: "The right arrow key seeks forward by 10 seconds"
+- id: playback.play-pause
+  source: features/playback.md
+  platforms: [desktop]
+  claim: "Space toggles play/pause"
+- id: playback.restart
+  source: code
+  platforms: [desktop]
+  claim: "Home restarts playback from the beginning"
+- id: playback.android.controls
+  source: features/playback.md
+  platforms: [android]
+  claim: "Tapping the screen opens a side menu with seek and play/pause buttons"
+  waived: "Android-only; no Android instrumentation suite yet."
+
+# ----------------------------------------------------------------------------- queue (queue.md)
+- id: queue.add.button
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "MIDI files can be added to the queue with the Add to queue button"
+- id: queue.add.drag-and-drop
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "MIDI files can be added to the queue by dragging and dropping them onto the screen"
+  waived: "Requires a real drag-and-drop gesture from the window system."
+- id: queue.remove
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "A song is removed from the queue with the close button next to it"
+- id: queue.reorder
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "Songs are reordered by dragging and dropping them to the desired position"
+- id: queue.op.load
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "A saved queue can be loaded from a file"
+- id: queue.op.save
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "The current queue can be saved to a file"
+- id: queue.op.shuffle
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "Shuffle randomises the order of songs in the queue"
+- id: queue.op.clear
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "Clear removes all songs from the queue"
+- id: queue.play-button-requires-song
+  source: features/queue.md
+  platforms: [desktop]
+  claim: "The Play button only appears if there is at least one song in the queue"
+
+# ---------------------------------------------------------------------------- search (search.md)
+- id: search.scans-subfolders
+  source: features/search.md
+  platforms: [desktop]
+  claim: "The app scans the chosen folder and its subfolders for MIDI files"
+- id: search.cancel-scan
+  source: features/search.md
+  platforms: [desktop]
+  claim: "A running scan can be stopped with the Cancel button"
+- id: search.filter-by-instrument
+  source: features/search.md
+  platforms: [desktop]
+  claim: "Selecting one or more instruments lists the MIDI files that use them"
+- id: search.click-loads-on-home
+  source: features/search.md
+  platforms: [desktop]
+  claim: "Clicking a found file loads it on the home tab"
+- id: search.deselect-all
+  source: features/search.md
+  platforms: [desktop]
+  claim: "Deselect all clears the instrument selection"
+
+# ---------------------------------------------------------------------- soundbanks (soundbanks.md)
+- id: soundbanks.desktop.synth-is-gervill
+  source: features/soundbanks.md
+  platforms: [desktop]
+  claim: "Custom soundbanks are used with Gervill, the built-in software synthesizer"
+- id: soundbanks.desktop.accepts-sf2-dls
+  source: features/soundbanks.md
+  platforms: [desktop]
+  claim: "A soundbank is added by selecting a .sf2 or .dls file"
+- id: soundbanks.remove
+  source: features/soundbanks.md
+  platforms: [desktop, android]
+  claim: "A soundbank is removed with the close button next to it"
+- id: soundbanks.select-on-home
+  source: features/soundbanks.md
+  platforms: [desktop, android]
+  claim: "The soundbank to use is selected on the home tab"
+- id: soundbanks.android.fluidsynth
+  source: features/soundbanks.md
+  platforms: [android]
+  claim: "Custom soundbanks are used with FluidSynth, the built-in software synthesizer"
+  waived: "Android-only; no Android instrumentation suite yet."
+
+# ------------------------------------------------------------------- synthesizer (synthesizer.md)
+- id: synth.reverb.setting
+  source: features/synthesizer.md
+  platforms: [desktop, android]
+  claim: "Reverb can be enabled or disabled in the settings tab"
+- id: synth.chorus.setting
+  source: features/synthesizer.md
+  platforms: [desktop, android]
+  claim: "Chorus can be enabled or disabled in the settings tab"
+- id: synth.effects-sent-as-control-change
+  source: features/synthesizer.md
+  platforms: [desktop, android]
+  claim: "Reverb and chorus settings work by sending a control change event to the synthesizer"
+
+- id: app.settings.persist
+  source: code
+  platforms: [desktop, android]
+  claim: "Settings survive a restart of the app"
+- id: app.debug.toggle
+  source: code
+  platforms: [desktop]
+  claim: "F3 toggles the debug information overlay"
+  waived: >-
+    The overlay's text is built from Compose string resources, and reading those asks the
+    windowing system for the screen resolution, which throws in a headless process. The F3
+    binding itself is covered by the key-binding tests; showing the overlay needs a display.
+- id: app.i18n.complete-translations
+  source: code
+  platforms: [desktop, android]
+  claim: "Every supported locale defines every string the default locale defines"
+- id: app.i18n.locale-lists-agree
+  source: code
+  platforms: [desktop, android]
+  claim: "The locale list offered in settings matches the locales that actually ship"
+- id: app.assets.all-referenced-assets-exist
+  source: code
+  platforms: [desktop, android]
+  claim: "Every model, texture and data file the app asks for at runtime exists"
+- id: app.assets.no-orphaned-data-files
+  source: code
+  platforms: [desktop, android]
+  claim: "Every bundled data file is referenced by some code path"
+- id: app.instruments.all-programs-construct
+  source: code
+  platforms: [desktop, android]
+  claim: "Every General MIDI program and percussion note builds its instrument without error"
+- id: app.performance.tick-is-stable
+  source: code
+  platforms: [desktop, android]
+  claim: "Stepping a performance never produces a non-finite transform"
+- id: app.managers.lifecycle
+  source: code
+  platforms: [desktop, android]
+  claim: "Every performance manager initialises and cleans up without error"
+- id: app.actions.match-docs
+  source: code
+  platforms: [desktop]
+  claim: "The bundled key bindings match the keys the documentation advertises"
