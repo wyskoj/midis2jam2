@@ -35,7 +35,7 @@
     <string name="soundbank_default">Varsayılan ses bankı</string>
     <string name="soundbank_selector_title">Ses bankını seç</string>
     <string name="soundbank_manage">Yönet</string>
-    <string name="soundbank_invalid_file_title">Geçersiz ses bankı </string>
+    <string name="soundbank_invalid_file_title">Geçersiz ses bankı</string>
     <string name="soundbank_invalid_file_message">Lütfen .sf2 uzantılı geçerli bir ses bankı seçin.</string>
     <string name="soundbank_missing_warning_title">Ses bankı bulunamadı</string>
     <string name="soundbank_missing_warning_message">Seçilen ses bankının dosyası diskte bulunamadı. Bunun yerine varsayılan ses bankı kullanılacak. İptal edip Ayarlar'da başka bir ses bankı seçebilirsiniz.</string>
@@ -60,14 +60,14 @@
     <string name="queue_load_missing_help">Aşağıdaki dosyalar bulunamadı:</string>
     <string name="queue_save">Kaydet</string>
     <string name="queue_save_confirmation">Sıra kaydedildi.</string>
-    <string name="queue_shuffle">Şarkıları Karıştır</string>
+    <string name="queue_shuffle">Şarkıları karıştır</string>
 
     <!-- Search -->
     <string name="search_criteria_too_narrow">Eşleşen MIDI dosyası bulunamadı. Ölçütü ayarlamayı deneyin.</string>
     <string name="search_deselect_all">Tüm seçimleri kaldır</string>
     <string name="search_directory">Dizin</string>
     <string name="search_index_not_available">MIDI dosyalarını dizinlemek için bir dizin seçin.</string>
-    <string name="search_index_waiting">Lütfen bekleyin.. MIDI dosyalarınız dizinleniyor...</string>
+    <string name="search_index_waiting">Lütfen bekleyin. MIDI dosyalarınız dizinleniyor...</string>
 
     <!-- Background warning dialog -->
     <string name="background_cubemap_warning_title">Arka plan yanlış yapılandırılmış</string>
@@ -89,7 +89,7 @@
     <string name="settings_controls_description">İmleç kilidi ve hız değiştirme tuşları</string>
     <string name="settings_controls_description_a">Dokunma girişi</string>
     <string name="settings_playback">Yürütme</string>
-    <string name="settings_playback_description">MIDI aygıtı, sentezleyici, ses bankaları </string>
+    <string name="settings_playback_description">MIDI aygıtı, sentezleyici, ses bankaları</string>
     <string name="settings_on_screen_elements">Ekran öğeleri</string>
     <string name="settings_on_screen_elements_description">Baş üstü göstergesi ve şarkı sözleri</string>
 
@@ -104,7 +104,7 @@
     <string name="settings_graphics_fullscreen">Tam ekran</string>
     <string name="settings_graphics_fullscreen_description">Tam ekran moduna girin</string>
     <string name="settings_graphics_resolution">Çözünürlük</string>
-    <string name="settings_graphics_resolution_fullscreen">Tam ekran etkinken çözünürlük monitörle aynı olur.</string>
+    <string name="settings_graphics_resolution_fullscreen">Tam ekran etkinken çözünürlük monitörle aynı olur</string>
     <string name="settings_graphics_resolution_default">Varsayılan çözünürlüğü kullan</string>
     <string name="settings_graphics_resolution_default_hint">Varsayılan</string>
     <string name="settings_graphics_resolution_default_description">Varsayılan çözünürlük ekranın çoğunu kullanır</string>
@@ -112,11 +112,11 @@
     <string name="settings_graphics_resolution_width">Genişlik</string>
     <string name="settings_graphics_resolution_height">Yükseklik</string>
     <string name="settings_graphics_shadows">Gölgeler</string>
-    <string name="settings_graphics_shadows_description">Nesnelerin altına gölge oluştur.</string>
+    <string name="settings_graphics_shadows_description">Nesnelerin altına gölge oluştur</string>
     <string name="settings_graphics_shadows_none">Yok (sahte gölge)</string>
-    <string name="settings_graphics_shadows_description_a">Dinamik gölgeleri oluştur.</string>
+    <string name="settings_graphics_shadows_description_a">Dinamik gölgeleri oluştur</string>
     <string name="settings_graphics_shadows_description_hint_a">Dinamik gölgeler daha güzel görünür ancak performansı etkileyebilir</string>
-    <string name="settings_graphics_anti_aliasing">Nesne Kenarlarını Yumuşatma</string>
+    <string name="settings_graphics_anti_aliasing">Nesne kenarlarını yumuşatma</string>
     <string name="settings_graphics_anti_aliasing_description">Nesne kenarlarını yumuşat</string>
 
     <!-- Settings / Background -->
@@ -146,10 +146,10 @@
     <string name="settings_controls_lock_cursor">İmleci kilitle</string>
     <string name="settings_controls_lock_cursor_description">İmleci pencereye kilitle</string>
     <string name="settings_controls_disable_touch">Dokunma girişini devre dışı bırak</string>
-    <string name="settings_controls_disable_touch_description">Ekrana dokunarak yörüngeyi, yatay dikey kaydırmayı, yakınlaştırmayı kapatır.</string>
+    <string name="settings_controls_disable_touch_description">Ekrana dokunarak yörüngeyi, yatay dikey kaydırmayı, yakınlaştırmayı kapatır</string>
     <string name="settings_controls_sticky_speed_modifier_keys">Yapışkan hız değiştirme tuşları</string>
-    <string name="settings_controls_sticky_speed_modifier_keys_true">Serbest kamera hızını değiştirmek için Ctrl ve Shift\'e basın</string>
-    <string name="settings_controls_sticky_speed_modifier_keys_false">Serbest kamera hızını değiştirmek için Ctrl ve Shift\'i basılı tutun</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Serbest kamera hızını değiştirmek için Ctrl ve Shift'e basın</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Serbest kamera hızını değiştirmek için Ctrl ve Shift'i basılı tutun</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Şarkı Sözleri</string>
