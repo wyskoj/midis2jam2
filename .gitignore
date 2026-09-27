@@ -21,6 +21,7 @@
 /.idea/kotlinc.xml
 /.idea/libraries-with-intellij-classes.xml
 /.idea/migrations.xml
+/.idea/misc.xml
 /.idea/**/*.iml
 /.settings
 /bin
