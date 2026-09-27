@@ -254,7 +254,6 @@ class SettingsModelTest {
     }
 
     @Test
-    @Spec("hud.toggle-setting")
     fun `the head-up display can be turned off`() = runTest(dispatcher) {
         val repository = inMemoryRepository()
         val model = SettingsModel(repository)

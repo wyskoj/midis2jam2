@@ -28,8 +28,10 @@ import org.wysko.midis2jam2.manager.HudManager
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
+import org.wysko.midis2jam2.world.Sprite
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -74,6 +76,38 @@ class OnScreenElementsTest {
                 later >= early,
                 "The progress indicator went backwards: $early then $later"
             )
+        }
+    }
+
+    @Test
+    @Spec("hud.toggle-setting")
+    fun `the head-up display is not drawn when the setting is off`() {
+        withHud(showHud = false) { hud, texts, sprites ->
+            assertFalse(hud.isEnabled, "The head-up display is turned off, but its manager is enabled")
+            assertTrue(
+                texts.none { it.contains(FILE_NAME) },
+                "The head-up display is turned off in the settings, but it still shows the file name " +
+                    "(see #433). The overlay shows: $texts"
+            )
+            assertEquals(
+                0,
+                sprites,
+                "The head-up display is turned off in the settings, but its progress bar is still drawn (see #433)"
+            )
+        }
+    }
+
+    @Test
+    @Spec("hud.toggle-setting")
+    fun `the head-up display is drawn when the setting is on`() {
+        withHud(showHud = true) { hud, texts, sprites ->
+            assertTrue(hud.isEnabled, "The head-up display is turned on, but its manager is disabled")
+            assertTrue(
+                texts.any { it.contains(FILE_NAME) },
+                "The head-up display is turned on in the settings, but it does not show the file name. " +
+                    "The overlay shows: $texts"
+            )
+            assertTrue(sprites > 0, "The head-up display is turned on in the settings, but its progress bar is not drawn")
         }
     }
 
@@ -133,6 +167,35 @@ class OnScreenElementsTest {
     private companion object {
 
         const val PROGRESS_OBSERVATION_MILLIS = 400L
+
+        const val FILE_NAME = "twinkle.mid"
+
+        /** Enough engine updates for anything that attaches to the overlay late to have done so. */
+        const val SETTLE_FRAMES = 10
+
+        /**
+         * Runs a performance with the head-up display option set to [showHud], lets it settle,
+         * and hands [block] the HUD manager, the overlay's text, and how many sprites it draws.
+         */
+        fun withHud(showHud: Boolean, block: (hud: HudManager, texts: List<String>, sprites: Int) -> Unit) {
+            val settings = AppSettings().apply { onScreenElementsSettings.isShowHeadsUpDisplay = showHud }
+            HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings, fileName = FILE_NAME)
+                .use { performance ->
+                    val hud = assertNotNull(
+                        performance.app.stateManager.getState(HudManager::class.java),
+                        "No head-up display manager was attached"
+                    )
+
+                    // Each call waits for one engine update.
+                    repeat(SETTLE_FRAMES) { performance.onEngineThread { } }
+
+                    val (texts, sprites) = performance.onEngineThread {
+                        val gui = performance.app.guiNode
+                        textsIn(gui) to gui.descendantMatches(Sprite::class.java).size
+                    }
+                    block(hud, texts, sprites)
+                }
+        }
 
         /** The text of every label currently on the overlay. */
         fun textsIn(root: Spatial): List<String> = buildList {
