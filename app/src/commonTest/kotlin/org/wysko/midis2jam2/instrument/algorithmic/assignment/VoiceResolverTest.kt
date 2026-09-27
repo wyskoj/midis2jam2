@@ -55,6 +55,7 @@ class VoiceResolverTest {
     )
 
     @Test
+    @Spec("midi.assignment.bank-select.xg", "midi.assignment.bank-select.gm2")
     fun `a voice with a look of its own appears as that look`() {
         assertEquals("Guitar.Jazz", resolver.melodic(setup(MidiMode.GM2, msb = 121, lsb = 3, program = 28))?.id)
         assertEquals("Guitar.Jazz", resolver.melodic(setup(MidiMode.XG, msb = 0, lsb = 3, program = 28))?.id)

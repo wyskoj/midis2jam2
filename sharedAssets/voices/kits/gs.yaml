@@ -1,2 +1,6 @@
-# Roland GS drum kits. Filled in by the next commit.
+# Roland GS drum sets.
+#
+# Not transcribed yet (SC-8850 Owner's Manual, drum set lists). kits/gm.yaml already reads kits by their GS
+# numbers, so every GS kit falls back to it.
+
 []

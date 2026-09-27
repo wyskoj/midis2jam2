@@ -1,2 +1,232 @@
-# Yamaha XG melodic voices. Filled in by the next commit.
-[]
+# Yamaha XG melodic voices.
+#
+# Transcribed from the "YAMAHA XG Voice List" (the 480-voice set), whose P.C Number column reads
+# MSB-LSB-program. `program` is 1-based, as printed. XG's own rule (XG Specifications v1.32, p.102) is that an
+# unmapped variation sounds as bank MSB 0, so a voice with no `look` appears as its General MIDI voice.
+#
+# Transcribed so far: Piano and Chromatic Percussion (voice list pages 1-2).
+
+
+# Voice List, pages 1-2: Piano
+- program: 1
+  msb: 0
+  name: "GrandPiano"
+- program: 1
+  msb: 0
+  lsb: 1
+  name: "GrandPiano KSP"
+- program: 1
+  msb: 0
+  lsb: 18
+  name: "MellowGrandPiano"
+- program: 1
+  msb: 0
+  lsb: 40
+  name: "PianoStrings"
+- program: 1
+  msb: 0
+  lsb: 41
+  name: "Dream"
+- program: 2
+  msb: 0
+  name: "BrightPiano"
+- program: 2
+  msb: 0
+  lsb: 1
+  name: "BrightPiano KSP"
+- program: 3
+  msb: 0
+  name: "El.GrandPiano"
+- program: 3
+  msb: 0
+  lsb: 1
+  name: "El.GrandPiano KSP"
+- program: 3
+  msb: 0
+  lsb: 32
+  name: "DetunedCP80"
+- program: 3
+  msb: 0
+  lsb: 40
+  name: "LayeredCP1"
+- program: 3
+  msb: 0
+  lsb: 41
+  name: "LayeredCP2"
+- program: 4
+  msb: 0
+  name: "Honkytonk"
+- program: 4
+  msb: 0
+  lsb: 1
+  name: "Honkytonk KSP"
+- program: 5
+  msb: 0
+  name: "ElectricPiano1"
+- program: 5
+  msb: 0
+  lsb: 1
+  name: "ElectricPiano1 KSP"
+- program: 5
+  msb: 0
+  lsb: 18
+  name: "MellowElectricPiano"
+- program: 5
+  msb: 0
+  lsb: 32
+  name: "ChorusEP1"
+- program: 5
+  msb: 0
+  lsb: 40
+  name: "HardElectricPiano"
+- program: 5
+  msb: 0
+  lsb: 45
+  name: "VXfadeEl.Piano1"
+- program: 5
+  msb: 0
+  lsb: 64
+  name: "60sElectricPiano1"
+- program: 6
+  msb: 0
+  name: "ElectricPiano2"
+- program: 6
+  msb: 0
+  lsb: 1
+  name: "ElectricPiano2 KSP"
+- program: 6
+  msb: 0
+  lsb: 32
+  name: "ChorusEP2"
+- program: 6
+  msb: 0
+  lsb: 33
+  name: "DXEPHard"
+- program: 6
+  msb: 0
+  lsb: 34
+  name: "DXLegend"
+- program: 6
+  msb: 0
+  lsb: 40
+  name: "DXPhaseEP"
+- program: 6
+  msb: 0
+  lsb: 41
+  name: "DX+AnalogEP"
+- program: 6
+  msb: 0
+  lsb: 42
+  name: "DXKotoEP"
+- program: 6
+  msb: 0
+  lsb: 45
+  name: "VXfadeEl.Piano2"
+- program: 7
+  msb: 0
+  name: "Harpsichord"
+- program: 7
+  msb: 0
+  lsb: 1
+  name: "Harpsichord KSP"
+- program: 7
+  msb: 0
+  lsb: 25
+  name: "Harpsichord2"
+- program: 7
+  msb: 0
+  lsb: 35
+  name: "Harpsichord3"
+- program: 8
+  msb: 0
+  name: "Clavi"
+- program: 8
+  msb: 0
+  lsb: 1
+  name: "Clavi KSP"
+- program: 8
+  msb: 0
+  lsb: 27
+  name: "ClaviWah"
+- program: 8
+  msb: 0
+  lsb: 64
+  name: "PulseClavi"
+- program: 8
+  msb: 0
+  lsb: 65
+  name: "PierceClavi"
+
+# Voice List, page 2: Chromatic Percussion
+- program: 9
+  msb: 0
+  name: "Celesta"
+- program: 10
+  msb: 0
+  name: "Glockenspiel"
+- program: 11
+  msb: 0
+  name: "MusicBox"
+- program: 11
+  msb: 0
+  lsb: 64
+  name: "Orgel"
+- program: 12
+  msb: 0
+  name: "Vibraphone"
+- program: 12
+  msb: 0
+  lsb: 1
+  name: "Vibraphone KSP"
+- program: 12
+  msb: 0
+  lsb: 45
+  name: "HardVibes"
+- program: 13
+  msb: 0
+  name: "Marimba"
+- program: 13
+  msb: 0
+  lsb: 1
+  name: "Marimba KSP"
+- program: 13
+  msb: 0
+  lsb: 64
+  name: "Sine Marimba"
+- program: 13
+  msb: 0
+  lsb: 97
+  name: "Balimba"
+- program: 13
+  msb: 0
+  lsb: 98
+  name: "Log Drums"
+- program: 14
+  msb: 0
+  name: "Xylophone"
+- program: 15
+  msb: 0
+  name: "TubularBells"
+- program: 15
+  msb: 0
+  lsb: 96
+  name: "ChurchBells"
+- program: 15
+  msb: 0
+  lsb: 97
+  name: "Carillon"
+- program: 16
+  msb: 0
+  name: "Dulcimer"
+- program: 16
+  msb: 0
+  lsb: 35
+  name: "Dulcimer2"
+- program: 16
+  msb: 0
+  lsb: 96
+  name: "Cimbalom"
+- program: 16
+  msb: 0
+  lsb: 97
+  name: "Santur"

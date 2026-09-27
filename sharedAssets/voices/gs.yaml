@@ -1,2 +1,283 @@
-# Roland GS melodic voices. Filled in by the next commit.
-[]
+# Roland GS melodic voices (tones).
+#
+# Transcribed from the SC-8850 Owner's Manual, Instrument List, using the SC-8850 map's names. `program` is
+# 1-based, as the manual prints it; `msb` is the variation number (controller 0). The LSB (controller 32) only
+# picks between the SC-55, SC-88, SC-88Pro and SC-8850 sound maps, so it isn't part of the key.
+# A voice with no `look` appears as the General MIDI voice with the same program (its capital tone).
+#
+# Transcribed so far: Piano and Chromatic percussion (pages 167-168).
+
+
+# Instrument List, page 167: Piano
+- program: 1
+  msb: 0
+  name: "Piano 1"
+- program: 1
+  msb: 1
+  name: "UprightPiano"
+- program: 1
+  msb: 2
+  name: "Mild Piano"
+- program: 1
+  msb: 8
+  name: "Upright P w"
+- program: 1
+  msb: 9
+  name: "Mild Piano w"
+- program: 1
+  msb: 16
+  name: "European Pf"
+- program: 1
+  msb: 24
+  name: "Piano + Str."
+- program: 1
+  msb: 25
+  name: "Piano + Str2"
+- program: 1
+  msb: 26
+  name: "Piano+Choir1"
+- program: 1
+  msb: 27
+  name: "Piano+Choir2"
+- program: 2
+  msb: 0
+  name: "Piano 2"
+- program: 2
+  msb: 1
+  name: "Pop Piano"
+- program: 2
+  msb: 2
+  name: "Rock Piano"
+- program: 2
+  msb: 8
+  name: "Pop Piano w"
+- program: 2
+  msb: 9
+  name: "Rock Piano w"
+- program: 2
+  msb: 16
+  name: "Dance Piano"
+- program: 3
+  msb: 0
+  name: "Piano 3"
+- program: 3
+  msb: 1
+  name: "EG+Rhodes 1"
+- program: 3
+  msb: 2
+  name: "EG+Rhodes 2"
+- program: 3
+  msb: 8
+  name: "Piano 3w"
+- program: 4
+  msb: 0
+  name: "Honky-tonk"
+- program: 4
+  msb: 8
+  name: "Honky-tonk 2"
+- program: 5
+  msb: 0
+  name: "E.Piano 1"
+- program: 5
+  msb: 8
+  name: "St.Soft EP"
+- program: 5
+  msb: 9
+  name: "Cho. E.Piano"
+- program: 5
+  msb: 10
+  name: "SilentRhodes"
+- program: 5
+  msb: 16
+  name: "FM+SA EP"
+- program: 5
+  msb: 17
+  name: "Dist E.Piano"
+- program: 5
+  msb: 24
+  name: "Wurly"
+- program: 5
+  msb: 25
+  name: "Hard Rhodes"
+- program: 5
+  msb: 26
+  name: "MellowRhodes"
+- program: 6
+  msb: 0
+  name: "E.Piano 2"
+- program: 6
+  msb: 1
+  name: "E.Piano 3"
+- program: 6
+  msb: 8
+  name: "Detuned EP 2"
+- program: 6
+  msb: 9
+  name: "Detuned EP 3"
+- program: 6
+  msb: 10
+  name: "EP Legend"
+- program: 6
+  msb: 16
+  name: "St.FM EP"
+- program: 6
+  msb: 24
+  name: "Hard FM EP"
+- program: 6
+  msb: 32
+  name: "EP Phase"
+- program: 7
+  msb: 0
+  name: "Harpsichord"
+- program: 7
+  msb: 1
+  name: "Harpsichord2"
+- program: 7
+  msb: 2
+  name: "Harpsichord3"
+- program: 7
+  msb: 8
+  name: "Coupled Hps."
+- program: 7
+  msb: 16
+  name: "Harpsi.w"
+- program: 7
+  msb: 24
+  name: "Harpsi.o"
+- program: 7
+  msb: 32
+  name: "Synth Harpsi"
+- program: 8
+  msb: 0
+  name: "Clav."
+- program: 8
+  msb: 1
+  name: "Clav. 2"
+- program: 8
+  msb: 2
+  name: "Atk Clav.1"
+- program: 8
+  msb: 3
+  name: "Atk Clav.2"
+- program: 8
+  msb: 8
+  name: "Comp Clav."
+- program: 8
+  msb: 16
+  name: "Reso Clav."
+- program: 8
+  msb: 17
+  name: "Phase Clav"
+- program: 8
+  msb: 24
+  name: "Clav.o"
+- program: 8
+  msb: 32
+  name: "Analog Clav."
+- program: 8
+  msb: 33
+  name: "JP8 Clav. 1"
+- program: 8
+  msb: 35
+  name: "JP8 Clav. 2"
+- program: 8
+  msb: 36
+  name: "SynRingClav."
+- program: 8
+  msb: 37
+  name: "SynDistClav."
+- program: 8
+  msb: 38
+  name: "JP8000 Clav."
+- program: 8
+  msb: 39
+  name: "Pulse Clav"
+
+# Instrument List, page 168: Chromatic percussion
+- program: 9
+  msb: 0
+  name: "Celesta"
+- program: 9
+  msb: 1
+  name: "Pop Celesta"
+- program: 10
+  msb: 0
+  name: "Glockenspiel"
+- program: 11
+  msb: 0
+  name: "Music Box"
+- program: 11
+  msb: 1
+  name: "Music Box 2"
+- program: 11
+  msb: 8
+  name: "St.Music Box"
+- program: 12
+  msb: 0
+  name: "Vibraphone"
+- program: 12
+  msb: 1
+  name: "Pop Vibe."
+- program: 12
+  msb: 8
+  name: "Vibraphone w"
+- program: 12
+  msb: 9
+  name: "Vibraphones"
+- program: 13
+  msb: 0
+  name: "Marimba"
+- program: 13
+  msb: 8
+  name: "Marimba w"
+- program: 13
+  msb: 16
+  name: "Barafon"
+- program: 13
+  msb: 17
+  name: "Barafon 2"
+- program: 13
+  msb: 24
+  name: "Log drum"
+- program: 14
+  msb: 0
+  name: "Xylophone"
+- program: 14
+  msb: 8
+  name: "Xylophone w"
+- program: 15
+  msb: 0
+  name: "Tubular-bell"
+- program: 15
+  msb: 8
+  name: "Church Bell"
+- program: 15
+  msb: 9
+  name: "Carillon"
+- program: 15
+  msb: 10
+  name: "Church Bell2"
+- program: 15
+  msb: 16
+  name: "Tubularbellw"
+- program: 16
+  msb: 0
+  name: "Santur"
+- program: 16
+  msb: 1
+  name: "Santur 2"
+- program: 16
+  msb: 2
+  name: "Santur 3"
+- program: 16
+  msb: 8
+  name: "Cimbalom"
+- program: 16
+  msb: 16
+  name: "Zither 1"
+- program: 16
+  msb: 17
+  name: "Zither 2"
+- program: 16
+  msb: 24
+  name: "Dulcimer"

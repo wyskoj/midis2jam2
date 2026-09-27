@@ -84,10 +84,9 @@ class InstrumentAssignmentTest {
     }
 
     @Test
-    @Spec("midi.assignment.gm-only")
-    fun `programs outside the General MIDI range are not accepted`() {
-        // The specification defines programs 0 through 127. Anything wider would mean the app
-        // had started interpreting a different standard, which the docs say it does not.
+    fun `the assignment table covers exactly the General MIDI programs`() {
+        // MIDI defines programs 0 through 127. GS, XG and GM2 reach further with bank select,
+        // not with more programs, and fall back to these.
         assertEquals(0, MidiFixtures.GENERAL_MIDI_PROGRAMS.first)
         assertEquals(127, MidiFixtures.GENERAL_MIDI_PROGRAMS.last)
 

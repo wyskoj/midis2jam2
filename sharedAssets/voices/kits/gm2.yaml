@@ -1,2 +1,42 @@
-# General MIDI 2 drum kits. Filled in by the next commit.
-[]
+# General MIDI 2 percussion sound set: the drum kits, all in bank MSB 78H (120).
+#
+# Transcribed from General MIDI 2 v1.2a (MMA RP-024), Appendix B. `program` is 1-based, as the specification
+# prints it. The orchestra, SFX, electronic and analog sets use the same notes as the app's kits of those names.
+
+# Appendix B (printed pages 32-34)
+- program: 1
+  msb: 120
+  name: "Standard Set"
+  look: Standard
+- program: 9
+  msb: 120
+  name: "Room Set"
+  look: Room
+- program: 17
+  msb: 120
+  name: "Power Set"
+  look: Power
+- program: 25
+  msb: 120
+  name: "Electronic Set"
+  look: Electronic
+- program: 26
+  msb: 120
+  name: "Analog Set"
+  look: Analog
+- program: 33
+  msb: 120
+  name: "Jazz Set"
+  look: Jazz
+- program: 41
+  msb: 120
+  name: "Brush Set"
+  look: Brush
+- program: 49
+  msb: 120
+  name: "Orchestra Set"
+  look: Orchestra
+- program: 57
+  msb: 120
+  name: "SFX Set"
+  look: Sfx
