@@ -26,8 +26,8 @@ import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.renderer.RendererBundle
+import org.wysko.midis2jam2.renderer.RendererCommand
 import org.wysko.midis2jam2.renderer.RendererMessage
-import org.wysko.midis2jam2.renderer.SERVER_PORT
 import org.wysko.midis2jam2.starter.MidiPackage
 import org.wysko.midis2jam2.starter.Midis2jam2Application
 import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
@@ -35,9 +35,15 @@ import org.wysko.midis2jam2.starter.applyConfigurations
 import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.starter.configuration.ConfigurationService
 import org.wysko.midis2jam2.util.isMacOs
+import org.wysko.midis2jam2.util.logger
 import java.io.File
-import java.net.Socket
+import java.io.InputStream
 import java.util.Base64
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+
+private const val PROCESS_EXIT_GRACE_SECONDS = 5L
+private const val RENDERER_DEBUG_ENV = "MIDIS2JAM2_RENDERER_DEBUG"
 
 actual class ApplicationService : KoinComponent {
     private val errorLogService: ErrorLogService by inject()
@@ -57,7 +63,7 @@ actual class ApplicationService : KoinComponent {
                     RendererBundle(midiFiles = listOf(midiFile.file.absolutePath), configurations)
                 )
                 val process = launchRendererProcess(extraArgs = listOf(bundle))
-                listenOnSocket(process)
+                manageRendererProcess(process)
             }
 
             else -> {
@@ -100,7 +106,7 @@ actual class ApplicationService : KoinComponent {
                     RendererBundle(midiFiles = midiFiles.map { it.file.absolutePath }, configurations)
                 )
                 val process = launchRendererProcess(extraArgs = listOf(bundle))
-                listenOnSocket(process, midiFiles.map { it.file })
+                manageRendererProcess(process, midiFiles.map { it.file })
             }
 
             else -> {
@@ -136,29 +142,78 @@ actual class ApplicationService : KoinComponent {
         }
     }
 
-    private fun listenOnSocket(process: Process, queueFiles: List<File> = emptyList()) {
-        Thread {
-            val socket = waitForPort("127.0.0.1", SERVER_PORT)
-            socket.inputStream.bufferedReader().forEachLine {
-                val message = Json.decodeFromString<RendererMessage>(it)
-                when (message.type) {
-                    "QueueTrackStart" -> {
-                        val trackIndex = message.trackIndex ?: return@forEachLine
-                        queueFiles.getOrNull(trackIndex)?.let(::recordPlaybackHistory)
-                    }
+    private fun manageRendererProcess(process: Process, queueFiles: List<File> = emptyList()) {
+        val reportedResult = AtomicBoolean(false)
 
-                    "Error" -> {
-                        errorLogService.addError(message.message!!, message.stackTrace!!)
-                        _isApplicationRunning.value = false
-                    }
-
-                    "Finish" -> {
-                        _isApplicationRunning.value = false
-                    }
-                }
+        consumeLines("renderer-stdout", process.inputStream) { line ->
+            when (val message = runCatching { Json.decodeFromString<RendererMessage>(line) }.getOrNull()) {
+                null -> println(line)
+                else -> handleRendererMessage(message, queueFiles, reportedResult)
             }
+        }
+
+        consumeLines("renderer-stderr", process.errorStream) { line -> System.err.println(line) }
+
+        process.onExit().thenAccept { exited ->
+            if (!reportedResult.get()) {
+                errorLogService.addError(
+                    "The rendering process stopped unexpectedly",
+                    "The renderer exited with code ${exited.exitValue()}"
+                )
+            }
+            _isApplicationRunning.value = false
+        }
+
+        Runtime.getRuntime().addShutdownHook(Thread { stopRenderer(process) })
+    }
+
+    private fun handleRendererMessage(
+        message: RendererMessage,
+        queueFiles: List<File>,
+        reportedResult: AtomicBoolean,
+    ) {
+        when (message.type) {
+            "QueueTrackStart" -> {
+                val trackIndex = message.trackIndex ?: return
+                queueFiles.getOrNull(trackIndex)?.let(::recordPlaybackHistory)
+            }
+
+            "Error" -> {
+                errorLogService.addError(
+                    message.message ?: "The renderer reported an error",
+                    message.stackTrace ?: "No stacktrace"
+                )
+                reportedResult.set(true)
+                _isApplicationRunning.value = false
+            }
+
+            "Finish" -> {
+                reportedResult.set(true)
+                _isApplicationRunning.value = false
+            }
+        }
+    }
+
+    private fun stopRenderer(process: Process) {
+        runCatching {
+            process.outputStream.bufferedWriter().use { writer ->
+                writer.write(Json.encodeToString(RendererCommand.stop()))
+                writer.newLine()
+                writer.flush()
+            }
+        }
+        if (!process.waitFor(PROCESS_EXIT_GRACE_SECONDS, TimeUnit.SECONDS)) {
+            process.destroy()
+        }
+    }
+
+    private fun consumeLines(threadName: String, stream: InputStream, onLine: (String) -> Unit) {
+        Thread {
+            runCatching { stream.bufferedReader().forEachLine(onLine) }
+        }.apply {
+            name = threadName
+            isDaemon = true
         }.start()
-        Runtime.getRuntime().addShutdownHook(Thread { process.destroy() })
     }
 
     private fun encodeBundle(rendererBundle: RendererBundle): String =
@@ -167,18 +222,6 @@ actual class ApplicationService : KoinComponent {
     private fun getConfigurations(): List<Configuration> {
         val configurationService: ConfigurationService by inject()
         return configurationService.getConfigurations()
-    }
-
-    private fun waitForPort(host: String, port: Int, timeoutMs: Long = 10000): Socket {
-        val start = System.currentTimeMillis()
-        while (System.currentTimeMillis() - start < timeoutMs) {
-            try {
-                return Socket(host, port)
-            } catch (_: Exception) {
-                Thread.sleep(50)
-            }
-        }
-        error("Timed out waiting for $host:$port")
     }
 
     private fun detectJavaExecutable(): String {
@@ -213,10 +256,22 @@ actual class ApplicationService : KoinComponent {
         val javaExec = detectJavaExecutable()
         val classpath = detectRendererClasspath()
 
-        val cmd = mutableListOf(javaExec, "-cp", classpath, mainClass)
+        val cmd = mutableListOf(javaExec)
+        rendererDebugAgent()?.let { agent -> // must precede -cp when set
+            cmd += agent
+            logger().warn("Renderer debug agent enabled: $agent")
+        }
+        cmd += listOf("-cp", classpath, mainClass)
         cmd.addAll(extraArgs)
 
-        return ProcessBuilder(cmd).inheritIO().redirectErrorStream(true).start()
+        return ProcessBuilder(cmd).start()
+    }
+
+    private fun rendererDebugAgent(): String? {
+        val spec = System.getenv(RENDERER_DEBUG_ENV)?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        val suspend = if (spec.endsWith(":nosuspend")) "n" else "y"
+        val port = spec.removeSuffix(":nosuspend")
+        return "-agentlib:jdwp=transport=dt_socket,server=y,suspend=$suspend,address=127.0.0.1:$port"
     }
 
     private fun recordPlaybackHistory(file: File) {

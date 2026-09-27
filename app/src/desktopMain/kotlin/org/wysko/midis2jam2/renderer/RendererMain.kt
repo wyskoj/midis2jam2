@@ -32,52 +32,52 @@ import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
 import org.wysko.midis2jam2.starter.applyConfigurations
 import java.io.BufferedWriter
 import java.io.File
-import java.net.ServerSocket
 import java.util.*
 import java.util.concurrent.CountDownLatch
-
-const val SERVER_PORT = 31320
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
+    val protocol = System.out.bufferedWriter()
+    installFatalErrorReporter(protocol)
+
     startKoin { modules(applicationModule, midiSystemModule, systemModule, uiModule) }
     val arguments = Base64.getDecoder().decode(args.first()).toString(Charsets.UTF_8)
     val config = Json.decodeFromString<RendererBundle>(arguments)
-    val serverWriter = startTcpListener()
     val midiFiles = config.midiFiles.map { File(it) }
 
     when (midiFiles.size) {
-        0 -> exit(serverWriter)
-        1 -> launchApplication(midiFiles, config, serverWriter)
-        else -> launchQueueApplication(midiFiles, config, serverWriter)
+        0 -> reportNoFiles(protocol)
+        1 -> launchApplication(midiFiles, config, protocol)
+        else -> launchQueueApplication(midiFiles, config, protocol)
     }
 }
 
 private fun launchApplication(
     midiFiles: List<File>,
     config: RendererBundle,
-    serverWriter: BufferedWriter,
+    protocol: BufferedWriter,
 ) {
     val midiFile = midiFiles.first()
     val midiPackage = runCatching { MidiPackage.build(midiFile, config.configurations) }.onFailure { t ->
-        onFailGetMidiPackage(t, serverWriter)
+        onFailGetMidiPackage(t, protocol)
         return
     }
     val latch = CountDownLatch(1)
     with(midiPackage.getOrNull() ?: return) {
-        Midis2jam2Application(
+        val application = Midis2jam2Application(
             sequence!!,
             midiFile.name,
             config.configurations,
             {
                 latch.countDown()
-                serverWriter.write(Json.encodeToString(RendererMessage.finish()))
-                serverWriter.flush()
-                serverWriter.close()
+                protocol.send(RendererMessage.finish())
             },
             sequencer,
             synthesizer,
             midiDevice
-        ).execute()
+        )
+        watchParentCommands { application.stop() }
+        application.execute()
     }
     latch.await()
 }
@@ -85,72 +85,79 @@ private fun launchApplication(
 private fun launchQueueApplication(
     midiFiles: List<File>,
     config: RendererBundle,
-    serverWriter: BufferedWriter,
+    protocol: BufferedWriter,
 ) {
     val reader = StandardMidiFileReader()
     val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
 
     val midiPackage = runCatching { MidiPackage.build(null, config.configurations) }.onFailure { t ->
-        onFailGetMidiPackage(t, serverWriter)
+        onFailGetMidiPackage(t, protocol)
         return
     }
 
     with(midiPackage.getOrNull() ?: return) {
-        Midis2jam2QueueApplication(
+        val application = Midis2jam2QueueApplication(
             sequences = sequences,
             fileNames = midiFiles.map { it.name },
             config.configurations,
-            onTrackStart = { trackIndex ->
-                serverWriter.write(Json.encodeToString(RendererMessage.queueTrackStart(trackIndex)))
-                serverWriter.newLine()
-                serverWriter.flush()
-            },
-            {
-                serverWriter.write(Json.encodeToString(RendererMessage.finish()))
-                serverWriter.newLine()
-                serverWriter.flush()
-                serverWriter.close()
-            },
+            onTrackStart = { trackIndex -> protocol.send(RendererMessage.queueTrackStart(trackIndex)) },
+            { protocol.send(RendererMessage.finish()) },
             sequencer,
             synthesizer,
             midiDevice
-        ).run {
+        )
+        watchParentCommands { application.stop() }
+        application.run {
             applyConfigurations(config.configurations)
             start()
         }
     }
 }
 
-private fun onFailGetMidiPackage(t: Throwable, serverWriter: BufferedWriter) {
+private fun BufferedWriter.send(message: RendererMessage) {
+    runCatching {
+        write(Json.encodeToString(message))
+        newLine()
+        flush()
+    }
+}
+
+private fun watchParentCommands(onStop: () -> Unit) {
+    Thread {
+        val reader = System.`in`.bufferedReader()
+        while (true) {
+            val line = runCatching { reader.readLine() }.getOrNull() ?: break
+            val command = runCatching { Json.decodeFromString<RendererCommand>(line) }.getOrNull()
+            if (command?.type == RendererCommand.STOP) break
+        }
+        onStop()
+    }.apply {
+        name = "parent-command-watcher"
+        isDaemon = true
+    }.start()
+}
+
+private fun onFailGetMidiPackage(t: Throwable, protocol: BufferedWriter) {
     t.printStackTrace()
-    serverWriter.write(
-        Json.encodeToString(
-            RendererMessage.error(
-                "There was an error initializing the MIDI device.",
-                t.stackTraceToString()
-            )
-        )
+    protocol.send(
+        RendererMessage.error("There was an error initializing the MIDI device.", t.stackTraceToString())
     )
-    serverWriter.flush()
-    serverWriter.close()
 }
 
-private fun exit(serverWriter: BufferedWriter) {
-    serverWriter.write(
-        Json.encodeToString(
-            RendererMessage.error(
-                "No MIDI files passed to renderer server.",
-                IllegalArgumentException("No MIDI files passed to renderer server.").stackTraceToString()
-            )
-        )
-    )
-    serverWriter.flush()
-    serverWriter.close()
+private fun reportNoFiles(protocol: BufferedWriter) {
+    val cause = IllegalArgumentException("No MIDI files passed to the renderer!")
+    protocol.send(RendererMessage.error(cause.message!!, cause.stackTraceToString()))
 }
 
-private fun startTcpListener(): BufferedWriter {
-    val server = ServerSocket(SERVER_PORT)
-    val client = server.accept()
-    val writer = client.getOutputStream().bufferedWriter()
-    return writer
+private fun installFatalErrorReporter(protocol: BufferedWriter) {
+    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+        throwable.printStackTrace()
+        protocol.send(
+            RendererMessage.error(
+                "The 3D engine stopped unexpectedly.",
+                "Uncaught exception on thread \"${thread.name}\":\n${throwable.stackTraceToString()}"
+            )
+        )
+        exitProcess(1)
+    }
 }

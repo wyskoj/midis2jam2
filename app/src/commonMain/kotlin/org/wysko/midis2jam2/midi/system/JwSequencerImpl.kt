@@ -81,6 +81,7 @@ class JwSequencerImpl : JwSequencer {
             this@JwSequencerImpl.device?.close()
             this.device = null
         }
+        threadPool.shutdown()
         _isOpen = false
     }
 
@@ -111,7 +112,7 @@ class JwSequencerImpl : JwSequencer {
         if (!isOpen || !isRunning) return
 
         _isRunning = false
-        job!!.join()
+        job?.takeIf { it !== Thread.currentThread() }?.join()
         pump!!.sendAllNotesOff()
     }
 
