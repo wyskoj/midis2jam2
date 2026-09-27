@@ -25,6 +25,10 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.Instrument
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.ChannelState
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.ChannelStateTimeline
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.PRIMARY_RHYTHM_CHANNEL
+import org.wysko.midis2jam2.instrument.algorithmic.assignment.SFX_KIT_PROGRAM
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaserType
 import org.wysko.midis2jam2.instrument.family.brass.FrenchHorn
@@ -124,12 +128,16 @@ object InstrumentAssignment {
         // As a safety precaution, we will sort each channel by the time of each event.
         channels.onEach { channel -> channel.sortBy { it.tick } }
 
+        // Channel 10 isn't necessarily the only rhythm channel, nor always one.
+        val timeline = ChannelStateTimeline.from(midiFile.smf.tracks.flatMap { it.events })
+
         // Create a place for instruments to go.
         val instruments = mutableListOf<Instrument>()
 
-        // Create a place for auxiliary percussion to go.
-        val auxiliary =
-            mutableMapOf<KClass<out AuxiliaryPercussion>, MutableList<MutableList<MidiEvent>>>()
+        // Notes on rhythm channels are pooled across channels, and turned into drums once every channel is read.
+        val rhythmNotes = mutableListOf<RhythmNote>()
+        var primaryKitSpans = emptyList<KitSpan>()
+        var drumInsertionIndex = 0
 
         // For each channel,
         channels.forEachIndexed { channel, channelSpecificEvents ->
@@ -150,58 +158,153 @@ object InstrumentAssignment {
             // instrument.
             val programPerNote = mutableMapOf<Byte, Byte>()
 
+            // Likewise, an OFF event goes wherever its ON event went, even if the channel changed state in between.
+            val rhythmKitPerNote = mutableMapOf<Byte, Int>()
+
             channelSpecificEvents.forEach { event ->
                 if (event !is NoteEvent.NoteOff) { // If the event is not an OFF event,
                     // Determine the last program event
                     val currentProgram = programEvents.lastOrNull { it.tick <= event.tick }?.program ?: 0
 
-                    // Add the event to the correct bin
-                    programBins[currentProgram]?.plusAssign(event)
+                    if (event is NoteEvent.NoteOn && timeline.stateAt(channel, event.tick) == ChannelState.Rhythm) {
+                        val kit = timeline.kitAt(channel, event.tick, currentProgram.toInt())
+                        rhythmNotes += RhythmNote(channel, kit, event)
+                        rhythmKitPerNote[event.note] = kit
+                    } else {
+                        // Add the event to the correct bin
+                        programBins[currentProgram]?.plusAssign(event)
+                        if (event is NoteEvent.NoteOn) rhythmKitPerNote.remove(event.note)
+                    }
 
                     // Keep track of current program for ON events.
                     if (event is NoteEvent.NoteOn) programPerNote[event.note] = currentProgram
                 } else {
-                    programBins[programPerNote[event.note]]?.plusAssign(event) ?: kotlin.run {
-                        logger().warn("Unbalanced MIDI note events.")
-                    }
+                    rhythmKitPerNote[event.note]?.let { rhythmNotes += RhythmNote(channel, it, event) }
+                        ?: programBins[programPerNote[event.note]]?.plusAssign(event)
+                        ?: kotlin.run { logger().warn("Unbalanced MIDI note events.") }
                 }
             }
 
-            if (channel == 9) {
-                programBins.entries.forEachIndexed { i, e ->
-                    onLoadingProgress((channel / 16f) + (i / programBins.entries.size / 16f))
-                    buildDrumSet(context, e.key.toInt(), e.value)?.let { instruments += it }
-                    buildSpecialCases(context, e.key.toInt(), e.value).let { instruments += it }
-                    collectAuxiliary(e.key.toInt(), e.value).let {
-                        it.forEach { (t, u) ->
-                            if (auxiliary[t] == null) {
-                                auxiliary[t] = u.map { it.toMutableList() }.toMutableList()
-                            } else {
-                                u.forEachIndexed { index, list ->
-                                    auxiliary[t]!![index].addAll(list)
-                                    auxiliary[t]!![index] = auxiliary[t]!![index].sortedBy { it.tick }.toMutableList()
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                // Convert lists of events to their corresponding instrument.
-                programBins.entries.forEachIndexed { i, e ->
-                    onLoadingProgress((channel / 16f) + (i / programBins.entries.size / 16f))
-                    buildInstrument(context, e.key, e.value, channelSpecificEvents)?.let { instruments += it }
-                }
+            if (channel == PRIMARY_RHYTHM_CHANNEL) {
+                drumInsertionIndex = instruments.size
+                primaryKitSpans = kitSpans(programEvents, rhythmNotes.filter { it.channel == channel })
+            }
+
+            // Convert lists of events to their corresponding instrument.
+            programBins.entries.forEachIndexed { i, e ->
+                onLoadingProgress((channel / 16f) + (i / programBins.entries.size / 16f))
+                buildInstrument(context, e.key, e.value, channelSpecificEvents)?.let { instruments += it }
             }
         }
 
-        // Add auxiliary percussion
-        instruments +=
-            auxiliary.map { (k, v) ->
-                k.primaryConstructor?.call(context, *v.toTypedArray()) ?: error("Invalid auxiliary percussion")
-            }
+        // The drums go where channel 10's would always have gone, so the order of the band doesn't change.
+        instruments.addAll(drumInsertionIndex, buildDrums(context, rhythmNotes, timeline, primaryKitSpans))
 
         return instruments
     }
+
+    /**
+     * Builds the drum sets, special cases and auxiliary percussion for every rhythm note in the file.
+     *
+     * Only one drum set is on stage at a time, so a rhythm channel other than channel 10 plays its drum set notes on
+     * whatever kit channel 10 is using, as long as both kits lay out their notes the same way. Everything else about
+     * a note (special cases, auxiliary percussion) follows the note's own kit.
+     */
+    private fun buildDrums(
+        context: PerformanceManager,
+        rhythmNotes: List<RhythmNote>,
+        timeline: ChannelStateTimeline,
+        primaryKitSpans: List<KitSpan>,
+    ): List<Instrument> {
+        val drumSetBins = rhythmNotes.groupBy(
+            keySelector = { note ->
+                if (note.channel == PRIMARY_RHYTHM_CHANNEL || note.event !is NoteEvent.NoteOn) return@groupBy note.kit
+                val primaryKit = timeline.primaryKitAt(note.event.tick, primaryKitSpans) ?: return@groupBy note.kit
+                if (canFold(note.kit, primaryKit, note.event.note.toInt())) primaryKit else note.kit
+            },
+            valueTransform = { it.event },
+        )
+        val kitBins = rhythmNotes.groupBy(keySelector = { it.kit }, valueTransform = { it.event })
+
+        val auxiliary = mutableMapOf<KClass<out AuxiliaryPercussion>, MutableList<MutableList<MidiEvent>>>()
+
+        return buildList {
+            drumSetBins.forEach { (kit, events) ->
+                buildDrumSet(context, kit, events.sortedBy { it.tick }.toMutableList<MidiEvent>())?.let { add(it) }
+            }
+            kitBins.forEach { (kit, events) ->
+                val sorted = events.sortedBy { it.tick }.toMutableList<MidiEvent>()
+                addAll(buildSpecialCases(context, kit, sorted))
+                collectAuxiliary(kit, sorted).forEach { (t, u) ->
+                    if (auxiliary[t] == null) {
+                        auxiliary[t] = u.map { it.toMutableList() }.toMutableList()
+                    } else {
+                        u.forEachIndexed { index, list ->
+                            auxiliary[t]!![index].addAll(list)
+                            auxiliary[t]!![index] = auxiliary[t]!![index].sortedBy { it.tick }.toMutableList()
+                        }
+                    }
+                }
+            }
+
+            // Add auxiliary percussion
+            addAll(
+                auxiliary.map { (k, v) ->
+                    k.primaryConstructor?.call(context, *v.toTypedArray()) ?: error("Invalid auxiliary percussion")
+                }
+            )
+        }
+    }
+
+    /**
+     * The stretches of channel 10 between program changes that actually have rhythm notes in them.
+     *
+     * An idle channel 10 still has a kit (Standard, by default), but it shouldn't pull another channel's notes onto
+     * a drum set nobody is playing.
+     */
+    private fun kitSpans(programEvents: List<ProgramEvent>, notes: List<RhythmNote>): List<KitSpan> =
+        programEvents.mapIndexedNotNull { i, programEvent ->
+            val end = programEvents.getOrNull(i + 1)?.tick ?: Int.MAX_VALUE
+            KitSpan(programEvent.tick, end, programEvent.program.toInt()).takeIf { span ->
+                notes.any { it.event is NoteEvent.NoteOn && it.event.tick in span.start until span.end }
+            }
+        }
+
+    /** The kit channel 10 is playing at [tick], or `null` if it isn't playing drums then. */
+    private fun ChannelStateTimeline.primaryKitAt(tick: Int, spans: List<KitSpan>): Int? {
+        if (stateAt(PRIMARY_RHYTHM_CHANNEL, tick) != ChannelState.Rhythm) return null
+        val span = spans.firstOrNull { tick in it.start until it.end } ?: return null
+        return kitAt(PRIMARY_RHYTHM_CHANNEL, tick, span.program)
+    }
+
+    /**
+     * Whether [note] from kit [from] can be played on [onto]'s drum set.
+     *
+     * Most kits share the General MIDI drum layout and differ only in sound, but the orchestra and SFX kits have their
+     * own layouts, and a note either kit turns into a special case isn't a drum set note at all.
+     */
+    private fun canFold(from: Int, onto: Int, note: Int): Boolean =
+        from !in KITS_WITH_OWN_LAYOUT &&
+            onto !in KITS_WITH_OWN_LAYOUT &&
+            note !in specialCaseNotes(from) &&
+            note !in specialCaseNotes(onto)
+
+    /** The notes [buildSpecialCases] takes away from the drum set for [kit]. Keep these two in step. */
+    private fun specialCaseNotes(kit: Int): Set<Int> = when (kit) {
+        24 -> setOf(52)
+        48 -> (41..53).toSet() + 88
+        SFX_KIT_PROGRAM -> setOf(58, 70)
+        else -> emptySet()
+    }
+
+    /** Orchestra and SFX. */
+    private val KITS_WITH_OWN_LAYOUT = setOf(48, SFX_KIT_PROGRAM)
+
+    /** A note on a rhythm channel, and the kit it was played on. */
+    private class RhythmNote(val channel: Int, val kit: Int, val event: NoteEvent)
+
+    /** A stretch of ticks, [start] inclusive to [end] exclusive, where a channel had [program] selected. */
+    private class KitSpan(val start: Int, val end: Int, val program: Int)
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun buildInstrument(
@@ -505,20 +608,5 @@ object InstrumentAssignment {
                 removeAt(i + 1)
             }
         }
-    }
-}
-
-/**
- * Each channel is either in a melodic or rhythmic state.
- */
-sealed class ChannelState {
-    /** Melodic state. */
-    data object Melody : ChannelState()
-
-    /** Rhythmic state. */
-    data object Rhythm : ChannelState()
-
-    companion object {
-        val DEFAULT_STATE: Array<ChannelState> = Array(16) { if (it == 9) Rhythm else Melody }
     }
 }
