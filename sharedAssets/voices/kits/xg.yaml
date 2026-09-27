@@ -100,7 +100,7 @@
   look: Brush
 - program: 42
   msb: 127
-  name: "Brush Kit 2"
+  name: "Brush Kit2"
   look: Brush
 - program: 49
   msb: 127

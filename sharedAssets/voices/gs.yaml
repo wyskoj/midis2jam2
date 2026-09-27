@@ -3820,7 +3820,7 @@
   look: None
 - program: 126
   msb: 28
-  name: "Compressor"
+  name: "Compresser"
   look: None
 - program: 126
   msb: 29
