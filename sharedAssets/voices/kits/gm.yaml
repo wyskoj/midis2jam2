@@ -1,0 +1,33 @@
+# Drum kits by program, as the app has always read them on any rhythm channel.
+#
+# General MIDI Level 1 has a single kit; these are the common GS kit numbers, which most files use. Any program not
+# listed plays the Standard kit, as General MIDI 2 recommends for an undefined kit.
+# `program` is 1-based, as the specifications print it.
+
+- program: 1
+  name: "Standard"
+  look: Standard
+- program: 9
+  name: "Room"
+  look: Room
+- program: 17
+  name: "Power"
+  look: Power
+- program: 25
+  name: "Electronic"
+  look: Electronic
+- program: 26
+  name: "TR-808"
+  look: Analog
+- program: 33
+  name: "Jazz"
+  look: Jazz
+- program: 41
+  name: "Brush"
+  look: Brush
+- program: 49
+  name: "Orchestra"
+  look: Orchestra
+- program: 57
+  name: "SFX"
+  look: Sfx

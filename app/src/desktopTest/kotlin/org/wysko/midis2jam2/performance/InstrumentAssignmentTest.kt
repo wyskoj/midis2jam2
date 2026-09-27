@@ -17,7 +17,9 @@
 
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
+import org.wysko.midis2jam2.instrument.family.strings.Violin
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
@@ -83,10 +85,9 @@ class InstrumentAssignmentTest {
     }
 
     @Test
-    @Spec("midi.assignment.gm-only")
-    fun `programs outside the General MIDI range are not accepted`() {
-        // The specification defines programs 0 through 127. Anything wider would mean the app
-        // had started interpreting a different standard, which the docs say it does not.
+    fun `the assignment table covers exactly the General MIDI programs`() {
+        // MIDI defines programs 0 through 127. GS, XG and GM2 reach further with bank select,
+        // not with more programs, and fall back to these.
         assertEquals(0, MidiFixtures.GENERAL_MIDI_PROGRAMS.first)
         assertEquals(127, MidiFixtures.GENERAL_MIDI_PROGRAMS.last)
 
@@ -96,6 +97,45 @@ class InstrumentAssignmentTest {
             table.keys.sorted(),
             "The assignment table should cover the General MIDI programs, and only those"
         )
+    }
+
+    @Test
+    @Spec("midi.assignment.same-look-merges")
+    fun `switching between programs that look the same keeps one instrument`() {
+        // Programs 25 and 26 (zero-based 24 and 25) are both drawn as the acoustic guitar.
+        HeadlessPerformance.start(MidiFixtures.programSwitch(24, 25), attachManagers = false).use { performance ->
+            val guitars = performance.instruments.filterIsInstance<Guitar>()
+            assertEquals(1, guitars.size, "Expected one guitar across the program change, got ${performance.instruments}")
+        }
+        // Programs that look different still get an instrument each.
+        HeadlessPerformance.start(MidiFixtures.programSwitch(24, 26), attachManagers = false).use { performance ->
+            val guitars = performance.instruments.filterIsInstance<Guitar>()
+            assertEquals(2, guitars.size, "Nylon and jazz guitars should be two instruments, got ${performance.instruments}")
+        }
+    }
+
+    @Test
+    fun `a note held across a program change is released by the instrument that started it`() {
+        // If the note off went to the new program's instrument instead, the piano's key would never come back up.
+        val file = MidiFixtures.noteHeldAcrossProgramChange(first = 0, second = 40)
+
+        HeadlessPerformance.start(file, attachManagers = false).use { performance ->
+            val piano = performance.instruments.filterIsInstance<Keyboard>().single()
+            val violin = performance.instruments.filterIsInstance<Violin>().single()
+            val held = MidiFixtures.HELD_NOTE.toByte()
+
+            val pianoArcs = piano.timedArcs.filter { it.noteOn.note == held }
+            assertEquals(1, pianoArcs.size, "The piano should play the held note once, got $pianoArcs")
+            assertEquals(
+                2 * MidiFixtures.TICKS_PER_QUARTER,
+                pianoArcs.single().noteOff.tick,
+                "The held note should end at its note off, after the program change",
+            )
+            assertTrue(
+                violin.timedArcs.none { it.noteOn.note == held || it.noteOff.note == held },
+                "The violin should know nothing of the piano's held note, got ${violin.timedArcs}",
+            )
+        }
     }
 
     @Test

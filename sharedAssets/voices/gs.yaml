@@ -1,0 +1,4712 @@
+# Roland GS melodic voices (tones).
+#
+# Transcribed from the SC-8850 Owner's Manual, Instrument List, using the SC-8850 map's names. `program` is
+# 1-based, as the manual prints it; `msb` is the variation number (controller 0). The LSB (controller 32) only
+# picks between the SC-55, SC-88, SC-88Pro and SC-8850 sound maps, so it isn't part of the key.
+# A voice with no `look` appears as the General MIDI voice with the same program (its capital tone).
+#
+# Transcribed in full: the Instrument List (pages 167-185) and the CM-64 map (page 186). Names ending in
+# "(legato)" are the manual's legato-enabled sounds, which it marks with a trailing colon.
+# A voice marked `look: None` is a different sound from its program's instrument (a door is not a telephone), so
+# it puts nothing on stage rather than the wrong thing.
+
+
+# Instrument List, page 167: Piano
+- program: 1
+  msb: 0
+  name: "Piano 1"
+- program: 1
+  msb: 1
+  name: "UprightPiano"
+- program: 1
+  msb: 2
+  name: "Mild Piano"
+- program: 1
+  msb: 8
+  name: "Upright P w"
+- program: 1
+  msb: 9
+  name: "Mild Piano w"
+- program: 1
+  msb: 16
+  name: "European Pf"
+- program: 1
+  msb: 24
+  name: "Piano + Str."
+- program: 1
+  msb: 25
+  name: "Piano + Str2"
+- program: 1
+  msb: 26
+  name: "Piano+Choir1"
+- program: 1
+  msb: 27
+  name: "Piano+Choir2"
+- program: 2
+  msb: 0
+  name: "Piano 2"
+- program: 2
+  msb: 1
+  name: "Pop Piano"
+- program: 2
+  msb: 2
+  name: "Rock Piano"
+- program: 2
+  msb: 8
+  name: "Pop Piano w"
+- program: 2
+  msb: 9
+  name: "Rock Piano w"
+- program: 2
+  msb: 16
+  name: "Dance Piano"
+- program: 3
+  msb: 0
+  name: "Piano 3"
+- program: 3
+  msb: 1
+  name: "EG+Rhodes 1"
+- program: 3
+  msb: 2
+  name: "EG+Rhodes 2"
+- program: 3
+  msb: 8
+  name: "Piano 3w"
+- program: 4
+  msb: 0
+  name: "Honky-tonk"
+- program: 4
+  msb: 8
+  name: "Honky-tonk 2"
+- program: 5
+  msb: 0
+  name: "E.Piano 1"
+- program: 5
+  msb: 8
+  name: "St.Soft EP"
+- program: 5
+  msb: 9
+  name: "Cho. E.Piano"
+- program: 5
+  msb: 10
+  name: "SilentRhodes"
+- program: 5
+  msb: 16
+  name: "FM+SA EP"
+- program: 5
+  msb: 17
+  name: "Dist E.Piano"
+- program: 5
+  msb: 24
+  name: "Wurly"
+- program: 5
+  msb: 25
+  name: "Hard Rhodes"
+- program: 5
+  msb: 26
+  name: "MellowRhodes"
+- program: 6
+  msb: 0
+  name: "E.Piano 2"
+- program: 6
+  msb: 1
+  name: "E.Piano 3"
+- program: 6
+  msb: 8
+  name: "Detuned EP 2"
+- program: 6
+  msb: 9
+  name: "Detuned EP 3"
+- program: 6
+  msb: 10
+  name: "EP Legend"
+- program: 6
+  msb: 16
+  name: "St.FM EP"
+- program: 6
+  msb: 24
+  name: "Hard FM EP"
+- program: 6
+  msb: 32
+  name: "EP Phase"
+- program: 7
+  msb: 0
+  name: "Harpsichord"
+- program: 7
+  msb: 1
+  name: "Harpsichord2"
+- program: 7
+  msb: 2
+  name: "Harpsichord3"
+- program: 7
+  msb: 8
+  name: "Coupled Hps."
+- program: 7
+  msb: 16
+  name: "Harpsi.w"
+- program: 7
+  msb: 24
+  name: "Harpsi.o"
+- program: 7
+  msb: 32
+  name: "Synth Harpsi"
+- program: 8
+  msb: 0
+  name: "Clav."
+- program: 8
+  msb: 1
+  name: "Clav. 2"
+- program: 8
+  msb: 2
+  name: "Atk Clav.1"
+- program: 8
+  msb: 3
+  name: "Atk Clav.2"
+- program: 8
+  msb: 8
+  name: "Comp Clav."
+- program: 8
+  msb: 16
+  name: "Reso Clav."
+- program: 8
+  msb: 17
+  name: "Phase Clav"
+- program: 8
+  msb: 24
+  name: "Clav.o"
+- program: 8
+  msb: 32
+  name: "Analog Clav."
+- program: 8
+  msb: 33
+  name: "JP8 Clav. 1"
+- program: 8
+  msb: 35
+  name: "JP8 Clav. 2"
+- program: 8
+  msb: 36
+  name: "SynRingClav."
+- program: 8
+  msb: 37
+  name: "SynDistClav."
+- program: 8
+  msb: 38
+  name: "JP8000 Clav."
+- program: 8
+  msb: 39
+  name: "Pulse Clav"
+
+# Instrument List, page 168: Chromatic percussion
+- program: 9
+  msb: 0
+  name: "Celesta"
+- program: 9
+  msb: 1
+  name: "Pop Celesta"
+- program: 10
+  msb: 0
+  name: "Glockenspiel"
+- program: 11
+  msb: 0
+  name: "Music Box"
+- program: 11
+  msb: 1
+  name: "Music Box 2"
+- program: 11
+  msb: 8
+  name: "St.Music Box"
+- program: 12
+  msb: 0
+  name: "Vibraphone"
+- program: 12
+  msb: 1
+  name: "Pop Vibe."
+- program: 12
+  msb: 8
+  name: "Vibraphone w"
+- program: 12
+  msb: 9
+  name: "Vibraphones"
+- program: 13
+  msb: 0
+  name: "Marimba"
+- program: 13
+  msb: 8
+  name: "Marimba w"
+- program: 13
+  msb: 16
+  name: "Barafon"
+- program: 13
+  msb: 17
+  name: "Barafon 2"
+- program: 13
+  msb: 24
+  name: "Log drum"
+- program: 14
+  msb: 0
+  name: "Xylophone"
+- program: 14
+  msb: 8
+  name: "Xylophone w"
+- program: 15
+  msb: 0
+  name: "Tubular-bell"
+- program: 15
+  msb: 8
+  name: "Church Bell"
+- program: 15
+  msb: 9
+  name: "Carillon"
+- program: 15
+  msb: 10
+  name: "Church Bell2"
+- program: 15
+  msb: 16
+  name: "Tubularbellw"
+- program: 16
+  msb: 0
+  name: "Santur"
+- program: 16
+  msb: 1
+  name: "Santur 2"
+- program: 16
+  msb: 2
+  name: "Santur 3"
+- program: 16
+  msb: 8
+  name: "Cimbalom"
+- program: 16
+  msb: 16
+  name: "Zither 1"
+- program: 16
+  msb: 17
+  name: "Zither 2"
+- program: 16
+  msb: 24
+  name: "Dulcimer"
+
+# Instrument List, page 169: Organ
+- program: 17
+  msb: 0
+  name: "Organ 1"
+- program: 17
+  msb: 1
+  name: "Organ 101"
+- program: 17
+  msb: 2
+  name: "Ful Organ 1"
+- program: 17
+  msb: 3
+  name: "Ful Organ 2"
+- program: 17
+  msb: 4
+  name: "Ful Organ 3"
+- program: 17
+  msb: 5
+  name: "Ful Organ 4"
+- program: 17
+  msb: 6
+  name: "Ful Organ 5"
+- program: 17
+  msb: 7
+  name: "Ful Organ 6"
+- program: 17
+  msb: 8
+  name: "Trem. Organ"
+- program: 17
+  msb: 9
+  name: "Organ o"
+- program: 17
+  msb: 10
+  name: "Ful Organ 7"
+- program: 17
+  msb: 11
+  name: "Ful Organ 8"
+- program: 17
+  msb: 12
+  name: "Ful Organ 9"
+- program: 17
+  msb: 16
+  name: "60's Organ 1"
+- program: 17
+  msb: 17
+  name: "60's Organ 2"
+- program: 17
+  msb: 18
+  name: "60's Organ 3"
+- program: 17
+  msb: 19
+  name: "Farf Organ"
+- program: 17
+  msb: 24
+  name: "Cheese Organ"
+- program: 17
+  msb: 25
+  name: "D-50 Organ"
+- program: 17
+  msb: 26
+  name: "JUNO Organ"
+- program: 17
+  msb: 27
+  name: "Hybrid Organ"
+- program: 17
+  msb: 28
+  name: "VS Organ"
+- program: 17
+  msb: 29
+  name: "Digi Church"
+- program: 17
+  msb: 30
+  name: "JX-8P Organ"
+- program: 17
+  msb: 31
+  name: "FM Organ"
+- program: 17
+  msb: 32
+  name: "70's E.Organ"
+- program: 17
+  msb: 33
+  name: "Even Bar"
+- program: 17
+  msb: 40
+  name: "Organ Bass"
+- program: 17
+  msb: 48
+  name: "5th Organ"
+- program: 18
+  msb: 0
+  name: "Organ 2"
+- program: 18
+  msb: 1
+  name: "Jazz Organ"
+- program: 18
+  msb: 2
+  name: "E.Organ 16+2"
+- program: 18
+  msb: 3
+  name: "Jazz Organ 2"
+- program: 18
+  msb: 4
+  name: "Jazz Organ 3"
+- program: 18
+  msb: 5
+  name: "Jazz Organ 4"
+- program: 18
+  msb: 6
+  name: "Jazz Organ 5"
+- program: 18
+  msb: 7
+  name: "Jazz Organ 6"
+- program: 18
+  msb: 8
+  name: "Chorus Or.2"
+- program: 18
+  msb: 9
+  name: "Octave Organ"
+- program: 18
+  msb: 32
+  name: "Perc. Organ"
+- program: 18
+  msb: 33
+  name: "Perc.Organ 2"
+- program: 18
+  msb: 34
+  name: "Perc.Organ 3"
+- program: 18
+  msb: 35
+  name: "Perc.Organ 4"
+- program: 19
+  msb: 0
+  name: "Organ 3"
+- program: 19
+  msb: 8
+  name: "Rotary Org."
+- program: 19
+  msb: 16
+  name: "Rotary Org.S"
+- program: 19
+  msb: 17
+  name: "Rock Organ 1"
+- program: 19
+  msb: 18
+  name: "Rock Organ 2"
+- program: 19
+  msb: 24
+  name: "Rotary Org.F"
+- program: 20
+  msb: 0
+  name: "Church Org.1"
+- program: 20
+  msb: 8
+  name: "Church Org.2"
+- program: 20
+  msb: 16
+  name: "Church Org.3"
+- program: 20
+  msb: 24
+  name: "Organ Flute"
+- program: 20
+  msb: 32
+  name: "Trem.Flute"
+- program: 20
+  msb: 33
+  name: "Theater Org."
+- program: 21
+  msb: 0
+  name: "Reed Organ"
+- program: 21
+  msb: 8
+  name: "Wind Organ"
+- program: 21
+  msb: 16
+  name: "Puff Organ"
+- program: 22
+  msb: 0
+  name: "Accordion Fr"
+- program: 22
+  msb: 8
+  name: "Accordion It"
+- program: 22
+  msb: 9
+  name: "Dist. Accord"
+- program: 22
+  msb: 16
+  name: "Cho. Accord"
+- program: 22
+  msb: 24
+  name: "Hard Accord"
+- program: 22
+  msb: 25
+  name: "Soft Accord"
+- program: 23
+  msb: 0
+  name: "Harmonica"
+- program: 23
+  msb: 1
+  name: "Harmonica 2"
+- program: 23
+  msb: 8
+  name: "B.Harp Basic"
+- program: 23
+  msb: 9
+  name: "B.Harp Suppl"
+- program: 24
+  msb: 0
+  name: "Bandoneon"
+- program: 24
+  msb: 8
+  name: "Bandoneon 2"
+- program: 24
+  msb: 16
+  name: "Bandoneon 3"
+
+# Instrument List, page 170: Guitar
+- program: 25
+  msb: 0
+  name: "Nylon-str.Gt"
+- program: 25
+  msb: 8
+  name: "Ukulele"
+- program: 25
+  msb: 16
+  name: "Nylon Gt.o"
+- program: 25
+  msb: 24
+  name: "Velo Harmnix"
+- program: 25
+  msb: 32
+  name: "Nylon Gt.2"
+- program: 25
+  msb: 40
+  name: "Lequint Gt."
+- program: 26
+  msb: 0
+  name: "Steel-str.Gt"
+- program: 26
+  msb: 8
+  name: "12-str.Gt"
+- program: 26
+  msb: 9
+  name: "Nylon+Steel"
+- program: 26
+  msb: 10
+  name: "Atk Steel Gt"
+- program: 26
+  msb: 16
+  name: "Mandolin"
+- program: 26
+  msb: 17
+  name: "Mandolin 2"
+- program: 26
+  msb: 18
+  name: "MandolinTrem"
+- program: 26
+  msb: 32
+  name: "Steel Gt.2"
+- program: 26
+  msb: 33
+  name: "Steel + Body"
+- program: 27
+  msb: 0
+  name: "Jazz Gt."
+- program: 27
+  msb: 1
+  name: "Mellow Gt."
+- program: 27
+  msb: 8
+  name: "Pedal Steel"
+- program: 28
+  msb: 0
+  name: "Clean Gt."
+- program: 28
+  msb: 1
+  name: "Clean Half"
+- program: 28
+  msb: 2
+  name: "Open Hard 1"
+- program: 28
+  msb: 3
+  name: "Open Hard 2"
+- program: 28
+  msb: 4
+  name: "JC Clean Gt."
+- program: 28
+  msb: 5
+  name: "Atk CleanGt."
+- program: 28
+  msb: 8
+  name: "Chorus Gt."
+- program: 28
+  msb: 9
+  name: "JC Chorus Gt"
+- program: 28
+  msb: 16
+  name: "TC FrontPick"
+- program: 28
+  msb: 17
+  name: "TC Rear Pick"
+- program: 28
+  msb: 18
+  name: "TC Clean ff"
+- program: 28
+  msb: 19
+  name: "TC Clean 2 (legato)"
+- program: 28
+  msb: 20
+  name: "LP Rear Pick"
+- program: 28
+  msb: 21
+  name: "LP Rear 2"
+- program: 28
+  msb: 22
+  name: "LP RearAtack"
+- program: 28
+  msb: 23
+  name: "Mid Tone GTR"
+- program: 28
+  msb: 24
+  name: "Chung Ruan"
+- program: 28
+  msb: 25
+  name: "Chung Ruan 2"
+- program: 29
+  msb: 0
+  name: "Muted Gt."
+- program: 29
+  msb: 1
+  name: "Muted Dis.Gt"
+- program: 29
+  msb: 2
+  name: "TC Muted Gt."
+- program: 29
+  msb: 8
+  name: "Funk Pop"
+- program: 29
+  msb: 16
+  name: "Funk Gt.2"
+- program: 29
+  msb: 24
+  name: "Jazz Man"
+  look: Guitar.Jazz
+- program: 30
+  msb: 0
+  name: "Overdrive Gt"
+- program: 30
+  msb: 1
+  name: "Overdrive 2"
+- program: 30
+  msb: 2
+  name: "Overdrive 3"
+- program: 30
+  msb: 3
+  name: "More Drive"
+- program: 30
+  msb: 4
+  name: "Guitar Pinch"
+- program: 30
+  msb: 5
+  name: "Attack Drive"
+- program: 30
+  msb: 8
+  name: "LP OverDrvGt"
+- program: 30
+  msb: 9
+  name: "LP OverDrv (legato)"
+- program: 30
+  msb: 10
+  name: "LP Half Drv"
+- program: 30
+  msb: 11
+  name: "LP Half Drv2"
+- program: 30
+  msb: 12
+  name: "LP Chorus"
+- program: 31
+  msb: 0
+  name: "DistortionGt"
+- program: 31
+  msb: 1
+  name: "Dist. Gt2 (legato)"
+- program: 31
+  msb: 2
+  name: "Dazed Guitar"
+- program: 31
+  msb: 3
+  name: "Distortion (legato)"
+- program: 31
+  msb: 4
+  name: "Dist.Fast (legato)"
+- program: 31
+  msb: 5
+  name: "Attack Dist"
+- program: 31
+  msb: 8
+  name: "Feedback Gt."
+- program: 31
+  msb: 9
+  name: "Feedback Gt2"
+- program: 31
+  msb: 16
+  name: "Power Guitar"
+- program: 31
+  msb: 17
+  name: "Power Gt.2"
+- program: 31
+  msb: 18
+  name: "5th Dist."
+- program: 31
+  msb: 24
+  name: "Rock Rhythm"
+- program: 31
+  msb: 25
+  name: "Rock Rhythm2"
+- program: 31
+  msb: 26
+  name: "Dist Rtm GTR"
+- program: 32
+  msb: 0
+  name: "Gt.Harmonics"
+- program: 32
+  msb: 8
+  name: "Gt. Feedback"
+- program: 32
+  msb: 9
+  name: "Gt.Feedback2"
+- program: 32
+  msb: 16
+  name: "Ac.Gt.Harmnx"
+- program: 32
+  msb: 24
+  name: "E.Bass Harm."
+  look: BassGuitar.Standard
+
+# Instrument List, pages 171-172: Bass
+- program: 33
+  msb: 0
+  name: "Acoustic Bs."
+- program: 33
+  msb: 1
+  name: "Rockabilly"
+- program: 33
+  msb: 8
+  name: "Wild A.Bass"
+- program: 33
+  msb: 9
+  name: "Atk A.Bass"
+- program: 33
+  msb: 16
+  name: "Bass + OHH"
+- program: 34
+  msb: 0
+  name: "Fingered Bs."
+- program: 34
+  msb: 1
+  name: "Fingered Bs2"
+- program: 34
+  msb: 2
+  name: "Jazz Bass"
+- program: 34
+  msb: 3
+  name: "Jazz Bass 2"
+- program: 34
+  msb: 4
+  name: "Rock Bass"
+- program: 34
+  msb: 5
+  name: "Heart Bass"
+- program: 34
+  msb: 6
+  name: "AttackFinger"
+- program: 34
+  msb: 7
+  name: "Finger Slap"
+- program: 34
+  msb: 8
+  name: "ChorusJazzBs"
+- program: 34
+  msb: 16
+  name: "F.Bass/Harm."
+- program: 35
+  msb: 0
+  name: "Picked Bass"
+- program: 35
+  msb: 1
+  name: "Picked Bass2"
+- program: 35
+  msb: 2
+  name: "Picked Bass3"
+- program: 35
+  msb: 3
+  name: "Picked Bass4"
+- program: 35
+  msb: 4
+  name: "Double Pick"
+- program: 35
+  msb: 8
+  name: "Muted PickBs"
+- program: 35
+  msb: 16
+  name: "P.Bass/Harm."
+- program: 36
+  msb: 0
+  name: "Fretless Bs."
+- program: 36
+  msb: 1
+  name: "Fretless Bs2"
+- program: 36
+  msb: 2
+  name: "Fretless Bs3"
+- program: 36
+  msb: 3
+  name: "Fretless Bs4"
+- program: 36
+  msb: 4
+  name: "Syn Fretless"
+- program: 36
+  msb: 5
+  name: "Mr.Smooth"
+- program: 36
+  msb: 8
+  name: "Wood+FlessBs"
+- program: 37
+  msb: 0
+  name: "Slap Bass 1"
+- program: 37
+  msb: 1
+  name: "Slap Pop"
+- program: 37
+  msb: 8
+  name: "Reso Slap"
+- program: 37
+  msb: 9
+  name: "Unison Slap"
+- program: 38
+  msb: 0
+  name: "Slap Bass 2"
+- program: 38
+  msb: 1
+  name: "Slap Bass 3"
+- program: 38
+  msb: 8
+  name: "FM Slap"
+- program: 39
+  msb: 0
+  name: "Synth Bass 1"
+- program: 39
+  msb: 1
+  name: "SynthBass101"
+- program: 39
+  msb: 2
+  name: "CS Bass"
+- program: 39
+  msb: 3
+  name: "JP-4 Bass"
+- program: 39
+  msb: 4
+  name: "JP-8 Bass"
+- program: 39
+  msb: 5
+  name: "P5 Bass"
+- program: 39
+  msb: 6
+  name: "JPMG Bass"
+- program: 39
+  msb: 8
+  name: "Acid Bass"
+- program: 39
+  msb: 9
+  name: "TB303 Bass"
+- program: 39
+  msb: 10
+  name: "Tekno Bass"
+- program: 39
+  msb: 11
+  name: "TB303 Bass 2"
+- program: 39
+  msb: 12
+  name: "Kicked TB303"
+- program: 39
+  msb: 13
+  name: "TB303 Saw Bs"
+- program: 39
+  msb: 14
+  name: "Rubber303 Bs"
+- program: 39
+  msb: 15
+  name: "Reso 303 Bs"
+- program: 39
+  msb: 16
+  name: "Reso SH Bass"
+- program: 39
+  msb: 17
+  name: "TB303 Sqr Bs"
+- program: 39
+  msb: 18
+  name: "TB303 DistBs"
+- program: 39
+  msb: 19
+  name: "Clavi Bass"
+- program: 39
+  msb: 20
+  name: "Hammer"
+- program: 39
+  msb: 21
+  name: "Jungle Bass"
+- program: 39
+  msb: 22
+  name: "Square Bass"
+- program: 39
+  msb: 23
+  name: "Square Bass2"
+- program: 39
+  msb: 24
+  name: "Arpeggio Bs"
+- program: 39
+  msb: 32
+  name: "Hit&Saw Bass"
+- program: 39
+  msb: 33
+  name: "Ring Bass"
+- program: 39
+  msb: 34
+  name: "AtkSineBass"
+- program: 39
+  msb: 35
+  name: "OB sine Bass"
+- program: 39
+  msb: 36
+  name: "Auxiliary Bs"
+- program: 39
+  msb: 40
+  name: "303SqDistBs"
+- program: 39
+  msb: 41
+  name: "303SqDistBs2"
+- program: 39
+  msb: 42
+  name: "303SqDistBs3"
+- program: 39
+  msb: 43
+  name: "303Sqr.Rev"
+- program: 39
+  msb: 44
+  name: "TeeBee"
+- program: 40
+  msb: 0
+  name: "Synth Bass 2"
+- program: 40
+  msb: 1
+  name: "SynthBass201"
+- program: 40
+  msb: 2
+  name: "Modular Bass"
+- program: 40
+  msb: 3
+  name: "Seq Bass"
+- program: 40
+  msb: 4
+  name: "MG Bass"
+- program: 40
+  msb: 5
+  name: "Mg Oct Bass1"
+- program: 40
+  msb: 6
+  name: "MG Oct Bass2"
+- program: 40
+  msb: 7
+  name: "MG Blip Bs (legato)"
+- program: 40
+  msb: 8
+  name: "Beef FM Bass"
+- program: 40
+  msb: 9
+  name: "Dly Bass"
+- program: 40
+  msb: 10
+  name: "X Wire Bass"
+- program: 40
+  msb: 11
+  name: "WireStr Bass"
+- program: 40
+  msb: 12
+  name: "Blip Bass (legato)"
+- program: 40
+  msb: 13
+  name: "RubberBass 1"
+- program: 40
+  msb: 14
+  name: "Syn Bell Bs"
+- program: 40
+  msb: 15
+  name: "Odd Bass"
+- program: 40
+  msb: 16
+  name: "RubberBass 2"
+- program: 40
+  msb: 17
+  name: "SH101 Bass 1"
+- program: 40
+  msb: 18
+  name: "SH101 Bass 2"
+- program: 40
+  msb: 19
+  name: "Smooth Bass"
+- program: 40
+  msb: 20
+  name: "SH101 Bass 3"
+- program: 40
+  msb: 21
+  name: "Spike Bass"
+- program: 40
+  msb: 22
+  name: "House Bass (legato)"
+- program: 40
+  msb: 23
+  name: "KG Bass"
+- program: 40
+  msb: 24
+  name: "Sync Bass"
+- program: 40
+  msb: 25
+  name: "MG 5th Bass"
+- program: 40
+  msb: 26
+  name: "RND Bass"
+- program: 40
+  msb: 27
+  name: "WowMG Bass"
+- program: 40
+  msb: 28
+  name: "Bubble Bass"
+- program: 40
+  msb: 29
+  name: "Attack Pulse"
+- program: 40
+  msb: 30
+  name: "Sync Bass 2"
+- program: 40
+  msb: 31
+  name: "Pulse Mix Bs"
+- program: 40
+  msb: 32
+  name: "MG Dist Bass"
+- program: 40
+  msb: 33
+  name: "Seq Bass 2"
+- program: 40
+  msb: 34
+  name: "3rd Bass"
+- program: 40
+  msb: 35
+  name: "MG Oct Bass"
+- program: 40
+  msb: 36
+  name: "SlowEnvBass"
+- program: 40
+  msb: 37
+  name: "Mild Bass"
+- program: 40
+  msb: 38
+  name: "DistEnvBass"
+- program: 40
+  msb: 39
+  name: "MG LightBass"
+- program: 40
+  msb: 40
+  name: "DistSynBass"
+- program: 40
+  msb: 41
+  name: "Rise Bass"
+- program: 40
+  msb: 42
+  name: "Cyber Bass"
+
+# Instrument List, page 172: Strings/orchestra
+- program: 41
+  msb: 0
+  name: "Violin (legato)"
+- program: 41
+  msb: 1
+  name: "Violin Atk (legato)"
+- program: 41
+  msb: 8
+  name: "Slow Violin"
+- program: 42
+  msb: 0
+  name: "Viola (legato)"
+- program: 42
+  msb: 1
+  name: "Viola Atk. (legato)"
+- program: 43
+  msb: 0
+  name: "Cello (legato)"
+- program: 43
+  msb: 1
+  name: "Cello Atk. (legato)"
+- program: 44
+  msb: 0
+  name: "Contrabass"
+- program: 45
+  msb: 0
+  name: "Tremolo Str"
+- program: 45
+  msb: 2
+  name: "Trem Str.St."
+- program: 45
+  msb: 8
+  name: "Slow Tremolo"
+- program: 45
+  msb: 9
+  name: "Suspense Str"
+- program: 45
+  msb: 10
+  name: "SuspenseStr2"
+- program: 46
+  msb: 0
+  name: "PizzicatoStr"
+- program: 46
+  msb: 1
+  name: "Vcs&Cbs Pizz"
+- program: 46
+  msb: 2
+  name: "Chamber Pizz"
+- program: 46
+  msb: 3
+  name: "St.Pizzicato"
+- program: 46
+  msb: 8
+  name: "Solo Pizz."
+- program: 46
+  msb: 16
+  name: "Solo Spic."
+- program: 46
+  msb: 17
+  name: "StringsSpic."
+- program: 47
+  msb: 0
+  name: "Harp"
+- program: 47
+  msb: 1
+  name: "Harp&Strings"
+- program: 47
+  msb: 2
+  name: "Harp St."
+- program: 47
+  msb: 8
+  name: "Uillean Harp"
+- program: 47
+  msb: 16
+  name: "Synth Harp"
+- program: 47
+  msb: 24
+  name: "Yang Qin"
+- program: 47
+  msb: 25
+  name: "Yang Qin 2"
+- program: 47
+  msb: 26
+  name: "SynthYangQin"
+- program: 48
+  msb: 0
+  name: "Timpani"
+
+# Instrument List, pages 173-174: Ensemble
+- program: 49
+  msb: 0
+  name: "Strings"
+- program: 49
+  msb: 1
+  name: "Bright Str (legato)"
+- program: 49
+  msb: 2
+  name: "ChamberStr"
+- program: 49
+  msb: 3
+  name: "Cello sect."
+- program: 49
+  msb: 4
+  name: "Bright Str.2"
+- program: 49
+  msb: 5
+  name: "Bright Str.3"
+- program: 49
+  msb: 6
+  name: "Quad Strings"
+- program: 49
+  msb: 7
+  name: "Mild Strings"
+- program: 49
+  msb: 8
+  name: "Orchestra"
+- program: 49
+  msb: 9
+  name: "Orchestra 2"
+- program: 49
+  msb: 10
+  name: "Tremolo Orch"
+- program: 49
+  msb: 11
+  name: "Choir Str."
+- program: 49
+  msb: 12
+  name: "Strings+Horn"
+- program: 49
+  msb: 13
+  name: "Str.+Flute"
+- program: 49
+  msb: 14
+  name: "Choir Str.2"
+- program: 49
+  msb: 15
+  name: "Choir Str.3"
+- program: 49
+  msb: 16
+  name: "St. Strings"
+- program: 49
+  msb: 17
+  name: "St.Strings 2"
+- program: 49
+  msb: 18
+  name: "St.Strings 3"
+- program: 49
+  msb: 19
+  name: "Orchestra 3"
+- program: 49
+  msb: 20
+  name: "Orchestra 4"
+- program: 49
+  msb: 24
+  name: "Velo Strings"
+- program: 49
+  msb: 32
+  name: "Oct Strings1"
+- program: 49
+  msb: 33
+  name: "Oct Strings2"
+- program: 49
+  msb: 34
+  name: "ContraBsSect"
+- program: 49
+  msb: 40
+  name: "60s Strings"
+- program: 50
+  msb: 0
+  name: "Slow Strings"
+- program: 50
+  msb: 1
+  name: "SlowStrings2"
+- program: 50
+  msb: 2
+  name: "SlowStrings3"
+- program: 50
+  msb: 8
+  name: "Legato Str."
+- program: 50
+  msb: 9
+  name: "Warm Strings"
+- program: 50
+  msb: 10
+  name: "St.Slow Str."
+- program: 50
+  msb: 11
+  name: "St.Slow Str2"
+- program: 50
+  msb: 12
+  name: "S.Str+Choir"
+- program: 50
+  msb: 13
+  name: "S.Str+Choir2"
+- program: 51
+  msb: 0
+  name: "Syn.Strings1"
+- program: 51
+  msb: 1
+  name: "OB Strings"
+- program: 51
+  msb: 2
+  name: "StackStrings"
+- program: 51
+  msb: 3
+  name: "JP Strings"
+- program: 51
+  msb: 4
+  name: "Chorus Str."
+- program: 51
+  msb: 8
+  name: "Syn.Strings3"
+- program: 51
+  msb: 9
+  name: "Syn.Strings4"
+- program: 51
+  msb: 10
+  name: "Syn.Strings6"
+- program: 51
+  msb: 11
+  name: "Syn.Strings7"
+- program: 51
+  msb: 12
+  name: "LoFi Strings"
+- program: 51
+  msb: 16
+  name: "High Strings"
+- program: 51
+  msb: 17
+  name: "Hybrid Str."
+- program: 51
+  msb: 24
+  name: "Tron Strings"
+- program: 51
+  msb: 25
+  name: "Noiz Strings"
+- program: 52
+  msb: 0
+  name: "Syn.Strings2"
+- program: 52
+  msb: 1
+  name: "Syn.Strings5"
+- program: 52
+  msb: 2
+  name: "JUNO Strings"
+- program: 52
+  msb: 3
+  name: "FilteredOrch"
+- program: 52
+  msb: 4
+  name: "JP Saw Str."
+- program: 52
+  msb: 5
+  name: "Hybrid Str.2"
+- program: 52
+  msb: 6
+  name: "DistStrings"
+- program: 52
+  msb: 7
+  name: "JUNOFullStr."
+- program: 52
+  msb: 8
+  name: "Air Strings"
+- program: 52
+  msb: 9
+  name: "Atk Syn Str."
+- program: 52
+  msb: 10
+  name: "StraightStr."
+- program: 53
+  msb: 0
+  name: "Choir Aahs"
+- program: 53
+  msb: 8
+  name: "St.ChoirAahs"
+- program: 53
+  msb: 9
+  name: "Melted Choir"
+- program: 53
+  msb: 10
+  name: "Church Choir"
+- program: 53
+  msb: 11
+  name: "Boys Choir 1"
+- program: 53
+  msb: 12
+  name: "Boys Choir 2"
+- program: 53
+  msb: 13
+  name: "St.BoysChoir"
+- program: 53
+  msb: 14
+  name: "Rich Choir"
+- program: 53
+  msb: 16
+  name: "Choir Hahs"
+- program: 53
+  msb: 24
+  name: "Chorus Lahs"
+- program: 53
+  msb: 32
+  name: "Chorus Aahs"
+- program: 53
+  msb: 33
+  name: "Male Aah+Str"
+- program: 54
+  msb: 0
+  name: "Voice Oohs"
+- program: 54
+  msb: 1
+  name: "Chorus Oohs"
+- program: 54
+  msb: 2
+  name: "Voice Oohs 2"
+- program: 54
+  msb: 3
+  name: "Chorus Oohs2"
+- program: 54
+  msb: 4
+  name: "OohsCodeMaj7"
+- program: 54
+  msb: 5
+  name: "OohsCodeSus4"
+- program: 54
+  msb: 6
+  name: "Jazz Scat"
+- program: 54
+  msb: 8
+  name: "Voice Dahs"
+- program: 54
+  msb: 9
+  name: "JzVoice Dat"
+- program: 54
+  msb: 10
+  name: "JzVoice Bap"
+- program: 54
+  msb: 11
+  name: "JzVoice Dow"
+- program: 54
+  msb: 12
+  name: "JzVoice Thum"
+- program: 54
+  msb: 16
+  name: "VoiceLah Fem"
+- program: 54
+  msb: 17
+  name: "ChorusLahFem"
+- program: 54
+  msb: 18
+  name: "VoiceLuh Fem"
+- program: 54
+  msb: 19
+  name: "ChorusLuhFem"
+- program: 54
+  msb: 20
+  name: "VoiceLan Fem"
+- program: 54
+  msb: 21
+  name: "ChorusLanFem"
+- program: 54
+  msb: 22
+  name: "VoiceAah Fem"
+- program: 54
+  msb: 23
+  name: "VoiceUuh Fem"
+- program: 54
+  msb: 24
+  name: "Fem Lah&Lan"
+- program: 54
+  msb: 32
+  name: "VoiceWah Mal"
+- program: 54
+  msb: 33
+  name: "ChorusWahMal"
+- program: 54
+  msb: 34
+  name: "VoiceWoh Mal"
+- program: 54
+  msb: 35
+  name: "ChorusWohMal"
+- program: 54
+  msb: 36
+  name: "VoiceAah Mal"
+- program: 54
+  msb: 37
+  name: "VoiceOoh Mal"
+- program: 54
+  msb: 40
+  name: "Humming"
+- program: 55
+  msb: 0
+  name: "SynVox"
+- program: 55
+  msb: 1
+  name: "SynVox 2"
+- program: 55
+  msb: 2
+  name: "SynVox 3"
+- program: 55
+  msb: 8
+  name: "Syn.Voice"
+- program: 55
+  msb: 9
+  name: "Silent Night"
+- program: 55
+  msb: 10
+  name: "Syn.Voice 2"
+- program: 55
+  msb: 16
+  name: "VP330 Choir"
+- program: 55
+  msb: 17
+  name: "Vinyl Choir"
+- program: 55
+  msb: 18
+  name: "JX8P Vox"
+- program: 55
+  msb: 19
+  name: "Analog Voice"
+- program: 56
+  msb: 0
+  name: "OrchestraHit"
+- program: 56
+  msb: 1
+  name: "Bass Hit"
+- program: 56
+  msb: 2
+  name: "6th Hit"
+- program: 56
+  msb: 3
+  name: "Euro Hit"
+- program: 56
+  msb: 8
+  name: "Impact Hit"
+- program: 56
+  msb: 9
+  name: "Philly Hit"
+- program: 56
+  msb: 10
+  name: "Double Hit"
+- program: 56
+  msb: 11
+  name: "Perc. Hit"
+- program: 56
+  msb: 12
+  name: "Shock Wave"
+- program: 56
+  msb: 13
+  name: "Bounce Hit"
+- program: 56
+  msb: 14
+  name: "Drill Hit"
+- program: 56
+  msb: 15
+  name: "Thrill Hit"
+- program: 56
+  msb: 16
+  name: "Lo Fi Rave"
+- program: 56
+  msb: 17
+  name: "Techno Hit"
+- program: 56
+  msb: 18
+  name: "Dist. Hit"
+- program: 56
+  msb: 19
+  name: "Bam Hit"
+- program: 56
+  msb: 20
+  name: "Bit Hit"
+- program: 56
+  msb: 21
+  name: "Bim Hit"
+- program: 56
+  msb: 22
+  name: "Technorg Hit"
+- program: 56
+  msb: 23
+  name: "Rave Hit"
+- program: 56
+  msb: 24
+  name: "Strings Hit"
+- program: 56
+  msb: 25
+  name: "Stack Hit"
+- program: 56
+  msb: 26
+  name: "Industry Hit"
+- program: 56
+  msb: 27
+  name: "Clap Hit"
+
+# Instrument List, pages 175-176: Brass
+- program: 57
+  msb: 0
+  name: "Trumpet"
+- program: 57
+  msb: 1
+  name: "Trumpet 2"
+- program: 57
+  msb: 2
+  name: "Trumpet (legato)"
+- program: 57
+  msb: 3
+  name: "Dark Trumpet"
+- program: 57
+  msb: 4
+  name: "Trumpet & Nz"
+- program: 57
+  msb: 8
+  name: "Flugel Horn"
+- program: 57
+  msb: 16
+  name: "4th Trumpets"
+- program: 57
+  msb: 24
+  name: "Bright Tp."
+- program: 57
+  msb: 25
+  name: "Warm Tp."
+- program: 57
+  msb: 26
+  name: "Warm Tp.2"
+- program: 57
+  msb: 27
+  name: "Twin Tp."
+- program: 57
+  msb: 32
+  name: "Syn. Trumpet"
+- program: 58
+  msb: 0
+  name: "Trombone"
+- program: 58
+  msb: 1
+  name: "Trombone 2"
+- program: 58
+  msb: 2
+  name: "Twin bones"
+- program: 58
+  msb: 3
+  name: "Bones & Tuba"
+- program: 58
+  msb: 4
+  name: "Bright Tb"
+- program: 58
+  msb: 8
+  name: "Bs. Trombone"
+- program: 58
+  msb: 16
+  name: "Euphonium"
+  look: Tuba
+- program: 59
+  msb: 0
+  name: "Tuba"
+- program: 59
+  msb: 1
+  name: "Tuba 2"
+- program: 59
+  msb: 8
+  name: "Tuba + Horn"
+- program: 60
+  msb: 0
+  name: "MutedTrumpet"
+- program: 60
+  msb: 1
+  name: "Cup Mute Tp"
+- program: 60
+  msb: 2
+  name: "MuteTrumpet2"
+- program: 60
+  msb: 3
+  name: "MuteTrumpet3"
+- program: 60
+  msb: 8
+  name: "Muted Horns"
+- program: 61
+  msb: 0
+  name: "French Horns"
+- program: 61
+  msb: 1
+  name: "Fr.Horn 2"
+- program: 61
+  msb: 2
+  name: "Horn + Orche"
+- program: 61
+  msb: 3
+  name: "Wide FreHrns"
+- program: 61
+  msb: 8
+  name: "F.Hrn Slow (legato)"
+- program: 61
+  msb: 9
+  name: "Dual Horns"
+- program: 61
+  msb: 16
+  name: "Synth Horn"
+- program: 61
+  msb: 24
+  name: "F.Horn Rip"
+- program: 62
+  msb: 0
+  name: "Brass 1"
+- program: 62
+  msb: 1
+  name: "Brass ff"
+- program: 62
+  msb: 2
+  name: "Bones Sect."
+- program: 62
+  msb: 3
+  name: "St. Brass ff"
+- program: 62
+  msb: 4
+  name: "Quad Brass1"
+- program: 62
+  msb: 5
+  name: "Quad Brass2"
+- program: 62
+  msb: 8
+  name: "Brass 2"
+- program: 62
+  msb: 9
+  name: "Brass 3"
+- program: 62
+  msb: 10
+  name: "Brass sfz"
+- program: 62
+  msb: 12
+  name: "Brass sfz 2"
+- program: 62
+  msb: 14
+  name: "FatPop Brass"
+- program: 62
+  msb: 16
+  name: "Brass Fall"
+- program: 62
+  msb: 17
+  name: "Trumpet Fall"
+- program: 62
+  msb: 24
+  name: "Octave Brass"
+- program: 62
+  msb: 25
+  name: "Brass + Reed"
+- program: 62
+  msb: 26
+  name: "Fat + Reed"
+- program: 62
+  msb: 32
+  name: "Orch Brass"
+- program: 62
+  msb: 33
+  name: "Orch Brass 2"
+- program: 62
+  msb: 35
+  name: "St.FatPopBrs"
+- program: 62
+  msb: 36
+  name: "St.Orch Brs"
+- program: 62
+  msb: 37
+  name: "St.Orch Brs2"
+- program: 62
+  msb: 38
+  name: "St.Orch Brs3"
+- program: 63
+  msb: 0
+  name: "Synth Brass1"
+- program: 63
+  msb: 1
+  name: "JUNO Brass"
+- program: 63
+  msb: 2
+  name: "Stack Brass"
+- program: 63
+  msb: 3
+  name: "SH-5 Brass"
+- program: 63
+  msb: 4
+  name: "MKS Brass"
+- program: 63
+  msb: 5
+  name: "Jump Brass"
+- program: 63
+  msb: 8
+  name: "Pro Brass"
+- program: 63
+  msb: 9
+  name: "P5 Brass"
+- program: 63
+  msb: 10
+  name: "OrchSynBrass"
+- program: 63
+  msb: 16
+  name: "Oct SynBrass"
+- program: 63
+  msb: 17
+  name: "Hybrid Brass"
+- program: 63
+  msb: 18
+  name: "OctSynBrass2"
+- program: 63
+  msb: 19
+  name: "BPF Brass"
+- program: 64
+  msb: 0
+  name: "Synth Brass2"
+- program: 64
+  msb: 1
+  name: "Soft Brass"
+- program: 64
+  msb: 2
+  name: "Warm Brass"
+- program: 64
+  msb: 3
+  name: "Synth Brass3"
+- program: 64
+  msb: 4
+  name: "Sync Brass"
+- program: 64
+  msb: 5
+  name: "Fat SynBrass"
+- program: 64
+  msb: 6
+  name: "DeepSynBrass"
+- program: 64
+  msb: 8
+  name: "SynBrass sfz"
+- program: 64
+  msb: 9
+  name: "OB Brass"
+- program: 64
+  msb: 10
+  name: "Reso Brass"
+- program: 64
+  msb: 11
+  name: "DistSqrBrass"
+- program: 64
+  msb: 12
+  name: "JP8000SawBrs"
+- program: 64
+  msb: 16
+  name: "Velo Brass 1"
+- program: 64
+  msb: 17
+  name: "Transbrass"
+
+# Instrument List, page 176: Reed
+- program: 65
+  msb: 0
+  name: "Soprano Sax"
+- program: 65
+  msb: 8
+  name: "Soprano Exp."
+- program: 66
+  msb: 0
+  name: "Alto Sax"
+- program: 66
+  msb: 8
+  name: "AltoSax Exp."
+- program: 66
+  msb: 9
+  name: "Grow Sax"
+- program: 66
+  msb: 16
+  name: "AltoSax + Tp"
+- program: 66
+  msb: 17
+  name: "Sax Section"
+- program: 67
+  msb: 0
+  name: "Tenor Sax"
+- program: 67
+  msb: 1
+  name: "Tenor Sax (legato)"
+- program: 67
+  msb: 8
+  name: "BreathyTn. (legato)"
+- program: 67
+  msb: 9
+  name: "St.Tenor Sax"
+- program: 68
+  msb: 0
+  name: "Baritone Sax"
+- program: 68
+  msb: 1
+  name: "Bari. Sax (legato)"
+- program: 68
+  msb: 8
+  name: "Bari & Tenor"
+- program: 69
+  msb: 0
+  name: "Oboe"
+- program: 69
+  msb: 8
+  name: "Oboe Exp."
+- program: 69
+  msb: 16
+  name: "Multi Reed"
+- program: 70
+  msb: 0
+  name: "English Horn"
+- program: 71
+  msb: 0
+  name: "Bassoon"
+- program: 72
+  msb: 0
+  name: "Clarinet"
+- program: 72
+  msb: 8
+  name: "Bs Clarinet"
+- program: 72
+  msb: 16
+  name: "Multi Wind"
+- program: 72
+  msb: 17
+  name: "Quad Wind"
+
+# Instrument List, page 177: Pipe
+- program: 73
+  msb: 0
+  name: "Piccolo"
+- program: 73
+  msb: 1
+  name: "Piccolo (legato)"
+- program: 73
+  msb: 8
+  name: "Nay"
+- program: 73
+  msb: 9
+  name: "Nay Tremolo"
+- program: 73
+  msb: 16
+  name: "Di"
+- program: 74
+  msb: 0
+  name: "Flute"
+- program: 74
+  msb: 1
+  name: "Flute 2 (legato)"
+- program: 74
+  msb: 2
+  name: "Flute Exp."
+- program: 74
+  msb: 3
+  name: "Flt Travelso"
+- program: 74
+  msb: 8
+  name: "Flute + Vln"
+- program: 74
+  msb: 9
+  name: "Pipe & Reed"
+- program: 74
+  msb: 16
+  name: "Tron Flute"
+- program: 74
+  msb: 17
+  name: "Indian Flute"
+- program: 75
+  msb: 0
+  name: "Recorder"
+- program: 76
+  msb: 0
+  name: "Pan Flute"
+- program: 76
+  msb: 8
+  name: "Kawala"
+- program: 76
+  msb: 16
+  name: "Zampona"
+- program: 76
+  msb: 17
+  name: "Zampona Atk"
+- program: 76
+  msb: 24
+  name: "Tin Whistle"
+  look: Whistles
+- program: 76
+  msb: 25
+  name: "TinWhtsle Nm"
+  look: Whistles
+- program: 76
+  msb: 26
+  name: "TinWhtsle Or"
+  look: Whistles
+- program: 77
+  msb: 0
+  name: "Bottle Blow"
+- program: 78
+  msb: 0
+  name: "Shakuhachi"
+- program: 78
+  msb: 1
+  name: "Shakuhachi (legato)"
+- program: 79
+  msb: 0
+  name: "Whistle"
+- program: 79
+  msb: 1
+  name: "Whistle 2"
+- program: 80
+  msb: 0
+  name: "Ocarina"
+
+# Instrument List, pages 177-179: Synth lead
+- program: 81
+  msb: 0
+  name: "Square Wave"
+- program: 81
+  msb: 1
+  name: "MG Square"
+- program: 81
+  msb: 2
+  name: "Hollow Mini"
+- program: 81
+  msb: 3
+  name: "Mellow FM"
+- program: 81
+  msb: 4
+  name: "CC Solo"
+- program: 81
+  msb: 5
+  name: "Shmoog"
+- program: 81
+  msb: 6
+  name: "LM Square"
+- program: 81
+  msb: 7
+  name: "JP8000 TWM"
+- program: 81
+  msb: 8
+  name: "2600 Sine"
+- program: 81
+  msb: 9
+  name: "Sine Lead"
+- program: 81
+  msb: 10
+  name: "KG Lead"
+- program: 81
+  msb: 11
+  name: "Twin Sine"
+- program: 81
+  msb: 16
+  name: "P5 Square"
+- program: 81
+  msb: 17
+  name: "OB Square"
+- program: 81
+  msb: 18
+  name: "JP-8 Square"
+- program: 81
+  msb: 19
+  name: "Dist Square"
+- program: 81
+  msb: 20
+  name: "303SquarDst1"
+- program: 81
+  msb: 21
+  name: "303SquarDst2"
+- program: 81
+  msb: 22
+  name: "303 Mix Sqr"
+- program: 81
+  msb: 23
+  name: "Dual Sqr&Saw"
+- program: 81
+  msb: 24
+  name: "Pulse Lead"
+- program: 81
+  msb: 25
+  name: "JP8 PulseLd1"
+- program: 81
+  msb: 26
+  name: "JP8 PulseLd2"
+- program: 81
+  msb: 27
+  name: "MG Reso. Pls"
+- program: 81
+  msb: 28
+  name: "JP8 PulseLd3"
+- program: 81
+  msb: 29
+  name: "260RingLead"
+- program: 81
+  msb: 30
+  name: "303DistLead"
+- program: 81
+  msb: 31
+  name: "JP8000DistLd"
+- program: 81
+  msb: 32
+  name: "HipHop SinLd"
+- program: 81
+  msb: 33
+  name: "HipHop SqrLd"
+- program: 81
+  msb: 34
+  name: "HipHop PlsLd"
+- program: 81
+  msb: 35
+  name: "Flux Pulse"
+- program: 82
+  msb: 0
+  name: "Saw Wave"
+- program: 82
+  msb: 1
+  name: "OB2 Saw"
+- program: 82
+  msb: 2
+  name: "Pulse Saw"
+- program: 82
+  msb: 3
+  name: "Feline GR"
+- program: 82
+  msb: 4
+  name: "Big Lead"
+- program: 82
+  msb: 5
+  name: "Velo Lead"
+- program: 82
+  msb: 6
+  name: "GR-300"
+- program: 82
+  msb: 7
+  name: "LA Saw"
+- program: 82
+  msb: 8
+  name: "Doctor Solo"
+- program: 82
+  msb: 9
+  name: "Fat Saw Lead"
+- program: 82
+  msb: 10
+  name: "JP8000 Saw"
+- program: 82
+  msb: 11
+  name: "D-50 Fat Saw"
+- program: 82
+  msb: 12
+  name: "OB DoubleSaw"
+- program: 82
+  msb: 13
+  name: "JP DoubleSaw"
+- program: 82
+  msb: 14
+  name: "FatSawLead 2"
+- program: 82
+  msb: 15
+  name: "JP SuperSaw"
+- program: 82
+  msb: 16
+  name: "Waspy Synth"
+- program: 82
+  msb: 17
+  name: "PM Lead"
+- program: 82
+  msb: 18
+  name: "CS Saw Lead"
+- program: 82
+  msb: 24
+  name: "MG Saw 1"
+- program: 82
+  msb: 25
+  name: "MG Saw 2"
+- program: 82
+  msb: 26
+  name: "OB Saw 1"
+- program: 82
+  msb: 27
+  name: "OB Saw 2"
+- program: 82
+  msb: 28
+  name: "D-50 Saw"
+- program: 82
+  msb: 29
+  name: "SH-101 Saw"
+- program: 82
+  msb: 30
+  name: "CS Saw"
+- program: 82
+  msb: 31
+  name: "MG Saw Lead"
+- program: 82
+  msb: 32
+  name: "OB Saw Lead"
+- program: 82
+  msb: 33
+  name: "P5 Saw Lead"
+- program: 82
+  msb: 34
+  name: "MG unison"
+- program: 82
+  msb: 35
+  name: "Oct Saw Lead"
+- program: 82
+  msb: 36
+  name: "Natural Lead"
+- program: 82
+  msb: 40
+  name: "SequenceSaw1"
+- program: 82
+  msb: 41
+  name: "SequenceSaw2"
+- program: 82
+  msb: 42
+  name: "Reso Saw"
+- program: 82
+  msb: 43
+  name: "Cheese Saw 1"
+- program: 82
+  msb: 44
+  name: "Cheese Saw 2"
+- program: 82
+  msb: 45
+  name: "Rhythmic Saw"
+- program: 82
+  msb: 46
+  name: "SequencedSaw"
+- program: 82
+  msb: 47
+  name: "Techno Saw"
+- program: 83
+  msb: 0
+  name: "Syn.Calliope"
+- program: 83
+  msb: 1
+  name: "Vent Synth"
+- program: 83
+  msb: 2
+  name: "Pure PanLead"
+- program: 83
+  msb: 8
+  name: "LM Pure Lead"
+- program: 83
+  msb: 9
+  name: "LM Blow Lead"
+- program: 84
+  msb: 0
+  name: "Chiffer Lead"
+- program: 84
+  msb: 1
+  name: "TB Lead"
+- program: 84
+  msb: 2
+  name: "Hybrid Lead"
+- program: 84
+  msb: 3
+  name: "Unison SqrLd"
+- program: 84
+  msb: 4
+  name: "FatSolo Lead"
+- program: 84
+  msb: 5
+  name: "ForcefulLead"
+- program: 84
+  msb: 6
+  name: "Oct.UnisonLd"
+- program: 84
+  msb: 7
+  name: "Unison SawLd"
+- program: 84
+  msb: 8
+  name: "Mad Lead"
+- program: 84
+  msb: 9
+  name: "CrowdingLead"
+- program: 84
+  msb: 10
+  name: "Double Sqr."
+- program: 85
+  msb: 0
+  name: "Charang"
+- program: 85
+  msb: 1
+  name: "Wire Lead"
+- program: 85
+  msb: 2
+  name: "FB.Charang"
+- program: 85
+  msb: 3
+  name: "Fat GR Lead"
+- program: 85
+  msb: 4
+  name: "Windy GR Ld"
+- program: 85
+  msb: 5
+  name: "Mellow GR Ld"
+- program: 85
+  msb: 6
+  name: "GR & Pulse"
+- program: 85
+  msb: 8
+  name: "Dist.Lead"
+- program: 85
+  msb: 9
+  name: "Acid Guitar1"
+- program: 85
+  msb: 10
+  name: "Acid Guitar2"
+- program: 85
+  msb: 11
+  name: "Dance Dst.Gt"
+- program: 85
+  msb: 12
+  name: "DanceDst.Gt2"
+- program: 85
+  msb: 16
+  name: "P5 Sync Lead"
+- program: 85
+  msb: 17
+  name: "Fat SyncLead"
+- program: 85
+  msb: 18
+  name: "Rock Lead"
+- program: 85
+  msb: 19
+  name: "5th DecaSync"
+- program: 85
+  msb: 20
+  name: "Dirty Sync"
+- program: 85
+  msb: 21
+  name: "DualSyncLead"
+- program: 85
+  msb: 22
+  name: "LA Brass Ld"
+- program: 85
+  msb: 24
+  name: "JUNO Sub Osc"
+- program: 85
+  msb: 25
+  name: "2600 Sub Osc"
+- program: 85
+  msb: 26
+  name: "JP8000Fd Osc"
+- program: 86
+  msb: 0
+  name: "Solo Vox"
+- program: 86
+  msb: 1
+  name: "Solo Vox 2"
+- program: 86
+  msb: 8
+  name: "Vox Lead"
+- program: 86
+  msb: 9
+  name: "LFO Vox"
+- program: 86
+  msb: 10
+  name: "Vox Lead 2"
+- program: 87
+  msb: 0
+  name: "5th Saw Wave"
+- program: 87
+  msb: 1
+  name: "Big Fives"
+- program: 87
+  msb: 2
+  name: "5th Lead"
+- program: 87
+  msb: 3
+  name: "5th Ana.Clav"
+- program: 87
+  msb: 4
+  name: "5th Pulse"
+- program: 87
+  msb: 5
+  name: "JP 5th Saw"
+- program: 87
+  msb: 6
+  name: "JP8000 5thFB"
+- program: 87
+  msb: 8
+  name: "4th Lead"
+- program: 88
+  msb: 0
+  name: "Bass & Lead"
+- program: 88
+  msb: 1
+  name: "Big & Raw"
+- program: 88
+  msb: 2
+  name: "Fat & Perky"
+- program: 88
+  msb: 3
+  name: "JUNO Rave"
+- program: 88
+  msb: 4
+  name: "JP8 BsLead 1"
+- program: 88
+  msb: 5
+  name: "JP8 BsLead 2"
+- program: 88
+  msb: 6
+  name: "SH-5 Bs.Lead"
+- program: 88
+  msb: 7
+  name: "Delayed Lead"
+
+# Instrument List, pages 179-180: Synth pad, etc
+- program: 89
+  msb: 0
+  name: "Fantasia"
+- program: 89
+  msb: 1
+  name: "Fantasia 2"
+- program: 89
+  msb: 2
+  name: "New Age Pad"
+- program: 89
+  msb: 3
+  name: "Bell Heaven"
+- program: 89
+  msb: 4
+  name: "Fantasia 3"
+- program: 89
+  msb: 5
+  name: "Fantasia 4"
+- program: 89
+  msb: 6
+  name: "After D !"
+- program: 89
+  msb: 7
+  name: "260HarmPad"
+- program: 90
+  msb: 0
+  name: "Warm Pad"
+- program: 90
+  msb: 1
+  name: "Thick Matrix"
+- program: 90
+  msb: 2
+  name: "Horn Pad"
+- program: 90
+  msb: 3
+  name: "Rotary Strng"
+- program: 90
+  msb: 4
+  name: "OB Soft Pad"
+- program: 90
+  msb: 5
+  name: "Sine Pad"
+- program: 90
+  msb: 6
+  name: "OB Soft Pad2"
+- program: 90
+  msb: 8
+  name: "Octave Pad"
+- program: 90
+  msb: 9
+  name: "Stack Pad"
+- program: 90
+  msb: 10
+  name: "Human Pad"
+- program: 90
+  msb: 11
+  name: "Sync Brs.Pad"
+- program: 90
+  msb: 12
+  name: "Oct.PWM Pad"
+- program: 90
+  msb: 13
+  name: "JP Soft Pad"
+- program: 91
+  msb: 0
+  name: "Polysynth"
+- program: 91
+  msb: 1
+  name: "80's PolySyn"
+- program: 91
+  msb: 2
+  name: "Polysynth 2"
+- program: 91
+  msb: 3
+  name: "Poly King"
+- program: 91
+  msb: 4
+  name: "Super Poly"
+- program: 91
+  msb: 8
+  name: "Power Stack"
+- program: 91
+  msb: 9
+  name: "Octave Stack"
+- program: 91
+  msb: 10
+  name: "Reso Stack"
+- program: 91
+  msb: 11
+  name: "Techno Stack"
+- program: 91
+  msb: 12
+  name: "Pulse Stack"
+- program: 91
+  msb: 13
+  name: "TwinOct.Rave"
+- program: 91
+  msb: 14
+  name: "Oct.Rave"
+- program: 91
+  msb: 15
+  name: "Happy Synth"
+- program: 91
+  msb: 16
+  name: "ForwardSweep"
+- program: 91
+  msb: 17
+  name: "ReverseSweep"
+- program: 91
+  msb: 24
+  name: "Minor Rave"
+- program: 92
+  msb: 0
+  name: "Space Voice"
+- program: 92
+  msb: 1
+  name: "Heaven II"
+- program: 92
+  msb: 2
+  name: "SC Heaven"
+- program: 92
+  msb: 3
+  name: "Itopia"
+- program: 92
+  msb: 4
+  name: "Water Space"
+- program: 92
+  msb: 5
+  name: "Cold Space"
+- program: 92
+  msb: 6
+  name: "Noise Peaker"
+- program: 92
+  msb: 7
+  name: "Bamboo Hit"
+- program: 92
+  msb: 8
+  name: "Cosmic Voice"
+- program: 92
+  msb: 9
+  name: "Auh Vox"
+- program: 92
+  msb: 10
+  name: "AuhAuh"
+- program: 92
+  msb: 11
+  name: "Vocorderman"
+- program: 92
+  msb: 12
+  name: "Holy Voices"
+- program: 93
+  msb: 0
+  name: "Bowed Glass"
+- program: 93
+  msb: 1
+  name: "SoftBellPad"
+- program: 93
+  msb: 2
+  name: "JP8 Sqr Pad"
+- program: 93
+  msb: 3
+  name: "7thBelPad"
+- program: 93
+  msb: 4
+  name: "Steel Glass"
+- program: 93
+  msb: 5
+  name: "Bottle Stack"
+- program: 94
+  msb: 0
+  name: "Metal Pad"
+- program: 94
+  msb: 1
+  name: "Tine Pad"
+- program: 94
+  msb: 2
+  name: "Panner Pad"
+- program: 94
+  msb: 3
+  name: "Steel Pad"
+- program: 94
+  msb: 4
+  name: "Special Rave"
+- program: 94
+  msb: 5
+  name: "Metal Pad 2"
+- program: 95
+  msb: 0
+  name: "Halo Pad"
+- program: 95
+  msb: 1
+  name: "Vox Pad"
+- program: 95
+  msb: 2
+  name: "Vox Sweep"
+- program: 95
+  msb: 8
+  name: "Horror Pad"
+- program: 95
+  msb: 9
+  name: "SynVox Pad"
+- program: 95
+  msb: 10
+  name: "SynVox Pad 2"
+- program: 95
+  msb: 11
+  name: "Breath&Rise"
+- program: 95
+  msb: 12
+  name: "Tears Voices"
+- program: 96
+  msb: 0
+  name: "Sweep Pad"
+- program: 96
+  msb: 1
+  name: "Polar Pad"
+- program: 96
+  msb: 2
+  name: "Ambient BPF"
+- program: 96
+  msb: 3
+  name: "Sync Pad"
+- program: 96
+  msb: 4
+  name: "Warriors"
+- program: 96
+  msb: 8
+  name: "Converge"
+- program: 96
+  msb: 9
+  name: "Shwimmer"
+- program: 96
+  msb: 10
+  name: "Celestial Pd"
+- program: 96
+  msb: 11
+  name: "Bag Sweep"
+- program: 96
+  msb: 12
+  name: "Sweep Pipe"
+- program: 96
+  msb: 13
+  name: "Sweep Stack"
+- program: 96
+  msb: 14
+  name: "Deep Sweep"
+- program: 96
+  msb: 15
+  name: "Stray Pad"
+
+# Instrument List, pages 180-181: Synth SFX
+- program: 97
+  msb: 0
+  name: "Ice Rain"
+- program: 97
+  msb: 1
+  name: "Harmo Rain"
+- program: 97
+  msb: 2
+  name: "African wood"
+- program: 97
+  msb: 3
+  name: "Anklung Pad"
+- program: 97
+  msb: 4
+  name: "Rattle Pad"
+- program: 97
+  msb: 5
+  name: "Saw Impulse"
+- program: 97
+  msb: 6
+  name: "Strange Str."
+- program: 97
+  msb: 7
+  name: "FastFWD Pad"
+- program: 97
+  msb: 8
+  name: "Clavi Pad"
+- program: 97
+  msb: 9
+  name: "EP Pad"
+- program: 97
+  msb: 10
+  name: "Tambra Pad"
+- program: 97
+  msb: 11
+  name: "CP Pad"
+- program: 98
+  msb: 0
+  name: "Soundtrack"
+- program: 98
+  msb: 1
+  name: "Ancestral"
+- program: 98
+  msb: 2
+  name: "Prologue"
+- program: 98
+  msb: 3
+  name: "Prologue 2"
+- program: 98
+  msb: 4
+  name: "Hols Strings"
+- program: 98
+  msb: 5
+  name: "HistoryWave"
+- program: 98
+  msb: 8
+  name: "Rave"
+- program: 99
+  msb: 0
+  name: "Crystal"
+- program: 99
+  msb: 1
+  name: "Syn Mallet"
+- program: 99
+  msb: 2
+  name: "Soft Crystal"
+- program: 99
+  msb: 3
+  name: "Round Glock"
+- program: 99
+  msb: 4
+  name: "Loud Glock"
+- program: 99
+  msb: 5
+  name: "GlockenChime"
+- program: 99
+  msb: 6
+  name: "Clear Bells"
+- program: 99
+  msb: 7
+  name: "ChristmasBel"
+- program: 99
+  msb: 8
+  name: "Vibra Bells"
+- program: 99
+  msb: 9
+  name: "Digi Bells"
+- program: 99
+  msb: 10
+  name: "Music Bell"
+- program: 99
+  msb: 11
+  name: "Analog Bell"
+- program: 99
+  msb: 12
+  name: "Blow Bell"
+- program: 99
+  msb: 13
+  name: "Hyper Bell"
+- program: 99
+  msb: 16
+  name: "Choral Bells"
+- program: 99
+  msb: 17
+  name: "Air Bells"
+- program: 99
+  msb: 18
+  name: "Bell Harp"
+- program: 99
+  msb: 19
+  name: "Gamelimba"
+- program: 99
+  msb: 20
+  name: "JUNO Bell"
+- program: 99
+  msb: 21
+  name: "JP Bell"
+- program: 99
+  msb: 22
+  name: "Pizz Bell"
+- program: 99
+  msb: 23
+  name: "Bottom Bell"
+- program: 100
+  msb: 0
+  name: "Atmosphere"
+- program: 100
+  msb: 1
+  name: "Warm Atmos"
+- program: 100
+  msb: 2
+  name: "Nylon Harp"
+- program: 100
+  msb: 3
+  name: "Harpvox"
+- program: 100
+  msb: 4
+  name: "HollowReleas"
+- program: 100
+  msb: 5
+  name: "Nylon+Rhodes"
+- program: 100
+  msb: 6
+  name: "Ambient Pad"
+- program: 100
+  msb: 7
+  name: "Invisible"
+- program: 100
+  msb: 8
+  name: "Pulsey Key"
+- program: 100
+  msb: 9
+  name: "Noise Piano"
+- program: 100
+  msb: 10
+  name: "Heaven Atmos"
+- program: 100
+  msb: 11
+  name: "Tambra Atmos"
+- program: 101
+  msb: 0
+  name: "Brightness"
+- program: 101
+  msb: 1
+  name: "Shining Star"
+- program: 101
+  msb: 2
+  name: "OB Stab"
+- program: 101
+  msb: 3
+  name: "Brass Star"
+- program: 101
+  msb: 4
+  name: "Choir Stab"
+- program: 101
+  msb: 5
+  name: "D-50 Retour"
+- program: 101
+  msb: 6
+  name: "SouthernWind"
+- program: 101
+  msb: 7
+  name: "SymbolicBell"
+- program: 101
+  msb: 8
+  name: "Org Bell"
+- program: 102
+  msb: 0
+  name: "Goblin"
+- program: 102
+  msb: 1
+  name: "Goblinson"
+- program: 102
+  msb: 2
+  name: "50's Sci-Fi"
+- program: 102
+  msb: 3
+  name: "Abduction"
+- program: 102
+  msb: 4
+  name: "Auhbient"
+- program: 102
+  msb: 5
+  name: "LFO Pad"
+- program: 102
+  msb: 6
+  name: "Random Str"
+- program: 102
+  msb: 7
+  name: "Random Pad"
+- program: 102
+  msb: 8
+  name: "LowBirds Pad"
+- program: 102
+  msb: 9
+  name: "Falling Down"
+- program: 102
+  msb: 10
+  name: "LFO RAVE"
+- program: 102
+  msb: 11
+  name: "LFO Horror"
+- program: 102
+  msb: 12
+  name: "LFO Techno"
+- program: 102
+  msb: 13
+  name: "Alternative"
+- program: 102
+  msb: 14
+  name: "UFO FX"
+- program: 102
+  msb: 15
+  name: "Gargle Man"
+- program: 102
+  msb: 16
+  name: "Sweep FX"
+- program: 102
+  msb: 17
+  name: "LM Has Come"
+- program: 102
+  msb: 18
+  name: "FallinInsect"
+- program: 102
+  msb: 19
+  name: "LFO Oct.Rave"
+- program: 102
+  msb: 20
+  name: "Just Before"
+- program: 102
+  msb: 21
+  name: "RND Fl.Chord"
+- program: 102
+  msb: 22
+  name: "RandomEnding"
+- program: 102
+  msb: 23
+  name: "Random Sine"
+- program: 102
+  msb: 24
+  name: "EatingFilter"
+- program: 102
+  msb: 25
+  name: "Noise&SawHit"
+- program: 102
+  msb: 26
+  name: "Pour Magic"
+- program: 102
+  msb: 27
+  name: "DancingDrill"
+- program: 102
+  msb: 28
+  name: "Dirty Stack"
+- program: 102
+  msb: 29
+  name: "Big Blue"
+- program: 102
+  msb: 30
+  name: "Static Hit"
+- program: 102
+  msb: 31
+  name: "Atl.Mod.FX"
+- program: 102
+  msb: 32
+  name: "Acid Copter"
+- program: 103
+  msb: 0
+  name: "Echo Drops"
+- program: 103
+  msb: 1
+  name: "Echo Bell"
+- program: 103
+  msb: 2
+  name: "Echo Pan"
+- program: 103
+  msb: 3
+  name: "Echo Pan 2"
+- program: 103
+  msb: 4
+  name: "Big Panner"
+- program: 103
+  msb: 5
+  name: "Reso Panner"
+- program: 103
+  msb: 6
+  name: "Water Piano"
+- program: 103
+  msb: 7
+  name: "Echo SynBass"
+- program: 103
+  msb: 8
+  name: "Pan Sequence"
+- program: 103
+  msb: 9
+  name: "Aqua"
+- program: 103
+  msb: 10
+  name: "Panning Lead"
+- program: 103
+  msb: 11
+  name: "PanningBrass"
+- program: 104
+  msb: 0
+  name: "Star Theme"
+- program: 104
+  msb: 1
+  name: "Star Theme 2"
+- program: 104
+  msb: 2
+  name: "Star Mind"
+- program: 104
+  msb: 3
+  name: "Star Dust"
+- program: 104
+  msb: 4
+  name: "Rep.Trance"
+- program: 104
+  msb: 5
+  name: "Etherality"
+- program: 104
+  msb: 6
+  name: "Mystic Pad"
+- program: 104
+  msb: 8
+  name: "Dream Pad"
+- program: 104
+  msb: 9
+  name: "Silky Pad"
+- program: 104
+  msb: 10
+  name: "Dream Pad 2"
+- program: 104
+  msb: 11
+  name: "Silky Pad 2"
+- program: 104
+  msb: 16
+  name: "New Century"
+- program: 104
+  msb: 17
+  name: "7th Atmos."
+- program: 104
+  msb: 18
+  name: "Galaxy Way"
+- program: 104
+  msb: 19
+  name: "Rising OSC."
+
+# Instrument List, page 182: Ethnic, etc
+- program: 105
+  msb: 0
+  name: "Sitar"
+- program: 105
+  msb: 1
+  name: "Sitar 2"
+- program: 105
+  msb: 2
+  name: "Detune Sitar"
+- program: 105
+  msb: 3
+  name: "Sitar 3"
+- program: 105
+  msb: 4
+  name: "Sitar/Drone"
+- program: 105
+  msb: 5
+  name: "Sitar 4"
+- program: 105
+  msb: 8
+  name: "Tambra"
+- program: 105
+  msb: 16
+  name: "Tamboura"
+- program: 106
+  msb: 0
+  name: "Banjo"
+- program: 106
+  msb: 1
+  name: "Muted Banjo"
+- program: 106
+  msb: 8
+  name: "Rabab"
+- program: 106
+  msb: 9
+  name: "San Xian"
+- program: 106
+  msb: 16
+  name: "Gopichant"
+- program: 106
+  msb: 24
+  name: "Oud"
+- program: 106
+  msb: 28
+  name: "Oud+Strings"
+- program: 106
+  msb: 32
+  name: "Pi Pa"
+- program: 107
+  msb: 0
+  name: "Shamisen"
+- program: 107
+  msb: 1
+  name: "Tsugaru"
+- program: 107
+  msb: 8
+  name: "Syn Shamisen"
+- program: 108
+  msb: 0
+  name: "Koto"
+- program: 108
+  msb: 1
+  name: "Gu Zheng"
+- program: 108
+  msb: 8
+  name: "Taisho Koto"
+- program: 108
+  msb: 16
+  name: "Kanoon"
+- program: 108
+  msb: 19
+  name: "Kanoon+Choir"
+- program: 108
+  msb: 24
+  name: "Oct Harp"
+- program: 109
+  msb: 0
+  name: "Kalimba"
+- program: 109
+  msb: 8
+  name: "Sanza"
+- program: 109
+  msb: 9
+  name: "Bodhran"
+  look: None
+- program: 109
+  msb: 10
+  name: "Bodhran Mute"
+  look: None
+- program: 110
+  msb: 0
+  name: "Bagpipe"
+- program: 110
+  msb: 8
+  name: "Didgeridoo"
+  look: None
+- program: 110
+  msb: 9
+  name: "Uillean Pipe"
+- program: 110
+  msb: 10
+  name: "UillnPipe Nm"
+- program: 110
+  msb: 11
+  name: "UillnPipe Or"
+- program: 111
+  msb: 0
+  name: "Fiddle"
+- program: 111
+  msb: 8
+  name: "Er Hu"
+- program: 111
+  msb: 9
+  name: "Gao Hu"
+- program: 112
+  msb: 0
+  name: "Shanai"
+- program: 112
+  msb: 1
+  name: "Shanai 2"
+- program: 112
+  msb: 8
+  name: "Pungi"
+- program: 112
+  msb: 16
+  name: "Hichiriki"
+- program: 112
+  msb: 24
+  name: "Mizmar"
+- program: 112
+  msb: 32
+  name: "Suona 1"
+- program: 112
+  msb: 33
+  name: "Suona 2"
+
+# Instrument List, pages 182-183: Percussive
+- program: 113
+  msb: 0
+  name: "Tinkle Bell"
+- program: 113
+  msb: 8
+  name: "Bonang"
+- program: 113
+  msb: 9
+  name: "Gender"
+- program: 113
+  msb: 10
+  name: "Gamelan Gong"
+  look: None
+- program: 113
+  msb: 11
+  name: "St.Gamelan"
+- program: 113
+  msb: 12
+  name: "Jang Gu"
+  look: None
+- program: 113
+  msb: 13
+  name: "Jegogan"
+- program: 113
+  msb: 14
+  name: "Jublag"
+- program: 113
+  msb: 15
+  name: "Pemade"
+- program: 113
+  msb: 16
+  name: "RAMA Cymbal"
+  look: None
+- program: 113
+  msb: 17
+  name: "Kajar"
+- program: 113
+  msb: 18
+  name: "Kelontuk"
+- program: 113
+  msb: 19
+  name: "Kelontuk Mt"
+- program: 113
+  msb: 20
+  name: "Kelontuk Sid"
+- program: 113
+  msb: 21
+  name: "Kopyak Op"
+  look: None
+- program: 113
+  msb: 22
+  name: "Kopyak Mt"
+  look: None
+- program: 113
+  msb: 23
+  name: "Ceng Ceng"
+  look: None
+- program: 113
+  msb: 24
+  name: "Reyoung"
+- program: 113
+  msb: 25
+  name: "Kempur"
+  look: None
+- program: 113
+  msb: 32
+  name: "Jngl Crash"
+  look: None
+- program: 113
+  msb: 40
+  name: "Crash Menu"
+  look: None
+- program: 113
+  msb: 41
+  name: "RideCym Menu"
+  look: None
+- program: 113
+  msb: 42
+  name: "RideBellMenu"
+  look: None
+- program: 114
+  msb: 0
+  name: "Agogo"
+- program: 114
+  msb: 8
+  name: "Atarigane"
+- program: 114
+  msb: 16
+  name: "Tambourine"
+  look: None
+- program: 115
+  msb: 0
+  name: "Steel Drums"
+- program: 115
+  msb: 1
+  name: "Island Mlt"
+- program: 116
+  msb: 0
+  name: "Woodblock"
+- program: 116
+  msb: 8
+  name: "Castanets"
+  look: None
+- program: 116
+  msb: 16
+  name: "Angklung"
+  look: None
+- program: 116
+  msb: 17
+  name: "Angkl Rhythm"
+  look: None
+- program: 116
+  msb: 24
+  name: "Finger Snaps"
+  look: None
+- program: 116
+  msb: 32
+  name: "909 HandClap"
+  look: None
+- program: 116
+  msb: 40
+  name: "HandClapMenu"
+  look: None
+- program: 117
+  msb: 0
+  name: "Taiko"
+- program: 117
+  msb: 1
+  name: "Small Taiko"
+- program: 117
+  msb: 8
+  name: "Concert BD"
+- program: 117
+  msb: 9
+  name: "ConcertBD Mt"
+- program: 117
+  msb: 16
+  name: "Jungle BD"
+- program: 117
+  msb: 17
+  name: "Techno BD"
+- program: 117
+  msb: 18
+  name: "Bounce"
+- program: 117
+  msb: 24
+  name: "KendangWadon"
+- program: 117
+  msb: 25
+  name: "Bebarongan"
+- program: 117
+  msb: 26
+  name: "Pelegongan"
+- program: 117
+  msb: 27
+  name: "Dholak 1"
+- program: 117
+  msb: 28
+  name: "Dholak 2"
+- program: 117
+  msb: 32
+  name: "Jngl BD Roll"
+- program: 117
+  msb: 40
+  name: "Kick Menu 1"
+- program: 117
+  msb: 41
+  name: "Kick Menu 2"
+- program: 117
+  msb: 42
+  name: "Kick Menu 3"
+- program: 117
+  msb: 43
+  name: "Kick Menu 4"
+- program: 118
+  msb: 0
+  name: "Melo. Tom 1"
+- program: 118
+  msb: 1
+  name: "Real Tom"
+- program: 118
+  msb: 2
+  name: "Real Tom 2"
+- program: 118
+  msb: 3
+  name: "Jazz Tom"
+- program: 118
+  msb: 4
+  name: "Brush Tom"
+- program: 118
+  msb: 8
+  name: "Melo. Tom 2"
+- program: 118
+  msb: 9
+  name: "Rock Tom"
+- program: 118
+  msb: 16
+  name: "Rash SD"
+- program: 118
+  msb: 17
+  name: "House SD"
+- program: 118
+  msb: 18
+  name: "Jungle SD"
+- program: 118
+  msb: 19
+  name: "909 SD"
+- program: 118
+  msb: 24
+  name: "Jngl SD Roll"
+- program: 118
+  msb: 40
+  name: "SD Menu 1"
+- program: 118
+  msb: 41
+  name: "SD Menu 2"
+- program: 118
+  msb: 42
+  name: "SD Menu 3"
+- program: 118
+  msb: 43
+  name: "SD Menu 4"
+- program: 118
+  msb: 44
+  name: "SD Menu 5"
+- program: 119
+  msb: 0
+  name: "Synth Drum"
+- program: 119
+  msb: 8
+  name: "808 Tom"
+- program: 119
+  msb: 9
+  name: "Elec Perc"
+- program: 119
+  msb: 10
+  name: "Sine Perc."
+- program: 119
+  msb: 11
+  name: "606 Tom"
+- program: 119
+  msb: 12
+  name: "909 Tom"
+- program: 119
+  msb: 13
+  name: "606 Dist.Tom"
+- program: 120
+  msb: 0
+  name: "Reverse Cym."
+- program: 120
+  msb: 1
+  name: "Reverse Cym2"
+- program: 120
+  msb: 2
+  name: "Reverse Cym3"
+- program: 120
+  msb: 3
+  name: "Reverse Cym4"
+- program: 120
+  msb: 8
+  name: "Rev.Snare 1"
+- program: 120
+  msb: 9
+  name: "Rev.Snare 2"
+- program: 120
+  msb: 16
+  name: "Rev.Kick 1"
+- program: 120
+  msb: 17
+  name: "Rev.ConBD"
+- program: 120
+  msb: 24
+  name: "Rev.Tom 1"
+- program: 120
+  msb: 25
+  name: "Rev.Tom 2"
+- program: 120
+  msb: 26
+  name: "Rev.Tom 3"
+- program: 120
+  msb: 27
+  name: "Rev.Tom 4"
+- program: 120
+  msb: 40
+  name: "Rev.SD Menu1"
+- program: 120
+  msb: 41
+  name: "Rev.SD Menu2"
+- program: 120
+  msb: 42
+  name: "Rev.SD Menu3"
+- program: 120
+  msb: 43
+  name: "Rev.BD Menu1"
+- program: 120
+  msb: 44
+  name: "Rev.BD Menu2"
+- program: 120
+  msb: 45
+  name: "Rev.BD Menu3"
+- program: 120
+  msb: 46
+  name: "Rev.ClapMenu"
+
+# Instrument List, pages 184-185: SFX
+- program: 121
+  msb: 0
+  name: "Gt.FretNoise"
+- program: 121
+  msb: 1
+  name: "Gt.Cut Noise"
+- program: 121
+  msb: 2
+  name: "String Slap"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 3
+  name: "Gt.CutNoise2"
+- program: 121
+  msb: 4
+  name: "Dist.CutNoiz"
+- program: 121
+  msb: 5
+  name: "Bass Slide"
+- program: 121
+  msb: 6
+  name: "Pick Scrape"
+- program: 121
+  msb: 8
+  name: "Gt. FX Menu"
+- program: 121
+  msb: 9
+  name: "Bartok Pizz."
+- program: 121
+  msb: 10
+  name: "Guitar Slap"
+- program: 121
+  msb: 11
+  name: "Chord Stroke"
+- program: 121
+  msb: 12
+  name: "Biwa Stroke"
+- program: 121
+  msb: 13
+  name: "Biwa Tremolo"
+- program: 121
+  msb: 16
+  name: "A.Bs.Nz Menu"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 17
+  name: "D.Gt.Nz Menu"
+- program: 121
+  msb: 18
+  name: "E.Gt.NzMenu1"
+- program: 121
+  msb: 19
+  name: "E.Gt.NzMenu2"
+- program: 121
+  msb: 20
+  name: "G.StrokeMenu"
+- program: 121
+  msb: 21
+  name: "Gt.SlideMenu"
+- program: 121
+  msb: 22
+  name: "A.Bs.Mute Nz"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 23
+  name: "A.Bs.TouchNz"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 24
+  name: "A.Bs.AtackNz"
+  look: AcousticBass.Pizzicato
+- program: 121
+  msb: 25
+  name: "TC Up Nz"
+- program: 121
+  msb: 26
+  name: "TC DownMt.Nz"
+- program: 121
+  msb: 27
+  name: "TC UpMt.Nz"
+- program: 121
+  msb: 28
+  name: "TC Down Nz"
+- program: 121
+  msb: 29
+  name: "DstGT.Up Nz"
+- program: 121
+  msb: 30
+  name: "DstGT.DwnNz1"
+- program: 121
+  msb: 31
+  name: "DstGT.DwnNz2"
+- program: 121
+  msb: 32
+  name: "DstGT.MuteNz"
+- program: 121
+  msb: 34
+  name: "Gt.StrokeNz5"
+- program: 121
+  msb: 35
+  name: "StlGt.SldNz1"
+- program: 121
+  msb: 36
+  name: "StlGt.SldNz2"
+- program: 121
+  msb: 37
+  name: "StlGt.SldNz3"
+- program: 121
+  msb: 38
+  name: "StlGt.SldNz4"
+- program: 121
+  msb: 39
+  name: "Gt.StrokeNz1"
+- program: 121
+  msb: 40
+  name: "Gt.StrokeNz2"
+- program: 121
+  msb: 41
+  name: "Gt.StrokeNz3"
+- program: 121
+  msb: 42
+  name: "Gt.StrokeNz4"
+- program: 122
+  msb: 0
+  name: "Breath Noise"
+- program: 122
+  msb: 1
+  name: "Fl.Key Click"
+  look: Flute
+- program: 122
+  msb: 2
+  name: "Brth Nz Menu"
+- program: 122
+  msb: 3
+  name: "Fl.Breath 1"
+  look: Flute
+- program: 122
+  msb: 4
+  name: "Fl.Breath 2"
+  look: Flute
+- program: 122
+  msb: 5
+  name: "Fl.Breath 3"
+  look: Flute
+- program: 122
+  msb: 6
+  name: "Vox Breath 1"
+- program: 122
+  msb: 7
+  name: "Vox Breath 2"
+- program: 122
+  msb: 8
+  name: "Trombone Nz"
+  look: Trombone
+- program: 122
+  msb: 9
+  name: "Trumpet Nz"
+  look: Trumpet
+- program: 123
+  msb: 0
+  name: "Seashore"
+- program: 123
+  msb: 1
+  name: "Rain"
+- program: 123
+  msb: 2
+  name: "Thunder"
+- program: 123
+  msb: 3
+  name: "Wind"
+- program: 123
+  msb: 4
+  name: "Stream"
+- program: 123
+  msb: 5
+  name: "Bubble"
+- program: 123
+  msb: 6
+  name: "Wind 2"
+- program: 123
+  msb: 7
+  name: "Cricket"
+- program: 123
+  msb: 16
+  name: "Pink Noise"
+- program: 123
+  msb: 17
+  name: "White Noise"
+- program: 124
+  msb: 0
+  name: "Bird"
+- program: 124
+  msb: 1
+  name: "Dog"
+  look: None
+- program: 124
+  msb: 2
+  name: "Horse-Gallop"
+  look: None
+- program: 124
+  msb: 3
+  name: "Bird 2"
+- program: 124
+  msb: 4
+  name: "Kitty"
+  look: None
+- program: 124
+  msb: 5
+  name: "Growl"
+  look: None
+- program: 124
+  msb: 6
+  name: "Growl 2"
+  look: None
+- program: 124
+  msb: 7
+  name: "Fancy Animal"
+  look: None
+- program: 124
+  msb: 8
+  name: "Seal"
+  look: None
+- program: 125
+  msb: 0
+  name: "Telephone 1"
+- program: 125
+  msb: 1
+  name: "Telephone 2"
+- program: 125
+  msb: 2
+  name: "DoorCreaking"
+  look: None
+- program: 125
+  msb: 3
+  name: "Door"
+  look: None
+- program: 125
+  msb: 4
+  name: "Scratch"
+  look: None
+- program: 125
+  msb: 5
+  name: "Wind Chimes"
+  look: None
+- program: 125
+  msb: 7
+  name: "Scratch 2"
+  look: None
+- program: 125
+  msb: 8
+  name: "ScratchKey"
+  look: None
+- program: 125
+  msb: 9
+  name: "TapeRewind"
+  look: None
+- program: 125
+  msb: 10
+  name: "Phono Noise"
+  look: None
+- program: 125
+  msb: 11
+  name: "MC-500 Beep"
+  look: None
+- program: 125
+  msb: 12
+  name: "Scratch 3"
+  look: None
+- program: 125
+  msb: 13
+  name: "Scratch 4"
+  look: None
+- program: 125
+  msb: 14
+  name: "Scratch 5"
+  look: None
+- program: 125
+  msb: 15
+  name: "Scratch 6"
+  look: None
+- program: 125
+  msb: 16
+  name: "Scratch 7"
+  look: None
+- program: 126
+  msb: 0
+  name: "Helicopter"
+- program: 126
+  msb: 1
+  name: "Car-Engine"
+  look: None
+- program: 126
+  msb: 2
+  name: "Car-Stop"
+  look: None
+- program: 126
+  msb: 3
+  name: "Car-Pass"
+  look: None
+- program: 126
+  msb: 4
+  name: "Car-Crash"
+  look: None
+- program: 126
+  msb: 5
+  name: "Siren"
+  look: None
+- program: 126
+  msb: 6
+  name: "Train"
+  look: None
+- program: 126
+  msb: 7
+  name: "Jetplane"
+  look: None
+- program: 126
+  msb: 8
+  name: "Starship"
+  look: None
+- program: 126
+  msb: 9
+  name: "Burst Noise"
+  look: None
+- program: 126
+  msb: 10
+  name: "Calculating"
+  look: None
+- program: 126
+  msb: 11
+  name: "Perc. Bang"
+  look: None
+- program: 126
+  msb: 12
+  name: "Burner"
+  look: None
+- program: 126
+  msb: 13
+  name: "Glass & Glam"
+  look: None
+- program: 126
+  msb: 14
+  name: "Ice Ring"
+  look: None
+- program: 126
+  msb: 15
+  name: "Over Blow"
+  look: None
+- program: 126
+  msb: 16
+  name: "Crack Bottle"
+  look: None
+- program: 126
+  msb: 17
+  name: "Pour Bottle"
+  look: None
+- program: 126
+  msb: 18
+  name: "Soda"
+  look: None
+- program: 126
+  msb: 19
+  name: "Open CD Tray"
+  look: None
+- program: 126
+  msb: 20
+  name: "Audio Switch"
+  look: None
+- program: 126
+  msb: 21
+  name: "Key Typing"
+  look: None
+- program: 126
+  msb: 22
+  name: "SL 1"
+  look: None
+- program: 126
+  msb: 23
+  name: "SL 2"
+  look: None
+- program: 126
+  msb: 24
+  name: "Car Engine 2"
+  look: None
+- program: 126
+  msb: 25
+  name: "Car Horn"
+  look: None
+- program: 126
+  msb: 26
+  name: "Boeeeen"
+  look: None
+- program: 126
+  msb: 27
+  name: "R.Crossing"
+  look: None
+- program: 126
+  msb: 28
+  name: "Compresser"
+  look: None
+- program: 126
+  msb: 29
+  name: "Sword Boom!"
+  look: None
+- program: 126
+  msb: 30
+  name: "Sword Cross"
+  look: None
+- program: 126
+  msb: 31
+  name: "Stab! 1"
+  look: None
+- program: 126
+  msb: 32
+  name: "Stab! 2"
+  look: None
+- program: 127
+  msb: 0
+  name: "Applause"
+- program: 127
+  msb: 1
+  name: "Laughing"
+  look: None
+- program: 127
+  msb: 2
+  name: "Screaming"
+  look: None
+- program: 127
+  msb: 3
+  name: "Punch"
+  look: None
+- program: 127
+  msb: 4
+  name: "Heart Beat"
+  look: None
+- program: 127
+  msb: 5
+  name: "Footsteps"
+  look: None
+- program: 127
+  msb: 6
+  name: "Applause 2"
+- program: 127
+  msb: 7
+  name: "Small Club"
+- program: 127
+  msb: 8
+  name: "ApplauseWave"
+- program: 127
+  msb: 9
+  name: "BabyLaughing"
+  look: None
+- program: 127
+  msb: 16
+  name: "Voice One"
+  look: None
+- program: 127
+  msb: 17
+  name: "Voice Two"
+  look: None
+- program: 127
+  msb: 18
+  name: "Voice Three"
+  look: None
+- program: 127
+  msb: 19
+  name: "Voice Tah"
+  look: None
+- program: 127
+  msb: 20
+  name: "Voice Whey"
+  look: None
+- program: 127
+  msb: 22
+  name: "Voice Kikit"
+  look: None
+- program: 127
+  msb: 23
+  name: "Voice ComeOn"
+  look: None
+- program: 127
+  msb: 24
+  name: "Voice Aou"
+  look: None
+- program: 127
+  msb: 25
+  name: "Voice Oou"
+  look: None
+- program: 127
+  msb: 26
+  name: "Voice Hie"
+  look: None
+- program: 128
+  msb: 0
+  name: "Gun Shot"
+- program: 128
+  msb: 1
+  name: "Machine Gun"
+- program: 128
+  msb: 2
+  name: "Lasergun"
+- program: 128
+  msb: 3
+  name: "Explosion"
+  look: None
+- program: 128
+  msb: 4
+  name: "Eruption"
+  look: None
+- program: 128
+  msb: 5
+  name: "Big Shot"
+- program: 128
+  msb: 6
+  name: "Explosion 2"
+  look: None
+
+# The CM-64 (MT-32) sounds' program numbers don't follow General MIDI, so each has the look of its General MIDI
+# counterpart. Bank 126 is the CM-64's PCM sounds, bank 127 its LA sounds.
+# Page 186: SC-55 Map (CM-64 Sound Map)
+- program: 1
+  msb: 126
+  name: "Piano 2"
+  look: Keyboard.BrightAcoustic
+- program: 2
+  msb: 126
+  name: "Piano 2"
+  look: Keyboard.BrightAcoustic
+- program: 3
+  msb: 126
+  name: "Piano 2"
+  look: Keyboard.BrightAcoustic
+- program: 4
+  msb: 126
+  name: "Honky-tonk"
+  look: Keyboard.HonkyTonk
+- program: 5
+  msb: 126
+  name: "Piano 1"
+  look: Keyboard.Piano
+- program: 6
+  msb: 126
+  name: "Piano 2"
+  look: Keyboard.BrightAcoustic
+- program: 7
+  msb: 126
+  name: "Piano 2"
+  look: Keyboard.BrightAcoustic
+- program: 8
+  msb: 126
+  name: "E.Piano 1"
+  look: Keyboard.Electric1
+- program: 9
+  msb: 126
+  name: "Detuned EP1"
+  look: Keyboard.Electric1
+- program: 10
+  msb: 126
+  name: "E.Piano 2"
+  look: Keyboard.Electric2
+- program: 11
+  msb: 126
+  name: "Steel Gt."
+  look: Guitar.Acoustic
+- program: 12
+  msb: 126
+  name: "Steel Gt."
+  look: Guitar.Acoustic
+- program: 13
+  msb: 126
+  name: "12-str.Gt"
+  look: Guitar.Acoustic
+- program: 14
+  msb: 126
+  name: "Funk Gt."
+  look: Guitar.Muted
+- program: 15
+  msb: 126
+  name: "Muted Gt."
+  look: Guitar.Muted
+- program: 16
+  msb: 126
+  name: "Slap Bass 1"
+  look: BassGuitar.Standard
+- program: 17
+  msb: 126
+  name: "Slap Bass 1"
+  look: BassGuitar.Standard
+- program: 18
+  msb: 126
+  name: "Slap Bass 1"
+  look: BassGuitar.Standard
+- program: 19
+  msb: 126
+  name: "Slap Bass 1"
+  look: BassGuitar.Standard
+- program: 20
+  msb: 126
+  name: "Slap Bass 2"
+  look: BassGuitar.Standard
+- program: 21
+  msb: 126
+  name: "Slap Bass 2"
+  look: BassGuitar.Standard
+- program: 22
+  msb: 126
+  name: "Slap Bass 2"
+  look: BassGuitar.Standard
+- program: 23
+  msb: 126
+  name: "Slap Bass 2"
+  look: BassGuitar.Standard
+- program: 24
+  msb: 126
+  name: "Fingered Bs"
+  look: BassGuitar.Standard
+- program: 25
+  msb: 126
+  name: "Fingered Bs"
+  look: BassGuitar.Standard
+- program: 26
+  msb: 126
+  name: "Picked Bass"
+  look: BassGuitar.Standard
+- program: 27
+  msb: 126
+  name: "Picked Bass"
+  look: BassGuitar.Standard
+- program: 28
+  msb: 126
+  name: "Fretless Bs"
+  look: BassGuitar.Fretless
+- program: 29
+  msb: 126
+  name: "Acoustic Bs"
+  look: AcousticBass.Pizzicato
+- program: 30
+  msb: 126
+  name: "Choir Aahs"
+  look: StageChoir.ChoirAahs
+- program: 31
+  msb: 126
+  name: "Choir Aahs"
+  look: StageChoir.ChoirAahs
+- program: 32
+  msb: 126
+  name: "Choir Aahs"
+  look: StageChoir.ChoirAahs
+- program: 33
+  msb: 126
+  name: "Choir Aahs"
+  look: StageChoir.ChoirAahs
+- program: 34
+  msb: 126
+  name: "SlowStrings"
+  look: StageStrings.Ensemble2
+- program: 35
+  msb: 126
+  name: "Strings"
+  look: StageStrings.Ensemble1
+- program: 36
+  msb: 126
+  name: "SynStrings3"
+  look: StageStrings.Synth1
+- program: 37
+  msb: 126
+  name: "SynStrings3"
+  look: StageStrings.Synth1
+- program: 38
+  msb: 126
+  name: "Organ 1"
+  look: Keyboard.Wood
+- program: 39
+  msb: 126
+  name: "Organ 1"
+  look: Keyboard.Wood
+- program: 40
+  msb: 126
+  name: "Organ 1"
+  look: Keyboard.Wood
+- program: 41
+  msb: 126
+  name: "Organ 2"
+  look: Keyboard.Wood
+- program: 42
+  msb: 126
+  name: "Organ 1"
+  look: Keyboard.Wood
+- program: 43
+  msb: 126
+  name: "Organ 1"
+  look: Keyboard.Wood
+- program: 44
+  msb: 126
+  name: "Organ 2"
+  look: Keyboard.Wood
+- program: 45
+  msb: 126
+  name: "Organ 2"
+  look: Keyboard.Wood
+- program: 46
+  msb: 126
+  name: "Organ 2"
+  look: Keyboard.Wood
+- program: 47
+  msb: 126
+  name: "Trumpet"
+  look: Trumpet
+- program: 48
+  msb: 126
+  name: "Trumpet"
+  look: Trumpet
+- program: 49
+  msb: 126
+  name: "Trombone"
+  look: Trombone
+- program: 50
+  msb: 126
+  name: "Trombone"
+  look: Trombone
+- program: 51
+  msb: 126
+  name: "Trombone"
+  look: Trombone
+- program: 52
+  msb: 126
+  name: "Trombone"
+  look: Trombone
+- program: 53
+  msb: 126
+  name: "Trombone"
+  look: Trombone
+- program: 54
+  msb: 126
+  name: "Trombone"
+  look: Trombone
+- program: 55
+  msb: 126
+  name: "Alto Sax"
+  look: AltoSax
+- program: 56
+  msb: 126
+  name: "Tenor Sax"
+  look: TenorSax
+- program: 57
+  msb: 126
+  name: "BaritoneSax"
+  look: BaritoneSax
+- program: 58
+  msb: 126
+  name: "Alto Sax"
+  look: AltoSax
+- program: 59
+  msb: 126
+  name: "Brass 1"
+  look: StageHorns.BrassSection
+- program: 60
+  msb: 126
+  name: "Brass 1"
+  look: StageHorns.BrassSection
+- program: 61
+  msb: 126
+  name: "Brass 2"
+  look: StageHorns.BrassSection
+- program: 62
+  msb: 126
+  name: "Brass 2"
+  look: StageHorns.BrassSection
+- program: 63
+  msb: 126
+  name: "Brass 1"
+  look: StageHorns.BrassSection
+- program: 64
+  msb: 126
+  name: "Orchest.Hit"
+  look: Keyboard.Wood
+- program: 1
+  msb: 127
+  name: "Acou Piano1"
+  look: Keyboard.Piano
+- program: 2
+  msb: 127
+  name: "Acou Piano2"
+  look: Keyboard.BrightAcoustic
+- program: 3
+  msb: 127
+  name: "Acou Piano3"
+  look: Keyboard.Piano
+- program: 4
+  msb: 127
+  name: "Elec Piano1"
+  look: Keyboard.Electric1
+- program: 5
+  msb: 127
+  name: "Elec Piano2"
+  look: Keyboard.Electric2
+- program: 6
+  msb: 127
+  name: "Elec Piano3"
+  look: Keyboard.Electric2
+- program: 7
+  msb: 127
+  name: "Elec Piano4"
+  look: Keyboard.Electric1
+- program: 8
+  msb: 127
+  name: "Honkytonk"
+  look: Keyboard.HonkyTonk
+- program: 9
+  msb: 127
+  name: "Elec Org 1"
+  look: Keyboard.Wood
+- program: 10
+  msb: 127
+  name: "Elec Org 2"
+  look: Keyboard.Wood
+- program: 11
+  msb: 127
+  name: "Elec Org 3"
+  look: Keyboard.Wood
+- program: 12
+  msb: 127
+  name: "Elec Org 4"
+  look: Keyboard.Wood
+- program: 13
+  msb: 127
+  name: "Pipe Org 1"
+  look: Keyboard.Wood
+- program: 14
+  msb: 127
+  name: "Pipe Org 2"
+  look: Keyboard.Wood
+- program: 15
+  msb: 127
+  name: "Pipe Org 3"
+  look: Keyboard.Wood
+- program: 16
+  msb: 127
+  name: "Accordion"
+  look: Accordion
+- program: 17
+  msb: 127
+  name: "Harpsi 1"
+  look: Keyboard.Harpsichord
+- program: 18
+  msb: 127
+  name: "Harpsi 2"
+  look: Keyboard.Harpsichord
+- program: 19
+  msb: 127
+  name: "Harpsi 3"
+  look: Keyboard.Harpsichord
+- program: 20
+  msb: 127
+  name: "Clavi 1"
+  look: Keyboard.Clavichord
+- program: 21
+  msb: 127
+  name: "Clavi 2"
+  look: Keyboard.Clavichord
+- program: 22
+  msb: 127
+  name: "Clavi 3"
+  look: Keyboard.Clavichord
+- program: 23
+  msb: 127
+  name: "Celesta 1"
+  look: Keyboard.Celesta
+- program: 24
+  msb: 127
+  name: "Celesta 2"
+  look: Keyboard.Celesta
+- program: 25
+  msb: 127
+  name: "Syn Brass 1"
+  look: StageHorns.SynthBrass1
+- program: 26
+  msb: 127
+  name: "Syn Brass 2"
+  look: StageHorns.SynthBrass2
+- program: 27
+  msb: 127
+  name: "Syn Brass 3"
+  look: StageHorns.SynthBrass1
+- program: 28
+  msb: 127
+  name: "Syn Brass 4"
+  look: StageHorns.SynthBrass2
+- program: 29
+  msb: 127
+  name: "Syn Bass 1"
+  look: BassGuitar.Synth1
+- program: 30
+  msb: 127
+  name: "Syn Bass 2"
+  look: BassGuitar.Synth2
+- program: 31
+  msb: 127
+  name: "Syn Bass 3"
+  look: BassGuitar.Synth1
+- program: 32
+  msb: 127
+  name: "Syn Bass 4"
+  look: BassGuitar.Synth2
+- program: 33
+  msb: 127
+  name: "Fantasy"
+  look: Keyboard.NewAge
+- program: 34
+  msb: 127
+  name: "Harmo Pan"
+  look: Keyboard.Sweep
+- program: 35
+  msb: 127
+  name: "Chorale"
+  look: StageChoir.ChoirAahs
+- program: 36
+  msb: 127
+  name: "Glasses"
+  look: TubularBells
+- program: 37
+  msb: 127
+  name: "Soundtrack"
+  look: Keyboard.Synth
+- program: 38
+  msb: 127
+  name: "Atmosphere"
+  look: Keyboard.Atmosphere
+- program: 39
+  msb: 127
+  name: "Warm Bell"
+  look: TubularBells
+- program: 40
+  msb: 127
+  name: "Funny Vox"
+  look: StageChoir.SynthVoice
+- program: 41
+  msb: 127
+  name: "Echo Bell"
+  look: Keyboard.Echoes
+- program: 42
+  msb: 127
+  name: "Ice Rain"
+  look: Keyboard.Synth
+- program: 43
+  msb: 127
+  name: "Oboe 2001"
+  look: Oboe
+- program: 44
+  msb: 127
+  name: "Echo Pan"
+  look: Keyboard.Echoes
+- program: 45
+  msb: 127
+  name: "Doctor Solo"
+  look: Lead.Saw
+- program: 46
+  msb: 127
+  name: "School Daze"
+  look: Keyboard.Synth
+- program: 47
+  msb: 127
+  name: "Bellsinger"
+  look: TubularBells
+- program: 48
+  msb: 127
+  name: "Square Wave"
+  look: Lead.Square
+- program: 49
+  msb: 127
+  name: "Str Sect 1"
+  look: StageStrings.Ensemble1
+- program: 50
+  msb: 127
+  name: "Str Sect 2"
+  look: StageStrings.Ensemble1
+- program: 51
+  msb: 127
+  name: "Str Sect 3"
+  look: StageStrings.Ensemble1
+- program: 52
+  msb: 127
+  name: "Pizzicato"
+  look: PizzicatoStrings
+- program: 53
+  msb: 127
+  name: "Violin 1"
+  look: Violin
+- program: 54
+  msb: 127
+  name: "Violin 2"
+  look: Violin
+- program: 55
+  msb: 127
+  name: "Cello 1"
+  look: Cello
+- program: 56
+  msb: 127
+  name: "Cello 2"
+  look: Cello
+- program: 57
+  msb: 127
+  name: "Contrabass"
+  look: AcousticBass.Arco
+- program: 58
+  msb: 127
+  name: "Harp 1"
+  look: Harp
+- program: 59
+  msb: 127
+  name: "Harp 2"
+  look: Harp
+- program: 60
+  msb: 127
+  name: "Guitar 1"
+  look: Guitar.Acoustic
+- program: 61
+  msb: 127
+  name: "Guitar 2"
+  look: Guitar.Acoustic
+- program: 62
+  msb: 127
+  name: "Elec Gtr 1"
+  look: Guitar.Clean
+- program: 63
+  msb: 127
+  name: "Elec Gtr 2"
+  look: Guitar.Clean
+- program: 64
+  msb: 127
+  name: "Sitar"
+  look: None
+- program: 65
+  msb: 127
+  name: "Acou Bass 1"
+  look: AcousticBass.Pizzicato
+- program: 66
+  msb: 127
+  name: "Acou Bass 2"
+  look: AcousticBass.Pizzicato
+- program: 67
+  msb: 127
+  name: "Elec Bass 1"
+  look: BassGuitar.Standard
+- program: 68
+  msb: 127
+  name: "Elec Bass 2"
+  look: BassGuitar.Standard
+- program: 69
+  msb: 127
+  name: "Slap Bass 1"
+  look: BassGuitar.Standard
+- program: 70
+  msb: 127
+  name: "Slap Bass 2"
+  look: BassGuitar.Standard
+- program: 71
+  msb: 127
+  name: "Fretless 1"
+  look: BassGuitar.Fretless
+- program: 72
+  msb: 127
+  name: "Fretless 2"
+  look: BassGuitar.Fretless
+- program: 73
+  msb: 127
+  name: "Flute 1"
+  look: Flute
+- program: 74
+  msb: 127
+  name: "Flute 2"
+  look: Flute
+- program: 75
+  msb: 127
+  name: "Piccolo 1"
+  look: Piccolo
+- program: 76
+  msb: 127
+  name: "Piccolo 2"
+  look: Piccolo
+- program: 77
+  msb: 127
+  name: "Recorder"
+  look: Recorder
+- program: 78
+  msb: 127
+  name: "Pan Pipes"
+  look: PanFlute.Wood
+- program: 79
+  msb: 127
+  name: "Sax 1"
+  look: SopranoSax
+- program: 80
+  msb: 127
+  name: "Sax 2"
+  look: AltoSax
+- program: 81
+  msb: 127
+  name: "Sax 3"
+  look: TenorSax
+- program: 82
+  msb: 127
+  name: "Sax 4"
+  look: BaritoneSax
+- program: 83
+  msb: 127
+  name: "Clarinet 1"
+  look: Clarinet
+- program: 84
+  msb: 127
+  name: "Clarinet 2"
+  look: Clarinet
+- program: 85
+  msb: 127
+  name: "Oboe"
+  look: Oboe
+- program: 86
+  msb: 127
+  name: "Engl Horn"
+  look: None
+- program: 87
+  msb: 127
+  name: "Bassoon"
+  look: None
+- program: 88
+  msb: 127
+  name: "Harmonica"
+  look: Harmonica
+- program: 89
+  msb: 127
+  name: "Trumpet 1"
+  look: Trumpet
+- program: 90
+  msb: 127
+  name: "Trumpet 2"
+  look: Trumpet
+- program: 91
+  msb: 127
+  name: "Trombone 1"
+  look: Trombone
+- program: 92
+  msb: 127
+  name: "Trombone 2"
+  look: Trombone
+- program: 93
+  msb: 127
+  name: "Fr Horn 1"
+  look: FrenchHorn
+- program: 94
+  msb: 127
+  name: "Fr Horn 2"
+  look: FrenchHorn
+- program: 95
+  msb: 127
+  name: "Tuba"
+  look: Tuba
+- program: 96
+  msb: 127
+  name: "Brs Sect 1"
+  look: StageHorns.BrassSection
+- program: 97
+  msb: 127
+  name: "Brs Sect 2"
+  look: StageHorns.BrassSection
+- program: 98
+  msb: 127
+  name: "Vibe 1"
+  look: Mallets.Vibraphone
+- program: 99
+  msb: 127
+  name: "Vibe 2"
+  look: Mallets.Vibraphone
+- program: 100
+  msb: 127
+  name: "Syn Mallet"
+  look: TubularBells
+- program: 101
+  msb: 127
+  name: "Windbell"
+  look: TubularBells
+- program: 102
+  msb: 127
+  name: "Glock"
+  look: Mallets.Glockenspiel
+- program: 103
+  msb: 127
+  name: "Tube Bell"
+  look: TubularBells
+- program: 104
+  msb: 127
+  name: "Xylophone"
+  look: Mallets.Xylophone
+- program: 105
+  msb: 127
+  name: "Marimba"
+  look: Mallets.Marimba
+- program: 106
+  msb: 127
+  name: "Koto"
+  look: None
+- program: 107
+  msb: 127
+  name: "Sho"
+  look: None
+- program: 108
+  msb: 127
+  name: "Shakuhachi"
+  look: None
+- program: 109
+  msb: 127
+  name: "Whistle 1"
+  look: Whistles
+- program: 110
+  msb: 127
+  name: "Whistle 2"
+  look: Whistles
+- program: 111
+  msb: 127
+  name: "Bottleblow"
+  look: BlownBottle
+- program: 112
+  msb: 127
+  name: "Breathpipe"
+  look: BlownBottle
+- program: 113
+  msb: 127
+  name: "Timpani"
+  look: Timpani
+- program: 114
+  msb: 127
+  name: "Melodic Tom"
+  look: MelodicTom
+- program: 115
+  msb: 127
+  name: "Deep Snare"
+  look: MelodicTom
+- program: 116
+  msb: 127
+  name: "Elec Perc 1"
+  look: SynthDrum
+- program: 117
+  msb: 127
+  name: "Elec Perc 2"
+  look: SynthDrum
+- program: 118
+  msb: 127
+  name: "Taiko"
+  look: TaikoDrum
+- program: 119
+  msb: 127
+  name: "Taiko Rim"
+  look: TaikoDrum
+- program: 120
+  msb: 127
+  name: "Cymbal"
+  look: None
+- program: 121
+  msb: 127
+  name: "Castanets"
+  look: None
+- program: 122
+  msb: 127
+  name: "Triangle"
+  look: None
+- program: 123
+  msb: 127
+  name: "Orche Hit"
+  look: Keyboard.Wood
+- program: 124
+  msb: 127
+  name: "Telephone"
+  look: TelephoneRing
+- program: 125
+  msb: 127
+  name: "Bird Tweet"
+  look: BirdTweet
+- program: 126
+  msb: 127
+  name: "OneNote Jam"
+  look: None
+- program: 127
+  msb: 127
+  name: "Water Bell"
+  look: TubularBells
+- program: 128
+  msb: 127
+  name: "Jungle Tune"
+  look: None

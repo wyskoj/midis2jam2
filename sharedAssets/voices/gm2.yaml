@@ -1,0 +1,944 @@
+# General MIDI 2 sound set: 256 melodic voices, all in bank MSB 79H (121).
+#
+# Transcribed from General MIDI 2 v1.2a (MMA RP-024), Appendix A. `program` is 1-based, as the specification
+# prints it; `lsb` is the bank select LSB (controller 32), 0 when omitted.
+# A voice with no `look` appears as the General MIDI voice with the same program (gm.yaml), which is also what
+# the specification (section 2.6) says a device should play for a variation it doesn't have.
+# A voice marked `look: None` is a different sound from its program's instrument (a door is not a telephone), so
+# it puts nothing on stage rather than the wrong thing.
+
+
+# Appendix A, 1 of 7 (printed page 25): Piano, Chromatic Percussion
+- program: 1
+  msb: 121
+  name: "Acoustic Grand Piano"
+- program: 1
+  msb: 121
+  lsb: 1
+  name: "Acoustic Grand Piano (wide)"
+- program: 1
+  msb: 121
+  lsb: 2
+  name: "Acoustic Grand Piano (dark)"
+- program: 2
+  msb: 121
+  name: "Bright Acoustic Piano"
+- program: 2
+  msb: 121
+  lsb: 1
+  name: "Bright Acoustic Piano (wide)"
+- program: 3
+  msb: 121
+  name: "Electric Grand Piano"
+- program: 3
+  msb: 121
+  lsb: 1
+  name: "Electric Grand Piano (wide)"
+- program: 4
+  msb: 121
+  name: "Honky-tonk Piano"
+- program: 4
+  msb: 121
+  lsb: 1
+  name: "Honky-tonk Piano (wide)"
+- program: 5
+  msb: 121
+  name: "Electric Piano 1"
+- program: 5
+  msb: 121
+  lsb: 1
+  name: "Detuned Electric Piano 1"
+- program: 5
+  msb: 121
+  lsb: 2
+  name: "Electric Piano 1 (velocity mix)"
+- program: 5
+  msb: 121
+  lsb: 3
+  name: "60's Electric Piano"
+- program: 6
+  msb: 121
+  name: "Electric Piano 2"
+- program: 6
+  msb: 121
+  lsb: 1
+  name: "Detuned Electric Piano 2"
+- program: 6
+  msb: 121
+  lsb: 2
+  name: "Electric Piano 2 (velocity mix)"
+- program: 6
+  msb: 121
+  lsb: 3
+  name: "EP Legend"
+- program: 6
+  msb: 121
+  lsb: 4
+  name: "EP Phase"
+- program: 7
+  msb: 121
+  name: "Harpsichord"
+- program: 7
+  msb: 121
+  lsb: 1
+  name: "Harpsichord (octave mix)"
+- program: 7
+  msb: 121
+  lsb: 2
+  name: "Harpsichord (wide)"
+- program: 7
+  msb: 121
+  lsb: 3
+  name: "Harpsichord (with key off)"
+- program: 8
+  msb: 121
+  name: "Clavi"
+- program: 8
+  msb: 121
+  lsb: 1
+  name: "Pulse Clavi"
+- program: 9
+  msb: 121
+  name: "Celesta"
+- program: 10
+  msb: 121
+  name: "Glockenspiel"
+- program: 11
+  msb: 121
+  name: "Music Box"
+- program: 12
+  msb: 121
+  name: "Vibraphone"
+- program: 12
+  msb: 121
+  lsb: 1
+  name: "Vibraphone (wide)"
+- program: 13
+  msb: 121
+  name: "Marimba"
+- program: 13
+  msb: 121
+  lsb: 1
+  name: "Marimba (wide)"
+- program: 14
+  msb: 121
+  name: "Xylophone"
+- program: 15
+  msb: 121
+  name: "Tubular Bells"
+- program: 15
+  msb: 121
+  lsb: 1
+  name: "Church Bell"
+- program: 15
+  msb: 121
+  lsb: 2
+  name: "Carillon"
+- program: 16
+  msb: 121
+  name: "Dulcimer"
+
+# Appendix A, 2 of 7 (printed page 26): Organ, Guitar
+- program: 17
+  msb: 121
+  name: "Drawbar Organ"
+- program: 17
+  msb: 121
+  lsb: 1
+  name: "Detuned Drawbar Organ"
+- program: 17
+  msb: 121
+  lsb: 2
+  name: "Italian 60's Organ"
+- program: 17
+  msb: 121
+  lsb: 3
+  name: "Drawbar Organ 2"
+- program: 18
+  msb: 121
+  name: "Percussive Organ"
+- program: 18
+  msb: 121
+  lsb: 1
+  name: "Detuned Percussive Organ"
+- program: 18
+  msb: 121
+  lsb: 2
+  name: "Percussive Organ 2"
+- program: 19
+  msb: 121
+  name: "Rock Organ"
+- program: 20
+  msb: 121
+  name: "Church Organ"
+- program: 20
+  msb: 121
+  lsb: 1
+  name: "Church Organ (octave mix)"
+- program: 20
+  msb: 121
+  lsb: 2
+  name: "Detuned Church Organ"
+- program: 21
+  msb: 121
+  name: "Reed Organ"
+- program: 21
+  msb: 121
+  lsb: 1
+  name: "Puff Organ"
+- program: 22
+  msb: 121
+  name: "Accordion"
+- program: 22
+  msb: 121
+  lsb: 1
+  name: "Accordion 2"
+- program: 23
+  msb: 121
+  name: "Harmonica"
+- program: 24
+  msb: 121
+  name: "Tango Accordion"
+- program: 25
+  msb: 121
+  name: "Acoustic Guitar (nylon)"
+- program: 25
+  msb: 121
+  lsb: 1
+  name: "Ukulele"
+- program: 25
+  msb: 121
+  lsb: 2
+  name: "Acoustic Guitar (nylon + key off)"
+- program: 25
+  msb: 121
+  lsb: 3
+  name: "Acoustic Guitar (nylon 2)"
+- program: 26
+  msb: 121
+  name: "Acoustic Guitar (steel)"
+- program: 26
+  msb: 121
+  lsb: 1
+  name: "12-Strings Guitar"
+- program: 26
+  msb: 121
+  lsb: 2
+  name: "Mandolin"
+- program: 26
+  msb: 121
+  lsb: 3
+  name: "Steel Guitar with Body Sound"
+- program: 27
+  msb: 121
+  name: "Electric Guitar (jazz)"
+- program: 27
+  msb: 121
+  lsb: 1
+  name: "Electric Guitar (pedal steel)"
+- program: 28
+  msb: 121
+  name: "Electric Guitar (clean)"
+- program: 28
+  msb: 121
+  lsb: 1
+  name: "Electric Guitar (detuned clean)"
+- program: 28
+  msb: 121
+  lsb: 2
+  name: "Mid Tone Guitar"
+- program: 29
+  msb: 121
+  name: "Electric Guitar (muted)"
+- program: 29
+  msb: 121
+  lsb: 1
+  name: "Electric Guitar (funky cutting)"
+- program: 29
+  msb: 121
+  lsb: 2
+  name: "Electric Guitar (muted velo-sw)"
+- program: 29
+  msb: 121
+  lsb: 3
+  name: "Jazz Man"
+  look: Guitar.Jazz
+- program: 30
+  msb: 121
+  name: "Overdriven Guitar"
+- program: 30
+  msb: 121
+  lsb: 1
+  name: "Guitar Pinch"
+- program: 31
+  msb: 121
+  name: "Distortion Guitar"
+- program: 31
+  msb: 121
+  lsb: 1
+  name: "Distortion Guitar (with feedback)"
+- program: 31
+  msb: 121
+  lsb: 2
+  name: "Distorted Rhythm Guitar"
+- program: 32
+  msb: 121
+  name: "Guitar Harmonics"
+- program: 32
+  msb: 121
+  lsb: 1
+  name: "Guitar Feedback"
+
+# Appendix A, 3 of 7 (printed page 27): Bass, Strings & Orchestral instruments, Ensemble
+- program: 33
+  msb: 121
+  name: "Acoustic Bass"
+- program: 34
+  msb: 121
+  name: "Electric Bass (finger)"
+- program: 34
+  msb: 121
+  lsb: 1
+  name: "Finger Slap Bass"
+- program: 35
+  msb: 121
+  name: "Electric Bass (pick)"
+- program: 36
+  msb: 121
+  name: "Fretless Bass"
+- program: 37
+  msb: 121
+  name: "Slap Bass 1"
+- program: 38
+  msb: 121
+  name: "Slap Bass 2"
+- program: 39
+  msb: 121
+  name: "Synth Bass 1"
+- program: 39
+  msb: 121
+  lsb: 1
+  name: "Synth Bass (warm)"
+- program: 39
+  msb: 121
+  lsb: 2
+  name: "Synth Bass 3 (resonance)"
+- program: 39
+  msb: 121
+  lsb: 3
+  name: "Clavi Bass"
+- program: 39
+  msb: 121
+  lsb: 4
+  name: "Hammer"
+- program: 40
+  msb: 121
+  name: "Synth Bass 2"
+- program: 40
+  msb: 121
+  lsb: 1
+  name: "Synth Bass 4 (attack)"
+- program: 40
+  msb: 121
+  lsb: 2
+  name: "Synth Bass (rubber)"
+- program: 40
+  msb: 121
+  lsb: 3
+  name: "Attack Pulse"
+- program: 41
+  msb: 121
+  name: "Violin"
+- program: 41
+  msb: 121
+  lsb: 1
+  name: "Violin (slow attack)"
+- program: 42
+  msb: 121
+  name: "Viola"
+- program: 43
+  msb: 121
+  name: "Cello"
+- program: 44
+  msb: 121
+  name: "Contrabass"
+- program: 45
+  msb: 121
+  name: "Tremolo Strings"
+- program: 46
+  msb: 121
+  name: "Pizzicato Strings"
+- program: 47
+  msb: 121
+  name: "Orchestral Harp"
+- program: 47
+  msb: 121
+  lsb: 1
+  name: "Yang Chin"
+- program: 48
+  msb: 121
+  name: "Timpani"
+- program: 49
+  msb: 121
+  name: "String Ensembles 1"
+- program: 49
+  msb: 121
+  lsb: 1
+  name: "Strings and Brass"
+- program: 49
+  msb: 121
+  lsb: 2
+  name: "60s Strings"
+- program: 50
+  msb: 121
+  name: "String Ensembles 2"
+- program: 51
+  msb: 121
+  name: "SynthStrings 1"
+- program: 51
+  msb: 121
+  lsb: 1
+  name: "SynthStrings 3"
+- program: 52
+  msb: 121
+  name: "SynthStrings 2"
+- program: 53
+  msb: 121
+  name: "Choir Aahs"
+- program: 53
+  msb: 121
+  lsb: 1
+  name: "Choir Aahs 2"
+- program: 54
+  msb: 121
+  name: "Voice Oohs"
+- program: 54
+  msb: 121
+  lsb: 1
+  name: "Humming"
+- program: 55
+  msb: 121
+  name: "Synth Voice"
+- program: 55
+  msb: 121
+  lsb: 1
+  name: "Analog Voice"
+- program: 56
+  msb: 121
+  name: "Orchestra Hit"
+- program: 56
+  msb: 121
+  lsb: 1
+  name: "Bass Hit Plus"
+- program: 56
+  msb: 121
+  lsb: 2
+  name: "6th Hit"
+- program: 56
+  msb: 121
+  lsb: 3
+  name: "Euro Hit"
+
+# Appendix A, 4 of 7 (printed page 28): Brass, Reed, Pipe
+- program: 57
+  msb: 121
+  name: "Trumpet"
+- program: 57
+  msb: 121
+  lsb: 1
+  name: "Dark Trumpet Soft"
+- program: 58
+  msb: 121
+  name: "Trombone"
+- program: 58
+  msb: 121
+  lsb: 1
+  name: "Trombone 2"
+- program: 58
+  msb: 121
+  lsb: 2
+  name: "Bright Trombone"
+- program: 59
+  msb: 121
+  name: "Tuba"
+- program: 60
+  msb: 121
+  name: "Muted Trumpet"
+- program: 60
+  msb: 121
+  lsb: 1
+  name: "Muted Trumpet 2"
+- program: 61
+  msb: 121
+  name: "French Horn"
+- program: 61
+  msb: 121
+  lsb: 1
+  name: "French Horn 2 (warm)"
+- program: 62
+  msb: 121
+  name: "Brass Section"
+- program: 62
+  msb: 121
+  lsb: 1
+  name: "Brass Section 2 (octave mix)"
+- program: 63
+  msb: 121
+  name: "Synth Brass 1"
+- program: 63
+  msb: 121
+  lsb: 1
+  name: "Synth Brass 3"
+- program: 63
+  msb: 121
+  lsb: 2
+  name: "Analog Synth Brass 1"
+- program: 63
+  msb: 121
+  lsb: 3
+  name: "Jump Brass"
+- program: 64
+  msb: 121
+  name: "Synth Brass 2"
+- program: 64
+  msb: 121
+  lsb: 1
+  name: "Synth Brass 4"
+- program: 64
+  msb: 121
+  lsb: 2
+  name: "Analog Synth Brass 2"
+- program: 65
+  msb: 121
+  name: "Soprano Sax"
+- program: 66
+  msb: 121
+  name: "Alto Sax"
+- program: 67
+  msb: 121
+  name: "Tenor Sax"
+- program: 68
+  msb: 121
+  name: "Baritone Sax"
+- program: 69
+  msb: 121
+  name: "Oboe"
+- program: 70
+  msb: 121
+  name: "English Horn"
+- program: 71
+  msb: 121
+  name: "Bassoon"
+- program: 72
+  msb: 121
+  name: "Clarinet"
+- program: 73
+  msb: 121
+  name: "Piccolo"
+- program: 74
+  msb: 121
+  name: "Flute"
+- program: 75
+  msb: 121
+  name: "Recorder"
+- program: 76
+  msb: 121
+  name: "Pan Flute"
+- program: 77
+  msb: 121
+  name: "Blown Bottle"
+- program: 78
+  msb: 121
+  name: "Shakuhachi"
+- program: 79
+  msb: 121
+  name: "Whistle"
+- program: 80
+  msb: 121
+  name: "Ocarina"
+
+# Appendix A, 5 of 7 (printed page 29): Synth Lead, Synth Pad, Synth SFX
+- program: 81
+  msb: 121
+  name: "Lead 1 (square)"
+- program: 81
+  msb: 121
+  lsb: 1
+  name: "Lead 1a (square 2)"
+- program: 81
+  msb: 121
+  lsb: 2
+  name: "Lead 1b (sine)"
+- program: 82
+  msb: 121
+  name: "Lead 2 (sawtooth)"
+- program: 82
+  msb: 121
+  lsb: 1
+  name: "Lead 2a (sawtooth 2)"
+- program: 82
+  msb: 121
+  lsb: 2
+  name: "Lead 2b (saw + pulse)"
+- program: 82
+  msb: 121
+  lsb: 3
+  name: "Lead 2c (double sawtooth)"
+- program: 82
+  msb: 121
+  lsb: 4
+  name: "Lead 2d (sequenced analog)"
+- program: 83
+  msb: 121
+  name: "Lead 3 (calliope)"
+- program: 84
+  msb: 121
+  name: "Lead 4 (chiff)"
+- program: 85
+  msb: 121
+  name: "Lead 5 (charang)"
+- program: 85
+  msb: 121
+  lsb: 1
+  name: "Lead 5a (wire lead)"
+- program: 86
+  msb: 121
+  name: "Lead 6 (voice)"
+- program: 87
+  msb: 121
+  name: "Lead 7 (fifths)"
+- program: 88
+  msb: 121
+  name: "Lead 8 (bass + lead)"
+- program: 88
+  msb: 121
+  lsb: 1
+  name: "Lead 8a (soft wrl)"
+- program: 89
+  msb: 121
+  name: "Pad 1 (new age)"
+- program: 90
+  msb: 121
+  name: "Pad 2 (warm)"
+- program: 90
+  msb: 121
+  lsb: 1
+  name: "Pad 2a (sine pad)"
+- program: 91
+  msb: 121
+  name: "Pad 3 (polysynth)"
+- program: 92
+  msb: 121
+  name: "Pad 4 (choir)"
+- program: 92
+  msb: 121
+  lsb: 1
+  name: "Pad 4a (itopia)"
+- program: 93
+  msb: 121
+  name: "Pad 5 (bowed)"
+- program: 94
+  msb: 121
+  name: "Pad 6 (metallic)"
+- program: 95
+  msb: 121
+  name: "Pad 7 (halo)"
+- program: 96
+  msb: 121
+  name: "Pad 8 (sweep)"
+- program: 97
+  msb: 121
+  name: "FX 1 (rain)"
+- program: 98
+  msb: 121
+  name: "FX 2 (soundtrack)"
+- program: 99
+  msb: 121
+  name: "FX 3 (crystal)"
+- program: 99
+  msb: 121
+  lsb: 1
+  name: "FX 3a (synth mallet)"
+- program: 100
+  msb: 121
+  name: "FX 4 (atmosphere)"
+- program: 101
+  msb: 121
+  name: "FX 5 (brightness)"
+- program: 102
+  msb: 121
+  name: "FX 6 (goblins)"
+- program: 103
+  msb: 121
+  name: "FX 7 (echoes)"
+- program: 103
+  msb: 121
+  lsb: 1
+  name: "FX 7a (echo bell)"
+- program: 103
+  msb: 121
+  lsb: 2
+  name: "FX 7b (echo pan)"
+- program: 104
+  msb: 121
+  name: "FX 8 (sci-fi)"
+
+# Appendix A, 6 of 7 (printed page 30): Ethnic Misc., Percussive
+- program: 105
+  msb: 121
+  name: "Sitar"
+- program: 105
+  msb: 121
+  lsb: 1
+  name: "Sitar 2 (bend)"
+- program: 106
+  msb: 121
+  name: "Banjo"
+- program: 107
+  msb: 121
+  name: "Shamisen"
+- program: 108
+  msb: 121
+  name: "Koto"
+- program: 108
+  msb: 121
+  lsb: 1
+  name: "Taisho Koto"
+- program: 109
+  msb: 121
+  name: "Kalimba"
+- program: 110
+  msb: 121
+  name: "Bag pipe"
+- program: 111
+  msb: 121
+  name: "Fiddle"
+- program: 112
+  msb: 121
+  name: "Shanai"
+- program: 113
+  msb: 121
+  name: "Tinkle Bell"
+- program: 114
+  msb: 121
+  name: "Agogo"
+- program: 115
+  msb: 121
+  name: "Steel Drums"
+- program: 116
+  msb: 121
+  name: "Woodblock"
+- program: 116
+  msb: 121
+  lsb: 1
+  name: "Castanets"
+  look: None
+- program: 117
+  msb: 121
+  name: "Taiko Drum"
+- program: 117
+  msb: 121
+  lsb: 1
+  name: "Concert Bass Drum"
+- program: 118
+  msb: 121
+  name: "Melodic Tom"
+- program: 118
+  msb: 121
+  lsb: 1
+  name: "Melodic Tom 2 (power)"
+- program: 119
+  msb: 121
+  name: "Synth Drum"
+- program: 119
+  msb: 121
+  lsb: 1
+  name: "Rhythm Box Tom"
+- program: 119
+  msb: 121
+  lsb: 2
+  name: "Electric Drum"
+- program: 120
+  msb: 121
+  name: "Reverse Cymbal"
+
+# Appendix A, 7 of 7 (printed page 31): SFX
+- program: 121
+  msb: 121
+  name: "Guitar Fret Noise"
+- program: 121
+  msb: 121
+  lsb: 1
+  name: "Guitar Cutting Noise"
+- program: 121
+  msb: 121
+  lsb: 2
+  name: "Acoustic Bass String Slap"
+  look: AcousticBass.Pizzicato
+- program: 122
+  msb: 121
+  name: "Breath Noise"
+- program: 122
+  msb: 121
+  lsb: 1
+  name: "Flute Key Click"
+  look: Flute
+- program: 123
+  msb: 121
+  name: "Seashore"
+- program: 123
+  msb: 121
+  lsb: 1
+  name: "Rain"
+- program: 123
+  msb: 121
+  lsb: 2
+  name: "Thunder"
+- program: 123
+  msb: 121
+  lsb: 3
+  name: "Wind"
+- program: 123
+  msb: 121
+  lsb: 4
+  name: "Stream"
+- program: 123
+  msb: 121
+  lsb: 5
+  name: "Bubble"
+- program: 124
+  msb: 121
+  name: "Bird Tweet"
+- program: 124
+  msb: 121
+  lsb: 1
+  name: "Dog"
+  look: None
+- program: 124
+  msb: 121
+  lsb: 2
+  name: "Horse Gallop"
+  look: None
+- program: 124
+  msb: 121
+  lsb: 3
+  name: "Bird Tweet 2"
+- program: 125
+  msb: 121
+  name: "Telephone Ring"
+- program: 125
+  msb: 121
+  lsb: 1
+  name: "Telephone Ring 2"
+- program: 125
+  msb: 121
+  lsb: 2
+  name: "Door Creaking"
+  look: None
+- program: 125
+  msb: 121
+  lsb: 3
+  name: "Door"
+  look: None
+- program: 125
+  msb: 121
+  lsb: 4
+  name: "Scratch"
+  look: None
+- program: 125
+  msb: 121
+  lsb: 5
+  name: "Wind Chime"
+  look: None
+- program: 126
+  msb: 121
+  name: "Helicopter"
+- program: 126
+  msb: 121
+  lsb: 1
+  name: "Car Engine"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 2
+  name: "Car Stop"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 3
+  name: "Car Pass"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 4
+  name: "Car Crash"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 5
+  name: "Siren"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 6
+  name: "Train"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 7
+  name: "Jetplane"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 8
+  name: "Starship"
+  look: None
+- program: 126
+  msb: 121
+  lsb: 9
+  name: "Burst Noise"
+  look: None
+- program: 127
+  msb: 121
+  name: "Applause"
+- program: 127
+  msb: 121
+  lsb: 1
+  name: "Laughing"
+  look: None
+- program: 127
+  msb: 121
+  lsb: 2
+  name: "Screaming"
+  look: None
+- program: 127
+  msb: 121
+  lsb: 3
+  name: "Punch"
+  look: None
+- program: 127
+  msb: 121
+  lsb: 4
+  name: "Heart Beat"
+  look: None
+- program: 127
+  msb: 121
+  lsb: 5
+  name: "Footsteps"
+  look: None
+- program: 128
+  msb: 121
+  name: "Gunshot"
+- program: 128
+  msb: 121
+  lsb: 1
+  name: "Machine Gun"
+- program: 128
+  msb: 121
+  lsb: 2
+  name: "Lasergun"
+- program: 128
+  msb: 121
+  lsb: 3
+  name: "Explosion"
+  look: None

@@ -39,10 +39,54 @@
   source: faq.md
   platforms: [desktop, android]
   claim: "If the MIDI file contains no program change messages, a piano is assigned to the track"
-- id: midi.assignment.gm-only
-  source: troubleshooting.md
+- id: midi.assignment.mode.reset-message
+  source: code
   platforms: [desktop, android]
-  claim: "The app supports General MIDI instruments only; XG instruments are not supported"
+  claim: "A GM, GM2, GS or XG reset message in the file decides how its bank select messages are read from then on"
+- id: midi.assignment.mode.settings
+  source: code
+  platforms: [desktop, android]
+  claim: "A file without a reset message of its own is read in the specification the app is set to send a reset for, or as General MIDI if none"
+- id: midi.assignment.bank-select.gm2
+  source: code
+  platforms: [desktop, android]
+  claim: "In GM2 mode, a voice chosen with bank select appears as its own instrument when the app has one for it"
+- id: midi.assignment.bank-select.gs
+  source: code
+  platforms: [desktop, android]
+  claim: "In GS mode, bank select picks a variation of the program, which appears as the same instrument as the program"
+- id: midi.assignment.bank-select.xg
+  source: code
+  platforms: [desktop, android]
+  claim: "In XG mode, voices are chosen by both bank select MSB and LSB"
+- id: midi.assignment.bank-select.gs-cm64
+  source: code
+  platforms: [desktop, android]
+  claim: "In GS mode, banks 126 and 127 select the CM-64 (MT-32) sounds, each drawn as its General MIDI counterpart rather than by its program number"
+- id: midi.assignment.bank-select.gs-kits
+  source: code
+  platforms: [desktop, android]
+  claim: "In GS mode, drum kits laid out unlike the General MIDI kits (such as Ethnic or Rhythm FX) draw nothing, while drum machine kits draw a drum set"
+- id: midi.assignment.bank-select.xg-sfx
+  source: code
+  platforms: [desktop, android]
+  claim: "In XG mode, sound effects in bank 64 are drawn as their own instrument or nothing, never as the General MIDI instrument with the same program number"
+- id: midi.assignment.bank-select.xg-kits
+  source: code
+  platforms: [desktop, android]
+  claim: "In XG mode, drum kits are chosen from XG's own kit list, so kits numbered like GS kits but different (such as the Symphony Kit) are drawn correctly"
+- id: midi.assignment.bank-select.unlike-sound-shows-nothing
+  source: code
+  platforms: [desktop, android]
+  claim: "A sound effect variation that is a different sound from its program's instrument (such as a door under Telephone) puts nothing on stage rather than the wrong instrument"
+- id: midi.assignment.bank-select.fallback
+  source: code
+  platforms: [desktop, android]
+  claim: "A GS, XG or GM2 voice without an instrument of its own is shown as the General MIDI instrument with the same program"
+- id: midi.assignment.same-look-merges
+  source: code
+  platforms: [desktop, android]
+  claim: "A channel switching between programs drawn as the same instrument keeps one instrument on stage"
 - id: midi.assignment.rhythm-channel.gs
   source: code
   platforms: [desktop, android]

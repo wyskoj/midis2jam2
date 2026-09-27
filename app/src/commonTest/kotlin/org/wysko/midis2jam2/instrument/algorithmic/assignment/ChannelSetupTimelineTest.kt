@@ -28,16 +28,17 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Reading which channels are rhythm channels out of a file's system exclusive and bank select messages.
+ * Reading what each channel is set up to play (bank, program, melody or rhythm) out of a file's messages.
  *
  * General MIDI only has channel 10, but GS, XG and GM2 files can make any channel a rhythm channel. The synthesizer
  * plays those channels as drums, so if this reads them wrong, the stage shows a melodic instrument playing drum notes.
+ * Bank select picks between variations of a program, but only from the next program change on.
  */
-class RhythmChannelsTest {
+class ChannelSetupTimelineTest {
 
     @Test
     fun `with no messages, only channel 10 is a rhythm channel`() {
-        val timeline = ChannelStateTimeline.from(emptyList())
+        val timeline = ChannelSetupTimeline.from(emptyList())
 
         repeat(16) { channel ->
             val expected = if (channel == 9) Rhythm else Melody
@@ -49,7 +50,7 @@ class RhythmChannelsTest {
     @Test
     @Spec("midi.assignment.rhythm-channel.gs")
     fun `the GS use-for-rhythm-part message makes a channel a rhythm channel, and can undo it`() {
-        val timeline = ChannelStateTimeline.from(
+        val timeline = ChannelSetupTimeline.from(
             listOf(
                 SysexEvent(0, GS_RESET),
                 SysexEvent(100, gsUseForRhythmPart(part = 0x0A, value = 2)),
@@ -71,7 +72,7 @@ class RhythmChannelsTest {
         expectedChannel.forEach { (part, channel) ->
             // Channel 10 is already a rhythm part, so turn it off instead, to see that it moves.
             val value = if (channel == 9) 0 else 1
-            val timeline = ChannelStateTimeline.from(listOf(SysexEvent(0, gsUseForRhythmPart(part, value))))
+            val timeline = ChannelSetupTimeline.from(listOf(SysexEvent(0, gsUseForRhythmPart(part, value))))
             val expected = if (channel == 9) Melody else Rhythm
 
             assertEquals(expected, timeline.stateAt(channel, 0), "GS part $part should address channel ${channel + 1}")
@@ -81,7 +82,7 @@ class RhythmChannelsTest {
     @Test
     fun `system exclusive data is understood with or without its F0 and F7`() {
         val bare = gsUseForRhythmPart(part = 0x0A, value = 1).drop(1).dropLast(1).toByteArray()
-        val timeline = ChannelStateTimeline.from(listOf(SysexEvent(0, bare)))
+        val timeline = ChannelSetupTimeline.from(listOf(SysexEvent(0, bare)))
 
         assertEquals(Rhythm, timeline.stateAt(10, 0))
     }
@@ -89,7 +90,7 @@ class RhythmChannelsTest {
     @Test
     fun `every kind of system reset puts channel 10 back as the only rhythm channel`() {
         listOf(GM_ON, GM2_ON, GS_RESET, XG_ON).forEach { reset ->
-            val timeline = ChannelStateTimeline.from(
+            val timeline = ChannelSetupTimeline.from(
                 listOf(
                     SysexEvent(0, gsUseForRhythmPart(part = 0x0A, value = 1)),
                     SysexEvent(0, gsUseForRhythmPart(part = 0x00, value = 0)),
@@ -106,7 +107,7 @@ class RhythmChannelsTest {
     @Test
     @Spec("midi.assignment.rhythm-channel.xg")
     fun `in XG, drum banks make rhythm channels and the part mode message does too`() {
-        val timeline = ChannelStateTimeline.from(
+        val timeline = ChannelSetupTimeline.from(
             listOf(
                 SysexEvent(0, XG_ON),
                 ControlChangeEvent(10, 3, 0, 127),
@@ -121,14 +122,14 @@ class RhythmChannelsTest {
 
         assertEquals(Rhythm, timeline.stateAt(3, 10), "Bank 127 is a drum kit")
         assertEquals(Rhythm, timeline.stateAt(4, 20), "Bank 126 is the SFX kit")
-        assertEquals(SFX_KIT_PROGRAM, timeline.kitAt(4, 20, 0), "Bank 126 should be treated as the SFX kit")
+        assertEquals(126, timeline.setupAt(4, 20).msb, "The SFX kit is chosen by its bank")
         assertEquals(Rhythm, timeline.stateAt(5, 30), "Part mode 2 is a drum setup")
         assertEquals(Melody, timeline.stateAt(3, 40), "Bank 0 is a normal voice again")
     }
 
     @Test
     fun `in XG, a normal bank on channel 10 does not take the drums away`() {
-        val timeline = ChannelStateTimeline.from(
+        val timeline = ChannelSetupTimeline.from(
             listOf(
                 SysexEvent(0, XG_ON),
                 ControlChangeEvent(10, 9, 0, 0),
@@ -142,7 +143,7 @@ class RhythmChannelsTest {
     @Test
     fun `bank 127 outside XG mode is not a drum kit`() {
         // GS uses bank 127 for the CM-64 sound set, which is melodic.
-        val timeline = ChannelStateTimeline.from(
+        val timeline = ChannelSetupTimeline.from(
             listOf(
                 SysexEvent(0, GS_RESET),
                 ControlChangeEvent(10, 3, 0, 127),
@@ -156,7 +157,7 @@ class RhythmChannelsTest {
     @Test
     @Spec("midi.assignment.rhythm-channel.gm2")
     fun `in GM2, bank 120 makes a rhythm channel and bank 121 a melodic one`() {
-        val timeline = ChannelStateTimeline.from(
+        val timeline = ChannelSetupTimeline.from(
             listOf(
                 SysexEvent(0, GM2_ON),
                 ControlChangeEvent(10, 2, 0, 120),
@@ -172,7 +173,7 @@ class RhythmChannelsTest {
 
     @Test
     fun `bank select waits for the next program change`() {
-        val timeline = ChannelStateTimeline.from(
+        val timeline = ChannelSetupTimeline.from(
             listOf(
                 SysexEvent(0, GM2_ON),
                 ControlChangeEvent(10, 2, 0, 120),
@@ -192,7 +193,106 @@ class RhythmChannelsTest {
             SysexEvent(0, GS_RESET),
         )
 
-        assertEquals(Rhythm, ChannelStateTimeline.from(events).stateAt(10, 100))
+        assertEquals(Rhythm, ChannelSetupTimeline.from(events).stateAt(10, 100))
+    }
+
+    @Test
+    fun `bank select is latched at the next program change`() {
+        val timeline = ChannelSetupTimeline.from(
+            listOf(
+                SysexEvent(0, GS_RESET),
+                ProgramEvent(0, 0, 4),
+                ControlChangeEvent(50, 0, 0, 8),
+                ControlChangeEvent(50, 0, 32, 2),
+                ProgramEvent(100, 0, 5),
+            )
+        )
+
+        assertEquals(ChannelSetup(MidiMode.GS, Melody, 0, 0, 4), timeline.setupAt(0, 99), "Before the program change")
+        assertEquals(ChannelSetup(MidiMode.GS, Melody, 8, 2, 5), timeline.setupAt(0, 100), "At the program change")
+    }
+
+    @Test
+    fun `a bank stays selected for later program changes`() {
+        val timeline = ChannelSetupTimeline.from(
+            listOf(
+                SysexEvent(0, GS_RESET),
+                ControlChangeEvent(0, 0, 0, 8),
+                ProgramEvent(0, 0, 4),
+                ProgramEvent(100, 0, 5),
+            )
+        )
+
+        assertEquals(8, timeline.setupAt(0, 100).msb)
+    }
+
+    @Test
+    fun `a reset puts the banks back to their defaults but keeps the program`() {
+        val timeline = ChannelSetupTimeline.from(
+            listOf(
+                SysexEvent(0, GS_RESET),
+                ControlChangeEvent(0, 0, 0, 8),
+                ProgramEvent(0, 0, 4),
+                SysexEvent(100, GM2_ON),
+            )
+        )
+
+        assertEquals(ChannelSetup(MidiMode.GM2, Melody, 121, 0, 4), timeline.setupAt(0, 100))
+        assertEquals(120, timeline.setupAt(9, 100).msb, "GM2 channel 10 starts on the rhythm bank")
+    }
+
+    @Test
+    fun `each reset sets its own mode`() {
+        mapOf(GM_ON to MidiMode.GM, GM2_ON to MidiMode.GM2, GS_RESET to MidiMode.GS, XG_ON to MidiMode.XG)
+            .forEach { (reset, mode) ->
+                val timeline = ChannelSetupTimeline.from(listOf(SysexEvent(10, reset)))
+                assertEquals(mode, timeline.setupAt(3, 10).mode, "After ${reset.hex()}")
+            }
+    }
+
+    @Test
+    @Spec("midi.assignment.mode.settings")
+    fun `without a reset of its own, a file is in the mode the synthesizer was reset to`() {
+        val timeline = ChannelSetupTimeline.from(emptyList(), initialMode = MidiMode.XG)
+
+        assertEquals(MidiMode.XG, timeline.setupAt(0, 0).mode)
+        assertEquals(127, timeline.setupAt(9, 0).msb, "XG channel 10 starts on the drum bank")
+        assertEquals(MidiMode.GM, ChannelSetupTimeline.from(emptyList()).setupAt(0, 0).mode, "GM when not told otherwise")
+    }
+
+    @Test
+    @Spec("midi.assignment.mode.reset-message")
+    fun `a reset in the file overrides the mode the synthesizer was reset to`() {
+        val timeline = ChannelSetupTimeline.from(listOf(SysexEvent(0, GS_RESET)), initialMode = MidiMode.XG)
+
+        assertEquals(MidiMode.GS, timeline.setupAt(0, 0).mode)
+    }
+
+    @Test
+    fun `there is no program before a channel's first program change`() {
+        val timeline = ChannelSetupTimeline.from(listOf(ProgramEvent(100, 0, 40)))
+
+        assertEquals(null, timeline.setupAt(0, 99).program)
+        assertEquals(40, timeline.setupAt(0, 100).program)
+    }
+
+    @Test
+    fun `the last of several program changes at one tick wins`() {
+        val timeline = ChannelSetupTimeline.from(listOf(ProgramEvent(0, 0, 1), ProgramEvent(0, 0, 2)))
+
+        assertEquals(2, timeline.setupAt(0, 0).program)
+    }
+
+    @Test
+    fun `setups are found correctly between many changes`() {
+        val events = (0 until 50).map { ProgramEvent(it * 10, 0, it.toByte()) }
+        val timeline = ChannelSetupTimeline.from(events)
+
+        (0 until 50).forEach { i ->
+            assertEquals(i, timeline.setupAt(0, i * 10).program, "At the change at ${i * 10}")
+            assertEquals(i, timeline.setupAt(0, i * 10 + 9).program, "Just before the change after ${i * 10}")
+        }
+        assertEquals(49, timeline.setupAt(0, Int.MAX_VALUE).program)
     }
 
     private companion object {

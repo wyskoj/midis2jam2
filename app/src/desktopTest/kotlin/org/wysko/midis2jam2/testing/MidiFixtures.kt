@@ -60,6 +60,42 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /** One channel playing four notes under [first], then switching to [second] for four more. */
+    fun programSwitch(first: Int, second: Int): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(first, absoluteTime = 0)
+                repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = it * TICKS_PER_QUARTER) }
+                program(second, absoluteTime = 4 * TICKS_PER_QUARTER)
+                repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = (4 + it) * TICKS_PER_QUARTER) }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The note [noteHeldAcrossProgramChange] holds across the program change. */
+    const val HELD_NOTE = 60
+
+    /**
+     * One channel that starts [HELD_NOTE] under [first], changes to [second] while the note is still held, and then
+     * releases it. The channel also plays a note of its own under [second], so both programs have an instrument.
+     */
+    fun noteHeldAcrossProgramChange(first: Int, second: Int): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(first, absoluteTime = 0)
+                note(HELD_NOTE, duration = 2.quarter, absoluteTime = 0)
+                program(second, absoluteTime = TICKS_PER_QUARTER)
+                note(HELD_NOTE + 7, duration = 1.quarter, absoluteTime = TICKS_PER_QUARTER)
+            }
+        }
+    }.toTimeBasedSequence()
+
     /**
      * A file with no program change at all.
      *
@@ -195,7 +231,52 @@ object MidiFixtures {
     }.toTimeBasedSequence()
 
     /** The GS reset message, as it appears in a file (without the leading F0). */
-    private val GS_RESET = byteArrayOf(0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7.toByte())
+    val GS_RESET: ByteArray = bytes(0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7)
+
+    /** The General MIDI system on message, as it appears in a file. */
+    val GM_SYSTEM_ON: ByteArray = bytes(0x7E, 0x7F, 0x09, 0x01, 0xF7)
+
+    /** The General MIDI 2 system on message, as it appears in a file. */
+    val GM2_SYSTEM_ON: ByteArray = bytes(0x7E, 0x7F, 0x09, 0x03, 0xF7)
+
+    /** The XG system on message, as it appears in a file. */
+    val XG_SYSTEM_ON: ByteArray = bytes(0x43, 0x10, 0x4C, 0x00, 0x00, 0x7E, 0x00, 0xF7)
+
+    /** A voice chosen by bank select and a zero-based program change. */
+    data class Patch(val msb: Int, val lsb: Int, val program: Int)
+
+    /**
+     * One channel that selects each of [patches] in turn, with bank select then a program change, and plays four
+     * notes on each. The file starts with [reset], if there is one.
+     *
+     * The notes start at [firstNote], so the same fixture works for rhythm channels.
+     */
+    fun bankSelect(
+        reset: ByteArray?,
+        vararg patches: Patch,
+        channel: Int = 0,
+        firstNote: Int = 60,
+    ): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            if (reset != null) sysex(reset, absoluteTime = 0)
+            channel(channel) {
+                patches.forEachIndexed { index, patch ->
+                    val start = index * 4 * TICKS_PER_QUARTER
+                    controller(0, patch.msb, absoluteTime = start)
+                    controller(32, patch.lsb, absoluteTime = start)
+                    program(patch.program, absoluteTime = start)
+                    repeat(4) {
+                        note(firstNote + it, duration = 1.eighth, absoluteTime = start + it * TICKS_PER_QUARTER)
+                    }
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    private fun bytes(vararg values: Int): ByteArray = ByteArray(values.size) { values[it].toByte() }
 
     /** The GS "use for rhythm part" message for the zero-based [channel], as it appears in a file. */
     private fun gsUseForRhythmPart(channel: Int, rhythm: Boolean): ByteArray {

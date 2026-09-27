@@ -1,0 +1,382 @@
+# General MIDI Level 1 sound set.
+#
+# The base catalogue: every other specification falls back to the voice here with the same program.
+# `program` is 1-based, as the specification prints it. A voice with no `look` has no instrument yet.
+
+- program: 1
+  name: "Acoustic Grand Piano"
+  look: Keyboard.Piano
+- program: 2
+  name: "Bright Acoustic Piano"
+  look: Keyboard.BrightAcoustic
+- program: 3
+  name: "Electric Grand Piano"
+  look: Keyboard.ElectricGrand
+- program: 4
+  name: "Honky-tonk Piano"
+  look: Keyboard.HonkyTonk
+- program: 5
+  name: "Electric Piano 1"
+  look: Keyboard.Electric1
+- program: 6
+  name: "Electric Piano 2"
+  look: Keyboard.Electric2
+- program: 7
+  name: "Harpsichord"
+  look: Keyboard.Harpsichord
+- program: 8
+  name: "Clavi"
+  look: Keyboard.Clavichord
+- program: 9
+  name: "Celesta"
+  look: Keyboard.Celesta
+- program: 10
+  name: "Glockenspiel"
+  look: Mallets.Glockenspiel
+- program: 11
+  name: "Music Box"
+  look: MusicBox
+- program: 12
+  name: "Vibraphone"
+  look: Mallets.Vibraphone
+- program: 13
+  name: "Marimba"
+  look: Mallets.Marimba
+- program: 14
+  name: "Xylophone"
+  look: Mallets.Xylophone
+- program: 15
+  name: "Tubular Bells"
+  look: TubularBells
+- program: 16
+  name: "Dulcimer"
+  look: Keyboard.Wood
+- program: 17
+  name: "Drawbar Organ"
+  look: Keyboard.Wood
+- program: 18
+  name: "Percussive Organ"
+  look: Keyboard.Wood
+- program: 19
+  name: "Rock Organ"
+  look: Keyboard.Wood
+- program: 20
+  name: "Church Organ"
+  look: Keyboard.Wood
+- program: 21
+  name: "Reed Organ"
+  look: Keyboard.Wood
+- program: 22
+  name: "Accordion"
+  look: Accordion
+- program: 23
+  name: "Harmonica"
+  look: Harmonica
+- program: 24
+  name: "Tango Accordion"
+  look: Accordion.Bandoneon
+- program: 25
+  name: "Acoustic Guitar (nylon)"
+  look: Guitar.Acoustic
+- program: 26
+  name: "Acoustic Guitar (steel)"
+  look: Guitar.Acoustic
+- program: 27
+  name: "Electric Guitar (jazz)"
+  look: Guitar.Jazz
+- program: 28
+  name: "Electric Guitar (clean)"
+  look: Guitar.Clean
+- program: 29
+  name: "Electric Guitar (muted)"
+  look: Guitar.Muted
+- program: 30
+  name: "Overdriven Guitar"
+  look: Guitar.Overdriven
+- program: 31
+  name: "Distortion Guitar"
+  look: Guitar.Distortion
+- program: 32
+  name: "Guitar harmonics"
+  look: Guitar.Harmonics
+- program: 33
+  name: "Acoustic Bass"
+  look: AcousticBass.Pizzicato
+- program: 34
+  name: "Electric Bass (finger)"
+  look: BassGuitar.Standard
+- program: 35
+  name: "Electric Bass (pick)"
+  look: BassGuitar.Standard
+- program: 36
+  name: "Fretless Bass"
+  look: BassGuitar.Fretless
+- program: 37
+  name: "Slap Bass 1"
+  look: BassGuitar.Standard
+- program: 38
+  name: "Slap Bass 2"
+  look: BassGuitar.Standard
+- program: 39
+  name: "Synth Bass 1"
+  look: BassGuitar.Synth1
+- program: 40
+  name: "Synth Bass 2"
+  look: BassGuitar.Synth2
+- program: 41
+  name: "Violin"
+  look: Violin
+- program: 42
+  name: "Viola"
+  look: Viola
+- program: 43
+  name: "Cello"
+  look: Cello
+- program: 44
+  name: "Contrabass"
+  look: AcousticBass.Arco
+- program: 45
+  name: "Tremolo Strings"
+  look: StageStrings.Tremolo
+- program: 46
+  name: "Pizzicato Strings"
+  look: PizzicatoStrings
+- program: 47
+  name: "Orchestral Harp"
+  look: Harp
+- program: 48
+  name: "Timpani"
+  look: Timpani
+- program: 49
+  name: "String Ensemble 1"
+  look: StageStrings.Ensemble1
+- program: 50
+  name: "String Ensemble 2"
+  look: StageStrings.Ensemble2
+- program: 51
+  name: "SynthStrings 1"
+  look: StageStrings.Synth1
+- program: 52
+  name: "SynthStrings 2"
+  look: StageStrings.Synth2
+- program: 53
+  name: "Choir Aahs"
+  look: StageChoir.ChoirAahs
+- program: 54
+  name: "Voice Oohs"
+  look: StageChoir.VoiceOohs
+- program: 55
+  name: "Synth Voice"
+  look: StageChoir.SynthVoice
+- program: 56
+  name: "Orchestra Hit"
+  look: Keyboard.Wood
+- program: 57
+  name: "Trumpet"
+  look: Trumpet
+- program: 58
+  name: "Trombone"
+  look: Trombone
+- program: 59
+  name: "Tuba"
+  look: Tuba
+- program: 60
+  name: "Muted Trumpet"
+  look: Trumpet.Muted
+- program: 61
+  name: "French Horn"
+  look: FrenchHorn
+- program: 62
+  name: "Brass Section"
+  look: StageHorns.BrassSection
+- program: 63
+  name: "SynthBrass 1"
+  look: StageHorns.SynthBrass1
+- program: 64
+  name: "SynthBrass 2"
+  look: StageHorns.SynthBrass2
+- program: 65
+  name: "Soprano Sax"
+  look: SopranoSax
+- program: 66
+  name: "Alto Sax"
+  look: AltoSax
+- program: 67
+  name: "Tenor Sax"
+  look: TenorSax
+- program: 68
+  name: "Baritone Sax"
+  look: BaritoneSax
+- program: 69
+  name: "Oboe"
+  look: Oboe
+- program: 70
+  name: "English Horn"
+- program: 71
+  name: "Bassoon"
+- program: 72
+  name: "Clarinet"
+  look: Clarinet
+- program: 73
+  name: "Piccolo"
+  look: Piccolo
+- program: 74
+  name: "Flute"
+  look: Flute
+- program: 75
+  name: "Recorder"
+  look: Recorder
+- program: 76
+  name: "Pan Flute"
+  look: PanFlute.Wood
+- program: 77
+  name: "Blown Bottle"
+  look: BlownBottle
+- program: 78
+  name: "Shakuhachi"
+- program: 79
+  name: "Whistle"
+  look: Whistles
+- program: 80
+  name: "Ocarina"
+  look: Ocarina
+- program: 81
+  name: "Lead 1 (square)"
+  look: Lead.Square
+- program: 82
+  name: "Lead 2 (sawtooth)"
+  look: Lead.Saw
+- program: 83
+  name: "Lead 3 (calliope)"
+  look: PanFlute.Gold
+- program: 84
+  name: "Lead 4 (chiff)"
+  look: Keyboard.Chiff
+- program: 85
+  name: "Lead 5 (charang)"
+  look: Keyboard.Charang
+- program: 86
+  name: "Lead 6 (voice)"
+  look: StageChoir.VoiceSynth
+- program: 87
+  name: "Lead 7 (fifths)"
+  look: FifthsKeyboard
+- program: 88
+  name: "Lead 8 (bass + lead)"
+  look: Keyboard.BassAndLead
+- program: 89
+  name: "Pad 1 (new age)"
+  look: Keyboard.NewAge
+- program: 90
+  name: "Pad 2 (warm)"
+  look: Keyboard.Warm
+- program: 91
+  name: "Pad 3 (polysynth)"
+  look: Keyboard.Polysynth
+- program: 92
+  name: "Pad 4 (choir)"
+  look: Keyboard.Choir
+- program: 93
+  name: "Pad 5 (bowed)"
+  look: StageStrings.BowedSynth
+- program: 94
+  name: "Pad 6 (metallic)"
+  look: Keyboard.Metallic
+- program: 95
+  name: "Pad 7 (halo)"
+  look: StageChoir.HaloSynth
+- program: 96
+  name: "Pad 8 (sweep)"
+  look: Keyboard.Sweep
+- program: 97
+  name: "FX 1 (rain)"
+  look: Keyboard.Synth
+- program: 98
+  name: "FX 2 (soundtrack)"
+  look: Keyboard.Synth
+- program: 99
+  name: "FX 3 (crystal)"
+  look: TubularBells
+- program: 100
+  name: "FX 4 (atmosphere)"
+  look: Keyboard.Atmosphere
+- program: 101
+  name: "FX 5 (brightness)"
+  look: Keyboard.Synth
+- program: 102
+  name: "FX 6 (goblins)"
+  look: StageChoir.GoblinSynth
+- program: 103
+  name: "FX 7 (echoes)"
+  look: Keyboard.Echoes
+- program: 104
+  name: "FX 8 (sci-fi)"
+  look: Keyboard.Synth
+- program: 105
+  name: "Sitar"
+- program: 106
+  name: "Banjo"
+  look: Banjo
+- program: 107
+  name: "Shamisen"
+  look: Shamisen
+- program: 108
+  name: "Koto"
+- program: 109
+  name: "Kalimba"
+  look: Kalimba
+- program: 110
+  name: "Bag pipe"
+  look: BagPipe
+- program: 111
+  name: "Fiddle"
+  look: Fiddle
+- program: 112
+  name: "Shanai"
+- program: 113
+  name: "Tinkle Bell"
+  look: TinkleBell
+- program: 114
+  name: "Agogo"
+  look: Agogos
+- program: 115
+  name: "Steel Drums"
+  look: SteelDrums
+- program: 116
+  name: "Woodblock"
+  look: Woodblocks
+- program: 117
+  name: "Taiko Drum"
+  look: TaikoDrum
+- program: 118
+  name: "Melodic Tom"
+  look: MelodicTom
+- program: 119
+  name: "Synth Drum"
+  look: SynthDrum
+- program: 120
+  name: "Reverse Cymbal"
+  look: ReverseCymbal
+- program: 121
+  name: "Guitar Fret Noise"
+  look: Guitar.Acoustic
+- program: 122
+  name: "Breath Noise"
+  look: StageChoir.SynthVoice
+- program: 123
+  name: "Seashore"
+- program: 124
+  name: "Bird Tweet"
+  look: BirdTweet
+- program: 125
+  name: "Telephone Ring"
+  look: TelephoneRing
+- program: 126
+  name: "Helicopter"
+  look: Helicopter
+- program: 127
+  name: "Applause"
+  look: ApplauseChoir
+- program: 128
+  name: "Gunshot"
+  look: Gunshot
