@@ -117,6 +117,14 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         }
     }
 
+    fun setGamepadEnabled(isEnabled: Boolean) {
+        screenModelScope.launch {
+            settingsRepository.updateAppSettings {
+                controlsSettings.isGamepadEnabled = isEnabled
+            }
+        }
+    }
+
     fun setIsSendResetMessage(isEnabled: Boolean) {
         screenModelScope.launch {
             settingsRepository.updateAppSettings {

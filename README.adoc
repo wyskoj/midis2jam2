@@ -28,7 +28,7 @@ $ cd midis2jam2 && ./gradlew run
 
 == ⁉️ Support
 
-Find guides and answers to common questions on the https://wyskoj.github.io/midis2jam2-docs/[documentation site]. For support, visit https://github.com/wyskoj/midis2jam2/discussions[the discussions page].
+Find guides and answers to common questions on the https://docs.midis2jam2.xyz/[documentation site]. For support, visit https://github.com/wyskoj/midis2jam2/discussions[the discussions page].
 
 == ✴️ Acknowledgements
 

@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">粘滞速度修改键</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">按 Ctrl 和 Shift 更改自由视角速度</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">按住 Ctrl 和 Shift 更改自由视角速度</string>
+    <string name="settings_controls_gamepad_enabled">手柄输入</string>
+    <string name="settings_controls_gamepad_enabled_description">允许已连接的手柄控制自由视角</string>
 
     <!-- 设置 / 屏幕元素 -->
     <string name="settings_onscreenelements_lyrics">歌词</string>

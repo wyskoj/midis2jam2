@@ -88,6 +88,7 @@ data class AppSettings(
         var isLockCursor: Boolean = false,
         var isSpeedModifierKeysSticky: Boolean = false,
         var isDisableTouchInput: Boolean = false,
+        var isGamepadEnabled: Boolean = false,
     )
 
     @Serializable

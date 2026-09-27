@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Tahmeat nopeuden muutosnäppäimet</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Paina Ctrl ja Shift vaihtaaksesi vapaakameran nopeutta</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Pidä Ctrl ja Shift pohjassa vaihtaaksesi vapaakameran nopeutta</string>
+    <string name="settings_controls_gamepad_enabled">Peliohjaimen syöttö</string>
+    <string name="settings_controls_gamepad_enabled_description">Salli liitetyn peliohjaimen ohjata vapaakameraa</string>
 
     <!-- Asetukset / Näytön elementit -->
     <string name="settings_onscreenelements_lyrics">Lyriikat</string>

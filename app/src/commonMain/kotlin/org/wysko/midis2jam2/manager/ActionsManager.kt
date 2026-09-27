@@ -67,6 +67,8 @@ class ActionsManager : BaseManager() {
         const val ACTION_CAMERA_PLUGIN_FREE: String = "camera_plugin_free"
         const val ACTION_CAMERA_PLUGIN_AUTO: String = "camera_plugin_auto"
         const val ACTION_CAMERA_PLUGIN_ROTATING: String = "camera_plugin_rotating"
+        const val ACTION_CAMERA_MODIFIER_SLOW: String = "camera_modifier_slow"
+        const val ACTION_CAMERA_MODIFIER_FAST: String = "camera_modifier_fast"
         const val ACTION_DEBUG: String = "debug"
         const val ACTION_PLAY: String = "playback_play"
         const val ACTION_RESTART: String = "playback_restart"

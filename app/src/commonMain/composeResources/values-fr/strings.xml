@@ -133,6 +133,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Touche de modification de vitesse persistante</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Appuyez sur Ctrl et Maj pour changer la vitesse de la caméra libre</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Maintenez Ctrl et Maj enfoncés pour changer la vitesse de la caméra libre</string>
+    <string name="settings_controls_gamepad_enabled">Entrée manette</string>
+    <string name="settings_controls_gamepad_enabled_description">Permet à une manette connectée de contrôler la caméra libre</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Paroles</string>

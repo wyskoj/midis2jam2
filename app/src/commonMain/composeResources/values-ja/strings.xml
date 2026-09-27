@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">スティッキー速度変更キー</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">CtrlとShiftを押してフリーカム速度を変更</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">CtrlとShiftを押し続けてフリーカム速度を変更</string>
+    <string name="settings_controls_gamepad_enabled">ゲームパッド入力</string>
+    <string name="settings_controls_gamepad_enabled_description">接続されたゲームパッドでフリーカムを操作できるようにする</string>
 
     <!-- 設定 / 画面上の要素 -->
     <string name="settings_onscreenelements_lyrics">歌詞</string>

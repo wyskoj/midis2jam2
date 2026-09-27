@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Yapışkan hız değiştirme tuşları</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Serbest kamera hızını değiştirmek için Ctrl ve Shift\'e basın</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Serbest kamera hızını değiştirmek için Ctrl ve Shift\'i basılı tutun</string>
+    <string name="settings_controls_gamepad_enabled">Oyun kolu girişi</string>
+    <string name="settings_controls_gamepad_enabled_description">Bağlı bir oyun kolunun serbest kamerayı kontrol etmesine izin ver</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Şarkı Sözleri</string>

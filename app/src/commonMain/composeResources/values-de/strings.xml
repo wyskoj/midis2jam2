@@ -150,6 +150,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Sticky Geschwindigkeitsmodifikatortasten</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Drücke Strg und Umschalt, um die Freecam-Geschwindigkeit zu ändern</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Halte Strg und Umschalt gedrückt, um die Freecam-Geschwindigkeit zu ändern</string>
+    <string name="settings_controls_gamepad_enabled">Gamepad-Eingabe</string>
+    <string name="settings_controls_gamepad_enabled_description">Erlaubt einem verbundenen Gamepad, die Freecam zu steuern</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Songtext</string>
