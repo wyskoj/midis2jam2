@@ -213,6 +213,7 @@ class HeadlessPerformance private constructor(
          * and is on by default because that is the configuration users actually run. Tests
          * that only need instruments to exist can turn it off for a quicker boot, but then
          * anything reading the playback clock - drum-set visibility, for one - is absent.
+         * [isRecording] builds the managers the way a recording does.
          */
         fun start(
             sequence: TimeBasedSequence,
@@ -220,6 +221,7 @@ class HeadlessPerformance private constructor(
             fileName: String = "fixture.mid",
             attachManagers: Boolean = true,
             sequencer: NoOpSequencer = NoOpSequencer(),
+            isRecording: Boolean = false,
         ): HeadlessPerformance {
             val configurations = listOf(
                 Configuration.HomeConfiguration(),
@@ -251,6 +253,7 @@ class HeadlessPerformance private constructor(
                             sequence = sequence,
                             sequencer = sequencer,
                             profile = ManagerProfile.Headless,
+                            isRecording = isRecording,
                         )
 
                         // The minimum an instrument needs in order to exist and be shown.

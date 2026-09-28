@@ -236,5 +236,39 @@
     <string name="history_file_missing_title">Песня недоступна</string>
     <string name="history_unknown_song">Неизвестная песня</string>
     <string name="history_clear_invalid_song">Очистить</string>
+
+    <!-- Record -->
+    <string name="tab_record">Запись</string>
+    <string name="record_start">Записать</string>
+    <string name="record_output">Сохранить как</string>
+    <string name="record_resolution">Разрешение</string>
+    <string name="record_frame_rate">Частота кадров</string>
+    <string name="record_quality">Качество</string>
+    <string name="record_quality_low">Низкое</string>
+    <string name="record_quality_medium">Среднее</string>
+    <string name="record_quality_high">Высокое</string>
+    <string name="record_quality_maximum">Максимальное</string>
+    <string name="record_preparing">Подготовка…</string>
+    <string name="record_recording">Запись…</string>
+    <string name="record_open_video">Открыть видео</string>
+    <string name="record_show_in_folder">Показать в папке</string>
+    <string name="record_cancelled">Запись отменена.</string>
+    <string name="record_audio_note">Создаётся встроенным синтезатором с этим банком звуков.</string>
+    <string name="record_window_note">Во время записи открывается окно предпросмотра. Закрытие окна отменяет запись.</string>
+    <string name="record_section_video">Видео</string>
+    <string name="record_section_audio">Звук</string>
+    <string name="record_empty_title">Записать выступление</string>
+    <string name="record_empty_body">Превратите MIDI-файл в видео со звуком.</string>
+    <string name="record_choose_file">Выбрать MIDI-файл</string>
+    <string name="record_drop_hint">или перетащите его сюда</string>
+    <string name="record_change_file">Изменить</string>
+    <string name="record_unreadable">Этот файл невозможно прочитать как MIDI.</string>
+    <string name="record_in_folder">в %1$s</string>
+    <string name="record_quality_low_detail">Минимальный размер</string>
+    <string name="record_quality_medium_detail">Сбалансированное</string>
+    <string name="record_quality_high_detail">Лучшее изображение</string>
+    <string name="record_saved">Сохранено</string>
+    <string name="record_failed_title">Не удалось записать</string>
+    <string name="record_time_left">осталось около %1$s</string>
 </resources>
 
