@@ -71,8 +71,9 @@ class SettingsRepositoryTest {
     @Test
     fun `an update is saved and read back by a new repository`() = runBlocking {
         val store = PropertiesSettings(Properties())
-        PreferenceBackedSettingsRepository(store).update { it.copy(version = it.version) }
-        PreferenceBackedSettingsRepository(store).updateAppSettings { generalSettings.locale = "ja" }
+        PreferenceBackedSettingsRepository(store).update {
+            it.copy(generalSettings = it.generalSettings.copy(locale = "ja"))
+        }
 
         assertEquals("ja", PreferenceBackedSettingsRepository(store).appSettings.value.generalSettings.locale)
     }

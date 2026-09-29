@@ -36,32 +36,44 @@ class AppSettingsSerializationTest {
 
     @Test
     fun `settings survive a round trip unchanged`() {
-        val settings = AppSettings().apply {
-            generalSettings.theme = AppTheme.DARK
-            generalSettings.locale = "ja"
-            generalSettings.isShowDebugInfo = true
-            graphicsSettings.isFullscreen = true
-            graphicsSettings.resolutionSettings.isUseDefaultResolution = false
-            graphicsSettings.resolutionSettings.resolutionWidth = 1920
-            graphicsSettings.resolutionSettings.resolutionHeight = 1080
-            graphicsSettings.shadowsSettings.shadowsQuality = ShadowsQuality.High
-            graphicsSettings.antiAliasingSettings.isUseAntiAliasing = true
-            graphicsSettings.antiAliasingSettings.antiAliasingQuality = AntiAliasingQuality.High
-            backgroundSettings.type = BackgroundType.Color
-            backgroundSettings.color = 0x00FF00
-            backgroundSettings.cubeMapTextures = MutableList(6) { "face$it.png" }
-            controlsSettings.isGamepadEnabled = true
-            controlsSettings.isSpeedModifierKeysSticky = true
-            playbackSettings.synthesizerSettings.isUseReverb = false
-            playbackSettings.soundbanksSettings.soundbanks = mutableListOf("a.sf2", "b.dls")
-            playbackSettings.midiSpecificationResetSettings.midiSpecification = MidiSpecification.GeneralStandard
-            onScreenElementsSettings.isShowHeadsUpDisplay = false
-            onScreenElementsSettings.lyricsSettings.isShowLyrics = false
-            onScreenElementsSettings.lyricsSettings.lyricsSize = 2.5
-            cameraSettings.defaultFieldOfView = 70f
-            cameraSettings.isClassicAutoCam = true
-            instrumentSettings.isAlwaysShowInstruments = true
-        }
+        val settings = AppSettings(
+            generalSettings = AppSettings.GeneralSettings(theme = AppTheme.DARK, locale = "ja", isShowDebugInfo = true),
+            graphicsSettings = AppSettings.GraphicsSettings(
+                resolutionSettings = AppSettings.GraphicsSettings.ResolutionSettings(
+                    isUseDefaultResolution = false,
+                    resolutionWidth = 1920,
+                    resolutionHeight = 1080,
+                ),
+                shadowsSettings = AppSettings.GraphicsSettings.ShadowsSettings(shadowsQuality = ShadowsQuality.High),
+                antiAliasingSettings = AppSettings.GraphicsSettings.AntiAliasingSettings(
+                    isUseAntiAliasing = true,
+                    antiAliasingQuality = AntiAliasingQuality.High,
+                ),
+                isFullscreen = true,
+            ),
+            backgroundSettings = AppSettings.BackgroundSettings(
+                type = BackgroundType.Color,
+                cubeMapTextures = List(6) { "face$it.png" },
+                color = 0x00FF00,
+            ),
+            controlsSettings = AppSettings.ControlsSettings(isGamepadEnabled = true, isSpeedModifierKeysSticky = true),
+            playbackSettings = AppSettings.PlaybackSettings(
+                midiSpecificationResetSettings = AppSettings.PlaybackSettings.MidiSpecificationResetSettings(
+                    midiSpecification = MidiSpecification.GeneralStandard,
+                ),
+                soundbanksSettings = AppSettings.PlaybackSettings.SoundbanksSettings(listOf("a.sf2", "b.dls")),
+                synthesizerSettings = AppSettings.PlaybackSettings.SynthesizerSettings(isUseReverb = false),
+            ),
+            onScreenElementsSettings = AppSettings.OnScreenElementsSettings(
+                lyricsSettings = AppSettings.OnScreenElementsSettings.LyricsSettings(
+                    isShowLyrics = false,
+                    lyricsSize = 2.5,
+                ),
+                isShowHeadsUpDisplay = false,
+            ),
+            cameraSettings = AppSettings.CameraSettings(defaultFieldOfView = 70f, isClassicAutoCam = true),
+            instrumentSettings = AppSettings.InstrumentSettings(isAlwaysShowInstruments = true),
+        )
 
         assertEquals(settings, json.decodeFromString<AppSettings>(json.encodeToString(settings)))
     }
@@ -138,6 +150,84 @@ class AppSettingsSerializationTest {
         ).forEach {
             assertTrue(encoded.contains("\"$it\""), "The serialized settings omit $it")
         }
+    }
+
+    @Test
+    fun `a blob saved by an earlier build decodes to the values it was saved with`() {
+        // Captured from a build that predates the version field, with every setting away from its default.
+        // If this stops decoding to these values, users' saved settings would silently reset.
+        val blob = """
+            {
+              "generalSettings": {"theme": "DARK", "locale": "ja", "isShowDebugInfo": true},
+              "graphicsSettings": {
+                "resolutionSettings": {"isUseDefaultResolution": false, "resolutionWidth": 1920, "resolutionHeight": 1080},
+                "shadowsSettings": {"isUseShadows": false, "shadowsQuality": "High"},
+                "antiAliasingSettings": {"isUseAntiAliasing": true, "antiAliasingQuality": "Medium"},
+                "isFullscreen": true
+              },
+              "backgroundSettings": {
+                "type": "CubeMap",
+                "cubeMapTextures": ["a.png", "b.png", "c.png", "d.png", "e.png", "f.png"],
+                "color": 65280
+              },
+              "controlsSettings": {
+                "isLockCursor": true, "isSpeedModifierKeysSticky": true,
+                "isDisableTouchInput": true, "isGamepadEnabled": true
+              },
+              "playbackSettings": {
+                "midiSpecificationResetSettings": {"isSendSpecificationResetMessage": true, "midiSpecification": "ExtendedGeneral"},
+                "soundbanksSettings": {"soundbanks": ["one.sf2", "two.dls"]},
+                "synthesizerSettings": {"isUseChorus": false, "isUseReverb": false}
+              },
+              "onScreenElementsSettings": {
+                "lyricsSettings": {"isShowLyrics": false, "lyricsSize": 2.5},
+                "isShowHeadsUpDisplay": false
+              },
+              "cameraSettings": {
+                "isStartAutocamWithSong": true, "isSmoothFreecam": false,
+                "isClassicAutoCam": true, "defaultFieldOfView": 70.0
+              },
+              "instrumentSettings": {"isAlwaysShowInstruments": true}
+            }
+        """
+
+        val loaded = json.decodeFromString<AppSettings>(blob)
+
+        assertEquals(1, loaded.version)
+        assertEquals(AppTheme.DARK, loaded.generalSettings.theme)
+        assertEquals("ja", loaded.generalSettings.locale)
+        assertEquals(true, loaded.generalSettings.isShowDebugInfo)
+        assertEquals(false, loaded.graphicsSettings.resolutionSettings.isUseDefaultResolution)
+        assertEquals(1920, loaded.graphicsSettings.resolutionSettings.resolutionWidth)
+        assertEquals(1080, loaded.graphicsSettings.resolutionSettings.resolutionHeight)
+        assertEquals(false, loaded.graphicsSettings.shadowsSettings.isUseShadows)
+        assertEquals(ShadowsQuality.High, loaded.graphicsSettings.shadowsSettings.shadowsQuality)
+        assertEquals(true, loaded.graphicsSettings.antiAliasingSettings.isUseAntiAliasing)
+        assertEquals(AntiAliasingQuality.Medium, loaded.graphicsSettings.antiAliasingSettings.antiAliasingQuality)
+        assertEquals(true, loaded.graphicsSettings.isFullscreen)
+        assertEquals(BackgroundType.CubeMap, loaded.backgroundSettings.type)
+        assertEquals(listOf("a.png", "b.png", "c.png", "d.png", "e.png", "f.png"), loaded.backgroundSettings.cubeMapTextures)
+        assertEquals(65280, loaded.backgroundSettings.color)
+        assertEquals(true, loaded.controlsSettings.isLockCursor)
+        assertEquals(true, loaded.controlsSettings.isSpeedModifierKeysSticky)
+        assertEquals(true, loaded.controlsSettings.isDisableTouchInput)
+        assertEquals(true, loaded.controlsSettings.isGamepadEnabled)
+        assertEquals(true, loaded.playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage)
+        assertEquals(
+            MidiSpecification.ExtendedGeneral,
+            loaded.playbackSettings.midiSpecificationResetSettings.midiSpecification
+        )
+        assertEquals(listOf("one.sf2", "two.dls"), loaded.playbackSettings.soundbanksSettings.soundbanks)
+        assertEquals(false, loaded.playbackSettings.synthesizerSettings.isUseChorus)
+        assertEquals(false, loaded.playbackSettings.synthesizerSettings.isUseReverb)
+        assertEquals(false, loaded.onScreenElementsSettings.lyricsSettings.isShowLyrics)
+        assertEquals(2.5, loaded.onScreenElementsSettings.lyricsSettings.lyricsSize)
+        assertEquals(false, loaded.onScreenElementsSettings.isShowHeadsUpDisplay)
+        assertEquals(true, loaded.cameraSettings.isStartAutocamWithSong)
+        assertEquals(false, loaded.cameraSettings.isSmoothFreecam)
+        assertEquals(true, loaded.cameraSettings.isClassicAutoCam)
+        assertEquals(70f, loaded.cameraSettings.defaultFieldOfView)
+        assertEquals(true, loaded.instrumentSettings.isAlwaysShowInstruments)
     }
 
     private companion object {

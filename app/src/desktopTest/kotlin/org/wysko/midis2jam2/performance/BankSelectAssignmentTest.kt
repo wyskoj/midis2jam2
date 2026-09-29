@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.testing.withMidiSpecificationReset
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.instrument.Instrument
@@ -105,9 +106,8 @@ class BankSelectAssignmentTest {
     fun `a file without a reset is read in the mode the app resets the synthesizer to`() {
         // In XG, bank 127 is a drum kit, even off channel 10. In General MIDI, bank select means nothing.
         val file = MidiFixtures.bankSelect(null, Patch(127, 0, 0), firstNote = 36)
-        val xg = AppSettings().apply {
-            playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage = true
-            playbackSettings.midiSpecificationResetSettings.midiSpecification = MidiSpecification.ExtendedGeneral
+        val xg = AppSettings().withMidiSpecificationReset {
+            copy(isSendSpecificationResetMessage = true, midiSpecification = MidiSpecification.ExtendedGeneral)
         }
 
         HeadlessPerformance.start(file, settings = xg).use { performance ->

@@ -40,11 +40,6 @@ interface SettingsRepository {
      * overwrite each other's changes.
      */
     suspend fun update(transform: (AppSettings) -> AppSettings)
-
-    /** Applies [block] to a copy of the stored settings and saves the result. */
-    suspend fun updateAppSettings(block: AppSettings.() -> Unit) = update { current ->
-        AppSettingsCodec.copy(current).also(block)
-    }
 }
 
 /**
@@ -100,9 +95,6 @@ internal object AppSettingsCodec {
 
     fun decode(stored: String): AppSettings =
         json.decodeFromJsonElement(AppSettings.serializer(), migrate(json.parseToJsonElement(stored) as JsonObject))
-
-    /** A deep copy of [settings], so the copy can be changed without touching the original. */
-    fun copy(settings: AppSettings): AppSettings = decode(encode(settings))
 
     /**
      * Brings a stored document up to [CURRENT_VERSION]. Documents that predate the version field count as

@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.input
 
+import org.wysko.midis2jam2.testing.withCamera
 import com.jme3.input.KeyInput
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.domain.settings.AppSettings
@@ -244,7 +245,7 @@ class CameraInputTest {
     @Test
     @Spec("camera.settings.smooth-freecam")
     fun `smooth freecam eases the camera into position instead of snapping`() {
-        val smooth = AppSettings().apply { cameraSettings.isSmoothFreecam = true }
+        val smooth = AppSettings().withCamera { copy(isSmoothFreecam = true) }
 
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = smooth).use { performance ->
             val input = InputHarness(performance)
@@ -268,10 +269,8 @@ class CameraInputTest {
     @Test
     @Spec("camera.settings.start-autocam-with-song")
     fun `the auto-cam can be set to start with the song`() {
-        val autoStart = AppSettings().apply {
-            cameraSettings.isStartAutocamWithSong = true
-            cameraSettings.isSmoothFreecam = false
-        }
+        val autoStart = AppSettings()
+            .withCamera { copy(isStartAutocamWithSong = true, isSmoothFreecam = false) }
 
         HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = autoStart).use { performance ->
             val input = InputHarness(performance)
@@ -292,10 +291,8 @@ class CameraInputTest {
     @Test
     @Spec("camera.settings.classic-autocam")
     fun `the classic auto-cam can be selected`() {
-        val classic = AppSettings().apply {
-            cameraSettings.isClassicAutoCam = true
-            cameraSettings.isSmoothFreecam = false
-        }
+        val classic = AppSettings()
+            .withCamera { copy(isClassicAutoCam = true, isSmoothFreecam = false) }
 
         HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = classic).use { performance ->
             val input = InputHarness(performance)
@@ -318,10 +315,8 @@ class CameraInputTest {
     @Test
     @Spec("graphics.fov")
     fun `the field of view setting is applied to the camera`() {
-        val narrow = AppSettings().apply {
-            cameraSettings.defaultFieldOfView = 30f
-            cameraSettings.isSmoothFreecam = false
-        }
+        val narrow = AppSettings()
+            .withCamera { copy(defaultFieldOfView = 30f, isSmoothFreecam = false) }
 
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = narrow).use { performance ->
             val input = InputHarness(performance)
@@ -350,7 +345,7 @@ class CameraInputTest {
          * lands exactly on its configured position rather than easing towards it.
          */
         fun withCamera(block: (HeadlessPerformance, InputHarness) -> Unit) {
-            val settings = AppSettings().apply { cameraSettings.isSmoothFreecam = false }
+            val settings = AppSettings().withCamera { copy(isSmoothFreecam = false) }
             HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = settings)
                 .use { performance ->
                     val input = InputHarness(performance)
@@ -397,7 +392,7 @@ class CameraInputTest {
 
         /** Like [withCamera], but with a song long enough to watch the camera for a while. */
         fun withLongSong(block: (HeadlessPerformance, InputHarness) -> Unit) {
-            val settings = AppSettings().apply { cameraSettings.isSmoothFreecam = false }
+            val settings = AppSettings().withCamera { copy(isSmoothFreecam = false) }
             HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = settings)
                 .use { performance ->
                     val input = InputHarness(performance)

@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.ui
 
+import org.wysko.midis2jam2.testing.withCamera
 import com.russhwolf.settings.PropertiesSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -102,7 +103,7 @@ class HomeTabConfigurationTest {
 
     @Test
     fun `the settings in force are handed to the performance alongside the home choices`() {
-        val settings = AppSettings().apply { cameraSettings.defaultFieldOfView = 55f }
+        val settings = AppSettings().withCamera { copy(defaultFieldOfView = 55f) }
         val service = configurationService(HomeTabPersistentState(midiDevice = "Gervill"), settings)
 
         val config = service.create(isLooping = false)

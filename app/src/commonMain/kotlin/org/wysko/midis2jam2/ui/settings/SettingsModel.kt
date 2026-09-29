@@ -22,256 +22,146 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
 
 class SettingsModel(private val settingsRepository: SettingsRepository) : ScreenModel {
-    fun setAppTheme(selectedTheme: AppTheme) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                generalSettings.theme = selectedTheme
-            }
-        }
-    }
-
-    fun setLocale(locale: String) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                generalSettings.locale = locale
-            }
-        }
-    }
-
-    fun setIsFullscreen(isFullscreen: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.isFullscreen = isFullscreen
-            }
-        }
-    }
-
-    fun setIsUseDefaultResolution(isUseDefaultResolution: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.resolutionSettings.isUseDefaultResolution = isUseDefaultResolution
-            }
-        }
-    }
-
-    fun setResolution(resolutionWidth: Int, resolutionHeight: Int) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.resolutionSettings.resolutionWidth = resolutionWidth
-                graphicsSettings.resolutionSettings.resolutionHeight = resolutionHeight
-            }
-        }
-    }
-
-    fun setBackgroundType(backgroundType: AppSettings.BackgroundSettings.BackgroundType) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                backgroundSettings.type = backgroundType
-            }
-        }
-    }
-
-    fun setBackgroundColor(color: Int) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                backgroundSettings.color = color
-            }
-        }
-    }
-
-    fun setCubeMapTexture(index: Int, texture: String) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                backgroundSettings.cubeMapTextures[index] = texture
-            }
-        }
-    }
-
-    fun setLockCursorEnabled(isEnabled: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                controlsSettings.isLockCursor = isEnabled
-            }
-        }
-    }
-
-    fun setDisableTouchInput(isDisableTouchInput: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                controlsSettings.isDisableTouchInput = isDisableTouchInput
-            }
-        }
-    }
-
-    fun setSpeedModifierKeysSticky(isSticky: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                controlsSettings.isSpeedModifierKeysSticky = isSticky
-            }
-        }
-    }
-
-    fun setGamepadEnabled(isEnabled: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                controlsSettings.isGamepadEnabled = isEnabled
-            }
-        }
-    }
-
-    fun setIsSendResetMessage(isEnabled: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage = isEnabled
-            }
-        }
-    }
-
-    fun setResetMessageSpecification(specification: MidiSpecification) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                playbackSettings.midiSpecificationResetSettings.midiSpecification = specification
-            }
-        }
-    }
-
-    fun setUseReverb(isUseReverb: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                playbackSettings.synthesizerSettings.isUseReverb = isUseReverb
-            }
-        }
-    }
-
-    fun setUseChorus(isUseChorus: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                playbackSettings.synthesizerSettings.isUseChorus = isUseChorus
-            }
-        }
-    }
-
-    fun addSoundbanks(soundbanks: List<String>) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                val newSoundbanks = soundbanks.minus(playbackSettings.soundbanksSettings.soundbanks.toSet())
-                playbackSettings.soundbanksSettings.soundbanks.addAll(newSoundbanks)
-            }
-        }
-    }
-
-    fun removeSoundbank(soundbank: String) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                playbackSettings.soundbanksSettings.soundbanks.remove(soundbank)
-            }
-        }
-    }
-
-    fun setShowHeadsUpDisplay(isShow: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                onScreenElementsSettings.isShowHeadsUpDisplay = isShow
-            }
-        }
-    }
-
-    fun setShowLyrics(isShow: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                onScreenElementsSettings.lyricsSettings.isShowLyrics = isShow
-            }
-        }
-    }
-
-    fun setLyricsSize(lyricsSize: Double) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                onScreenElementsSettings.lyricsSettings.lyricsSize = lyricsSize
-            }
-        }
-    }
-
-    fun setUseShadows(isUseShadows: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.shadowsSettings.isUseShadows = isUseShadows
-            }
-        }
-    }
-
-    fun setShadowsQuality(shadowsQuality: ShadowsQuality) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.shadowsSettings.shadowsQuality = shadowsQuality
-                graphicsSettings.shadowsSettings.isUseShadows = shadowsQuality != ShadowsQuality.Fake
-            }
-        }
-    }
-
-    fun setUseAntiAliasing(isUseAntiAliasing: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.antiAliasingSettings.isUseAntiAliasing = isUseAntiAliasing
-            }
-        }
-    }
-
-    fun setAntiAliasingQuality(
-        antiAliasingQuality: AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality,
-    ) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                graphicsSettings.antiAliasingSettings.antiAliasingQuality = antiAliasingQuality
-            }
-        }
-    }
-
-    fun setStartAutocamWithSong(isStartWithSong: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                cameraSettings.isStartAutocamWithSong = isStartWithSong
-            }
-        }
-    }
-
-    fun setSmoothFreecam(isSmoothFreecam: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                cameraSettings.isSmoothFreecam = isSmoothFreecam
-            }
-        }
-    }
-
-    fun setClassicAutoCam(isClassicAutoCam: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                cameraSettings.isClassicAutoCam = isClassicAutoCam
-            }
-        }
-    }
-
-    fun setAlwaysShowInstruments(isAlwaysShow: Boolean) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                instrumentSettings.isAlwaysShowInstruments = isAlwaysShow
-            }
-        }
-    }
-
-    fun setDefaultFieldOfView(defaultFieldOfView: Float) {
-        screenModelScope.launch {
-            settingsRepository.updateAppSettings {
-                cameraSettings.defaultFieldOfView = defaultFieldOfView
-            }
-        }
-    }
 
     val appSettings: StateFlow<AppSettings> = settingsRepository.appSettings
+
+    private fun update(transform: (AppSettings) -> AppSettings) {
+        screenModelScope.launch { settingsRepository.update(transform) }
+    }
+
+    private fun general(change: (AppSettings.GeneralSettings) -> AppSettings.GeneralSettings) =
+        update { it.copy(generalSettings = change(it.generalSettings)) }
+
+    private fun graphics(change: (AppSettings.GraphicsSettings) -> AppSettings.GraphicsSettings) =
+        update { it.copy(graphicsSettings = change(it.graphicsSettings)) }
+
+    private fun background(change: (AppSettings.BackgroundSettings) -> AppSettings.BackgroundSettings) =
+        update { it.copy(backgroundSettings = change(it.backgroundSettings)) }
+
+    private fun controls(change: (AppSettings.ControlsSettings) -> AppSettings.ControlsSettings) =
+        update { it.copy(controlsSettings = change(it.controlsSettings)) }
+
+    private fun playback(change: (AppSettings.PlaybackSettings) -> AppSettings.PlaybackSettings) =
+        update { it.copy(playbackSettings = change(it.playbackSettings)) }
+
+    private fun onScreenElements(
+        change: (AppSettings.OnScreenElementsSettings) -> AppSettings.OnScreenElementsSettings,
+    ) = update { it.copy(onScreenElementsSettings = change(it.onScreenElementsSettings)) }
+
+    private fun camera(change: (AppSettings.CameraSettings) -> AppSettings.CameraSettings) =
+        update { it.copy(cameraSettings = change(it.cameraSettings)) }
+
+    private fun instrument(change: (AppSettings.InstrumentSettings) -> AppSettings.InstrumentSettings) =
+        update { it.copy(instrumentSettings = change(it.instrumentSettings)) }
+
+    fun setAppTheme(selectedTheme: AppTheme) = general { it.copy(theme = selectedTheme) }
+
+    fun setLocale(locale: String) = general { it.copy(locale = locale) }
+
+    fun setIsFullscreen(isFullscreen: Boolean) = graphics { it.copy(isFullscreen = isFullscreen) }
+
+    fun setIsUseDefaultResolution(isUseDefaultResolution: Boolean) = graphics {
+        it.copy(resolutionSettings = it.resolutionSettings.copy(isUseDefaultResolution = isUseDefaultResolution))
+    }
+
+    fun setResolution(resolutionWidth: Int, resolutionHeight: Int) = graphics {
+        it.copy(
+            resolutionSettings = it.resolutionSettings.copy(
+                resolutionWidth = resolutionWidth,
+                resolutionHeight = resolutionHeight,
+            )
+        )
+    }
+
+    fun setBackgroundType(backgroundType: BackgroundType) = background { it.copy(type = backgroundType) }
+
+    fun setBackgroundColor(color: Int) = background { it.copy(color = color) }
+
+    fun setCubeMapTexture(index: Int, texture: String) = background {
+        it.copy(cubeMapTextures = it.cubeMapTextures.toMutableList().also { textures -> textures[index] = texture })
+    }
+
+    fun setLockCursorEnabled(isEnabled: Boolean) = controls { it.copy(isLockCursor = isEnabled) }
+
+    fun setDisableTouchInput(isDisableTouchInput: Boolean) =
+        controls { it.copy(isDisableTouchInput = isDisableTouchInput) }
+
+    fun setSpeedModifierKeysSticky(isSticky: Boolean) = controls { it.copy(isSpeedModifierKeysSticky = isSticky) }
+
+    fun setGamepadEnabled(isEnabled: Boolean) = controls { it.copy(isGamepadEnabled = isEnabled) }
+
+    fun setIsSendResetMessage(isEnabled: Boolean) = playback {
+        it.copy(
+            midiSpecificationResetSettings = it.midiSpecificationResetSettings.copy(
+                isSendSpecificationResetMessage = isEnabled
+            )
+        )
+    }
+
+    fun setResetMessageSpecification(specification: MidiSpecification) = playback {
+        it.copy(
+            midiSpecificationResetSettings = it.midiSpecificationResetSettings.copy(midiSpecification = specification)
+        )
+    }
+
+    fun setUseReverb(isUseReverb: Boolean) =
+        playback { it.copy(synthesizerSettings = it.synthesizerSettings.copy(isUseReverb = isUseReverb)) }
+
+    fun setUseChorus(isUseChorus: Boolean) =
+        playback { it.copy(synthesizerSettings = it.synthesizerSettings.copy(isUseChorus = isUseChorus)) }
+
+    fun addSoundbanks(soundbanks: List<String>) = playback {
+        val current = it.soundbanksSettings.soundbanks
+        it.copy(soundbanksSettings = it.soundbanksSettings.copy(soundbanks = current + soundbanks.minus(current.toSet())))
+    }
+
+    fun removeSoundbank(soundbank: String) = playback {
+        it.copy(soundbanksSettings = it.soundbanksSettings.copy(soundbanks = it.soundbanksSettings.soundbanks - soundbank))
+    }
+
+    fun setShowHeadsUpDisplay(isShow: Boolean) = onScreenElements { it.copy(isShowHeadsUpDisplay = isShow) }
+
+    fun setShowLyrics(isShow: Boolean) =
+        onScreenElements { it.copy(lyricsSettings = it.lyricsSettings.copy(isShowLyrics = isShow)) }
+
+    fun setLyricsSize(lyricsSize: Double) =
+        onScreenElements { it.copy(lyricsSettings = it.lyricsSettings.copy(lyricsSize = lyricsSize)) }
+
+    fun setUseShadows(isUseShadows: Boolean) =
+        graphics { it.copy(shadowsSettings = it.shadowsSettings.copy(isUseShadows = isUseShadows)) }
+
+    fun setShadowsQuality(shadowsQuality: ShadowsQuality) = graphics {
+        it.copy(
+            shadowsSettings = it.shadowsSettings.copy(
+                shadowsQuality = shadowsQuality,
+                isUseShadows = shadowsQuality != ShadowsQuality.Fake,
+            )
+        )
+    }
+
+    fun setUseAntiAliasing(isUseAntiAliasing: Boolean) =
+        graphics { it.copy(antiAliasingSettings = it.antiAliasingSettings.copy(isUseAntiAliasing = isUseAntiAliasing)) }
+
+    fun setAntiAliasingQuality(antiAliasingQuality: AntiAliasingQuality) = graphics {
+        it.copy(antiAliasingSettings = it.antiAliasingSettings.copy(antiAliasingQuality = antiAliasingQuality))
+    }
+
+    fun setStartAutocamWithSong(isStartWithSong: Boolean) =
+        camera { it.copy(isStartAutocamWithSong = isStartWithSong) }
+
+    fun setSmoothFreecam(isSmoothFreecam: Boolean) = camera { it.copy(isSmoothFreecam = isSmoothFreecam) }
+
+    fun setClassicAutoCam(isClassicAutoCam: Boolean) = camera { it.copy(isClassicAutoCam = isClassicAutoCam) }
+
+    fun setAlwaysShowInstruments(isAlwaysShow: Boolean) = instrument { it.copy(isAlwaysShowInstruments = isAlwaysShow) }
+
+    fun setDefaultFieldOfView(defaultFieldOfView: Float) = camera { it.copy(defaultFieldOfView = defaultFieldOfView) }
 }
