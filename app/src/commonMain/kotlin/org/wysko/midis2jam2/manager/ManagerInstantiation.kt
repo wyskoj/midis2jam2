@@ -49,6 +49,7 @@ fun instantiateManagers(
     isQueueApplication: Boolean = false,
     onPlaybackComplete: (() -> Unit)? = null,
     profile: ManagerProfile = ManagerProfile.Full,
+    isRecording: Boolean = false,
 ): List<BaseManager> {
     val settings = configurations.find<AppSettingsConfiguration>()
     val isLooping = configurations.find<Configuration.HomeConfiguration>().isLooping
@@ -78,8 +79,10 @@ fun instantiateManagers(
             PlaybackManager(
                 sequence = sequence,
                 sequencer = sequencer,
-                isLooping = isLooping && !isQueueApplication,
+                isLooping = isLooping && !isQueueApplication && !isRecording,
                 onPlaybackComplete = onPlaybackComplete,
+                // Pausing or seeking would leave the video out of step with the audio, rendered separately.
+                isInteractive = !isRecording,
             )
         )
     }

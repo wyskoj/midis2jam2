@@ -566,3 +566,83 @@
   source: code
   platforms: [desktop]
   claim: "The bundled key bindings match the keys the documentation advertises"
+
+# ------------------------------------------------------------------------------ recording (code)
+- id: record.output.mp4
+  source: code
+  platforms: [desktop]
+  claim: "A recording is an MP4 file with H.264 video and AAC audio, at the chosen resolution and frame rate"
+- id: record.output.upright
+  source: code
+  platforms: [desktop]
+  claim: "Recorded frames are the right way up"
+- id: record.frames.capture
+  source: code
+  platforms: [desktop]
+  claim: "The video shows what the performance window shows, including the HUD and lyrics"
+  waived: "Reading pixels back needs a real OpenGL context; the headless renderer draws nothing."
+- id: record.frames.fixed-step
+  source: code
+  platforms: [desktop]
+  claim: "A recording advances the performance exactly one video frame per frame drawn, however long drawing takes"
+- id: record.duration
+  source: code
+  platforms: [desktop]
+  claim: "The video runs from the start of the performance to the end of its outro"
+- id: record.audio.offline
+  source: code
+  platforms: [desktop]
+  claim: "The audio is rendered by the built-in synthesizer, with each note sounding when the file says"
+- id: record.audio.sync
+  source: code
+  platforms: [desktop]
+  claim: "The song's audio starts in the video where the song starts in the performance, after the intro"
+- id: record.input.playback-locked
+  source: code
+  platforms: [desktop]
+  claim: "While recording, the play/pause and seek keys do nothing"
+- id: record.cancel.removes-partial
+  source: code
+  platforms: [desktop]
+  claim: "Stopping a recording before it finishes deletes the partial video"
+- id: record.tab.midi-file.picker
+  source: code
+  platforms: [desktop]
+  claim: "On the Record tab, clicking the MIDI file or Save as field opens a file dialog"
+  waived: "Opens a native file dialog; not drivable headlessly."
+- id: record.tab.output-default
+  source: code
+  platforms: [desktop]
+  claim: "The video is saved beside the MIDI file with the same name, unless another location is chosen"
+- id: record.tab.song-length
+  source: code
+  platforms: [desktop]
+  claim: "The Record tab shows how long the chosen song plays"
+- id: record.tab.unreadable-file
+  source: code
+  platforms: [desktop]
+  claim: "A file that can't be read as MIDI is flagged on the Record tab and can't be recorded"
+- id: record.tab.record-requires-song
+  source: code
+  platforms: [desktop]
+  claim: "Record is only available with a MIDI file chosen and nothing else playing or recording"
+- id: record.tab.remembers-choices
+  source: code
+  platforms: [desktop]
+  claim: "The Record tab remembers the resolution, frame rate, quality and soundbank last chosen"
+- id: record.tab.resolutions-fit-screen
+  source: code
+  platforms: [desktop]
+  claim: "Only resolutions that fit on the screen are offered"
+- id: record.cli.record
+  source: code
+  platforms: [desktop]
+  claim: "midis2jam2 <file> --record <out.mp4> records the file to video without opening the main window"
+- id: record.cli.defaults
+  source: code
+  platforms: [desktop]
+  claim: "Recording options not given on the command line are the ones last chosen on the Record tab"
+- id: record.cli.invalid
+  source: code
+  platforms: [desktop]
+  claim: "An invalid --record command line prints what is wrong and how to use it"

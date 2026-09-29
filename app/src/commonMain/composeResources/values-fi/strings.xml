@@ -236,5 +236,39 @@
     <string name="history_file_missing_title">Kappale ei ole saatavilla</string>
     <string name="history_unknown_song">Tuntematon kappale</string>
     <string name="history_clear_invalid_song">Tyhjennä</string>
+
+    <!-- Record -->
+    <string name="tab_record">Nauhoita</string>
+    <string name="record_start">Nauhoita</string>
+    <string name="record_output">Tallenna nimellä</string>
+    <string name="record_resolution">Resoluutio</string>
+    <string name="record_frame_rate">Kuvataajuus</string>
+    <string name="record_quality">Laatu</string>
+    <string name="record_quality_low">Matala</string>
+    <string name="record_quality_medium">Keskitaso</string>
+    <string name="record_quality_high">Korkea</string>
+    <string name="record_quality_maximum">Suurin</string>
+    <string name="record_preparing">Valmistellaan…</string>
+    <string name="record_recording">Nauhoitetaan…</string>
+    <string name="record_open_video">Avaa video</string>
+    <string name="record_show_in_folder">Näytä kansiossa</string>
+    <string name="record_cancelled">Nauhoitus peruttiin.</string>
+    <string name="record_audio_note">Tuotetaan sisäänrakennetulla syntetisaattorilla tällä äänipankilla.</string>
+    <string name="record_window_note">Nauhoituksen aikana avautuu esikatseluikkuna. Sen sulkeminen peruu nauhoituksen.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Ääni</string>
+    <string name="record_empty_title">Nauhoita esitys</string>
+    <string name="record_empty_body">Tee MIDI-tiedostosta video, jossa on ääni.</string>
+    <string name="record_choose_file">Valitse MIDI-tiedosto</string>
+    <string name="record_drop_hint">tai pudota se tähän</string>
+    <string name="record_change_file">Vaihda</string>
+    <string name="record_unreadable">Tätä tiedostoa ei voi lukea MIDI-tiedostona.</string>
+    <string name="record_in_folder">kansiossa %1$s</string>
+    <string name="record_quality_low_detail">Pienin tiedosto</string>
+    <string name="record_quality_medium_detail">Tasapainoinen</string>
+    <string name="record_quality_high_detail">Paras kuva</string>
+    <string name="record_saved">Tallennettu</string>
+    <string name="record_failed_title">Nauhoitus epäonnistui</string>
+    <string name="record_time_left">noin %1$s jäljellä</string>
 </resources>
 
