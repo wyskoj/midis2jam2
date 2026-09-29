@@ -38,9 +38,9 @@ internal actual fun AppSettings.applyScreenFrequency() {
     }
 }
 
-internal actual fun getScreenResolution(): Resolution.CustomResolution? =
+internal actual fun getScreenResolution(): Resolution? =
     with(GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayMode) {
-        Resolution.CustomResolution(width, height)
+        Resolution(width, height)
     }
 
 /**

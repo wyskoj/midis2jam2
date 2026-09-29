@@ -97,7 +97,7 @@ internal actual class Midis2jam2Application(
                 }
 
                 enqueue {
-                    setupState(config, platform = Platform.Desktop)
+                    setupState(config, platform = Platform.Android)
                     val loadingProgressManager = LoadingProgressManager()
                     stateManager.attach(loadingProgressManager)
                     stateManager.attach(AssetLoader {

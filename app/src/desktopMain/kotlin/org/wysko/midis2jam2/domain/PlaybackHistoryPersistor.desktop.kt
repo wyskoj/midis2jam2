@@ -17,11 +17,7 @@
 
 package org.wysko.midis2jam2.domain
 
-import com.russhwolf.settings.PreferencesSettings
-import java.util.prefs.Preferences
 
 /** The desktop keeps the playback history in the user's Java preferences. */
 actual fun createPlaybackHistoryPersistor(): PlaybackHistoryPersistor =
-    PreferenceBackedPlaybackHistoryPersistor(
-        PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2"))
-    )
+    PreferenceBackedPlaybackHistoryPersistor(platformSettings(StoreName.PlaybackHistory))

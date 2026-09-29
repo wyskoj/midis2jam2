@@ -15,13 +15,16 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.domain
+package org.wysko.midis2jam2.starter.configuration
 
-import com.russhwolf.settings.PreferencesSettings
-import java.util.prefs.Preferences
+import java.io.File
 
-/** On the desktop, the home tab's state lives in the user's Java preferences. */
-actual fun createHomeTabPersistor(): HomeTabPersistor =
-    PreferenceBackedHomeTabPersistor(
-        PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2"))
-    )
+/** The folder the application keeps its files in, created if it does not exist. */
+val APPLICATION_CONFIG_HOME: File = File(File(System.getProperty("user.home")), ".midis2jam2").also {
+    it.mkdirs()
+}
+
+/** The folder where the user stores background images. */
+val BACKGROUND_IMAGES_FOLDER: File = File(APPLICATION_CONFIG_HOME, "backgrounds").also {
+    it.mkdirs()
+}

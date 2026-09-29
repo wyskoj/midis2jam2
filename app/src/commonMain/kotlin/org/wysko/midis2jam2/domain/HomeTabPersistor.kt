@@ -55,6 +55,3 @@ class PreferenceBackedHomeTabPersistor(private val settings: Settings) : HomeTab
         val defaultStateJson: String = json.encodeToString(HomeTabPersistentState())
     }
 }
-
-/** Builds the home tab store backed by this platform's own preference store. */
-expect fun createHomeTabPersistor(): HomeTabPersistor

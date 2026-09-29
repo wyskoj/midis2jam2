@@ -15,13 +15,23 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.domain.settings
+package org.wysko.midis2jam2.domain
 
-import com.russhwolf.settings.PreferencesSettings
-import java.util.prefs.Preferences
+import com.russhwolf.settings.Settings
 
-/** On the desktop, settings live in the user's Java preferences. */
-actual fun createSettingsRepository(): SettingsRepository =
-    PreferenceBackedSettingsRepository(
-        PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2"))
-    )
+/** Remembers whether the app has been launched before, so first-launch guidance is shown only once. */
+class OnboardingPersistor(private val settings: Settings = platformSettings(StoreName.Onboarding)) {
+
+    /** Whether no performance has been started yet. */
+    val isFirstLaunch: Boolean
+        get() = settings.getBoolean(KEY_IS_FIRST_LAUNCH, true)
+
+    /** Records that the app has been launched. */
+    fun markLaunched() {
+        settings.putBoolean(KEY_IS_FIRST_LAUNCH, false)
+    }
+
+    private companion object {
+        const val KEY_IS_FIRST_LAUNCH = "isFirstLaunch"
+    }
+}

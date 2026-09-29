@@ -41,25 +41,16 @@ actual class ApplicationService : KoinComponent {
     val config: StateFlow<PerformanceConfig?>
         get() = _config
 
-    private val _isFirstLaunch = MutableStateFlow(
-        run {
-            val context by inject<Context>()
-            val prefs = context.getSharedPreferences("org.wysko.midis2jam2.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE)
-            prefs.getBoolean("isFirstLaunch", true)
-        }
-    )
+    private val onboardingPersistor = OnboardingPersistor()
+    private val _isFirstLaunch = MutableStateFlow(onboardingPersistor.isFirstLaunch)
     val isFirstLaunch: StateFlow<Boolean>
         get() = _isFirstLaunch
 
     actual fun startApplication(executionState: ExecutionState) {
         _isApplicationRunning.value = true
 
-        run {
-            val context by inject<Context>()
-            val prefs = context.getSharedPreferences("org.wysko.midis2jam2.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE)
-            prefs.edit().putBoolean("isFirstLaunch", false).apply()
-            _isFirstLaunch.value = false
-        }
+        onboardingPersistor.markLaunched()
+        _isFirstLaunch.value = false
 
         val factory: PerformanceConfigFactory by inject()
         val config = factory.create(isLooping = executionState.isLooping)

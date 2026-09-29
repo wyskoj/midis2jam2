@@ -69,11 +69,11 @@ private fun AppSettings.applyResolution(config: PerformanceConfig) {
     }
 }
 
-internal fun screenResolution(): Resolution.CustomResolution? = getScreenResolution()
+internal fun screenResolution(): Resolution? = getScreenResolution()
 
-internal fun preferredResolution(screenResolution: Resolution.CustomResolution): Resolution.CustomResolution =
+internal fun preferredResolution(screenResolution: Resolution): Resolution =
     with(screenResolution) {
-        Resolution.CustomResolution((width * 0.95).toInt(), (height * 0.85).toInt())
+        Resolution((width * 0.95).toInt(), (height * 0.85).toInt())
     }
 
 private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
@@ -90,4 +90,4 @@ private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
 
 internal expect fun AppSettings.applyIcons()
 internal expect fun AppSettings.applyScreenFrequency()
-internal expect fun getScreenResolution(): Resolution.CustomResolution?
+internal expect fun getScreenResolution(): Resolution?

@@ -102,6 +102,3 @@ internal object AppSettingsCodec {
      */
     private fun migrate(document: JsonObject): JsonObject = document
 }
-
-/** Builds the settings repository backed by this platform's own preference store. */
-expect fun createSettingsRepository(): SettingsRepository

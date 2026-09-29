@@ -17,23 +17,12 @@
 
 package org.wysko.midis2jam2.starter.configuration
 
-import kotlinx.serialization.Serializable
-
 /**
- * Represents a resolution for display and rendering.
+ * A resolution for display and rendering.
+ *
+ * @property width The width of the resolution.
+ * @property height The height of the resolution.
  */
-@Serializable
-sealed class Resolution {
-
-    /**
-     * Represents a custom resolution for the application.
-     *
-     * @property width The width of the resolution.
-     * @property height The height of the resolution.
-     */
-    @Serializable
-    data class CustomResolution(val width: Int, val height: Int) : Resolution() {
-        override fun toString(): String = "${width}x$height"
-    }
+data class Resolution(val width: Int, val height: Int) {
+    override fun toString(): String = "${width}x$height"
 }
-
