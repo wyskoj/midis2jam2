@@ -20,7 +20,7 @@ package org.wysko.midis2jam2.performance
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.manager.MidiDeviceManager
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.NoOpMidiDevice
@@ -184,15 +184,12 @@ class MidiDeviceManagerTest {
     private fun attach(device: NoOpMidiDevice, settings: AppSettings) {
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = settings)
             .use { performance ->
-                val configurations = listOf(
-                    Configuration.HomeConfiguration(),
-                    Configuration.AppSettingsConfiguration(settings),
-                )
+                val config = PerformanceConfig(settings = settings)
 
                 // The shipped application attaches this alongside the other managers once the
                 // MIDI device is open.
                 performance.onEngineThread {
-                    performance.app.stateManager.attach(MidiDeviceManager(configurations, device))
+                    performance.app.stateManager.attach(MidiDeviceManager(config, device))
                 }
                 performance.awaitFrames(1)
                 performance.throwIfEngineFailed()

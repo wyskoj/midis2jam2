@@ -93,10 +93,8 @@ class LyricsTest {
             val manager = performance.app.stateManager.getState(LyricManager::class.java)
             assertNotNull(manager?.controller, "No lyric display was built at a non-default size")
 
-            val configured = performance.performance.configs
-                .filterIsInstance<org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration>()
-                .single()
-                .appSettings
+            val configured = performance.performance.config
+                .settings
                 .onScreenElementsSettings
                 .lyricsSettings
                 .lyricsSize

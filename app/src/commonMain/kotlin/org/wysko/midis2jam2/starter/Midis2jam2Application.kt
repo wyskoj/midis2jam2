@@ -31,9 +31,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.manager.instantiateManagers
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.midi.system.JwSequencer
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.LightingSetup
 import org.wysko.midis2jam2.world.graphics.antiAliasingQualityDefinition
 import org.wysko.midis2jam2.world.graphics.shadowsQualityDefinition
@@ -48,14 +46,14 @@ internal expect class Midis2jam2Application : SimpleApplication {
 internal expect fun getCameraManager(): CameraManager
 
 internal fun SimpleApplication.addManagers(
-    configurations: Collection<Configuration>,
+    config: PerformanceConfig,
     sequence: TimeBasedSequence,
     sequencer: JwSequencer,
     isQueueApplication: Boolean = false,
     onPlaybackComplete: (() -> Unit)? = null,
 ) {
     val managers = instantiateManagers(
-        configurations = configurations,
+        config = config,
         sequence = sequence,
         sequencer = sequencer,
         isQueueApplication = isQueueApplication,
@@ -65,7 +63,7 @@ internal fun SimpleApplication.addManagers(
 }
 
 internal fun SimpleApplication.setupState(
-    configurations: Collection<Configuration>,
+    config: PerformanceConfig,
     addFpp: Boolean = true,
     platform: Platform,
 ) {
@@ -74,7 +72,7 @@ internal fun SimpleApplication.setupState(
         unregisterInput()
         isEnabled = false
     }
-    with(configurations.find<AppSettingsConfiguration>().appSettings.graphicsSettings) {
+    with(config.settings.graphicsSettings) {
         val lightForShadows = LightingSetup.setupLights(rootNode)
 
         if (addFpp) {

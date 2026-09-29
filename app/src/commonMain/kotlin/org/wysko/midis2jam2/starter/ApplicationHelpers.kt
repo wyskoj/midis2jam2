@@ -21,15 +21,12 @@ import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
 import org.wysko.midis2jam2.starter.configuration.*
 
-internal fun SimpleApplication.applyConfigurations(configurations: Collection<Configuration>) {
+internal fun SimpleApplication.applyConfigurations(config: PerformanceConfig) {
     setSettings(
         AppSettings(false).apply {
             copyFrom(DEFAULT_JME_SETTINGS)
-            applyResolution(configurations)
-            setUseJoysticks(
-                configurations.find<Configuration.AppSettingsConfiguration>()
-                    .appSettings.controlsSettings.isGamepadEnabled
-            )
+            applyResolution(config)
+            setUseJoysticks(config.settings.controlsSettings.isGamepadEnabled)
         }
     )
     setDisplayStatView(false)
@@ -38,10 +35,10 @@ internal fun SimpleApplication.applyConfigurations(configurations: Collection<Co
     isShowSettings = false
 }
 
-private fun AppSettings.applyResolution(configurations: Collection<Configuration>) {
+private fun AppSettings.applyResolution(config: PerformanceConfig) {
     val measuredResolution = screenResolution()
     when {
-        configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings.isFullscreen -> {
+        config.settings.graphicsSettings.isFullscreen -> {
             isFullscreen = true
             if (measuredResolution != null) {
                 this@applyResolution.width = measuredResolution.width
@@ -51,7 +48,7 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
 
         else -> {
             isFullscreen = false
-            with(configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings) {
+            with(config.settings.graphicsSettings) {
                 when (resolutionSettings.isUseDefaultResolution) {
                     true -> {
                         measuredResolution?.let { screenRes ->

@@ -32,7 +32,7 @@ import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.DesktopCameraManager
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.AssetLoader
 import java.lang.invoke.MethodHandles
 import javax.sound.midi.Synthesizer
@@ -40,7 +40,7 @@ import javax.sound.midi.Synthesizer
 internal actual class Midis2jam2Application(
     private val sequence: TimeBasedSequence,
     private val fileName: String,
-    private val configurations: Collection<Configuration>,
+    private val config: PerformanceConfig,
     private val onFinish: () -> Unit,
     private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
@@ -50,7 +50,7 @@ internal actual class Midis2jam2Application(
 
     actual fun execute() {
         try {
-            applyConfigurations(configurations)
+            applyConfigurations(config)
             start()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -69,19 +69,19 @@ internal actual class Midis2jam2Application(
             sequencer.stop()
             sequencer.close()
         }
-        setupState(configurations, platform = Platform.Desktop)
+        setupState(config, platform = Platform.Desktop)
         stateManager.attach(AssetLoader())
         val performanceAppState = DesktopPerformanceManager(
             sequencer = sequencer,
             midiFile = sequence,
             onClose = { stop() },
             fileName = fileName,
-            configs = configurations,
+            config = config,
         )
         stateManager.attach(performanceAppState)
         rootNode.attachChild(performanceAppState.root)
-        addManagers(configurations, sequence, sequencer)
-        stateManager.attach(MidiDeviceManager(configurations, midiDevice))
+        addManagers(config, sequence, sequencer)
+        stateManager.attach(MidiDeviceManager(config, midiDevice))
     }
 
     actual override fun stop() {

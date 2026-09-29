@@ -22,16 +22,16 @@ import com.jme3.math.ColorRGBA
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.starter.configuration.BACKGROUND_IMAGES_FOLDER
 
 object BackgroundController {
-    fun configureBackground(context: PerformanceManager, config: AppSettingsConfiguration, root: Node, platform: Platform) {
+    fun configureBackground(context: PerformanceManager, config: PerformanceConfig, root: Node, platform: Platform) {
         with(context) {
             if (platform == Platform.Desktop) {
                 app.assetManager.registerLocator(BACKGROUND_IMAGES_FOLDER.absolutePath, FileLocator::class.java)
             }
-            when (config.appSettings.backgroundSettings.type) {
+            when (config.settings.backgroundSettings.type) {
                 AppSettings.BackgroundSettings.BackgroundType.Default -> {
                     root.attachChild(BackgroundFactory.Default(app.assetManager).create())
                 }
@@ -41,7 +41,7 @@ object BackgroundController {
                 }
 
                 AppSettings.BackgroundSettings.BackgroundType.Color -> {
-                    app.viewPort.backgroundColor = ColorRGBA().fromIntARGB(config.appSettings.backgroundSettings.color)
+                    app.viewPort.backgroundColor = ColorRGBA().fromIntARGB(config.settings.backgroundSettings.color)
                 }
             }
         }

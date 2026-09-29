@@ -18,10 +18,10 @@
 package org.wysko.midis2jam2.renderer
 
 import kotlinx.serialization.Serializable
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 
 @Serializable
 data class RendererBundle(
     val midiFiles: List<String>,
-    val configurations: List<Configuration>,
+    val config: PerformanceConfig,
 )

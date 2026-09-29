@@ -20,9 +20,7 @@ package org.wysko.midis2jam2.manager
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.manager.LyricManager.Companion.lyricEvents
 import org.wysko.midis2jam2.midi.system.JwSequencer
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.starter.getCameraManager
 
 /**
@@ -43,21 +41,20 @@ enum class ManagerProfile {
 }
 
 fun instantiateManagers(
-    configurations: Collection<Configuration>,
+    config: PerformanceConfig,
     sequence: TimeBasedSequence,
     sequencer: JwSequencer,
     isQueueApplication: Boolean = false,
     onPlaybackComplete: (() -> Unit)? = null,
     profile: ManagerProfile = ManagerProfile.Full,
 ): List<BaseManager> {
-    val settings = configurations.find<AppSettingsConfiguration>()
-    val isLooping = configurations.find<Configuration.HomeConfiguration>().isLooping
+    val settings = config.settings
 
     val managers = buildList {
-        if (!settings.appSettings.graphicsSettings.shadowsSettings.isUseShadows) {
+        if (!settings.graphicsSettings.shadowsSettings.isUseShadows) {
             add(FakeShadowsManager())
         }
-        add(PreferencesManager(settings.appSettings))
+        add(PreferencesManager(settings))
         add(ActionsManager())
         add(getCameraManager())
         add(CollectorsManager())
@@ -66,19 +63,19 @@ fun instantiateManagers(
         }
         add(DrumSetVisibilityManager())
         add(FadeManager())
-        add(HudManager().apply { isEnabled = settings.appSettings.onScreenElementsSettings.isShowHeadsUpDisplay })
+        add(HudManager().apply { isEnabled = settings.onScreenElementsSettings.isShowHeadsUpDisplay })
         add(StageManager())
         add(StandManager())
         // Only worth attaching when the file has something to sing and the user wants to see
         // it; the controller builds a text object per line up front.
-        if (settings.appSettings.onScreenElementsSettings.lyricsSettings.isShowLyrics) {
+        if (settings.onScreenElementsSettings.lyricsSettings.isShowLyrics) {
             sequence.lyricEvents().takeIf { it.isNotEmpty() }?.let { add(LyricManager(it)) }
         }
         add(
             PlaybackManager(
                 sequence = sequence,
                 sequencer = sequencer,
-                isLooping = isLooping && !isQueueApplication,
+                isLooping = config.isLooping && !isQueueApplication,
                 onPlaybackComplete = onPlaybackComplete,
             )
         )

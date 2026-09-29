@@ -42,23 +42,23 @@ fun main(args: Array<String>) {
 
     startKoin { modules(applicationModule, midiSystemModule, systemModule, uiModule) }
     val arguments = Base64.getDecoder().decode(args.first()).toString(Charsets.UTF_8)
-    val config = Json.decodeFromString<RendererBundle>(arguments)
-    val midiFiles = config.midiFiles.map { File(it) }
+    val bundle = Json.decodeFromString<RendererBundle>(arguments)
+    val midiFiles = bundle.midiFiles.map { File(it) }
 
     when (midiFiles.size) {
         0 -> reportNoFiles(protocol)
-        1 -> launchApplication(midiFiles, config, protocol)
-        else -> launchQueueApplication(midiFiles, config, protocol)
+        1 -> launchApplication(midiFiles, bundle, protocol)
+        else -> launchQueueApplication(midiFiles, bundle, protocol)
     }
 }
 
 private fun launchApplication(
     midiFiles: List<File>,
-    config: RendererBundle,
+    bundle: RendererBundle,
     protocol: BufferedWriter,
 ) {
     val midiFile = midiFiles.first()
-    val midiPackage = runCatching { MidiPackage.build(midiFile, config.configurations) }.onFailure { t ->
+    val midiPackage = runCatching { MidiPackage.build(midiFile, bundle.config) }.onFailure { t ->
         onFailGetMidiPackage(t, protocol)
         return
     }
@@ -67,7 +67,7 @@ private fun launchApplication(
         val application = Midis2jam2Application(
             sequence!!,
             midiFile.name,
-            config.configurations,
+            bundle.config,
             {
                 latch.countDown()
                 protocol.send(RendererMessage.finish())
@@ -84,13 +84,13 @@ private fun launchApplication(
 
 private fun launchQueueApplication(
     midiFiles: List<File>,
-    config: RendererBundle,
+    bundle: RendererBundle,
     protocol: BufferedWriter,
 ) {
     val reader = StandardMidiFileReader()
     val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
 
-    val midiPackage = runCatching { MidiPackage.build(null, config.configurations) }.onFailure { t ->
+    val midiPackage = runCatching { MidiPackage.build(null, bundle.config) }.onFailure { t ->
         onFailGetMidiPackage(t, protocol)
         return
     }
@@ -99,7 +99,7 @@ private fun launchQueueApplication(
         val application = Midis2jam2QueueApplication(
             sequences = sequences,
             fileNames = midiFiles.map { it.name },
-            config.configurations,
+            bundle.config,
             onTrackStart = { trackIndex -> protocol.send(RendererMessage.queueTrackStart(trackIndex)) },
             { protocol.send(RendererMessage.finish()) },
             sequencer,
@@ -108,7 +108,7 @@ private fun launchQueueApplication(
         )
         watchParentCommands { application.stop() }
         application.run {
-            applyConfigurations(config.configurations)
+            applyConfigurations(bundle.config)
             start()
         }
     }

@@ -29,11 +29,11 @@ import org.wysko.midis2jam2.domain.createPlaybackHistoryPersistor
 import org.wysko.midis2jam2.domain.PlaybackHistoryStore
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
 import org.wysko.midis2jam2.domain.settings.createSettingsRepository
-import org.wysko.midis2jam2.starter.configuration.ConfigurationService
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfigFactory
 
 val applicationModule: Module = module {
     single<ApplicationService> { ApplicationService() }
-    single<ConfigurationService> { ConfigurationService(get(), get(), get()) }
+    single<PerformanceConfigFactory> { PerformanceConfigFactory(get(), get()) }
     single<BackgroundImageRepository> { BackgroundImageRepository() }
     single<SettingsRepository> { createSettingsRepository() }
     single<HomeTabPersistor> { createHomeTabPersistor() }

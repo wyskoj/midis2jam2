@@ -25,8 +25,8 @@ import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.PerformanceActivity
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.ConfigurationService
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfigFactory
 
 actual class ApplicationService : KoinComponent {
     private val _isApplicationRunning = MutableStateFlow(false)
@@ -37,9 +37,9 @@ actual class ApplicationService : KoinComponent {
     val midiFile: StateFlow<PlatformFile?>
         get() = _midiFile
 
-    private val _configurations = MutableStateFlow<List<Configuration>>(emptyList())
-    val configurations: StateFlow<List<Configuration>>
-        get() = _configurations
+    private val _config = MutableStateFlow<PerformanceConfig?>(null)
+    val config: StateFlow<PerformanceConfig?>
+        get() = _config
 
     private val _isFirstLaunch = MutableStateFlow(
         run {
@@ -61,12 +61,12 @@ actual class ApplicationService : KoinComponent {
             _isFirstLaunch.value = false
         }
 
-        val configurationService: ConfigurationService by inject()
-        val configurations = configurationService.getConfigurations()
+        val factory: PerformanceConfigFactory by inject()
+        val config = factory.create(isLooping = executionState.isLooping)
         val midiFile = executionState.midiFile
 
         this._midiFile.value = midiFile
-        this._configurations.value = configurations
+        this._config.value = config
 
         val context: Context by inject()
         context.startActivity(
