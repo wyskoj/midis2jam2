@@ -60,6 +60,22 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /**
+     * A piano playing one note, [restQuarters] quarter notes into the file (at 120 BPM, half a second each), so the
+     * sound starts at a known time.
+     */
+    fun oneNoteAfterRest(restQuarters: Int = 2): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(0)
+                note(60, duration = 1.quarter, absoluteTime = restQuarters * TICKS_PER_QUARTER)
+            }
+        }
+    }.toTimeBasedSequence()
+
     /** One channel playing four notes under [first], then switching to [second] for four more. */
     fun programSwitch(first: Int, second: Int): TimeBasedSequence = smf {
         format = StandardMidiFile.Header.Format.Format0

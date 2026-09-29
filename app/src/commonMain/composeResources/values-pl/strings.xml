@@ -236,5 +236,39 @@
     <string name="history_file_missing_title">Utwór niedostępny</string>
     <string name="history_unknown_song">Nieznany utwór</string>
     <string name="history_clear_invalid_song">Wyczyść</string>
+
+    <!-- Record -->
+    <string name="tab_record">Nagrywanie</string>
+    <string name="record_start">Nagraj</string>
+    <string name="record_output">Zapisz jako</string>
+    <string name="record_resolution">Rozdzielczość</string>
+    <string name="record_frame_rate">Liczba klatek na sekundę</string>
+    <string name="record_quality">Jakość</string>
+    <string name="record_quality_low">Niska</string>
+    <string name="record_quality_medium">Średnia</string>
+    <string name="record_quality_high">Wysoka</string>
+    <string name="record_quality_maximum">Maksymalna</string>
+    <string name="record_preparing">Przygotowywanie…</string>
+    <string name="record_recording">Nagrywanie…</string>
+    <string name="record_open_video">Otwórz wideo</string>
+    <string name="record_show_in_folder">Pokaż w folderze</string>
+    <string name="record_cancelled">Nagrywanie zostało anulowane.</string>
+    <string name="record_audio_note">Generowane przez wbudowany syntezator z tym bankiem brzmień.</string>
+    <string name="record_window_note">Podczas nagrywania otwiera się okno podglądu. Zamknięcie go anuluje nagrywanie.</string>
+    <string name="record_section_video">Wideo</string>
+    <string name="record_section_audio">Dźwięk</string>
+    <string name="record_empty_title">Nagraj występ</string>
+    <string name="record_empty_body">Zamień plik MIDI w film z dźwiękiem.</string>
+    <string name="record_choose_file">Wybierz plik MIDI</string>
+    <string name="record_drop_hint">lub upuść go tutaj</string>
+    <string name="record_change_file">Zmień</string>
+    <string name="record_unreadable">Tego pliku nie można odczytać jako MIDI.</string>
+    <string name="record_in_folder">w %1$s</string>
+    <string name="record_quality_low_detail">Najmniejszy plik</string>
+    <string name="record_quality_medium_detail">Zrównoważona</string>
+    <string name="record_quality_high_detail">Najlepszy obraz</string>
+    <string name="record_saved">Zapisano</string>
+    <string name="record_failed_title">Nagrywanie nie powiodło się</string>
+    <string name="record_time_left">zostało ok. %1$s</string>
 </resources>
 

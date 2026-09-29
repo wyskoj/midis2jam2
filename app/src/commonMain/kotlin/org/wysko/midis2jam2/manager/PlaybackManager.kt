@@ -33,14 +33,18 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 
-private val INTRO = 2.0.seconds
-private val OUTRO = 3.0.seconds
+/** How long the performance runs before the song starts. */
+internal val INTRO = 2.0.seconds
+
+/** How long the performance keeps running after the song ends. */
+internal val OUTRO = 3.0.seconds
 
 class PlaybackManager(
     private val sequence: TimeBasedSequence,
     private val sequencer: JwSequencer,
     private val isLooping: Boolean,
     private val onPlaybackComplete: (() -> Unit)? = null,
+    private val isInteractive: Boolean = true,
 ) : BaseManager(), ActionListener {
     val duration: Duration = sequence.duration
     var time: Duration = -INTRO
@@ -52,9 +56,11 @@ class PlaybackManager(
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        app.inputManager.addListener(
-            this, ACTION_PLAY, ACTION_SEEK_FORWARD, ACTION_SEEK_BACKWARD, ACTION_RESTART
-        )
+        if (isInteractive) {
+            app.inputManager.addListener(
+                this, ACTION_PLAY, ACTION_SEEK_FORWARD, ACTION_SEEK_BACKWARD, ACTION_RESTART
+            )
+        }
     }
 
     override fun update(tpf: Float) {

@@ -25,10 +25,23 @@ data class RendererMessage(
     val message: String? = null,
     val stackTrace: String? = null,
     val trackIndex: Int? = null,
+    val framesCaptured: Long? = null,
+    val expectedFrames: Long? = null,
+    val path: String? = null,
 ) {
     companion object {
+        const val RECORD_PROGRESS: String = "RecordProgress"
+        const val RECORD_FINISHED: String = "RecordFinished"
+        const val RECORD_CANCELLED: String = "RecordCancelled"
+
         fun finish() = RendererMessage("Finish")
         fun error(message: String, stackTrace: String) = RendererMessage("Error", message, stackTrace)
         fun queueTrackStart(trackIndex: Int) = RendererMessage("QueueTrackStart", trackIndex = trackIndex)
+
+        fun recordProgress(framesCaptured: Long, expectedFrames: Long) =
+            RendererMessage(RECORD_PROGRESS, framesCaptured = framesCaptured, expectedFrames = expectedFrames)
+
+        fun recordFinished(path: String) = RendererMessage(RECORD_FINISHED, path = path)
+        fun recordCancelled() = RendererMessage(RECORD_CANCELLED)
     }
 }
