@@ -277,7 +277,7 @@ class CameraInputTest {
             input.frames(SETTLE_FRAMES)
 
             val start = input.cameraPose()
-            input.letTimePass()
+            input.letTimePass(AUTO_CAM_GUARANTEED_MOVE_MILLIS)
             val later = input.cameraPose()
 
             // The auto-cam is in charge from the first frame, so the view changes on its own.
@@ -369,6 +369,22 @@ class CameraInputTest {
 
         /** How long to wait when a test needs the engine's own clock to advance. */
         const val OBSERVATION_MILLIS = 700L
+
+        /**
+         * Long enough to make the standard auto-cam's first move deterministic.
+         *
+         * [StandardAutoCamPlugin] picks its first target at random: a 25% chance of a different
+         * stage angle (always visible movement), or else an instrument angle - which, during the
+         * 2-second intro ([org.wysko.midis2jam2.manager.INTRO]), has nothing visible to pick from
+         * and silently falls back to the camera's own starting angle. A short wait would only
+         * ever catch that first roll, so on the 75% of runs where it lands on the fallback, the
+         * camera never appears to move - flaky by design, not by accident. Waiting out the plugin's
+         * full re-roll cycle (finishing whatever move is underway, up to 3 seconds at its
+         * one-third-per-second pace, then its 3-second waiting period) lands well past the intro,
+         * by which point the drum kit alone is continuously visible, so the next roll - stage or
+         * instrument - is guaranteed to land somewhere else.
+         */
+        const val AUTO_CAM_GUARANTEED_MOVE_MILLIS = 8000L
 
         /** The slide camera eases in slowly; give it time to reach its travelling pace. */
         const val SLIDE_SETTLE_MILLIS = 3000L
