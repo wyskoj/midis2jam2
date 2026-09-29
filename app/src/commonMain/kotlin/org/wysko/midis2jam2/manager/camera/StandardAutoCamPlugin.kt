@@ -50,9 +50,8 @@ import org.wysko.midis2jam2.instrument.family.strings.*
 import org.wysko.midis2jam2.manager.DrumSetVisibilityManager.Companion.drumSetVisibilityManagerReal
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.manager.PlaybackManager
-import org.wysko.midis2jam2.manager.PreferencesManager
+import org.wysko.midis2jam2.manager.performanceConfig
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.util.state
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -80,7 +79,7 @@ class StandardAutoCamPlugin : AutoCamPlugin() {
         performanceManager = application.stateManager.getState(PerformanceManager::class.java)
         playbackManager = application.stateManager.getState(PlaybackManager::class.java)
 
-        if (app.state<PreferencesManager>()!!.getAppSettings().cameraSettings.isStartAutocamWithSong) {
+        if (app.performanceConfig.settings.cameraSettings.isStartAutocamWithSong) {
             application.camera.location = DEFAULT_CAMERA_ANGLE.location.clone()
             application.camera.rotation = DEFAULT_CAMERA_ANGLE.rotation.clone()
         }

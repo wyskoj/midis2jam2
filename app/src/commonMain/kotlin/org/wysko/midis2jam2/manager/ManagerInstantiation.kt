@@ -51,10 +51,10 @@ fun instantiateManagers(
     val settings = config.settings
 
     val managers = buildList {
+        add(PerformanceConfigState(config))
         if (!settings.graphicsSettings.shadowsSettings.isUseShadows) {
             add(FakeShadowsManager())
         }
-        add(PreferencesManager(settings))
         add(ActionsManager())
         add(getCameraManager())
         add(CollectorsManager())

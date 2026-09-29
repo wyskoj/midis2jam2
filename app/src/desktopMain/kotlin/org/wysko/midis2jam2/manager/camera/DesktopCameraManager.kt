@@ -18,19 +18,17 @@
 package org.wysko.midis2jam2.manager.camera
 
 import org.wysko.midis2jam2.manager.ActionsManager
-import org.wysko.midis2jam2.manager.PreferencesManager
+import org.wysko.midis2jam2.manager.performanceConfig
 import org.wysko.midis2jam2.manager.camera.FreeCameraPlugin.MovementType.Normal
 import org.wysko.midis2jam2.manager.camera.FreeCameraPlugin.MovementType.Smooth
-import org.wysko.midis2jam2.util.state
 
 class DesktopCameraManager : CameraManager() {
     override fun getDeviceCameraPlugin(): CameraPlugin {
-        val preferences = app.state<PreferencesManager>()
         return FreeCameraPlugin {
             setCurrentCameraPlugin<FreeCameraPlugin>()
         }.apply {
             movementType =
-                if (preferences?.getAppSettings()?.cameraSettings?.isSmoothFreecam ?: false) Smooth else Normal
+                if (app.performanceConfig.settings.cameraSettings.isSmoothFreecam) Smooth else Normal
         }
     }
 

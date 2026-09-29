@@ -21,8 +21,7 @@ import com.jme3.app.Application
 import com.jme3.input.controls.ActionListener
 import org.wysko.midis2jam2.manager.ActionsManager
 import org.wysko.midis2jam2.manager.BaseManager
-import org.wysko.midis2jam2.manager.PreferencesManager
-import org.wysko.midis2jam2.util.state
+import org.wysko.midis2jam2.manager.performanceConfig
 
 abstract class CameraManager : BaseManager(), ActionListener {
     protected lateinit var cameraPlugins: List<CameraPlugin>
@@ -35,17 +34,16 @@ abstract class CameraManager : BaseManager(), ActionListener {
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        val preferences = this.app.state<PreferencesManager>()
         cameraPlugins = buildList {
             add(getDeviceCameraPlugin())
-            when (preferences?.getAppSettings()?.cameraSettings?.isClassicAutoCam) {
+            when (app.performanceConfig.settings.cameraSettings.isClassicAutoCam) {
                 true -> add(ClassicAutoCamPlugin())
-                else -> add(StandardAutoCamPlugin())
+                false -> add(StandardAutoCamPlugin())
             }
             add(RotatingCameraPlugin())
         }
         app.stateManager.attachAll(cameraPlugins)
-        currentCameraPlugin = when (preferences?.getAppSettings()?.cameraSettings?.isStartAutocamWithSong) {
+        currentCameraPlugin = when (app.performanceConfig.settings.cameraSettings.isStartAutocamWithSong) {
             true -> {
                 cameraStateListeners.forEach { it.onAutoCameraEnabled() }
                 cameraPlugins.first { it is AutoCamPlugin }
