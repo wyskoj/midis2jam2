@@ -156,7 +156,7 @@ class AssetIntegrityTest {
         val KNOWN_ORPHANS = emptySet<String>()
 
         val ASSET_LITERAL =
-            Regex("\"([A-Za-z0-9_][A-Za-z0-9_/.\\-]*\\.(?:obj|bmp|png|jpg|jpeg|gif|fnt|j3md|frag))\"")
+            Regex("\"([A-Za-z0-9_][A-Za-z0-9_/.\\-]*\\.(?:obj|bmp|png|jpg|jpeg|gif|fnt|ttf|j3md|frag))\"")
 
         val FINGERING_FROM_CLASS = Regex(
             "(?:PressedKeysFingeringManager|HandPositionFingeringManager|SlidePositionManager)" +

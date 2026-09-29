@@ -337,4 +337,31 @@ object MidiFixtures {
         "Twin", "kle ", "twin", "kle ", "lit", "tle ", "star", "\n",
         "How ", "I ", "won", "der ", "what ", "you ", "are",
     )
+
+    /**
+     * A sung line whose syllables use characters outside the bundled Inter font's plain-ASCII
+     * character set (Japanese and accented Latin), so tests can exercise the dynamic glyph atlas.
+     */
+    fun withNonAsciiLyrics(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(0)
+                NON_ASCII_LYRIC_SYLLABLES.forEachIndexed { index, syllable ->
+                    lyric(syllable, absoluteTime = index * TICKS_PER_QUARTER)
+                    if (syllable != "\n") {
+                        note(60, duration = 1.quarter, absoluteTime = index * TICKS_PER_QUARTER)
+                    }
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The syllables [withNonAsciiLyrics] sings, in order. */
+    val NON_ASCII_LYRIC_SYLLABLES: List<String> = listOf(
+        "こん", "にち", "は", "\n",
+        "café ", "naïve ", "résumé",
+    )
 }

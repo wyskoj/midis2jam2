@@ -29,6 +29,7 @@ import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
 import org.wysko.midis2jam2.world.Sprite
+import org.wysko.midis2jam2.world.font.covers
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -55,6 +56,26 @@ class OnScreenElementsTest {
                 assertTrue(
                     texts.any { it.contains("twinkle.mid") },
                     "The head-up display should name the loaded file, but it shows: $texts"
+                )
+            }
+    }
+
+    @Test
+    @Spec("hud.filename.non-ascii-glyphs")
+    fun `the head-up display shows a file name with characters outside the bundled font`() {
+        val fileName = "日本語.mid"
+        HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), fileName = fileName)
+            .use { performance ->
+                val bitmapTexts = performance.onEngineThread { bitmapTextsIn(performance.app.guiNode) }
+                val match = bitmapTexts.firstOrNull { it.text.toString().contains(fileName) }
+
+                assertNotNull(
+                    match,
+                    "The head-up display should name the loaded file, but shows: ${bitmapTexts.map { it.text }}"
+                )
+                assertTrue(
+                    match.font.covers(fileName.toSet()),
+                    "The head-up display's font is missing glyphs used by the file name"
                 )
             }
     }
@@ -197,9 +218,12 @@ class OnScreenElementsTest {
         }
 
         /** The text of every label currently on the overlay. */
-        fun textsIn(root: Spatial): List<String> = buildList {
+        fun textsIn(root: Spatial): List<String> = bitmapTextsIn(root).map { it.text.toString() }
+
+        /** Every label currently on the overlay. */
+        fun bitmapTextsIn(root: Spatial): List<BitmapText> = buildList {
             fun visit(spatial: Spatial) {
-                if (spatial is BitmapText) add(spatial.text.toString())
+                if (spatial is BitmapText) add(spatial)
                 if (spatial is Node) spatial.children.forEach(::visit)
             }
             visit(root)
