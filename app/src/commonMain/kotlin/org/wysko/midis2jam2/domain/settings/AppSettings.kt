@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppSettings(
+    val version: Int = AppSettingsCodec.CURRENT_VERSION,
     val generalSettings: GeneralSettings = GeneralSettings(),
     val graphicsSettings: GraphicsSettings = GraphicsSettings(),
     val backgroundSettings: BackgroundSettings = BackgroundSettings(),

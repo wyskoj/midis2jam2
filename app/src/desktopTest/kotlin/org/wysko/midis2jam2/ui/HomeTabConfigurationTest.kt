@@ -149,8 +149,8 @@ class HomeTabConfigurationTest {
             val repository = PreferenceBackedSettingsRepository(PropertiesSettings(Properties()))
             return object : SettingsRepository {
                 override val appSettings: StateFlow<AppSettings> = MutableStateFlow(settings)
-                override suspend fun updateAppSettings(block: AppSettings.() -> Unit) {
-                    repository.updateAppSettings(block)
+                override suspend fun update(transform: (AppSettings) -> AppSettings) {
+                    repository.update(transform)
                 }
             }
         }
