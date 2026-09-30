@@ -17,12 +17,16 @@
 
 package org.wysko.midis2jam2.performance
 
-import org.wysko.midis2jam2.testing.withLyrics
+import com.jme3.font.BitmapText
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.manager.LyricManager
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
+import org.wysko.midis2jam2.testing.withLyrics
+import org.wysko.midis2jam2.world.font.covers
 import org.wysko.midis2jam2.world.lyric.renderString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -152,8 +156,48 @@ class LyricsTest {
         }
     }
 
+    @Test
+    @Spec("lyrics.font.non-ascii-glyphs")
+    fun `lyrics using characters outside the bundled font are still rendered`() {
+        HeadlessPerformance.start(MidiFixtures.withNonAsciiLyrics()).use { performance ->
+            val controller = assertNotNull(
+                performance.app.stateManager.getState(LyricManager::class.java)?.controller
+            )
+
+            val lines = performance.onEngineThread { controller.allLines.map { it.renderString() } }
+            val requiredChars = lines.flatMap { it.toSet() }.toSet()
+            assertTrue(
+                requiredChars.any { it.code > MAX_ASCII_CODE_POINT },
+                "This fixture should require characters outside the bundled font's ASCII coverage"
+            )
+
+            val lyricTexts = performance.onEngineThread { bitmapTextsIn(performance.app.guiNode) }
+                .filter { text -> lines.contains(text.text.toString()) }
+
+            assertTrue(lyricTexts.isNotEmpty(), "No lyric line text was found on screen")
+            lyricTexts.forEach { text ->
+                assertTrue(
+                    text.font.covers(requiredChars),
+                    "The lyric display's font is missing glyphs used by the lyrics: ${text.text}"
+                )
+            }
+        }
+    }
+
     private companion object {
         const val STEPS = 40
         const val FRAMES_PER_STEP = 15
+
+        /** The highest ASCII code point; anything above it is outside the bundled font's coverage. */
+        const val MAX_ASCII_CODE_POINT = 126
+
+        /** Every BitmapText currently in the scene under [root]. */
+        fun bitmapTextsIn(root: Spatial): List<BitmapText> = buildList {
+            fun visit(spatial: Spatial) {
+                if (spatial is BitmapText) add(spatial)
+                if (spatial is Node) spatial.children.forEach(::visit)
+            }
+            visit(root)
+        }
     }
 }

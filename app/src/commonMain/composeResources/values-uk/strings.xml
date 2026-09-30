@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Мова</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Повноекранний режим</string>
-    <string name="settings_graphics_fullscreen_description">Використовувати весь екран</string>
+    <string name="settings_graphics_window_mode">Режим вікна</string>
+    <string name="settings_graphics_window_mode_description">Як виконання заповнює екран</string>
+    <string name="settings_graphics_window_mode_windowed">Вікно</string>
+    <string name="settings_graphics_window_mode_borderless">Безрамковий повноекранний режим</string>
+    <string name="settings_graphics_window_mode_fullscreen">Повноекранний режим</string>
     <string name="settings_graphics_resolution">Роздільна здатність</string>
     <string name="settings_graphics_resolution_fullscreen">У повноекранному режимі роздільна здатність відповідає монітору</string>
     <string name="settings_graphics_resolution_default">Використовувати типову роздільну здатність</string>
@@ -236,5 +239,39 @@
     <string name="history_file_missing_title">Пісня недоступна</string>
     <string name="history_unknown_song">Невідома пісня</string>
     <string name="history_clear_invalid_song">Очистити</string>
+
+    <!-- Record -->
+    <string name="tab_record">Запис</string>
+    <string name="record_start">Записати</string>
+    <string name="record_output">Зберегти як</string>
+    <string name="record_resolution">Роздільна здатність</string>
+    <string name="record_frame_rate">Частота кадрів</string>
+    <string name="record_quality">Якість</string>
+    <string name="record_quality_low">Низька</string>
+    <string name="record_quality_medium">Середня</string>
+    <string name="record_quality_high">Висока</string>
+    <string name="record_quality_maximum">Максимальна</string>
+    <string name="record_preparing">Підготовка…</string>
+    <string name="record_recording">Запис…</string>
+    <string name="record_open_video">Відкрити відео</string>
+    <string name="record_show_in_folder">Показати в теці</string>
+    <string name="record_cancelled">Запис скасовано.</string>
+    <string name="record_audio_note">Створюється вбудованим синтезатором із цим банком звуків.</string>
+    <string name="record_window_note">Під час запису відкривається вікно попереднього перегляду. Закриття вікна скасовує запис.</string>
+    <string name="record_section_video">Відео</string>
+    <string name="record_section_audio">Звук</string>
+    <string name="record_empty_title">Записати виступ</string>
+    <string name="record_empty_body">Перетворіть MIDI-файл на відео зі звуком.</string>
+    <string name="record_choose_file">Вибрати MIDI-файл</string>
+    <string name="record_drop_hint">або перетягніть його сюди</string>
+    <string name="record_change_file">Змінити</string>
+    <string name="record_unreadable">Цей файл неможливо прочитати як MIDI.</string>
+    <string name="record_in_folder">у %1$s</string>
+    <string name="record_quality_low_detail">Найменший файл</string>
+    <string name="record_quality_medium_detail">Збалансована</string>
+    <string name="record_quality_high_detail">Найкраще зображення</string>
+    <string name="record_saved">Збережено</string>
+    <string name="record_failed_title">Не вдалося записати</string>
+    <string name="record_time_left">залишилося близько %1$s</string>
 </resources>
 

@@ -26,6 +26,7 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.world.font.resolveBitmapFont
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -38,10 +39,15 @@ import kotlin.time.Duration.Companion.seconds
  */
 class LyricController(private val context: PerformanceManager, private val events: List<MetaEvent.Lyric>) {
 
-    private val font = context.app.assetManager.loadFont("Assets/Fonts/Inter.fnt")
-
     private val words = events.filter { !separators.contains(it.text) }
     private val lines = events.partitionByNewLines()
+
+    private val font = resolveBitmapFont(
+        context.app.assetManager,
+        context.app.assetManager.loadFont("Assets/Fonts/Inter.fnt"),
+        lines.flatMapTo(mutableSetOf()) { it.renderString().toSet() },
+        basePixelSize = LYRICS_FONT_BASE_SIZE,
+    )
 
     /** The syllable that has most recently elapsed, or null before the first one. */
     internal var currentWord: MetaEvent.Lyric? = null
@@ -101,7 +107,7 @@ class LyricController(private val context: PerformanceManager, private val event
                 .config.settings
                 .onScreenElementsSettings.lyricsSettings.lyricsSize
 
-            size = (64 * lyricsSize).toFloat()
+            size = (LYRICS_FONT_BASE_SIZE * lyricsSize).toFloat()
             color = ColorRGBA.DarkGray
             text = it.renderString()
             alignment = BitmapFont.Align.Center
@@ -199,6 +205,9 @@ class LyricController(private val context: PerformanceManager, private val event
         appendLine("isVisible   $isVisible")
     }
 }
+
+/** The base pixel size `Assets/Fonts/Inter.fnt` (and any dynamic atlas standing in for it) is rendered at. */
+private const val LYRICS_FONT_BASE_SIZE = 64
 
 private val separators = listOf("\n", "\r", "\r\n")
 

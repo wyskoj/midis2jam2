@@ -18,11 +18,13 @@
 package org.wysko.midis2jam2.starter
 
 import Platform
+import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.jme3.app.SimpleApplication
 import org.koin.mp.KoinPlatformTools
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.DesktopPlaylistPerformanceManager
 import org.wysko.midis2jam2.domain.ErrorLogService
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.manager.BaseManager
 import org.wysko.midis2jam2.manager.MidiDeviceManager
 import org.wysko.midis2jam2.manager.instantiateManagers
@@ -58,6 +60,11 @@ internal class Midis2jam2QueueApplication(
     private var hasFinished = false
 
     override fun simpleInitApp() {
+        if (config.settings.graphicsSettings.windowMode ==
+            WindowMode.BorderlessFullscreen && isWindows()
+        ) {
+            applyBorderlessWindow(context)
+        }
         setupState(config, platform = Platform.Desktop)
         playFrom(0)
     }

@@ -101,8 +101,11 @@
     <string name="settings_general_locale">语言</string>
 
     <!-- 设置 / 图形 -->
-    <string name="settings_graphics_fullscreen">全屏</string>
-    <string name="settings_graphics_fullscreen_description">使用整个屏幕</string>
+    <string name="settings_graphics_window_mode">窗口模式</string>
+    <string name="settings_graphics_window_mode_description">演出如何填充屏幕</string>
+    <string name="settings_graphics_window_mode_windowed">窗口</string>
+    <string name="settings_graphics_window_mode_borderless">无边框全屏</string>
+    <string name="settings_graphics_window_mode_fullscreen">全屏</string>
     <string name="settings_graphics_resolution">分辨率</string>
     <string name="settings_graphics_resolution_fullscreen">启用全屏时，分辨率与显示器匹配</string>
     <string name="settings_graphics_resolution_default">使用默认分辨率</string>
@@ -236,5 +239,39 @@
     <string name="history_file_missing_title">歌曲不可用</string>
     <string name="history_unknown_song">未知歌曲</string>
     <string name="history_clear_invalid_song">清除</string>
+
+    <!-- Record -->
+    <string name="tab_record">录制</string>
+    <string name="record_start">录制</string>
+    <string name="record_output">保存为</string>
+    <string name="record_resolution">分辨率</string>
+    <string name="record_frame_rate">帧率</string>
+    <string name="record_quality">画质</string>
+    <string name="record_quality_low">低</string>
+    <string name="record_quality_medium">中</string>
+    <string name="record_quality_high">高</string>
+    <string name="record_quality_maximum">最高</string>
+    <string name="record_preparing">正在准备…</string>
+    <string name="record_recording">正在录制…</string>
+    <string name="record_open_video">打开视频</string>
+    <string name="record_show_in_folder">在文件夹中显示</string>
+    <string name="record_cancelled">录制已取消。</string>
+    <string name="record_audio_note">由内置合成器使用此音色库生成。</string>
+    <string name="record_window_note">录制时会打开预览窗口。关闭该窗口将取消录制。</string>
+    <string name="record_section_video">视频</string>
+    <string name="record_section_audio">音频</string>
+    <string name="record_empty_title">录制演奏</string>
+    <string name="record_empty_body">将 MIDI 文件变成带声音的视频。</string>
+    <string name="record_choose_file">选择 MIDI 文件</string>
+    <string name="record_drop_hint">或拖放到此处</string>
+    <string name="record_change_file">更改</string>
+    <string name="record_unreadable">无法将此文件读取为 MIDI。</string>
+    <string name="record_in_folder">位于 %1$s</string>
+    <string name="record_quality_low_detail">文件最小</string>
+    <string name="record_quality_medium_detail">均衡</string>
+    <string name="record_quality_high_detail">画面最佳</string>
+    <string name="record_saved">已保存</string>
+    <string name="record_failed_title">录制失败</string>
+    <string name="record_time_left">大约还剩 %1$s</string>
 </resources>
 

@@ -18,10 +18,13 @@
 package org.wysko.midis2jam2.renderer
 
 import kotlinx.serialization.Serializable
+import org.wysko.midis2jam2.record.RecordOptions
 import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 
 @Serializable
 data class RendererBundle(
     val midiFiles: List<String>,
     val config: PerformanceConfig,
+    /** Set to record the (single) MIDI file to video instead of playing it. */
+    val recordOptions: RecordOptions? = null,
 )

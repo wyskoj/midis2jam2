@@ -22,6 +22,7 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,7 +50,7 @@ class AppSettingsSerializationTest {
                     isUseAntiAliasing = true,
                     antiAliasingQuality = AntiAliasingQuality.High,
                 ),
-                isFullscreen = true,
+                windowMode = WindowMode.BorderlessFullscreen,
             ),
             backgroundSettings = AppSettings.BackgroundSettings(
                 type = BackgroundType.Color,
@@ -92,7 +93,7 @@ class AppSettingsSerializationTest {
         assertEquals("en", defaults.generalSettings.locale)
         assertEquals(false, defaults.generalSettings.isShowDebugInfo)
 
-        assertEquals(false, defaults.graphicsSettings.isFullscreen)
+        assertEquals(WindowMode.Windowed, defaults.graphicsSettings.windowMode)
         assertEquals(true, defaults.graphicsSettings.resolutionSettings.isUseDefaultResolution)
         assertEquals(true, defaults.graphicsSettings.shadowsSettings.isUseShadows)
         assertEquals(ShadowsQuality.Medium, defaults.graphicsSettings.shadowsSettings.shadowsQuality)
@@ -163,7 +164,7 @@ class AppSettingsSerializationTest {
                 "resolutionSettings": {"isUseDefaultResolution": false, "resolutionWidth": 1920, "resolutionHeight": 1080},
                 "shadowsSettings": {"isUseShadows": false, "shadowsQuality": "High"},
                 "antiAliasingSettings": {"isUseAntiAliasing": true, "antiAliasingQuality": "Medium"},
-                "isFullscreen": true
+                "windowMode": "Fullscreen"
               },
               "backgroundSettings": {
                 "type": "CubeMap",
@@ -204,7 +205,7 @@ class AppSettingsSerializationTest {
         assertEquals(ShadowsQuality.High, loaded.graphicsSettings.shadowsSettings.shadowsQuality)
         assertEquals(true, loaded.graphicsSettings.antiAliasingSettings.isUseAntiAliasing)
         assertEquals(AntiAliasingQuality.Medium, loaded.graphicsSettings.antiAliasingSettings.antiAliasingQuality)
-        assertEquals(true, loaded.graphicsSettings.isFullscreen)
+        assertEquals(WindowMode.Fullscreen, loaded.graphicsSettings.windowMode)
         assertEquals(BackgroundType.CubeMap, loaded.backgroundSettings.type)
         assertEquals(listOf("a.png", "b.png", "c.png", "d.png", "e.png", "f.png"), loaded.backgroundSettings.cubeMapTextures)
         assertEquals(65280, loaded.backgroundSettings.color)

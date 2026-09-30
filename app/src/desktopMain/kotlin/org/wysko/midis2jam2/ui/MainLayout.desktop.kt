@@ -29,17 +29,20 @@ import midis2jam2.app.generated.resources.home_outline
 import midis2jam2.app.generated.resources.info_fill
 import midis2jam2.app.generated.resources.info_outline
 import midis2jam2.app.generated.resources.playlist
+import midis2jam2.app.generated.resources.camera_video
 import midis2jam2.app.generated.resources.search
 import midis2jam2.app.generated.resources.settings_fill
 import midis2jam2.app.generated.resources.settings_outline
 import midis2jam2.app.generated.resources.tab_about
 import midis2jam2.app.generated.resources.tab_home
 import midis2jam2.app.generated.resources.tab_queue
+import midis2jam2.app.generated.resources.tab_record
 import midis2jam2.app.generated.resources.tab_search
 import midis2jam2.app.generated.resources.tab_settings
 import org.wysko.midis2jam2.ui.about.AboutTab
 import org.wysko.midis2jam2.ui.home.HomeTab
 import org.wysko.midis2jam2.ui.queue.QueueTab
+import org.wysko.midis2jam2.ui.record.RecordTab
 import org.wysko.midis2jam2.ui.search.SearchTab
 import org.wysko.midis2jam2.ui.settings.SettingsTab
 
@@ -65,6 +68,11 @@ actual val tabs: Map<Tab, TabParameters>
             name = Res.string.tab_queue,
             iconUnfocused = Res.drawable.playlist,
             iconFocused = Res.drawable.playlist,
+        ),
+        RecordTab to TabParameters(
+            name = Res.string.tab_record,
+            iconUnfocused = Res.drawable.camera_video,
+            iconFocused = Res.drawable.camera_video,
         ),
         SearchTab to TabParameters(
             name = Res.string.tab_search,

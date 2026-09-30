@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
@@ -66,7 +67,7 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
 
     fun setLocale(locale: String) = general { it.copy(locale = locale) }
 
-    fun setIsFullscreen(isFullscreen: Boolean) = graphics { it.copy(isFullscreen = isFullscreen) }
+    fun setWindowMode(windowMode: WindowMode) = graphics { it.copy(windowMode = windowMode) }
 
     fun setIsUseDefaultResolution(isUseDefaultResolution: Boolean) = graphics {
         it.copy(resolutionSettings = it.resolutionSettings.copy(isUseDefaultResolution = isUseDefaultResolution))

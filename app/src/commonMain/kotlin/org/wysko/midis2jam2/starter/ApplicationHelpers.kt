@@ -17,8 +17,10 @@
 
 package org.wysko.midis2jam2.starter
 
+import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.starter.configuration.*
 
 internal fun SimpleApplication.applyConfigurations(config: PerformanceConfig) {
@@ -37,8 +39,12 @@ internal fun SimpleApplication.applyConfigurations(config: PerformanceConfig) {
 
 private fun AppSettings.applyResolution(config: PerformanceConfig) {
     val measuredResolution = screenResolution()
-    when {
-        config.settings.graphicsSettings.isFullscreen -> {
+    val windowMode = config.settings.graphicsSettings.windowMode
+        // Borderless fullscreen is Windows-only (see applyBorderlessWindow); fall back to real fullscreen elsewhere.
+        .let { if (it == WindowMode.BorderlessFullscreen && !isWindows()) WindowMode.Fullscreen else it }
+
+    when (windowMode) {
+        WindowMode.Fullscreen -> {
             isFullscreen = true
             if (measuredResolution != null) {
                 this@applyResolution.width = measuredResolution.width
@@ -46,7 +52,17 @@ private fun AppSettings.applyResolution(config: PerformanceConfig) {
             }
         }
 
-        else -> {
+        WindowMode.BorderlessFullscreen -> {
+            // A real display-mode switch is never requested; the window is merely undecorated
+            // and sized to the screen (see applyBorderlessWindow on desktop).
+            isFullscreen = false
+            if (measuredResolution != null) {
+                this@applyResolution.width = measuredResolution.width
+                this@applyResolution.height = measuredResolution.height
+            }
+        }
+
+        WindowMode.Windowed -> {
             isFullscreen = false
             with(config.settings.graphicsSettings) {
                 when (resolutionSettings.isUseDefaultResolution) {

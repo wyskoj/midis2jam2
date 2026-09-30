@@ -101,8 +101,11 @@
     <string name="settings_general_locale">언어</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">전체 화면</string>
-    <string name="settings_graphics_fullscreen_description">전체 화면 사용</string>
+    <string name="settings_graphics_window_mode">창 모드</string>
+    <string name="settings_graphics_window_mode_description">공연이 화면을 채우는 방식</string>
+    <string name="settings_graphics_window_mode_windowed">창 모드</string>
+    <string name="settings_graphics_window_mode_borderless">테두리 없는 전체 화면</string>
+    <string name="settings_graphics_window_mode_fullscreen">전체 화면</string>
     <string name="settings_graphics_resolution">해상도</string>
     <string name="settings_graphics_resolution_fullscreen">전체 화면 사용 시 해상도는 모니터에 맞춰집니다</string>
     <string name="settings_graphics_resolution_default">기본 해상도 사용</string>
@@ -236,5 +239,39 @@
     <string name="history_file_missing_title">곡을 사용할 수 없음</string>
     <string name="history_unknown_song">알 수 없는 곡</string>
     <string name="history_clear_invalid_song">지우기</string>
+
+    <!-- Record -->
+    <string name="tab_record">녹화</string>
+    <string name="record_start">녹화</string>
+    <string name="record_output">저장 위치</string>
+    <string name="record_resolution">해상도</string>
+    <string name="record_frame_rate">프레임 속도</string>
+    <string name="record_quality">화질</string>
+    <string name="record_quality_low">낮음</string>
+    <string name="record_quality_medium">보통</string>
+    <string name="record_quality_high">높음</string>
+    <string name="record_quality_maximum">최고</string>
+    <string name="record_preparing">준비 중…</string>
+    <string name="record_recording">녹화 중…</string>
+    <string name="record_open_video">동영상 열기</string>
+    <string name="record_show_in_folder">폴더에서 보기</string>
+    <string name="record_cancelled">녹화가 취소되었습니다.</string>
+    <string name="record_audio_note">이 사운드뱅크로 내장 신시사이저가 생성합니다.</string>
+    <string name="record_window_note">녹화하는 동안 미리보기 창이 열립니다. 창을 닫으면 녹화가 취소됩니다.</string>
+    <string name="record_section_video">동영상</string>
+    <string name="record_section_audio">오디오</string>
+    <string name="record_empty_title">연주 녹화하기</string>
+    <string name="record_empty_body">MIDI 파일을 소리가 있는 동영상으로 만듭니다.</string>
+    <string name="record_choose_file">MIDI 파일 선택</string>
+    <string name="record_drop_hint">또는 여기에 끌어다 놓기</string>
+    <string name="record_change_file">변경</string>
+    <string name="record_unreadable">이 파일은 MIDI로 읽을 수 없습니다.</string>
+    <string name="record_in_folder">%1$s 안</string>
+    <string name="record_quality_low_detail">가장 작은 파일</string>
+    <string name="record_quality_medium_detail">균형</string>
+    <string name="record_quality_high_detail">가장 선명함</string>
+    <string name="record_saved">저장됨</string>
+    <string name="record_failed_title">녹화 실패</string>
+    <string name="record_time_left">약 %1$s 남음</string>
 </resources>
 

@@ -30,12 +30,16 @@ import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.scale
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Sprite
+import org.wysko.midis2jam2.world.font.resolveBitmapFont
 
 private const val VERTICAL_FILLBAR_SCALE = 0.7f
 private const val FILLBAR_LOCATION_OFFSET = 3f
 private const val FILLBAR_WIDTH = 16
 private const val FILLBAR_BOX_WIDTH = 512
 private const val MAXIMUM_FILLBAR_SCALE = (FILLBAR_BOX_WIDTH - (FILLBAR_LOCATION_OFFSET * 2)) / FILLBAR_WIDTH
+
+/** The base pixel size `Assets/Fonts/Inter_24.fnt` (and any dynamic atlas standing in for it) is rendered at. */
+private const val HUD_FONT_BASE_SIZE = 24
 
 class HudManager : BaseManager() {
     private var fadeManager: FadeManager? = null
@@ -55,7 +59,7 @@ class HudManager : BaseManager() {
             color = ColorRGBA.White
             loc = v3(0, 46, 0)
             setBox(Rectangle(0f, 488f, FILLBAR_BOX_WIDTH.toFloat(), 512f))
-            size = 24f
+            size = HUD_FONT_BASE_SIZE.toFloat()
             text = context.fileName
             verticalAlignment = BitmapFont.VAlign.Bottom
         }
@@ -103,5 +107,10 @@ class HudManager : BaseManager() {
 
     private fun loadSprite(textureName: String): Sprite = Sprite(application.assetManager, textureName)
 
-    private fun getDisplayFont(): BitmapFont = application.assetManager.loadFont("Assets/Fonts/Inter_24.fnt")
+    private fun getDisplayFont(): BitmapFont = resolveBitmapFont(
+        application.assetManager,
+        application.assetManager.loadFont("Assets/Fonts/Inter_24.fnt"),
+        context.fileName.toSet(),
+        basePixelSize = HUD_FONT_BASE_SIZE,
+    )
 }
