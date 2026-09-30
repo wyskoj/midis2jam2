@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">Şarkı kullanılamıyor</string>
     <string name="history_unknown_song">Bilinmeyen şarkı</string>
     <string name="history_clear_invalid_song">Temizle</string>
+
+    <!-- Record -->
+    <string name="tab_record">Kayıt</string>
+    <string name="record_start">Kaydı başlat</string>
+    <string name="record_output">Farklı kaydet</string>
+    <string name="record_resolution">Çözünürlük</string>
+    <string name="record_frame_rate">Kare hızı</string>
+    <string name="record_quality">Kalite</string>
+    <string name="record_quality_low">Düşük</string>
+    <string name="record_quality_medium">Orta</string>
+    <string name="record_quality_high">Yüksek</string>
+    <string name="record_quality_maximum">En yüksek</string>
+    <string name="record_preparing">Hazırlanıyor…</string>
+    <string name="record_recording">Kaydediliyor…</string>
+    <string name="record_open_video">Videoyu aç</string>
+    <string name="record_show_in_folder">Klasörde göster</string>
+    <string name="record_cancelled">Kayıt iptal edildi.</string>
+    <string name="record_audio_note">Bu ses bankasıyla yerleşik sentezleyici tarafından oluşturulur.</string>
+    <string name="record_window_note">Kayıt sırasında bir önizleme penceresi açılır. Pencereyi kapatmak kaydı iptal eder.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Ses</string>
+    <string name="record_empty_title">Bir performans kaydet</string>
+    <string name="record_empty_body">Bir MIDI dosyasını sesli bir videoya dönüştürün.</string>
+    <string name="record_choose_file">MIDI dosyası seç</string>
+    <string name="record_drop_hint">ya da buraya bırakın</string>
+    <string name="record_change_file">Değiştir</string>
+    <string name="record_unreadable">Bu dosya MIDI olarak okunamıyor.</string>
+    <string name="record_in_folder">%1$s içinde</string>
+    <string name="record_quality_low_detail">En küçük dosya</string>
+    <string name="record_quality_medium_detail">Dengeli</string>
+    <string name="record_quality_high_detail">En iyi görüntü</string>
+    <string name="record_saved">Kaydedildi</string>
+    <string name="record_failed_title">Kayıt başarısız</string>
+    <string name="record_time_left">yaklaşık %1$s kaldı</string>
 </resources>
 

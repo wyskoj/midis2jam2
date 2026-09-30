@@ -25,16 +25,78 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.ExecutionState
+import org.wysko.midis2jam2.record.RecordCliArgs
+import org.wysko.midis2jam2.record.RecordTabPersistor
+import org.wysko.midis2jam2.record.RecordingState
 import java.io.File
+import kotlin.system.exitProcess
+
+/** The exit code for a command line that can't be run. */
+private const val EXIT_USAGE = 2
+
+/** How often, in percent, recording progress is printed. */
+private const val PROGRESS_STEP = 5
 
 object CmdStart : KoinComponent {
     fun start(args: Array<String>) {
         if (args.isEmpty()) return
 
         val applicationService: ApplicationService by inject()
-        val midiFile = PlatformFile(File(args.first()))
 
-        startApplicationWithFile(applicationService, midiFile)
+        when (val record = RecordCliArgs.parse(args)) {
+            null -> startApplicationWithFile(applicationService, PlatformFile(File(args.first())))
+            is RecordCliArgs.Invalid -> {
+                System.err.println(record.message)
+                System.err.println(RecordCliArgs.USAGE)
+                exitProcess(EXIT_USAGE)
+            }
+
+            is RecordCliArgs.Record -> exitProcess(record(applicationService, record))
+        }
+    }
+
+    /**
+     * Records as [command] says, printing progress, and returns the exit code: zero only if the video was saved.
+     */
+    private fun record(applicationService: ApplicationService, command: RecordCliArgs.Record): Int {
+        val options = command.toOptions(RecordTabPersistor.forUser().load())
+        println("Recording ${command.midiFile} to ${options.outputPath} (${options.width}x${options.height}, ${options.fps} fps)")
+        applicationService.startRecording(command.midiFile, options)
+        try {
+            SplashScreen.hide()
+        } catch (_: Exception) {}
+
+        var lastPercent = -1
+        val result = runBlocking {
+            applicationService.recordingState.first { state ->
+                if (state is RecordingState.Rendering && state.progress != null) {
+                    val percent = (state.progress * 100).toInt()
+                    if (percent / PROGRESS_STEP > lastPercent / PROGRESS_STEP) {
+                        println("$percent%")
+                        lastPercent = percent
+                    }
+                }
+                state is RecordingState.Finished || state is RecordingState.Cancelled || state is RecordingState.Failed
+            }
+        }
+        runBlocking { applicationService.isApplicationRunning.first { !it } }
+
+        return when (result) {
+            is RecordingState.Finished -> {
+                println("Saved ${result.file}")
+                0
+            }
+
+            is RecordingState.Failed -> {
+                System.err.println("The recording failed: ${result.message}")
+                1
+            }
+
+            else -> {
+                System.err.println("The recording was cancelled.")
+                1
+            }
+        }
     }
 
     /**

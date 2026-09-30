@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">Bài hát không khả dụng</string>
     <string name="history_unknown_song">Bài hát không xác định</string>
     <string name="history_clear_invalid_song">Xóa</string>
+
+    <!-- Record -->
+    <string name="tab_record">Ghi hình</string>
+    <string name="record_start">Ghi hình</string>
+    <string name="record_output">Lưu thành</string>
+    <string name="record_resolution">Độ phân giải</string>
+    <string name="record_frame_rate">Tốc độ khung hình</string>
+    <string name="record_quality">Chất lượng</string>
+    <string name="record_quality_low">Thấp</string>
+    <string name="record_quality_medium">Trung bình</string>
+    <string name="record_quality_high">Cao</string>
+    <string name="record_quality_maximum">Tối đa</string>
+    <string name="record_preparing">Đang chuẩn bị…</string>
+    <string name="record_recording">Đang ghi hình…</string>
+    <string name="record_open_video">Mở video</string>
+    <string name="record_show_in_folder">Hiển thị trong thư mục</string>
+    <string name="record_cancelled">Đã hủy ghi hình.</string>
+    <string name="record_audio_note">Được tạo bởi bộ tổng hợp tích hợp với soundbank này.</string>
+    <string name="record_window_note">Một cửa sổ xem trước sẽ mở trong khi ghi hình. Đóng cửa sổ sẽ hủy ghi hình.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Âm thanh</string>
+    <string name="record_empty_title">Ghi hình màn trình diễn</string>
+    <string name="record_empty_body">Biến tệp MIDI thành video có âm thanh.</string>
+    <string name="record_choose_file">Chọn tệp MIDI</string>
+    <string name="record_drop_hint">hoặc thả tệp vào đây</string>
+    <string name="record_change_file">Thay đổi</string>
+    <string name="record_unreadable">Không thể đọc tệp này dưới dạng MIDI.</string>
+    <string name="record_in_folder">trong %1$s</string>
+    <string name="record_quality_low_detail">Tệp nhỏ nhất</string>
+    <string name="record_quality_medium_detail">Cân bằng</string>
+    <string name="record_quality_high_detail">Đẹp nhất</string>
+    <string name="record_saved">Đã lưu</string>
+    <string name="record_failed_title">Ghi hình thất bại</string>
+    <string name="record_time_left">còn khoảng %1$s</string>
 </resources>
 

@@ -25,6 +25,11 @@ import org.koin.core.component.inject
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
+import org.wysko.midis2jam2.record.GERVILL_EXPORTS_FLAG
+import org.wysko.midis2jam2.record.ProgressEstimator
+import org.wysko.midis2jam2.record.RecordOptions
+import org.wysko.midis2jam2.record.Recorder
+import org.wysko.midis2jam2.record.RecordingState
 import org.wysko.midis2jam2.renderer.RendererBundle
 import org.wysko.midis2jam2.renderer.RendererCommand
 import org.wysko.midis2jam2.renderer.RendererMessage
@@ -45,12 +50,49 @@ import java.util.concurrent.atomic.AtomicBoolean
 private const val PROCESS_EXIT_GRACE_SECONDS = 5L
 private const val RENDERER_DEBUG_ENV = "MIDIS2JAM2_RENDERER_DEBUG"
 
-actual class ApplicationService : KoinComponent {
+actual class ApplicationService : KoinComponent, Recorder {
     private val errorLogService: ErrorLogService by inject()
     private val playbackHistoryStore: PlaybackHistoryStore by inject()
     private val _isApplicationRunning = MutableStateFlow(false)
     actual val isApplicationRunning: StateFlow<Boolean>
         get() = _isApplicationRunning
+
+    override val isBusy: StateFlow<Boolean>
+        get() = _isApplicationRunning
+
+    private val _recordingState = MutableStateFlow<RecordingState>(RecordingState.Idle)
+    override val recordingState: StateFlow<RecordingState>
+        get() = _recordingState
+
+    @Volatile
+    private var recordingProcess: Process? = null
+    private val progressEstimator = ProgressEstimator()
+
+    /**
+     * Recording always runs in a renderer process of its own, which is started with the flag offline audio needs and
+     * can be stopped cleanly with [cancelRecording].
+     */
+    override fun startRecording(midiFile: File, options: RecordOptions) {
+        check(!_isApplicationRunning.value) { "A performance is already running." }
+        _isApplicationRunning.value = true
+        _recordingState.value = RecordingState.Rendering(progress = null)
+        progressEstimator.reset()
+        val bundle = encodeBundle(
+            RendererBundle(
+                midiFiles = listOf(midiFile.absolutePath),
+                configurations = getConfigurations(),
+                recordOptions = options,
+            )
+        )
+        val process = launchRendererProcess(extraArgs = listOf(bundle))
+        recordingProcess = process
+        manageRendererProcess(process)
+    }
+
+    override fun cancelRecording() {
+        val process = recordingProcess ?: return
+        Thread({ stopRenderer(process) }, "renderer-stop").apply { isDaemon = true }.start()
+    }
 
     actual fun startApplication(executionState: ExecutionState) {
         _isApplicationRunning.value = true
@@ -145,7 +187,7 @@ actual class ApplicationService : KoinComponent {
     private fun manageRendererProcess(process: Process, queueFiles: List<File> = emptyList()) {
         val reportedResult = AtomicBoolean(false)
 
-        consumeLines("renderer-stdout", process.inputStream) { line ->
+        val stdout = consumeLines("renderer-stdout", process.inputStream) { line ->
             when (val message = runCatching { Json.decodeFromString<RendererMessage>(line) }.getOrNull()) {
                 null -> println(line)
                 else -> handleRendererMessage(message, queueFiles, reportedResult)
@@ -155,11 +197,19 @@ actual class ApplicationService : KoinComponent {
         consumeLines("renderer-stderr", process.errorStream) { line -> System.err.println(line) }
 
         process.onExit().thenAccept { exited ->
+            // The process can be seen to exit before its last messages have been read.
+            stdout.join(PROCESS_EXIT_GRACE_SECONDS * 1000)
             if (!reportedResult.get()) {
                 errorLogService.addError(
                     "The rendering process stopped unexpectedly",
                     "The renderer exited with code ${exited.exitValue()}"
                 )
+            }
+            if (process === recordingProcess) {
+                recordingProcess = null
+                if (_recordingState.value is RecordingState.Rendering) {
+                    _recordingState.value = RecordingState.Failed("The recording stopped unexpectedly.")
+                }
             }
             _isApplicationRunning.value = false
         }
@@ -184,12 +234,30 @@ actual class ApplicationService : KoinComponent {
                     message.stackTrace ?: "No stacktrace"
                 )
                 reportedResult.set(true)
+                if (_recordingState.value is RecordingState.Rendering) {
+                    _recordingState.value = RecordingState.Failed(message.message ?: "The recording failed.")
+                }
                 _isApplicationRunning.value = false
             }
 
             "Finish" -> {
                 reportedResult.set(true)
                 _isApplicationRunning.value = false
+            }
+
+            RendererMessage.RECORD_PROGRESS -> {
+                val frames = message.framesCaptured ?: return
+                val expected = message.expectedFrames?.takeIf { it > 0 } ?: return
+                val progress = (frames.toFloat() / expected).coerceIn(0f, 1f)
+                _recordingState.value = RecordingState.Rendering(progress, progressEstimator.remaining(progress))
+            }
+
+            RendererMessage.RECORD_FINISHED -> {
+                _recordingState.value = RecordingState.Finished(File(message.path ?: return))
+            }
+
+            RendererMessage.RECORD_CANCELLED -> {
+                _recordingState.value = RecordingState.Cancelled
             }
         }
     }
@@ -207,14 +275,14 @@ actual class ApplicationService : KoinComponent {
         }
     }
 
-    private fun consumeLines(threadName: String, stream: InputStream, onLine: (String) -> Unit) {
+    private fun consumeLines(threadName: String, stream: InputStream, onLine: (String) -> Unit): Thread =
         Thread {
             runCatching { stream.bufferedReader().forEachLine(onLine) }
         }.apply {
             name = threadName
             isDaemon = true
-        }.start()
-    }
+            start()
+        }
 
     private fun encodeBundle(rendererBundle: RendererBundle): String =
         Base64.getEncoder().encodeToString(Json.encodeToString(rendererBundle).encodeToByteArray())
@@ -261,6 +329,7 @@ actual class ApplicationService : KoinComponent {
             cmd += agent
             logger().warn("Renderer debug agent enabled: $agent")
         }
+        cmd += GERVILL_EXPORTS_FLAG // for recording's offline audio
         cmd += listOf("-cp", classpath, mainClass)
         cmd.addAll(extraArgs)
 

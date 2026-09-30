@@ -224,4 +224,38 @@
     <string name="settings_camera_field_of_view_title">Field of view</string>
     <string name="settings_camera_field_of_view_label_prefix">Change how wide the camera sees</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
+
+    <!-- Record -->
+    <string name="tab_record">Record</string>
+    <string name="record_start">Record</string>
+    <string name="record_output">Save as</string>
+    <string name="record_resolution">Resolution</string>
+    <string name="record_frame_rate">Frame rate</string>
+    <string name="record_quality">Quality</string>
+    <string name="record_quality_low">Low</string>
+    <string name="record_quality_medium">Medium</string>
+    <string name="record_quality_high">High</string>
+    <string name="record_quality_maximum">Maximum</string>
+    <string name="record_preparing">Preparing…</string>
+    <string name="record_recording">Recording…</string>
+    <string name="record_open_video">Open video</string>
+    <string name="record_show_in_folder">Show in folder</string>
+    <string name="record_cancelled">The recording was cancelled.</string>
+    <string name="record_audio_note">Rendered by the built-in synthesizer using this soundbank.</string>
+    <string name="record_window_note">A preview window opens while recording. Closing it cancels.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Audio</string>
+    <string name="record_empty_title">Record a performance</string>
+    <string name="record_empty_body">Turn a MIDI file into a video, with sound.</string>
+    <string name="record_choose_file">Choose MIDI file</string>
+    <string name="record_drop_hint">or drop one here</string>
+    <string name="record_change_file">Change</string>
+    <string name="record_unreadable">This file can't be read as MIDI.</string>
+    <string name="record_in_folder">in %1$s</string>
+    <string name="record_quality_low_detail">Smallest file</string>
+    <string name="record_quality_medium_detail">Balanced</string>
+    <string name="record_quality_high_detail">Best-looking</string>
+    <string name="record_saved">Saved</string>
+    <string name="record_failed_title">Recording failed</string>
+    <string name="record_time_left">about %1$s left</string>
 </resources>

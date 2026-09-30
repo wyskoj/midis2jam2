@@ -19,11 +19,15 @@ package org.wysko.midis2jam2.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.HomeScreenModel
+import org.wysko.midis2jam2.record.RecordTabPersistor
+import org.wysko.midis2jam2.starter.getScreenResolution
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 import org.wysko.midis2jam2.ui.history.HistoryScreenModel
 import org.wysko.midis2jam2.ui.home.DesktopHomeScreenModel
 import org.wysko.midis2jam2.ui.queue.QueueTabModel
+import org.wysko.midis2jam2.ui.record.RecordTabModel
 import org.wysko.midis2jam2.ui.search.SearchTabModel
 import org.wysko.midis2jam2.ui.settings.SettingsModel
 import org.wysko.midis2jam2.ui.settings.SettingsScreenModel
@@ -35,6 +39,13 @@ actual val uiModule: Module = module {
     single { HistoryScreenModel(get()) }
 
     single { QueueTabModel(get()) }
+    single {
+        RecordTabModel(
+            recorder = get<ApplicationService>(),
+            persistor = RecordTabPersistor.forUser(),
+            screenSize = runCatching { getScreenResolution() }.getOrNull()?.let { it.width to it.height },
+        )
+    }
     single { SearchTabModel() }
 
     // Navigation

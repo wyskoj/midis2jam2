@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">เพลงไม่พร้อมใช้งาน</string>
     <string name="history_unknown_song">เพลงที่ไม่รู้จัก</string>
     <string name="history_clear_invalid_song">ล้าง</string>
+
+    <!-- Record -->
+    <string name="tab_record">บันทึก</string>
+    <string name="record_start">บันทึก</string>
+    <string name="record_output">บันทึกเป็น</string>
+    <string name="record_resolution">ความละเอียด</string>
+    <string name="record_frame_rate">อัตราเฟรม</string>
+    <string name="record_quality">คุณภาพ</string>
+    <string name="record_quality_low">ต่ำ</string>
+    <string name="record_quality_medium">ปานกลาง</string>
+    <string name="record_quality_high">สูง</string>
+    <string name="record_quality_maximum">สูงสุด</string>
+    <string name="record_preparing">กำลังเตรียม…</string>
+    <string name="record_recording">กำลังบันทึก…</string>
+    <string name="record_open_video">เปิดวิดีโอ</string>
+    <string name="record_show_in_folder">แสดงในโฟลเดอร์</string>
+    <string name="record_cancelled">ยกเลิกการบันทึกแล้ว</string>
+    <string name="record_audio_note">สร้างโดยซินธิไซเซอร์ในตัวโดยใช้ซาวด์แบงก์นี้</string>
+    <string name="record_window_note">หน้าต่างแสดงตัวอย่างจะเปิดขึ้นขณะบันทึก การปิดหน้าต่างจะยกเลิกการบันทึก</string>
+    <string name="record_section_video">วิดีโอ</string>
+    <string name="record_section_audio">เสียง</string>
+    <string name="record_empty_title">บันทึกการแสดง</string>
+    <string name="record_empty_body">เปลี่ยนไฟล์ MIDI เป็นวิดีโอพร้อมเสียง</string>
+    <string name="record_choose_file">เลือกไฟล์ MIDI</string>
+    <string name="record_drop_hint">หรือวางไฟล์ที่นี่</string>
+    <string name="record_change_file">เปลี่ยน</string>
+    <string name="record_unreadable">ไม่สามารถอ่านไฟล์นี้เป็น MIDI ได้</string>
+    <string name="record_in_folder">ใน %1$s</string>
+    <string name="record_quality_low_detail">ไฟล์เล็กที่สุด</string>
+    <string name="record_quality_medium_detail">สมดุล</string>
+    <string name="record_quality_high_detail">ภาพดีที่สุด</string>
+    <string name="record_saved">บันทึกแล้ว</string>
+    <string name="record_failed_title">การบันทึกล้มเหลว</string>
+    <string name="record_time_left">เหลืออีกประมาณ %1$s</string>
 </resources>
 

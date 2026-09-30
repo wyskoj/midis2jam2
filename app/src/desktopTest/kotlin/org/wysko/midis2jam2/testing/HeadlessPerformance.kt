@@ -213,6 +213,7 @@ class HeadlessPerformance private constructor(
          * and is on by default because that is the configuration users actually run. Tests
          * that only need instruments to exist can turn it off for a quicker boot, but then
          * anything reading the playback clock - drum-set visibility, for one - is absent.
+         * [isRecording] builds the managers the way a recording does.
          */
         fun start(
             sequence: TimeBasedSequence,
@@ -220,6 +221,7 @@ class HeadlessPerformance private constructor(
             fileName: String = "fixture.mid",
             attachManagers: Boolean = true,
             sequencer: NoOpSequencer = NoOpSequencer(),
+            isRecording: Boolean = false,
         ): HeadlessPerformance {
             val configurations = listOf(
                 Configuration.HomeConfiguration(),
@@ -251,6 +253,7 @@ class HeadlessPerformance private constructor(
                             sequence = sequence,
                             sequencer = sequencer,
                             profile = ManagerProfile.Headless,
+                            isRecording = isRecording,
                         )
 
                         // The minimum an instrument needs in order to exist and be shown.
@@ -261,13 +264,20 @@ class HeadlessPerformance private constructor(
                 }
 
                 override fun simpleUpdate(tpf: Float) {
-                    // By the time the first update body runs, every attached state has been
-                    // initialised, so the instruments exist and the test can proceed.
-                    if (!initialised) {
+                    frameCounter.increment()
+
+                    // A manager that attaches its own sub-states from within its initialize()
+                    // (CameraManager attaching its camera plugins, for instance) defers those
+                    // sub-states' own initialize() to the *next* stateManager.update() - one
+                    // frame later than everything attached up front in simpleInitApp(). Waiting
+                    // for a second completed frame here ensures those sub-states are fully
+                    // initialised too before a test can act, so a test that tears a manager down
+                    // right after boot can't race a sibling's still-pending sub-state init (which
+                    // otherwise could, e.g., resurrect an input mapping the teardown just deleted).
+                    if (!initialised && frameCounter.completed >= 2) {
                         initialised = true
                         ready.countDown()
                     }
-                    frameCounter.increment()
                 }
 
                 override fun handleError(errorMsg: String?, t: Throwable?) {

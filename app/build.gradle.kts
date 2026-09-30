@@ -145,6 +145,16 @@ kotlin {
 
             // install4j integration
             implementation(libs.install4j.runtime)
+
+            // Video recording: javacv's FFmpegFrameRecorder only needs javacpp and ffmpeg, so its other
+            // transitive dependencies (OpenCV, Tesseract, camera SDKs, ...) are left out.
+            implementation(libs.javacv.get().toString()) { isTransitive = false }
+            implementation(libs.javacpp)
+            implementation(libs.bytedeco.ffmpeg)
+            javacppPlatforms().forEach { platform ->
+                implementation("${libs.javacpp.get()}:$platform")
+                implementation("${libs.bytedeco.ffmpeg.get()}:$platform-gpl")
+            }
         }
     }
 }
@@ -226,6 +236,8 @@ tasks.named<Test>("desktopTest") {
     useJUnitPlatform()
     // The suite must run with no display, no window and no audio device attached.
     systemProperty("java.awt.headless", "true")
+    // Recording renders audio offline with Gervill, whose API for that isn't exported (see OfflineSynthesizer).
+    jvmArgs("--add-exports=java.desktop/com.sun.media.sound=ALL-UNNAMED")
     // SpecCoverageTest scans the compiled test classes for @Spec citations.
     val compiledTestClasses = testClassesDirs
     jvmArgumentProviders.add(
@@ -347,5 +359,22 @@ afterEvaluate {
         task.name != "copyCommonAssets" && (task.name.contains("ProcessResources") || task.name.contains("Resources"))
     }.configureEach {
         dependsOn(copyCommonAssets)
+    }
+}
+
+/**
+ * The JavaCPP platform classifiers whose natives are bundled into this build. Releases are built per OS, so only
+ * the host's natives are included; macOS gets both architectures so one jar runs on Intel and Apple silicon.
+ */
+fun javacppPlatforms(): List<String> {
+    val os = System.getProperty("os.name").lowercase()
+    val arch = when (System.getProperty("os.arch").lowercase()) {
+        "aarch64", "arm64" -> "arm64"
+        else -> "x86_64"
+    }
+    return when {
+        os.contains("mac") -> listOf("macosx-x86_64", "macosx-arm64")
+        os.contains("win") -> listOf("windows-$arch")
+        else -> listOf("linux-$arch")
     }
 }

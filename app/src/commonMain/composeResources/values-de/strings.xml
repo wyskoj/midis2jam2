@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">Titel nicht verfügbar</string>
     <string name="history_unknown_song">Unbekannter Titel</string>
     <string name="history_clear_invalid_song">Löschen</string>
+
+    <!-- Record -->
+    <string name="tab_record">Aufnehmen</string>
+    <string name="record_start">Aufnehmen</string>
+    <string name="record_output">Speichern unter</string>
+    <string name="record_resolution">Auflösung</string>
+    <string name="record_frame_rate">Bildrate</string>
+    <string name="record_quality">Qualität</string>
+    <string name="record_quality_low">Niedrig</string>
+    <string name="record_quality_medium">Mittel</string>
+    <string name="record_quality_high">Hoch</string>
+    <string name="record_quality_maximum">Maximal</string>
+    <string name="record_preparing">Wird vorbereitet …</string>
+    <string name="record_recording">Aufnahme läuft …</string>
+    <string name="record_open_video">Video öffnen</string>
+    <string name="record_show_in_folder">Im Ordner anzeigen</string>
+    <string name="record_cancelled">Die Aufnahme wurde abgebrochen.</string>
+    <string name="record_audio_note">Wird vom integrierten Synthesizer mit dieser Soundbank erzeugt.</string>
+    <string name="record_window_note">Während der Aufnahme öffnet sich ein Vorschaufenster. Wird es geschlossen, wird die Aufnahme abgebrochen.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Audio</string>
+    <string name="record_empty_title">Eine Darbietung aufnehmen</string>
+    <string name="record_empty_body">Mach aus einer MIDI-Datei ein Video mit Ton.</string>
+    <string name="record_choose_file">MIDI-Datei wählen</string>
+    <string name="record_drop_hint">oder hier ablegen</string>
+    <string name="record_change_file">Ändern</string>
+    <string name="record_unreadable">Diese Datei kann nicht als MIDI gelesen werden.</string>
+    <string name="record_in_folder">in %1$s</string>
+    <string name="record_quality_low_detail">Kleinste Datei</string>
+    <string name="record_quality_medium_detail">Ausgewogen</string>
+    <string name="record_quality_high_detail">Beste Bildqualität</string>
+    <string name="record_saved">Gespeichert</string>
+    <string name="record_failed_title">Aufnahme fehlgeschlagen</string>
+    <string name="record_time_left">noch etwa %1$s</string>
 </resources>
 

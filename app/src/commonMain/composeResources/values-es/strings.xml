@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">Canción no disponible</string>
     <string name="history_unknown_song">Canción desconocida</string>
     <string name="history_clear_invalid_song">Borrar</string>
+
+    <!-- Record -->
+    <string name="tab_record">Grabar</string>
+    <string name="record_start">Grabar</string>
+    <string name="record_output">Guardar como</string>
+    <string name="record_resolution">Resolución</string>
+    <string name="record_frame_rate">Velocidad de fotogramas</string>
+    <string name="record_quality">Calidad</string>
+    <string name="record_quality_low">Baja</string>
+    <string name="record_quality_medium">Media</string>
+    <string name="record_quality_high">Alta</string>
+    <string name="record_quality_maximum">Máxima</string>
+    <string name="record_preparing">Preparando…</string>
+    <string name="record_recording">Grabando…</string>
+    <string name="record_open_video">Abrir vídeo</string>
+    <string name="record_show_in_folder">Mostrar en la carpeta</string>
+    <string name="record_cancelled">Se canceló la grabación.</string>
+    <string name="record_audio_note">Generado por el sintetizador integrado con este banco de sonidos.</string>
+    <string name="record_window_note">Durante la grabación se abre una ventana de vista previa. Cerrarla cancela la grabación.</string>
+    <string name="record_section_video">Vídeo</string>
+    <string name="record_section_audio">Audio</string>
+    <string name="record_empty_title">Grabar una interpretación</string>
+    <string name="record_empty_body">Convierte un archivo MIDI en un vídeo con sonido.</string>
+    <string name="record_choose_file">Elegir archivo MIDI</string>
+    <string name="record_drop_hint">o suéltalo aquí</string>
+    <string name="record_change_file">Cambiar</string>
+    <string name="record_unreadable">Este archivo no se puede leer como MIDI.</string>
+    <string name="record_in_folder">en %1$s</string>
+    <string name="record_quality_low_detail">Archivo más pequeño</string>
+    <string name="record_quality_medium_detail">Equilibrada</string>
+    <string name="record_quality_high_detail">Mejor imagen</string>
+    <string name="record_saved">Guardado</string>
+    <string name="record_failed_title">La grabación falló</string>
+    <string name="record_time_left">quedan unos %1$s</string>
 </resources>
 

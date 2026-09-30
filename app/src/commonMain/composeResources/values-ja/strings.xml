@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">曲を再生できません</string>
     <string name="history_unknown_song">不明な曲</string>
     <string name="history_clear_invalid_song">クリア</string>
+
+    <!-- Record -->
+    <string name="tab_record">録画</string>
+    <string name="record_start">録画</string>
+    <string name="record_output">保存先</string>
+    <string name="record_resolution">解像度</string>
+    <string name="record_frame_rate">フレームレート</string>
+    <string name="record_quality">画質</string>
+    <string name="record_quality_low">低</string>
+    <string name="record_quality_medium">中</string>
+    <string name="record_quality_high">高</string>
+    <string name="record_quality_maximum">最高</string>
+    <string name="record_preparing">準備中…</string>
+    <string name="record_recording">録画中…</string>
+    <string name="record_open_video">動画を開く</string>
+    <string name="record_show_in_folder">フォルダーで表示</string>
+    <string name="record_cancelled">録画はキャンセルされました。</string>
+    <string name="record_audio_note">このサウンドバンクを使って内蔵シンセサイザーで生成されます。</string>
+    <string name="record_window_note">録画中はプレビューウィンドウが開きます。閉じると録画はキャンセルされます。</string>
+    <string name="record_section_video">映像</string>
+    <string name="record_section_audio">音声</string>
+    <string name="record_empty_title">演奏を録画</string>
+    <string name="record_empty_body">MIDI ファイルを音声付きの動画にします。</string>
+    <string name="record_choose_file">MIDI ファイルを選択</string>
+    <string name="record_drop_hint">またはここにドロップ</string>
+    <string name="record_change_file">変更</string>
+    <string name="record_unreadable">このファイルは MIDI として読み込めません。</string>
+    <string name="record_in_folder">%1$s 内</string>
+    <string name="record_quality_low_detail">最小のファイル</string>
+    <string name="record_quality_medium_detail">バランス</string>
+    <string name="record_quality_high_detail">最高の見た目</string>
+    <string name="record_saved">保存しました</string>
+    <string name="record_failed_title">録画に失敗しました</string>
+    <string name="record_time_left">残り約 %1$s</string>
 </resources>
 

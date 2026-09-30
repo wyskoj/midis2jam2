@@ -26,6 +26,11 @@ import org.wysko.midis2jam2.di.applicationModule
 import org.wysko.midis2jam2.di.midiSystemModule
 import org.wysko.midis2jam2.di.systemModule
 import org.wysko.midis2jam2.di.uiModule
+import org.wysko.midis2jam2.midi.system.SilentSequencer
+import org.wysko.midis2jam2.record.OfflineSynthesizer
+import org.wysko.midis2jam2.record.RecordOptions
+import org.wysko.midis2jam2.record.RecordingException
+import org.wysko.midis2jam2.record.RecordingListener
 import org.wysko.midis2jam2.starter.MidiPackage
 import org.wysko.midis2jam2.starter.Midis2jam2Application
 import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
@@ -34,6 +39,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.util.*
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -45,12 +51,79 @@ fun main(args: Array<String>) {
     val config = Json.decodeFromString<RendererBundle>(arguments)
     val midiFiles = config.midiFiles.map { File(it) }
 
-    when (midiFiles.size) {
-        0 -> reportNoFiles(protocol)
-        1 -> launchApplication(midiFiles, config, protocol)
+    when {
+        midiFiles.isEmpty() -> reportNoFiles(protocol)
+        config.recordOptions != null -> launchRecording(midiFiles.first(), config, config.recordOptions, protocol)
+        midiFiles.size == 1 -> launchApplication(midiFiles, config, protocol)
         else -> launchQueueApplication(midiFiles, config, protocol)
     }
 }
+
+private fun launchRecording(
+    midiFile: File,
+    config: RendererBundle,
+    options: RecordOptions,
+    protocol: BufferedWriter,
+) {
+    val sequence = runCatching { StandardMidiFileReader().readFile(midiFile).toTimeBasedSequence() }.getOrElse { t ->
+        protocol.send(RendererMessage.error("The MIDI file couldn't be read.", t.stackTraceToString()))
+        return
+    }
+    val synthesizer = runCatching { OfflineSynthesizer(options.soundbankPath?.let(::File)) }.getOrElse { t ->
+        protocol.send(RendererMessage.error("The synthesizer couldn't be started for recording.", t.stackTraceToString()))
+        return
+    }
+    val sequencer = SilentSequencer().apply {
+        open(synthesizer)
+        this.sequence = sequence
+    }
+    // The recording's outcome is only known once the engine has shut down, after the application says it's finished.
+    val outcome = CountDownLatch(1)
+    val listener = object : RecordingListener {
+        override fun onProgress(framesCaptured: Long, expectedFrames: Long) =
+            protocol.send(RendererMessage.recordProgress(framesCaptured, expectedFrames))
+
+        override fun onFinished(file: File) {
+            protocol.send(RendererMessage.recordFinished(file.absolutePath))
+            outcome.countDown()
+        }
+
+        override fun onCancelled() {
+            protocol.send(RendererMessage.recordCancelled())
+            outcome.countDown()
+        }
+
+        override fun onFailed(exception: RecordingException) {
+            protocol.send(
+                RendererMessage.error(
+                    exception.message ?: "The recording failed.",
+                    (exception.cause ?: exception).stackTraceToString()
+                )
+            )
+            outcome.countDown()
+        }
+    }
+
+    val latch = CountDownLatch(1)
+    val application = Midis2jam2Application(
+        sequence,
+        midiFile.name,
+        config.configurations,
+        { latch.countDown() },
+        sequencer,
+        synthesizer = null,
+        midiDevice = synthesizer,
+        recording = Midis2jam2Application.Recording(options, synthesizer, listener),
+    )
+    watchParentCommands { application.stop() }
+    application.execute()
+    latch.await()
+    outcome.await(RECORDING_OUTCOME_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+    protocol.send(RendererMessage.finish())
+}
+
+/** How long to wait, after the engine stops, for a recording to be written or discarded. */
+private const val RECORDING_OUTCOME_TIMEOUT_SECONDS = 60L
 
 private fun launchApplication(
     midiFiles: List<File>,

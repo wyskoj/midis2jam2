@@ -239,5 +239,39 @@
     <string name="history_file_missing_title">Sang utilgjengelig</string>
     <string name="history_unknown_song">Ukjent sang</string>
     <string name="history_clear_invalid_song">Tøm</string>
+
+    <!-- Record -->
+    <string name="tab_record">Ta opp</string>
+    <string name="record_start">Ta opp</string>
+    <string name="record_output">Lagre som</string>
+    <string name="record_resolution">Oppløsning</string>
+    <string name="record_frame_rate">Bildefrekvens</string>
+    <string name="record_quality">Kvalitet</string>
+    <string name="record_quality_low">Lav</string>
+    <string name="record_quality_medium">Middels</string>
+    <string name="record_quality_high">Høy</string>
+    <string name="record_quality_maximum">Maksimal</string>
+    <string name="record_preparing">Forbereder …</string>
+    <string name="record_recording">Tar opp …</string>
+    <string name="record_open_video">Åpne video</string>
+    <string name="record_show_in_folder">Vis i mappe</string>
+    <string name="record_cancelled">Opptaket ble avbrutt.</string>
+    <string name="record_audio_note">Lages av den innebygde synthesizeren med denne lydbanken.</string>
+    <string name="record_window_note">Et forhåndsvisningsvindu åpnes under opptaket. Lukkes det, avbrytes opptaket.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Lyd</string>
+    <string name="record_empty_title">Ta opp en fremføring</string>
+    <string name="record_empty_body">Gjør en MIDI-fil om til en video med lyd.</string>
+    <string name="record_choose_file">Velg MIDI-fil</string>
+    <string name="record_drop_hint">eller slipp en her</string>
+    <string name="record_change_file">Endre</string>
+    <string name="record_unreadable">Denne filen kan ikke leses som MIDI.</string>
+    <string name="record_in_folder">i %1$s</string>
+    <string name="record_quality_low_detail">Minst fil</string>
+    <string name="record_quality_medium_detail">Balansert</string>
+    <string name="record_quality_high_detail">Best bilde</string>
+    <string name="record_saved">Lagret</string>
+    <string name="record_failed_title">Opptaket mislyktes</string>
+    <string name="record_time_left">omtrent %1$s igjen</string>
 </resources>
 
