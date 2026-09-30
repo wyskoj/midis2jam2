@@ -93,10 +93,13 @@
     <string name="settings_general_locale">Language</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Fullscreen</string>
-    <string name="settings_graphics_fullscreen_description">Use the entire screen</string>
+    <string name="settings_graphics_window_mode">Window mode</string>
+    <string name="settings_graphics_window_mode_description">How the performance fills the screen</string>
+    <string name="settings_graphics_window_mode_windowed">Windowed</string>
+    <string name="settings_graphics_window_mode_borderless">Borderless fullscreen</string>
+    <string name="settings_graphics_window_mode_fullscreen">Fullscreen</string>
     <string name="settings_graphics_resolution">Resolution</string>
-    <string name="settings_graphics_resolution_fullscreen">Resolution matches monitor when fullscreen is enabled</string>
+    <string name="settings_graphics_resolution_fullscreen">Resolution matches monitor when not windowed</string>
     <string name="settings_graphics_resolution_default">Use default resolution</string>
     <string name="settings_graphics_resolution_default_hint">Default</string>
     <string name="settings_graphics_resolution_default_description">Default resolution uses most of the screen</string>

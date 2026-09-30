@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Idioma</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Pantalla completa</string>
-    <string name="settings_graphics_fullscreen_description">Usar toda la pantalla</string>
+    <string name="settings_graphics_window_mode">Modo de ventana</string>
+    <string name="settings_graphics_window_mode_description">Cómo la interpretación llena la pantalla</string>
+    <string name="settings_graphics_window_mode_windowed">Ventana</string>
+    <string name="settings_graphics_window_mode_borderless">Pantalla completa sin bordes</string>
+    <string name="settings_graphics_window_mode_fullscreen">Pantalla completa</string>
     <string name="settings_graphics_resolution">Resolución</string>
     <string name="settings_graphics_resolution_fullscreen">La resolución coincide con el monitor cuando la pantalla completa está activada</string>
     <string name="settings_graphics_resolution_default">Usar resolución predeterminada</string>

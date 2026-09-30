@@ -101,8 +101,11 @@
     <string name="settings_general_locale">ภาษา</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">เต็มหน้าจอ</string>
-    <string name="settings_graphics_fullscreen_description">ใช้ทั้งหน้าจอ</string>
+    <string name="settings_graphics_window_mode">โหมดหน้าต่าง</string>
+    <string name="settings_graphics_window_mode_description">การแสดงเติมเต็มหน้าจออย่างไร</string>
+    <string name="settings_graphics_window_mode_windowed">หน้าต่าง</string>
+    <string name="settings_graphics_window_mode_borderless">เต็มหน้าจอไร้ขอบ</string>
+    <string name="settings_graphics_window_mode_fullscreen">เต็มหน้าจอ</string>
     <string name="settings_graphics_resolution">ความละเอียด</string>
     <string name="settings_graphics_resolution_fullscreen">ความละเอียดจะตรงกับจอภาพเมื่อเปิดใช้งานเต็มหน้าจอ</string>
     <string name="settings_graphics_resolution_default">ใช้ความละเอียดมาตรฐาน</string>

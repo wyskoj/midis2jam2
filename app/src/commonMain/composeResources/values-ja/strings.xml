@@ -101,8 +101,11 @@
     <string name="settings_general_locale">言語</string>
 
     <!-- 設定 / グラフィックス -->
-    <string name="settings_graphics_fullscreen">フルスクリーン</string>
-    <string name="settings_graphics_fullscreen_description">画面全体を使用する</string>
+    <string name="settings_graphics_window_mode">ウィンドウモード</string>
+    <string name="settings_graphics_window_mode_description">演奏が画面をどのように埋めるか</string>
+    <string name="settings_graphics_window_mode_windowed">ウィンドウ</string>
+    <string name="settings_graphics_window_mode_borderless">ボーダーレスフルスクリーン</string>
+    <string name="settings_graphics_window_mode_fullscreen">フルスクリーン</string>
     <string name="settings_graphics_resolution">解像度</string>
     <string name="settings_graphics_resolution_fullscreen">フルスクリーン時は解像度がモニターに合わせられます</string>
     <string name="settings_graphics_resolution_default">デフォルト解像度を使用</string>

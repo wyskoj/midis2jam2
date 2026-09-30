@@ -84,8 +84,11 @@
     <string name="settings_general_locale">Langue</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Plein écran</string>
-    <string name="settings_graphics_fullscreen_description">Utiliser tout l'écran</string>
+    <string name="settings_graphics_window_mode">Mode de fenêtre</string>
+    <string name="settings_graphics_window_mode_description">Comment la performance remplit l'écran</string>
+    <string name="settings_graphics_window_mode_windowed">Fenêtré</string>
+    <string name="settings_graphics_window_mode_borderless">Plein écran sans bordure</string>
+    <string name="settings_graphics_window_mode_fullscreen">Plein écran</string>
     <string name="settings_graphics_resolution">Résolution</string>
     <string name="settings_graphics_resolution_fullscreen">La résolution correspond à celle du moniteur en mode plein écran</string>
     <string name="settings_graphics_resolution_default">Utiliser la résolution par défaut</string>

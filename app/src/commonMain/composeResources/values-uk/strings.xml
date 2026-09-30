@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Мова</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Повноекранний режим</string>
-    <string name="settings_graphics_fullscreen_description">Використовувати весь екран</string>
+    <string name="settings_graphics_window_mode">Режим вікна</string>
+    <string name="settings_graphics_window_mode_description">Як виконання заповнює екран</string>
+    <string name="settings_graphics_window_mode_windowed">Вікно</string>
+    <string name="settings_graphics_window_mode_borderless">Безрамковий повноекранний режим</string>
+    <string name="settings_graphics_window_mode_fullscreen">Повноекранний режим</string>
     <string name="settings_graphics_resolution">Роздільна здатність</string>
     <string name="settings_graphics_resolution_fullscreen">У повноекранному режимі роздільна здатність відповідає монітору</string>
     <string name="settings_graphics_resolution_default">Використовувати типову роздільну здатність</string>

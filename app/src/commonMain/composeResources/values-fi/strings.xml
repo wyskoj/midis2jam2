@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Kieli</string>
 
     <!-- Asetukset / Grafiikka -->
-    <string name="settings_graphics_fullscreen">Koko näyttö</string>
-    <string name="settings_graphics_fullscreen_description">Käytä koko näyttöä</string>
+    <string name="settings_graphics_window_mode">Ikkunatila</string>
+    <string name="settings_graphics_window_mode_description">Miten esitys täyttää näytön</string>
+    <string name="settings_graphics_window_mode_windowed">Ikkuna</string>
+    <string name="settings_graphics_window_mode_borderless">Reunaton koko näyttö</string>
+    <string name="settings_graphics_window_mode_fullscreen">Koko näyttö</string>
     <string name="settings_graphics_resolution">Resoluutio</string>
     <string name="settings_graphics_resolution_fullscreen">Resoluutio vastaa näyttöä, kun koko näyttö on käytössä</string>
     <string name="settings_graphics_resolution_default">Käytä oletusresoluutiota</string>

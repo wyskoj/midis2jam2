@@ -20,6 +20,7 @@
 package org.wysko.midis2jam2.starter
 
 import Platform
+import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.jme3.app.SimpleApplication
 import com.jme3.system.lwjgl.LwjglContext
 import org.koin.mp.KoinPlatformTools
@@ -30,6 +31,7 @@ import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.manager.MidiDeviceManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.DesktopCameraManager
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.record.FixedStepTimer
@@ -38,6 +40,7 @@ import org.wysko.midis2jam2.record.RecordOptions
 import org.wysko.midis2jam2.record.RecordingListener
 import org.wysko.midis2jam2.record.RecordingManager
 import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.world.AssetLoader
 import java.lang.invoke.MethodHandles
 import javax.sound.midi.Synthesizer
@@ -81,6 +84,11 @@ internal actual class Midis2jam2Application(
 
     actual override fun simpleInitApp() {
         installGlfwJoystickCallbackWorkaround()
+        if (configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings.windowMode ==
+            WindowMode.BorderlessFullscreen && isWindows()
+        ) {
+            applyBorderlessWindow(context)
+        }
         Jme3ExceptionHandler.setup {
             stop()
             sequencer.stop()

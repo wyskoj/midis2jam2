@@ -84,8 +84,11 @@
     <string name="settings_general_locale">भाषा</string>
 
     <!-- सेटिंग्स / ग्राफिक्स -->
-    <string name="settings_graphics_fullscreen">फुलस्क्रीन</string>
-    <string name="settings_graphics_fullscreen_description">पूरी स्क्रीन का उपयोग करें</string>
+    <string name="settings_graphics_window_mode">विंडो मोड</string>
+    <string name="settings_graphics_window_mode_description">प्रदर्शन स्क्रीन को कैसे भरता है</string>
+    <string name="settings_graphics_window_mode_windowed">विंडो</string>
+    <string name="settings_graphics_window_mode_borderless">बॉर्डरलेस फुलस्क्रीन</string>
+    <string name="settings_graphics_window_mode_fullscreen">फुलस्क्रीन</string>
     <string name="settings_graphics_resolution">रेज़ोल्यूशन</string>
     <string name="settings_graphics_resolution_fullscreen">फुलस्क्रीन सक्षम होने पर रेज़ोल्यूशन मॉनिटर से मेल खाता है</string>
     <string name="settings_graphics_resolution_default">डिफ़ॉल्ट रेज़ोल्यूशन का उपयोग करें</string>

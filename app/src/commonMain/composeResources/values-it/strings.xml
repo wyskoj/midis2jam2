@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Lingua</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Schermo intero</string>
-    <string name="settings_graphics_fullscreen_description">Utilizza l\'intero schermo</string>
+    <string name="settings_graphics_window_mode">Modalità finestra</string>
+    <string name="settings_graphics_window_mode_description">Come l'esecuzione riempie lo schermo</string>
+    <string name="settings_graphics_window_mode_windowed">Finestra</string>
+    <string name="settings_graphics_window_mode_borderless">Schermo intero senza bordi</string>
+    <string name="settings_graphics_window_mode_fullscreen">Schermo intero</string>
     <string name="settings_graphics_resolution">Risoluzione</string>
     <string name="settings_graphics_resolution_fullscreen">La risoluzione corrisponde al monitor quando lo schermo intero è abilitato</string>
     <string name="settings_graphics_resolution_default">Usa risoluzione predefinita</string>

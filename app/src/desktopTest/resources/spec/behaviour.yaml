@@ -286,8 +286,15 @@
 - id: graphics.fullscreen
   source: features/graphics.md
   platforms: [desktop]
-  claim: "When fullscreen is on the performance fills the screen; otherwise it is windowed"
+  claim: "Fullscreen mode does a real display-mode switch and fills the screen"
   waived: "Requires a real display."
+- id: graphics.window-mode.borderless
+  source: features/graphics.md
+  platforms: [desktop]
+  claim: >-
+    Borderless fullscreen mode sizes the window to the screen and removes its decorations without
+    switching the display mode
+  waived: "Requires a real display and a GLFW window; macOS falls back to exclusive fullscreen."
 - id: graphics.resolution.default
   source: features/graphics.md
   platforms: [desktop]

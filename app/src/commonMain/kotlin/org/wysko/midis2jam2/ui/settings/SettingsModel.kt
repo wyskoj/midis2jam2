@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
@@ -44,10 +45,10 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         }
     }
 
-    fun setIsFullscreen(isFullscreen: Boolean) {
+    fun setWindowMode(windowMode: WindowMode) {
         screenModelScope.launch {
             settingsRepository.updateAppSettings {
-                graphicsSettings.isFullscreen = isFullscreen
+                graphicsSettings.windowMode = windowMode
             }
         }
     }

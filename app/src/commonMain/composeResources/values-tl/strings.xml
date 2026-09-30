@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Wika</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Fullscreen</string>
-    <string name="settings_graphics_fullscreen_description">Gamitin ang buong screen</string>
+    <string name="settings_graphics_window_mode">Window mode</string>
+    <string name="settings_graphics_window_mode_description">Paano pupunuin ng pagtatanghal ang screen</string>
+    <string name="settings_graphics_window_mode_windowed">Windowed</string>
+    <string name="settings_graphics_window_mode_borderless">Borderless na fullscreen</string>
+    <string name="settings_graphics_window_mode_fullscreen">Fullscreen</string>
     <string name="settings_graphics_resolution">Resolution</string>
     <string name="settings_graphics_resolution_fullscreen">Tumutugma ang resolution sa monitor kapag pinagana ang fullscreen</string>
     <string name="settings_graphics_resolution_default">Gamitin ang default na resolution</string>
