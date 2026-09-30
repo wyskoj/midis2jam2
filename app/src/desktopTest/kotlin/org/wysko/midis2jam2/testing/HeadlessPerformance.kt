@@ -32,7 +32,7 @@ import org.wysko.midis2jam2.manager.DrumSetVisibilityManager
 import org.wysko.midis2jam2.manager.ManagerProfile
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.manager.instantiateManagers
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.AssetLoader
 import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
@@ -161,8 +161,8 @@ class HeadlessPerformance private constructor(
     class TestPerformanceManager(
         sequence: TimeBasedSequence,
         fileName: String,
-        configs: Collection<Configuration>,
-    ) : PerformanceManager(sequence, fileName, configs) {
+        config: PerformanceConfig,
+    ) : PerformanceManager(sequence, fileName, config) {
 
         override val onLoadingProgress: (Float) -> Unit = {}
 
@@ -223,12 +223,9 @@ class HeadlessPerformance private constructor(
             sequencer: NoOpSequencer = NoOpSequencer(),
             isRecording: Boolean = false,
         ): HeadlessPerformance {
-            val configurations = listOf(
-                Configuration.HomeConfiguration(),
-                Configuration.AppSettingsConfiguration(settings),
-            )
+            val config = PerformanceConfig(settings = settings)
 
-            val performance = TestPerformanceManager(sequence, fileName, configurations)
+            val performance = TestPerformanceManager(sequence, fileName, config)
             val ready = CountDownLatch(1)
             val failure = AtomicReference<Throwable?>(null)
             val frameCounter = FrameCounter()
@@ -249,7 +246,7 @@ class HeadlessPerformance private constructor(
 
                     val managers = when {
                         attachManagers -> instantiateManagers(
-                            configurations = configurations,
+                            config = config,
                             sequence = sequence,
                             sequencer = sequencer,
                             profile = ManagerProfile.Headless,

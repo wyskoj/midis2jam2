@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.manager.LyricManager
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
+import org.wysko.midis2jam2.testing.withLyrics
 import org.wysko.midis2jam2.world.font.covers
 import org.wysko.midis2jam2.world.lyric.renderString
 import kotlin.test.Test
@@ -72,9 +73,7 @@ class LyricsTest {
     @Test
     @Spec("lyrics.setting.toggle")
     fun `turning lyrics off in the settings removes the display`() {
-        val lyricsOff = AppSettings().apply {
-            onScreenElementsSettings.lyricsSettings.isShowLyrics = false
-        }
+        val lyricsOff = AppSettings().withLyrics { copy(isShowLyrics = false) }
 
         HeadlessPerformance.start(MidiFixtures.withLyrics(), settings = lyricsOff).use { performance ->
             assertNull(
@@ -87,9 +86,7 @@ class LyricsTest {
     @Test
     @Spec("lyrics.setting.size")
     fun `the lyric size setting is carried into the performance`() {
-        val large = AppSettings().apply {
-            onScreenElementsSettings.lyricsSettings.lyricsSize = 3.0
-        }
+        val large = AppSettings().withLyrics { copy(lyricsSize = 3.0) }
 
         HeadlessPerformance.start(MidiFixtures.withLyrics(), settings = large).use { performance ->
             // The controller reads the size while building its text, so reaching this point
@@ -97,10 +94,8 @@ class LyricsTest {
             val manager = performance.app.stateManager.getState(LyricManager::class.java)
             assertNotNull(manager?.controller, "No lyric display was built at a non-default size")
 
-            val configured = performance.performance.configs
-                .filterIsInstance<org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration>()
-                .single()
-                .appSettings
+            val configured = performance.performance.config
+                .settings
                 .onScreenElementsSettings
                 .lyricsSettings
                 .lyricsSize

@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.input
 
+import org.wysko.midis2jam2.testing.withControls
+import org.wysko.midis2jam2.testing.withCamera
 import com.jme3.input.KeyInput
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.testing.HeadlessPerformance
@@ -79,10 +81,9 @@ class CameraSpeedModifierTest {
     @Test
     @Spec("camera.freecam.speed.sticky-toggle")
     fun `sticky modifiers stay on after the key is released`() {
-        val sticky = AppSettings().apply {
-            cameraSettings.isSmoothFreecam = false
-            controlsSettings.isSpeedModifierKeysSticky = true
-        }
+        val sticky = AppSettings()
+            .withCamera { copy(isSmoothFreecam = false) }
+            .withControls { copy(isSpeedModifierKeysSticky = true) }
 
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = sticky).use { performance ->
             val input = InputHarness(performance)
@@ -115,10 +116,9 @@ class CameraSpeedModifierTest {
 
     @Test
     fun `the other modifier cancels a sticky one`() {
-        val sticky = AppSettings().apply {
-            cameraSettings.isSmoothFreecam = false
-            controlsSettings.isSpeedModifierKeysSticky = true
-        }
+        val sticky = AppSettings()
+            .withCamera { copy(isSmoothFreecam = false) }
+            .withControls { copy(isSpeedModifierKeysSticky = true) }
 
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = sticky).use { performance ->
             val input = InputHarness(performance)
@@ -150,7 +150,7 @@ class CameraSpeedModifierTest {
         const val SLOW_AT_MOST = 0.5f
 
         fun withFreeCamera(block: (InputHarness) -> Unit) {
-            val settings = AppSettings().apply { cameraSettings.isSmoothFreecam = false }
+            val settings = AppSettings().withCamera { copy(isSmoothFreecam = false) }
             HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = settings)
                 .use { performance ->
                     val input = InputHarness(performance)

@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.ui
 
+import org.wysko.midis2jam2.testing.withCamera
 import com.russhwolf.settings.PropertiesSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,10 +27,8 @@ import org.wysko.midis2jam2.domain.PreferenceBackedHomeTabPersistor
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.PreferenceBackedSettingsRepository
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.ConfigurationService
-import org.wysko.midis2jam2.starter.configuration.find
-import org.wysko.midis2jam2.testing.FakeHomeScreenModel
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfigFactory
 import org.wysko.midis2jam2.testing.Spec
 import java.util.Properties
 import kotlin.test.Test
@@ -51,11 +50,11 @@ class HomeTabConfigurationTest {
             HomeTabPersistentState(midiDevice = "Gervill", soundbank = "/music/orchestra.sf2")
         )
 
-        val home = service.getConfigurations().find<Configuration.HomeConfiguration>()
+        val config = service.create(isLooping = false)
 
         assertEquals(
             "/music/orchestra.sf2",
-            home.selectedSoundbank,
+            config.soundbank,
             "The soundbank picked on the home tab did not reach the performance"
         )
     }
@@ -64,17 +63,14 @@ class HomeTabConfigurationTest {
     fun `choosing no soundbank leaves the performance with none`() {
         val service = configurationService(HomeTabPersistentState(midiDevice = "Gervill", soundbank = null))
 
-        assertEquals(null, service.getConfigurations().find<Configuration.HomeConfiguration>().selectedSoundbank)
+        assertEquals(null, service.create(isLooping = false).soundbank)
     }
 
     @Test
     fun `the device chosen on the home tab reaches the performance`() {
         val service = configurationService(HomeTabPersistentState(midiDevice = "Some External Device"))
 
-        assertEquals(
-            "Some External Device",
-            service.getConfigurations().find<Configuration.HomeConfiguration>().selectedMidiDevice
-        )
+        assertEquals("Some External Device", service.create(isLooping = false).midiDevice)
     }
 
     @Test
@@ -100,38 +96,28 @@ class HomeTabConfigurationTest {
         )
         assertEquals(
             "Gervill",
-            Configuration.HomeConfiguration().selectedMidiDevice,
+            PerformanceConfig().midiDevice,
             "A fresh install should play through the built-in synthesizer"
         )
     }
 
     @Test
     fun `the settings in force are handed to the performance alongside the home choices`() {
-        val settings = AppSettings().apply { cameraSettings.defaultFieldOfView = 55f }
-        val service = configurationService(HomeTabPersistentState(), settings)
+        val settings = AppSettings().withCamera { copy(defaultFieldOfView = 55f) }
+        val service = configurationService(HomeTabPersistentState(midiDevice = "Gervill"), settings)
 
-        val configurations = service.getConfigurations()
+        val config = service.create(isLooping = false)
 
-        assertEquals(
-            55f,
-            configurations.find<Configuration.AppSettingsConfiguration>().appSettings.cameraSettings.defaultFieldOfView
-        )
-        assertTrue(
-            configurations.any { it is Configuration.HomeConfiguration },
-            "A performance needs the home tab's choices as well as the settings"
-        )
+        assertEquals(55f, config.settings.cameraSettings.defaultFieldOfView)
+        assertEquals("Gervill", config.midiDevice, "A performance needs the home tab's choices as well as the settings")
     }
 
     @Test
-    fun `looping is carried from the home screen`() {
-        val looping = FakeHomeScreenModel(isLooping = true)
-        val service = ConfigurationService(
-            PreferenceBackedHomeTabPersistor(PropertiesSettings(Properties())),
-            looping,
-            inMemorySettings(AppSettings()),
-        )
+    fun `looping is whatever the caller asks for`() {
+        val service = configurationService(HomeTabPersistentState())
 
-        assertTrue(service.getConfigurations().find<Configuration.HomeConfiguration>().isLooping)
+        assertTrue(service.create(isLooping = true).isLooping)
+        assertEquals(false, service.create(isLooping = false).isLooping)
     }
 
     private companion object {
@@ -139,18 +125,18 @@ class HomeTabConfigurationTest {
         fun configurationService(
             state: HomeTabPersistentState,
             settings: AppSettings = AppSettings(),
-        ): ConfigurationService {
+        ): PerformanceConfigFactory {
             val store = PropertiesSettings(Properties())
             val persistor = PreferenceBackedHomeTabPersistor(store).apply { save(state) }
-            return ConfigurationService(persistor, FakeHomeScreenModel(), inMemorySettings(settings))
+            return PerformanceConfigFactory(inMemorySettings(settings), persistor)
         }
 
         fun inMemorySettings(settings: AppSettings): SettingsRepository {
             val repository = PreferenceBackedSettingsRepository(PropertiesSettings(Properties()))
             return object : SettingsRepository {
                 override val appSettings: StateFlow<AppSettings> = MutableStateFlow(settings)
-                override suspend fun updateAppSettings(block: AppSettings.() -> Unit) {
-                    repository.updateAppSettings(block)
+                override suspend fun update(transform: (AppSettings) -> AppSettings) {
+                    repository.update(transform)
                 }
             }
         }

@@ -17,16 +17,26 @@
 
 package org.wysko.midis2jam2.domain
 
-import android.content.Context
-import com.russhwolf.settings.SharedPreferencesSettings
-import org.koin.mp.KoinPlatformTools
+import com.russhwolf.settings.Settings
 
-/** On Android, the home tab's state lives in its own shared preferences file. */
-actual fun createHomeTabPersistor(): HomeTabPersistor {
-    val context = KoinPlatformTools.defaultContext().get().get<Context>()
-    return PreferenceBackedHomeTabPersistor(
-        SharedPreferencesSettings(
-            delegate = context.getSharedPreferences("midis2jam2_home_tab_state", Context.MODE_PRIVATE)
-        )
-    )
+/** The separate key-value stores the app keeps on a device. */
+enum class StoreName {
+    /** The user's [org.wysko.midis2jam2.domain.settings.AppSettings]. */
+    AppSettings,
+
+    /** What the home tab was last set to. */
+    HomeTab,
+
+    /** The recently played songs. */
+    PlaybackHistory,
+
+    /** Whether the user has been through first-launch onboarding. */
+    Onboarding,
 }
+
+/**
+ * The key-value store this platform keeps [store] in.
+ *
+ * Each platform hands back the node or file it has always used for that store, so no saved data moves.
+ */
+expect fun platformSettings(store: StoreName): Settings

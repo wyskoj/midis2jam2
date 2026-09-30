@@ -21,9 +21,7 @@ import com.jme3.app.Application
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.util.logger
 
 /** The control change that sets a channel's reverb send level. */
@@ -39,14 +37,13 @@ private const val EFFECT_LEVEL_OFF = 0
 private const val CHANNEL_COUNT = 16
 
 class MidiDeviceManager(
-    private val configs: Collection<Configuration>,
+    private val config: PerformanceConfig,
     private val midiDevice: MidiDevice
 ) : BaseManager() {
     override fun initialize(app: Application) {
         super.initialize(app)
-        val isSendResetMessage = configs
-            .find<AppSettingsConfiguration>()
-            .appSettings
+        val isSendResetMessage = config
+            .settings
             .playbackSettings
             .midiSpecificationResetSettings
             .isSendSpecificationResetMessage
@@ -66,9 +63,8 @@ class MidiDeviceManager(
      * which is why the documentation warns the setting may not always hold.
      */
     private fun applySynthesizerEffects() {
-        val synthesizer = configs
-            .find<AppSettingsConfiguration>()
-            .appSettings
+        val synthesizer = config
+            .settings
             .playbackSettings
             .synthesizerSettings
 
@@ -87,9 +83,8 @@ class MidiDeviceManager(
     }
 
     fun sendResetMessage() {
-        val specification = configs
-            .find<AppSettingsConfiguration>()
-            .appSettings
+        val specification = config
+            .settings
             .playbackSettings
             .midiSpecificationResetSettings
             .midiSpecification

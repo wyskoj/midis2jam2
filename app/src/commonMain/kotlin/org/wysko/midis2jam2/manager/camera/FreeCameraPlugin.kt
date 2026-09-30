@@ -26,8 +26,7 @@ import com.jme3.renderer.Camera
 import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_MODIFIER_FAST
 import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_MODIFIER_SLOW
 import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_PLUGIN_FREE
-import org.wysko.midis2jam2.manager.PreferencesManager
-import org.wysko.midis2jam2.util.state
+import org.wysko.midis2jam2.manager.performanceConfig
 
 private const val DEFAULT_MOVE_SPEED = 100f
 private const val SLOW_MOVE_SPEED = 10f
@@ -55,18 +54,16 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         (app as SimpleApplication).flyByCamera.unregisterInput()
         dummyCamera = Camera(app.camera.width, app.camera.height).apply {
             isParallelProjection = false
-            app.state<PreferencesManager>()?.getAppSettings()?.cameraSettings?.defaultFieldOfView?.let {
-                fov = it
-            }
+            fov = app.performanceConfig.settings.cameraSettings.defaultFieldOfView
         }
         dummyFlyByCamera = ExtendedJoystickFlyByCamera(
             dummyCamera,
             onCameraInput,
-            app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isGamepadEnabled ?: false,
+            app.performanceConfig.settings.controlsSettings.isGamepadEnabled,
         ).apply {
             registerWithInput(app.inputManager)
             isDragToRotate =
-                app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isLockCursor?.not() ?: true
+                !app.performanceConfig.settings.controlsSettings.isLockCursor
             moveSpeed = DEFAULT_MOVE_SPEED
             zoomSpeed = DEFAULT_ZOOM_SPEED
         }
@@ -130,9 +127,7 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
      * again.
      */
     private fun handleSpeedModifier(name: String, isPressed: Boolean) {
-        val isSticky =
-            application.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isSpeedModifierKeysSticky
-                ?: false
+        val isSticky = application.performanceConfig.settings.controlsSettings.isSpeedModifierKeysSticky
 
         activeSpeedModifier = when (isSticky) {
             true -> {

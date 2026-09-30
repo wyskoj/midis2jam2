@@ -31,12 +31,12 @@ import com.jme3.scene.debug.WireBox
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.algorithmic.InstrumentAssignment
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 
 abstract class PerformanceManager(
     val sequence: TimeBasedSequence,
     val fileName: String,
-    val configs: Collection<Configuration>,
+    val config: PerformanceConfig,
 ) : AbstractAppState() {
     val root: Node = Node()
     lateinit var app: SimpleApplication

@@ -63,7 +63,7 @@ class DebugTextEngine(private val context: PerformanceManager) {
                 graphicsProcessingInfo,
                 javaVirtualMachineInfo.get()
             ),
-            "Settings" to listOf(context.configs.joinToString().wrap(80)),
+            "Settings" to listOf(context.config.toString().wrap(80)),
         )
         return sections.joinToString("\n\n") { "${it.first}:\n${it.second.joinToString("\n")}" }
     }

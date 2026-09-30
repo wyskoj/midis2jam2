@@ -23,15 +23,12 @@ import com.jme3.system.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.starter.configuration.*
 
-internal fun SimpleApplication.applyConfigurations(configurations: Collection<Configuration>) {
+internal fun SimpleApplication.applyConfigurations(config: PerformanceConfig) {
     setSettings(
         AppSettings(false).apply {
             copyFrom(DEFAULT_JME_SETTINGS)
-            applyResolution(configurations)
-            setUseJoysticks(
-                configurations.find<Configuration.AppSettingsConfiguration>()
-                    .appSettings.controlsSettings.isGamepadEnabled
-            )
+            applyResolution(config)
+            setUseJoysticks(config.settings.controlsSettings.isGamepadEnabled)
         }
     )
     setDisplayStatView(false)
@@ -40,9 +37,9 @@ internal fun SimpleApplication.applyConfigurations(configurations: Collection<Co
     isShowSettings = false
 }
 
-private fun AppSettings.applyResolution(configurations: Collection<Configuration>) {
+private fun AppSettings.applyResolution(config: PerformanceConfig) {
     val measuredResolution = screenResolution()
-    val windowMode = configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings.windowMode
+    val windowMode = config.settings.graphicsSettings.windowMode
         // Borderless fullscreen is Windows-only (see applyBorderlessWindow); fall back to real fullscreen elsewhere.
         .let { if (it == WindowMode.BorderlessFullscreen && !isWindows()) WindowMode.Fullscreen else it }
 
@@ -67,7 +64,7 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
 
         WindowMode.Windowed -> {
             isFullscreen = false
-            with(configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings) {
+            with(config.settings.graphicsSettings) {
                 when (resolutionSettings.isUseDefaultResolution) {
                     true -> {
                         measuredResolution?.let { screenRes ->
@@ -88,11 +85,11 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
     }
 }
 
-internal fun screenResolution(): Resolution.CustomResolution? = getScreenResolution()
+internal fun screenResolution(): Resolution? = getScreenResolution()
 
-internal fun preferredResolution(screenResolution: Resolution.CustomResolution): Resolution.CustomResolution =
+internal fun preferredResolution(screenResolution: Resolution): Resolution =
     with(screenResolution) {
-        Resolution.CustomResolution((width * 0.95).toInt(), (height * 0.85).toInt())
+        Resolution((width * 0.95).toInt(), (height * 0.85).toInt())
     }
 
 private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
@@ -109,4 +106,4 @@ private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
 
 internal expect fun AppSettings.applyIcons()
 internal expect fun AppSettings.applyScreenFrequency()
-internal expect fun getScreenResolution(): Resolution.CustomResolution?
+internal expect fun getScreenResolution(): Resolution?

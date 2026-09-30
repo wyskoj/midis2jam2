@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,12 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.starter.configuration
+package org.wysko.midis2jam2.domain
 
-import java.io.File
+import com.russhwolf.settings.PreferencesSettings
+import com.russhwolf.settings.Settings
+import java.util.prefs.Preferences
 
-/**
- * The folder where the user stores background images.
- */
-val BACKGROUND_IMAGES_FOLDER: File = File(APPLICATION_CONFIG_HOME, "backgrounds").also {
-    it.mkdirs()
-}
-
+/** On the desktop, every store shares one node of the user's Java preferences; their keys do not collide. */
+actual fun platformSettings(store: StoreName): Settings =
+    PreferencesSettings(Preferences.userRoot().node("org/wysko/midis2jam2"))

@@ -15,18 +15,21 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.domain.settings
+package org.wysko.midis2jam2.domain
 
 import android.content.Context
+import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
 import org.koin.mp.KoinPlatformTools
 
-/** On Android, settings live in the application's shared preferences. */
-actual fun createSettingsRepository(): SettingsRepository {
+/** On Android, each store is its own shared preferences file, under the names earlier versions already use. */
+actual fun platformSettings(store: StoreName): Settings {
     val context = KoinPlatformTools.defaultContext().get().get<Context>()
-    return PreferenceBackedSettingsRepository(
-        SharedPreferencesSettings(
-            delegate = context.getSharedPreferences("midis2jam2_settings", Context.MODE_PRIVATE)
-        )
-    )
+    val fileName = when (store) {
+        StoreName.AppSettings -> "midis2jam2_settings"
+        StoreName.HomeTab -> "midis2jam2_home_tab_state"
+        StoreName.PlaybackHistory -> "midis2jam2_playback_history"
+        StoreName.Onboarding -> "org.wysko.midis2jam2.PREFERENCE_FILE_KEY"
+    }
+    return SharedPreferencesSettings(delegate = context.getSharedPreferences(fileName, Context.MODE_PRIVATE))
 }

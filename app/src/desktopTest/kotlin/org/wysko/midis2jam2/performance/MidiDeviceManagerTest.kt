@@ -17,10 +17,12 @@
 
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.testing.withMidiSpecificationReset
+import org.wysko.midis2jam2.testing.withSynthesizer
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.manager.MidiDeviceManager
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.NoOpMidiDevice
@@ -86,7 +88,7 @@ class MidiDeviceManagerTest {
     fun `turning reverb off silences it on every channel`() {
         val device = NoOpMidiDevice()
 
-        withDevice(device) { it.playbackSettings.synthesizerSettings.isUseReverb = false }
+        withDevice(device) { it.withSynthesizer { copy(isUseReverb = false) } }
 
         assertEquals(
             (0 until CHANNELS).map { "controlChange ch=$it controller=$REVERB value=0" },
@@ -99,7 +101,7 @@ class MidiDeviceManagerTest {
     fun `turning chorus off silences it on every channel`() {
         val device = NoOpMidiDevice()
 
-        withDevice(device) { it.playbackSettings.synthesizerSettings.isUseChorus = false }
+        withDevice(device) { it.withSynthesizer { copy(isUseChorus = false) } }
 
         assertEquals(
             (0 until CHANNELS).map { "controlChange ch=$it controller=$CHORUS value=0" },
@@ -112,10 +114,7 @@ class MidiDeviceManagerTest {
     fun `leaving an effect on sends nothing, so the soundbank decides`() {
         val device = NoOpMidiDevice()
 
-        withDevice(device) {
-            it.playbackSettings.synthesizerSettings.isUseReverb = true
-            it.playbackSettings.synthesizerSettings.isUseChorus = true
-        }
+        withDevice(device) { it.withSynthesizer { copy(isUseReverb = true, isUseChorus = true) } }
 
         assertEquals(
             emptyList(),
@@ -128,10 +127,7 @@ class MidiDeviceManagerTest {
     fun `turning both effects off silences both`() {
         val device = NoOpMidiDevice()
 
-        withDevice(device) {
-            it.playbackSettings.synthesizerSettings.isUseReverb = false
-            it.playbackSettings.synthesizerSettings.isUseChorus = false
-        }
+        withDevice(device) { it.withSynthesizer { copy(isUseReverb = false, isUseChorus = false) } }
 
         assertEquals(
             CHANNELS * 2,
@@ -147,8 +143,8 @@ class MidiDeviceManagerTest {
         val device = NoOpMidiDevice()
 
         withDevice(device) {
-            it.playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage = true
-            it.playbackSettings.synthesizerSettings.isUseReverb = false
+            it.withMidiSpecificationReset { copy(isSendSpecificationResetMessage = true) }
+                .withSynthesizer { copy(isUseReverb = false) }
         }
 
         val reset = device.messages.indexOfFirst { it.startsWith("data ") }
@@ -163,9 +159,8 @@ class MidiDeviceManagerTest {
     }
 
     /** Boots a performance with [configure] applied to the settings, recording what the device receives. */
-    private fun withDevice(device: NoOpMidiDevice, configure: (AppSettings) -> Unit) {
-        val settings = AppSettings().apply(configure)
-        attach(device, settings)
+    private fun withDevice(device: NoOpMidiDevice, configure: (AppSettings) -> AppSettings) {
+        attach(device, configure(AppSettings()))
     }
 
     /** Boots a performance with the reset option configured, and a device that records what it receives. */
@@ -174,9 +169,8 @@ class MidiDeviceManagerTest {
         sendReset: Boolean,
         specification: MidiSpecification,
     ) {
-        val settings = AppSettings().apply {
-            playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage = sendReset
-            playbackSettings.midiSpecificationResetSettings.midiSpecification = specification
+        val settings = AppSettings().withMidiSpecificationReset {
+            copy(isSendSpecificationResetMessage = sendReset, midiSpecification = specification)
         }
         attach(device, settings)
     }
@@ -184,15 +178,12 @@ class MidiDeviceManagerTest {
     private fun attach(device: NoOpMidiDevice, settings: AppSettings) {
         HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings = settings)
             .use { performance ->
-                val configurations = listOf(
-                    Configuration.HomeConfiguration(),
-                    Configuration.AppSettingsConfiguration(settings),
-                )
+                val config = PerformanceConfig(settings = settings)
 
                 // The shipped application attaches this alongside the other managers once the
                 // MIDI device is open.
                 performance.onEngineThread {
-                    performance.app.stateManager.attach(MidiDeviceManager(configurations, device))
+                    performance.app.stateManager.attach(MidiDeviceManager(config, device))
                 }
                 performance.awaitFrames(1)
                 performance.throwIfEngineFailed()

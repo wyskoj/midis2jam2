@@ -39,8 +39,7 @@ import org.wysko.midis2jam2.record.OfflineSynthesizer
 import org.wysko.midis2jam2.record.RecordOptions
 import org.wysko.midis2jam2.record.RecordingListener
 import org.wysko.midis2jam2.record.RecordingManager
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.AssetLoader
 import java.lang.invoke.MethodHandles
 import javax.sound.midi.Synthesizer
@@ -48,7 +47,7 @@ import javax.sound.midi.Synthesizer
 internal actual class Midis2jam2Application(
     private val sequence: TimeBasedSequence,
     private val fileName: String,
-    private val configurations: Collection<Configuration>,
+    private val config: PerformanceConfig,
     private val onFinish: () -> Unit,
     private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
@@ -69,7 +68,7 @@ internal actual class Midis2jam2Application(
 
     actual fun execute() {
         try {
-            applyConfigurations(configurations)
+            applyConfigurations(config)
             recording?.let { configureForRecording(it.options) }
             start()
         } catch (e: Exception) {
@@ -84,7 +83,7 @@ internal actual class Midis2jam2Application(
 
     actual override fun simpleInitApp() {
         installGlfwJoystickCallbackWorkaround()
-        if (configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings.windowMode ==
+        if (config.settings.graphicsSettings.windowMode ==
             WindowMode.BorderlessFullscreen && isWindows()
         ) {
             applyBorderlessWindow(context)
@@ -94,14 +93,14 @@ internal actual class Midis2jam2Application(
             sequencer.stop()
             sequencer.close()
         }
-        setupState(configurations, platform = Platform.Desktop)
+        setupState(config, platform = Platform.Desktop)
         stateManager.attach(AssetLoader())
         val performanceAppState = DesktopPerformanceManager(
             sequencer = sequencer,
             midiFile = sequence,
             onClose = { stop() },
             fileName = fileName,
-            configs = configurations,
+            config = config,
         )
         stateManager.attach(performanceAppState)
         rootNode.attachChild(performanceAppState.root)
@@ -109,13 +108,13 @@ internal actual class Midis2jam2Application(
             RecordingManager(it.options, sequence, it.synthesizer, it.listener)
         }
         addManagers(
-            configurations,
+            config,
             sequence,
             sequencer,
             onPlaybackComplete = recordingManager?.let { manager -> { manager.complete(); stop() } },
             isRecording = recording != null,
         )
-        stateManager.attach(MidiDeviceManager(configurations, midiDevice))
+        stateManager.attach(MidiDeviceManager(config, midiDevice))
         // After the MIDI device manager, whose reset must reach the synthesizer before the song does.
         recordingManager?.let { stateManager.attach(it) }
     }

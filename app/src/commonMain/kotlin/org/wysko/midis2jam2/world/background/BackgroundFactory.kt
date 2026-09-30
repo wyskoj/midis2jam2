@@ -30,7 +30,7 @@ import com.jme3.texture.Texture
 import com.jme3.texture.Texture2D
 import com.jme3.texture.TextureCubeMap
 import com.jme3.util.SkyFactory
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 
 /**
  * Background factory for different background types.
@@ -99,10 +99,10 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
      */
     class CubeMap(
         assetManager: AssetManager,
-        private val config: AppSettingsConfiguration,
+        private val config: PerformanceConfig,
     ) : BackgroundFactory(assetManager) {
         override fun create(): Spatial {
-            val texturePaths = with(config.appSettings.backgroundSettings.cubeMapTextures) {
+            val texturePaths = with(config.settings.backgroundSettings.cubeMapTextures) {
                 listOf(this[3], this[1], this[0], this[2], this[4], this[5])
             }
 

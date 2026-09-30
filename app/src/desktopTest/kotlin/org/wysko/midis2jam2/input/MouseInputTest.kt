@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.input
 
+import org.wysko.midis2jam2.testing.withCamera
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.InputHarness
@@ -155,7 +156,7 @@ class MouseInputTest {
         const val ZOOM_CATCH_UP_FRAMES = 180
 
         fun withCamera(smooth: Boolean = false, block: (HeadlessPerformance, InputHarness) -> Unit) {
-            val settings = AppSettings().apply { cameraSettings.isSmoothFreecam = smooth }
+            val settings = AppSettings().withCamera { copy(isSmoothFreecam = smooth) }
             HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = settings)
                 .use { performance ->
                     val input = InputHarness(performance)

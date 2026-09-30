@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Jacob Wysko
+ * Copyright (C) 2026 Jacob Wysko
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,16 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.manager
+package org.wysko.midis2jam2.starter.configuration
 
-import org.wysko.midis2jam2.domain.settings.AppSettings
+import java.io.File
 
-class PreferencesManager(
-    private val appSettings: AppSettings,
-) : BaseManager() {
-    fun getAppSettings(): AppSettings = appSettings
+/** The folder the application keeps its files in, created if it does not exist. */
+val APPLICATION_CONFIG_HOME: File = File(File(System.getProperty("user.home")), ".midis2jam2").also {
+    it.mkdirs()
+}
+
+/** The folder where the user stores background images. */
+val BACKGROUND_IMAGES_FOLDER: File = File(APPLICATION_CONFIG_HOME, "backgrounds").also {
+    it.mkdirs()
 }

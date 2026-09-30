@@ -37,8 +37,8 @@ import org.wysko.midis2jam2.starter.MidiPackage
 import org.wysko.midis2jam2.starter.Midis2jam2Application
 import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
 import org.wysko.midis2jam2.starter.applyConfigurations
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.ConfigurationService
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfigFactory
 import org.wysko.midis2jam2.util.isMacOs
 import org.wysko.midis2jam2.util.logger
 import java.io.File
@@ -80,7 +80,7 @@ actual class ApplicationService : KoinComponent, Recorder {
         val bundle = encodeBundle(
             RendererBundle(
                 midiFiles = listOf(midiFile.absolutePath),
-                configurations = getConfigurations(),
+                config = createConfig(isLooping = false),
                 recordOptions = options,
             )
         )
@@ -96,13 +96,13 @@ actual class ApplicationService : KoinComponent, Recorder {
 
     actual fun startApplication(executionState: ExecutionState) {
         _isApplicationRunning.value = true
-        val configurations = getConfigurations()
+        val config = createConfig(isLooping = executionState.isLooping)
         val midiFile = executionState.midiFile
 
         when {
             isMacOs() -> {
                 val bundle = encodeBundle(
-                    RendererBundle(midiFiles = listOf(midiFile.file.absolutePath), configurations)
+                    RendererBundle(midiFiles = listOf(midiFile.file.absolutePath), config)
                 )
                 val process = launchRendererProcess(extraArgs = listOf(bundle))
                 manageRendererProcess(process)
@@ -112,7 +112,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                 val midiPackage = runCatching {
                     MidiPackage.build(
                         midiFile.file,
-                        configurations
+                        config
                     )
                 }.onFailure { t ->
                     errorLogService.addError("There was an error initializing the MIDI device.", t.stackTraceToString())
@@ -124,7 +124,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                     Midis2jam2Application(
                         sequence!!,
                         fileName = midiFile.file.name,
-                        configurations,
+                        config,
                         onFinish = {
                             _isApplicationRunning.value = false
                         },
@@ -140,19 +140,19 @@ actual class ApplicationService : KoinComponent, Recorder {
     actual fun startQueueApplication(executionState: QueueExecutionState) {
         _isApplicationRunning.value = true
         val midiFiles = executionState.queue
-        val configurations = getConfigurations()
+        val config = createConfig(isLooping = false)
 
         when {
             isMacOs() -> {
                 val bundle = encodeBundle(
-                    RendererBundle(midiFiles = midiFiles.map { it.file.absolutePath }, configurations)
+                    RendererBundle(midiFiles = midiFiles.map { it.file.absolutePath }, config)
                 )
                 val process = launchRendererProcess(extraArgs = listOf(bundle))
                 manageRendererProcess(process, midiFiles.map { it.file })
             }
 
             else -> {
-                val midiPackage = runCatching { MidiPackage.build(null, configurations) }.onFailure { t ->
+                val midiPackage = runCatching { MidiPackage.build(null, config) }.onFailure { t ->
                     errorLogService.addError("There was an error initializing the MIDI device.", t.stackTraceToString())
                     _isApplicationRunning.value = false
                     return
@@ -165,7 +165,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                     Midis2jam2QueueApplication(
                         sequences = sequences,
                         fileNames = executionState.queue.map { it.file.name },
-                        configurations,
+                        config,
                         onTrackStart = { trackIndex ->
                             executionState.queue.getOrNull(trackIndex)?.file?.let(::recordPlaybackHistory)
                         },
@@ -176,7 +176,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                         synthesizer,
                         midiDevice
                     ).run {
-                        applyConfigurations(configurations)
+                        applyConfigurations(config)
                         start()
                     }
                 }
@@ -287,9 +287,9 @@ actual class ApplicationService : KoinComponent, Recorder {
     private fun encodeBundle(rendererBundle: RendererBundle): String =
         Base64.getEncoder().encodeToString(Json.encodeToString(rendererBundle).encodeToByteArray())
 
-    private fun getConfigurations(): List<Configuration> {
-        val configurationService: ConfigurationService by inject()
-        return configurationService.getConfigurations()
+    private fun createConfig(isLooping: Boolean): PerformanceConfig {
+        val factory: PerformanceConfigFactory by inject()
+        return factory.create(isLooping)
     }
 
     private fun detectJavaExecutable(): String {

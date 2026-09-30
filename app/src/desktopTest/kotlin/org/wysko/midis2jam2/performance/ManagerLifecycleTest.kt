@@ -24,7 +24,7 @@ import org.wysko.midis2jam2.manager.ActionsManager
 import org.wysko.midis2jam2.manager.CollectorsManager
 import org.wysko.midis2jam2.manager.DrumSetVisibilityManager
 import org.wysko.midis2jam2.manager.PlaybackManager
-import org.wysko.midis2jam2.manager.PreferencesManager
+import org.wysko.midis2jam2.manager.PerformanceConfigState
 import org.wysko.midis2jam2.manager.StageManager
 import org.wysko.midis2jam2.manager.StandManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
@@ -126,7 +126,7 @@ class ManagerLifecycleTest {
 
         /** The managers every performance is assembled from, whether or not a screen exists. */
         val EXPECTED_MANAGERS = listOf(
-            PreferencesManager::class,
+            PerformanceConfigState::class,
             ActionsManager::class,
             CameraManager::class,
             CollectorsManager::class,

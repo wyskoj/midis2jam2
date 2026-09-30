@@ -35,7 +35,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.assignment.PRIMARY_RHYTHM_CHA
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.VoiceResolver
 import org.wysko.midis2jam2.instrument.family.percussion.AuxiliaryPercussion
 import org.wysko.midis2jam2.manager.PerformanceManager
-import org.wysko.midis2jam2.starter.configuration.Configuration
 import org.wysko.midis2jam2.util.logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -151,9 +150,7 @@ object InstrumentAssignment {
      * message for, if it's set to.
      */
     private fun initialMode(context: PerformanceManager): MidiMode {
-        val reset = context.configs.filterIsInstance<Configuration.AppSettingsConfiguration>().firstOrNull()
-            ?.appSettings?.playbackSettings?.midiSpecificationResetSettings
-            ?: return MidiMode.GM
+        val reset = context.config.settings.playbackSettings.midiSpecificationResetSettings
         if (!reset.isSendSpecificationResetMessage) return MidiMode.GM
         return when (reset.midiSpecification) {
             MidiSpecification.GeneralMidi -> MidiMode.GM

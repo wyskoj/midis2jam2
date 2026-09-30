@@ -24,8 +24,6 @@ import com.jme3.math.ColorRGBA
 import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.font.resolveBitmapFont
@@ -106,7 +104,7 @@ class LyricController(private val context: PerformanceManager, private val event
                 )
             )
             val lyricsSize = context
-                .configs.find<AppSettingsConfiguration>().appSettings
+                .config.settings
                 .onScreenElementsSettings.lyricsSettings.lyricsSize
 
             size = (LYRICS_FONT_BASE_SIZE * lyricsSize).toFloat()

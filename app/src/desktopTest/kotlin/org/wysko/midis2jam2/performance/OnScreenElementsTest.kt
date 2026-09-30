@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.testing.withOnScreenElements
 import com.jme3.font.BitmapText
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -199,7 +200,7 @@ class OnScreenElementsTest {
          * and hands [block] the HUD manager, the overlay's text, and how many sprites it draws.
          */
         fun withHud(showHud: Boolean, block: (hud: HudManager, texts: List<String>, sprites: Int) -> Unit) {
-            val settings = AppSettings().apply { onScreenElementsSettings.isShowHeadsUpDisplay = showHud }
+            val settings = AppSettings().withOnScreenElements { copy(isShowHeadsUpDisplay = showHud) }
             HeadlessPerformance.start(MidiFixtures.singleProgram(program = 0), settings, fileName = FILE_NAME)
                 .use { performance ->
                     val hud = assertNotNull(

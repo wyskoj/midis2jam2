@@ -19,8 +19,7 @@ package org.wysko.midis2jam2.manager.camera
 
 import com.jme3.app.Application
 import org.wysko.midis2jam2.AndroidOrbitingCamera
-import org.wysko.midis2jam2.manager.PreferencesManager
-import org.wysko.midis2jam2.util.state
+import org.wysko.midis2jam2.manager.performanceConfig
 
 class AndroidCameraManager : CameraManager() {
     private val orbitingCamera: AndroidOrbitingCamera
@@ -30,7 +29,7 @@ class AndroidCameraManager : CameraManager() {
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        ignoreInput = app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isDisableTouchInput ?: false
+        ignoreInput = app.performanceConfig.settings.controlsSettings.isDisableTouchInput
     }
 
     override fun getDeviceCameraPlugin(): CameraPlugin {

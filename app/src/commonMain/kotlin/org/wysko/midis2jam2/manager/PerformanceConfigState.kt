@@ -15,16 +15,20 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-package org.wysko.midis2jam2.renderer
+package org.wysko.midis2jam2.manager
 
-import kotlinx.serialization.Serializable
-import org.wysko.midis2jam2.record.RecordOptions
+import com.jme3.app.Application
 import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
+import org.wysko.midis2jam2.util.state
 
-@Serializable
-data class RendererBundle(
-    val midiFiles: List<String>,
-    val config: PerformanceConfig,
-    /** Set to record the (single) MIDI file to video instead of playing it. */
-    val recordOptions: RecordOptions? = null,
-)
+/**
+ * Holds the [PerformanceConfig] a performance was started with, so code that only has the [Application] can read it.
+ *
+ * Code that is handed its configuration when it is built should take it as a parameter instead.
+ */
+class PerformanceConfigState(val config: PerformanceConfig) : BaseManager()
+
+/** The configuration of the running performance. Fails if no [PerformanceConfigState] has been attached. */
+val Application.performanceConfig: PerformanceConfig
+    get() = state<PerformanceConfigState>()?.config
+        ?: error("No PerformanceConfigState is attached; it must be attached before anything reads the configuration.")

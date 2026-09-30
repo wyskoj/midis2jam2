@@ -91,7 +91,8 @@ class DesktopHomeScreenModel(
         @Suppress("ReplaceNotNullAssertionWithElvisReturn")
         applicationService.startApplication(
             ExecutionState(
-                midiFile = selectedMidiFile.value!!
+                midiFile = selectedMidiFile.value!!,
+                isLooping = isLooping.value,
             )
         )
     }

@@ -22,4 +22,4 @@ import org.wysko.midis2jam2.starter.configuration.Resolution
 
 internal actual fun AppSettings.applyIcons() = Unit // Not needed on Android
 internal actual fun AppSettings.applyScreenFrequency() = Unit // Not needed on Android
-internal actual fun getScreenResolution(): Resolution.CustomResolution? = null // Not needed on Android
+internal actual fun getScreenResolution(): Resolution? = null // Not needed on Android
