@@ -21,26 +21,21 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
-import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
-import org.wysko.midis2jam2.util.Utils
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.plusAssign
-import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
-import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.time.Duration
 
 /**
  * Any instrument that has strings and frets.
  *
- * The [FrettingEngine] is used to calculate the best fretboard position for every note.
+ * Where every note is played comes from a [FrettingPlan], worked out for the whole part before playback by the
+ * [fretting engine][org.wysko.midis2jam2.instrument.family.guitar.fretting.Fretter].
  *
  * The illusion of a vibrating string is created by scaling the string's resting position by the fret distance,
  * and scaling the frames of animation by the inverse of the fret distance.
@@ -48,7 +43,7 @@ import kotlin.time.Duration
  *
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
- * @property frettingEngine The fretting engine used for this fretted instrument.
+ * @property fretting Where every note is played, and what the fretting engine inferred.
  * @property positioning The positioning parameters.
  * @param numberOfStrings The number of strings.
  * @param instrumentBody A pair containing the instrument's body and its texture.
@@ -57,7 +52,7 @@ import kotlin.time.Duration
 abstract class FrettedInstrument protected constructor(
     context: PerformanceManager,
     events: List<MidiEvent>,
-    protected val frettingEngine: FrettingEngine,
+    val fretting: FrettingPlan,
     protected val positioning: FrettedInstrumentPositioning,
     private val numberOfStrings: Int,
     instrumentBody: Pair<Spatial, String>,
@@ -85,41 +80,20 @@ abstract class FrettedInstrument protected constructor(
     }.onEach { geometry += it }
 
     /**
-     * Maps each [NotePeriod] to its [FretboardPosition].
+     * Maps each [TimedArc] to its [FretboardPosition]. Notes the engine couldn't finger are absent.
      */
-    protected open val notePeriodFretboardPosition: Map<TimedArc, FretboardPosition> = run {
-        val fretboardPositions = mutableMapOf<TimedArc, FretboardPosition>()
+    internal val notePeriodFretboardPosition: Map<TimedArc, FretboardPosition> = fretting.positions
 
-        val periodByNoteEvent = buildMap {
-            timedArcs.forEach {
-                put(it.noteOff, it)
-                put(it.noteOn, it)
-            }
-        }
-        val occupiedStrings = mutableSetOf<Int>()
-        val stringByNoteEvent = mutableMapOf<Byte, Int>()
-        events.filterIsInstance<NoteEvent>().forEach { noteEvent ->
-            when (noteEvent) {
-                is NoteEvent.NoteOn -> {
-                    frettingEngine.bestFretboardPosition(midiNote = noteEvent.note)?.let {
-                        occupiedStrings += it.string
-                        fretboardPositions[periodByNoteEvent[noteEvent] ?: return@let] = it
-                        stringByNoteEvent[noteEvent.note] = it.string
-                        frettingEngine.applyFretboardPosition(it)
-                    }
-                }
+    private val numberOfFrets: Int = fretting.profile.fretCount
 
-                is NoteEvent.NoteOff -> {
-                    stringByNoteEvent.remove(noteEvent.note)?.let { frettingEngine.releaseString(it) }
-                }
-            }
-        }
+    /** Where things are on this instrument's neck; the note-finger dots use it. */
+    internal val fretboard: FretboardSpace = FretboardSpace(positioning, numberOfFrets)
 
-        fretboardPositions
-    }
+    /** The live fretting readout (F4). */
+    internal val readout: FrettingDebugOverlay = FrettingDebugOverlay(context, root, geometry, fretting)
+
 
     private val pitchBendModulationController = PitchBendModulationController(context, events, smoothness = 0.0)
-    private val stringHeight: Float = positioning.upperY - positioning.lowerY
     private val stringVibrators: List<StringVibrationController> by lazy {
         List(numberOfStrings) {
             StringVibrationController(
@@ -149,10 +123,19 @@ abstract class FrettedInstrument protected constructor(
                 ),
             )
         }
+        readout.update(time)
     }
 
+    /**
+     * The fret pressed on [string], or `null`. If a new note took a string that was still ringing, the newer note
+     * is the one shown.
+     */
     private fun fretPressedOnString(string: Int): Int? {
-        val np = collector.currentTimedArcs.firstOrNull { notePeriodFretboardPosition[it]?.string == string }
+        var np: TimedArc? = null
+        for (arc in collector.currentTimedArcs) {
+            if (notePeriodFretboardPosition[arc]?.string != string) continue
+            if (np == null || arc.startTime > np.startTime) np = arc
+        }
         return np?.let {
             return if (!animatedStartedMap[it]!!) {
                 animatedStartedMap[it] = true
@@ -163,39 +146,6 @@ abstract class FrettedInstrument protected constructor(
             } else {
                 notePeriodFretboardPosition[np]?.fret
             }
-        }
-    }
-
-    private fun fretToDistance(fret: Int, pitchBendAmount: Number): Double {
-        val pitchBendAmount = pitchBendAmount.toDouble()
-
-        val engine = frettingEngine as StandardFrettingEngine
-        // Find the whole number of semitones bent from the pitch bend.
-        val semitoneOffset = if (pitchBendAmount > 0) {
-            floor(pitchBendAmount).toInt()
-        } else {
-            ceil(pitchBendAmount).toInt()
-        }
-
-        // Find the microtonal offset from the semitone
-        val semitoneFraction = pitchBendAmount % 1
-
-        // Find the adjusted fret position
-        val adjFret = (fret + semitoneOffset).coerceIn(0..engine.numberOfFrets)
-
-        // Linear interpolation of the semitone fraction
-        return if (semitoneFraction > 0) {
-            Utils.lerp(
-                a = positioning.fretHeights.calculateScale(adjFret),
-                b = positioning.fretHeights.calculateScale((adjFret + 1).coerceAtMost(engine.numberOfFrets)),
-                t = semitoneFraction,
-            )
-        } else {
-            Utils.lerp(
-                a = positioning.fretHeights.calculateScale(adjFret),
-                b = positioning.fretHeights.calculateScale((adjFret - 1).coerceAtLeast(0)),
-                t = -semitoneFraction,
-            )
         }
     }
 
@@ -212,7 +162,7 @@ abstract class FrettedInstrument protected constructor(
         /* The fret distance is the ratio of scales for the upper and lower strings.
          * For example, if the note finger lands halfway in between the top and the bottom of the strings,
          * this should be 0.5. */
-        val fretDistance = fretToDistance(fret, pitchBendAmount).toFloat()
+        val fretDistance = fretboard.bentDistance(fret, pitchBendAmount.toDouble())
 
         // Scale the resting string's Y-axis by the fret distance.
         upperStrings[string].localScale = Vector3f(positioning.restingStrings[string]).apply { y = fretDistance }
@@ -224,19 +174,10 @@ abstract class FrettedInstrument protected constructor(
         }
 
         noteFingers[string].let {
-            if (fret != 0 || pitchBendAmount != 0f) {
+            // An open string (at the nut, or at the capo) shows no finger.
+            if (fret != fretting.capo || pitchBendAmount != 0f) {
                 it.cullHint = true.ch
-                with(positioning) {
-                    it.localTranslation = v3(
-                        x = (lowerX[string] - upperX[string]) * fretDistance + upperX[string],
-                        y = fingerVerticalOffset.y - stringHeight * fretDistance,
-                        z = if (this is FrettedInstrumentPositioningWithZ) {
-                            ((topZ[string] - bottomZ[string]) * fretDistance + topZ[string]) * -1.3 - 2
-                        } else {
-                            0
-                        },
-                    )
-                }
+                it.localTranslation = fretboard.pointAt(string.toDouble(), fretDistance)
             } else {
                 it.cullHint = false.ch
             }
@@ -247,9 +188,8 @@ abstract class FrettedInstrument protected constructor(
         name = "FRETBOARD",
         value = buildString {
             appendLine()
-            frettingEngine as StandardFrettingEngine
             for (x in (numberOfStrings - 1) downTo 0) {
-                for (y in 0..<frettingEngine.numberOfFrets) {
+                for (y in 0..<numberOfFrets) {
                     append(
                         if (collector.currentTimedArcs.any {
                                 notePeriodFretboardPosition[it]?.let {

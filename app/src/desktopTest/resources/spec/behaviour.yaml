@@ -656,3 +656,57 @@
   source: code
   platforms: [desktop]
   claim: "An invalid --record command line prints what is wrong and how to use it"
+
+# ------------------------------------------------ fretted instruments (fretted-instruments.md)
+- id: instrument.fretted.every-note-shown
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Guitars, basses, banjos, shamisens and the violin family show every note they play on a string, unless more notes sound at once than the instrument has strings"
+- id: instrument.fretted.one-note-per-string
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Notes that ring together are shown on different strings"
+- id: instrument.fretted.overlapping-chords
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Chords whose notes ring slightly into the next chord are fingered as separate chords"
+- id: instrument.fretted.stays-in-position
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "A passage that can be played in one hand position stays there instead of jumping around the neck"
+- id: instrument.fretted.riffs-consistent
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "A repeated riff is fingered the same way each time"
+- id: instrument.guitar.rhythm-and-lead
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "A guitar part that switches between strummed chords and a single-note solo is fingered as chords and as a solo respectively"
+- id: instrument.guitar.solo-box-position
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Guitar solos stay in one hand position, crossing strings, and move up or down the neck between phrases"
+- id: instrument.guitar.legato-same-string
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Hammer-ons, pull-offs and trills stay on one string"
+- id: instrument.guitar.bends-fretted
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Bent notes are shown on fretted strings with room to bend, preferably the G, B and high E strings"
+- id: instrument.guitar.harmonics
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Guitar Harmonics notes are shown at the natural harmonic frets (12, 7 and 5)"
+- id: instrument.guitar.tuning
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "The guitar picks the common tuning (standard, lowered, drop or open) and capo that make its part playable, and shows the drop-tuned model when its lowest string is tuned below E"
+- id: instrument.bass.tuning
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "The bass guitar picks the common tuning (standard, lowered or drop) that makes its part playable"
+- id: app.debug.fretting-readout
+  source: features/fretted-instruments.md
+  platforms: [desktop]
+  claim: "F4 toggles a readout above each fretted instrument showing its inferred tuning and capo, and live rhythm or lead, hand position, frets and cost breakdown"

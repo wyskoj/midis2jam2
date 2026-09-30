@@ -55,7 +55,7 @@ class KeyBindingsTest {
         if (mismatches.isNotEmpty()) {
             fail(
                 "actions.yaml has drifted from the documentation " +
-                    "(features/camera.md, features/playback.md):\n" +
+                    "(features/camera.md, features/playback.md, features/fretted-instruments.md):\n" +
                     mismatches.joinToString("\n") { "  $it" }
             )
         }
@@ -114,7 +114,8 @@ class KeyBindingsTest {
         /**
          * The bindings the documentation promises.
          *
-         * Camera keys: features/camera.md. Playback keys: features/playback.md.
+         * Camera keys: features/camera.md. Playback keys: features/playback.md. The fretting readout:
+         * features/fretted-instruments.md.
          * The remaining bindings are undocumented and are checked only for internal consistency.
          */
         val DOCUMENTED: Map<String, String> = mapOf(
@@ -133,6 +134,8 @@ class KeyBindingsTest {
             "camera_plugin_auto" to "KEY_0",
             "camera_plugin_rotating" to "KEY_9",
             "camera_plugin_free" to "KEY_GRAVE",
+            // features/fretted-instruments.md
+            "fretting_debug" to "KEY_F4",
         )
 
         @Serializable

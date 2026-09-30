@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.testing
 import org.wysko.kmidi.midi.StandardMidiFile
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
+import org.wysko.kmidi.midi.builder.TrackBuilder
 import org.wysko.kmidi.midi.builder.smf
 
 /**
@@ -364,4 +365,146 @@ object MidiFixtures {
         "こん", "にち", "は", "\n",
         "café ", "naïve ", "résumé",
     )
+
+    /** Steel-string acoustic guitar (zero-based General MIDI program). */
+    const val STEEL_GUITAR_PROGRAM = 25
+
+    /** Overdriven guitar (zero-based General MIDI program). */
+    const val OVERDRIVEN_GUITAR_PROGRAM = 29
+
+    /** Distortion guitar (zero-based General MIDI program). */
+    const val DISTORTION_GUITAR_PROGRAM = 30
+
+    /** Fingered electric bass (zero-based General MIDI program). */
+    const val FINGERED_BASS_PROGRAM = 33
+
+    /** How many ticks the chords of [humanizedGuitarChords] ring into the next chord. */
+    const val HUMANIZED_LATE_OFF = 4
+
+    /**
+     * Open E, A, D and G chords on an acoustic guitar, played the way recorded MIDI plays them: each strummed
+     * (a couple of ticks between strings) and ringing a few ticks into the next chord. The old fretting engine
+     * merged such chords into one.
+     */
+    fun humanizedGuitarChords(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(STEEL_GUITAR_PROGRAM, absoluteTime = 0)
+                chords(OPEN_CHORDS + OPEN_CHORDS, duration = 2 * TICKS_PER_QUARTER, spread = 2, lateOff = HUMANIZED_LATE_OFF)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The chords [humanizedGuitarChords] plays, twice over. */
+    val OPEN_CHORDS: List<List<Int>> = listOf(
+        listOf(40, 47, 52, 56, 59, 64),
+        listOf(45, 52, 57, 61, 64),
+        listOf(50, 57, 62, 66),
+        listOf(43, 47, 50, 55, 59, 67),
+    )
+
+    /** A power-chord riff on the low D string, which only drop-D tuning can play. */
+    fun dropDRiff(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(DISTORTION_GUITAR_PROGRAM, absoluteTime = 0)
+                val riff = listOf(listOf(38, 45, 50), listOf(38, 45, 50), listOf(41, 48, 53), listOf(43, 50, 55))
+                chords(List(4) { riff }.flatten(), duration = TICKS_PER_QUARTER / 2)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The note of [guitarSoloWithBends] that is bent up a whole step. */
+    const val BENT_NOTE_INDEX = 3
+
+    /** An A-minor pentatonic lick on an overdriven guitar, with one note bent up a whole step. */
+    fun guitarSoloWithBends(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(OVERDRIVEN_GUITAR_PROGRAM, absoluteTime = 0)
+                val eighth = TICKS_PER_QUARTER / 2
+                SOLO_LICK.forEachIndexed { i, pitch ->
+                    note(pitch, duration = eighth, absoluteTime = i * eighth)
+                }
+                // A whole-step bend (the full default two-semitone range) during the bent note, then back.
+                pitch(FULL_BEND, absoluteTime = BENT_NOTE_INDEX * eighth + eighth / 4)
+                pitch(0.0, absoluteTime = (BENT_NOTE_INDEX + 1) * eighth)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The notes of [guitarSoloWithBends]. */
+    val SOLO_LICK: List<Int> = listOf(69, 72, 74, 74, 72, 69, 67, 69, 72, 74, 76, 74, 72, 69, 67, 64)
+
+    /** Just under the largest pitch-wheel value, which a whole-step bend uses at the default range. */
+    private const val FULL_BEND = 0.9999
+
+    /** When [rhythmThenSolo] switches from chords to the solo, in seconds. */
+    const val SOLO_START_SECONDS = 4.0
+
+    /** Two bars of power chords and then a two-bar single-note solo, on one distortion guitar. */
+    fun rhythmThenSolo(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(DISTORTION_GUITAR_PROGRAM, absoluteTime = 0)
+                val riff = listOf(listOf(40, 47, 52), listOf(43, 50, 55), listOf(45, 52, 57), listOf(43, 50, 55))
+                chords(riff + riff, duration = TICKS_PER_QUARTER)
+                val soloStart = 8 * TICKS_PER_QUARTER
+                val sixteenth = TICKS_PER_QUARTER / 4
+                (SOLO_LICK + SOLO_LICK).forEachIndexed { i, pitch ->
+                    note(pitch, duration = sixteenth, absoluteTime = soloStart + i * sixteenth)
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** A rock bass line in eighth notes, with octave jumps. */
+    fun bassLine(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(FINGERED_BASS_PROGRAM, absoluteTime = 0)
+                val eighth = TICKS_PER_QUARTER / 2
+                val line = listOf(28, 28, 40, 28, 31, 33, 35, 36, 33, 33, 45, 33, 31, 31, 43, 31)
+                List(2) { line }.flatten().forEachIndexed { i, pitch ->
+                    note(pitch, duration = eighth, absoluteTime = i * eighth)
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /**
+     * Plays [chords] one after another, each lasting [duration] ticks, with [spread] ticks between the strings
+     * of a strum. Each note rings [lateOff] ticks into the next chord, unless the next chord plays the same pitch
+     * (MIDI can't sound one pitch twice at once on a channel).
+     */
+    private fun TrackBuilder.chords(
+        chords: List<List<Int>>,
+        duration: Int,
+        spread: Int = 0,
+        lateOff: Int = 0,
+    ) {
+        chords.forEachIndexed { i, chord ->
+            val next = chords.getOrNull(i + 1).orEmpty()
+            chord.forEachIndexed { k, pitch ->
+                val start = i * duration + k * spread
+                val end = (i + 1) * duration + if (pitch in next) -1 else lateOff
+                note(pitch, duration = end - start, absoluteTime = start)
+            }
+        }
+    }
 }

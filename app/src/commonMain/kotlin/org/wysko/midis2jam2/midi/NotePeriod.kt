@@ -17,73 +17,10 @@
 package org.wysko.midis2jam2.midi
 
 import org.wysko.kmidi.midi.TimedArc
-import org.wysko.kmidi.midi.analysis.Polyphony
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
-import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
-
-fun improvedContiguousGroupDetection(notePeriods: List<TimedArc>): List<TimedArcGroup> {
-    val overlapThreshold = 0.01 // 10 milliseconds
-
-    fun shouldIgnoreOverlap(note1: TimedArc, note2: TimedArc): Boolean {
-        return note1.end > note2.start && note1.end - note2.start < overlapThreshold
-    }
-
-    fun areSustainedTogether(note1: TimedArc, note2: TimedArc): Boolean {
-        // Check if note1 and note2 sustain together for a significant portion of their duration
-        return note1.start < note2.end && note2.start < note1.end
-    }
-
-    val groups = mutableListOf<TimedArcGroup>()
-    var currentGroup = mutableSetOf<TimedArc>()
-
-    for (i in notePeriods.indices) {
-        val currentNote = notePeriods[i]
-
-        if (currentGroup.isEmpty()) {
-            currentGroup.add(currentNote)
-        } else {
-            val lastNote = currentGroup.last()
-            val isOverlapping = lastNote.end > currentNote.start
-            val shouldGroup = isOverlapping && !shouldIgnoreOverlap(lastNote, currentNote)
-
-            if (shouldGroup || areSustainedTogether(lastNote, currentNote)) {
-                currentGroup.add(currentNote)
-            } else {
-                groups.add(TimedArcGroup(currentGroup))
-                currentGroup = mutableSetOf(currentNote)
-            }
-        }
-
-        // Look ahead to handle sustained notes forming chords
-        val lookAheadNotes = notePeriods.subList(i + 1, notePeriods.size)
-
-        for (lookAheadNote in lookAheadNotes) {
-            if (areSustainedTogether(currentNote, lookAheadNote)) {
-                currentGroup.add(lookAheadNote)
-            }
-        }
-    }
-
-    if (currentGroup.isNotEmpty()) {
-        groups.add(TimedArcGroup(currentGroup))
-    }
-
-    // Break some groups if the predominant polyphony is 1
-    val probablySoloGroups = groups.filter { (arcs) ->
-        Polyphony.averagePolyphony(arcs.map { listOf(it.noteOn, it.noteOff) }.flatten()).roundToInt() == 1
-    }
-    groups.removeAll(probablySoloGroups)
-    probablySoloGroups.forEach { soloGroup ->
-        soloGroup.arcs.forEach { notePeriod ->
-            groups.add(TimedArcGroup(setOf(notePeriod)))
-        }
-    }
-
-    return groups
-}
 
 /**
  * Calculates the note periods based on the given context and [modulus].

@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.strings
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
@@ -31,7 +32,7 @@ class Cello(context: PerformanceManager, events: List<MidiEvent>) : StringFamily
     true,
     20.0,
     Vector3f(0.75f, 0.75f, 0.75f),
-    intArrayOf(36, 43, 50, 57),
+    FrettingProfiles.cello(),
     context.modelD("Cello.obj", "CelloSkin.bmp")
 ) {
     override fun adjustForMultipleInstances(delta: Duration) {

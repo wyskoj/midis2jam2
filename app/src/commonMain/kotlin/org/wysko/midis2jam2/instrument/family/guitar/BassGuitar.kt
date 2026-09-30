@@ -24,11 +24,11 @@ import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
-import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.DROP_D
-import org.wysko.midis2jam2.instrument.family.guitar.BassGuitarTuning.STANDARD
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.BassStyle
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.Tunings
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.util.loc
@@ -44,24 +44,28 @@ private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
 
 private const val BASS_GUITAR_FORWARD_OFFSET = 0.02
 
+/** The lowest open string in standard tuning; a lower one shows the drop-tuned model. */
+private val STANDARD_LOWEST_STRING = Tunings.BASS.first().lowest
+
 /**
  * The Bass Guitar.
- *
- * @constructor Creates a BassGuitar.
  *
  * @param context context to the main class
  * @param events the list of events for this BassGuitar
  * @param type specifies the type of BassGuitar
+ * @param fretting Where every note is played; worked out before the model is chosen, because a lowered tuning
+ * shows the drop-tuned model.
  */
-class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: BassGuitarType) :
+class BassGuitar private constructor(
+    context: PerformanceManager,
+    events: List<MidiEvent>,
+    type: BassGuitarType,
+    fretting: FrettingPlan,
+) :
     FrettedInstrument(
         context,
         events,
-        StandardFrettingEngine(
-            4,
-            22,
-            if (needsDropTuning(events)) DROP_D.values else STANDARD.values
-        ),
+        fretting,
         positioning = with(BASS_GUITAR_MODEL_PROPERTIES) {
             FrettedInstrumentPositioning(
                 upperY = upperVerticalOffset,
@@ -74,7 +78,7 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
         },
         numberOfStrings = 4,
         instrumentBody = context.modelD(
-            if (needsDropTuning(events)) type.modelDropDFile else type.modelFile,
+            if (fretting.tuning.lowest < STANDARD_LOWEST_STRING) type.modelDropDFile else type.modelFile,
             type.textureFile
         ) to when (type) {
             BassGuitarType.Synth1 -> "BassSkinSynth1.png"
@@ -83,6 +87,7 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
         }
     ),
     MultipleInstancesLinearAdjustment {
+
 
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BassString.obj", BASS_SKIN_BMP).apply {
@@ -118,6 +123,12 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
         }
     }
 
+    /**
+     * Creates a bass guitar of [type] playing [events].
+     */
+    constructor(context: PerformanceManager, events: List<MidiEvent>, type: BassGuitarType) :
+        this(context, events, type, FrettingPlan.create(context, events, FrettingProfiles.bass(type.style)))
+
     override val multipleInstancesDirection: Vector3f = v3(7, -2.43, 0)
 
     init {
@@ -134,7 +145,8 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
         internal val modelFile: String,
         internal val modelDropDFile: String,
         internal val textureFile: String,
-        internal val glowColor: ColorRGBA
+        internal val glowColor: ColorRGBA,
+        internal val style: BassStyle = BassStyle.STANDARD,
     ) {
 
         /** The standard Bass Guitar type. */
@@ -150,7 +162,8 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
             modelFile = "BassFretless.obj",
             modelDropDFile = "BassFretlessD.obj",
             textureFile = "BassSkinFretless.png",
-            glowColor = STRING_GLOW
+            glowColor = STRING_GLOW,
+            style = BassStyle.FRETLESS,
         )
 
         /** The synth 1 Bass Guitar type. */
@@ -158,7 +171,8 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
             modelFile = "Bass.obj",
             modelDropDFile = "BassD.obj",
             textureFile = "BassSkinSynth1.png",
-            glowColor = ColorRGBA(0.64f, 1.1f, 0.67f, 1f)
+            glowColor = ColorRGBA(0.64f, 1.1f, 0.67f, 1f),
+            style = BassStyle.SYNTH,
         )
 
         /** The synth 2 Bass Guitar type. */
@@ -166,15 +180,8 @@ class BassGuitar(context: PerformanceManager, events: List<MidiEvent>, type: Bas
             modelFile = "Bass.obj",
             modelDropDFile = "BassD.obj",
             textureFile = "BassSkinSynth2.png",
-            glowColor = ColorRGBA(0.70f, 0.93f, 1.4f, 1f)
+            glowColor = ColorRGBA(0.70f, 0.93f, 1.4f, 1f),
+            style = BassStyle.SYNTH,
         )
     }
-}
-
-private fun needsDropTuning(events: List<MidiEvent>): Boolean =
-    (events.filterIsInstance<NoteEvent.NoteOn>().minByOrNull { it.note }?.note ?: 127) < 28
-
-private enum class BassGuitarTuning(val values: IntArray) {
-    STANDARD(intArrayOf(28, 33, 38, 43)),
-    DROP_D(intArrayOf(26, 33, 38, 43))
 }

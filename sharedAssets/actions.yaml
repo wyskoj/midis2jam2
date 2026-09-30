@@ -8,6 +8,8 @@
   key: KEY_HOME
 - name: debug
   key: KEY_F3
+- name: fretting_debug
+  key: KEY_F4
 - name: camera_plugin_auto
   key: KEY_0
 - name: camera_angle_1
