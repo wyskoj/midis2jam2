@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">Visibilità strumenti</string>
     <string name="settings_instruments_always_show_instruments">Mostra sempre gli strumenti</string>
     <string name="settings_instruments_always_show_instruments_description">Non nascondere mai gli strumenti, anche quando non suonano note</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Una remastered di MIDIJam, un visualizzatore 3D di file MIDI.</string>

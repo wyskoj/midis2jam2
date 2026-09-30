@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">Soittimien näkyvyys</string>
     <string name="settings_instruments_always_show_instruments">Näytä soittimet aina</string>
     <string name="settings_instruments_always_show_instruments_description">Älä koskaan piilota soittimia, vaikka nuotteja ei soiteta</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- Tietoa -->
     <string name="about_midis2jam2_description">Uudelleenmasterointi MIDIJamista, 3D MIDI-tiedoston visualisoijasta.</string>

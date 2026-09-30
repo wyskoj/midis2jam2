@@ -364,4 +364,30 @@ object MidiFixtures {
         "こん", "にち", "は", "\n",
         "café ", "naïve ", "résumé",
     )
+
+    /**
+     * A marimba part that exercises roaming mallets: an eighth-note scale, fast repeats of one note, leaps between
+     * the ends of the keyboard and a wide two-note chord. At 120 BPM an eighth note is a quarter of a second.
+     */
+    fun malletRun(program: Int = 12): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        val eighth = TICKS_PER_QUARTER / 2
+        val sixteenth = TICKS_PER_QUARTER / 4
+        track {
+            tempo(120)
+            channel(0) {
+                program(program)
+                listOf(60, 62, 64, 65, 67, 69, 71, 72).forEachIndexed { i, note ->
+                    note(note, duration = 1.eighth, absoluteTime = i * eighth)
+                }
+                repeat(8) { note(67, duration = 1.eighth, absoluteTime = 8 * eighth + it * sixteenth) }
+                listOf(40, 90, 40, 90).forEachIndexed { i, note ->
+                    note(note, duration = 1.eighth, absoluteTime = 12 * eighth + i * eighth)
+                }
+                note(45, duration = 1.quarter, absoluteTime = 18 * eighth)
+                note(85, duration = 1.quarter, absoluteTime = 18 * eighth)
+            }
+        }
+    }.toTimeBasedSequence()
 }

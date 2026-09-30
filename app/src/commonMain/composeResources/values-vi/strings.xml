@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">Hiển thị nhạc cụ</string>
     <string name="settings_instruments_always_show_instruments">Luôn hiện nhạc cụ</string>
     <string name="settings_instruments_always_show_instruments_description">Không ẩn các nhạc cụ kể cả khi không có nốt nào để chơi</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Một bản cải tiến của MIDIJam, một trình trực quan hóa 3D tập tin MIDI.</string>

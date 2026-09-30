@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">乐器可见性</string>
     <string name="settings_instruments_always_show_instruments">始终显示乐器</string>
     <string name="settings_instruments_always_show_instruments_description">即使没有音符播放，也从不隐藏乐器</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- 关于 -->
     <string name="about_midis2jam2_description">MIDIJam 的重制版，一款 3D MIDI 文件可视化工具。</string>

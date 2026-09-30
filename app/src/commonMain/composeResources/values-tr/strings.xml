@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">Enstrüman görünürlüğü</string>
     <string name="settings_instruments_always_show_instruments">Enstrümanları her zaman göster</string>
     <string name="settings_instruments_always_show_instruments_description">Notlar çalınmasa bile enstrümanları asla gizleme</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Bir 3D MIDI dosyası görselleştiricisi olan MIDIJam\'in yeniden düzenlenmiş halidir.</string>

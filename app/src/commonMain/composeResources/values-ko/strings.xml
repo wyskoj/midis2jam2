@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">악기 표시 여부</string>
     <string name="settings_instruments_always_show_instruments">항상 악기 표시</string>
     <string name="settings_instruments_always_show_instruments_description">음표가 재생되지 않을 때도 악기를 숨기지 않음</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">3D MIDI 파일 시각화 프로그램인 MIDIJam의 리마스터 버전입니다.</string>

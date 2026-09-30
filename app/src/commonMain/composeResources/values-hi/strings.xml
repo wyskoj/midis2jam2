@@ -192,6 +192,8 @@
     <string name="settings_instruments_description">वाद्ययंत्र दृश्यता</string>
     <string name="settings_instruments_always_show_instruments">हमेशा वाद्ययंत्र दिखाएं</string>
     <string name="settings_instruments_always_show_instruments_description">वाद्ययंत्रों को कभी भी छुपाएं नहीं, भले ही कोई नोट न बज रहा हो</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- के बारे में -->
     <string name="about_midis2jam2_description">MIDIJam का एक रीमास्टर, एक 3D MIDI फ़ाइल विज़ुअलाइज़र।</string>

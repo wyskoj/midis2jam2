@@ -178,6 +178,22 @@ internal fun AlwaysShowInstrumentsBooleanSelect(
 }
 
 @Composable
+internal fun SmartMalletsBooleanSelect(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+) {
+    SwitchRow(
+        settings.value.instrumentSettings.isSmartMallets,
+        model::setSmartMallets,
+        title = { Text(stringResource(Res.string.settings_instruments_smart_mallets)) },
+        label = {
+            Text(stringResource(Res.string.settings_instruments_smart_mallets_description))
+        },
+        icon = Res.drawable.music_note,
+    )
+}
+
+@Composable
 internal fun HudBooleanSelect(
     settings: State<AppSettings>,
     model: SettingsModel,

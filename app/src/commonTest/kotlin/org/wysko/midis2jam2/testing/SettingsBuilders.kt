@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.testing
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.ControlsSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.InstrumentSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings.LyricsSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings
@@ -52,3 +53,6 @@ fun AppSettings.withMidiSpecificationReset(
         midiSpecificationResetSettings = playbackSettings.midiSpecificationResetSettings.change()
     )
 )
+
+fun AppSettings.withInstruments(change: InstrumentSettings.() -> InstrumentSettings): AppSettings =
+    copy(instrumentSettings = instrumentSettings.change())

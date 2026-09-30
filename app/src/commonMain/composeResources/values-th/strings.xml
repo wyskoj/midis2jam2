@@ -209,6 +209,8 @@
     <string name="settings_instruments_description">การแสดงผลเครื่องดนตรี</string>
     <string name="settings_instruments_always_show_instruments">แสดงเครื่องดนตรีเสมอ</string>
     <string name="settings_instruments_always_show_instruments_description">ไม่ซ่อนเครื่องดนตรี แม้จะไม่มีโน้ตที่กำลังเล่น</string>
+    <string name="settings_instruments_smart_mallets">Smart mallets</string>
+    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">เวอร์ชันรีมาสเตอร์ของ MIDIJam, ตัวแสดงภาพ MIDI แบบ 3D</string>
