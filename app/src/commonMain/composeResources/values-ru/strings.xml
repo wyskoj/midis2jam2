@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Язык</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Полный экран</string>
-    <string name="settings_graphics_fullscreen_description">Использовать весь экран</string>
+    <string name="settings_graphics_window_mode">Режим окна</string>
+    <string name="settings_graphics_window_mode_description">Как исполнение заполняет экран</string>
+    <string name="settings_graphics_window_mode_windowed">Окно</string>
+    <string name="settings_graphics_window_mode_borderless">Полноэкранный без рамки</string>
+    <string name="settings_graphics_window_mode_fullscreen">Полный экран</string>
     <string name="settings_graphics_resolution">Разрешение</string>
     <string name="settings_graphics_resolution_fullscreen">В полноэкранном режиме разрешение соответствует монитору</string>
     <string name="settings_graphics_resolution_default">Использовать разрешение по умолчанию</string>

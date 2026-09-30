@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Språk</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Fullskjerm</string>
-    <string name="settings_graphics_fullscreen_description">Bruk hele skjermen</string>
+    <string name="settings_graphics_window_mode">Vindusmodus</string>
+    <string name="settings_graphics_window_mode_description">Hvordan forestillingen fyller skjermen</string>
+    <string name="settings_graphics_window_mode_windowed">Vindu</string>
+    <string name="settings_graphics_window_mode_borderless">Kantløs fullskjerm</string>
+    <string name="settings_graphics_window_mode_fullscreen">Fullskjerm</string>
     <string name="settings_graphics_resolution">Oppløsning</string>
     <string name="settings_graphics_resolution_fullscreen">Oppløsning matcher skjermen når fullskjerm er aktivert</string>
     <string name="settings_graphics_resolution_default">Bruk standardoppløsning</string>

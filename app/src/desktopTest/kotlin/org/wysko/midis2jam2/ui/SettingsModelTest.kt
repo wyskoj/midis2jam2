@@ -29,6 +29,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.domain.settings.PreferenceBackedSettingsRepository
@@ -347,8 +348,8 @@ class SettingsModelTest {
             SetterCase("locale", "ja", { it.setLocale("ja") }) {
                 it.generalSettings.locale
             },
-            SetterCase("fullscreen", true, { it.setIsFullscreen(true) }) {
-                it.graphicsSettings.isFullscreen
+            SetterCase("window mode", WindowMode.BorderlessFullscreen, { it.setWindowMode(WindowMode.BorderlessFullscreen) }) {
+                it.graphicsSettings.windowMode
             },
             SetterCase("default resolution", false, { it.setIsUseDefaultResolution(false) }) {
                 it.graphicsSettings.resolutionSettings.isUseDefaultResolution

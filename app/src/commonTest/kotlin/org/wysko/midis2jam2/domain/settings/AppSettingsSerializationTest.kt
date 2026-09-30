@@ -22,6 +22,7 @@ import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -40,7 +41,7 @@ class AppSettingsSerializationTest {
             generalSettings.theme = AppTheme.DARK
             generalSettings.locale = "ja"
             generalSettings.isShowDebugInfo = true
-            graphicsSettings.isFullscreen = true
+            graphicsSettings.windowMode = WindowMode.BorderlessFullscreen
             graphicsSettings.resolutionSettings.isUseDefaultResolution = false
             graphicsSettings.resolutionSettings.resolutionWidth = 1920
             graphicsSettings.resolutionSettings.resolutionHeight = 1080
@@ -80,7 +81,7 @@ class AppSettingsSerializationTest {
         assertEquals("en", defaults.generalSettings.locale)
         assertEquals(false, defaults.generalSettings.isShowDebugInfo)
 
-        assertEquals(false, defaults.graphicsSettings.isFullscreen)
+        assertEquals(WindowMode.Windowed, defaults.graphicsSettings.windowMode)
         assertEquals(true, defaults.graphicsSettings.resolutionSettings.isUseDefaultResolution)
         assertEquals(true, defaults.graphicsSettings.shadowsSettings.isUseShadows)
         assertEquals(ShadowsQuality.Medium, defaults.graphicsSettings.shadowsSettings.shadowsQuality)

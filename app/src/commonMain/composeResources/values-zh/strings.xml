@@ -101,8 +101,11 @@
     <string name="settings_general_locale">语言</string>
 
     <!-- 设置 / 图形 -->
-    <string name="settings_graphics_fullscreen">全屏</string>
-    <string name="settings_graphics_fullscreen_description">使用整个屏幕</string>
+    <string name="settings_graphics_window_mode">窗口模式</string>
+    <string name="settings_graphics_window_mode_description">演出如何填充屏幕</string>
+    <string name="settings_graphics_window_mode_windowed">窗口</string>
+    <string name="settings_graphics_window_mode_borderless">无边框全屏</string>
+    <string name="settings_graphics_window_mode_fullscreen">全屏</string>
     <string name="settings_graphics_resolution">分辨率</string>
     <string name="settings_graphics_resolution_fullscreen">启用全屏时，分辨率与显示器匹配</string>
     <string name="settings_graphics_resolution_default">使用默认分辨率</string>

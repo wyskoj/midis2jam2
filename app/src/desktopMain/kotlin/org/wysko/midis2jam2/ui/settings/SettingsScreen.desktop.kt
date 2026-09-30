@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.install4j.api.launcher.ApplicationLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.dialogs.FileKitMode
@@ -69,6 +70,7 @@ import midis2jam2.app.generated.resources.hotel_class
 import midis2jam2.app.generated.resources.keyboard_lock
 import midis2jam2.app.generated.resources.language
 import midis2jam2.app.generated.resources.midi_device
+import midis2jam2.app.generated.resources.monitor
 import midis2jam2.app.generated.resources.mouse_lock
 import midis2jam2.app.generated.resources.quality_high
 import midis2jam2.app.generated.resources.quality_low
@@ -92,8 +94,6 @@ import midis2jam2.app.generated.resources.settings_general_locale
 import midis2jam2.app.generated.resources.settings_graphics
 import midis2jam2.app.generated.resources.settings_graphics_anti_aliasing
 import midis2jam2.app.generated.resources.settings_graphics_anti_aliasing_description
-import midis2jam2.app.generated.resources.settings_graphics_fullscreen
-import midis2jam2.app.generated.resources.settings_graphics_fullscreen_description
 import midis2jam2.app.generated.resources.settings_graphics_resolution
 import midis2jam2.app.generated.resources.settings_graphics_resolution_default
 import midis2jam2.app.generated.resources.settings_graphics_resolution_default_description
@@ -104,6 +104,11 @@ import midis2jam2.app.generated.resources.settings_graphics_resolution_width
 import midis2jam2.app.generated.resources.settings_graphics_shadows
 import midis2jam2.app.generated.resources.settings_graphics_shadows_description
 import midis2jam2.app.generated.resources.settings_graphics_shadows_none
+import midis2jam2.app.generated.resources.settings_graphics_window_mode
+import midis2jam2.app.generated.resources.settings_graphics_window_mode_borderless
+import midis2jam2.app.generated.resources.settings_graphics_window_mode_description
+import midis2jam2.app.generated.resources.settings_graphics_window_mode_fullscreen
+import midis2jam2.app.generated.resources.settings_graphics_window_mode_windowed
 import midis2jam2.app.generated.resources.settings_instruments
 import midis2jam2.app.generated.resources.settings_on_screen_elements
 import midis2jam2.app.generated.resources.settings_playback_midi_specification_reset
@@ -113,6 +118,7 @@ import midis2jam2.app.generated.resources.settings_playback_soundbanks_add
 import midis2jam2.app.generated.resources.settings_playback_soundbanks_description
 import midis2jam2.app.generated.resources.settings_playback_soundbanks_none_loaded
 import midis2jam2.app.generated.resources.settings_playback_synthesizer
+import midis2jam2.app.generated.resources.screenshot_monitor
 import midis2jam2.app.generated.resources.star
 import midis2jam2.app.generated.resources.tonality
 import midis2jam2.app.generated.resources.update
@@ -124,6 +130,7 @@ import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.ui.common.appLocale
 import org.wysko.midis2jam2.ui.common.component.CategoryHeader
@@ -270,13 +277,7 @@ internal actual fun LazyListScope.SettingsScreenContent(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun LazyListScope.windowSettings(settings: State<AppSettings>, model: SettingsModel) {
     item {
-        SwitchRow(
-            checked = settings.value.graphicsSettings.isFullscreen,
-            onCheckedChange = model::setIsFullscreen,
-            title = { Text(stringResource(Res.string.settings_graphics_fullscreen)) },
-            label = { Text(stringResource(Res.string.settings_graphics_fullscreen_description)) },
-            icon = Res.drawable.fullscreen,
-        )
+        WindowModeSelect(settings, model)
     }
     item {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -286,14 +287,13 @@ private fun LazyListScope.windowSettings(settings: State<AppSettings>, model: Se
         var formWidth by remember { mutableStateOf("") }
         var formHeight by remember { mutableStateOf("") }
 
+        val isWindowed = settings.value.graphicsSettings.windowMode == WindowMode.Windowed
         UnitRow(
             title = { Text(stringResource(Res.string.settings_graphics_resolution)) },
             label = {
                 Text(
                     text = when {
-                        settings.value.graphicsSettings.isFullscreen -> stringResource(
-                            Res.string.settings_graphics_resolution_fullscreen
-                        )
+                        !isWindowed -> stringResource(Res.string.settings_graphics_resolution_fullscreen)
 
                         else -> when (settings.value.graphicsSettings.resolutionSettings.isUseDefaultResolution) {
                             true -> stringResource(Res.string.settings_graphics_resolution_default_hint)
@@ -303,7 +303,7 @@ private fun LazyListScope.windowSettings(settings: State<AppSettings>, model: Se
                 )
             },
             icon = Res.drawable.fit_screen,
-            enabled = !settings.value.graphicsSettings.isFullscreen,
+            enabled = isWindowed,
         ) {
             isShowSheet = true
             with(settings.value.graphicsSettings.resolutionSettings) {
@@ -420,6 +420,46 @@ private fun SpecificationResetSelect(settings: State<AppSettings>, model: Settin
         title = { Text(stringResource(Res.string.settings_playback_midi_specification_reset)) },
         icon = Res.drawable.replace_audio,
         description = stringResource(Res.string.settings_playback_midi_specification_reset_description),
+    )
+}
+
+@Composable
+private fun WindowModeSelect(settings: State<AppSettings>, model: SettingsModel) {
+    val options = buildList {
+        add(
+            SelectOption(
+                value = WindowMode.Windowed,
+                title = stringResource(Res.string.settings_graphics_window_mode_windowed),
+                icon = Res.drawable.monitor,
+            )
+        )
+        // Borderless fullscreen is Windows-only; only offer real fullscreen elsewhere.
+        if (isWindows()) {
+            add(
+                SelectOption(
+                    value = WindowMode.BorderlessFullscreen,
+                    title = stringResource(Res.string.settings_graphics_window_mode_borderless),
+                    icon = Res.drawable.screenshot_monitor,
+                )
+            )
+        }
+        add(
+            SelectOption(
+                value = WindowMode.Fullscreen,
+                title = stringResource(Res.string.settings_graphics_window_mode_fullscreen),
+                icon = Res.drawable.fullscreen,
+            )
+        )
+    }
+    val selectedWindowMode = settings.value.graphicsSettings.windowMode
+        .let { if (it == WindowMode.BorderlessFullscreen && !isWindows()) WindowMode.Fullscreen else it }
+    SelectRow(
+        selectedWindowMode,
+        model::setWindowMode,
+        options,
+        title = { Text(stringResource(Res.string.settings_graphics_window_mode)) },
+        icon = Res.drawable.fullscreen,
+        description = stringResource(Res.string.settings_graphics_window_mode_description),
     )
 }
 

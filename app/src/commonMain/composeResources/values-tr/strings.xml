@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Dil</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Tam ekran</string>
-    <string name="settings_graphics_fullscreen_description">Tüm ekranı kullan</string>
+    <string name="settings_graphics_window_mode">Pencere modu</string>
+    <string name="settings_graphics_window_mode_description">Performansın ekranı nasıl doldurduğu</string>
+    <string name="settings_graphics_window_mode_windowed">Pencereli</string>
+    <string name="settings_graphics_window_mode_borderless">Kenarlıksız tam ekran</string>
+    <string name="settings_graphics_window_mode_fullscreen">Tam ekran</string>
     <string name="settings_graphics_resolution">Çözünürlük</string>
     <string name="settings_graphics_resolution_fullscreen">Tam ekran etkinken çözünürlük monitörle aynı olur</string>
     <string name="settings_graphics_resolution_default">Varsayılan çözünürlüğü kullan</string>

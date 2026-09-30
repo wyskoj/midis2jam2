@@ -101,8 +101,11 @@
     <string name="settings_general_locale">언어</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">전체 화면</string>
-    <string name="settings_graphics_fullscreen_description">전체 화면 사용</string>
+    <string name="settings_graphics_window_mode">창 모드</string>
+    <string name="settings_graphics_window_mode_description">공연이 화면을 채우는 방식</string>
+    <string name="settings_graphics_window_mode_windowed">창 모드</string>
+    <string name="settings_graphics_window_mode_borderless">테두리 없는 전체 화면</string>
+    <string name="settings_graphics_window_mode_fullscreen">전체 화면</string>
     <string name="settings_graphics_resolution">해상도</string>
     <string name="settings_graphics_resolution_fullscreen">전체 화면 사용 시 해상도는 모니터에 맞춰집니다</string>
     <string name="settings_graphics_resolution_default">기본 해상도 사용</string>

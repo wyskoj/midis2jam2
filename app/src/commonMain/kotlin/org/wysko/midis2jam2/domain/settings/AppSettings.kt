@@ -42,8 +42,27 @@ data class AppSettings(
         val resolutionSettings: ResolutionSettings = ResolutionSettings(),
         val shadowsSettings: ShadowsSettings = ShadowsSettings(),
         val antiAliasingSettings: AntiAliasingSettings = AntiAliasingSettings(),
-        var isFullscreen: Boolean = false,
+        var windowMode: WindowMode = WindowMode.Windowed,
     ) {
+        /** How the performance window occupies the screen. Desktop only; Android is always full-screen. */
+        enum class WindowMode {
+            /** A resizable-or-fixed window sized per [ResolutionSettings]. */
+            Windowed,
+
+            /**
+             * An undecorated window sized to the screen, so switching away from it never changes the display mode.
+             *
+             * Windows-only: it's the only platform where this reliably gets the taskbar out of the way the same
+             * way real fullscreen does. Elsewhere, this setting is treated as [Fullscreen] instead (see
+             * `applyResolution` in `ApplicationHelpers.kt` and `applyBorderlessWindow` in
+             * `ApplicationHelpers.desktop.kt`).
+             */
+            BorderlessFullscreen,
+
+            /** A real display-mode fullscreen, exclusive to this application. */
+            Fullscreen,
+        }
+
         @Serializable
         data class ResolutionSettings(
             var isUseDefaultResolution: Boolean = true,

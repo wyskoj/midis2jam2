@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Sprache</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Vollbild</string>
-    <string name="settings_graphics_fullscreen_description">Gesamten Bildschirm verwenden</string>
+    <string name="settings_graphics_window_mode">Fenstermodus</string>
+    <string name="settings_graphics_window_mode_description">Wie die Performance den Bildschirm ausfüllt</string>
+    <string name="settings_graphics_window_mode_windowed">Fenster</string>
+    <string name="settings_graphics_window_mode_borderless">Randloser Vollbildmodus</string>
+    <string name="settings_graphics_window_mode_fullscreen">Vollbild</string>
     <string name="settings_graphics_resolution">Auflösung</string>
     <string name="settings_graphics_resolution_fullscreen">Auflösung entspricht dem Monitor, wenn Vollbild aktiviert ist</string>
     <string name="settings_graphics_resolution_default">Standardauflösung verwenden</string>

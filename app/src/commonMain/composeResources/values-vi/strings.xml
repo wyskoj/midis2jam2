@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Ngôn ngữ</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Toàn màn hình</string>
-    <string name="settings_graphics_fullscreen_description">Sử dụng toàn bộ màn hình</string>
+    <string name="settings_graphics_window_mode">Chế độ cửa sổ</string>
+    <string name="settings_graphics_window_mode_description">Cách buổi biểu diễn lấp đầy màn hình</string>
+    <string name="settings_graphics_window_mode_windowed">Cửa sổ</string>
+    <string name="settings_graphics_window_mode_borderless">Toàn màn hình không viền</string>
+    <string name="settings_graphics_window_mode_fullscreen">Toàn màn hình</string>
     <string name="settings_graphics_resolution">Độ phân giải</string>
     <string name="settings_graphics_resolution_fullscreen">Khi bật toàn màn hình, sẽ sử dụng độ phân giải gốc màn hình</string>
     <string name="settings_graphics_resolution_default">Sử dụng độ phân giải mặc định</string>
