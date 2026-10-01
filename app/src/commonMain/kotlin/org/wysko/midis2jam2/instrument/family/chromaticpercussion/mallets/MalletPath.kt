@@ -101,6 +101,27 @@ class MalletPath(
         return point.copy(y = point.y + max(arc, jump))
     }
 
+    /**
+     * Which gap between strikes [time] falls in (the index of the strike before it), and how far (0 to 1) the mallet
+     * has got from that strike's point towards the next, measured along the straight line between them. `null`
+     * before the first strike and after the last. Lets callers blend anything else, like orientation, in step with
+     * the motion.
+     */
+    fun segmentProgressAt(time: Double): Pair<Int, Double>? {
+        val i = segmentAt(keyframes, time) ?: return null
+        val a = keyframes[i].point
+        val b = keyframes[i + 1].point
+        val point = pointAt(keyframes, timings, i, time, relaxation)
+
+        val dx = b.x - a.x
+        val dy = b.y - a.y
+        val dz = b.z - a.z
+        val length = dx * dx + dy * dy + dz * dz
+        if (length < 1e-12) return i to ease(progress(timings[i], time))
+        val along = ((point.x - a.x) * dx + (point.y - a.y) * dy + (point.z - a.z) * dz) / length
+        return i to along.coerceIn(0.0, 1.0)
+    }
+
     private fun holdAt(time: Double): Point3 = when {
         keyframes.isEmpty() -> Point3(0.0, 0.0, 0.0)
         time <= keyframes.first().time -> keyframes.first().point

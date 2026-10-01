@@ -43,6 +43,9 @@ abstract class PercussionInstrument protected constructor(
     /** Node that recoils when the instrument is hit. */
     protected val recoilNode: Node = with(geometry) { +node() }
 
+    /** How far the instrument has recoiled from where it rests (zero at rest, negative when struck). */
+    internal val recoilOffset: Float get() = recoilNode.localTranslation.y
+
     override fun adjustForMultipleInstances(delta: Duration) {
         root.loc = v3(0, 10 * updateInstrumentIndex(delta), 0)
     }

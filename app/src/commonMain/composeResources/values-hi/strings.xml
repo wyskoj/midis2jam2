@@ -194,6 +194,8 @@
     <string name="settings_instruments_always_show_instruments_description">वाद्ययंत्रों को कभी भी छुपाएं नहीं, भले ही कोई नोट न बज रहा हो</string>
     <string name="settings_instruments_smart_mallets">Smart mallets</string>
     <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
+    <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
 
     <!-- के बारे में -->
     <string name="about_midis2jam2_description">MIDIJam का एक रीमास्टर, एक 3D MIDI फ़ाइल विज़ुअलाइज़र।</string>

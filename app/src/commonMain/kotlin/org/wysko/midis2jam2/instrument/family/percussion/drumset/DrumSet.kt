@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
+import com.jme3.math.Vector3f
+import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.kmidi.midi.event.NoteEvent.Companion.filterByNotes
 import org.wysko.midis2jam2.manager.PerformanceManager
@@ -40,6 +42,32 @@ import kotlin.time.Duration
  */
 abstract class DrumSet(context: PerformanceManager, events: List<NoteEvent.NoteOn>) :
     PercussionInstrument(context, events.toMutableList()) {
+
+    /** True if the smart drum sticks play this kit, so its pieces should be built with ghost sticks. */
+    protected val isSmartSticks: Boolean = context.config.settings.instrumentSettings.isSmartDrumSticks
+
+    private var smartSticks: SmartDrumSticks? = null
+
+    /** The smart drum sticks' nodes, left hand first. Empty unless the smart drum sticks are on. */
+    internal val smartStickNodes: List<Node> get() = smartSticks?.nodes.orEmpty()
+
+    /** Where the smart drum sticks strike each target, by target id, in [geometry]'s space. */
+    internal val smartStickTargets: Map<String, Vector3f> get() = smartSticks?.targetPositions.orEmpty()
+
+    /** The kit's pieces. */
+    internal var pieces: List<DrumSetInstrument> = emptyList()
+        private set
+
+    /** Adds the smart drum sticks, if they're on, to play [pieces]. Call once the pieces are attached to [geometry]. */
+    protected fun addSmartSticks(pieces: List<DrumSetInstrument>) {
+        this.pieces = pieces
+        if (isSmartSticks) smartSticks = SmartDrumSticks(context, geometry, pieces)
+    }
+
+    override fun tick(time: Duration, delta: Duration) {
+        super.tick(time, delta)
+        smartSticks?.tick(time, delta)
+    }
 
     init {
         if (context.isFakeShadows) {

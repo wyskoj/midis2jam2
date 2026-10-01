@@ -105,6 +105,9 @@ internal actual fun LazyListScope.SettingsScreenContent(
     item {
         SmartMalletsBooleanSelect(settings, model)
     }
+    item {
+        SmartDrumSticksBooleanSelect(settings, model)
+    }
     stickyHeader {
         CategoryHeader(stringResource(Res.string.settings_controls))
     }

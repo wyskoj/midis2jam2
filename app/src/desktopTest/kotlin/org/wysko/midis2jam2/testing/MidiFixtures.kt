@@ -390,4 +390,31 @@ object MidiFixtures {
             }
         }
     }.toTimeBasedSequence()
+
+    /**
+     * A rock groove on the standard kit, for the smart drum sticks: two bars of eighth-note hi-hat with the snare on
+     * two and four and the bass drum on one and three, then a sixteenth-note fill down the toms into a crash. At
+     * 120 BPM an eighth note is a quarter of a second.
+     */
+    fun drumGroove(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        val eighth = TICKS_PER_QUARTER / 2
+        val sixteenth = TICKS_PER_QUARTER / 4
+        track {
+            tempo(120)
+            channel(PERCUSSION_CHANNEL) {
+                repeat(16) { i ->
+                    note(42, duration = 1.eighth, absoluteTime = i * eighth)
+                    if (i % 4 == 0) note(36, duration = 1.eighth, absoluteTime = i * eighth)
+                    if (i % 4 == 2) note(38, duration = 1.eighth, absoluteTime = i * eighth)
+                }
+                listOf(50, 50, 48, 48, 47, 47, 45, 45, 43, 43, 41, 41).forEachIndexed { i, drum ->
+                    note(drum, duration = 1.eighth, absoluteTime = 16 * eighth + i * sixteenth)
+                }
+                note(49, duration = 1.quarter, absoluteTime = 16 * eighth + 12 * sixteenth)
+                note(36, duration = 1.quarter, absoluteTime = 16 * eighth + 12 * sixteenth)
+            }
+        }
+    }.toTimeBasedSequence()
 }

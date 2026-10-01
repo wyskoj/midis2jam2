@@ -38,25 +38,29 @@ class ElectronicDrumSet(context: PerformanceManager, events: List<NoteEvent.Note
 
     private val instruments = buildList {
         this += BassDrum(context, events.filterByNotes(35, 36), DrumShellElectronic)
-        this += SnareDrum(context, events.filterByNotes(37, 38, 40), DrumShellElectronic)
-        this += HiHat(context, events.filterByNotes(42, 44, 46), style = Electronic)
-        this += Tom(context, events.filterByNotes(41), TomPitch["low_floor"], DrumShellElectronic)
-        this += Tom(context, events.filterByNotes(43), TomPitch["high_floor"], DrumShellElectronic)
-        this += Tom(context, events.filterByNotes(45), TomPitch["low"], DrumShellElectronic)
-        this += Tom(context, events.filterByNotes(47), TomPitch["low_mid"], DrumShellElectronic)
-        this += Tom(context, events.filterByNotes(48), TomPitch["high_mid"], DrumShellElectronic)
-        this += Tom(context, events.filterByNotes(50), TomPitch["high"], DrumShellElectronic)
-        this += Cymbal(context, events.filterByNotes(49), CymbalType["crash_1"], Electronic)
-        this += Cymbal(context, events.filterByNotes(57), CymbalType["crash_2"], Electronic)
-        this += Cymbal(context, events.filterByNotes(55), CymbalType["splash"], Electronic)
+        this += SnareDrum(context, events.filterByNotes(37, 38, 40), DrumShellElectronic, ghostStick = isSmartSticks)
+        this += HiHat(context, events.filterByNotes(42, 44, 46), style = Electronic, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(41), TomPitch["low_floor"], DrumShellElectronic, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(43), TomPitch["high_floor"], DrumShellElectronic, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(45), TomPitch["low"], DrumShellElectronic, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(47), TomPitch["low_mid"], DrumShellElectronic, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(48), TomPitch["high_mid"], DrumShellElectronic, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(50), TomPitch["high"], DrumShellElectronic, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(49), CymbalType["crash_1"], Electronic, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(57), CymbalType["crash_2"], Electronic, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(55), CymbalType["splash"], Electronic, ghostStick = isSmartSticks)
         // Electronic drum set doesn't have a china, but we'll still show it because it looks weird without it
-        this += Cymbal(context, mutableListOf(), CymbalType["china"], Electronic)
+        this += Cymbal(context, mutableListOf(), CymbalType["china"], Electronic, ghostStick = isSmartSticks)
         partitionRideCymbals(events).let {
-            this += RideCymbal(context, it.first, CymbalType["ride_1"], Electronic)
-            this += RideCymbal(context, it.second, CymbalType["ride_2"], Electronic)
+            this += RideCymbal(context, it.first, CymbalType["ride_1"], Electronic, ghostStick = isSmartSticks)
+            this += RideCymbal(context, it.second, CymbalType["ride_2"], Electronic, ghostStick = isSmartSticks)
         }
     }.onEach {
         geometry.attachChild(it.placement)
+    }
+
+    init {
+        addSmartSticks(instruments)
     }
 
     override fun tick(time: Duration, delta: Duration) {

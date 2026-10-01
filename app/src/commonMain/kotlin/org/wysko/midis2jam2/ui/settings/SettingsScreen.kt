@@ -194,6 +194,22 @@ internal fun SmartMalletsBooleanSelect(
 }
 
 @Composable
+internal fun SmartDrumSticksBooleanSelect(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+) {
+    SwitchRow(
+        settings.value.instrumentSettings.isSmartDrumSticks,
+        model::setSmartDrumSticks,
+        title = { Text(stringResource(Res.string.settings_instruments_smart_drum_sticks)) },
+        label = {
+            Text(stringResource(Res.string.settings_instruments_smart_drum_sticks_description))
+        },
+        icon = Res.drawable.music_note,
+    )
+}
+
+@Composable
 internal fun HudBooleanSelect(
     settings: State<AppSettings>,
     model: SettingsModel,

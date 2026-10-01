@@ -44,14 +44,18 @@ class OrchestraDrumSet(
     private val instruments = buildList {
         // TODO: Bass and snare drum should have new models
         this += BassDrum(context, events.filterByNotes(35, 36), Standard)
-        this += SnareDrum(context, events.filterByNotes(37, 38, 40), Standard)
-        this += HiHat(context, events.filterByNotes(27, 28, 29), HiHatNoteMapping.Orchestra)
-        this += Cymbal(context, events.filterByNotes(59), CymbalType["crash_1"])
-        this += Cymbal(context, events.filterByNotes(57), CymbalType["crash_2"])
-        this += Cymbal(context, events.filterByNotes(55), CymbalType["splash"])
-        this += RideCymbal(context, events.filterByNotes(30), CymbalType["ride_1"])
+        this += SnareDrum(context, events.filterByNotes(37, 38, 40), Standard, ghostStick = isSmartSticks)
+        this += HiHat(context, events.filterByNotes(27, 28, 29), HiHatNoteMapping.Orchestra, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(59), CymbalType["crash_1"], ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(57), CymbalType["crash_2"], ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(55), CymbalType["splash"], ghostStick = isSmartSticks)
+        this += RideCymbal(context, events.filterByNotes(30), CymbalType["ride_1"], ghostStick = isSmartSticks)
     }.onEach {
         geometry.attachChild(it.placement)
+    }
+
+    init {
+        addSmartSticks(instruments)
     }
 
     override fun tick(time: Duration, delta: Duration) {

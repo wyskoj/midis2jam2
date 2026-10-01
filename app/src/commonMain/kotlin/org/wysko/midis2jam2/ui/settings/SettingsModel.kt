@@ -166,5 +166,7 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
 
     fun setSmartMallets(isSmartMallets: Boolean) = instrument { it.copy(isSmartMallets = isSmartMallets) }
 
+    fun setSmartDrumSticks(isSmartDrumSticks: Boolean) = instrument { it.copy(isSmartDrumSticks = isSmartDrumSticks) }
+
     fun setDefaultFieldOfView(defaultFieldOfView: Float) = camera { it.copy(defaultFieldOfView = defaultFieldOfView) }
 }
