@@ -45,6 +45,7 @@ enum class CostTerm(val label: String, val isStatic: Boolean) {
     LEGATO("leg", false),
     STEAL("steal", false),
     RELEASE("rel", false),
+    OPEN_AWAY("openup", false),
 }
 
 /** The cost of a fingering, term by term. Only built for the chosen path, to explain it. */

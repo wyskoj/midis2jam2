@@ -65,6 +65,8 @@ class FrettingCorpusBenchmark {
         report(parts, ::lowestFretBaseline)
         line("Engine (${profile.name}), tuning given as standard:")
         report(parts) { part -> evaluate(part, profile) }
+        line("Engine, with the parts written as a sequencer would (every lone note rings ${(LEGATO_OVERLAP * 1000).toInt()} ms into the next):")
+        report(parts) { part -> evaluate(part.asSequencedLegato(), profile) }
 
         diagnose(parts.filter { it.isSolo }, profile, "solo")
         diagnose(parts.filter { !it.isSolo }, profile, "comp")
@@ -232,6 +234,23 @@ class FrettingCorpusBenchmark {
         line("  $label fret histogram (engine):  ${chosenFrets.toList()}")
     }
 
+    /**
+     * The part as a sequencer or notation program might write it: each single note that nearly reaches the next one
+     * rings [LEGATO_OVERLAP] into it. People never overlap two notes on one string, but sequenced parts often do, and
+     * that shouldn't change where the notes are played.
+     */
+    private fun TabbedPart.asSequencedLegato(): TabbedPart {
+        val order = notes.indices.sortedBy { notes[it].start }
+        val written = notes.toMutableList()
+        for (k in 0 until order.size - 1) {
+            val note = notes[order[k]]
+            val next = notes[order[k + 1]]
+            val alone = (k == 0 || notes[order[k - 1]].start < note.start - CHORD) && next.start - note.start > CHORD
+            if (alone && next.start - note.end in 0.0..LEGATO_REACH) written[order[k]] = note.copy(end = next.start + LEGATO_OVERLAP)
+        }
+        return TabbedPart(name, written, strings, frets, isSolo, player)
+    }
+
     /** Plays every note at its lowest fret on a string not already sounding: roughly what a naive engine does. */
     private fun lowestFretBaseline(part: TabbedPart): Score {
         val standard = Tunings.GUITAR.first()
@@ -334,12 +353,15 @@ class FrettingCorpusBenchmark {
     }
 
     private companion object {
+        const val LEGATO_OVERLAP = 0.03
+        const val LEGATO_REACH = 0.15
+        const val CHORD = 0.03
         val ROUNDS = System.getenv("MIDIS2JAM2_FRETTING_TUNE_ROUNDS")?.toIntOrNull() ?: 3
         val STEPS = listOf(0.5, 1.5, 0.75, 1.25, 0.0, 2.0)
         val TARGET_STEPS = listOf(2.0, -2.0, 1.0, -1.0, 4.0, -4.0)
         val TUNABLE = setOf(
             "position", "positionTarget", "stretch", "finger", "barre", "openString", "pastAccess", "innerMute", "shift", "shiftOnset",
-            "stickiness", "cross", "repeat", "shape", "legato", "steal", "release",
+            "stickiness", "cross", "repeat", "shape", "legato", "steal", "release", "openAway",
         )
     }
 }

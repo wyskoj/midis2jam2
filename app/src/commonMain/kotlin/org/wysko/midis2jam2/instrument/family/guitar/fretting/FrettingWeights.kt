@@ -49,6 +49,8 @@ package org.wysko.midis2jam2.instrument.family.guitar.fretting
  * @property steal Per second of ring cut off when a new note takes a string that is still sounding.
  * @property release Per second of ring cut off when the hand moves away from a held fretted note.
  * @property riff For playing a repeated passage the same way as its other occurrences.
+ * @property openAway Per open string played, for each fret the hand sits beyond the lowest few: a player up the neck
+ * frets the note in position rather than reach for the open string.
  */
 data class FrettingWeights(
     val position: Double = 0.05,
@@ -74,12 +76,13 @@ data class FrettingWeights(
     val steal: Double = 3.0,
     val release: Double = 1.5,
     val riff: Double = -1.5,
+    val openAway: Double = 0.0,
 ) {
     /** The value of each weight, in declaration order. */
     fun toArray(): DoubleArray = doubleArrayOf(
         position, positionTarget, stretch, finger, barre, openString, pastAccess, innerMute, bendImpossible, bendLowString,
         vibratoOpen, drop, harmonic, shift, shiftOnset, stickiness, cross, repeat, shape, legato, steal, release,
-        riff,
+        riff, openAway,
     )
 
     companion object {
@@ -87,7 +90,7 @@ data class FrettingWeights(
         val NAMES: List<String> = listOf(
             "position", "positionTarget", "stretch", "finger", "barre", "openString", "pastAccess", "innerMute", "bendImpossible",
             "bendLowString", "vibratoOpen", "drop", "harmonic", "shift", "shiftOnset", "stickiness", "cross",
-            "repeat", "shape", "legato", "steal", "release", "riff",
+            "repeat", "shape", "legato", "steal", "release", "riff", "openAway",
         )
 
         /** Builds weights from values in the order of [toArray]. */
@@ -95,7 +98,7 @@ data class FrettingWeights(
             require(v.size == NAMES.size) { "Expected ${NAMES.size} weights, got ${v.size}" }
             return FrettingWeights(
                 v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14],
-                v[15], v[16], v[17], v[18], v[19], v[20], v[21], v[22],
+                v[15], v[16], v[17], v[18], v[19], v[20], v[21], v[22], v[23],
             )
         }
 

@@ -35,6 +35,28 @@ class DecodeContext(
     val maxCandidates: Int = CandidateGenerator.DEFAULT_MAX_CANDIDATES,
 ) {
     private val cache = arrayOfNulls<List<Candidate>>(slices.size)
+    private val byPitches = HashMap<List<Int>, List<Candidate>>()
+
+    /**
+     * How much of a note's ring can be cut short without cost, in seconds.
+     *
+     * Sequencers and notation software often let every note of a line ring slightly into the next. A player playing
+     * both on one string doesn't, and that is no reason to move to another string. So when even the lower quartile of
+     * consecutive single notes overlap, overlaps up to that much are taken as how the part was written, not as notes
+     * ringing on. A played part has gaps between most notes on one string, so its grace is zero.
+     */
+    val stealGrace: Double = run {
+        val overlaps = (1 until slices.size)
+            .filter { slices[it - 1].size == 1 && slices[it].size == 1 }
+            .map { notes[slices[it - 1].notes[0]].end - slices[it].time }
+            .sorted()
+        if (overlaps.size < MIN_LINE_NOTES) 0.0 else overlaps[overlaps.size / 4].coerceIn(0.0, MAX_STEAL_GRACE)
+    }
+
+    private companion object {
+        const val MIN_LINE_NOTES = 8
+        const val MAX_STEAL_GRACE = 0.06
+    }
 
     /** For each index-finger fret, the highest fret the hand reaches comfortably. */
     val reach: IntArray = IntArray(profile.fretCount + 1) {
@@ -43,7 +65,7 @@ class DecodeContext(
 
     /** The candidate fingerings of slice [index], generated once. */
     fun candidates(index: Int): List<Candidate> =
-        cache[index] ?: CandidateGenerator.generate(this, index, maxCandidates).also { cache[index] = it }
+        cache[index] ?: CandidateGenerator.generate(this, index, maxCandidates, byPitches).also { cache[index] = it }
 }
 
 /**
@@ -99,6 +121,9 @@ internal object BeamDecoder {
     private const val LEGATO_MAX_INTERVAL = 4
     private const val NOTICEABLE_STEAL = 0.05
     private const val NEVER = -1e9
+
+    /** How far up the neck (from the nut or capo) the hand can sit and still reach for an open string freely. */
+    private const val OPEN_FREE_FRETS = 4
 
     private class Key(val candidate: Int, val hand: Int, val occupants: IntArray) {
         override fun equals(other: Any?): Boolean =
@@ -261,7 +286,14 @@ internal object BeamDecoder {
             }
             handTime = t
         }
-        if (hand >= 0) add(CostTerm.POSITION, w.position * abs(hand - ctx.capo - w.positionTarget))
+        if (hand >= 0) {
+            add(CostTerm.POSITION, w.position * abs(hand - ctx.capo - w.positionTarget))
+            val away = hand - ctx.capo - OPEN_FREE_FRETS
+            if (away > 0 && w.openAway != 0.0) {
+                val open = candidate.notes.indices.count { candidate.frets[it] == ctx.capo && !candidate.harmonic[it] }
+                add(CostTerm.OPEN_AWAY, w.openAway * away * open)
+            }
+        }
 
         val before = previous.candidate
         if (before != null && before.notes.isNotEmpty() && candidate.notes.isNotEmpty()) {
@@ -316,7 +348,7 @@ internal object BeamDecoder {
             val s = candidate.strings[k]
             if (previous.occupantNote[s] >= 0 && previous.occupantEnd[s] > t) {
                 val remaining = min(previous.occupantEnd[s] - t, 1.0)
-                add(CostTerm.STEAL, w.steal * remaining)
+                add(CostTerm.STEAL, w.steal * (remaining - ctx.stealGrace).coerceAtLeast(0.0))
                 if (remaining > NOTICEABLE_STEAL) steals++
             }
         }
@@ -332,7 +364,8 @@ internal object BeamDecoder {
                 val fret = previous.occupantFret[s]
                 if (fret <= ctx.capo) continue
                 if (fret < hand || fret > ctx.reach[hand]) {
-                    add(CostTerm.RELEASE, w.release * min(previous.occupantEnd[s] - t, 1.0))
+                    val remaining = min(previous.occupantEnd[s] - t, 1.0)
+                    add(CostTerm.RELEASE, w.release * (remaining - ctx.stealGrace).coerceAtLeast(0.0))
                     released = released or (1 shl s)
                 }
             }

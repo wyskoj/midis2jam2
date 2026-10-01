@@ -65,6 +65,12 @@ class Candidate(
         id, notes, strings, frets, harmonic, dropped, dropPenalty, minFret, maxFret, barreFret, barreWidth,
         fingerCount, spanMm,
     ).also { it.staticCost = staticCost }
+
+    /** Returns a copy whose [notes] and [dropped] are mapped through [map]. */
+    internal fun withNotes(map: (Int) -> Int): Candidate = Candidate(
+        id, IntArray(notes.size) { map(notes[it]) }, strings, frets, harmonic, IntArray(dropped.size) { map(dropped[it]) },
+        dropPenalty, minFret, maxFret, barreFret, barreWidth, fingerCount, spanMm,
+    )
 }
 
 /**
@@ -88,10 +94,36 @@ object CandidateGenerator {
 
     private class Position(val string: Int, val fret: Int, val harmonic: Boolean)
 
-    /** The fingerings of slice [sliceIndex], cheapest first, at most [maxCandidates] of them. */
-    fun generate(ctx: DecodeContext, sliceIndex: Int, maxCandidates: Int = DEFAULT_MAX_CANDIDATES): List<Candidate> {
+    /**
+     * The fingerings of slice [sliceIndex], cheapest first, at most [maxCandidates] of them.
+     *
+     * Where they can go depends only on the slice's pitches, so slices with the same pitches (the same chord played
+     * again) share the search through [cache], which is keyed by pitches and holds fingerings by each note's place in
+     * its slice. Only the costs, which also depend on bends and on the slice's weights, are worked out each time.
+     */
+    fun generate(
+        ctx: DecodeContext,
+        sliceIndex: Int,
+        maxCandidates: Int = DEFAULT_MAX_CANDIDATES,
+        cache: MutableMap<List<Int>, List<Candidate>>? = null,
+    ): List<Candidate> {
         val slice = ctx.slices[sliceIndex]
         val w = ctx.weights[sliceIndex]
+        val pitches = slice.notes.map { ctx.notes[it].pitch }
+        val result = cache?.get(pitches)?.map { candidate -> candidate.withNotes { slice.notes[it] } }
+            ?: search(ctx, slice).also { found ->
+                cache?.put(pitches, found.map { candidate -> candidate.withNotes { slice.notes.indexOf(it) } })
+            }
+        result.forEach { it.staticCost = CostModel.staticCost(ctx, it, w, null) }
+        return result
+            .withIndex()
+            .sortedWith(compareBy({ it.value.staticCost }, { it.index }))
+            .take(maxCandidates)
+            .mapIndexed { rank, it -> it.value.withId(rank) }
+    }
+
+    /** Every fingering of [slice], in the order found, without costs. */
+    private fun search(ctx: DecodeContext, slice: Slice): List<Candidate> {
         val positions = slice.notes.associateWith { positionsOf(ctx, ctx.notes[it].pitch) }
         val unplayable = slice.notes.filter { positions.getValue(it).isEmpty() }
         val playable = slice.notes.filter { positions.getValue(it).isNotEmpty() }
@@ -114,12 +146,7 @@ object CandidateGenerator {
         if (result.isEmpty()) {
             result = listOf(empty(slice.notes.toList(), unplayable.size + playable.sumOf { penalties.getValue(it) }))
         }
-        result.forEach { it.staticCost = CostModel.staticCost(ctx, it, w, null) }
         return result
-            .withIndex()
-            .sortedWith(compareBy({ it.value.staticCost }, { it.index }))
-            .take(maxCandidates)
-            .mapIndexed { rank, it -> it.value.withId(rank) }
     }
 
     /** Calls [block] with each [size]-element subset of [items], in order of the earliest items first. */

@@ -90,6 +90,24 @@ class FretterSoloTest {
     }
 
     @Test
+    @Spec("instrument.guitar.solo-box-position", "instrument.guitar.legato-same-string")
+    fun `a solo whose notes overlap slightly, as sequenced MIDI often does, is fingered like a detached one`() {
+        // Sequencers and notation software often let each note ring a few tens of milliseconds into the next.
+        listOf(
+            listOf(57, 60, 62, 64, 67, 69, 72, 74, 72, 69, 67, 64, 62, 60, 57) to 0.12,
+            listOf(52, 54, 56, 57, 59, 61, 63, 64, 66, 68, 69, 71, 73, 75, 76) to 0.08,
+        ).forEach { (pitches, step) ->
+            val detached = melody(pitches, step)
+            val legato = melody(pitches, step, overlap = 0.03)
+            assertEquals(
+                Fretter.solve(detached, driven).describe(detached),
+                Fretter.solve(legato, driven).describe(legato),
+                "Overlapping the notes by 30 ms changed the fingering",
+            )
+        }
+    }
+
+    @Test
     fun `a high phrase stays up the neck`() {
         val phrase = melody(listOf(76, 74, 71, 69, 67, 64), 0.15)
         val solution = Fretter.solve(phrase, driven)

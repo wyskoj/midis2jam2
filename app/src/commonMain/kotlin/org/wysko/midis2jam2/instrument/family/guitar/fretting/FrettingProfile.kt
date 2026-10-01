@@ -118,6 +118,10 @@ enum class BassStyle(val label: String) {
  * The profiles of every instrument the fretting engine plays.
  *
  * The weights are starting points, to be calibrated against human tablature (see `FrettingCorpusBenchmark`).
+ *
+ * With the guitar weights, the benchmark puts notes on the string the player used for 82.7% of GuitarSet's comping and
+ * 66.6% of its solos (63.5% when the solos are written as a sequencer would, notes overlapping), and 72.9% of AnimeTAB's
+ * arrangements. The other instruments have no tablature to calibrate against, so their weights are set by hand.
  */
 object FrettingProfiles {
     /**
@@ -142,6 +146,7 @@ object FrettingProfiles {
         legato = -0.075,
         steal = 12.0,
         release = 0.85,
+        openAway = 0.2,
     )
 
     /**
@@ -167,6 +172,7 @@ object FrettingProfiles {
         legato = -0.1,
         steal = 12.0,
         release = 0.25,
+        openAway = 0.05,
     )
 
     /** A six-string guitar played in [style]. */
