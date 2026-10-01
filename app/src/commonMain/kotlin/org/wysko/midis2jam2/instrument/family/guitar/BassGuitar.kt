@@ -44,7 +44,7 @@ private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
 
 private const val BASS_GUITAR_FORWARD_OFFSET = 0.02
 
-/** The lowest open string in standard tuning; a lower one shows the drop-tuned model. */
+/** The lowest open string in standard tuning; a lower one shows the drop-tuned model, until the keys can turn. */
 private val STANDARD_LOWEST_STRING = Tunings.BASS.first().lowest
 
 /**
@@ -78,7 +78,7 @@ class BassGuitar private constructor(
         },
         numberOfStrings = 4,
         instrumentBody = context.modelD(
-            if (fretting.tuning.lowest < STANDARD_LOWEST_STRING) type.modelDropDFile else type.modelFile,
+            TuningKeyLayout.bodyFor(type.modelFile, type.modelDropDFile, fretting.tuning.lowest < STANDARD_LOWEST_STRING),
             type.textureFile
         ) to when (type) {
             BassGuitarType.Synth1 -> "BassSkinSynth1.png"
@@ -88,6 +88,12 @@ class BassGuitar private constructor(
     ),
     MultipleInstancesLinearAdjustment {
 
+    private val keyLayout = TuningKeyLayout.forModel(type.modelFile)
+    private val texture = type.textureFile
+
+    override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
+
+    override val bodyTexture: String get() = texture
 
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BassString.obj", BASS_SKIN_BMP).apply {

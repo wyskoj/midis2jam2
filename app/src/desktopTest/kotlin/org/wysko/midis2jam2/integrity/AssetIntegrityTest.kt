@@ -49,7 +49,7 @@ class AssetIntegrityTest {
     @Spec("app.assets.all-referenced-assets-exist")
     fun `every asset path named in code resolves to a bundled file`() {
         val missing = assetLiterals()
-            .filterNot { (literal, _) -> resolves(literal) }
+            .filterNot { (literal, _) -> resolves(literal) || literal in AWAITING_ART }
             .map { (literal, source) -> "$literal (referenced in ${source.name})" }
             .distinct()
             .sorted()
@@ -144,6 +144,12 @@ class AssetIntegrityTest {
         /** Lower bounds that keep the scans from passing vacuously. */
         const val MINIMUM_EXPECTED_ASSET_REFERENCES = 300
         const val MINIMUM_EXPECTED_DATA_FILES = 20
+
+        /**
+         * Models the code already looks for but which haven't been made yet; it shows a stand-in until they exist (see
+         * `docs/TUNING_KEYS.md`). Remove each one as its model is added.
+         */
+        val AWAITING_ART = setOf("Capo.obj")
 
         /**
          * Bundled data files that nothing reads.

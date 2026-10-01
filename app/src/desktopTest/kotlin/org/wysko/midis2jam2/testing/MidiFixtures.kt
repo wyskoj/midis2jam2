@@ -406,8 +406,11 @@ object MidiFixtures {
         listOf(43, 47, 50, 55, 59, 67),
     )
 
-    /** A power-chord riff on the low D string, which only drop-D tuning can play. */
-    fun dropDRiff(): TimeBasedSequence = smf {
+    /**
+     * A power-chord riff on the low D string, which only drop-D tuning can play. With [delayed], it starts
+     * [TUNED_PART_START_SECONDS] in, so the guitar's retune before it falls inside the song.
+     */
+    fun dropDRiff(delayed: Boolean = false): TimeBasedSequence = smf {
         format = StandardMidiFile.Header.Format.Format0
         division = tpq(TICKS_PER_QUARTER)
         track {
@@ -415,7 +418,11 @@ object MidiFixtures {
             channel(0) {
                 program(DISTORTION_GUITAR_PROGRAM, absoluteTime = 0)
                 val riff = listOf(listOf(38, 45, 50), listOf(38, 45, 50), listOf(41, 48, 53), listOf(43, 50, 55))
-                chords(List(4) { riff }.flatten(), duration = TICKS_PER_QUARTER / 2)
+                chords(
+                    List(4) { riff }.flatten(),
+                    duration = TICKS_PER_QUARTER / 2,
+                    offset = if (delayed) TUNED_PART_START_TICKS else 0,
+                )
             }
         }
     }.toTimeBasedSequence()
@@ -441,6 +448,33 @@ object MidiFixtures {
             }
         }
     }.toTimeBasedSequence()
+
+    /**
+     * Open-chord shapes (G, C, D, Em) strummed on a steel-string acoustic two frets up, which the engine plays with a
+     * capo on the second fret. It starts [TUNED_PART_START_SECONDS] in.
+     */
+    fun capoChords(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(STEEL_GUITAR_PROGRAM, absoluteTime = 0)
+                val shapes = listOf(
+                    listOf(43, 47, 50, 55, 59, 67),
+                    listOf(48, 52, 55, 60, 64),
+                    listOf(50, 57, 62, 66),
+                    listOf(40, 47, 52, 55, 59, 64),
+                )
+                val song = List(6) { shapes }.flatten().map { chord -> chord.map { it + 2 } }
+                chords(song, duration = 2 * TICKS_PER_QUARTER, spread = 2, offset = TUNED_PART_START_TICKS)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** When a delayed [dropDRiff] and [capoChords] start playing, in seconds. */
+    const val TUNED_PART_START_SECONDS = 2.0
+    private const val TUNED_PART_START_TICKS = 4 * TICKS_PER_QUARTER
 
     /** The notes of [guitarSoloWithBends]. */
     val SOLO_LICK: List<Int> = listOf(69, 72, 74, 74, 72, 69, 67, 69, 72, 74, 76, 74, 72, 69, 67, 64)
@@ -497,12 +531,13 @@ object MidiFixtures {
         duration: Int,
         spread: Int = 0,
         lateOff: Int = 0,
+        offset: Int = 0,
     ) {
         chords.forEachIndexed { i, chord ->
             val next = chords.getOrNull(i + 1).orEmpty()
             chord.forEachIndexed { k, pitch ->
-                val start = i * duration + k * spread
-                val end = (i + 1) * duration + if (pitch in next) -1 else lateOff
+                val start = offset + i * duration + k * spread
+                val end = offset + (i + 1) * duration + if (pitch in next) -1 else lateOff
                 note(pitch, duration = end - start, absoluteTime = start)
             }
         }

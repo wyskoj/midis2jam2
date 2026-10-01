@@ -37,7 +37,7 @@ import kotlin.time.Duration
 private val BASE_POSITION = v3(47, 35.3, 7.0)
 private const val GUITAR_VECTOR_THRESHOLD = 8
 
-/** The lowest open string in standard tuning; a lower one shows the drop-tuned model. */
+/** The lowest open string in standard tuning; a lower one shows the drop-tuned model, until the keys can turn. */
 private val STANDARD_LOWEST_STRING = Tunings.GUITAR.first().lowest
 
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =
@@ -73,7 +73,7 @@ class Guitar private constructor(
     },
     numberOfStrings = 6,
     instrumentBody = context.modelD(
-        if (fretting.tuning.lowest < STANDARD_LOWEST_STRING) type.modelDropD else type.model,
+        TuningKeyLayout.bodyFor(type.model, type.modelDropD, fretting.tuning.lowest < STANDARD_LOWEST_STRING),
         type.texture
     ) to "GuitarSkin.bmp"
 ) {
@@ -84,6 +84,12 @@ class Guitar private constructor(
     constructor(context: PerformanceManager, events: List<MidiEvent>, type: GuitarType) :
         this(context, events, type, FrettingPlan.create(context, events, FrettingProfiles.guitar(type.style)))
 
+    private val keyLayout = TuningKeyLayout.forModel(type.model)
+    private val texture = type.texture
+
+    override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
+
+    override val bodyTexture: String get() = texture
 
     override val upperStrings: Array<Spatial> = Array(6) {
         context.modelD(if (it < 3) "GuitarStringLow.obj" else "GuitarStringHigh.obj", type.texture)

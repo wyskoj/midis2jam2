@@ -702,6 +702,23 @@
   source: features/fretted-instruments.md
   platforms: [desktop, android]
   claim: "The guitar picks the common tuning (standard, lowered, drop or open) and capo that make its part playable, and shows the drop-tuned model when its lowest string is tuned below E"
+- id: instrument.fretted.tuning.slack
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "A string tuned below standard vibrates wider and slower, and one tuned above it tighter; strings in standard tuning vibrate as usual"
+- id: instrument.fretted.tuning.retune
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Just before its first note, a retuned instrument's retuned strings ring and glide from standard into their tuning, overshooting slightly and settling"
+- id: instrument.fretted.tuning.keys
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "Each tuning key is turned by how far its string is tuned from standard, turning into place during the retune"
+  pending: "Needs the separate tuning-key models (docs/TUNING_KEYS.md)"
+- id: instrument.fretted.capo
+  source: features/fretted-instruments.md
+  platforms: [desktop, android]
+  claim: "A capo is clamped across the neck just behind the inferred capo fret, sliding down from the nut just before the first note"
 - id: instrument.bass.tuning
   source: features/fretted-instruments.md
   platforms: [desktop, android]
