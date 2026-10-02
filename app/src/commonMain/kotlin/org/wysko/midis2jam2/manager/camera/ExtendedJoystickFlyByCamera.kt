@@ -21,17 +21,55 @@ import com.jme3.input.*
 import com.jme3.input.controls.KeyTrigger
 import com.jme3.input.controls.MouseAxisTrigger
 import com.jme3.input.controls.MouseButtonTrigger
+import com.jme3.input.event.*
 import com.jme3.math.Vector3f
 import com.jme3.renderer.Camera
+import kotlin.math.abs
+import kotlin.math.pow
+import kotlin.math.sign
 
-private const val FLYCAM_LEFT_ANALOG = "FLYCAM_Left_Analog"
-private const val FLYCAM_RIGHT_ANALOG = "FLYCAM_Right_Analog"
-private const val FLYCAM_UP_ANALOG = "FLYCAM_Up_Analog"
-private const val FLYCAM_DOWN_ANALOG = "FLYCAM_Down_Analog"
-private const val FLYCAM_RISE_ANALOG = "FLYCAM_Raise_Analog"
-private const val FLYCAM_LOWER_ANALOG = "FLYCAM_Lower_Analog"
+/** How many frames of raw axis samples to average when establishing each axis's at-rest value. */
+private const val CALIBRATION_FRAMES = 15
 
-private const val JOYSTICK_SENSITIVITY = 0.5f
+/** Deviation from an axis's calibrated rest value below which input is ignored. */
+internal const val STICK_DEADZONE = 0.2f
+
+/**
+ * If an axis's calibrated rest value sits further than this from zero, it's assumed to be a
+ * unipolar control (e.g. an analog trigger that reports its "unpressed" state at -1, per the
+ * common DirectInput/XInput/GLFW convention on Windows) rather than a spring-centered stick.
+ */
+private const val TRIGGER_REST_THRESHOLD = 0.6f
+
+/** Upper bound on the tracked frame delta, so a hitch or a pause doesn't produce a huge jump. */
+private const val MAX_FRAME_DELTA_SECONDS = 0.1f
+
+/** Degrees of field of view per unit of zoom input, before [FlyByCamera.zoomSpeed]; matches jME's own. */
+private const val ZOOM_DEGREES_PER_UNIT = 0.1f
+
+/** Multiplier for right-stick look rotation. Rotation reads much less "responsive" than movement
+ *  at the same nominal sensitivity, since [FlyByCamera]'s rotation speed is tuned for the tiny
+ *  per-pixel deltas mouse-look produces, not a full-range analog stick - so this is tuned higher
+ *  than [JOYSTICK_RISE_SENSITIVITY]. */
+private const val JOYSTICK_ROTATE_SENSITIVITY = 2.5f
+
+/** Multiplier for trigger-driven rise/lower. */
+private const val JOYSTICK_RISE_SENSITIVITY = 0.5f
+
+/** Multiplier for left-stick movement. 1.0 matches a fully-held movement key. */
+private const val JOYSTICK_MOVE_SENSITIVITY = 1.0f
+
+/**
+ * Exponent applied to a joystick axis's post-deadzone deviation (`deviation^EXPONENT`, sign
+ * preserved) before it drives the camera. A stick or trigger's usable range is small deflections
+ * most of the time, so a linear response leaves little room to make fine adjustments - values
+ * above 1 flatten the response near center (fine control) while still reaching full speed at full
+ * deflection. Applies only to joystick input; keyboard and mouse are untouched.
+ */
+internal const val RESPONSE_CURVE_EXPONENT = 2.5f
+
+private const val LEFT_STICK_X_AXIS = 0
+private const val LEFT_STICK_Y_AXIS = 1
 
 private val MAPPINGS: Array<String> = arrayOf(
     CameraInput.FLYCAM_LEFT,
@@ -48,12 +86,6 @@ private val MAPPINGS: Array<String> = arrayOf(
     CameraInput.FLYCAM_RISE,
     CameraInput.FLYCAM_LOWER,
     CameraInput.FLYCAM_INVERTY,
-    FLYCAM_LEFT_ANALOG,
-    FLYCAM_RIGHT_ANALOG,
-    FLYCAM_UP_ANALOG,
-    FLYCAM_DOWN_ANALOG,
-    FLYCAM_RISE_ANALOG,
-    FLYCAM_LOWER_ANALOG,
 )
 
 private val INTERRUPTIBLE_ACTIONS = arrayOf(
@@ -64,15 +96,54 @@ private val INTERRUPTIBLE_ACTIONS = arrayOf(
     CameraInput.FLYCAM_BACKWARD,
     CameraInput.FLYCAM_RISE,
     CameraInput.FLYCAM_LOWER,
-    FLYCAM_LEFT_ANALOG,
-    FLYCAM_RIGHT_ANALOG,
-    FLYCAM_UP_ANALOG,
-    FLYCAM_DOWN_ANALOG,
-    FLYCAM_RISE_ANALOG,
-    FLYCAM_LOWER_ANALOG,
 )
 
-class ExtendedJoystickFlyByCamera(camera: Camera, val onInput: () -> Unit = {}) : FlyByCamera(camera) {
+/**
+ * A [FlyByCamera] that additionally drives the camera from a gamepad, if one is connected and
+ * [isGamepadEnabled] is `true`.
+ *
+ * jME3's LWJGL3/GLFW joystick backend only reliably identifies the first two raw axes (the left
+ * stick) the same way across different controllers/drivers; axes beyond that have no dependable
+ * cross-vendor meaning, and on many controllers the analog triggers report their "unpressed" rest
+ * position at -1 rather than 0. Naively binding those axes by raw index (as earlier versions of
+ * this class did) made the camera spin or drift on its own whenever such a controller was
+ * connected, since a persistently nonzero reading gets applied every frame forever.
+ *
+ * To use axes beyond the left stick safely without knowing the controller's exact layout ahead of
+ * time, this class briefly samples every other axis right after the joystick is grabbed to learn
+ * its rest value, classifies it as a stick (rest near zero) or a trigger (rest near an extreme),
+ * and only then starts treating *deviation from that rest value* as input - the first two
+ * stick-like axes found (in index order) drive rotation, and up to two trigger-like axes drive
+ * rise/lower. This works out to the correct assignment for essentially any controller layout,
+ * since a right stick's X axis is universally reported before its Y axis, and a mis-resting axis
+ * simply calibrates itself out rather than causing runaway motion.
+ *
+ * All joystick axes - including the left stick - are read directly from raw input events rather
+ * than through jME's mapping system, so a response curve ([RESPONSE_CURVE_EXPONENT]) can be
+ * applied to make small deflections easier to control without sacrificing full speed at full
+ * deflection. Keyboard and mouse camera control are unaffected by any of this - they still go
+ * through the normal mapping-based [onAnalog].
+ */
+class ExtendedJoystickFlyByCamera(
+    camera: Camera,
+    val onInput: () -> Unit = {},
+    private val isGamepadEnabled: Boolean = false,
+) : FlyByCamera(camera), RawInputListener {
+
+    private var calibrationFrame = 0
+    private val axisValueSums = HashMap<Int, Float>()
+    private var baselines: Map<Int, Float>? = null
+    private var rotateXAxis = -1
+    private var rotateYAxis = -1
+    private val liftAxes = mutableListOf<Int>()
+    private var listeningForJoystick = false
+
+    // RawInputListener callbacks aren't given a tpf like onAnalog is, so it's tracked by hand -
+    // otherwise the calibrated axes below would apply a full -1..1 magnitude every single
+    // frame regardless of framerate, rather than a rate scaled to elapsed time.
+    private var lastFrameNanos = System.nanoTime()
+    private var frameDeltaSeconds = 0f
+
     override fun registerWithInput(inputManager: InputManager) {
         this.inputManager = inputManager
 
@@ -116,14 +187,26 @@ class ExtendedJoystickFlyByCamera(camera: Camera, val onInput: () -> Unit = {}) 
         inputManager.addListener(this, *MAPPINGS)
         inputManager.isCursorVisible = dragToRotate || !isEnabled
 
-        inputManager.joysticks?.firstOrNull()?.let { joystick ->
-            joystick.axes[0].assignAxis(CameraInput.FLYCAM_STRAFERIGHT, CameraInput.FLYCAM_STRAFELEFT)
-            joystick.axes[1].assignAxis(CameraInput.FLYCAM_BACKWARD, CameraInput.FLYCAM_FORWARD)
-            joystick.axes[3].assignAxis(FLYCAM_RIGHT_ANALOG, FLYCAM_LEFT_ANALOG)
-            joystick.axes[4].assignAxis(FLYCAM_DOWN_ANALOG, FLYCAM_UP_ANALOG)
-            joystick.axes[5].assignAxis(FLYCAM_RISE_ANALOG, FLYCAM_LOWER_ANALOG)
-            joystick.axes[2].assignAxis(FLYCAM_LOWER_ANALOG, FLYCAM_RISE_ANALOG)
+        if (isGamepadEnabled) {
+            inputManager.joysticks?.firstOrNull()?.let {
+                calibrationFrame = 0
+                axisValueSums.clear()
+                baselines = null
+                rotateXAxis = -1
+                rotateYAxis = -1
+                liftAxes.clear()
+                listeningForJoystick = true
+                inputManager.addRawInputListener(this)
+            }
         }
+    }
+
+    override fun unregisterInput() {
+        if (listeningForJoystick) {
+            inputManager?.removeRawInputListener(this)
+            listeningForJoystick = false
+        }
+        super.unregisterInput()
     }
 
     override fun onAnalog(name: String?, value: Float, tpf: Float) {
@@ -143,24 +226,123 @@ class ExtendedJoystickFlyByCamera(camera: Camera, val onInput: () -> Unit = {}) 
             CameraInput.FLYCAM_LOWER -> riseCamera(-value)
             CameraInput.FLYCAM_ZOOMIN -> zoomCamera(value)
             CameraInput.FLYCAM_ZOOMOUT -> zoomCamera(-value)
-            FLYCAM_LEFT_ANALOG -> joyRotateCamera(value, initialUpVec)
-            FLYCAM_RIGHT_ANALOG -> joyRotateCamera(-value, initialUpVec)
-            FLYCAM_UP_ANALOG -> joyRotateCamera(-value * (if (invertY) -1 else 1), cam.left)
-            FLYCAM_DOWN_ANALOG -> joyRotateCamera(value * (if (invertY) -1 else 1), cam.left)
-            FLYCAM_RISE_ANALOG -> joyRiseCamera(value)
-            FLYCAM_LOWER_ANALOG -> joyRiseCamera(-value)
         }
     }
 
+    /**
+     * Zooms as [FlyByCamera.zoomCamera] does, but keeps the field of view within [FOV_VALID_RANGE].
+     *
+     * The base class only stops the field of view going below zero. Past 180 degrees it wraps
+     * around to a negative angle, which the engine rejects when it is next applied to a camera,
+     * crashing the performance (#410).
+     */
+    override fun zoomCamera(value: Float) {
+        if (cam.isParallelProjection) return super.zoomCamera(value)
+        cam.fov = (cam.fov + value * ZOOM_DEGREES_PER_UNIT * zoomSpeed).coerceIn(FOV_VALID_RANGE)
+    }
+
+    private fun joyMoveCamera(value: Float, sideways: Boolean) {
+        moveCamera(value * JOYSTICK_MOVE_SENSITIVITY * frameDeltaSeconds, sideways)
+    }
+
     private fun joyRiseCamera(value: Float) {
-        riseCamera(value * JOYSTICK_SENSITIVITY)
+        riseCamera(value * JOYSTICK_RISE_SENSITIVITY * frameDeltaSeconds)
     }
 
     private fun joyRotateCamera(value: Float, axis: Vector3f) {
         val oldCanRotate = canRotate
         canRotate = true
-        rotateCamera(value * JOYSTICK_SENSITIVITY, axis)
+        rotateCamera(value * JOYSTICK_ROTATE_SENSITIVITY * frameDeltaSeconds, axis)
         canRotate = oldCanRotate
     }
 
+    /** Applies [STICK_DEADZONE] and [RESPONSE_CURVE_EXPONENT] to a raw axis deviation, preserving its sign. */
+    internal fun applyDeadzoneAndCurve(deviation: Float): Float {
+        val magnitude = abs(deviation)
+        if (magnitude < STICK_DEADZONE) return 0f
+        val normalized = ((magnitude - STICK_DEADZONE) / (1f - STICK_DEADZONE)).coerceIn(0f, 1f)
+        return normalized.pow(RESPONSE_CURVE_EXPONENT) * sign(deviation)
+    }
+
+    // region RawInputListener - used to safely discover and drive the second stick/triggers
+    override fun beginInput() = Unit
+
+    override fun endInput() {
+        val now = System.nanoTime()
+        frameDeltaSeconds = ((now - lastFrameNanos) / 1_000_000_000f).coerceIn(0f, MAX_FRAME_DELTA_SECONDS)
+        lastFrameNanos = now
+
+        if (baselines != null) return
+        calibrationFrame++
+        if (calibrationFrame >= CALIBRATION_FRAMES) {
+            finishCalibration()
+        }
+    }
+
+    override fun onJoyAxisEvent(evt: JoyAxisEvent) {
+        if (!isGamepadEnabled || !enabled) return
+
+        val axisId = evt.axisIndex
+
+        // The left stick is assumed centered at rest (true across vendors, unlike axes beyond it)
+        // so it needs no baseline calibration - just deadzone/curve shaping, same as the other axes.
+        if (axisId == LEFT_STICK_X_AXIS || axisId == LEFT_STICK_Y_AXIS) {
+            val curved = applyDeadzoneAndCurve(evt.value)
+            if (curved == 0f) return
+            joyMoveCamera(-curved, sideways = axisId == LEFT_STICK_X_AXIS)
+            onInput()
+            return
+        }
+
+        val bases = baselines
+        if (bases == null) {
+            axisValueSums[axisId] = (axisValueSums[axisId] ?: 0f) + evt.value
+            return
+        }
+
+        val baseline = bases[axisId] ?: return
+        val curved = applyDeadzoneAndCurve(evt.value - baseline)
+        if (curved == 0f) return
+
+        when (axisId) {
+            rotateXAxis -> {
+                joyRotateCamera(-curved, initialUpVec)
+                onInput()
+            }
+
+            rotateYAxis -> {
+                joyRotateCamera(curved * (if (invertY) -1 else 1), cam.left)
+                onInput()
+            }
+
+            in liftAxes -> {
+                val sign = if (liftAxes.indexOf(axisId) == 0) 1f else -1f
+                joyRiseCamera(sign * curved)
+                onInput()
+            }
+        }
+    }
+
+    private fun finishCalibration() {
+        val bases = axisValueSums.mapValues { (_, sum) -> sum / calibrationFrame }
+        baselines = bases
+
+        val sticks = mutableListOf<Int>()
+        val triggers = mutableListOf<Int>()
+        for (axisId in bases.keys.sorted()) {
+            val baseline = bases.getValue(axisId)
+            if (abs(baseline) > TRIGGER_REST_THRESHOLD) triggers += axisId else sticks += axisId
+        }
+
+        rotateXAxis = sticks.getOrElse(0) { -1 }
+        rotateYAxis = sticks.getOrElse(1) { -1 }
+        liftAxes.addAll(triggers.take(2))
+    }
+
+    override fun onJoyButtonEvent(evt: JoyButtonEvent) = Unit
+    override fun onMouseMotionEvent(evt: MouseMotionEvent) = Unit
+    override fun onMouseButtonEvent(evt: MouseButtonEvent) = Unit
+    override fun onKeyEvent(evt: KeyInputEvent) = Unit
+    override fun onTouchEvent(evt: TouchEvent) = Unit
+    // endregion
 }

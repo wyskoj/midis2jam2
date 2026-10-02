@@ -50,8 +50,6 @@ import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
-import org.wysko.midis2jam2.starter.configuration.Configuration.HomeConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.SourceInputStream
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.state
@@ -76,15 +74,14 @@ internal actual class Midis2jam2Application(
         val applicationService: ApplicationService by inject()
         val midiService: MidiService by inject()
         val midiFile = applicationService.midiFile.value!!
-        val configurations = applicationService.configurations.value
+        val config = applicationService.config.value!!
 
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val midiFileBuffered = midiFile.source().buffered()
                 val sequence = StandardMidiFileReader().readStream(SourceInputStream(midiFileBuffered)).toTimeBasedSequence()
                 val midiDevice = midiService.getMidiDevices().first()
-                val homeConfiguration = configurations.find<HomeConfiguration>()
-                homeConfiguration.selectedSoundbank?.let { soundbankPath ->
+                config.soundbank?.let { soundbankPath ->
                     (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)
                 }
                 val currentSequencer = JwSequencerImpl().apply {
@@ -100,7 +97,7 @@ internal actual class Midis2jam2Application(
                 }
 
                 enqueue {
-                    setupState(configurations, platform = Platform.Desktop)
+                    setupState(config, platform = Platform.Android)
                     val loadingProgressManager = LoadingProgressManager()
                     stateManager.attach(loadingProgressManager)
                     stateManager.attach(AssetLoader {
@@ -111,13 +108,13 @@ internal actual class Midis2jam2Application(
                         midiFile = sequence,
                         onClose = { stop() },
                         fileName = midiFile.name,
-                        configs = configurations,
+                        config = config,
                     )
                     stateManager.attach(performanceAppState)
                     rootNode.attachChild(performanceAppState.root)
-                    addManagers(configurations, sequence, currentSequencer)
+                    addManagers(config, sequence, currentSequencer)
                     stateManager.attach(AndroidInputManager())
-                    stateManager.attach(MidiDeviceManager(configurations, midiDevice))
+                    stateManager.attach(MidiDeviceManager(config, midiDevice))
                 }
             } catch (e: Exception) {
                 logger().error("MIDI file failed to read.", e)
@@ -141,7 +138,6 @@ internal actual class Midis2jam2Application(
     actual override fun destroy() {
         rootNode.detachAllChildren()
         assetManager.clearCache()
-        renderer.invalidateState()
         inputManager.clearMappings()
         super.destroy()
     }

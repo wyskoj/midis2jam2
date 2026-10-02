@@ -27,9 +27,7 @@ import org.wysko.midis2jam2.domain.MidiService
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.Configuration.HomeConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import java.io.File
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Synthesizer
@@ -43,11 +41,10 @@ internal class MidiPackage private constructor(
     val midiDevice: MidiDevice,
 ) {
     companion object {
-        fun build(midiFile: File?, configurations: Collection<Configuration>): MidiPackage {
-            val homeConfiguration = configurations.find<HomeConfiguration>()
+        fun build(midiFile: File?, config: PerformanceConfig): MidiPackage {
             val midiService = KoinPlatformTools.defaultContext().get().get<MidiService>()
 
-            val deviceName = homeConfiguration.selectedMidiDevice
+            val deviceName = config.midiDevice
             val midiDevice = midiService.getMidiDevices().find { it.name == deviceName }
 
             check(midiDevice != null) {
@@ -61,7 +58,7 @@ internal class MidiPackage private constructor(
             val synthesizer = when (deviceName) {
                 GERVILL -> GervillMidiDevice.instance.synthesizer.apply {
                     open()
-                    homeConfiguration.selectedSoundbank?.let {
+                    config.soundbank?.let {
                         val soundbank = MidiSystem.getSoundbank(File(it))
                         loadAllInstruments(soundbank)
                     }

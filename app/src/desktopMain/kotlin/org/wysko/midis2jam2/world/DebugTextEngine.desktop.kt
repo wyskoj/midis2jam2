@@ -17,10 +17,15 @@
 
 package org.wysko.midis2jam2.world
 
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 
 internal actual fun getGlRendererInfo(): String {
     return runCatching {
+        // Calling into GL with no current context aborts the process in native code, which no
+        // amount of catching here would survive. Asking for the capabilities first is safe:
+        // it throws an ordinary exception when there is no context to report on.
+        GL.getCapabilities()
         listOf(GL11.GL_RENDERER, GL11.GL_VENDOR, GL11.GL_VERSION).joinToString(" | ") { GL11.glGetString(it) ?: "UNK" }
     }.getOrNull() ?: "GL information unknown"
 }

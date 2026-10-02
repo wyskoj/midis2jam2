@@ -84,8 +84,11 @@
     <string name="settings_general_locale">भाषा</string>
 
     <!-- सेटिंग्स / ग्राफिक्स -->
-    <string name="settings_graphics_fullscreen">फुलस्क्रीन</string>
-    <string name="settings_graphics_fullscreen_description">पूरी स्क्रीन का उपयोग करें</string>
+    <string name="settings_graphics_window_mode">विंडो मोड</string>
+    <string name="settings_graphics_window_mode_description">प्रदर्शन स्क्रीन को कैसे भरता है</string>
+    <string name="settings_graphics_window_mode_windowed">विंडो</string>
+    <string name="settings_graphics_window_mode_borderless">बॉर्डरलेस फुलस्क्रीन</string>
+    <string name="settings_graphics_window_mode_fullscreen">फुलस्क्रीन</string>
     <string name="settings_graphics_resolution">रेज़ोल्यूशन</string>
     <string name="settings_graphics_resolution_fullscreen">फुलस्क्रीन सक्षम होने पर रेज़ोल्यूशन मॉनिटर से मेल खाता है</string>
     <string name="settings_graphics_resolution_default">डिफ़ॉल्ट रेज़ोल्यूशन का उपयोग करें</string>
@@ -133,6 +136,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">स्टिकी स्पीड-मॉडिफायर कुंजियाँ</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">फ्रीकैम की गति बदलने के लिए Ctrl और Shift दबाएं</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">फ्रीकैम की गति बदलने के लिए Ctrl और Shift दबाए रखें</string>
+    <string name="settings_controls_gamepad_enabled">गेमपैड इनपुट</string>
+    <string name="settings_controls_gamepad_enabled_description">कनेक्टेड गेमपैड को फ्रीकैम नियंत्रित करने की अनुमति दें</string>
 
     <!-- सेटिंग्स / ऑन-स्क्रीन तत्व -->
     <string name="settings_onscreenelements_lyrics">गीत के बोल</string>
@@ -217,5 +222,39 @@
     <string name="history_file_missing_title">गीत उपलब्ध नहीं है</string>
     <string name="history_unknown_song">अज्ञात गीत</string>
     <string name="history_clear_invalid_song">साफ़ करें</string>
+
+    <!-- Record -->
+    <string name="tab_record">रिकॉर्ड</string>
+    <string name="record_start">रिकॉर्ड करें</string>
+    <string name="record_output">इस रूप में सहेजें</string>
+    <string name="record_resolution">रेज़ोल्यूशन</string>
+    <string name="record_frame_rate">फ़्रेम दर</string>
+    <string name="record_quality">गुणवत्ता</string>
+    <string name="record_quality_low">निम्न</string>
+    <string name="record_quality_medium">मध्यम</string>
+    <string name="record_quality_high">उच्च</string>
+    <string name="record_quality_maximum">अधिकतम</string>
+    <string name="record_preparing">तैयारी हो रही है…</string>
+    <string name="record_recording">रिकॉर्ड हो रहा है…</string>
+    <string name="record_open_video">वीडियो खोलें</string>
+    <string name="record_show_in_folder">फ़ोल्डर में दिखाएँ</string>
+    <string name="record_cancelled">रिकॉर्डिंग रद्द कर दी गई।</string>
+    <string name="record_audio_note">इस साउंडबैंक के साथ बिल्ट-इन सिंथेसाइज़र द्वारा बनाया गया।</string>
+    <string name="record_window_note">रिकॉर्डिंग के दौरान एक पूर्वावलोकन विंडो खुलती है। उसे बंद करने से रिकॉर्डिंग रद्द हो जाती है।</string>
+    <string name="record_section_video">वीडियो</string>
+    <string name="record_section_audio">ऑडियो</string>
+    <string name="record_empty_title">एक प्रदर्शन रिकॉर्ड करें</string>
+    <string name="record_empty_body">किसी MIDI फ़ाइल को ध्वनि सहित वीडियो में बदलें।</string>
+    <string name="record_choose_file">MIDI फ़ाइल चुनें</string>
+    <string name="record_drop_hint">या यहाँ छोड़ें</string>
+    <string name="record_change_file">बदलें</string>
+    <string name="record_unreadable">यह फ़ाइल MIDI के रूप में नहीं पढ़ी जा सकती।</string>
+    <string name="record_in_folder">%1$s में</string>
+    <string name="record_quality_low_detail">सबसे छोटी फ़ाइल</string>
+    <string name="record_quality_medium_detail">संतुलित</string>
+    <string name="record_quality_high_detail">सबसे अच्छी दिखावट</string>
+    <string name="record_saved">सहेजा गया</string>
+    <string name="record_failed_title">रिकॉर्डिंग विफल रही</string>
+    <string name="record_time_left">लगभग %1$s शेष</string>
 </resources>
 

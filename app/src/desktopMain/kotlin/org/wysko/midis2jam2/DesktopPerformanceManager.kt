@@ -28,8 +28,7 @@ import org.wysko.midis2jam2.domain.ErrorLogService
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.manager.PlaybackManager.Companion.time
 import org.wysko.midis2jam2.midi.system.JwSequencer
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundFactory
@@ -42,8 +41,8 @@ open class DesktopPerformanceManager(
     val midiFile: TimeBasedSequence,
     val onClose: () -> Unit,
     fileName: String,
-    configs: Collection<Configuration>,
-) : PerformanceManager(midiFile, fileName, configs) {
+    config: PerformanceConfig,
+) : PerformanceManager(midiFile, fileName, config) {
     private val errorLogService = KoinPlatformTools.defaultContext().get().get<ErrorLogService>()
     override val onLoadingProgress: (Float) -> Unit = {}
 
@@ -54,7 +53,7 @@ open class DesktopPerformanceManager(
         try {
             BackgroundController.configureBackground(
                 context = this@DesktopPerformanceManager,
-                config = configs.find(),
+                config = config,
                 root = root,
                 Platform.Desktop
             )

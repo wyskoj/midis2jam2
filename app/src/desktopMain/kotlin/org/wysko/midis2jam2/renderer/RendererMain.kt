@@ -26,131 +26,211 @@ import org.wysko.midis2jam2.di.applicationModule
 import org.wysko.midis2jam2.di.midiSystemModule
 import org.wysko.midis2jam2.di.systemModule
 import org.wysko.midis2jam2.di.uiModule
+import org.wysko.midis2jam2.midi.system.SilentSequencer
+import org.wysko.midis2jam2.record.OfflineSynthesizer
+import org.wysko.midis2jam2.record.RecordOptions
+import org.wysko.midis2jam2.record.RecordingException
+import org.wysko.midis2jam2.record.RecordingListener
 import org.wysko.midis2jam2.starter.MidiPackage
 import org.wysko.midis2jam2.starter.Midis2jam2Application
 import org.wysko.midis2jam2.starter.Midis2jam2QueueApplication
 import org.wysko.midis2jam2.starter.applyConfigurations
 import java.io.BufferedWriter
 import java.io.File
-import java.net.ServerSocket
 import java.util.*
 import java.util.concurrent.CountDownLatch
-
-const val SERVER_PORT = 31320
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
+    val protocol = System.out.bufferedWriter()
+    installFatalErrorReporter(protocol)
+
     startKoin { modules(applicationModule, midiSystemModule, systemModule, uiModule) }
     val arguments = Base64.getDecoder().decode(args.first()).toString(Charsets.UTF_8)
-    val config = Json.decodeFromString<RendererBundle>(arguments)
-    val serverWriter = startTcpListener()
-    val midiFiles = config.midiFiles.map { File(it) }
+    val bundle = Json.decodeFromString<RendererBundle>(arguments)
+    val midiFiles = bundle.midiFiles.map { File(it) }
 
-    when (midiFiles.size) {
-        0 -> exit(serverWriter)
-        1 -> launchApplication(midiFiles, config, serverWriter)
-        else -> launchQueueApplication(midiFiles, config, serverWriter)
+    when {
+        midiFiles.isEmpty() -> reportNoFiles(protocol)
+        bundle.recordOptions != null -> launchRecording(midiFiles.first(), bundle, bundle.recordOptions, protocol)
+        midiFiles.size == 1 -> launchApplication(midiFiles, bundle, protocol)
+        else -> launchQueueApplication(midiFiles, bundle, protocol)
     }
 }
 
+private fun launchRecording(
+    midiFile: File,
+    bundle: RendererBundle,
+    options: RecordOptions,
+    protocol: BufferedWriter,
+) {
+    val sequence = runCatching { StandardMidiFileReader().readFile(midiFile).toTimeBasedSequence() }.getOrElse { t ->
+        protocol.send(RendererMessage.error("The MIDI file couldn't be read.", t.stackTraceToString()))
+        return
+    }
+    val synthesizer = runCatching { OfflineSynthesizer(options.soundbankPath?.let(::File)) }.getOrElse { t ->
+        protocol.send(RendererMessage.error("The synthesizer couldn't be started for recording.", t.stackTraceToString()))
+        return
+    }
+    val sequencer = SilentSequencer().apply {
+        open(synthesizer)
+        this.sequence = sequence
+    }
+    // The recording's outcome is only known once the engine has shut down, after the application says it's finished.
+    val outcome = CountDownLatch(1)
+    val listener = object : RecordingListener {
+        override fun onProgress(framesCaptured: Long, expectedFrames: Long) =
+            protocol.send(RendererMessage.recordProgress(framesCaptured, expectedFrames))
+
+        override fun onFinished(file: File) {
+            protocol.send(RendererMessage.recordFinished(file.absolutePath))
+            outcome.countDown()
+        }
+
+        override fun onCancelled() {
+            protocol.send(RendererMessage.recordCancelled())
+            outcome.countDown()
+        }
+
+        override fun onFailed(exception: RecordingException) {
+            protocol.send(
+                RendererMessage.error(
+                    exception.message ?: "The recording failed.",
+                    (exception.cause ?: exception).stackTraceToString()
+                )
+            )
+            outcome.countDown()
+        }
+    }
+
+    val latch = CountDownLatch(1)
+    val application = Midis2jam2Application(
+        sequence,
+        midiFile.name,
+        bundle.config,
+        { latch.countDown() },
+        sequencer,
+        synthesizer = null,
+        midiDevice = synthesizer,
+        recording = Midis2jam2Application.Recording(options, synthesizer, listener),
+    )
+    watchParentCommands { application.stop() }
+    application.execute()
+    latch.await()
+    outcome.await(RECORDING_OUTCOME_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+    protocol.send(RendererMessage.finish())
+}
+
+/** How long to wait, after the engine stops, for a recording to be written or discarded. */
+private const val RECORDING_OUTCOME_TIMEOUT_SECONDS = 60L
+
 private fun launchApplication(
     midiFiles: List<File>,
-    config: RendererBundle,
-    serverWriter: BufferedWriter,
+    bundle: RendererBundle,
+    protocol: BufferedWriter,
 ) {
     val midiFile = midiFiles.first()
-    val midiPackage = runCatching { MidiPackage.build(midiFile, config.configurations) }.onFailure { t ->
-        onFailGetMidiPackage(t, serverWriter)
+    val midiPackage = runCatching { MidiPackage.build(midiFile, bundle.config) }.onFailure { t ->
+        onFailGetMidiPackage(t, protocol)
         return
     }
     val latch = CountDownLatch(1)
     with(midiPackage.getOrNull() ?: return) {
-        Midis2jam2Application(
+        val application = Midis2jam2Application(
             sequence!!,
             midiFile.name,
-            config.configurations,
+            bundle.config,
             {
                 latch.countDown()
-                serverWriter.write(Json.encodeToString(RendererMessage.finish()))
-                serverWriter.flush()
-                serverWriter.close()
+                protocol.send(RendererMessage.finish())
             },
             sequencer,
             synthesizer,
             midiDevice
-        ).execute()
+        )
+        watchParentCommands { application.stop() }
+        application.execute()
     }
     latch.await()
 }
 
 private fun launchQueueApplication(
     midiFiles: List<File>,
-    config: RendererBundle,
-    serverWriter: BufferedWriter,
+    bundle: RendererBundle,
+    protocol: BufferedWriter,
 ) {
     val reader = StandardMidiFileReader()
     val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
 
-    val midiPackage = runCatching { MidiPackage.build(null, config.configurations) }.onFailure { t ->
-        onFailGetMidiPackage(t, serverWriter)
+    val midiPackage = runCatching { MidiPackage.build(null, bundle.config) }.onFailure { t ->
+        onFailGetMidiPackage(t, protocol)
         return
     }
 
     with(midiPackage.getOrNull() ?: return) {
-        Midis2jam2QueueApplication(
+        val application = Midis2jam2QueueApplication(
             sequences = sequences,
             fileNames = midiFiles.map { it.name },
-            config.configurations,
-            onTrackStart = { trackIndex ->
-                serverWriter.write(Json.encodeToString(RendererMessage.queueTrackStart(trackIndex)))
-                serverWriter.newLine()
-                serverWriter.flush()
-            },
-            {
-                serverWriter.write(Json.encodeToString(RendererMessage.finish()))
-                serverWriter.newLine()
-                serverWriter.flush()
-                serverWriter.close()
-            },
+            bundle.config,
+            onTrackStart = { trackIndex -> protocol.send(RendererMessage.queueTrackStart(trackIndex)) },
+            { protocol.send(RendererMessage.finish()) },
             sequencer,
             synthesizer,
             midiDevice
-        ).run {
-            applyConfigurations(config.configurations)
+        )
+        watchParentCommands { application.stop() }
+        application.run {
+            applyConfigurations(bundle.config)
             start()
         }
     }
 }
 
-private fun onFailGetMidiPackage(t: Throwable, serverWriter: BufferedWriter) {
+private fun BufferedWriter.send(message: RendererMessage) {
+    runCatching {
+        write(Json.encodeToString(message))
+        newLine()
+        flush()
+    }
+}
+
+private fun watchParentCommands(onStop: () -> Unit) {
+    Thread {
+        val reader = System.`in`.bufferedReader()
+        while (true) {
+            val line = runCatching { reader.readLine() }.getOrNull() ?: break
+            val command = runCatching { Json.decodeFromString<RendererCommand>(line) }.getOrNull()
+            if (command?.type == RendererCommand.STOP) break
+        }
+        onStop()
+    }.apply {
+        name = "parent-command-watcher"
+        isDaemon = true
+    }.start()
+}
+
+private fun onFailGetMidiPackage(t: Throwable, protocol: BufferedWriter) {
     t.printStackTrace()
-    serverWriter.write(
-        Json.encodeToString(
-            RendererMessage.error(
-                "There was an error initializing the MIDI device.",
-                t.stackTraceToString()
-            )
-        )
+    protocol.send(
+        RendererMessage.error("There was an error initializing the MIDI device.", t.stackTraceToString())
     )
-    serverWriter.flush()
-    serverWriter.close()
 }
 
-private fun exit(serverWriter: BufferedWriter) {
-    serverWriter.write(
-        Json.encodeToString(
-            RendererMessage.error(
-                "No MIDI files passed to renderer server.",
-                IllegalArgumentException("No MIDI files passed to renderer server.").stackTraceToString()
-            )
-        )
-    )
-    serverWriter.flush()
-    serverWriter.close()
+private fun reportNoFiles(protocol: BufferedWriter) {
+    val cause = IllegalArgumentException("No MIDI files passed to the renderer!")
+    protocol.send(RendererMessage.error(cause.message!!, cause.stackTraceToString()))
 }
 
-private fun startTcpListener(): BufferedWriter {
-    val server = ServerSocket(SERVER_PORT)
-    val client = server.accept()
-    val writer = client.getOutputStream().bufferedWriter()
-    return writer
+private fun installFatalErrorReporter(protocol: BufferedWriter) {
+    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+        throwable.printStackTrace()
+        protocol.send(
+            RendererMessage.error(
+                "The 3D engine stopped unexpectedly.",
+                "Uncaught exception on thread \"${thread.name}\":\n${throwable.stackTraceToString()}"
+            )
+        )
+        exitProcess(1)
+    }
 }

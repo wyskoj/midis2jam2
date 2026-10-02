@@ -10,8 +10,10 @@ colorpicker = "1.1.3"
 composeMultiplatform = "1.10.2"
 filekit = "0.14.1"
 install4j = "12.0.3"
+javacpp = "1.5.14"
+bytedeco-ffmpeg = "8.1.2-1.5.14"
 jme3 = "3.9.0-stable"
-kmidi = "0.2.1"
+kmidi = "0.2.3"
 koin-bom = "4.1.1"
 kotlin = "2.3.10"
 kotlin-reflect = "2.3.0"
@@ -71,10 +73,18 @@ kmidi = { group = "org.wysko", name = "kmidi", version.ref = "kmidi" }
 multiplatformSettings = { group = "com.russhwolf", name = "multiplatform-settings", version = "1.3.0" }
 install4j-runtime = { group = "com.install4j", name = "install4j-runtime", version.ref = "install4j" }
 
+# Video recording (FFmpeg through JavaCPP; natives are added per OS in app/build.gradle.kts)
+javacv = { group = "org.bytedeco", name = "javacv", version.ref = "javacpp" }
+javacpp = { group = "org.bytedeco", name = "javacpp", version.ref = "javacpp" }
+bytedeco-ffmpeg = { group = "org.bytedeco", name = "ffmpeg", version.ref = "bytedeco-ffmpeg" }
+
 # Misc.
 noise = { group = "org.spongepowered", name = "noise", version = "2.0.0-SNAPSHOT" }
 logbackClassic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackClassic" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+
+# Testing
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 [bundles]
 jme3 = ["jme3-core", "jme3-effects"]

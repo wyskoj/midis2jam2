@@ -20,6 +20,7 @@
 package org.wysko.midis2jam2.starter
 
 import Platform
+import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.jme3.app.SimpleApplication
 import com.jme3.system.lwjgl.LwjglContext
 import org.koin.mp.KoinPlatformTools
@@ -30,9 +31,15 @@ import org.wysko.midis2jam2.domain.Jme3ExceptionHandler
 import org.wysko.midis2jam2.manager.MidiDeviceManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.DesktopCameraManager
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
-import org.wysko.midis2jam2.starter.configuration.Configuration
+import org.wysko.midis2jam2.record.FixedStepTimer
+import org.wysko.midis2jam2.record.OfflineSynthesizer
+import org.wysko.midis2jam2.record.RecordOptions
+import org.wysko.midis2jam2.record.RecordingListener
+import org.wysko.midis2jam2.record.RecordingManager
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.AssetLoader
 import java.lang.invoke.MethodHandles
 import javax.sound.midi.Synthesizer
@@ -40,17 +47,29 @@ import javax.sound.midi.Synthesizer
 internal actual class Midis2jam2Application(
     private val sequence: TimeBasedSequence,
     private val fileName: String,
-    private val configurations: Collection<Configuration>,
+    private val config: PerformanceConfig,
     private val onFinish: () -> Unit,
     private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
     private val midiDevice: MidiDevice,
+    private val recording: Recording? = null,
 ) : SimpleApplication() {
+    /**
+     * Records the performance instead of playing it. The sound comes from [synthesizer], rendered offline, so the
+     * sequencer passed alongside should be silent and [synthesizer] should also be the MIDI device.
+     */
+    class Recording(
+        val options: RecordOptions,
+        val synthesizer: OfflineSynthesizer,
+        val listener: RecordingListener,
+    )
+
     private val errorLogService = KoinPlatformTools.defaultContext().get().get<ErrorLogService>()
 
     actual fun execute() {
         try {
-            applyConfigurations(configurations)
+            applyConfigurations(config)
+            recording?.let { configureForRecording(it.options) }
             start()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -64,24 +83,53 @@ internal actual class Midis2jam2Application(
 
     actual override fun simpleInitApp() {
         installGlfwJoystickCallbackWorkaround()
+        if (config.settings.graphicsSettings.windowMode ==
+            WindowMode.BorderlessFullscreen && isWindows()
+        ) {
+            applyBorderlessWindow(context)
+        }
         Jme3ExceptionHandler.setup {
             stop()
             sequencer.stop()
             sequencer.close()
         }
-        setupState(configurations, platform = Platform.Desktop)
+        setupState(config, platform = Platform.Desktop)
         stateManager.attach(AssetLoader())
         val performanceAppState = DesktopPerformanceManager(
             sequencer = sequencer,
             midiFile = sequence,
             onClose = { stop() },
             fileName = fileName,
-            configs = configurations,
+            config = config,
         )
         stateManager.attach(performanceAppState)
         rootNode.attachChild(performanceAppState.root)
-        addManagers(configurations, sequence, sequencer)
-        stateManager.attach(MidiDeviceManager(configurations, midiDevice))
+        val recordingManager = recording?.let {
+            RecordingManager(it.options, sequence, it.synthesizer, it.listener)
+        }
+        addManagers(
+            config,
+            sequence,
+            sequencer,
+            onPlaybackComplete = recordingManager?.let { manager -> { manager.complete(); stop() } },
+            isRecording = recording != null,
+        )
+        stateManager.attach(MidiDeviceManager(config, midiDevice))
+        // After the MIDI device manager, whose reset must reach the synthesizer before the song does.
+        recordingManager?.let { stateManager.attach(it) }
+    }
+
+    /** Draws at the video's size, as fast as frames can be encoded rather than at the screen's pace. */
+    private fun configureForRecording(options: RecordOptions) {
+        settings.apply {
+            width = options.width
+            height = options.height
+            isFullscreen = false
+            isVSync = false
+            frameRate = -1
+            title = "midis2jam2 — Recording"
+        }
+        setTimer(FixedStepTimer(options.fps))
     }
 
     actual override fun stop() {
@@ -92,7 +140,6 @@ internal actual class Midis2jam2Application(
     actual override fun destroy() {
         rootNode.detachAllChildren()
         assetManager.clearCache()
-        renderer.invalidateState()
         inputManager.clearMappings()
         (context as LwjglContext).systemListener = null
         super.destroy()

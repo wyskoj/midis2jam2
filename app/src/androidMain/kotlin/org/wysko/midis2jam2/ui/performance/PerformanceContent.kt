@@ -29,6 +29,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -244,6 +245,13 @@ fun PerformanceContent(
     }
 }
 
+/**
+ * Builds one of the buttons shown on the picture-in-picture window.
+ *
+ * Picture-in-picture itself arrived in Oreo, and every caller is already behind a version
+ * check; this says so, so that the requirement is stated where the API is actually used.
+ */
+@RequiresApi(Build.VERSION_CODES.O)
 private fun Context.pipRemoteAction(
     titleRes: Int,
     @DrawableRes iconResId: Int,

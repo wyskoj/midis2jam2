@@ -21,8 +21,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Visibility
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSet
 import org.wysko.midis2jam2.manager.DrumSetVisibilityManager.Companion.drumSetVisibilityManagerReal
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.minusAssign
 import org.wysko.midis2jam2.util.node
@@ -100,7 +98,7 @@ abstract class Instrument(
 
     private fun alwaysVisible(): Boolean {
         val alwaysShowInstruments =
-            context.configs.find<AppSettingsConfiguration>().appSettings.instrumentSettings.isAlwaysShowInstruments
+            context.config.settings.instrumentSettings.isAlwaysShowInstruments
 
         return if (this is DrumSet) {
             alwaysShowInstruments && context.drumSetVisibilityManagerReal.currentlyVisibleDrumSet == this

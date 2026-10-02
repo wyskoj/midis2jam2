@@ -23,14 +23,19 @@ import com.jme3.input.FlyByCamera
 import com.jme3.input.controls.ActionListener
 import com.jme3.math.Vector3f
 import com.jme3.renderer.Camera
+import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_MODIFIER_FAST
+import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_MODIFIER_SLOW
 import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_CAMERA_PLUGIN_FREE
-import org.wysko.midis2jam2.manager.PreferencesManager
-import org.wysko.midis2jam2.util.state
+import org.wysko.midis2jam2.manager.performanceConfig
 
 private const val DEFAULT_MOVE_SPEED = 100f
+private const val SLOW_MOVE_SPEED = 10f
+private const val FAST_MOVE_SPEED = 200f
 private const val DEFAULT_ZOOM_SPEED = -10f
 private const val INTERPOLATION_SPEED = 3.0f
 private const val NUM_CATEGORIES = 6
+/** The field of view, in degrees, the free camera is kept within. */
+internal val FOV_VALID_RANGE = 5f..150f
 
 class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), ActionListener {
     private val cameraAngleCategories = CameraAngleCategory.categories
@@ -42,30 +47,38 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
     private lateinit var dummyFlyByCamera: FlyByCamera
     private var registeredActions: Array<String> = emptyArray()
 
+    /** Which speed-modifier action is currently held/toggled on, or `null` for normal speed. */
+    private var activeSpeedModifier: String? = null
+
     override fun initialize(app: Application?) {
         (app as SimpleApplication).flyByCamera.unregisterInput()
         dummyCamera = Camera(app.camera.width, app.camera.height).apply {
             isParallelProjection = false
-            app.state<PreferencesManager>()?.getAppSettings()?.cameraSettings?.defaultFieldOfView?.let {
-                fov = it
-            }
+            fov = app.performanceConfig.settings.cameraSettings.defaultFieldOfView
         }
-        dummyFlyByCamera = ExtendedJoystickFlyByCamera(dummyCamera, onCameraInput).apply {
+        dummyFlyByCamera = ExtendedJoystickFlyByCamera(
+            dummyCamera,
+            onCameraInput,
+            app.performanceConfig.settings.controlsSettings.isGamepadEnabled,
+        ).apply {
             registerWithInput(app.inputManager)
             isDragToRotate =
-                app.state<PreferencesManager>()?.getAppSettings()?.controlsSettings?.isLockCursor?.not() ?: true
+                !app.performanceConfig.settings.controlsSettings.isLockCursor
             moveSpeed = DEFAULT_MOVE_SPEED
             zoomSpeed = DEFAULT_ZOOM_SPEED
         }
         applyCameraAngle()
         snapCamera()
-        registeredActions = cameraAngleActions + ACTION_CAMERA_PLUGIN_FREE
+        registeredActions =
+            cameraAngleActions + ACTION_CAMERA_PLUGIN_FREE + ACTION_CAMERA_MODIFIER_SLOW + ACTION_CAMERA_MODIFIER_FAST
         app.inputManager.addListener(this, *registeredActions)
     }
 
     override fun onEnable() {
         dummyCamera.location = application.camera.location
         dummyCamera.rotation = application.camera.rotation
+        activeSpeedModifier = null
+        dummyFlyByCamera.moveSpeed = DEFAULT_MOVE_SPEED
     }
 
     override fun onDisable(): Unit = Unit
@@ -80,13 +93,18 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
                         slerp(dummyCamera.rotation, tpf * INTERPOLATION_SPEED)
                         normalizeLocal()
                     }
-                    fov = fov.interpolate(dummyCamera.fov, tpf * INTERPOLATION_SPEED)
+                    fov = fov.interpolate(dummyCamera.fov, tpf * INTERPOLATION_SPEED).coerceIn(FOV_VALID_RANGE)
                 }
             }
         }
     }
 
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
+        if (name == ACTION_CAMERA_MODIFIER_SLOW || name == ACTION_CAMERA_MODIFIER_FAST) {
+            handleSpeedModifier(name, isPressed)
+            return
+        }
+
         if (!isPressed) return
 
         when (name) {
@@ -99,6 +117,32 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         }
 
         applyCameraAngle()
+    }
+
+    /**
+     * Applies [name]'s (a speed-modifier action) press/release to [dummyFlyByCamera]'s move speed.
+     *
+     * In non-sticky mode, the modifier is active only while the key is held. In sticky mode, it's
+     * toggled on release, and stays active until the same key - or the other modifier - is pressed
+     * again.
+     */
+    private fun handleSpeedModifier(name: String, isPressed: Boolean) {
+        val isSticky = application.performanceConfig.settings.controlsSettings.isSpeedModifierKeysSticky
+
+        activeSpeedModifier = when (isSticky) {
+            true -> {
+                if (isPressed) return // Only react on release
+                if (activeSpeedModifier == name) null else name
+            }
+
+            false -> if (isPressed) name else null
+        }
+
+        dummyFlyByCamera.moveSpeed = when (activeSpeedModifier) {
+            ACTION_CAMERA_MODIFIER_SLOW -> SLOW_MOVE_SPEED
+            ACTION_CAMERA_MODIFIER_FAST -> FAST_MOVE_SPEED
+            else -> DEFAULT_MOVE_SPEED
+        }
     }
 
     override fun cleanup(app: Application?) {

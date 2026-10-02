@@ -27,9 +27,7 @@ import org.wysko.midis2jam2.manager.LoadingProgressManager
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.manager.PlaybackManager.Companion.time
 import org.wysko.midis2jam2.midi.system.JwSequencer
-import org.wysko.midis2jam2.starter.configuration.Configuration
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
+import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.world.background.BackgroundController
 import org.wysko.midis2jam2.world.background.BackgroundFactory
@@ -42,17 +40,16 @@ class AndroidPerformanceManager(
     val midiFile: TimeBasedSequence,
     val onClose: () -> Unit,
     val sequencer: JwSequencer,
-    configs: Collection<Configuration>,
-) : PerformanceManager(midiFile, fileName, configs) {
+    config: PerformanceConfig,
+) : PerformanceManager(midiFile, fileName, config) {
     override val onLoadingProgress: (Float) -> Unit = {
         app.stateManager.getState(LoadingProgressManager::class.java).onLoadingProgress(it)
     }
 
     override fun initialize(stateManager: AppStateManager, app: Application) {
         super.initialize(stateManager, app)
-        val configuration = configs.find<AppSettingsConfiguration>()
         try {
-            BackgroundController.configureBackground(this@AndroidPerformanceManager, configuration, root, Platform.Android)
+            BackgroundController.configureBackground(this@AndroidPerformanceManager, config, root, Platform.Android)
         } catch (e: BackgroundImageMissingException) {
             logger().warn(e.message ?: "Not all cubemap background images have been assigned.")
             root.attachChild(BackgroundFactory.Default(app.assetManager).create())
@@ -74,7 +71,7 @@ class AndroidPerformanceManager(
             logger().warn("There was an error loading the background images.")
             root.attachChild(BackgroundFactory.Default(app.assetManager).create())
         }
-        app.camera.fov = configuration.appSettings.cameraSettings.defaultFieldOfView
+        app.camera.fov = config.settings.cameraSettings.defaultFieldOfView
     }
 
     override fun cleanup() {

@@ -22,8 +22,6 @@ import org.wysko.kmidi.midi.event.ChannelPressureEvent
 import org.wysko.kmidi.midi.event.ControlChangeEvent
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.kmidi.midi.event.NoteEvent
-import org.wysko.kmidi.midi.event.SysexEvent
 import org.wysko.kmidi.midi.event.PitchWheelChangeEvent
 import org.wysko.kmidi.midi.event.PolyphonicKeyPressureEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
@@ -81,6 +79,7 @@ class JwSequencerImpl : JwSequencer {
             this@JwSequencerImpl.device?.close()
             this.device = null
         }
+        threadPool.shutdown()
         _isOpen = false
     }
 
@@ -111,7 +110,7 @@ class JwSequencerImpl : JwSequencer {
         if (!isOpen || !isRunning) return
 
         _isRunning = false
-        job!!.join()
+        job?.takeIf { it !== Thread.currentThread() }?.join()
         pump!!.sendAllNotesOff()
     }
 
@@ -248,47 +247,7 @@ class JwSequencerImpl : JwSequencer {
         private fun tickToTime(tick: Int): Long = sequence.getTimeAtTick(tick).inWholeMilliseconds
 
         private fun dispatch(event: Event) {
-            if (event is MidiEvent) {
-                when (event) {
-                    is NoteEvent.NoteOff -> device?.sendNoteOffMessage(event.channel.toInt(), event.note.toInt())
-
-                    is NoteEvent.NoteOn -> device?.sendNoteOnMessage(
-                        event.channel.toInt(),
-                        event.note.toInt(),
-                        event.velocity.toInt()
-                    )
-
-                    is ChannelPressureEvent -> device?.sendChannelPressureMessage(
-                        event.channel.toInt(),
-                        event.pressure.toInt()
-                    )
-
-                    is ControlChangeEvent -> device?.sendControlChangeMessage(
-                        event.channel.toInt(),
-                        event.controller.toInt(),
-                        event.value.toInt()
-                    )
-
-                    is PitchWheelChangeEvent -> device?.sendPitchBendMessage(
-                        event.channel.toInt(),
-                        event.value.toInt()
-                    )
-
-                    is PolyphonicKeyPressureEvent -> device?.sendPolyphonicPressureMessage(
-                        event.channel.toInt(),
-                        event.note.toInt(),
-                        event.pressure.toInt()
-                    )
-
-                    is ProgramEvent -> device?.sendProgramChangeMessage(
-                        event.channel.toInt(),
-                        event.program.toInt()
-                    )
-                }
-            }
-            if (event is SysexEvent) {
-                sendData(event.data)
-            }
+            device?.dispatch(event)
         }
     }
 }

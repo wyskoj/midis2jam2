@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.domain
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.prefs.Preferences
 
 class PlaybackHistoryStore(
     private val playbackHistoryPersistor: PlaybackHistoryPersistor,
@@ -29,13 +30,17 @@ class PlaybackHistoryStore(
 
     fun addPlayback(filePath: String, title: String) {
         val existingWithoutFile = _historyEntries.value.filterNot { it.filePath == filePath }
-        val updated = listOf(
+        var updated = listOf(
             PlaybackHistoryEntry(
                 filePath = filePath,
                 title = title,
                 playedAtEpochMillis = System.currentTimeMillis(),
             )
         ) + existingWithoutFile
+
+        while (dataStringTooLong(playbackHistoryPersistor.getDataString(updated))) {
+            updated = updated.dropLast(1)
+        }
 
         playbackHistoryPersistor.save(updated)
         _historyEntries.value = playbackHistoryPersistor.load()
@@ -51,4 +56,6 @@ class PlaybackHistoryStore(
         playbackHistoryPersistor.save(emptyList())
         _historyEntries.value = emptyList()
     }
+
+    private fun dataStringTooLong(string: String): Boolean = string.length > Preferences.MAX_VALUE_LENGTH
 }

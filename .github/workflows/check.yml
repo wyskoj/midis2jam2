@@ -1,0 +1,43 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    name: Check on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # check runs the tests and Android lint. The suite is built to need no display, no
+      # audio device and no MIDI hardware: the performance tests boot jMonkeyEngine on its
+      # headless context.
+      - name: Run checks
+        run: ./gradlew check --no-daemon --stacktrace
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ matrix.os }}
+          path: |
+            app/build/reports/
+            app/build/test-results/
+          retention-days: 14

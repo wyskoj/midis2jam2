@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.domain
 
 import org.koin.mp.KoinPlatformTools
+import org.wysko.midis2jam2.util.logger
 
 class Jme3ExceptionHandler(
     private val onUncaught: () -> Unit = {},
@@ -42,12 +43,12 @@ class Jme3ExceptionHandler(
             for (thread in threads) {
                 if (thread.name == "jME3 Main") {
                     thread.uncaughtExceptionHandler = Jme3ExceptionHandler(onUncaught)
-                    println("Exception handler set for jME3 Main thread")
+                    logger().debug("Exception handler set for jME3 Main thread")
                     return
                 }
             }
 
-            println("jME3 Main thread not found.")
+            logger().warn("jME3 Main thread not found.")
         }
     }
 }

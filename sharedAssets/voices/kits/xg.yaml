@@ -1,0 +1,159 @@
+# Yamaha XG drum kits.
+#
+# Transcribed from XG Specifications v1.32, Table 2 (XG Drum Map). `program` is 1-based, as the specification
+# prints it. Drum kits are in bank 127, SFX kits in bank 126. A rhythm channel on bank 0 is looked up as bank 127.
+# XG's electronic kits keep the reverse cymbal on note 28 rather than 52, so they're drawn as the analog kit.
+# The Symphony Kit keeps its drums at the General MIDI positions (no timpani), so it's drawn as a standard kit.
+
+# Drum kits, bank 127 (XG Specifications v1.32, Drum Map, pages 63-71)
+- program: 1
+  msb: 127
+  name: "Standard Kit"
+  look: Standard
+- program: 2
+  msb: 127
+  name: "Standard Kit 2"
+  look: Standard
+- program: 3
+  msb: 127
+  name: "Dry Kit"
+  look: Standard
+- program: 4
+  msb: 127
+  name: "Bright Kit"
+  look: Standard
+- program: 5
+  msb: 127
+  name: "Skim Kit"
+  look: Standard
+- program: 6
+  msb: 127
+  name: "Slim Kit"
+  look: Standard
+- program: 7
+  msb: 127
+  name: "Rogue Kit"
+  look: Standard
+- program: 8
+  msb: 127
+  name: "Hob Kit"
+  look: Standard
+- program: 9
+  msb: 127
+  name: "Room Kit"
+  look: Room
+- program: 10
+  msb: 127
+  name: "Dark Room Kit"
+  look: Room
+- program: 17
+  msb: 127
+  name: "Rock Kit"
+  look: Power
+- program: 18
+  msb: 127
+  name: "Rock Kit 2"
+  look: Power
+- program: 25
+  msb: 127
+  name: "Electro Kit"
+  look: Analog
+- program: 26
+  msb: 127
+  name: "Analog Kit"
+  look: Analog
+- program: 27
+  msb: 127
+  name: "Analog Kit 2"
+  look: Analog
+- program: 28
+  msb: 127
+  name: "Dance Kit"
+  look: Analog
+- program: 29
+  msb: 127
+  name: "Hip Hop Kit"
+  look: Analog
+- program: 30
+  msb: 127
+  name: "Jungle Kit"
+  look: Analog
+- program: 31
+  msb: 127
+  name: "Apogee Kit"
+  look: Analog
+- program: 32
+  msb: 127
+  name: "Perigee Kit"
+  look: Analog
+- program: 33
+  msb: 127
+  name: "Jazz Kit"
+  look: Jazz
+- program: 34
+  msb: 127
+  name: "Jazz Kit 2"
+  look: Jazz
+- program: 41
+  msb: 127
+  name: "Brush Kit"
+  look: Brush
+- program: 42
+  msb: 127
+  name: "Brush Kit2"
+  look: Brush
+- program: 49
+  msb: 127
+  name: "Symphony Kit"
+  look: Standard
+- program: 65
+  msb: 127
+  name: "Tramp Kit"
+  look: Analog
+- program: 66
+  msb: 127
+  name: "Amber Kit"
+  look: Analog
+- program: 67
+  msb: 127
+  name: "Coffin Kit"
+  look: Analog
+- program: 127
+  msb: 127
+  name: "Standard Kit MU100 Native"
+  look: Standard
+- program: 128
+  msb: 127
+  name: "Standard Kit MU Basic"
+  look: Standard
+
+# SFX and other kits, bank 126 (pages 71-73). These lay their notes out unlike the General MIDI kits,
+# and nothing draws them yet.
+- program: 1
+  msb: 126
+  name: "SFX Kit 1"
+  look: None
+- program: 2
+  msb: 126
+  name: "SFX Kit 2"
+  look: None
+- program: 17
+  msb: 126
+  name: "Techno Kit K/S"
+  look: None
+- program: 18
+  msb: 126
+  name: "Techno Kit Hi"
+  look: None
+- program: 19
+  msb: 126
+  name: "Techno Kit Lo"
+  look: None
+- program: 33
+  msb: 126
+  name: "Sakura Kit"
+  look: None
+- program: 34
+  msb: 126
+  name: "Small Latin Kit"
+  look: None

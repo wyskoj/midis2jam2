@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppSettings(
+    val version: Int = AppSettingsCodec.CURRENT_VERSION,
     val generalSettings: GeneralSettings = GeneralSettings(),
     val graphicsSettings: GraphicsSettings = GraphicsSettings(),
     val backgroundSettings: BackgroundSettings = BackgroundSettings(),
@@ -32,9 +33,9 @@ data class AppSettings(
 ) {
     @Serializable
     data class GeneralSettings(
-        var theme: AppTheme = AppTheme.SYSTEM_DEFAULT,
-        var locale: String = "en",
-        var isShowDebugInfo: Boolean = false,
+        val theme: AppTheme = AppTheme.SYSTEM_DEFAULT,
+        val locale: String = "en",
+        val isShowDebugInfo: Boolean = false,
     )
 
     @Serializable
@@ -42,19 +43,38 @@ data class AppSettings(
         val resolutionSettings: ResolutionSettings = ResolutionSettings(),
         val shadowsSettings: ShadowsSettings = ShadowsSettings(),
         val antiAliasingSettings: AntiAliasingSettings = AntiAliasingSettings(),
-        var isFullscreen: Boolean = false,
+        val windowMode: WindowMode = WindowMode.Windowed,
     ) {
+        /** How the performance window occupies the screen. Desktop only; Android is always full-screen. */
+        enum class WindowMode {
+            /** A resizable-or-fixed window sized per [ResolutionSettings]. */
+            Windowed,
+
+            /**
+             * An undecorated window sized to the screen, so switching away from it never changes the display mode.
+             *
+             * Windows-only: it's the only platform where this reliably gets the taskbar out of the way the same
+             * way real fullscreen does. Elsewhere, this setting is treated as [Fullscreen] instead (see
+             * `applyResolution` in `ApplicationHelpers.kt` and `applyBorderlessWindow` in
+             * `ApplicationHelpers.desktop.kt`).
+             */
+            BorderlessFullscreen,
+
+            /** A real display-mode fullscreen, exclusive to this application. */
+            Fullscreen,
+        }
+
         @Serializable
         data class ResolutionSettings(
-            var isUseDefaultResolution: Boolean = true,
-            var resolutionWidth: Int = 640,
-            var resolutionHeight: Int = 480,
+            val isUseDefaultResolution: Boolean = true,
+            val resolutionWidth: Int = 640,
+            val resolutionHeight: Int = 480,
         )
 
         @Serializable
         data class ShadowsSettings(
-            var isUseShadows: Boolean = true,
-            var shadowsQuality: ShadowsQuality = ShadowsQuality.Medium,
+            val isUseShadows: Boolean = true,
+            val shadowsQuality: ShadowsQuality = ShadowsQuality.Medium,
         ) {
             enum class ShadowsQuality {
                 Fake, Low, Medium, High, Android
@@ -63,8 +83,8 @@ data class AppSettings(
 
         @Serializable
         data class AntiAliasingSettings(
-            var isUseAntiAliasing: Boolean = false,
-            var antiAliasingQuality: AntiAliasingQuality = AntiAliasingQuality.Low,
+            val isUseAntiAliasing: Boolean = false,
+            val antiAliasingQuality: AntiAliasingQuality = AntiAliasingQuality.Low,
         ) {
             enum class AntiAliasingQuality {
                 Low, Medium, High
@@ -74,9 +94,9 @@ data class AppSettings(
 
     @Serializable
     data class BackgroundSettings(
-        var type: BackgroundType = BackgroundType.Default,
-        var cubeMapTextures: MutableList<String> = MutableList(6) { "" },
-        var color: Int = -16777216, // Black
+        val type: BackgroundType = BackgroundType.Default,
+        val cubeMapTextures: List<String> = MutableList(6) { "" },
+        val color: Int = -16777216, // Black
     ) {
         enum class BackgroundType {
             Default, CubeMap, Color
@@ -85,9 +105,10 @@ data class AppSettings(
 
     @Serializable
     data class ControlsSettings(
-        var isLockCursor: Boolean = false,
-        var isSpeedModifierKeysSticky: Boolean = false,
-        var isDisableTouchInput: Boolean = false,
+        val isLockCursor: Boolean = false,
+        val isSpeedModifierKeysSticky: Boolean = false,
+        val isDisableTouchInput: Boolean = false,
+        val isGamepadEnabled: Boolean = false,
     )
 
     @Serializable
@@ -98,8 +119,8 @@ data class AppSettings(
     ) {
         @Serializable
         data class MidiSpecificationResetSettings(
-            var isSendSpecificationResetMessage: Boolean = false,
-            var midiSpecification: MidiSpecification = MidiSpecification.GeneralMidi,
+            val isSendSpecificationResetMessage: Boolean = false,
+            val midiSpecification: MidiSpecification = MidiSpecification.GeneralMidi,
         ) {
             enum class MidiSpecification(val displayName: String) {
                 GeneralMidi("General MIDI"),
@@ -110,38 +131,38 @@ data class AppSettings(
 
         @Serializable
         data class SoundbanksSettings(
-            var soundbanks: MutableList<String> = mutableListOf(),
+            val soundbanks: List<String> = emptyList(),
         )
 
         @Serializable
         data class SynthesizerSettings(
-            var isUseChorus: Boolean = true,
-            var isUseReverb: Boolean = true,
+            val isUseChorus: Boolean = true,
+            val isUseReverb: Boolean = true,
         )
     }
 
     @Serializable
     data class OnScreenElementsSettings(
         val lyricsSettings: LyricsSettings = LyricsSettings(),
-        var isShowHeadsUpDisplay: Boolean = true,
+        val isShowHeadsUpDisplay: Boolean = true,
     ) {
         @Serializable
         data class LyricsSettings(
-            var isShowLyrics: Boolean = true,
-            var lyricsSize: Double = 1.5,
+            val isShowLyrics: Boolean = true,
+            val lyricsSize: Double = 1.5,
         )
     }
 
     @Serializable
     data class CameraSettings(
-        var isStartAutocamWithSong: Boolean = false,
-        var isSmoothFreecam: Boolean = true,
-        var isClassicAutoCam: Boolean = false,
-        var defaultFieldOfView: Float = 45f,
+        val isStartAutocamWithSong: Boolean = false,
+        val isSmoothFreecam: Boolean = true,
+        val isClassicAutoCam: Boolean = false,
+        val defaultFieldOfView: Float = 45f,
     )
 
     @Serializable
     data class InstrumentSettings(
-        var isAlwaysShowInstruments: Boolean = false,
+        val isAlwaysShowInstruments: Boolean = false,
     )
 }

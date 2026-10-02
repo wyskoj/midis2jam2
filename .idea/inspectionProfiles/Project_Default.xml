@@ -38,12 +38,17 @@
     <inspection_tool class="IncompleteDestructuring" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JavaIoSerializableObjectMustHaveReadResolve" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="KotlinLoggerInitializedWithForeignClass" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MultiplatformPreviewAnnotationInFunctionWithParameters" enabled="true" level="ERROR" enabled_by_default="true">
+      <option name="composableFile" value="true" />
+    </inspection_tool>
+    <inspection_tool class="MultiplatformPreviewMultipleParameterProviders" enabled="true" level="ERROR" enabled_by_default="true">
+      <option name="composableFile" value="true" />
+    </inspection_tool>
     <inspection_tool class="ProhibitJvmOverloadsOnConstructorsOfAnnotationClassesMigration" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ProhibitRepeatedUseSiteTargetAnnotationsMigration" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ProhibitTypeParametersForLocalVariablesMigration" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ProhibitUseSiteTargetAnnotationsOnSuperTypesMigration" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PublicApiImplicitType" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="RedundantInnerClassModifier" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="RedundantLabelMigration" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="RedundantNotNullExtensionReceiverOfInline" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="Reformat" enabled="true" level="WEAK WARNING" enabled_by_default="true" />

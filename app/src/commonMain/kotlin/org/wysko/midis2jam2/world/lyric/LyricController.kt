@@ -24,10 +24,9 @@ import com.jme3.math.ColorRGBA
 import org.wysko.kmidi.midi.event.MetaEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
 import org.wysko.midis2jam2.util.NumberSmoother
 import org.wysko.midis2jam2.util.plusAssign
+import org.wysko.midis2jam2.world.font.resolveBitmapFont
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -40,13 +39,40 @@ import kotlin.time.Duration.Companion.seconds
  */
 class LyricController(private val context: PerformanceManager, private val events: List<MetaEvent.Lyric>) {
 
-    private val font = context.app.assetManager.loadFont("Assets/Fonts/Inter.fnt")
-
     private val words = events.filter { !separators.contains(it.text) }
     private val lines = events.partitionByNewLines()
 
-    private var currentWord: MetaEvent.Lyric? = null
-    private var currentLine: LyricLine? = null
+    private val font = resolveBitmapFont(
+        context.app.assetManager,
+        context.app.assetManager.loadFont("Assets/Fonts/Inter.fnt"),
+        lines.flatMapTo(mutableSetOf()) { it.renderString().toSet() },
+        basePixelSize = LYRICS_FONT_BASE_SIZE,
+    )
+
+    /** The syllable that has most recently elapsed, or null before the first one. */
+    internal var currentWord: MetaEvent.Lyric? = null
+        private set
+
+    /** The line currently being sung, or null before the first one. */
+    internal var currentLine: LyricLine? = null
+        private set
+
+    /** Every line of this file's lyrics, in order. */
+    internal val allLines: List<LyricLine> get() = lines
+
+    /** Whether the lyric display is currently showing anything. */
+    internal val isShowing: Boolean get() = isVisible
+
+    /**
+     * How many characters of [currentLine] have already been sung.
+     *
+     * The display colours this prefix white and leaves the rest gray, so this is the number
+     * the on-screen highlight is driven from.
+     */
+    internal val elapsedCharactersOfCurrentLine: Int
+        get() = currentLine?.take((currentLine?.indexOf(currentWord) ?: -1) + 1)
+            ?.sumOf { it.text.display().length }
+            ?: 0
 
     private val wordCollector = EventCollector(context, words, onSeek = { currentWord = it.prev() })
     private val lineCollector = LyricLineCollector(context, lines, onSeek = {
@@ -78,10 +104,10 @@ class LyricController(private val context: PerformanceManager, private val event
                 )
             )
             val lyricsSize = context
-                .configs.find<AppSettingsConfiguration>().appSettings
+                .config.settings
                 .onScreenElementsSettings.lyricsSettings.lyricsSize
 
-            size = (64 * lyricsSize).toFloat()
+            size = (LYRICS_FONT_BASE_SIZE * lyricsSize).toFloat()
             color = ColorRGBA.DarkGray
             text = it.renderString()
             alignment = BitmapFont.Align.Center
@@ -180,18 +206,21 @@ class LyricController(private val context: PerformanceManager, private val event
     }
 }
 
+/** The base pixel size `Assets/Fonts/Inter.fnt` (and any dynamic atlas standing in for it) is rendered at. */
+private const val LYRICS_FONT_BASE_SIZE = 64
+
 private val separators = listOf("\n", "\r", "\r\n")
 
-private fun String.display() = clean().replace("/", "").replace("\\", "").removePrefix("<").replace("^", " ")
+internal fun String.display() = clean().replace("/", "").replace("\\", "").removePrefix("<").replace("^", " ")
 
-private fun String.clean() = when {
+internal fun String.clean() = when {
     this.trim().startsWith("\"") && this.trim().endsWith("\"") -> this.trim().removeSurrounding("\"")
     else -> this
 }
 
-private fun List<MetaEvent.Lyric>.renderString(): String = joinToString("") { it.text.display() }
+internal fun List<MetaEvent.Lyric>.renderString(): String = joinToString("") { it.text.display() }
 
-private fun List<MetaEvent.Lyric>.partitionByNewLines(): List<LyricLine> {
+internal fun List<MetaEvent.Lyric>.partitionByNewLines(): List<LyricLine> {
     val result = mutableListOf<LyricLine>()
     var line = mutableListOf<MetaEvent.Lyric>()
 

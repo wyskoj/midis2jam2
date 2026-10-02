@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Lingua</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Schermo intero</string>
-    <string name="settings_graphics_fullscreen_description">Utilizza l\'intero schermo</string>
+    <string name="settings_graphics_window_mode">Modalità finestra</string>
+    <string name="settings_graphics_window_mode_description">Come l'esecuzione riempie lo schermo</string>
+    <string name="settings_graphics_window_mode_windowed">Finestra</string>
+    <string name="settings_graphics_window_mode_borderless">Schermo intero senza bordi</string>
+    <string name="settings_graphics_window_mode_fullscreen">Schermo intero</string>
     <string name="settings_graphics_resolution">Risoluzione</string>
     <string name="settings_graphics_resolution_fullscreen">La risoluzione corrisponde al monitor quando lo schermo intero è abilitato</string>
     <string name="settings_graphics_resolution_default">Usa risoluzione predefinita</string>
@@ -150,6 +153,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Tasti modificatori velocità sticky</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Premi Ctrl e Maiusc per cambiare la velocità della freecam</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Tieni premuti Ctrl e Maiusc per cambiare la velocità della freecam</string>
+    <string name="settings_controls_gamepad_enabled">Input gamepad</string>
+    <string name="settings_controls_gamepad_enabled_description">Consenti a un gamepad collegato di controllare la freecam</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Testi</string>
@@ -234,5 +239,39 @@
     <string name="history_file_missing_title">Brano non disponibile</string>
     <string name="history_unknown_song">Brano sconosciuto</string>
     <string name="history_clear_invalid_song">Cancella</string>
+
+    <!-- Record -->
+    <string name="tab_record">Registra</string>
+    <string name="record_start">Registra</string>
+    <string name="record_output">Salva come</string>
+    <string name="record_resolution">Risoluzione</string>
+    <string name="record_frame_rate">Frequenza fotogrammi</string>
+    <string name="record_quality">Qualità</string>
+    <string name="record_quality_low">Bassa</string>
+    <string name="record_quality_medium">Media</string>
+    <string name="record_quality_high">Alta</string>
+    <string name="record_quality_maximum">Massima</string>
+    <string name="record_preparing">Preparazione…</string>
+    <string name="record_recording">Registrazione…</string>
+    <string name="record_open_video">Apri video</string>
+    <string name="record_show_in_folder">Mostra nella cartella</string>
+    <string name="record_cancelled">La registrazione è stata annullata.</string>
+    <string name="record_audio_note">Generato dal sintetizzatore integrato con questo banco di suoni.</string>
+    <string name="record_window_note">Durante la registrazione si apre una finestra di anteprima. Chiuderla annulla la registrazione.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Audio</string>
+    <string name="record_empty_title">Registra un'esibizione</string>
+    <string name="record_empty_body">Trasforma un file MIDI in un video, con l'audio.</string>
+    <string name="record_choose_file">Scegli file MIDI</string>
+    <string name="record_drop_hint">oppure trascinalo qui</string>
+    <string name="record_change_file">Cambia</string>
+    <string name="record_unreadable">Questo file non può essere letto come MIDI.</string>
+    <string name="record_in_folder">in %1$s</string>
+    <string name="record_quality_low_detail">File più piccolo</string>
+    <string name="record_quality_medium_detail">Bilanciata</string>
+    <string name="record_quality_high_detail">Immagine migliore</string>
+    <string name="record_saved">Salvato</string>
+    <string name="record_failed_title">Registrazione non riuscita</string>
+    <string name="record_time_left">circa %1$s rimanenti</string>
 </resources>
 

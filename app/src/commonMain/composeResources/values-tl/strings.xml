@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Wika</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Fullscreen</string>
-    <string name="settings_graphics_fullscreen_description">Gamitin ang buong screen</string>
+    <string name="settings_graphics_window_mode">Window mode</string>
+    <string name="settings_graphics_window_mode_description">Paano pupunuin ng pagtatanghal ang screen</string>
+    <string name="settings_graphics_window_mode_windowed">Windowed</string>
+    <string name="settings_graphics_window_mode_borderless">Borderless na fullscreen</string>
+    <string name="settings_graphics_window_mode_fullscreen">Fullscreen</string>
     <string name="settings_graphics_resolution">Resolution</string>
     <string name="settings_graphics_resolution_fullscreen">Tumutugma ang resolution sa monitor kapag pinagana ang fullscreen</string>
     <string name="settings_graphics_resolution_default">Gamitin ang default na resolution</string>
@@ -150,6 +153,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Sticky speed-modifier keys</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Pindutin ang Ctrl at Shift para baguhin ang freecam speed</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Hawakan ang Ctrl at Shift para baguhin ang freecam speed</string>
+    <string name="settings_controls_gamepad_enabled">Gamepad input</string>
+    <string name="settings_controls_gamepad_enabled_description">Payagan ang nakakonektang gamepad na kontrolin ang freecam</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Mga Lyrics</string>
@@ -234,5 +239,39 @@
     <string name="history_file_missing_title">Hindi available ang kanta</string>
     <string name="history_unknown_song">Hindi kilalang kanta</string>
     <string name="history_clear_invalid_song">I-clear</string>
+
+    <!-- Record -->
+    <string name="tab_record">I-record</string>
+    <string name="record_start">I-record</string>
+    <string name="record_output">I-save bilang</string>
+    <string name="record_resolution">Resolusyon</string>
+    <string name="record_frame_rate">Frame rate</string>
+    <string name="record_quality">Kalidad</string>
+    <string name="record_quality_low">Mababa</string>
+    <string name="record_quality_medium">Katamtaman</string>
+    <string name="record_quality_high">Mataas</string>
+    <string name="record_quality_maximum">Pinakamataas</string>
+    <string name="record_preparing">Naghahanda…</string>
+    <string name="record_recording">Nagre-record…</string>
+    <string name="record_open_video">Buksan ang video</string>
+    <string name="record_show_in_folder">Ipakita sa folder</string>
+    <string name="record_cancelled">Kinansela ang pagre-record.</string>
+    <string name="record_audio_note">Ginagawa ng built-in na synthesizer gamit ang soundbank na ito.</string>
+    <string name="record_window_note">May bubukas na preview window habang nagre-record. Kapag isinara ito, makakansela ang pagre-record.</string>
+    <string name="record_section_video">Video</string>
+    <string name="record_section_audio">Audio</string>
+    <string name="record_empty_title">Mag-record ng performance</string>
+    <string name="record_empty_body">Gawing video na may tunog ang isang MIDI file.</string>
+    <string name="record_choose_file">Pumili ng MIDI file</string>
+    <string name="record_drop_hint">o i-drop dito</string>
+    <string name="record_change_file">Palitan</string>
+    <string name="record_unreadable">Hindi mabasa ang file na ito bilang MIDI.</string>
+    <string name="record_in_folder">sa %1$s</string>
+    <string name="record_quality_low_detail">Pinakamaliit na file</string>
+    <string name="record_quality_medium_detail">Balanse</string>
+    <string name="record_quality_high_detail">Pinakamaganda</string>
+    <string name="record_saved">Na-save</string>
+    <string name="record_failed_title">Nabigo ang pagre-record</string>
+    <string name="record_time_left">mga %1$s na lang</string>
 </resources>
 

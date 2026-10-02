@@ -17,15 +17,18 @@
 
 package org.wysko.midis2jam2.starter
 
+import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.jme3.app.SimpleApplication
 import com.jme3.system.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.starter.configuration.*
 
-internal fun SimpleApplication.applyConfigurations(configurations: Collection<Configuration>) {
+internal fun SimpleApplication.applyConfigurations(config: PerformanceConfig) {
     setSettings(
         AppSettings(false).apply {
             copyFrom(DEFAULT_JME_SETTINGS)
-            applyResolution(configurations)
+            applyResolution(config)
+            setUseJoysticks(config.settings.controlsSettings.isGamepadEnabled)
         }
     )
     setDisplayStatView(false)
@@ -34,10 +37,14 @@ internal fun SimpleApplication.applyConfigurations(configurations: Collection<Co
     isShowSettings = false
 }
 
-private fun AppSettings.applyResolution(configurations: Collection<Configuration>) {
+private fun AppSettings.applyResolution(config: PerformanceConfig) {
     val measuredResolution = screenResolution()
-    when {
-        configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings.isFullscreen -> {
+    val windowMode = config.settings.graphicsSettings.windowMode
+        // Borderless fullscreen is Windows-only (see applyBorderlessWindow); fall back to real fullscreen elsewhere.
+        .let { if (it == WindowMode.BorderlessFullscreen && !isWindows()) WindowMode.Fullscreen else it }
+
+    when (windowMode) {
+        WindowMode.Fullscreen -> {
             isFullscreen = true
             if (measuredResolution != null) {
                 this@applyResolution.width = measuredResolution.width
@@ -45,9 +52,19 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
             }
         }
 
-        else -> {
+        WindowMode.BorderlessFullscreen -> {
+            // A real display-mode switch is never requested; the window is merely undecorated
+            // and sized to the screen (see applyBorderlessWindow on desktop).
             isFullscreen = false
-            with(configurations.find<Configuration.AppSettingsConfiguration>().appSettings.graphicsSettings) {
+            if (measuredResolution != null) {
+                this@applyResolution.width = measuredResolution.width
+                this@applyResolution.height = measuredResolution.height
+            }
+        }
+
+        WindowMode.Windowed -> {
+            isFullscreen = false
+            with(config.settings.graphicsSettings) {
                 when (resolutionSettings.isUseDefaultResolution) {
                     true -> {
                         measuredResolution?.let { screenRes ->
@@ -68,11 +85,11 @@ private fun AppSettings.applyResolution(configurations: Collection<Configuration
     }
 }
 
-internal fun screenResolution(): Resolution.CustomResolution? = getScreenResolution()
+internal fun screenResolution(): Resolution? = getScreenResolution()
 
-internal fun preferredResolution(screenResolution: Resolution.CustomResolution): Resolution.CustomResolution =
+internal fun preferredResolution(screenResolution: Resolution): Resolution =
     with(screenResolution) {
-        Resolution.CustomResolution((width * 0.95).toInt(), (height * 0.85).toInt())
+        Resolution((width * 0.95).toInt(), (height * 0.85).toInt())
     }
 
 private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
@@ -85,9 +102,8 @@ private val DEFAULT_JME_SETTINGS = AppSettings(true).apply {
     title = "midis2jam2"
     audioRenderer = null
     centerWindow = true
-    setUseJoysticks(true)
 }
 
 internal expect fun AppSettings.applyIcons()
 internal expect fun AppSettings.applyScreenFrequency()
-internal expect fun getScreenResolution(): Resolution.CustomResolution?
+internal expect fun getScreenResolution(): Resolution?

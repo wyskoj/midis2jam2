@@ -22,12 +22,10 @@ import com.jme3.app.SimpleApplication
 import com.jme3.app.state.AbstractAppState
 import com.jme3.app.state.BaseAppState
 import org.wysko.midis2jam2.manager.PerformanceManager
-import org.wysko.midis2jam2.starter.configuration.Configuration.AppSettingsConfiguration
-import org.wysko.midis2jam2.starter.configuration.find
 
 fun Color.tintEnabled(enabled: Boolean): Color = if (enabled) this else this.copy(alpha = 0.38f)
 
 val PerformanceManager.isFakeShadows: Boolean
-    get() = !(configs.find<AppSettingsConfiguration>().appSettings.graphicsSettings.shadowsSettings.isUseShadows)
+    get() = !(config.settings.graphicsSettings.shadowsSettings.isUseShadows)
 
 fun String.digitsOnly(): String = this.filter { it.isDigit() }

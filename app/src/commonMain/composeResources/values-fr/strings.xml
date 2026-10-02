@@ -84,8 +84,11 @@
     <string name="settings_general_locale">Langue</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Plein écran</string>
-    <string name="settings_graphics_fullscreen_description">Utiliser tout l'écran</string>
+    <string name="settings_graphics_window_mode">Mode de fenêtre</string>
+    <string name="settings_graphics_window_mode_description">Comment la performance remplit l'écran</string>
+    <string name="settings_graphics_window_mode_windowed">Fenêtré</string>
+    <string name="settings_graphics_window_mode_borderless">Plein écran sans bordure</string>
+    <string name="settings_graphics_window_mode_fullscreen">Plein écran</string>
     <string name="settings_graphics_resolution">Résolution</string>
     <string name="settings_graphics_resolution_fullscreen">La résolution correspond à celle du moniteur en mode plein écran</string>
     <string name="settings_graphics_resolution_default">Utiliser la résolution par défaut</string>
@@ -133,6 +136,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Touche de modification de vitesse persistante</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Appuyez sur Ctrl et Maj pour changer la vitesse de la caméra libre</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Maintenez Ctrl et Maj enfoncés pour changer la vitesse de la caméra libre</string>
+    <string name="settings_controls_gamepad_enabled">Entrée manette</string>
+    <string name="settings_controls_gamepad_enabled_description">Permet à une manette connectée de contrôler la caméra libre</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Paroles</string>
@@ -217,5 +222,39 @@
     <string name="history_file_missing_title">Morceau indisponible</string>
     <string name="history_unknown_song">Morceau inconnu</string>
     <string name="history_clear_invalid_song">Effacer</string>
+
+    <!-- Record -->
+    <string name="tab_record">Enregistrer</string>
+    <string name="record_start">Enregistrer</string>
+    <string name="record_output">Enregistrer sous</string>
+    <string name="record_resolution">Résolution</string>
+    <string name="record_frame_rate">Fréquence d'images</string>
+    <string name="record_quality">Qualité</string>
+    <string name="record_quality_low">Basse</string>
+    <string name="record_quality_medium">Moyenne</string>
+    <string name="record_quality_high">Haute</string>
+    <string name="record_quality_maximum">Maximale</string>
+    <string name="record_preparing">Préparation…</string>
+    <string name="record_recording">Enregistrement…</string>
+    <string name="record_open_video">Ouvrir la vidéo</string>
+    <string name="record_show_in_folder">Afficher dans le dossier</string>
+    <string name="record_cancelled">L'enregistrement a été annulé.</string>
+    <string name="record_audio_note">Produit par le synthétiseur intégré avec cette banque de sons.</string>
+    <string name="record_window_note">Une fenêtre d'aperçu s'ouvre pendant l'enregistrement. La fermer l'annule.</string>
+    <string name="record_section_video">Vidéo</string>
+    <string name="record_section_audio">Audio</string>
+    <string name="record_empty_title">Enregistrer une performance</string>
+    <string name="record_empty_body">Transformez un fichier MIDI en vidéo, avec le son.</string>
+    <string name="record_choose_file">Choisir un fichier MIDI</string>
+    <string name="record_drop_hint">ou déposez-en un ici</string>
+    <string name="record_change_file">Modifier</string>
+    <string name="record_unreadable">Ce fichier ne peut pas être lu comme un fichier MIDI.</string>
+    <string name="record_in_folder">dans %1$s</string>
+    <string name="record_quality_low_detail">Fichier le plus léger</string>
+    <string name="record_quality_medium_detail">Équilibrée</string>
+    <string name="record_quality_high_detail">Meilleure image</string>
+    <string name="record_saved">Enregistré</string>
+    <string name="record_failed_title">Échec de l'enregistrement</string>
+    <string name="record_time_left">environ %1$s restantes</string>
 </resources>
 

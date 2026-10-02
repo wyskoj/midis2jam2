@@ -22,6 +22,9 @@ import org.wysko.midis2jam2.starter.configuration.Resolution
 import org.wysko.midis2jam2.util.isMacOs
 import java.awt.GraphicsEnvironment
 import java.lang.invoke.MethodHandles
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.IntBuffer
 import javax.imageio.ImageIO
 
 internal actual fun AppSettings.applyIcons() {
@@ -38,10 +41,93 @@ internal actual fun AppSettings.applyScreenFrequency() {
     }
 }
 
-internal actual fun getScreenResolution(): Resolution.CustomResolution? =
+internal actual fun getScreenResolution(): Resolution? =
     with(GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.displayMode) {
-        Resolution.CustomResolution(width, height)
+        Resolution(width, height)
     }
+
+/**
+ * Strips the window decorations (title bar, borders) from the running application's window and snaps
+ * it to exactly cover the primary monitor, so it behaves like a borderless-fullscreen window: no real
+ * display-mode switch happens, so Alt-Tab and other monitors are unaffected.
+ *
+ * The exact-monitor-bounds part matters beyond cosmetics: Windows only auto-hides the taskbar behind a
+ * window (the way exclusive-fullscreen games get it out of the way) when that window's rectangle
+ * precisely matches the monitor's own bounds. jME sizes the window from AWT's idea of the resolution
+ * (see [getScreenResolution]), which does not reliably agree with GLFW's, so any mismatch leaves a
+ * sliver of the taskbar visible. Re-querying and re-applying the bounds through GLFW itself, right
+ * before removing the decorations, avoids that.
+ *
+ * jME's [com.jme3.system.AppSettings] has no borderless-window option at all, so this reaches past it
+ * into GLFW directly, the same way [installGlfwJoystickCallbackWorkaround] does. It's implemented via
+ * reflection so that macOS builds (which use the LWJGL2 backend and have neither `LwjglWindow` nor GLFW
+ * on the classpath) still compile.
+ *
+ * Callers only invoke this on Windows: it's the only platform where a borderless window reliably gets
+ * the same "taskbar tucks itself away" treatment as a real fullscreen window (see the class-level note
+ * in [org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode.BorderlessFullscreen]).
+ * On Wayland, `glfwSetWindowPos`/`glfwSetWindowSize` are no-ops by design (clients can't place
+ * themselves), and no Linux desktop environment hides its panel just because a window's bounds match
+ * the monitor's the way Windows does. macOS never reaches this function at all — it falls back to
+ * exclusive fullscreen before this is called.
+ */
+internal fun applyBorderlessWindow(context: Any) {
+    try {
+        val lwjglWindowClass = Class.forName("com.jme3.system.lwjgl.LwjglWindow")
+        if (!lwjglWindowClass.isInstance(context)) return
+
+        val windowHandle = lwjglWindowClass.getMethod("getWindowHandle").invoke(context) as Long
+        val glfwClass = Class.forName("org.lwjgl.glfw.GLFW")
+
+        val monitor = glfwClass.getMethod("glfwGetPrimaryMonitor").invoke(null) as Long
+
+        val monitorX = directIntBuffer()
+        val monitorY = directIntBuffer()
+        glfwClass.getMethod(
+            "glfwGetMonitorPos",
+            Long::class.javaPrimitiveType,
+            IntBuffer::class.java,
+            IntBuffer::class.java,
+        ).invoke(null, monitor, monitorX, monitorY)
+
+        val videoMode = glfwClass.getMethod("glfwGetVideoMode", Long::class.javaPrimitiveType).invoke(null, monitor)
+            ?: return
+        val videoModeClass = videoMode.javaClass
+        val monitorWidth = videoModeClass.getMethod("width").invoke(videoMode) as Int
+        val monitorHeight = videoModeClass.getMethod("height").invoke(videoMode) as Int
+
+        val decoratedAttrib = glfwClass.getField("GLFW_DECORATED").getInt(null)
+        val glfwFalse = glfwClass.getField("GLFW_FALSE").getInt(null)
+        glfwClass.getMethod(
+            "glfwSetWindowAttrib",
+            Long::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+        ).invoke(null, windowHandle, decoratedAttrib, glfwFalse)
+
+        glfwClass.getMethod(
+            "glfwSetWindowPos",
+            Long::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+        ).invoke(null, windowHandle, monitorX.get(0), monitorY.get(0))
+        glfwClass.getMethod(
+            "glfwSetWindowSize",
+            Long::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+        ).invoke(null, windowHandle, monitorWidth, monitorHeight)
+    } catch (_: ReflectiveOperationException) {
+        // GLFW/LwjglWindow is not on the classpath (macOS uses the LWJGL2 backend);
+        // leave the window decorated and rely on exclusive fullscreen instead.
+    } catch (_: LinkageError) {
+        // As above.
+    }
+}
+
+/** A direct, native-order [IntBuffer] of one element, suitable for an LWJGL out-parameter. */
+private fun directIntBuffer(): IntBuffer =
+    ByteBuffer.allocateDirect(Int.SIZE_BYTES).order(ByteOrder.nativeOrder()).asIntBuffer()
 
 /**
  * Installs a null-safe wrapper around jME3's GLFW joystick callback.

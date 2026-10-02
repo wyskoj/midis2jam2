@@ -101,8 +101,11 @@
     <string name="settings_general_locale">Język</string>
 
     <!-- Settings / Graphics -->
-    <string name="settings_graphics_fullscreen">Pełny ekran</string>
-    <string name="settings_graphics_fullscreen_description">Użyj całego ekranu</string>
+    <string name="settings_graphics_window_mode">Tryb okna</string>
+    <string name="settings_graphics_window_mode_description">Jak wykonanie wypełnia ekran</string>
+    <string name="settings_graphics_window_mode_windowed">Okno</string>
+    <string name="settings_graphics_window_mode_borderless">Pełny ekran bez obramowania</string>
+    <string name="settings_graphics_window_mode_fullscreen">Pełny ekran</string>
     <string name="settings_graphics_resolution">Rozdzielczość</string>
     <string name="settings_graphics_resolution_fullscreen">Rozdzielczość dopasowana do monitora, gdy włączony jest pełny ekran</string>
     <string name="settings_graphics_resolution_default">Użyj domyślnej rozdzielczości</string>
@@ -150,6 +153,8 @@
     <string name="settings_controls_sticky_speed_modifier_keys">Przyklejające się klawisze modyfikatora prędkości</string>
     <string name="settings_controls_sticky_speed_modifier_keys_true">Naciśnij Ctrl i Shift, aby zmienić prędkość kamery swobodnej</string>
     <string name="settings_controls_sticky_speed_modifier_keys_false">Przytrzymaj Ctrl i Shift, aby zmienić prędkość kamery swobodnej</string>
+    <string name="settings_controls_gamepad_enabled">Wejście gamepada</string>
+    <string name="settings_controls_gamepad_enabled_description">Zezwól podłączonemu gamepadowi na sterowanie kamerą swobodną</string>
 
     <!-- Settings / On-screen elements -->
     <string name="settings_onscreenelements_lyrics">Teksty utworów</string>
@@ -234,5 +239,39 @@
     <string name="history_file_missing_title">Utwór niedostępny</string>
     <string name="history_unknown_song">Nieznany utwór</string>
     <string name="history_clear_invalid_song">Wyczyść</string>
+
+    <!-- Record -->
+    <string name="tab_record">Nagrywanie</string>
+    <string name="record_start">Nagraj</string>
+    <string name="record_output">Zapisz jako</string>
+    <string name="record_resolution">Rozdzielczość</string>
+    <string name="record_frame_rate">Liczba klatek na sekundę</string>
+    <string name="record_quality">Jakość</string>
+    <string name="record_quality_low">Niska</string>
+    <string name="record_quality_medium">Średnia</string>
+    <string name="record_quality_high">Wysoka</string>
+    <string name="record_quality_maximum">Maksymalna</string>
+    <string name="record_preparing">Przygotowywanie…</string>
+    <string name="record_recording">Nagrywanie…</string>
+    <string name="record_open_video">Otwórz wideo</string>
+    <string name="record_show_in_folder">Pokaż w folderze</string>
+    <string name="record_cancelled">Nagrywanie zostało anulowane.</string>
+    <string name="record_audio_note">Generowane przez wbudowany syntezator z tym bankiem brzmień.</string>
+    <string name="record_window_note">Podczas nagrywania otwiera się okno podglądu. Zamknięcie go anuluje nagrywanie.</string>
+    <string name="record_section_video">Wideo</string>
+    <string name="record_section_audio">Dźwięk</string>
+    <string name="record_empty_title">Nagraj występ</string>
+    <string name="record_empty_body">Zamień plik MIDI w film z dźwiękiem.</string>
+    <string name="record_choose_file">Wybierz plik MIDI</string>
+    <string name="record_drop_hint">lub upuść go tutaj</string>
+    <string name="record_change_file">Zmień</string>
+    <string name="record_unreadable">Tego pliku nie można odczytać jako MIDI.</string>
+    <string name="record_in_folder">w %1$s</string>
+    <string name="record_quality_low_detail">Najmniejszy plik</string>
+    <string name="record_quality_medium_detail">Zrównoważona</string>
+    <string name="record_quality_high_detail">Najlepszy obraz</string>
+    <string name="record_saved">Zapisano</string>
+    <string name="record_failed_title">Nagrywanie nie powiodło się</string>
+    <string name="record_time_left">zostało ok. %1$s</string>
 </resources>
 
