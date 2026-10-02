@@ -82,7 +82,7 @@ class TuningVisuals(
 
     /** The capo, or `null` if the part is played without one. */
     val capo: Spatial? = if (fretting.capo > 0) {
-        context.modelD(CAPO_MODEL, layout?.keyTexture ?: texture).also {
+        context.modelD(CAPO_MODEL, "RubberFoot.bmp").also {
             it.cullHint = false.ch
             parent.attachChild(it)
         }
@@ -120,15 +120,15 @@ class TuningVisuals(
         val fret = motion.capoFret(seconds)
         capo.cullHint = (fret != null).ch
         if (fret == null) return
-        // The capo is modelled in place across the neck, so it only slides along it (the model's Y) to just behind
-        // its fret, and lifts off the strings (the model's Z) until it clamps.
-        val along = fretboard.pointOn((fretboard.stringCount - 1) / 2.0, fret - CAPO_BEHIND_FRET).y
+        // The capo is modelled in place across the neck, so it only slides along it (the model's Y) and lifts off the
+        // strings (the model's Z) until it clamps. It sits on its fret, where an open string's vibrating part starts,
+        // so it covers the seam between the still and vibrating parts of the string.
+        val along = fretboard.pointOn((fretboard.stringCount - 1) / 2.0, fret).y
         capo.localTranslation = Vector3f(0f, along, (CAPO_LIFT * motion.capoLift(seconds)).toFloat())
     }
 
     private companion object {
         const val CAPO_MODEL = "GuitarCapo.obj"
-        const val CAPO_BEHIND_FRET = 0.25
         const val CAPO_LIFT = 0.4
     }
 }

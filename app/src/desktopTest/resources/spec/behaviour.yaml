@@ -717,7 +717,7 @@
 - id: instrument.fretted.capo
   source: features/fretted-instruments.md
   platforms: [desktop, android]
-  claim: "A capo is clamped across the neck just behind the inferred capo fret, sliding down from the nut just before the first note"
+  claim: "A capo is clamped across the neck on the inferred capo fret, covering where the open strings start to vibrate, sliding down from the nut just before the first note"
 - id: instrument.bass.tuning
   source: features/fretted-instruments.md
   platforms: [desktop, android]

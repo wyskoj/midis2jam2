@@ -73,7 +73,7 @@ mirroring the low E's is the high E's.
 ## Capo
 
 `GuitarCapo.obj` is modelled in place across the guitar's neck (its X and Z are the guitar's), centred on Y = 0.
-The code only slides it along the neck (the model's Y) to just behind its fret, lifted off the strings (Z) while it
+The code only slides it along the neck (the model's Y) onto its fret (covering where the open strings start to vibrate), lifted off the strings (Z) while it
 slides down from the nut, then dropped on to clamp. The acoustic shares the guitar's neck; the banjo uses the same
 model, so check it there if a banjo part ever infers a capo.
 

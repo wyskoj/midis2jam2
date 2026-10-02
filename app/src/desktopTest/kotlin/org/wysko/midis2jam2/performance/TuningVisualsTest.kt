@@ -88,7 +88,7 @@ class TuningVisualsTest {
 
     @Test
     @Spec("instrument.fretted.capo")
-    fun `a capo is clamped across the neck just behind its fret`() {
+    fun `a capo is clamped across the neck on its fret`() {
         HeadlessPerformance.start(MidiFixtures.capoChords(), attachManagers = false).use { performance ->
             val guitar = performance.instruments.filterIsInstance<Guitar>().single()
             assertEquals(2, guitar.fretting.capo)
@@ -104,7 +104,7 @@ class TuningVisualsTest {
                 val middle = (board.stringCount - 1) / 2.0
                 fun along(fret: Double) = board.pointOn(middle, fret).dot(board.along)
                 val at = capo.localTranslation.dot(board.along)
-                assertTrue(at > along(1.0) && at < along(2.0), "The capo should sit between frets 1 and 2")
+                assertEquals(along(2.0), at, 0.01f, "The capo should sit on its fret, over where the open strings start to vibrate")
                 assertEquals(0f, capo.localTranslation.z, "The capo should be clamped onto the strings by now")
             }
 
