@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /**
  * Any instrument that has strings and frets.
@@ -117,6 +118,9 @@ abstract class FrettedInstrument protected constructor(
     init {
         geometry += instrumentBody.first
     }
+
+    /** A retuned or capo'd instrument comes on stage early, to be seen retuning. */
+    override fun isHeldOnStage(time: Duration): Boolean = tuning.motion.isShowing(time.toDouble(DurationUnit.SECONDS))
 
     override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)

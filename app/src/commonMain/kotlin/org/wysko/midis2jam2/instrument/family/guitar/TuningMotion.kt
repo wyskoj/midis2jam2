@@ -17,9 +17,7 @@
 
 package org.wysko.midis2jam2.instrument.family.guitar
 
-import kotlin.math.PI
 import kotlin.math.pow
-import kotlin.math.sin
 
 /**
  * How a fretted instrument shows its tuning and capo over time, worked out from the song time alone so that seeking
@@ -27,30 +25,48 @@ import kotlin.math.sin
  *
  * Each string is tuned some number of semitones away from the instrument's standard tuning ([offsets]). A string tuned
  * down is slacker, so it vibrates wider and slower; one tuned up is tighter. Just before the instrument's first note,
- * it retunes from standard: the keys turn and the strings glide into their new tension, overshooting slightly and
- * settling as a player's ear would, and the capo slides down the neck and clamps.
+ * it retunes from standard the way a player does, one string at a time from the lowest: each string rings while its
+ * key turns and it glides into its new tension, overshooting slightly and settling as a player's ear would. The capo
+ * slides down the neck and clamps over the same time.
  *
  * @property offsets Per string, how many semitones it is tuned from standard (negative is lower).
  * @property capo The capo's fret, or `0` for none.
  * @property firstNote When the instrument's first note starts, in seconds, or `null` if it plays nothing; with
  * nothing to play, it is shown already tuned.
+ * @property songStart When the song's playback begins, in seconds (before its first note, for the intro); the retune
+ * is squeezed in after it when the instrument plays from the start.
  */
-class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?) {
+class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?, val songStart: Double = 0.0) {
 
     /** Whether any string is away from standard. */
     val isRetuned: Boolean = offsets.any { it != 0 }
 
-    /** When the retune starts. */
-    val retuneStart: Double? = firstNote?.let { it - RETUNE_LEAD }
+    /** The strings that are retuned, in the order they are tuned. */
+    private val retunedStrings: List<Int> = offsets.indices.filter { offsets[it] != 0 }
 
     /** When the retune ends. */
     val retuneEnd: Double? = firstNote?.let { it - RETUNE_GAP }
+
+    /** When the retune starts: [RETUNE_LEAD] before the first note, but never before the song can be seen. */
+    val retuneStart: Double? = firstNote?.let { maxOf(it - RETUNE_LEAD, songStart + START_MARGIN) }
 
     /** How far through the retune [time] is, from `0` (not started) to `1` (done). */
     fun progress(time: Double): Double {
         val start = retuneStart ?: return 1.0
         val end = retuneEnd ?: return 1.0
+        if (end <= start) return if (time >= end) 1.0 else 0.0
         return ((time - start) / (end - start)).coerceIn(0.0, 1.0)
+    }
+
+    /**
+     * Whether the instrument should be on stage at [time] to show its retune or capo: from a moment before the retune
+     * starts, so it has arrived and settled, until its first note. Instruments are otherwise only shown just before
+     * they play, which would hide most of the retune.
+     */
+    fun isShowing(time: Double): Boolean {
+        if (!isRetuned && capo == 0) return false
+        val start = retuneStart ?: return false
+        return time >= start - SHOW_BEFORE && time <= firstNote!!
     }
 
     /** Whether [time] falls inside the retune. */
@@ -61,7 +77,7 @@ class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?)
      * between a glide that overshoots a little and settles.
      */
     fun semitones(string: Int, time: Double): Double {
-        val glide = settle(progress(time))
+        val glide = settle(stringProgress(string, time))
         return if (glide == 0.0) 0.0 else offsets[string] * glide
     }
 
@@ -75,7 +91,14 @@ class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?)
     fun vibrationWidth(string: Int, time: Double): Double = tension(string, time).pow(-WIDTH_EXPONENT)
 
     /** Whether [string] rings open at [time] because it is being tuned, rather than because it was played. */
-    fun ringsWhileTuning(string: Int, time: Double): Boolean = offsets[string] != 0 && isRetuning(time)
+    fun ringsWhileTuning(string: Int, time: Double): Boolean = stringProgress(string, time).let { it > 0.0 && it < 1.0 }
+
+    /** How far through tuning [string] [time] is: the retune is shared out between the retuned strings in turn. */
+    fun stringProgress(string: Int, time: Double): Double {
+        val turn = retunedStrings.indexOf(string)
+        if (turn < 0) return 1.0
+        return (progress(time) * retunedStrings.size - turn).coerceIn(0.0, 1.0)
+    }
 
     /**
      * Where the capo is at [time], as a fret position (fractions fall between frets), or `null` while it isn't on the
@@ -89,19 +112,28 @@ class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?)
         return CAPO_START + (capo - CAPO_START) * slide
     }
 
-    /** How much the capo is squashed onto the neck at [time] as it clamps, from `0` (not at all) up. */
-    fun capoSquash(time: Double): Double {
+    /**
+     * How far the capo is lifted off the strings at [time], from `1` (while it slides down the neck) to `0` (clamped,
+     * which it is by the end of the retune).
+     */
+    fun capoLift(time: Double): Double {
         val p = progress(time)
-        if (p <= CAPO_SLIDE || p >= 1.0) return 0.0
-        return CAPO_SQUASH * sin(PI * (p - CAPO_SLIDE) / (1 - CAPO_SLIDE))
+        if (p <= CAPO_SLIDE) return 1.0
+        return 1 - smoothstep(((p - CAPO_SLIDE) / (1 - CAPO_SLIDE)).coerceAtMost(1.0))
     }
 
     companion object {
         /** How long before the first note the retune starts, in seconds. */
-        const val RETUNE_LEAD: Double = 1.5
+        const val RETUNE_LEAD: Double = 2.5
 
         /** How long before the first note the retune ends, in seconds. */
-        const val RETUNE_GAP: Double = 0.3
+        const val RETUNE_GAP: Double = 0.4
+
+        /** How long the instrument is on stage before its retune starts, in seconds. */
+        const val SHOW_BEFORE: Double = 0.6
+
+        /** How soon after the song's playback begins the retune can start, in seconds. */
+        const val START_MARGIN: Double = 0.3
 
         /** Exaggerates how much slower a slack string vibrates, so the difference can be seen. */
         const val SPEED_EXPONENT: Double = 1.5
@@ -112,7 +144,6 @@ class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?)
         private const val OVERSHOOT = 1.2
         private const val CAPO_SLIDE = 0.7
         private const val CAPO_START = -0.5
-        private const val CAPO_SQUASH = 0.25
 
         private fun smoothstep(x: Double): Double = x * x * (3 - 2 * x)
 

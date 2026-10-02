@@ -49,7 +49,7 @@ class AssetIntegrityTest {
     @Spec("app.assets.all-referenced-assets-exist")
     fun `every asset path named in code resolves to a bundled file`() {
         val missing = assetLiterals()
-            .filterNot { (literal, _) -> resolves(literal) || literal in AWAITING_ART }
+            .filterNot { (literal, _) -> resolves(literal) }
             .map { (literal, source) -> "$literal (referenced in ${source.name})" }
             .distinct()
             .sorted()
@@ -145,11 +145,6 @@ class AssetIntegrityTest {
         const val MINIMUM_EXPECTED_ASSET_REFERENCES = 300
         const val MINIMUM_EXPECTED_DATA_FILES = 20
 
-        /**
-         * Models the code already looks for but which haven't been made yet; it shows a stand-in until they exist (see
-         * `docs/TUNING_KEYS.md`). Remove each one as its model is added.
-         */
-        val AWAITING_ART = setOf("Capo.obj")
 
         /**
          * Bundled data files that nothing reads.
@@ -225,6 +220,10 @@ class AssetIntegrityTest {
 
             val relative = file.relativeTo(ProjectPaths.sharedAssets).path.replace(File.separatorChar, '/')
             if (text.contains(relative)) return true
+
+            // instrument/tuning/<Body>.json is the key art of the instrument whose body is <Body>.obj
+            // (TuningKeyLayout.forModel).
+            if (relative.startsWith("instrument/tuning/")) return text.contains("\"" + file.nameWithoutExtension + ".obj\"")
 
             // instrument/<Class>.json and friends are loaded through
             // resourceToString("/instrument/" + klass.simpleName + ".json").

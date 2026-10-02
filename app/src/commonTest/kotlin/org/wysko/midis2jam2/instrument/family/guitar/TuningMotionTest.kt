@@ -69,6 +69,21 @@ class TuningMotionTest {
     }
 
     @Test
+    @Spec("instrument.fretted.tuning.retune")
+    fun `the strings are tuned one at a time, lowest first`() {
+        val flat = TuningMotion(IntArray(6) { -1 }, capo = 0, firstNote = firstNote)
+        val start = flat.retuneStart!!
+        val length = flat.retuneEnd!! - start
+        (0 until 6).forEach { s ->
+            val t = start + length * (s + 0.5) / 6
+            val ringing = (0 until 6).filter { flat.ringsWhileTuning(it, t) }
+            assertEquals(listOf(s), ringing, "Only string $s should ring while it is tuned")
+            (0 until s).forEach { assertEquals(-1.0, flat.semitones(it, t), "String $it is already tuned") }
+            (s + 1 until 6).forEach { assertEquals(0.0, flat.semitones(it, t), "String $it isn't tuned yet") }
+        }
+    }
+
+    @Test
     fun `retuning overshoots a little and settles`() {
         val curve = (0..100).map { TuningMotion.settle(it / 100.0) }
         assertEquals(0.0, curve.first())
@@ -85,6 +100,23 @@ class TuningMotionTest {
         assertTrue(sliding < 3.0, "Partway through it is still sliding: $sliding")
         assertEquals(3.0, capo.capoFret(after))
         assertNull(dropD.capoFret(after), "No capo, nothing on the neck")
+    }
+
+    @Test
+    @Spec("instrument.fretted.tuning.retune")
+    fun `a retuned instrument is on stage for its whole retune, and one in standard tuning isn't held`() {
+        assertTrue(dropD.isShowing(dropD.retuneStart!!), "On stage when the retune starts")
+        assertTrue(dropD.isShowing(during))
+        assertTrue(!dropD.isShowing(before - 5), "Not long before")
+        assertTrue(!standard.isShowing(during), "Nothing to show in standard tuning")
+    }
+
+    @Test
+    fun `an instrument that plays from the start retunes during the intro, after playback begins`() {
+        val opening = TuningMotion(intArrayOf(-2, 0, 0, 0, 0, 0), capo = 0, firstNote = 0.0, songStart = -2.0)
+        assertTrue(opening.retuneStart!! > -2.0, "The retune can't start before the song is shown")
+        assertTrue(opening.retuneEnd!! - opening.retuneStart!! > 1.0, "There should still be time to see it")
+        assertEquals(-2.0, opening.semitones(0, 0.0))
     }
 
     @Test

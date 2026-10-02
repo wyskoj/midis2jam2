@@ -17,13 +17,18 @@
 
 package org.wysko.midis2jam2.performance
 
+import com.jme3.math.FastMath
+import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar
+import org.wysko.midis2jam2.instrument.family.guitar.TuningKeyLayout
 import org.wysko.midis2jam2.instrument.family.guitar.TuningMotion
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,6 +51,7 @@ class TuningVisualsTest {
             assertEquals(listOf(-2, 0, 0, 0, 0, 0), guitar.fretting.tuning.let { t -> (0 until 6).map { t[it] - STANDARD[it] } })
 
             stepTo(performance, MidiFixtures.TUNED_PART_START_SECONDS - (TuningMotion.RETUNE_LEAD + TuningMotion.RETUNE_GAP) / 2)
+            assertTrue(guitar.isVisible, "The guitar should be on stage to be seen retuning, though it plays nothing yet")
             val ringing = performance.onEngineThread { visibleStringFrames(guitar.geometry) }
             assertEquals(
                 listOf("GuitarLowStringBottom"),
@@ -87,7 +93,7 @@ class TuningVisualsTest {
             val guitar = performance.instruments.filterIsInstance<Guitar>().single()
             assertEquals(2, guitar.fretting.capo)
             // The visuals are built on the engine thread by the first frame.
-            performance.stepInstruments(frames = 1)
+            stepTo(performance, BEFORE_RETUNE)
             val capo = performance.onEngineThread { assertNotNull(guitar.tuning.capo, "A part played with a capo should show one") }
             performance.onEngineThread { assertEquals(Spatial.CullHint.Always, capo.cullHint, "No capo before the retune") }
 
@@ -99,19 +105,78 @@ class TuningVisualsTest {
                 fun along(fret: Double) = board.pointOn(middle, fret).dot(board.along)
                 val at = capo.localTranslation.dot(board.along)
                 assertTrue(at > along(1.0) && at < along(2.0), "The capo should sit between frets 1 and 2")
-                val neck = board.pointOn(0.0, 1.75).distance(board.pointOn(board.stringCount - 1.0, 1.75))
-                assertTrue(capo.localScale.x > neck, "The capo should span every string")
+                assertEquals(0f, capo.localTranslation.z, "The capo should be clamped onto the strings by now")
             }
 
             // Seeking back before the retune takes the capo off again.
-            performance.stepInstruments(frames = 1, delta = (-2.5).seconds)
+            stepTo(performance, BEFORE_RETUNE)
             performance.onEngineThread { assertEquals(Spatial.CullHint.Always, capo.cullHint) }
         }
     }
 
+    @Test
+    @Spec("instrument.fretted.tuning.keys")
+    fun `a drop-D guitar turns its low key during the retune, and leaves the others`() {
+        HeadlessPerformance.start(MidiFixtures.dropDRiff(delayed = true), attachManagers = false).use { performance ->
+            val guitar = performance.instruments.filterIsInstance<Guitar>().single()
+            stepTo(performance, BEFORE_RETUNE)
+            val keys = performance.onEngineThread { guitar.tuning.keys }
+            assertEquals(6, keys.size, "The guitar should have a key per string")
+            val rest = performance.onEngineThread { keys.map { it.localRotation.clone() } }
+
+            stepTo(performance, MidiFixtures.TUNED_PART_START_SECONDS + 0.5)
+            performance.onEngineThread {
+                val axis = Vector3f()
+                val turn = rest[0].inverse().mult(keys[0].localRotation).toAngleAxis(axis) * FastMath.RAD_TO_DEG
+                assertEquals(40f, turn, 0.5f, "Two semitones down should turn the low key 40 degrees")
+                assertEquals(1f, abs(axis.y), 0.001f, "The key should turn about its own post")
+                (1 until 6).forEach {
+                    assertTrue(rest[it].isSimilar(keys[it].localRotation, 1e-4f), "Key $it's string stays in standard tuning")
+                }
+            }
+
+            // Seeking back before the retune turns the key back.
+            stepTo(performance, BEFORE_RETUNE)
+            performance.onEngineThread { assertTrue(rest[0].isSimilar(keys[0].localRotation, 1e-4f)) }
+        }
+    }
+
+    @Test
+    fun `every instrument with key art has a key for each string`() {
+        mapOf("Guitar" to 6, "GuitarAcoustic" to 6, "Bass" to 4, "Banjo" to 4).forEach { (name, strings) ->
+            val layout = assertNotNull(TuningKeyLayout.load(name), "$name should have key art")
+            assertEquals(strings, layout.keys.size, "$name's keys")
+        }
+    }
+
+    /**
+     * Key poses are written as Blender shows them; they must be converted the same way Blender's OBJ exporter converts
+     * the meshes (Y up), or the keys land off the headstock. The expected matrices were worked out independently, and
+     * place the keys onto where the old models had them.
+     */
+    @Test
+    fun `Blender poses are converted the way the OBJ exporter converts meshes`() {
+        assertEquals(Vector3f(1f, 3f, -2f), TuningKeyLayout.blenderPosition(1f, 2f, 3f))
+        assertMatrix(
+            floatArrayOf(0.2823f, -0.9593f, -0.0094f, 0.937f, 0.2736f, 0.217f, -0.2056f, -0.0701f, 0.9761f),
+            TuningKeyLayout.blenderRotation(-38.426f, -69.561f, 36.073f),
+        )
+        assertMatrix(
+            floatArrayOf(0.196f, -0.9806f, -0.0004f, 0.9656f, 0.1929f, 0.1746f, -0.1711f, -0.0346f, 0.9846f),
+            TuningKeyLayout.blenderRotation(47.848f, -74.919f, 41.131f).mult(TuningKeyLayout.blenderRotation(-90f, 0f, 0f)),
+        )
+    }
+
+    private fun assertMatrix(expected: FloatArray, rotation: Quaternion) {
+        val m = rotation.toRotationMatrix()
+        (0 until 9).forEach { assertEquals(expected[it], m.get(it / 3, it % 3), 0.001f, "Element ${it / 3},${it % 3}") }
+    }
+
+    /** Steps forward frame by frame to [seconds], or jumps straight back to it (as a seek does). */
     private fun stepTo(performance: HeadlessPerformance, seconds: Double) {
-        val frames = ((seconds.seconds - performance.time) / HeadlessPerformance.FRAME).roundToInt()
-        performance.stepInstruments(frames = frames)
+        val gap = seconds.seconds - performance.time
+        if (gap.isNegative()) return performance.stepInstruments(frames = 1, delta = gap)
+        performance.stepInstruments(frames = (gap / HeadlessPerformance.FRAME).roundToInt())
     }
 
     /** The model names of the vibrating lower-string frames currently shown under [node]. */
@@ -126,5 +191,8 @@ class TuningVisualsTest {
 
     private companion object {
         val STANDARD = intArrayOf(40, 45, 50, 55, 59, 64)
+
+        /** A time before the fixtures' retunes, which start [TuningMotion.RETUNE_LEAD] before their first notes. */
+        const val BEFORE_RETUNE = -1.9
     }
 }

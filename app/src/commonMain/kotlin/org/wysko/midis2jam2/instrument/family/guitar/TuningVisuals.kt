@@ -17,18 +17,14 @@
 
 package org.wysko.midis2jam2.instrument.family.guitar
 
-import com.jme3.asset.ModelKey
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
-import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
-import com.jme3.scene.shape.Box
+import org.wysko.midis2jam2.manager.INTRO
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.util.quat
-import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -45,7 +41,7 @@ import kotlin.time.DurationUnit.SECONDS
  * @property fretboard Where things are on the neck.
  * @param fretting What the fretting engine decided.
  * @param layout Where the tuning keys go, or `null` if the instrument has no key art yet.
- * @param texture The instrument's texture, for the stand-in capo.
+ * @param texture The texture of the instrument's body, which its keys and capo share.
  */
 class TuningVisuals(
     context: PerformanceManager,
@@ -62,24 +58,37 @@ class TuningVisuals(
         firstNote = fretting.notes.indices
             .filter { fretting.solution.fingerings[it] != null }
             .minOfOrNull { fretting.notes[it].start },
+        songStart = -INTRO.toDouble(SECONDS),
     )
 
     /** The tuning keys, lowest string first, or empty while the instrument has no key art. */
     val keys: List<Spatial> = layout?.let { art ->
         art.keys.take(fretboard.stringCount).map { key ->
-            context.modelD(art.key, texture).also {
-                it.localTranslation = Vector3f(key.position[0], key.position[1], key.position[2])
+            context.modelD(art.key, art.keyTexture ?: texture).also {
+                it.localTranslation = TuningKeyLayout.blenderPosition(key.position[0], key.position[1], key.position[2])
+                it.setLocalScale(art.keyScale)
                 parent.attachChild(it)
             }
         }
     } ?: emptyList()
 
-    private val keyRest: List<Quaternion> = layout?.keys?.take(keys.size)?.map {
-        Vector3f(it.rotation[0], it.rotation[1], it.rotation[2]).quat()
+    /** Each key's orientation in standard tuning, including any turn of the key model within it. */
+    private val keyRest: List<Quaternion> = layout?.let { art ->
+        val model = with(art.keyRotation) { TuningKeyLayout.blenderRotation(this[0], this[1], this[2]) }
+        art.keys.take(keys.size).map {
+            TuningKeyLayout.blenderRotation(it.rotation[0], it.rotation[1], it.rotation[2]).mult(model)
+        }
     } ?: emptyList()
 
     /** The capo, or `null` if the part is played without one. */
-    val capo: Spatial? = if (fretting.capo > 0) loadCapo(context, texture).also { parent.attachChild(it) } else null
+    val capo: Spatial? = if (fretting.capo > 0) {
+        context.modelD(CAPO_MODEL, layout?.keyTexture ?: texture).also {
+            it.cullHint = false.ch
+            parent.attachChild(it)
+        }
+    } else {
+        null
+    }
 
     private var seconds = 0.0
 
@@ -111,34 +120,15 @@ class TuningVisuals(
         val fret = motion.capoFret(seconds)
         capo.cullHint = (fret != null).ch
         if (fret == null) return
-        // The capo sits just behind its fret, across every string.
-        val at = fret - CAPO_BEHIND_FRET
-        val low = fretboard.pointOn(0.0, at)
-        val high = fretboard.pointOn(fretboard.stringCount - 1.0, at)
-        val across = high.subtract(low)
-        val width = across.length() * (1 + CAPO_MARGIN)
-        across.normalizeLocal()
-        val along = across.cross(fretboard.normal).normalizeLocal()
-        capo.localTranslation = low.interpolateLocal(high, 0.5f)
-        capo.localRotation = Quaternion().fromAxes(across, fretboard.normal, along)
-        capo.localScale = Vector3f(width, (1 - motion.capoSquash(seconds)).toFloat(), 1f)
+        // The capo is modelled in place across the neck, so it only slides along it (the model's Y) to just behind
+        // its fret, and lifts off the strings (the model's Z) until it clamps.
+        val along = fretboard.pointOn((fretboard.stringCount - 1) / 2.0, fret - CAPO_BEHIND_FRET).y
+        capo.localTranslation = Vector3f(0f, along, (CAPO_LIFT * motion.capoLift(seconds)).toFloat())
     }
 
-    private fun loadCapo(context: PerformanceManager, texture: String): Spatial =
-        if (context.app.assetManager.locateAsset(ModelKey("Assets/$CAPO_MODEL")) != null) {
-            context.modelD(CAPO_MODEL, texture)
-        } else {
-            // A stand-in bar until the capo is modelled: one unit wide across the neck.
-            Geometry("Capo", Box(0.5f, CAPO_STAND_IN_HEIGHT, CAPO_STAND_IN_DEPTH)).apply {
-                material = context.assetLoader.diffuseMaterial(texture)
-            }
-        }.apply { cullHint = false.ch }
-
     private companion object {
-        const val CAPO_MODEL = "Capo.obj"
+        const val CAPO_MODEL = "GuitarCapo.obj"
         const val CAPO_BEHIND_FRET = 0.25
-        const val CAPO_MARGIN = 0.25f
-        const val CAPO_STAND_IN_HEIGHT = 0.12f
-        const val CAPO_STAND_IN_DEPTH = 0.2f
+        const val CAPO_LIFT = 0.4
     }
 }
