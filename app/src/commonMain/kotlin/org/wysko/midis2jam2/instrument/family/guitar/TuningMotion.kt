@@ -25,8 +25,8 @@ import kotlin.math.pow
  *
  * Each string is tuned some number of semitones away from the instrument's standard tuning ([offsets]). A string tuned
  * down is slacker, so it vibrates wider and slower; one tuned up is tighter. Just before the instrument's first note,
- * it retunes from standard the way a player does, one string at a time from the lowest: each string rings while its
- * key turns and it glides into its new tension, overshooting slightly and settling as a player's ear would. The capo
+ * it retunes from standard the way a player does, one string at a time from the lowest: each key turns, gliding its
+ * string into its new tension, overshooting slightly and settling as a player's ear would. The strings stay still. The capo
  * slides down the neck and clamps over the same time.
  *
  * @property offsets Per string, how many semitones it is tuned from standard (negative is lower).
@@ -89,9 +89,6 @@ class TuningMotion(val offsets: IntArray, val capo: Int, val firstNote: Double?,
 
     /** How wide [string] vibrates at [time], relative to standard. */
     fun vibrationWidth(string: Int, time: Double): Double = tension(string, time).pow(-WIDTH_EXPONENT)
-
-    /** Whether [string] rings open at [time] because it is being tuned, rather than because it was played. */
-    fun ringsWhileTuning(string: Int, time: Double): Boolean = stringProgress(string, time).let { it > 0.0 && it < 1.0 }
 
     /** How far through tuning [string] [time] is: the retune is shared out between the retuned strings in turn. */
     fun stringProgress(string: Int, time: Double): Double {

@@ -709,7 +709,7 @@
 - id: instrument.fretted.tuning.retune
   source: features/fretted-instruments.md
   platforms: [desktop, android]
-  claim: "Just before its first note, a retuned instrument tunes its retuned strings one at a time from the lowest, each ringing and gliding from standard into its tuning, overshooting slightly and settling"
+  claim: "Just before its first note, a retuned instrument turns the keys of its retuned strings one at a time from the lowest, each gliding from standard into its tuning, overshooting slightly and settling, while the strings stay still"
 - id: instrument.fretted.tuning.keys
   source: features/fretted-instruments.md
   platforms: [desktop, android]

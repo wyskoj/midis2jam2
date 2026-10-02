@@ -38,27 +38,22 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * How a guitar shows its tuning and capo in a real (headless) performance: a retuned string rings and glides into its
- * new tension before the first note, slack strings vibrate wider, and a capo sits on its fret across the neck.
+ * How a guitar shows its tuning and capo in a real (headless) performance: a retuned instrument is on stage, strings still,
+ * while its keys turn before the first note, slack strings vibrate wider, and a capo sits on its fret across the neck.
  */
 class TuningVisualsTest {
 
     @Test
     @Spec("instrument.fretted.tuning.retune", "instrument.fretted.tuning.slack")
-    fun `a drop-D guitar rings its low string into tune before it plays, and the low string stays slack`() {
+    fun `a drop-D guitar is on stage with still strings while it retunes, and the low string stays slack`() {
         HeadlessPerformance.start(MidiFixtures.dropDRiff(delayed = true), attachManagers = false).use { performance ->
             val guitar = performance.instruments.filterIsInstance<Guitar>().single()
             assertEquals(listOf(-2, 0, 0, 0, 0, 0), guitar.fretting.tuning.let { t -> (0 until 6).map { t[it] - STANDARD[it] } })
 
             stepTo(performance, MidiFixtures.TUNED_PART_START_SECONDS - (TuningMotion.RETUNE_LEAD + TuningMotion.RETUNE_GAP) / 2)
             assertTrue(guitar.isVisible, "The guitar should be on stage to be seen retuning, though it plays nothing yet")
-            val ringing = performance.onEngineThread { visibleStringFrames(guitar.geometry) }
-            assertEquals(
-                listOf("GuitarLowStringBottom"),
-                ringing.map { it.removeSuffix(".obj").dropLastWhile(Char::isDigit).substringAfterLast('/') }.distinct(),
-                "Only the low string should ring while it is tuned; ringing: $ringing",
-            )
-            assertEquals(1, ringing.size, "One frame of one string's vibration should show: $ringing")
+            val vibrating = performance.onEngineThread { visibleStringFrames(guitar.geometry) }
+            assertTrue(vibrating.isEmpty(), "Only the keys move while tuning; the strings stay still: $vibrating")
 
             stepTo(performance, MidiFixtures.TUNED_PART_START_SECONDS + 0.5)
             performance.onEngineThread {

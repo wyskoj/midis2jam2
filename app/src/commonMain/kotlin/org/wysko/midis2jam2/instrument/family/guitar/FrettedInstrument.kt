@@ -129,8 +129,7 @@ abstract class FrettedInstrument protected constructor(
         repeat(numberOfStrings) {
             animateString(
                 string = it,
-                // A string being tuned rings open.
-                fret = fretPressedOnString(it) ?: if (tuning.ringsWhileTuning(it)) fretting.capo else -1,
+                fret = fretPressedOnString(it) ?: -1,
                 delta = delta,
                 pitchBendAmount = pitchBendModulationController.tick(
                     time,

@@ -4,8 +4,8 @@ The fretting engine picks each part's tuning and capo. The guitar, bass and banj
 itself (`instrument/family/guitar/TuningVisuals.kt`, timed by `TuningMotion.kt`):
 - **Keys.** Each tuning key is turned by how far its string is tuned from standard.
 - **Slack.** A lowered string vibrates wider and slower; a raised one is tighter. This needs no art.
-- **Retune.** Just before the instrument's first note, the retuned strings are tuned one at a time from the lowest,
-  as a player does: each rings and glides from standard into its tuning while its key turns.
+- **Retune.** Just before the instrument's first note, the retuned strings' keys turn one at a time from the lowest,
+  as a player tunes. The strings themselves stay still.
 - **Capo.** A capo slides down from the nut and clamps behind its fret.
 
 ## Which instruments have key art
@@ -90,8 +90,8 @@ These constants are in `TuningMotion.kt`:
 ## Tests
 
 `TuningMotionTest` and `TuningVisualsTest` check:
-- the timing, the slack and the ringing strings;
-- that the strings are tuned one at a time, lowest first, each ringing only while it is tuned;
+- the timing and the slack, and that the strings stay still while tuning;
+- that the strings are tuned one at a time, lowest first;
 - that the drop-D low key turns 40° about its post and the others stay put;
 - that every layout has a key per string;
 - the capo's place;

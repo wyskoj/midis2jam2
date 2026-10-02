@@ -98,8 +98,6 @@ class TuningVisuals(
     /** How wide [string] vibrates now, relative to standard tuning. */
     fun vibrationWidth(string: Int): Double = motion.vibrationWidth(string, seconds)
 
-    /** Whether [string] rings open now because it is being tuned. */
-    fun ringsWhileTuning(string: Int): Boolean = motion.ringsWhileTuning(string, seconds)
 
     /** The angle [string]'s key is turned to now, in degrees from where it sits in standard tuning. */
     fun keyAngle(string: Int): Float {

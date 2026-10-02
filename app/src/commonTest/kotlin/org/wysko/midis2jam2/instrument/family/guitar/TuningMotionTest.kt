@@ -62,9 +62,8 @@ class TuningMotionTest {
         assertEquals(0.0, dropD.semitones(0, before), "Before the retune the string is at standard")
         assertEquals(-2.0, dropD.semitones(0, after), "After the retune the string is at its tuning")
         assertTrue(dropD.isRetuning(during))
-        assertTrue(dropD.ringsWhileTuning(0, during), "The string being tuned rings")
-        assertTrue(!dropD.ringsWhileTuning(1, during), "A string that stays in standard doesn't")
-        assertTrue(!dropD.ringsWhileTuning(0, after), "Tuning is over by the first note")
+        assertTrue(dropD.stringProgress(0, during) in 0.0..1.0 && dropD.semitones(0, during) != 0.0, "The low string is being tuned")
+        assertEquals(0.0, dropD.semitones(1, during), "A string that stays in standard doesn't move")
         assertTrue(!standard.isRetuned)
     }
 
@@ -76,8 +75,8 @@ class TuningMotionTest {
         val length = flat.retuneEnd!! - start
         (0 until 6).forEach { s ->
             val t = start + length * (s + 0.5) / 6
-            val ringing = (0 until 6).filter { flat.ringsWhileTuning(it, t) }
-            assertEquals(listOf(s), ringing, "Only string $s should ring while it is tuned")
+            val tuning = (0 until 6).filter { flat.stringProgress(it, t).let { p -> p > 0.0 && p < 1.0 } }
+            assertEquals(listOf(s), tuning, "Only string $s should be tuning now")
             (0 until s).forEach { assertEquals(-1.0, flat.semitones(it, t), "String $it is already tuned") }
             (s + 1 until 6).forEach { assertEquals(0.0, flat.semitones(it, t), "String $it isn't tuned yet") }
         }
