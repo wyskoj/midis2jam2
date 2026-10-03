@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.strings
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
@@ -31,7 +32,7 @@ class Viola(context: PerformanceManager, events: List<MidiEvent>) : StringFamily
     true,
     180.0,
     Vector3f(1f, 1f, 1f),
-    intArrayOf(48, 55, 62, 69),
+    FrettingProfiles.viola(),
     context.modelD("Violin.obj", "ViolaSkin.bmp")
 ) {
     override fun adjustForMultipleInstances(delta: Duration) {

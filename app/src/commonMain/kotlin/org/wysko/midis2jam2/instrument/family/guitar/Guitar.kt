@@ -22,9 +22,9 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import kotlinx.serialization.json.Json
-import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
-import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.GuitarStyle
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
@@ -38,34 +38,24 @@ private const val GUITAR_VECTOR_THRESHOLD = 8
 
 private val GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/Guitar.json"))
-private val GUITAR_CHORD_DEFINITIONS_STANDARD_E: Set<ChordDefinition> =
-    Json.decodeFromString(resourceToString("/instrument/chords/Guitar.json"))
-private val GUITAR_CHORD_DEFINITIONS_DROP_D: Set<ChordDefinition> =
-    Json.decodeFromString<Set<ChordDefinition>>(resourceToString("/instrument/chords/Guitar.json"))
-        .map { (notes, frets) ->
-            ChordDefinition(
-                notes = (listOf(if (notes[0].toInt() != -1) notes[0] - 2 else -1) + notes.subList(1, 6))
-                    .map { it.toByte() },
-                frets = frets
-            )
-        }.toSet()
-
 /**
  * The Guitar.
  *
  * @param context The context to the main class.
  * @param events The list of all events that this instrument should be aware of.
  * @param type The type of guitar.
+ * @param fretting Where every note is played, and the tuning and capo it is played in.
  * @see FrettedInstrument
  */
-class Guitar(context: PerformanceManager, events: List<MidiEvent>, type: GuitarType) : FrettedInstrument(
+class Guitar private constructor(
+    context: PerformanceManager,
+    events: List<MidiEvent>,
+    type: GuitarType,
+    fretting: FrettingPlan,
+) : FrettedInstrument(
     context = context,
     events = events,
-    frettingEngine = StandardFrettingEngine(
-        numberOfStrings = 6,
-        numberOfFrets = 22,
-        openStringMidiNotes = if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
-    ),
+    fretting = fretting,
     positioning = with(GUITAR_MODEL_PROPERTIES) {
         FrettedInstrumentPositioning(
             upperY = upperVerticalOffset,
@@ -78,21 +68,23 @@ class Guitar(context: PerformanceManager, events: List<MidiEvent>, type: GuitarT
     },
     numberOfStrings = 6,
     instrumentBody = context.modelD(
-        if (needsDropTuning(events)) type.modelDropD else type.model,
+        TuningKeyLayout.bodyFor(type.model, droppedModel = null, lowered = false),
         type.texture
     ) to "GuitarSkin.bmp"
 ) {
 
-    private val dictionary =
-        if (needsDropTuning(events)) GUITAR_CHORD_DEFINITIONS_DROP_D else GUITAR_CHORD_DEFINITIONS_STANDARD_E
-    private val openStringValues =
-        if (needsDropTuning(events)) GuitarTuning.DROP_D.values else GuitarTuning.STANDARD.values
-
     /**
-     * Maps each [TimedArc] that this Guitar is responsible to play to its [FretboardPosition].
+     * Creates a guitar of [type] playing [events].
      */
-    override val notePeriodFretboardPosition: Map<TimedArc, FretboardPosition> =
-        BetterFretting(context, dictionary, openStringValues, events).calculate(timedArcs)
+    constructor(context: PerformanceManager, events: List<MidiEvent>, type: GuitarType) :
+        this(context, events, type, FrettingPlan.create(context, events, FrettingProfiles.guitar(type.style)))
+
+    private val keyLayout = TuningKeyLayout.forModel(type.model)
+    private val texture = type.texture
+
+    override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
+
+    override val bodyTexture: String get() = texture
 
     override val upperStrings: Array<Spatial> = Array(6) {
         context.modelD(if (it < 3) "GuitarStringLow.obj" else "GuitarStringHigh.obj", type.texture)
@@ -146,29 +138,33 @@ class Guitar(context: PerformanceManager, events: List<MidiEvent>, type: GuitarT
      */
     sealed class GuitarType(
         internal val model: String,
-        internal val modelDropD: String,
-        internal val texture: String
+        internal val texture: String,
+        internal val style: GuitarStyle,
     ) {
         /** Acoustic guitar type. */
-        data object Acoustic : GuitarType("GuitarAcoustic.obj", "GuitarAcousticDropD.obj", "AcousticGuitar.png")
+        data object Acoustic :
+            GuitarType("GuitarAcoustic.obj", "AcousticGuitar.png", GuitarStyle.ACOUSTIC)
 
         /** Clean guitar type. */
-        data object Clean : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["clean"].file)
+        data object Clean : GuitarType("Guitar.obj", GuitarSkin["clean"].file, GuitarStyle.CLEAN)
 
         /** Jazz guitar type. */
-        data object Jazz : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["jazz"].file)
+        data object Jazz : GuitarType("Guitar.obj", GuitarSkin["jazz"].file, GuitarStyle.JAZZ)
 
         /** Muted guitar type. */
-        data object Muted : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["muted"].file)
+        data object Muted : GuitarType("Guitar.obj", GuitarSkin["muted"].file, GuitarStyle.MUTED)
 
         /** Overdrive guitar type. */
-        data object Overdriven : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["overdriven"].file)
+        data object Overdriven :
+            GuitarType("Guitar.obj", GuitarSkin["overdriven"].file, GuitarStyle.DRIVEN)
 
         /** Distortion guitar type. */
-        data object Distortion : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["distortion"].file)
+        data object Distortion :
+            GuitarType("Guitar.obj", GuitarSkin["distortion"].file, GuitarStyle.DRIVEN)
 
         /** Harmonics guitar type. */
-        data object Harmonics : GuitarType("Guitar.obj", "GuitarD.obj", GuitarSkin["harmonics"].file)
+        data object Harmonics :
+            GuitarType("Guitar.obj", GuitarSkin["harmonics"].file, GuitarStyle.HARMONICS)
     }
 
     init {
@@ -176,12 +172,4 @@ class Guitar(context: PerformanceManager, events: List<MidiEvent>, type: GuitarT
         geometry.localTranslation = BASE_POSITION
         geometry.localRotation = Quaternion().fromAngles(rad(2.66), rad(-44.8), rad(-60.3))
     }
-}
-
-private fun needsDropTuning(events: List<MidiEvent>): Boolean =
-    (events.filterIsInstance<NoteEvent.NoteOn>().minByOrNull { it.note }?.note ?: 127) < 40
-
-private enum class GuitarTuning(val values: IntArray) {
-    STANDARD(intArrayOf(40, 45, 50, 55, 59, 64)),
-    DROP_D(intArrayOf(38, 45, 50, 55, 59, 64))
 }

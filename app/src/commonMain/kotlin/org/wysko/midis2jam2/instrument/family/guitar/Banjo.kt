@@ -22,6 +22,7 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
@@ -41,7 +42,7 @@ private val BASE_POSITION = Vector3f(56.5f, 51f, -1.5f)
 class Banjo(context: PerformanceManager, events: List<MidiEvent>) : FrettedInstrument(
     context,
     events,
-    StandardFrettingEngine(4, 17, intArrayOf(48, 55, 62, 69)),
+    FrettingPlan.create(context, events, FrettingProfiles.banjo()),
     FrettedInstrumentPositioning(
         13.93f,
         -19.54f,
@@ -56,9 +57,13 @@ class Banjo(context: PerformanceManager, events: List<MidiEvent>) : FrettedInstr
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.modelD("Banjo.obj", "BanjoSkin.png") to
+    context.modelD(TuningKeyLayout.bodyFor("Banjo.obj", "Banjo.obj", lowered = false), "BanjoSkin.png") to
             "BanjoSkin.png"
 ) {
+    private val keyLayout = TuningKeyLayout.forModel("Banjo.obj")
+
+    override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
+
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BanjoString.obj", "BassSkin.bmp").also {
             geometry.attachChild(it)

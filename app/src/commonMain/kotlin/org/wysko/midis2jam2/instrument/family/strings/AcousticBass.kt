@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.strings
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
@@ -32,7 +33,7 @@ class AcousticBass(context: PerformanceManager, events: List<MidiEvent>, style: 
         style == PlayingStyle.ARCO,
         20.0,
         Vector3f(0.75f, 0.75f, 0.75f),
-        intArrayOf(28, 33, 38, 43),
+        FrettingProfiles.doubleBass(),
         context.modelD(
             "DoubleBass.obj",
             if (style == PlayingStyle.ARCO) "DoubleBassSkin.bmp" else "DoubleBassSkinAlt.png"

@@ -30,8 +30,6 @@ import com.jme3.scene.Spatial.CullHint.Dynamic
 import com.jme3.scene.control.Control
 import com.jme3.scene.debug.Arrow
 import org.wysko.midis2jam2.manager.PerformanceManager
-import kotlin.math.pow
-import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -157,13 +155,6 @@ val Boolean.sign: Float
  * @param length The length to wrap the string to.
  */
 fun String.wrap(length: Int): String = this.chunked(length).joinToString("\n")
-
-fun Collection<Number>.stdDev(): Double {
-    val asDoubles = this.map { it.toDouble() }
-    val mean = asDoubles.average()
-    val sum = asDoubles.sumOf { (it - mean).pow(2) }
-    return sqrt(sum / asDoubles.size)
-}
 
 /**
  * Returns the maximum of two bytes.

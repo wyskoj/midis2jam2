@@ -27,7 +27,8 @@ import org.wysko.midis2jam2.instrument.algorithmic.TimedArcGroupCollector
 import org.wysko.midis2jam2.instrument.family.guitar.FretHeightCalculator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
-import org.wysko.midis2jam2.instrument.family.guitar.StandardFrettingEngine
+import org.wysko.midis2jam2.instrument.family.guitar.FrettingPlan
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfile
 import org.wysko.midis2jam2.midi.contiguousGroups
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
@@ -53,12 +54,12 @@ abstract class StringFamilyInstrument protected constructor(
     showBow: Boolean,
     bowRotation: Double,
     bowScale: Vector3f,
-    openStringMidiNotes: IntArray,
+    profile: FrettingProfile,
     body: Spatial,
 ) : FrettedInstrument(
     context,
     events,
-    StandardFrettingEngine(4, 24, openStringMidiNotes),
+    FrettingPlan.create(context, events, profile),
     FrettedInstrumentPositioningWithZ(
         8.84f,
         -6.17f,

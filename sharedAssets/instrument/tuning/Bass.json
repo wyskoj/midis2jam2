@@ -1,0 +1,11 @@
+{
+  "body": "Bass.obj",
+  "key": "BassKey.obj",
+  "keyRotation": [-90, 0, 0],
+  "keys": [
+    {"position": [-1.129, 1.5923, 21.839], "rotation": [47.848, -74.919, 41.131], "direction": 1},
+    {"position": [-0.6286, 2.0293, 24.3044], "rotation": [47.848, -74.919, 41.131], "direction": 1},
+    {"position": [-0.1282, 2.4663, 26.7698], "rotation": [47.848, -74.919, 41.131], "direction": 1},
+    {"position": [0.3722, 2.9033, 29.2352], "rotation": [47.848, -74.919, 41.131], "direction": 1}
+  ]
+}

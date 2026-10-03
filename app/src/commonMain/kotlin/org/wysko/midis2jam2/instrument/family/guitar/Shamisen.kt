@@ -19,6 +19,7 @@ package org.wysko.midis2jam2.instrument.family.guitar
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.util.*
@@ -37,7 +38,7 @@ class Shamisen(context: PerformanceManager, events: List<MidiEvent>) :
     FrettedInstrument(
         context,
         events,
-        StandardFrettingEngine(3, 15, intArrayOf(50, 57, 62)),
+        FrettingPlan.create(context, events, FrettingProfiles.shamisen()),
         FrettedInstrumentPositioning(
             upperY = 38.814f,
             lowerY = -6.1f,

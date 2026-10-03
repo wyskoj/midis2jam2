@@ -1,0 +1,12 @@
+{
+  "body": "Guitar.obj",
+  "key": "GuitarKey.obj",
+  "keys": [
+    {"position": [-1.023, 1.1348, 18.124], "rotation": [-38.426, -69.561, 36.073], "direction": 1},
+    {"position": [-0.6431, 1.4116, 19.3853], "rotation": [-38.426, -69.561, 36.073], "direction": 1},
+    {"position": [-0.2632, 1.6883, 20.6465], "rotation": [-38.426, -69.561, 36.073], "direction": 1},
+    {"position": [0.1167, 1.9651, 21.9078], "rotation": [-38.426, -69.561, 36.073], "direction": 1},
+    {"position": [0.4967, 2.2419, 23.169], "rotation": [-38.426, -69.561, 36.073], "direction": 1},
+    {"position": [0.8766, 2.5186, 24.4303], "rotation": [-38.426, -69.561, 36.073], "direction": 1}
+  ]
+}

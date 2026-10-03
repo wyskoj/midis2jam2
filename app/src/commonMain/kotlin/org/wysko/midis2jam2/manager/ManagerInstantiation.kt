@@ -62,6 +62,7 @@ fun instantiateManagers(
         if (profile == ManagerProfile.Full) {
             add(DebugTextManager().apply { isEnabled = false })
         }
+        add(FrettingDebugManager())
         add(DrumSetVisibilityManager())
         add(FadeManager())
         add(HudManager().apply { isEnabled = settings.onScreenElementsSettings.isShowHeadsUpDisplay })
