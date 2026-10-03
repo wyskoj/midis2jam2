@@ -192,10 +192,10 @@
     <string name="settings_instruments_description">Visibilité des instruments</string>
     <string name="settings_instruments_always_show_instruments">Toujours afficher les instruments</string>
     <string name="settings_instruments_always_show_instruments_description">Ne jamais masquer les instruments, même lorsqu'aucune note n'est jouée</string>
-    <string name="settings_instruments_smart_mallets">Smart mallets</string>
-    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
-    <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
-    <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
+    <string name="settings_instruments_smart_mallets">Maillets intelligents</string>
+    <string name="settings_instruments_smart_mallets_description">Joue les instruments à maillets avec deux maillets qui se déplacent au lieu d'un par lame</string>
+    <string name="settings_instruments_smart_drum_sticks">Baguettes intelligentes</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Joue la batterie avec deux baguettes qui se déplacent autour d'elle au lieu d'une par tambour</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Une remasterisation de MIDIJam, un visualiseur 3D de fichiers MIDI.</string>

@@ -209,10 +209,10 @@
     <string name="settings_instruments_description">乐器可见性</string>
     <string name="settings_instruments_always_show_instruments">始终显示乐器</string>
     <string name="settings_instruments_always_show_instruments_description">即使没有音符播放，也从不隐藏乐器</string>
-    <string name="settings_instruments_smart_mallets">Smart mallets</string>
-    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
-    <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
-    <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
+    <string name="settings_instruments_smart_mallets">智能琴槌</string>
+    <string name="settings_instruments_smart_mallets_description">使用两根会移动的琴槌演奏槌击乐器，而不是每个琴键一根</string>
+    <string name="settings_instruments_smart_drum_sticks">智能鼓槌</string>
+    <string name="settings_instruments_smart_drum_sticks_description">使用两根绕鼓组移动的鼓槌演奏架子鼓，而不是每个鼓一根</string>
 
     <!-- 关于 -->
     <string name="about_midis2jam2_description">MIDIJam 的重制版，一款 3D MIDI 文件可视化工具。</string>

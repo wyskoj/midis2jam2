@@ -209,10 +209,10 @@
     <string name="settings_instruments_description">악기 표시 여부</string>
     <string name="settings_instruments_always_show_instruments">항상 악기 표시</string>
     <string name="settings_instruments_always_show_instruments_description">음표가 재생되지 않을 때도 악기를 숨기지 않음</string>
-    <string name="settings_instruments_smart_mallets">Smart mallets</string>
-    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
-    <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
-    <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
+    <string name="settings_instruments_smart_mallets">스마트 말렛</string>
+    <string name="settings_instruments_smart_mallets_description">건반마다 말렛 하나 대신 이동하는 말렛 두 개로 말렛 악기를 연주합니다</string>
+    <string name="settings_instruments_smart_drum_sticks">스마트 드럼 스틱</string>
+    <string name="settings_instruments_smart_drum_sticks_description">드럼마다 스틱 하나 대신 주위를 이동하는 스틱 두 개로 드럼 세트를 연주합니다</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">3D MIDI 파일 시각화 프로그램인 MIDIJam의 리마스터 버전입니다.</string>

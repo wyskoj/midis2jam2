@@ -209,10 +209,10 @@
     <string name="settings_instruments_description">楽器の表示/非表示</string>
     <string name="settings_instruments_always_show_instruments">常に楽器を表示</string>
     <string name="settings_instruments_always_show_instruments_description">音が鳴っていない場合でも楽器を非表示にしない</string>
-    <string name="settings_instruments_smart_mallets">Smart mallets</string>
-    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
-    <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
-    <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
+    <string name="settings_instruments_smart_mallets">スマートマレット</string>
+    <string name="settings_instruments_smart_mallets_description">鍵ごとに1本ではなく、2本のマレットが移動して打楽器を演奏します</string>
+    <string name="settings_instruments_smart_drum_sticks">スマートドラムスティック</string>
+    <string name="settings_instruments_smart_drum_sticks_description">ドラムごとに1本ではなく、2本のスティックがキット上を移動して演奏します</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">3D MIDIファイルビジュアライザー、MIDIJamのリマスター版。</string>

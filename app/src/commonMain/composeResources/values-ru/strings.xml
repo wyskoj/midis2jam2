@@ -209,10 +209,10 @@
     <string name="settings_instruments_description">Видимость инструментов</string>
     <string name="settings_instruments_always_show_instruments">Всегда показывать инструменты</string>
     <string name="settings_instruments_always_show_instruments_description">Никогда не скрывать инструменты, даже когда ноты не играют</string>
-    <string name="settings_instruments_smart_mallets">Smart mallets</string>
-    <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
-    <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
-    <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
+    <string name="settings_instruments_smart_mallets">Умные молоточки</string>
+    <string name="settings_instruments_smart_mallets_description">Играть на ударных клавишных инструментах двумя перемещающимися молоточками вместо одного на каждую пластину</string>
+    <string name="settings_instruments_smart_drum_sticks">Умные барабанные палочки</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Играть на ударной установке двумя палочками, которые перемещаются вокруг неё, вместо одной на каждый барабан</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Ремастер MIDIJam, 3D-визуализатора MIDI-файлов.</string>
