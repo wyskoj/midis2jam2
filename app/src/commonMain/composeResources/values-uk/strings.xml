@@ -209,6 +209,10 @@
     <string name="settings_instruments_description">Видимість інструментів</string>
     <string name="settings_instruments_always_show_instruments">Завжди показувати інструменти</string>
     <string name="settings_instruments_always_show_instruments_description">Ніколи не приховувати інструменти, навіть якщо ноти не грають</string>
+    <string name="settings_instruments_smart_mallets">Розумні молоточки</string>
+    <string name="settings_instruments_smart_mallets_description">Грати на ударних клавішних інструментах двома молоточками, що переміщуються, замість одного на кожну пластину</string>
+    <string name="settings_instruments_smart_drum_sticks">Розумні барабанні палички</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Грати на ударній установці двома паличками, що переміщуються навколо неї, замість однієї на кожен барабан</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Ремейк MIDIJam, 3D-візуалізатора MIDI-файлів.</string>

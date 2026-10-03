@@ -44,24 +44,28 @@ class TypicalDrumSet(
 
     private val instruments = buildList {
         this += BassDrum(context, events.filterByNotes(35, 36).toMutableList(), shellStyle)
-        this += SnareDrum(context, events.filterByNotes(37, 38, 40).toMutableList(), shellStyle)
-        this += HiHat(context, events.filterByNotes(42, 44, 46).toMutableList(), style = cymbalStyle)
-        this += Tom(context, events.filterByNotes(41).toMutableList(), TomPitch["low_floor"], shellStyle)
-        this += Tom(context, events.filterByNotes(43).toMutableList(), TomPitch["high_floor"], shellStyle)
-        this += Tom(context, events.filterByNotes(45).toMutableList(), TomPitch["low"], shellStyle)
-        this += Tom(context, events.filterByNotes(47).toMutableList(), TomPitch["low_mid"], shellStyle)
-        this += Tom(context, events.filterByNotes(48).toMutableList(), TomPitch["high_mid"], shellStyle)
-        this += Tom(context, events.filterByNotes(50).toMutableList(), TomPitch["high"], shellStyle)
-        this += Cymbal(context, events.filterByNotes(49).toMutableList(), CymbalType["crash_1"], cymbalStyle)
-        this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"], cymbalStyle)
-        this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"], cymbalStyle)
-        this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"], cymbalStyle)
+        this += SnareDrum(context, events.filterByNotes(37, 38, 40).toMutableList(), shellStyle, ghostStick = isSmartSticks)
+        this += HiHat(context, events.filterByNotes(42, 44, 46).toMutableList(), style = cymbalStyle, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(41).toMutableList(), TomPitch["low_floor"], shellStyle, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(43).toMutableList(), TomPitch["high_floor"], shellStyle, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(45).toMutableList(), TomPitch["low"], shellStyle, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(47).toMutableList(), TomPitch["low_mid"], shellStyle, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(48).toMutableList(), TomPitch["high_mid"], shellStyle, ghostStick = isSmartSticks)
+        this += Tom(context, events.filterByNotes(50).toMutableList(), TomPitch["high"], shellStyle, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(49).toMutableList(), CymbalType["crash_1"], cymbalStyle, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"], cymbalStyle, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"], cymbalStyle, ghostStick = isSmartSticks)
+        this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"], cymbalStyle, ghostStick = isSmartSticks)
         partitionRideCymbals(events).let {
-            this += RideCymbal(context, it.first, CymbalType["ride_1"], cymbalStyle)
-            this += RideCymbal(context, it.second, CymbalType["ride_2"], cymbalStyle)
+            this += RideCymbal(context, it.first, CymbalType["ride_1"], cymbalStyle, ghostStick = isSmartSticks)
+            this += RideCymbal(context, it.second, CymbalType["ride_2"], cymbalStyle, ghostStick = isSmartSticks)
         }
     }.onEach {
         geometry.attachChild(it.placement)
+    }
+
+    init {
+        addSmartSticks(instruments)
     }
 
     override fun tick(time: Duration, delta: Duration) {

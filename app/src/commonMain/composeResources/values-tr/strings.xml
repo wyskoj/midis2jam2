@@ -208,7 +208,11 @@
     <string name="settings_instruments">Enstrümanlar</string>
     <string name="settings_instruments_description">Enstrüman görünürlüğü</string>
     <string name="settings_instruments_always_show_instruments">Enstrümanları her zaman göster</string>
-    <string name="settings_instruments_always_show_instruments_description">Notalar çalınmasa bile enstrümanları asla gizleme</string>
+    <string name="settings_instruments_always_show_instruments_description">Notlar çalınmasa bile enstrümanları asla gizleme</string>
+    <string name="settings_instruments_smart_mallets">Akıllı tokmaklar</string>
+    <string name="settings_instruments_smart_mallets_description">Tokmaklı çalgıları her tuş için bir tokmak yerine hareket eden iki tokmakla çal</string>
+    <string name="settings_instruments_smart_drum_sticks">Akıllı davul çubukları</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Davul setini her davul için bir çubuk yerine set etrafında hareket eden iki çubukla çal</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Bir 3D MIDI dosyası görselleştiricisi olan MIDIJam'ın yeniden düzenlenmiş hali.</string>

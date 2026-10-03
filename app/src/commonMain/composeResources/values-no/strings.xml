@@ -209,6 +209,10 @@
     <string name="settings_instruments_description">Instrumentvisibilitet</string>
     <string name="settings_instruments_always_show_instruments">Vis instrumenter alltid</string>
     <string name="settings_instruments_always_show_instruments_description">Skjul aldri instrumenter, selv når ingen noter spilles</string>
+    <string name="settings_instruments_smart_mallets">Smarte køller</string>
+    <string name="settings_instruments_smart_mallets_description">Spill malletinstrumenter med to køller som beveger seg i stedet for én per tangent</string>
+    <string name="settings_instruments_smart_drum_sticks">Smarte trommestikker</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Spill trommesettet med to stikker som beveger seg rundt det i stedet for én per tromme</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">En nyutgivelse av MIDIJam, en 3D MIDI-filvisualisator.</string>

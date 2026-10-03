@@ -55,6 +55,8 @@ private const val DEFAULT_STRIKE_SPEED = 3.0
  * @param actualStick true if the spatial used in this object is actually a stick, and not something that is does not
  * appear as a stick but uses the same motion, false otherwise. When false, this object will always remain visible when
  * the "never_hidden" midis2jam2 property is enabled.
+ * @param windUpRise how high the whole stick (pivot and all) rises as it winds up to strike, as a hand lifts before
+ * bringing a stick down hard. Zero for none. See [windUpRise].
  */
 class Striker(
     private val context: PerformanceManager,
@@ -67,6 +69,7 @@ class Striker(
     private val actualStick: Boolean = true,
     private val fixed: Boolean = false,
     private val lift: Boolean = true,
+    private val windUpRise: Double = 0.0,
 ) {
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
@@ -79,18 +82,20 @@ class Striker(
         sticky: Boolean = true,
         actualStick: Boolean = true,
         fixed: Boolean = false,
+        windUpRise: Double = 0.0,
     ) : this(
-        context,
-        strikeEvents,
-        stickModel.let {
+        context = context,
+        strikeEvents = strikeEvents,
+        stickModel = stickModel.let {
             context.modelD(it.modelName, it.textureName)
         },
-        strikeSpeed,
-        maxIdleAngle,
-        rotationAxis,
-        sticky,
-        actualStick,
-        fixed,
+        strikeSpeed = strikeSpeed,
+        maxIdleAngle = maxIdleAngle,
+        rotationAxis = rotationAxis,
+        sticky = sticky,
+        actualStick = actualStick,
+        fixed = fixed,
+        windUpRise = windUpRise,
     )
 
     /**
@@ -141,7 +146,10 @@ class Striker(
 
         rotation = if (visibility || !actualStick) {
             if (!fixed) {
-                rotationNode.loc = v3(0, rotation * 2.0, 0)
+                val rise = windUpRise(
+                    currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity, anticipationTime, windUpRise
+                )
+                rotationNode.loc = v3(0, rotation * 2.0 + rise, 0)
             }
             evaluateRotation(currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity)
         } else {
@@ -242,6 +250,10 @@ class Striker(
      */
     fun offsetStick(operation: (stick: Spatial) -> Unit): Unit = operation(stickModel)
 
+    /** The stick model itself, for reading where it is. */
+    val model: Spatial
+        get() = stickModel
+
     private fun setRotation(axis: Axis, angle: Double) {
         rotationNode.localRotation =
             Quaternion().fromAngles(
@@ -249,6 +261,42 @@ class Striker(
             )
     }
 }
+
+/**
+ * How high a stick rises, on top of its swing, as it winds up to strike: nothing at rest, building through the
+ * wind-up to a peak around where the downswing starts, then dropping fast to nothing at the moment it strikes.
+ *
+ * Louder strikes rise higher (half [height] for the softest, all of it for the loudest). When strikes come quickly,
+ * the rise fades in from the last one, as the swing does, so the stick doesn't jump up straight after striking.
+ *
+ * @param time the current time, in seconds.
+ * @param timeOfNextEvent when the stick next strikes, if it does.
+ * @param timeOfLastEvent when the stick last struck, if it has.
+ * @param velocity how hard the next strike is.
+ * @param anticipationTime how long the wind-up takes.
+ * @param height the most the stick rises.
+ */
+internal fun windUpRise(
+    time: Double,
+    timeOfNextEvent: Double?,
+    timeOfLastEvent: Double?,
+    velocity: Byte,
+    anticipationTime: Double,
+    height: Double,
+): Double {
+    if (height <= 0.0 || timeOfNextEvent == null || time >= timeOfNextEvent) return 0.0
+    val windUp = 1.0 - min(timeOfNextEvent - time, anticipationTime) / anticipationTime
+    if (windUp <= 0.0) return 0.0
+
+    // sin(π·windUp^p) is zero at rest and at the strike, and peaks where windUp^p = ½: at 0.4, as the downswing begins.
+    val shape = sin(FastMath.PI * windUp.pow(WIND_UP_PEAK_EXPONENT))
+    val loudness = 0.5 + 0.5 * (velocity.coerceAtLeast(0) / 127.0)
+    val fadeIn = timeOfLastEvent?.let { Utils.mapRangeClamped(time, it, timeOfNextEvent, 0.0, 1.0) } ?: 1.0
+    return height * shape.coerceAtLeast(0.0) * loudness * fadeIn
+}
+
+/** ln ½ / ln 0.4: puts the peak of the wind-up rise at 40% of the way through the wind-up. */
+private const val WIND_UP_PEAK_EXPONENT = 0.7565
 
 /**
  * Returns data describing what the status of the stick is.

@@ -25,6 +25,7 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.world.modelD
@@ -32,9 +33,18 @@ import kotlin.time.Duration
 
 private val STICK_NODE_OFFSET = Vector3f(0f, 0f, 10f)
 
-/** A Tom. */
-class Tom(context: PerformanceManager, hits: List<NoteEvent.NoteOn>, pitch: TomPitch, style: ShellStyle) :
-    DrumSetInstrument(context, hits) {
+/**
+ * A Tom.
+ *
+ * @param ghostStick true if the smart drum sticks play this tom, so its own stick is hidden.
+ */
+class Tom(
+    context: PerformanceManager,
+    hits: List<NoteEvent.NoteOn>,
+    private val pitch: TomPitch,
+    style: ShellStyle,
+    ghostStick: Boolean = false,
+) : DrumSetInstrument(context, hits) {
     /** The drum. */
     private val drum =
         context.modelD(style.tomModel, style.shellTexture).apply {
@@ -46,7 +56,11 @@ class Tom(context: PerformanceManager, hits: List<NoteEvent.NoteOn>, pitch: TomP
     private val stick: Striker =
         Striker(context, hits, StickType.DRUM_SET_STICK).apply {
             setParent(recoilNode)
+            if (ghostStick) ghost(this)
         }
+
+    override fun stickTargets(): List<StickTarget> =
+        listOf(StickTarget("tom_${pitch.name}", { true }, stick.model, HandProfile.forTom(pitch.name)))
 
     init {
         // Move and rotate tom based on its pitch

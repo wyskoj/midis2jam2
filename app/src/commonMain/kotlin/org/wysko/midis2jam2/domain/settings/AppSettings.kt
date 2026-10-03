@@ -164,5 +164,7 @@ data class AppSettings(
     @Serializable
     data class InstrumentSettings(
         val isAlwaysShowInstruments: Boolean = false,
+        val isSmartMallets: Boolean = false,
+        val isSmartDrumSticks: Boolean = false,
     )
 }

@@ -366,6 +366,32 @@ object MidiFixtures {
         "café ", "naïve ", "résumé",
     )
 
+    /**
+     * A marimba part that exercises roaming mallets: an eighth-note scale, fast repeats of one note, leaps between
+     * the ends of the keyboard and a wide two-note chord. At 120 BPM an eighth note is a quarter of a second.
+     */
+    fun malletRun(program: Int = 12): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        val eighth = TICKS_PER_QUARTER / 2
+        val sixteenth = TICKS_PER_QUARTER / 4
+        track {
+            tempo(120)
+            channel(0) {
+                program(program)
+                listOf(60, 62, 64, 65, 67, 69, 71, 72).forEachIndexed { i, note ->
+                    note(note, duration = 1.eighth, absoluteTime = i * eighth)
+                }
+                repeat(8) { note(67, duration = 1.eighth, absoluteTime = 8 * eighth + it * sixteenth) }
+                listOf(40, 90, 40, 90).forEachIndexed { i, note ->
+                    note(note, duration = 1.eighth, absoluteTime = 12 * eighth + i * eighth)
+                }
+                note(45, duration = 1.quarter, absoluteTime = 18 * eighth)
+                note(85, duration = 1.quarter, absoluteTime = 18 * eighth)
+            }
+        }
+    }.toTimeBasedSequence()
+
     /** Steel-string acoustic guitar (zero-based General MIDI program). */
     const val STEEL_GUITAR_PROGRAM = 25
 
@@ -472,6 +498,33 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /**
+     * A rock groove on the standard kit, for the smart drum sticks: two bars of eighth-note hi-hat with the snare on
+     * two and four and the bass drum on one and three, then a sixteenth-note fill down the toms into a crash. At
+     * 120 BPM an eighth note is a quarter of a second.
+     */
+    fun drumGroove(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        val eighth = TICKS_PER_QUARTER / 2
+        val sixteenth = TICKS_PER_QUARTER / 4
+        track {
+            tempo(120)
+            channel(PERCUSSION_CHANNEL) {
+                repeat(16) { i ->
+                    note(42, duration = 1.eighth, absoluteTime = i * eighth)
+                    if (i % 4 == 0) note(36, duration = 1.eighth, absoluteTime = i * eighth)
+                    if (i % 4 == 2) note(38, duration = 1.eighth, absoluteTime = i * eighth)
+                }
+                listOf(50, 50, 48, 48, 47, 47, 45, 45, 43, 43, 41, 41).forEachIndexed { i, drum ->
+                    note(drum, duration = 1.eighth, absoluteTime = 16 * eighth + i * sixteenth)
+                }
+                note(49, duration = 1.quarter, absoluteTime = 16 * eighth + 12 * sixteenth)
+                note(36, duration = 1.quarter, absoluteTime = 16 * eighth + 12 * sixteenth)
+            }
+        }
+    }.toTimeBasedSequence()
+    
     /**
      * Open-chord shapes strummed on a tenor banjo (tuned C-G-D-A) two frets up, which the engine plays with a capo on the
      * second fret. It starts [TUNED_PART_START_SECONDS] in.

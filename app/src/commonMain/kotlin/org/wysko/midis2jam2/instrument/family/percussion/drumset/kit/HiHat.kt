@@ -27,6 +27,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.util.max
 import org.wysko.midis2jam2.world.model
 import kotlin.math.sin
@@ -42,12 +43,17 @@ private val MAX_PEDAL_WINDOW = 200.milliseconds
 private val MAX_OPEN_WINDOW = 200.milliseconds
 private val MAX_CLOSE_WINDOW = 50.milliseconds
 
-/** The hi-hat. */
+/**
+ * The hi-hat.
+ *
+ * @param ghostStick true if the smart drum sticks play this hi-hat, so its own stick is hidden.
+ */
 class HiHat(
     context: PerformanceManager,
     hits: List<NoteEvent.NoteOn>,
     private val noteMapping: HiHatNoteMapping = HiHatNoteMapping.Standard,
     style: Cymbal.Style = Cymbal.Style.Standard,
+    ghostStick: Boolean = false,
 ) : DrumSetInstrument(context, hits) {
     private val cymbalsNode =
         Node().apply {
@@ -86,7 +92,11 @@ class HiHat(
         ).apply {
             setParent(recoilNode)
             node.move(0f, 1f, 2f)
+            if (ghostStick) ghost(this)
         }
+
+    override fun stickTargets(): List<StickTarget> =
+        listOf(StickTarget("hi_hat", { it != noteMapping.pedal }, stick.model, HandProfile.HI_HAT))
 
     private val cymbalAnimator = CymbalAnimator(topCymbal, AMPLITUDE, WOBBLE_SPEED, DAMPENING)
 
