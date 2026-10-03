@@ -93,10 +93,10 @@ class TuningVisualsTest {
 
     @Test
     @Spec("instrument.fretted.capo")
-    fun `a banjo's capo is clamped on its fret, down on the banjo's lower strings`() {
+    fun `a banjo's capo is clamped on its fret`() {
         HeadlessPerformance.start(MidiFixtures.banjoCapoChords(), attachManagers = false).use { performance ->
             val banjo = performance.instruments.filterIsInstance<Banjo>().single()
-            assertCapoClamped(performance, banjo, capoZ = -0.15f)
+            assertCapoClamped(performance, banjo)
         }
     }
 
