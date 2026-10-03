@@ -17,8 +17,6 @@
 
 package org.wysko.midis2jam2.performance
 
-import com.jme3.scene.Node
-import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar
 import org.wysko.midis2jam2.instrument.family.guitar.FretboardPosition
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
@@ -63,18 +61,16 @@ class FrettedInstrumentTest {
                 openE.map { it.string to it.fret },
                 "The first chord should be the open E shape",
             )
-            assertTrue(modelNames(guitar).none { "DropD" in it }, "A standard-tuned part shows the standard model")
         }
     }
 
     @Test
     @Spec("instrument.guitar.tuning")
-    fun `a drop-D riff is played in drop D on the drop-D model`() {
+    fun `a drop-D riff is played in drop D`() {
         HeadlessPerformance.start(MidiFixtures.dropDRiff(), attachManagers = false).use { performance ->
             val guitar = performance.instruments.filterIsInstance<Guitar>().single()
             assertEquals("drop-d", guitar.fretting.tuning.id)
             assertTrue(guitar.timedArcs.all { it in guitar.notePeriodFretboardPosition }, "Every note of the riff is playable in drop D")
-            assertTrue(modelNames(guitar).any { it.endsWith("GuitarD.obj") }, "Expected the drop-D model, got ${modelNames(guitar)}")
         }
     }
 
@@ -118,15 +114,4 @@ class FrettedInstrumentTest {
 
     private fun describe(arcs: List<org.wysko.kmidi.midi.TimedArc>, positions: Map<org.wysko.kmidi.midi.TimedArc, FretboardPosition>) =
         arcs.joinToString { "${it.note}=${positions[it]}" }
-
-    /** The asset names of the models loaded into [instrument]'s geometry. */
-    private fun modelNames(instrument: FrettedInstrument): List<String> {
-        val names = mutableListOf<String>()
-        fun visit(spatial: Spatial) {
-            spatial.key?.name?.let { names += it }
-            if (spatial is Node) spatial.children.forEach(::visit)
-        }
-        visit(instrument.geometry)
-        return names
-    }
 }

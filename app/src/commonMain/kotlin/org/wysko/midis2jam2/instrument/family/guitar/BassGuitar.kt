@@ -44,7 +44,7 @@ private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
 
 private const val BASS_GUITAR_FORWARD_OFFSET = 0.02
 
-/** The lowest open string in standard tuning; a lower one shows the drop-tuned model. */
+/** The lowest open string in standard tuning; a lower one shows a drop-tuned model on a bass without key art. */
 private val STANDARD_LOWEST_STRING = Tunings.BASS.first().lowest
 
 /**
@@ -53,8 +53,8 @@ private val STANDARD_LOWEST_STRING = Tunings.BASS.first().lowest
  * @param context context to the main class
  * @param events the list of events for this BassGuitar
  * @param type specifies the type of BassGuitar
- * @param fretting Where every note is played; worked out before the model is chosen, because a lowered tuning
- * shows the drop-tuned model.
+ * @param fretting Where every note is played, and the tuning it is played in; worked out before the model is
+ * chosen, because a lowered tuning shows the drop-tuned model on a bass without key art.
  */
 class BassGuitar private constructor(
     context: PerformanceManager,
@@ -78,7 +78,7 @@ class BassGuitar private constructor(
         },
         numberOfStrings = 4,
         instrumentBody = context.modelD(
-            if (fretting.tuning.lowest < STANDARD_LOWEST_STRING) type.modelDropDFile else type.modelFile,
+            TuningKeyLayout.bodyFor(type.modelFile, null, fretting.tuning.lowest < STANDARD_LOWEST_STRING),
             type.textureFile
         ) to when (type) {
             BassGuitarType.Synth1 -> "BassSkinSynth1.png"
@@ -88,6 +88,12 @@ class BassGuitar private constructor(
     ),
     MultipleInstancesLinearAdjustment {
 
+    private val keyLayout = TuningKeyLayout.forModel(type.modelFile)
+    private val texture = type.textureFile
+
+    override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
+
+    override val bodyTexture: String get() = texture
 
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BassString.obj", BASS_SKIN_BMP).apply {
@@ -143,7 +149,6 @@ class BassGuitar private constructor(
      */
     sealed class BassGuitarType(
         internal val modelFile: String,
-        internal val modelDropDFile: String,
         internal val textureFile: String,
         internal val glowColor: ColorRGBA,
         internal val style: BassStyle = BassStyle.STANDARD,
@@ -152,7 +157,6 @@ class BassGuitar private constructor(
         /** The standard Bass Guitar type. */
         data object Standard : BassGuitarType(
             modelFile = "Bass.obj",
-            modelDropDFile = "BassD.obj",
             textureFile = BASS_SKIN_BMP,
             glowColor = STRING_GLOW
         )
@@ -160,7 +164,6 @@ class BassGuitar private constructor(
         /** The fretless Bass Guitar type. */
         data object Fretless : BassGuitarType(
             modelFile = "BassFretless.obj",
-            modelDropDFile = "BassFretlessD.obj",
             textureFile = "BassSkinFretless.png",
             glowColor = STRING_GLOW,
             style = BassStyle.FRETLESS,
@@ -169,7 +172,6 @@ class BassGuitar private constructor(
         /** The synth 1 Bass Guitar type. */
         data object Synth1 : BassGuitarType(
             modelFile = "Bass.obj",
-            modelDropDFile = "BassD.obj",
             textureFile = "BassSkinSynth1.png",
             glowColor = ColorRGBA(0.64f, 1.1f, 0.67f, 1f),
             style = BassStyle.SYNTH,
@@ -178,7 +180,6 @@ class BassGuitar private constructor(
         /** The synth 2 Bass Guitar type. */
         data object Synth2 : BassGuitarType(
             modelFile = "Bass.obj",
-            modelDropDFile = "BassD.obj",
             textureFile = "BassSkinSynth2.png",
             glowColor = ColorRGBA(0.70f, 0.93f, 1.4f, 1f),
             style = BassStyle.SYNTH,

@@ -32,9 +32,10 @@ class StringVibrationController(private val frames: Collection<Spatial>) {
      * Update animation.
      *
      * @param delta the amount of time since the last frame update
+     * @param speed how fast the vibration cycles, relative to normal (a slacker string vibrates slower)
      */
-    fun tick(delta: Duration) {
-        animationTime = (animationTime + delta.toDouble(SECONDS) * 60) % frames.size
+    fun tick(delta: Duration, speed: Double = 1.0) {
+        animationTime = (animationTime + delta.toDouble(SECONDS) * 60 * speed) % frames.size
         frames.forEachIndexed { index, frame -> frame.cullHint = (index == floor(animationTime).toInt()).ch }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "body": "Banjo.obj",
+  "key": "BassKey.obj",
+  "keyTexture": "BassSkin.bmp",
+  "keyRotation": [-90, 0, 0],
+  "keyScale": 0.75,
+  "capoZ": 0,
+  "keys": [
+    {"position": [-0.89, 1.59, 16.85], "rotation": [47.8, -74.9, 41.1], "direction": 1},
+    {"position": [-0.82, 2.24, 20.94], "rotation": [47.8, -74.9, 41.1], "direction": 1},
+    {"position": [0.82, 2.24, 20.94], "rotation": [47.8, 74.9, -41.1], "direction": -1},
+    {"position": [0.89, 1.59, 16.85], "rotation": [47.8, 74.9, -41.1], "direction": -1}
+  ]
+}

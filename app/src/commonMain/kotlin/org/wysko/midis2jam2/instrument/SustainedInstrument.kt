@@ -50,8 +50,14 @@ abstract class SustainedInstrument(context: PerformanceManager, events: List<Mid
         adjustForMultipleInstances(delta)
     }
 
+    /**
+     * Whether the instrument should stay on stage at [time] even though it plays nothing near it, to show something
+     * it does before it plays.
+     */
+    protected open fun isHeldOnStage(time: Duration): Boolean = false
+
     override fun calculateVisibility(time: Duration): Boolean =
-        Visibility.standardRules(collector, time).also {
+        (Visibility.standardRules(collector, time) || isHeldOnStage(time)).also {
             if (!isVisible && it) onEntry()
             if (isVisible && !it) onExit()
         }

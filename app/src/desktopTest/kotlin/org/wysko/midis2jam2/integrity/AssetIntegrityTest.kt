@@ -145,6 +145,7 @@ class AssetIntegrityTest {
         const val MINIMUM_EXPECTED_ASSET_REFERENCES = 300
         const val MINIMUM_EXPECTED_DATA_FILES = 20
 
+
         /**
          * Bundled data files that nothing reads.
          *
@@ -219,6 +220,10 @@ class AssetIntegrityTest {
 
             val relative = file.relativeTo(ProjectPaths.sharedAssets).path.replace(File.separatorChar, '/')
             if (text.contains(relative)) return true
+
+            // instrument/tuning/<Body>.json is the key art of the instrument whose body is <Body>.obj
+            // (TuningKeyLayout.forModel).
+            if (relative.startsWith("instrument/tuning/")) return text.contains("\"" + file.nameWithoutExtension + ".obj\"")
 
             // instrument/<Class>.json and friends are loaded through
             // resourceToString("/instrument/" + klass.simpleName + ".json").

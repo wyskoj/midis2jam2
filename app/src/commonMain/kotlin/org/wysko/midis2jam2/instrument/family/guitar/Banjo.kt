@@ -57,9 +57,13 @@ class Banjo(context: PerformanceManager, events: List<MidiEvent>) : FrettedInstr
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.modelD("Banjo.obj", "BanjoSkin.png") to
+    context.modelD(TuningKeyLayout.bodyFor("Banjo.obj", "Banjo.obj", lowered = false), "BanjoSkin.png") to
             "BanjoSkin.png"
 ) {
+    private val keyLayout = TuningKeyLayout.forModel("Banjo.obj")
+
+    override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
+
     override val upperStrings: Array<Spatial> = Array(4) {
         context.modelD("BanjoString.obj", "BassSkin.bmp").also {
             geometry.attachChild(it)

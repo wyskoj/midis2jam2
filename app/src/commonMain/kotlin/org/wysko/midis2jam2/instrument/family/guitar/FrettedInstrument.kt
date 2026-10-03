@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /**
  * Any instrument that has strings and frets.
@@ -92,6 +93,16 @@ abstract class FrettedInstrument protected constructor(
     /** The live fretting readout (F3). */
     internal val readout: FrettingDebugOverlay = FrettingDebugOverlay(context, root, geometry, fretting)
 
+    /** Where this instrument's tuning keys are drawn, or `null` while it has no key art. */
+    protected open val tuningKeyLayout: TuningKeyLayout? get() = null
+
+    /** The texture of the instrument's body, which its tuning keys and capo share. */
+    protected open val bodyTexture: String? get() = null
+
+    /** The tuning keys, string slack and capo, built on first use, once subclasses have finished constructing. */
+    internal val tuning: TuningVisuals by lazy {
+        TuningVisuals(context, geometry, fretboard, fretting, tuningKeyLayout, bodyTexture ?: instrumentBody.second)
+    }
 
     private val pitchBendModulationController = PitchBendModulationController(context, events, smoothness = 0.0)
     private val stringVibrators: List<StringVibrationController> by lazy {
@@ -108,8 +119,12 @@ abstract class FrettedInstrument protected constructor(
         geometry += instrumentBody.first
     }
 
+    /** A retuned or capo'd instrument comes on stage early, to be seen retuning. */
+    override fun isHeldOnStage(time: Duration): Boolean = tuning.motion.isShowing(time.toDouble(DurationUnit.SECONDS))
+
     override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
+        tuning.update(time)
 
         repeat(numberOfStrings) {
             animateString(
@@ -166,11 +181,13 @@ abstract class FrettedInstrument protected constructor(
 
         // Scale the resting string's Y-axis by the fret distance.
         upperStrings[string].localScale = Vector3f(positioning.restingStrings[string]).apply { y = fretDistance }
-        stringVibrators[string].tick(delta)
+        stringVibrators[string].tick(delta, tuning.vibrationSpeed(string))
 
-        // Scale each frame of animation to the inverse of the fret distance.
+        // Scale each frame of animation to the inverse of the fret distance, and as wide as the string's tension
+        // lets it swing.
+        val width = tuning.vibrationWidth(string).toFloat()
         lowerStrings[string].forEach {
-            it.localScale = Vector3f(positioning.restingStrings[string]).setY(1 - fretDistance)
+            it.localScale = Vector3f(positioning.restingStrings[string]).multLocal(width, 1f, width).setY(1 - fretDistance)
         }
 
         noteFingers[string].let {
