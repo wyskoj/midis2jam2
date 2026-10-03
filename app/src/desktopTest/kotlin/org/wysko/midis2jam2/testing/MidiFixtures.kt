@@ -472,6 +472,31 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /**
+     * Open-chord shapes strummed on a tenor banjo (tuned C-G-D-A) two frets up, which the engine plays with a capo on the
+     * second fret. It starts [TUNED_PART_START_SECONDS] in.
+     */
+    fun banjoCapoChords(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(BANJO_PROGRAM, absoluteTime = 0)
+                val shapes = listOf(
+                    listOf(48, 55, 64, 72),
+                    listOf(48, 57, 62, 69),
+                    listOf(50, 55, 62, 71),
+                    listOf(48, 55, 62, 72),
+                )
+                val song = List(8) { shapes }.flatten().map { chord -> chord.map { it + 2 } }
+                chords(song, duration = 2 * TICKS_PER_QUARTER, spread = 2, offset = TUNED_PART_START_TICKS)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    private const val BANJO_PROGRAM = 105
+
     /** When a delayed [dropDRiff] and [capoChords] start playing, in seconds. */
     const val TUNED_PART_START_SECONDS = 2.0
     private const val TUNED_PART_START_TICKS = 4 * TICKS_PER_QUARTER

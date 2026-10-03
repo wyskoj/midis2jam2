@@ -22,6 +22,8 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.instrument.family.guitar.Banjo
+import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.Guitar
 import org.wysko.midis2jam2.instrument.family.guitar.TuningKeyLayout
 import org.wysko.midis2jam2.instrument.family.guitar.TuningMotion
@@ -85,28 +87,43 @@ class TuningVisualsTest {
     @Spec("instrument.fretted.capo")
     fun `a capo is clamped across the neck on its fret`() {
         HeadlessPerformance.start(MidiFixtures.capoChords(), attachManagers = false).use { performance ->
-            val guitar = performance.instruments.filterIsInstance<Guitar>().single()
-            assertEquals(2, guitar.fretting.capo)
-            // The visuals are built on the engine thread by the first frame.
-            stepTo(performance, BEFORE_RETUNE)
-            val capo = performance.onEngineThread { assertNotNull(guitar.tuning.capo, "A part played with a capo should show one") }
-            performance.onEngineThread { assertEquals(Spatial.CullHint.Always, capo.cullHint, "No capo before the retune") }
-
-            stepTo(performance, MidiFixtures.TUNED_PART_START_SECONDS + 0.5)
-            performance.onEngineThread {
-                assertTrue(capo.cullHint != Spatial.CullHint.Always, "The capo should be on the neck")
-                val board = guitar.fretboard
-                val middle = (board.stringCount - 1) / 2.0
-                fun along(fret: Double) = board.pointOn(middle, fret).dot(board.along)
-                val at = capo.localTranslation.dot(board.along)
-                assertEquals(along(2.0), at, 0.01f, "The capo should sit on its fret, over where the open strings start to vibrate")
-                assertEquals(0f, capo.localTranslation.z, "The capo should be clamped onto the strings by now")
-            }
-
-            // Seeking back before the retune takes the capo off again.
-            stepTo(performance, BEFORE_RETUNE)
-            performance.onEngineThread { assertEquals(Spatial.CullHint.Always, capo.cullHint) }
+            assertCapoClamped(performance, performance.instruments.filterIsInstance<Guitar>().single())
         }
+    }
+
+    @Test
+    @Spec("instrument.fretted.capo")
+    fun `a banjo's capo is clamped on its fret, down on the banjo's lower strings`() {
+        HeadlessPerformance.start(MidiFixtures.banjoCapoChords(), attachManagers = false).use { performance ->
+            val banjo = performance.instruments.filterIsInstance<Banjo>().single()
+            assertCapoClamped(performance, banjo, capoZ = -0.15f)
+        }
+    }
+
+    private fun assertCapoClamped(performance: HeadlessPerformance, guitar: FrettedInstrument, capoZ: Float = 0f) {
+        assertEquals(2, guitar.fretting.capo)
+        // The visuals are built on the engine thread by the first frame.
+        stepTo(performance, BEFORE_RETUNE)
+        val capo = performance.onEngineThread { assertNotNull(guitar.tuning.capo, "A part played with a capo should show one") }
+        performance.onEngineThread { assertEquals(Spatial.CullHint.Always, capo.cullHint, "No capo before the retune") }
+
+        stepTo(performance, MidiFixtures.TUNED_PART_START_SECONDS + 0.5)
+        performance.onEngineThread {
+            assertTrue(capo.cullHint != Spatial.CullHint.Always, "The capo should be on the neck")
+            val board = guitar.fretboard
+            val middle = (board.stringCount - 1) / 2.0
+            fun along(fret: Double) = board.pointOn(middle, fret).dot(board.along)
+            val at = capo.localTranslation.dot(board.along)
+            assertEquals(along(2.0), at, 0.01f, "The capo should sit on its fret, over where the open strings start to vibrate")
+            assertEquals(
+                capoZ, capo.localTranslation.z, 1e-4f,
+                "The capo should be clamped onto the strings by now",
+            )
+        }
+
+        // Seeking back before the retune takes the capo off again.
+        stepTo(performance, BEFORE_RETUNE)
+        performance.onEngineThread { assertEquals(Spatial.CullHint.Always, capo.cullHint) }
     }
 
     @Test
@@ -138,7 +155,7 @@ class TuningVisualsTest {
 
     @Test
     fun `every instrument with key art has a key for each string`() {
-        mapOf("Guitar" to 6, "GuitarAcoustic" to 6, "Bass" to 4, "Banjo" to 4).forEach { (name, strings) ->
+        mapOf("Guitar" to 6, "GuitarAcoustic" to 6, "Bass" to 4, "BassFretless" to 4, "Banjo" to 4).forEach { (name, strings) ->
             val layout = assertNotNull(TuningKeyLayout.load(name), "$name should have key art")
             assertEquals(strings, layout.keys.size, "$name's keys")
         }

@@ -16,10 +16,9 @@ itself (`instrument/family/guitar/TuningVisuals.kt`, timed by `TuningMotion.kt`)
 | Acoustic guitar | `GuitarAcoustic.obj` | `GuitarKey.obj` | `instrument/tuning/GuitarAcoustic.json` |
 | Bass (standard, synth) | `Bass.obj` | `BassKey.obj` | `instrument/tuning/Bass.json` |
 | Banjo | `Banjo.obj` | `BassKey.obj` at 75% | `instrument/tuning/Banjo.json` |
-| Fretless bass | `BassFretless.obj` (still has keys) | — | none yet |
+| Fretless bass | `BassFretless.obj` | `BassKey.obj` | `instrument/tuning/BassFretless.json` (the bass's keys) |
 
-An instrument without a layout keeps the old rule instead: it shows its separate drop-D model (`BassFretlessD.obj`)
-when its lowest string is lowered. The other drop-D models are gone.
+The separate drop-D models are gone; every instrument with a layout draws the same body whatever the tuning.
 
 ## Models
 
@@ -55,6 +54,7 @@ OBJ exporter converts the meshes.
 | `keyRotation` | How the key model sits within each key object, for a model exported turned. `BassKey.obj` was exported with its post along Blender Z, while in the scene the bass key's post runs along its object's local Y, so it is `[-90, 0, 0]`. |
 | `keyScale` | How large each key is drawn (the banjo reuses `BassKey.obj` at `0.75`). |
 | `keyTexture` | The texture the key model and capo are UV-mapped to, when it isn't the body's. The acoustic's keys use `GuitarSkin.bmp`, and the banjo's (`BassKey.obj`) `BassSkin.bmp`. |
+| `capoZ` | How far the capo is moved out of the neck, for an instrument whose strings lie higher or lower than the guitar's (default 0; the banjo's is `-0.15`). |
 | `degreesPerSemitone` | How far a key turns per semitone from standard (default 20, so drop D's low key turns 40°; much more and the key turns edge-on to the camera and looks small). |
 | `keys` | One entry per string, lowest string first. |
 | `position`, `rotation` | That key object's Location and Rotation in Blender. |
@@ -75,7 +75,7 @@ mirroring the low E's is the high E's.
 `GuitarCapo.obj` is modelled in place across the guitar's neck (its X and Z are the guitar's), centred on Y = 0.
 The code only slides it along the neck (the model's Y) onto its fret (covering where the open strings start to vibrate), lifted off the strings (Z) while it
 slides down from the nut, then dropped on to clamp. The acoustic shares the guitar's neck; the banjo uses the same
-model, so check it there if a banjo part ever infers a capo.
+model, moved by the layout's `capoZ` (`-0.15` on the banjo, whose strings lie 0.15 lower) so it sits on the strings.
 
 ## Tuning by eye
 

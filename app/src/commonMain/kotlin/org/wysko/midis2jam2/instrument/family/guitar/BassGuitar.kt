@@ -78,7 +78,7 @@ class BassGuitar private constructor(
         },
         numberOfStrings = 4,
         instrumentBody = context.modelD(
-            TuningKeyLayout.bodyFor(type.modelFile, type.modelDropDFile, fretting.tuning.lowest < STANDARD_LOWEST_STRING),
+            TuningKeyLayout.bodyFor(type.modelFile, null, fretting.tuning.lowest < STANDARD_LOWEST_STRING),
             type.textureFile
         ) to when (type) {
             BassGuitarType.Synth1 -> "BassSkinSynth1.png"
@@ -149,7 +149,6 @@ class BassGuitar private constructor(
      */
     sealed class BassGuitarType(
         internal val modelFile: String,
-        internal val modelDropDFile: String? = null,
         internal val textureFile: String,
         internal val glowColor: ColorRGBA,
         internal val style: BassStyle = BassStyle.STANDARD,
@@ -165,7 +164,6 @@ class BassGuitar private constructor(
         /** The fretless Bass Guitar type. */
         data object Fretless : BassGuitarType(
             modelFile = "BassFretless.obj",
-            modelDropDFile = "BassFretlessD.obj",
             textureFile = "BassSkinFretless.png",
             glowColor = STRING_GLOW,
             style = BassStyle.FRETLESS,

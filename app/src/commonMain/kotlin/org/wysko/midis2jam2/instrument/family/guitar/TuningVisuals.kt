@@ -122,7 +122,7 @@ class TuningVisuals(
         // strings (the model's Z) until it clamps. It sits on its fret, where an open string's vibrating part starts,
         // so it covers the seam between the still and vibrating parts of the string.
         val along = fretboard.pointOn((fretboard.stringCount - 1) / 2.0, fret).y
-        capo.localTranslation = Vector3f(0f, along, (CAPO_LIFT * motion.capoLift(seconds)).toFloat())
+        capo.localTranslation = Vector3f(0f, along, (layout?.capoZ ?: 0f) + (CAPO_LIFT * motion.capoLift(seconds)).toFloat())
     }
 
     private companion object {

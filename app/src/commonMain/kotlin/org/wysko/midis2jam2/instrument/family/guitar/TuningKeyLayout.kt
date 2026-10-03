@@ -38,6 +38,8 @@ import org.wysko.midis2jam2.util.resourceToString
  * @property keyRotation How the key model is turned within each key, as Blender XYZ Euler degrees, for a model that
  * was exported turned relative to its object in the scene.
  * @property keyScale How large each key is drawn, relative to the model.
+ * @property capoZ How far the capo is moved out of the neck (toward the player is positive) from where `GuitarCapo.obj`
+ * sits on the guitar, for an instrument whose strings lie higher or lower than the guitar's.
  * @property degreesPerSemitone How far a key turns for each semitone its string is tuned from standard.
  * @property keys Per string, lowest first, where its key sits.
  */
@@ -48,6 +50,7 @@ data class TuningKeyLayout(
     val keyTexture: String? = null,
     val keyRotation: List<Float> = listOf(0f, 0f, 0f),
     val keyScale: Float = 1f,
+    val capoZ: Float = 0f,
     val degreesPerSemitone: Float = 20f,
     val keys: List<Key>,
 ) {
