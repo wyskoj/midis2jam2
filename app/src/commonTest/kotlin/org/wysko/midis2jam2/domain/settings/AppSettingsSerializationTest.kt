@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.domain.settings
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
@@ -72,7 +73,7 @@ class AppSettingsSerializationTest {
                 ),
                 isShowHeadsUpDisplay = false,
             ),
-            cameraSettings = AppSettings.CameraSettings(defaultFieldOfView = 70f, isClassicAutoCam = true),
+            cameraSettings = AppSettings.CameraSettings(defaultFieldOfView = 70f, autoCamMode = AutoCamMode.Legacy),
             instrumentSettings = AppSettings.InstrumentSettings(isAlwaysShowInstruments = true),
         )
 
@@ -111,7 +112,7 @@ class AppSettingsSerializationTest {
 
         assertEquals(false, defaults.cameraSettings.isStartAutocamWithSong)
         assertEquals(true, defaults.cameraSettings.isSmoothFreecam)
-        assertEquals(false, defaults.cameraSettings.isClassicAutoCam)
+        assertEquals(AutoCamMode.Smart, defaults.cameraSettings.autoCamMode)
         assertEquals(45f, defaults.cameraSettings.defaultFieldOfView)
     }
 
@@ -192,9 +193,9 @@ class AppSettingsSerializationTest {
             }
         """
 
-        val loaded = json.decodeFromString<AppSettings>(blob)
+        val loaded = AppSettingsCodec.decode(blob)
 
-        assertEquals(1, loaded.version)
+        assertEquals(AppSettingsCodec.CURRENT_VERSION, loaded.version)
         assertEquals(AppTheme.DARK, loaded.generalSettings.theme)
         assertEquals("ja", loaded.generalSettings.locale)
         assertEquals(true, loaded.generalSettings.isShowDebugInfo)
@@ -226,9 +227,28 @@ class AppSettingsSerializationTest {
         assertEquals(false, loaded.onScreenElementsSettings.isShowHeadsUpDisplay)
         assertEquals(true, loaded.cameraSettings.isStartAutocamWithSong)
         assertEquals(false, loaded.cameraSettings.isSmoothFreecam)
-        assertEquals(true, loaded.cameraSettings.isClassicAutoCam)
+        // The classic auto-cam switch became the Legacy auto-cam.
+        assertEquals(AutoCamMode.Legacy, loaded.cameraSettings.autoCamMode)
         assertEquals(70f, loaded.cameraSettings.defaultFieldOfView)
         assertEquals(true, loaded.instrumentSettings.isAlwaysShowInstruments)
+    }
+
+    @Test
+    fun `a blob from before the auto-cam modes, with the classic auto-cam off, gets the default auto-cam`() {
+        val blob = """{"cameraSettings": {"isClassicAutoCam": false, "defaultFieldOfView": 60.0}}"""
+
+        val loaded = AppSettingsCodec.decode(blob)
+
+        assertEquals(AppSettings.CameraSettings().autoCamMode, loaded.cameraSettings.autoCamMode)
+        assertEquals(60f, loaded.cameraSettings.defaultFieldOfView, "The other camera settings should be kept")
+    }
+
+    @Test
+    fun `the auto-cam mode survives being saved and loaded again`() {
+        AutoCamMode.entries.forEach { mode ->
+            val settings = AppSettings(cameraSettings = AppSettings.CameraSettings(autoCamMode = mode))
+            assertEquals(settings, AppSettingsCodec.decode(AppSettingsCodec.encode(settings)), "$mode was not kept")
+        }
     }
 
     private companion object {

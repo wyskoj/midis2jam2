@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Otomatik kamera ve klasik kamera</string>
     <string name="settings_camera_start_autocam_with_song">Şarkıyla birlikte otomatik kamerayı başlat</string>
     <string name="settings_camera_start_autocam_with_song_description">Şarkı başladığında, otomatik olarak otomatik kameraya geç</string>
-    <string name="settings_camera_classic_autocam">Klasik otomatik kamera</string>
-    <string name="settings_camera_classic_autocam_description">MIDIJam'ın otomatik kamerasını simule et</string>
+    <string name="settings_camera_autocam_mode">Oto-kam modu</string>
+    <string name="settings_camera_autocam_mode_smart">Akıllı</string>
+    <string name="settings_camera_autocam_mode_classic">Klasik</string>
+    <string name="settings_camera_autocam_mode_legacy">Eski</string>
     <string name="settings_camera_smooth_freecam">Yumuşak serbest kamera</string>
     <string name="settings_camera_smooth_freecam_description">Serbest kamera hareketini yumuşat</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">Görüş alanı</string>
     <string name="settings_camera_field_of_view_label_prefix">Kameranın ne kadar geniş gördüğünü değiştir</string>
     <string name="settings_camera_field_of_view_degrees">%1$d derece</string>
+    <string name="settings_camera_cinematic_pacing">Akıllı oto-kam temposu</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Sakin</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normal</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Enerjik</string>
+    <string name="settings_camera_cinematic_handheld">Elde tutulan akıllı oto-kam</string>
+    <string name="settings_camera_cinematic_handheld_description">Sinematik çekimler, kamera elde tutuluyormuş gibi hafifçe sallanır</string>
     <string name="history_empty">Çalma geçmişiniz burada görünecek.</string>
     <string name="clear_all">Tümünü temizle</string>
     <string name="history_file_missing_message">Bu MIDI dosyası artık kullanılamıyor.</string>

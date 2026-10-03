@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Autokamera, klassinen kamera</string>
     <string name="settings_camera_start_autocam_with_song">Käynnistä autokamera kappaleen kanssa</string>
     <string name="settings_camera_start_autocam_with_song_description">Kun kappale alkaa, vaihda automaattisesti autokameraan</string>
-    <string name="settings_camera_classic_autocam">Klassinen autokamera</string>
-    <string name="settings_camera_classic_autocam_description">Matkii autokameran liikettä MIDIJamista</string>
+    <string name="settings_camera_autocam_mode">Autokameran tila</string>
+    <string name="settings_camera_autocam_mode_smart">Älykäs</string>
+    <string name="settings_camera_autocam_mode_classic">Klassinen</string>
+    <string name="settings_camera_autocam_mode_legacy">Vanha</string>
     <string name="settings_camera_smooth_freecam">Sileä vapaakamera</string>
     <string name="settings_camera_smooth_freecam_description">Tee vapaakameran liikkeistä sulavampia</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">Näkökenttä</string>
     <string name="settings_camera_field_of_view_label_prefix">Muuta, kuinka leveästi kamera näkee</string>
     <string name="settings_camera_field_of_view_degrees">%1$d astetta</string>
+    <string name="settings_camera_cinematic_pacing">Älykkään autokameran tahti</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Rauhallinen</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normaali</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Energinen</string>
+    <string name="settings_camera_cinematic_handheld">Käsivarainen älykäs autokamera</string>
+    <string name="settings_camera_cinematic_handheld_description">Anna elokuvallisten otosten huojua hieman, kuin kamera olisi kädessä</string>
     <string name="history_empty">Toistohistoriasi näkyy täällä.</string>
     <string name="clear_all">Tyhjennä kaikki</string>
     <string name="history_file_missing_message">Tämä MIDI-tiedosto ei ole enää saatavilla.</string>

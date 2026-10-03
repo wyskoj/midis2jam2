@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Auto-Kam, klassische Kamera</string>
     <string name="settings_camera_start_autocam_with_song">Auto-Kam mit Song starten</string>
     <string name="settings_camera_start_autocam_with_song_description">Wenn der Song startet, automatisch zur Auto-Kam wechseln</string>
-    <string name="settings_camera_classic_autocam">Klassische Auto-Kam</string>
-    <string name="settings_camera_classic_autocam_description">Simuliert die Auto-Kam-Bewegung aus MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Auto-Kam-Modus</string>
+    <string name="settings_camera_autocam_mode_smart">Intelligent</string>
+    <string name="settings_camera_autocam_mode_classic">Klassisch</string>
+    <string name="settings_camera_autocam_mode_legacy">Legacy</string>
     <string name="settings_camera_smooth_freecam">Weiche Freecam</string>
     <string name="settings_camera_smooth_freecam_description">Macht die Freecam-Bewegung weicher</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">Sichtfeld</string>
     <string name="settings_camera_field_of_view_label_prefix">Ändere, wie breit die Kamera sieht</string>
     <string name="settings_camera_field_of_view_degrees">%1$d Grad</string>
+    <string name="settings_camera_cinematic_pacing">Tempo der intelligenten Auto-Kam</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Entspannt</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normal</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Energisch</string>
+    <string name="settings_camera_cinematic_handheld">Handgeführte intelligente Auto-Kam</string>
+    <string name="settings_camera_cinematic_handheld_description">Kinoaufnahmen leicht schwanken lassen, als würde die Kamera gehalten</string>
     <string name="history_empty">Dein Wiedergabeverlauf wird hier angezeigt.</string>
     <string name="clear_all">Alles löschen</string>
     <string name="history_file_missing_message">Diese MIDI-Datei ist nicht mehr verfügbar.</string>

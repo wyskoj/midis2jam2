@@ -58,7 +58,9 @@ import kotlin.time.Duration.Companion.seconds
 
 private const val MOVE_SPEED = (1 / 3f)
 private val WAIT_TIME = 3.seconds
-private val DEFAULT_CAMERA_ANGLE = AutoCamPosition.GENERAL_A
+// A getter, not a stored value: the angles themselves read this file's top-level values as they're set up, so if
+// they're loaded first (as the smart auto-cam does), a stored value here would be read before it existed: null.
+private val DEFAULT_CAMERA_ANGLE get() = AutoCamPosition.GENERAL_A
 
 class StandardAutoCamPlugin : AutoCamPlugin() {
     private var waiting = 0.seconds

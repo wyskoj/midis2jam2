@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Auto-kamera, kamera klasyczna</string>
     <string name="settings_camera_start_autocam_with_song">Uruchom auto-kamerę z utworem</string>
     <string name="settings_camera_start_autocam_with_song_description">Po rozpoczęciu utworu automatycznie przełącz na auto-kamerę</string>
-    <string name="settings_camera_classic_autocam">Klasyczna auto-kamera</string>
-    <string name="settings_camera_classic_autocam_description">Symuluj ruch auto-kamery z MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Tryb auto-kamery</string>
+    <string name="settings_camera_autocam_mode_smart">Inteligentny</string>
+    <string name="settings_camera_autocam_mode_classic">Klasyczny</string>
+    <string name="settings_camera_autocam_mode_legacy">Starszy</string>
     <string name="settings_camera_smooth_freecam">Płynna kamera swobodna</string>
     <string name="settings_camera_smooth_freecam_description">Uczyń ruch kamery swobodnej bardziej płynnym</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">Pole widzenia</string>
     <string name="settings_camera_field_of_view_label_prefix">Zmień, jak szeroko widzi kamera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d stopni</string>
+    <string name="settings_camera_cinematic_pacing">Tempo inteligentnej auto-kamery</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Spokojne</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normalne</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Energiczne</string>
+    <string name="settings_camera_cinematic_handheld">Inteligentna auto-kamera z ręki</string>
+    <string name="settings_camera_cinematic_handheld_description">Ujęcia filmowe lekko się kołyszą, jakby kamera była trzymana w dłoni</string>
     <string name="history_empty">Twoja historia odtwarzania pojawi się tutaj.</string>
     <string name="clear_all">Wyczyść wszystko</string>
     <string name="history_file_missing_message">Ten plik MIDI nie jest już dostępny.</string>

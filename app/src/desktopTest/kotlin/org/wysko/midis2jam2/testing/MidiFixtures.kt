@@ -169,6 +169,79 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /** The beats, at 120 BPM (half a second each), during which [soloOverBand]'s saxophone takes its solo. */
+    val SOLO_BEATS: IntRange = 16 until 32
+
+    /** How many beats [soloOverBand] lasts. */
+    const val SOLO_OVER_BAND_BEATS = 48
+
+    /**
+     * A band with a soloist: piano chords on every beat and a rock groove on the drums throughout, and an alto
+     * saxophone that sits out, plays a busy solo during [SOLO_BEATS], then sits out again. 24 seconds long.
+     */
+    fun soloOverBand(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(0, absoluteTime = 0)
+                repeat(SOLO_OVER_BAND_BEATS) { beat ->
+                    listOf(48, 52, 55).forEach {
+                        note(it, duration = 1.quarter, velocity = 70, absoluteTime = beat * TICKS_PER_QUARTER)
+                    }
+                }
+            }
+            channel(1) {
+                program(65, absoluteTime = 0) // Alto sax
+                val line = listOf(0, 4, 7, 12, 9, 5, 2, 11)
+                SOLO_BEATS.forEach { beat ->
+                    repeat(2) { half ->
+                        note(
+                            60 + line[(beat * 2 + half) % line.size],
+                            duration = 1.eighth,
+                            velocity = 110,
+                            absoluteTime = beat * TICKS_PER_QUARTER + half * TICKS_PER_QUARTER / 2,
+                        )
+                    }
+                }
+            }
+            channel(PERCUSSION_CHANNEL) {
+                repeat(SOLO_OVER_BAND_BEATS) { beat ->
+                    val at = beat * TICKS_PER_QUARTER
+                    note(if (beat % 2 == 0) 36 else 38, duration = 1.eighth, velocity = 100, absoluteTime = at)
+                    note(42, duration = 1.eighth, velocity = 80, absoluteTime = at)
+                    note(42, duration = 1.eighth, velocity = 70, absoluteTime = at + TICKS_PER_QUARTER / 2)
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The beat at which [secondPianoJoins]'s second piano comes in: at 120 BPM, 8 seconds in. */
+    const val SECOND_PIANO_BEAT = 16
+
+    /**
+     * A piano playing a chord on every beat for 32 beats, joined at [SECOND_PIANO_BEAT] by a second piano on another
+     * channel, which slides into its place beside the first as it comes on stage.
+     */
+    fun secondPianoJoins(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            listOf(Pair(0, 0 until 32), Pair(1, SECOND_PIANO_BEAT until 32)).forEach { (piano, beats) ->
+                channel(piano) {
+                    program(0, absoluteTime = 0)
+                    beats.forEach { beat ->
+                        listOf(48, 52, 55).forEach {
+                            note(it + 12 * piano, duration = 1.quarter, absoluteTime = beat * TICKS_PER_QUARTER)
+                        }
+                    }
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
     /** Everything at once: all melodic programs and all percussion notes. */
     fun theWholeBand(): TimeBasedSequence = smf {
         format = StandardMidiFile.Header.Format.Format0

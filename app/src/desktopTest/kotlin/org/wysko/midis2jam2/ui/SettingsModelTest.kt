@@ -27,6 +27,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
@@ -428,8 +429,8 @@ class SettingsModelTest {
             SetterCase("smooth freecam", false, { it.setSmoothFreecam(false) }) {
                 it.cameraSettings.isSmoothFreecam
             },
-            SetterCase("classic auto-cam", true, { it.setClassicAutoCam(true) }) {
-                it.cameraSettings.isClassicAutoCam
+            SetterCase("auto-cam mode", AutoCamMode.Legacy, { it.setAutoCamMode(AutoCamMode.Legacy) }) {
+                it.cameraSettings.autoCamMode
             },
             SetterCase("always show instruments", true, { it.setAlwaysShowInstruments(true) }) {
                 it.instrumentSettings.isAlwaysShowInstruments

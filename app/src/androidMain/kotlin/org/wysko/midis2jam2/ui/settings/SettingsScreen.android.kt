@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.domain.LocaleHelper
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
 import org.wysko.midis2jam2.ui.common.component.SelectOption
 import java.util.Locale
 
@@ -58,7 +59,13 @@ internal actual fun settingsPages(
     settingsPage(SettingsPage.Camera, Res.string.settings_camera_description) {
         section(Res.string.settings_section_autocam) {
             row { StartAutocamWithSongBooleanSelect(settings, model) }
-            row { IsClassicAutoCamBooleanSelect(settings, model) }
+            row { AutoCamModeSelect(settings, model) }
+            row(isVisible = { settings.value.cameraSettings.autoCamMode == AutoCamMode.Smart }) {
+                CinematicPacingSelect(settings, model)
+            }
+            row(isVisible = { settings.value.cameraSettings.autoCamMode == AutoCamMode.Smart }) {
+                CinematicHandheldBooleanSelect(settings, model)
+            }
         }
         section(Res.string.settings_section_freecam) { row { FieldOfViewSelect(settings, model) } }
     },

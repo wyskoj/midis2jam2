@@ -73,8 +73,4 @@ class AndroidCameraManager : CameraManager() {
     fun switchToRotatingCamera() {
         setCurrentCameraPlugin<RotatingCameraPlugin>()
     }
-
-    fun switchToAutoCam() {
-        setCurrentCameraPlugin<AutoCamPlugin>()
-    }
 }

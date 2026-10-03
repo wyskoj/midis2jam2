@@ -193,8 +193,10 @@
     <string name="settings_camera_description">オートカム、クラシックカメラ</string>
     <string name="settings_camera_start_autocam_with_song">曲とともにオートカムを開始</string>
     <string name="settings_camera_start_autocam_with_song_description">曲開始時に自動的にオートカムに切り替える</string>
-    <string name="settings_camera_classic_autocam">クラシックオートカム</string>
-    <string name="settings_camera_classic_autocam_description">MIDIJamのオートカム動作をシミュレートする</string>
+    <string name="settings_camera_autocam_mode">オートカムのモード</string>
+    <string name="settings_camera_autocam_mode_smart">スマート</string>
+    <string name="settings_camera_autocam_mode_classic">クラシック</string>
+    <string name="settings_camera_autocam_mode_legacy">レガシー</string>
     <string name="settings_camera_smooth_freecam">スムーズフリーカム</string>
     <string name="settings_camera_smooth_freecam_description">フリーカムの動きをより滑らかにする</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">視野角</string>
     <string name="settings_camera_field_of_view_label_prefix">カメラの視野の広さを変更</string>
     <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
+    <string name="settings_camera_cinematic_pacing">スマートオートカムのテンポ</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">ゆったり</string>
+    <string name="settings_camera_cinematic_pacing_normal">標準</string>
+    <string name="settings_camera_cinematic_pacing_energetic">エネルギッシュ</string>
+    <string name="settings_camera_cinematic_handheld">手持ちスマートオートカム</string>
+    <string name="settings_camera_cinematic_handheld_description">手持ちカメラのように、シネマショットをわずかに揺らします</string>
     <string name="history_empty">再生履歴がここに表示されます。</string>
     <string name="clear_all">すべて消去</string>
     <string name="history_file_missing_message">この MIDI ファイルは現在利用できません。</string>

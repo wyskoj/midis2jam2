@@ -185,8 +185,10 @@
     <string name="settings_camera_description">Auto-cam, classic camera</string>
     <string name="settings_camera_start_autocam_with_song">Start auto-cam with song</string>
     <string name="settings_camera_start_autocam_with_song_description">When song starts, automatically switch to auto-cam</string>
-    <string name="settings_camera_classic_autocam">Classic auto-cam</string>
-    <string name="settings_camera_classic_autocam_description">Simulate auto-cam movement from MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Auto-cam mode</string>
+    <string name="settings_camera_autocam_mode_smart">Smart</string>
+    <string name="settings_camera_autocam_mode_classic">Classic</string>
+    <string name="settings_camera_autocam_mode_legacy">Legacy</string>
     <string name="settings_camera_smooth_freecam">Smooth freecam</string>
     <string name="settings_camera_smooth_freecam_description">Make freecam movement smoother</string>
 
@@ -222,6 +224,12 @@
     <string name="settings_camera_field_of_view_title">Field of view</string>
     <string name="settings_camera_field_of_view_label_prefix">Change how wide the camera sees</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
+    <string name="settings_camera_cinematic_pacing">Smart auto-cam pacing</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Relaxed</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normal</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Energetic</string>
+    <string name="settings_camera_cinematic_handheld">Handheld smart auto-cam</string>
+    <string name="settings_camera_cinematic_handheld_description">Let cinematic shots drift slightly, as if the camera were held</string>
 
     <!-- Record -->
     <string name="tab_record">Record</string>

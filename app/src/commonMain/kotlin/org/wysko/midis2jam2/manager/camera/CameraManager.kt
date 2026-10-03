@@ -19,13 +19,18 @@ package org.wysko.midis2jam2.manager.camera
 
 import com.jme3.app.Application
 import com.jme3.input.controls.ActionListener
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
 import org.wysko.midis2jam2.manager.ActionsManager
 import org.wysko.midis2jam2.manager.BaseManager
+import org.wysko.midis2jam2.manager.camera.cinematic.CinematicCamPlugin
 import org.wysko.midis2jam2.manager.performanceConfig
 
 abstract class CameraManager : BaseManager(), ActionListener {
     protected lateinit var cameraPlugins: List<CameraPlugin>
     protected lateinit var currentCameraPlugin: CameraPlugin
+
+    /** The camera the auto-cam key turns on, as chosen in the settings. */
+    protected lateinit var autoCamPlugin: CameraPlugin
 
     protected abstract fun getDeviceCameraPlugin(): CameraPlugin
     protected abstract fun getDeviceCameraActions(): Array<String>
@@ -34,19 +39,17 @@ abstract class CameraManager : BaseManager(), ActionListener {
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        cameraPlugins = buildList {
-            add(getDeviceCameraPlugin())
-            when (app.performanceConfig.settings.cameraSettings.isClassicAutoCam) {
-                true -> add(ClassicAutoCamPlugin())
-                false -> add(StandardAutoCamPlugin())
-            }
-            add(RotatingCameraPlugin())
+        autoCamPlugin = when (app.performanceConfig.settings.cameraSettings.autoCamMode) {
+            AutoCamMode.Smart -> CinematicCamPlugin()
+            AutoCamMode.Classic -> StandardAutoCamPlugin()
+            AutoCamMode.Legacy -> ClassicAutoCamPlugin()
         }
+        cameraPlugins = listOf(getDeviceCameraPlugin(), autoCamPlugin, RotatingCameraPlugin())
         app.stateManager.attachAll(cameraPlugins)
         currentCameraPlugin = when (app.performanceConfig.settings.cameraSettings.isStartAutocamWithSong) {
             true -> {
                 cameraStateListeners.forEach { it.onAutoCameraEnabled() }
-                cameraPlugins.first { it is AutoCamPlugin }
+                autoCamPlugin
             }
 
             else -> cameraPlugins.first()
@@ -63,9 +66,18 @@ abstract class CameraManager : BaseManager(), ActionListener {
     override fun onAction(name: String, isPressed: Boolean, tpf: Float) {
         if (!isPressed) return
         when (name) {
-            ActionsManager.ACTION_CAMERA_PLUGIN_AUTO -> setCurrentCameraPlugin<AutoCamPlugin>()
+            ActionsManager.ACTION_CAMERA_PLUGIN_AUTO -> switchToAutoCam()
             ActionsManager.ACTION_CAMERA_PLUGIN_ROTATING -> setCurrentCameraPlugin<RotatingCameraPlugin>()
         }
+    }
+
+    /**
+     * Hands the camera to the auto-cam. If the smart auto-cam already has it, it plans a different edit of the song
+     * instead.
+     */
+    fun switchToAutoCam() {
+        (currentCameraPlugin as? CinematicCamPlugin)?.reroll()
+        activate(autoCamPlugin)
     }
 
     override fun cleanup(app: Application?) {
@@ -80,12 +92,17 @@ abstract class CameraManager : BaseManager(), ActionListener {
     }
 
     protected inline fun <reified T> setCurrentCameraPlugin() {
-        currentCameraPlugin = cameraPlugins.first { it is T }
+        activate(cameraPlugins.first { it is T })
+    }
+
+    /** Hands the camera to [plugin], and tells the listeners which mode that is. */
+    protected fun activate(plugin: CameraPlugin) {
+        currentCameraPlugin = plugin
         cameraPlugins.forEach { it.isEnabled = it == currentCameraPlugin }
 
-        when (T::class) {
-            AutoCamPlugin::class -> cameraStateListeners.forEach { it.onAutoCameraEnabled() }
-            RotatingCameraPlugin::class -> cameraStateListeners.forEach { it.onRotatingCameraEnabled() }
+        when {
+            plugin === autoCamPlugin -> cameraStateListeners.forEach { it.onAutoCameraEnabled() }
+            plugin is RotatingCameraPlugin -> cameraStateListeners.forEach { it.onRotatingCameraEnabled() }
             else -> cameraStateListeners.forEach { it.onFreeCameraEnabled() }
         }
     }

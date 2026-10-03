@@ -127,6 +127,23 @@ class PlaybackInputTest {
     }
 
     @Test
+    @Spec("playback.seek.resumes")
+    fun `playback carries on from where a seek lands`() {
+        withPlayback { performance, input, playback ->
+            // The test sequencer finishes moving before it even returns, the quickest a sequencer can. Playback
+            // must not mistake that for a seek that never finishes.
+            performance.onEngineThread { playback.seek(5.seconds) }
+            input.frames(SETTLE_FRAMES)
+
+            assertTrue(playback.isPlaying, "Seeking shouldn't pause playback")
+            assertTrue(
+                playback.time > 5.seconds,
+                "After seeking to 5 s, playback should carry on from there, but it is stuck at ${playback.time}"
+            )
+        }
+    }
+
+    @Test
     fun `pausing stops the sequencer as well as the clock`() {
         withPlayback { _, input, _ ->
             input.tap(KeyInput.KEY_SPACE)

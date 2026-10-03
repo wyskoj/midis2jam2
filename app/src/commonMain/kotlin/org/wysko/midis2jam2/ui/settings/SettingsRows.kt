@@ -46,6 +46,8 @@ import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Color
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.CubeMap
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Default
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.CinematicSettings.CinematicPacing
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.ui.common.component.*
 import kotlin.math.roundToInt
@@ -255,13 +257,44 @@ internal fun StartAutocamWithSongBooleanSelect(settings: State<AppSettings>, mod
 }
 
 @Composable
-internal fun IsClassicAutoCamBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
+internal fun AutoCamModeSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_camera_autocam_mode),
+        selected = settings.value.cameraSettings.autoCamMode,
+        onSelected = model::setAutoCamMode,
+        options = listOf(
+            SelectOption(AutoCamMode.Smart, stringResource(Res.string.settings_camera_autocam_mode_smart)),
+            SelectOption(AutoCamMode.Classic, stringResource(Res.string.settings_camera_autocam_mode_classic)),
+            SelectOption(AutoCamMode.Legacy, stringResource(Res.string.settings_camera_autocam_mode_legacy)),
+        ),
+    )
+}
+
+@Composable
+internal fun CinematicPacingSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_camera_cinematic_pacing),
+        selected = settings.value.cameraSettings.cinematicSettings.pacing,
+        onSelected = model::setCinematicPacing,
+        options = listOf(
+            SelectOption(CinematicPacing.Relaxed, stringResource(Res.string.settings_camera_cinematic_pacing_relaxed)),
+            SelectOption(CinematicPacing.Normal, stringResource(Res.string.settings_camera_cinematic_pacing_normal)),
+            SelectOption(
+                CinematicPacing.Energetic,
+                stringResource(Res.string.settings_camera_cinematic_pacing_energetic),
+            ),
+        ),
+    )
+}
+
+@Composable
+internal fun CinematicHandheldBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
     SettingsSwitchRow(
-        title = stringResource(Res.string.settings_camera_classic_autocam),
-        description = stringResource(Res.string.settings_camera_classic_autocam_description),
-        icon = Res.drawable.camera_video,
-        checked = settings.value.cameraSettings.isClassicAutoCam,
-        onCheckedChange = model::setClassicAutoCam,
+        title = stringResource(Res.string.settings_camera_cinematic_handheld),
+        description = stringResource(Res.string.settings_camera_cinematic_handheld_description),
+        icon = Res.drawable.video_stable,
+        checked = settings.value.cameraSettings.cinematicSettings.isHandheldFloat,
+        onCheckedChange = model::setCinematicHandheldFloat,
     )
 }
 

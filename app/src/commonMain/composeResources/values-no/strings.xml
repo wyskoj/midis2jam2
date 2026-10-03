@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Autokam, klassisk kamera</string>
     <string name="settings_camera_start_autocam_with_song">Start autokam med sang</string>
     <string name="settings_camera_start_autocam_with_song_description">Når sangen starter, bytt automatisk til autokam</string>
-    <string name="settings_camera_classic_autocam">Klassisk autokam</string>
-    <string name="settings_camera_classic_autocam_description">Simuler autokam-bevegelse fra MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Autokam-modus</string>
+    <string name="settings_camera_autocam_mode_smart">Smart</string>
+    <string name="settings_camera_autocam_mode_classic">Klassisk</string>
+    <string name="settings_camera_autocam_mode_legacy">Eldre</string>
     <string name="settings_camera_smooth_freecam">Myk frikam</string>
     <string name="settings_camera_smooth_freecam_description">Gjør frikam-bevegelse mykere</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">Synsfelt</string>
     <string name="settings_camera_field_of_view_label_prefix">Endre hvor bredt kameraet ser</string>
     <string name="settings_camera_field_of_view_degrees">%1$d grader</string>
+    <string name="settings_camera_cinematic_pacing">Tempo for smart autokam</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Rolig</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normal</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Energisk</string>
+    <string name="settings_camera_cinematic_handheld">Håndholdt smart autokam</string>
+    <string name="settings_camera_cinematic_handheld_description">La filmatiske opptak drive litt, som om kameraet ble holdt</string>
     <string name="history_empty">Avspillingshistorikken din vises her.</string>
     <string name="clear_all">Tøm alt</string>
     <string name="history_file_missing_message">Denne MIDI-filen er ikke lenger tilgjengelig.</string>

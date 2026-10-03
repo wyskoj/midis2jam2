@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Auto-cam, telecamera classica</string>
     <string name="settings_camera_start_autocam_with_song">Avvia auto-cam con la canzone</string>
     <string name="settings_camera_start_autocam_with_song_description">All\'avvio della canzone, passa automaticamente all\'auto-cam</string>
-    <string name="settings_camera_classic_autocam">Auto-cam classica</string>
-    <string name="settings_camera_classic_autocam_description">Simula il movimento auto-cam di MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Modalità auto-cam</string>
+    <string name="settings_camera_autocam_mode_smart">Intelligente</string>
+    <string name="settings_camera_autocam_mode_classic">Classica</string>
+    <string name="settings_camera_autocam_mode_legacy">Legacy</string>
     <string name="settings_camera_smooth_freecam">Freecam fluida</string>
     <string name="settings_camera_smooth_freecam_description">Rendi il movimento della freecam più fluido</string>
 
@@ -230,6 +232,12 @@
     <string name="settings_camera_field_of_view_title">Campo visivo</string>
     <string name="settings_camera_field_of_view_label_prefix">Modifica l'ampiezza della visuale della fotocamera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d gradi</string>
+    <string name="settings_camera_cinematic_pacing">Ritmo dell\'auto-cam intelligente</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Rilassato</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normale</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Energico</string>
+    <string name="settings_camera_cinematic_handheld">Auto-cam intelligente a mano</string>
+    <string name="settings_camera_cinematic_handheld_description">Le inquadrature cinematografiche oscillano leggermente, come se la telecamera fosse tenuta in mano</string>
     <string name="history_empty">La tua cronologia di riproduzione apparirà qui.</string>
     <string name="clear_all">Cancella tutto</string>
     <string name="history_file_missing_message">Questo file MIDI non è più disponibile.</string>
