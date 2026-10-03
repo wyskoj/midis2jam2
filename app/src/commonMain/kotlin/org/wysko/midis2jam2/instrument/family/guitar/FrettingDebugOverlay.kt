@@ -43,7 +43,7 @@ import kotlin.time.DurationUnit.SECONDS
  *
  * It hangs off the instrument's [root][org.wysko.midis2jam2.instrument.Instrument.root], so it follows the
  * instrument around the stage. It always faces the camera and is scaled with its distance from the camera, so the
- * text stays readable from any camera angle. [FrettingDebugManager] toggles it (F4); while it is hidden, no text is
+ * text stays readable from any camera angle. [FrettingDebugManager] toggles it (F3); while it is hidden, no text is
  * built.
  *
  * @param context The context to the main class.

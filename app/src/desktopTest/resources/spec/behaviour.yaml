@@ -709,4 +709,4 @@
 - id: app.debug.fretting-readout
   source: features/fretted-instruments.md
   platforms: [desktop]
-  claim: "F4 toggles a readout above each fretted instrument showing its inferred tuning and capo, and live rhythm or lead, hand position, frets and cost breakdown"
+  claim: "F3 toggles, along with the debug overlay, a readout above each fretted instrument showing its inferred tuning and capo, and live rhythm or lead, hand position, frets and cost breakdown"

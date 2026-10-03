@@ -134,8 +134,6 @@ class KeyBindingsTest {
             "camera_plugin_auto" to "KEY_0",
             "camera_plugin_rotating" to "KEY_9",
             "camera_plugin_free" to "KEY_GRAVE",
-            // features/fretted-instruments.md
-            "fretting_debug" to "KEY_F4",
         )
 
         @Serializable

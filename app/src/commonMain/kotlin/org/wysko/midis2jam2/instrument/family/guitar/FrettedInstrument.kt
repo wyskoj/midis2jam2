@@ -89,7 +89,7 @@ abstract class FrettedInstrument protected constructor(
     /** Where things are on this instrument's neck; the note-finger dots use it. */
     internal val fretboard: FretboardSpace = FretboardSpace(positioning, numberOfFrets)
 
-    /** The live fretting readout (F4). */
+    /** The live fretting readout (F3). */
     internal val readout: FrettingDebugOverlay = FrettingDebugOverlay(context, root, geometry, fretting)
 
 

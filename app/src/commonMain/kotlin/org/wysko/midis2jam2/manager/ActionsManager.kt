@@ -70,7 +70,6 @@ class ActionsManager : BaseManager() {
         const val ACTION_CAMERA_MODIFIER_SLOW: String = "camera_modifier_slow"
         const val ACTION_CAMERA_MODIFIER_FAST: String = "camera_modifier_fast"
         const val ACTION_DEBUG: String = "debug"
-        const val ACTION_FRETTING_DEBUG: String = "fretting_debug"
         const val ACTION_PLAY: String = "playback_play"
         const val ACTION_RESTART: String = "playback_restart"
         const val ACTION_SEEK_BACKWARD: String = "playback_seek_backward"

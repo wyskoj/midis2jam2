@@ -29,7 +29,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 /**
- * The live fretting readout, toggled with F4 through the real key bindings.
+ * The live fretting readout, toggled with F3 through the real key bindings.
  *
  * It exists so the fretting engine's decisions can be watched while a song plays: what it inferred for the whole
  * part, and what it is doing at each moment.
@@ -38,7 +38,7 @@ class FrettingReadoutInputTest {
 
     @Test
     @Spec("app.debug.fretting-readout")
-    fun `F4 shows the fretting readout above the guitar, keeps it current, and hides it again`() {
+    fun `F3 shows the fretting readout above the guitar, keeps it current, and hides it again`() {
         HeadlessPerformance.start(MidiFixtures.dropDRiff()).use { performance ->
             val input = InputHarness(performance)
             val guitar = performance.instruments.filterIsInstance<Guitar>().single()
@@ -46,19 +46,19 @@ class FrettingReadoutInputTest {
             performance.stepInstruments(10)
             assertFalse(performance.onEngineThread { guitar.readout.isShowing }, "The readout should start hidden")
 
-            input.tap(KeyInput.KEY_F4)
+            input.tap(KeyInput.KEY_F3)
             performance.stepInstruments(1)
             val (showing, first) = performance.onEngineThread { guitar.readout.isShowing to guitar.readout.text.text }
-            assertTrue(showing, "F4 should show the readout")
+            assertTrue(showing, "F3 should show the readout")
             assertTrue("Drop D" in first, "The readout should name the inferred tuning:\n$first")
 
             performance.stepInstruments(60)
             val later = performance.onEngineThread { guitar.readout.text.text }
             assertNotEquals(clockLine(first), clockLine(later), "The readout should follow the song")
 
-            input.tap(KeyInput.KEY_F4)
+            input.tap(KeyInput.KEY_F3)
             performance.stepInstruments(1)
-            assertFalse(performance.onEngineThread { guitar.readout.isShowing }, "A second F4 should hide the readout")
+            assertFalse(performance.onEngineThread { guitar.readout.isShowing }, "A second F3 should hide the readout")
         }
     }
 

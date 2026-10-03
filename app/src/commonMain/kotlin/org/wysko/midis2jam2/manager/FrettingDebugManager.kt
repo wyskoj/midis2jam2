@@ -19,13 +19,11 @@ package org.wysko.midis2jam2.manager
 
 import com.jme3.app.Application
 import com.jme3.input.controls.ActionListener
-import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_FRETTING_DEBUG
+import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_DEBUG
 
 /**
- * Toggles the live fretting readout that floats above every fretted instrument (F4).
- *
- * Kept apart from the F3 debug overlay, which darkens the whole scene: the point of this readout is to watch the
- * instruments while they play.
+ * Toggles the live fretting readout that floats above every fretted instrument, together with the F3 debug
+ * overlay.
  *
  * @see org.wysko.midis2jam2.instrument.family.guitar.FrettingDebugOverlay
  */
@@ -36,7 +34,7 @@ class FrettingDebugManager : BaseManager(), ActionListener {
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        app.inputManager.addListener(this, ACTION_FRETTING_DEBUG)
+        app.inputManager.addListener(this, ACTION_DEBUG)
     }
 
     override fun cleanup(app: Application?) {
@@ -44,6 +42,6 @@ class FrettingDebugManager : BaseManager(), ActionListener {
     }
 
     override fun onAction(name: String?, isPressed: Boolean, tpf: Float) {
-        if (isPressed && name == ACTION_FRETTING_DEBUG) isReadoutVisible = !isReadoutVisible
+        if (isPressed && name == ACTION_DEBUG) isReadoutVisible = !isReadoutVisible
     }
 }
