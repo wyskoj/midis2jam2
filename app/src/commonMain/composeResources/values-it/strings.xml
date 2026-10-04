@@ -209,6 +209,10 @@
     <string name="settings_instruments_description">Visibilità strumenti</string>
     <string name="settings_instruments_always_show_instruments">Mostra sempre gli strumenti</string>
     <string name="settings_instruments_always_show_instruments_description">Non nascondere mai gli strumenti, anche quando non suonano note</string>
+    <string name="settings_instruments_smart_mallets">Mazzuoli intelligenti</string>
+    <string name="settings_instruments_smart_mallets_description">Suona gli strumenti a mazzuoli con due mazzuoli che si spostano invece di uno per barra</string>
+    <string name="settings_instruments_smart_drum_sticks">Bacchette intelligenti</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Suona la batteria con due bacchette che si spostano intorno ad essa invece di una per tamburo</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Una remastered di MIDIJam, un visualizzatore 3D di file MIDI.</string>

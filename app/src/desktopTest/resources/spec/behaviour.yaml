@@ -564,6 +564,14 @@
   source: code
   platforms: [desktop, android]
   claim: "Every General MIDI program and percussion note builds its instrument without error"
+- id: instrument.mallets.smart
+  source: code
+  platforms: [desktop, android]
+  claim: "With smart mallets on, mallet instruments are played by two mallets that travel to each bar instead of one mallet per bar"
+- id: instrument.drumset.smart-sticks
+  source: code
+  platforms: [desktop, android]
+  claim: "With smart drum sticks on, the drum kit is played by two sticks that travel around it instead of one stick per piece"
 - id: app.performance.tick-is-stable
   source: code
   platforms: [desktop, android]

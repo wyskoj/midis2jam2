@@ -192,6 +192,10 @@
     <string name="settings_instruments_description">वाद्ययंत्र दृश्यता</string>
     <string name="settings_instruments_always_show_instruments">हमेशा वाद्ययंत्र दिखाएं</string>
     <string name="settings_instruments_always_show_instruments_description">वाद्ययंत्रों को कभी भी छुपाएं नहीं, भले ही कोई नोट न बज रहा हो</string>
+    <string name="settings_instruments_smart_mallets">स्मार्ट मैलेट</string>
+    <string name="settings_instruments_smart_mallets_description">मैलेट वाद्यों को हर बार के लिए एक मैलेट के बजाय दो घूमते मैलेट से बजाएँ</string>
+    <string name="settings_instruments_smart_drum_sticks">स्मार्ट ड्रमस्टिक</string>
+    <string name="settings_instruments_smart_drum_sticks_description">ड्रम किट को हर ड्रम के लिए एक स्टिक के बजाय उसके चारों ओर घूमती दो स्टिक से बजाएँ</string>
 
     <!-- के बारे में -->
     <string name="about_midis2jam2_description">MIDIJam का एक रीमास्टर, एक 3D MIDI फ़ाइल विज़ुअलाइज़र।</string>

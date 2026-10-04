@@ -21,6 +21,7 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUM_SET_STICK
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.midi.ACOUSTIC_SNARE
 import org.wysko.midis2jam2.midi.ELECTRIC_SNARE
 import org.wysko.midis2jam2.midi.SIDE_STICK
@@ -29,9 +30,18 @@ import org.wysko.midis2jam2.util.max
 import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
-/** The Snare drum. */
-class SnareDrum(context: PerformanceManager, hits: List<NoteEvent.NoteOn>, style: ShellStyle) :
-    DrumSetInstrument(context, hits) {
+/**
+ * The Snare drum.
+ *
+ * @param ghostStick true if the smart drum sticks play this drum, so its own (regular) stick is hidden. The side stick
+ * is always its own.
+ */
+class SnareDrum(
+    context: PerformanceManager,
+    hits: List<NoteEvent.NoteOn>,
+    style: ShellStyle,
+    ghostStick: Boolean = false,
+) : DrumSetInstrument(context, hits) {
     private val regularStick =
         Striker(
             context = context,
@@ -39,10 +49,15 @@ class SnareDrum(context: PerformanceManager, hits: List<NoteEvent.NoteOn>, style
             stickModel = DRUM_SET_STICK,
         ).apply {
             setParent(recoilNode)
+            if (ghostStick) ghost(this)
         }.also {
             it.node.move(10f, 0f, 3f)
             it.node.rotate(0f, rad(80.0), 0f)
         }
+
+    override fun stickTargets(): List<StickTarget> = listOf(
+        StickTarget("snare", { it == ACOUSTIC_SNARE || it == ELECTRIC_SNARE }, regularStick.model, HandProfile.SNARE)
+    )
 
     private val sideStick =
         Striker(

@@ -209,6 +209,10 @@
     <string name="settings_instruments_description">Instrumentensichtbarkeit</string>
     <string name="settings_instruments_always_show_instruments">Instrumente immer anzeigen</string>
     <string name="settings_instruments_always_show_instruments_description">Instrumente niemals ausblenden, auch wenn keine Noten gespielt werden</string>
+    <string name="settings_instruments_smart_mallets">Intelligente Schlägel</string>
+    <string name="settings_instruments_smart_mallets_description">Mallet-Instrumente mit zwei wandernden Schlägeln statt einem pro Platte spielen</string>
+    <string name="settings_instruments_smart_drum_sticks">Intelligente Drumsticks</string>
+    <string name="settings_instruments_smart_drum_sticks_description">Das Schlagzeug mit zwei Sticks spielen, die um das Set wandern, statt einem pro Trommel</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Eine Neuauflage von MIDIJam, einem 3D-MIDI-Datei-Visualisierer.</string>

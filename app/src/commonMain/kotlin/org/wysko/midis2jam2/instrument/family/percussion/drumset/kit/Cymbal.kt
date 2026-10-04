@@ -26,6 +26,7 @@ import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.util.rot
@@ -40,14 +41,20 @@ private val STICK_POSITION_MAP = buildMap {
 }
 private val DEFAULT_STICK_POSITION = v3(0, 2, 18)
 
+/** How a cymbal's stick is angled down, in degrees about each axis. */
+internal val STICK_TILT = v3(-20, 0, 0)
+
 /**
  * A crash, splash, ride, or china cymbal.
+ *
+ * @param ghostStick true if the smart drum sticks play this cymbal, so its own stick is hidden.
  */
 open class Cymbal(
     context: PerformanceManager,
     hits: List<NoteEvent.NoteOn>,
-    type: CymbalType,
-    style: Style = Style.Standard
+    protected val type: CymbalType,
+    style: Style = Style.Standard,
+    ghostStick: Boolean = false,
 ) : DrumSetInstrument(context, hits) {
     /**
      * The stick that strikes the cymbal.
@@ -61,9 +68,13 @@ open class Cymbal(
             )
         )
         offsetStick {
-            it.rot = v3(-20, 0, 0) // Angles stick down slightly
+            it.rot = STICK_TILT // Angles stick down slightly
         }
+        if (ghostStick) ghost(this)
     }
+
+    override fun stickTargets(): List<StickTarget> =
+        listOf(StickTarget("cymbal_${type.name}", { true }, stick.model, HandProfile.forCymbal(type.name)))
 
     private val model = with(geometry) {
         +context.model(type.model, style.texture, style.materialType).apply {
