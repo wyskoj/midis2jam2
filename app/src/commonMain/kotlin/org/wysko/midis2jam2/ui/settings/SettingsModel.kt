@@ -90,6 +90,11 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
         it.copy(cubeMapTextures = it.cubeMapTextures.toMutableList().also { textures -> textures[index] = texture })
     }
 
+    /** Uses [texture] for every side of the cube map. */
+    fun setAllCubeMapTextures(texture: String) = background {
+        it.copy(cubeMapTextures = it.cubeMapTextures.map { texture })
+    }
+
     fun setLockCursorEnabled(isEnabled: Boolean) = controls { it.copy(isLockCursor = isEnabled) }
 
     fun setDisableTouchInput(isDisableTouchInput: Boolean) =

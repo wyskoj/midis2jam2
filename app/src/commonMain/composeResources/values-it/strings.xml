@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Tieniti forte! Stiamo indicizzando i tuoi file MIDI...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Sfondo mal configurato</string>
-    <string name="background_cubemap_warning_message">Lo sfondo è impostato su cube map, ma non tutte e sei le immagini sono state assegnate. Verrà utilizzato lo sfondo predefinito. Puoi annullare e correggere questo nelle impostazioni dello sfondo.</string>
-    <string name="background_cubemap_missing_warning_title">Immagini di sfondo non trovate</string>
-    <string name="background_cubemap_missing_warning_message">Una o più delle immagini della cube map specificate non sono state trovate sul disco. Verrà utilizzato lo sfondo predefinito. Puoi annullare e correggere questo nelle impostazioni dello sfondo.</string>
-    <string name="background_cubemap_warning_continue">Continua comunque</string>
-    <string name="background_warning_settings_badge">Problema di configurazione dello sfondo</string>
 
     <!-- Settings -->
     <string name="settings_general">Generali</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Salvato</string>
     <string name="record_failed_title">Registrazione non riuscita</string>
     <string name="record_time_left">circa %1$s rimanenti</string>
+    <string name="settings_section_appearance">Aspetto</string>
+    <string name="settings_section_updates">Aggiornamenti</string>
+    <string name="settings_section_window">Finestra</string>
+    <string name="settings_section_quality">Qualità</string>
+    <string name="settings_section_autocam">Auto-cam</string>
+    <string name="settings_section_freecam">Freecam</string>
+    <string name="settings_section_visibility">Visibilità</string>
+    <string name="settings_section_overlays">Sovrapposizioni</string>
+    <string name="settings_section_mouse_keyboard">Mouse e tastiera</string>
+    <string name="settings_section_gamepad">Gamepad</string>
+    <string name="settings_section_touch">Touch</string>
+    <string name="settings_background_cubemap_all_sides">Usa una sola immagine per tutti i lati</string>
+    <string name="settings_background_cubemap_unset">Nessuna immagine: %1$s</string>
+    <string name="settings_background_cubemap_missing">File non trovato: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Aggiungi immagine</string>
+    <string name="settings_background_cubemap_choose">Scegli l'immagine per %1$s</string>
+    <string name="settings_background_cubemap_no_image">Nessuna immagine</string>
+    <string name="settings_background_cubemap_hint">Trascina un'immagine su un lato oppure fai clic su un lato per sceglierne una. Le immagini vengono copiate nella cartella degli sfondi.</string>
+    <string name="settings_background_cubemap_remove">Rimuovi immagine</string>
+    <string name="settings_background_cubemap_no_library">Ancora nessuna immagine. Importane una per iniziare.</string>
+    <string name="background_warning_title">Lo sfondo non è pronto</string>
+    <string name="background_warning_consequence_launch">Questa esecuzione userà lo sfondo predefinito.</string>
+    <string name="background_warning_consequence_settings">Finché non viene corretto, viene usato lo sfondo predefinito.</string>
+    <string name="background_warning_fix">Apri impostazioni sfondo</string>
+    <string name="background_warning_continue">Riproduci con lo sfondo predefinito</string>
 </resources>
 

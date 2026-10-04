@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Maghintay! Ina-index na namin ang iyong mga MIDI file...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Maling configuration ng background</string>
-    <string name="background_cubemap_warning_message">Ang background ay nakatakda sa cube map, ngunit hindi lahat ng anim na larawan ang itinalaga. Ang default na background ay gagamitin sa halip. Maaari kang mag-cancel at ayusin ito sa mga setting ng background.</string>
-    <string name="background_cubemap_missing_warning_title">Hindi nahanap ang mga larawan ng background</string>
-    <string name="background_cubemap_missing_warning_message">Isa o higit pang mga tinukoy na larawan ng cube map ay hindi mahanap sa disk. Ang default na background ay gagamitin sa halip. Maaari kang mag-cancel at ayusin ito sa mga setting ng background.</string>
-    <string name="background_cubemap_warning_continue">Magpatuloy nang gayon pa man</string>
-    <string name="background_warning_settings_badge">Problema sa configuration ng background</string>
 
     <!-- Settings -->
     <string name="settings_general">Pangkalahatan</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Na-save</string>
     <string name="record_failed_title">Nabigo ang pagre-record</string>
     <string name="record_time_left">mga %1$s na lang</string>
+    <string name="settings_section_appearance">Hitsura</string>
+    <string name="settings_section_updates">Mga update</string>
+    <string name="settings_section_window">Window</string>
+    <string name="settings_section_quality">Kalidad</string>
+    <string name="settings_section_autocam">Auto-cam</string>
+    <string name="settings_section_freecam">Freecam</string>
+    <string name="settings_section_visibility">Visibility</string>
+    <string name="settings_section_overlays">Mga overlay</string>
+    <string name="settings_section_mouse_keyboard">Mouse at keyboard</string>
+    <string name="settings_section_gamepad">Gamepad</string>
+    <string name="settings_section_touch">Touch</string>
+    <string name="settings_background_cubemap_all_sides">Gumamit ng isang larawan para sa lahat ng gilid</string>
+    <string name="settings_background_cubemap_unset">Walang larawan: %1$s</string>
+    <string name="settings_background_cubemap_missing">Hindi nahanap ang file: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Magdagdag ng larawan</string>
+    <string name="settings_background_cubemap_choose">Pumili ng larawan para sa %1$s</string>
+    <string name="settings_background_cubemap_no_image">Walang larawan</string>
+    <string name="settings_background_cubemap_hint">I-drop ang larawan sa isang gilid, o i-click ang gilid para pumili ng isa. Kinokopya ang mga larawan sa folder ng mga background.</string>
+    <string name="settings_background_cubemap_remove">Alisin ang larawan</string>
+    <string name="settings_background_cubemap_no_library">Wala pang larawan. Mag-import ng isa para magsimula.</string>
+    <string name="background_warning_title">Hindi pa handa ang background</string>
+    <string name="background_warning_consequence_launch">Gagamitin ng pagtugtog na ito ang default na background sa halip.</string>
+    <string name="background_warning_consequence_settings">Hangga't hindi ito naaayos, gagamitin ang default na background.</string>
+    <string name="background_warning_fix">Buksan ang mga setting ng background</string>
+    <string name="background_warning_continue">I-play gamit ang default na background</string>
 </resources>
 

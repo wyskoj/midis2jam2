@@ -17,517 +17,303 @@
 
 package org.wysko.midis2jam2.ui.settings
 
-import Platform
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import kotlinx.coroutines.launch
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import midis2jam2.app.generated.resources.*
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.SystemInteractionService
-import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Color
-import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.CubeMap
-import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Default
-import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.ui.BasicDeviceScaffold
-import org.wysko.midis2jam2.ui.common.component.*
-import kotlin.math.roundToInt
+import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 
+/** Windows narrower than this show a list of categories that open one at a time, like a phone. */
+private val CompactWidthThreshold = 720.dp
+
+private val RailWidth = 232.dp
+private val ContentMaxWidth = 680.dp
+
+/**
+ * The settings screen.
+ *
+ * In a wide window it is a category rail beside the selected page. In a narrow one (a phone) it is
+ * a list of categories, each of which opens its page as a separate screen.
+ */
 object SettingsScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
-    @Suppress("DuplicatedCode")
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val model = koinScreenModel<SettingsModel>()
-        val screenModel = koinScreenModel<SettingsScreenModel>()
-        val settings = model.appSettings.collectAsState()
+        val pages = rememberSettingsPages(model, koinScreenModel<SettingsScreenModel>())
         val systemInteractionService = koinInject<SystemInteractionService>()
+
+        val openHelp = { systemInteractionService.openOnlineDocumentation() }
+
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val compact = maxWidth < CompactWidthThreshold
+            CompositionLocalProvider(LocalSettingsCompact provides compact) {
+                if (compact) {
+                    BasicDeviceScaffold(
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(stringResource(Res.string.tab_settings)) },
+                                actions = { HelpButton(openHelp) },
+                            )
+                        }
+                    ) {
+                        SettingsCategoryList(pages)
+                    }
+                } else {
+                    // The rail runs the full height of the window, so it carries the title.
+                    BasicDeviceScaffold {
+                        SettingsMasterDetail(pages, openHelp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HelpButton(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(Res.drawable.help),
+            contentDescription = stringResource(Res.string.help),
+        )
+    }
+}
+
+/** One settings page, opened from the category list in a narrow window. */
+internal class SettingsPageScreen(private val page: SettingsPage) : Screen {
+    override val key: ScreenKey = "settings-page-${page.name}"
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val model = koinScreenModel<SettingsModel>()
+        val content = rememberSettingsPages(model, koinScreenModel<SettingsScreenModel>()).firstOrNull { it.page == page }
 
         BasicDeviceScaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(stringResource(Res.string.tab_settings)) },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                systemInteractionService.openOnlineDocumentation()
-                            },
-                        ) {
+                    title = { Text(stringResource(page.title)) },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator.pop() }) {
                             Icon(
-                                painter = painterResource(Res.drawable.help),
-                                contentDescription = stringResource(Res.string.help)
+                                painter = painterResource(Res.drawable.arrow_back),
+                                contentDescription = stringResource(Res.string.back),
                             )
                         }
-                    }
+                    },
                 )
             }
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            CompositionLocalProvider(LocalSettingsCompact provides true) {
+                content?.let { SettingsPageBody(it, showHeader = false) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun rememberSettingsPages(model: SettingsModel, screenModel: SettingsScreenModel): List<SettingsPageContent> {
+    val settings = model.appSettings.collectAsState()
+    return remember(model, screenModel) { settingsPages(settings, model, screenModel) }
+}
+
+@Composable
+private fun SettingsMasterDetail(pages: List<SettingsPageContent>, onHelp: () -> Unit) {
+    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    val selected = pages[selectedIndex.coerceIn(pages.indices)]
+
+    // Another screen can send the user straight to a page, such as the one a warning is about.
+    val navigationModel = koinInject<NavigationModel>()
+    val requestedPage by navigationModel.requestedSettingsPage.collectAsState()
+    LaunchedEffect(requestedPage) {
+        requestedPage?.let { requested ->
+            pages.indexOfFirst { it.page == requested }.takeIf { it >= 0 }?.let { selectedIndex = it }
+            navigationModel.clearRequestedSettingsPage()
+        }
+    }
+
+    Row(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .width(RailWidth)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().height(64.dp).padding(start = 24.dp, end = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                SettingsScreenContent(settings, model, screenModel)
-            }
-        }
-    }
-}
-
-internal expect fun LazyListScope.SettingsScreenContent(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-    screenModel: SettingsScreenModel,
-)
-
-internal expect val deviceThemeIcon: DrawableResource
-
-@Composable
-internal fun SynthesizerReverbSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        checked = settings.value.playbackSettings.synthesizerSettings.isUseReverb,
-        onCheckedChange = model::setUseReverb,
-        title = { Text(stringResource(Res.string.settings_playback_synthesizer_reverb)) },
-        label = { Text(stringResource(Res.string.settings_playback_synthesizer_reverb_description)) },
-        icon = Res.drawable.surround_sound,
-    )
-}
-
-@Composable
-internal fun SynthesizerChorusSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        checked = settings.value.playbackSettings.synthesizerSettings.isUseChorus,
-        onCheckedChange = model::setUseChorus,
-        title = { Text(stringResource(Res.string.settings_playback_synthesizer_chorus)) },
-        label = { Text(stringResource(Res.string.settings_playback_synthesizer_chorus_description)) },
-        icon = Res.drawable.graphic_eq,
-    )
-}
-
-@Composable
-internal fun IsClassicAutoCamBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.cameraSettings.isClassicAutoCam,
-        model::setClassicAutoCam,
-        title = { Text(stringResource(Res.string.settings_camera_classic_autocam)) },
-        label = { Text(stringResource(Res.string.settings_camera_classic_autocam_description)) },
-        icon = Res.drawable.camera_video,
-    )
-}
-
-@Composable
-internal fun StartAutocamWithSongBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.cameraSettings.isStartAutocamWithSong,
-        model::setStartAutocamWithSong,
-        title = { Text(stringResource(Res.string.settings_camera_start_autocam_with_song)) },
-        label = {
-            Text(
-                stringResource(Res.string.settings_camera_start_autocam_with_song_description)
-            )
-        },
-        icon = Res.drawable.motion_photos_auto,
-    )
-}
-
-@Composable
-internal fun AlwaysShowInstrumentsBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.instrumentSettings.isAlwaysShowInstruments,
-        model::setAlwaysShowInstruments,
-        title = { Text(stringResource(Res.string.settings_instruments_always_show_instruments)) },
-        label = {
-            Text(stringResource(Res.string.settings_instruments_always_show_instruments_description))
-        },
-        icon = Res.drawable.keep,
-    )
-}
-
-@Composable
-internal fun SmartMalletsBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.instrumentSettings.isSmartMallets,
-        model::setSmartMallets,
-        title = { Text(stringResource(Res.string.settings_instruments_smart_mallets)) },
-        label = {
-            Text(stringResource(Res.string.settings_instruments_smart_mallets_description))
-        },
-        icon = Res.drawable.music_note,
-    )
-}
-
-@Composable
-internal fun SmartDrumSticksBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.instrumentSettings.isSmartDrumSticks,
-        model::setSmartDrumSticks,
-        title = { Text(stringResource(Res.string.settings_instruments_smart_drum_sticks)) },
-        label = {
-            Text(stringResource(Res.string.settings_instruments_smart_drum_sticks_description))
-        },
-        icon = Res.drawable.music_note,
-    )
-}
-
-@Composable
-internal fun HudBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.onScreenElementsSettings.isShowHeadsUpDisplay,
-        model::setShowHeadsUpDisplay,
-        title = { Text(stringResource(Res.string.settings_onscreenelements_hud)) },
-        label = { Text(stringResource(Res.string.settings_onscreenelements_hud_description)) },
-        icon = Res.drawable.browse_activity,
-    )
-}
-
-internal fun LazyListScope.LyricsSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    item {
-        SwitchRow(
-            settings.value.onScreenElementsSettings.lyricsSettings.isShowLyrics,
-            model::setShowLyrics,
-            title = { Text(stringResource(Res.string.settings_onscreenelements_lyrics)) },
-            label = { Text(stringResource(Res.string.settings_onscreenelements_lyrics_description)) },
-            icon = Res.drawable.lyrics,
-        )
-    }
-    item {
-        val scaleOptions = listOf(
-            SelectOption(
-                value = 0.5,
-                title = stringResource(Res.string.settings_onscreenelements_lyrics_size_smaller)
-            ),
-            SelectOption(
-                value = 1.0,
-                title = stringResource(Res.string.settings_onscreenelements_lyrics_size_small)
-            ),
-            SelectOption(
-                value = 1.5,
-                title = stringResource(Res.string.settings_onscreenelements_lyrics_size_default)
-            ),
-            SelectOption(
-                value = 2.0,
-                title = stringResource(Res.string.settings_onscreenelements_lyrics_size_large)
-            ),
-            SelectOption(
-                value = 2.5,
-                title = stringResource(Res.string.settings_onscreenelements_lyrics_size_larger)
-            ),
-        )
-        AnimatedVisibility(
-            visible = settings.value.onScreenElementsSettings.lyricsSettings.isShowLyrics,
-            enter = expandVertically(),
-            exit = shrinkVertically()
-        ) {
-            SelectRow(
-                option = settings.value.onScreenElementsSettings.lyricsSettings.lyricsSize,
-                model::setLyricsSize,
-                options = scaleOptions,
-                title = { Text(stringResource(Res.string.settings_onscreenelements_lyrics_size)) },
-                icon = Res.drawable.format_size,
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun BackgroundSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-    backgroundWarning: BackgroundWarning? = null,
-) {
-    var showColorSelectModal by remember { mutableStateOf(false) }
-    val colorSelectSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showBackgroundWarningDialog by remember { mutableStateOf(false) }
-
-    var showCubeMapSelectModal by remember { mutableStateOf(false) }
-    val cubeMapSelectSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    val color = settings.value.backgroundSettings.color
-
-    val backgroundImagesOptions = listOf(
-        SelectOption(
-            value = CubeMap,
-            title = stringResource(Res.string.settings_background_type_cubemap),
-            label = stringResource(Res.string.settings_background_type_cubemap_description),
-            icon = Res.drawable.image,
-        ),
-    )
-
-    SelectRow(
-        settings.value.backgroundSettings.type,
-        {
-            model.setBackgroundType(it)
-            when (it) {
-                CubeMap -> showCubeMapSelectModal = true
-                Color -> showColorSelectModal = true
-                else -> Unit
-            }
-        },
-        options = listOf(
-            SelectOption(
-                value = Default,
-                title = stringResource(Res.string.settings_background_type_default),
-                label = stringResource(Res.string.settings_background_type_default_description),
-                icon = Res.drawable.wallpaper,
-            ),
-            SelectOption(
-                value = Color,
-                title = stringResource(Res.string.settings_background_type_color),
-                label = stringResource(Res.string.settings_background_type_color_description),
-                icon = Res.drawable.palette,
-            ),
-        ) + if (Platform.current() == Platform.Desktop) backgroundImagesOptions else emptyList(),
-        title = { Text(stringResource(Res.string.settings_background_type)) },
-        trailingIcon = {
-            if (settings.value.backgroundSettings.type == Color) {
-                Surface(
-                    modifier = Modifier.size(36.dp),
-                    shape = CircleShape,
-                    color = Color(color),
-                ) {}
-            }
-            if (backgroundWarning != null) {
-                IconButton(onClick = { showBackgroundWarningDialog = true }) {
-                    Icon(
-                        painterResource(Res.drawable.warning),
-                        contentDescription = stringResource(Res.string.background_warning_settings_badge),
-                        tint = WarningAmber,
-                    )
-                }
-            }
-        },
-        description = stringResource(Res.string.settings_background_description)
-    )
-
-    if (showBackgroundWarningDialog && backgroundWarning != null) {
-        val textButtonColors = ButtonDefaults.textButtonColors(
-            contentColor = MaterialTheme.colorScheme.primary
-        )
-        val title = backgroundWarningTitle(backgroundWarning)
-        val message = backgroundWarningMessage(backgroundWarning)
-        AlertDialog(
-            onDismissRequest = { showBackgroundWarningDialog = false },
-            title = { Text(title) },
-            icon = {
-                Icon(
-                    painterResource(Res.drawable.warning),
-                    contentDescription = title,
-                    tint = WarningAmber,
+                Text(
+                    text = stringResource(Res.string.tab_settings),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f),
                 )
-            },
-            text = { Text(message) },
-            confirmButton = {},
-            dismissButton = {
-                TextButton(
-                    onClick = { showBackgroundWarningDialog = false },
-                    colors = textButtonColors,
-                ) {
-                    Text(stringResource(Res.string.ok))
-                }
+                HelpButton(onHelp)
             }
-        )
-    }
-
-    if (showColorSelectModal) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showColorSelectModal = false
-            },
-            sheetState = colorSelectSheetState,
-        ) {
-            var formColor by remember { mutableIntStateOf(color) }
-            Box(
-                modifier = Modifier.padding(16.dp),
-            ) {
-                ColorPicker(
-                    color = formColor,
-                    setColor = model::setBackgroundColor,
-                )
-            }
-        }
-    }
-
-    if (showCubeMapSelectModal) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showCubeMapSelectModal = false
-            },
-            sheetState = cubeMapSelectSheetState,
-        ) {
-            Box(
-                modifier = Modifier.padding(16.dp),
-            ) {
-                CubeMapImageSelect(
-                    settings = settings.value,
-                    model = model,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-internal fun ShadowsBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.graphicsSettings.shadowsSettings.isUseShadows,
-        model::setUseShadows,
-        title = { Text(stringResource(Res.string.settings_graphics_shadows_description_a)) },
-        label = { Text(stringResource(Res.string.settings_graphics_shadows_description_hint_a)) },
-        icon = Res.drawable.tonality,
-    )
-}
-
-@Composable
-internal fun ThemeSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SelectRow(
-        settings.value.generalSettings.theme,
-        model::setAppTheme,
-        options = listOf(
-            SelectOption(
-                value = AppTheme.LIGHT,
-                title = stringResource(Res.string.settings_general_theme_light),
-                label = null,
-                icon = Res.drawable.light_mode,
-            ),
-            SelectOption(
-                value = AppTheme.DARK,
-                title = stringResource(Res.string.settings_general_theme_dark),
-                label = null,
-                icon = Res.drawable.dark_mode,
-            ),
-            SelectOption(
-                value = AppTheme.SYSTEM_DEFAULT,
-                title = stringResource(Res.string.settings_general_theme_system),
-                label = null,
-                icon = deviceThemeIcon,
-            ),
-        ),
-        title = { Text(stringResource(Res.string.settings_general_theme)) },
-    )
-}
-
-@Composable
-internal expect fun LocaleSelect(
-    selectedLocale: String,
-    onSelectLocale: (String) -> Unit,
-    availableLocales: List<String>,
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun FieldOfViewSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
-    var isShowSheet by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
-    @Composable
-    fun formatFov(degrees: Float): String {
-        return stringResource(Res.string.settings_camera_field_of_view_degrees, degrees.roundToInt())
-    }
-
-    UnitRow(
-        title = { Text(stringResource(Res.string.settings_camera_field_of_view_title)) },
-        label = {
-            val prefix = stringResource(Res.string.settings_camera_field_of_view_label_prefix)
-            val current = formatFov(settings.value.cameraSettings.defaultFieldOfView)
-            Text("$prefix ∙ $current")
-        },
-        icon = Res.drawable.zoom_in,
-    ) {
-        isShowSheet = true
-        sliderPosition = settings.value.cameraSettings.defaultFieldOfView
-    }
-
-    if (isShowSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                scope.launch {
-                    model.setDefaultFieldOfView(sliderPosition)
-                    sheetState.hide()
-                    isShowSheet = false
-                }
-            },
-            sheetState = sheetState,
-        ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Text(formatFov(sliderPosition))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(painterResource(Res.drawable.zoom_in), null)
-                    Slider(
-                        value = sliderPosition,
-                        onValueChange = {
-                            sliderPosition = it
-                        },
-                        valueRange = 30f..90f,
-                        modifier = Modifier.weight(1f),
-                        steps = 11,
+                pages.forEachIndexed { index, content ->
+                    SettingsRailItem(
+                        content = content,
+                        selected = content === selected,
+                        onClick = { selectedIndex = index },
                     )
-                    Icon(painterResource(Res.drawable.zoom_out), null)
                 }
+            }
+        }
+        VerticalDivider(color = settingsDividerColor())
+        SettingsPageBody(selected, showHeader = true, modifier = Modifier.weight(1f))
+    }
+}
+
+/**
+ * A category in the rail. The stock drawer item is 56dp tall, which leaves a small label floating
+ * in a large pill, so this one is a snug 44dp.
+ */
+@Composable
+private fun SettingsRailItem(content: SettingsPageContent, selected: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    val contentColor = if (selected) {
+        MaterialTheme.colorScheme.onSecondaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(44.dp)
+            .clip(shape)
+            .background(if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent)
+            .selectable(selected = selected, role = Role.Tab, onClick = onClick)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Icon(painterResource(content.icon), contentDescription = null, tint = contentColor)
+        Text(
+            text = stringResource(content.page.title),
+            style = MaterialTheme.typography.labelMedium,
+            color = contentColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun SettingsCategoryList(pages: List<SettingsPageContent>) {
+    val navigator = LocalNavigator.currentOrThrow
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        SettingsCard {
+            pages.forEachIndexed { index, content ->
+                if (index > 0) HorizontalDivider(color = settingsDividerColor())
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { navigator.push(SettingsPageScreen(content.page)) }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(content.icon),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    }
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(content.page.title),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                        Text(
+                            text = stringResource(content.summary),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    Icon(
+                        painter = painterResource(Res.drawable.chevron_right),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsPageBody(content: SettingsPageContent, showHeader: Boolean, modifier: Modifier = Modifier) {
+    val compact = LocalSettingsCompact.current
+    key(content.page) {
+        Box(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = ContentMaxWidth)
+                    .fillMaxWidth()
+                    .padding(horizontal = if (compact) 16.dp else 32.dp, vertical = if (compact) 8.dp else 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                if (showHeader) {
+                    Column {
+                        Text(
+                            text = stringResource(content.page.title),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                        Text(
+                            text = stringResource(content.summary),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                content.sections.forEach { SettingsSectionBlock(it) }
             }
         }
     }

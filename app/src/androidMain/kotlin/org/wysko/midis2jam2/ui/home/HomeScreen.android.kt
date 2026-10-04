@@ -67,7 +67,6 @@ import io.github.vinceglb.filekit.name
 import kotlinx.coroutines.launch
 import midis2jam2.app.generated.resources.Res
 import midis2jam2.app.generated.resources.audio_file
-import midis2jam2.app.generated.resources.background_cubemap_warning_continue
 import midis2jam2.app.generated.resources.cancel
 import midis2jam2.app.generated.resources.play_arrow
 import midis2jam2.app.generated.resources.play_midi_file
@@ -84,7 +83,6 @@ import org.koin.compose.koinInject
 import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.manager.AndroidSoundbanksManager
-import org.wysko.midis2jam2.ui.AppNavigationBar
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.component.WarningAmber
 import org.wysko.midis2jam2.ui.home.log.LogScreenButton
@@ -112,7 +110,6 @@ internal actual fun HomeScreenLayout() {
     }
 
     Scaffold(
-        bottomBar = { AppNavigationBar() },
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         Box(

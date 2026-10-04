@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Proszę czekać! Indeksujemy Twoje pliki MIDI...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Tło nieprawidłowo skonfigurowane</string>
-    <string name="background_cubemap_warning_message">Tło jest ustawione na mapę sześcienną, ale nie wszystkie sześć obrazów zostało przypisanych. Zamiast tego zostanie użyte domyślne tło. Możesz anulować i naprawić to w ustawieniach tła.</string>
-    <string name="background_cubemap_missing_warning_title">Nie znaleziono obrazów tła</string>
-    <string name="background_cubemap_missing_warning_message">Jeden lub więcej z podanych obrazów mapy sześciennej nie został znaleziony na dysku. Zamiast tego zostanie użyte domyślne tło. Możesz anulować i naprawić to w ustawieniach tła.</string>
-    <string name="background_cubemap_warning_continue">Kontynuuj mimo to</string>
-    <string name="background_warning_settings_badge">Problem z konfiguracją tła</string>
 
     <!-- Settings -->
     <string name="settings_general">Ogólne</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Zapisano</string>
     <string name="record_failed_title">Nagrywanie nie powiodło się</string>
     <string name="record_time_left">zostało ok. %1$s</string>
+    <string name="settings_section_appearance">Wygląd</string>
+    <string name="settings_section_updates">Aktualizacje</string>
+    <string name="settings_section_window">Okno</string>
+    <string name="settings_section_quality">Jakość</string>
+    <string name="settings_section_autocam">Auto-kamera</string>
+    <string name="settings_section_freecam">Kamera swobodna</string>
+    <string name="settings_section_visibility">Widoczność</string>
+    <string name="settings_section_overlays">Nakładki</string>
+    <string name="settings_section_mouse_keyboard">Mysz i klawiatura</string>
+    <string name="settings_section_gamepad">Gamepad</string>
+    <string name="settings_section_touch">Dotyk</string>
+    <string name="settings_background_cubemap_all_sides">Użyj jednego obrazu dla wszystkich boków</string>
+    <string name="settings_background_cubemap_unset">Brak obrazu: %1$s</string>
+    <string name="settings_background_cubemap_missing">Nie znaleziono pliku: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Dodaj obraz</string>
+    <string name="settings_background_cubemap_choose">Wybierz obraz dla: %1$s</string>
+    <string name="settings_background_cubemap_no_image">Brak obrazu</string>
+    <string name="settings_background_cubemap_hint">Upuść obraz na bok lub kliknij bok, aby wybrać obraz. Obrazy są kopiowane do folderu teł.</string>
+    <string name="settings_background_cubemap_remove">Usuń obraz</string>
+    <string name="settings_background_cubemap_no_library">Nie ma jeszcze obrazów. Zaimportuj jeden, aby zacząć.</string>
+    <string name="background_warning_title">Tło nie jest gotowe</string>
+    <string name="background_warning_consequence_launch">To odtworzenie użyje domyślnego tła.</string>
+    <string name="background_warning_consequence_settings">Do czasu naprawienia używane jest domyślne tło.</string>
+    <string name="background_warning_fix">Otwórz ustawienia tła</string>
+    <string name="background_warning_continue">Odtwórz z domyślnym tłem</string>
 </resources>
 

@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Chờ tí! Đang lập chỉ mục các tập tin MIDI của bạn...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Cấu hình nền không đúng</string>
-    <string name="background_cubemap_warning_message">Nền được đặt thành cube map, nhưng không phải tất cả sáu hình ảnh đã được gán. Nền mặc định sẽ được sử dụng thay thế. Bạn có thể hủy và sửa điều này trong cài đặt nền.</string>
-    <string name="background_cubemap_missing_warning_title">Không tìm thấy hình ảnh nền</string>
-    <string name="background_cubemap_missing_warning_message">Một hoặc nhiều hình ảnh cube map được chỉ định không thể tìm thấy trên đĩa. Nền mặc định sẽ được sử dụng thay thế. Bạn có thể hủy và sửa điều này trong cài đặt nền.</string>
-    <string name="background_cubemap_warning_continue">Tiếp tục dù sao</string>
-    <string name="background_warning_settings_badge">Sự cố cấu hình nền</string>
 
     <!-- Settings -->
     <string name="settings_general">Chung</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Đã lưu</string>
     <string name="record_failed_title">Ghi hình thất bại</string>
     <string name="record_time_left">còn khoảng %1$s</string>
+    <string name="settings_section_appearance">Giao diện</string>
+    <string name="settings_section_updates">Cập nhật</string>
+    <string name="settings_section_window">Cửa sổ</string>
+    <string name="settings_section_quality">Chất lượng</string>
+    <string name="settings_section_autocam">Auto-cam</string>
+    <string name="settings_section_freecam">Freecam</string>
+    <string name="settings_section_visibility">Hiển thị</string>
+    <string name="settings_section_overlays">Lớp phủ</string>
+    <string name="settings_section_mouse_keyboard">Chuột và bàn phím</string>
+    <string name="settings_section_gamepad">Tay cầm</string>
+    <string name="settings_section_touch">Cảm ứng</string>
+    <string name="settings_background_cubemap_all_sides">Dùng một ảnh cho tất cả các mặt</string>
+    <string name="settings_background_cubemap_unset">Chưa có ảnh: %1$s</string>
+    <string name="settings_background_cubemap_missing">Không tìm thấy tệp: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Thêm ảnh</string>
+    <string name="settings_background_cubemap_choose">Chọn ảnh cho %1$s</string>
+    <string name="settings_background_cubemap_no_image">Không có ảnh</string>
+    <string name="settings_background_cubemap_hint">Thả ảnh vào một mặt, hoặc nhấp vào một mặt để chọn ảnh. Ảnh được sao chép vào thư mục nền.</string>
+    <string name="settings_background_cubemap_remove">Xóa ảnh</string>
+    <string name="settings_background_cubemap_no_library">Chưa có ảnh nào. Hãy nhập một ảnh để bắt đầu.</string>
+    <string name="background_warning_title">Nền chưa sẵn sàng</string>
+    <string name="background_warning_consequence_launch">Buổi trình diễn này sẽ dùng nền mặc định thay thế.</string>
+    <string name="background_warning_consequence_settings">Cho đến khi sửa xong, nền mặc định sẽ được sử dụng.</string>
+    <string name="background_warning_fix">Mở cài đặt nền</string>
+    <string name="background_warning_continue">Phát với nền mặc định</string>
 </resources>
 

@@ -88,6 +88,7 @@ import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.HomeScreenModel
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
+import org.wysko.midis2jam2.ui.settings.rememberOpenBackgroundSettings
 import org.wysko.midis2jam2.ui.common.component.Midis2jam2Logo
 import org.wysko.midis2jam2.ui.common.navigation.NavigationModel
 import org.wysko.midis2jam2.ui.history.HistoryScreenButton
@@ -146,10 +147,11 @@ internal actual fun HomeScreenLayout() {
 
     val isSoundbankSelectVisible = selectedMidiDevice.value.name == "Gervill"
 
+    val openBackgroundSettings = rememberOpenBackgroundSettings()
     if (isBackgroundWarningDialogOpen) {
-        capturedBackgroundWarning?.let { warning ->
+        capturedBackgroundWarning?.let {
             BackgroundWarningDialog(
-                warningType = warning,
+                onOpenSettings = openBackgroundSettings,
                 onConfirm = {
                     isBackgroundWarningDialogOpen = false
                     model.startApplication()

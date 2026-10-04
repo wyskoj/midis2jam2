@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Подождите! Индексируем ваши MIDI-файлы…</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Фон неправильно настроен</string>
-    <string name="background_cubemap_warning_message">Фон установлен на кубическую карту, но не все шесть изображений были назначены. Вместо этого будет использован фон по умолчанию. Вы можете отменить и исправить это в настройках фона.</string>
-    <string name="background_cubemap_missing_warning_title">Изображения фона не найдены</string>
-    <string name="background_cubemap_missing_warning_message">Одно или несколько указанных изображений кубической карты не были найдены на диске. Вместо этого будет использован фон по умолчанию. Вы можете отменить и исправить это в настройках фона.</string>
-    <string name="background_cubemap_warning_continue">Продолжить в любом случае</string>
-    <string name="background_warning_settings_badge">Проблема с конфигурацией фона</string>
 
     <!-- Settings -->
     <string name="settings_general">Основные</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Сохранено</string>
     <string name="record_failed_title">Не удалось записать</string>
     <string name="record_time_left">осталось около %1$s</string>
+    <string name="settings_section_appearance">Внешний вид</string>
+    <string name="settings_section_updates">Обновления</string>
+    <string name="settings_section_window">Окно</string>
+    <string name="settings_section_quality">Качество</string>
+    <string name="settings_section_autocam">Авто-камера</string>
+    <string name="settings_section_freecam">Свободная камера</string>
+    <string name="settings_section_visibility">Видимость</string>
+    <string name="settings_section_overlays">Наложения</string>
+    <string name="settings_section_mouse_keyboard">Мышь и клавиатура</string>
+    <string name="settings_section_gamepad">Геймпад</string>
+    <string name="settings_section_touch">Сенсорный ввод</string>
+    <string name="settings_background_cubemap_all_sides">Использовать одно изображение для всех сторон</string>
+    <string name="settings_background_cubemap_unset">Нет изображения: %1$s</string>
+    <string name="settings_background_cubemap_missing">Файл не найден: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Добавить изображение</string>
+    <string name="settings_background_cubemap_choose">Выберите изображение для: %1$s</string>
+    <string name="settings_background_cubemap_no_image">Без изображения</string>
+    <string name="settings_background_cubemap_hint">Перетащите изображение на сторону или щёлкните сторону, чтобы выбрать его. Изображения копируются в папку фонов.</string>
+    <string name="settings_background_cubemap_remove">Удалить изображение</string>
+    <string name="settings_background_cubemap_no_library">Изображений пока нет. Импортируйте одно, чтобы начать.</string>
+    <string name="background_warning_title">Фон не готов</string>
+    <string name="background_warning_consequence_launch">Это воспроизведение будет использовать фон по умолчанию.</string>
+    <string name="background_warning_consequence_settings">Пока это не исправлено, используется фон по умолчанию.</string>
+    <string name="background_warning_fix">Открыть настройки фона</string>
+    <string name="background_warning_continue">Воспроизвести с фоном по умолчанию</string>
 </resources>
 

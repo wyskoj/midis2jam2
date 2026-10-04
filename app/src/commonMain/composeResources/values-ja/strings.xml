@@ -70,12 +70,6 @@
     <string name="search_index_waiting">しばらくお待ちください。MIDIファイルのインデックスを作成中です…</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">背景が正しく設定されていません</string>
-    <string name="background_cubemap_warning_message">背景はキューブマップに設定されていますが、六枚の画像がすべて割り当てられていません。代わりにデフォルトの背景が使用されます。キャンセルして背景の設定で修正できます。</string>
-    <string name="background_cubemap_missing_warning_title">背景画像が見つかりません</string>
-    <string name="background_cubemap_missing_warning_message">指定されたキューブマップの画像の一つ以上がディスク上で見つかりませんでした。代わりにデフォルトの背景が使用されます。キャンセルして背景の設定で修正できます。</string>
-    <string name="background_cubemap_warning_continue">このまま続ける</string>
-    <string name="background_warning_settings_badge">背景の設定に問題があります</string>
 
     <!-- 設定 -->
     <string name="settings_general">一般</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">保存しました</string>
     <string name="record_failed_title">録画に失敗しました</string>
     <string name="record_time_left">残り約 %1$s</string>
+    <string name="settings_section_appearance">外観</string>
+    <string name="settings_section_updates">アップデート</string>
+    <string name="settings_section_window">ウィンドウ</string>
+    <string name="settings_section_quality">品質</string>
+    <string name="settings_section_autocam">オートカム</string>
+    <string name="settings_section_freecam">フリーカム</string>
+    <string name="settings_section_visibility">表示</string>
+    <string name="settings_section_overlays">オーバーレイ</string>
+    <string name="settings_section_mouse_keyboard">マウスとキーボード</string>
+    <string name="settings_section_gamepad">ゲームパッド</string>
+    <string name="settings_section_touch">タッチ</string>
+    <string name="settings_background_cubemap_all_sides">すべての面に同じ画像を使う</string>
+    <string name="settings_background_cubemap_unset">画像なし: %1$s</string>
+    <string name="settings_background_cubemap_missing">ファイルが見つかりません: %1$s</string>
+    <string name="settings_background_cubemap_add_image">画像を追加</string>
+    <string name="settings_background_cubemap_choose">%1$sの画像を選択</string>
+    <string name="settings_background_cubemap_no_image">画像なし</string>
+    <string name="settings_background_cubemap_hint">面に画像をドロップするか、面をクリックして画像を選択します。画像は背景フォルダーにコピーされます。</string>
+    <string name="settings_background_cubemap_remove">画像を削除</string>
+    <string name="settings_background_cubemap_no_library">画像がまだありません。インポートして始めましょう。</string>
+    <string name="background_warning_title">背景の準備ができていません</string>
+    <string name="background_warning_consequence_launch">この演奏ではデフォルトの背景が使用されます。</string>
+    <string name="background_warning_consequence_settings">修正するまで、デフォルトの背景が使用されます。</string>
+    <string name="background_warning_fix">背景の設定を開く</string>
+    <string name="background_warning_continue">デフォルトの背景で再生</string>
 </resources>
 

@@ -18,36 +18,12 @@
 package org.wysko.midis2jam2.ui.settings
 
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.android
-import midis2jam2.app.generated.resources.audio_file
-import midis2jam2.app.generated.resources.hand_gesture_off
-import midis2jam2.app.generated.resources.language
-import midis2jam2.app.generated.resources.settings_camera
-import midis2jam2.app.generated.resources.settings_controls
-import midis2jam2.app.generated.resources.settings_controls_disable_touch
-import midis2jam2.app.generated.resources.settings_controls_disable_touch_description
-import midis2jam2.app.generated.resources.settings_general
-import midis2jam2.app.generated.resources.settings_general_locale
-import midis2jam2.app.generated.resources.settings_graphics
-import midis2jam2.app.generated.resources.settings_instruments
-import midis2jam2.app.generated.resources.settings_on_screen_elements
-import midis2jam2.app.generated.resources.settings_playback_soundbanks
-import midis2jam2.app.generated.resources.settings_playback_soundbanks_description
-import midis2jam2.app.generated.resources.settings_playback_synthesizer
+import midis2jam2.app.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -55,93 +31,68 @@ import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.domain.LocaleHelper
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.domain.settings.AppSettings
-import org.wysko.midis2jam2.ui.common.component.CategoryHeader
 import org.wysko.midis2jam2.ui.common.component.SelectOption
-import org.wysko.midis2jam2.ui.common.component.SelectRow
-import org.wysko.midis2jam2.ui.common.component.SwitchRow
-import org.wysko.midis2jam2.ui.common.component.UnitRow
 import java.util.Locale
 
-internal actual fun LazyListScope.SettingsScreenContent(
+internal actual fun settingsPages(
     settings: State<AppSettings>,
     model: SettingsModel,
     screenModel: SettingsScreenModel,
-) {
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_general))
-    }
-    item {
-        ThemeSelect(settings, model)
-    }
-    item {
-        LocaleSelect(
-            settings.value.generalSettings.locale,
-            model::setLocale,
-            screenModel.getAvailableLocales()
-        )
-    }
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_graphics))
-    }
-    item {
-        ShadowsBooleanSelect(settings, model)
-    }
-    item {
-        BackgroundSelect(settings, model)
-    }
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_on_screen_elements))
-    }
-    LyricsSelect(settings, model)
-    item {
-        HudBooleanSelect(settings, model)
-    }
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_instruments))
-    }
-    item {
-        AlwaysShowInstrumentsBooleanSelect(settings, model)
-    }
-    item {
-        SmartMalletsBooleanSelect(settings, model)
-    }
-    item {
-        SmartDrumSticksBooleanSelect(settings, model)
-    }
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_controls))
-    }
-    item {
-        DisableTouchInputBooleanSelect(settings, model)
-    }
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_playback_synthesizer))
-    }
-    item {
-        SoundbanksSelect(settings, model, screenModel)
-    }
-    item {
-        SynthesizerReverbSelect(settings, model)
-    }
-    item {
-        SynthesizerChorusSelect(settings, model)
-    }
-    stickyHeader {
-        CategoryHeader(stringResource(Res.string.settings_camera))
-    }
-    item {
-        StartAutocamWithSongBooleanSelect(settings, model)
-    }
-    item {
-        IsClassicAutoCamBooleanSelect(settings, model)
-    }
-    item {
-        FieldOfViewSelect(settings, model)
-    }
-    item {
-        Spacer(Modifier.height(0.dp))
-    }
-}
+): List<SettingsPageContent> = listOf(
+    settingsPage(SettingsPage.General, Res.string.settings_general_description) {
+        section(Res.string.settings_section_appearance) {
+            row { ThemeSelect(settings, model) }
+            row {
+                LocaleSelect(
+                    settings.value.generalSettings.locale,
+                    model::setLocale,
+                    screenModel.getAvailableLocales(),
+                )
+            }
+        }
+    },
+    settingsPage(SettingsPage.Graphics, Res.string.settings_graphics_description_a) {
+        section(Res.string.settings_section_quality) { row { ShadowsBooleanSelect(settings, model) } }
+        section(Res.string.settings_background) { row { BackgroundSelect(settings, model) } }
+    },
+    settingsPage(SettingsPage.Camera, Res.string.settings_camera_description) {
+        section(Res.string.settings_section_autocam) {
+            row { StartAutocamWithSongBooleanSelect(settings, model) }
+            row { IsClassicAutoCamBooleanSelect(settings, model) }
+        }
+        section(Res.string.settings_section_freecam) { row { FieldOfViewSelect(settings, model) } }
+    },
+    settingsPage(SettingsPage.Instruments, Res.string.settings_instruments_description) {
+        section(Res.string.settings_section_visibility) { row { AlwaysShowInstrumentsBooleanSelect(settings, model) } }
+        section {
+            row { SmartMalletsBooleanSelect(settings, model) }
+            row { SmartDrumSticksBooleanSelect(settings, model) }
+        }
+    },
+    settingsPage(SettingsPage.OnScreen, Res.string.settings_on_screen_elements_description) {
+        section(Res.string.settings_section_overlays) {
+            row { HudBooleanSelect(settings, model) }
+            row { LyricsSwitch(settings, model) }
+            row(isVisible = { settings.value.onScreenElementsSettings.lyricsSettings.isShowLyrics }) {
+                LyricsSizeSelect(settings, model)
+            }
+        }
+    },
+    settingsPage(
+        SettingsPage.Controls,
+        Res.string.settings_controls_description_a,
+        icon = Res.drawable.touch_app,
+    ) {
+        section(Res.string.settings_section_touch) { row { DisableTouchInputBooleanSelect(settings, model) } }
+    },
+    settingsPage(SettingsPage.Playback, Res.string.settings_playback_description) {
+        section(Res.string.settings_playback_synthesizer) {
+            row { SoundbanksSelect() }
+            row { SynthesizerReverbSelect(settings, model) }
+            row { SynthesizerChorusSelect(settings, model) }
+        }
+    },
+)
 
 internal actual val deviceThemeIcon: DrawableResource
     get() = Res.drawable.android
@@ -153,71 +104,56 @@ internal actual fun LocaleSelect(
     availableLocales: List<String>,
 ) {
     val systemInteraction = koinInject<SystemInteractionService>()
-    val localConfig = LocalConfiguration.current
     val context = LocalContext.current
 
     when (CompatLibrary.useLegacyLanguageSelect) {
         true -> {
             val options = availableLocales.map {
-                val locale = Locale(it)
-                SelectOption(
-                    value = it,
-                    title = locale.displayName,
-                )
+                SelectOption(value = it, title = Locale(it).displayName)
             }
             // Forces recomposition on locale change (12-)
-            val currentLocale = AppCompatDelegate.getApplicationLocales().get(0)
-            SelectRow(
-                selectedLocale,
-                {
+            AppCompatDelegate.getApplicationLocales().get(0)
+            SettingsChoiceRow(
+                title = stringResource(Res.string.settings_general_locale),
+                selected = selectedLocale,
+                onSelected = {
                     onSelectLocale(it)
                     LocaleHelper.updateLocale(context, it)
                 },
-                options = options,
-                title = { Text(stringResource(Res.string.settings_general_locale)) },
                 icon = Res.drawable.language,
+                options = options,
             )
         }
 
         false -> {
-            UnitRow(
-                title = { Text(stringResource(Res.string.settings_general_locale)) },
-                label = { Text(systemInteraction.getLocale().displayLanguage) },
+            SettingsNavRow(
+                title = stringResource(Res.string.settings_general_locale),
                 icon = Res.drawable.language,
-            ) {
-                systemInteraction.openSystemLanguageSettings()
-            }
+                value = systemInteraction.getLocale().displayLanguage,
+                onClick = { systemInteraction.openSystemLanguageSettings() },
+            )
         }
     }
 }
 
 @Composable
-private fun DisableTouchInputBooleanSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-) {
-    SwitchRow(
-        settings.value.controlsSettings.isDisableTouchInput,
-        model::setDisableTouchInput,
-        title = { Text(stringResource(Res.string.settings_controls_disable_touch)) },
-        label = { Text(stringResource(Res.string.settings_controls_disable_touch_description)) },
+private fun DisableTouchInputBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_controls_disable_touch),
+        description = stringResource(Res.string.settings_controls_disable_touch_description),
         icon = Res.drawable.hand_gesture_off,
+        checked = settings.value.controlsSettings.isDisableTouchInput,
+        onCheckedChange = model::setDisableTouchInput,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SoundbanksSelect(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-    screenModel: SettingsScreenModel,
-) {
+private fun SoundbanksSelect() {
     val navigator = LocalNavigator.currentOrThrow
-    UnitRow(
-        title = { Text(stringResource(Res.string.settings_playback_soundbanks)) },
-        label = { Text(stringResource(Res.string.settings_playback_soundbanks_description)) },
+    SettingsNavRow(
+        title = stringResource(Res.string.settings_playback_soundbanks),
         icon = Res.drawable.audio_file,
-    ) {
-        navigator.push(SoundbanksScreen)
-    }
+        description = stringResource(Res.string.settings_playback_soundbanks_description),
+        onClick = { navigator.push(SoundbanksScreen) },
+    )
 }

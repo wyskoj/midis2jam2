@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Vent litt! Vi indekserer MIDI-filene dine…</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Bakgrunnen er feil konfigurert</string>
-    <string name="background_cubemap_warning_message">Bakgrunnen er satt til kubiskart, men ikke alle seks bilder er tildelt. Standardbakgrunnen vil bli brukt i stedet. Du kan avbryte og fikse dette i bakgrunnsinnstillingene.</string>
-    <string name="background_cubemap_missing_warning_title">Bakgrunnsbilder ikke funnet</string>
-    <string name="background_cubemap_missing_warning_message">Ett eller flere av de angitte kubiskart-bildene ble ikke funnet på disken. Standardbakgrunnen vil bli brukt i stedet. Du kan avbryte og fikse dette i bakgrunnsinnstillingene.</string>
-    <string name="background_cubemap_warning_continue">Fortsett uansett</string>
-    <string name="background_warning_settings_badge">Problem med bakgrunnskonfigurasjonen</string>
 
     <!-- Settings -->
     <string name="settings_general">Generelt</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Lagret</string>
     <string name="record_failed_title">Opptaket mislyktes</string>
     <string name="record_time_left">omtrent %1$s igjen</string>
+    <string name="settings_section_appearance">Utseende</string>
+    <string name="settings_section_updates">Oppdateringer</string>
+    <string name="settings_section_window">Vindu</string>
+    <string name="settings_section_quality">Kvalitet</string>
+    <string name="settings_section_autocam">Autokam</string>
+    <string name="settings_section_freecam">Frikam</string>
+    <string name="settings_section_visibility">Synlighet</string>
+    <string name="settings_section_overlays">Overlegg</string>
+    <string name="settings_section_mouse_keyboard">Mus og tastatur</string>
+    <string name="settings_section_gamepad">Spillkontroller</string>
+    <string name="settings_section_touch">Trykk</string>
+    <string name="settings_background_cubemap_all_sides">Bruk ett bilde på alle sider</string>
+    <string name="settings_background_cubemap_unset">Ingen bilde: %1$s</string>
+    <string name="settings_background_cubemap_missing">Fant ikke filen: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Legg til bilde</string>
+    <string name="settings_background_cubemap_choose">Velg bilde for %1$s</string>
+    <string name="settings_background_cubemap_no_image">Ingen bilde</string>
+    <string name="settings_background_cubemap_hint">Slipp et bilde på en side, eller klikk på en side for å velge ett. Bilder kopieres til bakgrunnsmappen.</string>
+    <string name="settings_background_cubemap_remove">Fjern bilde</string>
+    <string name="settings_background_cubemap_no_library">Ingen bilder ennå. Importer ett for å komme i gang.</string>
+    <string name="background_warning_title">Bakgrunnen er ikke klar</string>
+    <string name="background_warning_consequence_launch">Denne framføringen bruker standardbakgrunnen i stedet.</string>
+    <string name="background_warning_consequence_settings">Inntil dette er rettet, brukes standardbakgrunnen.</string>
+    <string name="background_warning_fix">Åpne bakgrunnsinnstillinger</string>
+    <string name="background_warning_continue">Spill av med standardbakgrunn</string>
 </resources>
 

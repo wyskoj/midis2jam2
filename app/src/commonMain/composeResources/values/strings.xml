@@ -62,12 +62,6 @@
     <string name="search_index_waiting">Hang tight! We're indexing your MIDI files...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Background misconfigured</string>
-    <string name="background_cubemap_warning_message">The background is set to cube map, but not all six images have been assigned. The default background will be used instead. You can cancel and fix this in the background settings.</string>
-    <string name="background_cubemap_missing_warning_title">Background images not found</string>
-    <string name="background_cubemap_missing_warning_message">One or more of the specified cube map images could not be found on disk. The default background will be used instead. You can cancel and fix this in the background settings.</string>
-    <string name="background_cubemap_warning_continue">Continue anyway</string>
-    <string name="background_warning_settings_badge">Background configuration issue</string>
 
     <!-- Settings -->
     <string name="settings_general">General</string>
@@ -262,4 +256,29 @@
     <string name="record_saved">Saved</string>
     <string name="record_failed_title">Recording failed</string>
     <string name="record_time_left">about %1$s left</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_updates">Updates</string>
+    <string name="settings_section_window">Window</string>
+    <string name="settings_section_quality">Quality</string>
+    <string name="settings_section_autocam">Auto-cam</string>
+    <string name="settings_section_freecam">Free camera</string>
+    <string name="settings_section_visibility">Visibility</string>
+    <string name="settings_section_overlays">Overlays</string>
+    <string name="settings_section_mouse_keyboard">Mouse and keyboard</string>
+    <string name="settings_section_gamepad">Gamepad</string>
+    <string name="settings_section_touch">Touch</string>
+    <string name="settings_background_cubemap_all_sides">Use one image for all sides</string>
+    <string name="settings_background_cubemap_unset">No image: %1$s</string>
+    <string name="settings_background_cubemap_missing">File not found: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Add image</string>
+    <string name="settings_background_cubemap_choose">Choose image for %1$s</string>
+    <string name="settings_background_cubemap_no_image">No image</string>
+    <string name="settings_background_cubemap_hint">Drop an image onto a side, or click a side to choose one. Images are copied to the backgrounds folder.</string>
+    <string name="settings_background_cubemap_remove">Remove image</string>
+    <string name="settings_background_cubemap_no_library">No images yet. Import one to get started.</string>
+    <string name="background_warning_title">Background isn't ready</string>
+    <string name="background_warning_consequence_launch">This performance will use the default background instead.</string>
+    <string name="background_warning_consequence_settings">Until this is fixed, the default background is used.</string>
+    <string name="background_warning_fix">Open background settings</string>
+    <string name="background_warning_continue">Play with default background</string>
 </resources>

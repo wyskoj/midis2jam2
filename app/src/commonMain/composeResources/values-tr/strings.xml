@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Lütfen bekleyin. MIDI dosyalarınız dizinleniyor...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Arka plan yanlış yapılandırılmış</string>
-    <string name="background_cubemap_warning_message">Arka plan küp haritası olarak ayarlanmış, ancak altı görüntünün tamamı atanmamış. Bunun yerine varsayılan arka plan kullanılacak. İptal edip bunu arka plan ayarlarında düzeltebilirsiniz.</string>
-    <string name="background_cubemap_missing_warning_title">Arka plan görüntüleri bulunamadı</string>
-    <string name="background_cubemap_missing_warning_message">Belirtilen küp haritası görüntülerinden biri veya daha fazlası diskte bulunamadı. Bunun yerine varsayılan arka plan kullanılacak. İptal edip bunu arka plan ayarlarında düzeltebilirsiniz.</string>
-    <string name="background_cubemap_warning_continue">Yine de devam et</string>
-    <string name="background_warning_settings_badge">Arka plan yapılandırma sorunu</string>
 
     <!-- Settings -->
     <string name="settings_general">Genel ayarlar</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Kaydedildi</string>
     <string name="record_failed_title">Kayıt başarısız</string>
     <string name="record_time_left">yaklaşık %1$s kaldı</string>
+    <string name="settings_section_appearance">Görünüm</string>
+    <string name="settings_section_updates">Güncellemeler</string>
+    <string name="settings_section_window">Pencere</string>
+    <string name="settings_section_quality">Kalite</string>
+    <string name="settings_section_autocam">Otomatik kamera</string>
+    <string name="settings_section_freecam">Serbest kamera</string>
+    <string name="settings_section_visibility">Görünürlük</string>
+    <string name="settings_section_overlays">Bindirmeler</string>
+    <string name="settings_section_mouse_keyboard">Fare ve klavye</string>
+    <string name="settings_section_gamepad">Oyun kolu</string>
+    <string name="settings_section_touch">Dokunma</string>
+    <string name="settings_background_cubemap_all_sides">Tüm yüzler için tek bir görsel kullan</string>
+    <string name="settings_background_cubemap_unset">Görsel yok: %1$s</string>
+    <string name="settings_background_cubemap_missing">Dosya bulunamadı: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Görsel ekle</string>
+    <string name="settings_background_cubemap_choose">%1$s için görsel seç</string>
+    <string name="settings_background_cubemap_no_image">Görsel yok</string>
+    <string name="settings_background_cubemap_hint">Bir görseli bir yüze bırakın veya görsel seçmek için bir yüze tıklayın. Görseller arka plan klasörüne kopyalanır.</string>
+    <string name="settings_background_cubemap_remove">Görseli kaldır</string>
+    <string name="settings_background_cubemap_no_library">Henüz görsel yok. Başlamak için bir tane içe aktarın.</string>
+    <string name="background_warning_title">Arka plan hazır değil</string>
+    <string name="background_warning_consequence_launch">Bu performans bunun yerine varsayılan arka planı kullanacak.</string>
+    <string name="background_warning_consequence_settings">Bu düzeltilene kadar varsayılan arka plan kullanılır.</string>
+    <string name="background_warning_fix">Arka plan ayarlarını aç</string>
+    <string name="background_warning_continue">Varsayılan arka planla oynat</string>
 </resources>
 
