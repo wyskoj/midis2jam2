@@ -360,9 +360,8 @@ class CinematicCameraTest {
             frames.zipWithNext()
                 .filter { (a, b) -> a.shotIndex != b.shotIndex && a.time >= SETTLED && !b.whipped }
                 .forEach { (a, b) ->
-                val subject = b.framedBox?.center ?: b.envelope.center
                 assertTrue(
-                    ShotClarity.isDistinctCut(a.pose, b.pose, subject),
+                    ShotClarity.isDistinctCut(a.pose, b.pose),
                     "Cutting from '${a.shot.reason}' to '${b.shot.reason}' at ${"%.1f".format(b.time)} s barely " +
                         "changes the view in edit $edit"
                 )

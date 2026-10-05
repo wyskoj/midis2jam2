@@ -59,20 +59,23 @@ class ShotClarityTest {
     }
 
     @Test
-    fun `a cut that barely turns or moves the camera is a jump`() {
+    fun `a cut that does not turn the camera a good way is a jump`() {
         val target = SUBJECT.center
         val nudged = CameraPose(
             pose.location.add(3f, 0f, 0f),
             FramingSolver.aim(pose.location.add(3f, 0f, 0f), target.add(4f, 0f, 0f), FOV, ASPECT),
             FOV,
         )
-        assertFalse(ShotClarity.isDistinctCut(pose, nudged, target), "A small nudge is a jump cut")
+        assertFalse(ShotClarity.isDistinctCut(pose, nudged), "A small nudge is a jump cut")
 
         val turned = FramingSolver.place(SUBJECT, 35f, 10f, FOV, ASPECT, composition)
-        assertTrue(ShotClarity.isDistinctCut(pose, turned, target), "A 35-degree change of angle is a cut")
+        assertTrue(ShotClarity.isDistinctCut(pose, turned), "A 35-degree change of angle is a cut")
 
         val closer = FramingSolver.place(SUBJECT, 0f, 10f, FOV, ASPECT, composition, distanceScale = 0.45f)
-        assertTrue(ShotClarity.isDistinctCut(pose, closer, target), "Moving in to half the distance is a cut")
+        assertFalse(
+            ShotClarity.isDistinctCut(pose, closer),
+            "Moving in along the same line of sight is a jump, however far the camera goes"
+        )
     }
 
     private companion object {

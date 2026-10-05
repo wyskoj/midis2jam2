@@ -542,7 +542,7 @@ class CinematicCamPlugin : CameraPlugin() {
         fun score(yaw: Float, pitch: Float): Float {
             val start = rigPose(shot, box, yaw, pitch, shot.start)
             val whips = isWhip && cutFrom != null && canWhip(cutFrom, start, box)
-            val jump = cutFrom != null && !whips && !ShotClarity.isDistinctCut(cutFrom, start, box.center)
+            val jump = cutFrom != null && !whips && !ShotClarity.isDistinctCut(cutFrom, start)
             return clarity(yaw, pitch) - if (jump) INDISTINCT_CUT_PENALTY else 0f
         }
 

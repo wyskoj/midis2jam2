@@ -20,11 +20,11 @@ package org.wysko.midis2jam2.manager.camera.cinematic.framing
 import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 
-/** The least a cut may turn the camera, in degrees, unless it also moves it a long way. */
+/**
+ * The least a cut may turn the camera, in degrees, however far it moves it. Cutting from a wide view to a close one
+ * along the same line of sight changes the size, but it still looks like the picture jumped.
+ */
 const val MIN_CUT_TURN: Float = 20f
-
-/** The least a cut may move the camera, as a fraction of its distance from what it films, unless it also turns. */
-const val MIN_CUT_TRAVEL: Float = 0.4f
 
 /**
  * Judges how well a shot reads: whether the viewer can tell what it is about, and whether a cut into it looks like a
@@ -56,13 +56,12 @@ object ShotClarity {
 
     /**
      * Whether cutting from a camera at [from] to one at [to], filming something at [subject], is a real change of
-     * view. A cut that neither turns the camera nor moves it far looks like the picture jumped, not like a cut.
+     * view. A cut that doesn't turn the camera a good way looks like the picture jumped, not like a cut, however far
+     * the camera has moved.
      */
-    fun isDistinctCut(from: CameraPose, to: CameraPose, subject: Vector3f): Boolean {
+    fun isDistinctCut(from: CameraPose, to: CameraPose): Boolean {
         val turn = FastMath.acos(from.forward.dot(to.forward).coerceIn(-1f, 1f)) * FastMath.RAD_TO_DEG
-        if (turn >= MIN_CUT_TURN) return true
-        val reach = to.location.distance(subject).coerceAtLeast(1f)
-        return from.location.distance(to.location) >= MIN_CUT_TRAVEL * reach
+        return turn >= MIN_CUT_TURN
     }
 
     private fun depth(point: Vector3f, pose: CameraPose): Float = point.subtract(pose.location).dot(pose.forward)
