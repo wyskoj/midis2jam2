@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Odota! Indeksöimme MIDI-tiedostoja...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Tausta väärin määritetty</string>
-    <string name="background_cubemap_warning_message">Taustaksi on asetettu kuutiokuvastokartta, mutta kaikkia kuutta kuvaa ei ole määritetty. Oletustaustaa käytetään sen sijaan. Voit peruuttaa ja korjata tämän taustan asetuksissa.</string>
-    <string name="background_cubemap_missing_warning_title">Taustakuvia ei löydy</string>
-    <string name="background_cubemap_missing_warning_message">Yhtä tai useampaa määritettyä kuutiokuvastokarttakuvaa ei löydy levyltä. Oletustaustaa käytetään sen sijaan. Voit peruuttaa ja korjata tämän taustan asetuksissa.</string>
-    <string name="background_cubemap_warning_continue">Jatka kuitenkin</string>
-    <string name="background_warning_settings_badge">Taustan konfigurointiongelma</string>
 
     <!-- Asetukset -->
     <string name="settings_general">Yleiset</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Tallennettu</string>
     <string name="record_failed_title">Nauhoitus epäonnistui</string>
     <string name="record_time_left">noin %1$s jäljellä</string>
+    <string name="settings_section_appearance">Ulkoasu</string>
+    <string name="settings_section_updates">Päivitykset</string>
+    <string name="settings_section_window">Ikkuna</string>
+    <string name="settings_section_quality">Laatu</string>
+    <string name="settings_section_autocam">Autokamera</string>
+    <string name="settings_section_freecam">Vapaakamera</string>
+    <string name="settings_section_visibility">Näkyvyys</string>
+    <string name="settings_section_overlays">Peittokuvat</string>
+    <string name="settings_section_mouse_keyboard">Hiiri ja näppäimistö</string>
+    <string name="settings_section_gamepad">Peliohjain</string>
+    <string name="settings_section_touch">Kosketus</string>
+    <string name="settings_background_cubemap_all_sides">Käytä yhtä kuvaa kaikille sivuille</string>
+    <string name="settings_background_cubemap_unset">Ei kuvaa: %1$s</string>
+    <string name="settings_background_cubemap_missing">Tiedostoa ei löytynyt: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Lisää kuva</string>
+    <string name="settings_background_cubemap_choose">Valitse kuva: %1$s</string>
+    <string name="settings_background_cubemap_no_image">Ei kuvaa</string>
+    <string name="settings_background_cubemap_hint">Pudota kuva sivun päälle tai valitse kuva napsauttamalla sivua. Kuvat kopioidaan taustakansioon.</string>
+    <string name="settings_background_cubemap_remove">Poista kuva</string>
+    <string name="settings_background_cubemap_no_library">Ei vielä kuvia. Tuo kuva aloittaaksesi.</string>
+    <string name="background_warning_title">Tausta ei ole valmis</string>
+    <string name="background_warning_consequence_launch">Tässä esityksessä käytetään oletustaustaa.</string>
+    <string name="background_warning_consequence_settings">Kunnes tämä korjataan, käytetään oletustaustaa.</string>
+    <string name="background_warning_fix">Avaa taustan asetukset</string>
+    <string name="background_warning_continue">Toista oletustaustalla</string>
 </resources>
 

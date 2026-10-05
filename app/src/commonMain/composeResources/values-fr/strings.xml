@@ -53,12 +53,6 @@
     <string name="search_index_waiting">Patientez ! Nous indexons vos fichiers MIDI...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Arrière-plan mal configuré</string>
-    <string name="background_cubemap_warning_message">L'arrière-plan est défini sur cube map, mais les six images n'ont pas toutes été assignées. L'arrière-plan par défaut sera utilisé à la place. Vous pouvez annuler et corriger cela dans les paramètres d'arrière-plan.</string>
-    <string name="background_cubemap_missing_warning_title">Images d'arrière-plan introuvables</string>
-    <string name="background_cubemap_missing_warning_message">Une ou plusieurs des images de cube map spécifiées n'ont pas pu être trouvées sur le disque. L'arrière-plan par défaut sera utilisé à la place. Vous pouvez annuler et corriger cela dans les paramètres d'arrière-plan.</string>
-    <string name="background_cubemap_warning_continue">Continuer quand même</string>
-    <string name="background_warning_settings_badge">Problème de configuration d'arrière-plan</string>
 
     <!-- Settings -->
     <string name="settings_general">Général</string>
@@ -260,5 +254,30 @@
     <string name="record_saved">Enregistré</string>
     <string name="record_failed_title">Échec de l'enregistrement</string>
     <string name="record_time_left">environ %1$s restantes</string>
+    <string name="settings_section_appearance">Apparence</string>
+    <string name="settings_section_updates">Mises à jour</string>
+    <string name="settings_section_window">Fenêtre</string>
+    <string name="settings_section_quality">Qualité</string>
+    <string name="settings_section_autocam">Caméra auto</string>
+    <string name="settings_section_freecam">Caméra libre</string>
+    <string name="settings_section_visibility">Visibilité</string>
+    <string name="settings_section_overlays">Incrustations</string>
+    <string name="settings_section_mouse_keyboard">Souris et clavier</string>
+    <string name="settings_section_gamepad">Manette</string>
+    <string name="settings_section_touch">Tactile</string>
+    <string name="settings_background_cubemap_all_sides">Utiliser une image pour tous les côtés</string>
+    <string name="settings_background_cubemap_unset">Pas d'image : %1$s</string>
+    <string name="settings_background_cubemap_missing">Fichier introuvable : %1$s</string>
+    <string name="settings_background_cubemap_add_image">Ajouter une image</string>
+    <string name="settings_background_cubemap_choose">Choisir l'image pour %1$s</string>
+    <string name="settings_background_cubemap_no_image">Aucune image</string>
+    <string name="settings_background_cubemap_hint">Déposez une image sur un côté ou cliquez sur un côté pour en choisir une. Les images sont copiées dans le dossier des arrière-plans.</string>
+    <string name="settings_background_cubemap_remove">Retirer l'image</string>
+    <string name="settings_background_cubemap_no_library">Aucune image pour l'instant. Importez-en une pour commencer.</string>
+    <string name="background_warning_title">L'arrière-plan n'est pas prêt</string>
+    <string name="background_warning_consequence_launch">Cette lecture utilisera l'arrière-plan par défaut à la place.</string>
+    <string name="background_warning_consequence_settings">Tant que ce n'est pas corrigé, l'arrière-plan par défaut est utilisé.</string>
+    <string name="background_warning_fix">Ouvrir les paramètres d'arrière-plan</string>
+    <string name="background_warning_continue">Lire avec l'arrière-plan par défaut</string>
 </resources>
 

@@ -17,57 +17,95 @@
 
 package org.wysko.midis2jam2.ui.common.component
 
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.unit.dp
 import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.background_cubemap_warning_continue
-import midis2jam2.app.generated.resources.cancel
+import midis2jam2.app.generated.resources.background_warning_consequence_launch
+import midis2jam2.app.generated.resources.background_warning_continue
+import midis2jam2.app.generated.resources.background_warning_fix
+import midis2jam2.app.generated.resources.background_warning_title
+import midis2jam2.app.generated.resources.settings_background_cubemap_missing
+import midis2jam2.app.generated.resources.settings_background_cubemap_unset
 import midis2jam2.app.generated.resources.warning
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.wysko.midis2jam2.domain.BackgroundWarning
+import org.koin.compose.koinInject
+import org.wysko.midis2jam2.domain.cubeMapProblems
+import org.wysko.midis2jam2.domain.settings.SettingsRepository
+import org.wysko.midis2jam2.ui.settings.CubeMapFace
 
 /**
- * A warning dialog shown when the user attempts to start playback with a cube map background
- * misconfiguration:
- * - [BackgroundWarning.UNASSIGNED]: not all 6 images have been assigned.
- * - [BackgroundWarning.MISSING]: some specified image files cannot be found on disk.
+ * A dialog shown when the user tries to play with a cube map background that cannot be used. It says
+ * which sides are the problem, what will happen if they carry on, and offers to fix it.
  *
- * @param warningType The type of background misconfiguration.
- * @param onConfirm Called when the user chooses to continue anyway.
- * @param onDismiss Called when the user cancels.
+ * The same problems are shown beside the picker in the settings, where nothing is about to play, so
+ * this dialog is only for the moment of starting a performance.
+ *
+ * @param onOpenSettings Called when the user chooses to fix the background settings instead.
+ * @param onConfirm Called when the user chooses to play with the default background.
+ * @param onDismiss Called when the user closes the dialog without choosing.
  */
 @Composable
 fun BackgroundWarningDialog(
-    warningType: BackgroundWarning,
+    onOpenSettings: () -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val textButtonColors = ButtonDefaults.textButtonColors(
-        contentColor = MaterialTheme.colorScheme.primary
-    )
-    val title = backgroundWarningTitle(warningType)
-    val message = backgroundWarningMessage(warningType)
+    val settings = koinInject<SettingsRepository>().appSettings.collectAsState()
+    val textures = settings.value.backgroundSettings.cubeMapTextures
+    val problems = cubeMapProblems(settings.value.backgroundSettings)
+    val title = stringResource(Res.string.background_warning_title)
+    val faceNames = CubeMapFace.entries.map { stringResource(it.label) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
         icon = {
-            Icon(
-                painterResource(Res.drawable.warning),
-                contentDescription = title,
-                tint = WarningAmber,
-            )
+            Icon(painterResource(Res.drawable.warning), contentDescription = null, tint = WarningAmber)
         },
-        text = { Text(message) },
+        title = { Text(title) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (problems.unassigned.isNotEmpty()) {
+                    Text(
+                        stringResource(
+                            Res.string.settings_background_cubemap_unset,
+                            problems.unassigned.joinToString { faceNames[it] },
+                        )
+                    )
+                }
+                if (problems.missing.isNotEmpty()) {
+                    Text(
+                        stringResource(
+                            Res.string.settings_background_cubemap_missing,
+                            problems.missing.joinToString { "${faceNames[it]} (${textures[it]})" },
+                        )
+                    )
+                }
+                Text(stringResource(Res.string.background_warning_consequence_launch))
+            }
+        },
         confirmButton = {
-            TextButton(onClick = onConfirm, colors = textButtonColors) {
-                Text(stringResource(Res.string.background_cubemap_warning_continue))
+            Button(
+                onClick = {
+                    onDismiss()
+                    onOpenSettings()
+                }
+            ) {
+                Text(stringResource(Res.string.background_warning_fix))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss, colors = textButtonColors) {
-                Text(stringResource(Res.string.cancel))
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(Res.string.background_warning_continue))
             }
-        }
+        },
     )
 }

@@ -129,6 +129,14 @@
   source: features/background.md
   platforms: [desktop]
   claim: "A cubemap naming a file that does not exist is reported as a configuration warning"
+- id: background.cubemap.import
+  source: code
+  platforms: [desktop]
+  claim: "An image dropped on a cubemap side, or imported from the picker, is copied into the backgrounds folder and assigned to that side"
+- id: background.cubemap.all-sides
+  source: code
+  platforms: [desktop]
+  claim: "One image can be assigned to all six cubemap sides at once"
 - id: background.color.solid
   source: features/background.md
   platforms: [desktop, android]

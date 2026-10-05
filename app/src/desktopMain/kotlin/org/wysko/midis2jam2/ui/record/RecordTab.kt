@@ -135,6 +135,7 @@ import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.record.RecordingState
 import org.wysko.midis2jam2.record.VideoQuality
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
+import org.wysko.midis2jam2.ui.settings.rememberOpenBackgroundSettings
 import org.wysko.midis2jam2.util.FileDragAndDrop
 import java.io.File
 import kotlin.time.Duration
@@ -191,9 +192,10 @@ object RecordTab : Tab {
             }
         }
 
-        pendingBackgroundWarning?.let { warning ->
+        val openBackgroundSettings = rememberOpenBackgroundSettings()
+        pendingBackgroundWarning?.let {
             BackgroundWarningDialog(
-                warningType = warning,
+                onOpenSettings = openBackgroundSettings,
                 onConfirm = {
                     pendingBackgroundWarning = null
                     model.startRecording()

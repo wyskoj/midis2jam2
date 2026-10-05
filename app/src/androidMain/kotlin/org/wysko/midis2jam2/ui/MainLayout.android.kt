@@ -39,10 +39,8 @@ import org.wysko.midis2jam2.ui.settings.SettingsTab
 
 @Composable
 actual fun BasicDeviceScaffold(topBar: @Composable (() -> Unit), content: @Composable (() -> Unit)) {
-    Scaffold(
-        topBar = topBar,
-        bottomBar = { AppNavigationBar() }
-    ) { contentPadding ->
+    // The tab bar lives in [MainLayout], outside the per-tab navigators, so it stays put while screens transition.
+    Scaffold(topBar = topBar) { contentPadding ->
         Box(Modifier.padding(contentPadding)) {
             content()
         }

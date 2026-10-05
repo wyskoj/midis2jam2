@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Зачекайте! Ми індексуємо ваші MIDI-файли…</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Фон неправильно налаштовано</string>
-    <string name="background_cubemap_warning_message">Фон встановлено на кубічну карту, але не всі шість зображень призначено. Замість цього буде використано фон за замовчуванням. Ви можете скасувати та виправити це в налаштуваннях фону.</string>
-    <string name="background_cubemap_missing_warning_title">Зображення фону не знайдено</string>
-    <string name="background_cubemap_missing_warning_message">Одне або кілька зазначених зображень кубічної карти не знайдено на диску. Замість цього буде використано фон за замовчуванням. Ви можете скасувати та виправити це в налаштуваннях фону.</string>
-    <string name="background_cubemap_warning_continue">Продовжити в будь-якому разі</string>
-    <string name="background_warning_settings_badge">Проблема з конфігурацією фону</string>
 
     <!-- Settings -->
     <string name="settings_general">Загальні</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Збережено</string>
     <string name="record_failed_title">Не вдалося записати</string>
     <string name="record_time_left">залишилося близько %1$s</string>
+    <string name="settings_section_appearance">Вигляд</string>
+    <string name="settings_section_updates">Оновлення</string>
+    <string name="settings_section_window">Вікно</string>
+    <string name="settings_section_quality">Якість</string>
+    <string name="settings_section_autocam">Автокамера</string>
+    <string name="settings_section_freecam">Вільна камера</string>
+    <string name="settings_section_visibility">Видимість</string>
+    <string name="settings_section_overlays">Накладення</string>
+    <string name="settings_section_mouse_keyboard">Миша та клавіатура</string>
+    <string name="settings_section_gamepad">Геймпад</string>
+    <string name="settings_section_touch">Сенсорне керування</string>
+    <string name="settings_background_cubemap_all_sides">Використати одне зображення для всіх сторін</string>
+    <string name="settings_background_cubemap_unset">Немає зображення: %1$s</string>
+    <string name="settings_background_cubemap_missing">Файл не знайдено: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Додати зображення</string>
+    <string name="settings_background_cubemap_choose">Виберіть зображення для: %1$s</string>
+    <string name="settings_background_cubemap_no_image">Без зображення</string>
+    <string name="settings_background_cubemap_hint">Перетягніть зображення на сторону або клацніть сторону, щоб вибрати його. Зображення копіюються до теки фонів.</string>
+    <string name="settings_background_cubemap_remove">Видалити зображення</string>
+    <string name="settings_background_cubemap_no_library">Зображень ще немає. Імпортуйте одне, щоб почати.</string>
+    <string name="background_warning_title">Фон не готовий</string>
+    <string name="background_warning_consequence_launch">Це відтворення використає фон за замовчуванням.</string>
+    <string name="background_warning_consequence_settings">Доки це не виправлено, використовується фон за замовчуванням.</string>
+    <string name="background_warning_fix">Відкрити налаштування фону</string>
+    <string name="background_warning_continue">Відтворити з фоном за замовчуванням</string>
 </resources>
 

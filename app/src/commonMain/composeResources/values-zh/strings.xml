@@ -70,12 +70,6 @@
     <string name="search_index_waiting">请稍候！我们正在索引您的 MIDI 文件…</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">背景配置错误</string>
-    <string name="background_cubemap_warning_message">背景已设置为立方体贴图，但六张图片并非全部已分配。将改用默认背景。您可以取消并在背景设置中修复此问题。</string>
-    <string name="background_cubemap_missing_warning_title">未找到背景图片</string>
-    <string name="background_cubemap_missing_warning_message">无法在磁盘上找到一个或多个指定的立方体贴图图片。将改用默认背景。您可以取消并在背景设置中修复此问题。</string>
-    <string name="background_cubemap_warning_continue">仍然继续</string>
-    <string name="background_warning_settings_badge">背景配置问题</string>
 
     <!-- 设置 -->
     <string name="settings_general">通用</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">已保存</string>
     <string name="record_failed_title">录制失败</string>
     <string name="record_time_left">大约还剩 %1$s</string>
+    <string name="settings_section_appearance">外观</string>
+    <string name="settings_section_updates">更新</string>
+    <string name="settings_section_window">窗口</string>
+    <string name="settings_section_quality">画质</string>
+    <string name="settings_section_autocam">自动镜头</string>
+    <string name="settings_section_freecam">自由视角</string>
+    <string name="settings_section_visibility">可见性</string>
+    <string name="settings_section_overlays">叠加层</string>
+    <string name="settings_section_mouse_keyboard">鼠标和键盘</string>
+    <string name="settings_section_gamepad">手柄</string>
+    <string name="settings_section_touch">触摸</string>
+    <string name="settings_background_cubemap_all_sides">所有面使用同一张图片</string>
+    <string name="settings_background_cubemap_unset">无图片：%1$s</string>
+    <string name="settings_background_cubemap_missing">找不到文件：%1$s</string>
+    <string name="settings_background_cubemap_add_image">添加图片</string>
+    <string name="settings_background_cubemap_choose">为%1$s选择图片</string>
+    <string name="settings_background_cubemap_no_image">无图片</string>
+    <string name="settings_background_cubemap_hint">将图片拖放到某一面，或单击某一面来选择图片。图片会被复制到背景文件夹。</string>
+    <string name="settings_background_cubemap_remove">移除图片</string>
+    <string name="settings_background_cubemap_no_library">还没有图片。导入一张图片开始吧。</string>
+    <string name="background_warning_title">背景尚未就绪</string>
+    <string name="background_warning_consequence_launch">本次演奏将改用默认背景。</string>
+    <string name="background_warning_consequence_settings">在修复之前，将使用默认背景。</string>
+    <string name="background_warning_fix">打开背景设置</string>
+    <string name="background_warning_continue">使用默认背景播放</string>
 </resources>
 

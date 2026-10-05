@@ -22,12 +22,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,92 +49,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ch.qos.logback.core.util.EnvUtil.isWindows
 import com.install4j.api.launcher.ApplicationLauncher
-import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
-import midis2jam2.app.generated.resources.Res
-import midis2jam2.app.generated.resources.about_check_for_updates
-import midis2jam2.app.generated.resources.about_check_for_updates_description
-import midis2jam2.app.generated.resources.audio_file
-import midis2jam2.app.generated.resources.close
-import midis2jam2.app.generated.resources.computer
-import midis2jam2.app.generated.resources.fit_screen
-import midis2jam2.app.generated.resources.fullscreen
-import midis2jam2.app.generated.resources.gamepad
-import midis2jam2.app.generated.resources.high_density
-import midis2jam2.app.generated.resources.hotel_class
-import midis2jam2.app.generated.resources.keyboard_lock
-import midis2jam2.app.generated.resources.language
-import midis2jam2.app.generated.resources.midi_device
-import midis2jam2.app.generated.resources.monitor
-import midis2jam2.app.generated.resources.mouse_lock
-import midis2jam2.app.generated.resources.quality_high
-import midis2jam2.app.generated.resources.quality_low
-import midis2jam2.app.generated.resources.quality_medium
-import midis2jam2.app.generated.resources.quality_none
-import midis2jam2.app.generated.resources.radio_button_unchecked
-import midis2jam2.app.generated.resources.replace_audio
-import midis2jam2.app.generated.resources.settings_camera
-import midis2jam2.app.generated.resources.settings_camera_smooth_freecam
-import midis2jam2.app.generated.resources.settings_camera_smooth_freecam_description
-import midis2jam2.app.generated.resources.settings_controls
-import midis2jam2.app.generated.resources.settings_controls_gamepad_enabled
-import midis2jam2.app.generated.resources.settings_controls_gamepad_enabled_description
-import midis2jam2.app.generated.resources.settings_controls_lock_cursor
-import midis2jam2.app.generated.resources.settings_controls_lock_cursor_description
-import midis2jam2.app.generated.resources.settings_controls_sticky_speed_modifier_keys
-import midis2jam2.app.generated.resources.settings_controls_sticky_speed_modifier_keys_false
-import midis2jam2.app.generated.resources.settings_controls_sticky_speed_modifier_keys_true
-import midis2jam2.app.generated.resources.settings_general
-import midis2jam2.app.generated.resources.settings_general_locale
-import midis2jam2.app.generated.resources.settings_graphics
-import midis2jam2.app.generated.resources.settings_graphics_anti_aliasing
-import midis2jam2.app.generated.resources.settings_graphics_anti_aliasing_description
-import midis2jam2.app.generated.resources.settings_graphics_resolution
-import midis2jam2.app.generated.resources.settings_graphics_resolution_default
-import midis2jam2.app.generated.resources.settings_graphics_resolution_default_description
-import midis2jam2.app.generated.resources.settings_graphics_resolution_default_hint
-import midis2jam2.app.generated.resources.settings_graphics_resolution_fullscreen
-import midis2jam2.app.generated.resources.settings_graphics_resolution_height
-import midis2jam2.app.generated.resources.settings_graphics_resolution_width
-import midis2jam2.app.generated.resources.settings_graphics_shadows
-import midis2jam2.app.generated.resources.settings_graphics_shadows_description
-import midis2jam2.app.generated.resources.settings_graphics_shadows_none
-import midis2jam2.app.generated.resources.settings_graphics_window_mode
-import midis2jam2.app.generated.resources.settings_graphics_window_mode_borderless
-import midis2jam2.app.generated.resources.settings_graphics_window_mode_description
-import midis2jam2.app.generated.resources.settings_graphics_window_mode_fullscreen
-import midis2jam2.app.generated.resources.settings_graphics_window_mode_windowed
-import midis2jam2.app.generated.resources.settings_instruments
-import midis2jam2.app.generated.resources.settings_on_screen_elements
-import midis2jam2.app.generated.resources.settings_playback_midi_specification_reset
-import midis2jam2.app.generated.resources.settings_playback_midi_specification_reset_description
-import midis2jam2.app.generated.resources.settings_playback_soundbanks
-import midis2jam2.app.generated.resources.settings_playback_soundbanks_add
-import midis2jam2.app.generated.resources.settings_playback_soundbanks_description
-import midis2jam2.app.generated.resources.settings_playback_soundbanks_none_loaded
-import midis2jam2.app.generated.resources.settings_playback_synthesizer
-import midis2jam2.app.generated.resources.screenshot_monitor
-import midis2jam2.app.generated.resources.star
-import midis2jam2.app.generated.resources.tonality
-import midis2jam2.app.generated.resources.update
-import midis2jam2.app.generated.resources.video_stable
+import midis2jam2.app.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.ui.common.appLocale
-import org.wysko.midis2jam2.ui.common.component.CategoryHeader
 import org.wysko.midis2jam2.ui.common.component.SelectOption
-import org.wysko.midis2jam2.ui.common.component.SelectRow
-import org.wysko.midis2jam2.ui.common.component.SwitchRow
-import org.wysko.midis2jam2.ui.common.component.UnitRow
 import org.wysko.midis2jam2.util.FilesDragAndDrop
 import org.wysko.midis2jam2.util.digitsOnly
 import org.wysko.midis2jam2.util.isMacOs
@@ -145,6 +72,92 @@ import org.wysko.midis2jam2.util.tintEnabled
 import java.io.File
 import java.io.IOException
 import java.util.*
+
+private const val MinResolutionWidth = 640
+private const val MinResolutionHeight = 360
+
+internal actual fun settingsPages(
+    settings: State<AppSettings>,
+    model: SettingsModel,
+    screenModel: SettingsScreenModel,
+): List<SettingsPageContent> = listOf(
+    settingsPage(SettingsPage.General, Res.string.settings_general_description) {
+        section(Res.string.settings_section_appearance) {
+            row { ThemeSelect(settings, model) }
+            row {
+                LocaleSelect(
+                    settings.value.generalSettings.locale,
+                    model::setLocale,
+                    screenModel.getAvailableLocales(),
+                )
+            }
+        }
+        section(Res.string.settings_section_updates) { row { CheckForUpdates() } }
+    },
+    settingsPage(SettingsPage.Graphics, Res.string.settings_graphics_description) {
+        section(Res.string.settings_section_window) {
+            row { WindowModeSelect(settings, model) }
+            row { ResolutionSelect(settings, model) }
+        }
+        section(Res.string.settings_section_quality) {
+            row { ShadowsQualitySelect(settings, model) }
+            if (!isMacOs()) {
+                row { AntiAliasingQualitySelect(settings, model) }
+            }
+        }
+        section(Res.string.settings_background) {
+            row { BackgroundSelect(settings, model) }
+            row(isVisible = { settings.value.backgroundSettings.type == BackgroundType.CubeMap }) {
+                CubeMapCard(settings, model)
+            }
+        }
+    },
+    settingsPage(SettingsPage.Camera, Res.string.settings_camera_description) {
+        section(Res.string.settings_section_autocam) {
+            row { StartAutocamWithSongBooleanSelect(settings, model) }
+            row { IsClassicAutoCamBooleanSelect(settings, model) }
+        }
+        section(Res.string.settings_section_freecam) {
+            row { IsSmoothFreecamSelect(settings, model) }
+            row { FieldOfViewSelect(settings, model) }
+        }
+    },
+    settingsPage(SettingsPage.Instruments, Res.string.settings_instruments_description) {
+        section(Res.string.settings_section_visibility) { row { AlwaysShowInstrumentsBooleanSelect(settings, model) } }
+        section {
+            row { SmartMalletsBooleanSelect(settings, model) }
+            row { SmartDrumSticksBooleanSelect(settings, model) }
+        }
+    },
+    settingsPage(SettingsPage.OnScreen, Res.string.settings_on_screen_elements_description) {
+        section(Res.string.settings_section_overlays) {
+            row { HudBooleanSelect(settings, model) }
+            row { LyricsSwitch(settings, model) }
+            row(isVisible = { settings.value.onScreenElementsSettings.lyricsSettings.isShowLyrics }) {
+                LyricsSizeSelect(settings, model)
+            }
+        }
+    },
+    settingsPage(SettingsPage.Controls, Res.string.settings_controls_description) {
+        section(Res.string.settings_section_mouse_keyboard) {
+            row { LockCursorBooleanSelect(settings, model) }
+            row { IsSpeedModifierKeysStickyBooleanSelect(settings, model) }
+        }
+        section(Res.string.settings_section_gamepad) {
+            row { GamepadEnabledBooleanSelect(settings, model) }
+        }
+    },
+    settingsPage(SettingsPage.Playback, Res.string.settings_playback_description) {
+        section(Res.string.settings_playback_synthesizer) {
+            row { SoundbanksSelect(settings, model) }
+            row { SynthesizerReverbSelect(settings, model) }
+            row { SynthesizerChorusSelect(settings, model) }
+        }
+        section(Res.string.midi_device) {
+            row { SpecificationResetSelect(settings, model) }
+        }
+    },
+)
 
 internal actual val deviceThemeIcon: DrawableResource
     get() = Res.drawable.computer
@@ -155,230 +168,105 @@ internal actual fun LocaleSelect(
     onSelectLocale: (String) -> Unit,
     availableLocales: List<String>,
 ) {
-    val options = availableLocales.map {
-        SelectOption(
-            value = it,
-            title = Locale.of(it).displayLanguage,
-        )
-    }
-    SelectRow(
-        selectedLocale,
-        {
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_general_locale),
+        selected = selectedLocale,
+        onSelected = {
             onSelectLocale(it)
             appLocale = it
         },
-        options = options,
-        title = { Text(stringResource(Res.string.settings_general_locale)) },
         icon = Res.drawable.language,
+        options = availableLocales
+            .map { Locale.of(it).let { locale -> SelectOption(value = it, title = locale.getDisplayLanguage(locale)) } }
+            .sortedBy { it.title.lowercase() },
     )
 }
 
-internal actual fun LazyListScope.SettingsScreenContent(
-    settings: State<AppSettings>,
-    model: SettingsModel,
-    screenModel: SettingsScreenModel,
-) {
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_general))
-    }
-    item {
-        ThemeSelect(settings, model)
-    }
-    item {
-        LocaleSelect(
-            settings.value.generalSettings.locale,
-            model::setLocale,
-            screenModel.getAvailableLocales()
-        )
-    }
-    item {
-        CheckForUpdates()
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_graphics))
-    }
-    windowSettings(settings, model)
-    item {
-        ShadowsQualitySelect(settings, model)
-    }
-    if (!isMacOs()) {
-        item {
-            AntiAliasingQualitySelect(settings, model)
-        }
-    }
-    item {
-        val bg = settings.value.backgroundSettings
-        val bgWarning = computeBackgroundWarning(bg)
-        BackgroundSelect(settings, model, bgWarning)
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_on_screen_elements))
-    }
-    LyricsSelect(settings, model)
-    item {
-        HudBooleanSelect(settings, model)
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_instruments))
-    }
-    item {
-        AlwaysShowInstrumentsBooleanSelect(settings, model)
-    }
-    item {
-        SmartMalletsBooleanSelect(settings, model)
-    }
-    item {
-        SmartDrumSticksBooleanSelect(settings, model)
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_controls))
-    }
-    item {
-        LockCursorBooleanSelect(settings, model)
-    }
-    item {
-        IsSpeedModifierKeysStickyBooleanSelect(settings, model)
-    }
-    item {
-        GamepadEnabledBooleanSelect(settings, model)
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_playback_synthesizer))
-    }
-    item {
-        SoundbanksSelect(settings, model)
-    }
-    item {
-        SynthesizerReverbSelect(settings, model)
-    }
-    item {
-        SynthesizerChorusSelect(settings, model)
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.midi_device))
-    }
-    item {
-        SpecificationResetSelect(settings, model)
-    }
-    stickyHeader { // stickyHeader
-        CategoryHeader(stringResource(Res.string.settings_camera))
-    }
-    item {
-        StartAutocamWithSongBooleanSelect(settings, model)
-    }
-    item {
-        IsClassicAutoCamBooleanSelect(settings, model)
-    }
-    item {
-        IsSmoothFreecamSelect(settings, model)
-    }
-    item {
-        FieldOfViewSelect(settings, model)
-    }
-    item {
-        Spacer(Modifier.height(0.dp))
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
-private fun LazyListScope.windowSettings(settings: State<AppSettings>, model: SettingsModel) {
-    item {
-        WindowModeSelect(settings, model)
-    }
-    item {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        var isShowSheet by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
+@Composable
+private fun ResolutionSelect(settings: State<AppSettings>, model: SettingsModel) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isShowSheet by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-        var formWidth by remember { mutableStateOf("") }
-        var formHeight by remember { mutableStateOf("") }
+    var formWidth by remember { mutableStateOf("") }
+    var formHeight by remember { mutableStateOf("") }
 
-        val isWindowed = settings.value.graphicsSettings.windowMode == WindowMode.Windowed
-        UnitRow(
-            title = { Text(stringResource(Res.string.settings_graphics_resolution)) },
-            label = {
-                Text(
-                    text = when {
-                        !isWindowed -> stringResource(Res.string.settings_graphics_resolution_fullscreen)
-
-                        else -> when (settings.value.graphicsSettings.resolutionSettings.isUseDefaultResolution) {
-                            true -> stringResource(Res.string.settings_graphics_resolution_default_hint)
-                            false -> "${settings.value.graphicsSettings.resolutionSettings.resolutionWidth} × ${settings.value.graphicsSettings.resolutionSettings.resolutionHeight}"
-                        }
-                    }
-                )
-            },
-            icon = Res.drawable.fit_screen,
-            enabled = isWindowed,
-        ) {
+    val resolution = settings.value.graphicsSettings.resolutionSettings
+    val isWindowed = settings.value.graphicsSettings.windowMode == WindowMode.Windowed
+    SettingsNavRow(
+        title = stringResource(Res.string.settings_graphics_resolution),
+        icon = Res.drawable.fit_screen,
+        description = if (isWindowed) null else stringResource(Res.string.settings_graphics_resolution_fullscreen),
+        value = when {
+            !isWindowed -> null
+            resolution.isUseDefaultResolution -> stringResource(Res.string.settings_graphics_resolution_default_hint)
+            else -> "${resolution.resolutionWidth} × ${resolution.resolutionHeight}"
+        },
+        enabled = isWindowed,
+        onClick = {
             isShowSheet = true
-            with(settings.value.graphicsSettings.resolutionSettings) {
-                formWidth = resolutionWidth.toString()
-                formHeight = resolutionHeight.toString()
-            }
-        }
+            formWidth = resolution.resolutionWidth.toString()
+            formHeight = resolution.resolutionHeight.toString()
+        },
+    )
 
-        if (isShowSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    scope.launch {
-                        sheetState.hide()
-                        isShowSheet = false
+    if (isShowSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                    isShowSheet = false
 
-                        if (formWidth.isNotBlank() && formHeight.isNotBlank()) {
-                            model.setResolution(formWidth.toInt(), formHeight.toInt())
-                        }
+                    val width = formWidth.toIntOrNull()
+                    val height = formHeight.toIntOrNull()
+                    if (width != null && height != null) {
+                        model.setResolution(
+                            width.coerceAtLeast(MinResolutionWidth),
+                            height.coerceAtLeast(MinResolutionHeight),
+                        )
                     }
-                },
-                sheetState = sheetState,
+                }
+            },
+            sheetState = sheetState,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                SettingsSwitchRow(
+                    title = stringResource(Res.string.settings_graphics_resolution_default),
+                    icon = Res.drawable.fit_screen,
+                    description = stringResource(Res.string.settings_graphics_resolution_default_description),
+                    checked = resolution.isUseDefaultResolution,
+                    onCheckedChange = model::setIsUseDefaultResolution,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SwitchRow(
-                        checked = settings.value.graphicsSettings.resolutionSettings.isUseDefaultResolution,
-                        onCheckedChange = model::setIsUseDefaultResolution,
-                        title = { Text(stringResource(Res.string.settings_graphics_resolution_default)) },
-                        label = { Text(stringResource(Res.string.settings_graphics_resolution_default_description)) },
-                        icon = Res.drawable.fit_screen,
+                    val isCustomResolutionEnabled = !resolution.isUseDefaultResolution
+                    OutlinedTextField(
+                        value = formWidth,
+                        onValueChange = { formWidth = it.digitsOnly().take(4) },
+                        label = { Text(stringResource(Res.string.settings_graphics_resolution_width)) },
+                        isError = formWidth.isBlank(),
+                        enabled = isCustomResolutionEnabled,
                     )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        val isCustomResolutionEnabled =
-                            !settings.value.graphicsSettings.resolutionSettings.isUseDefaultResolution
-                        OutlinedTextField(
-                            value = formWidth,
-                            onValueChange = {
-                                formWidth = it.digitsOnly().take(4)
-                            },
-                            label = {
-                                Text(stringResource(Res.string.settings_graphics_resolution_width))
-                            },
-                            isError = formWidth.isBlank(),
-                            enabled = isCustomResolutionEnabled,
+                    Text(
+                        "×",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurface.tintEnabled(isCustomResolutionEnabled)
                         )
-                        Text(
-                            "×",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                color = MaterialTheme.colorScheme.onSurface.tintEnabled(isCustomResolutionEnabled)
-                            )
-                        )
-                        OutlinedTextField(
-                            value = formHeight,
-                            onValueChange = {
-                                formHeight = it.digitsOnly().take(4)
-                            },
-                            label = {
-                                Text(stringResource(Res.string.settings_graphics_resolution_height))
-                            },
-                            isError = formWidth.isBlank(),
-                            enabled = isCustomResolutionEnabled,
-                        )
-                    }
+                    )
+                    OutlinedTextField(
+                        value = formHeight,
+                        onValueChange = { formHeight = it.digitsOnly().take(4) },
+                        label = { Text(stringResource(Res.string.settings_graphics_resolution_height)) },
+                        isError = formHeight.isBlank(),
+                        enabled = isCustomResolutionEnabled,
+                    )
                 }
             }
         }
@@ -387,34 +275,29 @@ private fun LazyListScope.windowSettings(settings: State<AppSettings>, model: Se
 
 @Composable
 private fun CheckForUpdates() {
-    UnitRow(
-        title = { Text(stringResource(Res.string.about_check_for_updates)) },
-        label = { Text(stringResource(Res.string.about_check_for_updates_description)) },
+    SettingsNavRow(
+        title = stringResource(Res.string.about_check_for_updates),
         icon = Res.drawable.update,
-    ) {
-        try {
-            ApplicationLauncher.launchApplication("351", null, false, null)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
+        description = stringResource(Res.string.about_check_for_updates_description),
+        showChevron = false,
+        onClick = {
+            try {
+                ApplicationLauncher.launchApplication("351", null, false, null)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        },
+    )
 }
 
 @Composable
 private fun SpecificationResetSelect(settings: State<AppSettings>, model: SettingsModel) {
-    val options = (listOf(null) + MidiSpecification.entries.toList()).map {
-        SelectOption(
-            value = it,
-            title = it?.displayName ?: stringResource(Res.string.quality_none),
-        )
-    }
-
-    SelectRow(
-        option = when (settings.value.playbackSettings.midiSpecificationResetSettings.isSendSpecificationResetMessage) {
-            true -> settings.value.playbackSettings.midiSpecificationResetSettings.midiSpecification
-            false -> null
-        },
-        onOptionSelected = {
+    val reset = settings.value.playbackSettings.midiSpecificationResetSettings
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_playback_midi_specification_reset),
+        description = stringResource(Res.string.settings_playback_midi_specification_reset_description),
+        selected = if (reset.isSendSpecificationResetMessage) reset.midiSpecification else null,
+        onSelected = {
             if (it == null) {
                 model.setIsSendResetMessage(false)
             } else {
@@ -422,10 +305,10 @@ private fun SpecificationResetSelect(settings: State<AppSettings>, model: Settin
                 model.setResetMessageSpecification(it)
             }
         },
-        options,
-        title = { Text(stringResource(Res.string.settings_playback_midi_specification_reset)) },
         icon = Res.drawable.replace_audio,
-        description = stringResource(Res.string.settings_playback_midi_specification_reset_description),
+        options = (listOf<MidiSpecification?>(null) + MidiSpecification.entries).map {
+            SelectOption(value = it, title = it?.displayName ?: stringResource(Res.string.quality_none))
+        },
     )
 }
 
@@ -434,8 +317,8 @@ private fun WindowModeSelect(settings: State<AppSettings>, model: SettingsModel)
     val options = buildList {
         add(
             SelectOption(
-                value = WindowMode.Windowed,
-                title = stringResource(Res.string.settings_graphics_window_mode_windowed),
+                WindowMode.Windowed,
+                stringResource(Res.string.settings_graphics_window_mode_windowed),
                 icon = Res.drawable.monitor,
             )
         )
@@ -443,161 +326,116 @@ private fun WindowModeSelect(settings: State<AppSettings>, model: SettingsModel)
         if (isWindows()) {
             add(
                 SelectOption(
-                    value = WindowMode.BorderlessFullscreen,
-                    title = stringResource(Res.string.settings_graphics_window_mode_borderless),
+                    WindowMode.BorderlessFullscreen,
+                    stringResource(Res.string.settings_graphics_window_mode_borderless),
                     icon = Res.drawable.screenshot_monitor,
                 )
             )
         }
         add(
             SelectOption(
-                value = WindowMode.Fullscreen,
-                title = stringResource(Res.string.settings_graphics_window_mode_fullscreen),
+                WindowMode.Fullscreen,
+                stringResource(Res.string.settings_graphics_window_mode_fullscreen),
                 icon = Res.drawable.fullscreen,
             )
         )
     }
-    val selectedWindowMode = settings.value.graphicsSettings.windowMode
-        .let { if (it == WindowMode.BorderlessFullscreen && !isWindows()) WindowMode.Fullscreen else it }
-    SelectRow(
-        selectedWindowMode,
-        model::setWindowMode,
-        options,
-        title = { Text(stringResource(Res.string.settings_graphics_window_mode)) },
-        icon = Res.drawable.fullscreen,
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_graphics_window_mode),
         description = stringResource(Res.string.settings_graphics_window_mode_description),
+        selected = settings.value.graphicsSettings.windowMode
+            .let { if (it == WindowMode.BorderlessFullscreen && !isWindows()) WindowMode.Fullscreen else it },
+        onSelected = model::setWindowMode,
+        icon = Res.drawable.fullscreen,
+        options = options,
     )
 }
 
 @Composable
 private fun ShadowsQualitySelect(settings: State<AppSettings>, model: SettingsModel) {
-    val options = listOf(
-        SelectOption(
-            value = ShadowsQuality.Fake,
-            title = stringResource(Res.string.settings_graphics_shadows_none),
-            icon = Res.drawable.close
-        ),
-        SelectOption(
-            value = ShadowsQuality.Low,
-            title = stringResource(Res.string.quality_low),
-            icon = Res.drawable.radio_button_unchecked
-        ),
-        SelectOption(
-            value = ShadowsQuality.Medium,
-            title = stringResource(Res.string.quality_medium),
-            icon = Res.drawable.star
-        ),
-        SelectOption(
-            value = ShadowsQuality.High,
-            title = stringResource(Res.string.quality_high),
-            icon = Res.drawable.hotel_class
-        ),
-    )
-    SelectRow(
-        settings.value.graphicsSettings.shadowsSettings.shadowsQuality,
-        model::setShadowsQuality,
-        options,
-        title = { Text(stringResource(Res.string.settings_graphics_shadows)) },
-        icon = Res.drawable.tonality,
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_graphics_shadows),
         description = stringResource(Res.string.settings_graphics_shadows_description),
+        selected = settings.value.graphicsSettings.shadowsSettings.shadowsQuality,
+        onSelected = model::setShadowsQuality,
+        icon = Res.drawable.tonality,
+        options = listOf(
+            SelectOption(ShadowsQuality.Fake, stringResource(Res.string.settings_graphics_shadows_none), icon = Res.drawable.close),
+            SelectOption(ShadowsQuality.Low, stringResource(Res.string.quality_low), icon = Res.drawable.radio_button_unchecked),
+            SelectOption(ShadowsQuality.Medium, stringResource(Res.string.quality_medium), icon = Res.drawable.star),
+            SelectOption(ShadowsQuality.High, stringResource(Res.string.quality_high), icon = Res.drawable.hotel_class),
+        ),
     )
 }
 
 @Composable
 private fun AntiAliasingQualitySelect(settings: State<AppSettings>, model: SettingsModel) {
-    val options = listOf<SelectOption<AntiAliasingQuality?>>(
-        SelectOption(
-            value = null,
-            title = stringResource(Res.string.quality_none),
-            icon = Res.drawable.close
-        ),
-        SelectOption(
-            value = AntiAliasingQuality.Low,
-            title = stringResource(Res.string.quality_low),
-            icon = Res.drawable.radio_button_unchecked
-        ),
-        SelectOption(
-            value = AntiAliasingQuality.Medium,
-            title = stringResource(Res.string.quality_medium),
-            icon = Res.drawable.star
-        ),
-        SelectOption(
-            value = AntiAliasingQuality.High,
-            title = stringResource(Res.string.quality_high),
-            icon = Res.drawable.hotel_class
-        ),
-    )
-    SelectRow(
-        option = if (settings.value.graphicsSettings.antiAliasingSettings.isUseAntiAliasing) {
-            settings.value.graphicsSettings.antiAliasingSettings.antiAliasingQuality
-        } else {
-            null
-        },
-        {
+    val antiAliasing = settings.value.graphicsSettings.antiAliasingSettings
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_graphics_anti_aliasing),
+        description = stringResource(Res.string.settings_graphics_anti_aliasing_description),
+        selected = if (antiAliasing.isUseAntiAliasing) antiAliasing.antiAliasingQuality else null,
+        onSelected = {
             model.setUseAntiAliasing(it != null)
             if (it != null) {
                 model.setAntiAliasingQuality(it)
             }
         },
-        options,
-        title = { Text(stringResource(Res.string.settings_graphics_anti_aliasing)) },
         icon = Res.drawable.high_density,
-        description = stringResource(Res.string.settings_graphics_anti_aliasing_description),
+        options = listOf<SelectOption<AntiAliasingQuality?>>(
+            SelectOption(null, stringResource(Res.string.quality_none), icon = Res.drawable.close),
+            SelectOption(AntiAliasingQuality.Low, stringResource(Res.string.quality_low), icon = Res.drawable.radio_button_unchecked),
+            SelectOption(AntiAliasingQuality.Medium, stringResource(Res.string.quality_medium), icon = Res.drawable.star),
+            SelectOption(AntiAliasingQuality.High, stringResource(Res.string.quality_high), icon = Res.drawable.hotel_class),
+        ),
     )
 }
 
 @Composable
 private fun LockCursorBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
-    SwitchRow(
-        settings.value.controlsSettings.isLockCursor,
-        model::setLockCursorEnabled,
-        title = { Text(stringResource(Res.string.settings_controls_lock_cursor)) },
-        label = { Text(stringResource(Res.string.settings_controls_lock_cursor_description)) },
-        icon = Res.drawable.mouse_lock
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_controls_lock_cursor),
+        description = stringResource(Res.string.settings_controls_lock_cursor_description),
+        icon = Res.drawable.mouse_lock,
+        checked = settings.value.controlsSettings.isLockCursor,
+        onCheckedChange = model::setLockCursorEnabled,
     )
 }
 
 @Composable
 private fun GamepadEnabledBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
-    SwitchRow(
-        settings.value.controlsSettings.isGamepadEnabled,
-        model::setGamepadEnabled,
-        title = { Text(stringResource(Res.string.settings_controls_gamepad_enabled)) },
-        label = { Text(stringResource(Res.string.settings_controls_gamepad_enabled_description)) },
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_controls_gamepad_enabled),
+        description = stringResource(Res.string.settings_controls_gamepad_enabled_description),
         icon = Res.drawable.gamepad,
+        checked = settings.value.controlsSettings.isGamepadEnabled,
+        onCheckedChange = model::setGamepadEnabled,
     )
 }
 
 @Composable
 private fun IsSpeedModifierKeysStickyBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
-    SwitchRow(
-        settings.value.controlsSettings.isSpeedModifierKeysSticky,
-        model::setSpeedModifierKeysSticky,
-        title = { Text(stringResource(Res.string.settings_controls_sticky_speed_modifier_keys)) },
-        label = {
-            Text(
-                stringResource(
-                    when (settings.value.controlsSettings.isSpeedModifierKeysSticky) {
-                        true -> Res.string.settings_controls_sticky_speed_modifier_keys_true
-                        false -> Res.string.settings_controls_sticky_speed_modifier_keys_false
-                    }
-                )
-            )
-        },
-        icon = Res.drawable.keyboard_lock
+    val isSticky = settings.value.controlsSettings.isSpeedModifierKeysSticky
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_controls_sticky_speed_modifier_keys),
+        description = stringResource(
+            if (isSticky) Res.string.settings_controls_sticky_speed_modifier_keys_true
+            else Res.string.settings_controls_sticky_speed_modifier_keys_false
+        ),
+        icon = Res.drawable.keyboard_lock,
+        checked = isSticky,
+        onCheckedChange = model::setSpeedModifierKeysSticky,
     )
 }
 
 @Composable
 private fun IsSmoothFreecamSelect(settings: State<AppSettings>, model: SettingsModel) {
-    SwitchRow(
-        settings.value.cameraSettings.isSmoothFreecam,
-        model::setSmoothFreecam,
-        title = { Text(stringResource(Res.string.settings_camera_smooth_freecam)) },
-        label = {
-            Text(stringResource(Res.string.settings_camera_smooth_freecam_description))
-        },
-        icon = Res.drawable.video_stable
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_camera_smooth_freecam),
+        description = stringResource(Res.string.settings_camera_smooth_freecam_description),
+        icon = Res.drawable.video_stable,
+        checked = settings.value.cameraSettings.isSmoothFreecam,
+        onCheckedChange = model::setSmoothFreecam,
     )
 }
 
@@ -618,13 +456,13 @@ private fun SoundbanksSelect(settings: State<AppSettings>, model: SettingsModel)
         }
     }
 
-    UnitRow(
-        title = { Text(stringResource(Res.string.settings_playback_soundbanks)) },
-        label = { Text(stringResource(Res.string.settings_playback_soundbanks_description)) },
-        icon = Res.drawable.audio_file
-    ) {
-        isShowSheet = true
-    }
+    SettingsNavRow(
+        title = stringResource(Res.string.settings_playback_soundbanks),
+        icon = Res.drawable.audio_file,
+        description = stringResource(Res.string.settings_playback_soundbanks_description),
+        value = settings.value.playbackSettings.soundbanksSettings.soundbanks.size.takeIf { it > 0 }?.toString(),
+        onClick = { isShowSheet = true },
+    )
 
     val dragAndDropTarget = remember {
         FilesDragAndDrop { files ->

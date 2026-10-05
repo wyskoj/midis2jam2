@@ -70,12 +70,6 @@
     <string name="search_index_waiting">잠시만 기다려 주세요! MIDI 파일을 색인화하는 중입니다...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">배경이 잘못 설정되었습니다</string>
-    <string name="background_cubemap_warning_message">배경이 큐브 맵으로 설정되었지만 여섯 개의 이미지가 모두 할당되지 않았습니다. 기본 배경이 대신 사용됩니다. 취소하고 배경 설정에서 수정할 수 있습니다.</string>
-    <string name="background_cubemap_missing_warning_title">배경 이미지를 찾을 수 없습니다</string>
-    <string name="background_cubemap_missing_warning_message">지정된 큐브 맵 이미지 중 하나 이상을 디스크에서 찾을 수 없습니다. 기본 배경이 대신 사용됩니다. 취소하고 배경 설정에서 수정할 수 있습니다.</string>
-    <string name="background_cubemap_warning_continue">어쨌든 계속</string>
-    <string name="background_warning_settings_badge">배경 설정 문제</string>
 
     <!-- Settings -->
     <string name="settings_general">일반</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">저장됨</string>
     <string name="record_failed_title">녹화 실패</string>
     <string name="record_time_left">약 %1$s 남음</string>
+    <string name="settings_section_appearance">모양</string>
+    <string name="settings_section_updates">업데이트</string>
+    <string name="settings_section_window">창</string>
+    <string name="settings_section_quality">품질</string>
+    <string name="settings_section_autocam">자동 카메라</string>
+    <string name="settings_section_freecam">자유 시점 카메라</string>
+    <string name="settings_section_visibility">표시 여부</string>
+    <string name="settings_section_overlays">오버레이</string>
+    <string name="settings_section_mouse_keyboard">마우스 및 키보드</string>
+    <string name="settings_section_gamepad">게임패드</string>
+    <string name="settings_section_touch">터치</string>
+    <string name="settings_background_cubemap_all_sides">모든 면에 같은 이미지 사용</string>
+    <string name="settings_background_cubemap_unset">이미지 없음: %1$s</string>
+    <string name="settings_background_cubemap_missing">파일을 찾을 수 없음: %1$s</string>
+    <string name="settings_background_cubemap_add_image">이미지 추가</string>
+    <string name="settings_background_cubemap_choose">%1$s 이미지 선택</string>
+    <string name="settings_background_cubemap_no_image">이미지 없음</string>
+    <string name="settings_background_cubemap_hint">면에 이미지를 끌어다 놓거나 면을 클릭해 이미지를 선택하세요. 이미지는 배경 폴더에 복사됩니다.</string>
+    <string name="settings_background_cubemap_remove">이미지 제거</string>
+    <string name="settings_background_cubemap_no_library">아직 이미지가 없습니다. 가져오기로 시작하세요.</string>
+    <string name="background_warning_title">배경이 준비되지 않았습니다</string>
+    <string name="background_warning_consequence_launch">이번 연주에서는 기본 배경이 대신 사용됩니다.</string>
+    <string name="background_warning_consequence_settings">수정하기 전까지는 기본 배경이 사용됩니다.</string>
+    <string name="background_warning_fix">배경 설정 열기</string>
+    <string name="background_warning_continue">기본 배경으로 재생</string>
 </resources>
 

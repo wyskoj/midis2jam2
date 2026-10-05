@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.ui.common.navigation
 import cafe.adriel.voyager.core.model.ScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.wysko.midis2jam2.ui.settings.SettingsPage
 import java.io.File
 
 class NavigationModel : ScreenModel {
@@ -33,5 +34,19 @@ class NavigationModel : ScreenModel {
 
     fun clearApplyHomeScreenMidiFile() {
         _applyHomeScreenMidiFile.value = null
+    }
+
+    private val _requestedSettingsPage = MutableStateFlow<SettingsPage?>(null)
+
+    /** The settings page another screen has asked to be shown, until the settings screen has shown it. */
+    val requestedSettingsPage: StateFlow<SettingsPage?>
+        get() = _requestedSettingsPage
+
+    fun requestSettingsPage(page: SettingsPage) {
+        _requestedSettingsPage.value = page
+    }
+
+    fun clearRequestedSettingsPage() {
+        _requestedSettingsPage.value = null
     }
 }

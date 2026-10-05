@@ -70,12 +70,6 @@
     <string name="search_index_waiting">โปรดรอสักครู่! เรากำลังจัดดัชนีไฟล์ MIDI ของคุณ...</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">พื้นหลังกำหนดค่าไม่ถูกต้อง</string>
-    <string name="background_cubemap_warning_message">พื้นหลังถูกตั้งค่าเป็น cube map แต่ยังไม่ได้กำหนดภาพทั้งหกภาพ จะใช้พื้นหลังเริ่มต้นแทน คุณสามารถยกเลิกและแก้ไขในการตั้งค่าพื้นหลัง</string>
-    <string name="background_cubemap_missing_warning_title">ไม่พบรูปภาพพื้นหลัง</string>
-    <string name="background_cubemap_missing_warning_message">ไม่พบรูปภาพ cube map ที่ระบุหนึ่งรูปขึ้นไปบนดิสก์ จะใช้พื้นหลังเริ่มต้นแทน คุณสามารถยกเลิกและแก้ไขในการตั้งค่าพื้นหลัง</string>
-    <string name="background_cubemap_warning_continue">ดำเนินการต่อไปอยู่ดี</string>
-    <string name="background_warning_settings_badge">ปัญหาการกำหนดค่าพื้นหลัง</string>
 
     <!-- Settings -->
     <string name="settings_general">ทั่วไป</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">บันทึกแล้ว</string>
     <string name="record_failed_title">การบันทึกล้มเหลว</string>
     <string name="record_time_left">เหลืออีกประมาณ %1$s</string>
+    <string name="settings_section_appearance">รูปลักษณ์</string>
+    <string name="settings_section_updates">การอัปเดต</string>
+    <string name="settings_section_window">หน้าต่าง</string>
+    <string name="settings_section_quality">คุณภาพ</string>
+    <string name="settings_section_autocam">ออโต้แคม</string>
+    <string name="settings_section_freecam">ฟรีแคม</string>
+    <string name="settings_section_visibility">การแสดงผล</string>
+    <string name="settings_section_overlays">ภาพซ้อน</string>
+    <string name="settings_section_mouse_keyboard">เมาส์และคีย์บอร์ด</string>
+    <string name="settings_section_gamepad">เกมแพด</string>
+    <string name="settings_section_touch">การสัมผัส</string>
+    <string name="settings_background_cubemap_all_sides">ใช้ภาพเดียวกันกับทุกด้าน</string>
+    <string name="settings_background_cubemap_unset">ไม่มีภาพ: %1$s</string>
+    <string name="settings_background_cubemap_missing">ไม่พบไฟล์: %1$s</string>
+    <string name="settings_background_cubemap_add_image">เพิ่มภาพ</string>
+    <string name="settings_background_cubemap_choose">เลือกภาพสำหรับ %1$s</string>
+    <string name="settings_background_cubemap_no_image">ไม่มีภาพ</string>
+    <string name="settings_background_cubemap_hint">ลากภาพมาวางบนด้าน หรือคลิกที่ด้านเพื่อเลือกภาพ ภาพจะถูกคัดลอกไปยังโฟลเดอร์พื้นหลัง</string>
+    <string name="settings_background_cubemap_remove">ลบภาพ</string>
+    <string name="settings_background_cubemap_no_library">ยังไม่มีภาพ นำเข้าภาพเพื่อเริ่มต้น</string>
+    <string name="background_warning_title">พื้นหลังยังไม่พร้อม</string>
+    <string name="background_warning_consequence_launch">การแสดงนี้จะใช้พื้นหลังเริ่มต้นแทน</string>
+    <string name="background_warning_consequence_settings">จนกว่าจะแก้ไข จะใช้พื้นหลังเริ่มต้น</string>
+    <string name="background_warning_fix">เปิดการตั้งค่าพื้นหลัง</string>
+    <string name="background_warning_continue">เล่นด้วยพื้นหลังเริ่มต้น</string>
 </resources>
 

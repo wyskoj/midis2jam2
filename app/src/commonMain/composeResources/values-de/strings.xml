@@ -70,12 +70,6 @@
     <string name="search_index_waiting">Moment mal! Wir indizieren deine MIDI-Dateien…</string>
 
     <!-- Background warning dialog -->
-    <string name="background_cubemap_warning_title">Hintergrund falsch konfiguriert</string>
-    <string name="background_cubemap_warning_message">Der Hintergrund ist auf Cube Map eingestellt, aber nicht alle sechs Bilder wurden zugewiesen. Stattdessen wird der Standardhintergrund verwendet. Du kannst den Vorgang abbrechen und dies in den Hintergrundeinstellungen beheben.</string>
-    <string name="background_cubemap_missing_warning_title">Hintergrundbilder nicht gefunden</string>
-    <string name="background_cubemap_missing_warning_message">Ein oder mehrere der angegebenen Cube-Map-Bilder konnten auf dem Datenträger nicht gefunden werden. Stattdessen wird der Standardhintergrund verwendet. Du kannst den Vorgang abbrechen und dies in den Hintergrundeinstellungen beheben.</string>
-    <string name="background_cubemap_warning_continue">Trotzdem fortfahren</string>
-    <string name="background_warning_settings_badge">Problem mit der Hintergrundkonfiguration</string>
 
     <!-- Settings -->
     <string name="settings_general">Allgemein</string>
@@ -277,5 +271,30 @@
     <string name="record_saved">Gespeichert</string>
     <string name="record_failed_title">Aufnahme fehlgeschlagen</string>
     <string name="record_time_left">noch etwa %1$s</string>
+    <string name="settings_section_appearance">Darstellung</string>
+    <string name="settings_section_updates">Updates</string>
+    <string name="settings_section_window">Fenster</string>
+    <string name="settings_section_quality">Qualität</string>
+    <string name="settings_section_autocam">Auto-Kam</string>
+    <string name="settings_section_freecam">Freecam</string>
+    <string name="settings_section_visibility">Sichtbarkeit</string>
+    <string name="settings_section_overlays">Einblendungen</string>
+    <string name="settings_section_mouse_keyboard">Maus und Tastatur</string>
+    <string name="settings_section_gamepad">Gamepad</string>
+    <string name="settings_section_touch">Touch</string>
+    <string name="settings_background_cubemap_all_sides">Ein Bild für alle Seiten verwenden</string>
+    <string name="settings_background_cubemap_unset">Kein Bild: %1$s</string>
+    <string name="settings_background_cubemap_missing">Datei nicht gefunden: %1$s</string>
+    <string name="settings_background_cubemap_add_image">Bild hinzufügen</string>
+    <string name="settings_background_cubemap_choose">Bild für %1$s auswählen</string>
+    <string name="settings_background_cubemap_no_image">Kein Bild</string>
+    <string name="settings_background_cubemap_hint">Ziehe ein Bild auf eine Seite oder klicke auf eine Seite, um eines auszuwählen. Bilder werden in den Hintergrundordner kopiert.</string>
+    <string name="settings_background_cubemap_remove">Bild entfernen</string>
+    <string name="settings_background_cubemap_no_library">Noch keine Bilder. Importiere eines, um zu beginnen.</string>
+    <string name="background_warning_title">Hintergrund ist nicht bereit</string>
+    <string name="background_warning_consequence_launch">Diese Wiedergabe verwendet stattdessen den Standardhintergrund.</string>
+    <string name="background_warning_consequence_settings">Bis das behoben ist, wird der Standardhintergrund verwendet.</string>
+    <string name="background_warning_fix">Hintergrundeinstellungen öffnen</string>
+    <string name="background_warning_continue">Mit Standardhintergrund abspielen</string>
 </resources>
 

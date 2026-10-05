@@ -108,6 +108,7 @@ import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.SystemInteractionService
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
 import org.wysko.midis2jam2.ui.common.component.BackgroundWarningDialog
+import org.wysko.midis2jam2.ui.settings.rememberOpenBackgroundSettings
 import org.wysko.midis2jam2.util.FilesDragAndDrop
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -140,6 +141,7 @@ object QueueTab : Tab {
         var isPlaylistLoadDialogOpen by remember { mutableStateOf(false) }
         var isPlaylistLoadWarningsDialogOpen by remember { mutableStateOf(false) }
         var isBackgroundWarningDialogOpen by remember { mutableStateOf(false) }
+        val openBackgroundSettings = rememberOpenBackgroundSettings()
         var capturedBackgroundWarning by remember { mutableStateOf<BackgroundWarning?>(null) }
         var missingFiles by remember { mutableStateOf(listOf<String>()) }
         val isPlayButtonEnabled = model.isPlayButtonEnabled.collectAsState(initial = false)
@@ -333,7 +335,7 @@ object QueueTab : Tab {
                 }
 
                 isBackgroundWarningDialogOpen && capturedBackgroundWarning != null -> BackgroundWarningDialog(
-                    warningType = capturedBackgroundWarning!!,
+                    onOpenSettings = openBackgroundSettings,
                     onConfirm = {
                         isBackgroundWarningDialogOpen = false
                         model.startApplication()

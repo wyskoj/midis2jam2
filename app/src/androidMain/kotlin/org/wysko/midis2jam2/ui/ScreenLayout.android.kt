@@ -17,8 +17,11 @@
 
 package org.wysko.midis2jam2.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
@@ -33,7 +36,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 actual fun MainLayout() {
-    CurrentScreen()
+    Scaffold(bottomBar = { AppNavigationBar() }) { contentPadding ->
+        Box(Modifier.padding(contentPadding).consumeWindowInsets(contentPadding)) {
+            CurrentScreen()
+        }
+    }
 }
 
 @Composable
