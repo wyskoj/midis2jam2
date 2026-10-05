@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
+import org.wysko.midis2jam2.instrument.family.strings.bowing.BowingProfile
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
@@ -33,7 +34,8 @@ class Cello(context: PerformanceManager, events: List<MidiEvent>) : StringFamily
     20.0,
     Vector3f(0.75f, 0.75f, 0.75f),
     FrettingProfiles.cello(),
-    context.modelD("Cello.obj", "CelloSkin.bmp")
+    context.modelD("Cello.obj", "CelloSkin.bmp"),
+    BowingProfile.Cello,
 ) {
     override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(-20 * updateInstrumentIndex(delta), 0f, 0f)

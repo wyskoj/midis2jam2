@@ -23,20 +23,20 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
-import org.wysko.midis2jam2.instrument.algorithmic.TimedArcGroupCollector
 import org.wysko.midis2jam2.instrument.family.guitar.FretHeightCalculator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
 import org.wysko.midis2jam2.instrument.family.guitar.FrettingPlan
 import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfile
-import org.wysko.midis2jam2.midi.contiguousGroups
+import org.wysko.midis2jam2.instrument.family.strings.bowing.*
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
 import org.wysko.midis2jam2.world.modelD
+import kotlin.math.atan
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 /**
@@ -56,6 +56,7 @@ abstract class StringFamilyInstrument protected constructor(
     bowScale: Vector3f,
     profile: FrettingProfile,
     body: Spatial,
+    bowingProfile: BowingProfile = BowingProfile.Small,
 ) : FrettedInstrument(
     context,
     events,
@@ -70,19 +71,14 @@ abstract class StringFamilyInstrument protected constructor(
             Vector3f(1f, 1f, 1f),
         ),
         floatArrayOf(-0.369f, -0.122f, 0.126f, 0.364f),
-        floatArrayOf(-0.8f, -0.3f, 0.3f, 0.8f),
+        BRIDGE_X.map { it.toFloat() }.toFloatArray(),
         object : FretHeightCalculator {
             override fun calculateScale(fret: Int): Float {
                 return 1 - (0.0003041886 * fret.toDouble().pow(2.0) + -0.0312677 * fret + 1).toFloat()
             }
         },
         floatArrayOf(-0.6f, -0.6f, -0.6f, -0.6f),
-        floatArrayOf(
-            0.47f,
-            0.58f,
-            0.58f,
-            0.47f,
-        ),
+        BRIDGE_Z.map { it.toFloat() }.toFloatArray(),
     ),
     4,
     body to
@@ -137,7 +133,7 @@ abstract class StringFamilyInstrument protected constructor(
         }
 
     /** The Bow node. */
-    private val bowNode =
+    internal val bowNode =
         Node().apply {
             localScale = bowScale
             setLocalTranslation(0f, -4f, 1f)
@@ -153,76 +149,83 @@ abstract class StringFamilyInstrument protected constructor(
             bowNode.attachChild(this)
         }
 
-    private val groupCollector = TimedArcGroupCollector(context, timedArcs.contiguousGroups())
+    /** How the part is bowed, decided once from the notes and the strings the fretting engine put them on. */
+    private val bowMotion: BowMotion = run {
+        val openStrings = fretting.tuning.openStrings
+        val notes = timedArcs.map { arc ->
+            val string = fretting.positions[arc]?.string
+                ?: openStrings.indexOfLast { it <= arc.note.toInt() }.coerceAtLeast(0)
+            BowNote(arc.startTime.toDouble(DurationUnit.SECONDS), arc.endTime.toDouble(DurationUnit.SECONDS), string, arc.velocity.toInt())
+        }
+        BowMotion(BowingPlanner.plan(notes, bowingProfile), StringContactMap(BRIDGE_X, BRIDGE_Z))
+    }
+
+    /** The bow's resting orientation, before it's tilted onto a string. */
+    private val bowBaseRotation = Quaternion().fromAngles(rad(180.0), rad(180.0), rad(bowRotation))
+
+    private var lastPose: BowPose = bowMotion.poseAt(0.0)
 
     init {
         body.setLocalTranslation(0f, 0f, -1.2f)
     }
 
-    private var bowGoesLeft = false
-
     override fun tick(time: Duration, delta: Duration) {
         super.tick(time, delta)
-        groupCollector.advance(time)?.let {
-            bowGoesLeft = !bowGoesLeft
-        }
-        animateBow(time, delta)
+        animateBow(time)
     }
 
-    private var isBowDown = false
-    private val bowRaise = NumberSmoother(2f, 7.0)
-    private val dragIntensity = NumberSmoother(1f, 10.0)
+    private fun animateBow(time: Duration) {
+        if (bowNode.cullHint == Spatial.CullHint.Always) return
+        val pose = bowMotion.poseAt(time.toDouble(DurationUnit.SECONDS)).also { lastPose = it }
 
-    private fun animateBow(time: Duration, delta: Duration) {
-        val progress = groupCollector.currentTimedArcGroup?.calculateProgress(time) ?: (1.0)
+        // Slide the bow so the point at the strings runs from the frog (+x in the model) to the tip.
+        bow.loc = v3(BOW_CONTACT_RANGE * (2 * pose.position - 1), 0, 0)
 
-        bow.loc = v3(MAX_BOW_TRANSLATION, 0, 0) * bowGoesLeft.sign * (progress - 0.5) * dragIntensity.value
+        // Tilt about the strings' direction so the hair lies along the arch where the sounding strings are.
+        val tilt = Quaternion().fromAngles(0f, -atan(pose.line.slope).toFloat(), 0f)
+        bowNode.localRotation = tilt.mult(bowBaseRotation)
 
-        dragIntensity.tick(delta) {
-            if (groupCollector.currentTimedArcGroup == null) {
-                groupCollector.peek()?.let {
-                    if (it.startTime - time < 1.seconds) durationToIntensity(it.duration) else null
-                } ?: dragIntensity.value
+        val contactZ = BOW_DOWN_Z + (pose.line.z0 - BRIDGE_REFERENCE_Z).toFloat() - BOW_PRESSURE_DIP * pose.pressure.toFloat()
+        bowNode.loc = v3(0, -4, contactZ + (BOW_RAISED_Z - BOW_DOWN_Z) * pose.lift.toFloat())
+    }
+
+    override fun readoutExtra(time: Double): String? {
+        val plan = bowMotion.plan
+        val stroke = plan.strokeAt(time) ?: plan.nextAfter(time)
+        val pose = bowMotion.poseAt(time)
+        return buildString {
+            append("bow ")
+            if (stroke == null) {
+                append("no strokes")
             } else {
-                durationToIntensity(groupCollector.currentTimedArcGroup!!.duration)
+                append(if (plan.strokeAt(time) == null) "next " else "").append(stroke.direction.name.lowercase())
+                append("  strings ").append(stroke.stringsAt(time).sorted().joinToString("+"))
+                append("  ").append(if (stroke.events.size > 1) "slur x${stroke.events.size}" else "single")
+                if (stroke.retake) append("  retake")
             }
-        }
-
-        // Move bow up and down
-        collector.peek()?.let {
-            isBowDown = when {
-                // Playing?
-                groupCollector.currentTimedArcGroup != null -> true
-
-                // Not playing, but about to play
-                !isBowDown && it.startTime - time <= 0.5.seconds -> true
-
-                // Just played, about to play again soon
-                isBowDown && it.startTime - time < 5.seconds -> true
-
-                // Not playing
-                else -> false
-            }
-        }
-
-        if (isBowDown) {
-            bowNode.loc = v3(0, -4, bowRaise.tick(delta) { 0.5f })
-        } else {
-            bowNode.loc = v3(0, -4, bowRaise.tick(delta) { 2.0f })
+            append("\npos ").append(round2(pose.position))
+            append("  lift ").append(round2(pose.lift))
         }
     }
 
     override fun toString(): String =
         super.toString() +
-                formatProperty("intensity", dragIntensity.value) +
-                formatProperty("bowGoesLeft", bowGoesLeft) +
-                formatProperty("group", groupCollector.currentTimedArcGroup.toString()) +
-                formatProperty("isBowDown", isBowDown)
+                formatProperty("bowPosition", lastPose.position) +
+                formatProperty("bowLift", lastPose.lift) +
+                formatProperty("bowSlope", lastPose.line.slope)
 }
 
-private fun durationToIntensity(duration: Duration): Float = when {
-    duration > 0.5.seconds -> 1f
-    else -> duration.toDouble(DurationUnit.SECONDS).toFloat() * 2f
-}.coerceAtLeast(0.2f)
+/** Where the strings cross the bridge, sideways and in height. Shared by the string models and the bow. */
+private val BRIDGE_X = doubleArrayOf(-0.8, -0.3, 0.3, 0.8)
+private val BRIDGE_Z = doubleArrayOf(0.47, 0.58, 0.58, 0.47)
 
-private const val MAX_BOW_TRANSLATION = 10
+/** How far the bow slides in either direction from its centre, in model units. */
+private const val BOW_CONTACT_RANGE = 6.75f
+
+/** The bow's height with the hair on the strings, when the bridge's height is [BRIDGE_REFERENCE_Z]. */
+private const val BOW_DOWN_Z = 0.5f
+private const val BOW_RAISED_Z = 2.0f
+private const val BRIDGE_REFERENCE_Z = 0.55
+private const val BOW_PRESSURE_DIP = 0.05f
+
+private fun round2(value: Double): Double = (value * 100).roundToInt() / 100.0
