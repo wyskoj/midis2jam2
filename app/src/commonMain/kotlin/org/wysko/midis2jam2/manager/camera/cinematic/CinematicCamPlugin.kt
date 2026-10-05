@@ -195,6 +195,7 @@ class CinematicCamPlugin : CameraPlugin() {
     private var shotPitch = 0f
     private var shotClearView = 1f
     private var usingFallback = false
+    private var fallbackNote = ""
     private var usesPreferredView = false
 
     /** How the camera moves in the current shot: as planned, unless that would run it into something. */
@@ -377,7 +378,14 @@ class CinematicCamPlugin : CameraPlugin() {
         val reference = song?.let { maxOf(shot.start, it.musicStart) } ?: shot.start
         fun onStage(i: Int) = instruments[i].isVisible || song?.isOnStageAt(i, reference) == true
 
-        val subjectIds = compactGroup(shot.spec.subjects.filter { it in instruments.indices && onStage(it) })
+        val present = shot.spec.subjects.filter { it in instruments.indices && onStage(it) }
+        val compact = compactGroup(present)
+        // A group shot of a band too spread out to fill one frame is of the whole stage, not of whichever few players
+        // stand together: leaving most of the band out of a shot of the band is no shot of the band.
+        val spreadOut = compact.size < present.size && (shot.spec.size == ShotSize.Wide || present.size >= 3)
+        val subjectIds = if (spreadOut) emptyList() else compact
+        fallbackNote = if (spreadOut) "group too spread out: framing the whole stage"
+        else "subjects off stage: framing everything"
         usingFallback = shot.spec.subjects.isNotEmpty() && subjectIds.isEmpty()
         laserView = (subjectIds.singleOrNull()?.let(instruments::get) as? SpaceLaser)?.let {
             when (shot.spec.size) {
@@ -684,7 +692,7 @@ class CinematicCamPlugin : CameraPlugin() {
             append("\t- ${spec.size} ${spec.move} of $subjects, ${spec.lens} lens")
             append(", yaw ${"%.0f".format(shotYaw)}, pitch ${"%.0f".format(shotPitch)}")
             append(", clear view ${"%.0f".format(shotClearView * 100)}%")
-            if (usingFallback) append(" (subjects off stage: framing everything)")
+            if (usingFallback) append(" ($fallbackNote)")
             append("\n\t- why: ${shot.reason}")
             append("\n\t- next cut in ${"%.1f".format((shot.end - time).coerceAtLeast(0.0))} s")
             append(describeAnalysis(time))

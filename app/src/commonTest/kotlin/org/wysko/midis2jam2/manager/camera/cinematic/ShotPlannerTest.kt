@@ -29,6 +29,7 @@ import org.wysko.midis2jam2.manager.camera.cinematic.analysis.SongAnalysis
 import org.wysko.midis2jam2.manager.camera.cinematic.analysis.SubjectKind
 import org.wysko.midis2jam2.manager.camera.cinematic.analysis.SubjectNotes
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.ENTRANCE_HOLD
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.LensChoice
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.MAX_SHOT
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.MIN_ANGLE_CHANGE
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.DOLLY_ZOOM_SPACING
@@ -195,6 +196,58 @@ class ShotPlannerTest {
         (0L until SEEDS).forEach { seed ->
             val opening = ShotPlanner.plan(eased, seed).shots.first()
             assertEquals(ShotSize.Establishing, opening.spec.size, "A song that eases in should open on the stage")
+        }
+    }
+
+    @Test
+    @Spec("camera.cinematic.opens-on-band")
+    fun `the camera approaches the scene at the start, never drawing away from it`() {
+        val eased = SongAnalysis.of(
+            listOf(comping(KEYS, 16..95), drums(DRUMS, 16..95), melody(SOLOIST, 32..63)),
+            grid(96),
+        )
+        val retreating = setOf(Move.PullOut, Move.CraneUp)
+        (0L until SEEDS).forEach { seed ->
+            listOf(analysis, eased).forEach { song ->
+                ShotPlanner.plan(song, seed).shots.filter { it.reason.startsWith("opening") }.forEach { shot ->
+                    assertTrue(
+                        shot.spec.move !in retreating,
+                        "The opening should draw in or hold still, not pull away, but ${shot.spec.move} was planned"
+                    )
+                    assertEquals(
+                        LensChoice.Wide, shot.spec.lens,
+                        "The opening should be on a wide lens, to stand close to the stage"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    @Spec("camera.cinematic.opens-on-band")
+    fun `a band that comes in together stays on the band, not on one player, for its first bars`() {
+        // Everyone plays from the first beat, and the melody is the busiest part: left to the analysis, it would be
+        // found a soloist from the first bar.
+        val together = SongAnalysis.of(
+            listOf(
+                melody(SOLOIST, 0..127),
+                pads(PADS, 0..127, length = 8),
+                drums(DRUMS, 0..127),
+                comping(KEYS, 0..127),
+            ),
+            grid(128),
+        )
+        val firstBars = time(32)
+        (0L until SEEDS).forEach { seed ->
+            ShotPlanner.plan(together, seed).shots
+                .filter { it.start < firstBars && it.spec.subjects.size == 1 }
+                .forEach { shot ->
+                    assertTrue(
+                        shot.reason.startsWith("fill") || shot.reason.startsWith("hit"),
+                        "A band that started together should be filmed as a band at first, but at ${shot.start} s " +
+                            "the camera singled out ${shot.spec.subjects} (${shot.reason})"
+                    )
+                }
         }
     }
 

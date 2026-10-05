@@ -108,6 +108,13 @@ private const val WHIP_CHANCE = 0.2
 /** How many bars a band opening holds once the music starts. */
 private const val BAND_OPENING_BARS = 2
 
+/**
+ * How many bars, at most, a song that starts at full tilt stays on the band as a whole. Until the first section
+ * ends, or this many bars have gone by, nobody is singled out: the whole band came in together, and no one in it has
+ * yet done anything to deserve a shot of their own.
+ */
+private const val BAND_PHASE_BARS = 8
+
 /** How soon after playback starts the music must begin for the song to count as starting straight away, in seconds. */
 private const val IMMEDIATE_START = 1.0
 
@@ -189,6 +196,9 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
     private var featureStreak = 0
     private var featured: Moment? = null
 
+    /** When the band's opening ends, if the song started at full tilt: until then, the camera stays on the band. */
+    private var bandPhaseEnd = Double.NEGATIVE_INFINITY
+
     /** The song's biggest moments, strongest first and well apart, each filmed once with a dolly zoom. */
     private val dollyMoments: List<Moment> = buildList {
         analysis.moments
@@ -223,11 +233,16 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
             .take(3)
         val opening = if (immediate && band.isNotEmpty()) {
             val size = if (band.size > 1) ShotSize.Wide else ShotSize.Medium
-            shot(band, size, pick(Move.PushIn to 0.4, Move.Static to 0.3, Move.CraneDown to 0.3)) to "opening: the band"
+            shot(band, size, approaching(), LensChoice.Wide) to "opening: the band"
         } else {
-            establishing(pick(Move.CraneUp to 0.4, Move.PullOut to 0.3, Move.Static to 0.3)) to "opening"
+            establishing(approaching(), LensChoice.Wide) to "opening"
         }
         shots += PlannedShot(planStart, openingEnd, opening.first, opening.second)
+        if (immediate) {
+            val firstSectionEnd = analysis.sections.firstOrNull { it.end > openingEnd + 1e-6 }?.end ?: openingEnd
+            val cap = analysis.musicStart + BAND_PHASE_BARS * grid.secondsPerBarAt(analysis.musicStart)
+            bandPhaseEnd = snapToBar(minOf(firstSectionEnd, cap)).coerceAtLeast(openingEnd)
+        }
 
         var cursor = openingEnd
         while (closingStart - cursor >= MIN_SHOT) {
@@ -269,7 +284,7 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
             SectionRole.Breakdown, SectionRole.Intro, SectionRole.Outro -> 9.0
             else -> 7.0
         }
-        val active = activeMoment(cursor, beat)
+        val active = activeMoment(cursor, beat)?.takeUnless { cursor < bandPhaseEnd - 1e-6 && it.kind.isFeature }
         val isEntrance = active?.kind == MomentKind.Entrance
         val seconds = baseSeconds * pacing * (0.8 + random.nextDouble() * 0.4)
         val bars = (seconds / bar).roundToInt().coerceAtLeast(1)
@@ -432,6 +447,7 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
         return analysis.moments
             .asSequence()
             .filter { it.kind in CUT_FOR && it !in used }
+            .filterNot { it.kind.isFeature && it.start < bandPhaseEnd - 1e-6 }
             .filterNot { it.interrupts(feature, beat) }
             .filter { it.start - anticipation(it, beat) >= cursor + hold }
             .filter { it.start <= cursor + targetLength + bar / 2 }
@@ -465,6 +481,11 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
             .orEmpty()
         val isClimax = active != null && active in dollyMoments && active !in dollied &&
             onStage.isNotEmpty() && !looksSame(shots.lastOrNull()?.spec?.subjects.orEmpty(), onStage.take(1))
+        // While the band that came in together is still settling in, the shots are of the band.
+        if (active == null && cursor < bandPhaseEnd - 1e-6) {
+            featureStreak = 0
+            return band(cursor, end)
+        }
         // The band at full strength, or dropping out, sets the mood of a stretch of shots rather than its subject.
         if (active == null || onStage.isEmpty() || (active.kind.isMood && !isClimax)) {
             featureStreak = 0
@@ -592,6 +613,26 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
         }
     }
 
+    /**
+     * A shot of the band that came in together: its most interesting players that can be filmed, as a group, or the
+     * whole stage now and then. No one is singled out, however much they stand out in the first moments.
+     */
+    private fun band(cursor: Double, end: Double): Pair<ShotSpec, String> {
+        val players = analysis.subjects.map { it.id }
+            .filter {
+                analysis.isOnStageThroughout(it, cursor, end) && !analysis.movesDuring(it, cursor, end) &&
+                    analysis.playsDuring(it, cursor, end)
+            }
+            .sortedByDescending { analysis.interestOver(it, cursor, end) }
+            .take(BAND_ARRIVAL)
+        val lastWasEstablishing = shots.lastOrNull()?.spec?.size == ShotSize.Establishing
+        if (players.isEmpty() || (!lastWasEstablishing && random.nextDouble() < 0.3)) {
+            return establishing(approaching(), LensChoice.Wide) to "opening: the band"
+        }
+        val size = if (players.size > 1) ShotSize.Wide else ShotSize.Medium
+        return shot(players, size, approaching(), LensChoice.Wide) to "opening: the band"
+    }
+
     private fun general(cursor: Double, end: Double, mood: Moment? = null): Pair<ShotSpec, String> {
         val candidates = filmable(cursor, end)
         val role = analysis.sectionAt(cursor)?.role
@@ -669,13 +710,20 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
         )
     }
 
+    /**
+     * A move for the opening: the camera is coming to the scene, so it holds still or draws in, never away. The
+     * opening is also filmed on a wide lens, which takes in the same view from closer, so the camera isn't left
+     * standing off from the stage.
+     */
+    private fun approaching(): Move = pick(Move.PushIn to 0.45, Move.CraneDown to 0.3, Move.Static to 0.25)
+
     private fun generalMove(): Move = pick(
         Move.Static to 0.35, Move.PushIn to 0.15, Move.PullOut to 0.08, Move.TrackLeft to 0.09, Move.TrackRight to 0.09,
         Move.ArcLeft to 0.07, Move.ArcRight to 0.07, Move.CraneUp to 0.05, Move.CraneDown to 0.05,
     )
 
-    private fun establishing(move: Move): ShotSpec =
-        shot(emptyList(), ShotSize.Establishing, move, pick(LensChoice.Wide to 0.3, LensChoice.Normal to 0.7))
+    private fun establishing(move: Move, lens: LensChoice? = null): ShotSpec =
+        shot(emptyList(), ShotSize.Establishing, move, lens ?: pick(LensChoice.Wide to 0.3, LensChoice.Normal to 0.7))
 
     /**
      * Fills in the angle and lens of a shot of [subjects]. Cutting from one shot of an instrument to another of the
@@ -778,6 +826,8 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
         val beat = grid.beatAt(time)
         return if (grid.timeOf(beat) >= time - 1e-9) grid.timeOf(beat) else grid.timeOf(beat + 1)
     }
+
+    private val MomentKind.isFeature: Boolean get() = this == MomentKind.Solo || this == MomentKind.Duet
 
     private val MomentKind?.isAccent: Boolean get() = this == MomentKind.Fill || this == MomentKind.Hit
 

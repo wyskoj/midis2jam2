@@ -98,8 +98,12 @@ class CinematicCameraTest {
                     "its solo. The plan was:\n${plan.shots.joinToString("\n") { it.describe() }}"
             )
 
-            // Every half second, once the camera has finished arriving from wherever it was.
-            frames.filterIndexed { i, frame -> i % FRAMES_PER_CHECK == 0 && frame.time >= SETTLED }.forEach { frame ->
+            // Every half second, once the camera has finished arriving from wherever it was, and not while it is
+            // whipping round into a shot, when it is still on its way to its subject (see the whip pan test).
+            frames.filterIndexed { i, frame ->
+                i % FRAMES_PER_CHECK == 0 && frame.time >= SETTLED &&
+                    !(frame.whipped && frame.time < frame.shot.start + WHIP_SECONDS)
+            }.forEach { frame ->
                 assertTrue(frame.pose.isFinite, "The camera pose at ${frame.time} s is not a real number")
                 val angle = frame.envelope.audienceAngle(frame.pose.location)
                 assertTrue(
