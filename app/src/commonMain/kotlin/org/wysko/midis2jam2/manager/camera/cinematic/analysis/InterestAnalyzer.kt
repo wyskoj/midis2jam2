@@ -54,6 +54,9 @@ private const val NOVELTY_BEATS = 32
  */
 private const val HABITUATED = 0.6f
 
+/** How far apart, in semitones, two parts' pitches may be for them to be doubling each other, playing the same note. */
+private const val UNISON_TOLERANCE = 0.5f
+
 /** How interesting a part that only echoes another is, against what it would be on its own merits. */
 private const val ECHO_WEIGHT = 0.15f
 
@@ -84,7 +87,13 @@ class SubjectFeatures(val subject: SubjectNotes, beatCount: Int) {
     /** Whether the part plays one note at a time on each beat, rather than chords. */
     internal val singleLine: BooleanArray = BooleanArray(beatCount) { true }
 
-    /** Whether this part is the highest single line among the pitched parts playing on each beat. */
+    /** Whether the part is playing a line, one note at a time, on each beat, as opposed to holding chords or silent. */
+    internal val playsLine: BooleanArray = BooleanArray(beatCount)
+
+    /**
+     * Whether this part is the highest single line among the pitched parts playing on each beat. Parts doubling the
+     * same note share the honour: each is carrying the melody.
+     */
     val topVoice: BooleanArray = BooleanArray(beatCount)
 
     /** A spike when the part comes in after a long rest, decaying over the next few beats, 0–1. */
@@ -185,6 +194,13 @@ object InterestAnalyzer {
             if (together.size > 1) singleLine[beat] = false
         }
 
+        // A part plays a line while it sounds, from a single-note attack until its next attack.
+        var inLine = true
+        for (b in 0 until beatCount) {
+            if (onsets[b] > 0) inLine = singleLine[b]
+            playsLine[b] = sounding[b] && inLine
+        }
+
         // Density over a short window, so a part's busyness doesn't flicker from beat to beat.
         val prefix = IntArray(beatCount + 1)
         for (b in 0 until beatCount) prefix[b + 1] = prefix[b] + attacks[b]
@@ -240,9 +256,9 @@ object InterestAnalyzer {
         // An echo plays the top line over again; the part it echoes is the one carrying it.
         val pitched = all.filter { it.subject.kind.isPitched && it.echoOf == null }
         for (b in 0 until beatCount) {
-            pitched.filter { it.onsets[b] > 0 && it.singleLine[b] }
-                .maxByOrNull { it.meanPitch[b] }
-                ?.topVoice?.set(b, true)
+            val lines = pitched.filter { it.onsets[b] > 0 && it.singleLine[b] }
+            val top = lines.maxOfOrNull { it.meanPitch[b] } ?: continue
+            lines.filter { it.meanPitch[b] >= top - UNISON_TOLERANCE }.forEach { it.topVoice[b] = true }
         }
     }
 
@@ -263,8 +279,15 @@ object InterestAnalyzer {
     private fun SubjectFeatures.activity(beat: Int): Float {
         val loudness = if (onsets[beat] > 0) velocity[beat] / 127f else 0.5f
         val sustain = if (sounding[beat]) 0.4f else 0f
-        return (density[beat] * loudness + sustain) * subject.kind.activityWeight
+        return (density[beat] * loudness + sustain) * activityWeight(beat)
     }
+
+    /**
+     * How much this part counts towards the band's activity on [beat]. A choir or strings holding chords is padding,
+     * but one playing a line is carrying the tune, and counts as much as any other player.
+     */
+    private fun SubjectFeatures.activityWeight(beat: Int): Float =
+        if (subject.kind == SubjectKind.Ensemble && playsLine[beat]) 1f else subject.kind.activityWeight
 
     private fun score(features: SubjectFeatures, grid: BeatGrid) = with(features) {
         val playedVelocities = subject.notes.map { it.velocity.toDouble() }

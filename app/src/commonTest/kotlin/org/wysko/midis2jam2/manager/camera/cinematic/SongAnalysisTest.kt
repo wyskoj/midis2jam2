@@ -212,6 +212,34 @@ class SongAnalysisTest {
         )
     }
 
+    @Test
+    fun `a choir singing the tune is as interesting as the player doubling it`() {
+        val analysis = SongAnalysis.of(
+            listOf(
+                melody(SOLOIST, 0..63),
+                melody(CHOIR, 0..63, kind = SubjectKind.Ensemble),
+                comping(KEYS, 0..63),
+                drums(DRUMS, 0..63),
+            ),
+            grid(64),
+        )
+
+        val doubled = analysis.features.getValue(SOLOIST).topVoice.indices
+            .filter { analysis.features.getValue(SOLOIST).topVoice[it] }
+        assertTrue(doubled.isNotEmpty(), "The tune should be carried by someone")
+        assertTrue(
+            doubled.all { analysis.features.getValue(CHOIR).topVoice[it] },
+            "Parts playing the same notes should both be carrying the tune"
+        )
+        val player = analysis.meanInterest(SOLOIST, 8..55)
+        val choir = analysis.meanInterest(CHOIR, 8..55)
+        assertTrue(
+            choir >= 0.95f * player,
+            "A choir playing the tune ($choir) should be about as interesting as its double ($player), " +
+                "not discounted as padding"
+        )
+    }
+
     private fun SongAnalysis.meanInterest(id: Int, beats: IntRange): Float =
         beats.map { features.getValue(id).interest[it] }.average().toFloat()
 
@@ -222,5 +250,6 @@ class SongAnalysisTest {
         const val LATECOMER = 3
         const val KEYS = 4
         const val ECHO = 5
+        const val CHOIR = 6
     }
 }
