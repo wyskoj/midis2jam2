@@ -61,6 +61,9 @@ import kotlin.time.DurationUnit.SECONDS
 /** How long the camera takes to travel from wherever it was into the first shot, in seconds. */
 private const val ENTRY_BLEND = 2.5
 
+/** The least time the camera takes to carry on into a new shot after a cut during its entrance, in seconds. */
+private const val MIN_ENTRY_BLEND = 0.6
+
 /**
  * How much of the planned angle's variety is kept around an instrument's preferred view: enough to vary the shots
  * of it, not so much that it is seen from a poor side.
@@ -221,6 +224,9 @@ class CinematicCamPlugin : CameraPlugin() {
     private var blendElapsed = 0.0
     private var entering = false
 
+    /** Whether the camera is still travelling in from wherever it was when it took over. */
+    private var blendingIn = false
+
     /** The shot being filmed now, if the song has been read. */
     val currentShot: PlannedShot? get() = plan?.shots?.getOrNull(shotIndex)
 
@@ -261,14 +267,22 @@ class CinematicCamPlugin : CameraPlugin() {
 
     override fun onEnable() {
         entering = true
+        blendFrom = null
+        blendingIn = false
         shotIndex = -1
         lastPose = currentCameraPose()
     }
 
     override fun onDisable() {
-        // The slide camera and auto-cams leave the field of view alone, so give back the user's.
-        application.camera.fov = application.performanceConfig.settings.cameraSettings.defaultFieldOfView
         showSubjectBox(null)
+    }
+
+    /**
+     * Gives back the user's field of view. The other auto-cams and the rotating camera leave it alone, so whoever
+     * takes the camera next, if it isn't the free camera (which moves it as it moves the position), calls this.
+     */
+    fun restoreFieldOfView() {
+        application.camera.fov = application.performanceConfig.settings.cameraSettings.defaultFieldOfView
     }
 
     override fun cleanup(app: Application?): Unit = Unit
@@ -298,7 +312,10 @@ class CinematicCamPlugin : CameraPlugin() {
             val t = (blendElapsed / blendDuration).coerceIn(0.0, 1.0).toFloat()
             // Eased in and out with no jolt at either end, so a whip pan swings rather than snaps.
             pose = from.interpolate(pose, t * t * t * (t * (6 * t - 15) + 10))
-            if (t >= 1f) blendFrom = null
+            if (t >= 1f) {
+                blendFrom = null
+                blendingIn = false
+            }
         }
         if (!pose.isFinite) return
 
@@ -386,9 +403,24 @@ class CinematicCamPlugin : CameraPlugin() {
         whipped = !entering && from != null && shot.transition == Transition.Whip &&
             canWhip(from, rigPose(shot, box, shotYaw, shotPitch, shot.start), box)
         when {
-            entering -> beginBlend(ENTRY_BLEND)
-            whipped -> beginBlend(WHIP_SECONDS)
-            else -> blendFrom = null
+            entering -> {
+                beginBlend(ENTRY_BLEND)
+                blendingIn = true
+            }
+
+            whipped -> {
+                beginBlend(WHIP_SECONDS)
+                blendingIn = false
+            }
+
+            // A cut that lands before the camera has finished travelling in would leave it where it is, then jump.
+            // Carry on from wherever it has got to, towards the new shot, for as long as the entrance had left.
+            blendingIn && blendFrom != null -> beginBlend((blendDuration - blendElapsed).coerceAtLeast(MIN_ENTRY_BLEND))
+
+            else -> {
+                blendFrom = null
+                blendingIn = false
+            }
         }
         entering = false
     }

@@ -97,6 +97,10 @@ abstract class CameraManager : BaseManager(), ActionListener {
 
     /** Hands the camera to [plugin], and tells the listeners which mode that is. */
     protected fun activate(plugin: CameraPlugin) {
+        // The free camera takes over the field of view from where it is, and eases or snaps it as it does the
+        // position. The others leave it alone, so give back the user's.
+        (currentCameraPlugin as? CinematicCamPlugin)?.takeIf { plugin !== cameraPlugins.first() }
+            ?.restoreFieldOfView()
         currentCameraPlugin = plugin
         cameraPlugins.forEach { it.isEnabled = it == currentCameraPlugin }
 
