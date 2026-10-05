@@ -27,9 +27,12 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.shape.Quad
 import org.wysko.midis2jam2.manager.ActionsManager.Companion.ACTION_DEBUG
+import org.wysko.midis2jam2.manager.camera.cinematic.CinematicCamPlugin
+import org.wysko.midis2jam2.manager.camera.cinematic.CinematicDebugGraph
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.DebugTextEngine
+import kotlin.time.DurationUnit
 
 private const val SCREEN_MARGIN = 64
 
@@ -37,6 +40,7 @@ class DebugTextManager : BaseManager(), ActionListener {
     private lateinit var engine: DebugTextEngine
     private lateinit var textView: BitmapText
     private val node = Node()
+    private var cinematicGraph: CinematicDebugGraph? = null
 
     override fun initialize(app: Application) {
         super.initialize(app)
@@ -65,6 +69,35 @@ class DebugTextManager : BaseManager(), ActionListener {
     override fun update(tpf: Float) {
         super.update(tpf)
         textView.text = engine.getText()
+        updateCinematicGraph()
+    }
+
+    /** Shows the cinematic camera's analysis as a graph while it has the camera, and moves its playhead. */
+    private fun updateCinematicGraph() {
+        val cinematic = app.stateManager.getState(CinematicCamPlugin::class.java)?.takeIf { it.isEnabled }
+        val analysis = cinematic?.songAnalysis
+        val plan = cinematic?.plan
+        if (analysis == null || plan == null) {
+            cinematicGraph?.node?.removeFromParent()
+            cinematicGraph = null
+            return
+        }
+        // A reroll plans a new edit of the same analysis, so the graph is rebuilt whenever either changes.
+        var graph = cinematicGraph
+        if (graph == null || graph.analysisDrawn !== analysis || graph.plan !== plan) {
+            graph?.node?.removeFromParent()
+            graph = CinematicDebugGraph(
+                app.assetManager,
+                analysis,
+                plan,
+                (app.viewPort.camera.width - 2 * SCREEN_MARGIN).toFloat().coerceAtLeast(100f),
+            ).also {
+                it.node.setLocalTranslation(SCREEN_MARGIN.toFloat(), SCREEN_MARGIN.toFloat(), 0f)
+                node.attachChild(it.node)
+            }
+            cinematicGraph = graph
+        }
+        graph.update(app.stateManager.getState(PlaybackManager::class.java).time.toDouble(DurationUnit.SECONDS))
     }
 
     override fun onAction(name: String?, isPressed: Boolean, tpf: Float) {

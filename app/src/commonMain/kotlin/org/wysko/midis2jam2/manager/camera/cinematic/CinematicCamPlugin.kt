@@ -655,6 +655,24 @@ class CinematicCamPlugin : CameraPlugin() {
             if (usingFallback) append(" (subjects off stage: framing everything)")
             append("\n\t- why: ${shot.reason}")
             append("\n\t- next cut in ${"%.1f".format((shot.end - time).coerceAtLeast(0.0))} s")
+            append(describeAnalysis(time))
+        }
+    }
+
+    /** What the analysis says about the song at [time]: the section, the band's energy, who is interesting, and moments. */
+    private fun describeAnalysis(time: Double): String {
+        val song = analysis ?: return ""
+        if (song.grid.beatCount == 0) return ""
+        val beat = song.grid.beatAt(time.coerceAtLeast(0.0)).coerceIn(0, song.grid.beatCount - 1)
+        val section = song.sectionAt(time)
+        val leaders = song.features.values.sortedByDescending { it.interest[beat] }.take(3)
+            .joinToString { "${song.nameOf(it.subject.id)}#${it.subject.id} ${"%.2f".format(it.interest[beat])}" }
+        val moments = song.moments.filter { time >= it.start && time < it.end }
+        return buildString {
+            append("\n\t- section: ${section?.role ?: "none"}")
+            append(", energy ${"%.0f".format(song.energy[beat] * 100)}%")
+            append("\n\t- most interesting: $leaders")
+            append("\n\t- moments: ${moments.joinToString().ifEmpty { "none" }}")
         }
     }
 }
