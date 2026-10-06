@@ -105,6 +105,24 @@ const val WHIP_SPACING: Double = 25.0
 /** How often an eligible cut becomes a whip pan instead. */
 private const val WHIP_CHANCE = 0.2
 
+/**
+ * How long the camera stays on the player it whips to, at least, in seconds. A whip pan that is followed straight away
+ * by a cut feels like a mistake, so the planner doesn't whip to a player who won't hold the shot this long.
+ */
+const val WHIP_HOLD: Double = 4.0
+
+/** The least time between two glides, in seconds, at normal pacing. */
+const val GLIDE_SPACING: Double = 12.0
+
+/** How long the camera stays on the player it glides to, at least, in seconds. */
+const val GLIDE_HOLD: Double = 5.0
+
+/** How often a newcomer's entrance is reached with a glide from the player before, rather than a cut. */
+private const val ENTRANCE_GLIDE_CHANCE = 0.7
+
+/** How often a cut from one player to another becomes a glide instead. */
+private const val GLIDE_CHANCE = 0.08
+
 /** How many bars a band opening holds once the music starts. */
 private const val BAND_OPENING_BARS = 2
 
@@ -210,6 +228,7 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
     }
     private val dollied = mutableSetOf<Moment>()
     private var lastWhip = Double.NEGATIVE_INFINITY
+    private var lastGlide = Double.NEGATIVE_INFINITY
 
     fun plan(): List<PlannedShot> {
         val planStart = minOf(0.0, analysis.musicStart) - LEAD_IN
@@ -323,17 +342,37 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
             end = ceilBeat(cursor + CUTAWAY_HOLD)
             if (limit - end < MIN_SHOT) end = limit
         }
-        val transition = transitionInto(spec, reason, cursor)
-        if (active?.kind.isAccent) return PlannedShot(cursor, end, spec, reason, transition = transition)
         // A soloist is the feature for as long as the solo lasts: their shot ends only if they stop or fade.
         val featured = reason.startsWith("solo") || reason.startsWith("duet")
-        val ending = endWhenInterestMoves(spec, cursor, end, hold, limit, mayBeUpstaged = !featured)
+        fun endingFor(transition: Transition): Double =
+            if (active?.kind.isAccent && transition == Transition.Cut) end
+            else endWhenInterestMoves(spec, cursor, end, hold, limit, mayBeUpstaged = !featured)
+
+        // A whip pan or a glide draws attention to the player it arrives at, so it is only made to a shot that lasts:
+        // looking ahead, if the shot would be cut short, the camera cuts into it instead.
+        var transition = transitionInto(spec, reason, cursor)
+        var ending = endingFor(transition)
+        val wanted = when (transition) {
+            Transition.Whip -> WHIP_HOLD
+            Transition.Glide -> GLIDE_HOLD
+            Transition.Cut -> 0.0
+        }
+        if (ending - cursor < wanted - 1e-6) {
+            transition = Transition.Cut
+            ending = endingFor(transition)
+        }
+        when (transition) {
+            Transition.Whip -> lastWhip = cursor
+            Transition.Glide -> lastGlide = cursor
+            Transition.Cut -> Unit
+        }
         return PlannedShot(cursor, ending, spec, reason, transition = transition)
     }
 
     /**
-     * Whether to whip round into a shot of [spec] at [cursor] rather than cut. Only now and then, only from one
-     * player to another, and never into or out of an accent, the opening or a dolly zoom.
+     * Which transition to use into a shot of [spec] at [cursor]. Cuts, mostly. Now and then the camera whips round from
+     * one player to another, or glides to a newcomer as they come in, and never into or out of an accent, the opening
+     * or a dolly zoom. Whether the shot lasts long enough to deserve it is for the caller to check.
      */
     private fun transitionInto(spec: ShotSpec, reason: String, cursor: Double): Transition {
         val previous = shots.lastOrNull() ?: return Transition.Cut
@@ -341,13 +380,17 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
             it.startsWith("fill") || it.startsWith("hit") || it.startsWith("climax") || it.startsWith("opening") ||
                 it.startsWith("arrival")
         }
-        val eligible = shots.size >= 2 && calm &&
-            previous.spec.subjects.size == 1 && spec.subjects.size == 1 &&
-            !looksSame(previous.spec.subjects, spec.subjects) &&
+        val toAnother = calm && spec.subjects.size == 1 && !looksSame(previous.spec.subjects, spec.subjects)
+        val canGlide = toAnother && previous.spec.subjects.isNotEmpty() && cursor - lastGlide >= GLIDE_SPACING * pacing
+        val canWhip = toAnother && shots.size >= 2 && previous.spec.subjects.size == 1 &&
             cursor - lastWhip >= WHIP_SPACING * pacing
-        if (!eligible || random.nextDouble() >= WHIP_CHANCE) return Transition.Cut
-        lastWhip = cursor
-        return Transition.Whip
+        val isEntrance = reason.startsWith("entrance")
+        return when {
+            canGlide && isEntrance && random.nextDouble() < ENTRANCE_GLIDE_CHANCE -> Transition.Glide
+            canWhip && random.nextDouble() < WHIP_CHANCE -> Transition.Whip
+            canGlide && !isEntrance && random.nextDouble() < GLIDE_CHANCE -> Transition.Glide
+            else -> Transition.Cut
+        }
     }
 
     /**

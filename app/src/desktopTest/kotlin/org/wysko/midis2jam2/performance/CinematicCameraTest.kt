@@ -35,6 +35,7 @@ import org.wysko.midis2jam2.manager.PlaybackManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.cinematic.CinematicCamPlugin
 import org.wysko.midis2jam2.manager.camera.cinematic.SUBJECT_BOX_NAME
+import org.wysko.midis2jam2.manager.camera.cinematic.GLIDE_SECONDS
 import org.wysko.midis2jam2.manager.camera.cinematic.MAX_WHIP_TURN
 import org.wysko.midis2jam2.manager.camera.cinematic.WHIP_SECONDS
 import org.wysko.midis2jam2.manager.camera.cinematic.WIDE_SHOT_TILT
@@ -47,7 +48,11 @@ import org.wysko.midis2jam2.manager.camera.cinematic.framing.PreferredViews
 import org.wysko.midis2jam2.manager.camera.cinematic.framing.ShotClarity
 import org.wysko.midis2jam2.manager.camera.cinematic.framing.StageEnvelope
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.Move
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.LensChoice
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.PlannedShot
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.ShotPlan
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.ShotSpec
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.Transition
 import org.wysko.midis2jam2.manager.camera.cinematic.restingBox
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
@@ -102,7 +107,7 @@ class CinematicCameraTest {
             // whipping round into a shot, when it is still on its way to its subject (see the whip pan test).
             frames.filterIndexed { i, frame ->
                 i % FRAMES_PER_CHECK == 0 && frame.time >= SETTLED &&
-                    !(frame.whipped && frame.time < frame.shot.start + WHIP_SECONDS)
+                    !(frame.smooth && frame.time < frame.shot.start + frame.transitionSeconds)
             }.forEach { frame ->
                 assertTrue(frame.pose.isFinite, "The camera pose at ${frame.time} s is not a real number")
                 val angle = frame.envelope.audienceAngle(frame.pose.location)
@@ -134,29 +139,50 @@ class CinematicCameraTest {
     @Test
     @Spec("camera.cinematic.whip-pans")
     fun `a whip pan swings round to the next player quickly but without snapping`() {
-        var whips = 0
-        repeat(WHIP_EDITS) { edit ->
-            filmSoloOverBand(rerolls = edit) { _, _, frames ->
-                frames.groupBy { it.shotIndex }.values.filter { it.first().whipped }.forEach { shot ->
-                    whips++
-                    val first = shot.first()
-                    val swing = frames.filter { it.time >= first.shot.start - FRAME && it.time <= first.shot.start + WHIP_SECONDS }
-                    val before = frames.last { it.shotIndex == first.shotIndex - 1 }
-                    val after = swing.last()
-                    val turned = turnBetween(before, after)
-                    assertTrue(
-                        turned <= MAX_WHIP_TURN + 1f,
-                        "The whip pan into '${first.shot.reason}' swung $turned degrees: too far to whip"
-                    )
-                    val fastest = swing.zipWithNext(::turnRate).maxOrNull() ?: 0f
-                    assertTrue(
-                        fastest <= MAX_WHIP_RATE,
-                        "The whip pan into '${first.shot.reason}' turned at $fastest degrees a second: neck-snapping"
-                    )
-                }
-            }
+        filmSoloOverBand(edit = stagedEdit(Transition.Whip)) { _, _, frames ->
+            val shot = frames.filter { it.shotIndex == STAGED_TRANSITION_SHOT }
+            val first = shot.first()
+            assertTrue(first.whipped, "The camera should whip into '${first.shot.reason}', but it cut")
+            val swing = frames.filter { it.time >= first.shot.start - FRAME && it.time <= first.shot.start + WHIP_SECONDS }
+            val before = frames.last { it.shotIndex == first.shotIndex - 1 }
+            val turned = turnBetween(before, swing.last())
+            assertTrue(
+                turned <= MAX_WHIP_TURN + 1f,
+                "The whip pan into '${first.shot.reason}' swung $turned degrees: too far to whip"
+            )
+            val fastest = swing.zipWithNext(::turnRate).maxOrNull() ?: 0f
+            assertTrue(
+                fastest <= MAX_WHIP_RATE,
+                "The whip pan into '${first.shot.reason}' turned at $fastest degrees a second: neck-snapping"
+            )
         }
-        assertTrue(whips > 0, "None of $WHIP_EDITS edits whipped between players")
+    }
+
+    @Test
+    @Spec("camera.cinematic.glides")
+    fun `a glide passes through a view with both players in frame, and is gentle`() {
+        filmSoloOverBand(edit = stagedEdit(Transition.Glide)) { performance, _, frames ->
+            val shot = frames.filter { it.shotIndex == STAGED_TRANSITION_SHOT }
+            val first = shot.first()
+            assertTrue(first.glided, "The camera should glide into '${first.shot.reason}', but it cut")
+
+            val (from, to) = performance.onEngineThread {
+                listOf(STAGED_FROM, STAGED_TO).map { assertNotNull(performance.instruments[it].restingBox()) }
+            }
+            val glide = frames.filter { it.time >= first.shot.start && it.time <= first.shot.start + GLIDE_SECONDS }
+            assertTrue(
+                glide.any { frame ->
+                    listOf(from, to).all { box ->
+                        FramingSolver.project(box.center, frame.pose, frame.aspect)
+                            ?.let { abs(it.x) <= 1f && abs(it.y) <= 1f } == true
+                    }
+                },
+                "At no point in the glide into '${first.shot.reason}' were both players in frame"
+            )
+
+            val fastest = glide.zipWithNext(::turnRate).maxOrNull() ?: 0f
+            assertTrue(fastest <= MAX_GLIDE_RATE, "The glide turned at $fastest degrees a second: not gentle")
+        }
     }
 
     @Test
@@ -358,7 +384,7 @@ class CinematicCameraTest {
         filmSoloOverBand(rerolls = edit) { _, _, frames ->
             // Every cut, once the camera has arrived, should clearly change the view. A whip pan isn't a cut.
             frames.zipWithNext()
-                .filter { (a, b) -> a.shotIndex != b.shotIndex && a.time >= SETTLED && !b.whipped }
+                .filter { (a, b) -> a.shotIndex != b.shotIndex && a.time >= SETTLED && !b.smooth }
                 .forEach { (a, b) ->
                 assertTrue(
                     ShotClarity.isDistinctCut(a.pose, b.pose),
@@ -369,8 +395,8 @@ class CinematicCameraTest {
 
             frames.filter { it.time >= SETTLED }.groupBy { it.shotIndex }.values.forEach { whole ->
                 // A whip pan into the shot swings quickly by design; the shot is judged once it has arrived.
-                val shot = if (whole.first().whipped) {
-                    whole.filter { it.time >= whole.first().shot.start + WHIP_SECONDS }.ifEmpty { return@forEach }
+                val shot = if (whole.first().smooth) {
+                    whole.filter { it.time >= whole.first().shot.start + whole.first().transitionSeconds }.ifEmpty { return@forEach }
                 } else {
                     whole
                 }
@@ -433,6 +459,22 @@ class CinematicCameraTest {
         }
     }
 
+    /**
+     * A planned edit of [MidiFixtures.soloOverBand] with one [transition] in it, from the piano to the saxophone, held
+     * long enough to see it through. The planner only makes these now and then, so they are staged to be tested.
+     */
+    private fun stagedEdit(transition: Transition): ShotPlan {
+        fun spec(vararg subjects: Int) = ShotSpec(subjects.toList(), ShotSize.Medium, 0f, 10f, LensChoice.Normal, Move.Static)
+        return ShotPlan(
+            listOf(
+                PlannedShot(START, 9.0, spec(STAGED_FROM), "staged: before"),
+                PlannedShot(9.0, 15.0, spec(STAGED_TO), "staged: $transition", transition = transition),
+                PlannedShot(15.0, 1000.0, spec(STAGED_FROM), "staged: after"),
+            ),
+            seed = 0,
+        )
+    }
+
     /** What the camera was doing on one frame. */
     private class Frame(
         val time: Double,
@@ -445,7 +487,14 @@ class CinematicCameraTest {
         val blockers: List<Box3>,
         val framedBox: Box3?,
         val whipped: Boolean,
-    )
+        val glided: Boolean = false,
+    ) {
+        /** Whether the camera is travelling into the shot, rather than having cut to it. */
+        val smooth: Boolean get() = whipped || glided
+
+        /** How long that travel takes. */
+        val transitionSeconds: Double get() = if (glided) GLIDE_SECONDS else WHIP_SECONDS
+    }
 
     /**
      * Boots [MidiFixtures.soloOverBand], hands the camera to the cinematic camera, and films the whole song frame by
@@ -453,6 +502,7 @@ class CinematicCameraTest {
      */
     private fun filmSoloOverBand(
         rerolls: Int = 0,
+        edit: ShotPlan? = null,
         block: (HeadlessPerformance, CinematicCamPlugin, List<Frame>) -> Unit,
     ) {
         // Without the handheld drift, so a locked-off shot can be checked for holding still.
@@ -467,6 +517,7 @@ class CinematicCameraTest {
                 repeat(rerolls + 1) { cameras.switchToAutoCam() }
                 assertNotNull(performance.app.stateManager.getState(CinematicCamPlugin::class.java))
             }
+            edit?.let { staged -> performance.onEngineThread { plugin.useEdit(staged) } }
             val envelope = performance.onEngineThread {
                 StageEnvelope(assertNotNull(Box3.unionOf(performance.instruments.mapNotNull { it.restingBox() })))
             }
@@ -511,6 +562,7 @@ class CinematicCameraTest {
             blockers = performance.instruments.filter { it.isVisible }.mapNotNull { it.restingBox() },
             framedBox = plugin.framing.box,
             whipped = plugin.framing.whipped,
+            glided = plugin.framing.glided,
         )
     }
 
@@ -566,8 +618,13 @@ class CinematicCameraTest {
         /** How many different edits of the song the motion is checked across. */
         const val EDITS = 3
 
-        /** How many edits to look through for whip pans, which are deliberately rare. */
-        const val WHIP_EDITS = 10
+        /** Which shot of the staged edit is the whip pan or the glide, and between whom: the piano, then the sax. */
+        const val STAGED_TRANSITION_SHOT = 1
+        const val STAGED_FROM = 0
+        const val STAGED_TO = 1
+
+        /** The fastest a glide may turn the camera, in degrees per second. */
+        const val MAX_GLIDE_RATE = 40f
 
         /** The fastest a whip pan may turn the camera, in degrees per second. */
         const val MAX_WHIP_RATE = 150f

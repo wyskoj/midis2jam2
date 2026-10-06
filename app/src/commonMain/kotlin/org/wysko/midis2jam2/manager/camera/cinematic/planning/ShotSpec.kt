@@ -64,6 +64,12 @@ enum class Transition {
      * subject. The camera decides when the shot begins whether the two views are close enough; if not, it cuts.
      */
     Whip,
+
+    /**
+     * A gentle move from the shot before, by way of a shot with both players in frame. The camera decides when the
+     * shot begins whether the two fit in one frame; if not, it cuts.
+     */
+    Glide,
 }
 
 /**

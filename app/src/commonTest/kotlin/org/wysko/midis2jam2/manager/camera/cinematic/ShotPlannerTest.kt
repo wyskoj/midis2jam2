@@ -37,6 +37,9 @@ import org.wysko.midis2jam2.manager.camera.cinematic.planning.LOST_INTEREST
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.MAX_DOLLY_ZOOMS
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.Move
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.Transition
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.GLIDE_HOLD
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.GLIDE_SPACING
+import org.wysko.midis2jam2.manager.camera.cinematic.planning.WHIP_HOLD
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.WHIP_SPACING
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.MIN_HOLD
 import org.wysko.midis2jam2.manager.camera.cinematic.planning.MIN_SHOT
@@ -361,6 +364,44 @@ class ShotPlannerTest {
             }
         }
         assertTrue(whips > 0, "Across $SEEDS edits, there should be at least the odd whip pan")
+    }
+
+    @Test
+    @Spec("camera.cinematic.whip-held")
+    fun `the camera stays on the player it whips to for a while`() = forEachSeed { plan ->
+        plan.shots.filter { it.transition == Transition.Whip }.forEach { shot ->
+            assertTrue(
+                shot.length >= WHIP_HOLD - 1e-6,
+                "The whip pan into '${shot.reason}' is followed by a cut after only ${shot.length} s"
+            )
+        }
+    }
+
+    @Test
+    @Spec("camera.cinematic.glides")
+    fun `glides go from one player to another, are spaced out, and are held`() {
+        var glides = 0
+        forEachSeed { plan ->
+            val glideShots = plan.shots.withIndex().filter { it.value.transition == Transition.Glide }
+            glides += glideShots.size
+            glideShots.forEach { (index, shot) ->
+                val before = plan.shots[index - 1]
+                assertEquals(1, shot.spec.subjects.size, "'${shot.reason}' glides into a shot of more than one player")
+                assertTrue(before.spec.subjects.isNotEmpty(), "'${shot.reason}' glides out of a shot of the whole stage")
+                assertNotEquals(before.spec.subjects, shot.spec.subjects, "'${shot.reason}' glides to the same player")
+                assertTrue(shot.length >= GLIDE_HOLD - 1e-6, "The glide into '${shot.reason}' lasts only ${shot.length} s")
+                listOf(before, shot).forEach {
+                    assertTrue(
+                        listOf("fill", "hit", "climax", "opening", "arrival").none { prefix -> it.reason.startsWith(prefix) },
+                        "A glide should never touch '${it.reason}'"
+                    )
+                }
+            }
+            glideShots.zipWithNext().forEach { (a, b) ->
+                assertTrue(b.value.start - a.value.start >= GLIDE_SPACING - 1e-6, "Glides too close together")
+            }
+        }
+        assertTrue(glides > 0, "Across $SEEDS edits, there should be at least the odd glide")
     }
 
     @Test

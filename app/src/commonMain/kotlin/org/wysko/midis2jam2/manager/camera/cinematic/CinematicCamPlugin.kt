@@ -92,6 +92,18 @@ const val WHIP_SECONDS: Double = 1.1
 /** The furthest a whip pan may turn the camera, in degrees. Any further and it cuts instead. */
 const val MAX_WHIP_TURN: Float = 75f
 
+/** How long a glide from one player to the next takes, in seconds. */
+const val GLIDE_SECONDS: Double = 3.2
+
+/** The furthest a glide may turn the camera between the two views, in degrees. Any further and it cuts instead. */
+const val MAX_GLIDE_TURN: Float = 100f
+
+/** How much of a glide is spent travelling to the shot with both players in frame. */
+private const val GLIDE_TO_BOTH = 0.4f
+
+/** How much of a glide has gone by when the camera sets off from the shot with both players in frame. */
+private const val GLIDE_LEAVES_BOTH = 0.55f
+
 /** The furthest a whip pan may carry the camera, as a fraction of its distance from the new subject. */
 private const val MAX_WHIP_TRAVEL = 1f
 
@@ -204,6 +216,15 @@ class CinematicCamPlugin : CameraPlugin() {
     /** Whether the camera whipped round into the current shot rather than cutting. */
     private var whipped = false
 
+    /** Whether the camera glided into the current shot rather than cutting. */
+    private var glided = false
+
+    /** Where the camera passes through on a glide, with both players in frame. */
+    private var glideVia: CameraPose? = null
+
+    /** What a glide into the shot would frame to keep both players in view, if the two fit in one frame. */
+    private var glideBox: Box3? = null
+
     /** How the current shot films a space laser, if that is its subject. */
     private var laserView: LaserView? = null
 
@@ -236,7 +257,7 @@ class CinematicCamPlugin : CameraPlugin() {
 
     /** How the current shot is actually being filmed, which may differ from its plan. */
     val framing: Framing
-        get() = Framing(shotYaw, shotPitch, shotClearView, usingFallback, usesPreferredView, framedBox, shotMove, whipped)
+        get() = Framing(shotYaw, shotPitch, shotClearView, usingFallback, usesPreferredView, framedBox, shotMove, whipped, glided)
 
     /**
      * How a shot is actually being filmed.
@@ -249,6 +270,7 @@ class CinematicCamPlugin : CameraPlugin() {
      * @property box What the shot frames.
      * @property move How the camera moves, which is a locked-off shot if the planned move would run into something.
      * @property whipped Whether the camera whipped round into the shot rather than cutting.
+     * @property glided Whether the camera glided into the shot, by way of both players, rather than cutting.
      */
     data class Framing(
         val yaw: Float,
@@ -259,6 +281,7 @@ class CinematicCamPlugin : CameraPlugin() {
         val box: Box3?,
         val move: Move,
         val whipped: Boolean,
+        val glided: Boolean = false,
     )
 
     override fun initialize(app: Application) {
@@ -288,6 +311,12 @@ class CinematicCamPlugin : CameraPlugin() {
 
     override fun cleanup(app: Application?): Unit = Unit
 
+    /** Films [edit] instead of the planned one, starting from its first shot. Lets a test stage a particular edit. */
+    internal fun useEdit(edit: ShotPlan) {
+        plan = edit
+        shotIndex = -1
+    }
+
     /** Plans a different edit of the song, and cuts straight into it. */
     fun reroll() {
         rerolls++
@@ -312,10 +341,12 @@ class CinematicCamPlugin : CameraPlugin() {
             blendElapsed += tpf
             val t = (blendElapsed / blendDuration).coerceIn(0.0, 1.0).toFloat()
             // Eased in and out with no jolt at either end, so a whip pan swings rather than snaps.
-            pose = from.interpolate(pose, t * t * t * (t * (6 * t - 15) + 10))
+            val via = glideVia
+            pose = if (via == null) from.interpolate(pose, smootherStep(t)) else glide(from, via, pose, t)
             if (t >= 1f) {
                 blendFrom = null
                 blendingIn = false
+                glideVia = null
             }
         }
         if (!pose.isFinite) return
@@ -327,6 +358,18 @@ class CinematicCamPlugin : CameraPlugin() {
 
         showSubjectBox(framedBox.takeIf { isDebugViewOpen() })
     }
+
+    /**
+     * Where the camera is [t] of the way through a glide: it eases to [via], where both players are in frame, pauses
+     * there for a moment, then eases on to [to].
+     */
+    private fun glide(from: CameraPose, via: CameraPose, to: CameraPose, t: Float): CameraPose = when {
+        t < GLIDE_TO_BOTH -> from.interpolate(via, smootherStep(t / GLIDE_TO_BOTH))
+        t < GLIDE_LEAVES_BOTH -> via
+        else -> via.interpolate(to, smootherStep((t - GLIDE_LEAVES_BOTH) / (1f - GLIDE_LEAVES_BOTH)))
+    }
+
+    private fun smootherStep(t: Float): Float = t * t * t * (t * (6 * t - 15) + 10)
 
     /** Draws a box around [box] in the scene, or takes it away if [box] is `null`. */
     private fun showSubjectBox(box: Box3?) {
@@ -369,6 +412,7 @@ class CinematicCamPlugin : CameraPlugin() {
     /** Begins shot [index]: chooses its angle and how the camera arrives in it. */
     private fun startShot(plan: ShotPlan, index: Int) {
         shotIndex = index
+        glideVia = null
         val shot = plan.shots[index]
         val instruments = performanceManager.instruments
 
@@ -403,6 +447,12 @@ class CinematicCamPlugin : CameraPlugin() {
         blockers = instruments.indices
             .filter { onStage(it) && it !in shot.spec.subjects }
             .mapNotNull { instruments[it].restingBox() }
+        val previousSubjects = plan.shots.getOrNull(index - 1)?.spec?.subjects.orEmpty().filter(::onStage)
+        glideBox = if (shot.transition == Transition.Glide && !entering && lastPose != null && !usingFallback) {
+            bothInFrame(previousSubjects, subjectIds)
+        } else {
+            null
+        }
         chooseAngle(shot, box, subjectIds.map(instruments::get), framedIds.map(instruments::get))
 
         // A shot begins with a cut, unless the camera has just taken over from another mode, or the plan asks to whip
@@ -410,10 +460,18 @@ class CinematicCamPlugin : CameraPlugin() {
         val from = lastPose
         whipped = !entering && from != null && shot.transition == Transition.Whip &&
             canWhip(from, rigPose(shot, box, shotYaw, shotPitch, shot.start), box)
+        glided = !entering && !whipped && from != null && glideBox != null &&
+            canGlide(from, rigPose(shot, box, shotYaw, shotPitch, shot.start))
         when {
             entering -> {
                 beginBlend(ENTRY_BLEND)
                 blendingIn = true
+            }
+
+            glided -> {
+                beginBlend(GLIDE_SECONDS)
+                blendingIn = false
+                glideVia = glideBox?.let { bothPose(previousSubjects + subjectIds, it) }
             }
 
             whipped -> {
@@ -439,6 +497,41 @@ class CinematicCamPlugin : CameraPlugin() {
         val turn = FastMath.atan2(a.cross(b).length(), a.dot(b)) * FastMath.RAD_TO_DEG
         val travel = from.location.distance(to.location)
         return turn <= MAX_WHIP_TURN && travel <= MAX_WHIP_TRAVEL * to.location.distance(box.center)
+    }
+
+    /** Whether the camera can glide on to [to] without turning further than [MAX_GLIDE_TURN] from its view at [from]. */
+    private fun canGlide(from: CameraPose, to: CameraPose): Boolean {
+        val (a, b) = from.forward to to.forward
+        return FastMath.atan2(a.cross(b).length(), a.dot(b)) * FastMath.RAD_TO_DEG <= MAX_GLIDE_TURN
+    }
+
+    /**
+     * What a frame with the [previous] and [next] players both in it would frame, or `null` if there is no one before,
+     * or the two stand too far apart to fit in one frame.
+     */
+    private fun bothInFrame(previous: List<Int>, next: List<Int>): Box3? {
+        if (previous.isEmpty() || next.isEmpty()) return null
+        val instruments = performanceManager.instruments
+        val box = Box3.enclosing((previous + next).distinct().mapNotNull { instruments[it].restingBox() }) ?: return null
+        return box.takeIf { maxOf(it.extent.x, it.extent.y, it.extent.z) <= MAX_GROUP_EXTENT }
+    }
+
+    /** Where the camera stands to film [box], enclosing the players [ids], from the side they face, a little above. */
+    private fun bothPose(ids: List<Int>, box: Box3): CameraPose {
+        val instruments = performanceManager.instruments
+        val facing = ids.distinct().mapNotNull { id ->
+            instruments[id].restingBox()?.let { PreferredViews.viewOf(instruments[id], it.center)?.first }
+        }
+        val yaw = (if (facing.isEmpty()) 0f else facing.average().toFloat()).coerceIn(-MAX_WIDE_YAW, MAX_WIDE_YAW)
+        val composition = Composition(0f, WIDE_SHOT_TILT, ShotSize.Wide.fill)
+        val fov = application.performanceConfig.settings.cameraSettings.defaultFieldOfView.coerceIn(FOV_VALID_RANGE)
+        val pose = FramingSolver.place(box, yaw, TYPICAL_PITCH + 4f, fov, aspect, composition, 1f)
+        val location = stageEnvelope().constrain(pose.location)
+        if (location == pose.location) return pose
+        return pose.copy(
+            location = location,
+            rotation = FramingSolver.aim(location, box.center, pose.fovY, aspect, composition.anchorX, composition.anchorY),
+        )
     }
 
     /**
@@ -538,11 +631,14 @@ class CinematicCamPlugin : CameraPlugin() {
 
         // A cut must change the view. A whip pan turns from one view to the next, so it doesn't have to, but only if
         // the two views are close enough to whip between: otherwise the camera cuts after all.
+        // A glide does the same, by way of a view with both players in it.
         val isWhip = shot.transition == Transition.Whip
+        val isGlide = glideBox != null
         fun score(yaw: Float, pitch: Float): Float {
             val start = rigPose(shot, box, yaw, pitch, shot.start)
             val whips = isWhip && cutFrom != null && canWhip(cutFrom, start, box)
-            val jump = cutFrom != null && !whips && !ShotClarity.isDistinctCut(cutFrom, start)
+            val glides = isGlide && cutFrom != null && canGlide(cutFrom, start)
+            val jump = cutFrom != null && !whips && !glides && !ShotClarity.isDistinctCut(cutFrom, start)
             return clarity(yaw, pitch) - if (jump) INDISTINCT_CUT_PENALTY else 0f
         }
 

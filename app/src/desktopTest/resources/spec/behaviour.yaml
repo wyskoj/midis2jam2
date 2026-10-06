@@ -347,6 +347,14 @@
   source: code
   platforms: [desktop, android]
   claim: "Now and then the camera whips smoothly from one player to the next instead of cutting"
+- id: camera.cinematic.whip-held
+  source: code
+  platforms: [desktop, android]
+  claim: "The camera stays on the player it whips to for a few seconds, and only whips to a player who holds the shot"
+- id: camera.cinematic.glides
+  source: code
+  platforms: [desktop, android]
+  claim: "The camera sometimes glides gently from one player to another, usually as the newcomer comes in, passing through a view with both in frame"
 - id: camera.cinematic.debug-subject-box
   source: code
   platforms: [desktop]
