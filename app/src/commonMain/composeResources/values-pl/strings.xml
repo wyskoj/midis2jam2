@@ -194,7 +194,7 @@
     <string name="settings_camera_start_autocam_with_song">Uruchom auto-kamerę z utworem</string>
     <string name="settings_camera_start_autocam_with_song_description">Po rozpoczęciu utworu automatycznie przełącz na auto-kamerę</string>
     <string name="settings_camera_autocam_mode">Tryb auto-kamery</string>
-    <string name="settings_camera_autocam_mode_smart">Inteligentny</string>
+    <string name="settings_camera_autocam_mode_cinematic">Filmowy</string>
     <string name="settings_camera_autocam_mode_classic">Klasyczny</string>
     <string name="settings_camera_autocam_mode_legacy">Starszy</string>
     <string name="settings_camera_smooth_freecam">Płynna kamera swobodna</string>
@@ -232,7 +232,7 @@
     <string name="settings_camera_field_of_view_title">Pole widzenia</string>
     <string name="settings_camera_field_of_view_label_prefix">Zmień, jak szeroko widzi kamera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d stopni</string>
-    <string name="settings_camera_cinematic_pacing">Tempo inteligentnej auto-kamery</string>
+    <string name="settings_camera_cinematic_pacing">Tempo filmowej auto-kamery</string>
     <string name="settings_camera_cinematic_pacing_relaxed">Spokojne</string>
     <string name="settings_camera_cinematic_pacing_normal">Normalne</string>
     <string name="settings_camera_cinematic_pacing_energetic">Energiczne</string>

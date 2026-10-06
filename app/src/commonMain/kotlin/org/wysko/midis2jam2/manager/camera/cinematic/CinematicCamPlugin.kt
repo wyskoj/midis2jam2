@@ -755,13 +755,13 @@ class CinematicCamPlugin : CameraPlugin() {
 
     /** A one-line description of what the camera is doing, for the debug readout. */
     fun describe(): String {
-        val plan = plan ?: return "Smart auto-cam: reading the song"
-        val shot = currentShot ?: return "Smart auto-cam: waiting"
+        val plan = plan ?: return "Cinematic auto-cam: reading the song"
+        val shot = currentShot ?: return "Cinematic auto-cam: waiting"
         val time = playbackManager.time.toDouble(SECONDS)
         val spec = shot.spec
         val subjects = if (spec.subjects.isEmpty()) "stage" else spec.subjects.joinToString { "#$it" }
         return buildString {
-            append("Smart auto-cam (seed ${plan.seed}): shot ${shotIndex + 1}/${plan.shots.size}\n")
+            append("Cinematic auto-cam (seed ${plan.seed}): shot ${shotIndex + 1}/${plan.shots.size}\n")
             append("\t- ${spec.size} ${spec.move} of $subjects, ${spec.lens} lens")
             append(", yaw ${"%.0f".format(shotYaw)}, pitch ${"%.0f".format(shotPitch)}")
             append(", clear view ${"%.0f".format(shotClearView * 100)}%")

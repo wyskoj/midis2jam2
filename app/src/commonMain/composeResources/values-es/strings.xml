@@ -194,7 +194,7 @@
     <string name="settings_camera_start_autocam_with_song">Iniciar cámara automática con la canción</string>
     <string name="settings_camera_start_autocam_with_song_description">Cuando la canción comienza, cambiar automáticamente a cámara automática</string>
     <string name="settings_camera_autocam_mode">Modo de cámara automática</string>
-    <string name="settings_camera_autocam_mode_smart">Inteligente</string>
+    <string name="settings_camera_autocam_mode_cinematic">Cinemática</string>
     <string name="settings_camera_autocam_mode_classic">Clásico</string>
     <string name="settings_camera_autocam_mode_legacy">Heredado</string>
     <string name="settings_camera_smooth_freecam">Cámara libre suavizada</string>
@@ -232,7 +232,7 @@
     <string name="settings_camera_field_of_view_title">Campo de visión</string>
     <string name="settings_camera_field_of_view_label_prefix">Cambia qué tan ancho ve la cámara</string>
     <string name="settings_camera_field_of_view_degrees">%1$d grados</string>
-    <string name="settings_camera_cinematic_pacing">Ritmo de la cámara automática inteligente</string>
+    <string name="settings_camera_cinematic_pacing">Ritmo de la cámara automática cinemática</string>
     <string name="settings_camera_cinematic_pacing_relaxed">Relajado</string>
     <string name="settings_camera_cinematic_pacing_normal">Normal</string>
     <string name="settings_camera_cinematic_pacing_energetic">Enérgico</string>

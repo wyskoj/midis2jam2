@@ -194,7 +194,7 @@
     <string name="settings_camera_start_autocam_with_song">Şarkıyla birlikte otomatik kamerayı başlat</string>
     <string name="settings_camera_start_autocam_with_song_description">Şarkı başladığında, otomatik olarak otomatik kameraya geç</string>
     <string name="settings_camera_autocam_mode">Oto-kam modu</string>
-    <string name="settings_camera_autocam_mode_smart">Akıllı</string>
+    <string name="settings_camera_autocam_mode_cinematic">Sinematik</string>
     <string name="settings_camera_autocam_mode_classic">Klasik</string>
     <string name="settings_camera_autocam_mode_legacy">Eski</string>
     <string name="settings_camera_smooth_freecam">Yumuşak serbest kamera</string>
@@ -232,7 +232,7 @@
     <string name="settings_camera_field_of_view_title">Görüş alanı</string>
     <string name="settings_camera_field_of_view_label_prefix">Kameranın ne kadar geniş gördüğünü değiştir</string>
     <string name="settings_camera_field_of_view_degrees">%1$d derece</string>
-    <string name="settings_camera_cinematic_pacing">Akıllı oto-kam temposu</string>
+    <string name="settings_camera_cinematic_pacing">Sinematik oto-kam temposu</string>
     <string name="settings_camera_cinematic_pacing_relaxed">Sakin</string>
     <string name="settings_camera_cinematic_pacing_normal">Normal</string>
     <string name="settings_camera_cinematic_pacing_energetic">Enerjik</string>

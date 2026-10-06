@@ -194,7 +194,7 @@
     <string name="settings_camera_start_autocam_with_song">曲とともにオートカムを開始</string>
     <string name="settings_camera_start_autocam_with_song_description">曲開始時に自動的にオートカムに切り替える</string>
     <string name="settings_camera_autocam_mode">オートカムのモード</string>
-    <string name="settings_camera_autocam_mode_smart">スマート</string>
+    <string name="settings_camera_autocam_mode_cinematic">シネマティック</string>
     <string name="settings_camera_autocam_mode_classic">クラシック</string>
     <string name="settings_camera_autocam_mode_legacy">レガシー</string>
     <string name="settings_camera_smooth_freecam">スムーズフリーカム</string>
@@ -232,7 +232,7 @@
     <string name="settings_camera_field_of_view_title">視野角</string>
     <string name="settings_camera_field_of_view_label_prefix">カメラの視野の広さを変更</string>
     <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
-    <string name="settings_camera_cinematic_pacing">スマートオートカムのテンポ</string>
+    <string name="settings_camera_cinematic_pacing">シネマティックオートカムのテンポ</string>
     <string name="settings_camera_cinematic_pacing_relaxed">ゆったり</string>
     <string name="settings_camera_cinematic_pacing_normal">標準</string>
     <string name="settings_camera_cinematic_pacing_energetic">エネルギッシュ</string>

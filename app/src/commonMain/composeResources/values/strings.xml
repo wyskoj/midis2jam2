@@ -186,7 +186,7 @@
     <string name="settings_camera_start_autocam_with_song">Start auto-cam with song</string>
     <string name="settings_camera_start_autocam_with_song_description">When song starts, automatically switch to auto-cam</string>
     <string name="settings_camera_autocam_mode">Auto-cam mode</string>
-    <string name="settings_camera_autocam_mode_smart">Smart</string>
+    <string name="settings_camera_autocam_mode_cinematic">Cinematic</string>
     <string name="settings_camera_autocam_mode_classic">Classic</string>
     <string name="settings_camera_autocam_mode_legacy">Legacy</string>
     <string name="settings_camera_smooth_freecam">Smooth freecam</string>
@@ -224,7 +224,7 @@
     <string name="settings_camera_field_of_view_title">Field of view</string>
     <string name="settings_camera_field_of_view_label_prefix">Change how wide the camera sees</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
-    <string name="settings_camera_cinematic_pacing">Smart auto-cam pacing</string>
+    <string name="settings_camera_cinematic_pacing">Cinematic auto-cam pacing</string>
     <string name="settings_camera_cinematic_pacing_relaxed">Relaxed</string>
     <string name="settings_camera_cinematic_pacing_normal">Normal</string>
     <string name="settings_camera_cinematic_pacing_energetic">Energetic</string>

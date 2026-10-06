@@ -194,7 +194,7 @@
     <string name="settings_camera_start_autocam_with_song">随歌曲启动自动镜头</string>
     <string name="settings_camera_start_autocam_with_song_description">歌曲开始时自动切换到自动镜头</string>
     <string name="settings_camera_autocam_mode">自动镜头模式</string>
-    <string name="settings_camera_autocam_mode_smart">智能</string>
+    <string name="settings_camera_autocam_mode_cinematic">电影式</string>
     <string name="settings_camera_autocam_mode_classic">经典</string>
     <string name="settings_camera_autocam_mode_legacy">旧版</string>
     <string name="settings_camera_smooth_freecam">平滑自由视角</string>
@@ -232,7 +232,7 @@
     <string name="settings_camera_field_of_view_title">视场</string>
     <string name="settings_camera_field_of_view_label_prefix">更改摄像机视野宽度</string>
     <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
-    <string name="settings_camera_cinematic_pacing">智能自动镜头节奏</string>
+    <string name="settings_camera_cinematic_pacing">电影式自动镜头节奏</string>
     <string name="settings_camera_cinematic_pacing_relaxed">舒缓</string>
     <string name="settings_camera_cinematic_pacing_normal">正常</string>
     <string name="settings_camera_cinematic_pacing_energetic">活力</string>

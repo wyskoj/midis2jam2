@@ -194,7 +194,7 @@
     <string name="settings_camera_start_autocam_with_song">노래 시작 시 자동 카메라 시작</string>
     <string name="settings_camera_start_autocam_with_song_description">노래가 시작되면 자동으로 자동 카메라로 전환</string>
     <string name="settings_camera_autocam_mode">자동 카메라 모드</string>
-    <string name="settings_camera_autocam_mode_smart">스마트</string>
+    <string name="settings_camera_autocam_mode_cinematic">시네마틱</string>
     <string name="settings_camera_autocam_mode_classic">클래식</string>
     <string name="settings_camera_autocam_mode_legacy">레거시</string>
     <string name="settings_camera_smooth_freecam">부드러운 자유 시점 카메라</string>
@@ -232,7 +232,7 @@
     <string name="settings_camera_field_of_view_title">시야각</string>
     <string name="settings_camera_field_of_view_label_prefix">카메라 시야의 너비 변경</string>
     <string name="settings_camera_field_of_view_degrees">%1$d도</string>
-    <string name="settings_camera_cinematic_pacing">스마트 자동 카메라 속도</string>
+    <string name="settings_camera_cinematic_pacing">시네마틱 자동 카메라 속도</string>
     <string name="settings_camera_cinematic_pacing_relaxed">느긋하게</string>
     <string name="settings_camera_cinematic_pacing_normal">보통</string>
     <string name="settings_camera_cinematic_pacing_energetic">역동적으로</string>

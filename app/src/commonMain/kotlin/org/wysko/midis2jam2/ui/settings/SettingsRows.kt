@@ -263,7 +263,7 @@ internal fun AutoCamModeSelect(settings: State<AppSettings>, model: SettingsMode
         selected = settings.value.cameraSettings.autoCamMode,
         onSelected = model::setAutoCamMode,
         options = listOf(
-            SelectOption(AutoCamMode.Smart, stringResource(Res.string.settings_camera_autocam_mode_smart)),
+            SelectOption(AutoCamMode.Smart, stringResource(Res.string.settings_camera_autocam_mode_cinematic)),
             SelectOption(AutoCamMode.Classic, stringResource(Res.string.settings_camera_autocam_mode_classic)),
             SelectOption(AutoCamMode.Legacy, stringResource(Res.string.settings_camera_autocam_mode_legacy)),
         ),
