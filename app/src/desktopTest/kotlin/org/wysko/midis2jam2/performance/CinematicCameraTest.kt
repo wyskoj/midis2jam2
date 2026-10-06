@@ -505,10 +505,7 @@ class CinematicCameraTest {
         edit: ShotPlan? = null,
         block: (HeadlessPerformance, CinematicCamPlugin, List<Frame>) -> Unit,
     ) {
-        // Without the handheld drift, so a locked-off shot can be checked for holding still.
-        val settings = AppSettings().withCamera {
-            copy(isSmoothFreecam = false, cinematicSettings = cinematicSettings.copy(isHandheldFloat = false))
-        }
+        val settings = AppSettings().withCamera { copy(isSmoothFreecam = false) }
         HeadlessPerformance.start(MidiFixtures.soloOverBand(), settings = settings).use { performance ->
             val plugin = performance.onEngineThread {
                 playback(performance).isPlaying = false

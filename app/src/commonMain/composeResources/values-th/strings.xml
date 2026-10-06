@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">ผ่อนคลาย</string>
     <string name="settings_camera_cinematic_pacing_normal">ปกติ</string>
     <string name="settings_camera_cinematic_pacing_energetic">กระฉับกระเฉง</string>
-    <string name="settings_camera_cinematic_handheld">ออโต้แคมอัจฉริยะแบบถือ</string>
-    <string name="settings_camera_cinematic_handheld_description">ให้ภาพแบบภาพยนตร์ขยับเล็กน้อย เหมือนถือกล้องด้วยมือ</string>
     <string name="history_empty">ประวัติการเล่นของคุณจะแสดงที่นี่</string>
     <string name="clear_all">ล้างทั้งหมด</string>
     <string name="history_file_missing_message">ไฟล์ MIDI นี้ไม่พร้อมใช้งานอีกต่อไป</string>

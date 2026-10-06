@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">느긋하게</string>
     <string name="settings_camera_cinematic_pacing_normal">보통</string>
     <string name="settings_camera_cinematic_pacing_energetic">역동적으로</string>
-    <string name="settings_camera_cinematic_handheld">핸드헬드 스마트 자동 카메라</string>
-    <string name="settings_camera_cinematic_handheld_description">카메라를 손에 든 것처럼 시네마틱 샷이 살짝 흔들립니다</string>
     <string name="history_empty">재생 기록이 여기에 표시됩니다.</string>
     <string name="clear_all">모두 지우기</string>
     <string name="history_file_missing_message">이 MIDI 파일은 더 이상 사용할 수 없습니다.</string>

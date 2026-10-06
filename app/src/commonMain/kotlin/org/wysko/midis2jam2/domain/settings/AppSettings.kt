@@ -177,12 +177,10 @@ data class AppSettings(
          * How the smart auto-cam films a performance.
          *
          * @property pacing How quickly it cuts between shots.
-         * @property isHandheldFloat Whether shots drift slightly, as if the camera were held rather than locked off.
          */
         @Serializable
         data class CinematicSettings(
             val pacing: CinematicPacing = CinematicPacing.Normal,
-            val isHandheldFloat: Boolean = true,
         ) {
             /**
              * How quickly the cinematic camera cuts.

@@ -120,9 +120,6 @@ internal actual fun settingsPages(
             row(isVisible = { settings.value.cameraSettings.autoCamMode == AutoCamMode.Smart }) {
                 CinematicPacingSelect(settings, model)
             }
-            row(isVisible = { settings.value.cameraSettings.autoCamMode == AutoCamMode.Smart }) {
-                CinematicHandheldBooleanSelect(settings, model)
-            }
         }
         section(Res.string.settings_section_freecam) {
             row { IsSmoothFreecamSelect(settings, model) }

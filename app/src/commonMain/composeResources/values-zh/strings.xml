@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">舒缓</string>
     <string name="settings_camera_cinematic_pacing_normal">正常</string>
     <string name="settings_camera_cinematic_pacing_energetic">活力</string>
-    <string name="settings_camera_cinematic_handheld">手持智能自动镜头</string>
-    <string name="settings_camera_cinematic_handheld_description">让电影镜头轻微晃动，就像手持摄像机一样</string>
     <string name="history_empty">你的播放历史将显示在这里。</string>
     <string name="clear_all">全部清除</string>
     <string name="history_file_missing_message">此 MIDI 文件已不可用。</string>

@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">ゆったり</string>
     <string name="settings_camera_cinematic_pacing_normal">標準</string>
     <string name="settings_camera_cinematic_pacing_energetic">エネルギッシュ</string>
-    <string name="settings_camera_cinematic_handheld">手持ちスマートオートカム</string>
-    <string name="settings_camera_cinematic_handheld_description">手持ちカメラのように、シネマショットをわずかに揺らします</string>
     <string name="history_empty">再生履歴がここに表示されます。</string>
     <string name="clear_all">すべて消去</string>
     <string name="history_file_missing_message">この MIDI ファイルは現在利用できません。</string>

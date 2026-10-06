@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Спокойный</string>
     <string name="settings_camera_cinematic_pacing_normal">Обычный</string>
     <string name="settings_camera_cinematic_pacing_energetic">Энергичный</string>
-    <string name="settings_camera_cinematic_handheld">Умная авто-камера с рук</string>
-    <string name="settings_camera_cinematic_handheld_description">Кинематографичные кадры слегка покачиваются, как будто камеру держат в руках</string>
     <string name="history_empty">Здесь будет отображаться история воспроизведения.</string>
     <string name="clear_all">Очистить всё</string>
     <string name="history_file_missing_message">Этот MIDI-файл больше недоступен.</string>

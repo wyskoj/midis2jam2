@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Rauhallinen</string>
     <string name="settings_camera_cinematic_pacing_normal">Normaali</string>
     <string name="settings_camera_cinematic_pacing_energetic">Energinen</string>
-    <string name="settings_camera_cinematic_handheld">Käsivarainen älykäs autokamera</string>
-    <string name="settings_camera_cinematic_handheld_description">Anna elokuvallisten otosten huojua hieman, kuin kamera olisi kädessä</string>
     <string name="history_empty">Toistohistoriasi näkyy täällä.</string>
     <string name="clear_all">Tyhjennä kaikki</string>
     <string name="history_file_missing_message">Tämä MIDI-tiedosto ei ole enää saatavilla.</string>

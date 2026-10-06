@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Mabagal</string>
     <string name="settings_camera_cinematic_pacing_normal">Karaniwan</string>
     <string name="settings_camera_cinematic_pacing_energetic">Masigla</string>
-    <string name="settings_camera_cinematic_handheld">Hawak-kamay na smart auto-cam</string>
-    <string name="settings_camera_cinematic_handheld_description">Hayaang bahagyang gumalaw ang mga cinematic na kuha, na parang hawak ang kamera</string>
     <string name="history_empty">Lalabas dito ang iyong history ng playback.</string>
     <string name="clear_all">I-clear lahat</string>
     <string name="history_file_missing_message">Hindi na available ang MIDI file na ito.</string>

@@ -287,17 +287,6 @@ internal fun CinematicPacingSelect(settings: State<AppSettings>, model: Settings
     )
 }
 
-@Composable
-internal fun CinematicHandheldBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
-    SettingsSwitchRow(
-        title = stringResource(Res.string.settings_camera_cinematic_handheld),
-        description = stringResource(Res.string.settings_camera_cinematic_handheld_description),
-        icon = Res.drawable.video_stable,
-        checked = settings.value.cameraSettings.cinematicSettings.isHandheldFloat,
-        onCheckedChange = model::setCinematicHandheldFloat,
-    )
-}
-
 /**
  * A slider row. The setting is saved when the thumb is released, not on every step of the drag.
  */

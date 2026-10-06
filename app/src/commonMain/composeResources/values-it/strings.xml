@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Rilassato</string>
     <string name="settings_camera_cinematic_pacing_normal">Normale</string>
     <string name="settings_camera_cinematic_pacing_energetic">Energico</string>
-    <string name="settings_camera_cinematic_handheld">Auto-cam intelligente a mano</string>
-    <string name="settings_camera_cinematic_handheld_description">Le inquadrature cinematografiche oscillano leggermente, come se la telecamera fosse tenuta in mano</string>
     <string name="history_empty">La tua cronologia di riproduzione apparirà qui.</string>
     <string name="clear_all">Cancella tutto</string>
     <string name="history_file_missing_message">Questo file MIDI non è più disponibile.</string>

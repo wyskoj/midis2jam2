@@ -74,7 +74,7 @@ class SongChoiceTest {
         ratedAt = "2026-10-02T12:00:00Z", song = song.name, seed = 1, shotIndex = 0, shotCount = 9, start = 0.0,
         length = 5.0, reason = "interest: #0", section = null, size = "Medium", move = "Static", lens = "Normal",
         subjects = emptyList(), plannedYaw = 0f, plannedPitch = 10f, filmedYaw = 0f, filmedPitch = 10f,
-        clearView = 1f, framingEverything = false, fieldOfView = 45f, pacing = "Normal", handheld = false,
+        clearView = 1f, framingEverything = false, fieldOfView = 45f, pacing = "Normal",
         previous = null, stars = 4, tags = emptyList(), comment = "", songPath = song.absolutePath,
     )
 }

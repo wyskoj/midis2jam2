@@ -27,7 +27,6 @@ import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.family.animusic.SpaceLaser
 import org.wysko.midis2jam2.manager.DebugTextManager
 import com.jme3.math.FastMath
-import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.manager.PlaybackManager
@@ -54,7 +53,6 @@ import org.wysko.midis2jam2.manager.camera.cinematic.planning.ShotSize
 import org.wysko.midis2jam2.manager.performanceConfig
 import kotlin.math.abs
 import kotlin.math.atan
-import kotlin.math.sin
 import kotlin.math.tan
 import kotlin.time.DurationUnit.SECONDS
 
@@ -132,10 +130,6 @@ private val PITCH_ALTERNATIVES = listOf(0f, 10f, -6f)
 /** The name of the box drawn around the camera's subject in the debug view. */
 const val SUBJECT_BOX_NAME: String = "CinematicSubjectBox"
 
-/** How far the handheld float sways, in degrees. */
-private const val FLOAT_YAW = 0.3f
-private const val FLOAT_PITCH = 0.2f
-
 /**
  * How a space laser is filmed. Its beams reach hundreds of units into the sky, so it is never framed as one box: the
  * camera looks at the emitter, or stands by the base looking up the beams, or stands far off with the emitter low in
@@ -159,17 +153,6 @@ internal enum class LaserView(val pitch: Float, val anchorY: Float, val fill: Fl
 
 /** The stage assumed before any instrument has bounds. */
 private val FALLBACK_STAGE = Box3(Vector3f(-2f, 30f, 0f), Vector3f(80f, 30f, 60f))
-
-/**
- * How far the camera has swayed at [time] seconds, the way a camera on a shoulder or a Steadicam never quite holds
- * still. A slow, smooth wander of a fraction of a degree, made of unrelated sine waves so it never visibly repeats.
- */
-internal fun handheldSway(time: Double): Quaternion {
-    val t = time.toFloat()
-    val yaw = (sin(t * 0.83f) * 0.6f + sin(t * 1.37f + 1.1f) * 0.4f) * FLOAT_YAW * FastMath.DEG_TO_RAD
-    val pitch = (sin(t * 0.61f + 2.3f) * 0.6f + sin(t * 1.13f) * 0.4f) * FLOAT_PITCH * FastMath.DEG_TO_RAD
-    return Quaternion().fromAngles(pitch, yaw, 0f)
-}
 
 /**
  * The cinematic camera: a camera that watches the music.
@@ -334,9 +317,6 @@ class CinematicCamPlugin : CameraPlugin() {
         val shot = plan.shots[index]
 
         var pose = frame(shot, time)
-        if (application.performanceConfig.settings.cameraSettings.cinematicSettings.isHandheldFloat) {
-            pose = handheld(pose, time)
-        }
         blendFrom?.let { from ->
             blendElapsed += tpf
             val t = (blendElapsed / blendDuration).coerceIn(0.0, 1.0).toFloat()
@@ -741,9 +721,6 @@ class CinematicCamPlugin : CameraPlugin() {
             rotation = FramingSolver.aim(location, box.center, pose.fovY, aspect, composition.anchorX, composition.anchorY),
         )
     }
-
-    private fun handheld(pose: CameraPose, time: Double): CameraPose =
-        pose.copy(rotation = pose.rotation.mult(handheldSway(time)))
 
     /**
      * How much of the frame [shot]'s subject fills. Subjects sit in the middle of the frame: off to one side, the rest

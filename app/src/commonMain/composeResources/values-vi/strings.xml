@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Thư thả</string>
     <string name="settings_camera_cinematic_pacing_normal">Bình thường</string>
     <string name="settings_camera_cinematic_pacing_energetic">Sôi động</string>
-    <string name="settings_camera_cinematic_handheld">Auto-cam thông minh cầm tay</string>
-    <string name="settings_camera_cinematic_handheld_description">Các cảnh quay điện ảnh trôi nhẹ, như thể máy quay được cầm trên tay</string>
     <string name="history_empty">Lịch sử phát của bạn sẽ hiển thị ở đây.</string>
     <string name="clear_all">Xóa tất cả</string>
     <string name="history_file_missing_message">Tệp MIDI này không còn khả dụng.</string>

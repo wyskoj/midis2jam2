@@ -219,8 +219,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">आरामदायक</string>
     <string name="settings_camera_cinematic_pacing_normal">सामान्य</string>
     <string name="settings_camera_cinematic_pacing_energetic">ऊर्जावान</string>
-    <string name="settings_camera_cinematic_handheld">हाथ में पकड़ा स्मार्ट ऑटो-कैम</string>
-    <string name="settings_camera_cinematic_handheld_description">सिनेमैटिक शॉट्स को थोड़ा हिलने दें, जैसे कैमरा हाथ में पकड़ा हो</string>
     <string name="history_empty">आपका प्लेबैक इतिहास यहां दिखाई देगा।</string>
     <string name="clear_all">सब साफ करें</string>
     <string name="history_file_missing_message">यह MIDI फ़ाइल अब उपलब्ध नहीं है।</string>

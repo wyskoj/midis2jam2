@@ -236,8 +236,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Rolig</string>
     <string name="settings_camera_cinematic_pacing_normal">Normal</string>
     <string name="settings_camera_cinematic_pacing_energetic">Energisk</string>
-    <string name="settings_camera_cinematic_handheld">Håndholdt smart autokam</string>
-    <string name="settings_camera_cinematic_handheld_description">La filmatiske opptak drive litt, som om kameraet ble holdt</string>
     <string name="history_empty">Avspillingshistorikken din vises her.</string>
     <string name="clear_all">Tøm alt</string>
     <string name="history_file_missing_message">Denne MIDI-filen er ikke lenger tilgjengelig.</string>

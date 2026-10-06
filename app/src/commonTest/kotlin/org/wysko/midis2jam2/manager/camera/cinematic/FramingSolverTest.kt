@@ -218,28 +218,6 @@ class FramingSolverTest {
         assertTrue(underground.y > envelope.floorY, "The camera should be lifted above the floor")
     }
 
-    @Test
-    @Spec("camera.settings.cinematic-handheld")
-    fun `the handheld sway is a slow drift of a fraction of a degree`() {
-        var previous = handheldSway(0.0)
-        var largest = 0f
-        var moved = false
-        (1..2000).forEach { frame ->
-            val sway = handheldSway(frame / 60.0)
-            val angle = FastMath.acos(sway.getRotationColumn(2).dot(Vector3f.UNIT_Z).coerceIn(-1f, 1f))
-            largest = maxOf(largest, angle * FastMath.RAD_TO_DEG)
-            val step = FastMath.acos(
-                sway.getRotationColumn(2).dot(previous.getRotationColumn(2)).coerceIn(-1f, 1f)
-            ) * FastMath.RAD_TO_DEG
-            assertTrue(step < 0.05f, "The sway jumped $step degrees in one frame: a shake, not a drift")
-            if (step > 0f) moved = true
-            assertEquals(0f, sway.getRotationColumn(0).y, 1e-3f, "The sway should never roll the camera")
-            previous = sway
-        }
-        assertTrue(moved, "The handheld sway never moved")
-        assertTrue(largest < 0.5f, "The sway reached $largest degrees: enough to notice as a wobble")
-    }
-
     private companion object {
         const val FOV = 45f
         const val ASPECT = 16f / 9f

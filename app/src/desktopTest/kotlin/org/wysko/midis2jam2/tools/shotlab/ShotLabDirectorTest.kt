@@ -175,7 +175,7 @@ class ShotLabDirectorTest {
         length = 5.5, reason = "entrance: Entrance[1]", section = "Peak", size = "Medium", move = "Static",
         lens = "Normal", subjects = listOf(RatedSubject(1, "AltoSax", "Lead")),
         plannedYaw = 15f, plannedPitch = 8f, filmedYaw = 27f, filmedPitch = 8f, clearView = 0.9f,
-        framingEverything = false, fieldOfView = 45f, pacing = "Normal", handheld = true, previous = null,
+        framingEverything = false, fieldOfView = 45f, pacing = "Normal", previous = null,
         stars = 4, tags = listOf("Great"), comment = "",
     )
 

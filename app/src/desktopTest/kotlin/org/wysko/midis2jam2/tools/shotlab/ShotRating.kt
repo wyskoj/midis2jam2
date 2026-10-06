@@ -71,7 +71,6 @@ data class ShotRating(
     val framingEverything: Boolean,
     val fieldOfView: Float,
     val pacing: String,
-    val handheld: Boolean,
     val previous: PreviousShot?,
     val stars: Int,
     val tags: List<String>,

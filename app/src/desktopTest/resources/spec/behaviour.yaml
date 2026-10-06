@@ -415,10 +415,6 @@
   source: code
   platforms: [desktop, android]
   claim: "The Smart auto-cam pacing setting changes how quickly the Smart auto-cam cuts between shots"
-- id: camera.settings.cinematic-handheld
-  source: code
-  platforms: [desktop, android]
-  claim: "When Handheld smart auto-cam is on, the Smart auto-cam's shots drift very slightly, as if the camera were held"
 
 # ---------------------------------------------------- free camera speed modifiers (undocumented)
 - id: camera.freecam.speed.default

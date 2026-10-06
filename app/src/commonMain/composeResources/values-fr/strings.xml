@@ -219,8 +219,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Détendu</string>
     <string name="settings_camera_cinematic_pacing_normal">Normal</string>
     <string name="settings_camera_cinematic_pacing_energetic">Énergique</string>
-    <string name="settings_camera_cinematic_handheld">Caméra auto intelligente à l\'épaule</string>
-    <string name="settings_camera_cinematic_handheld_description">Les plans cinématiques bougent légèrement, comme si la caméra était tenue à la main</string>
     <string name="history_empty">Votre historique de lecture s&apos;affichera ici.</string>
     <string name="clear_all">Tout effacer</string>
     <string name="history_file_missing_message">Ce fichier MIDI n&apos;est plus disponible.</string>

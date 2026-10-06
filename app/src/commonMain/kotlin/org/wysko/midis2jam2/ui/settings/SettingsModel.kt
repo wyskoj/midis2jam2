@@ -179,7 +179,4 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
 
     fun setCinematicPacing(pacing: CinematicPacing) =
         camera { it.copy(cinematicSettings = it.cinematicSettings.copy(pacing = pacing)) }
-
-    fun setCinematicHandheldFloat(isHandheldFloat: Boolean) =
-        camera { it.copy(cinematicSettings = it.cinematicSettings.copy(isHandheldFloat = isHandheldFloat)) }
 }

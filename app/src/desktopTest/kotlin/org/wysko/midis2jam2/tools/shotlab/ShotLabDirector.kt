@@ -267,7 +267,6 @@ class ShotLabDirector(
             framingEverything = framing.usingFallback,
             fieldOfView = application.camera.fov,
             pacing = settings.cameraSettings.cinematicSettings.pacing.name,
-            handheld = settings.cameraSettings.cinematicSettings.isHandheldFloat,
             previous = previous,
             stars = 0,
             tags = emptyList(),

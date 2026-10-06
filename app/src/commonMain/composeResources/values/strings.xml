@@ -228,8 +228,6 @@
     <string name="settings_camera_cinematic_pacing_relaxed">Relaxed</string>
     <string name="settings_camera_cinematic_pacing_normal">Normal</string>
     <string name="settings_camera_cinematic_pacing_energetic">Energetic</string>
-    <string name="settings_camera_cinematic_handheld">Handheld smart auto-cam</string>
-    <string name="settings_camera_cinematic_handheld_description">Let cinematic shots drift slightly, as if the camera were held</string>
 
     <!-- Record -->
     <string name="tab_record">Record</string>
