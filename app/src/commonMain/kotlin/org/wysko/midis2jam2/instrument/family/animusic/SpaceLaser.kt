@@ -187,7 +187,10 @@ class SpaceLaser(context: PerformanceManager, eventList: List<MidiEvent>, type: 
                 if (startTime - time <= 1.seconds) { // Less than 1 second away from playing
                     val targetPos = angleCalculator.angleFromNote(
                         it.note,
-                        pitchBendModulationController.getPitchBendAtTick(it.start).toFloat()
+                        (
+                            pitchBendModulationController.getPitchBendAtTick(it.start) +
+                                pitchBendModulationController.getPortamentoOffsetAtTick(it.start, it.note.toInt())
+                            ).toFloat()
                     )
                     if (startTime - time >= delta) {
                         // Slowly inch our way to the target rotation

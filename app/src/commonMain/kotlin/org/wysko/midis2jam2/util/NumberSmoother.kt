@@ -17,7 +17,7 @@
 
 package org.wysko.midis2jam2.util
 
-import kotlin.math.abs
+import kotlin.math.exp
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -50,9 +50,9 @@ class NumberSmoother(initialValue: Float, smoothness: Double) {
         when (smoothness) {
             0.0 -> value = target.invoke()
             else -> with(target.invoke()) {
-                value += ((this - value) * delta.toDouble(SECONDS) * smoothness).toFloat().coerceIn(
-                    -abs(this - value)..abs(this - value) // Prevent the change from overshooting
-                )
+                // Exponential approach: the same result however the elapsed time is split into frames, and it can
+                // never overshoot the target.
+                value += (this - value) * (1.0 - exp(-smoothness * delta.toDouble(SECONDS))).toFloat()
             }
         }
         return value
