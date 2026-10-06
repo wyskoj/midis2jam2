@@ -620,8 +620,11 @@ class CinematicCameraTest {
         const val STAGED_FROM = 0
         const val STAGED_TO = 1
 
-        /** The fastest a glide may turn the camera, in degrees per second. */
-        const val MAX_GLIDE_RATE = 40f
+        /**
+         * The fastest a glide may turn the camera, in degrees per second. The peak depends on how far apart the two
+         * players are, and measures from 25 to 42 on different machines; a whip pan is allowed [MAX_WHIP_RATE].
+         */
+        const val MAX_GLIDE_RATE = 60f
 
         /** The fastest a whip pan may turn the camera, in degrees per second. */
         const val MAX_WHIP_RATE = 150f
