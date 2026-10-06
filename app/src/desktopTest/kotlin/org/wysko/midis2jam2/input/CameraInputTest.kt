@@ -348,8 +348,8 @@ class CameraInputTest {
         )
         mapOf(
             AutoCamMode.Smart to CinematicCamPlugin::class.java,
-            AutoCamMode.Classic to StandardAutoCamPlugin::class.java,
-            AutoCamMode.Legacy to ClassicAutoCamPlugin::class.java,
+            AutoCamMode.Classic to ClassicAutoCamPlugin::class.java,
+            AutoCamMode.Legacy to StandardAutoCamPlugin::class.java,
         ).forEach { (mode, expected) ->
             val settings = AppSettings().withCamera { copy(autoCamMode = mode, isSmoothFreecam = false) }
 

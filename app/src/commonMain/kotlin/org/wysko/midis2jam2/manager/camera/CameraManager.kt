@@ -41,8 +41,8 @@ abstract class CameraManager : BaseManager(), ActionListener {
         super.initialize(app)
         autoCamPlugin = when (app.performanceConfig.settings.cameraSettings.autoCamMode) {
             AutoCamMode.Smart -> CinematicCamPlugin()
-            AutoCamMode.Classic -> StandardAutoCamPlugin()
-            AutoCamMode.Legacy -> ClassicAutoCamPlugin()
+            AutoCamMode.Classic -> ClassicAutoCamPlugin()
+            AutoCamMode.Legacy -> StandardAutoCamPlugin()
         }
         cameraPlugins = listOf(getDeviceCameraPlugin(), autoCamPlugin, RotatingCameraPlugin())
         app.stateManager.attachAll(cameraPlugins)

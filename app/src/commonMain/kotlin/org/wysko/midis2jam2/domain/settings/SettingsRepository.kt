@@ -110,7 +110,7 @@ internal object AppSettingsCodec {
 
     /**
      * Version 2 replaced the "classic auto-cam" switch with a choice of auto-cam. The camera that switch turned on is
-     * now the Legacy one; anyone who left it off gets the new default.
+     * now the Classic one; anyone who left it off gets the new default.
      */
     private fun toVersion2(document: JsonObject): JsonObject {
         val camera = document["cameraSettings"] as? JsonObject
@@ -123,7 +123,7 @@ internal object AppSettingsCodec {
                     "cameraSettings",
                     JsonObject(
                         camera - "isClassicAutoCam" +
-                            if (wasClassic) mapOf("autoCamMode" to JsonPrimitive("Legacy")) else emptyMap()
+                            if (wasClassic) mapOf("autoCamMode" to JsonPrimitive("Classic")) else emptyMap()
                     ),
                 )
             }

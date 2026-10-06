@@ -238,7 +238,7 @@
 - id: camera.settings.autocam-mode
   source: code
   platforms: [desktop, android]
-  claim: "The Auto-cam mode setting chooses the auto-cam: Smart films the music like a concert film, Classic moves between angles of the instruments on stage, and Legacy uses MIDIJam's movement style"
+  claim: "The Auto-cam mode setting chooses the auto-cam: Smart films the music like a concert film, Classic uses MIDIJam's movement style, and Legacy moves between angles of the instruments on stage"
 - id: camera.settings.smooth-freecam
   source: features/camera.md
   platforms: [desktop, android]

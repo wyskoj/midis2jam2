@@ -227,8 +227,8 @@ class AppSettingsSerializationTest {
         assertEquals(false, loaded.onScreenElementsSettings.isShowHeadsUpDisplay)
         assertEquals(true, loaded.cameraSettings.isStartAutocamWithSong)
         assertEquals(false, loaded.cameraSettings.isSmoothFreecam)
-        // The classic auto-cam switch became the Legacy auto-cam.
-        assertEquals(AutoCamMode.Legacy, loaded.cameraSettings.autoCamMode)
+        // The classic auto-cam switch became the Classic auto-cam.
+        assertEquals(AutoCamMode.Classic, loaded.cameraSettings.autoCamMode)
         assertEquals(70f, loaded.cameraSettings.defaultFieldOfView)
         assertEquals(true, loaded.instrumentSettings.isAlwaysShowInstruments)
     }

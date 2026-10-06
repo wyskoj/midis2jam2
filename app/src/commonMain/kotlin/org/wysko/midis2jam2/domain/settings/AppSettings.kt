@@ -166,10 +166,10 @@ data class AppSettings(
             /** Watches the music, and cuts between shots of whoever is most worth watching. */
             Smart,
 
-            /** Moves between angles of whichever instruments are on stage. */
+            /** Simulates the auto-cam from MIDIJam. */
             Classic,
 
-            /** Simulates the auto-cam from MIDIJam. */
+            /** Moves between angles of whichever instruments are on stage. */
             Legacy,
         }
 
