@@ -23,6 +23,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettingsCodec
 import org.wysko.midis2jam2.domain.settings.PreferenceBackedSettingsRepository
 import java.util.Properties
 import kotlin.test.Test
@@ -86,6 +87,7 @@ class SettingsRepositoryTest {
         val loaded = PreferenceBackedSettingsRepository(store).appSettings.value
 
         assertEquals("fr", loaded.generalSettings.locale)
-        assertEquals(1, loaded.version)
+        // Migrated, so it is stamped with the current version.
+        assertEquals(AppSettingsCodec.CURRENT_VERSION, loaded.version)
     }
 }

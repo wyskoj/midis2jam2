@@ -176,8 +176,10 @@
     <string name="settings_camera_description">ऑटो-कैम, क्लासिक कैमरा</string>
     <string name="settings_camera_start_autocam_with_song">गाने के साथ ऑटो-कैम शुरू करें</string>
     <string name="settings_camera_start_autocam_with_song_description">जब गाना शुरू होता है, तो स्वचालित रूप से ऑटो-कैम पर स्विच करें</string>
-    <string name="settings_camera_classic_autocam">क्लासिक ऑटो-कैम</string>
-    <string name="settings_camera_classic_autocam_description">MIDIJam से ऑटो-कैम गति का अनुकरण करें</string>
+    <string name="settings_camera_autocam_mode">ऑटो-कैम मोड</string>
+    <string name="settings_camera_autocam_mode_cinematic">सिनेमाई</string>
+    <string name="settings_camera_autocam_mode_classic">क्लासिक</string>
+    <string name="settings_camera_autocam_mode_legacy">पुराना</string>
     <string name="settings_camera_smooth_freecam">स्मूद फ्रीकैम</string>
     <string name="settings_camera_smooth_freecam_description">फ्रीकैम गति को चिकना बनाएं</string>
 
@@ -213,6 +215,10 @@
     <string name="settings_camera_field_of_view_title">दृश्य क्षेत्र</string>
     <string name="settings_camera_field_of_view_label_prefix">कैमरा कितना चौड़ा देखता है, बदलें</string>
     <string name="settings_camera_field_of_view_degrees">%1$d डिग्री</string>
+    <string name="settings_camera_cinematic_pacing">सिनेमाई ऑटो-कैम की गति</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">आरामदायक</string>
+    <string name="settings_camera_cinematic_pacing_normal">सामान्य</string>
+    <string name="settings_camera_cinematic_pacing_energetic">ऊर्जावान</string>
     <string name="history_empty">आपका प्लेबैक इतिहास यहां दिखाई देगा।</string>
     <string name="clear_all">सब साफ करें</string>
     <string name="history_file_missing_message">यह MIDI फ़ाइल अब उपलब्ध नहीं है।</string>

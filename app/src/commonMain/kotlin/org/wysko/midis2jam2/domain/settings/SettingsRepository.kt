@@ -25,6 +25,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.intOrNull
 import org.wysko.midis2jam2.util.logger
 
 /** Where the user's settings are kept, and how they are changed. */
@@ -83,7 +86,7 @@ class PreferenceBackedSettingsRepository(private val settings: Settings) : Setti
 internal object AppSettingsCodec {
 
     /** The [AppSettings.version] written by this build. */
-    const val CURRENT_VERSION = 1
+    const val CURRENT_VERSION = 2
 
     private val json = Json {
         encodeDefaults = true
@@ -100,5 +103,31 @@ internal object AppSettingsCodec {
      * Brings a stored document up to [CURRENT_VERSION]. Documents that predate the version field count as
      * version 1. Future format changes add a step here for each version they leave behind.
      */
-    private fun migrate(document: JsonObject): JsonObject = document
+    private fun migrate(document: JsonObject): JsonObject {
+        val version = (document["version"] as? JsonPrimitive)?.intOrNull ?: 1
+        return if (version < 2) toVersion2(document) else document
+    }
+
+    /**
+     * Version 2 replaced the "classic auto-cam" switch with a choice of auto-cam. The camera that switch turned on is
+     * now the Classic one; anyone who left it off gets the new default.
+     */
+    private fun toVersion2(document: JsonObject): JsonObject {
+        val camera = document["cameraSettings"] as? JsonObject
+        val wasClassic = (camera?.get("isClassicAutoCam") as? JsonPrimitive)?.booleanOrNull == true
+        val migrated = buildMap {
+            putAll(document)
+            put("version", JsonPrimitive(2))
+            if (camera != null) {
+                put(
+                    "cameraSettings",
+                    JsonObject(
+                        camera - "isClassicAutoCam" +
+                            if (wasClassic) mapOf("autoCamMode" to JsonPrimitive("Classic")) else emptyMap()
+                    ),
+                )
+            }
+        }
+        return JsonObject(migrated)
+    }
 }

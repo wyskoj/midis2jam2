@@ -193,8 +193,10 @@
     <string name="settings_camera_description">ออโต้แคม, กล้องคลาสสิก</string>
     <string name="settings_camera_start_autocam_with_song">เริ่มออโต้แคมพร้อมเพลง</string>
     <string name="settings_camera_start_autocam_with_song_description">เมื่อเพลงเริ่มต้น ให้เปลี่ยนไปใช้ออโต้แคมโดยอัตโนมัติ</string>
-    <string name="settings_camera_classic_autocam">ออโต้แคมคลาสสิก</string>
-    <string name="settings_camera_classic_autocam_description">จำลองการเคลื่อนไหวออโต้แคมจาก MIDIJam</string>
+    <string name="settings_camera_autocam_mode">โหมดออโต้แคม</string>
+    <string name="settings_camera_autocam_mode_cinematic">ซีเนมาติก</string>
+    <string name="settings_camera_autocam_mode_classic">คลาสสิก</string>
+    <string name="settings_camera_autocam_mode_legacy">แบบเดิม</string>
     <string name="settings_camera_smooth_freecam">ฟรีแคมแบบเรียบ</string>
     <string name="settings_camera_smooth_freecam_description">ทำให้การเคลื่อนไหวฟรีแคมเรียบเนียนขึ้น</string>
 
@@ -230,6 +232,10 @@
     <string name="settings_camera_field_of_view_title">มุมมองภาพ</string>
     <string name="settings_camera_field_of_view_label_prefix">เปลี่ยนความกว้างที่กล้องมองเห็น</string>
     <string name="settings_camera_field_of_view_degrees">%1$d องศา</string>
+    <string name="settings_camera_cinematic_pacing">จังหวะออโต้แคมซีเนมาติก</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">ผ่อนคลาย</string>
+    <string name="settings_camera_cinematic_pacing_normal">ปกติ</string>
+    <string name="settings_camera_cinematic_pacing_energetic">กระฉับกระเฉง</string>
     <string name="history_empty">ประวัติการเล่นของคุณจะแสดงที่นี่</string>
     <string name="clear_all">ล้างทั้งหมด</string>
     <string name="history_file_missing_message">ไฟล์ MIDI นี้ไม่พร้อมใช้งานอีกต่อไป</string>

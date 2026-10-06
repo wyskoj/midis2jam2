@@ -176,8 +176,10 @@
     <string name="settings_camera_description">Caméra auto, caméra classique</string>
     <string name="settings_camera_start_autocam_with_song">Démarrer la caméra auto avec la chanson</string>
     <string name="settings_camera_start_autocam_with_song_description">Au début de la chanson, passer automatiquement en mode caméra auto</string>
-    <string name="settings_camera_classic_autocam">Caméra auto classique</string>
-    <string name="settings_camera_classic_autocam_description">Simuler le mouvement de la caméra auto de MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Mode de la caméra auto</string>
+    <string name="settings_camera_autocam_mode_cinematic">Cinématographique</string>
+    <string name="settings_camera_autocam_mode_classic">Classique</string>
+    <string name="settings_camera_autocam_mode_legacy">Ancien</string>
     <string name="settings_camera_smooth_freecam">Caméra libre fluide</string>
     <string name="settings_camera_smooth_freecam_description">Rendre le mouvement de la caméra libre plus fluide</string>
 
@@ -213,6 +215,10 @@
     <string name="settings_camera_field_of_view_title">Champ de vision</string>
     <string name="settings_camera_field_of_view_label_prefix">Modifier la largeur de la vision de la caméra</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrés</string>
+    <string name="settings_camera_cinematic_pacing">Rythme de la caméra auto cinématographique</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Détendu</string>
+    <string name="settings_camera_cinematic_pacing_normal">Normal</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Énergique</string>
     <string name="history_empty">Votre historique de lecture s&apos;affichera ici.</string>
     <string name="clear_all">Tout effacer</string>
     <string name="history_file_missing_message">Ce fichier MIDI n&apos;est plus disponible.</string>

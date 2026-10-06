@@ -21,9 +21,13 @@ import org.wysko.midis2jam2.testing.withCamera
 import com.jme3.input.KeyInput
 import com.jme3.math.Vector3f
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
 import org.wysko.midis2jam2.manager.camera.CameraAngleCategory
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.CameraStateListener
+import org.wysko.midis2jam2.manager.camera.ClassicAutoCamPlugin
+import org.wysko.midis2jam2.manager.camera.StandardAutoCamPlugin
+import org.wysko.midis2jam2.manager.camera.cinematic.CinematicCamPlugin
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.InputHarness
 import org.wysko.midis2jam2.testing.MidiFixtures
@@ -171,6 +175,52 @@ class CameraInputTest {
     }
 
     @Test
+    @Spec("camera.cinematic.repeat-press-rerolls")
+    fun `pressing the smart auto-cam key again films a different edit`() {
+        withLongSong { performance, input ->
+            input.tap(KeyInput.KEY_0)
+            input.frames(SETTLE_FRAMES)
+            val first = performance.onEngineThread { cinematicCamera(performance).plan }
+            assertNotNull(first, "The smart auto-cam should have planned an edit once it took over")
+
+            input.tap(KeyInput.KEY_0)
+            input.frames(SETTLE_FRAMES)
+            val second = assertNotNull(performance.onEngineThread { cinematicCamera(performance).plan })
+
+            assertTrue(second.seed != first.seed, "Pressing 0 again should plan with a new seed")
+            assertTrue(second.shots != first.shots, "Pressing 0 again should film a different edit")
+            assertTrue(
+                performance.onEngineThread { cinematicCamera(performance).isEnabled },
+                "Pressing 0 again should keep the smart auto-cam in control"
+            )
+            performance.throwIfEngineFailed()
+        }
+    }
+
+    @Test
+    @Spec("camera.cinematic.restores-fov")
+    fun `leaving the smart auto-cam restores the chosen field of view`() {
+        withCamera { performance, input ->
+            input.tap(KeyInput.KEY_0)
+            input.frames(SETTLE_FRAMES)
+
+            // Stand in for a long-lens shot: the smart auto-cam owns the lens while it films.
+            performance.onEngineThread { performance.app.camera.fov = 20f }
+
+            // The slide camera never sets the field of view itself, so it shows whatever it inherits.
+            input.tap(KeyInput.KEY_9)
+            input.frames(SETTLE_FRAMES)
+
+            assertEquals(
+                AppSettings().cameraSettings.defaultFieldOfView,
+                input.cameraPose().fieldOfView,
+                FOV_TOLERANCE,
+                "Leaving the smart auto-cam should restore the field of view from settings"
+            )
+        }
+    }
+
+    @Test
     @Spec("camera.autocam.repeat-press-advances")
     fun `pressing the auto-cam key again moves it somewhere else`() {
         withCamera { performance, input ->
@@ -289,26 +339,48 @@ class CameraInputTest {
     }
 
     @Test
-    @Spec("camera.settings.classic-autocam")
-    fun `the classic auto-cam can be selected`() {
-        val classic = AppSettings()
-            .withCamera { copy(isClassicAutoCam = true, isSmoothFreecam = false) }
+    @Spec("camera.settings.autocam-mode")
+    fun `the auto-cam mode setting chooses which camera key 0 turns on`() {
+        val autoCams = listOf(
+            CinematicCamPlugin::class.java,
+            StandardAutoCamPlugin::class.java,
+            ClassicAutoCamPlugin::class.java,
+        )
+        mapOf(
+            AutoCamMode.Smart to CinematicCamPlugin::class.java,
+            AutoCamMode.Classic to ClassicAutoCamPlugin::class.java,
+            AutoCamMode.Legacy to StandardAutoCamPlugin::class.java,
+        ).forEach { (mode, expected) ->
+            val settings = AppSettings().withCamera { copy(autoCamMode = mode, isSmoothFreecam = false) }
 
-        HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = classic).use { performance ->
-            val input = InputHarness(performance)
-            input.frames(SETTLE_FRAMES)
+            HeadlessPerformance.start(MidiFixtures.theWholeBand(), settings = settings).use { performance ->
+                val input = InputHarness(performance)
+                input.frames(SETTLE_FRAMES)
 
-            val observed = RecordingCameraStateListener()
-            performance.onEngineThread {
-                performance.app.stateManager.getState(CameraManager::class.java)
-                    ?.registerCameraStateListener(observed)
+                val observed = RecordingCameraStateListener()
+                performance.onEngineThread {
+                    performance.app.stateManager.getState(CameraManager::class.java)
+                        ?.registerCameraStateListener(observed)
+                }
+
+                input.tap(KeyInput.KEY_0)
+                input.frames(SETTLE_FRAMES)
+
+                assertTrue(observed.autoCamera > 0, "Key 0 did not activate the $mode auto-cam")
+                val attached = performance.onEngineThread {
+                    autoCams.mapNotNull { performance.app.stateManager.getState(it) }
+                }
+                assertEquals(
+                    listOf<Class<*>>(expected),
+                    attached.map { it.javaClass },
+                    "With the $mode auto-cam chosen, it should be the only auto-cam on hand"
+                )
+                assertTrue(
+                    performance.onEngineThread { attached.single().isEnabled },
+                    "Key 0 reported the $mode auto-cam, but it isn't the one in control"
+                )
+                performance.throwIfEngineFailed()
             }
-
-            input.tap(KeyInput.KEY_0)
-            input.frames(SETTLE_FRAMES)
-
-            assertTrue(observed.autoCamera > 0, "The classic auto-cam could not be activated")
-            performance.throwIfEngineFailed()
         }
     }
 
@@ -416,6 +488,10 @@ class CameraInputTest {
                     block(performance, input)
                 }
         }
+
+        /** The smart auto-cam. Call on the engine thread. */
+        fun cinematicCamera(performance: HeadlessPerformance): CinematicCamPlugin =
+            assertNotNull(performance.app.stateManager.getState(CinematicCamPlugin::class.java))
 
         fun cameraKeyFor(category: Int): Int = when (category) {
             1 -> KeyInput.KEY_1

@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Автокамера, классическая камера</string>
     <string name="settings_camera_start_autocam_with_song">Запускать авто-камеру с песней</string>
     <string name="settings_camera_start_autocam_with_song_description">При начале песни автоматически переключаться на авто-камеру</string>
-    <string name="settings_camera_classic_autocam">Классическая авто-камера</string>
-    <string name="settings_camera_classic_autocam_description">Имитировать движение авто-камеры из MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Режим авто-камеры</string>
+    <string name="settings_camera_autocam_mode_cinematic">Кинематографичный</string>
+    <string name="settings_camera_autocam_mode_classic">Классический</string>
+    <string name="settings_camera_autocam_mode_legacy">Старый</string>
     <string name="settings_camera_smooth_freecam">Плавная свободная камера</string>
     <string name="settings_camera_smooth_freecam_description">Сделать движение свободной камеры более плавным</string>
 
@@ -230,6 +232,10 @@
     <string name="settings_camera_field_of_view_title">Угол обзора</string>
     <string name="settings_camera_field_of_view_label_prefix">Изменить ширину обзора камеры</string>
     <string name="settings_camera_field_of_view_degrees">%1$d°</string>
+    <string name="settings_camera_cinematic_pacing">Темп кинематографичной авто-камеры</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Спокойный</string>
+    <string name="settings_camera_cinematic_pacing_normal">Обычный</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Энергичный</string>
     <string name="history_empty">Здесь будет отображаться история воспроизведения.</string>
     <string name="clear_all">Очистить всё</string>
     <string name="history_file_missing_message">Этот MIDI-файл больше недоступен.</string>

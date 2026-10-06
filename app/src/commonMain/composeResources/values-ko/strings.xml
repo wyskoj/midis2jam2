@@ -193,8 +193,10 @@
     <string name="settings_camera_description">자동 카메라, 클래식 카메라</string>
     <string name="settings_camera_start_autocam_with_song">노래 시작 시 자동 카메라 시작</string>
     <string name="settings_camera_start_autocam_with_song_description">노래가 시작되면 자동으로 자동 카메라로 전환</string>
-    <string name="settings_camera_classic_autocam">클래식 자동 카메라</string>
-    <string name="settings_camera_classic_autocam_description">MIDIJam의 자동 카메라 움직임 시뮬레이션</string>
+    <string name="settings_camera_autocam_mode">자동 카메라 모드</string>
+    <string name="settings_camera_autocam_mode_cinematic">시네마틱</string>
+    <string name="settings_camera_autocam_mode_classic">클래식</string>
+    <string name="settings_camera_autocam_mode_legacy">레거시</string>
     <string name="settings_camera_smooth_freecam">부드러운 자유 시점 카메라</string>
     <string name="settings_camera_smooth_freecam_description">자유 시점 카메라 이동을 더 부드럽게</string>
 
@@ -230,6 +232,10 @@
     <string name="settings_camera_field_of_view_title">시야각</string>
     <string name="settings_camera_field_of_view_label_prefix">카메라 시야의 너비 변경</string>
     <string name="settings_camera_field_of_view_degrees">%1$d도</string>
+    <string name="settings_camera_cinematic_pacing">시네마틱 자동 카메라 속도</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">느긋하게</string>
+    <string name="settings_camera_cinematic_pacing_normal">보통</string>
+    <string name="settings_camera_cinematic_pacing_energetic">역동적으로</string>
     <string name="history_empty">재생 기록이 여기에 표시됩니다.</string>
     <string name="clear_all">모두 지우기</string>
     <string name="history_file_missing_message">이 MIDI 파일은 더 이상 사용할 수 없습니다.</string>

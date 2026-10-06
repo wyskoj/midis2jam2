@@ -157,9 +157,48 @@ data class AppSettings(
     data class CameraSettings(
         val isStartAutocamWithSong: Boolean = false,
         val isSmoothFreecam: Boolean = true,
-        val isClassicAutoCam: Boolean = false,
+        val autoCamMode: AutoCamMode = AutoCamMode.Smart,
         val defaultFieldOfView: Float = 45f,
-    )
+        val cinematicSettings: CinematicSettings = CinematicSettings(),
+    ) {
+        /** Which camera takes over when the auto-cam is switched on. */
+        enum class AutoCamMode {
+            /** Watches the music, and cuts between shots of whoever is most worth watching. */
+            Smart,
+
+            /** Simulates the auto-cam from MIDIJam. */
+            Classic,
+
+            /** Moves between angles of whichever instruments are on stage. */
+            Legacy,
+        }
+
+        /**
+         * How the smart auto-cam films a performance.
+         *
+         * @property pacing How quickly it cuts between shots.
+         */
+        @Serializable
+        data class CinematicSettings(
+            val pacing: CinematicPacing = CinematicPacing.Normal,
+        ) {
+            /**
+             * How quickly the cinematic camera cuts.
+             *
+             * @property shotLengthScale How long shots last, as a multiple of normal.
+             */
+            enum class CinematicPacing(val shotLengthScale: Float) {
+                /** Long, slow shots. */
+                Relaxed(1.5f),
+
+                /** Shots paced to the music. */
+                Normal(1f),
+
+                /** Quick cutting, like a music video. */
+                Energetic(0.65f),
+            }
+        }
+    }
 
     @Serializable
     data class InstrumentSettings(

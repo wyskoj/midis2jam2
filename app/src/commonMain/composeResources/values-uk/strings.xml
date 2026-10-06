@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Автокамера, класична камера</string>
     <string name="settings_camera_start_autocam_with_song">Починати з автокамери</string>
     <string name="settings_camera_start_autocam_with_song_description">Після початку пісні автоматично перемикатися на автокамеру</string>
-    <string name="settings_camera_classic_autocam">Класична автокамера</string>
-    <string name="settings_camera_classic_autocam_description">Імітувати рух автокамери з MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Режим автокамери</string>
+    <string name="settings_camera_autocam_mode_cinematic">Кінематографічний</string>
+    <string name="settings_camera_autocam_mode_classic">Класичний</string>
+    <string name="settings_camera_autocam_mode_legacy">Старий</string>
     <string name="settings_camera_smooth_freecam">Плавна вільна камера</string>
     <string name="settings_camera_smooth_freecam_description">Зробити рух вільної камери плавнішим</string>
 
@@ -230,6 +232,10 @@
     <string name="settings_camera_field_of_view_title">Кут огляду</string>
     <string name="settings_camera_field_of_view_label_prefix">Змінити, наскільки широко бачить камера</string>
     <string name="settings_camera_field_of_view_degrees">%1$d°</string>
+    <string name="settings_camera_cinematic_pacing">Темп кінематографічної автокамери</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Спокійний</string>
+    <string name="settings_camera_cinematic_pacing_normal">Звичайний</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Енергійний</string>
     <string name="history_empty">Тут відображатиметься ваша історія відтворення.</string>
     <string name="clear_all">Очистити все</string>
     <string name="history_file_missing_message">Цей MIDI-файл більше недоступний.</string>

@@ -193,8 +193,10 @@
     <string name="settings_camera_description">自动镜头、经典相机</string>
     <string name="settings_camera_start_autocam_with_song">随歌曲启动自动镜头</string>
     <string name="settings_camera_start_autocam_with_song_description">歌曲开始时自动切换到自动镜头</string>
-    <string name="settings_camera_classic_autocam">经典自动镜头</string>
-    <string name="settings_camera_classic_autocam_description">模拟 MIDIJam 中的自动镜头运动</string>
+    <string name="settings_camera_autocam_mode">自动镜头模式</string>
+    <string name="settings_camera_autocam_mode_cinematic">电影式</string>
+    <string name="settings_camera_autocam_mode_classic">经典</string>
+    <string name="settings_camera_autocam_mode_legacy">旧版</string>
     <string name="settings_camera_smooth_freecam">平滑自由视角</string>
     <string name="settings_camera_smooth_freecam_description">使自由视角运动更平滑</string>
 
@@ -230,6 +232,10 @@
     <string name="settings_camera_field_of_view_title">视场</string>
     <string name="settings_camera_field_of_view_label_prefix">更改摄像机视野宽度</string>
     <string name="settings_camera_field_of_view_degrees">%1$d 度</string>
+    <string name="settings_camera_cinematic_pacing">电影式自动镜头节奏</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">舒缓</string>
+    <string name="settings_camera_cinematic_pacing_normal">正常</string>
+    <string name="settings_camera_cinematic_pacing_energetic">活力</string>
     <string name="history_empty">你的播放历史将显示在这里。</string>
     <string name="clear_all">全部清除</string>
     <string name="history_file_missing_message">此 MIDI 文件已不可用。</string>

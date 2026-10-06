@@ -193,8 +193,10 @@
     <string name="settings_camera_description">Auto-cam, classic camera</string>
     <string name="settings_camera_start_autocam_with_song">Simulan ang auto-cam kasama ng awit</string>
     <string name="settings_camera_start_autocam_with_song_description">Kapag nagsimula ang awit, awtomatikong lumipat sa auto-cam</string>
-    <string name="settings_camera_classic_autocam">Classic auto-cam</string>
-    <string name="settings_camera_classic_autocam_description">I-simulate ang paggalaw ng auto-cam mula sa MIDIJam</string>
+    <string name="settings_camera_autocam_mode">Mode ng auto-cam</string>
+    <string name="settings_camera_autocam_mode_cinematic">Cinematic</string>
+    <string name="settings_camera_autocam_mode_classic">Classic</string>
+    <string name="settings_camera_autocam_mode_legacy">Legacy</string>
     <string name="settings_camera_smooth_freecam">Smooth freecam</string>
     <string name="settings_camera_smooth_freecam_description">Gawing mas maayos ang paggalaw ng freecam</string>
 
@@ -230,6 +232,10 @@
     <string name="settings_camera_field_of_view_title">Field of view</string>
     <string name="settings_camera_field_of_view_label_prefix">Baguhin kung gaano kalapad ang nakikita ng camera</string>
     <string name="settings_camera_field_of_view_degrees">%1$d degrees</string>
+    <string name="settings_camera_cinematic_pacing">Bilis ng cinematic auto-cam</string>
+    <string name="settings_camera_cinematic_pacing_relaxed">Mabagal</string>
+    <string name="settings_camera_cinematic_pacing_normal">Karaniwan</string>
+    <string name="settings_camera_cinematic_pacing_energetic">Masigla</string>
     <string name="history_empty">Lalabas dito ang iyong history ng playback.</string>
     <string name="clear_all">I-clear lahat</string>
     <string name="history_file_missing_message">Hindi na available ang MIDI file na ito.</string>

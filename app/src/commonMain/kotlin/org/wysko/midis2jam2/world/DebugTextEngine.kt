@@ -30,6 +30,7 @@ import midis2jam2.app.generated.resources.build_version
 import midis2jam2.app.generated.resources.build_version_code
 import org.jetbrains.compose.resources.getString
 import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.manager.camera.cinematic.CinematicCamPlugin
 import org.wysko.midis2jam2.util.wrap
 
 internal expect fun getGlRendererInfo(): String
@@ -64,8 +65,14 @@ class DebugTextEngine(private val context: PerformanceManager) {
                 javaVirtualMachineInfo.get()
             ),
             "Settings" to listOf(context.config.toString().wrap(80)),
-        )
+        ) + cinematicSection()
         return sections.joinToString("\n\n") { "${it.first}:\n${it.second.joinToString("\n")}" }
+    }
+
+    /** What the cinematic camera is filming and why, while it has the camera. */
+    private fun cinematicSection(): List<Pair<String, List<String>>> {
+        val cinematic = context.app.stateManager.getState(CinematicCamPlugin::class.java)
+        return if (cinematic?.isEnabled == true) listOf("Camera" to listOf(cinematic.describe())) else emptyList()
     }
 
     private fun Deferred<String>.get() = if (this.isCompleted) this.getCompleted() else "Loading..."

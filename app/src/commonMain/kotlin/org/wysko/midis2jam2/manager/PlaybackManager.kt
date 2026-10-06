@@ -51,6 +51,11 @@ class PlaybackManager(
     var isPlaying: Boolean = true
 
     private var isSequencerStarted: Boolean = false
+    /**
+     * Whether the sequencer is still moving to a new position. The sequencer may say it has finished from another
+     * thread, or before [JwSequencer.setPosition] even returns, so this is set before asking it to move.
+     */
+    @Volatile
     private var isWaitingForSequencerSeek = false
     private var skippedFrames = 0
 
@@ -86,8 +91,8 @@ class PlaybackManager(
     private fun onLoop() {
         isSequencerStarted = false
         time = -INTRO
-        sequencer.setPosition(ZERO, false, ::onSequencerSetPositionFinished)
         isWaitingForSequencerSeek = true
+        sequencer.setPosition(ZERO, false, ::onSequencerSetPositionFinished)
         app.collectorsManager.seek(-INTRO)
         midiDeviceManager.sendResetMessage()
     }
@@ -97,8 +102,8 @@ class PlaybackManager(
         when {
             time > duration -> sequencer.stop()
             else -> {
-                sequencer.setPosition(time, isPlaying, ::onSequencerSetPositionFinished)
                 isWaitingForSequencerSeek = true
+                sequencer.setPosition(time, isPlaying, ::onSequencerSetPositionFinished)
             }
         }
         app.collectorsManager.seek(time)

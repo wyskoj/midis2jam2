@@ -22,6 +22,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
+import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.CinematicSettings.CinematicPacing
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
@@ -165,7 +167,7 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
 
     fun setSmoothFreecam(isSmoothFreecam: Boolean) = camera { it.copy(isSmoothFreecam = isSmoothFreecam) }
 
-    fun setClassicAutoCam(isClassicAutoCam: Boolean) = camera { it.copy(isClassicAutoCam = isClassicAutoCam) }
+    fun setAutoCamMode(autoCamMode: AutoCamMode) = camera { it.copy(autoCamMode = autoCamMode) }
 
     fun setAlwaysShowInstruments(isAlwaysShow: Boolean) = instrument { it.copy(isAlwaysShowInstruments = isAlwaysShow) }
 
@@ -174,4 +176,7 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
     fun setSmartDrumSticks(isSmartDrumSticks: Boolean) = instrument { it.copy(isSmartDrumSticks = isSmartDrumSticks) }
 
     fun setDefaultFieldOfView(defaultFieldOfView: Float) = camera { it.copy(defaultFieldOfView = defaultFieldOfView) }
+
+    fun setCinematicPacing(pacing: CinematicPacing) =
+        camera { it.copy(cinematicSettings = it.cinematicSettings.copy(pacing = pacing)) }
 }

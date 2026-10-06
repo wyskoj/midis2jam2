@@ -50,6 +50,9 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
     /** Which speed-modifier action is currently held/toggled on, or `null` for normal speed. */
     private var activeSpeedModifier: String? = null
 
+    /** Whether an angle key was pressed since the last update, so the target is that angle's. */
+    private var angleChosenThisFrame = false
+
     override fun initialize(app: Application?) {
         (app as SimpleApplication).flyByCamera.unregisterInput()
         dummyCamera = Camera(app.camera.width, app.camera.height).apply {
@@ -75,8 +78,13 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
     }
 
     override fun onEnable() {
-        dummyCamera.location = application.camera.location
-        dummyCamera.rotation = application.camera.rotation
+        // Pressing an angle key both picks the angle and hands over the camera, and which happens first is up to the
+        // order the input manager calls its listeners. If the angle came first, it is the target: keep it, rather
+        // than aiming for wherever the last camera left off.
+        if (!angleChosenThisFrame) {
+            dummyCamera.location = application.camera.location
+            dummyCamera.rotation = application.camera.rotation
+        }
         activeSpeedModifier = null
         dummyFlyByCamera.moveSpeed = DEFAULT_MOVE_SPEED
     }
@@ -84,6 +92,7 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
     override fun onDisable(): Unit = Unit
 
     override fun update(tpf: Float) {
+        angleChosenThisFrame = false
         when (movementType) {
             MovementType.Normal -> snapCamera()
             MovementType.Smooth -> {
@@ -117,6 +126,7 @@ class FreeCameraPlugin(val onCameraInput: () -> Unit = {}) : CameraPlugin(), Act
         }
 
         applyCameraAngle()
+        angleChosenThisFrame = true
     }
 
     /**

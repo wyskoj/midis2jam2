@@ -182,6 +182,25 @@ abstract class Instrument(
     }
 
     /**
+     * Runs [block] with the instrument posed where it comes to rest on stage while visible, rather than wherever it
+     * is sliding to or from this frame, then puts it back.
+     *
+     * Only the node transforms move; world transforms and bounds are not updated, so [block] must compose them from
+     * the nodes' local transforms.
+     */
+    fun <T> atRest(block: () -> T): T {
+        val current = index
+        index = findSimilar().filter { it === this || it.isVisible }.indexOf(this).coerceAtLeast(0).toDouble()
+        adjustForMultipleInstances(Duration.ZERO)
+        try {
+            return block()
+        } finally {
+            index = current
+            adjustForMultipleInstances(Duration.ZERO)
+        }
+    }
+
+    /**
      * Returns a list of instruments that are of the same type as this instrument.
      */
     protected open fun findSimilar(): List<Instrument> = context.instruments.filter { this::class.isInstance(it) }

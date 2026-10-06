@@ -253,6 +253,19 @@ tasks.named<Test>("desktopTest") {
     }
 }
 
+// Shot Lab: a tool for rating the cinematic camera's shots, one at a time. It isn't part of the app; it lives with
+// the desktop tests (tools/shotlab). Run with ./gradlew :app:shotLab, optionally -PshotLab="<files or folders;...>".
+tasks.register<JavaExec>("shotLab") {
+    group = "tools"
+    description = "Plays the cinematic camera's shots one at a time for rating."
+    val testCompilation = kotlin.jvm("desktop").compilations.getByName("test")
+    classpath = files(testCompilation.output.allOutputs, testCompilation.runtimeDependencyFiles)
+    mainClass.set("org.wysko.midis2jam2.tools.shotlab.ShotLabKt")
+    workingDir = rootDir
+    jvmArgs("--add-exports=java.desktop/com.sun.media.sound=ALL-UNNAMED")
+    providers.gradleProperty("shotLab").orNull?.let { args(it) }
+}
+
 compose.desktop {
     application {
         mainClass = "org.wysko.midis2jam2.MainKt"

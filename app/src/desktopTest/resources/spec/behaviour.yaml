@@ -235,10 +235,10 @@
   source: features/camera.md
   platforms: [desktop, android]
   claim: "When Start auto-cam with song is on, the auto-cam activates when a song starts playing"
-- id: camera.settings.classic-autocam
-  source: features/camera.md
+- id: camera.settings.autocam-mode
+  source: code
   platforms: [desktop, android]
-  claim: "When Classic auto-cam is on, the auto-cam uses the classic MIDIJam movement style"
+  claim: "The Auto-cam mode setting chooses the auto-cam: Smart films the music like a concert film, Classic uses MIDIJam's movement style, and Legacy moves between angles of the instruments on stage"
 - id: camera.settings.smooth-freecam
   source: features/camera.md
   platforms: [desktop, android]
@@ -253,6 +253,168 @@
   platforms: [android]
   claim: "On Android the Smooth freecam setting is always enabled"
   waived: "Android-only; no Android instrumentation suite yet."
+
+# ------------------------------------------------------------ cinematic camera (not yet in the docs)
+- id: camera.cinematic.repeat-press-rerolls
+  source: code
+  platforms: [desktop]
+  claim: "With the Cinematic auto-cam, pressing 0 again films the song with a different edit"
+- id: camera.cinematic.films-interesting-parts
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera films the instruments playing the most interesting parts, such as a soloist during their solo"
+- id: camera.cinematic.cuts-to-fills
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera cuts to the drummer as a fill builds, and cuts away a beat after the fill lands"
+- id: camera.cinematic.cuts-on-beat
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera cuts between shots on the beat"
+- id: camera.cinematic.no-jump-cuts
+  source: code
+  platforms: [desktop, android]
+  claim: "Two consecutive shots of the same instruments differ in size by at least two steps, or in angle by at least 30 degrees"
+- id: camera.cinematic.distinct-cuts
+  source: code
+  platforms: [desktop, android]
+  claim: "Every cut clearly changes the view: the camera turns at least 20 degrees or moves a good way"
+- id: camera.cinematic.motion-continuity
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera never cuts from a move into the same move going the other way"
+- id: camera.cinematic.unhurried-edit
+  source: code
+  platforms: [desktop, android]
+  claim: "Cinematic shots are held long enough to take in: at least three seconds each"
+- id: camera.cinematic.entrances-held
+  source: code
+  platforms: [desktop, android]
+  claim: "When a player comes in, the cinematic camera stays on them for at least five seconds"
+- id: camera.cinematic.no-wobble
+  source: code
+  platforms: [desktop, android]
+  claim: "A locked-off cinematic shot holds still while the instrument it films plays"
+- id: camera.cinematic.frames-visible-parts
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera frames the parts of an instrument that can be seen, not its hidden ones"
+- id: camera.cinematic.frames-resting-place
+  source: code
+  platforms: [desktop, android]
+  claim: "An instrument still sliding into its place on stage is framed where it will come to rest"
+- id: camera.cinematic.films-arrivals
+  source: code
+  platforms: [desktop, android]
+  claim: "When several players come in at once, the camera films them together"
+- id: camera.cinematic.ignores-echoes
+  source: code
+  platforms: [desktop, android]
+  claim: "A part that only echoes another (the same notes, a moment later) is never featured as a second player"
+- id: camera.cinematic.frames-what-shows
+  source: code
+  platforms: [desktop, android]
+  claim: "The camera frames a space laser by its emitter, not its beams, and an ensemble behind the stage by what rises above the back wall"
+- id: camera.cinematic.fits-instrument
+  source: code
+  platforms: [desktop, android]
+  claim: "An instrument standing at an angle is framed with a box turned to fit it, not one squared to the world"
+- id: camera.cinematic.preferred-views
+  source: code
+  platforms: [desktop, android]
+  claim: "Each instrument is filmed from around the direction that shows it best, such as a keyboard from above"
+- id: camera.cinematic.holds-framing
+  source: code
+  platforms: [desktop, android]
+  claim: "What a cinematic shot frames is settled when it begins: the camera doesn't chase an instrument that slides aside"
+- id: camera.cinematic.centered-subject
+  source: code
+  platforms: [desktop, android]
+  claim: "The instrument a cinematic shot is about sits in the middle of the frame"
+- id: camera.cinematic.subject-stays-put
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera never films an instrument alone while it is about to shift along the stage"
+- id: camera.cinematic.intercut-solos
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera never cuts from an instrument straight back to the same instrument; a long solo is intercut"
+- id: camera.cinematic.dolly-zooms
+  source: code
+  platforms: [desktop, android]
+  claim: "Dolly zooms are saved for a song's biggest moments: a few at most, well apart"
+- id: camera.cinematic.whip-pans
+  source: code
+  platforms: [desktop, android]
+  claim: "Now and then the camera whips smoothly from one player to the next instead of cutting"
+- id: camera.cinematic.whip-held
+  source: code
+  platforms: [desktop, android]
+  claim: "The camera stays on the player it whips to for a few seconds, and only whips to a player who holds the shot"
+- id: camera.cinematic.glides
+  source: code
+  platforms: [desktop, android]
+  claim: "The camera sometimes glides gently from one player to another, usually as the newcomer comes in, passing through a view with both in frame"
+- id: camera.cinematic.debug-subject-box
+  source: code
+  platforms: [desktop]
+  claim: "With the debug view open, a box shows what the cinematic camera is framing"
+- id: camera.cinematic.only-on-stage
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera only films instruments that stay on stage for the whole shot"
+- id: camera.cinematic.opens-and-closes-wide
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera opens on a wide shot and closes on a wide shot of the whole stage"
+- id: camera.cinematic.opens-on-band
+  source: code
+  platforms: [desktop, android]
+  claim: "A song that starts at full tilt opens on the band playing; one that eases in opens on the stage"
+- id: camera.cinematic.no-same-size-recut
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera never cuts between two shots of the same instrument at the same size"
+- id: camera.cinematic.follows-interest
+  source: code
+  platforms: [desktop, android]
+  claim: "A shot of one player ends once they stop playing, fade, or (unless they are soloing) fall behind someone else on stage"
+- id: camera.cinematic.worthy-entrances
+  source: code
+  platforms: [desktop, android]
+  claim: "Only a newcomer who plays a real part is given an entrance shot"
+- id: camera.cinematic.never-below-subject
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera never drops below the bottom of what it films"
+- id: camera.cinematic.frames-subject
+  source: code
+  platforms: [desktop, android]
+  claim: "The instrument a cinematic shot is about appears in frame"
+- id: camera.cinematic.steady-moves
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera moves slowly and steadily during a shot, never whipping round"
+- id: camera.cinematic.moving-at-cut
+  source: code
+  platforms: [desktop, android]
+  claim: "A cinematic shot with a camera move is already moving when the camera cuts to it"
+- id: camera.cinematic.stays-audience-side
+  source: code
+  platforms: [desktop, android]
+  claim: "The cinematic camera stays on the audience side of the stage"
+- id: camera.cinematic.deterministic-per-song
+  source: code
+  platforms: [desktop, android]
+  claim: "The same song is filmed with the same edit every time"
+- id: camera.cinematic.restores-fov
+  source: code
+  platforms: [desktop, android]
+  claim: "Leaving the Cinematic auto-cam restores the field of view chosen in settings"
+- id: camera.settings.cinematic-pacing
+  source: code
+  platforms: [desktop, android]
+  claim: "The Cinematic auto-cam pacing setting changes how quickly the Cinematic auto-cam cuts between shots"
 
 # ---------------------------------------------------- free camera speed modifiers (undocumented)
 - id: camera.freecam.speed.default
@@ -428,6 +590,10 @@
   source: features/playback.md
   platforms: [desktop]
   claim: "The right arrow key seeks forward by 10 seconds"
+- id: playback.seek.resumes
+  source: code
+  platforms: [desktop, android]
+  claim: "After a seek, playback carries on from where it landed"
 - id: playback.play-pause
   source: features/playback.md
   platforms: [desktop]
