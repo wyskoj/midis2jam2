@@ -50,12 +50,14 @@ import kotlin.time.DurationUnit.SECONDS
  * @param root The instrument's root node, which the readout is attached to.
  * @param geometry The instrument's geometry, which the readout floats above.
  * @param plan What the fretting engine decided.
+ * @param extra More text the instrument wants to show below the fretting readout, for a time in seconds.
  */
 class FrettingDebugOverlay(
     private val context: PerformanceManager,
     private val root: Node,
     private val geometry: Node,
     private val plan: FrettingPlan,
+    private val extra: (Double) -> String? = { null },
 ) {
     /** The node holding the readout; culled while the readout is hidden. */
     val node: Node = Node("FrettingReadout").apply {
@@ -102,7 +104,8 @@ class FrettingDebugOverlay(
         }
         if (!isAnchored) anchor()
         node.cullHint = Spatial.CullHint.Inherit
-        text.text = FrettingReadout.format(plan.solution, time.toDouble(SECONDS))
+        val seconds = time.toDouble(SECONDS)
+        text.text = FrettingReadout.format(plan.solution, seconds) + (extra(seconds)?.let { "\n$it" } ?: "")
 
         val width = text.lineWidth
         val height = text.height

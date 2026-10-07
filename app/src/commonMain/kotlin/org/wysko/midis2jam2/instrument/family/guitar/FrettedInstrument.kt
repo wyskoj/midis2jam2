@@ -91,7 +91,10 @@ abstract class FrettedInstrument protected constructor(
     internal val fretboard: FretboardSpace = FretboardSpace(positioning, numberOfFrets)
 
     /** The live fretting readout (F3). */
-    internal val readout: FrettingDebugOverlay = FrettingDebugOverlay(context, root, geometry, fretting)
+    internal val readout: FrettingDebugOverlay = FrettingDebugOverlay(context, root, geometry, fretting) { readoutExtra(it) }
+
+    /** Extra lines for the F3 readout at [time] seconds, or `null` for none. */
+    protected open fun readoutExtra(time: Double): String? = null
 
     /** Where this instrument's tuning keys are drawn, or `null` while it has no key art. */
     protected open val tuningKeyLayout: TuningKeyLayout? get() = null

@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
+import org.wysko.midis2jam2.instrument.family.strings.bowing.BowingProfile
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.modelD
@@ -37,7 +38,8 @@ class AcousticBass(context: PerformanceManager, events: List<MidiEvent>, style: 
         context.modelD(
             "DoubleBass.obj",
             if (style == PlayingStyle.ARCO) "DoubleBassSkin.bmp" else "DoubleBassSkinAlt.png"
-        )
+        ),
+        BowingProfile.Bass,
     ) {
     override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)
