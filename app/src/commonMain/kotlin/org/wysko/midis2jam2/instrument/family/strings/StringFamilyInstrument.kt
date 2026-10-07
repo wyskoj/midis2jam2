@@ -23,6 +23,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.manager.camera.cinematic.analysis.BeatGrid
 import org.wysko.midis2jam2.instrument.family.guitar.FretHeightCalculator
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrument
 import org.wysko.midis2jam2.instrument.family.guitar.FrettedInstrumentPositioning.FrettedInstrumentPositioningWithZ
@@ -157,7 +158,10 @@ abstract class StringFamilyInstrument protected constructor(
                 ?: openStrings.indexOfLast { it <= arc.note.toInt() }.coerceAtLeast(0)
             BowNote(arc.startTime.toDouble(DurationUnit.SECONDS), arc.endTime.toDouble(DurationUnit.SECONDS), string, arc.velocity.toInt())
         }
-        BowMotion(BowingPlanner.plan(notes, bowingProfile), StringContactMap(BRIDGE_X, BRIDGE_Z))
+        val grid = BeatGrid.from(context.sequence)
+        // A note starting on a bar line is a strong beat, which a player would take down-bow.
+        val onBarLine = { time: Double -> grid.nearestBarLine(time, STRONG_BEAT_TOLERANCE) != null }
+        BowMotion(BowingPlanner.plan(notes, bowingProfile, onBarLine), StringContactMap(BRIDGE_X, BRIDGE_Z))
     }
 
     /** The bow's resting orientation, before it's tilted onto a string. */
@@ -227,5 +231,8 @@ private const val BOW_DOWN_Z = 0.5f
 private const val BOW_RAISED_Z = 2.0f
 private const val BRIDGE_REFERENCE_Z = 0.55
 private const val BOW_PRESSURE_DIP = 0.05f
+
+/** How close to a bar line, in seconds, a note must start to count as being on the strong beat. */
+private const val STRONG_BEAT_TOLERANCE = 0.05
 
 private fun round2(value: Double): Double = (value * 100).roundToInt() / 100.0
