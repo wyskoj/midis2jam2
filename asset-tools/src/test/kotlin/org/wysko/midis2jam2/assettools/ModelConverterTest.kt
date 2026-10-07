@@ -132,7 +132,7 @@ class ModelConverterTest {
     fun `a manifest can ask for a generated reflective material on a texture`() {
         fixture(manifest = "default: reflective pic.png\nparts:\n  Thing: { Body: Red, Label: Picture }\n")
         write("Assets/MatDefs/SphereMapLighting.j3md", javaClass.classLoader.getResource("Common/MatDefs/Light/Lighting.j3md")!!.readText().replace("TextureCubeMap EnvMap", "Texture2D EnvMap"))
-        ImageIO.write(BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB), "bmp", File(shared, "Assets/Black.bmp"))
+        ImageIO.write(BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB), "bmp", File(shared, "Assets/Textures/Shared/Black.bmp").apply { parentFile.mkdirs() })
         ModelConverter(shared).convertAll(out)
 
         val plain = reload("Assets/Models/Test/Plain.j3o").single()

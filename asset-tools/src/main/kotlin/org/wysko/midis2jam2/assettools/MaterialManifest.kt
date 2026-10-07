@@ -108,15 +108,22 @@ class ManifestResolver(private val folder: String, val manifest: MaterialManifes
     }
 }
 
+/** The base under every reflective material: the reflection is drawn over black. */
+const val REFLECTION_BASE = "Assets/Textures/Shared/Black.bmp"
+
 /**
  * The material the build writes for a manifest value that names a texture rather than a library material: `Agogo.bmp`
  * (diffuse), `reflective ShinySilver.bmp` or `shadow DrumShadow.png`. Each matches what `AssetLoader` used to build
  * in code for that kind, and the catalog lists it under `Materials.Diffuse`, `Materials.Reflective` or
  * `Materials.Shadow`.
  *
- * @property texturePath The texture, from the asset root (`Assets/Agogo.bmp`).
+ * The texture is named by its file name (`Agogo.bmp`), and the build finds it wherever it is under `Assets/`, so a
+ * texture can move between folders without renaming its material. A path (`Textures/Percussion/Agogo.bmp`, from
+ * `Assets/`) is also accepted, for a file name that isn't unique.
+ *
+ * @property texture The texture as the manifest names it.
  */
-data class GeneratedMaterial(val texturePath: String, val kind: Kind) {
+data class GeneratedMaterial(val texture: String, val kind: Kind) {
 
     /**
      * A kind of generated material.
@@ -136,20 +143,20 @@ data class GeneratedMaterial(val texturePath: String, val kind: Kind) {
         Shadow(SHADOW_PREFIX, SHADOW_MATERIALS_DIR, "Shadow"),
     }
 
-    /** The texture path below `Assets/`, without its extension: the material's name and catalog path. */
-    val name: String get() = texturePath.removePrefix("Assets/").substringBeforeLast('.')
+    /** The texture's file name without its extension: the material's name in the catalog. */
+    val name: String get() = texture.substringAfterLast('/').substringBeforeLast('.')
 
     /** Where the material is written, from the asset root. */
     val path: String get() = "${kind.directory}/$name.j3m"
 
-    /** The material's `.j3m` source. */
-    fun source(): String {
+    /** The material's `.j3m` source, for the texture found at [texturePath] (from the asset root). */
+    fun source(texturePath: String): String {
         val (definition, parameters, renderState) = when (kind) {
             Kind.Diffuse -> Triple("Common/MatDefs/Light/Lighting.j3md", listOf("DiffuseMap : Flip $texturePath"), null)
             Kind.Reflective -> Triple(
                 "Assets/MatDefs/SphereMapLighting.j3md",
                 listOf(
-                    "DiffuseMap : Flip Assets/Black.bmp",
+                    "DiffuseMap : Flip $REFLECTION_BASE",
                     "EnvMap : Flip $texturePath",
                     "EnvMapAsSphereMap : true",
                     "FresnelParams : 0.18 0.18 0.18",
@@ -177,10 +184,7 @@ data class GeneratedMaterial(val texturePath: String, val kind: Kind) {
             val kind = Kind.entries.filter { it.prefix.isNotEmpty() }.firstOrNull { value.startsWith(it.prefix) }
             val texture = kind?.let { value.removePrefix(it.prefix).trim() } ?: value
             if (kind == null && !isTexture(texture)) return null
-            return GeneratedMaterial(
-                if (texture.startsWith("Assets/")) texture else "Assets/$texture",
-                kind ?: Kind.Diffuse,
-            )
+            return GeneratedMaterial(texture.removePrefix("Assets/"), kind ?: Kind.Diffuse)
         }
 
         fun isTexture(name: String) = name.substringAfterLast('.', "").lowercase() in TEXTURE_EXTENSIONS

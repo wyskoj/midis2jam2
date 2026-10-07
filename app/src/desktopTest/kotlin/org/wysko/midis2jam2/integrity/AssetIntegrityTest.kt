@@ -132,6 +132,54 @@ class AssetIntegrityTest {
     }
 
     @Test
+    fun `the Assets folder holds only its subfolders`() {
+        // Everything in Assets/ is sorted into a folder by kind: models live in sharedAssets/models, textures in
+        // Assets/Textures/<family>. A file dropped into the root is either misplaced or forgotten.
+        val root = File(ProjectPaths.sharedAssets, "Assets")
+        val stray = root.listFiles()!!.filter { it.isFile || it.name !in ASSET_FOLDERS }.map { it.name }.sorted()
+        assertTrue(
+            stray.isEmpty(),
+            "sharedAssets/Assets should hold only the folders $ASSET_FOLDERS, but also has: $stray. Put models in " +
+                "sharedAssets/models and textures in Assets/Textures/<family> (see docs/ASSETS.md)."
+        )
+    }
+
+    @Test
+    fun `every model source is under the models folder`() {
+        val misplaced = ProjectPaths.sharedAssets.walkTopDown()
+            .onEnter { it != ProjectPaths.modelSources }
+            .filter { it.isFile && it.extension.lowercase() in setOf("obj", "mtl", "j3o") }
+            .map { it.relativeTo(ProjectPaths.sharedAssets).invariantSeparatorsPath }
+            .toList()
+        assertTrue(misplaced.isEmpty(), "Models belong in sharedAssets/models, but these are elsewhere: $misplaced")
+    }
+
+    @Test
+    fun `every texture is used`() {
+        // A texture is used when a manifest, a material, a data file or the code names it, or when the code refers
+        // to it through the catalog (Textures.<Folder>.<Name>).
+        val textures = File(ProjectPaths.sharedAssets, "Assets/Textures")
+        val named = (
+            ProjectPaths.modelSources.walkTopDown().filter { it.name == "materials.yaml" } +
+                File(ProjectPaths.sharedAssets, "Assets/Materials").walkTopDown().filter { it.extension == "j3m" } +
+                File(ProjectPaths.sharedAssets, "instrument").walkTopDown().filter { it.extension == "json" }
+            ).joinToString("\n") { it.readText() } + ProjectPaths.allKotlinSourceText
+        val unused = textures.walkTopDown().filter { it.isFile }.filterNot { file ->
+            val catalogName = file.relativeTo(textures).invariantSeparatorsPath.substringBeforeLast('.').split('/')
+                .joinToString(".", prefix = "Textures.") { segment ->
+                    segment.split('_', '-', ' ').filter { it.isNotEmpty() }.joinToString("") {
+                        it.replaceFirstChar(Char::uppercaseChar)
+                    }
+                }
+            file.name in named || Regex(Regex.escape(catalogName) + "\\b").containsMatchIn(named)
+        }.map { it.relativeTo(textures).invariantSeparatorsPath }.toList()
+        assertTrue(
+            unused.isEmpty(),
+            "These textures are used by nothing; delete them, or name them in a materials.yaml: $unused"
+        )
+    }
+
+    @Test
     fun `every stand in stands yaml names a converted model`() {
         val stands = File(ProjectPaths.sharedAssets, "stands.yaml").readText()
         val models = AssetCatalog.models.map { it.path }.toSet()
@@ -174,6 +222,9 @@ class AssetIntegrityTest {
     }
 
     private companion object {
+
+        /** The only things allowed at the top of sharedAssets/Assets. */
+        val ASSET_FOLDERS = setOf("Fonts", "MatDefs", "Materials", "Shaders", "Textures")
 
         /** Lower bounds that keep the scans from passing vacuously. */
         const val MINIMUM_EXPECTED_ASSET_REFERENCES = 300

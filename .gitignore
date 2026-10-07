@@ -51,3 +51,6 @@ app/src/commonMain/composeResources/values/build.xml
 app/src/commonMain/composeResources/files/THIRD-PARTY-NOTICES.txt
 hs_err_pid*.log
 replay_pid*.log
+
+# Retired assets, kept locally for backup; not part of the build.
+/unused-assets/

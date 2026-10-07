@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.testing
 
+import org.wysko.midis2jam2.assets.Models
+import org.wysko.midis2jam2.assets.Textures
 import com.jme3.app.FlyCamAppState
 import com.jme3.app.SimpleApplication
 import com.jme3.material.Material
@@ -69,8 +71,8 @@ class HeadlessSpikeTest {
                     hasGuiNode = guiNode != null
 
                     // The real app loads these exact assets through AssetLoader.
-                    loadedModel = assetManager.loadModel("Assets/Violin.obj") != null
-                    loadedTexture = assetManager.loadTexture("Assets/ViolinSkin.bmp") != null
+                    loadedModel = assetManager.loadModel(Models.Strings.Violin.Body.path) != null
+                    loadedTexture = assetManager.loadTexture(Textures.Strings.ViolinSkin.path) != null
                     loadedMaterial =
                         Material(assetManager, "Common/MatDefs/Light/Lighting.j3md") != null
                     loadedFont = assetManager.loadFont("Assets/Fonts/Inter.fnt") != null
@@ -110,8 +112,8 @@ class HeadlessSpikeTest {
         assertTrue(hasGuiNode, "guiNode is null headlessly")
         assertTrue(hasInputManager, "inputManager is null headlessly - input simulation is not viable")
         assertTrue(hasFlyByCamera, "flyByCamera is null headlessly - free-camera tests are not viable")
-        assertTrue(loadedModel, "could not load Assets/Violin.obj")
-        assertTrue(loadedTexture, "could not load Assets/ViolinSkin.bmp")
+        assertTrue(loadedModel, "could not load ${Models.Strings.Violin.Body.path}")
+        assertTrue(loadedTexture, "could not load ${Textures.Strings.ViolinSkin.path}")
         assertTrue(loadedMaterial, "could not create a Lighting.j3md material")
         assertTrue(loadedFont, "could not load Assets/Fonts/Inter.fnt")
         assertNotNull(contextClass, "no JmeContext was created")

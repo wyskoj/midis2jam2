@@ -145,23 +145,44 @@ class ModelConverter(private val sharedAssets: File) {
     }
 
     /** The materials generated this run, by path. */
-    private val generatedMaterials = mutableMapOf<String, GeneratedMaterial>()
+    private val generatedMaterials = mutableMapOf<String, Pair<GeneratedMaterial, String>>()
+
+    /** Every file under `Assets/`, by file name, as paths from the asset root. */
+    private val assetFiles: Map<String, List<String>> by lazy {
+        val root = File(sharedAssets, "Assets")
+        root.walkTopDown().filter { it.isFile }
+            .map { "Assets/" + it.relativeTo(root).invariantSeparatorsPath }
+            .toList()
+            .groupBy { it.substringAfterLast('/') }
+    }
+
+    /** Where the texture [material] names is, from the asset root, failing if it can't be found exactly. */
+    private fun resolve(material: GeneratedMaterial, user: String): String {
+        val texture = material.texture
+        if (!GeneratedMaterial.isTexture(texture)) throw AssetToolException("$user uses '$texture', which isn't a texture")
+        if ('/' in texture) {
+            return "Assets/$texture".takeIf { File(sharedAssets, it).isFile }
+                ?: throw AssetToolException("$user uses texture 'Assets/$texture', which does not exist")
+        }
+        val found = assetFiles[texture].orEmpty()
+        return found.singleOrNull() ?: throw AssetToolException(
+            if (found.isEmpty()) "$user uses texture '$texture', which is nowhere under Assets/"
+            else "$user uses texture '$texture', which is ambiguous: name one of $found by its path"
+        )
+    }
 
     /** Writes [material] (once) under [outDir] and returns its path, failing if its texture does not exist. */
     private fun write(material: GeneratedMaterial, user: String, outDir: File): String {
-        val texturePath = material.texturePath
-        if (!GeneratedMaterial.isTexture(texturePath) || !File(sharedAssets, texturePath).isFile) {
-            throw AssetToolException("$user uses texture '$texturePath', which does not exist")
-        }
-        generatedMaterials[material.path]?.let { existing ->
-            if (existing != material) {
-                throw AssetToolException("${existing.texturePath} and $texturePath would share ${material.path}")
+        val texturePath = resolve(material, user)
+        generatedMaterials[material.path]?.let { (existing, existingPath) ->
+            if (existing.kind != material.kind || existingPath != texturePath) {
+                throw AssetToolException("$existingPath and $texturePath would share ${material.path}")
             }
             return material.path
         }
 
-        File(outDir, material.path).apply { parentFile.mkdirs() }.writeText(material.source())
-        generatedMaterials[material.path] = material
+        File(outDir, material.path).apply { parentFile.mkdirs() }.writeText(material.source(texturePath))
+        generatedMaterials[material.path] = material to texturePath
         return material.path
     }
     private fun deleteStale(modelsOut: File, keep: Set<File>) {

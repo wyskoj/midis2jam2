@@ -46,8 +46,8 @@ class MaterialLibraryParityTest {
 
     @Test
     fun `the reflective library materials match the reflective materials built in code`() {
-        assertSameMaterial(legacyReflectiveMaterial(assetManager, "Assets/HornSkin.bmp"), Materials.HornSkin)
-        assertSameMaterial(legacyReflectiveMaterial(assetManager, "Assets/HornSkinGrey.bmp"), Materials.HornSkinGrey)
+        assertSameMaterial(legacyReflectiveMaterial(assetManager, "Assets/Textures/Shared/HornSkin.bmp"), Materials.HornSkin)
+        assertSameMaterial(legacyReflectiveMaterial(assetManager, "Assets/Textures/Shared/HornSkinGrey.bmp"), Materials.HornSkinGrey)
         assertSameMaterial(
             legacyReflectiveMaterial(assetManager, "Assets/Textures/Brass/HornSkinCopper.png"),
             Materials.HornSkinCopper
@@ -56,8 +56,8 @@ class MaterialLibraryParityTest {
 
     @Test
     fun `the diffuse library materials match the diffuse materials built in code`() {
-        assertSameMaterial(legacyDiffuseMaterial(assetManager, "Assets/RubberFoot.bmp"), Materials.RubberFoot)
-        assertSameMaterial(legacyDiffuseMaterial(assetManager, "Assets/Wood.bmp"), Materials.Wood)
+        assertSameMaterial(legacyDiffuseMaterial(assetManager, "Assets/Textures/Shared/RubberFoot.bmp"), Materials.RubberFoot)
+        assertSameMaterial(legacyDiffuseMaterial(assetManager, "Assets/Textures/Shared/Wood.bmp"), Materials.Wood)
     }
 
     @Test

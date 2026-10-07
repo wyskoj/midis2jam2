@@ -78,7 +78,7 @@ internal fun legacyReflectiveMaterial(assetManager: AssetManager, texture: Strin
         setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
         setTexture(ENV_MAP, assetManager.loadTexture(texture.assetPrefix()))
-        setTexture(DIFFUSE_MAP, assetManager.loadTexture("Assets/Black.bmp"))
+        setTexture(DIFFUSE_MAP, assetManager.loadTexture("Assets/Textures/Shared/Black.bmp"))
     }
 
 /** An unlit, alpha-blended fake shadow: what the generated shadow materials replace. */
