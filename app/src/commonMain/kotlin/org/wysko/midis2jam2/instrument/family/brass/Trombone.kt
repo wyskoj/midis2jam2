@@ -17,10 +17,10 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.SlidePositionManager
@@ -30,8 +30,7 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -66,7 +65,7 @@ class Trombone(context: PerformanceManager, eventList: List<MidiEvent>) :
         parent = this@Trombone, rotationFactor = 0.1f, stretchFactor = 1f, scaleAxis = Axis.Z, rotationAxis = Axis.X
     ) {
 
-        private val slide: Spatial = context.modelR("TromboneSlide.obj", "HornSkin.bmp")
+        private val slide: Spatial = context.model(Models.Brass.Trombone.Slide)
 
         private val slidePosition: Double
             get() = 0.3 * (slide.localTranslation.z + 1)
@@ -74,16 +73,13 @@ class Trombone(context: PerformanceManager, eventList: List<MidiEvent>) :
         init {
             with(geometry) {
                 +slide
-                +context.modelR("TromboneBody.obj", "HornSkin.bmp").apply {
-                    this as Node
-                    getChild(1).setMaterial(context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                }
+                +context.model(Models.Brass.Trombone.Body)
                 rot = v3(-10.0, 0, 0)
                 localScale = v3(0.8f, 0.8f, 0.8f)
             }
 
             with(bell) {
-                +context.modelR("TromboneHorn.obj", "HornSkin.bmp")
+                +context.model(Models.Brass.Trombone.Horn)
                 loc = v3(0.5522, 4.291, 1.207)
                 rot = v3(-4.0, 0, 0)
             }

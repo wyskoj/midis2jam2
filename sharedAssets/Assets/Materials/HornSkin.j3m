@@ -1,0 +1,9 @@
+// Polished brass: a sphere-mapped reflection over a black base. Matches AssetLoader.reflectiveMaterial.
+Material HornSkin : Assets/MatDefs/SphereMapLighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Flip Assets/Black.bmp
+        EnvMap : Flip Assets/HornSkin.bmp
+        EnvMapAsSphereMap : true
+        FresnelParams : 0.18 0.18 0.18
+    }
+}

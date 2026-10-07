@@ -1,6 +1,6 @@
 {
-  "body": "Guitar.obj",
-  "key": "GuitarKey.obj",
+  "body": "Guitar",
+  "key": "GuitarKey",
   "keys": [
     {"position": [-1.023, 1.1348, 18.124], "rotation": [-38.426, -69.561, 36.073], "direction": 1},
     {"position": [-0.6431, 1.4116, 19.3853], "rotation": [-38.426, -69.561, 36.073], "direction": 1},

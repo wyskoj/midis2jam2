@@ -16,13 +16,16 @@
  */
 package org.wysko.midis2jam2.instrument.family.strings
 
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The upright bass. */
@@ -34,10 +37,9 @@ class AcousticBass(context: PerformanceManager, events: List<MidiEvent>, style: 
         20.0,
         Vector3f(0.75f, 0.75f, 0.75f),
         FrettingProfiles.doubleBass(),
-        context.modelD(
-            "DoubleBass.obj",
-            if (style == PlayingStyle.ARCO) "DoubleBassSkin.bmp" else "DoubleBassSkinAlt.png"
-        )
+        context.model(Models.Strings.DoubleBass.Body).apply {
+            if (style != PlayingStyle.ARCO) setMaterial(context.assetLoader.material(Materials.Diffuse.DoubleBassSkinAlt))
+        }
     ) {
     override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(-25 * updateInstrumentIndex(delta), 0f, 0f)

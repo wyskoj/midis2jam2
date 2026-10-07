@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
@@ -23,9 +25,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussive.OneDrumOctave
 import org.wysko.midis2jam2.instrument.family.percussive.modulus
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /**
@@ -41,7 +40,7 @@ class Timpani(context: PerformanceManager, eventList: List<MidiEvent>) : OneDrum
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = context.modelD("XylophoneMalletWhite.obj", "XylophoneBar.bmp")
+            stickModel = context.model(Models.ChromaticPercussion.Mallets.Mallet)
         ).apply {
             setParent(recoilNode)
             offsetStick { it.loc = v3(0, 0, -5) }
@@ -51,10 +50,8 @@ class Timpani(context: PerformanceManager, eventList: List<MidiEvent>) : OneDrum
 
     init {
         with(recoilNode) {
-            +context.modelR("TimpaniBody.obj", "HornSkin.bmp").apply {
-                (this as Node)[0].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-            }
-            +context.modelD("TimpaniHead.obj", "TimpaniSkin.bmp")
+            +context.model(Models.Ensemble.Timpani.Body)
+            +context.model(Models.Ensemble.Timpani.Head)
         }
         placement.loc = v3(0, 0, -120)
     }

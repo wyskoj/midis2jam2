@@ -1,0 +1,3 @@
+models: { Bell: HornSkinGrey }
+parts:
+  OuterBell: { Handle: Wood, Bell: HornSkin }

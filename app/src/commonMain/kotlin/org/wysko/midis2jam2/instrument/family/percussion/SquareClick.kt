@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -23,7 +25,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -34,7 +35,7 @@ class SquareClick(context: PerformanceManager, hits: MutableList<NoteEvent.NoteO
     private val squareClickNode =
         Node().apply {
             attachChild(
-                context.modelD("SquareShaker.obj", "Wood.bmp").apply {
+                context.model(Models.Percussion.SquareClick.Shaker).apply {
                     setLocalTranslation(0f, -2f, -2f)
                 },
             )

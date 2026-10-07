@@ -16,6 +16,12 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -30,7 +36,6 @@ import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 private val BASE_POSITION = v3(47, 35.3, 7.0)
@@ -67,10 +72,8 @@ class Guitar private constructor(
         )
     },
     numberOfStrings = 6,
-    instrumentBody = context.modelD(
-        TuningKeyLayout.bodyFor(type.model, droppedModel = null, lowered = false),
-        type.texture
-    ) to "GuitarSkin.bmp"
+    instrumentBody = context.model(TuningKeyLayout.bodyFor(type.model, droppedModel = null, lowered = false))
+        .apply { setMaterial(context.assetLoader.material(type.texture)) } to Materials.Diffuse.GuitarSkin
 ) {
 
     /**
@@ -84,10 +87,11 @@ class Guitar private constructor(
 
     override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
 
-    override val bodyTexture: String get() = texture
+    override val bodyTexture: MaterialAsset get() = texture
 
     override val upperStrings: Array<Spatial> = Array(6) {
-        context.modelD(if (it < 3) "GuitarStringLow.obj" else "GuitarStringHigh.obj", type.texture)
+        context.model(if (it < 3) Models.Guitar.StringLow else Models.Guitar.StringHigh)
+            .apply { setMaterial(context.assetLoader.material(type.texture)) }
     }.apply {
         forEachIndexed { index, string ->
             geometry += string
@@ -100,13 +104,12 @@ class Guitar private constructor(
 
     override val lowerStrings: List<List<Spatial>> = List(6) { string ->
         List(5) { animFrame: Int ->
-            context.modelD(
-                if (string < 3) "GuitarLowStringBottom$animFrame.obj" else "GuitarHighStringBottom$animFrame.obj",
-                type.texture
+            context.model(
+                if (string < 3) Models.Guitar.LowStringBottom[animFrame] else Models.Guitar.HighStringBottom[animFrame]
             ).also {
                 geometry.attachChild(it)
                 it.cullHint = Always
-                (it as Geometry).material.setColor("GlowColor", STRING_GLOW)
+                it.setMaterial(context.assetLoader.material(type.texture).apply { setColor("GlowColor", STRING_GLOW) })
             }
         }
     }.apply {
@@ -137,34 +140,34 @@ class Guitar private constructor(
      * The type of guitar.
      */
     sealed class GuitarType(
-        internal val model: String,
-        internal val texture: String,
+        internal val model: ModelAsset,
+        internal val texture: MaterialAsset,
         internal val style: GuitarStyle,
     ) {
         /** Acoustic guitar type. */
         data object Acoustic :
-            GuitarType("GuitarAcoustic.obj", "AcousticGuitar.png", GuitarStyle.ACOUSTIC)
+            GuitarType(Models.Guitar.GuitarAcoustic, Materials.Diffuse.AcousticGuitar, GuitarStyle.ACOUSTIC)
 
         /** Clean guitar type. */
-        data object Clean : GuitarType("Guitar.obj", GuitarSkin["clean"].file, GuitarStyle.CLEAN)
+        data object Clean : GuitarType(Models.Guitar.Guitar, Materials.Diffuse.GuitarSkin, GuitarStyle.CLEAN)
 
         /** Jazz guitar type. */
-        data object Jazz : GuitarType("Guitar.obj", GuitarSkin["jazz"].file, GuitarStyle.JAZZ)
+        data object Jazz : GuitarType(Models.Guitar.Guitar, Materials.Diffuse.JazzGuitarSkin, GuitarStyle.JAZZ)
 
         /** Muted guitar type. */
-        data object Muted : GuitarType("Guitar.obj", GuitarSkin["muted"].file, GuitarStyle.MUTED)
+        data object Muted : GuitarType(Models.Guitar.Guitar, Materials.Diffuse.MutedGuitarSkin, GuitarStyle.MUTED)
 
         /** Overdrive guitar type. */
         data object Overdriven :
-            GuitarType("Guitar.obj", GuitarSkin["overdriven"].file, GuitarStyle.DRIVEN)
+            GuitarType(Models.Guitar.Guitar, Materials.Diffuse.OverdrivenGuitarSkin, GuitarStyle.DRIVEN)
 
         /** Distortion guitar type. */
         data object Distortion :
-            GuitarType("Guitar.obj", GuitarSkin["distortion"].file, GuitarStyle.DRIVEN)
+            GuitarType(Models.Guitar.Guitar, Materials.Diffuse.DistortionGuitarSkin, GuitarStyle.DRIVEN)
 
         /** Harmonics guitar type. */
         data object Harmonics :
-            GuitarType("Guitar.obj", GuitarSkin["harmonics"].file, GuitarStyle.HARMONICS)
+            GuitarType(Models.Guitar.Guitar, Materials.Diffuse.HarmonicsGuitarSkin, GuitarStyle.HARMONICS)
     }
 
     init {

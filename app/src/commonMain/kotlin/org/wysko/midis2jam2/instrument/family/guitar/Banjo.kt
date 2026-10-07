@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -26,7 +29,6 @@ import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(56.5f, 51f, -1.5f)
@@ -57,15 +59,15 @@ class Banjo(context: PerformanceManager, events: List<MidiEvent>) : FrettedInstr
         FretHeightByTable.fromJson("Banjo")
     ),
     4,
-    context.modelD(TuningKeyLayout.bodyFor("Banjo.obj", "Banjo.obj", lowered = false), "BanjoSkin.png") to
-            "BanjoSkin.png"
+    context.model(TuningKeyLayout.bodyFor(Models.Guitar.Banjo, Models.Guitar.Banjo, lowered = false)) to
+        Materials.Diffuse.BanjoSkin
 ) {
-    private val keyLayout = TuningKeyLayout.forModel("Banjo.obj")
+    private val keyLayout = TuningKeyLayout.forModel(Models.Guitar.Banjo)
 
     override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
 
     override val upperStrings: Array<Spatial> = Array(4) {
-        context.modelD("BanjoString.obj", "BassSkin.bmp").also {
+        context.model(Models.Guitar.BanjoString).also {
             geometry.attachChild(it)
         }
     }.apply {
@@ -82,7 +84,7 @@ class Banjo(context: PerformanceManager, events: List<MidiEvent>) : FrettedInstr
 
     override val lowerStrings: List<List<Spatial>> = List(4) {
         List(5) { j: Int ->
-            context.modelD("BanjoStringBottom$j.obj", "BassSkin.bmp").apply {
+            context.model(Models.Guitar.BanjoStringBottom[j]).apply {
                 geometry.attachChild(this)
                 (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }

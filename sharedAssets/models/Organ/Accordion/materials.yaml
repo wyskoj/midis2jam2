@@ -1,0 +1,6 @@
+# The case textures are the accordion's; the bandoneon swaps them at runtime (Accordion.Type). Keys swap to their
+# pressed textures at runtime (KeyConfiguration).
+models: { RightHand: AccordionCaseFront.bmp, Fold: AccordionFold.bmp, KeyWhiteFront: AccordionKey.bmp, KeyWhiteBack: AccordionKey.bmp, KeyBlack: AccordionKeyBlack.bmp }
+parts:
+  LeftHand: { Case: AccordionCase.bmp, Strap: LeatherStrap.bmp, Foot: RubberFoot }
+variants: [ BandoneonCase.bmp, BandoneonCaseFront.bmp, AccordionKeyDown.bmp, AccordionKeyBlackDown.bmp ]

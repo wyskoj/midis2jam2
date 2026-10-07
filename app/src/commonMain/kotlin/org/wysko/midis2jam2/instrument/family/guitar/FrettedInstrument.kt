@@ -16,6 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
@@ -28,7 +32,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -47,7 +50,7 @@ import kotlin.time.DurationUnit
  * @property fretting Where every note is played, and what the fretting engine inferred.
  * @property positioning The positioning parameters.
  * @param numberOfStrings The number of strings.
- * @param instrumentBody A pair containing the instrument's body and its texture.
+ * @param instrumentBody A pair containing the instrument's body and the material of its note fingers.
  *
  */
 abstract class FrettedInstrument protected constructor(
@@ -56,7 +59,7 @@ abstract class FrettedInstrument protected constructor(
     val fretting: FrettingPlan,
     protected val positioning: FrettedInstrumentPositioning,
     private val numberOfStrings: Int,
-    instrumentBody: Pair<Spatial, String>,
+    instrumentBody: Pair<Spatial, MaterialAsset>,
 ) : SustainedInstrument(context, events) {
 
     /**
@@ -74,9 +77,9 @@ abstract class FrettedInstrument protected constructor(
      * The yellow circles that appear on strings.
      */
     protected val noteFingers: List<Spatial> = List(numberOfStrings) {
-        context.modelD("GuitarNoteFinger.obj", instrumentBody.second).apply {
+        context.model(Models.Guitar.NoteFinger).apply {
             cullHint = false.ch
-            (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
+            setMaterial(context.assetLoader.material(instrumentBody.second).apply { setColor("GlowColor", STRING_GLOW) })
         }
     }.onEach { geometry += it }
 
@@ -96,8 +99,8 @@ abstract class FrettedInstrument protected constructor(
     /** Where this instrument's tuning keys are drawn, or `null` while it has no key art. */
     protected open val tuningKeyLayout: TuningKeyLayout? get() = null
 
-    /** The texture of the instrument's body, which its tuning keys and capo share. */
-    protected open val bodyTexture: String? get() = null
+    /** The material of the instrument's body, which its tuning keys share. */
+    protected open val bodyTexture: MaterialAsset? get() = null
 
     /** The tuning keys, string slack and capo, built on first use, once subclasses have finished constructing. */
     internal val tuning: TuningVisuals by lazy {

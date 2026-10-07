@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
@@ -26,7 +29,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -43,7 +45,7 @@ class HighQ(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : 
         Striker(
             context = context,
             strikeEvents = hits,
-            stickModel = context.modelD("Zapper.obj", "Zapper.bmp"),
+            stickModel = context.model(Models.Percussion.HighQ.Zapper),
             actualStick = false,
         ).apply {
             setParent(geometry)
@@ -51,9 +53,9 @@ class HighQ(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : 
 
     /** The green beam that "shoots" out of the laser gun. */
     private val laserBeam: Spatial =
-        context.modelD("ZapperLaser.obj", "Laser.bmp").apply {
+        context.model(Models.Percussion.HighQ.Laser).apply {
             setMaterial(
-                context.assetLoader.diffuseMaterial("Laser.bmp").apply {
+                context.assetLoader.material(Materials.Diffuse.Laser).apply {
                     setColor("GlowColor", ColorRGBA.Green)
                 },
             )

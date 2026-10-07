@@ -1,0 +1,2 @@
+default: Pistol.png
+models: { Casing: HornSkin }

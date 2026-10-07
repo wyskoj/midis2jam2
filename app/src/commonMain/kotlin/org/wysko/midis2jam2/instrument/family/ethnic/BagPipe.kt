@@ -17,8 +17,9 @@
 
 package org.wysko.midis2jam2.instrument.family.ethnic
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
@@ -35,8 +36,6 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -52,11 +51,11 @@ class BagPipe(
     private val fingeringManager = HandPositionFingeringManager.from(this::class)
 
     private val leftHands =
-        List(3) { context.modelD("BagPipeLeftHand${it + 1}.obj", "hands.bmp") }
+        Models.Ethnic.BagPipe.LeftHand.map { context.model(it) }
             .onEachIndexed { i, hand -> geometry += hand.also { it.cullHint = (i == 0).ch } }
 
     private val rightHands =
-        List(5) { context.modelD("BagPipeRightHand${it + 1}.obj", "hands.bmp") }
+        Models.Ethnic.BagPipe.RightHand.map { context.model(it) }
             .onEachIndexed { i, hand -> geometry += hand.also { it.cullHint = (i == 0).ch } }
 
     private val puffers =
@@ -78,9 +77,7 @@ class BagPipe(
 
     init {
         with(geometry) {
-            +context.modelD("BagPipe.obj", "BagPipeSkin.png").also {
-                (it as Node).children.first().material = context.assetLoader.reflectiveMaterial("HornSkinGrey.bmp")
-            }
+            +context.model(Models.Ethnic.BagPipe.Body)
         }
         with(placement) {
             loc = v3(-70, 40, 30)

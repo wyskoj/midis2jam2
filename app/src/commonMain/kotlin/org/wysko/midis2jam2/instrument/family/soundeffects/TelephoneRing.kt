@@ -16,6 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial.CullHint.Always
@@ -28,11 +32,23 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
-private const val KEY_MODEL = "TelePhoneKey.obj"
+/** The keys as they look at rest (dark) and pressed (lit), in keypad order: 1 to 9, *, 0, #. */
+private val KEYS_UP: List<MaterialAsset> = with(Materials.Diffuse) {
+    listOf(
+        TelePhoneKey1Dark, TelePhoneKey2Dark, TelePhoneKey3Dark, TelePhoneKey4Dark, TelePhoneKey5Dark, TelePhoneKey6Dark,
+        TelePhoneKey7Dark, TelePhoneKey8Dark, TelePhoneKey9Dark, TelePhoneKeyStarDark, TelePhoneKey0Dark,
+        TelePhoneKeyPoundDark,
+    )
+}
+private val KEYS_DOWN: List<MaterialAsset> = with(Materials.Diffuse) {
+    listOf(
+        TelePhoneKey1, TelePhoneKey2, TelePhoneKey3, TelePhoneKey4, TelePhoneKey5, TelePhoneKey6, TelePhoneKey7,
+        TelePhoneKey8, TelePhoneKey9, TelePhoneKeyStar, TelePhoneKey0, TelePhoneKeyPound,
+    )
+}
 
 /**
  * The telephone ring.
@@ -45,7 +61,8 @@ class TelephoneRing(context: PerformanceManager, eventList: List<MidiEvent>) : S
     override val multipleInstancesDirection: Vector3f = v3(13, 0, 0)
 
     private val keysUp = List(12) {
-        context.modelD(KEY_MODEL, "TelePhoneKey${it.toKeyString()}Dark.bmp").apply {
+        context.model(Models.SoundEffects.TelephoneRing.Key).apply {
+            setMaterial(context.assetLoader.material(KEYS_UP[it]))
             loc = v3(
                 x = 1.2 * (it % 3 - 1), y = 3.9, z = -2.7 - 1.2 * -(it / 3)
             )
@@ -53,7 +70,8 @@ class TelephoneRing(context: PerformanceManager, eventList: List<MidiEvent>) : S
     }
 
     private val keysDown = List(12) {
-        context.modelD(KEY_MODEL, "TelePhoneKey${it.toKeyString()}.bmp").apply {
+        context.model(Models.SoundEffects.TelephoneRing.Key).apply {
+            setMaterial(context.assetLoader.material(KEYS_DOWN[it]))
             loc = v3(
                 x = 1.2 * (it % 3 - 1), y = 3.4, z = -2.7 - 1.2 * -(it / 3)
             )
@@ -61,7 +79,7 @@ class TelephoneRing(context: PerformanceManager, eventList: List<MidiEvent>) : S
         }
     }
 
-    private val handle = context.modelD("TelePhoneHandle.obj", "TelephoneHandle.bmp")
+    private val handle = context.model(Models.SoundEffects.TelephoneRing.Handle)
 
     init {
         with(geometry) {
@@ -71,9 +89,7 @@ class TelephoneRing(context: PerformanceManager, eventList: List<MidiEvent>) : S
                 keysUp.forEach { +it }
                 keysDown.forEach { +it }
             }
-            +context.modelD("TelePhoneBase.obj", "TelephoneBase.bmp").apply {
-                (this as Node).children[0].material = context.assetLoader.diffuseMaterial("RubberFoot.bmp")
-            }
+            +context.model(Models.SoundEffects.TelephoneRing.Base)
             +handle
         }
     }
@@ -114,10 +130,3 @@ class TelephoneRing(context: PerformanceManager, eventList: List<MidiEvent>) : S
     override fun toString(): String = super.toString() + formatProperties(::force, ::keyStates)
 }
 
-private fun Int.toKeyString(): String = when {
-    this < 9 -> (this + 1).toString()
-    this == 9 -> "Star"
-    this == 10 -> "0"
-    this == 11 -> "Pound"
-    else -> throw IllegalArgumentException()
-}

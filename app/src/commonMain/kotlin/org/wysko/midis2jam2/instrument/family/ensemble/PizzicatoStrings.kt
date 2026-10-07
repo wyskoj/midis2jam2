@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
@@ -28,7 +30,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -77,9 +78,9 @@ class PizzicatoStrings(
     private inner class PizzicatoString : TwelfthOfOctaveDecayed() {
 
         private val animatedStringNode = node()
-        private val restingString: Spatial = context.modelD("StageString.obj", "StageString.bmp")
-        private val animatedStringFrames: List<Spatial> = List(5) {
-            context.modelD("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
+        private val restingString: Spatial = context.model(Models.Ensemble.StageStrings.String)
+        private val animatedStringFrames: List<Spatial> = Models.Ensemble.StageStrings.StringBottom.map {
+            context.model(it).apply {
                 cullHint = Always // Hide on startup
                 animatedStringNode += this
                 (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
@@ -92,7 +93,7 @@ class PizzicatoStrings(
 
         init {
             with(animNode) {
-                +context.modelD("PizzicatoStringHolder.obj", "Wood.bmp")
+                +context.model(Models.Ensemble.PizzicatoStrings.Holder)
                 +restingString
                 +animatedStringNode
             }

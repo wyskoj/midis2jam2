@@ -16,13 +16,13 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /**
@@ -43,11 +43,11 @@ class Metronome(context: PerformanceManager, clickHits: List<NoteEvent.NoteOn>, 
         context = context, strikeEvents = clickHits, stickModel = Node(), fixed = true, lift = false
     )
 
-    private val bell = context.modelR("MetronomePendjulum2.obj", "HornSkin.bmp").apply {
+    private val bell = context.model(Models.Percussion.Metronome.Bell).apply {
         loc = v3(0, 0, 0.5)
     }
 
-    private val click = context.modelR("MetronomePendjulum1.obj", "ShinySilver.bmp").apply {
+    private val click = context.model(Models.Percussion.Metronome.Click).apply {
         loc = v3(0, 0, 1)
     }
 
@@ -58,7 +58,7 @@ class Metronome(context: PerformanceManager, clickHits: List<NoteEvent.NoteOn>, 
         with(geometry) {
             +bell
             +click
-            +context.modelD("MetronomeBox.obj", "Wood.bmp")
+            +context.model(Models.Percussion.Metronome.Box)
         }
         with(placement) {
             loc = v3(-20, 0, -48)

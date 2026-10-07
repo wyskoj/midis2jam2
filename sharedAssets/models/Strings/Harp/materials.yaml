@@ -1,0 +1,4 @@
+# Strings are red, blue or white by position; Harp swaps their textures at runtime.
+default: HarpStringWhitePlaying.bmp
+models: { Body: HarpSkin.bmp, String: HarpStringWhite.bmp }
+variants: [ HarpStringRed.bmp, HarpStringRedPlaying.bmp, HarpStringBlue.bmp, HarpStringBluePlaying.bmp ]

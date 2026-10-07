@@ -1,5 +1,4 @@
-- modelName: "Assets/PianoStand.obj"
-  textureName: "Assets/RubberFoot.bmp"
+- model: "Stands/PianoStand"
   position:
     x: -50
     y: 32
@@ -10,8 +9,7 @@
     z: 0
   scale: 1
   instrumentType: "org.wysko.midis2jam2.instrument.family.piano.Keyboard"
-- modelName: "Assets/XylophoneLegs.obj"
-  textureName: "Assets/RubberFoot.bmp"
+- model: "Stands/XylophoneLegs"
   position:
     x: -25
     y: 22.2

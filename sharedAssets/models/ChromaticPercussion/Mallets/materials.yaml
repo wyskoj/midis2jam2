@@ -1,0 +1,4 @@
+# Bars and mallets are retextured per mallet type at runtime (Mallets.MalletType).
+default: XylophoneBar.bmp
+models: { Case: Black.bmp, HitShadow: Black.bmp }
+variants: [ VibesBar.bmp, MarimbaBar.bmp, GlockenspielBar.bmp ]

@@ -1,0 +1,3 @@
+default: hands.bmp
+parts:
+  Body: { Bag: BagPipeSkin.png, Shiny: HornSkinGrey }

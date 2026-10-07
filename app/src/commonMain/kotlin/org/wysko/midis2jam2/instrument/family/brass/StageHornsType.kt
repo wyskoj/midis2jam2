@@ -17,22 +17,27 @@
 
 package org.wysko.midis2jam2.instrument.family.brass
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+
 /**
  * A type of stage horns.
+ *
+ * @property material What the horns are made of.
  */
-sealed class StageHornsType(internal val texture: String) {
+sealed class StageHornsType(internal val material: MaterialAsset) {
     /**
      * The default stage horns.
      */
-    data object BrassSection : StageHornsType("HornSkin.bmp")
+    data object BrassSection : StageHornsType(Materials.HornSkin)
 
     /**
      * The stage horns used for "Synth Brass 1".
      */
-    data object SynthBrass1 : StageHornsType("HornSkinGrey.bmp")
+    data object SynthBrass1 : StageHornsType(Materials.HornSkinGrey)
 
     /**
      * The stage horns used for "Synth Brass 2".
      */
-    data object SynthBrass2 : StageHornsType("HornSkinCopper.png")
+    data object SynthBrass2 : StageHornsType(Materials.HornSkinCopper)
 }

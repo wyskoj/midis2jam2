@@ -16,6 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Off
@@ -30,7 +34,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.PitchBendModulationController
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.exp
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -95,12 +98,17 @@ class StageChoir(context: PerformanceManager, eventList: List<MidiEvent>, type: 
     open inner class ChoirPeep(type: ChoirType, notePeriods: List<TimedArc>) :
         RisingPitchClassAnimator(context, notePeriods) {
         private val head = with(geometry) {
-            +context.modelD("StageChoirHead.obj", type.textureFile).also { it.move(v3(0, 24.652, 0)) }
+            +context.model(Models.Ensemble.StageChoir.Head).also {
+                it.setMaterial(context.assetLoader.material(type.material))
+                it.move(v3(0, 24.652, 0))
+            }
         }
 
         init {
             with(geometry) {
-                +context.modelD("StageChoirBody.obj", type.textureFile)
+                +context.model(Models.Ensemble.StageChoir.Body).apply {
+                    setMaterial(context.assetLoader.material(type.material))
+                }
             }
             root.loc = BASE_POSITION
         }
@@ -114,8 +122,7 @@ class StageChoir(context: PerformanceManager, eventList: List<MidiEvent>, type: 
     /** A single choir peep with a halo. */
     inner class ChoirPeepHalo(notePeriods: List<TimedArc>) : ChoirPeep(ChoirType.HaloSynth, notePeriods) {
         private val halo = with(geometry) {
-            +context.modelD("StageChoirHalo.obj", "ChoirHalo.png").also {
-                it.material = context.assetLoader.diffuseMaterial("ChoirHalo.png")
+            +context.model(Models.Ensemble.StageChoir.Halo).also {
                 it.shadowMode = Off
             }
         }
@@ -131,25 +138,25 @@ class StageChoir(context: PerformanceManager, eventList: List<MidiEvent>, type: 
     /**
      * The type of choir peep.
      *
-     * @property textureFile The texture file for the choir peep.
+     * @property material What the choir peep looks like.
      */
-    enum class ChoirType(val textureFile: String) {
+    enum class ChoirType(val material: MaterialAsset) {
         /** Voice aahs. */
-        ChoirAahs("ChoirPeep.bmp"),
+        ChoirAahs(Materials.Diffuse.ChoirPeep),
 
         /** Voice oohs. */
-        VoiceOohs("ChoirPeepOoh.png"),
+        VoiceOohs(Materials.Diffuse.ChoirPeepOoh),
 
         /** Synth voice. */
-        SynthVoice("ChoirPeepSynthVoice.png"),
+        SynthVoice(Materials.Diffuse.ChoirPeepSynthVoice),
 
         /** Voice synth. */
-        VoiceSynth("ChoirPeepVoiceSynth.png"),
+        VoiceSynth(Materials.Diffuse.ChoirPeepVoiceSynth),
 
         /** Halo synth. */
-        HaloSynth("ChoirHalo.png"),
+        HaloSynth(Materials.Diffuse.ChoirHalo),
 
         /** Goblin synth. */
-        GoblinSynth("ChoirPeepGoblin.png"),
+        GoblinSynth(Materials.Diffuse.ChoirPeepGoblin),
     }
 }

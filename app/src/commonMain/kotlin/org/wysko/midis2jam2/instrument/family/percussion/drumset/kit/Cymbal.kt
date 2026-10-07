@@ -16,6 +16,11 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
@@ -32,7 +37,6 @@ import org.wysko.midis2jam2.util.resourceToString
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
-import org.wysko.midis2jam2.world.MaterialType
 import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
@@ -77,7 +81,8 @@ open class Cymbal(
         listOf(StickTarget("cymbal_${type.name}", { true }, stick.model, HandProfile.forCymbal(type.name)))
 
     private val model = with(geometry) {
-        +context.model(type.model, style.texture, style.materialType).apply {
+        +context.model(type.modelAsset).apply {
+            setMaterial(context.assetLoader.material(style.material))
             scale(type.size)
         }
     }
@@ -100,19 +105,18 @@ open class Cymbal(
     /**
      * The style of the cymbal.
      *
-     * @property texture The texture of the cymbal.
-     * @property materialType The material type of the cymbal.
+     * @property material What the cymbal is made of.
      */
-    sealed class Style(val texture: String, val materialType: MaterialType) {
+    sealed class Style(val material: MaterialAsset) {
         /**
          * The standard style of cymbal.
          */
-        data object Standard : Style("CymbalSkinSphereMap.bmp", MaterialType.Reflective)
+        data object Standard : Style(Materials.Reflective.CymbalSkinSphereMap)
 
         /**
          * The electronic style of cymbal.
          */
-        data object Electronic : Style("RubberFoot.bmp", MaterialType.Diffuse)
+        data object Electronic : Style(Materials.RubberFoot)
     }
 }
 
@@ -121,7 +125,7 @@ open class Cymbal(
  * Defines properties about a type of cymbal.
  *
  * @property name The name of the cymbal.
- * @property model The name of the model file.
+ * @property model The cymbal's model: `Cymbal` or `ChinaCymbal` (see [modelAsset]).
  * @property size The size (or scale) of the cymbal.
  * @property amplitude The total rotational amplitude when the cymbal is struck.
  * @property wobbleSpeed The speed at which the cymbal should wobble after it is struck.
@@ -137,6 +141,14 @@ data class CymbalType(
     private val location: Array<Float>,
     private val rotation: Array<Float>,
 ) {
+    /** The converted model [model] names. */
+    val modelAsset: ModelAsset
+        get() = when (model) {
+            "Cymbal" -> Models.Percussion.DrumSet.Cymbal
+            "ChinaCymbal" -> Models.Percussion.DrumSet.ChinaCymbal
+            else -> error("Cymbal.json names an unknown cymbal model: $model")
+        }
+
     /**
      * The rate at which the wobble fades out to rest.
      */

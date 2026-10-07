@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.ModelAsset
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
@@ -32,8 +34,9 @@ import org.wysko.midis2jam2.util.resourceToString
  * straight from the model's scene; [blenderPosition] and [blenderRotation] convert them to the engine's Y-up space,
  * the same way the OBJ exporter converts the meshes.
  *
- * @property body The instrument's body, exported without its keys.
- * @property key One tuning key, with its pivot at the origin and turning about the model's +Y (Blender's +Z).
+ * @property body The instrument's body, exported without its keys: a model in `sharedAssets/models/Guitar`, by name.
+ * @property key One tuning key, with its pivot at the origin and turning about the model's +Y (Blender's +Z); a model
+ * in `sharedAssets/models/Guitar`, by name.
  * @property keyTexture The texture the key model (and the capo) is UV-mapped to, if not the body's.
  * @property keyRotation How the key model is turned within each key, as Blender XYZ Euler degrees, for a model that
  * was exported turned relative to its object in the scene.
@@ -64,8 +67,21 @@ data class TuningKeyLayout(
     @Serializable
     data class Key(val position: List<Float>, val rotation: List<Float> = listOf(0f, 0f, 0f), val direction: Float = 1f)
 
+    /** The converted model [key] names. */
+    val keyModel: ModelAsset get() = model(key)
+
+    /** The material [keyTexture] names, if any: the diffuse material the build generates for that texture. */
+    val keyMaterial: MaterialAsset? get() = keyTexture?.let(::diffuse)
+
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
+
+        /** A converted model in `sharedAssets/models/Guitar`, by its name there (`GuitarKey`). */
+        fun model(name: String): ModelAsset = ModelAsset("Assets/Models/Guitar/$name.j3o")
+
+        /** The diffuse material the build generates for [texture], a file in `Assets/` (`BassSkin.bmp`). */
+        fun diffuse(texture: String): MaterialAsset =
+            MaterialAsset("Assets/Materials/Diffuse/${texture.substringBeforeLast('.')}.j3m")
 
         /** Blender's ([x], [y], [z]) in the engine's Y-up space: Blender's up (Z) is the engine's Y. */
         fun blenderPosition(x: Float, y: Float, z: Float): Vector3f = Vector3f(x, z, -y)
@@ -84,11 +100,11 @@ data class TuningKeyLayout(
          * keys ([body]), whatever the tuning; without it, the legacy rule of [droppedModel] when the lowest string is
          * [lowered].
          */
-        fun bodyFor(model: String, droppedModel: String?, lowered: Boolean): String =
-            forModel(model)?.body ?: if (lowered && droppedModel != null) droppedModel else model
+        fun bodyFor(model: ModelAsset, droppedModel: ModelAsset?, lowered: Boolean): ModelAsset =
+            forModel(model)?.body?.let(::model) ?: if (lowered && droppedModel != null) droppedModel else model
 
-        /** The key art for an instrument whose body is normally [model] (`Guitar.obj` reads `Guitar.json`). */
-        fun forModel(model: String): TuningKeyLayout? = load(model.substringBeforeLast('.'))
+        /** The key art for an instrument whose body is normally [model] (`Guitar` reads `Guitar.json`). */
+        fun forModel(model: ModelAsset): TuningKeyLayout? = load(model.path.substringAfterLast('/').substringBefore('.'))
 
         /** Reads `instrument/tuning/<instrument>.json`, or `null` while there is no key art for [instrument]. */
         fun load(instrument: String): TuningKeyLayout? =

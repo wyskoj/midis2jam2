@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.scene.Geometry
 import com.jme3.scene.Mesh
 import com.jme3.scene.Spatial
@@ -26,7 +28,6 @@ import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
 import org.wysko.midis2jam2.testing.withInstruments
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.test.Test
@@ -106,7 +107,7 @@ class SmartMalletsTest {
          */
         fun malletModelsIn(performance: HeadlessPerformance, root: Spatial): Int {
             val malletMeshes = mutableListOf<Mesh>()
-            performance.performance.modelD("XylophoneMalletWhite.obj", "XylophoneBar.bmp")
+            performance.performance.model(Models.ChromaticPercussion.Mallets.Mallet)
                 .depthFirstTraversal { if (it is Geometry) malletMeshes += it.mesh }
 
             var count = 0

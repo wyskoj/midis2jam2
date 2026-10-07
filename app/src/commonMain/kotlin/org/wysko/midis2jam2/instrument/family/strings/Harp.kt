@@ -17,6 +17,11 @@
 
 package org.wysko.midis2jam2.instrument.family.strings
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import kotlinx.serialization.json.Json
@@ -30,7 +35,6 @@ import org.wysko.midis2jam2.instrument.family.piano.Key
 import org.wysko.midis2jam2.instrument.family.piano.Key.Color.Black
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -72,7 +76,7 @@ class Harp(context: PerformanceManager, eventList: List<MidiEvent>) :
 
     init {
         with(geometry) {
-            +context.modelD("Harp.obj", "HarpSkin.bmp")
+            +context.model(Models.Strings.Harp.Body)
             strings.forEach { +it.node }
         }
         with(placement) {
@@ -104,15 +108,17 @@ class Harp(context: PerformanceManager, eventList: List<MidiEvent>) :
         }
 
         private val idleString: Spatial = with(node) {
-            +context.modelD("HarpString.obj", textures.idle)
+            +context.model(Models.Strings.Harp.String).apply {
+                setMaterial(context.assetLoader.material(textures.idle))
+            }
         }
 
         private val vibratingStringNode = node()
 
-        private val vibratingStrings: List<Spatial> = List(5) {
-            context.modelD("HarpStringPlaying$it.obj", textures.playing).apply {
+        private val vibratingStrings: List<Spatial> = Models.Strings.Harp.StringPlaying.map {
+            context.model(it).apply {
                 cullHint = false.ch
-                (this as Geometry).material.setColor("GlowColor", DIM_GLOW)
+                setMaterial(context.assetLoader.material(textures.playing).apply { setColor("GlowColor", DIM_GLOW) })
             }
         }
 
@@ -137,10 +143,10 @@ class Harp(context: PerformanceManager, eventList: List<MidiEvent>) :
     }
 }
 
-private sealed class HarpTextures(val idle: String, val playing: String) {
-    data object Red : HarpTextures("HarpStringRed.bmp", "HarpStringRedPlaying.bmp")
-    data object Blue : HarpTextures("HarpStringBlue.bmp", "HarpStringBluePlaying.bmp")
-    data object White : HarpTextures("HarpStringWhite.bmp", "HarpStringWhitePlaying.bmp")
+private sealed class HarpTextures(val idle: MaterialAsset, val playing: MaterialAsset) {
+    data object Red : HarpTextures(Materials.Diffuse.HarpStringRed, Materials.Diffuse.HarpStringRedPlaying)
+    data object Blue : HarpTextures(Materials.Diffuse.HarpStringBlue, Materials.Diffuse.HarpStringBluePlaying)
+    data object White : HarpTextures(Materials.Diffuse.HarpStringWhite, Materials.Diffuse.HarpStringWhitePlaying)
 }
 
 private fun getHarpString(noteNumber: Int): Int = when (noteNumber) {

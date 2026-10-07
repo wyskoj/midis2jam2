@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -31,7 +33,6 @@ import org.wysko.midis2jam2.util.isFakeShadows
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.v3
-import org.wysko.midis2jam2.world.assetLoader
 import kotlin.time.Duration
 
 /**
@@ -71,7 +72,7 @@ abstract class DrumSet(context: PerformanceManager, events: List<NoteEvent.NoteO
 
     init {
         if (context.isFakeShadows) {
-            geometry += context.assetLoader.fakeShadow("Assets/DrumShadow.obj", "Assets/DrumShadow.png").apply {
+            geometry += context.model(Models.Shadows.Drum).apply {
                 loc = v3(0, 0.01, -80)
             }
         }

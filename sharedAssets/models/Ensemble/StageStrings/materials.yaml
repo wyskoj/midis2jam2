@@ -1,0 +1,6 @@
+# The holder and the bow stick are retextured per type at runtime (StageStringsType).
+default: StageStringPlaying.bmp
+models: { String: StageString.bmp, Holder: FakeWood.bmp }
+parts:
+  Bow: { Hair: StageString.bmp, Stick: FakeWood.bmp }
+variants: [ Laser.bmp, AccordionCaseFront.bmp, SongFillbar.bmp ]

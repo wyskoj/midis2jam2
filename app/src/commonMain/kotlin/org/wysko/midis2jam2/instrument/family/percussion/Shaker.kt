@@ -16,12 +16,13 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Shaker. */
@@ -30,7 +31,7 @@ class Shaker(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) :
         Striker(
             context = context,
             strikeEvents = hits,
-            stickModel = context.modelD("Shaker.obj", "DarkWood.bmp"),
+            stickModel = context.model(Models.Percussion.Shaker.Body),
             actualStick = false,
         ).apply {
             offsetStick { it.move(0f, 0f, -3f) }

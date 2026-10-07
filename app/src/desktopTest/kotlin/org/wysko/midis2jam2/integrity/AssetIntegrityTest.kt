@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.integrity
 
+import org.wysko.midis2jam2.instrument.family.guitar.TuningKeyLayout
+import org.wysko.midis2jam2.assets.AssetCatalog
 import org.wysko.midis2jam2.testing.ProjectPaths
 import org.wysko.midis2jam2.testing.Spec
 import java.io.File
@@ -30,16 +32,22 @@ import kotlin.test.fail
  * Asset paths are plain strings resolved at runtime, and an instrument only loads its models
  * when that instrument happens to appear on stage, so a bad path can sit unnoticed for a long
  * time. Conversely, a data file can be left behind by a refactor and quietly stop being read.
+ *
+ * This covers the legacy string paths. Assets referenced through the generated catalog
+ * (`Models`, `Materials`, `Textures`) cannot name a missing file; AssetCatalogTest checks that
+ * they also load.
  */
 class AssetIntegrityTest {
 
     @Test
     fun `the asset scan actually finds assets to check`() {
         // Guards against the scan quietly matching nothing after a refactor, which would make
-        // every other assertion in this class pass vacuously.
+        // every other assertion in this class pass vacuously. Assets move from string paths to the
+        // generated catalog family by family, so the two are counted together.
+        val references = assetLiterals().size + AssetCatalog.models.size
         assertTrue(
-            assetLiterals().size >= MINIMUM_EXPECTED_ASSET_REFERENCES,
-            "Only ${assetLiterals().size} asset references were found in the sources; the " +
+            references >= MINIMUM_EXPECTED_ASSET_REFERENCES,
+            "Only $references asset references were found in the sources and the catalog; the " +
                 "scan has probably stopped matching. Expected at least $MINIMUM_EXPECTED_ASSET_REFERENCES."
         )
         assertTrue(dataFiles().size >= MINIMUM_EXPECTED_DATA_FILES, "Found too few bundled data files")
@@ -108,6 +116,32 @@ class AssetIntegrityTest {
     }
 
     @Test
+    fun `every tuning-key layout names converted models and a generated material`() {
+        val models = AssetCatalog.models.map { it.path }.toSet()
+        val materials = AssetCatalog.materials.map { it.path }.toSet()
+        val problems = File(ProjectPaths.sharedAssets, "instrument/tuning").listFiles { f -> f.extension == "json" }!!
+            .flatMap { file ->
+                val layout = TuningKeyLayout.load(file.nameWithoutExtension)!!
+                listOfNotNull(
+                    TuningKeyLayout.model(layout.body).path.takeUnless { it in models },
+                    layout.keyModel.path.takeUnless { it in models },
+                    layout.keyMaterial?.path?.takeUnless { it in materials },
+                ).map { "${file.name} names $it, which does not exist" }
+            }
+        assertTrue(problems.isEmpty(), problems.joinToString("\n"))
+    }
+
+    @Test
+    fun `every stand in stands yaml names a converted model`() {
+        val stands = File(ProjectPaths.sharedAssets, "stands.yaml").readText()
+        val models = AssetCatalog.models.map { it.path }.toSet()
+        val missing = STAND_MODEL.findAll(stands).map { it.groupValues[1] }
+            .filterNot { "Assets/Models/$it.j3o" in models }
+            .toList()
+        assertTrue(missing.isEmpty(), "stands.yaml names models that are not in sharedAssets/models: $missing")
+    }
+
+    @Test
     @Spec("app.assets.no-orphaned-data-files")
     fun `every bundled data file is read by some code path`() {
         val orphans = dataFiles()
@@ -166,6 +200,8 @@ class AssetIntegrityTest {
 
         val FRET_HEIGHT_FROM_JSON = Regex("FretHeightByTable\\.fromJson\\(\"(\\w+)\"\\)")
 
+        val STAND_MODEL = Regex("model:\\s*\"([^\"]+)\"")
+
         val INSTRUMENT_TYPE = Regex("instrumentType:\\s*\"([^\"]+)\"")
 
         val DECLARES_TYPE_NAMED = { name: String -> Regex("\\b(?:class|object)\\s+$name\\b") }
@@ -205,8 +241,12 @@ class AssetIntegrityTest {
             ).any { File(root, it).isFile }
         }
 
-        /** Structured data files: the YAML and JSON the app reads at runtime. */
+        /**
+         * Structured data files: the YAML and JSON the app reads at runtime. The model sources' material
+         * manifests are excluded: they are read by the build (:asset-tools), not by the app.
+         */
         fun dataFiles(): List<File> = ProjectPaths.sharedAssets.walkTopDown()
+            .onEnter { it != ProjectPaths.modelSources }
             .filter { it.isFile && (it.extension == "yaml" || it.extension == "json") }
             .toList()
 
@@ -221,9 +261,9 @@ class AssetIntegrityTest {
             val relative = file.relativeTo(ProjectPaths.sharedAssets).path.replace(File.separatorChar, '/')
             if (text.contains(relative)) return true
 
-            // instrument/tuning/<Body>.json is the key art of the instrument whose body is <Body>.obj
-            // (TuningKeyLayout.forModel).
-            if (relative.startsWith("instrument/tuning/")) return text.contains("\"" + file.nameWithoutExtension + ".obj\"")
+            // instrument/tuning/<Body>.json is the key art of the instrument whose body is the model
+            // Models.Guitar.<Body> (TuningKeyLayout.forModel).
+            if (relative.startsWith("instrument/tuning/")) return text.contains("Models.Guitar." + file.nameWithoutExtension)
 
             // instrument/<Class>.json and friends are loaded through
             // resourceToString("/instrument/" + klass.simpleName + ".json").

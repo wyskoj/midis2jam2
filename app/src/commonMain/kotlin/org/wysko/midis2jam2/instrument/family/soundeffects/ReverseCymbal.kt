@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
@@ -27,7 +29,6 @@ import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUM_SET_STICK
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelR
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -47,7 +48,7 @@ private const val DAMPENING = 1.5f
 class ReverseCymbal(context: PerformanceManager, eventList: List<MidiEvent>) : SustainedInstrument(context, eventList),
     MultipleInstancesLinearAdjustment {
     override val multipleInstancesDirection: Vector3f = v3(0, 20, 0)
-    private val cymbal = context.modelR("DrumSet_Cymbal.obj", "CymbalSkinSphereMap.bmp")
+    private val cymbal = context.model(Models.Percussion.DrumSet.Cymbal)
     private val pseudoHits =
         timedArcs.map { NoteEvent.NoteOn(it.end, it.noteOn.channel, it.note, 127) }.toMutableList().also {
             context.sequence.registerEvents(it)

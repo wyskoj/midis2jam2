@@ -17,9 +17,9 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
@@ -32,8 +32,7 @@ import org.wysko.midis2jam2.util.times
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(FrenchHorn::class)
@@ -61,25 +60,21 @@ class FrenchHorn(context: PerformanceManager, eventList: List<MidiEvent>) :
 
         override val keys: Array<Spatial> =
             with(geometry) {
-                Array(4) {
-                    +context.modelR(
-                        "FrenchHorn${if (it == 0) "Trigger" else "Key$it"}.obj",
-                        "HornSkinGrey.bmp"
-                    )
-                }.also {
-                    it.first().loc = v3(0, 0, 1) // Trigger key is offset
-                }
+                (listOf(Models.Brass.FrenchHorn.Trigger) + Models.Brass.FrenchHorn.Key)
+                    .map { +context.model(it) }
+                    .toTypedArray()
+                    .also {
+                        it[TRIGGER_INDEX].loc = v3(0, 0, 1) // Trigger key is offset
+                    }
             }
 
         init {
             with(geometry) {
-                +context.modelR("FrenchHornBody.obj", "HornSkin.bmp").also {
-                    (it as Node).getChild(1).setMaterial(context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp"))
-                }
+                +context.model(Models.Brass.FrenchHorn.Body)
             }
 
             with(bell) {
-                +context.modelR("FrenchHornHorn.obj", "HornSkin.bmp")
+                +context.model(Models.Brass.FrenchHorn.Horn)
                 loc = v3(0, -4.63, -1.87)
                 rot = v3(22, 0, 0)
             }

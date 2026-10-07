@@ -17,11 +17,10 @@
 
 package org.wysko.midis2jam2.manager
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.app.Application
 import com.jme3.app.SimpleApplication
-import com.jme3.material.Material
-import com.jme3.material.RenderState
-import com.jme3.renderer.queue.RenderQueue.Bucket.Transparent
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.family.guitar.BassGuitar
@@ -41,24 +40,24 @@ class FakeShadowsManager : BaseManager() {
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        keyboardShadow = loadFakeShadow("Assets/PianoShadow.obj", "Assets/KeyboardShadow.png").apply {
+        keyboardShadow = context.model(Models.Shadows.Piano).apply {
             loc = v3(-47, 0.1, 3)
             rot = v3(0, 45, 0)
         }
         harpShadows = List(context.count<Harp>()) {
-            loadFakeShadow("Assets/HarpShadow.obj", "Assets/HarpShadow.png").apply {
+            context.model(Models.Shadows.Harp).apply {
                 loc = v3(-126, 0.1, -30 + 60 * it)
                 rot = v3(0, -35, 0)
             }
         }
         guitarShadows = List(context.count<Guitar>()) {
-            loadFakeShadow("Assets/GuitarShadow.obj", "Assets/GuitarShadow.png").apply {
+            context.model(Models.Shadows.Guitar).apply {
                 loc = v3(43.4f + 5 * (it * 1.5), 0.1f + 0.01f * (it * 1.5), 7.1)
                 rot = v3(0, -49.0, 0)
             }
         }
         bassGuitarShadows = List(context.count<BassGuitar>()) {
-            loadFakeShadow("Assets/BassShadow.obj", "Assets/BassShadow.png").apply {
+            context.model(Models.Shadows.Bass).apply {
                 loc = v3(51.6f + 7 * it, 0.1f + 0.01f * it, -16.6)
                 rot = v3(0, -43.5, 0)
             }
@@ -92,18 +91,6 @@ class FakeShadowsManager : BaseManager() {
     }
 
     override fun cleanup(app: Application?): Unit = Unit
-    private fun loadFakeShadow(modelName: String, textureName: String): Spatial =
-        application.assetManager.loadModel(modelName).apply {
-            setMaterial(
-                Material(context.app.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-                    setTexture("ColorMap", app.assetManager.loadTexture(textureName))
-                    additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-                    setFloat("AlphaDiscardThreshold", 0.01f)
-                }
-            )
-            queueBucket = Transparent
-        }
-
     private fun updateKeyboard() {
         keyboardShadow.cullHint = context.instruments.any { it is Keyboard && it.isVisible }.ch
         val keyboards = context.instruments.filterIsInstance<Keyboard>()

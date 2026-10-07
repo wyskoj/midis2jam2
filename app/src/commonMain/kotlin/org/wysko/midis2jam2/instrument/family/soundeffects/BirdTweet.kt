@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.TimedArc
@@ -27,13 +29,10 @@ import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(0f, 49.5f, -152.65f)
-private const val BIRD_TEXTURE = "Bird.png"
 
 /**
  * The bird tweet.
@@ -66,16 +65,14 @@ class BirdTweet(context: PerformanceManager, events: List<MidiEvent>) : Divisive
     }
 
     private inner class Bird(notePeriods: List<TimedArc>) : RisingPitchClassAnimator(context, notePeriods) {
-        private val openBeak = context.modelD("BirdBeak_Open.obj", BIRD_TEXTURE).also { geometry += it }
-        private val closedBeak = context.modelD("BirdBeak_Closed.obj", BIRD_TEXTURE).also { geometry += it }
-        private val wings = context.modelD("BirdWings.obj", BIRD_TEXTURE).also { geometry += it }
+        private val openBeak = context.model(Models.SoundEffects.BirdTweet.BeakOpen).also { geometry += it }
+        private val closedBeak = context.model(Models.SoundEffects.BirdTweet.BeakClosed).also { geometry += it }
+        private val wings = context.model(Models.SoundEffects.BirdTweet.Wings).also { geometry += it }
         private var animationIndex = 0.0f
 
         init {
             with(geometry) {
-                +context.modelD("Bird.obj", BIRD_TEXTURE).apply {
-                    (this as Node)[0].material = context.assetLoader.reflectiveMaterial("Assets/HornSkin.bmp")
-                }
+                +context.model(Models.SoundEffects.BirdTweet.Body)
             }
         }
 

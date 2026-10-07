@@ -1,0 +1,2 @@
+# The synth brass variants swap this for HornSkinGrey or HornSkinCopper at runtime (StageHornsType).
+default: HornSkin

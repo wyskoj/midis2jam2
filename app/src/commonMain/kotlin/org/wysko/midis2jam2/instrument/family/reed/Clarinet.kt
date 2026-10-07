@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
@@ -30,7 +31,7 @@ import org.wysko.midis2jam2.instrument.clone.CloneWithHands
 import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: HandPositionFingeringManager = from(Clarinet::class)
@@ -59,17 +60,13 @@ class Clarinet(context: PerformanceManager, eventList: List<MidiEvent>) :
     /** The type Clarinet clone. */
     inner class ClarinetClone : CloneWithHands(this@Clarinet, 0.075f) {
 
-        override val leftHands: List<Spatial> = List(20) {
-            parent.context.modelD("ClarinetLeftHand$it.obj", "hands.bmp")
-        }
+        override val leftHands: List<Spatial> = Models.Reed.Hands.Left.map { parent.context.model(it) }
 
-        override val rightHands: List<Spatial> = List(13) {
-            parent.context.modelD("ClarinetRightHand$it.obj", "hands.bmp")
-        }
+        override val rightHands: List<Spatial> = Models.Reed.Hands.Right.map { parent.context.model(it) }
 
         init {
             /* Load body */
-            geometry.attachChild(context.modelD("ClarinetBody.obj", "ClarinetSkin.png"))
+            geometry.attachChild(context.model(Models.Reed.Clarinet.Body))
 
             /* Position Clarinet */
             animNode.setLocalTranslation(0f, 0f, 10f)
@@ -79,7 +76,7 @@ class Clarinet(context: PerformanceManager, eventList: List<MidiEvent>) :
         }
 
         /** The bell. */
-        private val bell: Spatial = context.modelD("ClarinetHorn.obj", "ClarinetSkin.png").apply {
+        private val bell: Spatial = context.model(Models.Reed.Clarinet.Horn).apply {
             geometry.attachChild(this)
             setLocalTranslation(0f, -20.7125f, 0f)
         }

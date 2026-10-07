@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType.DRUM_SET_STICK
@@ -27,7 +30,6 @@ import org.wysko.midis2jam2.midi.ELECTRIC_SNARE
 import org.wysko.midis2jam2.midi.SIDE_STICK
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.max
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -78,7 +80,8 @@ class SnareDrum(
         }
 
     init {
-        context.modelD(style.snareDrumModel, style.snareShellTexture).apply {
+        context.model(style.snareDrumModel).apply {
+            setMaterial(context.assetLoader.material(style.snareShell))
             recoilNode.attachChild(this)
             if (style is ShellStyle.AlternativeDrumShell) scale(1.2f) // Looks more aesthetically pleasing
         }

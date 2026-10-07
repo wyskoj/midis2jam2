@@ -1,0 +1,3 @@
+models: { Head: TimpaniSkin.bmp }
+parts:
+  Body: { Metal: HornSkin, Trim: HornSkinGrey }

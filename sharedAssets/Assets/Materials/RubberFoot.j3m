@@ -1,0 +1,6 @@
+// Matte black rubber. Matches AssetLoader.diffuseMaterial.
+Material RubberFoot : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Flip Assets/RubberFoot.bmp
+    }
+}

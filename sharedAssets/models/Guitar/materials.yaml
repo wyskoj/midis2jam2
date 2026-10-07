@@ -1,0 +1,31 @@
+# Bodies, strings, keys and note fingers are retextured per instrument type at runtime (Guitar.GuitarType,
+# BassGuitar.BassGuitarType); these are the standard looks. Tuning-key layouts in sharedAssets/instrument/tuning name
+# the bodies and keys here by file name (see docs/TUNING_KEYS.md).
+default: GuitarSkin.bmp
+models:
+  GuitarAcoustic: AcousticGuitar.png
+  Bass: BassSkin.bmp
+  BassFretless: BassSkinFretless.png
+  Banjo: BanjoSkin.png
+  Shamisen: ShamisenSkin.png
+  BassKey: BassSkin.bmp
+  Capo: RubberFoot
+  BassString: BassSkin.bmp
+  BassStringBottom0: BassSkin.bmp
+  BassStringBottom1: BassSkin.bmp
+  BassStringBottom2: BassSkin.bmp
+  BassStringBottom3: BassSkin.bmp
+  BassStringBottom4: BassSkin.bmp
+  BanjoString: BassSkin.bmp
+  BanjoStringBottom0: BassSkin.bmp
+  BanjoStringBottom1: BassSkin.bmp
+  BanjoStringBottom2: BassSkin.bmp
+  BanjoStringBottom3: BassSkin.bmp
+  BanjoStringBottom4: BassSkin.bmp
+  ShamisenString: ShamisenSkin.png
+  ShamisenStringBottom0: ShamisenSkin.png
+  ShamisenStringBottom1: ShamisenSkin.png
+  ShamisenStringBottom2: ShamisenSkin.png
+  ShamisenStringBottom3: ShamisenSkin.png
+  ShamisenStringBottom4: ShamisenSkin.png
+variants: [ JazzGuitarSkin.png, MutedGuitarSkin.png, OverdrivenGuitarSkin.png, DistortionGuitarSkin.png, HarmonicsGuitarSkin.png, BassSkinSynth1.png, BassSkinSynth2.png ]

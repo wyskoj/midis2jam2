@@ -45,3 +45,4 @@ plugins {
 }
 
 include(":app")
+include(":asset-tools")

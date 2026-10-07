@@ -1,0 +1,4 @@
+# Fake shadows: unlit, alpha-blended planes under instruments (and the helicopter's rotor blur).
+models: { Xylophone: shadow XylophoneShadow.png, Drum: shadow DrumShadow.png, Piano: shadow KeyboardShadow.png, Harp: shadow HarpShadow.png, Guitar: shadow GuitarShadow.png, Bass: shadow BassShadow.png, HelicopterRotor: shadow HelicopterRotor.png }
+# The helicopter's lights are drawn on the same rotor plane.
+variants: [ shadow HelicopterLights1.png, shadow HelicopterLights2.png, shadow HelicopterLights3.png, shadow HelicopterLights4.png, shadow HelicopterLights5.png, shadow HelicopterLights6.png, shadow HelicopterLights7.png, shadow HelicopterLights8.png, shadow HelicopterLights9.png, shadow HelicopterLights10.png, shadow HelicopterLights11.png, shadow HelicopterLights12.png ]

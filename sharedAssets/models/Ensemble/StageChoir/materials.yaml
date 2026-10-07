@@ -1,0 +1,4 @@
+# Head and body are retextured per choir type at runtime (StageChoir.ChoirType).
+default: ChoirPeep.bmp
+models: { Halo: ChoirHalo.png, NoBook: ChoirPeepOoh.png }
+variants: [ ChoirPeepSynthVoice.png, ChoirPeepVoiceSynth.png, ChoirPeepGoblin.png ]

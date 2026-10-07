@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.performance
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.scene.Geometry
 import com.jme3.scene.Mesh
 import com.jme3.scene.Spatial
@@ -28,7 +30,6 @@ import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
 import org.wysko.midis2jam2.testing.withInstruments
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.ceil
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -178,7 +179,7 @@ class SmartDrumSticksTest {
          */
         fun visibleSticksIn(performance: HeadlessPerformance, root: Spatial): Int {
             val stickMeshes = mutableListOf<Mesh>()
-            performance.performance.modelD("DrumSet_Stick.obj", "StickSkin.bmp")
+            performance.performance.model(Models.Shared.Stick)
                 .depthFirstTraversal { if (it is Geometry) stickMeshes += it.mesh }
 
             var count = 0

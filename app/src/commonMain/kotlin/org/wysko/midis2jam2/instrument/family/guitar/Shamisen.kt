@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
@@ -23,9 +26,7 @@ import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
 
-private const val SHAMISEN_SKIN_TEXTURE = "ShamisenSkin.png"
 private const val FORWARD = -0.23126f
 
 /**
@@ -52,13 +53,13 @@ class Shamisen(context: PerformanceManager, events: List<MidiEvent>) :
             }
         ),
         3,
-        context.modelD("Shamisen.obj", SHAMISEN_SKIN_TEXTURE) to SHAMISEN_SKIN_TEXTURE
+        context.model(Models.Guitar.Shamisen) to Materials.Diffuse.ShamisenSkin
     ),
     MultipleInstancesLinearAdjustment {
 
     override val upperStrings: Array<Spatial> = Array(3) {
         with(geometry) {
-            +context.modelD("ShamisenString.obj", SHAMISEN_SKIN_TEXTURE).apply {
+            +context.model(Models.Guitar.ShamisenString).apply {
                 loc = v3(positioning.upperX[it], positioning.upperY, FORWARD)
             }
         }
@@ -67,7 +68,7 @@ class Shamisen(context: PerformanceManager, events: List<MidiEvent>) :
     override val lowerStrings: List<List<Spatial>> = List(3) { i: Int ->
         List(5) { j: Int ->
             with(geometry) {
-                +context.modelD("ShamisenStringBottom$j.obj", SHAMISEN_SKIN_TEXTURE).apply {
+                +context.model(Models.Guitar.ShamisenStringBottom[j]).apply {
                     loc = v3(positioning.lowerX[i], positioning.lowerY, FORWARD)
                     cullHint = false.ch
                 }

@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
@@ -28,8 +30,6 @@ import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.particle.ParticleGenerator
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -48,9 +48,9 @@ class Gunshot(context: PerformanceManager, events: List<MidiEvent>) : DecayedIns
     private val collector = EventCollector(context, events.filterIsInstance<NoteEvent.NoteOn>())
     private val casingGenerator = CasingGenerator(context)
 
-    private val pistol = context.modelD("Pistol.obj", "Pistol.png")
-    private val slide = context.modelD("PistolSlide.obj", "Pistol.png")
-    private val trigger = context.modelD("PistolTrigger.obj", "Pistol.png")
+    private val pistol = context.model(Models.SoundEffects.Gunshot.Pistol)
+    private val slide = context.model(Models.SoundEffects.Gunshot.Slide)
+    private val trigger = context.model(Models.SoundEffects.Gunshot.Trigger)
 
     private val recoil = NumberSmoother(0.0f, 8.0)
     private val slideAmount = NumberSmoother(0.0f, 15.0)
@@ -122,7 +122,7 @@ private class CasingGenerator(private val context: PerformanceManager) : Particl
     }
 
     private fun getNewCasing(): Spatial = if (pool.isEmpty()) {
-        context.modelR("PistolCasing.obj", "HornSkin.bmp")
+        context.model(Models.SoundEffects.Gunshot.Casing)
     } else {
         pool.removeAt(pool.lastIndex)
     }.also {

@@ -35,6 +35,9 @@ object ProjectPaths {
     }
 
     val sharedAssets: File get() = File(repositoryRoot, "sharedAssets")
+
+    /** The OBJ sources the build converts to `.j3o` (see docs/ASSETS.md); not shipped as they are. */
+    val modelSources: File get() = File(sharedAssets, "models")
     val sourceRoot: File get() = File(repositoryRoot, "app/src")
     val composeResources: File get() = File(repositoryRoot, "app/src/commonMain/composeResources")
     val appBuildScript: File get() = File(repositoryRoot, "app/build.gradle.kts")

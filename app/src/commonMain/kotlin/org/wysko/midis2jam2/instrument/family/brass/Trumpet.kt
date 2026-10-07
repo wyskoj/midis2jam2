@@ -17,9 +17,9 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
@@ -28,9 +28,7 @@ import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Trumpet::class)
@@ -59,21 +57,17 @@ class Trumpet(context: PerformanceManager, eventList: List<MidiEvent>, type: Tru
      * The Trumpet clone.
      */
     open inner class TrumpetClone : CloneWithKeyPositions(this@Trumpet, 0.15f, 0.9f, Axis.Z, Axis.X) {
-        override val keys: Array<Spatial> = Array(3) { index ->
-            with(geometry) {
-                +context.modelR("TrumpetKey${index + 1}.obj", "HornSkinGrey.bmp")
-            }
+        override val keys: Array<Spatial> = with(geometry) {
+            Models.Brass.Trumpet.Key.map { +context.model(it) }.toTypedArray()
         }
 
         init {
             with(geometry) {
-                +context.modelR("TrumpetBody.obj", "HornSkin.bmp").apply {
-                    (this as Node)[1].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-                }
+                +context.model(Models.Brass.Trumpet.Body)
             }
 
             with(bell) {
-                +context.modelR("TrumpetHorn.obj", "HornSkin.bmp")
+                +context.model(Models.Brass.Trumpet.Horn)
                 loc = v3(0, 0, 5.58)
             }
 
@@ -97,7 +91,7 @@ class Trumpet(context: PerformanceManager, eventList: List<MidiEvent>, type: Tru
      */
     inner class MutedTrumpetClone : TrumpetClone() {
         init {
-            bell += context.modelD("TrumpetMute.obj", "RubberFoot.bmp")
+            bell += context.model(Models.Brass.Trumpet.Mute)
         }
     }
 }

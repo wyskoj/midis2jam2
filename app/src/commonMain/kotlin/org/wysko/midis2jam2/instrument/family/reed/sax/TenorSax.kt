@@ -17,13 +17,11 @@
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
 import com.jme3.math.Quaternion
-import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.PressedKeysFingeringManager
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.blackMaterial
 import org.wysko.midis2jam2.world.model
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(TenorSax::class)
@@ -36,20 +34,11 @@ class TenorSax(context: PerformanceManager, events: List<MidiEvent>) :
     /** A single TenorSax. */
     inner class TenorSaxClone : SaxophoneClone(this@TenorSax, STRETCH_FACTOR) {
         init {
-            val shine = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-
             with(bell) {
                 move(0f, -22f, 0f)
-                attachChild(context.model("Assets/TenorSaxHorn.obj"))
-                setMaterial(shine)
+                attachChild(context.model(Models.Reed.Sax.Tenor.Horn))
             }
-
-            context.model("Assets/TenorSaxBody.obj").apply {
-                this as Node
-                getChild(0).setMaterial(shine)
-                getChild(1).setMaterial(context.blackMaterial())
-                geometry.attachChild(this)
-            }
+            geometry.attachChild(context.model(Models.Reed.Sax.Tenor.Body))
             highestLevel.localRotation = Quaternion().fromAngles(rad(10.0), rad(30.0), 0f)
         }
     }

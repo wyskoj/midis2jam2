@@ -17,9 +17,10 @@
 package org.wysko.midis2jam2.instrument.family.reed.sax
 
 import com.jme3.math.Quaternion
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyStates
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 /** The number of keys on a saxophone. */
@@ -37,11 +38,10 @@ abstract class SaxophoneClone protected constructor(parent: Saxophone, stretchFa
     }
 
     init {
-        keysUp = List(NUMBER_OF_KEYS) {
-            parent.context.modelR("AltoSaxKeyUp$it.obj", "HornSkinGrey.bmp")
-        }
-        keysDown = List(NUMBER_OF_KEYS) {
-            parent.context.modelR("AltoSaxKeyDown$it.obj", "HornSkinGrey.bmp")
+        keysUp = Models.Reed.Sax.Shared.KeyUp.map { parent.context.model(it) }
+        keysDown = Models.Reed.Sax.Shared.KeyDown.map { parent.context.model(it) }
+        check(keysUp.size == NUMBER_OF_KEYS && keysDown.size == NUMBER_OF_KEYS) {
+            "Expected $NUMBER_OF_KEYS saxophone keys in each state, found ${keysUp.size} up and ${keysDown.size} down"
         }
         attachKeys()
 

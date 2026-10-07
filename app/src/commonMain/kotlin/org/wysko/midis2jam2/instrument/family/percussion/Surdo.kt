@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -29,7 +31,6 @@ import org.wysko.midis2jam2.util.VectorSmoother
 import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Surdo. */
@@ -54,7 +55,7 @@ class Surdo(
 
     /** The hand that rests or hovers above the drum. */
     private val hand: Spatial =
-        context.modelD("hand_left.obj", "hands.bmp").also {
+        context.model(Models.Shared.HandLeft).also {
             recoilNode.attachChild(it)
         }
 
@@ -64,7 +65,7 @@ class Surdo(
 
     init {
         recoilNode.attachChild(
-            context.modelD("DrumSet_Surdo.obj", "DrumShell_Surdo.png").apply {
+            context.model(Models.Percussion.Surdo.Drum).apply {
                 setLocalScale(1.7f)
             },
         )

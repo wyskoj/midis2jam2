@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -23,7 +25,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Bongos. */
@@ -34,7 +35,7 @@ class Bongos(
 ) : AuxiliaryPercussion(context, (lowHits + highHits).sortedBy { it.tick }.toMutableList()) {
     private val leftBongoAnimNode =
         Node().apply {
-            context.modelD("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").apply {
+            context.model(Models.Percussion.Bongos.Drum).apply {
                 setLocalScale(0.9f)
             }.also {
                 this.attachChild(it)
@@ -43,7 +44,7 @@ class Bongos(
 
     private val rightBongoAnimNode =
         Node().apply {
-            context.modelD("DrumSet_Bongo.obj", "DrumShell_Bongo.bmp").also {
+            context.model(Models.Percussion.Bongos.Drum).also {
                 this.attachChild(it)
             }
         }

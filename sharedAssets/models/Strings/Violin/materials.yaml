@@ -1,0 +1,4 @@
+# The viola and the fiddle swap the body texture at runtime.
+default: ViolinSkin.bmp
+models: { StringPlayed0: DoubleBassSkin.bmp, StringPlayed1: DoubleBassSkin.bmp, StringPlayed2: DoubleBassSkin.bmp, StringPlayed3: DoubleBassSkin.bmp, StringPlayed4: DoubleBassSkin.bmp }
+variants: [ ViolaSkin.bmp, FiddleSkin.png ]

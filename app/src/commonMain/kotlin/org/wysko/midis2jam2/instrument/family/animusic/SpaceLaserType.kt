@@ -17,23 +17,25 @@
 
 package org.wysko.midis2jam2.instrument.family.animusic
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
 import com.jme3.math.ColorRGBA
 
 /**
  * Defines a type of [SpaceLaser].
  *
- * @property filename The texture file of the laser.
+ * @property material What the laser looks like.
  * @property glowColor The glow color.
  * @see SpaceLaser
  */
-sealed class SpaceLaserType(val filename: String, val glowColor: ColorRGBA) {
+sealed class SpaceLaserType(val material: MaterialAsset, val glowColor: ColorRGBA) {
     /**
      * Sawtooth laser.
      */
-    data object Saw : SpaceLaserType("Laser.bmp", ColorRGBA.Green)
+    data object Saw : SpaceLaserType(Materials.Diffuse.Laser, ColorRGBA.Green)
 
     /**
      * Square laser.
      */
-    data object Square : SpaceLaserType("LaserRed.png", ColorRGBA.Red)
+    data object Square : SpaceLaserType(Materials.Diffuse.LaserRed, ColorRGBA.Red)
 }

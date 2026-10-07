@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
@@ -24,7 +26,6 @@ import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.plusAssign
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Cowbell. */
@@ -36,7 +37,7 @@ class Cowbell(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) 
     }
 
     init {
-        recoilNode += context.modelR("CowBell.obj", "MetalTexture.bmp")
+        recoilNode += context.model(Models.Percussion.Cowbell.Body)
         geometry.run {
             loc = v3(-10, 37.5, -85)
             rot = v3(24, 26.7, -3.81)

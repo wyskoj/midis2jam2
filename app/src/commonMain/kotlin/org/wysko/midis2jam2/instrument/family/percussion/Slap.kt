@@ -16,13 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -35,7 +36,7 @@ class Slap(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : A
         Striker(
             context = context,
             strikeEvents = hits,
-            stickModel = context.modelD("SlapHalf.obj", "Wood.bmp"),
+            stickModel = context.model(Models.Percussion.Slap.Half),
             strikeSpeed = 2.4,
             maxIdleAngle = 30.0,
             actualStick = false,
@@ -47,7 +48,7 @@ class Slap(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) : A
     private val rightSlap =
         Node().also {
             it.attachChild(
-                context.modelD("SlapHalf.obj", "Wood.bmp").apply {
+                context.model(Models.Percussion.Slap.Half).apply {
                     localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
                 },
             )

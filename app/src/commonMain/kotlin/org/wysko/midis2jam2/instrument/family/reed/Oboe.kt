@@ -20,6 +20,7 @@ import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.BellStretcher
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
@@ -29,7 +30,7 @@ import org.wysko.midis2jam2.instrument.clone.CloneWithHands
 import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 // The below is not a typo! Rather, a symbol of laziness.
@@ -58,7 +59,7 @@ class Oboe(context: PerformanceManager, eventList: List<MidiEvent>) :
     inner class OboeClone : CloneWithHands(this@Oboe, 0.075f) {
 
         /** The bell. */
-        private val bell = context.modelD("OboeHorn.obj", "OboeSkin.png").apply {
+        private val bell = context.model(Models.Reed.Oboe.Horn).apply {
             geometry.attachChild(this)
             setLocalTranslation(0f, -20.7125f, 0f)
         }
@@ -70,13 +71,9 @@ class Oboe(context: PerformanceManager, eventList: List<MidiEvent>) :
             root.localRotation = Quaternion().fromAngles(0f, rad((25 * indexForMoving()).toDouble()), 0f)
         }
 
-        override val leftHands: List<Spatial> = List(20) {
-            parent.context.modelD("ClarinetLeftHand$it.obj", "hands.bmp")
-        }
+        override val leftHands: List<Spatial> = Models.Reed.Hands.Left.map { parent.context.model(it) }
 
-        override val rightHands: List<Spatial> = List(13) {
-            parent.context.modelD("ClarinetRightHand$it.obj", "hands.bmp")
-        }
+        override val rightHands: List<Spatial> = Models.Reed.Hands.Right.map { parent.context.model(it) }
 
         override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
@@ -85,7 +82,7 @@ class Oboe(context: PerformanceManager, eventList: List<MidiEvent>) :
 
         init {
             /* Load body */
-            geometry.attachChild(context.modelD("OboeBody.obj", "OboeSkin.png"))
+            geometry.attachChild(context.model(Models.Reed.Oboe.Body))
             loadHands()
 
             animNode.setLocalTranslation(0f, 0f, 10f)

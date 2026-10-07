@@ -1,0 +1,3 @@
+# Models many instruments share: the drumstick and the striking hands.
+default: hands.bmp
+models: { Stick: StickSkin.bmp }

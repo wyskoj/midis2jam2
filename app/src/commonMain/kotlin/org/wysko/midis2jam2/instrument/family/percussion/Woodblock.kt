@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -23,7 +25,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The woodblock. High and low. */
@@ -35,13 +36,13 @@ class Woodblock(
     /** The Left woodblock anim node. */
     private val leftWoodblockNode =
         Node().apply {
-            attachChild(context.modelD("WoodBlockHigh.obj", "SimpleWood.bmp"))
+            attachChild(context.model(Models.Percussion.Woodblock.High))
         }
 
     /** The Right woodblock anim node. */
     private val rightWoodblockNode =
         Node().apply {
-            attachChild(context.modelD("WoodBlockLow.obj", "SimpleWood.bmp"))
+            attachChild(context.model(Models.Percussion.Woodblock.Low))
         }
 
     private val leftStick =

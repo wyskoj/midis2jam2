@@ -16,13 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Melodic tom. */
@@ -49,7 +50,7 @@ class MelodicTom(
 
     init {
         recoilNode.attachChild(
-            context.modelD("MelodicTom.obj", "DrumShell_MelodicTom.bmp").apply {
+            context.model(Models.Percussive.MelodicTom.Drum).apply {
                 localRotation = Quaternion().fromAngles(rad(36.0), 0f, 0f)
             }
         )

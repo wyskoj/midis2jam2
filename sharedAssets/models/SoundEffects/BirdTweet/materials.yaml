@@ -1,0 +1,3 @@
+default: Bird.png
+parts:
+  Body: { Shiny: HornSkin, Feathers: Bird.png }

@@ -17,15 +17,14 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Cuica. */
@@ -39,17 +38,14 @@ class Cuica(
 
     init {
         // Load drum
-        context.modelD("DrumSet_Cuica.obj", "DrumShell_Cuica.png").also {
-            geometry.attachChild(it)
-            (it as Node).getChild(0).setMaterial(context.assetLoader.diffuseMaterial("Wood.bmp"))
-        }
+        geometry.attachChild(context.model(Models.Percussion.Cuica.Drum))
     }
 
-    private val strokeHand = context.modelD("Hand_Cuica.obj", "hands.bmp").also {
+    private val strokeHand = context.model(Models.Percussion.Cuica.Hand).also {
         geometry.attachChild(it)
     }
 
-    private val restHand = context.modelD("hand_left.obj", "hands.bmp").also {
+    private val restHand = context.model(Models.Shared.HandLeft).also {
         geometry.attachChild(it)
         it.setLocalTranslation(3f, 0f, 0f)
         it.localRotation = Quaternion().fromAngles(0f, 1.57f, 0f)

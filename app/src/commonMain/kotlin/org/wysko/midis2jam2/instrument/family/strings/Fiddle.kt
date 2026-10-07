@@ -16,13 +16,16 @@
  */
 package org.wysko.midis2jam2.instrument.family.strings
 
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Violin. */
@@ -33,7 +36,9 @@ class Fiddle(context: PerformanceManager, events: List<MidiEvent>) : StringFamil
     180.0,
     Vector3f(1f, 1f, 1f),
     FrettingProfiles.fiddle(),
-    context.modelD("Violin.obj", "FiddleSkin.png")
+    context.model(Models.Strings.Violin.Body).apply {
+        setMaterial(context.assetLoader.material(Materials.Diffuse.FiddleSkin))
+    }
 ) {
     override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(20 * updateInstrumentIndex(delta), 0f, 0f)

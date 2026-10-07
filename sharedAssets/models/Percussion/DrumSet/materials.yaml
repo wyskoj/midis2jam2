@@ -1,0 +1,7 @@
+# Shells and cymbals are retextured per kit style at runtime (ShellStyle, Cymbal.Style).
+default: DrumShell.bmp
+models: { Pedal: MetalTexture.bmp, Cymbal: reflective CymbalSkinSphereMap.bmp, ChinaCymbal: reflective CymbalSkinSphereMap.bmp }
+parts:
+  BeaterArm: { Shiny: reflective ShinySilver.bmp, Dark: MetalTextureDark.bmp, Metal: MetalTexture.bmp }
+  BeaterHolder: { Bolt: MetalTexture.bmp, Frame: MetalTexture.bmp }
+variants: [ DrumShell_Snare.bmp, DrumShell_Room.png, DrumShell_Snare_Room.png, DrumShell_Power.png, DrumShell_Snare_Power.png, DrumShell_Jazz.png, DrumShell_Snare_Jazz.png, DrumShell_Brush.png, DrumShell_Snare_Brush.png, SynthDrum.bmp, SynthDrumAlternative.png ]

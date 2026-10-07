@@ -17,6 +17,9 @@
 
 package org.wysko.midis2jam2.instrument.family.piano
 
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
+
 /**
  * Defines how the models and textures of a key should be configured.
  * The configuration can be based on whether the key makes up/down distinction
@@ -25,32 +28,32 @@ package org.wysko.midis2jam2.instrument.family.piano
 sealed class KeyConfiguration {
     /**
      * Separate models for each key state (up/down).
-     * @property frontKeyFile The file path of the model for the front of the key in the up state.
-     * @property backKeyFile The file path of the model for the back of the key in the up state. Null if not applicable.
-     * @property frontKeyFileDown The file path of the model for the front of the key in the down state.
-     * @property backKeyFileDown The file path of the model for the back of the key in the down state. Null if not applicable.
-     * @property texture The texture used for all states of the key.
+     * @property frontKeyFile The model for the front of the key in the up state.
+     * @property backKeyFile The model for the back of the key in the up state. Null if not applicable.
+     * @property frontKeyFileDown The model for the front of the key in the down state.
+     * @property backKeyFileDown The model for the back of the key in the down state. Null if not applicable.
+     * @property texture The material used for all states of the key.
      */
     data class SeparateModels(
-        val frontKeyFile: String,
-        val backKeyFile: String?,
-        val frontKeyFileDown: String,
-        val backKeyFileDown: String?,
-        val texture: String
+        val frontKeyFile: ModelAsset,
+        val backKeyFile: ModelAsset?,
+        val frontKeyFileDown: ModelAsset,
+        val backKeyFileDown: ModelAsset?,
+        val texture: MaterialAsset
     ) : KeyConfiguration()
 
     /**
      * Same model with separate textures for each key state (up/down).
-     * @property frontKeyFile The file path of the model for the front of the key.
-     * @property backKeyFile The file path of the model for the back of the key. Null if not applicable.
-     * @property upTexture The texture used when the key is in the up state.
-     * @property downTexture The texture used when the key is in the down state.
+     * @property frontKeyFile The model for the front of the key.
+     * @property backKeyFile The model for the back of the key. Null if not applicable.
+     * @property upTexture The material used when the key is in the up state.
+     * @property downTexture The material used when the key is in the down state.
      */
     data class SeparateTextures(
-        val frontKeyFile: String,
-        val backKeyFile: String?,
-        val upTexture: String,
-        val downTexture: String
+        val frontKeyFile: ModelAsset,
+        val backKeyFile: ModelAsset?,
+        val upTexture: MaterialAsset,
+        val downTexture: MaterialAsset
     ) : KeyConfiguration()
 }
 
