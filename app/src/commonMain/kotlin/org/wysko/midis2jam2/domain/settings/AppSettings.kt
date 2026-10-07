@@ -116,6 +116,8 @@ data class AppSettings(
         val midiSpecificationResetSettings: MidiSpecificationResetSettings = MidiSpecificationResetSettings(),
         val soundbanksSettings: SoundbanksSettings = SoundbanksSettings(),
         val synthesizerSettings: SynthesizerSettings = SynthesizerSettings(),
+        /** Whether the silence before the first note and after the last one is cut from the song. */
+        val isTrimSilence: Boolean = false,
     ) {
         @Serializable
         data class MidiSpecificationResetSettings(

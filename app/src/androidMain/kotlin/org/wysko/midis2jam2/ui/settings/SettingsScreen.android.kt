@@ -95,6 +95,9 @@ internal actual fun settingsPages(
             row { SynthesizerReverbSelect(settings, model) }
             row { SynthesizerChorusSelect(settings, model) }
         }
+        section(Res.string.settings_section_song) {
+            row { TrimSilenceSelect(settings, model) }
+        }
     },
 )
 

@@ -19,11 +19,11 @@ package org.wysko.midis2jam2.starter
 
 import org.koin.mp.KoinPlatformTools
 import org.wysko.kmidi.midi.TimeBasedSequence
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.domain.GervillMidiDevice
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
 import org.wysko.midis2jam2.midi.system.MidiDevice
@@ -69,7 +69,7 @@ internal class MidiPackage private constructor(
 
             val reader = StandardMidiFileReader()
             midiFile?.let {
-                val sequence = reader.readFile(it).toTimeBasedSequence()
+                val sequence = reader.readFile(it).toPerformanceSequence(config.settings)
                 sequencer.sequence = sequence
             }
 

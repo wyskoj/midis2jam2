@@ -188,6 +188,11 @@
     <string name="settings_playback_synthesizer_reverb">Kaiku (Reverb)</string>
     <string name="settings_playback_synthesizer_reverb_description">Käytä kaikuefektiä</string>
 
+    <!-- Settings / Playback / Song -->
+    <string name="settings_section_song">Kappale</string>
+    <string name="settings_playback_trim_silence">Poista hiljaisuus</string>
+    <string name="settings_playback_trim_silence_description">Ohita hiljaisuus kappaleen alussa ja lopussa</string>
+
     <!-- Asetukset / Kamera -->
     <string name="settings_camera">Kamera</string>
     <string name="settings_camera_description">Autokamera, klassinen kamera</string>

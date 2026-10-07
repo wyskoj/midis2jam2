@@ -38,12 +38,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.domain.BackgroundWarning
 import org.wysko.midis2jam2.domain.computeBackgroundWarning
 import org.wysko.midis2jam2.midi.search.MIDI_FILE_EXTENSIONS
+import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.record.RecordOptions
 import org.wysko.midis2jam2.record.RecordTabPersistor
 import org.wysko.midis2jam2.record.RecordTabState
@@ -141,8 +141,10 @@ class RecordTabModel(
         _midiFile.value = file
         _songInfo.value = null
         scope.launch {
+            val settings: SettingsModel by inject()
             val info = runCatching {
-                SongInfo(StandardMidiFileReader().readFile(file).toTimeBasedSequence().duration, isReadable = true)
+                val sequence = StandardMidiFileReader().readFile(file).toPerformanceSequence(settings.appSettings.value)
+                SongInfo(sequence.duration, isReadable = true)
             }.getOrElse { SongInfo(duration = null, isReadable = false) }
             // Another file may have been chosen while this one was being read.
             if (_midiFile.value == file) _songInfo.value = info

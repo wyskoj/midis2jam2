@@ -397,6 +397,17 @@ internal fun SynthesizerReverbSelect(settings: State<AppSettings>, model: Settin
 }
 
 @Composable
+internal fun TrimSilenceSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_playback_trim_silence),
+        description = stringResource(Res.string.settings_playback_trim_silence_description),
+        icon = Res.drawable.fit_screen,
+        checked = settings.value.playbackSettings.isTrimSilence,
+        onCheckedChange = model::setTrimSilence,
+    )
+}
+
+@Composable
 internal fun SynthesizerChorusSelect(settings: State<AppSettings>, model: SettingsModel) {
     SettingsSwitchRow(
         title = stringResource(Res.string.settings_playback_synthesizer_chorus),

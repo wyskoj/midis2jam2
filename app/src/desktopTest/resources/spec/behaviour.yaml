@@ -602,6 +602,18 @@
   source: code
   platforms: [desktop]
   claim: "Home restarts playback from the beginning"
+- id: playback.trim-silence.setting
+  source: code
+  platforms: [desktop, android]
+  claim: "Trimming silence can be turned on in the settings, and is off by default"
+- id: playback.trim-silence.removes-leading-and-trailing-silence
+  source: code
+  platforms: [desktop, android]
+  claim: "With trimming on, the song starts at its first note and ends at its last, keeping the timing in between"
+- id: playback.trim-silence.keeps-setup-messages
+  source: code
+  platforms: [desktop, android]
+  claim: "With trimming on, the messages in the trimmed intro are all sent at once, in order, before the first note"
 - id: playback.android.controls
   source: features/playback.md
   platforms: [android]

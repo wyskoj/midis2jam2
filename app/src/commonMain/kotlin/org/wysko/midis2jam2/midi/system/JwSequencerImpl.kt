@@ -25,6 +25,7 @@ import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.kmidi.midi.event.PitchWheelChangeEvent
 import org.wysko.kmidi.midi.event.PolyphonicKeyPressureEvent
 import org.wysko.kmidi.midi.event.ProgramEvent
+import org.wysko.midis2jam2.midi.eventsInPlayOrder
 import org.wysko.midis2jam2.util.logger
 import java.util.concurrent.Executors
 import kotlin.time.Duration
@@ -43,7 +44,7 @@ class JwSequencerImpl : JwSequencer {
 
             if (value != null) {
                 pump = DataPump(value)
-                events = value.smf.tracks.flatMap { it.events }.sortedBy { it.tick }
+                events = value.smf.eventsInPlayOrder()
             } else {
                 pump = null
                 events = null

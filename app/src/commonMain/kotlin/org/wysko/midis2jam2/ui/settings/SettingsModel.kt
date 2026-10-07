@@ -126,6 +126,8 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
     fun setUseChorus(isUseChorus: Boolean) =
         playback { it.copy(synthesizerSettings = it.synthesizerSettings.copy(isUseChorus = isUseChorus)) }
 
+    fun setTrimSilence(isTrimSilence: Boolean) = playback { it.copy(isTrimSilence = isTrimSilence) }
+
     fun addSoundbanks(soundbanks: List<String>) = playback {
         val current = it.soundbanksSettings.soundbanks
         it.copy(soundbanksSettings = it.soundbanksSettings.copy(soundbanks = current + soundbanks.minus(current.toSet())))

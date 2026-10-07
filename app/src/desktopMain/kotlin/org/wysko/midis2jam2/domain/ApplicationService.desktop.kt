@@ -22,9 +22,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
+import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.record.GERVILL_EXPORTS_FLAG
 import org.wysko.midis2jam2.record.ProgressEstimator
 import org.wysko.midis2jam2.record.RecordOptions
@@ -159,7 +159,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                 }
 
                 val reader = StandardMidiFileReader()
-                val sequences = executionState.queue.map { reader.readFile(it.file).toTimeBasedSequence() }
+                val sequences = executionState.queue.map { reader.readFile(it.file).toPerformanceSequence(config.settings) }
 
                 with(midiPackage.getOrNull() ?: return) {
                     Midis2jam2QueueApplication(

@@ -398,6 +398,9 @@ class SettingsModelTest {
             SetterCase("chorus", false, { it.setUseChorus(false) }) {
                 it.playbackSettings.synthesizerSettings.isUseChorus
             },
+            SetterCase("trim silence", true, { it.setTrimSilence(true) }) {
+                it.playbackSettings.isTrimSilence
+            },
             SetterCase("head-up display", false, { it.setShowHeadsUpDisplay(false) }) {
                 it.onScreenElementsSettings.isShowHeadsUpDisplay
             },

@@ -19,7 +19,6 @@ package org.wysko.midis2jam2.renderer
 
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.di.applicationModule
@@ -27,6 +26,7 @@ import org.wysko.midis2jam2.di.midiSystemModule
 import org.wysko.midis2jam2.di.systemModule
 import org.wysko.midis2jam2.di.uiModule
 import org.wysko.midis2jam2.midi.system.SilentSequencer
+import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.record.OfflineSynthesizer
 import org.wysko.midis2jam2.record.RecordOptions
 import org.wysko.midis2jam2.record.RecordingException
@@ -65,7 +65,9 @@ private fun launchRecording(
     options: RecordOptions,
     protocol: BufferedWriter,
 ) {
-    val sequence = runCatching { StandardMidiFileReader().readFile(midiFile).toTimeBasedSequence() }.getOrElse { t ->
+    val sequence = runCatching {
+        StandardMidiFileReader().readFile(midiFile).toPerformanceSequence(bundle.config.settings)
+    }.getOrElse { t ->
         protocol.send(RendererMessage.error("The MIDI file couldn't be read.", t.stackTraceToString()))
         return
     }
@@ -161,7 +163,7 @@ private fun launchQueueApplication(
     protocol: BufferedWriter,
 ) {
     val reader = StandardMidiFileReader()
-    val sequences = midiFiles.map { reader.readFile(it).toTimeBasedSequence() }
+    val sequences = midiFiles.map { reader.readFile(it).toPerformanceSequence(bundle.config.settings) }
 
     val midiPackage = runCatching { MidiPackage.build(null, bundle.config) }.onFailure { t ->
         onFailGetMidiPackage(t, protocol)

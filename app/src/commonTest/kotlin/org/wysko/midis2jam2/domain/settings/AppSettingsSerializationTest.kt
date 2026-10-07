@@ -65,6 +65,7 @@ class AppSettingsSerializationTest {
                 ),
                 soundbanksSettings = AppSettings.PlaybackSettings.SoundbanksSettings(listOf("a.sf2", "b.dls")),
                 synthesizerSettings = AppSettings.PlaybackSettings.SynthesizerSettings(isUseReverb = false),
+                isTrimSilence = true,
             ),
             onScreenElementsSettings = AppSettings.OnScreenElementsSettings(
                 lyricsSettings = AppSettings.OnScreenElementsSettings.LyricsSettings(
@@ -106,6 +107,9 @@ class AppSettingsSerializationTest {
         // The docs describe reverb and chorus as enhancements that are on out of the box.
         assertEquals(true, defaults.playbackSettings.synthesizerSettings.isUseReverb)
         assertEquals(true, defaults.playbackSettings.synthesizerSettings.isUseChorus)
+
+        // Songs play as the file has them unless the user asks for the silence to be trimmed.
+        assertEquals(false, defaults.playbackSettings.isTrimSilence)
 
         assertEquals(true, defaults.onScreenElementsSettings.isShowHeadsUpDisplay)
         assertEquals(true, defaults.onScreenElementsSettings.lyricsSettings.isShowLyrics)
@@ -222,6 +226,7 @@ class AppSettingsSerializationTest {
         assertEquals(listOf("one.sf2", "two.dls"), loaded.playbackSettings.soundbanksSettings.soundbanks)
         assertEquals(false, loaded.playbackSettings.synthesizerSettings.isUseChorus)
         assertEquals(false, loaded.playbackSettings.synthesizerSettings.isUseReverb)
+        assertEquals(false, loaded.playbackSettings.isTrimSilence, "A document from before the setting gets the default")
         assertEquals(false, loaded.onScreenElementsSettings.lyricsSettings.isShowLyrics)
         assertEquals(2.5, loaded.onScreenElementsSettings.lyricsSettings.lyricsSize)
         assertEquals(false, loaded.onScreenElementsSettings.isShowHeadsUpDisplay)

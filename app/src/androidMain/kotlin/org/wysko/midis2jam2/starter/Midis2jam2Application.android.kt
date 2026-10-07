@@ -31,7 +31,6 @@ import kotlinx.io.buffered
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatformTools
-import org.wysko.kmidi.midi.TimeBasedSequence.Companion.toTimeBasedSequence
 import org.wysko.kmidi.midi.reader.InvalidHeaderException
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.StandardMidiFileReadingException
@@ -50,6 +49,7 @@ import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
+import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.util.SourceInputStream
 import org.wysko.midis2jam2.util.logger
 import org.wysko.midis2jam2.util.state
@@ -79,7 +79,8 @@ internal actual class Midis2jam2Application(
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val midiFileBuffered = midiFile.source().buffered()
-                val sequence = StandardMidiFileReader().readStream(SourceInputStream(midiFileBuffered)).toTimeBasedSequence()
+                val sequence = StandardMidiFileReader().readStream(SourceInputStream(midiFileBuffered))
+                    .toPerformanceSequence(config.settings)
                 val midiDevice = midiService.getMidiDevices().first()
                 config.soundbank?.let { soundbankPath ->
                     (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)

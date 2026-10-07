@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.record
 
 import org.wysko.kmidi.midi.TimeBasedSequence
+import org.wysko.midis2jam2.midi.eventsInPlayOrder
 import org.wysko.midis2jam2.midi.system.MidiDevice
 import org.wysko.midis2jam2.midi.system.dispatch
 import java.io.File
@@ -69,7 +70,7 @@ class OfflineSynthesizer(soundbank: File?) : MidiDevice, AudioSource {
      * Schedules every event in [sequence], after anything already sent to this device.
      */
     fun queue(sequence: TimeBasedSequence) {
-        sequence.smf.tracks.flatMap { it.events }.sortedBy { it.tick }.forEach { event ->
+        sequence.smf.eventsInPlayOrder().forEach { event ->
             timestampMicros = sequence.getTimeAtTick(event.tick).inWholeMicroseconds
             dispatch(event)
         }

@@ -673,6 +673,26 @@ object MidiFixtures {
     }.toTimeBasedSequence()
 
     /**
+     * A melody that starts after two bars of silence, which is spent choosing its instrument. The second track picks
+     * a piano straight away, then the first picks [program] a moment later, so the melody is played on [program]
+     * only if the setup is applied in the order the file sends it rather than track by track.
+     */
+    fun setupDuringSilentIntro(program: Int): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format1
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) { program(program, absoluteTime = TICKS_PER_QUARTER) }
+        }
+        track {
+            channel(0) {
+                program(0, absoluteTime = 0)
+                repeat(4) { note(60 + it, duration = TICKS_PER_QUARTER, absoluteTime = (8 + it) * TICKS_PER_QUARTER) }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /**
      * Plays [chords] one after another, each lasting [duration] ticks, with [spread] ticks between the strings
      * of a strum. Each note rings [lateOff] ticks into the next chord, unless the next chord plays the same pitch
      * (MIDI can't sound one pitch twice at once on a channel).
