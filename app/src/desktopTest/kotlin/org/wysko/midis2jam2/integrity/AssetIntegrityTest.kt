@@ -148,7 +148,7 @@ class AssetIntegrityTest {
     fun `every model source is under the models folder`() {
         val misplaced = ProjectPaths.sharedAssets.walkTopDown()
             .onEnter { it != ProjectPaths.modelSources }
-            .filter { it.isFile && it.extension.lowercase() in setOf("obj", "mtl", "j3o") }
+            .filter { it.isFile && it.extension.lowercase() in setOf("blend", "glb", "gltf", "obj", "mtl", "j3o") }
             .map { it.relativeTo(ProjectPaths.sharedAssets).invariantSeparatorsPath }
             .toList()
         assertTrue(misplaced.isEmpty(), "Models belong in sharedAssets/models, but these are elsewhere: $misplaced")
@@ -156,14 +156,15 @@ class AssetIntegrityTest {
 
     @Test
     fun `every texture is used`() {
-        // A texture is used when a manifest, a material, a data file or the code names it, or when the code refers
-        // to it through the catalog (Textures.<Folder>.<Name>).
+        // A texture is used when a material, a data file or the code names it, or when the code refers to it through
+        // the catalog (Textures.<Folder>.<Name>). The materials include those the build generates for the looks the
+        // models' Blender materials and variants.yaml name, which exist only on the classpath.
         val textures = File(ProjectPaths.sharedAssets, "Assets/Textures")
+        val generated = AssetCatalog.materials.mapNotNull { javaClass.classLoader.getResource(it.path)?.readText() }
         val named = (
-            ProjectPaths.modelSources.walkTopDown().filter { it.name == "materials.yaml" } +
-                File(ProjectPaths.sharedAssets, "Assets/Materials").walkTopDown().filter { it.extension == "j3m" } +
+            File(ProjectPaths.sharedAssets, "Assets/Materials").walkTopDown().filter { it.extension == "j3m" } +
                 File(ProjectPaths.sharedAssets, "instrument").walkTopDown().filter { it.extension == "json" }
-            ).joinToString("\n") { it.readText() } + ProjectPaths.allKotlinSourceText
+            ).joinToString("\n") { it.readText() } + generated.joinToString("\n") + ProjectPaths.allKotlinSourceText
         val unused = textures.walkTopDown().filter { it.isFile }.filterNot { file ->
             val catalogName = file.relativeTo(textures).invariantSeparatorsPath.substringBeforeLast('.').split('/')
                 .joinToString(".", prefix = "Textures.") { segment ->
@@ -175,7 +176,8 @@ class AssetIntegrityTest {
         }.map { it.relativeTo(textures).invariantSeparatorsPath }.toList()
         assertTrue(
             unused.isEmpty(),
-            "These textures are used by nothing; delete them, or name them in a materials.yaml: $unused"
+            "These textures are used by nothing; delete them, use them in a model's materials, or list them in " +
+                "sharedAssets/models/variants.yaml: $unused"
         )
     }
 
@@ -293,8 +295,8 @@ class AssetIntegrityTest {
         }
 
         /**
-         * Structured data files: the YAML and JSON the app reads at runtime. The model sources' material
-         * manifests are excluded: they are read by the build (:asset-tools), not by the app.
+         * Structured data files: the YAML and JSON the app reads at runtime. The model sources' `variants.yaml` is
+         * excluded: it is read by the build (:asset-tools), not by the app.
          */
         fun dataFiles(): List<File> = ProjectPaths.sharedAssets.walkTopDown()
             .onEnter { it != ProjectPaths.modelSources }

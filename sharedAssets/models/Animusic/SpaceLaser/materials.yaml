@@ -1,6 +1,0 @@
-# The emitter and the beam glow in the laser type's colour, set at runtime (SpaceLaserType).
-models: { Beam: Laser.bmp }
-parts:
-  Base: { Stand: Wood.bmp, Rod: reflective ShinySilver.bmp, Feet: RubberFoot }
-  Shooter: { Body: HornSkinGrey, Grip: RubberFoot, Emitter: Laser.bmp }
-variants: [ LaserRed.png ]

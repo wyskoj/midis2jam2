@@ -61,6 +61,10 @@ internal actual class Midis2jam2Application(
 ) : SimpleApplication(), KoinComponent {
     private var sequencer: JwSequencerImpl? = null
 
+    init {
+        assetConfigLogger // quiets jME's warnings about loaders the app doesn't ship
+    }
+
     actual fun execute() = Unit
 
     override fun start() {

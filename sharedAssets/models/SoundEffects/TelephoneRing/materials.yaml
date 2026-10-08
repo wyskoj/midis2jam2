@@ -1,5 +1,0 @@
-# Each key has its own number, lit or dark, set at runtime (TelephoneRing).
-models: { Key: TelePhoneKey1Dark.bmp, Handle: TelephoneHandle.bmp }
-parts:
-  Base: { Feet: RubberFoot, Body: TelephoneBase.bmp }
-variants: [ TelePhoneKey1.bmp, TelePhoneKey1Dark.bmp, TelePhoneKey2.bmp, TelePhoneKey2Dark.bmp, TelePhoneKey3.bmp, TelePhoneKey3Dark.bmp, TelePhoneKey4.bmp, TelePhoneKey4Dark.bmp, TelePhoneKey5.bmp, TelePhoneKey5Dark.bmp, TelePhoneKey6.bmp, TelePhoneKey6Dark.bmp, TelePhoneKey7.bmp, TelePhoneKey7Dark.bmp, TelePhoneKey8.bmp, TelePhoneKey8Dark.bmp, TelePhoneKey9.bmp, TelePhoneKey9Dark.bmp, TelePhoneKeyStar.bmp, TelePhoneKeyStarDark.bmp, TelePhoneKey0.bmp, TelePhoneKey0Dark.bmp, TelePhoneKeyPound.bmp, TelePhoneKeyPoundDark.bmp ]

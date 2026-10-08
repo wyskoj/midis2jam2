@@ -24,22 +24,19 @@ const val MODELS_SOURCE_DIR = "models"
 const val MATERIALS_DIR = "Assets/Materials"
 const val TEXTURES_DIR = "Assets/Textures"
 
-/** Where the diffuse materials generated from a manifest's texture shorthand are served from. */
+/** Where the materials generated from looks that name a texture are served from. */
 const val DIFFUSE_MATERIALS_DIR = "Assets/Materials/Diffuse"
 const val REFLECTIVE_MATERIALS_DIR = "Assets/Materials/Reflective"
 const val SHADOW_MATERIALS_DIR = "Assets/Materials/Shadow"
 
-/** A manifest value `reflective <texture>` asks for a generated sphere-mapped material on that texture. */
+/** A look `reflective <texture>` asks for a generated sphere-mapped material on that texture. */
 const val REFLECTIVE_PREFIX = "reflective "
 
-/** A manifest value `shadow <texture>` asks for a generated unlit, alpha-blended fake-shadow material. */
+/** A look `shadow <texture>` asks for a generated unlit, alpha-blended fake-shadow material. */
 const val SHADOW_PREFIX = "shadow "
 
 /** Where converted models are served from at runtime. */
 const val MODELS_ASSET_DIR = "Assets/Models"
-
-/** The manifest that says which material each model in a folder gets. */
-const val MANIFEST_NAME = "materials.yaml"
 
 internal val TEXTURE_EXTENSIONS = setOf("png", "bmp", "jpg", "jpeg")
 
@@ -60,16 +57,36 @@ enum class AssetKind(val rootObject: String, val type: String) {
 data class CatalogEntry(val kind: AssetKind, val segments: List<String>, val assetPath: String)
 
 /**
- * Scans `sharedAssets` for everything the catalog covers: the model sources under `models/`, the material
- * library under `Assets/Materials/`, and the textures under `Assets/Textures/`. The legacy flat `Assets/` root is
- * deliberately not catalogued; it shrinks as instrument families are migrated.
+ * Scans `sharedAssets` for everything the catalog covers: the model sources under `models/` (`.glb` files exported
+ * from Blender, each holding one model per top-level object), the material library under
+ * `Assets/Materials/`, the textures under `Assets/Textures/`, and the materials the build generates from looks.
  *
  * Results are sorted so that the generated catalog and the converted output are the same on every machine.
  */
 class AssetTree(private val sharedAssets: File) {
 
-    /** Every model source, as its path under `models/` without `.obj` (`Reed/Sax/Alto/Body`). */
-    val models: List<String> by lazy { relativeFiles(MODELS_SOURCE_DIR) { it.extension == "obj" }.map { it.removeSuffix(".obj") } }
+    /** Every `.glb` source, by its path under `models/` without `.glb` (`Reed/Sax/Alto`), read. */
+    val glbSources: Map<String, GltfDocument> by lazy {
+        relativeFiles(MODELS_SOURCE_DIR) { it.extension == "glb" }.associate {
+            it.removeSuffix(".glb") to GltfDocument.read(File(sharedAssets, "$MODELS_SOURCE_DIR/$it"))
+        }
+    }
+
+    /**
+     * Every model, as its path under `Assets/Models` without `.j3o`: a `.glb`'s path followed by a top-level object's
+     * name (`Reed/Sax/Alto.glb`'s `Body` is `Reed/Sax/Alto/Body`).
+     */
+    val models: List<String> by lazy {
+        glbSources.flatMap { (source, document) -> document.models.map { "$source/$it" } }.sorted()
+    }
+
+    /** Every look the generated materials come from: the `.glb` files' materials, and `variants.yaml`. */
+    val looks: List<String> by lazy {
+        val resolver = LookResolver(sharedAssets)
+        glbSources.flatMap { (source, document) ->
+            document.materials.map { (name, look) -> resolver.resolve(name, look, "$source.glb") }
+        } + readVariants(sharedAssets)
+    }
 
     /** Every catalogued asset. */
     val entries: List<CatalogEntry> by lazy {
@@ -82,7 +99,7 @@ class AssetTree(private val sharedAssets: File) {
         val textureEntries = relativeFiles(TEXTURES_DIR) { it.extension.lowercase() in TEXTURE_EXTENSIONS }.map {
             CatalogEntry(AssetKind.Texture, it.substringBeforeLast('.').split('/'), "$TEXTURES_DIR/$it")
         }
-        val generatedEntries = manifests.values.flatMap { it.values }.mapNotNull(GeneratedMaterial::of).distinct().map {
+        val generatedEntries = looks.mapNotNull(GeneratedMaterial::of).distinct().map {
             CatalogEntry(
                 AssetKind.Material,
                 listOf(it.kind.catalogName) + it.name.split('/'),
@@ -90,18 +107,6 @@ class AssetTree(private val sharedAssets: File) {
             )
         }
         modelEntries + materialEntries + generatedEntries + textureEntries
-    }
-
-    /** Every folder's material manifest, by folder under `models/`. */
-    val manifests: Map<String, MaterialManifest> by lazy {
-        relativeFiles(MODELS_SOURCE_DIR) { it.name == MANIFEST_NAME }.associate { path ->
-            val text = File(sharedAssets, "$MODELS_SOURCE_DIR/$path").readText()
-            path.substringBeforeLast('/', "") to try {
-                MaterialManifest.parse(text)
-            } catch (e: Exception) {
-                throw AssetToolException("$MODELS_SOURCE_DIR/$path could not be read: ${e.message}")
-            }
-        }
     }
 
     private fun relativeFiles(dir: String, include: (File) -> Boolean): List<String> {

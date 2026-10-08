@@ -1,2 +1,0 @@
-default: hands.bmp
-models: { Body: Recorder.bmp }

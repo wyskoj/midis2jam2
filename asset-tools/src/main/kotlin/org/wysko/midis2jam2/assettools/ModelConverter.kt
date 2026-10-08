@@ -26,19 +26,22 @@ import com.jme3.material.MatParamTexture
 import com.jme3.material.Material
 import com.jme3.material.RenderState
 import com.jme3.renderer.queue.RenderQueue
+import com.jme3.math.Transform
+import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
+import com.jme3.scene.Mesh
+import com.jme3.scene.Node
+import com.jme3.scene.VertexBuffer
 import java.io.File
+import java.nio.FloatBuffer
 
 /**
- * Converts every OBJ under `sharedAssets/models` into a `.j3o` with its materials baked in.
+ * Converts every model source under `sharedAssets/models` (`.glb` files exported from Blender) into `.j3o` files with
+ * their materials baked in (see [convertGlb]), and writes the materials generated from looks that name a texture.
  *
- * Each geometry is given a material from the library in `Assets/Materials`, chosen by the folder's
- * `materials.yaml`. A model split into parts (by `usemtl`, with an MTL naming each part) is matched part by part;
- * the part names also become the geometry names, so code can find a part by name. The `.j3o` stores the material
- * by its `.j3m` name and its textures by path, so the engine loads them from the library, shared, at runtime.
- *
- * Anything that would otherwise fail quietly at runtime (an unlisted part, a material or texture that does not
- * exist) stops the conversion instead.
+ * The `.j3o` stores each material by its `.j3m` name and its textures by path, so the engine loads them from the
+ * library, shared, at runtime. Anything that would otherwise fail quietly at runtime (a material or texture that does
+ * not exist) stops the conversion instead.
  */
 class ModelConverter(private val sharedAssets: File) {
 
@@ -51,33 +54,25 @@ class ModelConverter(private val sharedAssets: File) {
      * longer has a source. Returns the files written.
      */
     fun convertAll(outDir: File): List<File> {
-        val models = AssetTree(sharedAssets).models
+        val tree = AssetTree(sharedAssets)
         outDir.mkdirs()
         assetManager.registerLocator(outDir.absolutePath, FileLocator::class.java)
         generatedMaterials.clear()
         val errors = mutableListOf<String>()
         val written = mutableListOf<File>()
 
-        for ((folder, inFolder) in models.groupBy { it.substringBeforeLast('/', "") }) {
+        for ((source, document) in tree.glbSources) {
             try {
-                val resolver = ManifestResolver.forFolder(File(sharedAssets, "$MODELS_SOURCE_DIR/$folder"), folder)
-                for (model in inFolder) {
-                    try {
-                        written += convert(model, resolver, outDir)
-                    } catch (e: AssetToolException) {
-                        errors += e.message!!
-                    }
-                }
-                resolver.unused().forEach { errors += "$folder/$MANIFEST_NAME lists $it, which matches nothing" }
-                for (variant in resolver.manifest.variants) {
-                    try {
-                        val material = GeneratedMaterial.of(variant)
-                            ?: throw AssetToolException("$folder/$MANIFEST_NAME: variant '$variant' must name a texture")
-                        loadMaterial(write(material, folder, outDir), folder)
-                    } catch (e: AssetToolException) {
-                        errors += e.message!!
-                    }
-                }
+                written += convertGlb(source, document, outDir)
+            } catch (e: AssetToolException) {
+                errors += e.message!!
+            }
+        }
+        for (variant in readVariants(sharedAssets)) {
+            try {
+                val material = GeneratedMaterial.of(variant)
+                    ?: throw AssetToolException("$MODELS_SOURCE_DIR/$VARIANTS_NAME: '$variant' must name a texture")
+                loadMaterial(write(material, VARIANTS_NAME, outDir), VARIANTS_NAME)
             } catch (e: AssetToolException) {
                 errors += e.message!!
             }
@@ -94,34 +89,96 @@ class ModelConverter(private val sharedAssets: File) {
         return written
     }
 
-    private fun convert(model: String, resolver: ManifestResolver, outDir: File): File {
-        val spatial = assetManager.loadModel(ModelKey("$MODELS_SOURCE_DIR/$model.obj"))
-        val modelName = model.substringAfterLast('/')
+    /**
+     * Converts every model in the `.glb` exported from Blender at `models/<source>.glb`: one per top-level object,
+     * written to `Assets/Models/<source>/<object>.j3o`. Each part (an object under it, or the object itself) keeps its
+     * Blender name, so code can find it, and is drawn in the look its Blender material names (see [LookResolver]).
+     */
+    private fun convertGlb(source: String, document: GltfDocument, outDir: File): List<File> {
+        val user = "$MODELS_SOURCE_DIR/$source.glb"
+        val resolver = LookResolver(sharedAssets)
+        val looks = document.materials.associate { (name, look) -> name to resolver.resolve(name, look, user) }
+        val scene = assetManager.loadModel(ModelKey(user)) as Node
 
-        val geometries = mutableListOf<Geometry>()
-        spatial.depthFirstTraversal { if (it is Geometry) geometries += it }
-        if (geometries.isEmpty()) throw AssetToolException("$model has no geometry")
+        return scene.children.toList().map { root ->
+            val modelName = authoredName(root.name)
+            val model = "$source/$modelName"
+            root.removeFromParent()
+            root.updateGeometricState()
 
-        for (geometry in geometries) {
-            // The MTL loader names each material after its `newmtl`; the OBJ loader's fallback material has no name.
-            val part = geometry.material?.name
-            val materialName = resolver.materialFor(modelName, part)
-            geometry.material = GeneratedMaterial.of(materialName)
-                ?.let { loadMaterial(write(it, model, outDir), model) }
-                ?: loadLibraryMaterial(materialName, model)
-            // Alpha-blended materials (fake shadows) must be drawn after everything opaque.
-            if (geometry.material.additionalRenderState.blendMode != RenderState.BlendMode.Off) {
-                geometry.queueBucket = RenderQueue.Bucket.Transparent
+            val geometries = mutableListOf<Geometry>()
+            root.depthFirstTraversal { if (it is Geometry) geometries += it }
+            if (geometries.isEmpty()) throw AssetToolException("$user: $modelName has no mesh")
+
+            val output = Node(model)
+            for (geometry in geometries) {
+                // jME's glTF loader puts a mesh's geometries in a node under the one for its Blender object.
+                val part = authoredName(geometry.parent?.parent?.name ?: modelName)
+                val look = looks[geometry.material?.name]
+                    ?: throw AssetToolException("$user: $modelName's part '$part' has no material")
+                // Each part is saved with its transform baked into its vertices: code scales and turns the nodes
+                // models hang from, and jME applies a parent's uneven scale along a rotated child's own axes, so a
+                // part left turned would stretch the wrong way. A copy of the mesh, since glTF can share one between
+                // parts.
+                geometry.mesh = geometry.mesh.deepClone().also { mesh ->
+                    bakeTransform(mesh, geometry.worldTransform)
+                    // glTF counts texture rows from the top; the textures are loaded flipped, for rows counted from
+                    // the bottom (as in OBJ, which the models were first made in).
+                    flipTextureRows(mesh)
+                }
+                geometry.localTransform = Transform.IDENTITY.clone()
+                geometry.removeFromParent()
+                applyLook(geometry, look, "$user: $modelName", outDir)
+                geometry.name = part
+                output.attachChild(geometry)
             }
-            geometry.name = part ?: modelName
-        }
-        // A one-part model loads as a bare geometry, which keeps its part name.
-        if (spatial !is Geometry) spatial.name = model
 
-        val file = File(outDir, "$MODELS_ASSET_DIR/$model.j3o")
-        file.parentFile.mkdirs()
-        BinaryExporter.getInstance().save(spatial, file)
-        return file
+            // A one-part model is saved as its geometry alone, as code expects of the simple models.
+            val saved = output.children.singleOrNull() ?: output
+            val file = File(outDir, "$MODELS_ASSET_DIR/$model.j3o")
+            file.parentFile.mkdirs()
+            BinaryExporter.getInstance().save(saved, file)
+            file
+        }
+    }
+
+    /** Moves [mesh]'s vertices and normals by [transform], so it can be drawn with none. */
+    private fun bakeTransform(mesh: Mesh, transform: Transform) {
+        mesh.getFloatBuffer(VertexBuffer.Type.Position)?.let { positions ->
+            val vertex = Vector3f()
+            for (i in 0 until positions.limit() / 3) {
+                vertex.set(positions.get(i * 3), positions.get(i * 3 + 1), positions.get(i * 3 + 2))
+                transform.transformVector(vertex, vertex)
+                positions.put(i * 3, vertex.x).put(i * 3 + 1, vertex.y).put(i * 3 + 2, vertex.z)
+            }
+        }
+        mesh.getFloatBuffer(VertexBuffer.Type.Normal)?.let { normals ->
+            // Normals are scaled by the inverse of an uneven scale, then turned, then made unit length again.
+            val normal = Vector3f()
+            val scale = transform.scale
+            for (i in 0 until normals.limit() / 3) {
+                normal.set(normals.get(i * 3) / scale.x, normals.get(i * 3 + 1) / scale.y, normals.get(i * 3 + 2) / scale.z)
+                transform.rotation.multLocal(normal).normalizeLocal()
+                normals.put(i * 3, normal.x).put(i * 3 + 1, normal.y).put(i * 3 + 2, normal.z)
+            }
+        }
+        mesh.updateBound()
+    }
+
+    private fun flipTextureRows(mesh: Mesh) {
+        val uvs = mesh.getBuffer(VertexBuffer.Type.TexCoord)?.data as? FloatBuffer ?: return
+        for (i in 1 until uvs.limit() step 2) uvs.put(i, 1f - uvs.get(i))
+    }
+
+    /** Gives [geometry] the material [look] names: a library material, or one generated from a texture. */
+    private fun applyLook(geometry: Geometry, look: String, user: String, outDir: File) {
+        geometry.material = GeneratedMaterial.of(look)
+            ?.let { loadMaterial(write(it, user, outDir), user) }
+            ?: loadLibraryMaterial(look, user)
+        // Alpha-blended materials (fake shadows) must be drawn after everything opaque.
+        if (geometry.material.additionalRenderState.blendMode != RenderState.BlendMode.Off) {
+            geometry.queueBucket = RenderQueue.Bucket.Transparent
+        }
     }
 
     private fun loadLibraryMaterial(name: String, model: String): Material {
@@ -185,6 +242,7 @@ class ModelConverter(private val sharedAssets: File) {
         generatedMaterials[material.path] = material to texturePath
         return material.path
     }
+
     private fun deleteStale(modelsOut: File, keep: Set<File>) {
         if (!modelsOut.isDirectory) return
         val kept = keep.map { it.canonicalFile }.toSet()

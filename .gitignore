@@ -54,3 +54,6 @@ replay_pid*.log
 
 # Retired assets, kept locally for backup; not part of the build.
 /unused-assets/
+
+# Blender's save backups.
+*.blend1

@@ -1,3 +1,0 @@
-# The steam puffs are retextured per instrument at runtime (SteamPuffer.Texture).
-default: SteamPuff.bmp
-variants: [ SteamPuff_Harmonica.bmp, SteamPuff_Pop.bmp, SteamPuff_Whistle.bmp ]

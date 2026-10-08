@@ -45,7 +45,7 @@ import kotlin.test.fail
 class AssetCatalogTest {
 
     private val assetManager: AssetManager = DesktopAssetManager(true)
-    /** Whether [path] is a library material: hand-written, or generated from a manifest's texture shorthand. */
+    /** Whether [path] is a library material: hand-written, or generated from a look that names a texture. */
     private fun isLibraryMaterial(path: String?): Boolean =
         path != null && (path in AssetCatalog.materials.map { it.path } || path.startsWith("Assets/Materials/Diffuse/") || path.startsWith("Assets/Materials/Reflective/"))
 

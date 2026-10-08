@@ -1,0 +1,2 @@
+# Blender sources: large binaries, edited by hand, never read by the build (it reads the exported .glb beside each).
+*.blend filter=lfs diff=lfs merge=lfs -text

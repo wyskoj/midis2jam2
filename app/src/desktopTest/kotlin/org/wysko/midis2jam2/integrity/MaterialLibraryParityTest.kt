@@ -61,9 +61,10 @@ class MaterialLibraryParityTest {
     }
 
     @Test
-    fun `the materials generated from manifest textures match the materials built in code`() {
-        // A materials.yaml may name a texture instead of a library material; the build then writes a diffuse (or,
-        // with `reflective`, a sphere-mapped) material for it. Each must match what the code would have built.
+    fun `the materials generated from looks that name a texture match the materials built in code`() {
+        // A model's material may name a texture instead of a library material; the build then writes a diffuse (or,
+        // with `reflective` or `shadow`, a sphere-mapped or fake-shadow) material for it. Each must match what the
+        // code would have built.
         val generated = listOf(
             "Diffuse" to ::legacyDiffuseMaterial,
             "Reflective" to ::legacyReflectiveMaterial,

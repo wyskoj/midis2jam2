@@ -341,6 +341,9 @@ val copyLicenseReport: TaskProvider<Copy> = tasks.register<Copy>("copyLicenseRep
 // shipped alongside the rest of sharedAssets; the same tool generates the typed catalog code refers to them by.
 val sharedAssetsDir: File = rootDir.resolve("sharedAssets")
 
+// What :asset-tools reads of the model sources: the .blend files are Blender's, and reach the build as their .glb.
+val modelSources: FileTree = fileTree(sharedAssetsDir.resolve("models")) { include("**/*.glb", "variants.yaml") }
+
 val assetTools: Configuration by configurations.creating {
     isCanBeConsumed = false
     attributes {
@@ -360,7 +363,7 @@ val generateAssetCatalog: TaskProvider<JavaExec> = tasks.register<JavaExec>("gen
     val outDir = layout.buildDirectory.dir("generated/assetCatalog/kotlin")
     classpath = assetTools
     mainClass.set("org.wysko.midis2jam2.assettools.MainKt")
-    inputs.dir(sharedAssetsDir.resolve("models")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(modelSources).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(sharedAssetsDir.resolve("Assets/Materials")).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(sharedAssetsDir.resolve("Assets/Textures")).withPathSensitivity(PathSensitivity.RELATIVE)
     outputs.dir(outDir)
@@ -369,11 +372,11 @@ val generateAssetCatalog: TaskProvider<JavaExec> = tasks.register<JavaExec>("gen
 
 val convertModels: TaskProvider<JavaExec> = tasks.register<JavaExec>("convertModels") {
     group = "assets"
-    description = "Converts the OBJ sources in sharedAssets/models to .j3o, with their library materials."
+    description = "Converts the .glb sources in sharedAssets/models to .j3o, with their materials."
     val outDir = layout.buildDirectory.dir("generated/jmeAssets")
     classpath = assetTools
     mainClass.set("org.wysko.midis2jam2.assettools.MainKt")
-    inputs.dir(sharedAssetsDir.resolve("models")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(modelSources).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.files(
         fileTree(sharedAssetsDir.resolve("Assets")) {
             include("Materials/**", "MatDefs/**", "Shaders/**", "**/*.bmp", "**/*.png")
@@ -382,6 +385,30 @@ val convertModels: TaskProvider<JavaExec> = tasks.register<JavaExec>("convertMod
     outputs.dir(outDir)
     systemProperty("java.awt.headless", "true")
     args("convert", sharedAssetsDir.absolutePath, outDir.get().asFile.absolutePath)
+}
+
+// Exports every .blend under sharedAssets/models whose .glb is out of date, with Blender (never part of the build).
+// Set Blender's path once in ~/.gradle/gradle.properties as midis2jam2.blender; -PexportAll exports every .blend.
+tasks.register<JavaExec>("exportModels") {
+    group = "assets"
+    description = "Exports each .blend under sharedAssets/models whose .glb is out of date, using Blender."
+    classpath = assetTools
+    mainClass.set("org.wysko.midis2jam2.assettools.MainKt")
+    workingDir = rootDir
+    val blender = providers.gradleProperty("midis2jam2.blender")
+    val all = providers.gradleProperty("exportAll").isPresent
+    val script = rootDir.resolve("tools/blender/export_models.py").absolutePath
+    val sharedAssetsPath = sharedAssetsDir.absolutePath
+    argumentProviders.add(
+        CommandLineArgumentProvider {
+            val path = blender.orNull ?: throw GradleException(
+                "Set midis2jam2.blender to Blender's executable in ~/.gradle/gradle.properties, e.g.\n" +
+                    "  midis2jam2.blender=C:/Users/you/AppData/Local/Microsoft/WindowsApps/blender-launcher.exe"
+            )
+            listOf("export", sharedAssetsPath, path, script) + (if (all) listOf("all") else emptyList())
+        }
+    )
+    outputs.upToDateWhen { false }
 }
 
 kotlin.sourceSets.commonMain {

@@ -1,3 +1,0 @@
-models: { Hand: hands.bmp }
-parts:
-  Drum: { Frame: Wood, Shell: DrumShell_Cuica.png }

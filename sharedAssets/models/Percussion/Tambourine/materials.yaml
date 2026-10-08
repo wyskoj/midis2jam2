@@ -1,2 +1,0 @@
-parts:
-  Hand: { Hand: hands.bmp, Jingles: MetalTexture.bmp, Frame: TambourineWood.bmp }

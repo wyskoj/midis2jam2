@@ -22,21 +22,21 @@ The separate drop-D models are gone; every instrument with a layout draws the sa
 
 ## Models
 
-All go in `sharedAssets/models/Guitar/`, as OBJ (Blender's default export: Y up), sharing the body's texture and UVs.
-The build converts them like every other model (see `docs/ASSETS.md`); a new one needs an entry in that folder's
-`materials.yaml` if it isn't drawn in the default `GuitarSkin.bmp`.
-- **Body.** Exported without its keys, in exactly the same space as before, so the strings, frets and hand still line
+All go in `sharedAssets/models/Guitar.blend`, one top-level object each, sharing the body's texture and UVs. The build
+converts them like every other model (see `docs/ASSETS.md`): give a new one a material named for its texture
+(`GuitarSkin`), then export `Guitar.glb`.
+- **Body.** Modelled without its keys, in exactly the same space as before, so the strings, frets and hand still line
   up. Leave the tuner posts or bushings on the body; only the part that turns moves.
-- **Key.** One key, exported on its own with its pivot (the centre of the post) at the origin, so its post runs along
-  the export's +Y (Blender's +Z). The key turns about that axis. Every key on the headstock is a copy of it.
+- **Key.** One key, its own object, with its pivot (the centre of the post) at the world origin, so its post runs
+  along the engine's +Y (Blender's +Z). (The build bakes each object's placement into its vertices.) The key turns about that axis. Every key on the headstock is a copy of it.
 
 ## Layout
 
-`sharedAssets/instrument/tuning/<Body>.json`, named after the body it belongs to (`Guitar.json` for `Guitar.obj`).
-Models are named without their `.obj`, by their file name in `sharedAssets/models/Guitar/`.
+`sharedAssets/instrument/tuning/<Body>.json`, named after the body it belongs to (`Guitar.json` for the `Guitar` model).
+Models are named by their object's name in `sharedAssets/models/Guitar.blend`.
 Having this file is what switches the instrument over. Positions and rotations are **Blender's own numbers**, as
 the N panel shows them (Z up, XYZ Euler, degrees); the code converts them to the engine's Y-up space exactly as the
-OBJ exporter converts the meshes.
+export converts the meshes.
 
 ```json
 {
@@ -56,7 +56,7 @@ OBJ exporter converts the meshes.
 | `key` | The key model. |
 | `keyRotation` | How the key model sits within each key object, for a model exported turned. `BassKey` was exported with its post along Blender Z, while in the scene the bass key's post runs along its object's local Y, so it is `[-90, 0, 0]`. |
 | `keyScale` | How large each key is drawn (the banjo reuses `BassKey` at `0.75`). |
-| `keyTexture` | The texture the key model and capo are UV-mapped to, when it isn't the body's. The acoustic's keys use `GuitarSkin.bmp`, and the banjo's (`BassKey`) `BassSkin.bmp`. The build generates a material for each texture named here (it is listed in `Guitar/materials.yaml`), and `AssetIntegrityTest` checks that it exists. |
+| `keyTexture` | The texture the key model and capo are UV-mapped to, when it isn't the body's. The acoustic's keys use `GuitarSkin.bmp`, and the banjo's (`BassKey`) `BassSkin.bmp`. The build generates a material for each texture named here (a model in `Guitar.blend` uses it), and `AssetIntegrityTest` checks that it exists. |
 | `capoZ` | How far the capo is moved out of the neck, for an instrument whose strings lie higher or lower than the guitar's (default 0; positive is toward the player). |
 | `degreesPerSemitone` | How far a key turns per semitone from standard (default 20, so drop D's low key turns 40°; much more and the key turns edge-on to the camera and looks small). |
 | `keys` | One entry per string, lowest string first. |
@@ -75,7 +75,7 @@ mirroring the low E's is the high E's.
 
 ## Capo
 
-`Capo.obj` (in `sharedAssets/models/Guitar/`) is modelled in place across the guitar's neck (its X and Z are the guitar's), centred on Y = 0.
+`Capo` (in `sharedAssets/models/Guitar.blend`) is modelled in place across the guitar's neck (its X and Z are the guitar's), centred on Y = 0.
 The code only slides it along the neck (the model's Y) onto its fret (covering where the open strings start to vibrate), lifted off the strings (Z) while it
 slides down from the nut, then dropped on to clamp. The acoustic shares the guitar's neck; the banjo uses the same
 model, moved out of the neck, if it needs to be, by the layout's `capoZ` (currently `0` on the banjo; its strings lie 0.15 lower than the guitar's, but at `-0.15` the capo sat too far back).

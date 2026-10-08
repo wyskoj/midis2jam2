@@ -1,3 +1,0 @@
-# The pizzicato double bass swaps this for DoubleBassSkinAlt.png at runtime.
-default: DoubleBassSkin.bmp
-variants: [ DoubleBassSkinAlt.png ]

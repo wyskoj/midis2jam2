@@ -1,4 +1,0 @@
-default: HornSkin
-models: { Key1: HornSkinGrey, Key2: HornSkinGrey, Key3: HornSkinGrey, Mute: RubberFoot }
-parts:
-  Body: { Metal: HornSkin, Trim: HornSkinGrey }

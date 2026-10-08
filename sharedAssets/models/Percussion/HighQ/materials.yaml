@@ -1,2 +1,0 @@
-# The laser glows green, set at runtime (HighQ).
-models: { Zapper: Zapper.bmp, Laser: Laser.bmp }

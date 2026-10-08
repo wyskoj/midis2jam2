@@ -29,6 +29,8 @@ dependencies {
     implementation(libs.jme3.core)
     implementation(libs.jme3.desktop) // image loaders for the textures that materials pull in
     implementation(libs.kotlinx.serialization.yaml)
+    implementation(libs.jme3.plugins) // the glTF loader, for the .glb model sources
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(kotlin("test"))
 }

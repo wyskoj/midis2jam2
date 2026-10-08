@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.starter
 import Platform
 import ch.qos.logback.core.util.EnvUtil.isMacOs
 import com.jme3.app.SimpleApplication
+import com.jme3.asset.AssetConfig
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.BloomFilter.GlowMode.Objects
@@ -35,6 +36,19 @@ import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.LightingSetup
 import org.wysko.midis2jam2.world.graphics.antiAliasingQualityDefinition
 import org.wysko.midis2jam2.world.graphics.shadowsQualityDefinition
+import java.util.logging.Level
+import java.util.logging.Logger
+
+/**
+ * Quiets the "Cannot find loader" warnings jME logs when it creates an asset manager. Its built-in loader list names
+ * loaders from jars the app doesn't ship (Ogre, FBX and glTF in jme3-plugins, Ogg in jme3-jogg), and the app needs
+ * none of them: models are converted to `.j3o` at build time. Only this logger is quieted, so real asset problems,
+ * such as a missing texture, are still logged.
+ *
+ * Kept in a property, since java.util.logging holds loggers weakly and could otherwise drop the level set here.
+ * Each platform's [Midis2jam2Application] reads it before jME starts.
+ */
+internal val assetConfigLogger: Logger = Logger.getLogger(AssetConfig::class.java.name).apply { level = Level.SEVERE }
 
 internal expect class Midis2jam2Application : SimpleApplication {
     fun execute()

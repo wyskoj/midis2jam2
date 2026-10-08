@@ -1,3 +1,0 @@
-default: HornSkinGrey
-parts:
-  Body: { Metal: HornSkinGrey, Dark: Black }

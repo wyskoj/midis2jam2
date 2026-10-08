@@ -1,3 +1,0 @@
-models: { Stick: Wood }
-parts:
-  Drum: { Body: Wood, Head: TaikoHead.bmp }
