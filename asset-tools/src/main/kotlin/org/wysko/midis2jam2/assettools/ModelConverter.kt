@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.assettools
 
+import com.jme3.asset.AssetInfo
 import com.jme3.asset.AssetManager
 import com.jme3.asset.DesktopAssetManager
 import com.jme3.asset.ModelKey
@@ -32,7 +33,9 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Mesh
 import com.jme3.scene.Node
 import com.jme3.scene.VertexBuffer
+import com.jme3.scene.plugins.gltf.GlbLoader
 import java.io.File
+import java.io.InputStream
 import java.nio.FloatBuffer
 
 /**
@@ -46,6 +49,7 @@ import java.nio.FloatBuffer
 class ModelConverter(private val sharedAssets: File) {
 
     private val assetManager: AssetManager = DesktopAssetManager(true).apply {
+        registerLoader(ClosingGlbLoader::class.java, "glb")
         registerLocator(sharedAssets.absolutePath, FileLocator::class.java)
     }
 
@@ -251,6 +255,24 @@ class ModelConverter(private val sharedAssets: File) {
                 it.isFile && it.canonicalFile !in kept -> it.delete()
                 it.isDirectory && it.list().isNullOrEmpty() -> it.delete()
             }
+        }
+    }
+}
+
+/**
+ * jME's [GlbLoader], closing the `.glb` it reads: jME's leaves it open until the stream is garbage collected, which on
+ * Windows keeps the file from being moved or deleted in the meantime.
+ */
+class ClosingGlbLoader : GlbLoader() {
+    override fun load(assetInfo: AssetInfo): Any {
+        val opened = mutableListOf<InputStream>()
+        val closing = object : AssetInfo(assetInfo.manager, assetInfo.key) {
+            override fun openStream(): InputStream = assetInfo.openStream().also { opened += it }
+        }
+        try {
+            return super.load(closing)
+        } finally {
+            opened.forEach { it.close() }
         }
     }
 }

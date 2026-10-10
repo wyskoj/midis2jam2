@@ -224,7 +224,10 @@ class ModelConverterTest {
     fun `a model whose source was removed is removed from the output`() {
         fixture()
         ModelConverter(shared).convertAll(out)
-        File(shared, "models/Test/Fixture.glb").renameTo(File(shared, "models/Test/Renamed.glb"))
+        assertTrue(
+            File(shared, "models/Test/Fixture.glb").renameTo(File(shared, "models/Test/Renamed.glb")),
+            "the conversion should not keep the .glb open"
+        )
         ModelConverter(shared).convertAll(out)
 
         assertFalse(File(out, "Assets/Models/Test/Fixture").exists())
