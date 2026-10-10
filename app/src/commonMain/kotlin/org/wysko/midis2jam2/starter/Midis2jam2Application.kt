@@ -21,6 +21,8 @@ import Platform
 import ch.qos.logback.core.util.EnvUtil.isMacOs
 import com.jme3.app.SimpleApplication
 import com.jme3.asset.AssetConfig
+import com.jme3.light.AmbientLight
+import com.jme3.material.TechniqueDef
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.BloomFilter.GlowMode.Objects
@@ -49,6 +51,9 @@ import java.util.logging.Logger
  * Each platform's [Midis2jam2Application] reads it before jME starts.
  */
 internal val assetConfigLogger: Logger = Logger.getLogger(AssetConfig::class.java.name).apply { level = Level.SEVERE }
+
+/** How many times smaller than the screen bloom's glow and blur passes are rendered on Android. */
+private const val ANDROID_BLOOM_DOWNSAMPLING = 2f
 
 internal expect class Midis2jam2Application : SimpleApplication {
     fun execute()
@@ -91,9 +96,22 @@ internal fun SimpleApplication.setupState(
     with(config.settings.graphicsSettings) {
         val lightForShadows = LightingSetup.setupLights(rootNode)
 
+        // Light every geometry with all the lights in one draw, instead of drawing it again for each light.
+        renderManager.preferredLightMode = TechniqueDef.LightMode.SinglePass
+        renderManager.singlePassLightBatchSize = rootNode.localLightList.count { it !is AmbientLight }
+
         if (addFpp) {
             val fpp = FilterPostProcessor(assetManager).apply {
-                addFilter(BloomFilter(Objects))
+                addFilter(
+                    BloomFilter(Objects).apply {
+                        // Bloom's passes run at full resolution by default, which phone GPUs can't afford. The blur
+                        // reaches as far across the texture whatever its size, so it is shortened to match.
+                        if (platform == Platform.Android) {
+                            downSamplingFactor = ANDROID_BLOOM_DOWNSAMPLING
+                            blurScale /= ANDROID_BLOOM_DOWNSAMPLING
+                        }
+                    }
+                )
 
                 // Set anti-aliasing quality
                 if (platform == Platform.Desktop && !isMacOs()) {

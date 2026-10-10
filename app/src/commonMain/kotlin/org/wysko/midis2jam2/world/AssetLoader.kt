@@ -31,6 +31,9 @@ import org.wysko.midis2jam2.manager.BaseManager
 import org.wysko.midis2jam2.manager.PerformanceManager
 
 private const val LIGHTING_MAT: String = "Common/MatDefs/Light/Lighting.j3md"
+
+/** midis2jam2's own lighting, whose single-pass technique lights reflections as its multi-pass technique does. */
+private const val JW_LIGHTING_MAT: String = "Assets/MatDefs/Lighting.j3md"
 private const val UNSHADED_MAT: String = "Common/MatDefs/Misc/Unshaded.j3md"
 private const val COLOR_MAP: String = "ColorMap"
 private const val DIFFUSE_MAP: String = "DiffuseMap"
@@ -69,7 +72,7 @@ internal fun legacyDiffuseMaterial(assetManager: AssetManager, texture: String):
 
 /** A sphere-mapped reflection over black: what the HornSkin materials and generated reflective materials replace. */
 internal fun legacyReflectiveMaterial(assetManager: AssetManager, texture: String): Material =
-    Material(assetManager, LIGHTING_MAT).apply {
+    Material(assetManager, JW_LIGHTING_MAT).apply {
         setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
         setTexture(ENV_MAP, assetManager.loadTexture(texture.assetPrefix()))
