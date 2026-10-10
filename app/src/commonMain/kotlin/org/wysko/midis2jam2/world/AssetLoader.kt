@@ -43,16 +43,11 @@ private fun String.assetPrefix(): String = if (this.startsWith("Assets/")) this 
 /**
  * Loads the bundled models, materials and textures, by their references in the generated asset catalog (`Models`,
  * `Materials`, `Textures`; see docs/ASSETS.md).
- *
- * @property onLoadAsset Called with each model's path as it loads, for the loading progress.
  */
-class AssetLoader(val onLoadAsset: (String) -> Unit = {}) : BaseManager() {
+class AssetLoader : BaseManager() {
 
     /** Loads a converted [model], which arrives with its library materials already applied. */
-    fun load(model: ModelAsset): Spatial {
-        onLoadAsset(model.path)
-        return application.assetManager.loadModel(model.path)
-    }
+    fun load(model: ModelAsset): Spatial = application.assetManager.loadModel(model.path)
 
     /** Loads a [material] from the library. Each call returns a copy that can be changed independently. */
     fun material(material: MaterialAsset): Material = application.assetManager.loadMaterial(material.path)

@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Bis das behoben ist, wird der Standardhintergrund verwendet.</string>
     <string name="background_warning_fix">Hintergrundeinstellungen öffnen</string>
     <string name="background_warning_continue">Mit Standardhintergrund abspielen</string>
+    <string name="loading_reading_midi">MIDI-Datei wird gelesen…</string>
+    <string name="loading_soundbank">Soundbank wird geladen…</string>
+    <string name="loading_building_band">Band wird aufgebaut…</string>
 </resources>
 

@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">수정하기 전까지는 기본 배경이 사용됩니다.</string>
     <string name="background_warning_fix">배경 설정 열기</string>
     <string name="background_warning_continue">기본 배경으로 재생</string>
+    <string name="loading_reading_midi">MIDI 파일 읽는 중…</string>
+    <string name="loading_soundbank">사운드뱅크 불러오는 중…</string>
+    <string name="loading_building_band">밴드 준비 중…</string>
 </resources>
 

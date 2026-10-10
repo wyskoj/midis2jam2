@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Доки це не виправлено, використовується фон за замовчуванням.</string>
     <string name="background_warning_fix">Відкрити налаштування фону</string>
     <string name="background_warning_continue">Відтворити з фоном за замовчуванням</string>
+    <string name="loading_reading_midi">Читання MIDI-файлу…</string>
+    <string name="loading_soundbank">Завантаження звукового банку…</string>
+    <string name="loading_building_band">Підготовка гурту…</string>
 </resources>
 

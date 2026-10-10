@@ -17,8 +17,26 @@
 
 package org.wysko.midis2jam2.starter
 
+/** The steps a performance goes through before it can start, in order. */
+enum class LoadingStage {
+    /** Parsing the MIDI file. */
+    ReadingMidi,
+
+    /** Opening the MIDI device, which for the built-in synthesizer means loading its soundbank. */
+    LoadingSoundbank,
+
+    /** Assigning instruments and loading their models. The only stage that reports a fraction. */
+    BuildingBand,
+}
+
+/** Hears how far a performance has got with loading. Called from whichever thread is doing the work. */
 interface ProgressListener {
-    fun onReady()
-    fun onLoadingAsset(assetName: String)
+    /** Loading has moved on to [stage]. */
+    fun onLoadingStage(stage: LoadingStage)
+
+    /** How much of [LoadingStage.BuildingBand] is done, from 0 to 1. */
     fun onLoadingProgress(progress: Float)
+
+    /** The performance is loaded and about to show its first frame. */
+    fun onReady()
 }

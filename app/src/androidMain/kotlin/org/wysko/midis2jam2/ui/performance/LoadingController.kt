@@ -17,52 +17,44 @@
 
 package org.wysko.midis2jam2.ui.performance
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import org.wysko.midis2jam2.starter.LoadingStage
+import org.wysko.midis2jam2.starter.ProgressListener
 
 @Composable
 fun rememberLoadingController(): LoadingController = remember { LoadingController() }
 
+/**
+ * How far a performance has got with loading.
+ *
+ * @property stage The stage loading is in, or `null` before it has started.
+ * @property progress How much of the stage is done, or `null` while that isn't known.
+ * @property ready Whether the performance has loaded.
+ */
 data class LoadingState(
+    val stage: LoadingStage? = null,
+    val progress: Float? = null,
     val ready: Boolean = false,
-    val showLoading: Boolean = true,
-    val loadProgress: String = "",
-    val loadProgressDecimal: Float = 0f,
 )
 
-class LoadingController {
+/** Collects loading progress, which arrives from the loading and render threads, into state for the UI. */
+class LoadingController : ProgressListener {
     private val _state = MutableStateFlow(LoadingState())
     val state: StateFlow<LoadingState> get() = _state
 
-    val animatedProgress: State<Float>
-        @Composable
-        get() {
-            val targetValue = _state.collectAsState().value.loadProgressDecimal
-            return animateFloatAsState(
-                targetValue,
-                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
-            )
-        }
-
-    fun setReady(ready: Boolean) {
-        _state.value = _state.value.copy(ready = ready)
+    override fun onLoadingStage(stage: LoadingStage) {
+        _state.update { it.copy(stage = stage, progress = null) }
     }
 
-    fun setShowLoading(show: Boolean) {
-        _state.value = _state.value.copy(showLoading = show)
+    override fun onLoadingProgress(progress: Float) {
+        _state.update { it.copy(progress = progress) }
     }
 
-    fun setLoadProgress(progress: String) {
-        _state.value = _state.value.copy(loadProgress = progress)
-    }
-
-    fun setLoadProgressDecimal(progress: Float) {
-        _state.value = _state.value.copy(loadProgressDecimal = progress)
+    override fun onReady() {
+        _state.update { it.copy(ready = true) }
     }
 }

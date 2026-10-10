@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Пока это не исправлено, используется фон по умолчанию.</string>
     <string name="background_warning_fix">Открыть настройки фона</string>
     <string name="background_warning_continue">Воспроизвести с фоном по умолчанию</string>
+    <string name="loading_reading_midi">Чтение MIDI-файла…</string>
+    <string name="loading_soundbank">Загрузка звукового банка…</string>
+    <string name="loading_building_band">Подготовка группы…</string>
 </resources>
 

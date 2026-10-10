@@ -23,10 +23,12 @@ import com.jme3.app.SimpleApplication
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
 import io.github.vinceglb.filekit.source
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import kotlinx.io.buffered
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -60,6 +62,13 @@ internal actual class Midis2jam2Application(
     private val onFinish: () -> Unit = {},
 ) : SimpleApplication(), KoinComponent {
     private var sequencer: JwSequencerImpl? = null
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    /** Made up front, so that it can report the stages that come before the managers are attached. */
+    private val loadingProgressManager = LoadingProgressManager()
+
+    /** Completes once every manager is attached, for the listeners that need one of them. */
+    private val managersAttached = CompletableDeferred<Unit>()
 
     init {
         assetConfigLogger // quiets jME's warnings about loaders the app doesn't ship
@@ -80,11 +89,13 @@ internal actual class Midis2jam2Application(
         val midiFile = applicationService.midiFile.value!!
         val config = applicationService.config.value!!
 
-        CoroutineScope(Dispatchers.Default).launch {
+        scope.launch {
             try {
+                loadingProgressManager.onLoadingStage(LoadingStage.ReadingMidi)
                 val midiFileBuffered = midiFile.source().buffered()
                 val sequence = StandardMidiFileReader().readStream(SourceInputStream(midiFileBuffered))
                     .toPerformanceSequence(config.settings)
+                loadingProgressManager.onLoadingStage(LoadingStage.LoadingSoundbank)
                 val midiDevice = midiService.getMidiDevices().first()
                 config.soundbank?.let { soundbankPath ->
                     (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)
@@ -101,13 +112,11 @@ internal actual class Midis2jam2Application(
                     currentSequencer.close()
                 }
 
+                loadingProgressManager.onLoadingStage(LoadingStage.BuildingBand)
                 enqueue {
                     setupState(config, platform = Platform.Android)
-                    val loadingProgressManager = LoadingProgressManager()
                     stateManager.attach(loadingProgressManager)
-                    stateManager.attach(AssetLoader {
-                        loadingProgressManager.onLoadingAsset(it)
-                    })
+                    stateManager.attach(AssetLoader())
                     val performanceAppState = AndroidPerformanceManager(
                         sequencer = currentSequencer,
                         midiFile = sequence,
@@ -120,6 +129,7 @@ internal actual class Midis2jam2Application(
                     addManagers(config, sequence, currentSequencer)
                     stateManager.attach(AndroidInputManager())
                     stateManager.attach(MidiDeviceManager(config, midiDevice))
+                    managersAttached.complete(Unit)
                 }
             } catch (e: Exception) {
                 logger().error("MIDI file failed to read.", e)
@@ -133,6 +143,7 @@ internal actual class Midis2jam2Application(
     }
 
     actual override fun stop() {
+        scope.cancel()
         sequencer?.stop()
         sequencer?.close()
         sequencer = null
@@ -155,26 +166,22 @@ internal actual class Midis2jam2Application(
         super.enqueue(block)
     }
 
-    fun registerProgressListener(listener: ProgressListener) {
-        fun getProgressManager(): LoadingProgressManager? =
-            stateManager.getState(LoadingProgressManager::class.java)
-        CoroutineScope(Dispatchers.Default).launch {
-            while (getProgressManager() == null) yield()
-            (getProgressManager() ?: return@launch).registerProgressListener(listener)
-        }
+    fun registerProgressListener(listener: ProgressListener): Unit =
+        loadingProgressManager.registerProgressListener(listener)
+
+    fun registerCameraStateListener(listener: CameraStateListener): Unit = onceManagersAttached {
+        state<CameraManager>()?.registerCameraStateListener(listener)
     }
 
-    fun registerCameraStateListener(listener: CameraStateListener) {
-        CoroutineScope(Dispatchers.Default).launch {
-            while (state<CameraManager>() == null) yield()
-            (state<CameraManager>() ?: return@launch).registerCameraStateListener(listener)
-        }
+    fun registerPlaybackStateListener(listener: (Boolean) -> Unit): Unit = onceManagersAttached {
+        state<AndroidInputManager>()?.registerPlaybackStateListener(listener)
     }
 
-    fun registerPlaybackStateListener(listener: (Boolean) -> Unit) {
-        CoroutineScope(Dispatchers.Default).launch {
-            while (state<AndroidInputManager>() == null) yield()
-            (state<AndroidInputManager>() ?: return@launch).registerPlaybackStateListener(listener)
+    /** Runs [block] on the render thread once the managers are attached. */
+    private fun onceManagersAttached(block: () -> Unit) {
+        scope.launch {
+            managersAttached.await()
+            enqueue(block)
         }
     }
 

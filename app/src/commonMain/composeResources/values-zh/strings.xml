@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">在修复之前，将使用默认背景。</string>
     <string name="background_warning_fix">打开背景设置</string>
     <string name="background_warning_continue">使用默认背景播放</string>
+    <string name="loading_reading_midi">正在读取 MIDI 文件…</string>
+    <string name="loading_soundbank">正在加载音色库…</string>
+    <string name="loading_building_band">正在准备乐队…</string>
 </resources>
 

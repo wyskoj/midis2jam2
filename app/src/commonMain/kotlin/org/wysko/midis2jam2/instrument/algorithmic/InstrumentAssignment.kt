@@ -67,6 +67,10 @@ object InstrumentAssignment {
         // Create a place for instruments to go.
         val instruments = mutableListOf<Instrument>()
 
+        // Progress is counted in events, since an instrument costs roughly as much to build as it has events to play.
+        val totalEvents = channels.sumOf { it.size }.coerceAtLeast(1)
+        var builtEvents = 0
+
         // Notes on rhythm channels are pooled across channels, and turned into drums once every channel is read.
         val rhythmNotes = mutableListOf<RhythmNote>()
         var primaryKitSpans = emptyList<KitSpan>()
@@ -133,14 +137,16 @@ object InstrumentAssignment {
             }
 
             // Convert lists of events to their corresponding instrument.
-            lookBins.entries.forEachIndexed { i, e ->
-                onLoadingProgress((channel / 16f) + (i / lookBins.entries.size / 16f))
+            lookBins.entries.forEach { e ->
                 buildInstrument(context, e.key, e.value, channelSpecificEvents)?.let { instruments += it }
+                builtEvents += e.value.size
+                onLoadingProgress(builtEvents.toFloat() / totalEvents)
             }
         }
 
         // The drums go where channel 10's would always have gone, so the order of the band doesn't change.
         instruments.addAll(drumInsertionIndex, buildDrums(context, rhythmNotes, timeline, resolver, primaryKitSpans))
+        onLoadingProgress(1f)
 
         return instruments
     }

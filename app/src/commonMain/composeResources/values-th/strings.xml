@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">จนกว่าจะแก้ไข จะใช้พื้นหลังเริ่มต้น</string>
     <string name="background_warning_fix">เปิดการตั้งค่าพื้นหลัง</string>
     <string name="background_warning_continue">เล่นด้วยพื้นหลังเริ่มต้น</string>
+    <string name="loading_reading_midi">กำลังอ่านไฟล์ MIDI…</string>
+    <string name="loading_soundbank">กำลังโหลด Soundbank…</string>
+    <string name="loading_building_band">กำลังเตรียมวงดนตรี…</string>
 </resources>
 
