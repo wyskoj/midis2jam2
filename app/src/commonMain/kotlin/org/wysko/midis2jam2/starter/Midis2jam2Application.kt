@@ -36,6 +36,9 @@ import org.wysko.midis2jam2.world.LightingSetup
 import org.wysko.midis2jam2.world.graphics.antiAliasingQualityDefinition
 import org.wysko.midis2jam2.world.graphics.shadowsQualityDefinition
 
+/** How many times smaller than the screen bloom's glow and blur passes are rendered on Android. */
+private const val ANDROID_BLOOM_DOWNSAMPLING = 2f
+
 internal expect class Midis2jam2Application : SimpleApplication {
     fun execute()
     override fun simpleInitApp()
@@ -79,7 +82,16 @@ internal fun SimpleApplication.setupState(
 
         if (addFpp) {
             val fpp = FilterPostProcessor(assetManager).apply {
-                addFilter(BloomFilter(Objects))
+                addFilter(
+                    BloomFilter(Objects).apply {
+                        // Bloom's passes run at full resolution by default, which phone GPUs can't afford. The blur
+                        // reaches as far across the texture whatever its size, so it is shortened to match.
+                        if (platform == Platform.Android) {
+                            downSamplingFactor = ANDROID_BLOOM_DOWNSAMPLING
+                            blurScale /= ANDROID_BLOOM_DOWNSAMPLING
+                        }
+                    }
+                )
 
                 // Set anti-aliasing quality
                 if (platform == Platform.Desktop && !isMacOs()) {

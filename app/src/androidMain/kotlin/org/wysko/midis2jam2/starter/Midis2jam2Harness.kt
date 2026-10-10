@@ -31,6 +31,18 @@ import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.manager.camera.CameraStateListener
 import org.wysko.midis2jam2.util.logger
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.roundToInt
+
+/**
+ * The most pixels the scene is rendered at along the screen's short side. Phone GPUs can't fill a 1440p screen
+ * at 120 Hz with the post-processing the scene uses, so taller screens render smaller and the display hardware
+ * scales the picture up, which costs nothing and is hard to tell apart on such dense screens.
+ */
+private const val MAX_RENDER_SHORT_SIDE = 1080
+
+/** How much smaller than a [width] by [height] view the scene is rendered. */
+private fun renderScale(width: Int, height: Int): Float =
+    (MAX_RENDER_SHORT_SIDE.toFloat() / minOf(width, height)).coerceAtMost(1f)
 
 class Midis2jam2Harness(
     context: Context,
@@ -48,9 +60,17 @@ class Midis2jam2Harness(
         app.setDisplayStatView(false)
         app.start()
         ctx = app.context as OGLESContext
+        // Sound comes from FluidSynth, so jME's own audio renderer (OpenAL) would only cost CPU (and has crashed while
+        // starting). Android's context can't be made without a renderer named, but on initialize the application
+        // takes the context's settings and skips the audio if none is named there.
+        ctx.settings.audioRenderer = null
         view = ctx.createView(context)
         JmeAndroidSystem.setView(view)
         ctx.systemListener = this
+        view.addOnLayoutChangeListener { _, left, top, right, bottom, _, _, _, _ ->
+            val scale = renderScale(right - left, bottom - top)
+            view.holder.setFixedSize(((right - left) * scale).roundToInt(), ((bottom - top) * scale).roundToInt())
+        }
         app.registerCameraStateListener(object : CameraStateListener {
             override fun onFreeCameraEnabled() {
                 _isAutoCamActive.value = false
@@ -75,7 +95,6 @@ class Midis2jam2Harness(
 
     override fun reshape(width: Int, height: Int) {
         app.reshape(width, height)
-        view.layout(0, 0, width, height)
     }
 
     override fun update() {

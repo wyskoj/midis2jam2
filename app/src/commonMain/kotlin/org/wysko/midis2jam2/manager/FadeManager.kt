@@ -71,6 +71,8 @@ class FadeManager : BaseManager() {
 
             else -> 1.0f
         }
+        // A full-screen pass that does nothing when fully faded in, so it is only run while fading.
+        fadeFilter.isEnabled = fadeFilter.value < 1.0f
     }
 
     private fun getFpp() = application.viewPort.processors.filterIsInstance<FilterPostProcessor>().firstOrNull()
