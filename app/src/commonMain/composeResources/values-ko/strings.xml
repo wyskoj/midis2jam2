@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">기본값</string>
     <string name="settings_onscreenelements_lyrics_size_large">크게</string>
     <string name="settings_onscreenelements_lyrics_size_larger">더 크게</string>
+    <string name="settings_onscreenelements_lyrics_style">가사 스타일</string>
+    <string name="settings_onscreenelements_lyrics_style_description">각 줄에서 부른 부분을 강조하는 방식</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">음절 단위</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">부드럽게</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

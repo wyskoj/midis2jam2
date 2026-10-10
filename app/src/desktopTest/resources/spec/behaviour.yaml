@@ -561,6 +561,14 @@
   source: features/lyrics.md
   platforms: [desktop, android]
   claim: "The size of the lyrics can be set in the settings tab"
+- id: lyrics.setting.style
+  source: code
+  platforms: [desktop, android]
+  claim: "The lyrics style (by syllable, or glide) can be chosen in the settings tab; by syllable is the default"
+- id: lyrics.style.glide
+  source: code
+  platforms: [desktop, android]
+  claim: "In the glide style, the highlight sweeps smoothly through each syllable as it is sung, rather than colouring it all at once"
 - id: lyrics.font.non-ascii-glyphs
   source: code
   platforms: [desktop, android]

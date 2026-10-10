@@ -31,6 +31,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMo
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
+import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings.LyricsSettings.LyricsStyle
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.domain.settings.PreferenceBackedSettingsRepository
@@ -256,6 +257,24 @@ class SettingsModelTest {
     }
 
     @Test
+    @Spec("lyrics.setting.style")
+    fun `the lyrics style is by syllable until glide is chosen`() = runTest(dispatcher) {
+        val repository = inMemoryRepository()
+        val model = SettingsModel(repository)
+        val style = { repository.appSettings.value.onScreenElementsSettings.lyricsSettings.style }
+
+        assertEquals(LyricsStyle.Syllable, style(), "Lyrics should highlight by syllable unless another style is chosen")
+
+        model.setLyricsStyle(LyricsStyle.Glide)
+        advanceUntilIdle()
+        assertEquals(LyricsStyle.Glide, style())
+
+        model.setLyricsStyle(LyricsStyle.Syllable)
+        advanceUntilIdle()
+        assertEquals(LyricsStyle.Syllable, style())
+    }
+
+    @Test
     fun `the head-up display can be turned off`() = runTest(dispatcher) {
         val repository = inMemoryRepository()
         val model = SettingsModel(repository)
@@ -409,6 +428,9 @@ class SettingsModelTest {
             },
             SetterCase("lyrics size", 2.5, { it.setLyricsSize(2.5) }) {
                 it.onScreenElementsSettings.lyricsSettings.lyricsSize
+            },
+            SetterCase("lyrics style", LyricsStyle.Glide, { it.setLyricsStyle(LyricsStyle.Glide) }) {
+                it.onScreenElementsSettings.lyricsSettings.style
             },
             SetterCase("use shadows", false, { it.setUseShadows(false) }) {
                 it.graphicsSettings.shadowsSettings.isUseShadows

@@ -74,22 +74,41 @@ class LyricController(private val context: PerformanceManager, private val event
             ?.sumOf { it.text.display().length }
             ?: 0
 
+    /**
+     * How many characters of [currentLine] the display last showed as sung. In the glide style this is
+     * fractional while a syllable is part-way sung; otherwise it matches [elapsedCharactersOfCurrentLine].
+     */
+    internal var sungCharactersOfCurrentLine: Float = 0f
+        private set
+
+    private val settings = context.config.settings.onScreenElementsSettings.lyricsSettings
+
+    private val highlight = settings.style.highlight(context.app.assetManager)
+
+    private val syllables = lines.associateWith { line ->
+        line.map { TimedSyllable(context.sequence.getTimeOf(it), it.text.display().length) }
+    }
+
+    /** When the display moves on from each line to the one after it; the last line is never moved on from. */
+    private val handOffs = lines.withIndex().associate { (index, line) ->
+        line to (lines.getOrNull(index + 1)?.let { handOffTime(line, it) } ?: Duration.INFINITE)
+    }
+
     private val wordCollector = EventCollector(context, words, onSeek = { currentWord = it.prev() })
     private val lineCollector = LyricLineCollector(context, lines, onSeek = {
         currentLine = it.prev()
     }, triggerCondition = { line: LyricLine, time: Duration ->
-        with(context) {
-            currentLine?.let { currentLine ->
-                var timeBetween = startTime(line) - endTime(currentLine)
-                if (timeBetween > 4.seconds) {
-                    timeBetween = 4.seconds
-                }
-                time > startTime(line) - (timeBetween * 0.45)
-            } ?: let {
-                time >= startTime(line) - 1.seconds
-            }
-        }
+        currentLine?.let { time > handOffTime(it, line) } ?: (time >= context.startTime(line) - 1.seconds)
     })
+
+    /**
+     * When the display moves from [previous] to [next]: a little before [next] starts, sooner the longer the
+     * gap between them (up to a point), so the next line has slid into place by the time it is sung.
+     */
+    private fun handOffTime(previous: LyricLine, next: LyricLine): Duration = with(context) {
+        val timeBetween = (startTime(next) - endTime(previous)).coerceAtMost(4.seconds)
+        startTime(next) - (timeBetween * 0.45)
+    }
 
     private val opacity = NumberSmoother(0f, 5.0)
     private var isVisible = false
@@ -103,14 +122,11 @@ class LyricController(private val context: PerformanceManager, private val event
                     100f
                 )
             )
-            val lyricsSize = context
-                .config.settings
-                .onScreenElementsSettings.lyricsSettings.lyricsSize
-
-            size = (LYRICS_FONT_BASE_SIZE * lyricsSize).toFloat()
+            size = (LYRICS_FONT_BASE_SIZE * settings.lyricsSize).toFloat()
             color = ColorRGBA.DarkGray
             text = it.renderString()
             alignment = BitmapFont.Align.Center
+            highlight.prepare(this)
         }
     }.onEach { context.app.guiNode += it.value }
     private val linePositionCtrl = lines.associateWith { NumberSmoother(0.8f, 10.0) }
@@ -153,11 +169,18 @@ class LyricController(private val context: PerformanceManager, private val event
 
             calculateVisibility(time)
 
-            texts[currentLine]?.setColor(
-                0,
-                currentLine?.take(currentLine!!.indexOf(currentWord) + 1)?.sumOf { it.text.display().length } ?: 0,
-                ColorRGBA(1f, 1f, 1f, opacity.value)
-            )
+            sungCharactersOfCurrentLine = currentLine?.let { line ->
+                texts[line]?.let { text ->
+                    highlight.highlight(
+                        text,
+                        syllables.getValue(line),
+                        handOffs.getValue(line),
+                        elapsedCharactersOfCurrentLine,
+                        time,
+                        ColorRGBA(1f, 1f, 1f, opacity.value),
+                    )
+                }
+            } ?: 0f
 
             opacity.tick(delta) { if (isVisible) 1f else 0f }
         }

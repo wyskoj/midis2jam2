@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">Mặc định</string>
     <string name="settings_onscreenelements_lyrics_size_large">Lớn</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Lớn hơn</string>
+    <string name="settings_onscreenelements_lyrics_style">Kiểu lời bài hát</string>
+    <string name="settings_onscreenelements_lyrics_style_description">Cách làm nổi bật phần đã hát của mỗi dòng</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">Theo âm tiết</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Lướt</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

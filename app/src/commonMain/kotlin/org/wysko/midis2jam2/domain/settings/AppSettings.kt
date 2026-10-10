@@ -152,7 +152,17 @@ data class AppSettings(
         data class LyricsSettings(
             val isShowLyrics: Boolean = true,
             val lyricsSize: Double = 1.5,
-        )
+            val style: LyricsStyle = LyricsStyle.Syllable,
+        ) {
+            /** How the lyric display shows which part of the line has been sung. */
+            enum class LyricsStyle {
+                /** Each syllable turns white the moment it is sung. */
+                Syllable,
+
+                /** The highlight sweeps through each syllable as it is sung, like karaoke. */
+                Glide,
+            }
+        }
     }
 
     @Serializable

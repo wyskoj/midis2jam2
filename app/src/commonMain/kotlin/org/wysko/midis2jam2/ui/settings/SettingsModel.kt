@@ -28,6 +28,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.Backg
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
+import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings.LyricsSettings.LyricsStyle
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.domain.settings.SettingsRepository
@@ -144,6 +145,9 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
 
     fun setLyricsSize(lyricsSize: Double) =
         onScreenElements { it.copy(lyricsSettings = it.lyricsSettings.copy(lyricsSize = lyricsSize)) }
+
+    fun setLyricsStyle(style: LyricsStyle) =
+        onScreenElements { it.copy(lyricsSettings = it.lyricsSettings.copy(style = style)) }
 
     fun setUseShadows(isUseShadows: Boolean) =
         graphics { it.copy(shadowsSettings = it.shadowsSettings.copy(isUseShadows = isUseShadows)) }

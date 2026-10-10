@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">มาตรฐาน</string>
     <string name="settings_onscreenelements_lyrics_size_large">ใหญ่</string>
     <string name="settings_onscreenelements_lyrics_size_larger">ใหญ่มาก</string>
+    <string name="settings_onscreenelements_lyrics_style">รูปแบบเนื้อเพลง</string>
+    <string name="settings_onscreenelements_lyrics_style_description">วิธีไฮไลต์ส่วนที่ร้องแล้วของแต่ละบรรทัด</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">ทีละพยางค์</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">เลื่อนต่อเนื่อง</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

@@ -146,6 +146,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">Par défaut</string>
     <string name="settings_onscreenelements_lyrics_size_large">Grand</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Plus grand</string>
+    <string name="settings_onscreenelements_lyrics_style">Style des paroles</string>
+    <string name="settings_onscreenelements_lyrics_style_description">Comment la partie chantée de chaque ligne est mise en évidence</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">Par syllabe</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Glissement</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

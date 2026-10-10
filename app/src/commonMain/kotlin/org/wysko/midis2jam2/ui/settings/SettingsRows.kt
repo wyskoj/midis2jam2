@@ -48,6 +48,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.Backg
 import org.wysko.midis2jam2.domain.settings.AppSettings.BackgroundSettings.BackgroundType.Default
 import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMode
 import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.CinematicSettings.CinematicPacing
+import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings.LyricsSettings.LyricsStyle
 import org.wysko.midis2jam2.domain.settings.AppTheme
 import org.wysko.midis2jam2.ui.common.component.*
 import kotlin.math.roundToInt
@@ -208,6 +209,22 @@ internal fun LyricsSizeSelect(settings: State<AppSettings>, model: SettingsModel
             SelectOption(1.5, stringResource(Res.string.settings_onscreenelements_lyrics_size_default)),
             SelectOption(2.0, stringResource(Res.string.settings_onscreenelements_lyrics_size_large)),
             SelectOption(2.5, stringResource(Res.string.settings_onscreenelements_lyrics_size_larger)),
+        ),
+    )
+}
+
+/** Shown beneath [LyricsSwitch]; the entry is hidden while lyrics are off. */
+@Composable
+internal fun LyricsStyleSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SettingsChoiceRow(
+        title = stringResource(Res.string.settings_onscreenelements_lyrics_style),
+        description = stringResource(Res.string.settings_onscreenelements_lyrics_style_description),
+        selected = settings.value.onScreenElementsSettings.lyricsSettings.style,
+        onSelected = model::setLyricsStyle,
+        icon = Res.drawable.lyrics,
+        options = listOf(
+            SelectOption(LyricsStyle.Syllable, stringResource(Res.string.settings_onscreenelements_lyrics_style_syllable)),
+            SelectOption(LyricsStyle.Glide, stringResource(Res.string.settings_onscreenelements_lyrics_style_glide)),
         ),
     )
 }

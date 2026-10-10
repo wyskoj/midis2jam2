@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">Standard</string>
     <string name="settings_onscreenelements_lyrics_size_large">Stor</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Større</string>
+    <string name="settings_onscreenelements_lyrics_style">Tekststil</string>
+    <string name="settings_onscreenelements_lyrics_style_description">Hvordan den sungne delen av hver linje fremheves</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">Stavelse for stavelse</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Glidende</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

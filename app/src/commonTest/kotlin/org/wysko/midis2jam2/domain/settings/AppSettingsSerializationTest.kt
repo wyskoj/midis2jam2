@@ -24,6 +24,7 @@ import org.wysko.midis2jam2.domain.settings.AppSettings.CameraSettings.AutoCamMo
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.AntiAliasingSettings.AntiAliasingQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.ShadowsSettings.ShadowsQuality
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
+import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings.LyricsSettings.LyricsStyle
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -71,6 +72,7 @@ class AppSettingsSerializationTest {
                 lyricsSettings = AppSettings.OnScreenElementsSettings.LyricsSettings(
                     isShowLyrics = false,
                     lyricsSize = 2.5,
+                    style = LyricsStyle.Glide,
                 ),
                 isShowHeadsUpDisplay = false,
             ),
@@ -113,6 +115,7 @@ class AppSettingsSerializationTest {
 
         assertEquals(true, defaults.onScreenElementsSettings.isShowHeadsUpDisplay)
         assertEquals(true, defaults.onScreenElementsSettings.lyricsSettings.isShowLyrics)
+        assertEquals(LyricsStyle.Syllable, defaults.onScreenElementsSettings.lyricsSettings.style)
 
         assertEquals(false, defaults.cameraSettings.isStartAutocamWithSong)
         assertEquals(true, defaults.cameraSettings.isSmoothFreecam)
@@ -229,6 +232,11 @@ class AppSettingsSerializationTest {
         assertEquals(false, loaded.playbackSettings.isTrimSilence, "A document from before the setting gets the default")
         assertEquals(false, loaded.onScreenElementsSettings.lyricsSettings.isShowLyrics)
         assertEquals(2.5, loaded.onScreenElementsSettings.lyricsSettings.lyricsSize)
+        assertEquals(
+            LyricsStyle.Syllable,
+            loaded.onScreenElementsSettings.lyricsSettings.style,
+            "A document from before the setting gets the default",
+        )
         assertEquals(false, loaded.onScreenElementsSettings.isShowHeadsUpDisplay)
         assertEquals(true, loaded.cameraSettings.isStartAutocamWithSong)
         assertEquals(false, loaded.cameraSettings.isSmoothFreecam)
