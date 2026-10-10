@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">デフォルト</string>
     <string name="settings_onscreenelements_lyrics_size_large">大きい</string>
     <string name="settings_onscreenelements_lyrics_size_larger">より大きい</string>
+    <string name="settings_onscreenelements_lyrics_style">歌詞のスタイル</string>
+    <string name="settings_onscreenelements_lyrics_style_description">各行の歌われた部分の強調方法</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">音節ごと</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">なめらか</string>
 
     <!-- 設定 / 再生 -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

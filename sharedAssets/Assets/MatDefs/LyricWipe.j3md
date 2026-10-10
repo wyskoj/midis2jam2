@@ -1,0 +1,36 @@
+// Bitmap text where one glyph, the one being sung, is part sung and part unsung, for the glide lyric style.
+// The glyph is picked out by being drawn in MarkerColor; every other glyph keeps its vertex colour.
+MaterialDef LyricWipe {
+
+    MaterialParameters {
+        Int BoundDrawBuffer
+
+        // The font page
+        Texture2D ColorMap
+
+        // The vertex colour that marks the glyph being sung (alpha ignored)
+        Color MarkerColor : 1.0 0.0 1.0 1.0
+
+        // The colours either side of the wipe (alpha ignored in favour of the vertex colour's)
+        Color SungColor : 1.0 1.0 1.0 1.0
+        Color UnsungColor : 0.25 0.25 0.25 1.0
+
+        // The marked glyph's horizontal extent in the font page, and how far across it the wipe is (0 to 1)
+        Float WipeU0 : 0.0
+        Float WipeU1 : 1.0
+        Float WipeFraction : 0.0
+    }
+
+    Technique {
+        VertexShader   GLSL310 GLSL300 GLSL150 GLSL100 : Assets/Shaders/LyricWipe.vert
+        FragmentShader GLSL310 GLSL300 GLSL150 GLSL100 : Assets/Shaders/LyricWipe.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+        }
+
+        Defines {
+            BOUND_DRAW_BUFFER: BoundDrawBuffer
+        }
+    }
+}

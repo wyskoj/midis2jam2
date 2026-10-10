@@ -18,9 +18,11 @@
 package org.wysko.midis2jam2.performance
 
 import com.jme3.font.BitmapText
+import com.jme3.scene.Geometry
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.domain.settings.AppSettings
+import org.wysko.midis2jam2.domain.settings.AppSettings.OnScreenElementsSettings.LyricsSettings.LyricsStyle
 import org.wysko.midis2jam2.manager.LyricManager
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
@@ -28,6 +30,7 @@ import org.wysko.midis2jam2.testing.Spec
 import org.wysko.midis2jam2.testing.withLyrics
 import org.wysko.midis2jam2.world.font.covers
 import org.wysko.midis2jam2.world.lyric.renderString
+import kotlin.math.floor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -157,6 +160,58 @@ class LyricsTest {
     }
 
     @Test
+    @Spec("lyrics.style.glide")
+    fun `in the glide style the highlight sweeps through each syllable`() {
+        val glide = AppSettings().withLyrics { copy(style = LyricsStyle.Glide) }
+
+        HeadlessPerformance.start(MidiFixtures.withLyrics(), settings = glide).use { performance ->
+            val controller = assertNotNull(
+                performance.app.stateManager.getState(LyricManager::class.java)?.controller
+            )
+
+            val lyricTexts = performance.onEngineThread { bitmapTextsIn(performance.app.guiNode) }
+                .filter { text -> controller.allLines.any { it.renderString() == text.text } }
+            assertTrue(lyricTexts.isNotEmpty(), "No lyric line text was found on screen")
+            lyricTexts.flatMap { it.children.filterIsInstance<Geometry>() }.forEach {
+                assertEquals(
+                    "LyricWipe",
+                    it.material.materialDef.name,
+                    "A lyric line is drawn without the wipe the glide style needs"
+                )
+            }
+
+            val sungOverTime = mutableListOf<Pair<String?, Float>>()
+            repeat(STEPS) { step ->
+                val at = HeadlessPerformance.FRAME * ((step + 1) * FRAMES_PER_STEP)
+                // Read in the same engine task as the tick: the manager's own updates tick at playback time.
+                sungOverTime += performance.onEngineThread {
+                    controller.tick(at, HeadlessPerformance.FRAME)
+                    controller.currentLine?.renderString() to controller.sungCharactersOfCurrentLine
+                }
+            }
+
+            val sung = sungOverTime.map { it.second }
+            assertTrue(
+                sung.any { it != floor(it) },
+                "The highlight only ever covered whole characters, so it jumped instead of gliding: $sung"
+            )
+            sungOverTime.zipWithNext().filter { (before, after) -> before.first == after.first }
+                .forEach { (before, after) ->
+                    assertTrue(
+                        after.second >= before.second,
+                        "The highlight went backwards within a line: $sungOverTime"
+                    )
+                }
+            sungOverTime.groupBy({ it.first }, { it.second }).forEach { (line, values) ->
+                assertTrue(
+                    values.zipWithNext().all { (before, after) -> after - before <= MAX_STEP_CHARACTERS },
+                    "The highlight leapt through \"$line\" rather than gliding: $values"
+                )
+            }
+        }
+    }
+
+    @Test
     @Spec("lyrics.font.non-ascii-glyphs")
     fun `lyrics using characters outside the bundled font are still rendered`() {
         HeadlessPerformance.start(MidiFixtures.withNonAsciiLyrics()).use { performance ->
@@ -187,6 +242,13 @@ class LyricsTest {
     private companion object {
         const val STEPS = 40
         const val FRAMES_PER_STEP = 15
+
+        /**
+         * The most characters the glide may cover between two steps. A quarter note of the fixture is
+         * 0.5 s and holds one syllable of at most four characters; a step is a quarter of a second, so a
+         * glide covers about two characters a step, and an instant jump covers a whole syllable at once.
+         */
+        const val MAX_STEP_CHARACTERS = 3f
 
         /** The highest ASCII code point; anything above it is outside the bundled font's coverage. */
         const val MAX_ASCII_CODE_POINT = 126

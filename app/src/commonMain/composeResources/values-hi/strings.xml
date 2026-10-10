@@ -146,6 +146,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">डिफ़ॉल्ट</string>
     <string name="settings_onscreenelements_lyrics_size_large">बड़ा</string>
     <string name="settings_onscreenelements_lyrics_size_larger">बड़ा</string>
+    <string name="settings_onscreenelements_lyrics_style">गीत के बोल की शैली</string>
+    <string name="settings_onscreenelements_lyrics_style_description">हर पंक्ति का गाया गया हिस्सा कैसे हाइलाइट हो</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">शब्दांश के अनुसार</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">सरकता हुआ</string>
 
     <!-- सेटिंग्स / प्लेबैक -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

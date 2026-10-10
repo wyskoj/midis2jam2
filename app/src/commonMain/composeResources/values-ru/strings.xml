@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">По умолчанию</string>
     <string name="settings_onscreenelements_lyrics_size_large">Большой</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Очень большой</string>
+    <string name="settings_onscreenelements_lyrics_style">Стиль текста</string>
+    <string name="settings_onscreenelements_lyrics_style_description">Как выделяется спетая часть каждой строки</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">По слогам</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Плавно</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

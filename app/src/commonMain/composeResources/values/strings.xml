@@ -155,6 +155,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">Default</string>
     <string name="settings_onscreenelements_lyrics_size_large">Large</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Larger</string>
+    <string name="settings_onscreenelements_lyrics_style">Lyrics style</string>
+    <string name="settings_onscreenelements_lyrics_style_description">How the sung part of each line is highlighted</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">By syllable</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Glide</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

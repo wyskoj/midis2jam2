@@ -80,6 +80,9 @@ internal actual fun settingsPages(
             row(isVisible = { settings.value.onScreenElementsSettings.lyricsSettings.isShowLyrics }) {
                 LyricsSizeSelect(settings, model)
             }
+            row(isVisible = { settings.value.onScreenElementsSettings.lyricsSettings.isShowLyrics }) {
+                LyricsStyleSelect(settings, model)
+            }
         }
     },
     settingsPage(

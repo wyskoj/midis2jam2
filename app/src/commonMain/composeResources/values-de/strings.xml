@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">Standard</string>
     <string name="settings_onscreenelements_lyrics_size_large">Groß</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Größer</string>
+    <string name="settings_onscreenelements_lyrics_style">Textstil</string>
+    <string name="settings_onscreenelements_lyrics_style_description">Wie der gesungene Teil jeder Zeile hervorgehoben wird</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">Silbenweise</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Gleitend</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>

@@ -66,7 +66,7 @@ class SettingsPagesTest {
     }
 
     @Test
-    fun `the lyrics size row is only visible while lyrics are on`() {
+    fun `the lyrics size and style rows are only visible while lyrics are on`() {
         val lyricsSettings = AppSettings().onScreenElementsSettings.lyricsSettings
         val state = mutableStateOf(
             AppSettings().copy(
@@ -82,13 +82,13 @@ class SettingsPagesTest {
         ).first { it.page == SettingsPage.OnScreen }
 
         val entries = onScreen.sections.flatMap { it.entries }
-        assertEquals(listOf(true, true, false), entries.map { it.isVisible() })
+        assertEquals(listOf(true, true, false, false), entries.map { it.isVisible() })
 
         state.value = state.value.copy(
             onScreenElementsSettings = state.value.onScreenElementsSettings.copy(
                 lyricsSettings = lyricsSettings.copy(isShowLyrics = true)
             )
         )
-        assertTrue(entries.all { it.isVisible() }, "Lyrics size should appear once lyrics are on")
+        assertTrue(entries.all { it.isVisible() }, "Lyrics size and style should appear once lyrics are on")
     }
 }

@@ -163,6 +163,10 @@
     <string name="settings_onscreenelements_lyrics_size_default">Default</string>
     <string name="settings_onscreenelements_lyrics_size_large">Malaki</string>
     <string name="settings_onscreenelements_lyrics_size_larger">Mas Malaki</string>
+    <string name="settings_onscreenelements_lyrics_style">Istilo ng Lyrics</string>
+    <string name="settings_onscreenelements_lyrics_style_description">Kung paano naka-highlight ang bahaging naawit na sa bawat linya</string>
+    <string name="settings_onscreenelements_lyrics_style_syllable">Bawat pantig</string>
+    <string name="settings_onscreenelements_lyrics_style_glide">Dumudulas</string>
 
     <!-- Settings / Playback -->
     <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
