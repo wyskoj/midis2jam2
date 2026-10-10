@@ -16,6 +16,11 @@
  */
 package org.wysko.midis2jam2.particle
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Quaternion.IDENTITY
 import com.jme3.math.Vector3f
@@ -25,7 +30,6 @@ import com.jme3.scene.Node
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.pow
@@ -103,7 +107,8 @@ class SteamPuffer(
          */
         var isActive = false
 
-        private val cube = context.modelD("SteamCloud.obj", type.filename).apply {
+        private val cube = context.model(Models.Particles.SteamCloud).apply {
+            setMaterial(context.assetLoader.material(type.material))
             shadowMode = RenderQueue.ShadowMode.Cast
         }.also {
             node += it
@@ -187,27 +192,27 @@ class SteamPuffer(
     /**
      * The texture of the steam puff.
      *
-     * @property filename The filename of the cloud texture.
+     * @property material What the cloud looks like.
      */
-    sealed class Texture(val filename: String) {
+    sealed class Texture(val material: MaterialAsset) {
         /**
          * The normal steam puff texture.
          */
-        data object Normal : Texture("SteamPuff.bmp")
+        data object Normal : Texture(Materials.Diffuse.SteamPuff)
 
         /**
          * The harmonica steam puff texture.
          */
-        data object Harmonica : Texture("SteamPuff_Harmonica.bmp")
+        data object Harmonica : Texture(Materials.Diffuse.SteamPuffHarmonica)
 
         /**
          * The pop steam puff texture.
          */
-        data object Pop : Texture("SteamPuff_Pop.bmp")
+        data object Pop : Texture(Materials.Diffuse.SteamPuffPop)
 
         /**
          * The whistle steam puff texture.
          */
-        data object Whistle : Texture("SteamPuff_Whistle.bmp")
+        data object Whistle : Texture(Materials.Diffuse.SteamPuffWhistle)
     }
 }

@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Do czasu naprawienia używane jest domyślne tło.</string>
     <string name="background_warning_fix">Otwórz ustawienia tła</string>
     <string name="background_warning_continue">Odtwórz z domyślnym tłem</string>
+    <string name="loading_reading_midi">Wczytywanie pliku MIDI…</string>
+    <string name="loading_soundbank">Ładowanie banku dźwięków…</string>
+    <string name="loading_building_band">Przygotowywanie zespołu…</string>
 </resources>
 

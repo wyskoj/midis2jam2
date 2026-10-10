@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
@@ -28,7 +31,6 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrume
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 private val STICK_NODE_OFFSET = Vector3f(0f, 0f, 10f)
@@ -47,7 +49,8 @@ class Tom(
 ) : DrumSetInstrument(context, hits) {
     /** The drum. */
     private val drum =
-        context.modelD(style.tomModel, style.shellTexture).apply {
+        context.model(style.tomModel).apply {
+            setMaterial(context.assetLoader.material(style.shell))
             recoilNode.attachChild(this)
             localScale = Vector3f.UNIT_XYZ.clone().mult(pitch.scale)
         }

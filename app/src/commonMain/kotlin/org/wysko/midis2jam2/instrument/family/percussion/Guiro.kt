@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
@@ -27,7 +29,6 @@ import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.LONG
 import org.wysko.midis2jam2.instrument.family.percussion.GuiroStickSpeed.SHORT
 import org.wysko.midis2jam2.midi.LONG_GUIRO
 import org.wysko.midis2jam2.midi.SHORT_GUIRO
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -71,14 +72,14 @@ class Guiro(
 
     private val guiroNode =
         Node().apply {
-            attachChild(context.modelD("DrumSet_Guiro.obj", "GuiroSkin.png"))
+            attachChild(context.model(Models.Percussion.Guiro.Body))
         }.also {
             geometry.attachChild(it)
         }
 
     private val stickNode =
         Node().apply {
-            attachChild(context.modelD("DrumSet_GuiroStick.obj", "Wood.bmp"))
+            attachChild(context.model(Models.Percussion.Guiro.Stick))
         }.also {
             geometry.attachChild(it)
         }

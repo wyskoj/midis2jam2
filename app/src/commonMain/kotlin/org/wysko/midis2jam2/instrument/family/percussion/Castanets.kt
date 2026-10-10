@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
@@ -23,7 +25,6 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -34,7 +35,7 @@ class Castanets(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>
         Striker(
             context = context,
             hits,
-            stickModel = context.modelD("Castanets.obj", "WoodBleach.bmp"),
+            stickModel = context.model(Models.Percussion.Castanets.Body),
             strikeSpeed = 2.0,
             maxIdleAngle = 25.0,
             actualStick = false,
@@ -48,7 +49,7 @@ class Castanets(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>
     private val bottomCastanetNode =
         Node().apply {
             attachChild(
-                context.modelD("Castanets.obj", "WoodBleach.bmp").also {
+                context.model(Models.Percussion.Castanets.Body).also {
                     it.localRotation = Quaternion().fromAngles(0f, 0f, FastMath.PI)
                     it.move(0f, 0f, -3f)
                 },

@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
@@ -24,7 +26,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -51,7 +52,7 @@ class HandClap(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>)
             geometry.attachChild(this)
         }.also {
             it.attachChild(
-                context.modelD("hand_right.obj", "hands.bmp").apply {
+                context.model(Models.Shared.HandRight).apply {
                     move(0f, 0f, -1.5f)
                     localRotation = Quaternion().fromAngles(0f, rad(10.0), FastMath.PI)
                 },

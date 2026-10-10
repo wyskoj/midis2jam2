@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.organ
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
@@ -26,7 +28,6 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
 import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Harmonica
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -54,7 +55,7 @@ class Harmonica(context: PerformanceManager, eventList: List<MidiEvent>) :
 
     init {
         with(geometry) {
-            +context.modelD("Harmonica.obj", "Harmonica.bmp")
+            +context.model(Models.Organ.Harmonica.Body)
             repeat(12) {
                 +node {
                     +puffers[it].root.apply {

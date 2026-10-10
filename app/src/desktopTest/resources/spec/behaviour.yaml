@@ -619,6 +619,11 @@
   platforms: [android]
   claim: "Tapping the screen opens a side menu with seek and play/pause buttons"
   waived: "Android-only; no Android instrumentation suite yet."
+- id: playback.android.loading-screen
+  source: code
+  platforms: [android]
+  claim: "A performance that takes more than a moment to load shows the song's name, a progress bar and what is being loaded"
+  waived: "Android-only; no Android instrumentation suite yet."
 
 # ----------------------------------------------------------------------------- queue (queue.md)
 - id: queue.add.button

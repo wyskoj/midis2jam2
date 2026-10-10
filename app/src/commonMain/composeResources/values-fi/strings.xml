@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Kunnes tämä korjataan, käytetään oletustaustaa.</string>
     <string name="background_warning_fix">Avaa taustan asetukset</string>
     <string name="background_warning_continue">Toista oletustaustalla</string>
+    <string name="loading_reading_midi">Luetaan MIDI-tiedostoa…</string>
+    <string name="loading_soundbank">Ladataan äänipankkia…</string>
+    <string name="loading_building_band">Kootaan bändiä…</string>
 </resources>
 

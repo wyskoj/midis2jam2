@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.manager
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.ModelAsset
 import com.charleskorn.kaml.Yaml
 import com.jme3.app.Application
 import com.jme3.scene.Spatial
@@ -28,8 +30,8 @@ import org.wysko.midis2jam2.util.*
 class StandManager : BaseManager() {
     @Serializable
     private data class StandConfiguration(
-        val modelName: String,
-        val textureName: String,
+        /** The stand's converted model, as its path under `sharedAssets/models` (`Stands/PianoStand`). */
+        val model: String,
         val position: Vector3fAsStruct,
         val rotation: Vector3fAsStruct,
         val scale: Float,
@@ -44,10 +46,7 @@ class StandManager : BaseManager() {
 
         configurations = Yaml.default.decodeFromString<List<StandConfiguration>>(resourceToString("/stands.yaml"))
         for (configuration in configurations) {
-            stands[configuration] = app.assetManager.loadDiffuseModel(
-                modelName = configuration.modelName,
-                textureName = configuration.textureName,
-            ).apply {
+            stands[configuration] = context.model(ModelAsset("Assets/Models/${configuration.model}.j3o")).apply {
                 loc = configuration.position
                 rot = configuration.rotation
                 scale(configuration.scale)

@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -23,7 +25,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The sticks. */
@@ -48,7 +49,7 @@ class Sticks(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) :
     private val rightStickNode =
         Node().apply {
             attachChild(
-                context.modelD("DrumSet_Stick.obj", "StickSkin.bmp").apply {
+                context.model(Models.Shared.Stick).apply {
                     setLocalTranslation(-2.5f, 0f, 0f)
                     localRotation = Quaternion().fromAngles(0f, -rad(20.0), 0f)
                 },

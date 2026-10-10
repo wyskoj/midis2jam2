@@ -17,9 +17,9 @@
 package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
-import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.instrument.MultipleInstancesLinearAdjustment
@@ -28,8 +28,7 @@ import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithKeyPositions
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER: PressedKeysFingeringManager = PressedKeysFingeringManager.from(Tuba::class)
@@ -52,10 +51,8 @@ class Tuba(context: PerformanceManager, eventList: List<MidiEvent>) :
      */
     inner class TubaClone : CloneWithKeyPositions(this@Tuba, -0.05f, 0.8f, Axis.Y, Axis.X) {
 
-        override val keys: Array<Spatial> = Array(4) { i ->
-            with(geometry) {
-                +context.modelR("TubaKey${i + 1}.obj", "HornSkinGrey.bmp")
-            }
+        override val keys: Array<Spatial> = with(geometry) {
+            Models.Brass.Tuba.Key.map { +context.model(it) }.toTypedArray()
         }
 
         override fun adjustForPolyphony(delta: Duration) {
@@ -69,12 +66,10 @@ class Tuba(context: PerformanceManager, eventList: List<MidiEvent>) :
 
         init {
             with(geometry) {
-                +context.modelR("TubaBody.obj", "HornSkin.bmp").apply {
-                    (this as Node)[1].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-                }
+                +context.model(Models.Brass.Tuba.Body)
             }
             with(bell) {
-                +context.modelR("TubaHorn.obj", "HornSkin.bmp")
+                +context.model(Models.Brass.Tuba.Horn)
             }
 
             highestLevel.loc = v3(10, 0, 0)

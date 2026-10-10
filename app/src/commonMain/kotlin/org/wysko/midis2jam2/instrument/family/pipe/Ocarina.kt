@@ -19,12 +19,13 @@ package org.wysko.midis2jam2.instrument.family.pipe
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithHands
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 /** The Ocarina. */
@@ -47,9 +48,7 @@ class Ocarina(context: PerformanceManager, events: List<MidiEvent>) :
     inner class OcarinaClone : CloneWithHands(this@Ocarina, 0f) {
 
         override val leftHands: List<Spatial> = listOf()
-        override val rightHands: List<Spatial> = List(12) {
-            context.modelD("OcarinaHand$it.obj", "hands.bmp")
-        }
+        override val rightHands: List<Spatial> = Models.Pipe.Ocarina.Hand.map { context.model(it) }
 
         override fun tick(time: Duration, delta: Duration) {
             super.tick(time, delta)
@@ -71,7 +70,7 @@ class Ocarina(context: PerformanceManager, events: List<MidiEvent>) :
 
         init {
             loadHands()
-            geometry.attachChild(context.modelD("Ocarina.obj", "Ocarina.bmp"))
+            geometry.attachChild(context.model(Models.Pipe.Ocarina.Body))
             highestLevel.setLocalTranslation(0f, 0f, 18f)
         }
     }

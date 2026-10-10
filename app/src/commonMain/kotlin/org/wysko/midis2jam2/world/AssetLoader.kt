@@ -17,15 +17,18 @@
 
 package org.wysko.midis2jam2.world
 
+import com.jme3.asset.AssetManager
 import com.jme3.material.Material
 import com.jme3.material.RenderState
 import com.jme3.math.ColorRGBA.Black
 import com.jme3.math.Vector3f
-import com.jme3.renderer.queue.RenderQueue.Bucket.Transparent
 import com.jme3.scene.Spatial
-import org.wysko.midis2jam2.manager.PerformanceManager
+import com.jme3.texture.Texture
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.TextureAsset
 import org.wysko.midis2jam2.manager.BaseManager
-import org.wysko.midis2jam2.manager.LoadingProgressManager
+import org.wysko.midis2jam2.manager.PerformanceManager
 
 private const val LIGHTING_MAT: String = "Common/MatDefs/Light/Lighting.j3md"
 private const val UNSHADED_MAT: String = "Common/MatDefs/Misc/Unshaded.j3md"
@@ -35,167 +38,62 @@ private const val FRESNEL_PARAMS: String = "FresnelParams"
 private const val ENV_MAP_AS_SPHERE_MAP: String = "EnvMapAsSphereMap"
 private const val ENV_MAP: String = "EnvMap"
 
-private const val MODEL_PREFIX = "Assets/Models/"
-private const val TEXTURE_PREFIX = "Assets/Textures/"
-private const val MATERIAL_PREFIX = "Assets/Materials/"
-
 private fun String.assetPrefix(): String = if (this.startsWith("Assets/")) this else "Assets/$this"
 
 /**
- * Provides utility functions for loading assets from files.
- *
- * @property context The context to the main class.
+ * Loads the bundled models, materials and textures, by their references in the generated asset catalog (`Models`,
+ * `Materials`, `Textures`; see docs/ASSETS.md).
  */
-class AssetLoader(val onLoadAsset: (String) -> Unit = {}) : BaseManager() {
+class AssetLoader : BaseManager() {
 
-    private val progressListener by lazy {
-        stateManager.getState(LoadingProgressManager::class.java)
+    /** Loads a converted [model], which arrives with its library materials already applied. */
+    fun load(model: ModelAsset): Spatial = application.assetManager.loadModel(model.path)
+
+    /** Loads a [material] from the library. Each call returns a copy that can be changed independently. */
+    fun material(material: MaterialAsset): Material = application.assetManager.loadMaterial(material.path)
+
+    /** Loads a [texture], flipped as every model's UVs expect. */
+    fun texture(texture: TextureAsset): Texture = application.assetManager.loadTexture(texture.path)
+}
+
+/*
+ * The materials the instruments used to build in code, before they moved to the material library. They are kept
+ * only as references: MaterialLibraryParityTest checks that every library and generated material still matches them.
+ */
+
+/** A lit, textured material: what the generated diffuse materials replace. */
+internal fun legacyDiffuseMaterial(assetManager: AssetManager, texture: String): Material =
+    Material(assetManager, LIGHTING_MAT).apply {
+        setTexture(DIFFUSE_MAP, assetManager.loadTexture(texture.assetPrefix()))
     }
 
-    /**
-     * Loads a [model] and applies a regular [texture].
-     */
-    fun loadDiffuseModel(model: String, texture: String): Spatial {
-        onLoadAsset(model)
-        return application.assetManager.loadModel(model.assetPrefix()).apply {
-            setMaterial(diffuseMaterial(texture))
-        }
-    }
-
-    /**
-     * Loads a [model] and applies a regular [texture].
-     */
-    fun loadDiffuseModelReal(model: String, texture: String): Spatial {
-        val modelPath = prefix(model, AssetType.Model)
-        onLoadAsset(model)
-        return application.assetManager.loadModel(modelPath).also { spatial ->
-            if (!modelPath.endsWith(".j3o")) {
-                val texturePath = prefix(texture, AssetType.Texture)
-                spatial.setMaterial(
-                    diffuseMaterialReal(texturePath)
-                )
-            }
-        }
-    }
-
-    /**
-     * Loads a [model] and applies a regular [texture].
-     */
-    fun loadReflectiveModel(model: String, texture: String): Spatial {
-        onLoadAsset(model)
-        return application.assetManager.loadModel(model.assetPrefix()).apply {
-            setMaterial(reflectiveMaterial(texture))
-        }
-    }
-
-    /** Loads a fake shadow, given the paths to its [model] and [texture]. */
-    fun fakeShadow(model: String, texture: String): Spatial = application.assetManager.loadModel(model).apply {
-        setMaterial(
-            Material(application.assetManager, UNSHADED_MAT).apply {
-                setTexture(COLOR_MAP, application.assetManager.loadTexture(texture))
-                additionalRenderState.blendMode = RenderState.BlendMode.Alpha
-                setFloat("AlphaDiscardThreshold", 0.01F)
-            }
-        )
-        queueBucket = Transparent
-    }
-
-    /**
-     * Loads a diffuse material conditionally on the enhanced graphics state.
-     */
-    fun diffuseMaterial(texture: String): Material = Material(application.assetManager, LIGHTING_MAT).apply {
-        setTexture(DIFFUSE_MAP, application.assetManager.loadTexture(texture.assetPrefix()))
-    }
-
-    /**
-     * Loads a diffuse material conditionally on the enhanced graphics state.
-     */
-    fun diffuseMaterialReal(texture: String): Material =
-        Material(application.assetManager, "Assets/MatDefs/Lighting.j3md").apply {
-            setTexture(DIFFUSE_MAP, application.assetManager.loadTexture(prefix(texture, AssetType.Texture)))
-        }
-
-    /**
-     * Loads a material based on its texture and the material type.
-     *
-     * @param texture The material texture.
-     * @param type The material type.
-     */
-    fun material(texture: String, type: MaterialType): Material = when (type) {
-        MaterialType.Diffuse -> diffuseMaterial(texture)
-        MaterialType.Reflective -> reflectiveMaterial(texture)
-    }
-
-    /**
-     * Loads a reflective material conditionally on the enhanced graphics state.
-     */
-    fun reflectiveMaterial(texture: String): Material = Material(application.assetManager, LIGHTING_MAT).apply {
+/** A sphere-mapped reflection over black: what the HornSkin materials and generated reflective materials replace. */
+internal fun legacyReflectiveMaterial(assetManager: AssetManager, texture: String): Material =
+    Material(assetManager, LIGHTING_MAT).apply {
         setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
-        setTexture(ENV_MAP, application.assetManager.loadTexture(texture.assetPrefix()))
-        setTexture("DiffuseMap", application.assetManager.loadTexture("Assets/Black.bmp"))
+        setTexture(ENV_MAP, assetManager.loadTexture(texture.assetPrefix()))
+        setTexture(DIFFUSE_MAP, assetManager.loadTexture("Assets/Textures/Shared/Black.bmp"))
     }
+
+/** An unlit, alpha-blended fake shadow: what the generated shadow materials replace. */
+internal fun legacyShadowMaterial(assetManager: AssetManager, texture: String): Material =
+    Material(assetManager, UNSHADED_MAT).apply {
+        setTexture(COLOR_MAP, assetManager.loadTexture(texture.assetPrefix()))
+        additionalRenderState.blendMode = RenderState.BlendMode.Alpha
+        setFloat("AlphaDiscardThreshold", 0.01F)
+    }
+
+/** Flat black: what the library's Black material replaces. */
+internal fun legacyBlackMaterial(assetManager: AssetManager): Material = Material(assetManager, UNSHADED_MAT).apply {
+    setColor("Color", Black)
 }
 
-/**
- * A type of material.
- */
-sealed class MaterialType {
-    /**
-     * Diffuse type.
-     */
-    data object Diffuse : MaterialType()
-
-    /**
-     * Reflective type.
-     */
-    data object Reflective : MaterialType()
-}
-
+/** The performance's asset loader. */
 val PerformanceManager.assetLoader: AssetLoader
     get() = app.stateManager.getState(AssetLoader::class.java)
 
 /**
- * Convenience function for loading a [model] with a diffuse [texture].
+ * Loads a converted [model] from the asset catalog (`Models.…`), with its materials already applied.
  */
-fun PerformanceManager.modelD(model: String, texture: String): Spatial = assetLoader.loadDiffuseModel(model, texture)
-
-/**
- * Convenience function for loading a [model] with a diffuse [texture].
- */
-fun PerformanceManager.modelDReal(model: String, texture: String): Spatial =
-    assetLoader.loadDiffuseModelReal(model, texture)
-
-/**
- * Convenience function for loading a [model] with a reflective [texture].
- */
-fun PerformanceManager.modelR(model: String, texture: String): Spatial = assetLoader.loadReflectiveModel(model, texture)
-
-/**
- * Convenience function for loading a [model] with a [texture] and [type].
- */
-fun PerformanceManager.model(model: String, texture: String, type: MaterialType): Spatial = when (type) {
-    MaterialType.Diffuse -> modelD(model, texture)
-    MaterialType.Reflective -> modelR(model, texture)
-}
-
-/**
- * Convenience function for loading a [model] with a [texture] and [type].
- */
-fun PerformanceManager.model(model: String): Spatial = app.assetManager.loadModel(model)
-
-fun PerformanceManager.blackMaterial() = Material(app.assetManager, "Common/MatDefs/Misc/Unshaded.j3md").apply {
-    setColor("Color", Black)
-}
-
-
-private fun prefix(name: String, type: AssetType): String = when {
-    name.startsWith(type.prefix) -> name
-    else -> "${type.prefix}$name"
-}
-
-private enum class AssetType(val prefix: String) {
-    Model(MODEL_PREFIX),
-    Texture(TEXTURE_PREFIX),
-    Material(MATERIAL_PREFIX)
-}
+fun PerformanceManager.model(model: ModelAsset): Spatial = assetLoader.load(model)

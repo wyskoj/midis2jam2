@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
@@ -25,11 +27,9 @@ import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.DrumSetInstrument
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
-private const val METAL_TEXTURE = "MetalTexture.bmp"
 private const val BASS_DRUM_RECOIL_DISTANCE = -3f
 
 /**
@@ -57,23 +57,20 @@ class BassDrum(
         }
 
     private val drum =
-        context.modelD(style.bassDrumModel, style.shellTexture).apply {
+        context.model(style.bassDrumModel).apply {
+            setMaterial(context.assetLoader.material(style.shell))
             shadowMode = RenderQueue.ShadowMode.Cast
             recoilNode.attachChild(this)
         }
 
     private val beaterArm =
-        context.modelD("DrumSet_BassDrumBeaterArm.obj", METAL_TEXTURE).apply {
+        context.model(Models.Percussion.DrumSet.BeaterArm).apply {
             beaterAssembly.attachChild(this)
             move(0f, 5.5f, 1.35f)
-            (this as Node).let { // Set correct materials
-                it.children[0].setMaterial(context.assetLoader.reflectiveMaterial("ShinySilver.bmp"))
-                it.children[1].setMaterial(context.assetLoader.diffuseMaterial("MetalTextureDark.bmp"))
-            }
         }
 
     private val pedal =
-        context.modelD("DrumSet_BassDrumPedal.obj", METAL_TEXTURE).apply {
+        context.model(Models.Percussion.DrumSet.Pedal).apply {
             beaterAssembly.attachChild(this)
             move(0f, 0.5f, 7.5f)
         }
@@ -81,7 +78,7 @@ class BassDrum(
     private var rotationFactor = 0f
 
     init {
-        beaterAssembly.attachChild(context.modelD("DrumSet_BassDrumBeaterHolder.obj", METAL_TEXTURE))
+        beaterAssembly.attachChild(context.model(Models.Percussion.DrumSet.BeaterHolder))
         geometry.move(0f, 0f, -80f)
     }
 

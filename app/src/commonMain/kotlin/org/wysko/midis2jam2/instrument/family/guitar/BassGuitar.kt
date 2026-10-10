@@ -16,6 +16,12 @@
  */
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
@@ -35,10 +41,8 @@ import org.wysko.midis2jam2.util.loc
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 
 private val BASE_POSITION = Vector3f(51.5863f, 54.5902f, -16.5817f)
-private const val BASS_SKIN_BMP = "BassSkin.bmp"
 private val BASS_GUITAR_MODEL_PROPERTIES: StringAlignment =
     Json.decodeFromString(resourceToString("/instrument/alignment/BassGuitar.json"))
 
@@ -77,13 +81,12 @@ class BassGuitar private constructor(
             )
         },
         numberOfStrings = 4,
-        instrumentBody = context.modelD(
-            TuningKeyLayout.bodyFor(type.modelFile, null, fretting.tuning.lowest < STANDARD_LOWEST_STRING),
-            type.textureFile
-        ) to when (type) {
-            BassGuitarType.Synth1 -> "BassSkinSynth1.png"
-            BassGuitarType.Synth2 -> "BassSkinSynth2.png"
-            else -> BASS_SKIN_BMP
+        instrumentBody = context.model(
+            TuningKeyLayout.bodyFor(type.modelFile, null, fretting.tuning.lowest < STANDARD_LOWEST_STRING)
+        ).apply { setMaterial(context.assetLoader.material(type.textureFile)) } to when (type) {
+            BassGuitarType.Synth1 -> Materials.Diffuse.BassSkinSynth1
+            BassGuitarType.Synth2 -> Materials.Diffuse.BassSkinSynth2
+            else -> Materials.Diffuse.BassSkin
         }
     ),
     MultipleInstancesLinearAdjustment {
@@ -93,10 +96,10 @@ class BassGuitar private constructor(
 
     override val tuningKeyLayout: TuningKeyLayout? get() = keyLayout
 
-    override val bodyTexture: String get() = texture
+    override val bodyTexture: MaterialAsset get() = texture
 
     override val upperStrings: Array<Spatial> = Array(4) {
-        context.modelD("BassString.obj", BASS_SKIN_BMP).apply {
+        context.model(Models.Guitar.BassString).apply {
             geometry.attachChild(this)
         }
     }.apply {
@@ -110,7 +113,7 @@ class BassGuitar private constructor(
 
     override val lowerStrings: List<List<Spatial>> = List(4) {
         List(5) { j ->
-            context.modelD("BassStringBottom$j.obj", BASS_SKIN_BMP).apply {
+            context.model(Models.Guitar.BassStringBottom[j]).apply {
                 geometry.attachChild(this)
                 cullHint = Always
                 (this as Geometry).material.setColor("GlowColor", type.glowColor)
@@ -148,39 +151,39 @@ class BassGuitar private constructor(
      * Type of Bass Guitar.
      */
     sealed class BassGuitarType(
-        internal val modelFile: String,
-        internal val textureFile: String,
+        internal val modelFile: ModelAsset,
+        internal val textureFile: MaterialAsset,
         internal val glowColor: ColorRGBA,
         internal val style: BassStyle = BassStyle.STANDARD,
     ) {
 
         /** The standard Bass Guitar type. */
         data object Standard : BassGuitarType(
-            modelFile = "Bass.obj",
-            textureFile = BASS_SKIN_BMP,
+            modelFile = Models.Guitar.Bass,
+            textureFile = Materials.Diffuse.BassSkin,
             glowColor = STRING_GLOW
         )
 
         /** The fretless Bass Guitar type. */
         data object Fretless : BassGuitarType(
-            modelFile = "BassFretless.obj",
-            textureFile = "BassSkinFretless.png",
+            modelFile = Models.Guitar.BassFretless,
+            textureFile = Materials.Diffuse.BassSkinFretless,
             glowColor = STRING_GLOW,
             style = BassStyle.FRETLESS,
         )
 
         /** The synth 1 Bass Guitar type. */
         data object Synth1 : BassGuitarType(
-            modelFile = "Bass.obj",
-            textureFile = "BassSkinSynth1.png",
+            modelFile = Models.Guitar.Bass,
+            textureFile = Materials.Diffuse.BassSkinSynth1,
             glowColor = ColorRGBA(0.64f, 1.1f, 0.67f, 1f),
             style = BassStyle.SYNTH,
         )
 
         /** The synth 2 Bass Guitar type. */
         data object Synth2 : BassGuitarType(
-            modelFile = "Bass.obj",
-            textureFile = "BassSkinSynth2.png",
+            modelFile = Models.Guitar.Bass,
+            textureFile = Materials.Diffuse.BassSkinSynth2,
             glowColor = ColorRGBA(0.70f, 0.93f, 1.4f, 1f),
             style = BassStyle.SYNTH,
         )

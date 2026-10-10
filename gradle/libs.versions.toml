@@ -52,6 +52,7 @@ jme3-desktop = { group = "org.jmonkeyengine", name = "jme3-desktop", version.ref
 jme3-effects = { group = "org.jmonkeyengine", name = "jme3-effects", version.ref = "jme3" }
 jme3-lwjgl = { group = "org.jmonkeyengine", name = "jme3-lwjgl", version.ref = "jme3" }
 jme3-lwjgl3 = { group = "org.jmonkeyengine", name = "jme3-lwjgl3", version.ref = "jme3" }
+jme3-plugins = { group = "org.jmonkeyengine", name = "jme3-plugins", version.ref = "jme3" }
 
 # Koin (Dependency Injection)
 koin-android = { module = "io.insert-koin:koin-android" }
@@ -97,6 +98,7 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 licenseReport = { id = "com.github.jk1.dependency-license-report", version.ref = "licenseReport" }

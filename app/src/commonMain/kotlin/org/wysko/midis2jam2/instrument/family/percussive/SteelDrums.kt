@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import kotlinx.serialization.Serializable
@@ -25,8 +27,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.resourceToString
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 private val STICK_ADJUSTMENTS: Array<SteelDrumStickAdjustment> =
@@ -42,7 +42,7 @@ class SteelDrums(
         Striker(
             context = context,
             strikeEvents = eventList.modulus(it),
-            stickModel = context.modelD("SteelDrumMallet.obj", "StickSkin.bmp"),
+            stickModel = context.model(Models.Percussive.SteelDrums.Mallet),
             sticky = false
         ).apply {
             setParent(recoilNode)
@@ -58,7 +58,7 @@ class SteelDrums(
 
     init {
         recoilNode.attachChild(
-            context.modelR("SteelDrum.obj", "ShinySilver.bmp").also {
+            context.model(Models.Percussive.SteelDrums.Drum).also {
                 it.move(0f, 2f, 0f)
             }
         )

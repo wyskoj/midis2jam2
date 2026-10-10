@@ -17,52 +17,57 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
+
 /**
  * Defines the look and feel of the drum set.
  *
  * @property bassDrumModel The model of the bass drum.
  * @property tomModel The model of the tom.
  * @property snareDrumModel The model of the snare drum.
- * @property shellTexture The texture of the drum shell.
- * @property snareShellTexture The texture of the snare drum shell.
+ * @property shell The material of the drum shell.
+ * @property snareShell The material of the snare drum shell.
  */
 sealed class ShellStyle(
-    val bassDrumModel: String,
-    val tomModel: String,
-    val snareDrumModel: String,
-    open val shellTexture: String,
-    open val snareShellTexture: String,
+    val bassDrumModel: ModelAsset,
+    val tomModel: ModelAsset,
+    val snareDrumModel: ModelAsset,
+    open val shell: MaterialAsset,
+    open val snareShell: MaterialAsset,
 ) {
     /**
      * Defines the strings that are associated with the different drum sets.
      *
-     * @param shellTexture The texture of the drum shell.
-     * @param snareShellTexture The texture of the snare drum shell.
+     * @param shell The material of the drum shell.
+     * @param snareShell The material of the snare drum shell.
      */
     sealed class TypicalDrumShell(
-        override val shellTexture: String,
-        override val snareShellTexture: String,
+        override val shell: MaterialAsset,
+        override val snareShell: MaterialAsset,
     ) : ShellStyle(
-        "DrumSet_BassDrum.obj",
-        "DrumSet_Tom.obj",
-        "DrumSet_SnareDrum.obj",
-        shellTexture,
-        snareShellTexture,
+        Models.Percussion.DrumSet.BassDrum,
+        Models.Percussion.DrumSet.Tom,
+        Models.Percussion.DrumSet.SnareDrum,
+        shell,
+        snareShell,
     ) {
         /** Standard set. */
-        data object Standard : TypicalDrumShell("DrumShell.bmp", "DrumShell_Snare.bmp")
+        data object Standard : TypicalDrumShell(Materials.Diffuse.DrumShell, Materials.Diffuse.DrumShellSnare)
 
         /** Room set. */
-        data object Room : TypicalDrumShell("DrumShell_Room.png", "DrumShell_Snare_Room.png")
+        data object Room : TypicalDrumShell(Materials.Diffuse.DrumShellRoom, Materials.Diffuse.DrumShellSnareRoom)
 
         /** Power set. */
-        data object Power : TypicalDrumShell("DrumShell_Power.png", "DrumShell_Snare_Power.png")
+        data object Power : TypicalDrumShell(Materials.Diffuse.DrumShellPower, Materials.Diffuse.DrumShellSnarePower)
 
         /** Jazz set. */
-        data object Jazz : TypicalDrumShell("DrumShell_Jazz.png", "DrumShell_Snare_Jazz.png")
+        data object Jazz : TypicalDrumShell(Materials.Diffuse.DrumShellJazz, Materials.Diffuse.DrumShellSnareJazz)
 
         /** Brush set. */
-        data object Brush : TypicalDrumShell("DrumShell_Brush.png", "DrumShell_Snare_Brush.png")
+        data object Brush : TypicalDrumShell(Materials.Diffuse.DrumShellBrush, Materials.Diffuse.DrumShellSnareBrush)
 
         companion object {
             fun fromProgramNumber(program: Byte): TypicalDrumShell? {
@@ -77,18 +82,18 @@ sealed class ShellStyle(
         }
     }
 
-    sealed class AlternativeDrumShell(override val shellTexture: String, override val snareShellTexture: String) :
+    sealed class AlternativeDrumShell(override val shell: MaterialAsset, override val snareShell: MaterialAsset) :
         ShellStyle(
-            bassDrumModel = "DrumSet_Alternative_BassDrum.obj",
-            tomModel = "DrumSet_Alternative.obj",
-            snareDrumModel = "DrumSet_Alternative.obj",
-            shellTexture = shellTexture,
-            snareShellTexture = snareShellTexture,
+            bassDrumModel = Models.Percussion.DrumSet.AlternativeBassDrum,
+            tomModel = Models.Percussion.DrumSet.Alternative,
+            snareDrumModel = Models.Percussion.DrumSet.Alternative,
+            shell = shell,
+            snareShell = snareShell,
         ) {
         /** Analog set. */
-        data object Analog : AlternativeDrumShell("SynthDrum.bmp", "SynthDrum.bmp")
+        data object Analog : AlternativeDrumShell(Materials.Diffuse.SynthDrum, Materials.Diffuse.SynthDrum)
 
         /** Analog set. */
-        data object Electronic : AlternativeDrumShell("SynthDrumAlternative.png", "SynthDrumAlternative.png")
+        data object Electronic : AlternativeDrumShell(Materials.Diffuse.SynthDrumAlternative, Materials.Diffuse.SynthDrumAlternative)
     }
 }

@@ -17,12 +17,13 @@
 
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.instrument.family.percussion.Turntable.Position.Companion.opposite
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -35,13 +36,13 @@ class Turntable(
 ) : AuxiliaryPercussion(context, (pushEvents + pullEvents).sortedBy { it.tick }) {
 
     private val vinylNode = node {
-        +context.modelD("TurntableVinyl.obj", "Turntable.png")
-        +context.modelD("hand_right.obj", "hands.bmp").apply {
+        +context.model(Models.Percussion.Turntable.Vinyl)
+        +context.model(Models.Shared.HandRight).apply {
             loc = v3(-3.3, 0.7, 6)
             rot = v3(0, 0, 0)
         }
     }
-    private val stylus = context.modelD("TurntableStylus.obj", "Turntable.png")
+    private val stylus = context.model(Models.Percussion.Turntable.Stylus)
     private val pushCollector = EventCollector(context, pushEvents)
     private val pullCollector = EventCollector(context, pullEvents)
     private var targetPosition: Position = Position.Start
@@ -51,7 +52,7 @@ class Turntable(
     init {
         with(geometry) {
             +vinylNode
-            +context.modelD("TurntableBase.obj", "Turntable.png")
+            +context.model(Models.Percussion.Turntable.Base)
             +stylus.apply {
                 loc = v3(8.38, 0, -3.82)
             }

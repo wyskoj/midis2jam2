@@ -290,5 +290,8 @@
     <string name="background_warning_consequence_settings">जब तक इसे ठीक नहीं किया जाता, डिफ़ॉल्ट बैकग्राउंड उपयोग की जाती है।</string>
     <string name="background_warning_fix">बैकग्राउंड सेटिंग्स खोलें</string>
     <string name="background_warning_continue">डिफ़ॉल्ट बैकग्राउंड के साथ चलाएँ</string>
+    <string name="loading_reading_midi">MIDI फ़ाइल पढ़ी जा रही है…</string>
+    <string name="loading_soundbank">साउंडबैंक लोड हो रहा है…</string>
+    <string name="loading_building_band">बैंड तैयार किया जा रहा है…</string>
 </resources>
 

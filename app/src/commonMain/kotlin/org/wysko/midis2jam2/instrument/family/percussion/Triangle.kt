@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
@@ -24,8 +26,6 @@ import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Triangle. */
@@ -38,7 +38,7 @@ class Triangle(
     private val openCollector = EventCollector(context, openHits)
 
     private val fist = with(recoilNode) {
-        +context.modelD("MutedTriangle.obj", "hands.bmp").apply {
+        +context.model(Models.Percussion.Triangle.Muted).apply {
             cullHint = false.ch
         }
     }
@@ -47,7 +47,7 @@ class Triangle(
         Striker(
             context = context,
             strikeEvents = _hits,
-            stickModel = context.modelR("Triangle_Stick.obj", "ShinySilver.bmp"),
+            stickModel = context.model(Models.Percussion.Triangle.Stick),
         ).apply {
             setParent(geometry)
             node.move(0f, 2f, 4f)
@@ -56,7 +56,7 @@ class Triangle(
 
     init {
         with(recoilNode) {
-            +context.modelR("Triangle.obj", "ShinySilver.bmp")
+            +context.model(Models.Percussion.Triangle.Body)
             rot = v3(0, 0, 45)
         }
 

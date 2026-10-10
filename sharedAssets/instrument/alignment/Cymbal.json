@@ -1,7 +1,7 @@
 [
   {
     "name": "crash_1",
-    "model": "DrumSet_Cymbal.obj",
+    "model": "Cymbal",
     "location": [-18, 48, -90],
     "rotation": [20, 45, 0],
     "size": 2.0,
@@ -10,7 +10,7 @@
   },
   {
     "name": "crash_2",
-    "model": "DrumSet_Cymbal.obj",
+    "model": "Cymbal",
     "location": [13, 48, -90],
     "rotation": [20, -45, 0],
     "size": 1.5,
@@ -19,7 +19,7 @@
   },
   {
     "name": "splash",
-    "model": "DrumSet_Cymbal.obj",
+    "model": "Cymbal",
     "location": [-2, 48, -90],
     "rotation": [20, 0, 0],
     "size": 1.0,
@@ -28,7 +28,7 @@
   },
   {
     "name": "ride_1",
-    "model": "DrumSet_Cymbal.obj",
+    "model": "Cymbal",
     "location": [22, 43, -77.8],
     "rotation": [17, 291, -9.45],
     "size": 2.0,
@@ -37,7 +37,7 @@
   },
   {
     "name": "ride_2",
-    "model": "DrumSet_Cymbal.obj",
+    "model": "Cymbal",
     "location": [-23, 40, -78.8],
     "rotation": [20, 37.9, -3.49],
     "size": 2.0,
@@ -46,7 +46,7 @@
   },
   {
     "name": "china",
-    "model": "DrumSet_ChinaCymbal.obj",
+    "model": "ChinaCymbal",
     "location": [32.7, 34.4, -68.4],
     "rotation": [18, -89.2, -10],
     "size": 2.0,

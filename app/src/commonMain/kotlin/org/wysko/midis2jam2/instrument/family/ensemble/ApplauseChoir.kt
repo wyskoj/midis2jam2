@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
@@ -26,7 +28,6 @@ import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.Instrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -78,7 +79,7 @@ class ApplauseChoir(context: PerformanceManager, private val eventList: List<Mid
 
         init {
             with(geometry) {
-                +context.modelD("StageChoirNoBook.obj", "ChoirPeepOoh.png")
+                +context.model(Models.Ensemble.StageChoir.NoBook)
             }
             root.loc = BASE_POSITION
         }

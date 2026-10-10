@@ -16,11 +16,12 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -54,7 +55,7 @@ class Woodblocks(
     inner class Woodblock(i: Int) : TwelfthOfOctaveDecayed() {
         init {
             animNode.attachChild(
-                context.modelD("WoodBlockSingle.obj", "SimpleWood.bmp").apply {
+                context.model(Models.Percussive.Woodblocks.Block).apply {
                     setLocalScale(1 - 0.036f * i)
                 }
             )

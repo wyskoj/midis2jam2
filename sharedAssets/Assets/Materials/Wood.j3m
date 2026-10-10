@@ -1,0 +1,6 @@
+// Plain wood. Matches AssetLoader.diffuseMaterial.
+Material Wood : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Flip Assets/Textures/Shared/Wood.bmp
+    }
+}

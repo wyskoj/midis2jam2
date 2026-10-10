@@ -292,4 +292,7 @@
     <string name="background_warning_consequence_settings">Until this is fixed, the default background is used.</string>
     <string name="background_warning_fix">Open background settings</string>
     <string name="background_warning_continue">Play with default background</string>
+    <string name="loading_reading_midi">Reading MIDI file…</string>
+    <string name="loading_soundbank">Loading soundbank…</string>
+    <string name="loading_building_band">Setting up the band…</string>
 </resources>

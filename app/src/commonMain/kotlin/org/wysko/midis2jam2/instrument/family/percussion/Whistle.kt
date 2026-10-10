@@ -19,13 +19,14 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.Behavior
 import org.wysko.midis2jam2.particle.SteamPuffer.Texture
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -90,7 +91,7 @@ class Whistle(
             Node().apply {
                 highestLevel.attachChild(this)
             }.also {
-                it.attachChild(context.modelR("Whistle.obj", "ShinySilver.bmp"))
+                it.attachChild(context.model(Models.Pipe.Whistle.Body))
             }
 
         /** The Puffer. */

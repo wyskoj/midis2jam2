@@ -17,19 +17,20 @@
 
 package org.wysko.midis2jam2.manager
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.app.Application
 import com.jme3.app.SimpleApplication
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Node
 import org.wysko.midis2jam2.manager.PerformanceManager
-import org.wysko.midis2jam2.world.modelD
 
 class StageManager : BaseManager() {
     val stageNode: Node = Node()
 
     override fun initialize(app: Application) {
         super.initialize(app)
-        stageNode.attachChild(context.modelD("Stage.obj", "Stage.bmp").apply {
+        stageNode.attachChild(context.model(Models.Stage.Stage).apply {
             shadowMode = RenderQueue.ShadowMode.Receive
         })
     }

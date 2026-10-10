@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -23,7 +25,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Timbales. */
@@ -35,14 +36,14 @@ class Timbales(
     /** The left timbale anim node. */
     private val lowTimbaleAnimNode =
         Node().also {
-            it.attachChild(context.modelD("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp"))
+            it.attachChild(context.model(Models.Percussion.Timbales.Drum))
         }
 
     /** The right timbale anim node. */
     private val highTimbaleAnimNode =
         Node().also {
             it.attachChild(
-                context.modelD("DrumSet_Timbale.obj", "DrumShell_Timbale.bmp").apply {
+                context.model(Models.Percussion.Timbales.Drum).apply {
                     scale(0.75f)
                 },
             )

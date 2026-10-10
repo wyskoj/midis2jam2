@@ -16,6 +16,11 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
@@ -32,7 +37,6 @@ import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.Axis.Y
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -82,16 +86,16 @@ class StageStrings(
 
         private val bowNode = Node()
         private val animStringNode = Node()
-        private val animStrings: List<Spatial> = List(5) {
-            context.modelD("StageStringBottom$it.obj", "StageStringPlaying.bmp").apply {
+        private val animStrings: List<Spatial> = Models.Ensemble.StageStrings.StringBottom.map {
+            context.model(it).apply {
                 cullHint = false.ch // Hide on startup
                 (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }.onEach { animStringNode += it }
-        private val restingString = context.modelD("StageString.obj", "StageString.bmp")
+        private val restingString = context.model(Models.Ensemble.StageStrings.String)
         private val bow: Spatial =
-            context.modelD("StageStringBow.obj", type.textureFile).apply {
-                (this as Node)[0].material = (restingString as Geometry).material
+            context.model(Models.Ensemble.StageStrings.Bow).apply {
+                (this as Node).getChild("Stick").material = context.assetLoader.material(type.material)
             }
         private val animator: StringVibrationController = StringVibrationController(animStrings)
         private val nudgeCtrl = NumberSmoother(-1f, if (type == StageStringsType.StringEnsemble2) 20.0 else 30.0)
@@ -99,7 +103,9 @@ class StageStrings(
 
         init {
             with(geometry) {
-                +context.modelD("StageStringHolder.obj", type.textureFile)
+                +context.model(Models.Ensemble.StageStrings.Holder).apply {
+                    setMaterial(context.assetLoader.material(type.material))
+                }
                 +animStringNode
                 +restingString
                 +bowNode
@@ -162,20 +168,20 @@ class StageStrings(
     /**
      * Defines how stage strings should look, depending on the MIDI patch they play.
      */
-    enum class StageStringsType(internal val textureFile: String) {
+    enum class StageStringsType(internal val material: MaterialAsset) {
         /** String Ensemble 1 type. */
-        StringEnsemble1("FakeWood.bmp"),
+        StringEnsemble1(Materials.Diffuse.FakeWood),
 
         /** String Ensemble 2 type. */
-        StringEnsemble2("Wood.bmp"),
+        StringEnsemble2(Materials.Wood),
 
         /** Synth Strings 1 type. */
-        SynthStrings1("Laser.bmp"),
+        SynthStrings1(Materials.Diffuse.Laser),
 
         /** Synth Strings 2 type. */
-        SynthStrings2("AccordionCaseFront.bmp"),
+        SynthStrings2(Materials.Diffuse.AccordionCaseFront),
 
         /** Bowed Synth type. */
-        BowedSynth("SongFillbar.bmp"),
+        BowedSynth(Materials.Diffuse.SongFillbar),
     }
 }

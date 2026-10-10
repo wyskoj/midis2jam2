@@ -66,6 +66,10 @@ internal actual class Midis2jam2Application(
 
     private val errorLogService = KoinPlatformTools.defaultContext().get().get<ErrorLogService>()
 
+    init {
+        assetConfigLogger // quiets jME's warnings about loaders the app doesn't ship
+    }
+
     actual fun execute() {
         try {
             applyConfigurations(config)

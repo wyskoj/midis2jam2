@@ -17,6 +17,10 @@
 
 package org.wysko.midis2jam2.instrument.family.guitar
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
@@ -25,7 +29,6 @@ import com.jme3.scene.Spatial
 import org.wysko.midis2jam2.manager.INTRO
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.ch
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -41,7 +44,7 @@ import kotlin.time.DurationUnit.SECONDS
  * @property fretboard Where things are on the neck.
  * @param fretting What the fretting engine decided.
  * @param layout Where the tuning keys go, or `null` if the instrument has no key art yet.
- * @param texture The texture of the instrument's body, which its keys and capo share.
+ * @param texture The material of the instrument's body, which its keys share.
  */
 class TuningVisuals(
     context: PerformanceManager,
@@ -49,7 +52,7 @@ class TuningVisuals(
     private val fretboard: FretboardSpace,
     fretting: FrettingPlan,
     private val layout: TuningKeyLayout?,
-    texture: String,
+    texture: MaterialAsset,
 ) {
     /** How the tuning and capo are shown over time. */
     val motion: TuningMotion = TuningMotion(
@@ -64,7 +67,8 @@ class TuningVisuals(
     /** The tuning keys, lowest string first, or empty while the instrument has no key art. */
     val keys: List<Spatial> = layout?.let { art ->
         art.keys.take(fretboard.stringCount).map { key ->
-            context.modelD(art.key, art.keyTexture ?: texture).also {
+            context.model(art.keyModel).also {
+                it.setMaterial(context.assetLoader.material(art.keyMaterial ?: texture))
                 it.localTranslation = TuningKeyLayout.blenderPosition(key.position[0], key.position[1], key.position[2])
                 it.setLocalScale(art.keyScale)
                 parent.attachChild(it)
@@ -82,7 +86,7 @@ class TuningVisuals(
 
     /** The capo, or `null` if the part is played without one. */
     val capo: Spatial? = if (fretting.capo > 0) {
-        context.modelD(CAPO_MODEL, "RubberFoot.bmp").also {
+        context.model(Models.Guitar.Capo).also {
             it.cullHint = false.ch
             parent.attachChild(it)
         }
@@ -126,7 +130,6 @@ class TuningVisuals(
     }
 
     private companion object {
-        const val CAPO_MODEL = "GuitarCapo.obj"
         const val CAPO_LIFT = 0.4
     }
 }

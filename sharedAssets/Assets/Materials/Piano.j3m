@@ -1,0 +1,7 @@
+// The keyboards. Uses the project's own lighting (LightingJW.frag); each keyboard variant swaps the DiffuseMap for one
+// of the textures in Assets/Textures/piano (Keyboard.Variant). Matches what AssetLoader.diffuseMaterialReal built.
+Material Piano : Assets/MatDefs/Lighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Flip Assets/Textures/piano/piano.png
+    }
+}

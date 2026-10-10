@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -33,7 +35,6 @@ import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.unaryPlus
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.GlowController
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 private val PRONG_SCALES = listOf(1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f, 1.9f, 1.7f, 1.5f, 1.3f, 1.1f, 0.9f)
@@ -66,7 +67,7 @@ class Kalimba(context: PerformanceManager, events: List<MidiEvent>) :
 
     init {
         with(geometry) {
-            +context.modelD("Kalimba.obj", "KalimbaSkin.png")
+            +context.model(Models.ChromaticPercussion.Kalimba.Body)
             loc = v3(20, 40, 38)
             rot = v3(0, -17, 0)
         }
@@ -86,7 +87,7 @@ class Kalimba(context: PerformanceManager, events: List<MidiEvent>) :
         private val cymbalAnimator = CymbalAnimator(root, 0.1, 15.0, 4.0)
         private val glowController = GlowController(ColorRGBA.Yellow)
         private val tineModel: Geometry = with(root) {
-            +context.modelD(isAlternate.tineFile(), "KalimbaSkin.png")
+            +context.model(isAlternate.tineModel())
         } as Geometry
 
         internal fun tick(delta: Duration) {
@@ -100,6 +101,7 @@ class Kalimba(context: PerformanceManager, events: List<MidiEvent>) :
             cymbalAnimator.strike()
         }
 
-        private fun Boolean.tineFile(): String = if (this) "KalimbaProng.obj" else "KalimbaProngAlt.obj"
+        private fun Boolean.tineModel() =
+            if (this) Models.ChromaticPercussion.Kalimba.Tine else Models.ChromaticPercussion.Kalimba.TineAlt
     }
 }

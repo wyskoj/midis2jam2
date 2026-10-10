@@ -16,11 +16,12 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /** The Melodic Agogos. */
@@ -50,7 +51,7 @@ class Agogos(
     inner class Agogo(i: Int) : TwelfthOfOctaveDecayed() {
         init {
             animNode.attachChild(
-                context.modelR("AgogoSingle.obj", "HornSkinGrey.bmp").apply {
+                context.model(Models.Percussive.Agogos.Agogo).apply {
                     setLocalScale(1 - 0.036f * i)
                 }
             )

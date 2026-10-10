@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.animusic
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.collision.CollisionResults
 import com.jme3.math.Ray
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Off
@@ -32,7 +34,6 @@ import org.wysko.midis2jam2.manager.StageManager.Companion.stageManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -108,11 +109,7 @@ class SpaceLaser(context: PerformanceManager, eventList: List<MidiEvent>, type: 
     }
 
     init {
-        val base = context.modelD("SpaceLaserBase.obj", "Wood.bmp")
-        (base as Node).apply {
-            this[1].material = context.assetLoader.reflectiveMaterial("Assets/ShinySilver.bmp")
-            this[2].material = context.assetLoader.diffuseMaterial("Assets/RubberFoot.bmp")
-        }
+        val base = context.model(Models.Animusic.SpaceLaser.Base)
 
         with(geometry) {
             +base
@@ -121,14 +118,10 @@ class SpaceLaser(context: PerformanceManager, eventList: List<MidiEvent>, type: 
 
         clones.forEach {
             it as SpaceLaserClone
-            val glowMaterial = context.assetLoader.diffuseMaterial("Assets/" + type.filename).apply {
+            val glowMaterial = context.assetLoader.material(type.material).apply {
                 setColor("GlowColor", type.glowColor)
             }
-            with(it.shooter as Node) {
-                this[0].material = context.assetLoader.reflectiveMaterial("Assets/HornSkinGrey.bmp")
-                this[1].material = context.assetLoader.diffuseMaterial("Assets/RubberFoot.bmp")
-                this[2].material = glowMaterial
-            }
+            (it.shooter as Node).getChild("Emitter").material = glowMaterial
             it.laserBeam.material = glowMaterial
         }
     }
@@ -140,7 +133,7 @@ class SpaceLaser(context: PerformanceManager, eventList: List<MidiEvent>, type: 
         private val laserNode = with(highestLevel) { +node() }
         private var wobbleTime = 0.0
         internal val laserBeam: Spatial = with(laserNode) {
-            +context.modelD("SpaceLaserLaser.obj", "Laser.bmp").apply {
+            +context.model(Models.Animusic.SpaceLaser.Beam).apply {
                 shadowMode = Off
                 setUserData("bounding_box", false)
             }
@@ -148,7 +141,7 @@ class SpaceLaser(context: PerformanceManager, eventList: List<MidiEvent>, type: 
         private var wobbleIntensity = 0.0
         private val angleCalculator = SigmoidAngleCalculator
         internal val shooter: Spatial = with(laserNode) {
-            +context.modelD("SpaceLaser.obj", "ShinySilver.bmp")
+            +context.model(Models.Animusic.SpaceLaser.Shooter)
         }
         private val index: NumberSmoother = NumberSmoother(0f, 17.0)
 

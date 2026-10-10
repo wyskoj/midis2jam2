@@ -16,13 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Synth drum. */
@@ -47,7 +48,7 @@ class SynthDrum(context: PerformanceManager, eventList: List<MidiEvent>) : OneDr
 
     init {
         recoilNode.attachChild(
-            context.modelD("SynthDrum.obj", "SynthDrum.bmp").apply {
+            context.model(Models.Percussive.SynthDrum.Drum).apply {
                 localRotation = Quaternion().fromAngles(rad(45.0), 0f, 0f)
             }
         )

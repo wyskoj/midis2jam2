@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Bu düzeltilene kadar varsayılan arka plan kullanılır.</string>
     <string name="background_warning_fix">Arka plan ayarlarını aç</string>
     <string name="background_warning_continue">Varsayılan arka planla oynat</string>
+    <string name="loading_reading_midi">MIDI dosyası okunuyor…</string>
+    <string name="loading_soundbank">Ses bankası yükleniyor…</string>
+    <string name="loading_building_band">Grup hazırlanıyor…</string>
 </resources>
 

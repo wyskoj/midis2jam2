@@ -16,13 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.MAX_STICK_IDLE_ANGLE
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -33,7 +34,7 @@ class Maracas(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) 
         Striker(
             context = context,
             strikeEvents = hits,
-            stickModel = context.modelD("Maraca.obj", "Maraca.bmp"),
+            stickModel = context.model(Models.Percussion.Maracas.Maraca),
             actualStick = false,
         ).apply {
             setParent(geometry)
@@ -41,7 +42,7 @@ class Maracas(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) 
         }
 
     private val rightMaraca =
-        context.modelD("Maraca.obj", "Maraca.bmp").apply {
+        context.model(Models.Percussion.Maracas.Maraca).apply {
             geometry.attachChild(this)
             move(5f, -1f, 0f)
             localRotation = Quaternion().fromAngles(0f, 0f, -0.2f)

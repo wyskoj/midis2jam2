@@ -16,14 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussive
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Taiko drum. */
@@ -33,7 +33,7 @@ class TaikoDrum(context: PerformanceManager, eventList: List<MidiEvent>) : OneDr
         Striker(
             context = context,
             strikeEvents = eventList.modulus(i),
-            stickModel = context.modelD("TaikoStick.obj", "Wood.bmp")
+            stickModel = context.model(Models.Percussive.TaikoDrum.Stick)
         ).apply {
             setParent(recoilNode)
             offsetStick { it.move(0f, 0f, -5f) }
@@ -47,9 +47,8 @@ class TaikoDrum(context: PerformanceManager, eventList: List<MidiEvent>) : OneDr
 
     init {
         recoilNode.attachChild(
-            context.modelD("Taiko.obj", "TaikoHead.bmp").apply {
+            context.model(Models.Percussive.TaikoDrum.Drum).apply {
                 localRotation = Quaternion().fromAngles(rad(60.0), 0f, 0f)
-                (this as Node).getChild(0).setMaterial(context.assetLoader.diffuseMaterial("Assets/Wood.bmp"))
             }
         )
 

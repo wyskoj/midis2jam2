@@ -290,5 +290,8 @@
     <string name="background_warning_consequence_settings">Tant que ce n'est pas corrigé, l'arrière-plan par défaut est utilisé.</string>
     <string name="background_warning_fix">Ouvrir les paramètres d'arrière-plan</string>
     <string name="background_warning_continue">Lire avec l'arrière-plan par défaut</string>
+    <string name="loading_reading_midi">Lecture du fichier MIDI…</string>
+    <string name="loading_soundbank">Chargement de la banque de sons…</string>
+    <string name="loading_building_band">Installation du groupe…</string>
 </resources>
 

@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.world.background
 
+import org.wysko.midis2jam2.assets.Textures
 import com.jme3.asset.AssetManager
 import com.jme3.bounding.BoundingSphere
 import com.jme3.material.Material
@@ -72,7 +73,7 @@ sealed class BackgroundFactory(internal val assetManager: AssetManager) {
             }
 
         private fun loadSkyTexture(): TextureCubeMap =
-            loadTexture("Assets/sky.png").let { texture ->
+            loadTexture(Textures.World.Sky.path).let { texture ->
                 Image(
                     texture.image.format,
                     texture.image.width,

@@ -17,6 +17,9 @@
 
 package org.wysko.midis2jam2.instrument.algorithmic
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
+import org.wysko.midis2jam2.assets.ModelAsset
 import com.jme3.math.FastMath
 import com.jme3.math.Matrix3f
 import com.jme3.math.Quaternion
@@ -26,7 +29,6 @@ import org.wysko.kmidi.midi.event.NoteEvent.NoteOn
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.Axis
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.exp
 import kotlin.math.min
 import kotlin.math.pow
@@ -86,9 +88,7 @@ class Striker(
     ) : this(
         context = context,
         strikeEvents = strikeEvents,
-        stickModel = stickModel.let {
-            context.modelD(it.modelName, it.textureName)
-        },
+        stickModel = context.model(stickModel.model),
         strikeSpeed = strikeSpeed,
         maxIdleAngle = maxIdleAngle,
         rotationAxis = rotationAxis,
@@ -319,25 +319,13 @@ data class StickStatus(
 /**
  * Defines common stick models.
  */
-enum class StickType(
-    internal val modelName: String,
-    internal val textureName: String,
-) {
+enum class StickType(internal val model: ModelAsset) {
     /** The drum set stick. */
-    DRUM_SET_STICK(
-        modelName = "DrumSet_Stick.obj",
-        textureName = "StickSkin.bmp",
-    ),
+    DRUM_SET_STICK(Models.Shared.Stick),
 
     /** The left hand. */
-    HAND_LEFT(
-        modelName = "hand_left.obj",
-        textureName = "hands.bmp",
-    ),
+    HAND_LEFT(Models.Shared.HandLeft),
 
     /** The right hand. */
-    HAND_RIGHT(
-        modelName = "hand_right.obj",
-        textureName = "hands.bmp",
-    ),
+    HAND_RIGHT(Models.Shared.HandRight),
 }

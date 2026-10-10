@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath.PI
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -29,8 +31,6 @@ import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.collections.ArrayList
 import kotlin.collections.List
 import kotlin.collections.MutableList
@@ -46,7 +46,6 @@ import kotlin.collections.set
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
-private const val SHINY_SILVER: String = "ShinySilver.bmp"
 
 /**
  * The music box has several animation components. The first is the spindle/cylinder. The spindle spins at a rate of 1/4
@@ -62,7 +61,7 @@ class MusicBox(context: PerformanceManager, eventList: List<MidiEvent>) :
     private val cylinder = node()
     private val activePins: MutableList<Spatial> = mutableListOf()
     private val pinRotations: MutableMap<Spatial, Float> = mutableMapOf()
-    private val pinModel: Spatial = context.modelR("MusicBoxPoint.obj", SHINY_SILVER)
+    private val pinModel: Spatial = context.model(Models.ChromaticPercussion.MusicBox.Pin)
     private val pinPool: MutableList<Spatial> = ArrayList()
     private val collectorForPins = EventCollector(context, _hits, { event, time ->
         context.sequence.getTimeAtTick(event.tick - context.sequence.smf.tpq) <= time // Quarter note early
@@ -71,10 +70,10 @@ class MusicBox(context: PerformanceManager, eventList: List<MidiEvent>) :
 
     init {
         with(geometry) {
-            +context.modelD("MusicBoxCase.obj", "Wood.bmp")
-            +context.modelR("MusicBoxTopBlade.obj", SHINY_SILVER)
+            +context.model(Models.ChromaticPercussion.MusicBox.Case)
+            +context.model(Models.ChromaticPercussion.MusicBox.TopBlade)
             +cylinder.apply {
-                +context.modelR("MusicBoxSpindle.obj", SHINY_SILVER)
+                +context.model(Models.ChromaticPercussion.MusicBox.Spindle)
             }
         }
         placement.loc = v3(37, 5, -5)
@@ -126,7 +125,7 @@ class MusicBox(context: PerformanceManager, eventList: List<MidiEvent>) :
      * Represents a single lamella of the music box. This is the part that recoils when a note is played.
      */
     inner class Lamella(i: Int) : TwelfthOfOctaveDecayed() {
-        private val model: Geometry = context.modelR("MusicBoxKey.obj", SHINY_SILVER).apply {
+        private val model: Geometry = context.model(Models.ChromaticPercussion.MusicBox.Key).apply {
             localScale = v3(-0.0454f * i + 1, 1, 1)
         } as Geometry
 

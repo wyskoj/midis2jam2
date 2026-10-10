@@ -1,0 +1,95 @@
+# Looks that code swaps in at runtime but no model uses, so the build generates them anyway, and the catalog
+# lists them (Materials.Diffuse.ChoirPeepOoh, ...). Same values as a material's `look` property: a texture, or
+# `reflective <texture>` / `shadow <texture>`. See docs/ASSETS.md.
+
+# Animusic/SpaceLaser
+- LaserRed.png
+# ChromaticPercussion/Mallets
+- VibesBar.bmp
+- MarimbaBar.bmp
+- GlockenspielBar.bmp
+# Ensemble/StageChoir
+- ChoirPeepSynthVoice.png
+- ChoirPeepVoiceSynth.png
+- ChoirPeepGoblin.png
+# Ensemble/StageStrings
+- Laser.bmp
+- AccordionCaseFront.bmp
+- SongFillbar.bmp
+# Guitar
+- JazzGuitarSkin.png
+- MutedGuitarSkin.png
+- OverdrivenGuitarSkin.png
+- DistortionGuitarSkin.png
+- HarmonicsGuitarSkin.png
+- BassSkinSynth1.png
+- BassSkinSynth2.png
+# Organ/Accordion
+- BandoneonCase.bmp
+- BandoneonCaseFront.bmp
+- AccordionKeyDown.bmp
+- AccordionKeyBlackDown.bmp
+# Particles
+- SteamPuff_Harmonica.bmp
+- SteamPuff_Pop.bmp
+- SteamPuff_Whistle.bmp
+# Percussion/DrumSet
+- DrumShell_Snare.bmp
+- DrumShell_Room.png
+- DrumShell_Snare_Room.png
+- DrumShell_Power.png
+- DrumShell_Snare_Power.png
+- DrumShell_Jazz.png
+- DrumShell_Snare_Jazz.png
+- DrumShell_Brush.png
+- DrumShell_Snare_Brush.png
+- SynthDrum.bmp
+- SynthDrumAlternative.png
+# Shadows
+- shadow HelicopterLights1.png
+- shadow HelicopterLights2.png
+- shadow HelicopterLights3.png
+- shadow HelicopterLights4.png
+- shadow HelicopterLights5.png
+- shadow HelicopterLights6.png
+- shadow HelicopterLights7.png
+- shadow HelicopterLights8.png
+- shadow HelicopterLights9.png
+- shadow HelicopterLights10.png
+- shadow HelicopterLights11.png
+- shadow HelicopterLights12.png
+# SoundEffects/TelephoneRing
+- TelePhoneKey1.bmp
+- TelePhoneKey1Dark.bmp
+- TelePhoneKey2.bmp
+- TelePhoneKey2Dark.bmp
+- TelePhoneKey3.bmp
+- TelePhoneKey3Dark.bmp
+- TelePhoneKey4.bmp
+- TelePhoneKey4Dark.bmp
+- TelePhoneKey5.bmp
+- TelePhoneKey5Dark.bmp
+- TelePhoneKey6.bmp
+- TelePhoneKey6Dark.bmp
+- TelePhoneKey7.bmp
+- TelePhoneKey7Dark.bmp
+- TelePhoneKey8.bmp
+- TelePhoneKey8Dark.bmp
+- TelePhoneKey9.bmp
+- TelePhoneKey9Dark.bmp
+- TelePhoneKeyStar.bmp
+- TelePhoneKeyStarDark.bmp
+- TelePhoneKey0.bmp
+- TelePhoneKey0Dark.bmp
+- TelePhoneKeyPound.bmp
+- TelePhoneKeyPoundDark.bmp
+# Strings/DoubleBass
+- DoubleBassSkinAlt.png
+# Strings/Harp
+- HarpStringRed.bmp
+- HarpStringRedPlaying.bmp
+- HarpStringBlue.bmp
+- HarpStringBluePlaying.bmp
+# Strings/Violin
+- ViolaSkin.bmp
+- FiddleSkin.png

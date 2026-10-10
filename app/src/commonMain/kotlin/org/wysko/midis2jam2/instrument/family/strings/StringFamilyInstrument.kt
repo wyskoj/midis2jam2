@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.strings
 
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -33,7 +36,6 @@ import org.wysko.midis2jam2.instrument.family.strings.bowing.*
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.STRING_GLOW
-import org.wysko.midis2jam2.world.modelD
 import kotlin.math.atan
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -82,12 +84,11 @@ abstract class StringFamilyInstrument protected constructor(
         BRIDGE_Z.map { it.toFloat() }.toFloatArray(),
     ),
     4,
-    body to
-    "GuitarSkin.bmp",
+    body to Materials.Diffuse.GuitarSkin,
 ) {
     override val upperStrings: Array<Spatial> =
         Array(4) {
-            context.modelD("ViolinString.obj", "ViolinSkin.bmp").apply {
+            context.model(Models.Strings.Violin.String).apply {
                 geometry.attachChild(this)
             }
         }.apply {
@@ -104,8 +105,8 @@ abstract class StringFamilyInstrument protected constructor(
 
     override val lowerStrings: List<List<Spatial>> =
         List(4) {
-            List(5) { j: Int ->
-                context.modelD("ViolinStringPlayed$j.obj", "DoubleBassSkin.bmp").apply {
+            Models.Strings.Violin.StringPlayed.map { frame ->
+                context.model(frame).apply {
                     geometry.attachChild(this)
                     (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
                 }
@@ -146,7 +147,7 @@ abstract class StringFamilyInstrument protected constructor(
 
     /** The bow of this string instrument. */
     private val bow: Spatial =
-        context.modelD("ViolinBow.obj", "ViolinSkin.bmp").apply {
+        context.model(Models.Strings.Violin.Bow).apply {
             bowNode.attachChild(this)
         }
 

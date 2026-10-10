@@ -16,6 +16,11 @@
  */
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
 import com.jme3.scene.Node
@@ -41,7 +46,6 @@ import org.wysko.midis2jam2.instrument.family.piano.Key.Color.White
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -75,7 +79,7 @@ class Mallets(
     private val fakeShadow: Spatial? =
         if (context.isFakeShadows) {
             with(geometry) {
-                +context.assetLoader.fakeShadow("Assets/XylophoneShadow.obj", "Assets/XylophoneShadow.png").apply {
+                +context.model(Models.Shadows.Xylophone).apply {
                     setLocalScale(2 / 3f)
                     loc = v3(0, -22, 0)
                 }
@@ -106,7 +110,7 @@ class Mallets(
     init {
         placement.loc = v3(18, 0, -5)
         with(geometry) {
-            +context.modelD("XylophoneCase.obj", "Black.bmp").apply {
+            +context.model(Models.ChromaticPercussion.Mallets.Case).apply {
                 setLocalScale(MALLET_CASE_SCALE)
             }
         }
@@ -167,29 +171,33 @@ class Mallets(
     /** Where a mallet strikes [note]'s bar, in geometry space. */
     internal fun strikePointOf(note: Int): Vector3f = barFor(note).strikePoint.clone()
 
+    /** Loads [model] in this instrument's bar material, which depends on its [MalletType]. */
+    private fun typed(model: ModelAsset): Spatial =
+        context.model(model).apply { setMaterial(context.assetLoader.material(type.material)) }
+
     /**
      * The type of mallets.
      */
-    enum class MalletType(internal val textureFile: String) {
+    enum class MalletType(internal val material: MaterialAsset) {
         /**
          * The vibraphone.
          */
-        Vibraphone("VibesBar.bmp"),
+        Vibraphone(Materials.Diffuse.VibesBar),
 
         /**
          * The marimba.
          */
-        Marimba("MarimbaBar.bmp"),
+        Marimba(Materials.Diffuse.MarimbaBar),
 
         /**
          * The glockenspiel.
          */
-        Glockenspiel("GlockenspielBar.bmp"),
+        Glockenspiel(Materials.Diffuse.GlockenspielBar),
 
         /**
          * The xylophone.
          */
-        Xylophone("XylophoneBar.bmp"),
+        Xylophone(Materials.Diffuse.XylophoneBar),
     }
 
     /**
@@ -203,7 +211,7 @@ class Mallets(
         private val striker = Striker(
             context,
             hits.map { it.source },
-            context.modelD("XylophoneMalletWhite.obj", type.textureFile),
+            typed(Models.ChromaticPercussion.Mallets.Mallet),
         ).apply {
             // Changes the pivot point of rotation
             offsetStick { it.move(0f, 0f, -2f) }
@@ -212,7 +220,7 @@ class Mallets(
 
         val node: Node get() = striker.node
 
-        private val shadow: Spatial = context.modelD("MalletHitShadow.obj", "Black.bmp").apply { scale(0f) }
+        private val shadow: Spatial = context.model(Models.ChromaticPercussion.Mallets.HitShadow).apply { scale(0f) }
 
         init {
             striker.node.loc = path.positionAt(0.0).toVector3f()
@@ -246,7 +254,7 @@ class Mallets(
         }
         private var upBar: Spatial
         private var downBar: Spatial
-        private val shadow: Spatial? = events?.let { context.modelD("MalletHitShadow.obj", "Black.bmp") }
+        private val shadow: Spatial? = events?.let { context.model(Models.ChromaticPercussion.Mallets.HitShadow) }
 
         private var isRecoiling = false
         private var recoilNow = false
@@ -255,7 +263,7 @@ class Mallets(
             Striker(
                 context,
                 it,
-                context.modelD("XylophoneMalletWhite.obj", type.textureFile),
+                typed(Models.ChromaticPercussion.Mallets.Mallet),
                 sticky = false,
             ).apply {
                 // Changes the pivot point of rotation
@@ -274,16 +282,16 @@ class Mallets(
             val scaleFactor = (RANGE.last - midiNote + 20) / 50f
 
             if (Key.Color.fromNoteNumber(midiNote) == White) {
-                upBar = context.modelD("XylophoneWhiteBar.obj", type.textureFile)
-                downBar = context.modelD("XylophoneWhiteBarDown.obj", type.textureFile)
+                upBar = typed(Models.ChromaticPercussion.Mallets.WhiteBar)
+                downBar = typed(Models.ChromaticPercussion.Mallets.WhiteBarDown)
                     .apply { (this as Geometry).material.setColor("GlowColor", DIM_GLOW) }
 
                 bar.setLocalScale(0.55f, 1f, 0.5f * scaleFactor)
                 root.loc = v3(1.333f * (startPos - 26), 0f, 0f)
                 strikePoint = v3(0f, 1.35f, -midiNote / 11.5f + 19)
             } else {
-                upBar = context.modelD("XylophoneBlackBar.obj", type.textureFile)
-                downBar = context.modelD("XylophoneBlackBarDown.obj", type.textureFile)
+                upBar = typed(Models.ChromaticPercussion.Mallets.BlackBar)
+                downBar = typed(Models.ChromaticPercussion.Mallets.BlackBarDown)
                     .apply { (this as Geometry).material.setColor("GlowColor", DIM_GLOW) }
 
                 bar.setLocalScale(0.6f, 0.7f, 0.5f * scaleFactor)

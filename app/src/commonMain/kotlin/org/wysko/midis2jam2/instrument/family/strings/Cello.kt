@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.strings
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
@@ -23,7 +25,6 @@ import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.instrument.family.strings.bowing.BowingProfile
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Cello. */
@@ -34,7 +35,7 @@ class Cello(context: PerformanceManager, events: List<MidiEvent>) : StringFamily
     20.0,
     Vector3f(0.75f, 0.75f, 0.75f),
     FrettingProfiles.cello(),
-    context.modelD("Cello.obj", "CelloSkin.bmp"),
+    context.model(Models.Strings.Cello.Body),
     BowingProfile.Cello,
 ) {
     override fun adjustForMultipleInstances(delta: Duration) {

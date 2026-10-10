@@ -16,6 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.piano
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.ModelAsset
+import org.wysko.midis2jam2.assets.MaterialAsset
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -23,7 +27,6 @@ import org.wysko.midis2jam2.instrument.family.percussion.PercussionInstrument
 import org.wysko.midis2jam2.util.ch
 import org.wysko.midis2jam2.util.sign
 import org.wysko.midis2jam2.util.toQuaternion
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
@@ -115,14 +118,16 @@ abstract class Key protected constructor(
 
     /** Loads the key model and attaches it to the given node. */
     private fun loadKeyModel(
-        frontKeyFile: String,
-        backKeyFile: String? = null,
-        texture: String,
+        frontKeyFile: ModelAsset,
+        backKeyFile: ModelAsset? = null,
+        texture: MaterialAsset,
         node: Node,
     ) {
-        node.attachChild(keyedInstrument.context.modelD(frontKeyFile, texture))
+        val context = keyedInstrument.context
+        fun load(model: ModelAsset) = context.model(model).apply { setMaterial(context.assetLoader.material(texture)) }
+        node.attachChild(load(frontKeyFile))
         backKeyFile?.let { backKey ->
-            node.attachChild(keyedInstrument.context.modelD(backKey, texture).also { it.move(0f, -0.01f, 0f) })
+            node.attachChild(load(backKey).also { it.move(0f, -0.01f, 0f) })
         }
     }
 

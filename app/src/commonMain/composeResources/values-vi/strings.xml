@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Cho đến khi sửa xong, nền mặc định sẽ được sử dụng.</string>
     <string name="background_warning_fix">Mở cài đặt nền</string>
     <string name="background_warning_continue">Phát với nền mặc định</string>
+    <string name="loading_reading_midi">Đang đọc tập tin MIDI…</string>
+    <string name="loading_soundbank">Đang tải soundbank…</string>
+    <string name="loading_building_band">Đang chuẩn bị ban nhạc…</string>
 </resources>
 

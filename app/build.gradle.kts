@@ -337,13 +337,103 @@ val copyLicenseReport: TaskProvider<Copy> = tasks.register<Copy>("copyLicenseRep
     into(projectDir.resolve("src/commonMain/composeResources/files"))
 }
 
-val copyCommonAssets: TaskProvider<Copy> = tasks.register<Copy>("copyCommonAssets") {
-    from(projectDir.parentFile.resolve("sharedAssets"))
+// Assets (see docs/ASSETS.md). The model sources in sharedAssets/models are converted to .j3o by :asset-tools and
+// shipped alongside the rest of sharedAssets; the same tool generates the typed catalog code refers to them by.
+val sharedAssetsDir: File = rootDir.resolve("sharedAssets")
+
+// What :asset-tools reads of the model sources: the .blend files are Blender's, and reach the build as their .glb.
+val modelSources: FileTree = fileTree(sharedAssetsDir.resolve("models")) { include("**/*.glb", "variants.yaml") }
+
+val assetTools: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+    }
+}
+
+dependencies {
+    assetTools(project(":asset-tools"))
+}
+
+val generateAssetCatalog: TaskProvider<JavaExec> = tasks.register<JavaExec>("generateAssetCatalog") {
+    group = "assets"
+    description = "Generates the typed asset catalog (Models, Materials, Textures) from sharedAssets."
+    val outDir = layout.buildDirectory.dir("generated/assetCatalog/kotlin")
+    classpath = assetTools
+    mainClass.set("org.wysko.midis2jam2.assettools.MainKt")
+    inputs.files(modelSources).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(sharedAssetsDir.resolve("Assets/Materials")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(sharedAssetsDir.resolve("Assets/Textures")).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.dir(outDir)
+    args("catalog", sharedAssetsDir.absolutePath, outDir.get().asFile.absolutePath)
+}
+
+val convertModels: TaskProvider<JavaExec> = tasks.register<JavaExec>("convertModels") {
+    group = "assets"
+    description = "Converts the .glb sources in sharedAssets/models to .j3o, with their materials."
+    val outDir = layout.buildDirectory.dir("generated/jmeAssets")
+    classpath = assetTools
+    mainClass.set("org.wysko.midis2jam2.assettools.MainKt")
+    inputs.files(modelSources).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(
+        fileTree(sharedAssetsDir.resolve("Assets")) {
+            include("Materials/**", "MatDefs/**", "Shaders/**", "**/*.bmp", "**/*.png")
+        }
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.dir(outDir)
+    systemProperty("java.awt.headless", "true")
+    args("convert", sharedAssetsDir.absolutePath, outDir.get().asFile.absolutePath)
+}
+
+// Exports every .blend under sharedAssets/models whose .glb is out of date, with Blender (never part of the build).
+// Set Blender's path once in ~/.gradle/gradle.properties as midis2jam2.blender; -PexportAll exports every .blend.
+tasks.register<JavaExec>("exportModels") {
+    group = "assets"
+    description = "Exports each .blend under sharedAssets/models whose .glb is out of date, using Blender."
+    classpath = assetTools
+    mainClass.set("org.wysko.midis2jam2.assettools.MainKt")
+    workingDir = rootDir
+    val blender = providers.gradleProperty("midis2jam2.blender")
+    val all = providers.gradleProperty("exportAll").isPresent
+    val script = rootDir.resolve("tools/blender/export_models.py").absolutePath
+    val sharedAssetsPath = sharedAssetsDir.absolutePath
+    argumentProviders.add(
+        CommandLineArgumentProvider {
+            val path = blender.orNull ?: throw GradleException(
+                "Set midis2jam2.blender to Blender's executable in ~/.gradle/gradle.properties, e.g.\n" +
+                    "  midis2jam2.blender=C:/Users/you/AppData/Local/Microsoft/WindowsApps/blender-launcher.exe"
+            )
+            listOf("export", sharedAssetsPath, path, script) + (if (all) listOf("all") else emptyList())
+        }
+    )
+    outputs.upToDateWhen { false }
+}
+
+kotlin.sourceSets.commonMain {
+    kotlin.srcDir(generateAssetCatalog)
+}
+
+tasks.matching { it.name == "prepareKotlinIdeaImport" }.configureEach {
+    dependsOn(generateAssetCatalog)
+}
+
+// Sync rather than Copy, so that a moved or deleted asset disappears from the copy too, instead of lingering there
+// and hiding a reference that was not updated. Both destinations are gitignored and hold nothing else.
+fun Sync.shippedAssets() {
+    from(sharedAssetsDir) { exclude("models/**") }
+    from(convertModels)
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+
+val copyCommonAssets: TaskProvider<Sync> = tasks.register<Sync>("copyCommonAssets") {
+    shippedAssets()
     into(projectDir.resolve("src/commonMain/resources"))
 }
 
-val copyAndroidAssets: TaskProvider<Copy> = tasks.register<Copy>("copyAndroidAssets") {
-    from(projectDir.parentFile.resolve("sharedAssets"))
+val copyAndroidAssets: TaskProvider<Sync> = tasks.register<Sync>("copyAndroidAssets") {
+    shippedAssets()
     into(projectDir.resolve("src/androidMain/assets"))
 }
 dependencies {

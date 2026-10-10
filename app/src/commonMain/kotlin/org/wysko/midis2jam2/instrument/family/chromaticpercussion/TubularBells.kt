@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath.PI
 import com.jme3.math.Vector3f
 import com.jme3.renderer.queue.RenderQueue.ShadowMode.Receive
@@ -29,8 +31,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /**
@@ -75,7 +75,7 @@ class TubularBells(context: PerformanceManager, events: List<MidiEvent>) :
                 context = context,
                 strikeEvents = events,
                 stickModel =
-                context.modelD("TubularBellMallet.obj", "Wood.bmp").apply {
+                context.model(Models.ChromaticPercussion.TubularBells.Mallet).apply {
                     loc = v3(0, 5, 0)
                     shadowMode = Receive // The shadows it casts look weird, so only receive them
                 },
@@ -85,7 +85,7 @@ class TubularBells(context: PerformanceManager, events: List<MidiEvent>) :
             }
 
         val bellModel: Geometry = with(root) {
-            +context.modelR("TubularBell.obj", "ShinySilver.bmp").apply {
+            +context.model(Models.ChromaticPercussion.TubularBells.Bell).apply {
                 shadowMode = Receive
             }
         } as Geometry

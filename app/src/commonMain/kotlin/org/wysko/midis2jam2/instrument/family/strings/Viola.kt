@@ -16,13 +16,16 @@
  */
 package org.wysko.midis2jam2.instrument.family.strings
 
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.instrument.family.guitar.fretting.FrettingProfiles
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /** The Viola. */
@@ -33,7 +36,9 @@ class Viola(context: PerformanceManager, events: List<MidiEvent>) : StringFamily
     180.0,
     Vector3f(1f, 1f, 1f),
     FrettingProfiles.viola(),
-    context.modelD("Violin.obj", "ViolaSkin.bmp")
+    context.model(Models.Strings.Violin.Body).apply {
+        setMaterial(context.assetLoader.material(Materials.Diffuse.ViolaSkin))
+    }
 ) {
     override fun adjustForMultipleInstances(delta: Duration) {
         root.setLocalTranslation(20f * updateInstrumentIndex(delta), 0f, 0f)

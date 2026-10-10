@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Hangga't hindi ito naaayos, gagamitin ang default na background.</string>
     <string name="background_warning_fix">Buksan ang mga setting ng background</string>
     <string name="background_warning_continue">I-play gamit ang default na background</string>
+    <string name="loading_reading_midi">Binabasa ang MIDI file…</string>
+    <string name="loading_soundbank">Nilo-load ang soundbank…</string>
+    <string name="loading_building_band">Inihahanda ang banda…</string>
 </resources>
 

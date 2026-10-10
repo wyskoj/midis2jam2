@@ -18,13 +18,15 @@ package org.wysko.midis2jam2.instrument.family.brass
 
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
 import org.wysko.midis2jam2.instrument.RisingPitchClassAnimator
 import org.wysko.midis2jam2.midi.notePeriodsModulus
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(0f, 29.5f, -152.65f)
@@ -41,7 +43,9 @@ class StageHorns(context: PerformanceManager, eventList: List<MidiEvent>, type: 
 
     override val animators: List<PitchClassAnimator> = List(12) {
         RisingPitchClassAnimator(context, eventList.notePeriodsModulus(context, 11 - it)).apply {
-            geometry += context.modelR("StageHorn.obj", type.texture)
+            geometry += context.model(Models.Brass.StageHorns.Horn).apply {
+                setMaterial(context.assetLoader.material(type.material))
+            }
         }
     }
 

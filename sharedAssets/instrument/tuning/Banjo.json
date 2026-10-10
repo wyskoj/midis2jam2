@@ -1,6 +1,6 @@
 {
-  "body": "Banjo.obj",
-  "key": "BassKey.obj",
+  "body": "Banjo",
+  "key": "BassKey",
   "keyTexture": "BassSkin.bmp",
   "keyRotation": [-90, 0, 0],
   "keyScale": 0.75,

@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Hasta que se corrija, se usa el fondo predeterminado.</string>
     <string name="background_warning_fix">Abrir configuración de fondo</string>
     <string name="background_warning_continue">Reproducir con el fondo predeterminado</string>
+    <string name="loading_reading_midi">Leyendo archivo MIDI…</string>
+    <string name="loading_soundbank">Cargando banco de sonidos…</string>
+    <string name="loading_building_band">Preparando la banda…</string>
 </resources>
 

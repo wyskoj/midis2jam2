@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset.kit
 
+import org.wysko.midis2jam2.world.assetLoader
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.FastMath
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
@@ -63,22 +65,16 @@ class HiHat(
         }
 
     private val topCymbal: Spatial =
-        context.model(
-            model = "DrumSet_Cymbal.obj",
-            texture = style.texture,
-            type = style.materialType,
-        ).apply {
+        context.model(Models.Percussion.DrumSet.Cymbal).apply {
+            setMaterial(context.assetLoader.material(style.material))
             localTranslation.set(HiHatState.Closed.position)
             cymbalsNode.attachChild(this)
         }
 
     init {
         // Add bottom cymbal
-        context.model(
-            model = "DrumSet_Cymbal.obj",
-            texture = style.texture,
-            type = style.materialType,
-        ).apply {
+        context.model(Models.Percussion.DrumSet.Cymbal).apply {
+            setMaterial(context.assetLoader.material(style.material))
             rotate(FastMath.PI, 0f, 0f) // Rotate upside down
             cymbalsNode.attachChild(this)
         }

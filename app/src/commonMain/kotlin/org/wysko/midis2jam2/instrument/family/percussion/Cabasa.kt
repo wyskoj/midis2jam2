@@ -16,12 +16,13 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.Utils
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -32,7 +33,7 @@ class Cabasa(context: PerformanceManager, hits: MutableList<NoteEvent.NoteOn>) :
         Striker(
             context = context,
             hits,
-            context.modelD("Cabasa.obj", "Cabasa.bmp"),
+            context.model(Models.Percussion.Cabasa.Body),
             actualStick = false,
         ).apply {
             setParent(geometry)

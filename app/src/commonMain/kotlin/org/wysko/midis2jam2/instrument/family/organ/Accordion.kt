@@ -16,6 +16,10 @@
  */
 package org.wysko.midis2jam2.instrument.family.organ
 
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.MidiEvent
@@ -30,18 +34,17 @@ import org.wysko.midis2jam2.instrument.family.piano.KeyboardConfiguration
 import org.wysko.midis2jam2.instrument.family.piano.KeyedInstrument
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
 
-private const val WHITE_KEY_FRONT = "AccordionKeyWhiteFront.obj"
-private const val WHITE_KEY_BACK = "AccordionKeyWhiteBack.obj"
-private const val BLACK_KEY = "AccordionKeyBlack.obj"
+private val WHITE_KEY_FRONT = Models.Organ.Accordion.KeyWhiteFront
+private val WHITE_KEY_BACK = Models.Organ.Accordion.KeyWhiteBack
+private val BLACK_KEY = Models.Organ.Accordion.KeyBlack
 
-private const val WHITE_KEY_TEXTURE = "AccordionKey.bmp"
-private const val WHITE_KEY_DOWN_TEXTURE = "AccordionKeyDown.bmp"
-private const val BLACK_KEY_TEXTURE = "AccordionKeyBlack.bmp"
-private const val BLACK_KEY_DOWN_TEXTURE = "AccordionKeyBlackDown.bmp"
+private val WHITE_KEY_TEXTURE = Materials.Diffuse.AccordionKey
+private val WHITE_KEY_DOWN_TEXTURE = Materials.Diffuse.AccordionKeyDown
+private val BLACK_KEY_TEXTURE = Materials.Diffuse.AccordionKeyBlack
+private val BLACK_KEY_DOWN_TEXTURE = Materials.Diffuse.AccordionKeyBlackDown
 
 private val SQUEEZE_RANGE: ClosedFloatingPointRange<Double> = 1.0..4.0
 private const val SECTION_COUNT = 14
@@ -73,15 +76,15 @@ class Accordion(context: PerformanceManager, eventList: List<MidiEvent>, type: T
 
     init {
         accordionSections.first().run {
-            +context.modelD("AccordionLeftHand.obj", type.textureCaseName).also {
-                it as Node
-                it.children[1].material = context.assetLoader.diffuseMaterial("LeatherStrap.bmp")
-                it.children[2].material = context.assetLoader.diffuseMaterial("RubberFoot.bmp")
+            +context.model(Models.Organ.Accordion.LeftHand).also {
+                (it as Node).getChild("Case").material = context.assetLoader.material(type.case)
             }
         }
 
         accordionSections.last().run {
-            +context.modelD("AccordionRightHand.obj", type.textureCaseFrontName)
+            +context.model(Models.Organ.Accordion.RightHand).apply {
+                setMaterial(context.assetLoader.material(type.caseFront))
+            }
             +node {
                 loc = v3(-4, 22, -0.8)
                 +dummyWhiteKey().also {
@@ -96,7 +99,7 @@ class Accordion(context: PerformanceManager, eventList: List<MidiEvent>, type: T
 
         accordionSections.forEach {
             geometry += it
-            it += context.modelD("AccordionFold.obj", "AccordionFold.bmp")
+            it += context.model(Models.Organ.Accordion.Fold)
         }
 
         placement.run {
@@ -132,8 +135,8 @@ class Accordion(context: PerformanceManager, eventList: List<MidiEvent>, type: T
     }
 
     private fun dummyWhiteKey() = node {
-        +context.modelD(WHITE_KEY_FRONT, WHITE_KEY_TEXTURE)
-        +context.modelD(WHITE_KEY_BACK, WHITE_KEY_TEXTURE)
+        +context.model(WHITE_KEY_FRONT)
+        +context.model(WHITE_KEY_BACK)
     }
 
     private fun calculateSqueezeSpeed(delta: Duration) = when {
@@ -144,20 +147,20 @@ class Accordion(context: PerformanceManager, eventList: List<MidiEvent>, type: T
     /**
      * A type of accordion.
      *
-     * @property textureCaseName The name of the texture for the accordion case.
-     * @property textureCaseFrontName The name of the texture for the accordion case front.
+     * @property case The material of the accordion case.
+     * @property caseFront The material of the accordion case front.
      */
-    enum class Type(val textureCaseName: String, val textureCaseFrontName: String) {
+    enum class Type(val case: MaterialAsset, val caseFront: MaterialAsset) {
 
         /**
          * The accordion.
          */
-        Accordion("AccordionCase.bmp", "AccordionCaseFront.bmp"),
+        Accordion(Materials.Diffuse.AccordionCase, Materials.Diffuse.AccordionCaseFront),
 
         /**
          * The bandoneon.
          */
-        Bandoneon("BandoneonCase.bmp", "BandoneonCaseFront.bmp"),
+        Bandoneon(Materials.Diffuse.BandoneonCase, Materials.Diffuse.BandoneonCaseFront),
     }
 
     companion object {

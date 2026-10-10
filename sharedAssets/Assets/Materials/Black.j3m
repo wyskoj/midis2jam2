@@ -1,0 +1,6 @@
+// Flat black, unaffected by light. Matches PerformanceManager.blackMaterial.
+Material Black : Common/MatDefs/Misc/Unshaded.j3md {
+    MaterialParameters {
+        Color : 0 0 0 1
+    }
+}

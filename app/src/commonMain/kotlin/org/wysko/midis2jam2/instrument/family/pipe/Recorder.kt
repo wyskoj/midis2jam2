@@ -19,13 +19,14 @@ package org.wysko.midis2jam2.instrument.family.pipe
 import com.jme3.math.Quaternion
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.instrument.clone.CloneWithPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 private val FINGERING_MANAGER = HandPositionFingeringManager.from(Recorder::class)
@@ -44,12 +45,8 @@ class Recorder(context: PerformanceManager, events: List<MidiEvent>) :
      * A single Recorder.
      */
     inner class RecorderClone : CloneWithPuffer(this@Recorder, SteamPuffer.Texture.Pop, 1f) {
-        override val leftHands: List<Spatial> = List(13) {
-            parent.context.modelD("RecorderHandLeft$it.obj", "hands.bmp")
-        }
-        override val rightHands: List<Spatial> = List(11) {
-            parent.context.modelD("RecorderHandRight$it.obj", "hands.bmp")
-        }
+        override val leftHands: List<Spatial> = Models.Pipe.Recorder.HandLeft.map { parent.context.model(it) }
+        override val rightHands: List<Spatial> = Models.Pipe.Recorder.HandRight.map { parent.context.model(it) }
 
         override fun adjustForPolyphony(delta: Duration) {
             root.localRotation = Quaternion().fromAngles(0f, rad((15f + indexForMoving() * 15).toDouble()), 0f)
@@ -62,7 +59,7 @@ class Recorder(context: PerformanceManager, events: List<MidiEvent>) :
             puffer.root.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.root.setLocalTranslation(0f, -12.3f, 0f)
 
-            geometry.attachChild(context.modelD("Recorder.obj", "Recorder.bmp"))
+            geometry.attachChild(context.model(Models.Pipe.Recorder.Body))
             animNode.setLocalTranslation(0f, 0f, 23f)
             highestLevel.localRotation = Quaternion().fromAngles(rad(45.5 - 90), 0f, 0f)
         }

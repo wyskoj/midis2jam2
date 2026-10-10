@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.manager
 
+import org.wysko.midis2jam2.assets.Textures
 import com.jme3.app.Application
 import com.jme3.app.SimpleApplication
 import com.jme3.font.BitmapFont
@@ -50,7 +51,7 @@ class HudManager : BaseManager() {
         super.initialize(app)
         fadeManager = application.stateManager.getState(FadeManager::class.java)
 
-        val fillbarBox = loadSprite("Assets/SongFillbarBox.bmp").apply {
+        val fillbarBox = loadSprite(Textures.Interface.SongFillbarBox.path).apply {
             loc = v3(0, 0, -10)
         }
 
@@ -64,7 +65,7 @@ class HudManager : BaseManager() {
             verticalAlignment = BitmapFont.VAlign.Bottom
         }
 
-        fillbar = loadSprite("Assets/SongFillbar.bmp").apply {
+        fillbar = loadSprite(Textures.Interface.SongFillbar.path).apply {
             loc = v3(FILLBAR_LOCATION_OFFSET, FILLBAR_LOCATION_OFFSET, 10)
         }
 

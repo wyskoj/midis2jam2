@@ -1,0 +1,9 @@
+// Polished copper: a sphere-mapped reflection over a black base. Matches AssetLoader.reflectiveMaterial.
+Material HornSkinCopper : Assets/MatDefs/SphereMapLighting.j3md {
+    MaterialParameters {
+        DiffuseMap : Flip Assets/Textures/Shared/Black.bmp
+        EnvMap : Flip Assets/Textures/Brass/HornSkinCopper.png
+        EnvMapAsSphereMap : true
+        FresnelParams : 0.18 0.18 0.18
+    }
+}

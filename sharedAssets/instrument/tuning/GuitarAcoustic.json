@@ -1,6 +1,6 @@
 {
-  "body": "GuitarAcoustic.obj",
-  "key": "GuitarKey.obj",
+  "body": "GuitarAcoustic",
+  "key": "GuitarKey",
   "keyTexture": "GuitarSkin.bmp",
   "keys": [
     {"position": [-0.8583, 1.3557, 18.205], "rotation": [-90.0, -70.0, 90.0], "direction": 1},

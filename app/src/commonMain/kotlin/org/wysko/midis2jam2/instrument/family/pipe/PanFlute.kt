@@ -18,6 +18,9 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.MaterialAsset
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
@@ -28,7 +31,7 @@ import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
 import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Normal
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 /**
@@ -73,14 +76,13 @@ class PanFlute(context: PerformanceManager, eventList: List<MidiEvent>, skin: Pi
      * Represents a skin the Pan Flute can have.
      */
     enum class PipeSkin(
-        internal val textureFile: String,
-        internal val reflective: Boolean,
+        internal val material: MaterialAsset,
     ) {
         /** Gold pipe skin. */
-        GOLD("HornSkin.bmp", true),
+        GOLD(Materials.HornSkin),
 
         /** Wood pipe skin. */
-        WOOD("Wood.bmp", false),
+        WOOD(Materials.Wood),
     }
 
     /** Each of the pipes in the pan flute, calliope, etc. */
@@ -92,10 +94,8 @@ class PanFlute(context: PerformanceManager, eventList: List<MidiEvent>, skin: Pi
 
         init {
             with(geometry) {
-                +context.modelD("PanPipe.obj", skin.textureFile).apply {
-                    if (skin.reflective) {
-                        material = context.assetLoader.reflectiveMaterial(skin.textureFile)
-                    }
+                +context.model(Models.Pipe.PanFlute.Pipe).apply {
+                    setMaterial(context.assetLoader.material(skin.material))
                 }
             }
             with(animation) {

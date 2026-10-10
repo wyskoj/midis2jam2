@@ -18,12 +18,13 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import com.jme3.math.Quaternion
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.HandPositionFingeringManager
 import org.wysko.midis2jam2.instrument.clone.ClonePitchBendConfiguration
 import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 
 private val FINGERING_MANAGER: HandPositionFingeringManager = HandPositionFingeringManager.from(Flute::class)
 
@@ -39,10 +40,7 @@ class Flute(context: PerformanceManager, events: List<MidiEvent>) :
             puffer.root.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.root.setLocalTranslation(0f, -12.3f, 0f)
             geometry.attachChild(
-                context.modelR(
-                    "Flute.obj",
-                    "ShinySilver.bmp"
-                )
+                context.model(Models.Pipe.Flute.Body)
             )
         }
     }

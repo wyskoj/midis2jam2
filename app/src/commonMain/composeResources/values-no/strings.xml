@@ -307,5 +307,8 @@
     <string name="background_warning_consequence_settings">Inntil dette er rettet, brukes standardbakgrunnen.</string>
     <string name="background_warning_fix">Åpne bakgrunnsinnstillinger</string>
     <string name="background_warning_continue">Spill av med standardbakgrunn</string>
+    <string name="loading_reading_midi">Leser MIDI-fil…</string>
+    <string name="loading_soundbank">Laster inn lydbank…</string>
+    <string name="loading_building_band">Setter opp bandet…</string>
 </resources>
 

@@ -16,6 +16,8 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
@@ -27,7 +29,6 @@ import org.wysko.midis2jam2.midi.MUTE_HIGH_CONGA
 import org.wysko.midis2jam2.midi.OPEN_HIGH_CONGA
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.max
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 /**
@@ -65,7 +66,7 @@ class Congas(
     private val leftRecoil =
         Node().also {
             it.attachChild(
-                context.modelD("DrumSet_Conga.obj", "DrumShell_Conga.bmp").apply {
+                context.model(Models.Percussion.Congas.Drum).apply {
                     scale(0.92f)
                 },
             )
@@ -76,7 +77,7 @@ class Congas(
     private val rightRecoil =
         Node().also {
             it.attachChild(
-                context.modelD("DrumSet_Conga.obj", "DrumShell_Conga.bmp"),
+                context.model(Models.Percussion.Congas.Drum),
             )
         }.apply {
             rightNode.attachChild(this)

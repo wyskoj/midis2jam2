@@ -16,6 +16,9 @@
  */
 package org.wysko.midis2jam2.instrument.family.soundeffects
 
+import org.wysko.midis2jam2.assets.Materials
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
@@ -28,7 +31,6 @@ import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelD
 import java.util.*
 import kotlin.math.cos
 import kotlin.time.Duration
@@ -171,22 +173,17 @@ class Helicopter(context: PerformanceManager, eventList: List<MidiEvent>) :
 
     init {
         // Load helicopter
-        val copter = context.modelD("HelicopterBody.obj", "Helicopter.png")
+        val copter = context.model(Models.SoundEffects.Helicopter.Body)
         rotor.attachChild(
-            context.assetLoader.fakeShadow(
-                "Assets/HelicopterRotorPlane.obj",
-                "Assets/HelicopterRotor.png",
-            ),
+            context.model(Models.Shadows.HelicopterRotor),
         )
 
         // Load lights
         lights =
             Array(12) {
-                context.assetLoader.fakeShadow(
-                    "Assets/HelicopterRotorPlane.obj",
-                    "Assets/HelicopterLights${it + 1}.png"
-                )
+                context.model(Models.Shadows.HelicopterRotor)
                     .apply {
+                        setMaterial(context.assetLoader.material(Materials.Shadow.HelicopterLights[it]))
                         rotor.attachChild(this)
                         this.cullHint = Always
                     }
@@ -197,7 +194,7 @@ class Helicopter(context: PerformanceManager, eventList: List<MidiEvent>) :
         animNode.attachChild(rotor)
 
         // Load rotor cap
-        val cap = context.modelD("HelicopterRotorCap.obj", "Helicopter.png")
+        val cap = context.model(Models.SoundEffects.Helicopter.RotorCap)
         cap.setLocalTranslation(0f, 0f, 0.5f)
         animNode.attachChild(cap)
 

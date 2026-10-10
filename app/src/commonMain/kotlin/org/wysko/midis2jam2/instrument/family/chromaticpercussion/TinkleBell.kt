@@ -17,6 +17,8 @@
 
 package org.wysko.midis2jam2.instrument.family.chromaticpercussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.ColorRGBA
 import com.jme3.math.Vector3f
 import com.jme3.scene.Geometry
@@ -30,8 +32,6 @@ import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.percussion.CymbalAnimator
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.GlowController
-import org.wysko.midis2jam2.world.assetLoader
-import org.wysko.midis2jam2.world.modelR
 import kotlin.time.Duration
 
 /*
@@ -84,7 +84,7 @@ class TinkleBell(
             scale(1 - (index * 0.02f))
         }
         private val tinkleBell = with(root) {
-            +context.modelR("TinkleBellBell.obj", "HornSkinGrey.bmp").apply { loc = v3(0f, -7.8f, 0f) }
+            +context.model(Models.ChromaticPercussion.TinkleBell.Bell).apply { loc = v3(0f, -7.8f, 0f) }
         }
         private val cymbalAnimator = CymbalAnimator(tinkleBell, 1.0, 15.0, 2.0)
         private val glowController = GlowController(glowColor = ColorRGBA.Yellow.mult(0.75f))
@@ -99,9 +99,8 @@ class TinkleBell(
         }
 
         private val outerBell = with(root) {
-            +context.modelR("TinkleBell.obj", "HornSkin.bmp").apply {
+            +context.model(Models.ChromaticPercussion.TinkleBell.OuterBell).apply {
                 loc = v3(0, -10, 0)
-                ((this as Node).children[0] as Geometry).material = context.assetLoader.diffuseMaterial("Wood.bmp")
             }
         }
 
@@ -113,7 +112,7 @@ class TinkleBell(
                 }
             }
 
-            ((outerBell as Node).children[1] as Geometry).material.setColor(
+            ((outerBell as Node).getChild("Bell") as Geometry).material.setColor(
                 "GlowColor",
                 glowController.calculate(cymbalAnimator.animTime.let { if (it == -1.0) Double.MAX_VALUE else it } * 2f)
             )

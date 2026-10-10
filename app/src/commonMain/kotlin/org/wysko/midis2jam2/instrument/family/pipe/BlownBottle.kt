@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
@@ -27,8 +28,7 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
 import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Pop
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelD
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 /** The Blown bottle. */
@@ -85,15 +85,15 @@ class BlownBottle(context: PerformanceManager, events: List<MidiEvent>) :
         init {
             // Load pop bottle
             with(geometry) {
-                +context.modelR("PopBottle.obj", "PopBottle.bmp")
-                +context.modelD("PopBottleLabel.obj", "PopLabel.bmp").apply { rot = v3(0, 180, 0) }
+                +context.model(Models.Pipe.BlownBottle.Bottle)
+                +context.model(Models.Pipe.BlownBottle.Label).apply { rot = v3(0, 180, 0) }
 
                 val scale = 0.3f + 0.027273f * i
-                +context.modelR("PopBottlePop.obj", "Pop.bmp").apply {
+                +context.model(Models.Pipe.BlownBottle.Pop).apply {
                     loc = v3(0, -3.25, 0)
                     scale(1f, scale, 1f)
                 }
-                +context.modelR("PopBottleMiddle.obj", "PopBottle.bmp").apply {
+                +context.model(Models.Pipe.BlownBottle.Middle).apply {
                     scale(1f, 1 - scale, 1f)
                 }
 

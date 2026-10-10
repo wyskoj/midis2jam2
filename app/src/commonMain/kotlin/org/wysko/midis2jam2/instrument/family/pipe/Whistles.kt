@@ -18,6 +18,7 @@ package org.wysko.midis2jam2.instrument.family.pipe
 
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
+import org.wysko.midis2jam2.assets.Models
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DivisiveSustainedInstrument
 import org.wysko.midis2jam2.instrument.PitchClassAnimator
@@ -26,7 +27,7 @@ import org.wysko.midis2jam2.particle.SteamPuffer
 import org.wysko.midis2jam2.particle.SteamPuffer.Behavior.Outwards
 import org.wysko.midis2jam2.particle.SteamPuffer.Texture.Whistle
 import org.wysko.midis2jam2.util.*
-import org.wysko.midis2jam2.world.modelR
+import org.wysko.midis2jam2.world.model
 import kotlin.time.Duration
 
 /**
@@ -72,7 +73,7 @@ class Whistles(context: PerformanceManager, events: List<MidiEvent>) :
 
         init {
             with(geometry) {
-                +context.modelR("Whistle.obj", "ShinySilver.bmp").apply {
+                +context.model(Models.Pipe.Whistle.Body).apply {
                     val scaleFactor = 2 + -0.0909091 * i
                     loc = v3(0, 5 + -5 * scaleFactor, 0)
                     rot = v3(0, -90, 0)

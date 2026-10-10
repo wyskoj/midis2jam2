@@ -42,7 +42,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,12 +55,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toRect
+import io.github.vinceglb.filekit.nameWithoutExtension
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.compose.koinInject
 import org.wysko.midis2jam2.CompatLibrary
 import org.wysko.midis2jam2.Midis2jam2Action
 import org.wysko.midis2jam2.R
+import org.wysko.midis2jam2.domain.ApplicationService
 import org.wysko.midis2jam2.starter.Midis2jam2Harness
 import org.wysko.midis2jam2.util.findActivity
 import org.wysko.midis2jam2.util.rememberIsInPipMode
@@ -74,31 +75,26 @@ fun PerformanceContent(
     onFinish: () -> Unit,
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val loadingController = rememberLoadingController()
     val loadingState by loadingController.state.collectAsState()
-    val animatedProgress = loadingController.animatedProgress
-    val listener = remember { LoadingListener(loadingController) }
+    val songTitle = koinInject<ApplicationService>().midiFile.collectAsState().value?.nameWithoutExtension ?: ""
 
     var showControls by rememberSaveable { mutableStateOf(false) }
     var pipSourceRectHint by remember { mutableStateOf<Rect?>(null) }
     val isPlaybackPlaying = remember { MutableStateFlow(true) }
     val currentIsPlaybackPlaying by isPlaybackPlaying.collectAsState()
 
-    // drive the loading exit delay
-    LaunchedEffect(loadingState.ready) {
-        if (loadingState.ready) {
-            scope.launch {
-                delay(750.milliseconds)
-                loadingController.setShowLoading(false)
-            }
-        }
+    // A quick load goes straight to the performance, rather than flashing the loading screen
+    var isLoadingSlow by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(LOADING_INDICATOR_DELAY)
+        isLoadingSlow = true
     }
 
     // harness
     val harness = remember {
         Midis2jam2Harness(context, onFinish).apply {
-            registerProgressListener(listener)
+            registerProgressListener(loadingController)
             registerPlaybackStateListener { isPlaybackPlaying.value = it }
         }
     }
@@ -237,10 +233,9 @@ fun PerformanceContent(
         }
 
         LoadingIndicator(
-            showLoading = loadingState.showLoading,
-            ready = loadingState.ready,
-            animatedProgress = animatedProgress.value,
-            loadProgress = loadingState.loadProgress
+            visible = isLoadingSlow && !loadingState.ready,
+            title = songTitle,
+            state = loadingState,
         )
     }
 }
@@ -269,6 +264,9 @@ private fun Context.pipRemoteAction(
     val icon = Icon.createWithResource(this, iconResId)
     return RemoteAction(icon, title, title, pendingIntent)
 }
+
+/** How long loading has to take before the loading screen is shown. */
+private val LOADING_INDICATOR_DELAY = 300.milliseconds
 
 private const val PIP_ACTION_PLAY_PAUSE = "org.wysko.midis2jam2.PIP_ACTION_PLAY_PAUSE"
 private const val PIP_ACTION_SEEK_BACKWARD = "org.wysko.midis2jam2.PIP_ACTION_SEEK_BACKWARD"

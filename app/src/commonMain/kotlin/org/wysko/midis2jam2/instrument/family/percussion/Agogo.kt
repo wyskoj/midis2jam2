@@ -16,13 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion
 
+import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Vector3f
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.util.max
-import org.wysko.midis2jam2.world.modelD
 import kotlin.time.Duration
 
 private val BASE_POSITION = Vector3f(-5f, 50f, -85f)
@@ -54,7 +55,7 @@ class Agogo(
         }
 
     init {
-        recoilNode.attachChild(context.modelD("Agogo.obj", "HornSkinGrey.bmp"))
+        recoilNode.attachChild(context.model(Models.Percussion.Agogo.Body))
         geometry.localTranslation = BASE_POSITION
     }
 
