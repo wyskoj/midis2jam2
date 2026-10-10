@@ -29,6 +29,8 @@ import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
 import org.wysko.midis2jam2.testing.withLyrics
 import org.wysko.midis2jam2.world.font.covers
+import org.wysko.midis2jam2.world.lyric.LyricController
+import org.wysko.midis2jam2.world.lyric.LyricLine
 import org.wysko.midis2jam2.world.lyric.renderString
 import kotlin.math.floor
 import kotlin.test.Test
@@ -36,6 +38,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * The lyric display, and the reason this suite exists.
@@ -212,6 +216,100 @@ class LyricsTest {
     }
 
     @Test
+    @Spec("lyrics.upcoming-line")
+    fun `the next line is shown smaller beneath the current one`() {
+        HeadlessPerformance.start(MidiFixtures.withLyrics()).use { performance ->
+            val controller = assertNotNull(
+                performance.app.stateManager.getState(LyricManager::class.java)?.controller
+            )
+            val (first, second) = performance.onEngineThread { controller.allLines }
+            val texts = performance.onEngineThread { lyricTextsByLine(performance, controller) }
+
+            // Partway through the first line, with the display settled.
+            performance.onEngineThread { playUntil(controller, 2.5.seconds) }
+            performance.onEngineThread {
+                assertEquals(first, controller.currentLine)
+                assertEquals(second, controller.upcomingLine, "The next line should be shown beneath the current one")
+                assertTrue(
+                    texts.getValue(second).color.a > 0.9f,
+                    "The next line is meant to be visible beneath the current one, but it is hidden"
+                )
+                assertTrue(
+                    controller.topOf(second) < controller.topOf(first),
+                    "The next line should sit beneath the current one"
+                )
+                assertTrue(
+                    texts.getValue(second).size < texts.getValue(first).size,
+                    "The next line should be smaller than the current one"
+                )
+            }
+
+            // Into the last line, which has nothing after it.
+            performance.onEngineThread { playUntil(controller, 6.seconds) }
+            performance.onEngineThread {
+                assertEquals(second, controller.currentLine)
+                assertNull(controller.upcomingLine, "The last line has no next line to show")
+                assertTrue(
+                    texts.getValue(second).size > texts.getValue(first).size * 0.99f,
+                    "The next line should grow to full size once it is being sung"
+                )
+            }
+        }
+    }
+
+    @Test
+    @Spec("lyrics.upcoming-line.not-across-break")
+    fun `the next line is not shown when a break between stanzas comes first`() {
+        HeadlessPerformance.start(MidiFixtures.withStanzaBreak()).use { performance ->
+            val controller = assertNotNull(
+                performance.app.stateManager.getState(LyricManager::class.java)?.controller
+            )
+            val (first, second) = performance.onEngineThread { controller.allLines }
+            val texts = performance.onEngineThread { lyricTextsByLine(performance, controller) }
+
+            performance.onEngineThread { playUntil(controller, 2.5.seconds) }
+            performance.onEngineThread {
+                assertEquals(first, controller.currentLine)
+                assertNull(controller.upcomingLine, "A line after a break between stanzas shouldn't be shown early")
+                assertTrue(
+                    texts.getValue(second).color.a < 0.05f,
+                    "The line after the break is visible beneath the current line"
+                )
+            }
+        }
+    }
+
+    /**
+     * After a break between stanzas, the display fades back in. It used to fade in while still on the line
+     * before the break, and only then switch, so that old line flashed up again for a moment.
+     */
+    @Test
+    fun `after a break between stanzas the display comes back on the new line`() {
+        HeadlessPerformance.start(MidiFixtures.withStanzaBreak()).use { performance ->
+            val controller = assertNotNull(
+                performance.app.stateManager.getState(LyricManager::class.java)?.controller
+            )
+            val (first, second) = performance.onEngineThread { controller.allLines }
+            val texts = performance.onEngineThread { lyricTextsByLine(performance, controller) }
+
+            // From well into the break, once the display has faded out, through the second stanza's entrance.
+            val firstLineAlpha = performance.onEngineThread {
+                buildList {
+                    playUntil(controller, 15.seconds) { at -> if (at > 10.seconds) add(texts.getValue(first).color.a) }
+                }
+            }
+            assertTrue(
+                firstLineAlpha.all { it < 0.01f },
+                "The line before the break reappeared as the display faded back in: max alpha ${firstLineAlpha.max()}"
+            )
+            performance.onEngineThread {
+                assertEquals(second, controller.currentLine)
+                assertTrue(texts.getValue(second).color.a > 0.9f, "The new stanza's line isn't showing")
+            }
+        }
+    }
+
+    @Test
     @Spec("lyrics.font.non-ascii-glyphs")
     fun `lyrics using characters outside the bundled font are still rendered`() {
         HeadlessPerformance.start(MidiFixtures.withNonAsciiLyrics()).use { performance ->
@@ -252,6 +350,29 @@ class LyricsTest {
 
         /** The highest ASCII code point; anything above it is outside the bundled font's coverage. */
         const val MAX_ASCII_CODE_POINT = 126
+
+        /**
+         * Plays the lyric display from the start until [end], a frame at a time. Call it in one engine task:
+         * the manager's own updates tick the display at playback time, which the test doesn't advance.
+         */
+        fun playUntil(
+            controller: LyricController,
+            end: Duration,
+            eachFrame: (at: Duration) -> Unit = {},
+        ) {
+            var at = Duration.ZERO
+            while (at < end) {
+                at += HeadlessPerformance.FRAME
+                controller.tick(at, HeadlessPerformance.FRAME)
+                eachFrame(at)
+            }
+        }
+
+        /** Each line's text on screen. */
+        fun lyricTextsByLine(performance: HeadlessPerformance, controller: LyricController): Map<LyricLine, BitmapText> {
+            val texts = bitmapTextsIn(performance.app.guiNode)
+            return controller.allLines.associateWith { line -> texts.first { it.text == line.renderString() } }
+        }
 
         /** Every BitmapText currently in the scene under [root]. */
         fun bitmapTextsIn(root: Spatial): List<BitmapText> = buildList {

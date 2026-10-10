@@ -104,11 +104,30 @@ class LyricController(private val context: PerformanceManager, private val event
     /**
      * When the display moves from [previous] to [next]: a little before [next] starts, sooner the longer the
      * gap between them (up to a point), so the next line has slid into place by the time it is sung.
+     *
+     * Across a break between stanzas, the display has faded out, so it moves on just before it fades back in:
+     * the first thing seen is [next], not [previous] again.
      */
     private fun handOffTime(previous: LyricLine, next: LyricLine): Duration = with(context) {
-        val timeBetween = (startTime(next) - endTime(previous)).coerceAtMost(4.seconds)
-        startTime(next) - (timeBetween * 0.45)
+        val timeBetween = startTime(next) - endTime(previous)
+        if (timeBetween > STANZA_BREAK) return startTime(next) - FADE_IN_LEAD - BREAK_HAND_OFF_MARGIN
+        startTime(next) - (timeBetween.coerceAtMost(4.seconds) * 0.45)
     }
+
+    private val lineIndex = lines.withIndex().associate { it.value to it.index }
+
+    /** Whether a break between stanzas follows each line, so the line after it isn't shown beneath it. */
+    private val isBreakAfter = lines.mapIndexed { index, line ->
+        lines.getOrNull(index + 1)?.let { context.startTime(it) - context.endTime(line) > STANZA_BREAK } ?: true
+    }
+
+    /** The line shown, smaller, beneath [currentLine]: the one after it, unless a break between stanzas follows. */
+    internal val upcomingLine: LyricLine?
+        get() = currentLine?.let { lineIndex.getValue(it) }
+            ?.takeUnless { isBreakAfter[it] }
+            ?.let { lines[it + 1] }
+
+    private val baseSize = (LYRICS_FONT_BASE_SIZE * settings.lyricsSize).toFloat()
 
     private val opacity = NumberSmoother(0f, 5.0)
     private var isVisible = false
@@ -117,19 +136,24 @@ class LyricController(private val context: PerformanceManager, private val event
             setBox(
                 Rectangle(
                     0f,
-                    context.app.viewPort.camera.height * 0.85f,
+                    context.app.viewPort.camera.height * 0.8f,
                     context.app.viewPort.camera.width.toFloat(),
                     100f
                 )
             )
-            size = (LYRICS_FONT_BASE_SIZE * settings.lyricsSize).toFloat()
+            size = baseSize * UPCOMING_LINE_SCALE
             color = ColorRGBA.DarkGray
             text = it.renderString()
             alignment = BitmapFont.Align.Center
             highlight.prepare(this)
         }
     }.onEach { context.app.guiNode += it.value }
-    private val linePositionCtrl = lines.associateWith { NumberSmoother(0.8f, 10.0) }
+
+    /** Where each line is, eased toward where its [Slot] puts it. */
+    private val layouts = lines.associateWith { LineLayout(context.app.viewPort.camera.height * 0.8f) }
+
+    /** The top of [line]'s text, in gui space. */
+    internal fun topOf(line: LyricLine): Float = layouts.getValue(line).top.value
 
     /**
      * Updates the controller.
@@ -145,27 +169,7 @@ class LyricController(private val context: PerformanceManager, private val event
             }
             wordCollector.advanceCollectOne(time)?.let { currentWord = it }
 
-            texts.forEach { (line, text) ->
-                linePositionCtrl[line]?.tick(delta) {
-                    when {
-                        lines.indexOf(line) < lines.indexOf(currentLine) -> 0.95f
-                        line == currentLine -> 0.9f
-                        else -> 0.85f
-                    }
-                }?.let {
-                    text.color = text.color.clone().setAlpha(
-                        (1f - (abs(it - 0.9f).coerceIn(0f..0.05f) * 20f)) * opacity.value
-                    )
-                    text.setBox(
-                        Rectangle(
-                            0f,
-                            context.app.viewPort.camera.height * it,
-                            context.app.viewPort.camera.width.toFloat(),
-                            100f
-                        )
-                    )
-                }
-            }
+            layOutLines(delta)
 
             calculateVisibility(time)
 
@@ -186,6 +190,74 @@ class LyricController(private val context: PerformanceManager, private val event
         }
     }
 
+    /**
+     * Eases every line toward where its slot puts it: the current line, the one beneath it, or out of sight.
+     * While the display is faded out, lines go straight there instead, so it fades back in already arranged.
+     */
+    private fun layOutLines(delta: Duration) {
+        val camera = context.app.viewPort.camera
+        val isHidden = opacity.value < HIDDEN_OPACITY
+        val currentIndex = currentLine?.let { lineIndex.getValue(it) }
+        val upcoming = upcomingLine
+
+        val currentTop = camera.height * CURRENT_LINE_TOP
+        val currentHeight = texts[currentLine]?.let { it.lineHeight * it.lineCount } ?: baseSize
+        val upcomingTop = currentTop - currentHeight - baseSize * UPCOMING_LINE_GAP
+        val drift = camera.height * LINE_DRIFT
+
+        texts.forEach { (line, text) ->
+            val index = lineIndex.getValue(line)
+            val slot = when {
+                currentIndex == null -> Slot.Waiting
+                index < currentIndex -> Slot.Sung
+                index == currentIndex -> Slot.Current
+                line == upcoming -> Slot.Upcoming
+                else -> Slot.Waiting
+            }
+
+            fun NumberSmoother.ease(target: Float): Float =
+                if (isHidden) target.also { snap(it) } else tick(delta) { target }
+
+            val layout = layouts.getValue(line)
+            val top = layout.top.ease(
+                when (slot) {
+                    Slot.Sung -> currentTop + drift
+                    Slot.Current -> currentTop
+                    Slot.Upcoming -> upcomingTop
+                    Slot.Waiting -> upcomingTop - drift
+                }
+            )
+            val scale = layout.scale.ease(if (slot == Slot.Sung || slot == Slot.Current) 1f else UPCOMING_LINE_SCALE)
+            val alpha = layout.alpha.ease(if (slot == Slot.Current || slot == Slot.Upcoming) 1f else 0f)
+
+            (baseSize * scale).let { if (abs(text.size - it) > SIZE_EPSILON) text.size = it }
+            text.color = text.color.clone().setAlpha(alpha * opacity.value)
+            text.setBox(Rectangle(0f, top, camera.width.toFloat(), 100f))
+        }
+    }
+
+    /** Where a line belongs on screen. */
+    private enum class Slot {
+        /** Already sung: drifting up and out of sight. */
+        Sung,
+
+        /** Being sung. */
+        Current,
+
+        /** Next to be sung, shown smaller beneath the current line. */
+        Upcoming,
+
+        /** Not yet shown. */
+        Waiting,
+    }
+
+    /** A line's position, size (as a multiple of the lyrics size) and opacity, each eased toward its target. */
+    private class LineLayout(initialTop: Float) {
+        val top = NumberSmoother(initialTop, 10.0)
+        val scale = NumberSmoother(UPCOMING_LINE_SCALE, 10.0)
+        val alpha = NumberSmoother(0f, 10.0)
+    }
+
     private fun calculateVisibility(time: Duration) {
         with(context) {
             currentLine?.let {
@@ -195,11 +267,11 @@ class LyricController(private val context: PerformanceManager, private val event
                 }
             }
             isVisible = when {
-                lineCollector.peek()?.let { startTime(it) - time <= 2.0.seconds } == true -> true
+                lineCollector.peek()?.let { startTime(it) - time <= FADE_IN_LEAD } == true -> true
 
                 lineCollector.prev()?.let { prev ->
                     lineCollector.peek()?.let { peek ->
-                        startTime(peek) - endTime(prev) <= 7.0.seconds
+                        startTime(peek) - endTime(prev) <= STANZA_BREAK
                     }
                 } == true -> true
 
@@ -222,7 +294,8 @@ class LyricController(private val context: PerformanceManager, private val event
         appendLine("in currentLineTime ${lineTime?.let { time in it } ?: ""}\n")
         appendLine("currentWord ${currentWord?.text}\n")
         appendLine("peek line   ${lineCollector.peek()?.renderString()}")
-        appendLine("prev line   ${lineCollector.prev()?.renderString()}\n")
+        appendLine("prev line   ${lineCollector.prev()?.renderString()}")
+        appendLine("upcoming    ${upcomingLine?.renderString()}\n")
         appendLine("peek word   ${wordCollector.peek()?.text}")
         appendLine("prev word   ${wordCollector.prev()?.text}")
         appendLine("isVisible   $isVisible")
@@ -231,6 +304,36 @@ class LyricController(private val context: PerformanceManager, private val event
 
 /** The base pixel size `Assets/Fonts/Inter.fnt` (and any dynamic atlas standing in for it) is rendered at. */
 private const val LYRICS_FONT_BASE_SIZE = 64
+
+/** The top of the current line, as a fraction of the screen's height. */
+private const val CURRENT_LINE_TOP = 0.9f
+
+/** How far, as a fraction of the screen's height, a line drifts as it fades in or out. */
+private const val LINE_DRIFT = 0.05f
+
+/** How big the upcoming line is, relative to the current one. */
+private const val UPCOMING_LINE_SCALE = 0.6f
+
+/** The space between the current line and the upcoming line beneath it, as a fraction of the lyrics size. */
+private const val UPCOMING_LINE_GAP = 0.15f
+
+/** The smallest change in a line's size worth laying its text out again for. */
+private const val SIZE_EPSILON = 0.01f
+
+/**
+ * A gap between lines longer than this is a break between stanzas: the display fades out during it, and the
+ * line after it isn't shown beneath the line before it.
+ */
+private val STANZA_BREAK = 7.seconds
+
+/** How long before a line starts the display begins fading in, when it had faded out. */
+private val FADE_IN_LEAD = 2.seconds
+
+/** How long before the display fades back in after a break between stanzas it moves on to the next line. */
+private val BREAK_HAND_OFF_MARGIN = 0.25.seconds
+
+/** Below this opacity the display counts as faded out, and lines are moved without easing. */
+private const val HIDDEN_OPACITY = 0.01f
 
 private val separators = listOf("\n", "\r", "\r\n")
 

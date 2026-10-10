@@ -545,6 +545,14 @@
   source: features/lyrics.md
   platforms: [desktop, android]
   claim: "The first line shows the current line of lyrics"
+- id: lyrics.upcoming-line
+  source: code
+  platforms: [desktop, android]
+  claim: "The next line of lyrics is shown, smaller, beneath the current line"
+- id: lyrics.upcoming-line.not-across-break
+  source: code
+  platforms: [desktop, android]
+  claim: "The next line isn't shown beneath the current one when a break between stanzas comes between them"
 - id: lyrics.elapsed-syllables-white
   source: features/lyrics.md
   platforms: [desktop, android]

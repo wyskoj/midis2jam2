@@ -406,6 +406,32 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /**
+     * [withLyrics]'s two lines with a long rest between them, the kind of break between stanzas
+     * the lyric display fades out for.
+     */
+    fun withStanzaBreak(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            channel(0) {
+                program(0)
+                val lineBreak = LYRIC_SYLLABLES.indexOf("\n")
+                LYRIC_SYLLABLES.forEachIndexed { index, syllable ->
+                    val quarter = if (index > lineBreak) index + STANZA_BREAK_QUARTERS else index
+                    lyric(syllable, absoluteTime = quarter * TICKS_PER_QUARTER)
+                    if (syllable != "\n") {
+                        note(60, duration = 1.quarter, absoluteTime = quarter * TICKS_PER_QUARTER)
+                    }
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** The rest [withStanzaBreak] adds before its second line: ten seconds at its tempo. */
+    private const val STANZA_BREAK_QUARTERS = 20
+
     /** The syllables [withLyrics] sings, in order. The newline separates the two lines. */
     val LYRIC_SYLLABLES: List<String> = listOf(
         "Twin", "kle ", "twin", "kle ", "lit", "tle ", "star", "\n",
