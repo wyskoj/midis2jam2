@@ -320,6 +320,104 @@ object MidiFixtures {
         }
     }.toTimeBasedSequence()
 
+    /**
+     * Two tracks on channel 1 of different MIDI ports, as MuseScore writes a score with more than 16 instruments:
+     * [first] on port 1 and [second] on port 2, each playing four notes at the same time as the other.
+     */
+    fun twoPorts(first: Int, second: Int): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format1
+        division = tpq(TICKS_PER_QUARTER)
+        track { tempo(120) }
+        listOf(first, second).forEachIndexed { port, program ->
+            track {
+                midiPort(port)
+                channel(0) {
+                    program(program, absoluteTime = 0)
+                    repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = it * TICKS_PER_QUARTER) }
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** A piano on port 1, and [beats] of [PRIMARY_RHYTHM_NOTE] on channel 10 of port 2. */
+    fun drumsOnSecondPort(beats: Int = 8): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format1
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            midiPort(0)
+            channel(0) {
+                program(0, absoluteTime = 0)
+                repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = it * TICKS_PER_QUARTER) }
+            }
+        }
+        track {
+            midiPort(1)
+            channel(PERCUSSION_CHANNEL) {
+                program(0, absoluteTime = 0)
+                repeat(beats) { note(PRIMARY_RHYTHM_NOTE, duration = 1.eighth, absoluteTime = it * TICKS_PER_QUARTER) }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /**
+     * Channel 11 of port 1 set as a GS rhythm part on [kit], playing [beats] of [SECOND_RHYTHM_NOTE], while port 2
+     * sends a GS reset of its own half a beat in, and plays a piano.
+     *
+     * The reset is only for port 2: if it reached port 1, channel 11 would go back to being melodic, and its kit's
+     * program number would be drawn as a melodic instrument.
+     */
+    fun resetOnSecondPort(kit: Int, beats: Int = 8): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format1
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            midiPort(0)
+            sysex(GS_RESET, absoluteTime = 0)
+            sysex(gsUseForRhythmPart(SECOND_RHYTHM_CHANNEL, rhythm = true), absoluteTime = 0)
+            channel(SECOND_RHYTHM_CHANNEL) {
+                program(kit, absoluteTime = 0)
+                repeat(beats) {
+                    note(SECOND_RHYTHM_NOTE, duration = 1.eighth, absoluteTime = it * TICKS_PER_QUARTER)
+                }
+            }
+        }
+        track {
+            midiPort(1)
+            sysex(GS_RESET, absoluteTime = TICKS_PER_QUARTER / 2)
+            channel(0) {
+                program(0, absoluteTime = TICKS_PER_QUARTER / 2)
+                repeat(4) { note(60 + it, duration = 1.quarter, absoluteTime = (it + 1) * TICKS_PER_QUARTER) }
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /**
+     * Channel 1 of port 1 turned all the way down, and a piano note on channel 1 of port 2, [restQuarters] quarter
+     * notes in (at 120 BPM, half a second each).
+     *
+     * Played with each port on its own synthesizer, the note sounds. Played with both ports on one, it is silenced.
+     */
+    fun noteOnSecondPortBesideSilencedFirst(restQuarters: Int = 2): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format1
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(120)
+            midiPort(0)
+            channel(0) { controller(VOLUME_CONTROLLER, 0, absoluteTime = 0) }
+        }
+        track {
+            midiPort(1)
+            channel(0) {
+                program(0, absoluteTime = 0)
+                note(60, duration = 1.quarter, absoluteTime = restQuarters * TICKS_PER_QUARTER)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /** Channel volume. */
+    private const val VOLUME_CONTROLLER = 7
+
     /** The GS reset message, as it appears in a file (without the leading F0). */
     val GS_RESET: ByteArray = bytes(0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7)
 

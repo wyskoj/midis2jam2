@@ -29,7 +29,7 @@ import org.wysko.midis2jam2.manager.BaseManager
 import org.wysko.midis2jam2.manager.MidiDeviceManager
 import org.wysko.midis2jam2.manager.instantiateManagers
 import org.wysko.midis2jam2.midi.system.JwSequencer
-import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.world.AssetLoader
 import javax.sound.midi.Synthesizer
@@ -42,7 +42,7 @@ internal class Midis2jam2QueueApplication(
     private val onPlaylistFinish: () -> Unit,
     private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
-    private val midiDevice: MidiDevice,
+    private val midiPorts: MidiPorts,
 ) : SimpleApplication() {
     private data class TrackRuntimeBundle(
         val performanceManager: DesktopPlaylistPerformanceManager,
@@ -101,7 +101,7 @@ internal class Midis2jam2QueueApplication(
             isQueueApplication = true,
             onPlaybackComplete = { onTrackCompleted() },
         )
-        val midiDeviceManager = MidiDeviceManager(config, midiDevice)
+        val midiDeviceManager = MidiDeviceManager(config, midiPorts)
 
         stateManager.attach(assetLoader)
         stateManager.attach(performanceManager)

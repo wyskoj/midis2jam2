@@ -24,6 +24,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
+import org.wysko.midis2jam2.midi.portCount
 import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.record.GERVILL_EXPORTS_FLAG
 import org.wysko.midis2jam2.record.ProgressEstimator
@@ -130,7 +131,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                         },
                         sequencer,
                         synthesizer,
-                        midiDevice
+                        midiPorts
                     ).execute()
                 }
             }
@@ -152,14 +153,16 @@ actual class ApplicationService : KoinComponent, Recorder {
             }
 
             else -> {
-                val midiPackage = runCatching { MidiPackage.build(null, config) }.onFailure { t ->
+                val reader = StandardMidiFileReader()
+                val sequences = executionState.queue.map { reader.readFile(it.file).toPerformanceSequence(config.settings) }
+
+                // Enough ports for whichever song needs the most.
+                val portCount = sequences.maxOfOrNull { it.smf.portCount } ?: 1
+                val midiPackage = runCatching { MidiPackage.build(null, config, portCount) }.onFailure { t ->
                     errorLogService.addError("There was an error initializing the MIDI device.", t.stackTraceToString())
                     _isApplicationRunning.value = false
                     return
                 }
-
-                val reader = StandardMidiFileReader()
-                val sequences = executionState.queue.map { reader.readFile(it.file).toPerformanceSequence(config.settings) }
 
                 with(midiPackage.getOrNull() ?: return) {
                     Midis2jam2QueueApplication(
@@ -174,7 +177,7 @@ actual class ApplicationService : KoinComponent, Recorder {
                         },
                         sequencer,
                         synthesizer,
-                        midiDevice
+                        midiPorts
                     ).run {
                         applyConfigurations(config)
                         start()

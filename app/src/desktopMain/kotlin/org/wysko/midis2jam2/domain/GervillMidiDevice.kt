@@ -23,11 +23,15 @@ import javax.sound.midi.ShortMessage
 import javax.sound.midi.Synthesizer
 import javax.sound.midi.SysexMessage
 
-class GervillMidiDevice private constructor() : MidiDevice {
-    private val device: javax.sound.midi.MidiDevice = MidiSystem.getSynthesizer()
-
+/**
+ * Java's built-in synthesizer, Gervill.
+ *
+ * [instance] is the one the app plays on. A file with more than one MIDI port plays each further port on a Gervill of
+ * its own, made with [forExtraPort].
+ */
+class GervillMidiDevice private constructor(private val device: Synthesizer) : MidiDevice {
     val synthesizer: Synthesizer
-        get() = device as Synthesizer
+        get() = device
 
     override val name: String
         get() = "Gervill"
@@ -76,6 +80,9 @@ class GervillMidiDevice private constructor() : MidiDevice {
     }
 
     companion object {
-        val instance: GervillMidiDevice = GervillMidiDevice()
+        val instance: GervillMidiDevice = GervillMidiDevice(MidiSystem.getSynthesizer())
+
+        /** A new Gervill, separate from [instance], to play one of a file's further MIDI ports. */
+        fun forExtraPort(): GervillMidiDevice = GervillMidiDevice(MidiSystem.getSynthesizer())
     }
 }

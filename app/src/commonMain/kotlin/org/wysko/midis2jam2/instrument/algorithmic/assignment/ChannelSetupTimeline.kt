@@ -21,8 +21,15 @@ import org.wysko.kmidi.midi.event.ControlChangeEvent
 import org.wysko.kmidi.midi.event.Event
 import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.kmidi.midi.event.SysexEvent
+import org.wysko.midis2jam2.midi.CHANNELS_PER_PORT
+import org.wysko.midis2jam2.midi.PortedEvent
+import org.wysko.midis2jam2.midi.channelKey
+import org.wysko.midis2jam2.midi.channelOf
 
-/** The channel that the General MIDI specification reserves for percussion (channel 10, zero-based). */
+/**
+ * The channel that the General MIDI specification reserves for percussion (channel 10, zero-based). Every port has
+ * one, but this one, on the first port, is where the band's drum set comes from.
+ */
 const val PRIMARY_RHYTHM_CHANNEL: Int = 9
 
 /** The specification a file (or the synthesizer playing it) follows, which decides how bank select is read. */
@@ -51,7 +58,9 @@ sealed class ChannelState {
     data object Rhythm : ChannelState()
 
     companion object {
-        val DEFAULT_STATE: Array<ChannelState> = Array(16) { if (it == PRIMARY_RHYTHM_CHANNEL) Rhythm else Melody }
+        /** The state each channel of a port starts in. */
+        val DEFAULT_STATE: Array<ChannelState> =
+            Array(CHANNELS_PER_PORT) { if (it == PRIMARY_RHYTHM_CHANNEL) Rhythm else Melody }
     }
 }
 
@@ -78,6 +87,9 @@ data class ChannelSetup(
  * Bank select only takes effect at the next program change, as every specification has it. On top of that, GS, XG
  * and GM2 files can turn any channel into a rhythm channel (and back) with system exclusive messages or bank select.
  * The synthesizer honours all of this, so the visuals need to as well.
+ *
+ * Channels are numbered by [channel key][channelKey], so that a file with more than one MIDI port has 16 channels for
+ * each. A system exclusive message only affects the channels of the port it was sent to.
  */
 class ChannelSetupTimeline private constructor(
     private val initial: Array<ChannelSetup>,
@@ -86,7 +98,7 @@ class ChannelSetupTimeline private constructor(
 
     private class Transition(val tick: Int, val setup: ChannelSetup)
 
-    /** The setup of [channel] (zero-based) at [tick], counting changes made at that very tick. */
+    /** The setup of [channel] (a [channel key][channelKey]) at [tick], counting changes made at that very tick. */
     fun setupAt(channel: Int, tick: Int): ChannelSetup {
         val list = transitions[channel]
         // Find the first transition after [tick]; the one before it is in effect.
@@ -99,7 +111,7 @@ class ChannelSetupTimeline private constructor(
         return if (low == 0) initial[channel] else list[low - 1].setup
     }
 
-    /** The state of [channel] (zero-based) at [tick]. */
+    /** The state of [channel] (a [channel key][channelKey]) at [tick]. */
     fun stateAt(channel: Int, tick: Int): ChannelState = setupAt(channel, tick).state
 
     companion object {
@@ -110,28 +122,44 @@ class ChannelSetupTimeline private constructor(
         private const val GM2_RHYTHM_BANK = 120
         private const val GM2_MELODY_BANK = 121
 
-        /** The bank select MSB a channel starts with in [mode]. */
+        /** The bank select MSB a channel (a [channel key][channelKey]) starts with in [mode]. */
         private fun defaultMsb(mode: MidiMode, channel: Int): Int = when (mode) {
-            MidiMode.GM2 -> if (channel == PRIMARY_RHYTHM_CHANNEL) GM2_RHYTHM_BANK else GM2_MELODY_BANK
-            MidiMode.XG -> if (channel == PRIMARY_RHYTHM_CHANNEL) XG_DRUM_BANK else 0
+            MidiMode.GM2 -> if (channelOf(channel) == PRIMARY_RHYTHM_CHANNEL) GM2_RHYTHM_BANK else GM2_MELODY_BANK
+            MidiMode.XG -> if (channelOf(channel) == PRIMARY_RHYTHM_CHANNEL) XG_DRUM_BANK else 0
             MidiMode.GS, MidiMode.GM -> 0
         }
 
         /**
-         * Reads the channel setups out of [events], which may come from any number of tracks.
+         * Reads the channel setups out of [events], which may come from any number of tracks, all on one port.
+         *
+         * @param initialMode The specification in effect before the file sends a reset of its own: the one the
+         * synthesizer was reset to, if any.
+         */
+        fun from(events: List<Event>, initialMode: MidiMode = MidiMode.GM): ChannelSetupTimeline =
+            from(events.map { PortedEvent(0, it) }, portCount = 1, initialMode)
+
+        /**
+         * Reads the channel setups out of [events], which may come from any number of tracks, on [portCount] ports.
          *
          * @param initialMode The specification in effect before the file sends a reset of its own: the one the
          * synthesizer was reset to, if any.
          */
         @Suppress("CyclomaticComplexMethod", "LongMethod")
-        fun from(events: List<Event>, initialMode: MidiMode = MidiMode.GM): ChannelSetupTimeline {
-            val initial = Array(16) {
-                ChannelSetup(initialMode, ChannelState.DEFAULT_STATE[it], defaultMsb(initialMode, it), 0, null)
+        fun from(events: List<PortedEvent>, portCount: Int, initialMode: MidiMode = MidiMode.GM): ChannelSetupTimeline {
+            val channelCount = portCount * CHANNELS_PER_PORT
+            val initial = Array(channelCount) {
+                ChannelSetup(
+                    initialMode,
+                    ChannelState.DEFAULT_STATE[channelOf(it)],
+                    defaultMsb(initialMode, it),
+                    0,
+                    null,
+                )
             }
-            val transitions = Array(16) { mutableListOf<Transition>() }
+            val transitions = Array(channelCount) { mutableListOf<Transition>() }
             val current = initial.copyOf()
-            val msbRegister = IntArray(16) { initial[it].msb }
-            val lsbRegister = IntArray(16)
+            val msbRegister = IntArray(channelCount) { initial[it].msb }
+            val lsbRegister = IntArray(channelCount)
 
             fun set(channel: Int, tick: Int, setup: ChannelSetup) {
                 if (current[channel] == setup) return
@@ -139,41 +167,43 @@ class ChannelSetupTimeline private constructor(
                 transitions[channel] += Transition(tick, setup)
             }
 
-            // A reset puts every channel back to its defaults. The program is left alone: a reset and a program
-            // change at the same tick, in different tracks, can arrive in either order.
-            fun reset(tick: Int, mode: MidiMode) = repeat(16) {
-                msbRegister[it] = defaultMsb(mode, it)
-                lsbRegister[it] = 0
+            // A reset puts every channel of its port back to its defaults. The program is left alone: a reset and a
+            // program change at the same tick, in different tracks, can arrive in either order.
+            fun reset(port: Int, tick: Int, mode: MidiMode) = repeat(CHANNELS_PER_PORT) { channel ->
+                val key = channelKey(port, channel)
+                msbRegister[key] = defaultMsb(mode, key)
+                lsbRegister[key] = 0
                 set(
-                    it,
+                    key,
                     tick,
-                    current[it].copy(
+                    current[key].copy(
                         mode = mode,
-                        state = ChannelState.DEFAULT_STATE[it],
-                        msb = msbRegister[it],
+                        state = ChannelState.DEFAULT_STATE[channel],
+                        msb = msbRegister[key],
                         lsb = 0,
                     ),
                 )
             }
 
-            events.sortedBy { it.tick }.forEach { event ->
+            events.sortedBy { it.event.tick }.forEach { (port, event) ->
                 when (event) {
                     is SysexEvent -> when (val message = SysexMessage.parse(event.data)) {
-                        is SysexMessage.Reset -> reset(event.tick, message.mode)
+                        is SysexMessage.Reset -> reset(port, event.tick, message.mode)
                         is SysexMessage.PartState -> with(message) {
-                            set(channel, event.tick, current[channel].copy(state = state))
+                            val key = channelKey(port, channel)
+                            set(key, event.tick, current[key].copy(state = state))
                         }
 
                         null -> Unit
                     }
 
                     is ControlChangeEvent -> when (event.controller.toInt()) {
-                        CC_BANK_SELECT_MSB -> msbRegister[event.channel.toInt()] = event.value.toInt()
-                        CC_BANK_SELECT_LSB -> lsbRegister[event.channel.toInt()] = event.value.toInt()
+                        CC_BANK_SELECT_MSB -> msbRegister[channelKey(port, event.channel.toInt())] = event.value.toInt()
+                        CC_BANK_SELECT_LSB -> lsbRegister[channelKey(port, event.channel.toInt())] = event.value.toInt()
                     }
 
                     is ProgramEvent -> {
-                        val channel = event.channel.toInt()
+                        val channel = channelKey(port, event.channel.toInt())
                         val setup = current[channel]
                         val msb = msbRegister[channel]
                         val state = when (setup.mode) {
@@ -181,7 +211,11 @@ class ChannelSetupTimeline private constructor(
                                 XG_DRUM_BANK, XG_SFX_KIT_BANK -> ChannelState.Rhythm
                                 // Channel 10 is left alone: plenty of files send bank 0 to every channel as a matter
                                 // of habit, and we'd rather keep the drums than lose them.
-                                else -> if (channel == PRIMARY_RHYTHM_CHANNEL) setup.state else ChannelState.Melody
+                                else -> if (channelOf(channel) == PRIMARY_RHYTHM_CHANNEL) {
+                                    setup.state
+                                } else {
+                                    ChannelState.Melody
+                                }
                             }
 
                             MidiMode.GM2 -> when (msb) {
@@ -204,7 +238,7 @@ class ChannelSetupTimeline private constructor(
                 }
             }
 
-            return ChannelSetupTimeline(initial, Array(16) { transitions[it].toList() })
+            return ChannelSetupTimeline(initial, Array(channelCount) { transitions[it].toList() })
         }
     }
 
@@ -213,7 +247,7 @@ class ChannelSetupTimeline private constructor(
         /** A GM, GM2, GS or XG system reset. */
         data class Reset(val mode: MidiMode) : SysexMessage()
 
-        /** One channel set to melody or rhythm. */
+        /** One channel, within the port the message was sent to, set to melody or rhythm. */
         data class PartState(val channel: Int, val state: ChannelState) : SysexMessage()
 
         companion object {

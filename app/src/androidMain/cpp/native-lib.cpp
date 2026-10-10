@@ -13,7 +13,7 @@ struct FluidSynthHolder {
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_org_wysko_midis2jam2_domain_FluidSynthBridge_initFluidSynth(
-        JNIEnv *env, jobject thiz, jstring jSoundfontPath) {
+        JNIEnv *env, jobject thiz, jstring jSoundfontPath, jint channels) {
     const char *soundfontPath = env->GetStringUTFChars(jSoundfontPath, nullptr);
     FluidSynthHolder *holder = new FluidSynthHolder();
     holder->settings = new_fluid_settings();
@@ -22,8 +22,15 @@ Java_org_wysko_midis2jam2_domain_FluidSynthBridge_initFluidSynth(
     fluid_settings_setint(holder->settings, "synth.reverb.active", 0);
     fluid_settings_setint(holder->settings, "synth.chorus.active", 0);
     fluid_settings_setnum(holder->settings, "synth.gain", 0.8);
+    // 16 channels for each MIDI port the file uses.
+    fluid_settings_setint(holder->settings, "synth.midi-channels", channels);
 
     holder->synth = new_fluid_synth(holder->settings);
+    // Channel 10 of every port is a drum channel, not only the first port's. This is set before the soundfont is
+    // loaded, which picks each channel's preset by its type.
+    for (int channel = 9; channel < channels; channel += 16) {
+        fluid_synth_set_channel_type(holder->synth, channel, CHANNEL_TYPE_DRUM);
+    }
     holder->adriver = new_fluid_audio_driver(holder->settings, holder->synth);
     int sf_id = fluid_synth_sfload(holder->synth, soundfontPath, 1);
     if (sf_id == FLUID_FAILED) {

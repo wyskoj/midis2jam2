@@ -55,9 +55,9 @@ fun StandardMidiFile.eventsInPlayOrder(): List<Event> = tracks.flatMap { it.even
  * at once just before the first note. The last of any tempo changes in it is the one in effect at the first note, so
  * the timing of the song is unchanged.
  *
- * Track names and other events that belong to a particular track stay in that track. Events after the last note are
- * dropped: once the notes are over there is nothing left to hear, and the sequencer silences every note when it
- * stops.
+ * Track names and other events that belong to a particular track stay in that track, and the moved events keep the
+ * MIDI port they were sent to. Events after the last note are dropped: once the notes are over there is nothing left
+ * to hear, and the sequencer silences every note when it stops.
  *
  * A file with no notes, or no silence to trim, is returned as it is.
  */
@@ -68,12 +68,14 @@ fun StandardMidiFile.trimSilence(): StandardMidiFile {
 
     if (start == 0 && allEvents.none { it.tick > end }) return this
 
-    val preRoll = eventsInPlayOrder()
-        .filter { it.tick < start && !it.belongsToItsTrack() && it !is NoteEvent && it !is MetaEvent.EndOfTrack }
-        .map { it.withTick(0) }
+    val preRoll = tracks.flatMap { it.eventsWithFilePorts() }
+        .sortedBy { (_, event) -> event.tick }
+        .filter { (_, event) ->
+            event.tick < start && !event.belongsToItsTrack() && event !is NoteEvent && event !is MetaEvent.EndOfTrack
+        }
 
     val trimmedTracks = tracks.mapIndexed { index, track ->
-        val identity = track.events.filter { it.tick < start && it.belongsToItsTrack() }
+        val identity = track.events.filter { it.tick < start && it.belongsToItsTrack() }.map { it.withTick(0) }
         val body = track.events
             .filter { it.tick in start..end && it !is MetaEvent.EndOfTrack }
             .map { it.withTick(it.tick - start) }
@@ -81,20 +83,46 @@ fun StandardMidiFile.trimSilence(): StandardMidiFile {
             .coerceIn(start, end) - start
 
         StandardMidiFile.Track(
-            identity + (if (index == 0) preRoll else emptyList()) + body + MetaEvent.EndOfTrack(endOfTrack)
+            identity + (if (index == 0) preRoll.onPorts(identity) else emptyList()) + body +
+                MetaEvent.EndOfTrack(endOfTrack)
         )
     }
 
     return copy(tracks = trimmedTracks)
 }
 
-/** Whether this event describes the track it is in, and so has to stay there. These can only occur at tick 0. */
+/**
+ * The pre-roll of every track, moved to tick 0 in the first track, whose own [identity] events come before it.
+ *
+ * The events came from tracks on any number of ports, so MIDI Port events are put between them to send each to the
+ * port it was sent to before, and one at the end puts the first track back on its own port.
+ */
+private fun List<Pair<Int, Event>>.onPorts(identity: List<Event>): List<Event> {
+    val ownPort = identity.filterIsInstance<MetaEvent.MidiPort>().lastOrNull()?.port?.toInt() ?: 0
+    var port = ownPort
+    return buildList {
+        this@onPorts.forEach { (eventPort, event) ->
+            if (eventPort != port) {
+                add(MetaEvent.MidiPort(0, eventPort.toByte()))
+                port = eventPort
+            }
+            add(event.withTick(0))
+        }
+        if (port != ownPort) add(MetaEvent.MidiPort(0, ownPort.toByte()))
+    }
+}
+
+/**
+ * Whether this event describes the track it is in, and so has to stay there. These all occur before the first note, so
+ * they are moved to tick 0.
+ */
 private fun Event.belongsToItsTrack(): Boolean = when (this) {
     is MetaEvent.SequenceTrackName,
     is MetaEvent.InstrumentName,
     is MetaEvent.CopyrightNotice,
     is MetaEvent.SequenceNumber,
     is MetaEvent.SmpteOffset,
+    is MetaEvent.MidiPort,
     -> true
 
     else -> false
@@ -115,6 +143,7 @@ private fun Event.withTick(tick: Int): Event = when (this) {
     is MetaEvent.Marker -> copy(tick = tick)
     is MetaEvent.CuePoint -> copy(tick = tick)
     is MetaEvent.ChannelPrefix -> copy(tick = tick)
+    is MetaEvent.MidiPort -> copy(tick = tick)
     is MetaEvent.EndOfTrack -> copy(tick = tick)
     is MetaEvent.SetTempo -> copy(tick = tick)
     is MetaEvent.TimeSignature -> copy(tick = tick)

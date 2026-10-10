@@ -1,10 +1,13 @@
 package org.wysko.midis2jam2.domain
 
-class FluidSynthBridge(soundfontPath: String) {
+/**
+ * The native FluidSynth, with [channels] MIDI channels: 16 for each MIDI port of the file it plays.
+ */
+class FluidSynthBridge(soundfontPath: String, channels: Int) {
     internal var synthPtr: Long = 0
 
     init {
-        synthPtr = initFluidSynth(soundfontPath)
+        synthPtr = initFluidSynth(soundfontPath, channels)
     }
 
     fun setChorusActive(isChorusActive: Boolean) {
@@ -27,7 +30,7 @@ class FluidSynthBridge(soundfontPath: String) {
     private external fun setChorusActiveImpl(synthPtr: Long, isChorusActive: Boolean)
     private external fun setReverbActiveImpl(synthPtr: Long, isReverbActive: Boolean)
 
-    private external fun initFluidSynth(soundfontPath: String): Long
+    private external fun initFluidSynth(soundfontPath: String, channels: Int): Long
     private external fun closeFluidSynth(synthPtr: Long)
 
     fun close() {

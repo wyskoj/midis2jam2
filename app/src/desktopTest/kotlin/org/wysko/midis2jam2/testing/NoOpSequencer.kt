@@ -20,6 +20,7 @@ package org.wysko.midis2jam2.testing
 import org.wysko.kmidi.midi.TimeBasedSequence
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import kotlin.time.Duration
 
 /**
@@ -45,7 +46,7 @@ class NoOpSequencer : JwSequencer {
     /** Every raw MIDI message the app has sent, in order. */
     val sentData: MutableList<ByteArray> = mutableListOf()
 
-    var openedDevice: MidiDevice? = null
+    var openedPorts: MidiPorts? = null
         private set
 
     var resetCount: Int = 0
@@ -57,8 +58,8 @@ class NoOpSequencer : JwSequencer {
     var stopCount: Int = 0
         private set
 
-    override fun open(device: MidiDevice) {
-        openedDevice = device
+    override fun open(ports: MidiPorts) {
+        openedPorts = ports
         isOpen = true
     }
 

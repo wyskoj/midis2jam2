@@ -103,6 +103,39 @@
   source: code
   platforms: [desktop, android]
   claim: "Drums on a second rhythm channel play on channel 10's drum set when both kits share the General MIDI drum layout; orchestra and SFX kits get their own"
+- id: midi.ports.channels
+  source: faq.md
+  platforms: [desktop, android]
+  claim: "In a file with MIDI Port meta events, each port has 16 channels of its own, so the same channel on two ports plays two instruments"
+- id: midi.ports.drums
+  source: code
+  platforms: [desktop, android]
+  claim: "Channel 10 of every MIDI port plays drums"
+- id: midi.ports.sysex-scope
+  source: code
+  platforms: [desktop, android]
+  claim: "A reset or rhythm part message in a track on one MIDI port only affects that port's channels"
+- id: midi.ports.trim-silence
+  source: code
+  platforms: [desktop, android]
+  claim: "Trimming silence keeps each setup message on the MIDI port it was sent to"
+- id: midi.ports.playback.gervill
+  source: code
+  platforms: [desktop]
+  claim: "With the built-in synthesizer, each MIDI port of a file is played on a synthesizer of its own"
+- id: midi.ports.playback.external
+  source: faq.md
+  platforms: [desktop]
+  claim: "An external MIDI device plays every MIDI port of a file on its one set of 16 channels"
+- id: midi.ports.playback.android
+  source: code
+  platforms: [android]
+  claim: "On Android, the synthesizer has 16 channels for each MIDI port of a file, with channel 10 of each playing drums"
+  waived: "Runs in native FluidSynth, which can't be loaded on the desktop test JVM."
+- id: midi.ports.recording
+  source: code
+  platforms: [desktop]
+  claim: "A recording renders each MIDI port of a file on a synthesizer of its own"
 
 # ------------------------------------------------------------------- background (background.md)
 - id: background.default.checkerboard

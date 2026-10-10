@@ -195,7 +195,7 @@ private fun playSong(song: File) {
         },
         midiPackage.sequencer,
         midiPackage.synthesizer,
-        midiPackage.midiDevice,
+        midiPackage.midiPorts,
     )
     application.execute()
     application.enqueue { application.stateManager.attach(director) }

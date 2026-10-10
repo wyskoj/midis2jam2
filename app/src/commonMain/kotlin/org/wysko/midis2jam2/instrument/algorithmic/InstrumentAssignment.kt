@@ -35,6 +35,10 @@ import org.wysko.midis2jam2.instrument.algorithmic.assignment.PRIMARY_RHYTHM_CHA
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.VoiceResolver
 import org.wysko.midis2jam2.instrument.family.percussion.AuxiliaryPercussion
 import org.wysko.midis2jam2.manager.PerformanceManager
+import org.wysko.midis2jam2.midi.CHANNELS_PER_PORT
+import org.wysko.midis2jam2.midi.channelKey
+import org.wysko.midis2jam2.midi.portCount
+import org.wysko.midis2jam2.midi.portedEventsInPlayOrder
 import org.wysko.midis2jam2.util.logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -51,17 +55,20 @@ object InstrumentAssignment {
         midiFile: TimeBasedSequence,
         onLoadingProgress: (Float) -> Unit = {},
     ): List<Instrument> {
-        // Begin by extracting events from tracks and assign them to their target channels.
-        val channels =
-            with(midiFile.smf.tracks.flatMap { it.events }.filterIsInstance<MidiEvent>()) {
-                Array(16) { arr -> this.filter { it.channel.toInt() == arr }.toMutableList() }
-            }
+        // Begin by extracting events from tracks and assign them to their target channels. A file with MIDI Port
+        // events has 16 channels on each port, so channels are numbered by channel key.
+        val events = midiFile.smf.portedEventsInPlayOrder()
+        val portCount = midiFile.smf.portCount
+        val channels = Array(portCount * CHANNELS_PER_PORT) { mutableListOf<MidiEvent>() }
+        events.forEach { (port, event) ->
+            if (event is MidiEvent) channels[channelKey(port, event.channel.toInt())] += event
+        }
 
         // As a safety precaution, we will sort each channel by the time of each event.
         channels.onEach { channel -> channel.sortBy { it.tick } }
 
         // What each channel is set up to play (bank, program, melody or rhythm), and when that changes.
-        val timeline = ChannelSetupTimeline.from(midiFile.smf.tracks.flatMap { it.events }, initialMode(context))
+        val timeline = ChannelSetupTimeline.from(events, portCount, initialMode(context))
         val resolver = VoiceResolver()
 
         // Create a place for instruments to go.
@@ -168,8 +175,8 @@ object InstrumentAssignment {
     /**
      * Builds the drum sets, special cases and auxiliary percussion for every rhythm note in the file.
      *
-     * Only one drum set is on stage at a time, so a rhythm channel other than channel 10 plays its drum set notes on
-     * whatever kit channel 10 is using, as long as both kits lay out their notes the same way. Everything else about
+     * Only one drum set is on stage at a time, so a rhythm channel other than channel 10 (of the first port) plays its
+     * drum set notes on whatever kit channel 10 is using, as long as both kits lay out their notes the same way. Everything else about
      * a note (special cases, auxiliary percussion) follows the note's own kit.
      */
     private fun buildDrums(
@@ -254,7 +261,7 @@ object InstrumentAssignment {
             note !in from.specialCaseNotes &&
             note !in onto.specialCaseNotes
 
-    /** A note on a rhythm channel, and the kit it was played on. */
+    /** A note on a rhythm channel (a channel key), and the kit it was played on. */
     private class RhythmNote(val channel: Int, val kit: KitLook, val event: NoteEvent)
 
     /** A stretch of ticks, [start] inclusive to [end] exclusive, between two of a channel's program changes. */

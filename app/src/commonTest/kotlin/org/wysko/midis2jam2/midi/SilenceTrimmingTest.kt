@@ -203,6 +203,48 @@ class SilenceTrimmingTest {
         assertEquals(Duration.ZERO, file.toPerformanceSequence(trimming).firstNoteOnTime)
     }
 
+    @Test
+    @Spec("midi.ports.trim-silence")
+    fun `the setup in the silence is still sent to the MIDI port it was sent to`() {
+        val file = smf {
+            format = StandardMidiFile.Header.Format.Format1
+            division = tpq(TPQ)
+            track {
+                tempo(120)
+                channel(1) { note(67, duration = 1.quarter, absoluteTime = 4.quarter) }
+            }
+            track {
+                midiPort(0)
+                channel(0) {
+                    program(0, absoluteTime = 0)
+                    note(60, duration = 1.quarter, absoluteTime = 4.quarter)
+                }
+            }
+            track {
+                midiPort(1)
+                channel(0) {
+                    program(40, absoluteTime = 0)
+                    note(64, duration = 1.quarter, absoluteTime = 4.quarter)
+                }
+            }
+        }
+
+        val ports = file.trimSilence().portedEventsInPlayOrder().mapNotNull { (port, event) ->
+            when (event) {
+                is ProgramEvent -> "program ${event.program}" to port
+                is NoteEvent.NoteOn -> "note ${event.note}" to port
+                else -> null
+            }
+        }.toMap()
+
+        assertEquals(
+            mapOf("program 0" to 0, "program 40" to 1, "note 67" to 0, "note 60" to 0, "note 64" to 1),
+            ports,
+            "Moving the setup to the first track must not move it to the first track's port, nor leave that track on " +
+                "another port",
+        )
+    }
+
     private fun noteOnTimes(file: StandardMidiFile): List<Duration> {
         val sequence = file.toTimeBasedSequence()
         return file.eventsInPlayOrder().filterIsInstance<NoteEvent.NoteOn>().map { sequence.getTimeAtTick(it.tick) }

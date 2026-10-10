@@ -24,7 +24,10 @@ import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.wysko.midis2jam2.midi.CHANNELS_PER_PORT
+import org.wysko.midis2jam2.midi.channelKey
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import java.io.File
 import java.io.IOException
 
@@ -80,6 +83,12 @@ internal fun Context.copyBytesToInternalStorage(fileName: String, bytes: ByteArr
     return destFile.absolutePath
 }
 
+/**
+ * FluidSynth, as the MIDI device for the first MIDI port of a file.
+ *
+ * A file with more than one port plays all of them on this one synthesizer, which has 16 channels for each:
+ * [ports] gives a device for each port, which plays its channels on the synthesizer's.
+ */
 class FluidSynthDevice(context: Context) : MidiDevice {
     override val name: String
         get() = "FluidSynth MIDI Device"
@@ -90,12 +99,18 @@ class FluidSynthDevice(context: Context) : MidiDevice {
     /** Override path to a user-supplied SF2 file. Set before calling [open]. */
     var soundfontOverridePath: String? = null
 
+    /** The MIDI ports the synthesizer has channels for. Set before calling [open]. */
+    var portCount: Int = 1
+
+    /** A device for each of the [portCount] MIDI ports, the first of which is this one. */
+    fun ports(): MidiPorts = MidiPorts(List(portCount) { port -> if (port == 0) this else Port(port) })
+
     override fun open() {
         if (bridge == null) {
             val path = soundfontOverridePath
                 ?.takeIf { java.io.File(it).exists() }
                 ?: builtInSoundfontPath
-            bridge = FluidSynthBridge(path)
+            bridge = FluidSynthBridge(path, portCount * CHANNELS_PER_PORT)
         }
     }
 
@@ -142,6 +157,45 @@ class FluidSynthDevice(context: Context) : MidiDevice {
 
     fun setReverbActive(isReverbActive: Boolean) {
         bridge?.setReverbActive(isReverbActive)
+    }
+
+    /**
+     * MIDI port [port] of the file, played on the synthesizer's channels for it. The synthesizer itself is opened and
+     * closed as the first port.
+     */
+    private inner class Port(port: Int) : MidiDevice {
+        private val offset = channelKey(port, 0)
+
+        override val name: String
+            get() = this@FluidSynthDevice.name
+
+        override fun open() = Unit
+
+        override fun close() = Unit
+
+        override fun sendNoteOnMessage(channel: Int, note: Int, velocity: Int) =
+            this@FluidSynthDevice.sendNoteOnMessage(offset + channel, note, velocity)
+
+        override fun sendNoteOffMessage(channel: Int, note: Int) =
+            this@FluidSynthDevice.sendNoteOffMessage(offset + channel, note)
+
+        override fun sendControlChangeMessage(channel: Int, controller: Int, value: Int) =
+            this@FluidSynthDevice.sendControlChangeMessage(offset + channel, controller, value)
+
+        override fun sendProgramChangeMessage(channel: Int, program: Int) =
+            this@FluidSynthDevice.sendProgramChangeMessage(offset + channel, program)
+
+        override fun sendPitchBendMessage(channel: Int, pitch: Int) =
+            this@FluidSynthDevice.sendPitchBendMessage(offset + channel, pitch)
+
+        override fun sendChannelPressureMessage(channel: Int, pressure: Int) =
+            this@FluidSynthDevice.sendChannelPressureMessage(offset + channel, pressure)
+
+        override fun sendPolyphonicPressureMessage(channel: Int, note: Int, pressure: Int) =
+            this@FluidSynthDevice.sendPolyphonicPressureMessage(offset + channel, note, pressure)
+
+        // System exclusive messages are addressed to a whole synthesizer, and this port only has part of one.
+        override fun sendData(data: ByteArray) = Unit
     }
 
     companion object {

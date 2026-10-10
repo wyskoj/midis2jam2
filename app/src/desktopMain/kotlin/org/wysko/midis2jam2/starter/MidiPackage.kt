@@ -23,10 +23,11 @@ import org.wysko.kmidi.midi.reader.StandardMidiFileReader
 import org.wysko.kmidi.midi.reader.readFile
 import org.wysko.midis2jam2.domain.GervillMidiDevice
 import org.wysko.midis2jam2.domain.MidiService
+import org.wysko.midis2jam2.midi.portCount
 import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.midi.system.JwSequencer
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
-import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import java.io.File
 import javax.sound.midi.MidiSystem
@@ -38,10 +39,16 @@ internal class MidiPackage private constructor(
     val sequence: TimeBasedSequence?,
     val sequencer: JwSequencer,
     val synthesizer: Synthesizer?,
-    val midiDevice: MidiDevice,
+    val midiPorts: MidiPorts,
 ) {
     companion object {
-        fun build(midiFile: File?, config: PerformanceConfig): MidiPackage {
+        /**
+         * Opens the MIDI device [config] names, and reads [midiFile] into a sequencer playing on it, if there is one.
+         *
+         * Gervill gets one synthesizer for each MIDI port the file uses (or [portCount], without a file), so that each
+         * port's channels are heard apart. Any other device plays every port.
+         */
+        fun build(midiFile: File?, config: PerformanceConfig, portCount: Int = 1): MidiPackage {
             val midiService = KoinPlatformTools.defaultContext().get().get<MidiService>()
 
             val deviceName = config.midiDevice
@@ -51,29 +58,39 @@ internal class MidiPackage private constructor(
                 "MIDI device $deviceName not found"
             }
 
+            val sequence = midiFile?.let { StandardMidiFileReader().readFile(it).toPerformanceSequence(config.settings) }
+
+            val midiPorts = when (deviceName) {
+                GERVILL -> gervillPorts(sequence?.smf?.portCount ?: portCount)
+                else -> MidiPorts.of(midiDevice)
+            }
+
             val sequencer = JwSequencerImpl().apply {
-                open(midiDevice)
+                open(midiPorts)
             }
 
             val synthesizer = when (deviceName) {
-                GERVILL -> GervillMidiDevice.instance.synthesizer.apply {
-                    open()
-                    config.soundbank?.let {
-                        val soundbank = MidiSystem.getSoundbank(File(it))
-                        loadAllInstruments(soundbank)
+                GERVILL -> {
+                    val soundbank = config.soundbank?.let { MidiSystem.getSoundbank(File(it)) }
+                    midiPorts.distinctDevices.filterIsInstance<GervillMidiDevice>().forEach { gervill ->
+                        gervill.synthesizer.apply {
+                            open()
+                            soundbank?.let { loadAllInstruments(it) }
+                        }
                     }
+                    GervillMidiDevice.instance.synthesizer
                 }
 
                 else -> null
             }
 
-            val reader = StandardMidiFileReader()
-            midiFile?.let {
-                val sequence = reader.readFile(it).toPerformanceSequence(config.settings)
-                sequencer.sequence = sequence
-            }
+            sequence?.let { sequencer.sequence = it }
 
-            return MidiPackage(sequencer.sequence, sequencer, synthesizer, midiDevice)
+            return MidiPackage(sequencer.sequence, sequencer, synthesizer, midiPorts)
         }
+
+        /** A Gervill for each of [portCount] MIDI ports: the app's own for the first, and a new one for each other. */
+        fun gervillPorts(portCount: Int): MidiPorts =
+            MidiPorts(listOf(GervillMidiDevice.instance) + List(portCount - 1) { GervillMidiDevice.forExtraPort() })
     }
 }
