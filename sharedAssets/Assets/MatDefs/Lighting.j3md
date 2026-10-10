@@ -145,7 +145,7 @@ MaterialDef Phong Lighting {
         LightMode SinglePass
 
         VertexShader   GLSL310 GLSL300 GLSL150 GLSL100:   Common/MatDefs/Light/SPLighting.vert
-        FragmentShader GLSL310 GLSL300 GLSL150 GLSL100: Common/MatDefs/Light/SPLighting.frag
+        FragmentShader GLSL310 GLSL300 GLSL150 GLSL100: Assets/Shaders/LightingJW_SP.frag
 
         WorldParameters {
             WorldViewProjectionMatrix
@@ -180,6 +180,10 @@ MaterialDef Phong Lighting {
             NUM_MORPH_TARGETS: NumberOfMorphTargets
             NUM_TARGETS_BUFFERS: NumberOfTargetsBuffers
             NORMAL_TYPE: NormalType
+
+            // JW - Hue shift
+            HUE_SHIFT: HueShift
+            HUE_SHIFT_MASK: HueShiftMask
 
             // fog - jayfella
             USE_FOG : UseFog

@@ -20,6 +20,8 @@ package org.wysko.midis2jam2.starter
 import Platform
 import ch.qos.logback.core.util.EnvUtil.isMacOs
 import com.jme3.app.SimpleApplication
+import com.jme3.light.AmbientLight
+import com.jme3.material.TechniqueDef
 import com.jme3.post.FilterPostProcessor
 import com.jme3.post.filters.BloomFilter
 import com.jme3.post.filters.BloomFilter.GlowMode.Objects
@@ -79,6 +81,10 @@ internal fun SimpleApplication.setupState(
     }
     with(config.settings.graphicsSettings) {
         val lightForShadows = LightingSetup.setupLights(rootNode)
+
+        // Light every geometry with all the lights in one draw, instead of drawing it again for each light.
+        renderManager.preferredLightMode = TechniqueDef.LightMode.SinglePass
+        renderManager.singlePassLightBatchSize = rootNode.localLightList.count { it !is AmbientLight }
 
         if (addFpp) {
             val fpp = FilterPostProcessor(assetManager).apply {

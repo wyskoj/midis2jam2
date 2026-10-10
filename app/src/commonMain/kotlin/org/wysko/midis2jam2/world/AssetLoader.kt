@@ -28,6 +28,9 @@ import org.wysko.midis2jam2.manager.BaseManager
 import org.wysko.midis2jam2.manager.LoadingProgressManager
 
 private const val LIGHTING_MAT: String = "Common/MatDefs/Light/Lighting.j3md"
+
+/** midis2jam2's own lighting, whose single-pass technique lights reflections as its multi-pass technique does. */
+private const val JW_LIGHTING_MAT: String = "Assets/MatDefs/Lighting.j3md"
 private const val UNSHADED_MAT: String = "Common/MatDefs/Misc/Unshaded.j3md"
 private const val COLOR_MAP: String = "ColorMap"
 private const val DIFFUSE_MAP: String = "DiffuseMap"
@@ -111,7 +114,7 @@ class AssetLoader(val onLoadAsset: (String) -> Unit = {}) : BaseManager() {
      * Loads a diffuse material conditionally on the enhanced graphics state.
      */
     fun diffuseMaterialReal(texture: String): Material =
-        Material(application.assetManager, "Assets/MatDefs/Lighting.j3md").apply {
+        Material(application.assetManager, JW_LIGHTING_MAT).apply {
             setTexture(DIFFUSE_MAP, application.assetManager.loadTexture(prefix(texture, AssetType.Texture)))
         }
 
@@ -129,7 +132,7 @@ class AssetLoader(val onLoadAsset: (String) -> Unit = {}) : BaseManager() {
     /**
      * Loads a reflective material conditionally on the enhanced graphics state.
      */
-    fun reflectiveMaterial(texture: String): Material = Material(application.assetManager, LIGHTING_MAT).apply {
+    fun reflectiveMaterial(texture: String): Material = Material(application.assetManager, JW_LIGHTING_MAT).apply {
         setVector3(FRESNEL_PARAMS, Vector3f(0.18f, 0.18f, 0.18f))
         setBoolean(ENV_MAP_AS_SPHERE_MAP, true)
         setTexture(ENV_MAP, application.assetManager.loadTexture(texture.assetPrefix()))
