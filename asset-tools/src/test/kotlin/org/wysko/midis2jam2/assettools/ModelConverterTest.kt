@@ -69,7 +69,7 @@ class ModelConverterTest {
             "Material Red : Common/MatDefs/Misc/Unshaded.j3md {\n MaterialParameters {\n  Color : 1 0 0 1\n }\n}\n"
         )
         write(
-            "Assets/MatDefs/SphereMapLighting.j3md",
+            "Assets/MatDefs/Lighting.j3md",
             javaClass.classLoader.getResource("Common/MatDefs/Light/Lighting.j3md")!!.readText()
                 .replace("TextureCubeMap EnvMap", "Texture2D EnvMap")
         )

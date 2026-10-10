@@ -25,7 +25,6 @@ import com.jme3.material.MatParamTexture
 import com.jme3.material.Material
 import org.wysko.midis2jam2.assets.MaterialAsset
 import org.wysko.midis2jam2.assets.Materials
-import org.wysko.midis2jam2.testing.ProjectPaths
 import org.wysko.midis2jam2.world.legacyBlackMaterial
 import org.wysko.midis2jam2.world.legacyDiffuseMaterial
 import org.wysko.midis2jam2.world.legacyReflectiveMaterial
@@ -97,25 +96,15 @@ class MaterialLibraryParityTest {
         assertSameMaterial(legacyBlackMaterial(assetManager), Materials.Black)
     }
 
-    @Test
-    fun `the sphere-map lighting definition is the engine's lighting definition with only the env map retyped`() {
-        // SphereMapLighting.j3md is a copy of the engine's Lighting.j3md, so that a .j3m can give EnvMap a sphere map.
-        // A jME upgrade that changes the original must be carried over to the copy.
-        val engine = javaClass.classLoader.getResource("Common/MatDefs/Light/Lighting.j3md")!!.readText()
-        val copy = File(ProjectPaths.sharedAssets, "Assets/MatDefs/SphereMapLighting.j3md").readText()
-            .lines()
-            .dropWhile { it.startsWith("//") || it.isBlank() }
-            .joinToString("\n")
-
-        assertEquals(
-            engine.replace("        TextureCubeMap EnvMap\n", "        Texture2D EnvMap\n").normalized(),
-            copy.normalized(),
-            "SphereMapLighting.j3md has drifted from the engine's Lighting.j3md; copy it again and retype EnvMap"
-        )
-    }
-
     private fun assertSameMaterial(expected: Material, library: MaterialAsset) {
         val actual = assetManager.loadMaterial(library.path)
+        // The definition decides the shaders: the same parameters on the engine's lighting, whose single-pass shader
+        // darkens reflections, would draw a reflective material black.
+        assertEquals(
+            expected.materialDef.assetName,
+            actual.materialDef.assetName,
+            "${library.path} uses a different material definition from the material built in code"
+        )
         assertEquals(describe(expected), describe(actual), "${library.path} does not match the material built in code")
         assertEquals(
             expected.additionalRenderState,
@@ -139,6 +128,4 @@ class MaterialLibraryParityTest {
         /** The parameter that holds each kind of generated material's texture. */
         val TEXTURE_PARAMETER = mapOf("Diffuse" to "DiffuseMap", "Reflective" to "EnvMap", "Shadow" to "ColorMap")
     }
-
-    private fun String.normalized() = replace("\r\n", "\n").trimEnd()
 }

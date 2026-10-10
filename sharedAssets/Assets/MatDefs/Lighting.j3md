@@ -76,8 +76,9 @@ MaterialDef Phong Lighting {
         // Z = power
         Vector3 FresnelParams
 
-        // Env Map for reflection
-        TextureCubeMap EnvMap
+        // Env Map for reflection. A Texture2D rather than the stock TextureCubeMap, so that a .j3m can give it a
+        // sphere map (with EnvMapAsSphereMap); the material loader would otherwise read the image as a cube map.
+        Texture2D EnvMap
 
         // the env map is a spheremap and not a cube map
         Boolean EnvMapAsSphereMap

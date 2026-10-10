@@ -1,5 +1,5 @@
 // Polished silver-grey metal: a sphere-mapped reflection over a black base. Matches AssetLoader.reflectiveMaterial.
-Material HornSkinGrey : Assets/MatDefs/SphereMapLighting.j3md {
+Material HornSkinGrey : Assets/MatDefs/Lighting.j3md {
     MaterialParameters {
         DiffuseMap : Flip Assets/Textures/Shared/Black.bmp
         EnvMap : Flip Assets/Textures/Shared/HornSkinGrey.bmp

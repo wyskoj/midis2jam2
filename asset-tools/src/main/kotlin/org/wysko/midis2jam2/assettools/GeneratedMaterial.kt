@@ -63,7 +63,7 @@ data class GeneratedMaterial(val texture: String, val kind: Kind) {
         val (definition, parameters, renderState) = when (kind) {
             Kind.Diffuse -> Triple("Common/MatDefs/Light/Lighting.j3md", listOf("DiffuseMap : Flip $texturePath"), null)
             Kind.Reflective -> Triple(
-                "Assets/MatDefs/SphereMapLighting.j3md",
+                "Assets/MatDefs/Lighting.j3md",
                 listOf(
                     "DiffuseMap : Flip $REFLECTION_BASE",
                     "EnvMap : Flip $texturePath",
