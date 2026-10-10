@@ -512,7 +512,13 @@ class CinematicCameraTest {
                 playback(performance).time = START.seconds
                 val cameras = assertNotNull(performance.app.stateManager.getState(CameraManager::class.java))
                 repeat(rerolls + 1) { cameras.switchToAutoCam() }
-                assertNotNull(performance.app.stateManager.getState(CinematicCamPlugin::class.java))
+                // Only the test updates it, a frame at a time: left enabled, the engine would update it too, with the
+                // wall clock, and a slow machine would see glides and whip pans run faster than they do. The first
+                // update is the one the engine gives it as it takes over, so a staged edit starts mid-performance.
+                assertNotNull(performance.app.stateManager.getState(CinematicCamPlugin::class.java)).also {
+                    it.isEnabled = false
+                    it.update(FRAME)
+                }
             }
             edit?.let { staged -> performance.onEngineThread { plugin.useEdit(staged) } }
             val envelope = performance.onEngineThread {
@@ -620,11 +626,8 @@ class CinematicCameraTest {
         const val STAGED_FROM = 0
         const val STAGED_TO = 1
 
-        /**
-         * The fastest a glide may turn the camera, in degrees per second. The peak depends on how far apart the two
-         * players are, and measures from 25 to 42 on different machines; a whip pan is allowed [MAX_WHIP_RATE].
-         */
-        const val MAX_GLIDE_RATE = 60f
+        /** The fastest a glide may turn the camera, in degrees per second; a whip pan is allowed [MAX_WHIP_RATE]. */
+        const val MAX_GLIDE_RATE = 40f
 
         /** The fastest a whip pan may turn the camera, in degrees per second. */
         const val MAX_WHIP_RATE = 150f
