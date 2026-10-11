@@ -50,7 +50,9 @@ import org.wysko.midis2jam2.manager.MidiDeviceManager
 import org.wysko.midis2jam2.manager.camera.AndroidCameraManager
 import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.CameraStateListener
+import org.wysko.midis2jam2.midi.portCount
 import org.wysko.midis2jam2.midi.system.JwSequencerImpl
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.util.SourceInputStream
 import org.wysko.midis2jam2.util.logger
@@ -100,8 +102,12 @@ internal actual class Midis2jam2Application(
                 config.soundbank?.let { soundbankPath ->
                     (midiDevice as? FluidSynthDevice)?.soundfontOverridePath = resolveSoundbankPath(soundbankPath)
                 }
+                val midiPorts = when (midiDevice) {
+                    is FluidSynthDevice -> midiDevice.apply { portCount = sequence.smf.portCount }.ports()
+                    else -> MidiPorts.of(midiDevice)
+                }
                 val currentSequencer = JwSequencerImpl().apply {
-                    open(midiDevice)
+                    open(midiPorts)
                     this.sequence = sequence
                 }
                 sequencer = currentSequencer
@@ -128,7 +134,7 @@ internal actual class Midis2jam2Application(
                     rootNode.attachChild(performanceAppState.root)
                     addManagers(config, sequence, currentSequencer)
                     stateManager.attach(AndroidInputManager())
-                    stateManager.attach(MidiDeviceManager(config, midiDevice))
+                    stateManager.attach(MidiDeviceManager(config, midiPorts))
                     managersAttached.complete(Unit)
                 }
             } catch (e: Exception) {

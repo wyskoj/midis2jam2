@@ -17,6 +17,7 @@
 
 package org.wysko.midis2jam2.record
 
+import org.wysko.midis2jam2.midi.portCount
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
 import kotlin.math.abs
@@ -57,8 +58,23 @@ class OfflineSynthesizerTest {
         assertTrue(onset != null && abs((onset - 1.5.seconds).inWholeMilliseconds) <= 20, "Onset was $onset")
     }
 
-    private fun render(sequence: org.wysko.kmidi.midi.TimeBasedSequence, length: Duration): Samples =
-        OfflineSynthesizer(soundbank = null).use { synthesizer ->
+    @Test
+    @Spec("midi.ports.recording")
+    fun `each MIDI port is rendered on a synthesizer of its own`() {
+        val file = MidiFixtures.noteOnSecondPortBesideSilencedFirst(restQuarters = 2)
+
+        val audio = render(file, length = 2.seconds, portCount = file.smf.portCount)
+        assertTrue(
+            audio.firstLoudSample() != null,
+            "Port 2's note should sound: only port 1's channel was turned down, but the recording was silent",
+        )
+
+        val folded = render(file, length = 2.seconds, portCount = 1)
+        assertTrue(folded.firstLoudSample() == null, "On one synthesizer, port 1's volume should silence the note")
+    }
+
+    private fun render(sequence: org.wysko.kmidi.midi.TimeBasedSequence, length: Duration, portCount: Int = 1) =
+        OfflineSynthesizer(soundbank = null, portCount).use { synthesizer ->
             synthesizer.queue(sequence)
             synthesizer.readFor(length)
         }

@@ -23,6 +23,8 @@ import org.wysko.kmidi.midi.event.ProgramEvent
 import org.wysko.kmidi.midi.event.SysexEvent
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.ChannelState.Melody
 import org.wysko.midis2jam2.instrument.algorithmic.assignment.ChannelState.Rhythm
+import org.wysko.midis2jam2.midi.PortedEvent
+import org.wysko.midis2jam2.midi.channelKey
 import org.wysko.midis2jam2.testing.Spec
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -293,6 +295,56 @@ class ChannelSetupTimelineTest {
             assertEquals(i, timeline.setupAt(0, i * 10 + 9).program, "Just before the change after ${i * 10}")
         }
         assertEquals(49, timeline.setupAt(0, Int.MAX_VALUE).program)
+    }
+
+    @Test
+    @Spec("midi.ports.channels")
+    fun `the same channel on two MIDI ports is set up separately`() {
+        val timeline = ChannelSetupTimeline.from(
+            listOf(PortedEvent(0, ProgramEvent(0, 0, 5)), PortedEvent(1, ProgramEvent(0, 0, 40))),
+            portCount = 2,
+        )
+
+        assertEquals(5, timeline.setupAt(channelKey(0, 0), 0).program, "Port 1, channel 1")
+        assertEquals(40, timeline.setupAt(channelKey(1, 0), 0).program, "Port 2, channel 1")
+    }
+
+    @Test
+    fun `channel 10 of every MIDI port starts as a rhythm channel`() {
+        val timeline = ChannelSetupTimeline.from(emptyList<PortedEvent>(), portCount = 2)
+
+        assertEquals(Rhythm, timeline.stateAt(channelKey(1, 9), 0), "Port 2, channel 10")
+        assertEquals(Melody, timeline.stateAt(channelKey(1, 0), 0), "Port 2, channel 1")
+    }
+
+    @Test
+    @Spec("midi.ports.sysex-scope")
+    fun `a reset sent to one MIDI port leaves the other ports' channels alone`() {
+        val timeline = ChannelSetupTimeline.from(
+            listOf(
+                PortedEvent(0, SysexEvent(0, GS_RESET)),
+                PortedEvent(0, SysexEvent(100, gsUseForRhythmPart(part = 0x0A, value = 2))),
+                PortedEvent(1, SysexEvent(200, GS_RESET)),
+            ),
+            portCount = 2,
+        )
+
+        assertEquals(Rhythm, timeline.stateAt(channelKey(0, 10), 300), "Port 2's reset reset port 1's channel 11")
+    }
+
+    @Test
+    @Spec("midi.ports.sysex-scope")
+    fun `a rhythm part message sent to one MIDI port sets that port's channel`() {
+        val timeline = ChannelSetupTimeline.from(
+            listOf(
+                PortedEvent(1, SysexEvent(0, GS_RESET)),
+                PortedEvent(1, SysexEvent(100, gsUseForRhythmPart(part = 0x0A, value = 2))),
+            ),
+            portCount = 2,
+        )
+
+        assertEquals(Rhythm, timeline.stateAt(channelKey(1, 10), 100), "Port 2, channel 11")
+        assertEquals(Melody, timeline.stateAt(channelKey(0, 10), 100), "Port 1, channel 11")
     }
 
     private companion object {

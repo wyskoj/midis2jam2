@@ -26,6 +26,7 @@ import org.wysko.midis2jam2.di.midiSystemModule
 import org.wysko.midis2jam2.di.systemModule
 import org.wysko.midis2jam2.di.uiModule
 import org.wysko.midis2jam2.midi.system.SilentSequencer
+import org.wysko.midis2jam2.midi.portCount
 import org.wysko.midis2jam2.midi.toPerformanceSequence
 import org.wysko.midis2jam2.record.OfflineSynthesizer
 import org.wysko.midis2jam2.record.RecordOptions
@@ -71,12 +72,14 @@ private fun launchRecording(
         protocol.send(RendererMessage.error("The MIDI file couldn't be read.", t.stackTraceToString()))
         return
     }
-    val synthesizer = runCatching { OfflineSynthesizer(options.soundbankPath?.let(::File)) }.getOrElse { t ->
+    val synthesizer = runCatching {
+        OfflineSynthesizer(options.soundbankPath?.let(::File), sequence.smf.portCount)
+    }.getOrElse { t ->
         protocol.send(RendererMessage.error("The synthesizer couldn't be started for recording.", t.stackTraceToString()))
         return
     }
     val sequencer = SilentSequencer().apply {
-        open(synthesizer)
+        open(synthesizer.ports)
         this.sequence = sequence
     }
     // The recording's outcome is only known once the engine has shut down, after the application says it's finished.
@@ -114,7 +117,7 @@ private fun launchRecording(
         { latch.countDown() },
         sequencer,
         synthesizer = null,
-        midiDevice = synthesizer,
+        midiPorts = synthesizer.ports,
         recording = Midis2jam2Application.Recording(options, synthesizer, listener),
     )
     watchParentCommands { application.stop() }
@@ -149,7 +152,7 @@ private fun launchApplication(
             },
             sequencer,
             synthesizer,
-            midiDevice
+            midiPorts
         )
         watchParentCommands { application.stop() }
         application.execute()
@@ -165,7 +168,8 @@ private fun launchQueueApplication(
     val reader = StandardMidiFileReader()
     val sequences = midiFiles.map { reader.readFile(it).toPerformanceSequence(bundle.config.settings) }
 
-    val midiPackage = runCatching { MidiPackage.build(null, bundle.config) }.onFailure { t ->
+    val portCount = sequences.maxOfOrNull { it.smf.portCount } ?: 1
+    val midiPackage = runCatching { MidiPackage.build(null, bundle.config, portCount) }.onFailure { t ->
         onFailGetMidiPackage(t, protocol)
         return
     }
@@ -179,7 +183,7 @@ private fun launchQueueApplication(
             { protocol.send(RendererMessage.finish()) },
             sequencer,
             synthesizer,
-            midiDevice
+            midiPorts
         )
         watchParentCommands { application.stop() }
         application.run {

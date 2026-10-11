@@ -33,7 +33,7 @@ import org.wysko.midis2jam2.manager.camera.CameraManager
 import org.wysko.midis2jam2.manager.camera.DesktopCameraManager
 import org.wysko.midis2jam2.domain.settings.AppSettings.GraphicsSettings.WindowMode
 import org.wysko.midis2jam2.midi.system.JwSequencer
-import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import org.wysko.midis2jam2.record.FixedStepTimer
 import org.wysko.midis2jam2.record.OfflineSynthesizer
 import org.wysko.midis2jam2.record.RecordOptions
@@ -51,12 +51,12 @@ internal actual class Midis2jam2Application(
     private val onFinish: () -> Unit,
     private val sequencer: JwSequencer,
     private val synthesizer: Synthesizer?,
-    private val midiDevice: MidiDevice,
+    private val midiPorts: MidiPorts,
     private val recording: Recording? = null,
 ) : SimpleApplication() {
     /**
      * Records the performance instead of playing it. The sound comes from [synthesizer], rendered offline, so the
-     * sequencer passed alongside should be silent and [synthesizer] should also be the MIDI device.
+     * sequencer passed alongside should be silent and [synthesizer]'s ports should also be the MIDI ports.
      */
     class Recording(
         val options: RecordOptions,
@@ -118,7 +118,7 @@ internal actual class Midis2jam2Application(
             onPlaybackComplete = recordingManager?.let { manager -> { manager.complete(); stop() } },
             isRecording = recording != null,
         )
-        stateManager.attach(MidiDeviceManager(config, midiDevice))
+        stateManager.attach(MidiDeviceManager(config, midiPorts))
         // After the MIDI device manager, whose reset must reach the synthesizer before the song does.
         recordingManager?.let { stateManager.attach(it) }
     }

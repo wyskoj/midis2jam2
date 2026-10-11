@@ -20,7 +20,9 @@ package org.wysko.midis2jam2.manager
 import com.jme3.app.Application
 import org.wysko.midis2jam2.domain.settings.AppSettings.PlaybackSettings.MidiSpecificationResetSettings.MidiSpecification
 import org.wysko.midis2jam2.midi.midiSpecificationResetMessage
+import org.wysko.midis2jam2.midi.CHANNELS_PER_PORT
 import org.wysko.midis2jam2.midi.system.MidiDevice
+import org.wysko.midis2jam2.midi.system.MidiPorts
 import org.wysko.midis2jam2.starter.configuration.PerformanceConfig
 import org.wysko.midis2jam2.util.logger
 
@@ -33,13 +35,17 @@ private const val CONTROLLER_CHORUS_LEVEL = 93
 /** Silences an effect entirely. */
 private const val EFFECT_LEVEL_OFF = 0
 
-/** The channels a General MIDI file can use. */
-private const val CHANNEL_COUNT = 16
-
+/**
+ * Prepares the MIDI device for a performance: the specification reset and the effect settings.
+ *
+ * A file with more than one MIDI port is played on a device for each, and each gets the same preparation.
+ */
 class MidiDeviceManager(
     private val config: PerformanceConfig,
-    private val midiDevice: MidiDevice
+    private val midiPorts: MidiPorts,
 ) : BaseManager() {
+    constructor(config: PerformanceConfig, midiDevice: MidiDevice) : this(config, MidiPorts.of(midiDevice))
+
     override fun initialize(app: Application) {
         super.initialize(app)
         val isSendResetMessage = config
@@ -77,8 +83,10 @@ class MidiDeviceManager(
     }
 
     private fun silenceOnEveryChannel(controller: Int) {
-        repeat(CHANNEL_COUNT) { channel ->
-            midiDevice.sendControlChangeMessage(channel, controller, EFFECT_LEVEL_OFF)
+        midiPorts.distinctDevices.forEach { device ->
+            repeat(CHANNELS_PER_PORT) { channel ->
+                device.sendControlChangeMessage(channel, controller, EFFECT_LEVEL_OFF)
+            }
         }
     }
 
@@ -88,6 +96,6 @@ class MidiDeviceManager(
             .playbackSettings
             .midiSpecificationResetSettings
             .midiSpecification
-        midiDevice.sendData(midiSpecificationResetMessage[specification] ?: return)
+        midiPorts.sendData(midiSpecificationResetMessage[specification] ?: return)
     }
 }

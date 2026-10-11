@@ -34,7 +34,7 @@ class SilentSequencer : JwSequencer {
     override var isOpen: Boolean = false
         private set
 
-    override fun open(device: MidiDevice) {
+    override fun open(ports: MidiPorts) {
         isOpen = true
     }
 

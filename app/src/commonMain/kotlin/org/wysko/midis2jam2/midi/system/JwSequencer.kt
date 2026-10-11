@@ -25,7 +25,12 @@ interface JwSequencer {
     val isRunning: Boolean
     val isOpen: Boolean
 
-    fun open(device: MidiDevice)
+    /** Opens the sequencer, to play each MIDI port of a file on its device in [ports]. */
+    fun open(ports: MidiPorts)
+
+    /** Opens the sequencer, to play every MIDI port of a file on [device]. */
+    fun open(device: MidiDevice): Unit = open(MidiPorts.of(device))
+
     fun close()
     fun start()
     fun stop()
