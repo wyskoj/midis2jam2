@@ -22,13 +22,15 @@ import org.wysko.midis2jam2.assets.Materials
 import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.model
 import org.wysko.midis2jam2.assets.Models
-import com.jme3.scene.Geometry
+import com.jme3.math.ColorRGBA
 import com.jme3.scene.Spatial
 import kotlinx.serialization.json.Json
 import org.wysko.kmidi.midi.TimedArc
 import org.wysko.kmidi.midi.event.MidiEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.SustainedInstrument
+import org.wysko.midis2jam2.instrument.algorithmic.StringLight
+import org.wysko.midis2jam2.instrument.algorithmic.StringRingEnvelope
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.algorithmic.TimedArcCollector
 import org.wysko.midis2jam2.instrument.family.piano.Key
@@ -37,6 +39,15 @@ import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.DIM_GLOW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+
+/** How quickly a harp string dies away once let go: it halves in strength this often. */
+private val RING_HALF_LIFE = 100.milliseconds
+
+/** How long a harp string's light takes to go out once it's let go. */
+private val LIGHT_FADE = 150.milliseconds
+
+/** How thick a resting string is, relative to the played string's model, which is drawn thicker. */
+private const val RESTING_THICKNESS = 0.64f
 
 private val HARP_SCALES =
     Json.decodeFromString<List<Float>>(resourceToString("/instrument/Harp.json")).mapIndexed { index, fl ->
@@ -116,13 +127,8 @@ class Harp(context: PerformanceManager, eventList: List<MidiEvent>) :
         private val vibratingStringNode = node()
 
         private val vibratingStrings: List<Spatial> = Models.Strings.Harp.StringPlaying.map {
-            context.model(it).apply {
-                cullHint = false.ch
-                setMaterial(context.assetLoader.material(textures.playing).apply { setColor("GlowColor", DIM_GLOW) })
-            }
+            context.model(it).apply { cullHint = false.ch }
         }
-
-        private val stringAnimator = StringVibrationController(vibratingStrings)
 
         init {
             with(node) {
@@ -133,20 +139,45 @@ class Harp(context: PerformanceManager, eventList: List<MidiEvent>) :
             }
         }
 
+        private val stringAnimator = StringVibrationController(vibratingStrings)
+        private val envelope = StringRingEnvelope(RING_HALF_LIFE)
+        private val light = StringLight(
+            material = context.assetLoader.material(textures.idle).also { vibratingStrings.first().setMaterial(it) },
+            glow = DIM_GLOW,
+            tint = textures.lit,
+            hold = Duration.ZERO,
+            fade = LIGHT_FADE,
+        )
+        private var held = false
+
         fun tick(delta: Duration) {
-            collector.currentTimedArcs.any { it.note in midiNotes }.let { playing ->
-                idleString.cullHint = (!playing).ch
-                vibratingStringNode.cullHint = playing.ch
-            }
-            stringAnimator.tick(delta)
+            val playing = collector.currentTimedArcs.any { it.note in midiNotes }
+            if (playing && !held) stringAnimator.restart()
+            held = playing
+
+            // A played string is drawn thicker, and slims back down as its light goes out.
+            val thickness = RESTING_THICKNESS + (1 - RESTING_THICKNESS) * light.tick(delta, playing)
+            vibratingStringNode.scale = v3(thickness, 1, thickness)
+
+            val amplitude = envelope.tick(delta, playing)
+            idleString.cullHint = (!envelope.isRinging).ch
+            vibratingStringNode.cullHint = envelope.isRinging.ch
+            stringAnimator.tick(delta, amplitude = amplitude)
         }
     }
 }
 
-private sealed class HarpTextures(val idle: MaterialAsset, val playing: MaterialAsset) {
-    data object Red : HarpTextures(Materials.Diffuse.HarpStringRed, Materials.Diffuse.HarpStringRedPlaying)
-    data object Blue : HarpTextures(Materials.Diffuse.HarpStringBlue, Materials.Diffuse.HarpStringBluePlaying)
-    data object White : HarpTextures(Materials.Diffuse.HarpStringWhite, Materials.Diffuse.HarpStringWhitePlaying)
+/**
+ * A harp string's look.
+ *
+ * @property idle the string's material
+ * @property lit how much brighter the string is while played, paler for the colored strings, as their playing
+ * textures are
+ */
+private sealed class HarpTextures(val idle: MaterialAsset, val lit: ColorRGBA) {
+    data object Red : HarpTextures(Materials.Diffuse.HarpStringRed, ColorRGBA(1f, 1.29f, 1.29f, 1f))
+    data object Blue : HarpTextures(Materials.Diffuse.HarpStringBlue, ColorRGBA(1.44f, 1.48f, 1.22f, 1f))
+    data object White : HarpTextures(Materials.Diffuse.HarpStringWhite, ColorRGBA(1.2f, 1.2f, 1.2f, 1f))
 }
 
 private fun getHarpString(noteNumber: Int): Int = when (noteNumber) {
