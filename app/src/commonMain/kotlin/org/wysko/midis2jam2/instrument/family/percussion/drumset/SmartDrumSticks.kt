@@ -23,6 +23,7 @@ import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.StrikeWeight
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.mallets.MalletKeyframe
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.mallets.MalletPath
@@ -95,7 +96,15 @@ class SmartDrumSticks(
         hits: List<StickHit<NoteEvent.NoteOn>>,
         private val rotations: List<Quaternion>,
     ) {
-        private val striker = Striker(context, hits.map { it.source }, StickType.DRUM_SET_STICK, windUpRise = WIND_UP_RISE).apply {
+        private val targetIds = hits.associate { it.source to it.target.id }
+
+        private val striker = Striker(
+            context,
+            hits.map { it.source },
+            StickType.DRUM_SET_STICK,
+            windUpRise = WIND_UP_RISE,
+            weight = { targetIds[it]?.let(::weightFor) ?: StrikeWeight.NORMAL },
+        ).apply {
             setParent(kit)
         }
 
@@ -132,6 +141,19 @@ class SmartDrumSticks(
     private companion object {
         /** How high the sticks rise as they wind up to a strike, in the kit's units (on top of their swing). */
         const val WIND_UP_RISE = 3.0
+
+        /** How the sticks strike most of the kit: with a deeper swing than usual, so the hits land with weight. */
+        val HEAVY = StrikeWeight(backswing = 1.6)
+
+        /** How the sticks strike a crash, hardest of all: swung right back, lifted high, and wound up for longer. */
+        val CRASH = StrikeWeight(backswing = 2.6, rise = 1.8, windUp = 1.5)
+
+        /** How a stick strikes the target [id]. The ride and hi-hat are played gently, as usual. */
+        fun weightFor(id: String): StrikeWeight = when {
+            id.startsWith("ride") || id == "hi_hat" -> StrikeWeight.NORMAL
+            id.startsWith("cymbal_crash") -> CRASH
+            else -> HEAVY
+        }
 
         /** Where [pose] sits relative to [kit], from the local transforms between them. */
         fun poseInKit(pose: Spatial, kit: Node): Transform {
