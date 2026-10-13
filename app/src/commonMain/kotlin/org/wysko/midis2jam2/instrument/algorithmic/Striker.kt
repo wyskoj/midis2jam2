@@ -43,6 +43,9 @@ const val MAX_STICK_IDLE_ANGLE: Double = 50.0
 
 private const val DEFAULT_STRIKE_SPEED = 3.0
 
+/** The longest gap between strikes, in seconds, that a sticky stick stays visible through by default. */
+private const val DEFAULT_STICKY_GAP = 2.0
+
 /**
  * Provides common logic and functionality for objects that animate with a "strike" motion, such as drum sticks or
  * mallets.
@@ -59,6 +62,7 @@ private const val DEFAULT_STRIKE_SPEED = 3.0
  * the "never_hidden" midis2jam2 property is enabled.
  * @param windUpRise how high the whole stick (pivot and all) rises as it winds up to strike, as a hand lifts before
  * bringing a stick down hard. Zero for none. See [windUpRise].
+ * @param stickyGap with [sticky], the longest gap between strikes, in seconds, that the stick stays visible through.
  * @param weight how heavily the stick winds up to strike a given note, so some strikes land with more force. See
  * [StrikeWeight].
  */
@@ -75,6 +79,7 @@ class Striker(
     private val lift: Boolean = true,
     private val windUpRise: Double = 0.0,
     private val weight: (NoteOn) -> StrikeWeight = { StrikeWeight.NORMAL },
+    private val stickyGap: Double = DEFAULT_STICKY_GAP,
 ) {
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
@@ -89,6 +94,7 @@ class Striker(
         fixed: Boolean = false,
         windUpRise: Double = 0.0,
         weight: (NoteOn) -> StrikeWeight = { StrikeWeight.NORMAL },
+        stickyGap: Double = DEFAULT_STICKY_GAP,
     ) : this(
         context = context,
         strikeEvents = strikeEvents,
@@ -101,6 +107,7 @@ class Striker(
         fixed = fixed,
         windUpRise = windUpRise,
         weight = weight,
+        stickyGap = stickyGap,
     )
 
     /**
@@ -143,7 +150,7 @@ class Striker(
             if (peek != null && prev != null) {
                 val division = context.sequence.smf.tpq
                 val tickSpan = peek.tick - prev.tick
-                if (tickSpan <= division * 2.1 || timeOfNextEvent - timeOfLastEvent < 2.0) {
+                if (tickSpan <= division * 2.1 || timeOfNextEvent - timeOfLastEvent < stickyGap) {
                     visibility = true
                 }
             }

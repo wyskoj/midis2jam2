@@ -32,6 +32,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.DrumStic
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.DrumTarget
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.StickHit
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.StickTravel
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.sharedHits
 import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.time.Duration
@@ -116,11 +117,16 @@ class SmartDrumSticks(
             StickType.DRUM_SET_STICK,
             windUpRise = WIND_UP_RISE,
             weight = { targetIds[it]?.let(::weightFor) ?: StrikeWeight.NORMAL },
+            stickyGap = STICKY_GAP,
         ).apply {
             setParent(kit)
         }
 
-        private val path = MalletPath(hits.zip(positions) { hit, position -> MalletKeyframe(hit.time, position) })
+        private val keyframes = hits.zip(positions) { hit, position -> MalletKeyframe(hit.time, position) }
+
+        private val path = MalletPath(keyframes)
+
+        private val travel = StickTravel(keyframes, TRAVEL_SPEED, MIN_TRAVEL)
 
         val node: Node get() = striker.node
 
@@ -129,7 +135,7 @@ class SmartDrumSticks(
         }
 
         fun tick(time: Duration, delta: Duration) {
-            place(time.toDouble(SECONDS))
+            place(travel.pathTime(time.toDouble(SECONDS)))
             striker.tick(time, delta)
         }
 
@@ -166,6 +172,18 @@ class SmartDrumSticks(
             id.startsWith("cymbal_crash") -> CRASH
             else -> HEAVY
         }
+
+        /**
+         * The longest gap between strikes, in seconds, that a stick stays out through. Longer than a piece's own
+         * stick, since a roaming stick waits on the piece it struck rather than drifting off.
+         */
+        const val STICKY_GAP = 4.0
+
+        /** How fast a stick travels between pieces, in the kit's units per second (the snare to the hi-hat is ~10). */
+        const val TRAVEL_SPEED = 20.0
+
+        /** The least time a stick takes to travel between pieces, in seconds. */
+        const val MIN_TRAVEL = 0.4
 
         /** How close together in time both hands strike a piece for them to share it and move aside, in seconds. */
         const val SHARED_WINDOW = 0.5
