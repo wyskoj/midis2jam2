@@ -30,7 +30,9 @@ import org.wysko.midis2jam2.instrument.family.chromaticpercussion.mallets.Mallet
 import org.wysko.midis2jam2.instrument.family.chromaticpercussion.mallets.Point3
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.DrumStickPlanner
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.DrumTarget
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.StickHit
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.sharedHits
 import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.SECONDS
@@ -76,9 +78,18 @@ class SmartDrumSticks(
             drumTargets["hi_hat"]?.position ?: fallback,
         )
         val plan = DrumStickPlanner.plan(hits, home)
+        val shared = sharedHits(plan.perHand, SHARED_WINDOW)
 
-        sticks = plan.perHand.map { handHits ->
-            RoamingStick(context, kit, handHits, handHits.map { poses.getValue(it.target.id).rotation })
+        sticks = plan.perHand.mapIndexed { hand, handHits ->
+            val positions = handHits.mapIndexed { i, hit ->
+                val pose = poses.getValue(hit.target.id)
+                if (shared[hand][i]) {
+                    pose.translation.add(sideways(pose.rotation, hand)).toPoint3()
+                } else {
+                    hit.target.position
+                }
+            }
+            RoamingStick(context, kit, handHits, positions, handHits.map { poses.getValue(it.target.id).rotation })
         }
     }
 
@@ -94,6 +105,7 @@ class SmartDrumSticks(
         context: PerformanceManager,
         kit: Node,
         hits: List<StickHit<NoteEvent.NoteOn>>,
+        positions: List<Point3>,
         private val rotations: List<Quaternion>,
     ) {
         private val targetIds = hits.associate { it.source to it.target.id }
@@ -108,7 +120,7 @@ class SmartDrumSticks(
             setParent(kit)
         }
 
-        private val path = MalletPath(hits.map { MalletKeyframe(it.time, it.target.position) })
+        private val path = MalletPath(hits.zip(positions) { hit, position -> MalletKeyframe(hit.time, position) })
 
         val node: Node get() = striker.node
 
@@ -153,6 +165,23 @@ class SmartDrumSticks(
             id.startsWith("ride") || id == "hi_hat" -> StrikeWeight.NORMAL
             id.startsWith("cymbal_crash") -> CRASH
             else -> HEAVY
+        }
+
+        /** How close together in time both hands strike a piece for them to share it and move aside, in seconds. */
+        const val SHARED_WINDOW = 0.5
+
+        /** How far each stick moves aside on a piece both hands share, in the kit's units. */
+        const val SHARED_SPACING = 1.0f
+
+        /**
+         * Which way, and how far, [hand]'s stick moves aside on a piece both hands share: along the axis the stick
+         * swings about (so the sticks end up side by side), the left hand to the drummer's left (the kit's -X, where
+         * the hi-hat is) and the right hand to the right.
+         */
+        fun sideways(rotation: Quaternion, hand: Int): Vector3f {
+            val axis = rotation.mult(Vector3f.UNIT_X)
+            if (axis.x < 0) axis.negateLocal()
+            return axis.multLocal(if (hand == HandProfile.LEFT) -SHARED_SPACING else SHARED_SPACING)
         }
 
         /** Where [pose] sits relative to [kit], from the local transforms between them. */
