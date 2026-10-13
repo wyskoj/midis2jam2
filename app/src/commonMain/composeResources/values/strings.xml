@@ -210,6 +210,8 @@
     <string name="settings_instruments_smart_mallets_description">Play mallet instruments with two traveling mallets instead of one per bar</string>
     <string name="settings_instruments_smart_drum_sticks">Smart drum sticks</string>
     <string name="settings_instruments_smart_drum_sticks_description">Play the drum kit with two sticks that travel around it instead of one per drum</string>
+    <string name="settings_instruments_smooth_hand_movement">Smooth hand movement</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Move the fingers on woodwinds smoothly into each fingering instead of snapping to it</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">A remaster of MIDIJam, a 3D MIDI file visualizer.</string>
@@ -278,6 +280,7 @@
     <string name="settings_section_autocam">Auto-cam</string>
     <string name="settings_section_freecam">Free camera</string>
     <string name="settings_section_visibility">Visibility</string>
+    <string name="settings_section_animation">Animation</string>
     <string name="settings_section_overlays">Overlays</string>
     <string name="settings_section_mouse_keyboard">Mouse and keyboard</string>
     <string name="settings_section_gamepad">Gamepad</string>

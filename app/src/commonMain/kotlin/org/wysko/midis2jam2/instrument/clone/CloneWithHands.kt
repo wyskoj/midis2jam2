@@ -32,7 +32,8 @@ import kotlin.time.Duration
  * Some instruments visualize notes by showing hands in different playing positions. To do this, a separate 3D model for
  * each hand in each "shape" is created. Where a hand's shapes share one mesh layout, they become morph targets of a
  * single [MorphedHand], and the fingers move smoothly into each note's shape, arriving as it starts (see
- * [HandShapeBlend]). Otherwise, the shapes are swapped out at each note.
+ * [HandShapeBlend]). Otherwise, or with smooth hand movement turned off in the settings, the shapes are swapped out
+ * at each note.
  */
 abstract class CloneWithHands protected constructor(parent: InstrumentWithHands, rotationFactor: Float) :
     Clone(parent, rotationFactor, Axis.X) {
@@ -66,7 +67,8 @@ abstract class CloneWithHands protected constructor(parent: InstrumentWithHands,
 
     private fun loadHand(node: Node, shapes: List<Spatial>): MorphedHand? {
         node.detachAllChildren()
-        MorphedHand.from(shapes)?.let {
+        val isSmooth = parent.context.config.settings.instrumentSettings.isSmoothHandMovement
+        (if (isSmooth) MorphedHand.from(shapes) else null)?.let {
             node.attachChild(it.geometry)
             return it
         }

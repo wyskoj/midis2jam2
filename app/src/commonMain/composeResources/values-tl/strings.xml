@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">I-play ang mga mallet instrument gamit ang dalawang gumagalaw na mallet sa halip na isa kada bar</string>
     <string name="settings_instruments_smart_drum_sticks">Matalinong drumstick</string>
     <string name="settings_instruments_smart_drum_sticks_description">I-play ang drum kit gamit ang dalawang stick na gumagalaw sa paligid nito sa halip na isa kada drum</string>
+    <string name="settings_instruments_smooth_hand_movement">Maayos na galaw ng kamay</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Igalaw nang maayos ang mga daliri sa woodwinds papunta sa bawat fingering sa halip na biglang lumipat</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Isang remaster ng MIDIJam, isang 3D MIDI file visualizer.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Auto-cam</string>
     <string name="settings_section_freecam">Freecam</string>
     <string name="settings_section_visibility">Visibility</string>
+    <string name="settings_section_animation">Animasyon</string>
     <string name="settings_section_overlays">Mga overlay</string>
     <string name="settings_section_mouse_keyboard">Mouse at keyboard</string>
     <string name="settings_section_gamepad">Gamepad</string>

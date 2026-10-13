@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Suona gli strumenti a mazzuoli con due mazzuoli che si spostano invece di uno per barra</string>
     <string name="settings_instruments_smart_drum_sticks">Bacchette intelligenti</string>
     <string name="settings_instruments_smart_drum_sticks_description">Suona la batteria con due bacchette che si spostano intorno ad essa invece di una per tamburo</string>
+    <string name="settings_instruments_smooth_hand_movement">Movimento fluido delle mani</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Sposta le dita sui legni in modo fluido verso ogni diteggiatura invece di saltarvi direttamente</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Una remastered di MIDIJam, un visualizzatore 3D di file MIDI.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Auto-cam</string>
     <string name="settings_section_freecam">Freecam</string>
     <string name="settings_section_visibility">Visibilità</string>
+    <string name="settings_section_animation">Animazione</string>
     <string name="settings_section_overlays">Sovrapposizioni</string>
     <string name="settings_section_mouse_keyboard">Mouse e tastiera</string>
     <string name="settings_section_gamepad">Gamepad</string>

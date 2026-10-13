@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Грати на ударних клавішних інструментах двома молоточками, що переміщуються, замість одного на кожну пластину</string>
     <string name="settings_instruments_smart_drum_sticks">Розумні барабанні палички</string>
     <string name="settings_instruments_smart_drum_sticks_description">Грати на ударній установці двома паличками, що переміщуються навколо неї, замість однієї на кожен барабан</string>
+    <string name="settings_instruments_smooth_hand_movement">Плавний рух рук</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Плавно переводити пальці на дерев’яних духових у кожну аплікатуру замість миттєвого перемикання</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Ремейк MIDIJam, 3D-візуалізатора MIDI-файлів.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Автокамера</string>
     <string name="settings_section_freecam">Вільна камера</string>
     <string name="settings_section_visibility">Видимість</string>
+    <string name="settings_section_animation">Анімація</string>
     <string name="settings_section_overlays">Накладення</string>
     <string name="settings_section_mouse_keyboard">Миша та клавіатура</string>
     <string name="settings_section_gamepad">Геймпад</string>

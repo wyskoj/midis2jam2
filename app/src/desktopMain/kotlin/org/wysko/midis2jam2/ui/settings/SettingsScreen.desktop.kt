@@ -128,9 +128,10 @@ internal actual fun settingsPages(
     },
     settingsPage(SettingsPage.Instruments, Res.string.settings_instruments_description) {
         section(Res.string.settings_section_visibility) { row { AlwaysShowInstrumentsBooleanSelect(settings, model) } }
-        section {
+        section(Res.string.settings_section_animation) {
             row { SmartMalletsBooleanSelect(settings, model) }
             row { SmartDrumSticksBooleanSelect(settings, model) }
+            row { SmoothHandMovementBooleanSelect(settings, model) }
         }
     },
     settingsPage(SettingsPage.OnScreen, Res.string.settings_on_screen_elements_description) {

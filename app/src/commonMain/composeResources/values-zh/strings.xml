@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">使用两根会移动的琴槌演奏槌击乐器，而不是每个琴键一根</string>
     <string name="settings_instruments_smart_drum_sticks">智能鼓槌</string>
     <string name="settings_instruments_smart_drum_sticks_description">使用两根绕鼓组移动的鼓槌演奏架子鼓，而不是每个鼓一根</string>
+    <string name="settings_instruments_smooth_hand_movement">平滑的手部动作</string>
+    <string name="settings_instruments_smooth_hand_movement_description">让木管乐器的手指平滑地移动到每个指法，而不是直接跳变</string>
 
     <!-- 关于 -->
     <string name="about_midis2jam2_description">MIDIJam 的重制版，一款 3D MIDI 文件可视化工具。</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">自动镜头</string>
     <string name="settings_section_freecam">自由视角</string>
     <string name="settings_section_visibility">可见性</string>
+    <string name="settings_section_animation">动画</string>
     <string name="settings_section_overlays">叠加层</string>
     <string name="settings_section_mouse_keyboard">鼠标和键盘</string>
     <string name="settings_section_gamepad">手柄</string>

@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Spill malletinstrumenter med to køller som beveger seg i stedet for én per tangent</string>
     <string name="settings_instruments_smart_drum_sticks">Smarte trommestikker</string>
     <string name="settings_instruments_smart_drum_sticks_description">Spill trommesettet med to stikker som beveger seg rundt det i stedet for én per tromme</string>
+    <string name="settings_instruments_smooth_hand_movement">Jevne håndbevegelser</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Flytt fingrene på treblåsere jevnt inn i hvert grep i stedet for å hoppe dit</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">En nyutgivelse av MIDIJam, en 3D MIDI-filvisualisator.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Autokam</string>
     <string name="settings_section_freecam">Frikam</string>
     <string name="settings_section_visibility">Synlighet</string>
+    <string name="settings_section_animation">Animasjon</string>
     <string name="settings_section_overlays">Overlegg</string>
     <string name="settings_section_mouse_keyboard">Mus og tastatur</string>
     <string name="settings_section_gamepad">Spillkontroller</string>

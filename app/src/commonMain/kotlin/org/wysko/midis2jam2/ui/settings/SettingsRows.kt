@@ -263,6 +263,17 @@ internal fun SmartDrumSticksBooleanSelect(settings: State<AppSettings>, model: S
 }
 
 @Composable
+internal fun SmoothHandMovementBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
+    SettingsSwitchRow(
+        title = stringResource(Res.string.settings_instruments_smooth_hand_movement),
+        description = stringResource(Res.string.settings_instruments_smooth_hand_movement_description),
+        icon = Res.drawable.hand_gesture,
+        checked = settings.value.instrumentSettings.isSmoothHandMovement,
+        onCheckedChange = model::setSmoothHandMovement,
+    )
+}
+
+@Composable
 internal fun StartAutocamWithSongBooleanSelect(settings: State<AppSettings>, model: SettingsModel) {
     SettingsSwitchRow(
         title = stringResource(Res.string.settings_camera_start_autocam_with_song),

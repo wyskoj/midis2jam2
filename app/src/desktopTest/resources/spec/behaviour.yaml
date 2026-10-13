@@ -941,7 +941,7 @@
 - id: instrument.hands.smooth-transitions
   source: code
   platforms: [desktop, android]
-  claim: "Instruments that show fingering with hands (clarinet, oboe, flute, piccolo, recorder) move their fingers smoothly into each note's shape, arriving as the note starts"
+  claim: "With smooth hand movement on (the default), instruments that show fingering with hands (clarinet, oboe, flute, piccolo, recorder) move their fingers smoothly into each note's shape, arriving as the note starts; with it off, they snap to each shape"
 - id: instrument.guitar.rhythm-and-lead
   source: features/fretted-instruments.md
   platforms: [desktop, android]

@@ -217,5 +217,6 @@ data class AppSettings(
         val isAlwaysShowInstruments: Boolean = false,
         val isSmartMallets: Boolean = false,
         val isSmartDrumSticks: Boolean = false,
+        val isSmoothHandMovement: Boolean = true,
     )
 }

@@ -18,10 +18,14 @@ package org.wysko.midis2jam2.performance
 
 import com.jme3.renderer.queue.RenderQueue
 import com.jme3.scene.Geometry
+import com.jme3.scene.Node
+import com.jme3.scene.Spatial
+import org.wysko.midis2jam2.domain.settings.AppSettings
 import org.wysko.midis2jam2.instrument.MonophonicInstrument
 import org.wysko.midis2jam2.testing.HeadlessPerformance
 import org.wysko.midis2jam2.testing.MidiFixtures
 import org.wysko.midis2jam2.testing.Spec
+import org.wysko.midis2jam2.testing.withInstruments
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -87,6 +91,24 @@ class HandMorphTest {
                 }
                 it.throwIfEngineFailed()
             }
+        }
+    }
+
+    @Test
+    @Spec("instrument.hands.smooth-transitions")
+    fun `with smooth hand movement off, the hands snap between shapes`() {
+        val snapping = AppSettings().withInstruments { copy(isSmoothHandMovement = false) }
+        HeadlessPerformance.start(MidiFixtures.singleProgram(71, note = 69), snapping, attachManagers = false).use {
+            val instrument = it.instruments.filterIsInstance<MonophonicInstrument>().single()
+            it.stepInstruments(frames = 91, delta = STEP) // 0.455 s, where a smooth hand would be mid-move
+            val (morphing, shown) = it.onEngineThread {
+                morphingHands(instrument) to instrument.clones.first().geometry.children
+                    .flatMap { node -> (node as? Node)?.children.orEmpty() }
+                    .filter { shape -> shape.name.startsWith("Left") || shape.name.startsWith("Right") }
+                    .count { shape -> shape.cullHint != Spatial.CullHint.Always }
+            }
+            assertTrue(morphing.isEmpty(), "With smooth hand movement off, the clarinet's hands shouldn't morph")
+            assertEquals(2, shown, "With smooth hand movement off, exactly one shape per hand should be shown")
         }
     }
 

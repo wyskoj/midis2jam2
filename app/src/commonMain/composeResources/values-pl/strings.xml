@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Graj na instrumentach z pałkami za pomocą dwóch przemieszczających się pałek zamiast jednej na każdą sztabkę</string>
     <string name="settings_instruments_smart_drum_sticks">Inteligentne pałeczki perkusyjne</string>
     <string name="settings_instruments_smart_drum_sticks_description">Graj na zestawie perkusyjnym za pomocą dwóch pałeczek, które przemieszczają się wokół niego, zamiast jednej na bęben</string>
+    <string name="settings_instruments_smooth_hand_movement">Płynny ruch dłoni</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Płynnie przesuwaj palce na instrumentach dętych drewnianych do każdego chwytu zamiast przeskakiwać</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Remaster MIDIJam, wizualizera plików MIDI 3D.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Auto-kamera</string>
     <string name="settings_section_freecam">Kamera swobodna</string>
     <string name="settings_section_visibility">Widoczność</string>
+    <string name="settings_section_animation">Animacja</string>
     <string name="settings_section_overlays">Nakładki</string>
     <string name="settings_section_mouse_keyboard">Mysz i klawiatura</string>
     <string name="settings_section_gamepad">Gamepad</string>

@@ -201,6 +201,8 @@
     <string name="settings_instruments_smart_mallets_description">मैलेट वाद्यों को हर बार के लिए एक मैलेट के बजाय दो घूमते मैलेट से बजाएँ</string>
     <string name="settings_instruments_smart_drum_sticks">स्मार्ट ड्रमस्टिक</string>
     <string name="settings_instruments_smart_drum_sticks_description">ड्रम किट को हर ड्रम के लिए एक स्टिक के बजाय उसके चारों ओर घूमती दो स्टिक से बजाएँ</string>
+    <string name="settings_instruments_smooth_hand_movement">सहज हाथ की गति</string>
+    <string name="settings_instruments_smooth_hand_movement_description">वुडविंड वाद्यों पर उंगलियों को हर फ़िंगरिंग में अचानक बदलने के बजाय सहजता से ले जाएँ</string>
 
     <!-- के बारे में -->
     <string name="about_midis2jam2_description">MIDIJam का एक रीमास्टर, एक 3D MIDI फ़ाइल विज़ुअलाइज़र।</string>
@@ -276,6 +278,7 @@
     <string name="settings_section_autocam">ऑटो-कैम</string>
     <string name="settings_section_freecam">फ्रीकैम</string>
     <string name="settings_section_visibility">दृश्यता</string>
+    <string name="settings_section_animation">एनिमेशन</string>
     <string name="settings_section_overlays">ओवरले</string>
     <string name="settings_section_mouse_keyboard">माउस और कीबोर्ड</string>
     <string name="settings_section_gamepad">गेमपैड</string>
