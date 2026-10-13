@@ -812,6 +812,10 @@
   source: code
   platforms: [desktop, android]
   claim: "With smart drum sticks on, the drum kit is played by two sticks that travel around it instead of one stick per piece"
+- id: instrument.congas.mute-either-hand
+  source: code
+  platforms: [desktop, android]
+  claim: "The congas are played by two hands, one per conga, and either hand moves to its conga's mute position to play a muted conga"
 - id: app.performance.tick-is-stable
   source: code
   platforms: [desktop, android]
