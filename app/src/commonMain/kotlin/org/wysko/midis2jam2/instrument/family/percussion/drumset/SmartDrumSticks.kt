@@ -16,12 +16,14 @@
  */
 package org.wysko.midis2jam2.instrument.family.percussion.drumset
 
+import com.jme3.math.FastMath
 import com.jme3.math.Quaternion
 import com.jme3.math.Transform
 import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import com.jme3.scene.Spatial
 import org.wysko.kmidi.midi.event.NoteEvent
+import org.wysko.midis2jam2.instrument.algorithmic.MAX_STICK_IDLE_ANGLE
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
 import org.wysko.midis2jam2.instrument.algorithmic.StrikeWeight
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
@@ -33,6 +35,7 @@ import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.DrumTarg
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.HandProfile
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.StickHit
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.StickTravel
+import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.StickTurn
 import org.wysko.midis2jam2.instrument.family.percussion.drumset.sticks.sharedHits
 import org.wysko.midis2jam2.manager.PerformanceManager
 import kotlin.time.Duration
@@ -146,9 +149,9 @@ class SmartDrumSticks(
 
             val progress = path.segmentProgressAt(seconds)
             node.localRotation = when {
-                progress != null -> Quaternion().apply {
-                    slerp(rotations[progress.first], rotations[progress.first + 1], progress.second.toFloat())
-                }
+                progress != null -> StickTurn.between(
+                    rotations[progress.first], rotations[progress.first + 1], progress.second.toFloat(), RESTING_AXIS
+                )
 
                 seconds <= path.keyframes.first().time -> rotations.first()
                 else -> rotations.last()
@@ -184,6 +187,10 @@ class SmartDrumSticks(
 
         /** The least time a stick takes to travel between pieces, in seconds. */
         const val MIN_TRAVEL = 0.4
+
+        /** The way a stick points at rest, in its own space: along its length (Z), tilted up by its resting swing. */
+        val RESTING_AXIS: Vector3f =
+            Quaternion().fromAngles(MAX_STICK_IDLE_ANGLE.toFloat() * FastMath.DEG_TO_RAD, 0f, 0f).mult(Vector3f.UNIT_Z)
 
         /** How close together in time both hands strike a piece for them to share it and move aside, in seconds. */
         const val SHARED_WINDOW = 0.5
