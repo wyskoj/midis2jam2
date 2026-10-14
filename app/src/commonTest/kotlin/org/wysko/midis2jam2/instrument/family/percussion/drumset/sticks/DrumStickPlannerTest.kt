@@ -78,6 +78,23 @@ class DrumStickPlannerTest {
     }
 
     @Test
+    fun `in fills across the toms the sticks keep to their own sides`() {
+        val down = listOf(HIGH_TOM, HIGH_MID_TOM, HIGH_MID_TOM, LOW_MID_TOM, HIGH_TOM, LOW_MID_TOM, FLOOR_TOM, FLOOR_TOM)
+        val up = listOf(FLOOR_TOM, LOW_MID_TOM, FLOOR_TOM, HIGH_MID_TOM, LOW_MID_TOM, HIGH_TOM, HIGH_MID_TOM, HIGH_TOM)
+        for (fill in listOf(down, up)) {
+            val plan = DrumStickPlanner.plan(fill.mapIndexed { i, tom -> StickHit(i * 0.125, tom, i) }, HOME)
+            assertNeverCrosses(plan)
+        }
+    }
+
+    @Test
+    fun `the right hand still crosses over to the hi-hat`() {
+        val hits = List(8) { StickHit(it * 0.25, HI_HAT, it) } + StickHit(0.5, SNARE, 8)
+        val plan = DrumStickPlanner.plan(hits, HOME)
+        assertTrue(plan.perHand[RIGHT].all { it.target == HI_HAT }, "Right hand: ${plan.perHand[RIGHT].ids()}")
+    }
+
+    @Test
     fun `planning is deterministic`() {
         val hits = List(32) { i -> StickHit(i * 0.1, listOf(SNARE, HI_HAT, HIGH_TOM, CRASH, RIDE)[(i * 7) % 5], i) }
         assertEquals(DrumStickPlanner.plan(hits, HOME), DrumStickPlanner.plan(hits, HOME))
@@ -104,6 +121,24 @@ class DrumStickPlannerTest {
         val HOME = listOf(SNARE.position, HI_HAT.position)
 
         fun List<StickHit<*>>.ids() = map { it.target.id }
+
+        /** Asserts that, after each hit of [plan], the left stick isn't to the right of the right stick. */
+        fun assertNeverCrosses(plan: StickPlan<Int>) {
+            val where = arrayOfNulls<DrumTarget>(2)
+            plan.perHand
+                .flatMapIndexed { hand, hits -> hits.map { hand to it } }
+                .sortedBy { it.second.time }
+                .forEach { (hand, hit) ->
+                    where[hand] = hit.target
+                    val (left, right) = where
+                    if (left != null && right != null) {
+                        assertTrue(
+                            left.position.x <= right.position.x,
+                            "At ${hit.time}s the left stick (${left.id}) is right of the right stick (${right.id})"
+                        )
+                    }
+                }
+        }
 
         /** Asserts every hit of [plan] is struck by the other hand from the hit before. */
         fun assertAlternates(plan: StickPlan<Int>) {

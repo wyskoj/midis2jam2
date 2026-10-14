@@ -41,7 +41,7 @@ data class StickHit<T>(val time: Double, val target: DrumTarget, val source: T)
 
 /**
  * Tuning weights for [DrumStickPlanner]. Distances are in the kit's units (the snare to the hi-hat is about 10) and
- * times in seconds.
+ * times in seconds; x increases to the drummer's right.
  *
  * @property chordWindow hits closer together than this are struck together.
  * @property beamWidth how many candidate plans survive each chord.
@@ -51,6 +51,10 @@ data class StickHit<T>(val time: Double, val target: DrumTarget, val source: T)
  * @property alternateBelow a hand striking again sooner than this is penalized, so rolls and fills alternate hands.
  * @property repeatWeight the cost of an instant repeat by the same hand, fading to nothing at [alternateBelow].
  * @property handWeight how much each piece's [HandProfile] costs count.
+ * @property crossWeight cost per unit the left stick ends up to the right of the right stick (beyond [crossSlack]), so
+ * each hand keeps to its own side, except when the right hand is crossed over to the hi-hat.
+ * @property crossSlack how far the sticks can cross for free, so that neighbouring pieces, like the snare and the high
+ * tom, can be struck either way round.
  */
 data class DrumStickParams(
     val chordWindow: Double = 0.015,
@@ -61,6 +65,8 @@ data class DrumStickParams(
     val alternateBelow: Double = 0.2,
     val repeatWeight: Double = 6.0,
     val handWeight: Double = 1.0,
+    val crossWeight: Double = 1.0,
+    val crossSlack: Double = 5.0,
 )
 
 /**
@@ -111,6 +117,7 @@ object DrumStickPlanner {
                 chordIndex = -1,
                 assignment = IntArray(0),
                 positions = home.toTypedArray(),
+                targets = arrayOfNulls(HANDS),
                 lastHit = DoubleArray(HANDS) { Double.NEGATIVE_INFINITY },
                 cost = 0.0,
             )
@@ -145,6 +152,7 @@ object DrumStickPlanner {
         val chordIndex: Int,
         val assignment: IntArray,
         val positions: Array<Point3>,
+        val targets: Array<DrumTarget?>,
         val lastHit: DoubleArray,
         val cost: Double,
     )
@@ -158,6 +166,7 @@ object DrumStickPlanner {
         params: DrumStickParams,
     ): State {
         val positions = state.positions.copyOf()
+        val targets = state.targets.copyOf()
         val lastHit = state.lastHit.copyOf()
         var cost = state.cost
 
@@ -177,10 +186,18 @@ object DrumStickPlanner {
             }
 
             positions[hand] = target.position
+            targets[hand] = target
             lastHit[hand] = time
         }
 
-        return State(state, chordIndex, assignment, positions, lastHit, cost)
+        // The right hand crossed over to the hi-hat is how this drummer plays; crossing anywhere else isn't.
+        val right = targets[HandProfile.RIGHT]
+        if (right != null && right.profile != HandProfile.HI_HAT) {
+            val crossed = positions[HandProfile.LEFT].x - positions[HandProfile.RIGHT].x - params.crossSlack
+            cost += params.crossWeight * max(0.0, crossed)
+        }
+
+        return State(state, chordIndex, assignment, positions, targets, lastHit, cost)
     }
 
     /** Every way of giving [size] hits to distinct hands: hit `i` goes to hand `assignment[i]`. */
