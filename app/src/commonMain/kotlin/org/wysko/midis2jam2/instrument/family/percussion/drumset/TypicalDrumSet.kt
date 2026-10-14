@@ -56,7 +56,7 @@ class TypicalDrumSet(
         this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"], cymbalStyle, ghostStick = isSmartSticks)
         this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"], cymbalStyle, ghostStick = isSmartSticks)
         this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"], cymbalStyle, ghostStick = isSmartSticks)
-        partitionRideCymbals(events).let {
+        partitionRideCymbals(events, splitBellChords = isSmartSticks).let {
             this += RideCymbal(context, it.first, CymbalType["ride_1"], cymbalStyle, ghostStick = isSmartSticks)
             this += RideCymbal(context, it.second, CymbalType["ride_2"], cymbalStyle, ghostStick = isSmartSticks)
         }
