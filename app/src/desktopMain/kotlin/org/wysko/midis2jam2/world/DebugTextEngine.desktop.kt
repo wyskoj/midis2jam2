@@ -17,15 +17,18 @@
 
 package org.wysko.midis2jam2.world
 
-import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 
 internal actual fun getGlRendererInfo(): String {
     return runCatching {
         // Calling into GL with no current context aborts the process in native code, which no
         // amount of catching here would survive. Asking for the capabilities first is safe:
-        // it throws an ordinary exception when there is no context to report on.
-        GL.getCapabilities()
+        // it throws an ordinary exception when there is no context to report on. macOS builds use
+        // LWJGL 2 (GLContext) and everything else LWJGL 3 (GL), so it's looked up by name.
+        val capabilitiesClass = listOf("org.lwjgl.opengl.GL", "org.lwjgl.opengl.GLContext").firstNotNullOf {
+            runCatching { Class.forName(it) }.getOrNull()
+        }
+        capabilitiesClass.getMethod("getCapabilities").invoke(null)
         listOf(GL11.GL_RENDERER, GL11.GL_VENDOR, GL11.GL_VERSION).joinToString(" | ") { GL11.glGetString(it) ?: "UNK" }
     }.getOrNull() ?: "GL information unknown"
 }
