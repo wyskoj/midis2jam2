@@ -1,0 +1,111 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - "v*"    # run on version tags (e.g. v1.0.0)
+  workflow_dispatch:  # allow manual trigger
+
+env:
+  INSTALL4J_VERSION: "12.0.4"
+
+jobs:
+  uberjars:
+    name: Build uber-jar on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-15-intel]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "21"
+
+      - name: Build uber-jar
+        run: ./gradlew packageReleaseUberJarForCurrentOS --no-daemon --stacktrace
+
+      - name: Upload uber-jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uberjar-${{ matrix.os }}
+          path: app/build/compose/jars/*.jar
+
+  installers:
+    name: Build installers
+    needs: uberjars
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Download uber-jars
+        uses: actions/download-artifact@v4
+        with:
+          pattern: uberjar-*
+          merge-multiple: true
+          path: artifacts
+
+      - name: Determine version and copyright year
+        id: meta
+        run: |
+          # Version comes from the jar filename, e.g. midis2jam2-linux-x64-2.1.0-release.jar
+          JAR=$(ls artifacts/midis2jam2-linux-x64-*-release.jar)
+          VERSION=$(basename "$JAR" | sed -E 's/^midis2jam2-linux-x64-(.+)-release\.jar$/\1/')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          ROMAN=$(python3 -c '
+          import datetime
+          n = datetime.date.today().year
+          out = ""
+          for v, r in [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),
+                       (50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]:
+              while n >= v:
+                  out += r
+                  n -= v
+          print(out)')
+          echo "roman=$ROMAN" >> "$GITHUB_OUTPUT"
+
+          echo "Version: $VERSION, copyright end: $ROMAN"
+
+      - name: Cache install4j
+        id: cache-install4j
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/install4j
+          key: install4j-${{ env.INSTALL4J_VERSION }}
+
+      - name: Download install4j
+        if: steps.cache-install4j.outputs.cache-hit != 'true'
+        run: |
+          V="${INSTALL4J_VERSION//./_}"
+          curl -fsSL -o install4j.tar.gz "https://download.ej-technologies.com/install4j/install4j_unix_${V}.tar.gz"
+          mkdir -p "$RUNNER_TEMP/install4j"
+          tar -xzf install4j.tar.gz -C "$RUNNER_TEMP/install4j" --strip-components=1
+
+      - name: Build installers
+        env:
+          INSTALL4J_LICENSE: ${{ secrets.INSTALL4J_LICENSE }}
+        run: |
+          "$RUNNER_TEMP/install4j/bin/install4jc" \
+            --license="$INSTALL4J_LICENSE" \
+            --release="${{ steps.meta.outputs.version }}" \
+            --destination="$GITHUB_WORKSPACE/installers" \
+            -D "artifactsDir=$GITHUB_WORKSPACE/artifacts,copyrightEnd=${{ steps.meta.outputs.roman }}" \
+            install4j/midis2jam2.install4j
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers
+          path: |
+            installers/*.exe
+            installers/*.sh
+            installers/*.dmg
+            installers/updates.xml

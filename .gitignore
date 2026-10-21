@@ -57,3 +57,7 @@ replay_pid*.log
 
 # Blender's save backups.
 *.blend1
+
+# install4j
+install4j/artifacts/
+install4j/output/
