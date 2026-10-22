@@ -43,6 +43,9 @@ const val MAX_STICK_IDLE_ANGLE: Double = 50.0
 
 private const val DEFAULT_STRIKE_SPEED = 3.0
 
+/** The longest gap between strikes, in seconds, that a sticky stick stays visible through by default. */
+private const val DEFAULT_STICKY_GAP = 2.0
+
 /**
  * Provides common logic and functionality for objects that animate with a "strike" motion, such as drum sticks or
  * mallets.
@@ -59,6 +62,9 @@ private const val DEFAULT_STRIKE_SPEED = 3.0
  * the "never_hidden" midis2jam2 property is enabled.
  * @param windUpRise how high the whole stick (pivot and all) rises as it winds up to strike, as a hand lifts before
  * bringing a stick down hard. Zero for none. See [windUpRise].
+ * @param stickyGap with [sticky], the longest gap between strikes, in seconds, that the stick stays visible through.
+ * @param weight how heavily the stick winds up to strike a given note, so some strikes land with more force. See
+ * [StrikeWeight].
  */
 class Striker(
     private val context: PerformanceManager,
@@ -72,6 +78,8 @@ class Striker(
     private val fixed: Boolean = false,
     private val lift: Boolean = true,
     private val windUpRise: Double = 0.0,
+    private val weight: (NoteOn) -> StrikeWeight = { StrikeWeight.NORMAL },
+    private val stickyGap: Double = DEFAULT_STICKY_GAP,
 ) {
     /** Secondary constructor allowing for a predefined type of stick passed as a [StickType]. */
     constructor(
@@ -85,6 +93,8 @@ class Striker(
         actualStick: Boolean = true,
         fixed: Boolean = false,
         windUpRise: Double = 0.0,
+        weight: (NoteOn) -> StrikeWeight = { StrikeWeight.NORMAL },
+        stickyGap: Double = DEFAULT_STICKY_GAP,
     ) : this(
         context = context,
         strikeEvents = strikeEvents,
@@ -96,6 +106,8 @@ class Striker(
         actualStick = actualStick,
         fixed = fixed,
         windUpRise = windUpRise,
+        weight = weight,
+        stickyGap = stickyGap,
     )
 
     /**
@@ -126,8 +138,10 @@ class Striker(
         val timeOfNextEvent = eventCollector.peek()?.let { context.sequence.getTimeOf(it).toDouble(SECONDS) }
 
         val anticipatedVelocity = eventCollector.peek()?.velocity ?: 0
+        val nextWeight = eventCollector.peek()?.let(weight) ?: StrikeWeight.NORMAL
+        val anticipation = anticipationTime * nextWeight.windUp
 
-        var visibility = calculateIsVisible(currentTime, timeOfNextEvent, timeOfLastEvent)
+        var visibility = calculateIsVisible(currentTime, timeOfNextEvent, timeOfLastEvent, anticipation)
 
         if (sticky && timeOfLastEvent != null && timeOfNextEvent != null) {
             val peek = eventCollector.peek()
@@ -136,7 +150,7 @@ class Striker(
             if (peek != null && prev != null) {
                 val division = context.sequence.smf.tpq
                 val tickSpan = peek.tick - prev.tick
-                if (tickSpan <= division * 2.1 || timeOfNextEvent - timeOfLastEvent < 2.0) {
+                if (tickSpan <= division * 2.1 || timeOfNextEvent - timeOfLastEvent < stickyGap) {
                     visibility = true
                 }
             }
@@ -147,11 +161,12 @@ class Striker(
         rotation = if (visibility || !actualStick) {
             if (!fixed) {
                 val rise = windUpRise(
-                    currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity, anticipationTime, windUpRise
+                    currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity, anticipation,
+                    windUpRise * nextWeight.rise,
                 )
                 rotationNode.loc = v3(0, rotation * 2.0 + rise, 0)
             }
-            evaluateRotation(currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity)
+            evaluateRotation(currentTime, timeOfNextEvent, timeOfLastEvent, anticipatedVelocity, anticipation, nextWeight)
         } else {
             1.0
         }
@@ -164,9 +179,14 @@ class Striker(
         )
     }
 
-    private fun calculateIsVisible(time: Double, timeOfNextEvent: Double?, timeOfLastEvent: Double?): Boolean = when {
-        timeOfNextEvent != null && timeOfLastEvent != null -> timeOfNextEvent - time < anticipationTime || time - timeOfLastEvent < recoilTime
-        timeOfNextEvent != null -> timeOfNextEvent - time < anticipationTime
+    private fun calculateIsVisible(
+        time: Double,
+        timeOfNextEvent: Double?,
+        timeOfLastEvent: Double?,
+        anticipation: Double,
+    ): Boolean = when {
+        timeOfNextEvent != null && timeOfLastEvent != null -> timeOfNextEvent - time < anticipation || time - timeOfLastEvent < recoilTime
+        timeOfNextEvent != null -> timeOfNextEvent - time < anticipation
         timeOfLastEvent != null -> time - timeOfLastEvent < recoilTime
         else -> false
     }
@@ -175,20 +195,21 @@ class Striker(
         time: Double,
         timeOfNextEvent: Double?,
         timeOfLastEvent: Double?,
-        anticipatedVelocity: Byte
+        anticipatedVelocity: Byte,
+        anticipation: Double,
+        nextWeight: StrikeWeight,
     ): Double {
 
         val strikeIndex = when (timeOfNextEvent) {
             null -> 0.0
-            else -> 1.0 - (min(timeOfNextEvent - time, anticipationTime) / anticipationTime)
+            else -> 1.0 - (min(timeOfNextEvent - time, anticipation) / anticipation)
         }
         val weakHit = evaluateWeakStrikeCurve(strikeIndex)
         val strongHit = evaluateStrongStrikeCurve(strikeIndex)
-        val strikeCurveEvaluation = if (lift) {
-            Utils.lerp(weakHit, strongHit, (anticipatedVelocity / 127.0))
-        } else {
-            weakHit
-        }
+        val strikeCurveEvaluation = deepenBackswing(
+            if (lift) Utils.lerp(weakHit, strongHit, (anticipatedVelocity / 127.0)) else weakHit,
+            nextWeight.backswing,
+        )
 
         val recoilIndex = when (timeOfLastEvent) {
             null -> 0.0
@@ -294,6 +315,28 @@ internal fun windUpRise(
     val fadeIn = timeOfLastEvent?.let { Utils.mapRangeClamped(time, it, timeOfNextEvent, 0.0, 1.0) } ?: 1.0
     return height * shape.coerceAtLeast(0.0) * loudness * fadeIn
 }
+
+/**
+ * How heavily a stick winds up to strike a note, each part relative to a usual strike (1 for as usual).
+ *
+ * @property backswing how much further back the stick swings. See [deepenBackswing].
+ * @property rise how much higher the stick rises as it winds up. See [windUpRise].
+ * @property windUp how much longer the wind-up takes, so a bigger swing doesn't have to be rushed.
+ */
+data class StrikeWeight(val backswing: Double = 1.0, val rise: Double = 1.0, val windUp: Double = 1.0) {
+    companion object {
+        /** A usual strike. */
+        val NORMAL = StrikeWeight()
+    }
+}
+
+/**
+ * Deepens a strike's wind-up by [factor]: how far the swing goes past its resting angle (a [curve] above 1) is
+ * multiplied, and the rest of the swing is left alone. The stick still starts at rest and lands on time, but goes back
+ * further and so comes down faster.
+ */
+internal fun deepenBackswing(curve: Double, factor: Double): Double =
+    if (curve > 1.0) 1.0 + (curve - 1.0) * factor else curve
 
 /** ln ½ / ln 0.4: puts the peak of the wind-up rise at 40% of the way through the wind-up. */
 private const val WIND_UP_PEAK_EXPONENT = 0.7565

@@ -50,7 +50,7 @@ class BrushDrumSet(context: PerformanceManager, events: List<NoteEvent.NoteOn>) 
         this += Cymbal(context, events.filterByNotes(57).toMutableList(), CymbalType["crash_2"], ghostStick = isSmartSticks)
         this += Cymbal(context, events.filterByNotes(55).toMutableList(), CymbalType["splash"], ghostStick = isSmartSticks)
         this += Cymbal(context, events.filterByNotes(52).toMutableList(), CymbalType["china"], ghostStick = isSmartSticks)
-        partitionRideCymbals(events).let {
+        partitionRideCymbals(events, splitBellChords = isSmartSticks).let {
             this += RideCymbal(context, it.first, CymbalType["ride_1"], ghostStick = isSmartSticks)
             this += RideCymbal(context, it.second, CymbalType["ride_2"], ghostStick = isSmartSticks)
         }

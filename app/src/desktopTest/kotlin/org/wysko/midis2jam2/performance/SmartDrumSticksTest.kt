@@ -80,6 +80,41 @@ class SmartDrumSticksTest {
     }
 
     @Test
+    fun `when both hands play one drum, each stick strikes it to its own side`() {
+        val sequence = MidiFixtures.drumGroove()
+
+        HeadlessPerformance.start(sequence, SMART).use { performance ->
+            val kit = performance.instruments.filterIsInstance<DrumSet>().single()
+            // The fill strikes each tom twice in a row, a sixteenth apart, so the hands mostly alternate on it.
+            val fill = sequence.smf.tracks.flatMap { it.events }
+                .filterIsInstance<NoteEvent.NoteOn>()
+                .filter { it.note.toInt() in FILL_TOMS }
+                .sortedBy { sequence.getTimeOf(it) }
+
+            val clock = Clock(performance)
+            val strikes = fill.map { hit ->
+                clock.stepTo(sequence.getTimeOf(hit).toDouble(SECONDS))
+                val target = kit.smartStickTargets.getValue(TARGET_BY_NOTE.getValue(hit.note.toInt()))
+                val sticks = performance.onEngineThread { kit.smartStickNodes.map { it.localTranslation.clone() } }
+                val hand = sticks.indices.minBy { sticks[it].distance(target) }
+                Triple(hit.note, hand, sticks[hand].subtract(target))
+            }
+            performance.throwIfEngineFailed()
+
+            val shared = strikes.groupBy { it.first }.values.filter { tom -> tom.map { it.second }.toSet().size == 2 }
+            assertTrue(shared.isNotEmpty(), "The hands should share at least one tom in the fill")
+            for ((note, hand, offset) in shared.flatten()) {
+                val side = if (hand == 0) "left" else "right"
+                assertTrue(
+                    offset.length() > 0.5f && (offset.x < 0) == (hand == 0),
+                    "Both hands play tom $note, so the $side stick should strike it to the $side of its centre, " +
+                        "but it's $offset off"
+                )
+            }
+        }
+    }
+
+    @Test
     fun `with smart drum sticks on, the drums still recoil when struck`() {
         HeadlessPerformance.start(MidiFixtures.drumGroove(), SMART).use { performance ->
             val kit = performance.instruments.filterIsInstance<DrumSet>().single()
@@ -146,8 +181,11 @@ class SmartDrumSticksTest {
 
     private companion object {
         const val FPS = 60.0
-        /** Pieces are about ten units apart; a frame after a hit, the stick has only just moved on. */
-        const val TOLERANCE = 0.5f
+        /**
+         * Pieces are about ten units apart; a frame after a hit, the stick has only just moved on, and on a piece both
+         * hands share it sits a unit to one side.
+         */
+        const val TOLERANCE = 1.5f
         const val SNARE_TIME = 0.5
         const val FILL_TIME = 4.0
 
@@ -171,6 +209,9 @@ class SmartDrumSticksTest {
             41 to "tom_low_floor",
             49 to "cymbal_crash_1",
         )
+
+        /** The toms in [MidiFixtures.drumGroove]'s fill. */
+        val FILL_TOMS = setOf(50, 48, 47, 45, 43, 41)
 
         /**
          * Counts the stick models under [root] that aren't hidden for good. Loaded models share their meshes with the

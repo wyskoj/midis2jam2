@@ -721,7 +721,26 @@ object MidiFixtures {
             }
         }
     }.toTimeBasedSequence()
-    
+
+    /**
+     * A ride pattern of ride, ride, bell with ride, ride, four times over, in eighth notes: the ride and its bell are
+     * struck together on every third note.
+     */
+    fun rideBellGroove(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        val eighth = TICKS_PER_QUARTER / 2
+        track {
+            tempo(120)
+            channel(PERCUSSION_CHANNEL) {
+                repeat(16) { i ->
+                    note(51, duration = 1.eighth, absoluteTime = i * eighth)
+                    if (i % 4 == 2) note(53, duration = 1.eighth, absoluteTime = i * eighth)
+                }
+            }
+        }
+    }.toTimeBasedSequence()
+
     /**
      * Open-chord shapes strummed on a tenor banjo (tuned C-G-D-A) two frets up, which the engine plays with a capo on the
      * second fret. It starts [TUNED_PART_START_SECONDS] in.

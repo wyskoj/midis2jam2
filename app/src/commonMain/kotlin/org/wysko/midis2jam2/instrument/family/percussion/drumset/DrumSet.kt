@@ -90,37 +90,49 @@ abstract class DrumSet(context: PerformanceManager, events: List<NoteEvent.NoteO
 
     companion object {
         /**
-         * Given a set of events for ride cymbals, partitions them based on which cymbal each event is for.
+         * Given a set of events for ride cymbals, partitions them based on which cymbal each event is for. The bell is
+         * played on whichever ride was last struck.
          *
          * @param events The events to partition.
+         * @param splitBellChords Whether a ride hit struck together with the bell of the same ride goes to the other
+         * ride instead, so that two sticks playing them aren't both on one cymbal.
          * @return A pair of lists, the first list is for the first cymbal, the second list is for the second cymbal.
          */
-        fun partitionRideCymbals(events: List<NoteEvent.NoteOn>): Pair<List<NoteEvent.NoteOn>, List<NoteEvent.NoteOn>> {
+        fun partitionRideCymbals(
+            events: List<NoteEvent.NoteOn>,
+            splitBellChords: Boolean = false,
+        ): Pair<List<NoteEvent.NoteOn>, List<NoteEvent.NoteOn>> {
             var currentRide = 1
             val ride1Notes = mutableListOf<NoteEvent.NoteOn>()
             val ride2Notes = mutableListOf<NoteEvent.NoteOn>()
-            events.filterByNotes(RIDE_BELL, RIDE_CYMBAL_1, RIDE_CYMBAL_2).forEach {
-                when (it.note) {
-                    RIDE_CYMBAL_1 -> {
-                        ride1Notes.add(it)
-                        currentRide = 1
+            events.filterByNotes(RIDE_BELL, RIDE_CYMBAL_1, RIDE_CYMBAL_2).groupBy { it.tick }.values.forEach { chord ->
+                val onRide1 = mutableListOf<NoteEvent.NoteOn>()
+                val onRide2 = mutableListOf<NoteEvent.NoteOn>()
+                chord.forEach {
+                    when (it.note) {
+                        RIDE_CYMBAL_1 -> currentRide = 1
+                        RIDE_CYMBAL_2 -> currentRide = 2
                     }
-
-                    RIDE_CYMBAL_2 -> {
-                        ride2Notes.add(it)
-                        currentRide = 2
-                    }
-
-                    RIDE_BELL -> {
-                        if (currentRide == 1) {
-                            ride1Notes.add(it)
-                        } else {
-                            ride2Notes.add(it)
-                        }
-                    }
+                    if (currentRide == 1) onRide1 += it else onRide2 += it
                 }
+                if (splitBellChords) {
+                    val toRide2 = onRide1.splitBellChord()
+                    val toRide1 = onRide2.splitBellChord()
+                    onRide1 += toRide1
+                    onRide2 += toRide2
+                }
+                ride1Notes += onRide1
+                ride2Notes += onRide2
             }
             return Pair(ride1Notes, ride2Notes)
+        }
+
+        /** If these notes, struck at once on one ride, include its bell and its edge, removes and returns the edge. */
+        private fun MutableList<NoteEvent.NoteOn>.splitBellChord(): List<NoteEvent.NoteOn> {
+            if (none { it.note == RIDE_BELL } || all { it.note == RIDE_BELL }) return emptyList()
+            val edge = filter { it.note != RIDE_BELL }
+            removeAll(edge)
+            return edge
         }
     }
 }

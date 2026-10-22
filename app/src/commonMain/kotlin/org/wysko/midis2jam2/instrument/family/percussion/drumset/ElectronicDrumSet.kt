@@ -51,7 +51,7 @@ class ElectronicDrumSet(context: PerformanceManager, events: List<NoteEvent.Note
         this += Cymbal(context, events.filterByNotes(55), CymbalType["splash"], Electronic, ghostStick = isSmartSticks)
         // Electronic drum set doesn't have a china, but we'll still show it because it looks weird without it
         this += Cymbal(context, mutableListOf(), CymbalType["china"], Electronic, ghostStick = isSmartSticks)
-        partitionRideCymbals(events).let {
+        partitionRideCymbals(events, splitBellChords = isSmartSticks).let {
             this += RideCymbal(context, it.first, CymbalType["ride_1"], Electronic, ghostStick = isSmartSticks)
             this += RideCymbal(context, it.second, CymbalType["ride_2"], Electronic, ghostStick = isSmartSticks)
         }
