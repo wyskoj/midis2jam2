@@ -181,6 +181,9 @@ class SettingsModel(private val settingsRepository: SettingsRepository) : Screen
 
     fun setSmartDrumSticks(isSmartDrumSticks: Boolean) = instrument { it.copy(isSmartDrumSticks = isSmartDrumSticks) }
 
+    fun setSmoothHandMovement(isSmoothHandMovement: Boolean) =
+        instrument { it.copy(isSmoothHandMovement = isSmoothHandMovement) }
+
     fun setDefaultFieldOfView(defaultFieldOfView: Float) = camera { it.copy(defaultFieldOfView = defaultFieldOfView) }
 
     fun setCinematicPacing(pacing: CinematicPacing) =

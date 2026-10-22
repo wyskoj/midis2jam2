@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Играть на ударных клавишных инструментах двумя перемещающимися молоточками вместо одного на каждую пластину</string>
     <string name="settings_instruments_smart_drum_sticks">Умные барабанные палочки</string>
     <string name="settings_instruments_smart_drum_sticks_description">Играть на ударной установке двумя палочками, которые перемещаются вокруг неё, вместо одной на каждый барабан</string>
+    <string name="settings_instruments_smooth_hand_movement">Плавное движение рук</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Плавно переводить пальцы на деревянных духовых в каждую аппликатуру вместо мгновенного переключения</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Ремастер MIDIJam, 3D-визуализатора MIDI-файлов.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Авто-камера</string>
     <string name="settings_section_freecam">Свободная камера</string>
     <string name="settings_section_visibility">Видимость</string>
+    <string name="settings_section_animation">Анимация</string>
     <string name="settings_section_overlays">Наложения</string>
     <string name="settings_section_mouse_keyboard">Мышь и клавиатура</string>
     <string name="settings_section_gamepad">Геймпад</string>

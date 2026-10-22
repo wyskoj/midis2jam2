@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Tokmaklı çalgıları her tuş için bir tokmak yerine hareket eden iki tokmakla çal</string>
     <string name="settings_instruments_smart_drum_sticks">Akıllı davul çubukları</string>
     <string name="settings_instruments_smart_drum_sticks_description">Davul setini her davul için bir çubuk yerine set etrafında hareket eden iki çubukla çal</string>
+    <string name="settings_instruments_smooth_hand_movement">Akıcı el hareketi</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Tahta üflemeli çalgılarda parmakları her parmak pozisyonuna aniden geçmek yerine akıcı şekilde hareket ettir</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Bir 3D MIDI dosyası görselleştiricisi olan MIDIJam'ın yeniden düzenlenmiş hali.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Otomatik kamera</string>
     <string name="settings_section_freecam">Serbest kamera</string>
     <string name="settings_section_visibility">Görünürlük</string>
+    <string name="settings_section_animation">Animasyon</string>
     <string name="settings_section_overlays">Bindirmeler</string>
     <string name="settings_section_mouse_keyboard">Fare ve klavye</string>
     <string name="settings_section_gamepad">Oyun kolu</string>

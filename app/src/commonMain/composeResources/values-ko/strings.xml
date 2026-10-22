@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">건반마다 말렛 하나 대신 이동하는 말렛 두 개로 말렛 악기를 연주합니다</string>
     <string name="settings_instruments_smart_drum_sticks">스마트 드럼 스틱</string>
     <string name="settings_instruments_smart_drum_sticks_description">드럼마다 스틱 하나 대신 주위를 이동하는 스틱 두 개로 드럼 세트를 연주합니다</string>
+    <string name="settings_instruments_smooth_hand_movement">부드러운 손 움직임</string>
+    <string name="settings_instruments_smooth_hand_movement_description">목관악기의 손가락이 각 운지로 갑자기 바뀌지 않고 부드럽게 움직입니다</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">3D MIDI 파일 시각화 프로그램인 MIDIJam의 리마스터 버전입니다.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">자동 카메라</string>
     <string name="settings_section_freecam">자유 시점 카메라</string>
     <string name="settings_section_visibility">표시 여부</string>
+    <string name="settings_section_animation">애니메이션</string>
     <string name="settings_section_overlays">오버레이</string>
     <string name="settings_section_mouse_keyboard">마우스 및 키보드</string>
     <string name="settings_section_gamepad">게임패드</string>

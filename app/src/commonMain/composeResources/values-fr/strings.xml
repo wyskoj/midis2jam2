@@ -201,6 +201,8 @@
     <string name="settings_instruments_smart_mallets_description">Joue les instruments à maillets avec deux maillets qui se déplacent au lieu d'un par lame</string>
     <string name="settings_instruments_smart_drum_sticks">Baguettes intelligentes</string>
     <string name="settings_instruments_smart_drum_sticks_description">Joue la batterie avec deux baguettes qui se déplacent autour d'elle au lieu d'une par tambour</string>
+    <string name="settings_instruments_smooth_hand_movement">Mouvement fluide des mains</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Déplace les doigts sur les bois en douceur vers chaque doigté au lieu de sauter directement</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Une remasterisation de MIDIJam, un visualiseur 3D de fichiers MIDI.</string>
@@ -276,6 +278,7 @@
     <string name="settings_section_autocam">Caméra auto</string>
     <string name="settings_section_freecam">Caméra libre</string>
     <string name="settings_section_visibility">Visibilité</string>
+    <string name="settings_section_animation">Animation</string>
     <string name="settings_section_overlays">Incrustations</string>
     <string name="settings_section_mouse_keyboard">Souris et clavier</string>
     <string name="settings_section_gamepad">Manette</string>

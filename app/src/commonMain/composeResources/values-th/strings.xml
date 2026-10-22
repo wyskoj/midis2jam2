@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">เล่นเครื่องดนตรีประเภทไม้ตีด้วยไม้ตีสองอันที่เคลื่อนที่ไปมา แทนที่จะใช้หนึ่งอันต่อหนึ่งแผ่น</string>
     <string name="settings_instruments_smart_drum_sticks">ไม้กลองอัจฉริยะ</string>
     <string name="settings_instruments_smart_drum_sticks_description">เล่นชุดกลองด้วยไม้สองอันที่เคลื่อนที่รอบชุดกลอง แทนที่จะใช้หนึ่งอันต่อหนึ่งใบ</string>
+    <string name="settings_instruments_smooth_hand_movement">การเคลื่อนไหวมือที่ลื่นไหล</string>
+    <string name="settings_instruments_smooth_hand_movement_description">ขยับนิ้วบนเครื่องเป่าลมไม้ไปยังแต่ละท่านิ้วอย่างลื่นไหลแทนการเปลี่ยนทันที</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">เวอร์ชันรีมาสเตอร์ของ MIDIJam, ตัวแสดงภาพ MIDI แบบ 3D</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">ออโต้แคม</string>
     <string name="settings_section_freecam">ฟรีแคม</string>
     <string name="settings_section_visibility">การแสดงผล</string>
+    <string name="settings_section_animation">แอนิเมชัน</string>
     <string name="settings_section_overlays">ภาพซ้อน</string>
     <string name="settings_section_mouse_keyboard">เมาส์และคีย์บอร์ด</string>
     <string name="settings_section_gamepad">เกมแพด</string>

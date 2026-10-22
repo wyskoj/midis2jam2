@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Chơi các nhạc cụ gõ phím bằng hai chiếc dùi di chuyển thay vì một chiếc cho mỗi thanh</string>
     <string name="settings_instruments_smart_drum_sticks">Dùi trống thông minh</string>
     <string name="settings_instruments_smart_drum_sticks_description">Chơi bộ trống bằng hai chiếc dùi di chuyển quanh bộ trống thay vì một chiếc cho mỗi trống</string>
+    <string name="settings_instruments_smooth_hand_movement">Chuyển động tay mượt mà</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Di chuyển các ngón tay trên nhạc cụ bộ gỗ mượt mà vào từng thế bấm thay vì nhảy ngay sang</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Một bản cải tiến của MIDIJam, một trình trực quan hóa 3D tập tin MIDI.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Auto-cam</string>
     <string name="settings_section_freecam">Freecam</string>
     <string name="settings_section_visibility">Hiển thị</string>
+    <string name="settings_section_animation">Hoạt ảnh</string>
     <string name="settings_section_overlays">Lớp phủ</string>
     <string name="settings_section_mouse_keyboard">Chuột và bàn phím</string>
     <string name="settings_section_gamepad">Tay cầm</string>

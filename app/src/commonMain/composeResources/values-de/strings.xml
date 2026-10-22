@@ -218,6 +218,8 @@
     <string name="settings_instruments_smart_mallets_description">Mallet-Instrumente mit zwei wandernden Schlägeln statt einem pro Platte spielen</string>
     <string name="settings_instruments_smart_drum_sticks">Intelligente Drumsticks</string>
     <string name="settings_instruments_smart_drum_sticks_description">Das Schlagzeug mit zwei Sticks spielen, die um das Set wandern, statt einem pro Trommel</string>
+    <string name="settings_instruments_smooth_hand_movement">Flüssige Handbewegungen</string>
+    <string name="settings_instruments_smooth_hand_movement_description">Die Finger an Holzblasinstrumenten fließend in jeden Griff bewegen, statt sofort umzuspringen</string>
 
     <!-- About -->
     <string name="about_midis2jam2_description">Eine Neuauflage von MIDIJam, einem 3D-MIDI-Datei-Visualisierer.</string>
@@ -293,6 +295,7 @@
     <string name="settings_section_autocam">Auto-Kam</string>
     <string name="settings_section_freecam">Freecam</string>
     <string name="settings_section_visibility">Sichtbarkeit</string>
+    <string name="settings_section_animation">Animation</string>
     <string name="settings_section_overlays">Einblendungen</string>
     <string name="settings_section_mouse_keyboard">Maus und Tastatur</string>
     <string name="settings_section_gamepad">Gamepad</string>

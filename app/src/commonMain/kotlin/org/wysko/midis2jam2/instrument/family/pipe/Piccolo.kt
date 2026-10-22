@@ -40,7 +40,6 @@ class Piccolo(context: PerformanceManager, events: List<MidiEvent>) :
     inner class PiccoloClone : FluteAndPiccoloClone(this@Piccolo, SteamPuffer.Texture.Normal, 1f) {
         init {
             val horn = context.model(Models.Pipe.Piccolo.Body)
-            loadHands()
             puffer.root.localRotation = Quaternion().fromAngles(floatArrayOf(0f, 0f, rad(-90.0)))
             puffer.root.setLocalTranslation(0f, -8.6f, 0f)
             geometry.attachChild(horn)
