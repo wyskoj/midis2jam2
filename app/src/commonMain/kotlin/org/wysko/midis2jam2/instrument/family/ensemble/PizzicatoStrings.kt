@@ -16,9 +16,11 @@
  */
 package org.wysko.midis2jam2.instrument.family.ensemble
 
+import org.wysko.midis2jam2.world.assetLoader
 import org.wysko.midis2jam2.world.model
+import org.wysko.midis2jam2.assets.Materials
 import org.wysko.midis2jam2.assets.Models
-import com.jme3.scene.Geometry
+import com.jme3.math.ColorRGBA
 import com.jme3.scene.Spatial
 import com.jme3.scene.Spatial.CullHint.Always
 import org.wysko.kmidi.midi.event.MidiEvent
@@ -26,16 +28,33 @@ import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.DecayedInstrument
 import org.wysko.midis2jam2.instrument.algorithmic.EventCollector
+import org.wysko.midis2jam2.instrument.algorithmic.StringLight
+import org.wysko.midis2jam2.instrument.algorithmic.StringRingEnvelope
 import org.wysko.midis2jam2.instrument.algorithmic.StringVibrationController
 import org.wysko.midis2jam2.instrument.family.percussive.TwelveDrumOctave.TwelfthOfOctaveDecayed
 import org.wysko.midis2jam2.util.*
 import org.wysko.midis2jam2.world.STRING_GLOW
 import kotlin.time.Duration
-import kotlin.time.DurationUnit.SECONDS
+import kotlin.time.Duration.Companion.milliseconds
+
+/** How quickly a plucked string dies away: it halves in strength this often. */
+private val RING_HALF_LIFE = 60.milliseconds
+
+/** How far a fresh pluck swings the string, relative to its model's furthest frame; it dies away too fast to see less. */
+private const val PLUCK_REACH = 1.5f
+
+/** How long a plucked string stays fully lit after the pluck before it starts to fade. */
+private val LIGHT_HOLD = 60.milliseconds
+
+/** How long a plucked string's light then takes to fade steadily out. */
+private val LIGHT_FADE = 200.milliseconds
+
+/** How much brighter a lit string is than one at rest: a warm white, as the stage strings' playing texture is. */
+private val LIT_TINT = ColorRGBA(1.41f, 1.41f, 1.28f, 1f)
 
 /**
  * Pizzicato strings have 12 separate strings that animate for each note. When a note is played, the string moves
- * forwards and vibrates for about 0.14 seconds.
+ * forwards and lights up, fading after [LIGHT_HOLD] over [LIGHT_FADE], and vibrates, dying away over about 0.4 seconds.
  *
  * @param context The context to the main class.
  * @param eventList The list of all events that this instrument should be aware of.
@@ -83,12 +102,21 @@ class PizzicatoStrings(
             context.model(it).apply {
                 cullHint = Always // Hide on startup
                 animatedStringNode += this
-                (this as Geometry).material.setColor("GlowColor", STRING_GLOW)
             }
         }
-        private var playing: Boolean = false
-        private val stringAnimator: StringVibrationController = StringVibrationController(animatedStringFrames)
-        private var progress = 0.0
+        private val stringAnimator: StringVibrationController =
+            StringVibrationController(animatedStringFrames, reach = PLUCK_REACH)
+        private val envelope = StringRingEnvelope(RING_HALF_LIFE)
+        private val light = StringLight(
+            material = context.assetLoader.material(Materials.Diffuse.StageString).also {
+                animatedStringFrames.first().setMaterial(it)
+            },
+            glow = STRING_GLOW,
+            tint = LIT_TINT,
+            hold = LIGHT_HOLD,
+            fade = LIGHT_FADE,
+        )
+        private var plucked = false
         private val nudgeCtrl = NumberSmoother(0f, 40.0)
 
         init {
@@ -100,20 +128,22 @@ class PizzicatoStrings(
         }
 
         override fun tick(delta: Duration) {
-            stringAnimator.tick(delta)
-            if (progress >= 1) playing = false
+            // A pluck is held for just the frame it lands on, then rings out.
+            stringAnimator.tick(delta, amplitude = envelope.tick(delta, held = plucked))
+            val lit = light.tick(delta, held = plucked)
+            plucked = false
 
             // Move string and update visibility
-            animatedStringNode.cullHint = playing.ch
-            restingString.cullHint = (!playing).ch
-            animNode.loc = v3(0, 0, nudgeCtrl.tick(delta) { if (playing) 2f else 0f })
-
-            progress += (delta * 7).toDouble(SECONDS)
+            val ringing = envelope.isRinging
+            animatedStringNode.cullHint = ringing.ch
+            restingString.cullHint = (!ringing).ch
+            // The holder stays forward until the light is half gone.
+            animNode.loc = v3(0, 0, nudgeCtrl.tick(delta) { if (lit > 0.5f) 2f else 0f })
         }
 
         fun play() {
-            playing = true
-            progress = 0.0
+            plucked = true
+            stringAnimator.restart(fromPeak = true)
         }
     }
 }
