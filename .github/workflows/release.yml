@@ -60,6 +60,12 @@ jobs:
           VERSION=$(basename "$JAR" | sed -E 's/^midis2jam2-linux-x64-(.+)-release\.jar$/\1/')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+          # On tag builds, fail if the tag doesn't match the version in Gradle
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match the app version $VERSION. Did you forget the version bump?"
+            exit 1
+          fi
+
           ROMAN=$(python3 -c '
           import datetime
           n = datetime.date.today().year
@@ -109,3 +115,36 @@ jobs:
             installers/*.sh
             installers/*.dmg
             installers/updates.xml
+
+  release:
+    name: Draft GitHub release
+    needs: installers
+    if: github.ref_type == 'tag'   # manual runs build, but don't create a release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download uber-jars
+        uses: actions/download-artifact@v4
+        with:
+          pattern: uberjar-*
+          merge-multiple: true
+          path: dist
+
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          name: installers
+          path: dist
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: |
+            dist/*.jar
+            dist/*.exe
+            dist/*.sh
+            dist/*.dmg
