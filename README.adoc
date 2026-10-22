@@ -17,8 +17,8 @@ Install midis2jam2 with the https://github.com/wyskoj/midis2jam2/releases[approp
 
 == 💾 Building
 
-midis2jam2 requires JDK 17 to be on your machine's PATH to build and run.
-https://www.azul.com/downloads/#zulu[Azul Zulu 17] is known to work well.
+midis2jam2 requires JDK 21 to be on your machine's PATH to build and run.
+https://www.azul.com/downloads/#zulu[Azul Zulu 21] is known to work well.
 
 [source,bash]
 ----
