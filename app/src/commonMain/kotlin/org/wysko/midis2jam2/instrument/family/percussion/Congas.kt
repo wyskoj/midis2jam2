@@ -19,27 +19,27 @@ package org.wysko.midis2jam2.instrument.family.percussion
 import org.wysko.midis2jam2.world.model
 import org.wysko.midis2jam2.assets.Models
 import com.jme3.math.Quaternion
+import com.jme3.math.Vector3f
 import com.jme3.scene.Node
 import org.wysko.kmidi.midi.event.NoteEvent
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.instrument.algorithmic.StickType
+import org.wysko.midis2jam2.instrument.algorithmic.StickStatus
 import org.wysko.midis2jam2.instrument.algorithmic.Striker
 import org.wysko.midis2jam2.midi.LOW_CONGA
 import org.wysko.midis2jam2.midi.MUTE_HIGH_CONGA
 import org.wysko.midis2jam2.midi.OPEN_HIGH_CONGA
 import org.wysko.midis2jam2.util.Utils.rad
-import org.wysko.midis2jam2.util.max
+import org.wysko.midis2jam2.util.v3
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /**
- * Although there are three MIDI congas, there are two physical congas on stage. The left conga plays [OPEN_HIGH_CONGA]
- * and [MUTE_HIGH_CONGA], where the right conga plays [LOW_CONGA].
+ * Although there are three MIDI congas, there are two physical congas on stage, each with one hand. The left hand plays
+ * [OPEN_HIGH_CONGA] on the left conga, and the right hand plays [LOW_CONGA] on the right conga.
  *
- * The left conga has two left hands. The second left hand is slightly offset and near the top of the head of the conga
- * to represent a muted note.
- *
- * Because both the high and muted notes are played on the same conga, instances where both notes play at the same time
- * use the maximum velocity of the two for recoiling animation.
+ * A [MUTE_HIGH_CONGA] can be played by either hand: the hand moves from its open position, at the edge of its conga, to
+ * a mute position nearer the top of the head. [CongaHands] decides which hand plays each mute.
  */
 class Congas(
     context: PerformanceManager,
@@ -83,38 +83,49 @@ class Congas(
             rightNode.attachChild(this)
         }
 
-    private val lowHand =
-        Striker(
-            context = context,
-            strikeEvents = lowHits,
-            stickModel = StickType.HAND_RIGHT,
-        ).apply {
-            setParent(rightRecoil)
-            offsetStick { it.move(0f, 0f, -1f) }
-            node.setLocalTranslation(0f, 0f, 6f)
-        }
+    private val hitsByHand: Map<CongaHand, List<NoteEvent.NoteOn>> = run {
+        val hits = muteHiHits.map { it to CongaStroke.MUTE } +
+            openHiHits.map { it to CongaStroke.OPEN_HIGH } +
+            lowHits.map { it to CongaStroke.LOW }
+        val hands = CongaHands.assign(hits.map { (note, stroke) -> CongaHit(note.time, stroke) })
+        hits.map { it.first }.zip(hands).groupBy({ it.second }, { it.first })
+    }
 
-    private val highHand =
-        Striker(
-            context = context,
-            strikeEvents = openHiHits,
-            stickModel = StickType.HAND_LEFT,
-        ).apply {
-            setParent(leftRecoil)
-            offsetStick { it.move(0f, 0f, -1f) }
-            node.setLocalTranslation(1.5f, 0f, 6f)
-        }
+    private val leftHand = hand(CongaHand.LEFT, StickType.HAND_LEFT, leftRecoil, open = v3(1.5, 0, 6), mute = v3(-2.5, 0, 1))
+    private val rightHand = hand(CongaHand.RIGHT, StickType.HAND_RIGHT, rightRecoil, open = v3(0, 0, 6), mute = v3(2.5, 0, 1))
 
-    private val mutedHand =
-        Striker(
+    private inner class Hand(val striker: Striker, val open: Vector3f, val mute: Vector3f)
+
+    private fun hand(which: CongaHand, model: StickType, conga: Node, open: Vector3f, mute: Vector3f) = Hand(
+        striker = Striker(
             context = context,
-            strikeEvents = muteHiHits,
-            stickModel = StickType.HAND_LEFT,
+            strikeEvents = hitsByHand[which].orEmpty().sortedBy { it.tick },
+            stickModel = model,
         ).apply {
-            setParent(leftRecoil)
+            setParent(conga)
             offsetStick { it.move(0f, 0f, -1f) }
-            node.setLocalTranslation(-2.5f, 0f, 1f)
-        }
+            node.localTranslation = open
+        },
+        open = open,
+        mute = mute,
+    )
+
+    private val NoteEvent.NoteOn.time: Double
+        get() = context.sequence.getTimeOf(this).toDouble(DurationUnit.SECONDS)
+
+    private val NoteEvent.NoteOn.isMute: Boolean
+        get() = note == MUTE_HIGH_CONGA
+
+    private fun Hand.tick(time: Duration, delta: Duration): StickStatus {
+        val status = striker.tick(time, delta)
+        val blend = CongaHands.muteBlend(
+            time.toDouble(DurationUnit.SECONDS),
+            striker.prev()?.let { it.time to it.isMute },
+            striker.peek()?.let { it.time to it.isMute },
+        )
+        striker.node.localTranslation = Vector3f().interpolateLocal(open, mute, blend.toFloat())
+        return status
+    }
 
     init {
         with(geometry) {
@@ -129,11 +140,7 @@ class Congas(
     ) {
         super.tick(time, delta)
 
-        val lowResults = lowHand.tick(time, delta)
-        val highResults = highHand.tick(time, delta)
-        val mutedResults = mutedHand.tick(time, delta)
-
-        recoilDrum(leftRecoil, max(highResults.velocity, mutedResults.velocity), delta)
-        recoilDrum(rightRecoil, lowResults.velocity, delta)
+        recoilDrum(leftRecoil, leftHand.tick(time, delta).velocity, delta)
+        recoilDrum(rightRecoil, rightHand.tick(time, delta).velocity, delta)
     }
 }
