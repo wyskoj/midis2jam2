@@ -55,3 +55,12 @@ jobs:
           fi
           git commit -m "Update to $TAG"
           git push
+
+  rebuild-docs:
+    name: Rebuild docs site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify build
+        env:
+          DOCS_BUILD_HOOK: ${{ secrets.DOCS_BUILD_HOOK }}
+        run: curl -fsS -X POST -d '{}' "$DOCS_BUILD_HOOK"
