@@ -2,7 +2,7 @@
 agp = "8.12.3"
 android-compileSdk = "36"
 android-minSdk = "24"
-android-targetSdk = "35"
+android-targetSdk = "36"
 androidx-activity = "1.12.4"
 androidx-lifecycle = "2.9.6"
 androidxComposeBom = "2026.02.01"
