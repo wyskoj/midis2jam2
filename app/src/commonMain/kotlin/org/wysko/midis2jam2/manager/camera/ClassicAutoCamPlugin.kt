@@ -89,7 +89,7 @@ class ClassicAutoCamPlugin : AutoCamPlugin() {
 
                 if (transitionFactor == 1f) {
                     isTransitioning = false
-                    lastAngles.removeFirst()
+                    lastAngles.removeAt(0)
                     lastAngles.add(targetAngle)
                 }
             }
@@ -108,7 +108,7 @@ class ClassicAutoCamPlugin : AutoCamPlugin() {
                     targetAngle = randomViableAngle.second
 
                     if (isJumpCut) {
-                        lastAngles.removeFirst()
+                        lastAngles.removeAt(0)
                         lastAngles.add(targetAngle)
                     } else {
                         isTransitioning = true

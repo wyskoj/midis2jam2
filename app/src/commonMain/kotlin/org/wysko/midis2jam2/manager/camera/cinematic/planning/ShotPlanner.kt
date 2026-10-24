@@ -270,7 +270,7 @@ private class Director(val analysis: SongAnalysis, val random: Random, val pacin
         }
 
         // Cutting from one shot of the stage to another reads as a stutter: the ending takes over instead.
-        if (shots.size > 1 && shots.last().spec.size == ShotSize.Establishing) cursor = shots.removeLast().start
+        if (shots.size > 1 && shots.last().spec.size == ShotSize.Establishing) cursor = shots.removeAt(shots.lastIndex).start
 
         val closingEnd = maxOf(analysis.musicEnd + CLOSING_TAIL, cursor + MIN_SHOT)
         draftLength = closingEnd - cursor
