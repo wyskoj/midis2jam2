@@ -195,6 +195,7 @@ jobs:
             dist/*.sh
             dist/*.dmg
             dist/*.apk
+            dist/updates.xml
 
       - name: Upload AAB to Play Console (draft)
         uses: r0adkll/upload-google-play@v1

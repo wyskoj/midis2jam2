@@ -1,0 +1,57 @@
+name: Publish Update Feed
+
+on:
+  release:
+    types: [published]   # only once the release is public, so the redirects resolve
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v2.1.2)"
+        required: true
+
+jobs:
+  publish:
+    name: Update midis2jam2-installers
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+
+    steps:
+      - name: Checkout installers repo
+        uses: actions/checkout@v4
+        with:
+          repository: wyskoj/midis2jam2-installers
+          ssh-key: ${{ secrets.INSTALLERS_DEPLOY_KEY }}
+          path: site
+
+      - name: Download updates.xml from the release
+        run: gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern updates.xml --dir site --clobber
+
+      - name: Generate _redirects
+        run: |
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets \
+            --jq '.assets[].name | select(endswith(".exe") or endswith(".dmg") or endswith(".sh"))' |
+          while read -r FILE; do
+            printf '/installers/%s  https://github.com/%s/releases/download/%s/%s  302\n' \
+              "$FILE" "$GITHUB_REPOSITORY" "$TAG" "$FILE"
+          done > site/_redirects
+
+          cat site/_redirects
+          if [ ! -s site/_redirects ]; then
+            echo "::error::No installers found on release $TAG"
+            exit 1
+          fi
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898808+github-actions[bot]@users.noreply.github.com"
+          git add updates.xml _redirects
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git commit -m "Update to $TAG"
+          git push
