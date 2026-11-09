@@ -38,6 +38,7 @@ object SettingsScreenModel : ScreenModel {
         "no",
         "pl",
         "ru",
+        "sv",
         "th",
         "tl",
         "tr",
