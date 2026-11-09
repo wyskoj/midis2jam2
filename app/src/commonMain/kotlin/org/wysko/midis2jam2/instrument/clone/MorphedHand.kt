@@ -22,6 +22,7 @@ import com.jme3.scene.Mesh
 import com.jme3.scene.Spatial
 import com.jme3.scene.VertexBuffer.Type
 import com.jme3.scene.mesh.MorphTarget
+import com.jme3.shader.VarType
 import com.jme3.util.BufferUtils
 import org.wysko.midis2jam2.instrument.algorithmic.HandShapeBlend.Blend
 import java.nio.FloatBuffer
@@ -51,6 +52,9 @@ class MorphedHand private constructor(val geometry: Geometry, shapeCount: Int) {
     }
 
     companion object {
+        /** How many morph targets the GPU blends at once: a hand only ever blends two shapes (see [show]). */
+        private const val GPU_MORPH_TARGETS = 2
+
         /**
          * Builds a morphing hand from [shapes], one model per shape, or returns null if they can't be morphed between
          * (they aren't all single meshes with the same vertices in the same order).
@@ -75,12 +79,25 @@ class MorphedHand private constructor(val geometry: Geometry, shapeCount: Int) {
 
             val geometry = Geometry(base.name, mesh).apply {
                 // The morph weights are read from the material, so each hand needs its own.
-                material = base.material.clone()
+                material = base.material.clone().apply {
+                    // Normally MorphControl sets these up while probing the GPU's limit, but setting that limit
+                    // ourselves (below) skips the probe, so the material has to be prepared here instead.
+                    val buffersPerTarget = if (mesh.morphTargets.first().getBuffer(Type.Normal) != null) 2 else 1
+                    setParam("MorphWeights", VarType.FloatArray, FloatArray(GPU_MORPH_TARGETS))
+                    setInt("NumberOfTargetsBuffers", buffersPerTarget)
+                    setInt("NumberOfMorphTargets", GPU_MORPH_TARGETS)
+                }
                 // The local modes: the shapes aren't in the scene, so their effective modes would resolve to defaults
                 // (no shadow) rather than inheriting from the instrument as they should.
                 queueBucket = base.localQueueBucket
                 shadowMode = base.localShadowMode
                 addControl(MorphControl())
+                // A hand only ever blends two shapes at once (see `show`), so GPU morphing never needs more than two
+                // simultaneous targets. Setting this explicitly skips MorphControl's own auto-detection, which probes
+                // the limit by test-compiling the shader with as many of this mesh's (possibly dozens of) morph
+                // targets as fit the GPU's reported vertex attribute budget; on some drivers that probe itself
+                // crashes instead of failing cleanly, taking down rendering entirely.
+                setNbSimultaneousGPUMorph(GPU_MORPH_TARGETS)
             }
             return MorphedHand(geometry, geometries.size).apply { geometry.setMorphState(weights) }
         }
