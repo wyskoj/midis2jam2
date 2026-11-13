@@ -4545,7 +4545,7 @@
 - program: 87
   msb: 127
   name: "Bassoon"
-  look: None
+  look: Bassoon
 - program: 88
   msb: 127
   name: "Harmonica"

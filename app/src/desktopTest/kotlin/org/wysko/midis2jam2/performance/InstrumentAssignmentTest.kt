@@ -187,10 +187,10 @@ class InstrumentAssignmentTest {
     private companion object {
 
         /**
-         * General MIDI programs with no instrument yet: English Horn, Bassoon, Shakuhachi,
-         * Sitar, Koto, Shanai and Seashore.
+         * General MIDI programs with no instrument yet: English Horn, Shakuhachi, Sitar, Koto, Shanai and
+         * Seashore.
          */
-        val KNOWN_UNIMPLEMENTED_PROGRAMS = listOf(69, 70, 77, 104, 107, 111, 122)
+        val KNOWN_UNIMPLEMENTED_PROGRAMS = listOf(69, 77, 104, 107, 111, 122)
 
         /** A floor, not an exact count, so that adding an instrument does not fail the test. */
         const val MINIMUM_WHOLE_BAND_SIZE = 100

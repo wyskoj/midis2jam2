@@ -214,6 +214,7 @@
   name: "English Horn"
 - program: 71
   name: "Bassoon"
+  look: Bassoon
 - program: 72
   name: "Clarinet"
   look: Clarinet

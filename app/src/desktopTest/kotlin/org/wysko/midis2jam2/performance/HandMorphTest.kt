@@ -42,6 +42,7 @@ class HandMorphTest {
     private val handedInstruments = listOf(
         Triple(71, 69, "clarinet"),
         Triple(68, 69, "oboe"),
+        Triple(70, 45, "bassoon"),
         Triple(73, 64, "flute"),
         Triple(72, 76, "piccolo"),
         Triple(74, 64, "recorder"),

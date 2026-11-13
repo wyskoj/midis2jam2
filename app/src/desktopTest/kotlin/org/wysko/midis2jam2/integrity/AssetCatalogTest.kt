@@ -154,7 +154,7 @@ class AssetCatalogTest {
 
     private companion object {
         /** Every zero-based General MIDI program that draws an instrument. */
-        val CONVERTED_PROGRAMS = (0..127) - setOf(69, 70, 77, 104, 107, 111, 122)
+        val CONVERTED_PROGRAMS = (0..127) - setOf(69, 77, 104, 107, 111, 122)
 
         const val BRASS_SECTION = 61
         const val SYNTH_BRASS_1 = 62

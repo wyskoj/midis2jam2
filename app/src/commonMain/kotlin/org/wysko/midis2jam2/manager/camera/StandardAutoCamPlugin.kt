@@ -38,6 +38,7 @@ import org.wysko.midis2jam2.instrument.family.organ.Harmonica
 import org.wysko.midis2jam2.instrument.family.percussive.*
 import org.wysko.midis2jam2.instrument.family.piano.Keyboard
 import org.wysko.midis2jam2.instrument.family.pipe.*
+import org.wysko.midis2jam2.instrument.family.reed.Bassoon
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -605,6 +606,13 @@ enum class AutoCamPosition(
         Vector3f(-13.75f, 52.54f, 37.02f),
         Quaternion(-0.01f, 0.99f, -0.15f, -0.04f),
         { time, instruments, _ -> visibleNowAndLater(instruments, Clarinet::class.java, time, WAIT_TIME * 1.5) },
+        AutoCamPositionType.INSTRUMENT
+    ),
+
+    BASSOON(
+        Vector3f(-36.00f, 80.00f, 34.00f),
+        Quaternion(-0.02f, 0.97f, -0.22f, -0.10f),
+        { time, instruments, _ -> visibleNowAndLater(instruments, Bassoon::class.java, time, WAIT_TIME * 1.5) },
         AutoCamPositionType.INSTRUMENT
     ),
 
