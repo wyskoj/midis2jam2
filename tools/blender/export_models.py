@@ -67,7 +67,8 @@ def main(arguments, log):
     if not arguments and bpy.data.filepath:
         arguments = [bpy.data.filepath]  # run from inside Blender: export the open file
     for blend in sources(arguments):
-        bpy.ops.wm.open_mainfile(filepath=blend)
+        # Without the saved UI: restoring some files' UI marks them dirty on load, though nothing has changed.
+        bpy.ops.wm.open_mainfile(filepath=blend, load_ui=False)
         glb = os.path.splitext(blend)[0] + ".glb"
         export_glb(glb)
         log(f"exported {glb}")
