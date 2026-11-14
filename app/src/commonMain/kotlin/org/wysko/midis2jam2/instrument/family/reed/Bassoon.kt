@@ -30,6 +30,7 @@ import org.wysko.midis2jam2.instrument.family.pipe.InstrumentWithHands
 import org.wysko.midis2jam2.manager.PerformanceManager
 import org.wysko.midis2jam2.util.Utils.rad
 import org.wysko.midis2jam2.util.loc
+import org.wysko.midis2jam2.util.rot
 import org.wysko.midis2jam2.util.v3
 import org.wysko.midis2jam2.world.Axis
 import org.wysko.midis2jam2.world.model
@@ -98,15 +99,14 @@ class Bassoon(context: PerformanceManager, eventList: List<MidiEvent>) :
 
     init {
         geometry.run {
-            loc = v3(-58, 52, -38)
-            localRotation = Quaternion().fromAngleAxis(rad(55.0), Vector3f.UNIT_Y)
-                .mult(Quaternion().fromAngleAxis(rad(-20.0), Vector3f.UNIT_Z))
+            loc = v3(59, 52, 37)
+            rot = v3(10, 0, -10)
             setLocalScale(0.9f)
         }
     }
 
     private companion object {
         /** How far each further bassoon on stage stands from the last. */
-        val MULTIPLE_INSTANCE_OFFSET: Vector3f = v3(-7, 0, -5)
+        val MULTIPLE_INSTANCE_OFFSET: Vector3f = v3(-12, 0, -10)
     }
 }

@@ -610,8 +610,8 @@ enum class AutoCamPosition(
     ),
 
     BASSOON(
-        Vector3f(-36.00f, 80.00f, 34.00f),
-        Quaternion(-0.02f, 0.97f, -0.22f, -0.10f),
+        Vector3f(68.00f, 80.00f, 102.00f),
+        Quaternion(-0.01f, 0.99f, -0.12f, -0.07f),
         { time, instruments, _ -> visibleNowAndLater(instruments, Bassoon::class.java, time, WAIT_TIME * 1.5) },
         AutoCamPositionType.INSTRUMENT
     ),
