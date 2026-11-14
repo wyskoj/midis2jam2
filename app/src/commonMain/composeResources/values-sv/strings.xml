@@ -1,0 +1,239 @@
+<!--
+  ~ Copyright (C) 2025 Jacob Wysko
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see https://www.gnu.org/licenses/.
+  -->
+
+<resources>
+    <!-- Common -->
+    <string name="tab_home">Hem</string>
+    <string name="tab_queue">Kö</string>
+    <string name="tab_search">Sök</string>
+    <string name="tab_history">Historik</string>
+    <string name="tab_settings">Inställningar</string>
+    <string name="tab_about">Om</string>
+    <string name="ok">OK</string>
+    <string name="clear_all">Rensa allt</string>
+    <string name="cancel">Avbryt</string>
+    <string name="warning">Varning</string>
+    <string name="back">Tillbaka</string>
+    <string name="play">Spela upp</string>
+    <string name="enabled">Aktiverad</string>
+    <string name="disabled">Inaktiverad</string>
+    <string name="midi_file">MIDI-fil</string>
+    <string name="midi_device">MIDI-enhet</string>
+    <string name="soundbank">Ljudbank</string>
+    <string name="soundbank_default">Standardljudbank</string>
+    <string name="soundbank_selector_title">Välj ljudbank</string>
+    <string name="soundbank_manage">Hantera</string>
+    <string name="soundbank_invalid_file_title">Ogiltig ljudbanksfil</string>
+    <string name="soundbank_invalid_file_message">Snälla välj en giltig SoundFont-fil med .sf2-tillägget.</string>
+    <string name="soundbank_missing_warning_title">Ljudbanken hittades inte</string>
+    <string name="soundbank_missing_warning_message">Den valda ljudbanksfilen kunde inte hittas på disken. Standardljudbanken kommer användas istället. Du kan avbryta och välj en annan ljudbank på Inställningar.</string>
+    <string name="play_midi_file">Spela upp MIDI-fil</string>
+    <string name="quality_none">Ingen</string>
+    <string name="quality_low">Låg</string>
+    <string name="quality_medium">Medel</string>
+    <string name="quality_high">Hög</string>
+    <string name="help">Hjälp</string>
+    <string name="launcher_window_title">midis2jam2 launcher</string>
+
+    <!-- Queue -->
+    <string name="queue_add">Lägg till i kön</string>
+    <string name="queue_clear">Rensa</string>
+    <string name="queue_clear_prompt">Rensa kön?</string>
+    <string name="queue_clear_warning">Denna åtgärd kan inte ångras.</string>
+    <string name="queue_empty">Låtar som du lägger till visas här.</string>
+    <string name="queue_load">Ladda</string>
+    <string name="queue_load_prompt">Ladda kö?</string>
+    <string name="queue_load_warning">Detta kommer att rensa den nuvarande kön.</string>
+    <string name="queue_load_missing">Några filer fattas</string>
+    <string name="queue_load_missing_help">De följande filer hittades inte:</string>
+    <string name="queue_save">Spara</string>
+    <string name="queue_save_confirmation">Kö sparad.</string>
+    <string name="queue_shuffle">Blanda</string>
+
+    <!-- History -->
+    <string name="history_empty">Din uppspelningshistorik visas här.</string>
+    <string name="history_file_missing_title">Låten är otillgänglig</string>
+    <string name="history_file_missing_message">Denna MIDI-fil är inte längre tillgänglig.</string>
+    <string name="history_clear_invalid_song">Rensa</string>
+    <string name="history_unknown_song">Okänd låt</string>
+
+    <!-- Search -->
+    <string name="search_criteria_too_narrow">Inga matchande MIDI-filer hittades. Prova att ändra dina filter.</string>
+    <string name="search_deselect_all">Avmarkera alla</string>
+    <string name="search_directory">Mapp</string>
+    <string name="search_index_not_available">Välj en mapp för att indexera MIDI-filer.</string>
+    <string name="search_index_waiting">Ett ögonblick! Vi indexerar dina MIDI-filer...</string>
+
+    <!-- Background warning dialog -->
+    <string name="background_cubemap_warning_title">Felkonfigurerad bakgrund</string>
+    <string name="background_cubemap_warning_message">Bakgrunden är inställd på kubmappning, men alla sex bilder har inte tilldelats. Standardbakgrunden kommer användas istället. Du kan avbryta och fixa detta på Bakgrundsinställningar.</string>
+    <string name="background_cubemap_missing_warning_title">Bakgrundsbilderna hittades inte</string>
+    <string name="background_cubemap_missing_warning_message">En eller flera av de valda bilderna för kubmappningen kunde inte hittas på disken. Standardbakgrunden kommer användas istället. Du kan avbryta och fixa detta på Bakgrundsinställningar.</string>
+    <string name="background_cubemap_warning_continue">Fortsätt ändå</string>
+    <string name="background_warning_settings_badge">Konfigurationsfel för bakgrunden</string>
+
+    <!-- Settings -->
+    <string name="settings_general">Allmänt</string>
+    <string name="settings_general_description">Språk, tema</string>
+    <string name="settings_graphics">Grafik</string>
+    <string name="settings_graphics_description">Helskärm, upplösning, kantutjämning</string>
+    <string name="settings_graphics_description_a">Skuggor</string>
+    <string name="settings_background">Bakgrund</string>
+    <string name="settings_background_description">Välj en bild eller färg</string>
+    <string name="settings_controls">Kontroller</string>
+    <string name="settings_controls_description">Pekarlås, modifieringstangenter för hastighet</string>
+    <string name="settings_controls_description_a">Pekstyrning</string>
+    <string name="settings_playback">Uppspelning</string>
+    <string name="settings_playback_description">MIDI-enhet, synthesizer, ljudbankar</string>
+    <string name="settings_on_screen_elements">Element på skärmen</string>
+    <string name="settings_on_screen_elements_description">Head-up display, låttexter</string>
+
+    <!-- Settings / General -->
+    <string name="settings_general_theme">Tema</string>
+    <string name="settings_general_theme_light">Ljus</string>
+    <string name="settings_general_theme_dark">Mörk</string>
+    <string name="settings_general_theme_system">Följ system</string>
+    <string name="settings_general_locale">Språk</string>
+
+    <!-- Settings / Graphics -->
+    <string name="settings_graphics_fullscreen">Helskärm</string>
+    <string name="settings_graphics_fullscreen_description">Använd hela skärmen</string>
+    <string name="settings_graphics_resolution">Upplösning</string>
+    <string name="settings_graphics_resolution_fullscreen">Upplösningen matchar skärmen i helskärmsläge</string>
+    <string name="settings_graphics_resolution_default">Använd standardupplösning</string>
+    <string name="settings_graphics_resolution_default_hint">Standard</string>
+    <string name="settings_graphics_resolution_default_description">Standardupplösning använder mest av skärmen</string>
+    <string name="settings_graphics_resolution_custom">Anpassat upplösning</string>
+    <string name="settings_graphics_resolution_width">Bredd</string>
+    <string name="settings_graphics_resolution_height">Höjd</string>
+    <string name="settings_graphics_shadows">Skuggor</string>
+    <string name="settings_graphics_shadows_description">Renderar skuggor under objekt</string>
+    <string name="settings_graphics_shadows_none">Inga (Simulerad)</string>
+    <string name="settings_graphics_shadows_description_a">Rendera dynamiska skuggor</string>
+    <string name="settings_graphics_shadows_description_hint_a">Dynamiska skuggor är snyggare, men kan påverka prestandan</string>
+    <string name="settings_graphics_anti_aliasing">Kantutjämning</string>
+    <string name="settings_graphics_anti_aliasing_description">Jämnar ut objektskanter</string>
+
+    <!-- Settings / Background -->
+    <string name="settings_background_type">Bakgrundstyp</string>
+    <string name="settings_background_texture">Textur</string>
+    <string name="settings_background_direction_north">Norr</string>
+    <string name="settings_background_direction_east">Öst</string>
+    <string name="settings_background_direction_south">Syd</string>
+    <string name="settings_background_direction_west">Väst</string>
+    <string name="settings_background_direction_up">Upp</string>
+    <string name="settings_background_direction_down">Ner</string>
+    <string name="settings_background_direction_texture_template">%1$stextur</string>
+    <string name="settings_background_type_default">Standard</string>
+    <string name="settings_background_type_default_description">Mörk schackrutsmönster</string>
+    <string name="settings_background_type_cubemap">Kubmapp</string>
+    <string name="settings_background_type_cubemap_description">Använd en textur på varje vägg</string>
+    <string name="settings_background_type_color">Färg</string>
+    <string name="settings_background_type_color_description">Använd en enfärgad bakgrund</string>
+    <string name="settings_background_texture_no_options_hint">Inga texturer tillgängliga.</string>
+    <string name="settings_background_texture_open_folder">Öppna texturmappen</string>
+    <string name="settings_background_texture_none">Ingen</string>
+    <string name="settings_background_texture_file_not_found">Filen hittades inte</string>
+    <string name="settings_background_missing_textures_repeated">Bakgrundstexturen är inte inställd</string>
+    <string name="settings_background_missing_textures_unique">En eller flera bakgrundstexturer är inte inställda</string>
+
+    <!-- Settings / Controls -->
+    <string name="settings_controls_lock_cursor">Lås pekaren</string>
+    <string name="settings_controls_lock_cursor_description">Lås pekaren till fönstret</string>
+    <string name="settings_controls_disable_touch">Inaktivera pekstyrning</string>
+    <string name="settings_controls_disable_touch_description">Pekskärmsgester för att rotera, panorera eller zooma ignoreras</string>
+    <string name="settings_controls_sticky_speed_modifier_keys">Tröga hastighetstangenter</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_true">Tryck på Ctrl och Skift för att ändra hastigheten för fri kamera</string>
+    <string name="settings_controls_sticky_speed_modifier_keys_false">Håll in Ctrl och Skift för att ändra hastigheten för fri kamera</string>
+
+    <!-- Settings / On-screen elements -->
+    <string name="settings_onscreenelements_lyrics">Låttexter</string>
+    <string name="settings_onscreenelements_lyrics_description">Om låten innehåller textdata visas den i realtid</string>
+    <string name="settings_onscreenelements_hud">Head-up display</string>
+    <string name="settings_onscreenelements_hud_description">Visa låtnamn och förlopp</string>
+
+    <!-- Settings / On-screen elements / Lyrics -->
+    <string name="settings_onscreenelements_lyrics_size">Låttextstorlek</string>
+    <string name="settings_onscreenelements_lyrics_size_smaller">Mindre</string>
+    <string name="settings_onscreenelements_lyrics_size_small">Liten</string>
+    <string name="settings_onscreenelements_lyrics_size_default">Standard</string>
+    <string name="settings_onscreenelements_lyrics_size_large">Stor</string>
+    <string name="settings_onscreenelements_lyrics_size_larger">Större</string>
+
+    <!-- Settings / Playback -->
+    <string name="settings_playback_midi_specification_reset_label_template">%1$s ∙ %2$s</string>
+    <string name="settings_playback_midi_specification_reset">Skicka återställningsmeddelande för MIDI-specifikation</string>
+    <string name="settings_playback_midi_specification_reset_description">Skicka ett meddelande till MIDI-enheten för att återställa den</string>
+    <string name="settings_playback_synthesizer">Synthesizer</string>
+    <string name="settings_playback_synthesizer_description">Konfigurera MIDI-synthesizern</string>
+
+    <!-- Settings / Playback / Soundbanks -->
+    <string name="settings_playback_soundbanks">Ljudbankar</string>
+    <string name="settings_playback_soundbanks_add">Lägg till ljudbankar</string>
+    <string name="settings_playback_soundbanks_description">Importera ljudbankar för användning med synthesizer</string>
+    <string name="settings_playback_soundbanks_none_loaded">Inga ljudbankar laddade</string>
+    <string name="settings_playback_soundbanks_import">Importera</string>
+    <string name="settings_playback_soundbanks_importing">Importerar</string>
+    <string name="settings_playback_soundbanks_delete">Radera</string>
+    <string name="settings_playback_soundbanks_delete_title">Radera ljudbank?</string>
+    <string name="settings_playback_soundbanks_delete_message">Är du säker att du vill radera %1$s?</string>
+
+    <!-- Settings / Playback / Synthesizer -->
+    <string name="settings_playback_synthesizer_chorus">Chorus</string>
+    <string name="settings_playback_synthesizer_chorus_description">Använd choruseffekten</string>
+    <string name="settings_playback_synthesizer_reverb">Reverb</string>
+    <string name="settings_playback_synthesizer_reverb_description">Använd reverbeffekten</string>
+
+    <!-- Settings / Camera -->
+    <string name="settings_camera">Kamera</string>
+    <string name="settings_camera_description">Automatisk kamera, klassisk kamera</string>
+    <string name="settings_camera_start_autocam_with_song">Starta automatisk kamera med låten</string>
+    <string name="settings_camera_start_autocam_with_song_description">När låten börjas, byt automatiskt till automatisk kamera</string>
+    <string name="settings_camera_classic_autocam">Klassisk automatisk kamera</string>
+    <string name="settings_camera_classic_autocam_description">Simulerar den automatiska kamerarörelsen från MIDIJam</string>
+    <string name="settings_camera_smooth_freecam">Mjuk fri kamera</string>
+    <string name="settings_camera_smooth_freecam_description">Gör den fria kamerans rörelser mjukare</string>
+
+    <!-- Settings / Instruments -->
+    <string name="settings_instruments">Instrument</string>
+    <string name="settings_instruments_description">Instrumentsynlighet</string>
+    <string name="settings_instruments_always_show_instruments">Visa alltid instrument</string>
+    <string name="settings_instruments_always_show_instruments_description">Aldrig göm instrument, även när inga noter spelas</string>
+
+    <!-- About -->
+    <string name="about_midis2jam2_description">En remaster av MIDIJam, en 3D-visualiserare för MIDI-filer.</string>
+    <string name="about_development_contributors">Bidragsgivare</string>
+    <string name="about_attributions_and_contributions">Erkännanden och bidrag</string>
+    <string name="about_i18n_contributions">Bidrag till översättningen</string>
+    <string name="about_oss_licenses">Tredjepartsmeddelanden</string>
+    <string name="about_check_for_updates">Sök efter uppdateringar</string>
+    <string name="about_check_for_updates_description">Kontrollerar snabbt om det finns en ny version tillgänglig</string>
+
+    <!-- Log Screen -->
+    <string name="log_title">Meddelandelogg</string>
+    <string name="log_clear_all">Rensa alla</string>
+    <string name="log_cleared_all_entries">Alla logginlägg har rensats</string>
+    <string name="log_empty_message">Om programmet stöter på problem loggas de här.</string>
+    <string name="log_cleared_entry">Rensat logginlägg</string>
+    <string name="log_copied_to_clipboard">Kopierat till urklipp</string>
+    <string name="log_copy_to_clipboard">Kopiera till urklipp</string>
+    <string name="log_clear">Rensa</string>
+    <!-- Settings / Camera / Field of View -->
+    <string name="settings_camera_field_of_view_title">Synfält</string>
+    <string name="settings_camera_field_of_view_label_prefix">Ändrar hur brett kameran ser</string>
+    <string name="settings_camera_field_of_view_degrees">%1$d grader</string>
+</resources>

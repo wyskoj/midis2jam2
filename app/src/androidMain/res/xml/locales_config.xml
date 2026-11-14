@@ -28,6 +28,7 @@
     <locale android:name="no" /> <!-- Norwegian -->
     <locale android:name="pl" /> <!-- Polish -->
     <locale android:name="ru" /> <!-- Russian -->
+    <locale android:name="sv" /> <!-- Swedish -->
     <locale android:name="th" /> <!-- Thai -->
     <locale android:name="tl" /> <!-- Tagalog -->
     <locale android:name="tr" /> <!-- Turkish -->
