@@ -18,6 +18,7 @@
 package org.wysko.midis2jam2.record
 
 import com.jme3.app.Application
+import com.jme3.app.SimpleApplication
 import com.jme3.post.SceneProcessor
 import com.jme3.profile.AppProfiler
 import com.jme3.renderer.RenderManager
@@ -57,8 +58,12 @@ interface RecordingListener {
  * frame and then copied to the window as a preview. Reading back our own frame buffer rather than the window's means
  * the video is right even when the window is covered or partly off-screen.
  *
- * This must be attached with a [FixedStepTimer] installed and the window sized to the video, and [complete] called
- * when playback ends.
+ * The cameras are kept at the video's size too, whatever size the window ends up. Windows shrinks a window that
+ * doesn't fit on the display (a 1080p window on a 1080p display loses its title bar's height), and a camera sized to
+ * that window would leave the top rows of the video unpainted (#471).
+ *
+ * This must be attached with a [FixedStepTimer] installed and the window sized to the video, [claimViewPorts] called
+ * before anything is laid out against the cameras, and [complete] called when playback ends.
  */
 class RecordingManager(
     private val options: RecordOptions,
@@ -77,15 +82,24 @@ class RecordingManager(
         super.initialize(app)
         val playback = app.stateManager.getState(PlaybackManager::class.java)
         timeline = RecordingTimeline(options.fps, playback.duration + OUTRO)
+    }
 
+    /**
+     * Points [app]'s scene and GUI at the video's frame buffer and sizes their cameras to the video. Call at the start
+     * of `simpleInitApp`, before the filter post-processor is added and before anything reads the cameras' size.
+     */
+    fun claimViewPorts(app: SimpleApplication) {
         frameBuffer = FrameBuffer(options.width, options.height, 1).apply {
             addColorTarget(FrameBufferTarget.newTarget(Image.Format.RGBA8))
             setDepthTarget(FrameBufferTarget.newTarget(Image.Format.Depth))
         }
         // Before the first frame, so the filter post-processor picks it up as its output when it initializes.
-        this.app.viewPort.outputFrameBuffer = frameBuffer
-        this.app.guiViewPort.outputFrameBuffer = frameBuffer
-        this.app.guiViewPort.addProcessor(Capture())
+        app.viewPort.outputFrameBuffer = frameBuffer
+        app.guiViewPort.outputFrameBuffer = frameBuffer
+        // The cameras were made at the window's size, which isn't the video's if the window had to shrink.
+        app.camera.resize(options.width, options.height, true)
+        app.guiViewPort.camera.resize(options.width, options.height, true)
+        app.guiViewPort.addProcessor(Capture())
     }
 
     override fun update(tpf: Float) {
@@ -179,7 +193,14 @@ class RecordingManager(
             renderer.copyFrameBuffer(frameBuffer, null, true, false)
         }
 
-        override fun reshape(vp: ViewPort, w: Int, h: Int) = Unit
+        /**
+         * The window changed size. The filter post-processor has just resized the scene camera to match it, so put
+         * everything back to the video's size. (The GUI processor runs last, after the scene's.)
+         */
+        override fun reshape(vp: ViewPort, w: Int, h: Int) {
+            if (w != options.width || h != options.height) renderManager.notifyReshape(options.width, options.height)
+        }
+
         override fun preFrame(tpf: Float) = Unit
         override fun postQueue(rq: RenderQueue) = Unit
         override fun cleanup() = Unit

@@ -92,6 +92,10 @@ internal actual class Midis2jam2Application(
         ) {
             applyBorderlessWindow(context)
         }
+        val recordingManager = recording?.let {
+            RecordingManager(it.options, sequence, it.synthesizer, it.listener)
+                .apply { claimViewPorts(this@Midis2jam2Application) }
+        }
         Jme3ExceptionHandler.setup {
             stop()
             sequencer.stop()
@@ -108,9 +112,6 @@ internal actual class Midis2jam2Application(
         )
         stateManager.attach(performanceAppState)
         rootNode.attachChild(performanceAppState.root)
-        val recordingManager = recording?.let {
-            RecordingManager(it.options, sequence, it.synthesizer, it.listener)
-        }
         addManagers(
             config,
             sequence,
