@@ -87,6 +87,16 @@ class TickStabilityTest {
         }
     }
 
+    @Test
+    fun `a music box in a file without a tempo event at the start can be animated`() {
+        // The music box spins at the current tempo. Before the file's first tempo event, that is a default tempo kmidi
+        // adds itself, and kmidi 0.2.4 crashed when asked for it (kmidi issue #2).
+        HeadlessPerformance.start(MidiFixtures.musicBoxWithLateTempo()).use { performance ->
+            performance.stepInstruments(frames = FRAMES)
+            performance.throwIfEngineFailed()
+        }
+    }
+
     private companion object {
 
         /** Four seconds of animation at sixty frames a second. */

@@ -62,6 +62,22 @@ object MidiFixtures {
     }.toTimeBasedSequence()
 
     /**
+     * The file from kmidi issue #2: a music box playing one note, in a file whose only tempo event (60 BPM) comes three
+     * beats in, so the start of the file plays at the default tempo that no event sets.
+     */
+    fun musicBoxWithLateTempo(): TimeBasedSequence = smf {
+        format = StandardMidiFile.Header.Format.Format0
+        division = tpq(TICKS_PER_QUARTER)
+        track {
+            tempo(60, absoluteTime = 3 * TICKS_PER_QUARTER)
+            channel(0) {
+                program(10)
+                note(60, duration = 1.eighth, absoluteTime = 9 * TICKS_PER_QUARTER / 2)
+            }
+        }
+    }.toTimeBasedSequence()
+
+    /**
      * A piano playing one note, [restQuarters] quarter notes into the file (at 120 BPM, half a second each), so the
      * sound starts at a known time.
      */
