@@ -67,6 +67,7 @@ import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
 import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
 import org.wysko.midis2jam2.instrument.family.pipe.Recorder
 import org.wysko.midis2jam2.instrument.family.pipe.Whistles
+import org.wysko.midis2jam2.instrument.family.reed.Bassoon
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -204,6 +205,7 @@ object Looks {
         Look("TenorSax") { c, e -> TenorSax(c, e) },
         Look("BaritoneSax") { c, e -> BaritoneSax(c, e) },
         Look("Oboe") { c, e -> Oboe(c, e) },
+        Look("Bassoon") { c, e -> Bassoon(c, e) },
         Look("Clarinet") { c, e -> Clarinet(c, e) },
 
         // Pipe

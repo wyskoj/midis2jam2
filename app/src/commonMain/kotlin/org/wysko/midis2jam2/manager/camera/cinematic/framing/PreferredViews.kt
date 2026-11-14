@@ -55,6 +55,7 @@ import org.wysko.midis2jam2.instrument.family.pipe.PanFlute
 import org.wysko.midis2jam2.instrument.family.pipe.Piccolo
 import org.wysko.midis2jam2.instrument.family.pipe.Recorder
 import org.wysko.midis2jam2.instrument.family.pipe.Whistles
+import org.wysko.midis2jam2.instrument.family.reed.Bassoon
 import org.wysko.midis2jam2.instrument.family.reed.Clarinet
 import org.wysko.midis2jam2.instrument.family.reed.Oboe
 import org.wysko.midis2jam2.instrument.family.reed.sax.AltoSax
@@ -133,6 +134,7 @@ object PreferredViews {
         Trumpet::class to AutoCamPosition.TRUMPET,
         Oboe::class to AutoCamPosition.OBOE,
         Clarinet::class to AutoCamPosition.CLARINET,
+        Bassoon::class to AutoCamPosition.BASSOON,
         SteelDrums::class to AutoCamPosition.STEEL_DRUMS,
         Fiddle::class to AutoCamPosition.FIDDLE,
         Ocarina::class to AutoCamPosition.OCARINA,
