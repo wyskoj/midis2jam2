@@ -1,43 +1,111 @@
-# 🎹 midis2jam2 Online
-# Still in development, doesn't work yet.
+# midis2jam2
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/tvoginc/midis2jam2-online)
 
-Experience **[midis2jam2](https://github.com/wyskoj/midis2jam2)** right in your web browser with zero local installation—powered by **GitHub Codespaces** with live 3D graphics, real-time audio streaming, and an easy MIDI file uploader.
+Turn a MIDI file into a 3D stage performance. midis2jam2 animates a virtual band as it
+plays your music, with detailed instruments, configurable cameras, lyrics, and video
+recording.
 
----
+## What makes it special
 
-## ✨ What You Can Do
+- **A full 3D band:** instruments move and play in time with the notes in your MIDI.
+- **Your music, your way:** open MIDI files, connect supported MIDI devices, and customize
+  the performance and stage.
+- **Make it cinematic:** choose camera angles or let automatic cameras follow the music.
+- **Keep the performance:** record a performance to a video file from the desktop app.
+- **More than a piano roll:** lyrics, instrument-specific animation, and visual details make
+  each arrangement feel like a show.
 
-* **Watch & Listen in Your Browser:** Enjoy the full 3D virtual band performance with synchronized live audio streamed straight to your browser tab.
-* **Play Your Own MIDI Files:** Upload any `.mid` or `.midi` file from your computer using the built-in web toolbar and start jamming instantly.
-* **Automatic Performance Tuning:** No manual configuration required—the app automatically detects your Codespace's hardware and adjusts graphics quality and frame rate for smooth playback.
-* **Always Up to Date:** Automatically stays synced with the latest features and instrument updates from the official `wyskoj/midis2jam2` project.
+## Get the app
 
----
+See the [latest releases](https://github.com/wysko/midis2jam2/releases) for available
+desktop and Android downloads. For feature details and usage instructions, visit the
+[documentation](https://docs.midis2jam2.xyz/).
 
-## 🚀 How to Launch & Play
+## Run locally
 
-### Step 1: Click to Launch
-Click the **[Open in GitHub Codespaces]** button at the top of this page.
+You need **JDK 21**, Android SDK platform 36, build tools 36.0.0, NDK 27.0.12077973,
+and CMake 3.22.1. Install the Android components with Android Studio's SDK Manager and
+make sure `ANDROID_HOME` or `ANDROID_SDK_ROOT` points to the SDK.
 
-*(Your cloud environment will automatically build the 3D engine, configure audio streaming, and open the web player in a new browser tab after 1–2 minutes.)*
+Run the desktop app on your computer:
 
-### Step 2: Upload & Jam
-1. Once the **midis2jam2 Online** web page opens, choose any `.mid` or `.midi` file in the top bar and click **Upload & Play**.
-2. Click the **Play (`▶`)** button on the top audio bar if your browser pauses sound automatically.
+```sh
+./gradlew :app:run
+```
 
-*(Tip: If the web player tab doesn't open automatically, go to the **Ports** tab at the bottom of the Codespace and click the **globe icon** next to port **5000**.)*
+On Windows, use `.\gradlew.bat :app:run`. The Gradle wrapper downloads the project's
+Gradle version automatically. To open a MIDI file, use the app's file picker.
 
----
+### Browser player on Linux
 
-## 💡 Tips for the Best Experience
+The browser player needs Xvfb, Fluxbox, x11vnc, noVNC, websockify, PulseAudio, FFmpeg,
+Python 3, and a working Android SDK. These are preinstalled in the dev container. On a
+Linux host, install the same packages with your distribution's package manager. On
+Ubuntu/Debian, for example:
 
-* **Audio Blocked?** Modern browsers often mute autoplay audio until you interact with the page. Simply click the **Play (`▶`)** button in the top audio bar once after uploading a song.
-* **Need More FPS?** If the 3D stage feels choppy, launch your Codespace with an **8-core** or **16-core** machine type—the setup script will automatically unlock higher resolution and smoother frame rates.
+```sh
+sudo apt-get install curl ffmpeg fluxbox libasound2 libgl1 libgl1-mesa-dri libopenal1 \
+  libxcursor1 libxinerama1 libxrandr2 libxss1 mesa-utils novnc pulseaudio \
+  pulseaudio-utils python3 python3-venv unzip websockify x11-utils x11vnc xvfb
+```
 
----
+Create a Python environment, install the small web-server dependency, then launch:
 
-## 🙏 Credits
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -r web/requirements.txt
+./scripts/run-online.sh
+```
 
-Built on top of **[midis2jam2](https://github.com/wyskoj/midis2jam2)**, created by [wyskoj](https://github.com/wyskoj).
+Open <http://localhost:5000>, choose a `.mid` or `.midi` file, and select **Upload & Play**.
+The app renders in a private virtual display; the browser receives its video and audio
+streams. The local listener binds to loopback; Codespaces forwards private ports, and the
+display websocket uses a per-run token. Stop the launcher with **Ctrl+C**.
+
+On macOS or Windows, use **Reopen in Container** in VS Code with Docker installed, then
+follow the Codespaces instructions below to use the browser player. You can also run the
+desktop app directly on either platform.
+
+## Use GitHub Codespaces
+
+Create a Codespace from the badge above or the repository's **Code → Codespaces** menu.
+The dev container installs JDK 21, the Android SDK, and the private browser-player
+dependencies during setup. When ready, run:
+
+```sh
+./scripts/run-online.sh
+```
+
+Codespaces opens the private port 5000 player in your browser. Upload a MIDI file there to
+start the performance. Port 6080 carries the private display stream and is not public.
+
+## Run tests
+
+```sh
+./gradlew :app:desktopTest :asset-tools:test
+```
+
+Run `./gradlew check` for the full check, including Android lint.
+
+## Website
+
+The [project showcase](site/index.html) is separate from the live player. Preview it locally:
+
+```sh
+python3 -m http.server 8000 --directory site
+```
+
+Then open <http://localhost:8000>. The GitHub Pages workflow deploys `site/` when
+the repository's `main` or `master` branch is updated. Enable **Settings → Pages →
+Build and deployment → GitHub Actions** in the repository to publish it.
+
+## Contributing
+
+Read [CONDUCT.md](CONDUCT.md) before participating. Project behavior and test coverage are
+described in [docs/SPEC.md](docs/SPEC.md).
+
+## License
+
+midis2jam2 is free software under the terms of the
+[GNU General Public License, version 3 or later](LICENSE).
