@@ -1,0 +1,35 @@
+name: Sync Upstream midis2jam2
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # Runs daily at 04:00 UTC
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch and merge upstream changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@://github.com"
+          git remote add upstream https://github.com
+          git fetch upstream
+          
+          # Merge upstream changes, favoring your custom files if any conflict occurs
+          git merge upstream/main -X ours --no-edit || (
+            git checkout --ours setup.sh .github/workflows/sync-upstream.yml
+            git add .
+            git commit -m "chore: sync upstream midis2jam2 while preserving web setup"
+          )
+
+      - name: Push updates to your repo
+        run: git push origin HEAD

@@ -1,0 +1,26 @@
+{
+  "name": "midis2jam2",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installGradle": false
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup-android-sdk.sh && python3 -m venv .venv && .venv/bin/pip install -r web/requirements.txt && ./gradlew --version",
+  "forwardPorts": [5000, 6080],
+  "portsAttributes": {
+    "5000": {
+      "label": "midis2jam2 browser player",
+      "onAutoForward": "openBrowser",
+      "visibility": "private"
+    },
+    "6080": {
+      "label": "midis2jam2 display",
+      "onAutoForward": "silent",
+      "visibility": "private"
+    }
+  }
+}

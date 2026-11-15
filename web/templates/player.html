@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111019">
+    <title>midis2jam2 — Live player</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='player.css') }}">
+    <script defer src="{{ url_for('static', filename='player.js') }}"></script>
+  </head>
+  <body data-csrf-token="{{ csrf_token }}" data-vnc-token="{{ vnc_token }}">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="midis2jam2 live player">
+        <span class="brand-mark" aria-hidden="true">m₂</span>
+        <span>midis2jam2</span>
+      </a>
+      <span class="private-badge"><span></span> PRIVATE PLAYER</span>
+      <a class="source-link" href="https://github.com/wysko/midis2jam2">Project source <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="eyebrow">YOUR MIDI, LIVE ON STAGE</p>
+        <h1>Make some <span>noise.</span></h1>
+        <p>Upload a MIDI and watch the virtual band bring it to life. Your performance runs in a private virtual display.</p>
+      </section>
+
+      <section class="player-card" aria-label="Live midis2jam2 player">
+        <div class="player-toolbar">
+          <div class="now-playing">
+            <span class="status-dot" id="status-dot"></span>
+            <div>
+              <span class="toolbar-label">NOW PLAYING</span>
+              <span class="filename" id="filename">Waiting for a MIDI</span>
+            </div>
+          </div>
+          <span class="display-label">3D STAGE <span aria-hidden="true">✦</span></span>
+        </div>
+        <div class="display-frame">
+          <iframe
+            id="display"
+            title="midis2jam2 3D performance display"
+            allow="autoplay; fullscreen"
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+        <div class="player-controls">
+          <form id="upload-form">
+            <label class="file-picker" for="midi-file">
+              <span aria-hidden="true">♫</span>
+              <span id="file-label">Choose MIDI</span>
+              <input id="midi-file" type="file" name="midi" accept=".mid,.midi,audio/midi,audio/x-midi" required>
+            </label>
+            <button class="play-button" type="submit">Upload &amp; Play <span aria-hidden="true">▶</span></button>
+            <button class="stop-button" id="stop-button" type="button">Stop</button>
+          </form>
+          <p class="notice" id="notice" role="status" aria-live="polite">Choose a MIDI file to start the show.</p>
+          <div class="audio-control">
+            <span class="toolbar-label">STREAM AUDIO</span>
+            <audio controls preload="none" src="/audio.mp3">Your browser does not support audio playback.</audio>
+          </div>
+        </div>
+      </section>
+
+      <p class="footnote">MIDI files are processed in this session and removed when you replace them or stop the player.</p>
+    </main>
+  </body>
+</html>
